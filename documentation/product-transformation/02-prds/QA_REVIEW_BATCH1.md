@@ -355,3 +355,106 @@ P2 (peer) ──► Q03 (hard)
 points (Q01 after `:71`, Q03 after `:70`, Q04/Q06 the served-tree block, Q07 after `:160`); `tier-advisor.html` and
 `tia-942-checklist.html` (Q04 FR-9, Q03 T-6b, peer P2 and X5). Each pair needs one owner per release, and the second change
 rebases on the first.
+
+---
+
+## Re-score after revision
+
+Revision: all five PRDs are now version 1.1 (2026-11-11, "QA batch 1 revisions (D1–D8)"), applying the coordinator's
+binding decisions D1–D8. New file `documentation/product-transformation/DECISIONS.md` holds 22 owner decisions
+(D-Q01-1…3, D-Q03-1…4, D-Q04-1…9, D-Q06-1…2, D-Q07-1…4), all PROPOSED with a recommended default. This re-score was
+written by the session that made the revisions, not by an independent reviewer; treat it as a self-check that the
+next independent pass should confirm. Only dimensions whose score changed are listed; every other dimension keeps its
+score from the tables above. Code facts added in the revisions were checked with grep on this tree (listed per PRD).
+
+### Summary after revision
+
+| PRD | Dimensions changed (old → new) | Lowest dimension | Result |
+|---|---|---|---|
+| Q01 | Feasibility 4→5, Functional clarity 4→5, API 4→5, Cross-module 4→5, Testability 3→4 | 4 (Security, Testability, Impl. readiness) | PASS |
+| Q03 | Functional clarity 4→5, API 3→4, Cross-module 4→5 | 4 (several) | PASS |
+| Q04 | UI/UX 4→5, Cross-module 3→5, Testability 4→5 | 4 (Feasibility, Journey, Security, Impl. readiness) | PASS |
+| Q06 | Cross-module 4→5 | 4 (Data model, API, Security, Impl. readiness) | PASS |
+| Q07 | API 4→5, Cross-module 4→5, Security 3→4, Testability 4→5 | 4 (Feasibility, Security, Impl. readiness) | PASS |
+
+No dimension is below 4 after revision.
+
+### PRD-Q01
+
+| Dimension | Old → new | Evidence |
+|---|---|---|
+| Testability | 3 → 4 | §22 phase 0 row: L8 is green in phase 0, because FR-8a (new) records every in-scope page as `pending-review` (`pendingReview[]`, schema §10.2, rule V15, CLI `pending` in §11.1) and L8 (§20.4) counts a page as compliant with a block, a `pending-review` record or an exemption, failing only for a page with neither; its render checks run on `tools/fixtures/relations/render-fixture.html` (`--render-fixture`). New §20.5: one planted-violation fixture per law (11 fixtures for L1–L9) with the expected failure message; §20.4 states that the fixture run, not a missing script, is the red proof. New L9 (idempotent splice, second `--apply` writes 0 files, one block per page) with AC13. Not 5: L8 coverage can now be satisfied by a bookkeeping record the session writes without an owner request (by design, D1), so it proves "not forgotten", not "linked"; L1 still carries the linking requirement from phase 1. The fixtures are specified, not built |
+| Functional clarity | 4 → 5 | FR-10 rewritten: own class `rz-related` (never `tool-ref`), marker pair `<!-- rz-related:start -->`/`<!-- rz-related:end -->`, first-run anchor (after the first `section.tool-ref`, found by tag matching), replace-between-markers on later runs, eyebrow read only from the hand-written section, error cases for missing/duplicate/broken markers |
+| Technical feasibility | 4 → 5 | The anchor ambiguity (D2) is gone. Checked: each of the 33 tool-register pages has exactly one `<section class="tool-ref"` (loop with `grep -c`), and `tier-advisor.html`'s eyebrow reads `02 / Reference`, so the generated one reads `03 / Related` |
+| API contracts | 4 → 5 | §11.3 now defines both marker pairs and the tool-page root element; §11.1 adds `pending` and `--render-fixture` with exit codes; §9.3 gives the exact tool-page HTML |
+| Cross-module | 4 → 5 | D8: §1 Dependencies, §5.4, §11.4, §13 and §10.6 now state that Q1 never reads Q03 data; the §13 row "Q3 reads accepted tool→incident edges" is replaced. Q07 is named as a reader for V16 |
+
+Still short of 5: Security stays 4 (the dossier gate is presentational, unchanged and stated in §16); Implementation
+readiness stays 4 (phases 1 and 2 wait for D-Q01-1…3 and the owner's batch review). Q01 now has nine laws; the PRD
+brief asks for 3–8. The ninth (L9) was added because D1 requires an idempotence law; L7 and L9 could be merged if the
+brief's range is binding.
+
+### PRD-Q03
+
+| Dimension | Old → new | Evidence |
+|---|---|---|
+| API contracts | 3 → 4 | The STALE claim (check 10) is fixed: FR-13 (2), FR-6, §5.4, §9.6, §11.3 and §16 now use the agreed string `origin` (≤ 80 characters, `^[A-Za-z0-9_.:/-]+$`, optional, never used for navigation, never inserted as HTML), value `incident:<slug>:<entry>`; the `{kind, slug, entry, set[]}` object and the banner/marker request are withdrawn (§11.3 says so). New RV17 checks it. Lengths measured with `wc -c`: the 4 entries give 39, 40, 43, 45; the longest slug in the library gives 60. The mirror inputs are in FR-2, §10.4 (count 64), A1, L3, AC1, AC3, T-2 and Appendix A. Checked: `capture()` drops `type="hidden"` (`js/rz-scenario.js:18`), so the PRD states that P2's mirrors must be capturable for the agreed round trip, and records the type as captured. Not 5: P2 is still not on main, so the mirror element type is `<as captured>` until T-2 reads P2's committed page; FR-2 says what happens if the mirrors are missing (62 inputs, `--check` exit 1 until the peer's answer is recorded) |
+| Functional clarity | 4 → 5 | FR-13 specifies the agreed contract instead of a replaced one; FR-2 and FR-6 state exactly what is emitted and when it is omitted |
+| Cross-module | 4 → 5 | §1 and §5.4 state the single direction Q3 → Q1 (rule R2I); the matching Q01 rows are removed (D8). The STATE.md agreement is the cited source for every P2 field |
+
+Still at 4: Error handling (a partly failed restore is still left to P2's message), Security, Testability,
+Implementation readiness, Technical feasibility (hard dependency on P2 landing on main).
+
+### PRD-Q04
+
+| Dimension | Old → new | Evidence |
+|---|---|---|
+| Cross-module | 3 → 5 | D1 resolved without a normaliser: FR-17 and L7 check `computeModelLegacy` by behaviour only (the 12 input sets × 28 outputs of `tools/fixtures/ltc-lab-golden.json`, with `window.__ltcLegacy = true`, engine blocked and engine present, equal NEW `tools/fixtures/ltc-legacy-golden.json`), never by its source text, and Q06 FR-13 now places every mark/clear in the wrapper `computeModel` (`js/ltc-system-modelling-lab.js:2701-2706`) and leaves `computeModelLegacy` untouched. T-16 records two red proofs (a changed `CLIMATE_FACTORS` value fails; an added `RZProvenance.mark` inside the legacy function passes). The DCMOC rebuild order (Q04 first, then Q06; one rebuild when both ship in one release, followed by the trace-parity probe and `--law L3`) is stated identically in Q04 §13 and §22.3 and Q06 §13 and §22.3. D6: the missing-engine state is Q06's `kind=fallback` line with code F-CALC-ENGINE-MISSING, registered in Q06's registry (FR-16, §9.2, §9.3, §9.6, §9.8, §9.10, T-9), so Q06's L6 also proves it; Q06 is now a declared hard dependency of FR-16 |
+| Testability | 4 → 5 | D2 fixed: the total is 24 PUE + 20 carbon + 7 tier + 10 OPEX energy = 61 in §2, §3.2, O1, FR-1, the §10.2 seed table, T-1 and L1; "±" is removed; T-1 recounts as verification, writes `verifiedCount.local`, and stops on a different number. L7 has behavioural red proofs; L8 now also checks statically that `js/rz-provenance.js` is loaded (today `grep -c` → 0 on all five pages, checked) |
+| UI/UX depth | 4 → 5 | The disabled exports carry `aria-describedby="rz-prov-calc"` (FR-16, §9.5, §9.12, L8, AC-16), and the reason is visible in the `Fallback` line above the results on every width, so a press on a phone is never unexplained |
+
+Honesty note on the total: the coordinator's correction (D3) is applied as 61 registry entries. The seed table in 1.0
+had counted `opex-calculator.html:1691` only among the energy anchors, so 1.0's 60 counted distinct lines. Version 1.1
+registers `:1691` under both `pue` (the implied-PUE model) and `energy`, says so in §3.2 and §10.2, and notes that the
+61 entries sit on 60 distinct lines. Still at 4: Journey (no on-page note that pages differ by design), Security,
+Feasibility (largest change set), Implementation readiness (D-Q04-1…9 wait for the owner; D-Q04-8 includes the
+"feature removal" confirmation).
+
+### PRD-Q06
+
+| Dimension | Old → new | Evidence |
+|---|---|---|
+| Cross-module | 4 → 5 | §13 gains a PRD-Q04 row (L7 behavioural, wrapper-only calls, F-CALC-ENGINE-MISSING entries added by Q04, Q06 owns the contract, D6) and the Q7 row now states that Q07 uses `.rz-prov` and the token chain and does not load `css/rz-hub.css` (D7). FR-13, §18.2 and T-12 put every provenance call in `computeModel`, which re-reads the engine condition (`:2710`, checked); `computeModelLegacy` is not edited. §13 DCMOC row and §22.3 carry the rebuild order |
+
+Not changed, as instructed (Q06 edits were limited to the placement, the rebuild order and the decision ids): the
+review's second note, removing the `demo` state's light-theme `!important` background (`js/rz-telemetry-quality.js:79`,
+`#FFF8D6`), is **not** in FR-3. This matters for Q07, whose training runs use the `demo` banner. It does not lower a
+score below 4, but it should be added in Q06's next revision. Still at 4: Data model (registry audit fields), API
+(`NOTICE_DELAY_MS` measured later), Security (fallback `reason` strings and runtime exception text not discussed),
+Implementation readiness.
+
+### PRD-Q07
+
+| Dimension | Old → new | Evidence |
+|---|---|---|
+| Security | 3 → 4 | (a) No `auth.js` change: §11.5 is replaced by "Supabase client on the cockpits (existing path, no `auth.js` change)"; FR-11, §5.3, §13, §16, §17, §18, T-9, §22 and DoD reuse the calculators' path (`js/rz-config.js` + module `js/rz-supabase.js`, as `opex-calculator.html:3980,3982` and `account.html:175,177` load them; 9 pages load the module, checked) and `rzSupa.saveScenario/listScenarios/deleteScenario` (`js/rz-supabase.js:163-188`). Default behaviour without the module is device-only saving with the "account unavailable" line. No FR needed the owner-approval marking, because saving does not need `auth.js`. (b) `rz-tracker.js` is no metric source: O7 reads "not measurable across visitors until PRD-Q10 ships consent-gated logging; until then, measured only by the gate's scenario runs"; T-15 dispatches the two DOM events and calls no tracker, with no privacy claim; §16 adds "training adds no tracking call" and lists what a run record holds. Checked: `rz-tracker.js:11` key `rz_user_events`, `:38` fetch to `ipapi.co`. (c) V5 says drafts are "not listed", not access-controlled. Not 5: §11.5 records an existing race (if the login modal opens before the deferred module attaches, `ensureSupabase()` injects a second tag with a different `?v=`, `auth.js:439`) that this PRD does not widen and cannot close without an `auth.js` change; L6 checks for the "Multiple GoTrueClient instances" warning |
+| Cross-module | 4 → 5 | Q01 FR-13 is a declared dependency (§1, §5.4, V16, L3, §13, R11): until `isRootOnlyHref` matches dossiers, an approved scenario must have empty `relatedIncidents`. D7: §9.7 uses Q06's token names with Q06's fallback values and `css/rz-hub.css` values as fallbacks for hover and motion tokens (`css/rz-hub.css:18`, `:26-27`, `:36`, checked), and cockpits no longer load `css/rz-hub.css` (`grep -c rz-hub.css` → 0 on both pages today, checked). The `auth.js`/`auth.min.js` collision with Q01 (X5) is gone |
+| API contracts | 4 → 5 | One event name everywhere (`rz-fault-run-start`/`rz-fault-run-end`, §11.2; `fault_run_start` removed); `request` pattern aligned to `^R[0-9]{2,4}$`; V5 wording fixed; §11.5 now describes the real client contract |
+| Testability | 4 → 5 | O7 has a stated measurement (the gate's runs) instead of a false one; L3 also asserts the V16 dependency and that `js/rz-fault-*.js` contains no tracker call; T-9 checks `git diff --stat auth.js auth.min.js` is empty |
+
+Still at 4: Feasibility (`currentCooling()` touches 8 consumer sites), Implementation readiness (phases gated by
+D-Q07-1…4).
+
+### Cross-PRD findings after revision
+
+| Finding | Status |
+|---|---|
+| X1 (Q04 L7 vs Q06 FR-13) | Closed: behavioural L7 + wrapper-only placement (D3) |
+| X2 (two "engine missing" idioms) | Closed: Q04 uses Q06's `kind=fallback` (D6) |
+| X3 (`origin` object vs string) | Closed (D2) |
+| X4 (decision-record formats) | Closed for owner decisions: one `DECISIONS.md` (D5). Per-record status fields inside each feature's data (relation edges, reproduce entries, scenario files) keep their own sets; Q07's `request` pattern now matches Q01/Q03 |
+| X5 (`auth.js` edited by Q01 and Q07) | Closed: Q07 no longer edits `auth.js` (D4); only Q01 FR-13 does, behind D-Q01-3 |
+| X6 (`rz-hub.css` on cockpits) | Closed: Q06's contract wins (D7) |
+| Cycle Q01 ↔ Q03 | Closed: Q03 → Q01 only (D8) |
+| Ordering Q04 / Q06 (`dcmoc/` rebuild) | Closed: fixed order, one rebuild per release (D3) |
+| Duplicated modules (§X2 above: owner-decision CLI, axe planted-line helper, browser harness, register checks) | Open. Not part of D1–D8; still worth one shared helper each

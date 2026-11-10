@@ -66,3 +66,11 @@ items merged into them, and X2, X3, X5, X9.
     makes a second tag a no-op.
   - My task, after v3.37.0 is live: delete index.html's inline `serviceWorker.register` block (~1534-1538) and add the tag before
     `</body>`.
+
+## QA batch 1 (2026-11-11)
+- The independent review failed Q01, Q03, Q04 and Q07, each on one dimension. The revision v1.1 applies coordinator decisions D1–D8.
+  The revising agent then self-scored every dimension at 4 or above; a confirming independent re-check is still owed in QA batch 2.
+- Carry-over for the next Q06 revision: FR-3 must remove the `demo` state's light-theme `!important` background
+  (`js/rz-telemetry-quality.js:79`), because Q07 training runs use the demo state.
+- Q01 has 9 laws, above the brief's 3–8. Accepted: D1 required the idempotence law.
+- Owner decisions: `DECISIONS.md` (22 so far, all PROPOSED with a recommended default).

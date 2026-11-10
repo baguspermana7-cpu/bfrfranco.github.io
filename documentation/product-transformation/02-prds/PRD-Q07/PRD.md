@@ -6,23 +6,24 @@
 |---|---|
 | PRD id | PRD-Q07 |
 | Feature | Training mode on the conventional data-hall cockpit (`datahall.html`) and the fuel cockpit (`fuel-system.html`): scripted, seeded fault scenarios with play, pause and step; acknowledgement per alarm; expected actions with sourced time budgets; a debrief with PDF export; saved runs on the device and, when signed in, in the account. Removes the random excursion generator from `datahall.html` |
-| Version | 1.0 |
+| Version | 1.1 |
 | Status | Draft |
 | Author | Opus 5.5 (Fable quota exhausted) |
 | Date | 2026-11-11 |
 | Owner requests | R110 (PRD per idea), R111 (24-section structure) |
 | Priority | 73.0 (addendum rank: I 8, N 8, C 7, E 5, effort 4 weeks; `documentation/PRODUCT_INNOVATION_ASSESSMENT_2026-11_ADDENDUM.md:78`) |
 | Related findings | Q7 (`…_ADDENDUM.md:144-175`, workflow table `:517-532`), X4 (`:50`), maturity row "simulation honesty" (`:34`), BASELINE §7. New findings in this PRD: F2 (excursion values chosen to always warn), F5 (no air-side transient model anywhere in the repo), F8 (engine labels the A1 allowable range "recommended"), F13 (stale EPMS line in a standard), corrections C1–C5 (§3.3) |
-| Dependencies | **Q6** provenance labels (`documentation/product-transformation/02-prds/PRD-Q06/PRD.md`, new `js/rz-provenance.js`) must ship first; PRD-Q06 §13 (`:1257`) already records that Q7 will call `RZProvenance.mark(...)` and remove the random excursion. Owner decisions OQ-1 to OQ-4 (§23). No peer-owned file is touched |
-| Related modules | `datahall.html`, `fuel-system.html`, `js/conv-engine.js` (read only, byte-locked by `tools/ship-gate.sh:349-361`), `js/rz-alarm-state.js`, `js/rz-telemetry-quality.js`, `js/rz-pdf-export.js`, `js/rz-toast.js`, `js/rz-sheet.js`, `js/rz-supabase.js`, `auth.js`, `css/rz-hub.css`, `tools/test-datahall-operator-engineering.mjs`, `tools/test-ict-datahall-operator-runtime.mjs`, `tools/test-datahall-authority.mjs`, `manual/datahall.html`, `prd/datahall.html`, `manual/fuel-system.html` |
+| Dependencies | **Q6** provenance labels (`documentation/product-transformation/02-prds/PRD-Q06/PRD.md`, new `js/rz-provenance.js`) must ship first; PRD-Q06 §13 (`:1257`) already records that Q7 will call `RZProvenance.mark(...)` and remove the random excursion; Q7 also uses Q6's `.rz-prov` classes and token chain for every provenance or simulated label on the cockpits (Q6 §9.8, coordinator decision D7). **PRD-Q01 FR-13** (the dossier link lock: `isRootOnlyHref` matcher fix and "Root access" word) must ship before any scenario with a non-empty `relatedIncidents` is approved; until then V16 requires `relatedIncidents` to be empty. Owner decisions D-Q07-1 to D-Q07-4 in `documentation/product-transformation/DECISIONS.md` (§23). No peer-owned file is touched, and `auth.js` is not changed |
+| Related modules | `datahall.html`, `fuel-system.html`, `js/conv-engine.js` (read only, byte-locked by `tools/ship-gate.sh:349-361`), `js/rz-alarm-state.js`, `js/rz-telemetry-quality.js`, `js/rz-provenance.js` (Q6), `js/rz-pdf-export.js`, `js/rz-toast.js`, `js/rz-sheet.js`, `js/rz-config.js` and `js/rz-supabase.js` (loaded as the calculators already load them), `auth.js` (read only: `_rzAuth.showModal`, `isRootSession`), `tools/test-datahall-operator-engineering.mjs`, `tools/test-ict-datahall-operator-runtime.mjs`, `tools/test-datahall-authority.mjs`, `manual/datahall.html`, `prd/datahall.html`, `manual/fuel-system.html` |
 | Target wave | Addendum roadmap "Strategic, week 17+" (`…_ADDENDUM.md:558`), after Q6 (wave 1) |
-| Approval status | Approved by owner R110/R111 2026-11-10 (the PRD set). The addendum marks Q7 "Major feature: needs owner approval" (`…_ADDENDUM.md:144-175`, "Dependencies and risks"); that approval is the R110/R111 set approval plus the per-scenario acceptance in §12. Phase C (temperature model) additionally needs the owner to adopt the hall's thermal capacitance (OQ-1) |
+| Approval status | Approved by owner R110/R111 2026-11-10 (the PRD set). The addendum marks Q7 "Major feature: needs owner approval" (`…_ADDENDUM.md:144-175`, "Dependencies and risks"); that approval is the R110/R111 set approval plus the per-scenario acceptance in §12. Phase C (temperature model) additionally needs the owner to adopt the hall's thermal capacitance (D-Q07-1). No auth or security boundary changes (`STATE.md` approval list): `auth.js` is only read |
 
 Change history
 
 | Version | Date | Author | Change |
 |---|---|---|---|
 | 1.0 | 2026-11-11 | Opus 5.5 | First complete draft, 24 sections. Facts verified against `wt-hub3` at `2f458f7c5` (branch `hub-r3`) |
+| 1.1 | 2026-11-11 | Opus 5.5 | QA batch 1 revisions (D1–D8). D4: no `auth.js` change; account saves reuse the calculators' existing Supabase path (`js/rz-config.js` + `js/rz-supabase.js` tags, `rzSupa.saveScenario/listScenarios/deleteScenario`); `rz-tracker.js` removed as a metric source, O7 rewritten, T-15 rewritten without a privacy claim; Q01 FR-13 added as a dependency for V16. D5: OQ-1…4 are now D-Q07-1…4 in `DECISIONS.md`. D7: the panel uses Q6's `.rz-prov` classes and token chain, and cockpits do not load `css/rz-hub.css`. Drafts are "not listed", not access-controlled (V5) |
 
 ## 2. Executive summary
 
@@ -69,7 +70,7 @@ Scope v1: `datahall.html` (three scenarios) and `fuel-system.html` (one scenario
 | C1 | "Scenario: CRAH-3 fan failure at 70 % load … Temperatures rise at rates from the engine's thermal model" (`:144-175`) | No engine model gives an air-side rise rate (F5). The engine's hall runs at 75 % (7,500 of 10,000 kW), not 70 %. One CRAH lost at N+1 is covered by the standby and produces no steady excursion (F6) | Load comes from the engine snapshot. The CRAH-trip scenario shows no temperature change and says why. Temperature output exists only in Phase C, behind an adopted capacitance (FR-12) |
 | C2 | X4 / Q7: "picks a random zone and CRAH every 120 s" (`:50`, `:145`) | First at 30 s, then every 120 s (`datahall.html:2135`); the temperature range sits between the warning and critical thresholds by construction (F2) | Stated as F2 |
 | C3 | "Integration points: datahall, datahallAI, fuel-system, EPMS" | `datahallAI.html` is root/educator-gated and already scripted; `EPMS_Telemetry.html` has no random path and its ATS timings (1 s / 2 s, `:1084`, `:1094`) carry no source (Appendix A) | v1 = `datahall.html` + `fuel-system.html`; the others are v2 (§5.2) |
-| C4 | BASELINE §7: "Q7 needs … the engine's thermal model" | That model does not exist (F5) | FR-12 specifies the minimum sourced model and blocks its output until OQ-1 |
+| C4 | BASELINE §7: "Q7 needs … the engine's thermal model" | That model does not exist (F5) | FR-12 specifies the minimum sourced model and blocks its output until D-Q07-1 |
 | C5 | — | `ALARM_STATE.md:98` is stale (F13) | Fixed in the release's standards update (§22) |
 
 ## 4. Objectives and success metrics
@@ -82,7 +83,7 @@ Scope v1: `datahall.html` (three scenarios) and `fuel-system.html` (one scenario
 | O4 Honest idle state | Alarms injected when no scenario runs, over 10 simulated minutes | 0 (today: 1 at 30 s, then 1 every 120 s) | L4 | Page timers are fast-forwarded in the test |
 | O5 Useful debrief | Expected alarms and actions listed with expected and actual times, seed, engine version, trace id; PDF carries the same rows | 100 % of rows | L5 | — |
 | O6 Runs persist | Local save and account save round-trip | Pass | L6 | Account save tested against a stubbed `rzSupa`; one live check by the owner's account after deploy |
-| O7 Use | Training runs started per month | UNKNOWN — no baseline; measure with the existing `rz-tracker.js` event after release (task T-15) | Tracker event `fault_run_start` counts | No target is set before a baseline exists |
+| O7 Use | Training runs started per month | Not measurable across visitors until PRD-Q10 ships consent-gated logging; until then, measured only by the gate's scenario runs | The gate's own runs (L2, L5, L6 start and end a run on every ship) | No target is set. `rz-tracker.js` is not a source: it keeps events only in the visitor's own `localStorage['rz_user_events']` and tags each with IP, country and city from `https://ipapi.co/json/` (`rz-tracker.js:37-38`), so it can neither count across visitors nor be extended without a consent decision. Training adds no tracking call (§16); the DOM events `rz-fault-run-start` / `rz-fault-run-end` (§11.2) are what a future Q10 counter would listen to |
 
 ## 5. Scope
 
@@ -96,7 +97,7 @@ Scope v1: `datahall.html` (three scenarios) and `fuel-system.html` (one scenario
 6. Persistence: `localStorage` (`rz_fault_runs_v1`) and `saved_scenarios` (calc `fault-training`) when signed in.
 7. Integration with Q6 (`RZProvenance.mark`), `RZTelemetryQuality.setPageMode('demo')`, `RZPdfExport`, `RZToast`, `RZSheet`.
 8. New gate `tools/test-fault-scenarios.mjs`; updates to the three gates in F3.
-9. Phase C: the lumped air model (FR-12), switched on per scenario only after OQ-1.
+9. Phase C: the lumped air model (FR-12), switched on per scenario only after D-Q07-1.
 
 ### 5.2 Out of scope (non-goals)
 
@@ -123,8 +124,8 @@ Scope v1: `datahall.html` (three scenarios) and `fuel-system.html` (one scenario
 | PDF document shell | `js/rz-pdf-export.js:176-241` | Debrief PDF |
 | Toast, sheet | `js/rz-toast.js:175`, `:239-242`; `js/rz-sheet.js:275-277` | Save/PDF feedback; phone panel |
 | Supabase client and scenario table | `js/rz-supabase.js:163-188`; `supabase/schema.sql:280-331` | Account save/list/delete |
-| Supabase lazy loader | `auth.js:432-455` | Exported (one line) and reused, so a page never loads a second client |
-| Hub tokens | `css/rz-hub.css:11-30` (dark), `:31-39` (light) | Panel styling |
+| Supabase access for saved scenarios | The calculators' existing path: `<script src="js/rz-config.js">` + `<script type="module" src="js/rz-supabase.js">` (e.g. `opex-calculator.html:3980-3982`, `account.html:175-177`; 9 pages load the module), then `window.rzSupa.saveScenario/listScenarios/deleteScenario` (`js/rz-supabase.js:163-188`) | Same two tags on `datahall.html` and `fuel-system.html`; no `auth.js` change. `auth.js`'s own lazy loader `ensureSupabase()` (`:432-455`) returns the existing `window.rzSupa` when the module is already on the page (`:433`), so the page still holds one client |
+| Provenance styling contract | PRD-Q06 §9.8 (`.rz-prov` classes; token fallback chain `var(--rz-text-secondary,#A0AEC0)`, `var(--rz-text-primary,#E8EDF5)`, `var(--rz-line-tier-2,rgba(255,255,255,.12))`, `var(--rz-accent-signal,#FFAA00)`, `var(--rz-accent-alert,#FF3030)`, light values `#374151`, `#111827`, `#7A4800`, `#CC1F1F`) | Panel styling and the simulated label; cockpits do not load `css/rz-hub.css` (D7) |
 | Motion tokens | `standarization/MOTION_STANDARD.md:60-68` | Only through RZSheet/RZToast; the panel itself does not animate |
 | Test harness with own server | `tools/test-fmea-sim.mjs:21-28` pattern; `rz-lane` (`~/.local/bin/rz-lane`, usage `rz-lane [-l N] [-t SECS] -- <cmd>`) | New gate |
 
@@ -133,9 +134,11 @@ Scope v1: `datahall.html` (three scenarios) and `fuel-system.html` (one scenario
 | Dependency | Type | State on 2026-11-11 |
 |---|---|---|
 | Q6 `js/rz-provenance.js` and the `rz-prov-dh-*` lines | Blocking | PRD written (`PRD-Q06/PRD.md`), not shipped |
-| Owner decision OQ-1 (hall thermal capacitance) | Blocks Phase C only | Open |
-| Owner decision OQ-2 (standby start delay) | Refines S1/S2; not blocking | Open |
-| Owner acceptance per scenario file | Blocks listing of that scenario | Open |
+| Owner decision D-Q07-1 (hall thermal capacitance) | Blocks Phase C only | Open |
+| Owner decision D-Q07-2 (standby start delay) | Refines S1/S2; not blocking | Open |
+| Owner acceptance of the scenario files (D-Q07-4; each file then records `approvedBy`/`approvedOn`/`request`) | Blocks listing of that scenario | Open (PROPOSED in `DECISIONS.md`) |
+| PRD-Q01 FR-13 (dossier link lock) | Blocks only scenarios with a non-empty `relatedIncidents` (V16); the four v1 files have none | PRD written, not shipped; FR-13 itself waits for D-Q01-3 |
+| PRD-Q10 consent-gated logging | Needed only to measure O7 across visitors | Not written in this batch |
 | Peer | Version claim only | Peer holds local v3.35.10 work (STATE.md) |
 
 ### 5.5 Constraints
@@ -346,7 +349,7 @@ Each FR lists: description, trigger, preconditions, inputs, processing, outputs,
 **FR-11 Saves in the account**
 - Description: **Save to account** inserts one `saved_scenarios` row: `calc = 'fault-training'`, `name = "<title> · <YYYY-MM-DD HH:MM>"` (≤ 120 chars, title truncated first), `payload = run record` without `inputs` (so `account.html:214-245` shows Delete only).
 - Trigger: button (never automatic: the 200-row cap is shared with calculator scenarios, F9).
-- Preconditions: signed in; Supabase client from `window._rzAuth.ensureSupabase()` (one-line export added to `auth.js` next to the existing `window._rzAuth` members, `:785`; no behaviour change).
+- Preconditions: signed in; `window.rzSupa` present, reached the way the calculators already reach it: `datahall.html` and `fuel-system.html` gain `<script src="js/rz-config.js?v=<token>"></script>` and `<script type="module" src="js/rz-supabase.js?v=<token>"></script>` (the pair `opex-calculator.html:3980,3982` and `account.html:175,177` use), and the panel awaits `window.rzSupa.ready`. **No `auth.js` change** (coordinator decision D4): `ensureSupabase()` stays internal, and because it returns the existing `window.rzSupa` when the module is on the page (`auth.js:433`), the login modal and the panel share one client. If `window.rzSupa` is absent or `configured` is false (CDN blocked, config missing), Save to account stays hidden and the panel shows "Saving to your account is not available right now. Runs are still saved on this device." — device saves (FR-10) work without it, which is the default behaviour.
 - Inputs: run record.
 - Processing: serialise; refuse > 65,536 bytes before the call; `rzSupa.saveScenario('fault-training', name, payload)`; map errors (§9.6).
 - Outputs: `RZToast.ok("Saved to your account.")`.
@@ -355,7 +358,7 @@ Each FR lists: description, trigger, preconditions, inputs, processing, outputs,
 - Exceptions: not signed in → message; cap reached (`saved scenario limit reached (200)…`, `schema.sql:322`) → cap message; network or other error → "Could not save to your account. The run is still saved on this device."; double click → button disabled until the call returns (no duplicates).
 - Acceptance: L6 (stubbed `rzSupa` receives exactly one insert with the contract fields); AC-9.
 
-**FR-12 Phase C: minimum sourced thermal model (switched off until OQ-1)**
+**FR-12 Phase C: minimum sourced thermal model (switched off until D-Q07-1)**
 - Description: `RZFaultPlayer.thermal.lumpedAir(T, qItKw, qCoolKw, capKjPerK, tSetC, dtS)` returns `max(tSetC, T + (qItKw − qCoolKw) × dtS / capKjPerK)`: a single-zone air energy balance `C·dT/dt = Q_IT − Q_cool`, clamped at the set point because the CRAH controls hold it while capacity suffices.
 - Trigger: each `advance()` in a scenario whose `model.thermal` is `lumped-air-v1`.
 - Preconditions: `model.params.capKjPerK` present with a basis whose evidence is `ADOPTED` (owner) — the validator refuses `lumped-air-v1` otherwise (V14).
@@ -363,7 +366,7 @@ Each FR lists: description, trigger, preconditions, inputs, processing, outputs,
 - Processing: Euler step of 1 s (exact for this linear form between events). The air-only value `C_air = 1.2 × 1.006 × V` kJ/K (`datahall.html` `AIR_RHO_CP`) is a lower bound on `C` (furniture, racks and structure add mass) and therefore gives the fastest possible rise; if the owner adopts the air-only bound, every temperature line says "fastest possible rise (air only)". `V` (hall air volume) is UNKNOWN: no hall geometry exists in `js/conv-engine.js`, `js/conv-design-basis.js` or `js/conv-parameters.js` (grep in Appendix B, B8); `js/ltc-plant.js:144` geometry belongs to the LTC halls, not this hall.
 - Outputs: hall rack-inlet temperature fed to `thermal.set`; the page evaluator then raises its own 27 °C / 30 °C alarms; the debrief adds the rate of change against the ASHRAE limits ≤ 5 °C in any 15 min and ≤ 20 °C in any hour (`28_…:369`) and the time spent above 27 °C (recommended) and above 32 °C (A1 allowable, `28_…:368`).
 - State change: in memory.
-- Dependencies: OQ-1; optionally OQ-2 (standby start delay, a sequence-of-operation value; UNKNOWN — until adopted, a standby that starts is shown running from the next second and the debrief says the start transient is not modelled).
+- Dependencies: D-Q07-1; optionally D-Q07-2 (standby start delay, a sequence-of-operation value; UNKNOWN — until adopted, a standby that starts is shown running from the next second and the debrief says the start transient is not modelled).
 - Exceptions: none at run time; refusals happen at validation.
 - Acceptance: U-tests T1–T4 (§20.1) with hand checks; L3 refuses a `lumped-air-v1` scenario without an `ADOPTED` capacitance.
 
@@ -429,8 +432,8 @@ Each FR lists: description, trigger, preconditions, inputs, processing, outputs,
 | FR-8 | Run ends | Record complete | Run, scenario | Debrief | — | FR-4/6/7 | Ended before first alarm | L5 |
 | FR-9 | Download PDF | Builder loaded | Debrief | Print window | — | FR-8 | Popup blocked, builder missing | L5, AC-8 |
 | FR-10 | Debrief opens; each second | Storage | Run record | Saved runs | Browser storage | FR-8 | Blocked storage | L6 |
-| FR-11 | Save to account | Signed in | Run record | Row | `saved_scenarios` | FR-10, `auth.js` export | Cap, network, double click | L6, AC-9 |
-| FR-12 | `advance()` (Phase C) | Adopted `C` | Engine values, `C` | Temperature | Memory | OQ-1 | Refused at validation | T1–T4, L3 |
+| FR-11 | Save to account | Signed in | Run record | Row | `saved_scenarios` | FR-10, `js/rz-config.js` + `js/rz-supabase.js` tags | Cap, network, double click | L6, AC-9 |
+| FR-12 | `advance()` (Phase C) | Adopted `C` | Engine values, `C` | Temperature | Memory | D-Q07-1 | Refused at validation | T1–T4, L3 |
 | FR-13 | Load, exit | Q6 shipped | Id, version, seed | Banner, attributes | DOM | Q6 | Gate fails without Q6 | L8 |
 | FR-14 | Hash on load | Engine bound | Hash | Loaded run | — | FR-3 | Invalid copy | AC-10 |
 | FR-15 | Events, page ACK | Fuel authority | S4 | Repainted page | Memory | FR-4/6 | — | AC-11, L2 |
@@ -601,6 +604,7 @@ No global keyboard shortcuts are added (MOTION_STANDARD frequency gate; and the 
 | saved account | Saved to your account. |
 | cap | Your account already holds 200 saved items. Delete some on the Account page to save more. |
 | account error | Could not save to your account. The run is still saved on this device. |
+| account unavailable | Saving to your account is not available right now. Runs are still saved on this device. |
 | popup blocked | Allow pop-ups for this site to download the PDF. |
 | pdf missing | The PDF builder did not load. Try again. |
 | version changed | This run used version {a} of the scenario; the current version is {b}. The debrief shows the saved results. |
@@ -610,8 +614,9 @@ Error `{reason}` strings per code are in §11.1. Copy carries no internal ids (Q
 
 ### 9.7 Styling contract (`css/rz-fault-panel.css`, budget ≤ 4,096 B)
 
-- Tokens only from `css/rz-hub.css` (`--rz-bg-elevated`, `--rz-bg-inset`, `--rz-line-tier-2`, `--rz-text-primary/secondary/muted`, `--rz-accent-signal`, `--rz-accent-alert`, `--rz-text-accent`); both themes come from the token file. The cockpit pages load `css/rz-hub.css` for this (its body rules are scoped to `body.hub`, `:44-48`, so the cockpit body is untouched; its only global rule is `html { scroll-behavior: smooth }` with a reduced-motion override, `:42-43`, which the gate's screenshot pass checks for side effects).
-- Panel: 1 px `--rz-line-tier-2` border, radius 2 px, no shadow, no gradient, no backdrop filter.
+- PRD-Q06's styling contract wins on the cockpits (coordinator decision D7). The cockpit pages do **not** load `css/rz-hub.css`. The panel uses the same token names with the same fallback values that `js/rz-provenance.js` injects (PRD-Q06 §9.8): `var(--rz-text-primary,#E8EDF5)`, `var(--rz-text-secondary,#A0AEC0)`, `var(--rz-line-tier-2,rgba(255,255,255,.12))`, `var(--rz-accent-signal,#FFAA00)`, `var(--rz-accent-alert,#FF3030)`, `var(--rz-text-accent,#FFAA00)`, and Q06's light values under `[data-theme="light"]` and the `prefers-color-scheme: light` guard (`#374151`, `#111827`, `#7A4800`, `#CC1F1F`, line `rgba(17,24,39,.14)`). Motion and hover tokens carry the `css/rz-hub.css` values as fallbacks: `var(--rz-line-tier-1,rgba(255,255,255,.18))` (light `rgba(17,24,39,.22)`), `var(--rz-dur-press,120ms)`, `var(--rz-ease-out,cubic-bezier(.23,1,.32,1))` (`css/rz-hub.css:18`, `:26-27`, `:36`).
+- Provenance and simulated labelling use Q06's own component, never a Q07 copy: the run banner is Q06's `.rz-tq-banner` in `demo` state and every model or simulated line is a `p.rz-prov` written by `RZProvenance.mark` (FR-13). `css/rz-fault-panel.css` styles only the panel's own layout (list, rows, buttons, debrief table) and contains no `.rz-prov` or `.rz-tq-banner` rule.
+- Panel: no background of its own (it sits on the cockpit sidebar surface; contrast is measured against the computed background, as in PRD-Q06 L8); 1 px `--rz-line-tier-2` border, radius 2 px, no shadow, no gradient, no backdrop filter.
 - One amber element per state: the Acknowledge button of an unacknowledged P1/P2 alarm uses `--rz-accent-signal` border and text; everything else is graphite. Critical class word uses `--rz-accent-alert` text colour; no coloured stripe or fill on the row (UX law 14).
 - Fonts: IBM Plex Sans for text; JetBrains Mono for the clock, T+ times, kW and °C values.
 - Inputs and selects: `font-size: 16px` at ≤ 768 px; buttons `min-height: 44px` at ≤ 768 px.
@@ -654,7 +659,7 @@ None in the panel. The phone sheet uses `RZSheet` (its motion is governed and ga
     "status": {"enum": ["draft","approved","retired"]},
     "approvedBy": {"const": "owner"},
     "approvedOn": {"type": "string", "format": "date"},
-    "request": {"type": "string", "pattern": "^R[0-9]{3,4}$"},
+    "request": {"type": "string", "pattern": "^R[0-9]{2,4}$"},
     "page": {"enum": ["datahall.html","fuel-system.html"]},
     "title": {"type": "string", "minLength": 8, "maxLength": 80},
     "summary": {"type": "string", "minLength": 20, "maxLength": 300},
@@ -705,7 +710,7 @@ Text fields may use placeholders resolved at run time from the engine snapshot o
 | V2 | `id` equals the file name and matches the pattern | E_ID |
 | V3 | `page` equals the page loading it | E_PAGE |
 | V4 | `engine.module` and major.minor of `engine.version` equal the loaded engine (`CONV_CALC` meta version) | E_ENGINE |
-| V5 | `status` is `approved` for listing (drafts load only with `?draft=1` and `rz_premium_session` role root) | E_STATUS |
+| V5 | `status` is `approved` for listing. Drafts are **not listed**; this is a listing rule, not an access control: draft files are public static JSON like every scenario file, and `?draft=1` with a root session (a client-side check that anyone can forge) only lets the owner preview one in the panel | E_STATUS |
 | V6 | every `at` ≤ `durationS`; events sorted by `at` among absolute events | E_TIME |
 | V7 | every `basis` reference resolves to a `basis[].id` | E_BASIS |
 | V8 | every `acks[].budgetS` and every non-null `actions[].budgetS` has a basis | E_BUDGET |
@@ -716,7 +721,7 @@ Text fields may use placeholders resolved at run time from the engine snapshot o
 | V13 | `raise` has exactly one of `onEvent` (event index, optional `delayS` that must carry a basis), `when` (`capacity.deficit`, `comms.stale`), `pageTag` (string) | E_RAISE |
 | V14 | `model.thermal` `lumped-air-v1` requires `params.capKjPerK` referencing a basis with evidence `ADOPTED` | E_MODEL |
 | V15 | file ≤ 8,192 bytes; ≤ 40 events; ≤ 12 alarms; ≤ 12 actions | E_SIZE |
-| V16 | `relatedIncidents[]` exist as `data/incidents/<slug>.json` (gate only); rendered with the word "Root access" per the Q01 contract | E_INCIDENT |
+| V16 | `relatedIncidents[]` exist as `data/incidents/<slug>.json` (gate only) and render through PRD-Q01's renderer with the word "Root access" (Q01 FR-13, BR6). Dependency on Q01: while `isRootOnlyHref('/incident-<slug>.html')` from `auth.js` (loaded in a node `vm`, as Q01 L6 does) returns false, i.e. before Q01 FR-13 ships, an approved scenario must have an empty `relatedIncidents` | E_INCIDENT |
 
 ### 10.4 Trace format
 
@@ -781,7 +786,7 @@ Error reasons (shown after "This scenario file could not be used:"): E_PARSE "th
 
 ### 11.2 `window.RZFaultPanel` (`js/rz-fault-panel.js`)
 
-`mount({page, adapter, catalogueUrl, mountNode, sheetBreakpointPx: 768})` once per page; `open()`, `close()`, `loadScenario(id, seed)`, `isRunning()`. Emits DOM events on `document`: `rz-fault-run-start` `{id, seed}`, `rz-fault-run-end` `{id, seed, traceId, endReason}` (consumed by the tracker, T-15).
+`mount({page, adapter, catalogueUrl, mountNode, sheetBreakpointPx: 768})` once per page; `open()`, `close()`, `loadScenario(id, seed)`, `isRunning()`. Emits DOM events on `document`: `rz-fault-run-start` `{id, seed}`, `rz-fault-run-end` `{id, seed, traceId, endReason}`. These two names are the only event names used anywhere in this PRD. Nothing consumes them in v1 (no tracker call, §16); the gate listens to them, and a future consent-gated counter (PRD-Q10) may.
 
 ### 11.3 Page adapter contract (implemented in each page)
 
@@ -803,9 +808,11 @@ Error reasons (shown after "This scenario file could not be used:"): E_PARSE "th
 
 Rate limits: none added; inserts are user-initiated and capped at 200 rows by the trigger. Timeouts: the panel abandons a pending save after 15 s with the account-error copy (the Supabase call may still complete; the next list shows it). Pagination: not needed (≤ 200 rows).
 
-### 11.5 `auth.js` export
+### 11.5 Supabase client on the cockpits (existing path, no `auth.js` change)
 
-Add `ensureSupabase: ensureSupabase` to the existing `window._rzAuth` object (`auth.js:785`). It changes no permission and no session handling; it lets the panel reuse the single loader and the single `window.__rzSupaLoading` promise (`:434-454`) so a cockpit never instantiates a second Supabase client. Mirror the change into `auth.min.js` (the homepage twin, memory "Stale .min twin").
+Version 1.0 proposed exporting `ensureSupabase` on `window._rzAuth`. That is withdrawn (coordinator decision D4): it changed the auth module's public surface, which `STATE.md` puts on the owner-approval list. Saving does not need it. The cockpits load the same two tags the calculators load (`js/rz-config.js`, then `js/rz-supabase.js` as a module; `opex-calculator.html:3980,3982`), and the panel uses `window.rzSupa` exactly as `js/rz-scenario.js` `saveToAccount` does (`js/rz-scenario.js:124-143`). `auth.js` and `auth.min.js` are not edited and get no new cache token from this PRD.
+
+One-client check: `auth.js` `ensureSupabase()` returns `window.rzSupa.ready` when the module has attached (`auth.js:433`). If a visitor opens the login modal in the short window before the deferred module attaches, `ensureSupabase()` injects its own tag with a different `?v=` (`:439`) and the module could run twice. That window exists today on the 9 pages that load the module; this PRD does not widen it, and L6 asserts the console carries no supabase-js "Multiple GoTrueClient instances" warning after the page settles and after opening the login modal. Closing the window for good would need an `auth.js` change and therefore the owner's approval; it is not part of this PRD.
 
 ### 11.6 Static files
 
@@ -866,28 +873,29 @@ Scenario file lifecycle: `draft → approved → retired` (owner only, by commit
 
 | Module | Change | Propagation |
 |---|---|---|
-| `datahall.html` | Remove `:2079-2135`; add adapter, `currentCooling()`, Training button, panel mount, `css/rz-hub.css` and `css/rz-fault-panel.css` links, `js/rz-fault-player.js` and `js/rz-fault-panel.js` (deferred, panel lazy) | Cache tokens via `node tools/test-asset-cache-tokens.mjs --fix …` |
-| `fuel-system.html` | Adapter, ACK wrap, keydown guard, button, panel | Same |
+| `datahall.html` | Remove `:2079-2135`; add adapter, `currentCooling()`, Training button, panel mount, `css/rz-fault-panel.css` link (no `css/rz-hub.css`, D7), `js/rz-config.js` and module `js/rz-supabase.js` tags (the calculators' pair, FR-11), `js/rz-fault-player.js` and `js/rz-fault-panel.js` (deferred, panel lazy) | Cache tokens via `node tools/test-asset-cache-tokens.mjs --fix …` |
+| `fuel-system.html` | Adapter, ACK wrap, keydown guard, button, panel, the same `js/rz-config.js` + `js/rz-supabase.js` tags | Same |
 | `js/conv-engine.js` | None (read only) | Engine byte guard stays green |
 | Q6 `js/rz-provenance.js`, `tools/provenance-registry.json` | Q7 marks; the `rz-prov-dh-alarms` text changes (FR-13); the Q6 interim suffix is removed | Q6 gates (`tools/test-provenance.mjs`, `tools/test-provenance-runtime.mjs`) updated in the same release |
 | `js/rz-telemetry-quality.js` | Used (`setPageMode('demo')`) | `standarization/TELEMETRY_QUALITY.md` notes training |
 | `js/rz-pdf-export.js` | New adopter (lazy) | `tools/test-rz-pdf-export.mjs` adopter list if it enumerates adopters |
-| `auth.js`, `auth.min.js` | One export | `tools/test-auth-surface.mjs` stays green |
+| `auth.js`, `auth.min.js` | None. Read only: `_rzAuth.showModal()` (sign-in link), `_rzAuth.isRootSession()` (draft preview); `ensureSupabase()` stays internal | — |
+| `js/rz-config.js`, `js/rz-supabase.js` | Loaded on two more pages, unchanged | Tokens via `test-asset-cache-tokens.mjs --fix` name only the two cockpit pages' new tags |
 | `account.html` | None. A training row renders as its escaped name, the raw calc id "fault-training" and the date, with Delete only (`account.html:216-235`: no label map, "Open" only when `payload.inputs` has keys) | — |
 | Tests in F3 | Rewritten (FR-16) | — |
 | `manual/datahall.html` `:596`, `:617`, `:632`; `prd/datahall.html` `:188`, `:248`, `:265`; `manual/fuel-system.html` | Replace excursion text with a "Training mode" section; keep every string pinned by `tools/test-conv-document-parity.mjs:6-60` | `python3 tools/build-llms-full.py --apply`; `python3 tools/build-search-sections.py --apply` if headings change |
-| Incidents | Optional `relatedIncidents` with "Root access" wording (Q01 contract, `isRootOnlyHref`) | None in v1 files |
+| Incidents | Optional `relatedIncidents`, rendered only through PRD-Q01's renderer with the "Root access" word; depends on Q01 FR-13 (V16 keeps the list empty until `isRootOnlyHref` matches dossiers) | None in v1 files |
 | Q17 learning paths | May later link a scenario by `#scn=` (a v2 alarm path, `PRD-Q17`) | Contract: the hash in FR-14 |
 | Explain DB | Terms used in panel copy (`crah`, `alarm-management`) exist in `js/rz-explain-db.js`; panel adds `data-explain` on "CRAH" and "acknowledge" where keys exist | No DB change |
 | Search, sitemap, llms | No new page | llms-full regenerates for manual text |
 | Service worker `sw.js` | Static assets are cache-first under a version-named cache (`sw.js:5`, `:108`); the version bump renames the cache; scenario JSON is fetched with `?v=<RZ_VERSION>` | `python3 tools/sync-sw-version.py` |
-| `rz-tracker.js` | Count `rz-fault-run-start` events (T-15) | — |
+| `rz-tracker.js` | None. Not called by the panel and not a metric source (it stores events on the visitor's device with IP and city, O7) | A gate assertion: no `rzTrack`/`track(` call in `js/rz-fault-*.js` (T-15) |
 
 ## 14. AI and automation requirements
 
 - No LLM anywhere in the runtime path. The player is deterministic code.
 - Automation: the gate validates files, recomputes golden traces and, in the browser, checks the page. `--write-golden <id>` regenerates a golden trace on purpose; the gate never rewrites one silently.
-- Human approval points: (1) each scenario file (`status: approved`); (2) the thermal capacitance (OQ-1); (3) the standby start delay (OQ-2); (4) the alarm-class basis (A2).
+- Human approval points: (1) each scenario file (`status: approved`); (2) the thermal capacitance (D-Q07-1); (3) the standby start delay (D-Q07-2); (4) the alarm-class basis (A2).
 
 ## 15. Non-functional requirements
 
@@ -910,12 +918,13 @@ Scenario file lifecycle: `draft → approved → retired` (owner only, by commit
 ## 16. Security and access control
 
 - Roles: everyone can run scenarios on public pages; saving to the account needs a signed-in Supabase user; RLS restricts rows to the owner (`schema.sql:299-309`); the 200-row cap is enforced server-side (`:314-331`).
-- No secrets in client code; the Supabase anon config is loaded the same way as today (`auth.js:449-452`).
+- No secrets in client code; the Supabase anon config is loaded the way the calculators load it (`js/rz-config.js`, `opex-calculator.html:3980`).
+- Privacy: training adds no tracking call. The panel does not call `rz-tracker.js` (which tags events with IP, country and city from `ipapi.co`, `rz-tracker.js:37-38`) or any other analytics; a run record holds only scenario id and version, seed, engine and site versions, trace id, operator actions with their times, device-clock start and end, and an optional trainee name the user types. The record stays on the device unless the user presses Save to account.
 - Inputs: scenario files are same-origin static JSON, validated before use; text is inserted with `textContent` or escaped by `esc()` before entering HTML (panel and PDF); the deep-link hash is matched against strict patterns and the catalogue; trainee name is limited to 60 characters of letters, digits, space and `.,'-`, and escaped.
-- Drafts (`?draft=1`) load only for a root session (`window._rzAuth.isRootSession()`); this is a convenience for the owner's review and grants no server access.
+- Drafts are not listed (V5). `?draft=1` with `window._rzAuth.isRootSession()` only lets the owner preview a draft in the panel; the session check is client-side and forgeable, and draft files are public static JSON anyway, so this is a listing rule, never an access control.
 - Abuse: inserts are user-initiated, size-checked, capped by the trigger.
 - Audit: run records carry seed, engine and site versions, trace id; account rows carry `created_at`.
-- Approval: the `auth.js` export (FR-11) adds no permission; it is reviewed with the release, not an auth-boundary change in the STATE.md sense. Retiring the excursion is a feature removal in name only: it is the defect X4 the owner asked to fix, replaced in the same release.
+- Approval: this PRD makes no auth or security boundary change: `auth.js` and `auth.min.js` are not edited (D4), saving reuses the existing `rzSupa` path and RLS. Retiring the excursion is a feature removal in name only: it is the defect X4 the owner asked to fix, replaced in the same release.
 
 ## 17. Edge cases and failure scenarios
 
@@ -939,12 +948,12 @@ Scenario file lifecycle: `draft → approved → retired` (owner only, by commit
 | Network error on save | Account-error copy; local copy kept |
 | Session expired between open and save | `getUser()` null → signed-out copy |
 | Stale service-worker cache | Scenario fetched with `?v=<RZ_VERSION>`; cache name changes with the version (`sw.js:5`) |
-| Stale `auth.js` without `ensureSupabase` export | Save button shows "Account save is unavailable on this page right now." and stays disabled |
+| `js/rz-supabase.js` failed to load (CDN `cdn.jsdelivr.net` blocked) or `rzSupa.configured` is false | Save to account is hidden; the panel shows "Saving to your account is not available right now. Runs are still saved on this device."; device saves and the debrief work (FR-10) |
 | Popup blocked on PDF | Toast |
 | Fuel page shortcut `r` while typing a name | Ignored (FR-15) |
 | Q6 not loaded | Run works; L8 fails in the gate, so this cannot ship |
 | Saved run of a retired scenario | Debrief from the stored result with "This scenario has been retired." |
-| Phase C scenario before OQ-1 | Refused (E_MODEL) and not listed |
+| Phase C scenario before D-Q07-1 | Refused (E_MODEL) and not listed |
 
 ## 18. Technical architecture
 
@@ -967,7 +976,7 @@ flowchart LR
   PANEL --> TQ[RZTelemetryQuality]
   PANEL --> PDF[RZPdfExport]
   PANEL --> LS[(localStorage / sessionStorage)]
-  PANEL --> AUTH[_rzAuth.ensureSupabase] --> SUPA[(Supabase saved_scenarios)]
+  PANEL --> RZSUPA[window.rzSupa from js/rz-supabase.js tag] --> SUPA[(Supabase saved_scenarios)]
 ```
 
 Sequence, one acknowledged alarm:
@@ -1021,15 +1030,15 @@ Deployment: static files on GitHub Pages; Supabase unchanged; no Worker.
 | T-6 | Panel UI (list, run view, ledger, actions) | T-3, T-5 | `js/rz-fault-panel.js`, `css/rz-fault-panel.css` | §9 | 2 d | L2 browser part, AC-3..AC-7 | Screenshots looked at |
 | T-7 | Debrief + PDF | T-6 | panel | `RZPdfExport` lazy | 1 d | L5 | PDF HTML rows = panel rows |
 | T-8 | Device saves, drafts, replay | T-7 | panel | FR-10 | 1 d | L6 local part | Replay trace id equal |
-| T-9 | `auth.js` export + account save/list/delete | T-8 | `auth.js`, `auth.min.js`, panel | FR-11 | 1 d | L6 stub part; `tools/test-auth-surface.mjs` | No second client (one `GoTrueClient` in console) |
+| T-9 | Account save/list/delete through the existing `rzSupa` path | T-8 | `datahall.html`, `fuel-system.html` (two tags each: `js/rz-config.js`, module `js/rz-supabase.js`), panel. Not `auth.js` | FR-11 | 1 d | L6 stub part; `git diff --stat auth.js auth.min.js` empty; with the module blocked, Save to account is hidden and the "account unavailable" line shows | No "Multiple GoTrueClient instances" warning after load and after opening the login modal |
 | T-10 | Deep link | T-6 | panel | FR-14 | 0.5 d | AC-10 | — |
 | T-11 | Q6 integration | Q6 shipped, T-6 | panel, Q6 line copy, Q6 gates | FR-13 | 0.5 d | L8 | Q6 gates green |
 | T-12 | Update the three gates in F3 (+ Q6 L7) | T-5, T-6 | `tools/test-datahall-operator-engineering.mjs`, `tools/test-ict-datahall-operator-runtime.mjs`, `tools/test-datahall-authority.mjs` | FR-16 | 1 d | Each fails on a mutated adapter (red), passes on the real one | Wired unchanged in ship-gate |
 | T-13 | Fuel adapter + S4 (phase B) | T-6 | `fuel-system.html` | FR-15 | 1.5 d | AC-11, L2 for S4 | Shortcut guard proven |
 | T-14 | Documents and standards | T-1..T-13 | manuals, `prd/datahall.html`, standards (§22) | Keep parity strings | 1 d | `tools/test-conv-document-parity.mjs` | R089 list done |
-| T-15 | Tracker events + baseline note | T-6 | panel, `rz-tracker.js` call only | Count runs; no personal data | 0.5 d | Event seen in a test run | O7 baseline documented after 30 days |
+| T-15 | Run events for the gate; no tracking | T-6 | panel | Dispatch `rz-fault-run-start` and `rz-fault-run-end` (§11.2) on `document`; call no tracker or analytics. O7 stays "not measurable across visitors until PRD-Q10 ships consent-gated logging" | 0.5 d | The gate sees both events once per scripted run; `grep -cE 'rzTrack\|rz-tracker\|track\(' js/rz-fault-*.js` → 0, also a static assertion in `--law L3` | No privacy claim is made: nothing is collected, so nothing needs one |
 | T-16 | Release | all | `js/rz-version.js`, `CHANGELOG.md` | §22 chain | 0.5 d | Live checks §22 | DoD §24 |
-| T-17 | Phase C (after OQ-1) | T-4, OQ-1 | S2 file v2, golden | Add `lumped-air-v1` with the adopted basis | 1 d | U-tests + L2 + L3 | Owner-accepted file |
+| T-17 | Phase C (after D-Q07-1) | T-4, D-Q07-1 | S2 file v2, golden | Add `lumped-air-v1` with the adopted basis | 1 d | U-tests + L2 + L3 | Owner-accepted file |
 
 Total phases A+B ≈ 18.5 days; Phase C 1 day after the owner's decision. Addendum estimate 4 weeks holds.
 
@@ -1066,7 +1075,7 @@ The three updated gates keep their existing lines (`:154`, `:159`, `:160`).
 |---|---|---|---|
 | L1 | No `Math.random` call in `datahall.html` code (comments stripped) or in `js/rz-fault-*.js`, and no `fireExcursion`/`dhRand` identifier remains | `node tools/test-fault-scenarios.mjs --law L1` | `datahall.html:2085` calls `Math.random` → `L1 FAIL datahall.html:2085 Math.random`, exit 1 |
 | L2 | For each approved scenario, seed 1, no ops: the node trace, the browser trace (1× and 10×) and `data/scenarios/_golden/<id>.seed1.trace.txt` are byte-identical; with a recorded ops list, replay reproduces the stored trace id | `--law L2` | No player, no scenario, no golden → `L2 FAIL missing js/rz-fault-player.js`, exit 1 |
-| L3 | Every scenario validates (V1–V16); every rate, threshold and budget has a basis whose `source` file and line range exist; no typed numbers with units in text; `index.json` lists exactly the approved files; a `lumped-air-v1` scenario without an `ADOPTED` capacitance is refused | `--law L3` | `data/scenarios/` does not exist → `L3 FAIL no scenarios`, exit 1 |
+| L3 | Every scenario validates (V1–V16); every rate, threshold and budget has a basis whose `source` file and line range exist; no typed numbers with units in text; `index.json` lists exactly the approved files; a `lumped-air-v1` scenario without an `ADOPTED` capacitance is refused; an approved scenario has empty `relatedIncidents` while `isRootOnlyHref` does not match dossiers (V16, Q01 dependency); `js/rz-fault-*.js` contains no tracker or analytics call | `--law L3` | `data/scenarios/` does not exist → `L3 FAIL no scenarios`, exit 1 |
 | L4 | With no scenario loaded, fast-forwarding every page timer through 600 simulated seconds adds no alarm, no banner text and no log line beyond the load lines; the alarm list equals the evaluator on the engine snapshot | `--law L4` (browser; the test wraps `setTimeout`/`setInterval` before page scripts, as `tools/test-ict-datahall-operator-runtime.mjs:106-116` does, and fires each timer callback in delay order) | The 30 s timer fires `fireExcursion` → warning count 0 → 1, banner "⚠ EXCURSION SIMULATED …" → `L4 FAIL injected alarm at 30 s`, exit 1 |
 | L5 | The debrief lists every expected alarm and action with expected and actual times, result and basis, plus seed, engine version, site version and trace id; the PDF HTML from `RZPdfExport.buildDocument` contains the same rows and the footer "Training simulation. Not live plant data." | `--law L5` (browser; S1 with scripted ops: ack at 107, x1 at 190, x2 at 240) | No Training button → `L5 FAIL #rz-fault-open missing`, exit 1 |
 | L6 | The run is in `localStorage['rz_fault_runs_v1']` after the debrief; replay from storage gives the same trace id; with a stubbed `rzSupa`, Save to account performs exactly one insert with `calc:'fault-training'`, `name` ≤ 120 chars, `payload.inputs === null`, payload ≤ 65,536 bytes; cap and network errors show their copy and keep the local copy | `--law L6` | No panel → `L6 FAIL`, exit 1 |
@@ -1119,17 +1128,17 @@ FR → test mapping
 |---|---|---|---|
 | A | T-1..T-12, T-14..T-16 on `datahall.html` with S1–S3 | Training on the data hall; excursion gone | All eight laws (`--strict`) |
 | B | T-13: fuel adapter + S4 | Training on the fuel page | Same laws cover S4 |
-| C | T-17 after OQ-1 | S2 v2 shows temperature with its basis | Same laws; U-tests T1–T4 |
+| C | T-17 after D-Q07-1 | S2 v2 shows temperature with its basis | Same laws; U-tests T1–T4 |
 
 - Flags: none at runtime; a scenario's `status` is its switch.
 - Data migration: none.
 - Compatibility: outside training the page renders exactly the engine values (parity gates).
 - Rollback: set a scenario to `retired` (content rollback) or `git revert` the release commit. Reverting brings the random excursion back; if that is ever needed, Q6's label must return with it.
-- Monitoring: tracker counts of `rz-fault-run-start`; gate logs.
+- Monitoring: gate logs only (the scripted runs of L2, L5 and L6 on every ship). Use across visitors is not measured until PRD-Q10 ships consent-gated logging (O7).
 - Post-deploy live validation: `curl -s https://resistancezero.com/datahall.html | grep -c 'Math.random'` → 0; `curl -s https://resistancezero.com/data/scenarios/index.json` lists the approved ids; `curl -s https://resistancezero.com/js/rz-version.js` equals the release (GitHub Pages deploys are not guaranteed, addendum `:576`); `node tools/test-fault-scenarios.mjs --law L4 --base https://resistancezero.com` and `--law L2 --base …` against the live site.
-- Release chain: next free version, claimed with the peer (MINOR: new feature); `js/rz-version.js`; `CHANGELOG.md` entry; `python3 tools/build-changelog-html.py --apply`; `python3 tools/sync-sw-version.py`; `node tools/test-asset-cache-tokens.mjs --fix js/rz-fault-player.js js/rz-fault-panel.js css/rz-fault-panel.css auth.js auth.min.js`; generators `python3 tools/build-llms-full.py --apply` (manual text) and `python3 tools/build-search-sections.py --apply` (if manual headings change); `bash tools/ship-gate.sh --probe`; push; `python3 tools/indexnow-submit.py --since HEAD~1`.
+- Release chain: next free version, claimed with the peer (MINOR: new feature); `js/rz-version.js`; `CHANGELOG.md` entry; `python3 tools/build-changelog-html.py --apply`; `python3 tools/sync-sw-version.py`; `node tools/test-asset-cache-tokens.mjs --fix js/rz-fault-player.js js/rz-fault-panel.js css/rz-fault-panel.css js/rz-config.js js/rz-supabase.js` (the last two only to stamp their existing tokens onto the two cockpit pages; the files themselves do not change); generators `python3 tools/build-llms-full.py --apply` (manual text) and `python3 tools/build-search-sections.py --apply` (if manual headings change); `bash tools/ship-gate.sh --probe`; push; `python3 tools/indexnow-submit.py --since HEAD~1`.
 - Standards docs in the same release (R089): new `standarization/FAULT_SCENARIO_STANDARD.md` (format, basis rules, approval, golden traces); `standarization/ACCURACY_VALIDATION.md` Rule 2 (`:18-32`): alarms and fault events are never random; add the L4 acceptance test; `standarization/ALARM_STATE.md` (training ledger uses the four states as words; fix `:98` per F13); `standarization/BMS_SHELL.md` adoption table row; `standarization/TELEMETRY_QUALITY.md` (training uses `demo`); `standarization/PDF_EXPORT_STANDARD.md` adopters; `standarization/UIUX_AUDIT_LEDGER.md` row for X4 closed with the version and `tools/test-fault-scenarios.mjs`; `standarization/CONTENT_LINKAGE_PLAYBOOK.md` row "new scenario → schema, golden, index, manual, owner acceptance"; CLAUDE.md audit list line for the new gate (`tools/test-gate-wiring.mjs` then enforces the wiring).
-- Peer coordination: claim the version; tell the peer about the `auth.js` export; no peer-owned file is touched.
+- Peer coordination: claim the version; no peer-owned file is touched; `auth.js` is not edited, so there is no `auth.js`/`auth.min.js` collision with PRD-Q01 FR-13.
 
 ## 23. Risks and dependencies
 
@@ -1139,18 +1148,20 @@ FR → test mapping
 | R2 | Trainees expect temperatures in v1 | High | Disappointment | Plain "not modelled" copy with the reason; Phase C path visible; S1 teaches that N+1 covers one trip |
 | R3 | `currentCooling()` refactor changes a number outside training | Medium | Accuracy regression | Parity gates (`test-datahall-authority.mjs`, `test-conv-coverage.mjs --strict`, `test-conv-snapshot-binding.mjs`) run before and after T-5 |
 | R4 | 200-row cap shared with calculators fills up | Low | Save fails | Save only on click; cap copy; local copy kept |
-| R5 | Handbook classes read as an industry standard | Medium | Misleading budgets | Every budget line says "worked example"; OQ-3 lets the owner adopt another basis |
+| R5 | Handbook classes read as an industry standard | Medium | Misleading budgets | Every budget line says "worked example"; D-Q07-3 lets the owner adopt another basis |
 | R6 | Scenario files drift from the engine (engine bump) | Medium | Wrong numbers | V4 refuses a mismatch; placeholders, not typed numbers (V10) |
 | R7 | Golden traces rewritten carelessly | Low | Determinism unproven | `--write-golden` only by name; reviewed diff |
 | R8 | `rz-engine.js` A1 label (F8) misleads elsewhere | Medium | Wrong teaching elsewhere | Reported to the engine owner as a separate engine fix; Q7 cites the handbook, not the engine table |
 | R9 | Q6 L7 still references the excursion | High if order differs | Red gate | FR-16 rewrites it in the same release |
 | R10 | GitHub Pages deploy does not run | Medium | Live stays old | Live version check in §22 |
 
-Open questions for the owner:
-- OQ-1 Adopt the Hall A air volume (or an effective thermal capacitance with its source) for Phase C; or adopt the air-only bound labelled "fastest possible rise".
-- OQ-2 Adopt a standby CRAH start delay (sequence of operation), or keep "not modelled".
-- OQ-3 Keep the Cx handbook MSC-1 alarm classes as the training budget basis, or supply the site's alarm philosophy (the page code cites a "doc-03 Alarm Rules" that is not in the repository, `datahall.html:1409`).
-- OQ-4 Accept the four scenario files (Appendix C) for publication.
+| R11 | Q01 FR-13 not shipped when a scenario wants incident links | Medium | Dossier links without the lock | V16 refuses a non-empty `relatedIncidents` until `isRootOnlyHref` matches dossiers |
+
+Owner decisions (recorded in `documentation/product-transformation/DECISIONS.md` with options, recommended default and status; all PROPOSED on 2026-11-11):
+- D-Q07-1 Adopt the Hall A air volume (or an effective thermal capacitance with its source) for Phase C; or adopt the air-only bound labelled "fastest possible rise".
+- D-Q07-2 Adopt a standby CRAH start delay (sequence of operation), or keep "not modelled".
+- D-Q07-3 Keep the Cx handbook MSC-1 alarm classes as the training budget basis, or supply the site's alarm philosophy (the page code cites a "doc-03 Alarm Rules" that is not in the repository, `datahall.html:1409`).
+- D-Q07-4 Accept the four scenario files (Appendix C) for publication.
 
 ## 24. Definition of done
 
@@ -1159,14 +1170,14 @@ Open questions for the owner:
 - [ ] Player, panel, adapters work at 1440 and 390, both themes; screenshots looked at.
 - [ ] Same scenario + seed + ops → byte-identical traces in node and browser; L2 green.
 - [ ] Debrief and PDF carry every row, seed, engine version, site version, trace id; L5 green.
-- [ ] Device save and account save round-trip; errors handled; L6 green.
+- [ ] Device save and account save round-trip; errors handled; L6 green. `auth.js` and `auth.min.js` unchanged (`git diff --stat` empty); no tracker call in the panel.
 - [ ] Malformed files refused with their copy; L7 green.
 - [ ] Q6 provenance and data mode correct; axe clean; design rules hold; L8 green.
 - [ ] The three updated gates and the new gate wired; `bash tools/ship-gate.sh --probe` exit 0.
 - [ ] Manuals, page PRD and the standards in §22 updated in the same release.
 - [ ] Version claimed with the peer, CHANGELOG, changelog page, service-worker cache name, cache tokens.
 - [ ] Live: page has no `Math.random`, catalogue served, live L2 and L4 pass against `https://resistancezero.com`.
-- [ ] Phase C stays refused until OQ-1 is decided; when decided, T-17 done with the adopted basis.
+- [ ] Phase C stays refused until D-Q07-1 is decided; when decided, T-17 done with the adopted basis.
 
 ## Appendix A — Inventory of alarm paths on the six cockpit pages (verified 2026-11-11)
 
@@ -1229,7 +1240,7 @@ S1 `data/scenarios/dh-crah-trip-n1.json`:
 ```
 (`basis` holds the full objects in the file; abbreviated here. `x2` has an effect `{"do":"equipment.set","target":"crah:pick:u","state":"stby"}` that returns the unit to standby.)
 
-S2 `data/scenarios/dh-crah-trip-standby-oos.json` (v1 capacity only; v2 adds `lumped-air-v1` after OQ-1):
+S2 `data/scenarios/dh-crah-trip-standby-oos.json` (v1 capacity only; v2 adds `lumped-air-v1` after D-Q07-1):
 - Premise at 0: `crah:standby` state `oos`; alarm a0 P4 "{standbyTag} out of service for maintenance" (no acknowledgement budget: "next working day" is outside the session; result "No time budget set").
 - At 60: `crah:pick:u` trips → a1 P2 "{tag} tripped, fan stopped" (ack budget 300 s, `hb-classes`).
 - Condition `capacity.deficit` → a2 P1 "Cooling capacity {availKw} kW below hall IT load {itKw} kW" (ack budget 60 s, `hb-classes`; class P1 because the handbook defines P1 as "immediate risk to IT load").

@@ -6,23 +6,24 @@
 |---|---|
 | PRD id | PRD-Q01 |
 | Feature | Relation file (`data/relations.json`) linking journal articles, tool pages, incident dossiers and glossary terms, rendered as static HTML on both ends of every link |
-| Version | 1.0 |
+| Version | 1.1 |
 | Status | Draft |
 | Author | Opus 5.5 (Fable quota exhausted) |
 | Date | 2026-11-10 |
 | Owner requests | R110 (PRD per idea), R111 (24-section structure) |
 | Priority | 74.5 (addendum rank 2: I 8, N 6, C 8, E 4; `PRODUCT_INNOVATION_ASSESSMENT_2026-11_ADDENDUM.md:77`) |
 | Related findings | Addendum Q1 (`…_ADDENDUM.md:117-142`), maturity row "Cross-linking of content: 1" (`:29`). New findings from this PRD: N1 (auth.js cannot match dossier URLs, §3 F6), C1–C4 (addendum corrections, §3.3) |
-| Dependencies | None blocking. Consumers: Q3 (incident reproduce), Q17 (learning paths). Coordinate: P14 (palette, peer), X11 (tool inventory) |
+| Dependencies | None blocking. Q1 depends on no other PRD of this program; in particular it neither reads PRD-Q03 data nor requires Q03 to ship (coordinator decision D8: the only direction is Q03 → Q01, through Q03's rule R2I, which proposes edges into this file and leaves every decision to the owner). Readers of `data/relations.json`: Q17 (learning paths), Q07 V16 (needs FR-13). Coordinate: P14 (palette, peer), X11 (tool inventory) |
 | Related modules | `tools/build-journal.py`, `tools/build-incidents.py`, `tools/assemble-article.py`, `auth.js` + `auth.min.js`, `js/rz-explain-db.js`, `glossary.html`, `tools/test-generator-freshness.py`, `tools/ship-gate.sh`, 36 journal pages, 32 tool pages, 43 dossier pages |
 | Target wave | "Connected reference, weeks 9–16" (addendum Deliverable 4, `…_ADDENDUM.md:557`) |
-| Approval status | Approved by owner R110/R111 2026-11-10 (the PRD set). Each individual relation still needs owner acceptance (§12). FR-13 changes `auth.js`, an auth boundary, so it needs the owner's explicit yes before T-7 ships (`documentation/product-transformation/STATE.md`: "Approval is still required for … auth or security boundary changes") |
+| Approval status | Approved by owner R110/R111 2026-11-10 (the PRD set). Each individual relation still needs owner acceptance (§12). FR-13 changes `auth.js`, an auth boundary, so it needs the owner's explicit yes before T-7 ships (`documentation/product-transformation/STATE.md`: "Approval is still required for … auth or security boundary changes"). Owner decisions: D-Q01-1 (dossier rows on public pages, was OQ1), D-Q01-2 (how edges are accepted, was OQ2), D-Q01-3 (the FR-13 `auth.js` change), all in `documentation/product-transformation/DECISIONS.md` |
 
 Change history
 
 | Version | Date | Author | Change |
 |---|---|---|---|
 | 1.0 | 2026-11-10 | Opus 5.5 | First complete draft, 24 sections. Facts verified against `wt-hub3` at `803253314` and re-checked at `1cb6dd292` (the only commit between them adds the product-transformation docs) |
+| 1.1 | 2026-11-11 | Opus 5.5 | QA batch 1 revisions (D1–D8). D1: L8 counts a page as compliant with a rendered block or a recorded `pending-review`/`exempt` status (new `pendingReview[]`, V15, `pending` command), so phase 0 is green; every law's red proof is a planted-violation fixture (§20.5 table); tool pages get their own section class `rz-related` and marker pair `<!-- rz-related:start -->`/`<!-- rz-related:end -->` (FR-10, §9.3, §11.3); new law L9, re-running the build is byte-identical. D5: OQ1/OQ2 and the FR-13 approval are D-Q01-1…3 in `DECISIONS.md`. D8: the Q3 read of this file is removed (§5.4, §11.4, §13) |
 
 ## 2. Executive summary
 
@@ -58,7 +59,7 @@ The site has 36 journal articles, 43 incident dossiers, 32 public tool pages and
 ### 3.2 Consequence of leaving it
 
 - A reader who finishes an article on power distribution cannot reach the calculator, the dossier or the terms for that topic except through the generic menu. The 36 articles, the tools and the 43 dossiers behave as three separate libraries.
-- Q3 (reproduce an incident in a calculator) and Q17 (learning paths) have no data to stand on; both need accepted article/tool/incident links.
+- Q17 (learning paths) has no data to stand on; it needs accepted article/tool/incident links. Q3's tool → incident links also have nowhere to appear on tool pages until this file exists (Q3 feeds proposals in through its rule R2I; Q1 does not read Q3).
 - Without a single source, any cross-link added by hand (like `article-19.html:1008`) drifts silently when a page is renamed. Nothing checks it.
 
 ### 3.3 Addendum corrections
@@ -101,7 +102,7 @@ No target above is an invented user-behaviour figure. Usage counts (clicks on ro
 ### 5.2 Out of scope (non-goals)
 
 - Removing or changing the nav dropdown (C2).
-- Opening the incident library to non-root tiers (owner decision, §16, OQ1).
+- Opening the incident library to non-root tiers (owner decision, §16, D-Q01-1 option C).
 - Search and palette coverage (peer P14). Relations may feed the palette later; not specified here.
 - Article→article links (already `.related-articles`).
 - Reverse rows on `glossary.html` (term→article). 449 term entries with reverse lists would be noise; v2 option.
@@ -131,10 +132,11 @@ No target above is an invented user-behaviour figure. Usage counts (clicks on ro
 | Dependency | Type | Status |
 |---|---|---|
 | Owner acceptance of edges | Human | Needed per batch (T-10) |
-| Owner approval of FR-13 (`auth.js`, auth boundary) | Human | Needed before phase 2 (§22) |
+| Owner approval of FR-13 (`auth.js`, auth boundary): D-Q01-3 in `DECISIONS.md` | Human | Needed before phase 2 (§22) |
 | Peer agreement for `cx-calculator.html` | Coordination | Not needed for v1 (excluded) |
 | P14 palette | Coordination only | No change required by this PRD |
-| Q3, Q17 | Downstream consumers | They read `data/relations.json`; schema `rz-relations/1` is their contract |
+| Q17 | Downstream consumer | Reads `data/relations.json`; schema `rz-relations/1` is its contract |
+| Q3 | Upstream proposer only (D8) | Q3's rule R2I appends `proposed` tool → incident edges through this PRD's CLI (PRD-Q03 FR-12); Q1 never reads Q3 data, and no Q1 law or build step depends on Q3 |
 
 ### 5.5 Constraints
 
@@ -145,8 +147,8 @@ No target above is an invented user-behaviour figure. Usage counts (clicks on ro
 
 ### 5.6 Assumptions
 
-- A1: The owner keeps the incident library root-only in v1 (OQ1 default).
-- A2: The owner accepts edges in chat by id; the session records the decision with the request id (OQ2 default).
+- A1: The owner keeps the incident library root-only in v1 (D-Q01-1, recommended default A).
+- A2: The owner accepts edges in chat by id; the session records the decision with the request id (D-Q01-2, recommended default A).
 - A3: Article ids, dossier slugs, tool page names and explain-db keys are stable identifiers. Renames are handled by `retire` + re-propose (§17).
 
 ## 6. User personas and use cases
@@ -223,14 +225,14 @@ Each FR lists: description, trigger, preconditions, inputs, processing, outputs,
 **FR-1 Relation file and validation**
 - Description: `data/relations.json` is the single source of truth; `tools/relations_lib.py` loads and validates it.
 - Trigger: every `build-relations.py` command, `build-incidents.py` run, every gate run.
-- Preconditions: file exists (T-1 commits the empty skeleton `{"schema":"rz-relations/1","nodes":{"tools":[]},"edges":[],"exemptions":[]}`).
+- Preconditions: file exists (T-1 commits the empty skeleton `{"schema":"rz-relations/1","nodes":{"tools":[]},"edges":[],"exemptions":[],"pendingReview":[]}`).
 - Inputs: `data/relations.json`, `data/journal.json`, `data/incidents/*.json` (names not starting `_`), `js/rz-explain-db.js`, `glossary.html`, tool pages.
-- Processing: parse; check rules V1–V14 (§10.3); collect errors and warnings.
+- Processing: parse; check rules V1–V15 (§10.3); collect errors and warnings.
 - Outputs: `(errors: list[str], warnings: list[str])`.
 - State change: none.
 - Dependencies: Python 3 standard library only.
 - Exceptions: malformed JSON → exit 2 with line and column; unknown `schema` → exit 2.
-- Acceptance: `python3 tools/test-relations-lib.py` passes U1–U16; each planted invalid fixture yields exactly its named error.
+- Acceptance: `python3 tools/test-relations-lib.py` passes U1–U17; each planted invalid fixture yields exactly its named error.
 
 **FR-2 Tool registry**
 - Description: `nodes.tools[]` lists tool pages that may carry relations.
@@ -252,7 +254,7 @@ Each FR lists: description, trigger, preconditions, inputs, processing, outputs,
 - Exceptions: no tool reaches 4 → nothing proposed (the owner may exempt the article, FR-8).
 - Acceptance: on a fixture article containing "NFPA 2001" ×2 and "clean agent" ×1, `fire-calculator` is proposed with score 3×2 + 2×1 = 8 and the quote contains "NFPA 2001".
 
-Visible text (all propose rules): page HTML from `<body` to the first `<div class="related-articles"`, with `<script>`, `<style>`, `<nav>`, `<header class=…navbar…>`, `<footer>` and any existing `<!-- rz:related -->` block removed, tags stripped, entities decoded, whitespace collapsed.
+Visible text (all propose rules): page HTML from `<body` to the first `<div class="related-articles"`, with `<script>`, `<style>`, `<nav>`, `<header class=…navbar…>`, `<footer>` and any existing generated block (`<!-- rz:related -->…<!-- /rz:related -->` on articles, `<!-- rz-related:start -->…<!-- rz-related:end -->` on tool pages) removed, tags stripped, entities decoded, whitespace collapsed.
 
 **FR-4 Propose article→incident (rule A2I)**
 - Inputs: article visible text; per dossier: `operator`, `operatorShort`, `dcName`, `location.city`, `date` year, `title`.
@@ -286,6 +288,21 @@ Visible text (all propose rules): page HTML from `<body` to the first `<div clas
 - Exceptions: `--by` other than `owner` → exit 2 ("only the owner accepts relations"); missing `--request` → exit 2.
 - Acceptance: U9–U12; the file is byte-identical after a refused command.
 
+**FR-8a Pending-review records (L8 coverage)**
+- Description: a page in scope (36 journal, 32 tool, 43 dossier pages) that has no rendered block yet carries a recorded
+  status instead, so L8 can tell "waiting for the owner" from "forgotten" (coordinator decision D1).
+- Trigger: `build-relations.py pending (<node> | --scope all) --reason "<text>"`; T-4 runs `--scope all --reason
+  "awaiting owner batch 1"` once, which records every in-scope node that has neither an accepted edge nor an exemption.
+- Processing: appends `{node, status: "pending-review", recordedOn, reason}` to `pendingReview[]` (V15). This is a
+  bookkeeping status, not an owner decision: it needs no `--request` and never renders anything. `decide --accept`
+  removes the `pendingReview` record of every node that gains its first accepted edge in that call, in the same
+  atomic write; `exempt` removes it for the exempted node.
+- Effect on the laws: L8 counts a page as compliant when it has a rendered block, or its node is in `pendingReview[]`,
+  or in `exemptions[]` (`exempt`). It fails only for a page with neither. L1 is unaffected: from phase 1 a journal
+  page still needs an accepted Tool row or an exemption, and `pending-review` does not satisfy L1.
+- Acceptance: U17 (record, auto-removal on first accept, V15 on a node that has an accepted edge); L8 coverage part
+  green on the phase 0 tree.
+
 **FR-9 Article block**
 - Trigger: `build-relations.py --apply` (and `--check` compares).
 - Processing: for each journal page, collect accepted edges where `from = article:<id>`; if any, render the block (§9.3) between `<!-- rz:related -->` and `<!-- /rz:related -->` placed immediately before `<div class="related-articles">`; insert the marker pair on first run; if no accepted edge, write an empty marker pair (no block). Add `<link rel="stylesheet" href="css/rz-related.css?v=<token>">` between `<!-- rz:related-css -->` markers placed before `</head>`, only on pages that render a block.
@@ -294,8 +311,12 @@ Visible text (all propose rules): page HTML from `<body` to the first `<div clas
 - Acceptance: L1, L2, L4, L5; byte-stable second run (idempotent).
 
 **FR-10 Tool page block**
-- Processing: accepted edges where `to = tool:<id>` (Article rows) and `from = tool:<id>` (Incident rows); block placed right after the closing `</section>` of `section.tool-ref`; eyebrow number = the `.tool-ref` eyebrow number + 1 when it reads `NN / …`, else no number.
-- Acceptance: L2 on every tool with an accepted edge; L8 render checks.
+- Processing: accepted edges where `to = tool:<id>` (Article rows) and `from = tool:<id>` (Incident rows). The generated section has its own class `rz-related` (plus `rz-rel rz-rel--tool` for the shared row styling) and **never** the class `tool-ref`, so the hand-written `section.tool-ref` stays the only element with that class. It sits between a unique marker pair `<!-- rz-related:start -->` … `<!-- rz-related:end -->` (coordinator decision D1).
+  - First run (no marker pair on the page): insert the pair, empty, immediately after the `</section>` that closes the first `section.tool-ref` in document order (found by tag matching from its opening tag, never by a regex over the whole page).
+  - Every run: replace only what lies between the markers; content outside them is never touched. With no accepted edge the pair stays empty.
+  - Eyebrow: read once per run from the first `.tool-ref .eyebrow` (the hand-written section); when it reads `NN / …` the generated eyebrow is `NN+1 / Related` (zero-padded), else no number. The generated section's own eyebrow is never read.
+  - Exceptions: no `section.tool-ref` and no marker pair → error naming the page; more than one `rz-related:start` marker, or a start without its end → error naming the page, nothing written (L9 fixture).
+- Acceptance: L2 on every tool with an accepted edge; L8 render checks; L9 (second `--apply` byte-identical, one block per page).
 
 **FR-11 Dossier block**
 - Processing: `tools/build-incidents.py` imports `relations_lib.render_incident_block(slug)`; adds a section `id="related"` after `#sources` and before the share bar, and adds `("related", "Related")` to the section nav (`_SECTIONS`, `tools/build-incidents.py:1493`) only when the dossier has accepted edges. Rows: Article (from article→incident edges), Tool (from tool→incident edges). Head gets the stylesheet via `head_extra` with `_asset_token("css/rz-related.css")`.
@@ -303,7 +324,7 @@ Visible text (all propose rules): page HTML from `<body` to the first `<div clas
 
 **FR-12 Freshness**
 - `build-relations.py --check` re-renders all blocks in memory and exits 1 naming any page whose block differs; `tools/test-generator-freshness.py` gains `("data/relations.json -> relation blocks", ["python3", "tools/build-relations.py", "--check"])`.
-- Acceptance: L7; a hand edit inside a block turns `--check` red naming the page.
+- Acceptance: L7; a hand edit inside a block turns `--check` red naming the page. L9: running `--apply` a second time on an already built tree writes 0 files and every page's SHA-256 is unchanged (idempotent splice).
 
 **FR-13 Root-gated rows and the matcher fix (N1)**
 - Description: every row whose target is root-only shows the word "Root access"; `isRootOnlyHref()` matches dossier URLs.
@@ -315,7 +336,7 @@ Visible text (all propose rules): page HTML from `<body` to the first `<div clas
 - Acceptance: fixture assembly from a shell that carries a block produces a page with no block; `build-relations.py --apply` then adds the new article's own block.
 
 **FR-15 Gate**
-- `tools/test-relations.mjs` implements L1–L8 (§20.4) with `--law`, `--live`, `--strict` and `--phase 0|1` (§22); `tools/test-relations-lib.py` runs unit tests; both wired in `tools/ship-gate.sh` (§20.3).
+- `tools/test-relations.mjs` implements L1–L9 (§20.4) with `--law`, `--live`, `--strict`, `--phase 0|1` (§22) and `--fixture <dir>` (runs one law against a planted-violation tree under `tools/fixtures/relations/`, §20.5); `tools/test-relations-lib.py` runs unit tests; both wired in `tools/ship-gate.sh` (§20.3). Every law's red proof is a fixture run, stored in `05-test-evidence/Q01/`.
 
 **FR-16 Content linkage process**
 - The playbook (`standarization/CONTENT_LINKAGE_PLAYBOOK.md` §1, §2 and a new incident row) gains: "propose → owner decision → `--apply` → `test-relations`". L1 enforces it for every journal page.
@@ -333,7 +354,8 @@ Visible text (all propose rules): page HTML from `<body` to the first `<div clas
 | FR-7 | `report` | — | relations file | Markdown or JSON sheet, or a count | None | FR-1 | Unknown status → exit 2 | U9 |
 | FR-8 | `decide`, `edit`, `retire`, `exempt` | Ids exist; status fits; `--request` given | Ids, request id, why text | Summary per id | Status and audit fields; atomic write | FR-1 | `--by` not owner or no request → exit 2; quote drift → exit 1; nothing written | U12, U15, U16, AC4, AC5 |
 | FR-9 | `--apply` / `--check` | `.related-articles` present | Accepted edges, labels | 36 article pages | HTML between markers; CSS link | FR-1, renderers | Anchor missing → error naming the page | L1, L2, L4, L5, AC1, AC6 |
-| FR-10 | `--apply` / `--check` | `section.tool-ref` present | Accepted edges | Tool pages | HTML after `.tool-ref` | FR-9 | Anchor missing → error | L2, AC2 |
+| FR-10 | `--apply` / `--check` | `section.tool-ref` present, or the `rz-related` marker pair | Accepted edges | Tool pages | `section.rz-related` between `<!-- rz-related:start/end -->`, first placed after `.tool-ref` | FR-9 | Anchor and markers missing, duplicate or broken markers → error naming the page, nothing written | L2, L9, AC2, AC13 |
+| FR-8a | `pending` | Node in scope, no accepted edge, not exempt | Node or `--scope all`, reason | `pendingReview[]` records | Records added; removed by the node's first `decide --accept` or by `exempt` | FR-1 | V15 violation → exit 1, nothing written | U17, L8, AC14 |
 | FR-11 | `build-incidents.py --apply` | Relations valid | Accepted edges | Dossier `#related` + nav | Dossier HTML | `tools/build-incidents.py` | Invalid relations → that build fails | L2, AC3 |
 | FR-12 | `--check`; freshness gate | — | Relations file + pages | Exit code, stale page names | None | FR-9, FR-10, FR-11 | Stale → exit 1 | L7, AC9 |
 | FR-13 | Page load (`auth.js`) | Owner approval of the change | Link hrefs | Lock icon, title, root prompt | DOM class and title | `auth.js`, `auth.min.js` | `auth.js` absent → dossier's own gate | L6, AC7 |
@@ -453,7 +475,18 @@ The "why" line is optional; rows without it are one line on desktop.
 
 (Labels, slugs and term keys above are illustrative of the format; real rows exist only after owner acceptance.)
 
-Tool pages wrap the same `<ul>` in `<section class="tool-ref rz-rel rz-rel--tool" data-rz-rel="1" aria-labelledby="rz-rel-h"><div class="wrap"><p class="eyebrow">03 / Related</p><h2 id="rz-rel-h" class="rz-rel-h">…</h2>…</div></section>`. Dossiers use `<section class="inc-sec rz-rel rz-rel--inc" id="related" aria-labelledby="h-related" data-rz-rel="1"><h2 id="h-related">Related articles and tools</h2>…`.
+Tool pages wrap the same `<ul>` in their own marker pair and section class (FR-10; never `tool-ref`):
+
+```html
+<!-- rz-related:start -->
+<section class="rz-related rz-rel rz-rel--tool" data-rz-rel="1" aria-labelledby="rz-rel-h">
+  <div class="wrap"><p class="eyebrow">03 / Related</p><h2 id="rz-rel-h" class="rz-rel-h">Articles and incidents that use this tool</h2>
+  <ul class="rz-rel-list">…</ul></div>
+</section>
+<!-- rz-related:end -->
+```
+
+(Eyebrow "03" because `tier-advisor.html`'s hand-written section reads "02 / Reference"; every one of the 33 tool-register pages has exactly one `<section class="tool-ref"`, checked with `grep -c`.) Dossiers use `<section class="inc-sec rz-rel rz-rel--inc" id="related" aria-labelledby="h-related" data-rz-rel="1"><h2 id="h-related">Related articles and tools</h2>…`.
 
 Text sources: incident label = dossier `title` with a trailing parenthetical removed, plus ", <year>"; if empty, `_short()`. Article label = `journal.json` `title`. Tool label = registry `label`. Term label = explain-db `t`. All text HTML-escaped (`html.escape(..., quote=True)`).
 
@@ -505,6 +538,7 @@ The addendum's keys "Compute" and "See it fail" (`…_ADDENDUM.md:119-120`) are 
 - Why: sans 14px/1.5 secondary, block below the link.
 - Access word: mono 11px muted, right column; no background, no border (a state is a word).
 - ≤ 768 px: grid becomes one column; link `display: block; min-height: 44px; padding: 10px 0`; access word inline after the why.
+- Tool pages: the generated section is styled through `.rz-related` (its own class), e.g. `.rz-related .eyebrow` copies the tool register's eyebrow tokens by the same fallback chain; no rule in this file targets `.tool-ref`, so the hand-written section is never restyled.
 - `@media print { .rz-rel { display: none } }`.
 - Forbidden in this file (checked by L8): `transition`, `transform`, `animation`, `box-shadow`, `gradient`, `backdrop-filter`, `border-radius` > 4px, `border-left` wider than 1px.
 
@@ -533,7 +567,7 @@ No relation data. Article metadata lives in `data/journal.json` (generated, over
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "rz-relations/1",
   "type": "object",
-  "required": ["schema", "nodes", "edges", "exemptions"],
+  "required": ["schema", "nodes", "edges", "exemptions", "pendingReview"],
   "additionalProperties": false,
   "properties": {
     "schema": { "const": "rz-relations/1" },
@@ -543,7 +577,8 @@ No relation data. Article metadata lives in `data/journal.json` (generated, over
       "properties": { "tools": { "type": "array", "items": { "$ref": "#/$defs/tool" } } }
     },
     "edges": { "type": "array", "items": { "$ref": "#/$defs/edge" } },
-    "exemptions": { "type": "array", "items": { "$ref": "#/$defs/exemption" } }
+    "exemptions": { "type": "array", "items": { "$ref": "#/$defs/exemption" } },
+    "pendingReview": { "type": "array", "items": { "$ref": "#/$defs/pending" } }
   },
   "$defs": {
     "nodeRef": { "type": "string", "pattern": "^(article|tool|incident|term):[A-Za-z0-9-]{1,80}$" },
@@ -598,6 +633,16 @@ No relation data. Article metadata lives in `data/journal.json` (generated, over
         "decidedOn": { "type": "string", "format": "date" },
         "request": { "type": "string", "pattern": "^R[0-9]{2,4}$" }
       }
+    },
+    "pending": {
+      "type": "object", "additionalProperties": false,
+      "required": ["node", "status", "recordedOn", "reason"],
+      "properties": {
+        "node": { "$ref": "#/$defs/nodeRef" },
+        "status": { "const": "pending-review" },
+        "recordedOn": { "type": "string", "format": "date" },
+        "reason": { "type": "string", "minLength": 10, "maxLength": 140 }
+      }
     }
   }
 }
@@ -623,6 +668,7 @@ No relation data. Article metadata lives in `data/journal.json` (generated, over
 | V12 | accepted per `from`: article ≤ 3 tool, ≤ 3 incident, ≤ 8 term; tool ≤ 6 incident | `V12 over cap` |
 | V13 | registry: `url == id + ".html"`, file has `section.tool-ref`, `access` equals the site gate for that page, `incidentCategories` ⊆ `CATEGORY_LABEL` keys (`tools/build-incidents.py:30`) | `V13 registry` |
 | V14 | exemption node has 0 accepted edges of that kind | `V14 exemption contradicts an accepted edge` |
+| V15 | `pendingReview` node is unique in the array, exists (V4 rules), and has 0 accepted edges (on either end); a node is never both pending and exempt | `V15 pending record contradicts the data` |
 
 ### 10.4 Tool registry v1
 
@@ -670,7 +716,7 @@ Exemption:
 
 ### 10.6 Versioning, migration, compatibility, retention
 
-- Versioning: `schema: "rz-relations/1"`. A breaking change creates `rz-relations/2` and a one-shot migration in `build-relations.py migrate`; readers (Q3, Q17) must check `schema`.
+- Versioning: `schema: "rz-relations/1"`. A breaking change creates `rz-relations/2` and a one-shot migration in `build-relations.py migrate`; readers (Q17, and Q07 when it renders dossier links) must check `schema`.
 - Migration from today: none exists; T-1 commits the empty skeleton. The hand link in `article-19.html:1008` stays as prose; the generator will propose the same tools for the owner to accept as rows.
 - Compatibility: pages without accepted edges get only an empty marker pair, so nothing visible changes until the owner accepts.
 - Retention: records are never deleted. Rejected records stop re-proposal; retired records keep history. Git history is the audit log (`git log -p data/relations.json`).
@@ -686,7 +732,9 @@ There is no backend: no Supabase table, no RPC, no Worker endpoint (verified: no
 |---|---|---|
 | `--check` | Validate + re-render in memory; list stale pages | 0 fresh, 1 stale or invalid, 2 IO/schema error |
 | `--apply` | Validate; write all blocks and CSS links | 0 written, 1 invalid (nothing written), 2 IO error |
-| `validate` | Rules V1–V14 only | 0 / 1 / 2 |
+| `validate` | Rules V1–V15 only | 0 / 1 / 2 |
+| `pending (<node> \| --scope all) --reason "<text>"` | Record `pending-review` for in-scope pages with no accepted edge and no exemption (FR-8a); no request id (bookkeeping, not a decision) | 0 / 1 (V15) |
+| `--render-fixture` | Write `tools/fixtures/relations/render-fixture.html`: a static page in the article register with one Tool, one Incident and one Terms row built from fixture edges, used by L8 in phase 0 (no real page has a block yet) | 0 / 2 |
 | `seed-tools` | Create registry entries for tool pages not yet listed | 0 / 2 |
 | `propose [--scope <node>\|all] [--rules A2T,A2I,T2I,A2W]` | Append proposals | 0 (prints count) / 2 |
 | `report [--status …] [--scope …] [--format md\|json] [--count]` | Print review sheet | 0 |
@@ -718,13 +766,13 @@ def visible_text(html: str) -> str: ...                                      # F
 
 | Item | Contract |
 |---|---|
-| Markers | `<!-- rz:related -->` … `<!-- /rz:related -->` (body); `<!-- rz:related-css -->` … `<!-- /rz:related-css -->` (head). Generator-owned; never hand-edited |
-| Root element | `section.rz-rel[data-rz-rel="1"]` |
+| Markers | Articles: `<!-- rz:related -->` … `<!-- /rz:related -->` (body). Tool pages: `<!-- rz-related:start -->` … `<!-- rz-related:end -->` (body), inserted once after the first `section.tool-ref`, at most one pair per page. Both: `<!-- rz:related-css -->` … `<!-- /rz:related-css -->` (head). Generator-owned; never hand-edited |
+| Root element | `section.rz-rel[data-rz-rel="1"]`; on tool pages `section.rz-related.rz-rel.rz-rel--tool[data-rz-rel="1"]`, never with class `tool-ref` |
 | Row | `li.rz-rel-row[data-kind="tool|incident|terms|article"]` |
 | Link | `a[data-edge="rel-NNNN"]`; the same id appears on the reverse page (two-way check) |
 | Access | `span.rz-rel-access` with text `Root access` |
 
-### 11.4 Consumers' contract (Q3, Q17)
+### 11.4 Consumers' contract (Q17; Q3 only writes proposals through the CLI)
 
 Read `data/relations.json`, check `schema`, use only `status == "accepted"`. Never write to it except through the CLI.
 
@@ -759,7 +807,7 @@ stateDiagram-v2
 | `tools/build-incidents.py` | Imports `relations_lib`; adds `#related` section and nav entry | Edge accepted/retired → `build-incidents.py --apply` (its `--check` turns red until then) |
 | Dossier JSON | Read only | Slug rename → V4 error |
 | `js/rz-explain-db.js` / `glossary.html` | Read only | Term removed from the glossary → V4 error; anchor change → L3 error |
-| Tool pages (32) | Block spliced after `.tool-ref` | Tool page rewrite that drops `.tool-ref` → FR-10 error names the page |
+| Tool pages (32) | Block spliced between `<!-- rz-related:start/end -->`, first placed after the hand-written `section.tool-ref` | Tool page rewrite that drops `.tool-ref` and the markers → FR-10 error names the page; a page with the markers keeps its block even if `.tool-ref` moves |
 | `tools/assemble-article.py` | Strips inherited block (FR-14) | New article never inherits another's rows |
 | `auth.js`, `auth.min.js` | Matcher fix | Every page with a dossier link gets lock + prompt |
 | `tools/build-llms-full.py` | None; its output changes because article text gains rows | Rerun `--apply` in the release; freshness gate catches it |
@@ -770,7 +818,7 @@ stateDiagram-v2
 | Scenarios (`js/rz-scenario.js`), account page | None | — |
 | Engine (`rz-engine.js`), manuals | None | — |
 | Second Brain graph (`Apps/second brain/sync-graph.py`) | None in v1 | v2 option: import accepted edges as graph links |
-| Q3 | Reads accepted tool→incident edges to cross-check its `reproduce[]` entries | Contract §11.4 |
+| Q3 | None in Q1. Q3's rule R2I (PRD-Q03 FR-12) appends `proposed` tool → incident edges through `build-relations.py propose`; the owner decides them like any other edge. Q1 does not read Q3's `reproduce[]` data (D8) | — |
 
 ## 14. AI and automation requirements
 
@@ -796,7 +844,7 @@ stateDiagram-v2
 | Privacy | No user data stored or sent; no analytics | Code review |
 | Maintainability | One file, one CLI, one module; docs in `RELATIONS_STANDARD.md` | — |
 | Observability | `report --count` per status; gate prints per-law counts | Gate log |
-| Data integrity | V1–V14 on every build; freshness gate | L7 |
+| Data integrity | V1–V15 on every build; freshness gate; idempotent splice | L7, L9 |
 | Backup / recovery | Git; `git revert` restores any prior state | §22 |
 
 ## 16. Security and access control
@@ -804,7 +852,7 @@ stateDiagram-v2
 - Roles: owner (decides), session (proposes, records), readers (read). Enforcement of "only the owner decides" is procedural (BR2) plus audit fields (V8). The gate cannot prove a human said it; the request id makes every decision traceable to a chat request.
 - Access to targets: tool pages public in v1 (V13). Dossiers root-only (F5). Q1 does not change who can read a dossier.
 - Approval: FR-13 widens which links `auth.js` locks. That is an auth-boundary change, so it ships only after the owner approves it by name (STATE.md approval list). Until then no dossier row is rendered (phase 2 waits, §22), so no public page links a dossier without the lock.
-- Observation (not introduced by Q1): the dossier gate is presentational. The full dossier is in the page HTML and in `data/incidents/*.json`, both served publicly; `noindex` keeps it out of search. Linking dossiers from public articles makes their URLs easier to find, not their content more exposed. If the owner treats the library as confidential, the gate itself needs a server-side change, independent of Q1 (OQ1).
+- Observation (not introduced by Q1): the dossier gate is presentational. The full dossier is in the page HTML and in `data/incidents/*.json`, both served publicly; `noindex` keeps it out of search. Linking dossiers from public articles makes their URLs easier to find, not their content more exposed. If the owner treats the library as confidential, the gate itself needs a server-side change, independent of Q1 (D-Q01-1).
 - Input validation: the CLI validates every argument (ids pattern, request pattern, why rules); the generator never builds an href from free text.
 - XSS: every label, why and quote passes `html.escape(…, quote=True)`; unit U13 plants `<script>` in a why line and expects escaped output.
 - Secrets: none involved. No key, token or credential is read or written.
@@ -891,12 +939,12 @@ Deployment: commit → push → GitHub Pages serves the HTML. No Supabase or Wor
 | T-1 | Skeleton file, schema, `relations_lib.load/validate`, unit tests U1–U8 | — | `data/relations.json`, `tools/relations_lib.py`, `tools/test-relations-lib.py` | stdlib only | 1.5 d | `python3 tools/test-relations-lib.py` → all pass; planted fixtures fail with named rule | V1–V14 implemented |
 | T-2 | `seed-tools` + curate keywords and categories for 32 tools | T-1 | `tools/build-relations.py`, `data/relations.json` | read `<h1>`, `<title>`, `.tool-ref` | 1 d | `validate` → 0 errors; 32 tools | Registry reviewed in chat |
 | T-3 | `propose` rules A2T, A2I, T2I, A2W + `report` | T-2 | `tools/build-relations.py` | rules in §8 | 2 d | fixtures in U9–U11; `report --count` printed | Counts recorded in the evidence folder |
-| T-4 | Renderers + `--apply`/`--check` for articles and tool pages; CSS | T-1 | `tools/relations_lib.py`, `tools/build-relations.py`, `css/rz-related.css`, 36 + 32 pages (markers only while 0 accepted) | marker splice | 1.5 d | second `--apply` writes 0 files; byte and time budgets measured | Budgets recorded |
+| T-4 | Renderers + `--apply`/`--check` for articles and tool pages (tool pages: `rz-related` section and `<!-- rz-related:start/end -->` markers, FR-10); `pending --scope all`; `--render-fixture`; CSS | T-1 | `tools/relations_lib.py`, `tools/build-relations.py`, `css/rz-related.css`, `tools/fixtures/relations/render-fixture.html`, 36 + 32 pages (markers only while 0 accepted) | marker splice | 1.5 d | second `--apply` writes 0 files (L9); byte and time budgets measured on the render fixture, whose full block (3 tool, 3 incident, 8 term links) may exceed the 2,048 B estimate: the measured value replaces the budget in O8 and §15, recorded with its command | Budgets recorded |
 | T-5 | Dossier block in `build-incidents.py` | T-4 | `tools/build-incidents.py`, 43 dossier pages | import lib | 1 d | `python3 tools/build-incidents.py --check` → CURRENT | Nav entry only with edges |
 | T-6 | `decide`, `edit`, `retire`, `exempt`, `fmt` | T-1 | `tools/build-relations.py` | atomic writes | 1 d | U12, U15, U16 | Refusals leave file byte-identical |
 | T-7 | N1 matcher fix + twin + tokens | Owner approval (auth boundary) | `auth.js`, `auth.min.js`, pages loading them | one-line change | 0.5 d | `node -e` check of `isRootOnlyHref('/incident-x.html') === true`; `node tools/audit-min-twins.mjs --strict` | L6 green |
 | T-8 | Assembler strip | T-4 | `tools/assemble-article.py` | regex on head and tail | 0.5 d | fixture assembly without block | — |
-| T-9 | Gate `test-relations.mjs` L1–L8, red-first proofs, wiring | T-4..T-8 | `tools/test-relations.mjs`, `tools/ship-gate.sh`, `tools/test-generator-freshness.py` | own HTTP server on port 0, identity check | 2 d | red on `803253314`; red on planted mutations; green after T-11 | Red/green log in `05-test-evidence/Q01/` |
+| T-9 | Gate `test-relations.mjs` L1–L9, the planted-violation fixtures of §20.5, wiring | T-4..T-8 | `tools/test-relations.mjs`, `tools/fixtures/relations/*`, `tools/ship-gate.sh`, `tools/test-generator-freshness.py` | own HTTP server on port 0, identity check | 2 d | every law exits 1 on its §20.5 fixture with the expected message (red), and `--strict --phase 0` exits 0 on the built phase 0 tree (green) | Red/green log in `05-test-evidence/Q01/` |
 | T-10 | Owner review, batch 1 (all 36 articles) and batch 2 (tools→incidents) | T-3, T-6 | `data/relations.json` | report → chat → decide | 0.5 d session + owner time | `report --status proposed --count` → 0 for scope | Every article decided or exempt |
 | T-11 | `--apply`, `build-incidents.py --apply`, `build-llms-full.py --apply`, docs | T-10 | pages, `llms-full.txt`, standards docs | — | 1 d | all gates green locally | Docs per §22 |
 | T-12 | Release + live verification | T-11 | `js/rz-version.js`, `CHANGELOG.md`, `changelog.html` | release chain | 0.5 d | live `--law L4 --live` 36/36 (with rows or exempt) | Live proof in evidence folder |
@@ -909,9 +957,9 @@ Total ≈ 13 working days (addendum estimate 3 weeks).
 
 | Level | What | File |
 |---|---|---|
-| Unit | V1–V14, renderers escape text, id allocation, idempotence, atomic writes (U1–U16) | `tools/test-relations-lib.py` (plain asserts, exit 1 on failure) |
+| Unit | V1–V15, renderers escape text, id allocation, idempotence, atomic writes, pending-review records (U1–U17) | `tools/test-relations-lib.py` (plain asserts, exit 1 on failure) |
 | Integration | `propose → decide → --apply → build-incidents --apply` on a temp copy of the repo with fixtures | `tools/test-relations.mjs --fixture` |
-| Contract | `schema` check; Q3/Q17 reader stub reads accepted edges only | `tools/test-relations-lib.py` U14 |
+| Contract | `schema` check; Q17 reader stub reads accepted edges only | `tools/test-relations-lib.py` U14 |
 | E2E (puppeteer, run under `rz-lane`) | 3 pages × 2 widths × 2 themes: article-7, tier-advisor, one dossier (as root via a seeded `rz_premium_session` with a root role) | `tools/test-relations.mjs` L8 |
 | UI interaction | Non-root click on a dossier row opens the root prompt and does not navigate; root click navigates | L6 browser part |
 | Accessibility | axe-core on `.rz-rel`, planted-line method (insert a span with 2:1 contrast inside the block, require axe to report it, remove it, require 0 serious/critical) | L8 |
@@ -927,13 +975,17 @@ Total ≈ 13 working days (addendum estimate 3 weeks).
 ### 20.3 Gate wiring in `tools/ship-gate.sh`
 
 - After line 71 (incident gates):
-  `gate "relations — owner-accepted links render on both ends, resolve, and are static" node tools/test-relations.mjs --strict --phase 0` (the `--phase` value follows the shipped phase, §22, and is removed when phase 2 ships so every law runs)
+  `gate "relations — owner-accepted links render on both ends, resolve, and are static" node tools/test-relations.mjs --strict --phase 0` (the `--phase` value follows the shipped phase, §22, and is removed when phase 2 ships so every law runs; phase 0 is green with 0 accepted edges because L8 accepts `pending-review` records and renders its checks on the render fixture)
   `gate "relations — data rules and renderers (unit)" python3 tools/test-relations-lib.py`
 - In `tools/test-generator-freshness.py` `BUILDERS` (`:56-73`): `("data/relations.json -> relation blocks", ["python3", "tools/build-relations.py", "--check"])` (already run by `ship-gate.sh:257`).
 
 ### 20.4 LAWS
 
-| Law | Claim | Command | How it fails on today's tree |
+The red-first proof of every law is a run of the gate against a planted-violation fixture (§20.5), never "the script
+does not exist yet" (coordinator decision D1). The last column also states what today's tree shows, for reference;
+where that is only "no file", the fixture run is the proof.
+
+| Law | Claim | Command | How it fails on today's tree / red proof |
 |---|---|---|---|
 | L1 | Each of the 36 journal pages has ≥1 accepted Tool row in its static HTML, or an owner exemption | `node tools/test-relations.mjs --law L1` | `data/relations.json` does not exist and 0 of 36 pages contain `data-rz-rel` → `L1 FAIL 0/36`, exit 1 |
 | L2 | Every accepted page-to-page edge id appears as `data-edge` on exactly its two pages | `--law L2` | No file → exit 1. After build, red proof: delete the block from `tier-advisor.html` in a temp copy → `L2 FAIL rel-NNNN missing on tier-advisor.html` |
@@ -941,8 +993,31 @@ Total ≈ 13 working days (addendum estimate 3 weeks).
 | L4 | Pages with accepted rows show them without JS, live | `node tools/test-relations.mjs --law L4 --live` (fetches `https://resistancezero.com/<page>` with plain HTTP) | Live HTML has 0 `data-edge="rel-` today → `L4 FAIL 0/36` |
 | L5 | Rendered edge ids equal accepted edge ids, and each accepted edge has `decidedBy: owner`, `decidedOn`, `request` | `--law L5` | No file → exit 1. Red proof: a `proposed` fixture edge rendered by a mutated renderer → `L5 FAIL unaccepted edge rendered` |
 | L6 | Every link to `incident-*.html` in a relation block has the text "Root access" in its row, and `isRootOnlyHref()` from `auth.js` (loaded in a node `vm`) returns true for it | `--law L6` | Today `isRootOnlyHref('/incident-ovhcloud-sbg2-fire-2021.html')` returns false (F6) → `L6 FAIL matcher` |
-| L7 | Every block equals a fresh render | `python3 tools/build-relations.py --check` | Script does not exist → exit 2 |
-| L8 | At 390 and 1440 px, both themes: no horizontal overflow in `.rz-rel`; axe 0 serious/critical after the planted line is caught; computed `transition-property` is not `all`; no `transform`; radius ≤ 4 px; fonts are IBM Plex Sans / JetBrains Mono; no new `search-sections` id | `--law L8` | No `.rz-rel` element on any page → `L8 FAIL no block` |
+| L7 | Every block equals a fresh render (no hand edit inside any marker pair) | `node tools/test-relations.mjs --law L7` (runs `python3 tools/build-relations.py --check`) | Red proof: fixture `l7-hand-edit` → `L7 FAIL stale article-7.html`, exit 1 |
+| L8 | (a) Coverage: every in-scope page (36 journal, 32 tool, 43 dossier) has a rendered block, or its node is recorded as `pending-review` (`pendingReview[]`) or `exempt` (`exemptions[]`); it fails only for a page with neither. (b) Render: on every rendered block, and in phase 0 on `tools/fixtures/relations/render-fixture.html` (`--render-fixture`, one Tool, one Incident and one Terms row), at 390 and 1440 px, both themes: no horizontal overflow in `.rz-rel`; axe 0 serious/critical after the planted line is caught; computed `transition-property` is not `all`; no `transform`; radius ≤ 4 px; fonts are IBM Plex Sans / JetBrains Mono; no new `search-sections` id | `--law L8` (phase 0: `--law L8 --fixture render`) | Red proofs: fixture `l8-uncovered` → `L8 FAIL uncovered article-7 (no block, not pending-review, not exempt)`; fixture `l8-render-bad` → `L8 FAIL register render-fixture-bad.html transition-property all` |
+| L9 | Re-running the build is byte-identical: a second `build-relations.py --apply` on a built tree writes 0 files and leaves every page's SHA-256 unchanged; each page holds at most one marker pair and one `[data-rz-rel]` block | `node tools/test-relations.mjs --law L9` (copies the tree to a temp dir, runs `--apply` twice, hashes) | Red proof: fixture `l9-double-block` → `L9 FAIL 2 blocks on tier-advisor.html`; fixture `l9-split-markers` → build exits 1 `FR-10 marker pair broken tier-advisor.html` and L9 reports it |
+
+### 20.5 Planted-violation fixtures (red-first proofs)
+
+Each fixture is a minimal tree under `tools/fixtures/relations/<name>/` (a `data/relations.json`, the pages it needs,
+and copies of `data/journal.json` entries for the nodes it names). `node tools/test-relations.mjs --law <Ln> --fixture
+<name>` must exit 1 and print the expected line; T-9 stores each red log in `05-test-evidence/Q01/<name>.txt`. The
+same command on the real built tree must exit 0. A fixture that stops failing fails the unit test that runs all of
+them (`test-relations-lib.py` U18).
+
+| Law | Fixture | What is planted | Expected failure message |
+|---|---|---|---|
+| L1 | `l1-missing-tool-row` | `article-7` has accepted incident and term edges, no accepted tool edge, no exemption | `L1 FAIL article-7 no Tool row and no exemption` |
+| L2 | `l2-one-sided-edge` | accepted `rel-0001` article-7 → tier-advisor rendered on `article-7.html` only | `L2 FAIL rel-0001 missing on tier-advisor.html` |
+| L3 | `l3-dangling-href` | a block row links `no-such-page.html`; a term row links `glossary.html#term-nope` | `L3 FAIL dangling no-such-page.html in article-7.html` and `L3 FAIL anchor term-nope` |
+| L4 | `l4-stale-live` | served by the gate's own port-0 server as the "live" base: `relations.json` has an accepted edge, the page HTML has no block | `L4 FAIL 0/1` (run with `--live --base http://127.0.0.1:<port>`) |
+| L5 | `l5-unaccepted-rendered` | `article-7.html` carries `data-edge="rel-0002"` while `rel-0002` is `proposed`; `rel-0003` accepted without `request` | `L5 FAIL unaccepted edge rendered rel-0002` and `L5 FAIL rel-0003 no owner record` |
+| L6 | `l6-old-matcher` | an `auth.js` holding today's `ROOT_ONLY_PATHS` and `isRootOnlyHref` (`auth.js:330-347`), and a dossier row without "Root access" | `L6 FAIL matcher incident-ovhcloud-sbg2-fire-2021.html` and `L6 FAIL no "Root access" rel-0004` |
+| L7 | `l7-hand-edit` | one `why` text edited by hand inside the block of `article-7.html` | `L7 FAIL stale article-7.html` |
+| L8 | `l8-uncovered` | `article-7` has no block, is not in `pendingReview[]` and not in `exemptions[]` | `L8 FAIL uncovered article-7 (no block, not pending-review, not exempt)` |
+| L8 | `l8-render-bad` | `render-fixture-bad.html`: the block with `transition: all .2s`, `border-radius: 8px` and a 2:1 contrast line | `L8 FAIL register render-fixture-bad.html transition-property all` (also the radius and the axe lines) |
+| L9 | `l9-double-block` | `tier-advisor.html` with two generated sections (what the v1.0 anchor rule would produce on a second run) | `L9 FAIL 2 blocks on tier-advisor.html` |
+| L9 | `l9-split-markers` | `tier-advisor.html` with `<!-- rz-related:start -->` and no end marker | `L9 FAIL build refused tier-advisor.html: FR-10 marker pair broken` |
 
 ## 21. Acceptance criteria
 
@@ -958,6 +1033,8 @@ Total ≈ 13 working days (addendum estimate 3 weeks).
 - AC10 (L8): Given any page with a block, at 390 px dark, then `scrollWidth <= clientWidth` for `.rz-rel` and axe reports 0 serious/critical.
 - AC11 (FR-6): Given a term present in 19 of 36 articles, then `propose` does not propose it.
 - AC12 (FR-4): Given an article that names Equinix only as a company, then no Equinix dossier is proposed.
+- AC13 (FR-10, L9): Given `tier-advisor.html` with an accepted edge, when `build-relations.py --apply` runs twice, then the page holds exactly one `section.rz-related` between one `<!-- rz-related:start -->`/`<!-- rz-related:end -->` pair, directly after the hand-written `section.tool-ref`, its eyebrow reads `03 / Related`, no generated element carries the class `tool-ref`, and the second run writes 0 files.
+- AC14 (FR-8a, L8): Given the phase 0 tree (0 accepted edges, every in-scope node `pending-review`), when `test-relations.mjs --strict --phase 0` runs, then it exits 0; given fixture `l8-uncovered`, it exits 1 naming `article-7`.
 
 | FR | Tests |
 |---|---|
@@ -970,19 +1047,20 @@ Total ≈ 13 working days (addendum estimate 3 weeks).
 | FR-7 | U9 (report output) |
 | FR-8 | U12, U15, U16, AC4, AC5 |
 | FR-9 | L1, L4, L5, AC1, AC6 |
-| FR-10 | L2, AC2 |
+| FR-8a | U17, L8 coverage, AC14 |
+| FR-10 | L2, L9, AC2, AC13 |
 | FR-11 | L2, AC3, `build-incidents --check` |
 | FR-12 | L7, AC9 |
 | FR-13 | L6, AC7, `audit-min-twins --strict` |
 | FR-14 | AC8 |
-| FR-15 | L1–L8 red/green log |
+| FR-15 | L1–L9 red (fixture runs, §20.5) and green log |
 | FR-16 | Docs review in T-11; L1 for new articles |
 
 ## 22. Rollout and migration
 
 | Phase | Content | Visible change | Gate state |
 |---|---|---|---|
-| 0 | T-1..T-6, T-8, T-9: tooling, empty markers, gate in place | None (empty marker pairs only) | `test-relations.mjs --strict --phase 0` runs L2, L3, L5, L7, L8. L1 and L4 wait for phase 1, L6 for phase 2 |
+| 0 | T-1..T-6, T-8, T-9: tooling, empty markers, `pending --scope all`, gate in place | None (empty marker pairs only) | `test-relations.mjs --strict --phase 0` runs L2, L3, L5, L7 and L9 (they hold with 0 accepted edges) and L8: coverage is green because every in-scope page is recorded `pending-review` (FR-8a), and the render checks run on `tools/fixtures/relations/render-fixture.html` (`--law L8 --fixture render`). The phase 0 gate is therefore green, not red. Every law's red proof is its §20.5 fixture. L1 and L4 wait for phase 1, L6 for phase 2 |
 | 1 | Article↔tool and term rows after owner batch 1 | Blocks on articles and tool pages | `--phase 1` adds L1 and L4 |
 | 2 | T-7 after the owner approves the `auth.js` change, then article↔incident and tool↔incident rows after owner batch 2 | Incident rows, dossier `#related`, lock on dossier links | `--strict` with no phase: all eight laws |
 
@@ -1003,7 +1081,7 @@ Total ≈ 13 working days (addendum estimate 3 weeks).
 | Wrong relations published | Medium | High (credibility) | Owner accepts every edge; evidence quote shown in review; caps |
 | Owner review backlog blocks L1 | Medium | Medium | Batches by topic; exemptions; phase 0 ships without L1 |
 | Generator noise (F17) wastes review time | High | Low | Operator-only never proposes; caps; generic-term drop; report sorted by score |
-| Public rows advertise a locked library | Medium | Low | "Root access" word, root prompt (FR-13); OQ1 lets the owner hide dossier rows instead |
+| Public rows advertise a locked library | Medium | Low | "Root access" word, root prompt (FR-13); D-Q01-1 option B lets the owner hide dossier rows instead |
 | Assembler or hand edits break blocks | Medium | Low | FR-14, L7, L2 |
 | Parallel sessions edit `relations.json` | Medium | Low | Line-based JSON, `fmt`, V2/V6 |
 | `auth.js` change regresses login flows | Low | High | One-line change; `audit-min-twins`, existing auth gates, L6 browser check |
@@ -1018,7 +1096,8 @@ Total ≈ 13 working days (addendum estimate 3 weeks).
 - [ ] Owner approval for the `auth.js` change recorded with its request id before phase 2 ships.
 - [ ] Dossier rows carry "Root access"; non-root click opens the root prompt; root navigates (L6, browser-checked).
 - [ ] `build-relations.py --check`, `build-incidents.py --check`, `test-generator-freshness.py` green.
-- [ ] `test-relations.mjs --strict` and `test-relations-lib.py` wired in `ship-gate.sh` and green; red-first log stored.
+- [ ] `test-relations.mjs --strict` (L1–L9) and `test-relations-lib.py` wired in `ship-gate.sh` and green; every law's red log from its §20.5 fixture stored in `05-test-evidence/Q01/`.
+- [ ] No page holds a `pending-review` record for a node that renders a block (V15); at release, every pending record is listed in the release note.
 - [ ] 12 screenshots looked at and stored; L8 green at 390/1440 in both themes.
 - [ ] Byte and time budgets measured and inside limits (T-4 numbers in the evidence folder).
 - [ ] Release chain complete; standards docs updated in the same release.

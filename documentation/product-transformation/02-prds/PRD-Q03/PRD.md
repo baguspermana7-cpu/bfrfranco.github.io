@@ -6,23 +6,24 @@
 |---|---|
 | PRD id | PRD-Q03 |
 | Feature | `reproduce[]` entries in incident dossiers, rendered as a "Reproduce" section whose links open a site calculator with exactly the conditions the dossier states |
-| Version | 1.0 |
+| Version | 1.1 |
 | Status | Draft |
 | Author | Opus 5.5 (Fable quota exhausted) |
 | Date | 2026-11-10 |
 | Owner requests | R110 (PRD per idea), R111 (24-section structure) |
 | Priority | 71.0 (addendum Q3: I 8, N 8, C 6, E 5; `documentation/PRODUCT_INNOVATION_ASSESSMENT_2026-11_ADDENDUM.md:201-220`; register row `documentation/product-transformation/01-improvement-register/REGISTER.md:15`) |
 | Related findings | Addendum Q3. Corrections D1–D6 in §3.3. Cross-link with Q1 (`02-prds/PRD-Q01/PRD.md`) |
-| Dependencies | **P2 Part 2** (peer session, hard): the `#rzs=` reader on `tia-942-checklist.html` and `tier-advisor.html`. Contract = peer PRD-P02 (path in §11.3); not re-specified here. Q1 (soft). Owner acceptance of every entry |
+| Dependencies | **P2 Part 2** (peer session, hard): the `#rzs=` reader on `tia-942-checklist.html` and `tier-advisor.html`. Contract = peer PRD-P02 (path in §11.3) plus the interface agreed with the peer on 2026-11-11 (`documentation/product-transformation/STATE.md`, "Interface agreements with the peer": `origin` string, mirror inputs `#tiaTier`/`#tiaDcType`); not re-specified here. Q1 (soft, one direction only: Q3 → Q1 through rule R2I, FR-12; Q1 never reads Q3 data). Owner decisions D-Q03-1…4 in `documentation/product-transformation/DECISIONS.md` |
 | Related modules | `tools/build-incidents.py`, `tools/incidents_fmea.py` (evidence resolver), new `tools/incidents_reproduce.py`, new `tools/build-reproduce-baselines.py`, `data/incidents/{ovhcloud-sbg2-fire-2021,equinix-ld8-london-ups-2020,delta-atlanta-switchgear-2016}.json`, new `data/reproduce-baselines.json`, new `data/incidents/_reproduce-review.json`, `tia-942-checklist.html`, `tier-advisor.html`, `js/rz-scenario.js` (changed by P2, peer) |
 | Target wave | "Connected reference, weeks 9–16: Q1 relation file, then Q3 (needs P2)" (`…_ADDENDUM.md:557`) |
-| Approval status | Approved by owner R110/R111 2026-11-10 (the PRD set). The addendum marks Q3 "Needs owner approval" (`…_ADDENDUM.md:217`): implementation starts only after the owner says yes to the feature, to business rule BR-2 (the named baseline, §12) and to each entry |
+| Approval status | Approved by owner R110/R111 2026-11-10 (the PRD set). The addendum marks Q3 "Needs owner approval" (`…_ADDENDUM.md:217`): implementation starts only after the owner says yes to the feature (D-Q03-1), to business rule BR-2 (the named baseline, §12; D-Q03-2) and to the entries (D-Q03-3, with D-Q03-4 on Delta's non-postmortem source); each accepted entry is then recorded by `decide` with the request id |
 
 Change history
 
 | Version | Date | Author | Change |
 |---|---|---|---|
 | 1.0 | 2026-11-10 | Opus 5.5 | First complete draft. Facts verified on `wt-hub3` (branch `hub-r3`) at `803253314` and re-checked at `1cb6dd292` (docs-only commit between them); peer state read from `~/.cache/rz-k28` at `b80fd7bca` and the peer PRD-P02 |
+| 1.1 | 2026-11-11 | Opus 5.5 | QA batch 1 revisions (D1–D8). D2: `origin` is the agreed string `incident:<slug>:<entry>` (≤ 80 characters, `^[A-Za-z0-9_.:/-]+$`, optional, never used for navigation, never inserted as HTML; new RV17); the stale object shape and its `set[]` are removed (FR-6, FR-13, §5.4, §9.6, §11.3, §16, §23); the TIA baseline includes P2's capturable mirror inputs `tiaTier`/`tiaDcType`, so it holds 64 inputs (FR-2, §10.4, A1, L3, AC1, AC3, T-2). D5: owner decisions D-Q03-1…4 in `DECISIONS.md`. D8: the Q3 → Q1 direction is the only one |
 
 ## 2. Executive summary
 
@@ -126,9 +127,10 @@ No usage target is set. The site has no consented click analytics, and the audie
 |---|---|---|---|
 | P2 Part 1: `openInCalc` routes `tia`, `tier` | Peer, soft | Committed `b80fd7bca` on `feat/p-wave1`, not on `hub-r3` | Saving and re-opening a reproduced scenario from `account.html` would not reach TIA or tier |
 | P2 Part 2: `#rzs=` reader + `js/rz-scenario.js` loaded on `tia-942-checklist.html` and `tier-advisor.html` + `data/scenario-link.schema.json` | Peer, hard | Specified in PRD-P02, "next minor" (its `:14`) | The section is not rendered (FR-6 precondition); phase 0 only |
-| P2 v2 optional `origin` field and banner variant | Peer, soft (requested, FR-13) | Not in PRD-P02 | The calculator shows P2's generic "Shared scenario" banner; the dossier carries the full explanation |
+| P2 optional `origin` field | Peer, soft | Agreed 2026-11-11 (`STATE.md`, "Interface agreements with the peer"): part of the P2 **v1** schema, a string of at most 80 characters matching `^[A-Za-z0-9_.:/-]+$`, optional, never used for navigation, never inserted as HTML | Q3 omits `origin`; the link still restores. Whether and how the banner shows anything for it is the peer's choice |
+| P2 hidden mirror inputs `#tiaTier`, `#tiaDcType` on `tia-942-checklist.html` | Peer, soft for Q3 | Agreed 2026-11-11 (`STATE.md`): "kept in step by the setters", round trip asserted by P2's E2E test. A round trip through `capture()` requires the mirrors to be capturable, i.e. not `type="hidden"`, which `EXCLUDE_TYPES` drops (`js/rz-scenario.js:18`); so `capture()` includes them | T-2 reads P2's committed page; if the mirrors are absent or not capturable, the baseline keeps 62 inputs and the peer's answer is recorded in this row |
 | Q1 | Soft | Draft | FR-12 is skipped until Q1 ships |
-| Owner | Human | — | Feature yes, BR-2 yes, each entry |
+| Owner | Human | D-Q03-1…4 PROPOSED in `DECISIONS.md` | Feature yes (D-Q03-1), BR-2 yes (D-Q03-2), the 4 entries (D-Q03-3, D-Q03-4), then each entry recorded by `decide` |
 
 ### 5.5 Constraints
 
@@ -136,7 +138,7 @@ Static site; Python generators; vanilla ES5 in pages; no runtime JS on dossiers;
 
 ### 5.6 Assumptions
 
-- A1: TIA starts at Tier 3, Enterprise on every load (F7). The gate checks it on every run, so a change to the default fails loudly.
+- A1: TIA starts at Tier 3, Enterprise on every load (F7). The gate checks it on every run, so a change to the default fails loudly. With P2's mirror inputs the link also carries the tier and DC type explicitly (`tiaTier` = `"3"`, `tiaDcType` = `"ent"`), so a reproduction no longer depends on the load default alone.
 - A2: PRD-P02's reader restores after the page's own init, twice, at 350 ms and 900 ms (its `:87`).
 - A3: The library stays root-only in v1.
 - A4: Calculator item ids (`chk-<id>`, `fireSuppression`) stay stable. A rename fails RV6 and L3.
@@ -209,7 +211,7 @@ A checklist item is renamed → `build-reproduce-baselines.py --check` goes stal
 - Trigger: every `build-incidents.py` run, every gate run, every CLI write.
 - Preconditions: `data/reproduce-baselines.json` exists.
 - Inputs: dossier JSON, baselines, `js/rz-scenario.js` route map.
-- Processing: rules RV1–RV16 (§10.3).
+- Processing: rules RV1–RV17 (§10.3).
 - Outputs: list of `"<slug>:<entry> RVn <message>"`.
 - State change: none.
 - Dependencies: `incidents_fmea.resolve_evidence`.
@@ -218,10 +220,10 @@ A checklist item is renamed → `build-reproduce-baselines.py --check` goes stal
 
 **FR-2 Baselines file and generator**
 - Description: `tools/build-reproduce-baselines.py --apply|--check` derives the two v1 baselines from the calculator pages.
-- Processing: `tia-t3-ent-all`: parse `ITEMS` in `tia-942-checklist.html` (regex on `{id:'…',cat:'…',label:'…',tiers:[…],w:n,ref:'…',dcTypes:…}`, `DC_ALL` from `:390`), keep items with tier 3 and `ent`, emit `chk-<id>: {t:"checkbox", v:true}` and `labels[chk-<id>] = label`. `tier-defaults`: parse every `<select id>` (the `selected` option, else the first) and `<input id>` (its `value`) in `tier-advisor.html`, skipping types `capture()` excludes (F6); emit `labels` from the `aria-label` and `options` from option text.
+- Processing: `tia-t3-ent-all`: parse `ITEMS` in `tia-942-checklist.html` (regex on `{id:'…',cat:'…',label:'…',tiers:[…],w:n,ref:'…',dcTypes:…}`, `DC_ALL` from `:390`), keep items with tier 3 and `ent`, emit `chk-<id>: {t:"checkbox", v:true}` and `labels[chk-<id>] = label`. Then add P2's two mirror inputs (§5.4, `STATE.md` agreement), which `capture()` includes: `tiaTier: {t: <type>, v: "3"}` and `tiaDcType: {t: <type>, v: "ent"}`, where `<type>` is what `capture()` records for the element P2 commits (`select` for a `<select>`, else the input's `type`, `js/rz-scenario.js:38-41`), read from P2's committed `tia-942-checklist.html`; labels "Tier" and "Facility type". The baseline then holds 64 inputs. If P2's committed page has no capturable mirrors, the generator emits the 62 checkboxes only and exits 1 on `--check` with `mirrors missing: tiaTier, tiaDcType` until the peer's answer is recorded in §5.4. `tier-defaults`: parse every `<select id>` (the `selected` option, else the first) and `<input id>` (its `value`) in `tier-advisor.html`, skipping types `capture()` excludes (F6); emit `labels` from the `aria-label` and `options` from option text.
 - Outputs: canonical JSON (`sort_keys=True`, `indent=1`, trailing newline).
 - Exceptions: item count at Tier 3, Enterprise ≠ the previous file's count → still written by `--apply`, and `--check` fails until it is re-applied (so a checklist change is visible in the diff).
-- Acceptance: `tia-t3-ent-all` has 62 inputs; `tier-defaults` has 22; `--check` passes after `--apply`; L3 confirms in a browser that the parsed defaults equal `rzScenario.capture()` on a fresh load.
+- Acceptance: `tia-t3-ent-all` has 64 inputs (62 checkboxes + `tiaTier` + `tiaDcType`); `tier-defaults` has 22; `--check` passes after `--apply`. L3 confirms in a browser on a fresh load: for TIA, the key set of `rzScenario.capture()` equals the 64 baseline keys and `#tiaTier`/`#tiaDcType` read `3`/`ent` (checkbox values differ by design: the page loads unticked, the baseline ticks them); for tier, `capture()` equals `tier-defaults` key for key and value for value.
 
 **FR-3 Review records and report**
 - Description: `data/incidents/_reproduce-review.json` holds a verdict per non-seed dossier whose `category` includes `power`, `cooling` or `fire` and which has no accepted entry. `python3 tools/incidents_reproduce.py report [--entries] [--format md|json]` lists all 43 with a code.
@@ -241,7 +243,7 @@ A checklist item is renamed → `build-reproduce-baselines.py --check` goes stal
 
 **FR-6 Link encoding**
 - Preconditions (P2 ready): `data/scenario-link.schema.json` exists; `js/rz-scenario.js` defines `readLink`; both target pages load `js/rz-scenario.js`. If any is false, no section is rendered and the static gate reports `P2 not ready` (phase 0, §22).
-- Processing: `payload = {"v": 1, "calc": calc, "inputs": baseline.inputs ⊕ {s.input: {t: baseline t, v: s.value}}}` (plus `"origin"` only when the P2 schema accepts it, FR-13); `json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)` → UTF-8 → base64url without padding; `href = PAGE[calc] + "#rzs=" + b64`. `PAGE = {"tia": "tia-942-checklist.html", "tier": "tier-advisor.html"}`, cross-checked against the `openInCalc` map in `js/rz-scenario.js`.
+- Processing: `payload = {"v": 1, "calc": calc, "origin": "incident:<slug>:<entry id>", "inputs": baseline.inputs ⊕ {s.input: {t: baseline t, v: s.value}}}`. `origin` is the string agreed with the peer (FR-13 (2)), e.g. `incident:ovhcloud-sbg2-fire-2021:rp-tia`; the build checks it against RV17 and omits it if P2's committed schema has no `origin` property; `json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)` → UTF-8 → base64url without padding; `href = PAGE[calc] + "#rzs=" + b64`. `PAGE = {"tia": "tia-942-checklist.html", "tier": "tier-advisor.html"}`, cross-checked against the `openInCalc` map in `js/rz-scenario.js`.
 - Exceptions: link > 8,000 characters (PRD-P02 FR-P02-6) or payload invalid against the schema → build error naming the entry.
 - Acceptance: L2.
 
@@ -253,7 +255,7 @@ A checklist item is renamed → `build-reproduce-baselines.py --check` goes stal
 - Processing: `incidents_fmea.fmea_section` adds, inside the `details` body of the mode named by an accepted entry's `mode`, one line `Reproduce: <a href="#rp-tia">TIA-942 checklist</a> · <a href="#rp-tier">Tier advisor</a>`. It reads entries through `incidents_reproduce.entries_for_mode(inc, mode_id)`; no change to scores, rows or the simulator.
 - Acceptance: `python3 tools/test-incidents-fmea.py --strict --require-all` and `node tools/test-fmea-sim.mjs --strict` stay green; L5 checks the link.
 
-**FR-9 Static gate** `tools/test-incidents-reproduce.py [--strict] [--law Ln] [--phase 0]`: L1, L2, L5, L7 (and RV1–RV16 on every dossier).
+**FR-9 Static gate** `tools/test-incidents-reproduce.py [--strict] [--law Ln] [--phase 0]`: L1, L2, L5, L7 (and RV1–RV17 on every dossier).
 
 **FR-10 Browser gate** `tools/test-incidents-reproduce.mjs [--strict] [--law Ln] [--live]`: L3, L4, L6. Own HTTP server on port 0 serving the tree it is run from, with an identity check (a marker file it writes and reads back).
 
@@ -261,17 +263,17 @@ A checklist item is renamed → `build-reproduce-baselines.py --check` goes stal
 
 **FR-12 Q1 integration**: when Q1's `tools/build-relations.py` exists, its `propose` gains rule `R2I`: every accepted reproduce entry proposes `tool:<calc page id> → incident:<slug>` with the entry's first evidence quote. The owner still decides each edge (PRD-Q01 BR2).
 
-**FR-13 P2 coordination requests** (coordinate with the peer session; Q3 works without them):
-1. P2 Part 2 loads `js/rz-scenario.js` and the reader on `tia-942-checklist.html` and `tier-advisor.html` (required, §5.4).
-2. Optional `origin` in the payload schema: `{"kind": "incident", "slug": "<^[a-z0-9-]{3,80}$>", "entry": "<^rp-[a-z0-9-]{1,30}$>", "set": ["<input id>", …]}`. Banner variant copy in §9.6. The banner renders no free text from the URL: the slug only builds a same-origin link `incident-<slug>.html`, and `set` only marks fields that exist on the page.
-3. Note for P2's own round-trip promise: TIA's Tier and DC type are buttons (F7), so a shared TIA link drops a user's non-default tier. Q3 does not need them restored (its baseline uses the load defaults, A1).
+**FR-13 P2 interface (agreed with the peer 2026-11-11, `documentation/product-transformation/STATE.md` "Interface agreements with the peer")**:
+1. P2 task T-P02-C loads `js/rz-scenario.js` and the `#rzs=` reader on `tia-942-checklist.html` and `tier-advisor.html` (required, §5.4).
+2. `origin` (optional, P2 v1 schema) is a **string** of at most 80 characters matching `^[A-Za-z0-9_.:/-]+$`. Q3 writes `incident:<slug>:<entry id>`, e.g. `incident:ovhcloud-sbg2-fire-2021:rp-tia` (39 characters). Measured with `wc -c`: the 4 entries give 39, 40, 43 and 45 characters (the longest is `incident:delta-atlanta-switchgear-2016:rp-tia`); the longest slug in the library (43 characters, `cloudflare-bot-management-feature-file-2025`) would give 60 with `rp-tier`, under the cap. `origin` is never used for navigation and never inserted as HTML (the agreement); Q3 does not ask for a back link, field markers or a `set` list. A build error is raised when the string exceeds 80 characters or fails the pattern (RV17).
+3. TIA Tier and DC type: P2 adds the hidden mirror inputs `#tiaTier` and `#tiaDcType`, kept in step by the setters, and `capture()` includes them (FR-2). Q3's TIA links therefore carry `tiaTier = "3"` and `tiaDcType = "ent"` explicitly, and L3 asserts both after restore.
 
 ### 8.1 FR field matrix (every FR, all fields)
 
 | FR | Trigger | Preconditions | Inputs | Outputs | State change | Dependencies | Exceptions | Acceptance |
 |---|---|---|---|---|---|---|---|---|
 | FR-1 | Build, gate, CLI write | Baselines file exists | Dossier JSON, baselines, `openInCalc` map | Error list | None | `incidents_fmea.resolve_evidence` | Bad baselines file → exit 2 | U1–U16, L1, AC6, AC7 |
-| FR-2 | `--apply` / `--check`; freshness gate | Both calculator pages exist | `tia-942-checklist.html`, `tier-advisor.html` | `data/reproduce-baselines.json` | File written (`--apply`) | — | Count change → `--check` fails until re-applied | 62 / 22 inputs; L3 parse = live capture |
+| FR-2 | `--apply` / `--check`; freshness gate | Both calculator pages exist | `tia-942-checklist.html`, `tier-advisor.html` | `data/reproduce-baselines.json` | File written (`--apply`) | — | Count change → `--check` fails until re-applied; mirrors missing → `--check` exit 1 naming them | 64 / 22 inputs; L3 key set = live capture, mirrors `3`/`ent` |
 | FR-3 | `report`, `review`; L7 | — | Dossiers, review file | 43-row table; review records | Review file (`review`) | FR-1 | Unknown verdict code → exit 1 | L7, AC11 |
 | FR-4 | Session drafting | R1–R5 hold | Dossier evidence | `proposed` entries | Dossier JSON | FR-1 | Any RV failure → not written | L1 |
 | FR-5 | `decide`, `retire` | Entry exists; status fits; `--request` given | Entry ids, request id | Summary per entry | Status and audit fields; atomic write | FR-1 | `--by` not owner or no request → exit 2; quote drift → exit 1; nothing written | U15, U16, AC4, AC5 |
@@ -282,7 +284,7 @@ A checklist item is renamed → `build-reproduce-baselines.py --check` goes stal
 | FR-10 | `ship-gate.sh` (phase 1) | P2 live; puppeteer | Pages served from the tree under test | L3, L4, L6 results | None | Own server on port 0; `rz-lane` locally | Port bind failure or identity mismatch → exit 2 with reason | Red/green log |
 | FR-11 | Freshness gate | — | Baselines builder | Exit code | None | FR-2 | Stale → exit 1 | `test-generator-freshness.py` |
 | FR-12 | Q1 `propose` | Q1 shipped; entry accepted | Accepted entries | `proposed` tool → incident edges | `data/relations.json` | PRD-Q01 | — | Q1 report lists R2I proposals |
-| FR-13 | Peer coordination | — | Requests in FR-13 | Peer decision | P2 schema and banner (peer files) | Peer session | Declined → generic P2 banner | Peer's P2 tests; L2 schema check |
+| FR-13 | Peer interface (agreed 2026-11-11) | P2 on main | `origin` string, mirror inputs | Q3 links that validate against P2 v1 | None in Q3 (P2 files are the peer's) | Peer session, `STATE.md` | P2 lands without `origin` or mirrors → omitted / 62 inputs (§23) | Peer's P2 tests; Q3 RV15, RV17, L2 schema check, L3 mirrors |
 
 ## 9. UI/UX specification
 
@@ -293,7 +295,7 @@ A checklist item is renamed → `build-reproduce-baselines.py --check` goes stal
 | Dossier section `#reproduce` | After `#fmea`, before `#causes` | `h2` "Reproduce in a calculator", one intro paragraph, one block per accepted entry |
 | Dossier nav | After "FMEA" | "Reproduce" (only when entries exist) |
 | FMEA row | Inside the `details` body of the named mode, after the evidence list | "Reproduce:" + one link per entry for that mode |
-| Calculator | P2's banner (peer); optional origin variant (FR-13) | — |
+| Calculator | P2's banner (peer); whatever P2 does with the `origin` string is the peer's (FR-13) | — |
 
 ### 9.2 Layout
 
@@ -420,7 +422,7 @@ No buttons, forms, filters, dialogs or toasts are added; nothing is dead.
 | Link text | `Open the checklist with these inputs` / `Open the tier advisor with these inputs` |
 | FMEA back-link | `Reproduce:` followed by entry headings joined by ` · ` |
 | Nav | `Reproduce` |
-| Requested P2 origin banner (peer decides) | `Opened from an incident dossier. Fields marked "from the record" hold the conditions the record states; every other field holds the baseline named on the dossier.` + link `Back to the dossier`; field marker word `from the record` after the field label |
+| `origin` value (P2 v1, agreed) | `incident:<slug>:<entry id>`, e.g. `incident:ovhcloud-sbg2-fire-2021:rp-tia`. Q3 requests no banner copy, link or field marker: `origin` is never used for navigation or inserted as HTML, and any banner wording is the peer's. The dossier row carries the full explanation (baseline note above) |
 
 ### 9.7 Styling contract (`incidents_reproduce.CSS`, inline)
 
@@ -524,6 +526,7 @@ Mapping to the addendum's shape: `calc` = calc; `inputs` = baseline ⊕ set (com
 | RV14 | The built link is ≤ 8,000 characters (PRD-P02 FR-P02-6) |
 | RV15 | The payload validates against `data/scenario-link.schema.json` (once P2 ships it) |
 | RV16 | At most one entry per `(dossier, calc)` |
+| RV17 | The built `origin` equals `incident:<slug>:<entry id>`, is at most 80 characters and matches the P2 v1 pattern `^[A-Za-z0-9_.:/-]+$` (`STATE.md` agreement) |
 
 ### 10.4 New: `data/reproduce-baselines.json` (generated)
 
@@ -538,9 +541,9 @@ Mapping to the addendum's shape: `calc` = calc; `inputs` = baseline ⊕ set (com
       "describe": "Every item on the Tier 3, Enterprise list ticked",
       "context": { "tier": 3, "dcType": "ent", "basis": "page defaults tia-942-checklist.html:584-585" },
       "derivedFrom": "ITEMS where tiers include 3 and dcTypes include 'ent' (tia-942-checklist.html:599-604)",
-      "count": 62,
-      "inputs": { "chk-elec_dual_pdu": { "t": "checkbox", "v": true }, "chk-fire_suppression": { "t": "checkbox", "v": true } },
-      "labels": { "chk-elec_dual_pdu": "Dual A+B PDU feeds per rack", "chk-fire_suppression": "Automatic fire suppression" }
+      "count": 64,
+      "inputs": { "chk-elec_dual_pdu": { "t": "checkbox", "v": true }, "chk-fire_suppression": { "t": "checkbox", "v": true }, "tiaTier": { "t": "<as captured>", "v": "3" }, "tiaDcType": { "t": "<as captured>", "v": "ent" } },
+      "labels": { "chk-elec_dual_pdu": "Dual A+B PDU feeds per rack", "chk-fire_suppression": "Automatic fire suppression", "tiaTier": "Tier", "tiaDcType": "Facility type" }
     },
     "tier-defaults": {
       "calc": "tier",
@@ -556,7 +559,7 @@ Mapping to the addendum's shape: `calc` = calc; `inputs` = baseline ⊕ set (com
 }
 ```
 
-(`inputs` and `labels` are shortened here; the file holds all 62 and 22.)
+(`inputs` and `labels` are shortened here; the file holds all 64 (62 checkboxes + the 2 P2 mirrors) and 22. `<as captured>` is filled by T-2 from P2's committed page.)
 
 ### 10.5 New: `data/incidents/_reproduce-review.json`
 
@@ -624,7 +627,7 @@ There is no backend: no Supabase table, RPC or Worker is involved. The contracts
 SCHEMA = "rz-incident-reproduce/1"
 PAGE = {"tia": "tia-942-checklist.html", "tier": "tier-advisor.html"}
 def load_baselines(path="data/reproduce-baselines.json") -> dict: ...
-def validate_reproduce(inc: dict, baselines: dict, root: str = ".") -> list[str]: ...   # RV1–RV16
+def validate_reproduce(inc: dict, baselines: dict, root: str = ".") -> list[str]: ...   # RV1–RV17
 def accepted(inc: dict) -> list[dict]: ...
 def payload(entry: dict, baselines: dict) -> dict: ...            # {"v":1,"calc":…,"inputs":…}
 def link(entry: dict, baselines: dict) -> str: ...                # "<page>#rzs=<base64url>"
@@ -639,7 +642,7 @@ CSS: str
 
 | Command | Effect | Exit |
 |---|---|---|
-| `python3 tools/incidents_reproduce.py validate` | RV1–RV16 on all dossiers | 0 / 1 |
+| `python3 tools/incidents_reproduce.py validate` | RV1–RV17 on all dossiers | 0 / 1 |
 | `… report [--entries] [--format md\|json]` | 43-row verdict table, or entry review sheet | 0 |
 | `… decide --accept <slug:id,…> --reject <slug:id,…> --by owner --request R<n>` | Record owner decisions | 0 / 1 refused / 2 usage |
 | `… retire <slug:id> --request R<n> --reason "<text>"` | Stop rendering an entry | 0 / 1 |
@@ -664,7 +667,15 @@ Source: `/home/baguspermana7/.local/state/rzharness/projects/PRJ-RZ-WEB/work-ite
 | Schema file `data/scenario-link.schema.json`, readers accept v1 and v2 | `:168` | RV15 |
 | Messages "This link could not be read…", "n fields could not be applied" | `:88`, `:190` | J1 failure path |
 
-Q3 requests (FR-13, marked REQUEST, the peer decides): optional `origin` object in v2; banner variant; marker word on restored fields.
+Agreed with the peer on 2026-11-11 (`documentation/product-transformation/STATE.md`, "Interface agreements with the peer"), and the only contract Q3 builds against (FR-13):
+
+| Item | Contract | Q3 use |
+|---|---|---|
+| `origin` | Optional string in the P2 **v1** schema, ≤ 80 characters, `^[A-Za-z0-9_.:/-]+$`; never used for navigation, never inserted as HTML | `incident:<slug>:<entry id>`; RV17; omitted if P2's committed schema lacks it |
+| TIA mirrors | Hidden mirror inputs `#tiaTier`, `#tiaDcType` kept in step by the setters; P2's E2E asserts the round trip; capturable, so `capture()` includes them | Part of `tia-t3-ent-all` (64 inputs); L3 asserts `3`/`ent` |
+| Loader | P2 task T-P02-C loads `js/rz-scenario.js` and the reader on tia, tier, spares and rfs | FR-6 precondition |
+
+Version 1.0 of this PRD asked for an `origin` object `{kind, slug, entry, set[]}`, a banner variant and field markers. That request is withdrawn: the peer's v1 schema would reject the object.
 
 ### 11.4 HTML contract
 
@@ -744,15 +755,15 @@ stateDiagram-v2
 | Privacy | Links carry checklist and select states only; no personal data | L2 decodes and lists keys |
 | Maintainability | One module, one generator, one review file; rules in `standarization/DC_INCIDENTS_QA_STANDARD.md` §4c | — |
 | Observability | `report` counts per code; gate prints per-law counts | Gate log |
-| Data integrity | RV1–RV16 on every build; baselines freshness | L1, L7, freshness |
+| Data integrity | RV1–RV17 on every build; baselines freshness | L1, L7, freshness |
 | Backup and recovery | Git; `retire` or `git revert` | §22 |
 
 ## 16. Security and access control
 
 - Roles: owner decides; session drafts; root reads dossiers; anyone reads calculators.
 - Authorization: unchanged. The dossier root gate is client-side and presentational (F16); dossier content, including these links, is in the page HTML as it is today. Q3 adds no data more sensitive than what the dossier already shows.
-- Input validation: entries validated at build (RV1–RV16); links decoded and validated again by P2 on the calculator (untrusted hash, PRD-P02 `:182`).
-- Link spoofing: anyone can craft a `#rzs=` link. Q3's requested `origin` banner must not show free text from the URL (FR-13): only a slug-built same-origin link and markers on fields that exist on the page.
+- Input validation: entries validated at build (RV1–RV17); links decoded and validated again by P2 on the calculator (untrusted hash, PRD-P02 `:182`).
+- Link spoofing: anyone can craft a `#rzs=` link, including any `origin` string. Under the agreed contract (`STATE.md`) `origin` is length- and pattern-limited (≤ 80, `^[A-Za-z0-9_.:/-]+$`), never used for navigation and never inserted as HTML, so a forged value can at most be shown as plain text by P2 or ignored. Q3 builds no link from it and asks for no markers (FR-13); RV17 keeps Q3's own values inside the pattern.
 - XSS: every label, quote and option text passes `html.escape(…, quote=True)`; U13 plants `<script>` in a quote fixture.
 - Secrets: none.
 - Audit: decision fields + git history.
@@ -829,15 +840,15 @@ Deployment: GitHub Pages serves the regenerated dossier pages; calculators uncha
 
 | T | Description | Depends | Files | Approach | Effort | Verify | DoD |
 |---|---|---|---|---|---|---|---|
-| T-1 | Schema, `validate_reproduce`, unit tests U1–U16 | — | `tools/incidents_reproduce.py`, `tools/test-incidents-reproduce.py` (unit part), fixtures under `tools/fixtures/reproduce/` | follow `incidents_response.py` | 1.5 d | each planted fixture fails with its RV; existing FMEA and response gates green on a dossier carrying `reproduce` | RV1–RV16 implemented |
-| T-2 | Baselines generator | — | `tools/build-reproduce-baselines.py`, `data/reproduce-baselines.json` | regex parse (FR-2) | 1 d | counts 62 and 22; `--check` green after `--apply` | File committed |
+| T-1 | Schema, `validate_reproduce`, unit tests U1–U16 | — | `tools/incidents_reproduce.py`, `tools/test-incidents-reproduce.py` (unit part), fixtures under `tools/fixtures/reproduce/` | follow `incidents_response.py` | 1.5 d | each planted fixture fails with its RV; existing FMEA and response gates green on a dossier carrying `reproduce` | RV1–RV17 implemented |
+| T-2 | Baselines generator | — | `tools/build-reproduce-baselines.py`, `data/reproduce-baselines.json` | regex parse (FR-2); read the mirror elements `#tiaTier`/`#tiaDcType` and their captured type from P2's committed `tia-942-checklist.html` | 1 d | counts 64 and 22 (or 62 with the peer's answer recorded in §5.4); `--check` green after `--apply`; a unit fixture with a 81-character `origin` and one with a space fails RV17 | File committed |
 | T-3 | Section, nav, CSS, link encoder, P2-ready check | T-1, T-2 | `tools/incidents_reproduce.py`, `tools/build-incidents.py` | FR-6, FR-7 | 1.5 d | 40 dossiers byte-identical; bytes and build time measured | Budgets recorded |
 | T-4 | FMEA back-link | T-3 | `tools/incidents_fmea.py` | FR-8 | 0.5 d | FMEA gates green | — |
 | T-5 | Review records for 11 dossiers + `report` | T-1 | `data/incidents/_reproduce-review.json`, `tools/incidents_reproduce.py` | Appendix B, C | 1 d | `report` counts Q3 B1 C7 S15 N17 | L7 green |
 | T-6 | Browser gate L3, L4, L6 + restore timing | T-3, P2 Part 2 | `tools/test-incidents-reproduce.mjs` | puppeteer, own server on port 0, identity check | 2 d | red on today's tree; green after P2 + T-9 | Red/green log in `documentation/product-transformation/05-test-evidence/Q03/` |
 | T-6b | Only if T-6 measures > 1,500 ms: coalesce TIA recalculation during restore | T-6 | `tia-942-checklist.html` (coordinate with the peer: P2 touches this page) | `onCheck` schedules one `calculate()` per frame | 0.5 d | timing under budget | — |
 | T-7 | Static gate laws L1, L2, L5, L7, phase flag, wiring | T-3, T-5 | `tools/test-incidents-reproduce.py`, `tools/ship-gate.sh`, `tools/test-generator-freshness.py` | — | 1 d | red-first proofs | Wired |
-| T-8 | Owner review: feature, BR-2, 4 entries | T-1, T-5 | dossier JSON (3 files) | `report --entries` → chat → `decide` | 0.5 d + owner time | L1 green | Decisions recorded |
+| T-8 | Owner review: D-Q03-1 (feature), D-Q03-2 (BR-2), D-Q03-3 and D-Q03-4 (entries); rows updated in `DECISIONS.md` | T-1, T-5 | dossier JSON (3 files) | `report --entries` → chat → `decide` | 0.5 d + owner time | L1 green | Decisions recorded |
 | T-9 | Apply and render once P2 is live | T-8, P2 Part 2 | 3 dossier pages | `build-incidents.py --apply` | 0.5 d | L3–L6 green | — |
 | T-10 | Q1 rule R2I | Q1 shipped | `tools/build-relations.py` | FR-12 | 0.5 d | proposals appear in Q1 report | — |
 | T-11 | Docs and release, live validation | T-9 | standards docs, `js/rz-version.js`, `CHANGELOG.md`, `changelog.html` | §22 | 1 d | live checks green | §24 |
@@ -850,7 +861,7 @@ Total ≈ 11.5 days plus the wait for P2 Part 2 (addendum estimate 4 weeks).
 
 | Level | Content | File |
 |---|---|---|
-| Unit | RV1–RV16 fixtures; canonical encoding round-trip; escaping (U13); atomic decide (U15); refusal leaves file byte-identical (U16) | `tools/test-incidents-reproduce.py --unit` |
+| Unit | RV1–RV17 fixtures; canonical encoding round-trip; escaping (U13); atomic decide (U15); refusal leaves file byte-identical (U16) | `tools/test-incidents-reproduce.py --unit` |
 | Integration | Temp copy of the repo: draft → decide → `build-incidents.py --apply` → section present, 40 pages unchanged | `tools/test-incidents-reproduce.py --integration` |
 | Contract | Payload validates against `data/scenario-link.schema.json`; decode with the same algorithm as `rzScenario.readLink` (run in node `vm` on `js/rz-scenario.js`) equals the stored map | L2 |
 | E2E (puppeteer via `rz-lane` locally) | Each link on its calculator, signed-out; plus one premium run (seeded `rz_premium_session`) for timing | L3, L4 |
@@ -880,9 +891,9 @@ The second line is added in phase 1, when P2 Part 2 is live; `--phase 0` is remo
 
 | Law | Claim | Command | How it fails on today's tree |
 |---|---|---|---|
-| L1 | The 3 qualifying dossiers carry the 4 Appendix A entries, all accepted with owner decision fields; every evidence pointer resolves verbatim; RV1–RV16 pass; no entry sits on a seed dossier | `python3 tools/test-incidents-reproduce.py --law L1` | 0 dossiers have `reproduce` (F2) → `L1 FAIL 0/4 entries` |
+| L1 | The 3 qualifying dossiers carry the 4 Appendix A entries, all accepted with owner decision fields; every evidence pointer resolves verbatim; RV1–RV17 pass; no entry sits on a seed dossier | `python3 tools/test-incidents-reproduce.py --law L1` | 0 dossiers have `reproduce` (F2) → `L1 FAIL 0/4 entries` |
 | L2 | Each entry's link decodes to exactly `{v:1, calc, inputs: baseline ⊕ set}` (sorted-key JSON equality), is ≤ 8,000 characters, validates against `data/scenario-link.schema.json`, and its page equals `openInCalc`'s route | `--law L2` | No section and no link exist; the schema file does not exist → `L2 FAIL 0/4 links; P2 schema missing` |
-| L3 | Opening each link restores every stored input: on the calculator, `rzScenario.capture()` equals the stored map for every key, and TIA shows Tier 3 and Enterprise pressed | `node tools/test-incidents-reproduce.mjs --law L3` | `window.rzScenario` is undefined on both pages (F4) → `L3 FAIL 0/4 restored` |
+| L3 | Opening each link restores every stored input: on the calculator, `rzScenario.capture()` restricted to the stored keys equals the stored map, and on TIA `#tiaTier`/`#tiaDcType` read `3`/`ent` and the Tier 3 and Enterprise buttons are pressed | `node tools/test-incidents-reproduce.mjs --law L3` | `window.rzScenario` is undefined on both pages (F4) → `L3 FAIL 0/4 restored` |
 | L4 | The output changes exactly at the stated inputs (signed-out): TIA "Top gaps" headings equal the violated labels and `#scoreValue` reads `92%` (OVH) or `98%` (LD8, Delta) against `100%` for the baseline-only link; tier advisor `#physicalVal` 56 → 34 and `#scoreValue` 58 → 56 | `--law L4` | Nothing restores (as L3) → TIA shows `0%` and no gaps list → `L4 FAIL 0/4` |
 | L5 | Exactly the 3 dossiers render `#reproduce` after `#fmea`, the nav entry and the FMEA back-link; one row per set item with its evidence label and quote; the other 40 dossiers are byte-identical to a build without Q3; `build-incidents.py --check` is CURRENT | `python3 tools/test-incidents-reproduce.py --law L5` | 0 sections → `L5 FAIL 0/3 dossiers` |
 | L6 | At 390 and 1440 px in both themes: no horizontal overflow in `#reproduce`; axe reports 0 serious/critical after first catching a planted 2:1 line; computed styles: no `transition: all`, no transform, radius ≤ 4 px, IBM Plex Sans / JetBrains Mono | `node tools/test-incidents-reproduce.mjs --law L6` | No `#reproduce` element → `L6 FAIL no section` |
@@ -892,9 +903,9 @@ Red-first proofs beyond today's tree, recorded in the evidence folder: L1 with o
 
 ## 21. Acceptance criteria
 
-- AC1 (FR-6, L2): Given the OVH TIA entry is accepted and P2 is ready, when `build-incidents.py --apply` runs, then the dossier contains `a.rp-open` whose `#rzs=` payload decodes to 62 inputs, 59 true and 3 false.
+- AC1 (FR-6, L2): Given the OVH TIA entry is accepted and P2 is ready, when `build-incidents.py --apply` runs, then the dossier contains `a.rp-open` whose `#rzs=` payload decodes to 64 inputs (62 checkboxes, 59 true and 3 false, plus `tiaTier` `"3"` and `tiaDcType` `"ent"`) and `origin` `incident:ovhcloud-sbg2-fire-2021:rp-tia`.
 - AC2 (FR-7, L5): Given the same, then `#reproduce` follows `#fmea`, the nav shows "Reproduce", and `incident-cloudflare-flexential-pdx-power-2023.html` is byte-identical to its build without Q3.
-- AC3 (L3, L4): Given a signed-out browser, when the OVH TIA link opens, then all 62 checkboxes match, Tier 3 and Enterprise are pressed, `#scoreValue` reads `92%`, and Top gaps lists the 3 stated items.
+- AC3 (L3, L4): Given a signed-out browser, when the OVH TIA link opens, then all 62 checkboxes match, `#tiaTier`/`#tiaDcType` read `3`/`ent`, Tier 3 and Enterprise are pressed, `#scoreValue` reads `92%`, and Top gaps lists the 3 stated items.
 - AC4 (FR-5): Given an entry `proposed`, when `decide --accept … --by owner` runs without `--request`, then exit 2 and the dossier file is byte-identical.
 - AC5 (FR-5, RV10): Given a quote no longer verbatim, when `decide --accept` runs, then exit 1 naming the entry and RV10, and nothing is written.
 - AC6 (RV11): Given a Kakao entry whose only evidence is `contributingFactors[2]`, when validated, then RV11 fails.
@@ -954,11 +965,11 @@ Red-first proofs beyond today's tree, recorded in the evidence folder: L1 with o
 | A quote changes in a dossier refresh | Medium | Low | RV10 blocks; owner re-accepts |
 | Audience of 2 accounts makes the work low-yield | High | Medium | Stated in §2 and D6; work is small (~11.5 d); the data also feeds Q1 |
 | Mapping disputes (Delta's server wiring vs a per-rack checklist item) | Low | Medium | Row text quotes the record; owner decides; `retire` available |
-| Peer declines `origin` | Medium | Low | Generic P2 banner; dossier carries the explanation |
+| P2 lands without `origin` or without capturable mirrors, despite the 2026-11-11 agreement | Low | Low | `origin` omitted (FR-6) and the link still restores; without mirrors the baseline keeps 62 inputs and relies on the load default (A1), the peer's answer recorded in §5.4 |
 
 ## 24. Definition of done
 
-- [ ] Owner has approved the feature, BR-2 and each of the 4 entries (request ids recorded).
+- [ ] Owner has decided D-Q03-1…4 in `DECISIONS.md` (ACCEPTED or DEFAULTED, request ids recorded), and each accepted entry carries its `decide` record.
 - [ ] `data/reproduce-baselines.json` generated and fresh; `_reproduce-review.json` covers the 8 non-qualifying facility dossiers (B 1, C 7).
 - [ ] L1, L2, L5, L7 green in `tools/test-incidents-reproduce.py --strict`; L3, L4, L6 green in `tools/test-incidents-reproduce.mjs --strict`; both wired in `tools/ship-gate.sh`; red-first log stored.
 - [ ] FMEA, FMEA simulator, response and diagram gates still green; the 40 other dossiers byte-identical.
@@ -973,10 +984,10 @@ Model outputs are computed from the calculators' own code (TIA `tia-942-checklis
 
 | Entry | Dossier | Calculator | Stored inputs | Set inputs (role → value) | Evidence (resolver label; file:line) | FMEA mode | Expected output (model) |
 |---|---|---|---|---|---|---|---|
-| `rp-tia` | `ovhcloud-sbg2-fire-2021` (official postmortem: yes) | `tia-942-checklist.html` | 62 (baseline `tia-t3-ent-all`) | violated: `chk-fire_suppression` → false; `chk-fire_clean_agent` → false; `chk-fire_preaction` → false. stated: `chk-fire_detection` → true | references[2] "Reference #3 · regulatory" (BEA-RI report): "equipped with fire detection but had no automatic extinguishing system" (`data/incidents/ovhcloud-sbg2-fire-2021.json:349`); references[6] "Reference #7 · news" (DCD): "OVH has chosen not to equip any of the five buildings in its Strasbourg data center with an automatic fire protection system." (`:377`) | FM-02 | Overall 100 % → 92 % (91.9 before rounding); Fire Protection 100 → 50; Top gaps: Automatic fire suppression, Clean agent (FM-200/Novec 1230), Pre-action sprinkler system |
+| `rp-tia` | `ovhcloud-sbg2-fire-2021` (official postmortem: yes) | `tia-942-checklist.html` | 64 (baseline `tia-t3-ent-all`: 62 checkboxes + the 2 P2 mirrors) | violated: `chk-fire_suppression` → false; `chk-fire_clean_agent` → false; `chk-fire_preaction` → false. stated: `chk-fire_detection` → true | references[2] "Reference #3 · regulatory" (BEA-RI report): "equipped with fire detection but had no automatic extinguishing system" (`data/incidents/ovhcloud-sbg2-fire-2021.json:349`); references[6] "Reference #7 · news" (DCD): "OVH has chosen not to equip any of the five buildings in its Strasbourg data center with an automatic fire protection system." (`:377`) | FM-02 | Overall 100 % → 92 % (91.9 before rounding); Fire Protection 100 → 50; Top gaps: Automatic fire suppression, Clean agent (FM-200/Novec 1230), Pre-action sprinkler system |
 | `rp-tier` | same | `tier-advisor.html` | 22 (baseline `tier-defaults`) | violated: `fireSuppression` → `none` (default `preaction`) | same two references | FM-02 | Physical 56 → 34 (56.25 → 33.5); composite 58 → 56; tier label Tier II both. Fire suppression carries 0.35 × 0.10 = 3.5 % of the composite (`tier-advisor.html:586`, `:552`) |
-| `rp-tia` | `equinix-ld8-london-ups-2020` (official postmortem: yes) | `tia-942-checklist.html` | 62 | violated: `chk-elec_dual_pdu` → false | sequenceOfEvents[8] "Sequence of events #9" (source: Tech Monitor (Giganet)): "Customer A/B redundancy is defeated because the affected feeds derived from the same UPS"; contributingFactors[1] "Contributing factor #2": "previously A+B went to a single UPS" (`data/incidents/equinix-ld8-london-ups-2020.json:204`); references[4] "Reference #5 · news": "We lost both A+B feeds to 1 of our 2 Equinix LD8 racks" (`:307`) | FM-02 | Overall 100 % → 98 % (97.995), grade A+ unchanged; Electrical 100 → 90.9; Top gaps: Dual A+B PDU feeds per rack |
-| `rp-tia` | `delta-atlanta-switchgear-2016` (official postmortem: no; source Availability Digest) | `tia-942-checklist.html` | 62 | violated: `chk-elec_dual_pdu` → false | references[6] "Reference #7 · other" (Availability Digest): "300 of Delta's 7,000 servers were not linked to an alternate power source" (`data/incidents/delta-atlanta-switchgear-2016.json:333`); metrics[1] "Metric #2" (source: Availability Digest): "~300 of 7,000 (~4.3%)" | FM-04 | Same as LD8: 98 %, A+; Top gaps: Dual A+B PDU feeds per rack |
+| `rp-tia` | `equinix-ld8-london-ups-2020` (official postmortem: yes) | `tia-942-checklist.html` | 64 | violated: `chk-elec_dual_pdu` → false | sequenceOfEvents[8] "Sequence of events #9" (source: Tech Monitor (Giganet)): "Customer A/B redundancy is defeated because the affected feeds derived from the same UPS"; contributingFactors[1] "Contributing factor #2": "previously A+B went to a single UPS" (`data/incidents/equinix-ld8-london-ups-2020.json:204`); references[4] "Reference #5 · news": "We lost both A+B feeds to 1 of our 2 Equinix LD8 racks" (`:307`) | FM-02 | Overall 100 % → 98 % (97.995), grade A+ unchanged; Electrical 100 → 90.9; Top gaps: Dual A+B PDU feeds per rack |
+| `rp-tia` | `delta-atlanta-switchgear-2016` (official postmortem: no; source Availability Digest) | `tia-942-checklist.html` | 64 | violated: `chk-elec_dual_pdu` → false | references[6] "Reference #7 · other" (Availability Digest): "300 of Delta's 7,000 servers were not linked to an alternate power source" (`data/incidents/delta-atlanta-switchgear-2016.json:333`); metrics[1] "Metric #2" (source: Availability Digest): "~300 of 7,000 (~4.3%)" | FM-04 | Same as LD8: 98 %, A+; Top gaps: Dual A+B PDU feeds per rack |
 
 Notes for the owner's review:
 - LD8 is a colocation site; the checklist's default list is Enterprise. The item is on both lists (Tier 3 has 62 Enterprise items and 67 Colocation items). The row says "Tier 3 list, Enterprise".

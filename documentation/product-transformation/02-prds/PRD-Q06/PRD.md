@@ -6,7 +6,7 @@
 |---|---|
 | PRD id | PRD-Q06 |
 | Feature | One provenance line idiom (`Simulated` / `Snapshot` / `Model output` / `Fallback`) from one small module, the shared simulated banner on all 10 cockpits, removal of every "Live" and "real-time" claim the site cannot back, visible fallbacks in the LTC lab and DCMOC, the X4 interim label and the X6 fix |
-| Version | 1.0 |
+| Version | 1.1 |
 | Status | Draft |
 | Author | Opus 5.5; Fable quota exhausted |
 | Date | 2026-11-10 |
@@ -16,8 +16,8 @@
 | Dependencies | None blocking. **X5** (tier-advisor and tia-942 noise bands, `…_ADDENDUM.md:51`) is owned by the peer session and is NOT specified here; when the peer ships X5, tier-advisor and tia-942 can join the registry (§10.3) with no change to this design. Consumers of this PRD: **Q7** scripted scenarios (`…_ADDENDUM.md:490`: "Q7 scenarios set kind=simulated scenario=<id>"; `04-implementation-plan/TRACKER.md:32` lists Q7 as depending on Q6), **P26** market-tracker dates (peer; coordinate on `dc-market-tracker.html`), **Q8** refresh pipeline (merged into P26, `01-improvement-register/REGISTER.md:31`; it will update `asOf`) |
 | Related modules | NEW `js/rz-provenance.js`; `js/rz-telemetry-quality.js`; the 10 cockpits (`datahall.html`, `datahallAI.html`, `chiller-plant.html`, `fire-system.html`, `ict.html`, `water-system.html`, `fuel-system.html`, `EPMS_Telemetry.html`, `dc-conventional.html`, `cdu-mini-bms.html`); the 7 PLN pages; `ltc-system-modelling-lab.html` + `js/ltc-system-modelling-lab.js`; `dcmoc/src/components/layout/Shell.tsx` + `dcmoc/src/lib/rz-engine.ts`; `manual/datahallai.html`; `prd/datahallai.html`; `tools.html`; `insights.html`; `datacenter-solutions.html`; `cdu-selection-guide.html`; `dc-market-tracker.html`; `tools/build-og-images.py`; `search-index.json`; NEW `tools/provenance-registry.json`, `tools/test-provenance.mjs`, `tools/test-provenance-runtime.mjs`; `tools/ship-gate.sh`; `CLAUDE.md`; standards docs (§22.4) |
 | Target wave | Addendum roadmap "Quick wins, weeks 1–2" (`…_ADDENDUM.md:554`). Implementation wave 1 of `04-implementation-plan/PROGRAM.md` (to be written by the main session); Q7 waits for it |
-| Overlap to resolve | `01-improvement-register/REGISTER.md:24` and `04-implementation-plan/TRACKER.md:40` also list "X4 interim" and "X6" under PRD-X-DEFECTS. This PRD specifies both in full (FR-6, FR-7, FR-10). PRD-X-DEFECTS should point here, not re-specify them. The main session owns that decision |
-| Approval status | Approved by owner R110/R111 2026-11-10. Approval class "ordinary" (`REGISTER.md:12`). The title and meta-description rewrites in §9.10 are SEO-visible copy; they are inside this approval because each one removes a false claim |
+| Overlap to resolve | `01-improvement-register/REGISTER.md:24` and `04-implementation-plan/TRACKER.md:40` also list "X4 interim" and "X6" under PRD-X-DEFECTS. This PRD specifies both in full (FR-6, FR-7, FR-10). PRD-X-DEFECTS should point here, not re-specify them. The main session owns that decision: **D-Q06-2** in `documentation/product-transformation/DECISIONS.md` (PROPOSED, default "Q06 specifies both") |
+| Approval status | Approved by owner R110/R111 2026-11-10. Approval class "ordinary" (`REGISTER.md:12`). The title and meta-description rewrites in §9.10 are SEO-visible copy; they are inside this approval because each one removes a false claim. The owner's acceptance of the copy as final is **D-Q06-1** in `DECISIONS.md` (PROPOSED, default "accept as written") |
 | Facts verified at | `wt-hub3` commit `1cb6dd292` (2026-11-10, "docs: product-transformation program skeleton"), working tree clean |
 
 Change history
@@ -25,6 +25,7 @@ Change history
 | Version | Date | Author | Change |
 |---|---|---|---|
 | 1.0 | 2026-11-10 | Opus 5.5 | First complete draft, all 24 sections. Every fact re-verified on `1cb6dd292` with the commands quoted in §3 |
+| 1.1 | 2026-11-11 | Opus 5.5 | QA batch 1 revisions (D1–D8). D3: FR-13 places every `RZProvenance.mark/clear` call in the wrapper `computeModel`, never inside `computeModelLegacy` (§18.2, T-12 follow); `dcmoc/` rebuild order fixed (Q04 then Q06, one rebuild per release, §13, §22.3). D5: owner decisions are D-Q06-1 and D-Q06-2 in `DECISIONS.md`. D6/D7: §13 records that Q04 and Q07 use this PRD's fallback contract and styling contract |
 
 ## 2. Executive summary
 
@@ -657,12 +658,16 @@ runtime check in L6b.
 - Add `<script src="js/rz-provenance.js?v=<token>" defer></script>` before `js/ltc-system-modelling-lab.js`
   (`ltc-system-modelling-lab.html:5587`).
 - Add the static line `rz-prov-ltc-model` after `<h3>Engineering Output</h3>` (`:4576`), kind `model`.
-- In `computeModel()` (`js/ltc-system-modelling-lab.js:2701-2706`): plant path success → `clear`; `window.__ltcLegacy`
-  set → mark F-DEBUG; `window.LTCLabPlant` missing → mark F-PLANT-MISSING; catch → mark F-PLANT-ERROR (keep the
-  `console.error`). In `computeModelLegacy()` inline-table branch (`:2708-2711` else-path) → mark F-ENGINE-MISSING
-  (this one wins only when the plant path is not used; when the plant path succeeds the physical figures do not come
-  from the inline tables, so the engine-missing mark appends to the `reason` of the model line instead:
-  "screening scores from inline lab tables (shared engine not loaded)").
+- Every mark and clear call lives in the wrapper `computeModel()` (`js/ltc-system-modelling-lab.js:2701-2706`).
+  **`computeModelLegacy()` (`:2708` onward) is not edited at all**: PRD-Q04 L7 freezes its behaviour with a golden
+  (coordinator decision D3), and no provenance call is placed in it. The wrapper first reads
+  `var engineUsed = !!(window.RZEngine && window.RZEngine.models && window.RZEngine.models.ltc);`, the same condition
+  `computeModelLegacy` tests at `:2710` (read again, not shared), then calls `computeModelLegacy(input)` unchanged.
+  Plant path success → `clear` when `engineUsed`, else mark F-ENGINE-MISSING (the physical figures come from the
+  plant engine, so the engine-missing mark carries the reason "screening scores from inline lab tables (shared engine
+  not loaded)"); `window.__ltcLegacy` set → mark F-DEBUG; `window.LTCLabPlant` missing → mark F-PLANT-MISSING;
+  catch → mark F-PLANT-ERROR (keep the `console.error`); plant path not used and `!engineUsed` → mark F-BOTH
+  (precedence §12 rule 6).
 - `:8886` `LTCLabPlant.sync` catch → same F-PLANT-ERROR mark.
 - All calls are guarded: `if (window.RZProvenance) { … }`.
 - Texts in §9.10. The 28 golden outputs (`tools/test-ltc-lab-golden.mjs`) must not change.
@@ -1253,8 +1258,9 @@ stateDiagram-v2
 | Manuals | `manual/datahallai.html:711` | Corrected (FR-9). `prd/datahallai.html:190` likewise |
 | Explain DB | None | — |
 | Incidents, scenarios, account page | None | — |
-| DCMOC | New component, rebuilt export | T-13 |
-| Q7 (next wave) | Will call `RZProvenance.mark(el, {kind:'simulated', basis:'scenario <id>'})` and remove the random excursion | Documented in §11.2 so Q7 can rely on it |
+| DCMOC | New component, rebuilt export | T-13. Rebuild order with PRD-Q04 is fixed (coordinator decision D3): Q04's engine and DCMOC source changes first, then this PRD's T-13; when both ship in one release there is one rebuild (§22.3) |
+| PRD-Q04 (one engine path per metric) | (1) Q04 FR-17/L7 freezes `computeModelLegacy` by behaviour (a golden of its outputs, engine blocked and present), never by its source text; FR-13 here edits only the wrapper `computeModel`, so the two cannot conflict. (2) Q04 FR-16 shows a missing engine on five calculators through this PRD's `kind=fallback` contract with the code F-CALC-ENGINE-MISSING, and adds one registry entry per page to `tools/provenance-registry.json` (Q04 T-9); this PRD owns the contract and its styling (D6) | No change to this PRD's code; L6 picks up the new registry entries |
+| Q7 (next wave) | Will call `RZProvenance.mark(el, {kind:'simulated', basis:'scenario <id>'})` and remove the random excursion. Q07 uses this PRD's `.rz-prov` classes and token fallback chain (§9.8) for any provenance or simulated label on cockpit pages, and does not load `css/rz-hub.css` there (D7) | Documented in §11.2 and §9.8 so Q7 can rely on them |
 | P26 (peer) | Will add per-figure dates to the tracker using the same `snapshot` kind if the peer chooses | Offered, not required |
 
 ## 14. AI and automation requirements
@@ -1267,7 +1273,8 @@ No LLM or AI runs at page time; every line is deterministic text. Automation is 
   which is intended (a human updates the line when the data changes).
 
 Human approval points: the owner approved the PRD set (R110/R111). The copy in §9.10 is final unless the owner
-edits it. Q6 changes no auth boundary, so no extra approval is needed.
+edits it (D-Q06-1 in `documentation/product-transformation/DECISIONS.md`); the X4-interim/X6 ownership is D-Q06-2 (main
+session). Q6 changes no auth boundary, so no extra approval is needed.
 
 ## 15. Non-functional requirements
 
@@ -1375,7 +1382,8 @@ sequenceDiagram
     participant PV as RZProvenance
     participant L as #rz-prov-ltc-model
     U->>Lab: change an input
-    Lab->>Lab: computeModelLegacy(input) (engine or inline tables; records source)
+    Lab->>Lab: engineUsed = RZEngine.models.ltc present (read in the wrapper)
+    Lab->>Lab: computeModelLegacy(input) (unchanged; no provenance call inside it)
     alt plant present and no debug switch
         Lab->>Plant: compute(input, legacy)
         alt returns
@@ -1455,8 +1463,8 @@ static export under `dcmoc/`, so its change needs a rebuild (§22.3) before the 
 | T-9 | X4 interim labels | T-2 | `datahall.html` | FR-10 | 0.5 d | L7; `node tools/test-datahall-operator-engineering.mjs` green | 3/3 surfaces labelled |
 | T-10 | Water ripple label | T-2 | `water-system.html` | FR-11 | 0.5 d | L6b water case | Label follows the toggle |
 | T-11 | cdu-mini-bms copy and state word | — | `cdu-mini-bms.html` | FR-12 | 0.5 d | L4 (−13); screenshot running and paused | RUNNING/PAUSED as plain words |
-| T-12 | LTC lab line and fallbacks | T-2 | `ltc-system-modelling-lab.html`, `js/ltc-system-modelling-lab.js` | FR-13; record the legacy source in `computeModelLegacy`; precedence §12 rule 6 | 1 d | L6 (3 cases); `tools/test-ltc-lab-golden.mjs` and `tools/test-ltc-lab-steps.mjs` green | Line follows the path |
-| T-13 | DCMOC notice and rebuild | T-2 | NEW `dcmoc/src/components/layout/EngineFallbackNotice.tsx`, `dcmoc/src/components/layout/Shell.tsx`, the `dcmoc/` export | FR-14; measure engine-ready time 10× on the live site to set `NOTICE_DELAY_MS` (A2); check whether DCMOC calls `worker/` (§5.2) | 1.5 d | L6 DCMOC case; `node tools/test-dcmoc-cx-plan.mjs` green; `tools/_dcmoc_trace_parity_probe.mjs` clean | Export rebuilt and committed |
+| T-12 | LTC lab line and fallbacks | T-2 | `ltc-system-modelling-lab.html`, `js/ltc-system-modelling-lab.js` | FR-13; all calls in the wrapper `computeModel`, which re-reads the engine condition; `computeModelLegacy` untouched (Q04 L7 golden must stay green); precedence §12 rule 6 | 1 d | L6 (3 cases); `tools/test-ltc-lab-golden.mjs` and `tools/test-ltc-lab-steps.mjs` green | Line follows the path |
+| T-13 | DCMOC notice and rebuild | T-2 | NEW `dcmoc/src/components/layout/EngineFallbackNotice.tsx`, `dcmoc/src/components/layout/Shell.tsx`, the `dcmoc/` export | FR-14; measure engine-ready time 10× on the live site to set `NOTICE_DELAY_MS` (A2); check whether DCMOC calls `worker/` (§5.2); rebuild after Q04's DCMOC tasks, or one rebuild with them (§22.3) | 1.5 d | L6 DCMOC case; `node tools/test-dcmoc-cx-plan.mjs` green; `tools/_dcmoc_trace_parity_probe.mjs` clean | Export rebuilt and committed |
 | T-14 | Copy sweep and generated artefacts | — (message the peer first for the tracker and OG generator lines) | 15 pages (F8), `tools/build-og-images.py`, `search-index.json`, `llms.txt`, `llms-full.txt`, `search-sections.json`, 2 OG cards | FR-15 | 1 d | L4 = 0; `python3 tools/test-generator-freshness.py` green; open both OG cards and read them | 0 claims |
 | T-15 | Runtime gate | T-2…T-13 | NEW `tools/test-provenance-runtime.mjs` | §20.2 L5b, L6–L8; free port or `RZ_BASE`; sessions seeded as §5.3 | 1.5 d | Red on `1cb6dd292` in a worktree (proves it can fail), green on the branch | Gate exits 0 |
 | T-16 | Wiring and standards | T-1, T-15 | `tools/ship-gate.sh`, `CLAUDE.md`, standards docs §22.4 | §20.3 | 0.5 d | `node tools/test-gate-wiring.mjs` exit 0; `node tools/test-telemetry-docs.mjs` green | Wired and documented |
@@ -1595,6 +1603,12 @@ revert (§22.5).
 worktree), then replace the export: `rm -rf _next _not-found && cp -r out/. .`, then run
 `node tools/_dcmoc_trace_parity_probe.mjs` and `node tools/test-dcmoc-cx-plan.mjs`. The prerender loads
 `rz-engine.js` through `rz-engine.ts:20-40` (`DCMOC_DCOS_STANDARD.md:20`).
+
+Order with PRD-Q04 (coordinator decision D3, stated identically in PRD-Q04 §22.3): Q04's engine changes and DCMOC
+source changes (Q04 T-3…T-8, T-14, T-15) go in first, then this PRD's T-13. When both ship in one release there is one
+rebuild, from a tree that holds both changes, followed by the two checks above and `node tools/test-engine-paths.mjs
+--law L3`. When this PRD ships after a Q04 release, T-13 rebuilds on top of Q04's committed export; if Q04 is still in
+flight, T-13 waits for Q04's DCMOC tasks or ships with them in one release.
 
 ### 22.4 Standards docs in the same release (rule R089, "standards docs follow every change", `standarization/UIUX_AUDIT_LEDGER.md:160`)
 

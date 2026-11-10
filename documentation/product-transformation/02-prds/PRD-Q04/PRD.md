@@ -6,17 +6,17 @@
 |---|---|
 | PRD id | PRD-Q04 |
 | Feature | Every calculator page and every DCMOC module gets PUE, the tier rating, carbon (grid factor, carbon price, Scope 1/2/3) and OPEX energy from one engine function per metric. Before a page is switched, a parity fixture records the local result and the engine result. Where they differ, a decision record says which is right, and the change ships with its evidence. A registry and two gates keep the rule after this release |
-| Version | 1.0 |
+| Version | 1.1 |
 | Status | Draft |
 | Author | Opus 5.5; Fable quota exhausted |
 | Date | 2026-11-11 |
 | Owner requests | R110 (a PRD per idea), R111 (24-section structure) |
 | Priority | 67.5 (addendum rank 8: impact 8, innovation 3, confidence 8, effort score 5 = 4 weeks; `documentation/PRODUCT_INNOVATION_ASSESSMENT_2026-11_ADDENDUM.md:83`, section `:262-282`) |
 | Related findings | Q4 (`…_ADDENDUM.md:262-282`); maturity row "Engine consistency across tools: 2" (`:32`); X5 (`:51`, owned by the peer session, a dependency only). New findings N1–N12 (§3.3). Corrections to the addendum C1–C6 (§3.4) |
-| Dependencies | **X5** (peer): the three `Math.random()` noise lines in `tier-advisor.html` (`:786`, `:810`, `:1166`) are not touched here; both changes keep the variable `composite` (§13). **P8** (peer, Q5 merged into it): the Monte Carlo panels on opex, pue, carbon and tier read the values this PRD makes canonical. **P16** (peer): engine version manifest; named by the addendum as an integration point (`:272`); this PRD does not change any pinned cockpit engine. **PRD-Q06** (this program): the LTC and DCMOC fallback lines; Q4 relies on them for the two fallbacks it keeps. **`standarization/ENGINE_UNIFICATION.md`**: the charter this PRD finishes for the root calculators (`:85` "Root-calculator consumers still to migrate") |
+| Dependencies | **X5** (peer): the three `Math.random()` noise lines in `tier-advisor.html` (`:786`, `:810`, `:1166`) are not touched here; both changes keep the variable `composite` (§13). **P8** (peer, Q5 merged into it): the Monte Carlo panels on opex, pue, carbon and tier read the values this PRD makes canonical. **P16** (peer): engine version manifest; named by the addendum as an integration point (`:272`); this PRD does not change any pinned cockpit engine. **PRD-Q06** (this program, hard for FR-16): the LTC and DCMOC fallback lines, and `js/rz-provenance.js`, whose `kind=fallback` line is the only way this PRD shows a missing engine (FR-16, coordinator decision D6). Q06 ships first. The `dcmoc/` export is rebuilt in a fixed order: Q04's engine and DCMOC source changes first, then Q06's; when both ship in one release there is one rebuild (§13, §22.3). **`standarization/ENGINE_UNIFICATION.md`**: the charter this PRD finishes for the root calculators (`:85` "Root-calculator consumers still to migrate") |
 | Related modules | `rz-engine.js` (+ `rz-engine.min.js`); `tier-advisor.html`; `carbon-footprint.html`; `opex-calculator.html`; `pue-calculator.html`; `tco-calculator.html`; `capex-calculator.html` (grid table only); `js/rz-calc-utils.js`; `js/ltc-system-modelling-lab.js` (no code change, parity wiring only); DCMOC: `dcmoc/src/constants/pue.ts`, `state/adapters/arch-adapter.ts`, `state/adapters/capex-adapter.ts`, `lib/CapexEngine.ts`, `lib/decision/deterministicProvider.ts`, `lib/diagnostics.ts`, `lib/value-trace.ts`, `modules/analytics/CarbonEngine.ts`, `modules/analytics/BenchmarkEngine.ts`, `modules/analytics/SensitivityEngine.ts`, `modules/infrastructure/FuelGenEngine.ts`, `components/modules/StrategicPlanningDashboard.tsx`, `components/modules/CapexDashboard.tsx`, `components/modules/DesignToolsDashboards.tsx`, `components/modules/sustainability/EnergyAuditPage.tsx`; manuals `manual/opex.html`, `manual/pue.html`, `manual/carbon.html`, `manual/tier.html`, `manual/tco.html`, `manual/dcmoc.html`; NEW `tools/engine-paths.json`, `tools/fixtures/engine-parity.json`, `tools/test-engine-paths.mjs`, `tools/test-engine-paths-runtime.mjs`; `tools/ship-gate.sh`; `CLAUDE.md`; standards docs (§22.4) |
 | Target wave | Addendum roadmap "Foundations, weeks 3–8" (`…_ADDENDUM.md:556`). The implementation wave is set in `04-implementation-plan/PROGRAM.md` (to be written by the main session) |
-| Approval status | Approved by owner R110/R111 2026-11-10. Approval class "ordinary; any change in output needs evidence" (`01-improvement-register/REGISTER.md:17`). Decisions D-1 to D-9 (§12.3) change visible numbers; each one ships only with its evidence table and the owner's yes. D-8 removes a silent local fallback on five pages; the main session should confirm with the owner that this is not a "feature removal" in the sense of `STATE.md` ("Approval is still required for: … feature removal") |
+| Approval status | Approved by owner R110/R111 2026-11-10. Approval class "ordinary; any change in output needs evidence" (`01-improvement-register/REGISTER.md:17`). Decisions D-Q04-1 to D-Q04-9 (§12.3; recorded in `documentation/product-transformation/DECISIONS.md`, all PROPOSED) change visible numbers; each one ships only with its evidence table and the owner's yes. D-Q04-8 removes a silent local fallback on five pages; D-Q04-8 itself asks the owner to confirm that this is not a "feature removal" in the sense of `STATE.md` ("Approval is still required for: … feature removal") |
 | Facts verified at | `wt-hub3` commit `2f458f7c5` (2026-11-11, "docs: record P2 interface agreement for Q3"), working tree clean |
 
 Change history
@@ -24,6 +24,7 @@ Change history
 | Version | Date | Author | Change |
 |---|---|---|---|
 | 1.0 | 2026-11-11 | Opus 5.5 | First complete draft, all 24 sections. Every fact re-verified on `2f458f7c5` with the commands quoted in §3 |
+| 1.1 | 2026-11-11 | Opus 5.5 | QA batch 1 revisions (D1–D8). D3: L7 checks the LTC legacy model by behaviour (golden outputs), never by its body; DCMOC rebuild order fixed (Q04 then Q06, one rebuild per release); `local` total corrected to 24 PUE + 20 + 7 + 10 = 61, "±" removed. D5: decisions renamed D-Q04-1…9 and moved to `DECISIONS.md`. D6: the missing-engine state uses Q06's `RZProvenance` `kind=fallback` line (F-CALC-ENGINE-MISSING); exports gain `aria-describedby` |
 
 ## 2. Executive summary
 
@@ -67,7 +68,7 @@ This PRD:
 
 | Measure | Today (`2f458f7c5`) | After |
 |---|---|---|
-| Registry entries of class `local` (PUE, tier, carbon, OPEX energy) | 60 (prototype scan, §3.2 F1) | 0, or owner holds (§22.1) |
+| Registry entries of class `local` (PUE, tier, carbon, OPEX energy) | 61 (prototype scan plus read finds, §3.2 F1) | 0, or owner holds (§22.1) |
 | `RZEngine` calls in `tier-advisor.html` | 0 (engine not loaded) | 1 per calculation |
 | Countries for which `models.carbon.gridFactor(code)` returns that country's own value | 0 of 40 | 40 of 40 |
 | opex cooling × climate combinations where the shown PUE is the PUE the energy cost uses | 1 of 42 | 42 of 42 |
@@ -114,7 +115,11 @@ reading: `pue-calculator.html:1490` (monthly PUE, `pue × (1 + (t − 20) × 0.0
 the same prototype found 23 carbon statements in 8 files (18 local) and 7 tier statements, all local, in
 `tier-advisor.html`. Two more local carbon tables are not matched by name and were found by reading
 (`opex-calculator.html:1510`, `carbon-footprint.html:845`). Ten OPEX-energy statements on the four Q4 pages are
-registered by anchor (§10.2). **Total `local` today: 23 PUE + 20 carbon + 7 tier + 10 OPEX energy = 60.**
+registered by anchor (§10.2). **Total `local` today: 24 PUE (22 scanned + the 2 read-found models) + 20 carbon +
+7 tier + 10 OPEX energy = 61 registry entries.** `opex-calculator.html:1691` carries two entries, one `pue` (the
+implied-PUE model, `itLoadKW × (effectivePue − 1) × efficiencyMult × coolingEnergyMult`) and one `energy` anchor (the kWh
+product), because FR-11 replaces it for both metrics; the 61 entries therefore sit on 60 distinct lines. T-1 recounts
+as verification (FR-1).
 
 Commands: the scan rule above, implemented in T-1 as `node tools/test-engine-paths.mjs --scan`; the same rule as a
 throwaway Python script printed "FILES 31 CANDIDATES 81" before the two exclusions (1 `embed/` statement, 6 matches
@@ -347,12 +352,12 @@ copy is added.
 
 | # | Objective | Metric | Method | Baseline | Target | Assumption |
 |---|---|---|---|---|---|---|
-| O1 | One registered path for every PUE, tier, carbon and OPEX-energy statement in scope | `local` entries; unregistered candidates; stale entries | `node tools/test-engine-paths.mjs --law L1` | 60 / not measured / — | 0 (or owner holds, §22.1) / 0 / 0 | The scanner rule in §20.1 is the definition; misses are caught by anchors and by L2–L6 |
+| O1 | One registered path for every PUE, tier, carbon and OPEX-energy statement in scope | `local` entries; unregistered candidates; stale entries | `node tools/test-engine-paths.mjs --law L1` | 61 / not measured / — | 0 (or owner holds, §22.1) / 0 / 0 | The scanner rule in §20.1 is the definition; misses are caught by anchors and by L2–L6 |
 | O2 | tier-advisor shows the engine's result | static checks + 200 seeded browser cases | L2 | 0 engine calls | 200 / 200 equal | — |
 | O3 | Every DCMOC PUE consumer agrees with the engine for every cooling × tier | combinations agreeing | L3 | 4 / 12 | 12 / 12 | DCMOC keeps 4 cooling types and Tiers 2–4 |
-| O4 | One grid factor and one carbon price per country | countries resolving to their own grid value; page price tables | L4 | 0 / 40; 3 page tables | 40 / 40; 0 | D-1 and D-2 approved as recommended |
-| O5 | carbon-footprint shows the engine's scopes | fixtures equal (5) | L5 | 0 / 5 | 5 / 5 | D-4 approved |
-| O6 | opex shows the PUE it charges for; one kWh figure | combinations consistent (42) | L6 | 1 / 42 | 42 / 42; energy cost unchanged in 42 / 42 | D-3 option A approved |
+| O4 | One grid factor and one carbon price per country | countries resolving to their own grid value; page price tables | L4 | 0 / 40; 3 page tables | 40 / 40; 0 | D-Q04-1 and D-Q04-2 approved as recommended |
+| O5 | carbon-footprint shows the engine's scopes | fixtures equal (5) | L5 | 0 / 5 | 5 / 5 | D-Q04-4 approved |
+| O6 | opex shows the PUE it charges for; one kWh figure | combinations consistent (42) | L6 | 1 / 42 | 42 / 42; energy cost unchanged in 42 / 42 | D-Q04-3 option A approved |
 | O7 | Every kept fallback is parity-proven and wired | fallbacks with wired passing check | L7 | 0 / 6 | 6 / 6 | — |
 | O8 | No calculator shows numbers without the engine | pages showing the missing-engine line and "—" with the engine blocked | L8 | 0 / 5 | 5 / 5 | — |
 | O9 | No output changes silently | changed fixtures with a `before` value, a decision id and a CHANGELOG row | review of `tools/fixtures/engine-parity.json` against CHANGELOG at T-18 | — | 100 % | — |
@@ -390,7 +395,7 @@ none is invented here.
 | `models.tier.classify` vs `advise` (F16) | Different inputs | Documented in the registry `canonical` block |
 | pue-calculator percentile bands (`:1140-1145`) | A classification of the PUE, not a PUE value; no engine source exists | FU-5 (Q6-style provenance) |
 | Article calculators (`article-*.html`) | The charter's article program already bound them (`ENGINE_UNIFICATION.md:100-116`) with an inline fallback; not in the addendum's Q4 scope | Left as is |
-| `.rz-calc-validation` red tint (`js/rz-calc-utils.js:21-24`) | Existing component used by every calculator; tool pages override part of it (`css/rz-tool.css:102-104`). Q4 changes only its radius, 8 → 4 px, because the box now carries the missing-engine state (FR-16) | Tint logged OPEN in `UIUX_AUDIT_LEDGER.md` (§22.4) |
+| `.rz-calc-validation` red tint (`js/rz-calc-utils.js:21-24`) | Existing component used by every calculator; tool pages override part of it (`css/rz-tool.css:102-104`). Q4 changes only its radius, 8 → 4 px (panels ≤ 4 px; tier-advisor gains one, FR-16). The missing-engine state is not in this box: it is Q06's `Fallback` line (FR-16) | Tint logged OPEN in `UIUX_AUDIT_LEDGER.md` (§22.4) |
 | The rest of tco's unused `BENCHMARKS` object (`tco-calculator.html:1019-1033`) | Not a Q4 metric; dead code outside the request | Reported in the T-13 notes, not deleted |
 | Explain-DB text "Industry average sits around 1.55" (`js/rz-explain-db.js`, entry `pue`) vs `DATA.pueBenchmark.industryAvg` 1.52 | Tooltip text, not a computed path | FU-6 |
 
@@ -428,7 +433,7 @@ to T-8 touch only the engine and new tool files.
 
 | Id | Assumption | If wrong |
 |---|---|---|
-| A1 | The five calculator pages can require the engine: it is a same-origin static file already loaded by four of them | D-8 is reversed and each page keeps a parity-proven fallback with a visible line (the LTC pattern) |
+| A1 | The five calculator pages can require the engine: it is a same-origin static file already loaded by four of them | D-Q04-8 is reversed and each page keeps a parity-proven fallback with a visible line (the LTC pattern) |
 | A2 | `DATA.countries` grid values are at least as good as `DATA.carbon.gridFactor` for the six overlapping countries | T-4 checks both against the primary source both cite (Ember); the table that matches wins; the other is corrected |
 | A3 | Users accept that some numbers change, given the evidence table | The owner rejects a decision; that page keeps its local path and its registry entries stay `local` with a `hold` (§22.1); L1 reports them as HOLD and the CHANGELOG lists them |
 
@@ -442,7 +447,7 @@ Tiers as the site has them: `free | demo | pro | root` (`js/rz-feature-flags.js:
 | P1 Facility / DC engineer | Sizes a design, checks a vendor claim, compares tools | The same inputs give the same PUE, tier and carbon on every tool | free or pro |
 | P2 Energy or sustainability analyst | Prepares a carbon or energy figure for a report | Know which grid factor and carbon price a number used, for the selected country | pro (carbon pro mode, opex advanced) |
 | P3 Student or educator | Coursework on PUE, tiers and carbon | Numbers that agree between the calculator, the manual and the LTC lab | free; LTC lab needs pro |
-| P4 Owner (root) | Runs DCMOC; approves decisions D-1 to D-9 | DCMOC modules agree with each other and with the calculators; every changed number has evidence | root |
+| P4 Owner (root) | Runs DCMOC; approves decisions D-Q04-1 to D-Q04-9 | DCMOC modules agree with each other and with the calculators; every changed number has evidence | root |
 | P5 Signed-out visitor | Arrives from search | Results that are either the engine's or plainly absent | free |
 | P6 Contributor (the main session today; any later engineer) | Adds or edits a calculator | Told by the gate, at the line, when a formula should be an engine call | n/a |
 
@@ -467,7 +472,7 @@ Use cases:
 | UC3 | P2 | Runs carbon-footprint for France | Scope 2 uses France's grid factor from `DATA.countries`; "Carbon Tax" uses France's compliance price from `DATA.envCosts` and applies it to Scope 1 + 2; the basis line names both |
 | UC4 | P4 | Sets a DCMOC scenario to Tier 4, liquid cooling | Summary, Capex energy, FuelGen load, Benchmark and Sensitivity all use PUE 1.10 |
 | UC5 | P4 | Opens DCMOC Financial for a facility in Sweden | "Carbon Levy" shows Sweden's compliance price × Sweden's grid factor, with the basis text, not the US figures |
-| UC6 | P5 | Opens any of the five calculators while `rz-engine.min.js` fails to load | The validation box reads "The calculation engine did not load, so no results are shown. Reload the page to try again."; result cells show "—" |
+| UC6 | P5 | Opens any of the five calculators while `rz-engine.min.js` fails to load | The provenance line under the results heading reads "Fallback · no results shown · shared engine rz-engine.min.js not loaded; reload the page to try again" (PRD-Q06 contract, code F-CALC-ENGINE-MISSING); result cells show "—" |
 | UC7 | P3 | Opens the LTC lab without the engine | As today plus Q6: the inline model runs, labelled; Q4 guarantees it equals the engine (parity gate) |
 | UC8 | P6 | Adds `const pue = facilityKw / itKw;` to a page | `tools/test-engine-paths.mjs --strict` fails with "L1 FAIL unregistered pue <file>:<line> - (-, -) — call RZEngine.models.pue.pueFromInputs or register the statement with a class and a reason" (grammar in §11.4) |
 
@@ -483,7 +488,7 @@ Use cases:
 | Success | Result cells, bars, charts and the PDF builder read the engine result. The header basis line (`.res-head .basis`) names the engine function and the data sources (copy in §9.10) |
 | Input change | `oninput`/`onchange` handlers are unchanged; each recomputes through the engine; no local path remains |
 | Validation failure | As today: the validation box lists the bad inputs ("Check 1 input: IT load must be 50–100000"); the engine is called with the page's existing defaults, as today |
-| Engine missing | `window.RZEngine` (or the needed function) is absent when `calculate()` runs: the validation box shows the missing-engine line (FR-16), every result cell shows "—", charts are not drawn, PDF export is disabled with the same line as its tooltip. No exception escapes to the console |
+| Engine missing | `window.RZEngine` (or the needed function) is absent when `calculate()` runs: the `#rz-prov-calc` line turns into Q06's `Fallback` line (FR-16), every result cell shows "—", charts are not drawn, exports are inert with the same sentence as `title` and `aria-describedby="rz-prov-calc"`. No exception escapes to the console |
 | Recovery | The user reloads; the service worker serves the token-addressed engine file (cache-first for static assets, `sw.js:2`); a new release changes the `?v=` token, so a stale copy is never mixed with new page code |
 | Exit | PDF export, scenario save (inputs only, `supabase/schema.sql:280` `payload jsonb`), navigation away. Nothing new is persisted |
 
@@ -502,7 +507,7 @@ Use cases:
 1. Owner signs in; DCMOC loads; until `useEngineReady()` is true the modules render with the fallback table, which
    now equals the engine for all 12 cooling × tier pairs (FR-14), so nothing jumps when the engine arrives.
 2. Owner sets Tier 4 + liquid: every module reads 1.10.
-3. Financial → "Carbon Levy" for the US case of F6 (1 MW, PUE 1.5) after D-1/D-2: the line reads $0 and its basis
+3. Financial → "Carbon Levy" for the US case of F6 (1 MW, PUE 1.5) after D-Q04-1/D-Q04-2: the line reads $0 and its basis
    reads "5256 tCO₂ × $0/t compliance (no scheme)" (1 MW × 1.5 × 8,760 h × 0.40 t/MWh, the US value in
    `DATA.countries`; T-4 may correct that value, and the tonnes follow it). Exact grammar in §9.10.
 4. Engine blocked: Q6's notice appears (PRD-Q06 FR-14); PUE values still equal the engine's because the fallback is
@@ -511,7 +516,7 @@ Use cases:
 ### 7.4 Owner decision (P4)
 
 1. T-2 writes the evidence table per decision into `documentation/product-transformation/05-test-evidence/Q4/`
-   (`D-<n>.md`: fixtures, old value, engine value, delta, sources).
+   (`D-Q04-<n>.md`: fixtures, old value, engine value, delta, sources).
 2. The main session sends the owner the table and the recommended option (§12.3).
 3. Yes → the switch task runs; the fixture's `after` is set; the CHANGELOG gets the row (§22.8).
 4. No → the page keeps its local path; its registry entries keep class `local` with `"hold": "D-n rejected
@@ -551,8 +556,9 @@ exceptions, acceptance.
 - Dependencies: none beyond Node built-ins.
 - Exceptions: registry missing or invalid JSON → exit 2 with `E_REGISTRY <message>`; a scoped file unreadable →
   exit 2 `E_READ <file>`.
-- Acceptance: AC-1; on today's tree `--strict` exits 1 with `local=60` (± the T-1 recount, recorded in the registry
-  header `verifiedCount`).
+- Acceptance: AC-1; on today's tree `--strict` exits 1 with `local=61` (24 PUE + 20 carbon + 7 tier + 10 OPEX energy,
+  §3.2 F1). T-1 recounts as verification and writes the exact number into the registry header `verifiedCount.local`;
+  if the recount differs from 61, T-1 stops and §3.2, O1 and L1 are corrected in the same commit, never hedged.
 
 **FR-2 Parity fixtures and evidence capture.**
 - Description: fixtures that hold, for each switch, the inputs, the local result before the switch, the engine result
@@ -565,7 +571,7 @@ exceptions, acceptance.
   (`test-engine-paths-runtime.mjs --capture-before`) sets each fixture's inputs on the live page, waits for the
   calculation, reads the result cells and writes `before`. `after` is filled from the engine once the decision is
   recorded.
-- Outputs: fixture file; `documentation/product-transformation/05-test-evidence/Q4/D-<n>.md` evidence tables.
+- Outputs: fixture file; `documentation/product-transformation/05-test-evidence/Q4/D-Q04-<n>.md` evidence tables.
 - State changes: fixture file and evidence files (written by the implementing session, committed).
 - Dependencies: the served tree (`LTC_BASE`) for the browser part.
 - Exceptions: a fixture whose page cell cannot be found → capture fails with `E_CELL <fixture> <selector>`.
@@ -589,10 +595,10 @@ exceptions, acceptance.
 - Acceptance: AC-3 (`defaultFor('rearDoor', 2|3|4)` = 1.24, 1.18, 1.14; `defaultFor('inrow', 2)` = 1.34;
   `defaultFor('air', 3)` = 1.50 unchanged; `test-rz-engine.mjs:171-172` still pass).
 
-**FR-4 Engine: one grid factor and one carbon price per country (D-1, D-2).**
+**FR-4 Engine: one grid factor and one carbon price per country (D-Q04-1, D-Q04-2).**
 - Description: country resolution for the grid factor; an explicit price basis for every carbon cost.
 - Trigger: any carbon or OPEX call.
-- Preconditions: D-1 and D-2 approved (§12.3).
+- Preconditions: D-Q04-1 and D-Q04-2 approved (§12.3).
 - Inputs: ISO-2 code or aggregate code (`EU`, `APAC`, `LATAM`); `basis` `'compliance' | 'shadow'`.
 - Processing:
   - NEW `models.carbon.resolveGrid(code)` → `{ value, code, source, asOf }`: (1) `DATA.countries[c].environment
@@ -617,14 +623,14 @@ exceptions, acceptance.
 - Outputs: numbers and basis objects; `DATA.sources['carbon']` row text updated ("regional aggregates and shadow
   prices; country values live in DATA.countries and DATA.envCosts").
 - State changes: engine data only.
-- Dependencies: D-1, D-2.
+- Dependencies: D-Q04-1, D-Q04-2.
 - Exceptions: unknown code → fallback-US with `source: 'fallback-US'`; callers that show a figure must show the
   source word when it is `fallback-US` (FR-10, FR-15).
 - Acceptance: AC-4 (40 / 40 countries resolve to their own value; "Carbon Levy" for US, FR, SE, ZA, TH no longer
   equal; `annualCost(1, 1.52, 'US')` = 0).
 
-**FR-5 Engine: `models.carbon.scopes` takes what the pages need (D-4).**
-- Description: additive inputs; defaults give today's numbers except where D-2 changes the grid value.
+**FR-5 Engine: `models.carbon.scopes` takes what the pages need (D-Q04-4).**
+- Description: additive inputs; defaults give today's numbers except where D-Q04-2 changes the grid value.
 - Trigger: carbon-footprint, DCMOC CarbonEngine, value-trace, SustainabilityEnginePage.
 - Preconditions: FR-4.
 - Inputs: `{ mw, pue, region, lifeYears = 15, genTestHours | genHours = DATA.carbon.genTestHoursPerYear (52),
@@ -658,14 +664,14 @@ exceptions, acceptance.
 - Acceptance: AC-6 (5,000 seeded cases: page values before = engine after, including confidence and the eight
   tornado impacts).
 
-**FR-7 Engine: the opex energy model moves into the engine verbatim (D-3).**
+**FR-7 Engine: the opex energy model moves into the engine verbatim (D-Q04-3).**
 - Description: the page's cooling and climate tables and its energy formula become engine data and functions.
 - Processing: NEW `DATA.opexCalculator = { coolingTypes, climateZones }` copied field for field from
   `opex-calculator.html:1254-1300` and `:1308-1357` (labels, multipliers, maintenance and water fields), with a
   `DATA.sources` row "Carried verbatim from opex-calculator.html (2f458f7c5); the page cites no source for these
   multipliers; screening values". NEW `models.opex.effectivePue({ basePue, cooling, climate })` and
   `models.opex.energyAnnual({ itKw, basePue, cooling, climate, utilization, ratePerKwh, hoursPerYear = 8760 })`.
-  Under D-3 option A, `facilityKw = itKw + itKw × (basePue + pueImpact − 1) × efficiencyMult × coolingEnergyMult`
+  Under D-Q04-3 option A, `facilityKw = itKw + itKw × (basePue + pueImpact − 1) × efficiencyMult × coolingEnergyMult`
   (same operation order as `:1691-1694`), `effectivePue = facilityKw / itKw`, `annualKwh = facilityKw × hours ×
   utilization`, `energyCost = annualKwh × ratePerKwh`, `overheadKwh = annualKwh − itKw × hours × utilization`.
 - Outputs: §11.1.
@@ -714,7 +720,7 @@ exceptions, acceptance.
 - Exceptions: engine missing → FR-16.
 - Acceptance: AC-9, L2.
 
-**FR-10 carbon-footprint uses `models.carbon.scopes` (D-1, D-2, D-4).**
+**FR-10 carbon-footprint uses `models.carbon.scopes` (D-Q04-1, D-Q04-2, D-Q04-4).**
 - Processing: `calculate()` builds `{ mw: itLoad / 1000, pue, region: country, renewablePct, genHours, fuelType:
   genType, refrigerant: { key, leakPct: leakRate }, embodiedTonnes: totalLifecycle, lifeYears: projectLife }` where
   `key` maps `COOLING_DATA` names to `DATA.refrigerants` keys (`R-410A → R410A`, `R-134a → R134a`, `R-1234ze →
@@ -726,14 +732,14 @@ exceptions, acceptance.
   constant `:964`). Delete `CARBON_TAX_RATE`, `DIESEL_EMISSION_FACTOR`, `HVO_EMISSION_FACTOR`,
   `DIESEL_CONSUMPTION_RATE`, `CARBON_OFFSET_PRICE` and the `grid` field of `COUNTRIES` (names and rates stay; rates
   are already patched from `DATA.countries`, `:881-891`). `COOLING_DATA` keeps `name`, `defaultLeak` and the key map;
-  `charge` and `gwp` come from `DATA.refrigerants` under D-4. The generator options print emission factors
+  `charge` and `gwp` come from `DATA.refrigerants` under D-Q04-4. The generator options print emission factors
   (`:403` "Diesel (2.68 kgCO₂/L)", `:404` "HVO Biodiesel (0.54 kgCO₂/L)"); their numbers are written at init from
   `DATA.fuelGen.fuelTypeModel[<value>].co2PerUnit`, so the label always shows the factor the calculation uses
-  (diesel 2.68, HVO 0.268 under D-4).
+  (diesel 2.68, HVO 0.268 under D-Q04-4).
 - Outputs: same cells; basis line (§9.10).
 - Acceptance: AC-10, L5.
 
-**FR-11 opex uses the engine for PUE, energy and carbon (D-1, D-3).**
+**FR-11 opex uses the engine for PUE, energy and carbon (D-Q04-1, D-Q04-3).**
 - Processing: `calculateOPEX()` calls `models.opex.energyAnnual` with the page inputs; `effectivePue` (`:1687`),
   `coolingPowerKW` and `annualKWh` (`:1690-1694`) come from it; `computeDerivedMetrics()` (`:1545`) and the per-kWh
   metric (`:2650-2654`) use the same `annualKwh`; `pueOverhead` (`:1569`) uses `overheadKwh × energyRate`; carbon
@@ -756,7 +762,7 @@ exceptions, acceptance.
 - Acceptance: AC-12 (free-user outputs unchanged; pro what-if baselines equal the main PUE).
 
 **FR-13 tco: dead PUE tables go and the cooling labels stop printing unused PUEs; capex: grid factor from the
-engine (D-5).**
+engine (D-Q04-5).**
 - Description: remove the PUE numbers that tco shows but never uses; give capex's sustainability block the engine's
   grid factor.
 - Trigger: page load and every recalculation (unchanged triggers).
@@ -764,16 +770,16 @@ engine (D-5).**
 - Processing (tco): delete `COOLING_PUE` (`:966`) and the two lines that patch it (`:970-972`), keeping the
   `DOMContentLoaded` handler and its `syncMarketRatesFromEngine()` call (`:973`); delete the `globalAvgPUE` entry
   (`:1020-1021`) of the unused `BENCHMARKS` object (the rest of `BENCHMARKS` is unused too and is reported, not
-  deleted: §5.2). Under D-5 option A the four option labels (`:399-402`) become "Air Cooled", "Chilled Water",
+  deleted: §5.2). Under D-Q04-5 option A the four option labels (`:399-402`) become "Air Cooled", "Chilled Water",
   "Evaporative" and "Direct Liquid Cooling"; the option values do not change, so saved scenarios restore as before.
-  `tcoPowerAnnual` loses its inline fallback (`:1193`) under D-8; the engine call stays (`:1191`).
+  `tcoPowerAnnual` loses its inline fallback (`:1193`) under D-Q04-8; the engine call stays (`:1191`).
 - Processing (capex): NEW page function `capexGridCode(region)` with the map `{ usa: 'US', europe: 'EU', india: 'IN',
   japan: 'JP', sea: 'ID', china: 'CN', australia: 'AU', mena: 'SA' }` (`usa`, `europe`, `india`, `japan` and `sea`
   follow the page's own existing map at `capex-calculator.html:1956`; `china`, `australia` and `mena` are mapped to a
-  country here because the grid factor needs one, and that map is part of D-5). The four reads
+  country here because the grid factor needs one, and that map is part of D-Q04-5). The four reads
   `gridEmissionFactor[…] || 0.4` (`:1976`, `:2235`, `:2236`, `:3139`) become
   `RZEngine.models.carbon.resolveGrid(capexGridCode(r)).value`; the table `:1110-1114` is deleted.
-- Outputs (capex, grid factor per region, today → after D-2/D-5, `node` against `DATA`): usa 0.39 → 0.40, europe
+- Outputs (capex, grid factor per region, today → after D-Q04-2/D-Q04-5, `node` against `DATA`): usa 0.39 → 0.40, europe
   0.23 → 0.23 (EU aggregate), india 0.71 → 0.72, japan 0.47 → 0.50, sea 0.72 → 0.70, china 0.56 → 0.58,
   australia 0.65 → 0.60, mena 0.55 → 0.55. The CO₂ figure in the sustainability block moves by the same ratio.
 - State changes: none persisted.
@@ -783,7 +789,7 @@ engine (D-5).**
 - Acceptance: AC-13 (`grep -c 'COOLING_PUE\|globalAvgPUE\|PUE ~' tco-calculator.html` = 0; capex CO₂ for the eight
   regions equals `annualMWh × resolveGrid(code).value`).
 
-**FR-14 DCMOC: one PUE per scenario (D-6).**
+**FR-14 DCMOC: one PUE per scenario (D-Q04-6).**
 - Processing:
   - `dcmoc/src/constants/pue.ts`: `PUE_FALLBACK: Record<'air'|'inrow'|'rdhx'|'liquid', { tier2: number; tier3:
     number; tier4: number }>` with the engine values verbatim; `getPUE(coolingType: string, tier: 2 | 3 | 4 = 3)` →
@@ -816,46 +822,67 @@ engine (D-5).**
   - Rebuild (§22.3).
 - Acceptance: AC-14, L3.
 
-**FR-15 DCMOC: carbon through the engine (D-1, D-2, D-4).**
+**FR-15 DCMOC: carbon through the engine (D-Q04-1, D-Q04-2, D-Q04-4).**
 - Processing: `modules/analytics/CarbonEngine.ts` takes `countryCode` (ISO-2) in its input (callers already hold
   `c.id`: `diagnostics.ts:341-350` passes `c.name` today); Scope 2 = `rzModels().carbon.scopes(...)`'s `scope2` with
   the module's renewable option mapped to `renewablePct`; no blend (`:139-142` deleted) and no `substring(0, 2)`
   (`:135` deleted); Scope 1 genset uses the module's own run-hours model (topology-dependent, `:144-168`) but reads
   `DATA.fuelGen.fuelTypeModel` for L/kWh and CO₂/L (`DIESEL_CONSUMPTION_RATE` and `DIESEL_EMISSION_FACTOR` at
-  `:84-85` deleted); refrigerant uses `DATA.refrigerants` (it already does, `:107`); Scope 3 follows D-4 (engine
+  `:84-85` deleted); refrigerant uses `DATA.refrigerants` (it already does, `:107`); Scope 3 follows D-Q04-4 (engine
   amortisation, `:180` deleted); EU-ETS exposure uses `price(code, 'compliance')` (`CARBON_TAX_RATE_USD` `:83`
   deleted). The local fallback when the engine is absent returns the same structure computed from the verbatim
   constants kept in one `CARBON_FALLBACK` object, parity-checked (L7).
 - Acceptance: AC-15, L4.
 
-**FR-16 Missing-engine state on the five calculator pages (D-8).**
+**FR-16 Missing-engine state on the five calculator pages (D-Q04-8).**
 - Description: no page computes a metric without the engine; it says so instead.
 - Trigger: `calculate()` (or the page's equivalent) runs and `window.RZEngine` or the needed function is missing, or
   the engine call throws.
 - Processing: a guard at the top of each page's calculation: `var E = window.RZEngine; if (!E || !E.models ||
   !E.models.<ns> || typeof E.models.<ns>.<fn> !== 'function') { showEngineMissing(); return; }`; the engine call is
   wrapped in `try { … } catch (e) { console.error('[engine]', e); showEngineMissing(); return; }`.
-  NEW `RZCalc.showEngineMissing(boxId, resultRoot)` in `js/rz-calc-utils.js`: writes the line (§9.10) into the
-  validation box, adds the class `is-engine`, sets `hidden = false`, sets the text of every `[data-rz-result]` cell
-  inside `resultRoot` to "—", sets `aria-disabled="true"` and `title` (the same line) on the page's PDF button.
-  `RZCalc.clearEngineMissing(boxId)` reverses it when a later calculation succeeds. Result cells get the attribute
-  `data-rz-result` in each page (T-9 to T-13). The injected style's `border-radius:8px` (`js/rz-calc-utils.js:21`)
-  becomes `4px` (design rule: panels ≤ 4 px); colours do not change.
-- Outputs: the line, "—" cells, disabled PDF button.
+  The missing-engine state uses PRD-Q06's provenance contract and defines no idiom of its own (coordinator decision
+  D6). Each of the five pages loads `js/rz-provenance.js` (Q06 FR-1) before its page script and carries one static
+  line in its results header, under `.basis`: `<p class="rz-prov" id="rz-prov-calc" data-rz-provenance="model" aria-live="polite"
+  data-rz-prov-basis="RZEngine.models.<ns>.<fn> (rz-engine.js)">` with the Q06 `format()` text (Q06's
+  runtime-capable line form, PRD-Q06 §9.3).
+  NEW `RZCalc.showEngineMissing(resultRoot)` in `js/rz-calc-utils.js` calls
+  `RZProvenance.mark('#rz-prov-calc', {kind: 'fallback', basis: 'no results shown', reason: 'shared engine
+  rz-engine.min.js not loaded; reload the page to try again'})`. The record's code is **F-CALC-ENGINE-MISSING**; T-9
+  adds it to Q06's `tools/provenance-registry.json` as one forced-fallback entry per page (`"force": {"block":
+  ["rz-engine.min.js"]}, "expectCode": "F-CALC-ENGINE-MISSING"`), so Q06's runtime gate L6 also proves it. The
+  function then sets the text of every `[data-rz-result]` cell inside `resultRoot` to "—" and sets
+  `aria-disabled="true"`, `title` (the same sentence) and `aria-describedby="rz-prov-calc"` on each export button,
+  so the reason is read on touch screens and by screen readers, not only through `title`.
+  `RZCalc.clearEngineMissing()` calls `RZProvenance.clear('#rz-prov-calc')` and re-enables the exports when a later
+  calculation succeeds. Result cells get the attribute `data-rz-result` in each page (T-9 to T-13). The validation box
+  keeps validation errors only. Its injected style's `border-radius:8px` (`js/rz-calc-utils.js:21`) becomes `4px`
+  (design rule: panels ≤ 4 px; tier-advisor gains the box for `#fuelAutonomy`); colours do not change.
+- Outputs: the `Fallback` line, "—" cells, inert exports.
 - State changes: none persisted.
-- Exceptions: the validation box missing → the function logs `[engine] missing box <id>` and still blanks the cells.
+- Exceptions: `window.RZProvenance` absent (its script failed) → `RZCalc` logs `[engine] RZProvenance missing`, still
+  blanks the cells and disables the exports; the static gate (L8 static part) proves the script tag is present on all
+  five pages, so this happens only on a network failure of that one file.
 - Acceptance: AC-16, L8.
 
 **FR-17 LTC: the kept fallback is parity-proven in the gate.**
-- Processing: wire `node tools/test-ltc-parity.mjs` into `tools/ship-gate.sh` after the LTC plant gate (`:62`);
-  `test-engine-paths.mjs --law L7` checks that the normalised body of `computeModelLegacy` without its delegation
-  guard equals the frozen `computeModel` in `tools/test-ltc-parity.mjs`, and that `CLIMATE_FACTORS`, `RACK_PROFILES`
-  and `COOLANTS` (`js/ltc-system-modelling-lab.js:44`, `:51`, `:59`) deep-equal the test's copies (each object
-  literal extracted by brace matching and evaluated with `new Function('return ' + text)`).
+- Processing: wire `node tools/test-ltc-parity.mjs` into `tools/ship-gate.sh` after the LTC plant gate (`:62`). The
+  legacy model is checked by **behaviour, never by its source text** (coordinator decision D3; no body hash, no
+  normalised-body comparison), so PRD-Q06 FR-13's provenance calls in the wrapper `computeModel` cannot turn L7 red:
+  1. `test-ltc-parity.mjs` (existing, 486 lines) proves the frozen pre-migration model equals `models.ltc.compute` over
+     its seeded inputs.
+  2. NEW runtime check `test-engine-paths-runtime.mjs --law L7`: on `ltc-system-modelling-lab.html` with an educator
+     session (seeded as in `tools/test-ltc-lab-golden.mjs`), `window.__ltcLegacy = true` set before load
+     (`evaluateOnNewDocument`), so `computeModel` returns `computeModelLegacy`'s result
+     (`js/ltc-system-modelling-lab.js:2701-2706`). It drives the 12 input sets of `tools/fixtures/ltc-lab-golden.json`
+     and reads the same 28 output ids, twice: with `rz-engine.min.js` blocked (the inline-table branch) and with it
+     loaded (the delegation branch). Both runs must equal NEW `tools/fixtures/ltc-legacy-golden.json`, recorded once
+     with `--record-ltc-legacy` on the pre-change tree (T-16) and never re-recorded without an owner-visible reason in
+     the CHANGELOG.
 - Acceptance: AC-17.
 
 **FR-18 Decisions and evidence: never switch silently.**
-- Processing: for each decision in §12.3, T-2 writes `05-test-evidence/Q4/D-<n>.md` (fixture ids, old value, engine
+- Processing: for each decision in §12.3, T-2 writes `05-test-evidence/Q4/D-Q04-<n>.md` (fixture ids, old value, engine
   value, delta %, sources, recommendation); the owner's answer is recorded in the file and in the fixture
   (`decision`); the switch task does not start without it; the CHANGELOG entry lists every changed figure class
   (§22.8).
@@ -879,13 +906,13 @@ This PRD changes where numbers come from, not how pages look. The visible change
 | Page | Visible change | Everything else |
 |---|---|---|
 | tier-advisor | Static numbers in the results panel (`:425-436` and the rest of `.results-panel`) become "—" until the engine answers; a validation line at the top of the results panel; header basis names the engine function | Same ids, layout, charts, PDF, Monte Carlo (X5 is the peer's) |
-| opex-calculator | One line under the PUE slider: the effective PUE the energy cost uses; header basis corrected; results' PUE and derived energy metrics use one kWh (D-3) | Same layout and controls |
+| opex-calculator | One line under the PUE slider: the effective PUE the energy cost uses; header basis corrected; results' PUE and derived energy metrics use one kWh (D-Q04-3) | Same layout and controls |
 | carbon-footprint | Carbon Tax = Scope 1 + 2 × the country's compliance price, "$0 (no scheme)" where there is none; tooltip and panel basis rewritten; header basis names the engine | Same layout and controls |
-| pue-calculator | Header basis names the engine function; pro what-if baselines equal the main PUE (D-7) | Same layout |
-| tco-calculator | Cooling option labels lose their unused PUE numbers (D-5) | Same layout |
-| capex-calculator | CO₂ figure in the sustainability block uses the engine grid factor (D-5) | Same layout |
+| pue-calculator | Header basis names the engine function; pro what-if baselines equal the main PUE (D-Q04-7) | Same layout |
+| tco-calculator | Cooling option labels lose their unused PUE numbers (D-Q04-5) | Same layout |
+| capex-calculator | CO₂ figure in the sustainability block uses the engine grid factor (D-Q04-5) | Same layout |
 | All five calculators | Missing-engine line and "—" when the engine is not loaded (FR-16) | — |
-| DCMOC | Tier-aware PUE everywhere (D-6); "Carbon Levy" per country with its basis in the line's tooltip (D-1, D-2); Carbon module per country (FR-15) | No new controls |
+| DCMOC | Tier-aware PUE everywhere (D-Q04-6); "Carbon Levy" per country with its basis in the line's tooltip (D-Q04-1, D-Q04-2); Carbon module per country (FR-15) | No new controls |
 
 ### 9.2 Layout (ASCII)
 
@@ -909,10 +936,9 @@ Any calculator, engine missing (FR-16), 390 px:
 ```
 ┌─ Results ───────────────────────────┐
 │ score = Σ subsystem score · weight… │   ← basis wraps to its own line under 600 px (css/rz-tool.css:96)
-├─────────────────────────────────────┤
-│ The calculation engine did not      │   ← .tool-valid line, role="alert", text in --rzt-text-2
-│ load, so no results are shown.      │
-│ Reload the page to try again.       │
+│ Fallback · no results shown ·       │   ← p.rz-prov#rz-prov-calc, PRD-Q06 contract (§9.8 there):
+│ shared engine rz-engine.min.js not  │     JetBrains Mono 12 px, "Fallback" in the amber text token,
+│ loaded; reload the page to try again│     aria-live via RZProvenance; code F-CALC-ENGINE-MISSING
 ├─────────────────────────────────────┤
 │ HEADLINE                            │
 │   Classification            —       │
@@ -920,7 +946,7 @@ Any calculator, engine missing (FR-16), 390 px:
 │   Composite score           —       │
 │   Grade                     —       │
 └─────────────────────────────────────┘
-[ Export PDF ]  ← aria-disabled="true", title = the same sentence
+[ Export PDF ]  ← aria-disabled="true", title = the same sentence, aria-describedby="rz-prov-calc"
 ```
 
 opex PUE control (inputs column, both widths):
@@ -940,11 +966,12 @@ carbon-footprint "Cost and compliance" panel, France selected (`DATA.envCosts.ca
 └──────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### 9.3 Component hierarchy (all existing)
+### 9.3 Component hierarchy (existing, plus the Q06 line)
 
-`.results-panel.tool-results` → `.res-head` (`h2` + `.basis`) → `.rz-calc-validation.tool-valid` (new on tier-advisor
-only) → `.res-group` (`h3`) → `[data-rz-fact-list]` → `.metric-box` → `.metric-value[data-rz-result]`. The opex line
-is a `p.field-note` inside the existing slider group. No new component type.
+`.results-panel.tool-results` → `.res-head` (`h2` + `.basis` + `p.rz-prov#rz-prov-calc`, PRD-Q06's component, styled
+only by `js/rz-provenance.js`) → `.rz-calc-validation.tool-valid` (new on tier-advisor only; validation errors only) →
+`.res-group` (`h3`) → `[data-rz-fact-list]` → `.metric-box` → `.metric-value[data-rz-result]`. The opex line is a
+`p.field-note` inside the existing slider group. No component type of Q04's own.
 
 ### 9.4 Navigation and information architecture
 
@@ -959,7 +986,7 @@ No control is added or removed. Existing controls behave as follows after the ch
 |---|---|---|
 | tier-advisor | 15 selects (`onchange`), `#fuelAutonomy` (`oninput`, debounced `:1615`) | Recompute through `models.tier.advise`; `#fuelAutonomy` is validated against its own `min="0" max="720"` (`:279`); an invalid value shows "Check 1 input: Fuel autonomy must be 0–720" and the page uses 48 h (the field default), as the other four pages do with their defaults |
 | tier-advisor | pro regional inputs | Unchanged; `calcRegional()` result is passed as `regionalScore` |
-| tier-advisor | `#btnExportPDF` | Engine present: as today. Engine missing: `aria-disabled="true"`, `title` = the missing-engine sentence, click does nothing (the handler returns first) |
+| tier-advisor | `#btnExportPDF` | Engine present: as today. Engine missing: `aria-disabled="true"`, `title` = the `Fallback` line text, `aria-describedby="rz-prov-calc"`, click does nothing (the handler returns first) |
 | opex | `#pueSlider` (`onchange`), `#coolingType`, `#climateZone` (`onchange="updateCalculation()"`) | Recompute; the effective-PUE line updates in the same pass |
 | opex | PDF, CSV (`#btnExportOpexCSV`), scenario save buttons | PDF and CSV disabled with the sentence when the engine is missing; scenario save stays enabled (it stores inputs only) |
 | carbon-footprint | `#country` and every input | Recompute through `models.carbon.scopes`; `#gridIntensity` (read-only) shows `resolveGrid(country).value` |
@@ -969,15 +996,17 @@ No control is added or removed. Existing controls behave as follows after the ch
 | tco | `#tcoExportPdf`, CSV | Disabled with the sentence when the engine is missing |
 | All | "Save" to account | Unchanged; works with or without the engine |
 
-A disabled export button uses `aria-disabled`, not the `disabled` attribute, so it stays focusable and its `title`
-can be read; the handler checks `aria-disabled` and returns. No dead button: when the engine is present every
+"Disabled with the sentence" in this table means: `aria-disabled="true"`, `title` and `aria-describedby="rz-prov-calc"`
+(FR-16). A disabled export button uses `aria-disabled`, not the `disabled` attribute, so it stays focusable; its
+reason is announced through `aria-describedby` and is visible on every screen width in the `Fallback` line directly
+above the results, so a press on a phone is never left unexplained; the handler checks `aria-disabled` and returns. No dead button: when the engine is present every
 button does what it does today.
 
 ### 9.6 Forms, validation and precedence
 
-1. The engine guard runs first. If the engine is missing, the box shows the missing-engine sentence and nothing
-   else, and the calculation stops.
-2. If the engine is present, `RZCalc.clearEngineMissing(box)` removes the `is-engine` class, then the page's
+1. The engine guard runs first. If the engine is missing, the `Fallback` line shows, the validation box is hidden,
+   and the calculation stops.
+2. If the engine is present, `RZCalc.clearEngineMissing()` restores the `Model output` line, then the page's
    existing `RZCalc.validateNumbers` / `RZCalc.showErrors` run exactly as today (messages unchanged, e.g. "Check 1
    input: IT load must be 50–100000"), then the engine is called.
 3. The two messages never show at once.
@@ -991,8 +1020,9 @@ no chart is shown as if it were current: the results panel above it reads "—")
 ### 9.8 Notifications
 
 No RZToast. The missing-engine state lasts as long as the engine is missing; a toast would disappear
-(`js/rz-toast.js`), and the state must stay visible next to the "—" cells. The existing `role="alert"
-aria-live="polite"` on the validation box announces the sentence once.
+(`js/rz-toast.js`), and the state must stay visible next to the "—" cells. The line carries `aria-live="polite"` (Q06's
+runtime-capable line, PRD-Q06 §9.3), and `RZProvenance.mark` writes only when the signature changes, so the change is
+announced once; Q04 adds no live region of its own.
 
 ### 9.9 Loading, empty and error states
 
@@ -1001,7 +1031,7 @@ aria-live="polite"` on the validation box announces the sentence once.
 | Loading | Page parsed, engine script not yet run (`defer`) | "—" in result cells; no spinner (the engine is a same-origin cached file; measured load time is UNKNOWN — measure in T-9) |
 | Success | Engine call returned | Values, basis lines |
 | Validation error | Input outside its `min`/`max` | Existing message; calculation continues with the field default (existing behaviour) |
-| Engine missing | `window.RZEngine` or the function absent | The sentence, "—", exports disabled |
+| Engine missing | `window.RZEngine` or the function absent | Q06 `Fallback` line (F-CALC-ENGINE-MISSING), "—", exports inert |
 | Engine threw | Exception inside the engine call | Same as engine missing; `console.error('[engine]', e)` |
 | Country without data | `resolveGrid` source `fallback-US`, or `price` returns `null` | Grid: "grid factor: US value used, no data for <code>" under the figure; price: Carbon Tax "— (no price data)" |
 | No compliance scheme | `price(code,'compliance').usdPerT === 0` | "$0 (no scheme)" |
@@ -1021,8 +1051,9 @@ aria-live="polite"` on the validation box announces the sentence once.
 | pue header basis (`:269`) | "engine RZEngine · basis ASHRAE TC 9.9, The Green Grid · updated 2026-10" | "engine models.pue.buildUp · basis ASHRAE TC 9.9, The Green Grid; component factors are screening values · updated <yyyy-mm>" |
 | tco cooling options (`:399-402`) | "Air Cooled (PUE ~1.40)", "Chilled Water (PUE ~1.25)", "Evaporative (PUE ~1.15)", "Direct Liquid Cooling (PUE ~1.08)" | "Air Cooled", "Chilled Water", "Evaporative", "Direct Liquid Cooling" |
 | capex grid fallback (new) | — | "grid factor: US value used, no data for this region" |
-| Missing engine (all five) | — | "The calculation engine did not load, so no results are shown. Reload the page to try again." |
-| Export buttons when the engine is missing (`title`) | — | the same sentence |
+| Provenance line, engine present (all five, new) | — | Q06 `format()` of `{kind:'model', basis:'RZEngine.models.<ns>.<fn> (rz-engine.js)'}`, e.g. "Model output · RZEngine.models.tier.advise (rz-engine.js)" |
+| Missing engine (all five) | — | Q06 `format()` of the F-CALC-ENGINE-MISSING record: "Fallback · no results shown · shared engine rz-engine.min.js not loaded; reload the page to try again" |
+| Export buttons when the engine is missing (`title`, `aria-describedby`) | — | the same line text; `aria-describedby="rz-prov-calc"` |
 | DCMOC "Carbon Levy" basis (engine `:11988`, shown as the line's tooltip, `OpexBreakdown.tsx:157`) | "<t> tCO₂ × grid price" | "<t> tCO₂ × $<p>/t compliance (DATA.envCosts)"; "<t> tCO₂ × $0/t compliance (no scheme)"; "<t> tCO₂ × no compliance price data" |
 | DCMOC stand-alone capex KPI note (FR-14) | — | "PUE at the Tier III design point" |
 
@@ -1042,7 +1073,8 @@ in the copy come from the engine at run time, never typed into HTML.
 
 No new focusable element on four pages. tier-advisor gains a validation box that is not focusable (it is announced by
 `role="alert"`). Disabled export buttons stay in the tab order with `aria-disabled="true"`; Enter or Space does
-nothing and the `title` explains why. Focus never moves on recalculation.
+nothing, and `aria-describedby="rz-prov-calc"` makes a screen reader read the `Fallback` line on focus. Focus never
+moves on recalculation.
 
 ### 9.13 Motion
 
@@ -1053,8 +1085,8 @@ unaffected. MOTION_STANDARD tokens (`standarization/MOTION_STANDARD.md:60-65`) a
 
 - Tokens only: the effective-PUE line uses `font: 400 12px var(--rzt-mono); color: var(--rzt-text-2)` in a new rule
   `body.tool .tool-inputs .field-note` in `css/rz-tool.css` (next to `.range-ends`, `:368`).
-- A state is a word: "The calculation engine did not load…", "no scheme", "no price data". No badge, pill, dot or
-  icon.
+- A state is a word: "Fallback" (Q06's line, styled only by Q06's contract, PRD-Q06 §9.8), "no scheme", "no price
+  data". No badge, pill, dot or icon.
 - `.rz-calc-validation` radius 8 → 4 px (FR-16). No glass, gradient, aurora, hover transform or `transition: all`.
 - Both themes: the line and the box use theme tokens (`--rzt-text-2`, `--rzt-line`); the existing dark rule for
   `.rz-calc-validation` (`js/rz-calc-utils.js:24`) still applies.
@@ -1077,7 +1109,7 @@ Two notes:
 {
   "schemaVersion": 1,
   "verifiedAt": "<commit>",
-  "verifiedCount": { "pue": 74, "carbon": 23, "tier": 7, "energy": 52 },
+  "verifiedCount": { "pue": 74, "carbon": 23, "tier": 7, "energy": 52, "local": 61 },
   "scope": {
     "include": ["*.html", "js/*.js", "dcmoc/src/**/*.ts", "dcmoc/src/**/*.tsx"],
     "exclude": ["article-*.html", "changelog.html", "rz-ops-*.html", "*.min.js", "js/spares-parts-catalog.js", "embed/**"]
@@ -1098,7 +1130,7 @@ Two notes:
       "class": "local",
       "target": "models.opex.effectivePue",
       "task": "T-11",
-      "decision": "D-3",
+      "decision": "D-Q04-3",
       "reason": "page model of PUE by cooling type; moved into the engine verbatim"
     }
   ]
@@ -1118,14 +1150,14 @@ Field rules:
 | `target` | string | required for `local`, `fallback`: a `canonical` function |
 | `parity` | string | required for `fallback` and `authority`: the gate command that proves it (e.g. `node tools/test-ltc-parity.mjs`) and that `tools/ship-gate.sh` runs |
 | `task`, `decision` | string | required for `local` |
-| `hold` | string | optional, only on `local`: `"D-<n> rejected <yyyy-mm-dd>"`; valid only if `05-test-evidence/Q4/D-<n>.md` records the owner's no |
+| `hold` | string | optional, only on `local`: `"D-Q04-<n> rejected <yyyy-mm-dd>"`; valid only if `05-test-evidence/Q4/D-Q04-<n>.md` records the owner's no |
 | `reason` | string | required for every class except `engine` |
 
 Seed (written by T-1 from the F1 scan plus the reading finds; the counts are the acceptance numbers for T-1):
 
 | Metric | Class counts at `2f458f7c5` | `local` entries (file:anchor line today) |
 |---|---|---|
-| pue (74 statements + 1 anchor) | local 23 (22 + `pue-calculator.html:1490` anchor; `opex:1691` is carried by the energy anchors), authority 9, fallback 6, engine 5, definitional 5, scenario 6, input-default 8, not-a-metric 13 | as F1 |
+| pue (74 statements + 2 anchors) | local 24 (22 + the `pue-calculator.html:1490` anchor + the `opex-calculator.html:1691` implied-PUE anchor, which also has its own `energy` entry below), authority 9, fallback 6, engine 5, definitional 5, scenario 6, input-default 8, not-a-metric 13 | as F1 |
 | tier (7) | local 7 | `tier-advisor.html:552`, `:554`, `:591`, `:596`, `:597`, `:599`, `:600` |
 | carbon (23 + 2 anchors) | local 20, engine 4 (`value-trace.ts:1900` engine call, `SustainabilityEnginePage.tsx:101`, and the two `?? 0.50` guards `SimulationPdf.ts:178`, `SimulationDashboard.tsx:706`, each with the reason "guard; field present for 40/40 countries, checked by L4"), not-a-metric 1 (`value-trace.ts:1897`) | `capex-calculator.html:1111`; `carbon-footprint.html:845` (anchor), `:965`, `:966`, `:967`, `:968`, `:1246`, `:1255`, `:1270`, `:1273`; `opex-calculator.html:1510` (anchor), `:1529`; `CarbonEngine.ts:83`, `:84`, `:85`, `:140`, `:168`, `:175`, `:177`, `:180` |
 | energy (10 anchors on the Q4 pages) | local 10 | `opex-calculator.html:1552`, `:1569`, `:1691`, `:1693`, `:1694`, `:2653`; `pue-calculator.html:893`, `:894`; `carbon-footprint.html:1251`; `tco-calculator.html:1193` |
@@ -1151,7 +1183,7 @@ registered as `scenario`. The 42 other facility-energy products (F15) are not re
       "before": { "scope1": 192.1, "scope2": 5326.1, "scope3Annual": 150.0, "metTax": null },
       "after": null,
       "tolerance": { "abs": 0.05 },
-      "decision": "D-4",
+      "decision": "D-Q04-4",
       "source": "page defaults carbon-footprint.html:293, :303, :340, :392, :408; engine DATA.fuelGen.fuelTypeModel, DATA.refrigerants.R410A, DATA.countries.US",
       "capturedAt": "<commit>"
     }
@@ -1171,7 +1203,7 @@ line, 40 countries, 1 MW, PUE 1.5), F-CAPEX-GRID-01…08 (8 regions).
 
 | Key | Kind | Content | `DATA.sources` row |
 |---|---|---|---|
-| `DATA.coolingTypes.rearDoor.pueKey` | change | `'liquid'` → `'rdhx'` (D-9) | existing row; note the correction |
+| `DATA.coolingTypes.rearDoor.pueKey` | change | `'liquid'` → `'rdhx'` (D-Q04-9) | existing row; note the correction |
 | `DATA.opexCalculator` | NEW | `coolingTypes`, `climateZones` verbatim from `opex-calculator.html:1254-1300`, `:1308-1357` | "Carried verbatim from opex-calculator.html (2f458f7c5); the page cites no source for these multipliers; screening values" |
 | `DATA.pueBuildUp` | NEW | tables `pue-calculator.html:701-718` + constants (FR-8) | "Carried verbatim from pue-calculator.html (2f458f7c5); page basis ASHRAE TC 9.9, The Green Grid; individual multipliers carry no citation; screening values" |
 | `DATA.tier.subWeights` | NEW | the sub-weights inside `advise` (`rz-engine.js:14071-14074`), same numbers | existing `tier` row |
@@ -1184,7 +1216,7 @@ line, 40 countries, 1 MW, PUE 1.5), F-CAPEX-GRID-01…08 (8 regions).
 Backward compatibility: every existing `models.*` signature keeps working with its old arguments; new arguments are
 optional with defaults (`annualCost` 5th argument, `scopes` new fields, `defaultFor` accepts both key sets).
 `advise` gains fields; none is removed. The only removed engine behaviour is the US fallback for countries that
-have their own value (D-2).
+have their own value (D-Q04-2).
 
 ### 10.5 Retention, audit and integrity
 
@@ -1215,10 +1247,10 @@ the DCMOC TypeScript functions, the two JSON files and the gate CLIs.
 | `models.tier.contributions` | same input | `[{ key, category, score, subWeight, categoryWeight, impact }]` (8 factors used by the tornado) | NEW |
 | `models.tier.classify` | `(subScores)` | `{ tier, label, score, capped }` | existing `:14046`, unchanged |
 | `models.carbon.resolveGrid` | `(code)` | `{ value, code, source: 'DATA.countries' \| 'DATA.carbon.gridFactor' \| 'fallback-US', asOf }` | NEW |
-| `models.carbon.gridFactor` | `(code)` | number | existing `:12285`, resolution changed (D-2) |
+| `models.carbon.gridFactor` | `(code)` | number | existing `:12285`, resolution changed (D-Q04-2) |
 | `models.carbon.price` | `(code, basis)` | `{ usdPerT: number \| null, basis, source, note }` | NEW |
 | `models.carbon.annualTonnes` | `(mw, pue, region, hoursPerYear)` | number (t) | existing, uses `resolveGrid` |
-| `models.carbon.annualCost` | `(mw, pue, region, hoursPerYear, basis = 'compliance')` | number \| null | existing, 5th argument added (D-1) |
+| `models.carbon.annualCost` | `(mw, pue, region, hoursPerYear, basis = 'compliance')` | number \| null | existing, 5th argument added (D-Q04-1) |
 | `models.carbon.scopes` | FR-5 input | `{ scope1, scope1Genset, scope1Refrigerant, scope2, scope2LocationBased, scope3Annual, totalAnnual, scope2Pct, basis: { grid, price, fuelType, refrigerant, scope3 } }` | existing, fields added |
 | `models.opex.effectivePue` | `({ basePue, cooling, climate })` | number | NEW |
 | `models.opex.energyAnnual` | `({ itKw, basePue, cooling, climate, utilization, ratePerKwh, hoursPerYear = 8760 })` | `{ effectivePue, facilityKw, coolingKw, annualKwh, energyCost, overheadKwh }` | NEW |
@@ -1280,15 +1312,15 @@ gate is wrapped in `timeout 900` in the ship gate.
 | R2 | `local` is debt. L1 fails while one exists, except an entry with a `hold` that its evidence file backs with the owner's recorded no (§22.1); L1 prints that entry as HOLD |
 | R3 | A fallback exists only with a parity check that the ship gate runs (L7). DCMOC's PUE table and the LTC inline model are the only fallbacks after this PRD |
 | R4 | No number changes without a fixture holding `before`, `after`, `decision` and `source`, and a CHANGELOG row ("never switch silently") |
-| R5 | Cost, levy and tax lines use the compliance price (`DATA.envCosts`, D-1). The shadow price (`DATA.carbon.carbonPrice`) is used only for an avoided-carbon value and is labelled "shadow" |
-| R6 | Grid factor: the country's own value (`DATA.countries`); aggregates only for aggregate codes (`EU`, `APAC`, `LATAM`); any other code uses the US value and the screen says so (D-2) |
+| R5 | Cost, levy and tax lines use the compliance price (`DATA.envCosts`, D-Q04-1). The shadow price (`DATA.carbon.carbonPrice`) is used only for an avoided-carbon value and is labelled "shadow" |
+| R6 | Grid factor: the country's own value (`DATA.countries`); aggregates only for aggregate codes (`EU`, `APAC`, `LATAM`); any other code uses the US value and the screen says so (D-Q04-2) |
 | R7 | Scope 2 is location-based (IT × PUE × hours × grid); the renewable share reduces it as the page does today; the location-based value is returned too |
 | R8 | Refrigerant charge is per kW of heat (`chargeKgPerKwth`); the cooling load is taken equal to the IT load, as the page does today |
 | R9 | Tier: weights, maps, Tier III/IV floors and grade bands from `DATA.tier`; composite rounded as today; confidence is a screening heuristic and says so |
 | R10 | Design PUE by cooling × tier from `DATA.pueMatrix`; DCMOC tiers are 2–4 (`arch-adapter.ts:46`) |
-| R11 | opex: the PUE shown is `facilityKw / itKw` of the energy model (D-3 option A) |
+| R11 | opex: the PUE shown is `facilityKw / itKw` of the energy model (D-Q04-3 option A) |
 | R12 | Moved models keep the page's operation order, so results are bit-identical (`===`) before the switch; pages keep their display rounding |
-| R13 | Without the engine the five calculators show no numbers (D-8). DCMOC PUE uses the verbatim table; the LTC lab uses its parity-proven inline model with Q6's line |
+| R13 | Without the engine the five calculators show no numbers (D-Q04-8). DCMOC PUE uses the verbatim table; the LTC lab uses its parity-proven inline model with Q6's line |
 
 ### 12.2 State machines
 
@@ -1330,23 +1362,27 @@ stateDiagram-v2
 
 ### 12.3 Decisions (each ships only with its evidence file and the owner's yes)
 
+The owner-facing record of each decision is its row in `documentation/product-transformation/DECISIONS.md` (ids
+D-Q04-1…9, statuses PROPOSED / ACCEPTED / REJECTED / DEFAULTED). The table below keeps the evidence; the status lives
+only in `DECISIONS.md`, and the evidence file `05-test-evidence/Q4/D-Q04-<n>.md` quotes the owner's answer.
+
 | Id | Question | Options | Evidence (computed on `2f458f7c5`) | Recommendation | FRs |
 |---|---|---|---|---|---|
-| D-1 | Which carbon price do cost lines use? | A compliance per country (`DATA.envCosts`, the charter's canonical table, `ENGINE_UNIFICATION.md:37`); shadow only for avoided-carbon values, labelled. B keep the blended table for costs | DCMOC "Carbon Levy", 1 MW, PUE 1.5, today → A (with D-2): US 194,472 → 0; FR 194,472 → 48,092; SE 194,472 → 63,072; ZA 194,472 → 106,434; TH 194,472 → 0; DE 194,472 → 280,539; ID 107,222 → 16,556; SG 96,973 → 173,448; IN 82,782 → 0 (USD/yr). `annualCost(1, 1.52, 'US')` 197,064 → 0. carbon-footprint Carbon Tax: captured in T-2 | A | FR-4, FR-10, FR-11, FR-15 |
-| D-2 | Which grid factor? | A `DATA.countries` per country (40), aggregates for aggregate codes. B `DATA.carbon.gridFactor` (9 codes, US for the rest) | Today 34 of 40 countries get US 0.37. The 6 overlapping differ (US 0.37/0.40, ID 0.68/0.70, SG 0.41/0.40, JP 0.47/0.50, IN 0.63/0.72, MY 0.55/0.60). T-4 checks these six against Ember | A, after the T-4 check | FR-4, FR-10, FR-11, FR-13, FR-15 |
-| D-3 | opex: which PUE is shown and charged? | A show the PUE the energy model implies (energy cost unchanged). B charge the shown PUE (energy cost changes) | A: energy cost unchanged in 42/42; shown PUE changes in 41/42 (e.g. air chiller / tropical humid 1.65 → 1.75); derived-metrics kWh and the per-kWh metric move to the cost's kWh (10.716 GWh in that example). B: energy cost changes in 41/42, by up to 16.0 % | A (it keeps the climate effect the cost already contains) | FR-7, FR-11 |
-| D-4 | carbon-footprint and DCMOC Scope 1 and 3 method | A engine data: genset 0.27 L/kWh at 75 % load (`DATA.fuelGen`, "EPA Tier 4 Final … ~0.27 L/kWh @ 75%"), refrigerant from `DATA.refrigerants` (R-410A 0.15 kg/kWth, GWP 2088, IPCC AR4), HVO 0.268 kg/L; Scope 3 = the page's own life-cycle total ÷ life, else 3,200 t/MW ÷ life. B keep page factors | F-CO2-01: genset 160.8 → 108.5 t; refrigerant 31.3 → 15.7 t; Scope 3 150.0 → life-cycle total ÷ 15 (value captured in T-2); Scope 2 5,326.1 → 5,326.1 (page and `DATA.countries` both use 0.40). Refrigerant charge is per cooling type on the page (0.3 / 0.2 / 0.15 / 0.05 kg/kW, `:974-977`, no source) and per refrigerant in the engine (sourced row); T-2 computes all four cooling types. DCMOC Scope 3 12 % of S1+S2 → same rule | A | FR-5, FR-10, FR-15 |
-| D-5 | tco labels and capex grid factor | A tco labels without numbers; capex `resolveGrid` with the map in FR-13 (mena → SA, china → CN, australia → AU). B tco labels with engine values for air and DLC only | tco: no calculation changes (the labels are unused). capex grid per region: usa 0.39 → 0.40, europe 0.23 → 0.23, india 0.71 → 0.72, japan 0.47 → 0.50, sea 0.72 → 0.70, china 0.56 → 0.58, australia 0.65 → 0.60, mena 0.55 → 0.55 | A | FR-13 |
-| D-6 | DCMOC: tier-aware PUE everywhere | A yes. B keep Tier 3 everywhere (then the summary must change instead) | 8 of 12 cooling × tier pairs change in Capex energy, FuelGen load, Benchmark, Sensitivity and diagnostics, by −4.3 % to +8.0 % (F9 table); Tier 3 unchanged | A | FR-14 |
-| D-7 | pue-calculator what-if baselines use the main build-up | A yes. B keep `estimatePue` | Free users: unchanged if the free defaults equal `estimatePue`'s fixed losses (checked by F-PUE fixtures in T-2). Pro users who change PDU type, transformer loss or supply temperature: the what-if baseline equals the main PUE | A | FR-8, FR-12 |
-| D-8 | Calculators without the engine | A no numbers, the sentence and "—". B a parity-proven fallback per page with a visible line (the LTC pattern) | The engine is a same-origin static file already loaded by four of the five pages; tier-advisor adds 172,650 B gzip (level 6; 535,843 B raw). The five local copies are the paths that drifted (F2–F5, F12, F13) | A; the main session confirms with the owner that this is not a "feature removal" (`STATE.md`) | FR-16 |
-| D-9 | Rear-door PUE key | A point `rearDoor` at the `rdhx` row. B leave it | `defaultFor('rearDoor', 2/3/4)` 1.22/1.15/1.10 → 1.24/1.18/1.14; no screen uses it today (F11) | A | FR-3 |
+| D-Q04-1 | Which carbon price do cost lines use? | A compliance per country (`DATA.envCosts`, the charter's canonical table, `ENGINE_UNIFICATION.md:37`); shadow only for avoided-carbon values, labelled. B keep the blended table for costs | DCMOC "Carbon Levy", 1 MW, PUE 1.5, today → A (with D-Q04-2): US 194,472 → 0; FR 194,472 → 48,092; SE 194,472 → 63,072; ZA 194,472 → 106,434; TH 194,472 → 0; DE 194,472 → 280,539; ID 107,222 → 16,556; SG 96,973 → 173,448; IN 82,782 → 0 (USD/yr). `annualCost(1, 1.52, 'US')` 197,064 → 0. carbon-footprint Carbon Tax: captured in T-2 | A | FR-4, FR-10, FR-11, FR-15 |
+| D-Q04-2 | Which grid factor? | A `DATA.countries` per country (40), aggregates for aggregate codes. B `DATA.carbon.gridFactor` (9 codes, US for the rest) | Today 34 of 40 countries get US 0.37. The 6 overlapping differ (US 0.37/0.40, ID 0.68/0.70, SG 0.41/0.40, JP 0.47/0.50, IN 0.63/0.72, MY 0.55/0.60). T-4 checks these six against Ember | A, after the T-4 check | FR-4, FR-10, FR-11, FR-13, FR-15 |
+| D-Q04-3 | opex: which PUE is shown and charged? | A show the PUE the energy model implies (energy cost unchanged). B charge the shown PUE (energy cost changes) | A: energy cost unchanged in 42/42; shown PUE changes in 41/42 (e.g. air chiller / tropical humid 1.65 → 1.75); derived-metrics kWh and the per-kWh metric move to the cost's kWh (10.716 GWh in that example). B: energy cost changes in 41/42, by up to 16.0 % | A (it keeps the climate effect the cost already contains) | FR-7, FR-11 |
+| D-Q04-4 | carbon-footprint and DCMOC Scope 1 and 3 method | A engine data: genset 0.27 L/kWh at 75 % load (`DATA.fuelGen`, "EPA Tier 4 Final … ~0.27 L/kWh @ 75%"), refrigerant from `DATA.refrigerants` (R-410A 0.15 kg/kWth, GWP 2088, IPCC AR4), HVO 0.268 kg/L; Scope 3 = the page's own life-cycle total ÷ life, else 3,200 t/MW ÷ life. B keep page factors | F-CO2-01: genset 160.8 → 108.5 t; refrigerant 31.3 → 15.7 t; Scope 3 150.0 → life-cycle total ÷ 15 (value captured in T-2); Scope 2 5,326.1 → 5,326.1 (page and `DATA.countries` both use 0.40). Refrigerant charge is per cooling type on the page (0.3 / 0.2 / 0.15 / 0.05 kg/kW, `:974-977`, no source) and per refrigerant in the engine (sourced row); T-2 computes all four cooling types. DCMOC Scope 3 12 % of S1+S2 → same rule | A | FR-5, FR-10, FR-15 |
+| D-Q04-5 | tco labels and capex grid factor | A tco labels without numbers; capex `resolveGrid` with the map in FR-13 (mena → SA, china → CN, australia → AU). B tco labels with engine values for air and DLC only | tco: no calculation changes (the labels are unused). capex grid per region: usa 0.39 → 0.40, europe 0.23 → 0.23, india 0.71 → 0.72, japan 0.47 → 0.50, sea 0.72 → 0.70, china 0.56 → 0.58, australia 0.65 → 0.60, mena 0.55 → 0.55 | A | FR-13 |
+| D-Q04-6 | DCMOC: tier-aware PUE everywhere | A yes. B keep Tier 3 everywhere (then the summary must change instead) | 8 of 12 cooling × tier pairs change in Capex energy, FuelGen load, Benchmark, Sensitivity and diagnostics, by −4.3 % to +8.0 % (F9 table); Tier 3 unchanged | A | FR-14 |
+| D-Q04-7 | pue-calculator what-if baselines use the main build-up | A yes. B keep `estimatePue` | Free users: unchanged if the free defaults equal `estimatePue`'s fixed losses (checked by F-PUE fixtures in T-2). Pro users who change PDU type, transformer loss or supply temperature: the what-if baseline equals the main PUE | A | FR-8, FR-12 |
+| D-Q04-8 | Calculators without the engine | A no numbers, the sentence and "—". B a parity-proven fallback per page with a visible line (the LTC pattern) | The engine is a same-origin static file already loaded by four of the five pages; tier-advisor adds 172,650 B gzip (level 6; 535,843 B raw). The five local copies are the paths that drifted (F2–F5, F12, F13) | A; the main session confirms with the owner that this is not a "feature removal" (`STATE.md`) | FR-16 |
+| D-Q04-9 | Rear-door PUE key | A point `rearDoor` at the `rdhx` row. B leave it | `defaultFor('rearDoor', 2/3/4)` 1.22/1.15/1.10 → 1.24/1.18/1.14; no screen uses it today (F11) | A | FR-3 |
 
 ## 13. Cross-module integration
 
 | Module | Effect | How the change propagates |
 |---|---|---|
-| `rz-engine.js` / `.min.js` | New functions and data (§10.4, §11.1); D-1, D-2, D-9 data changes | `terser rz-engine.js -c -m -o rz-engine.min.js` (`CLAUDE.md:88`); `node tools/test-asset-cache-tokens.mjs --fix rz-engine.min.js` updates every page that loads it, including the token inside tier-advisor's print string (`:1457`) and `pdf.scriptTagsHTML()` (`CLAUDE.md:90`) |
+| `rz-engine.js` / `.min.js` | New functions and data (§10.4, §11.1); D-Q04-1, D-Q04-2, D-Q04-9 data changes | `terser rz-engine.js -c -m -o rz-engine.min.js` (`CLAUDE.md:88`); `node tools/test-asset-cache-tokens.mjs --fix rz-engine.min.js` updates every page that loads it, including the token inside tier-advisor's print string (`:1457`) and `pdf.scriptTagsHTML()` (`CLAUDE.md:90`) |
 | Engine version | `DATA.version` (`rz-engine.js:33`, '2.5.1') | Next minor engine version, claimed with the peer (P16 owns the version manifest). Printed copies: `manual/capex.html:332`, `:597`, `manual/dcmoc.html:88`, `:334`, `:602` |
 | `/calc` Worker (`cf-worker/src/calc.js`) | Bundles `rz-engine.js` at `wrangler deploy` (`:12`) and allows the `carbon`, `opex` and `tier` models (`:17-23`); no page calls it today (`grep` finds only `setup-supabase.html`) | `node cf-worker/test/calc.test.mjs` after the engine change; redeploy by the owner if it is deployed (UNKNOWN, asked in T-18) |
 | Engine tests | `tools/test-rz-engine.mjs:218` pins `annualTonnes('US')` to `DATA.carbon.gridFactor.US`; `:219` asserts `annualCost(10, 1.5, 'US') > 0` | T-4 changes them to `resolveGrid('US').value` and to `=== 0` (compliance) plus `> 0` with `'shadow'`; every other carbon and opex assertion is relational and passes unchanged (`:124-126`, `:966-970`, `:1309-1321`) |
@@ -1362,7 +1398,7 @@ stateDiagram-v2
 | Explain DB (`js/rz-explain-db.js`) | `pue` entry text says "Industry average sits around 1.55"; the engine has 1.52 (2026, `rz-engine.js:84`) | Text, not a computed path: FU-6 (§22.9) |
 | P8 Monte Carlo (peer) | Panels take base values from the page; after the switch the base values are the engine's | Coordinate with the peer session; no change to the simulation code here |
 | X5 (peer) | tier-advisor `:786`, `:810`, `:1166` | Q4 does not edit these lines; both keep the variable `composite` |
-| PRD-Q06 | LTC and DCMOC fallback lines; its runtime gate sits in the same served-tree block | Order the two runtime gates after the LTC step-thread gate; whichever ships second rebases on the first |
+| PRD-Q06 | (1) Q06 owns how a missing or failed engine is shown: `RZProvenance` `kind=fallback` with an F-code. Q04 FR-16 uses it on the five calculators (code F-CALC-ENGINE-MISSING, added to Q06's registry by T-9) and defines no idiom of its own (D6). (2) Q06 FR-13 puts its `RZProvenance.mark/clear` calls in the wrapper `computeModel` (`js/ltc-system-modelling-lab.js` ~2701-2706), never inside `computeModelLegacy`; Q04 L7 checks the legacy model by behaviour, so those calls cannot turn it red (FR-17). (3) `dcmoc/` export rebuild order is fixed: Q04's engine changes (T-3…T-8) and DCMOC source changes (T-14, T-15) first, then Q06 T-13. When both ship in one release there is one rebuild, run from a tree holding both changes, followed by `node tools/_dcmoc_trace_parity_probe.mjs` and `node tools/test-engine-paths.mjs --law L3` on that export. (4) Both runtime gates sit in the served-tree block after the LTC step-thread gate; whichever ships second rebases on the first | Q06 ships first (hard dependency of FR-16); rebuild order as (3) |
 | Incidents, journal, glossary | No metric path | None |
 
 ## 14. AI and automation requirements
@@ -1370,7 +1406,7 @@ stateDiagram-v2
 - No LLM in the runtime path or in the gates. Every check is deterministic code over the repo and the engine.
 - Automation added: the static gate and the runtime gate (§20), the `--capture-before` fixture writer and the
   `--init` registry helper. None runs on a schedule; both gates run in `tools/ship-gate.sh`.
-- Human approval points: each decision D-1 to D-9 (the owner); each `UNCLASSIFIED` entry that `--init` adds (the
+- Human approval points: each decision D-Q04-1 to D-Q04-9 (the owner); each `UNCLASSIFIED` entry that `--init` adds (the
   implementing engineer classifies it, a reviewer sees it in the commit diff); any fixture `before` value (written
   once by the tool, never by hand).
 - Generators re-run in the release chain (§22.8); none is new.
@@ -1385,7 +1421,7 @@ stateDiagram-v2
 | Parity | tier: exact (`===`) on composite, tier, grade, tierNum, canT3, canT4, confidence; opex energy cost and pue build-up: `===` (operation order kept, R12); carbon: 0.05 t (display is 1 dp); DCMOC PUE: exact | Fixture tolerances (§10.3) |
 | Availability | GitHub Pages static hosting; the engine is a same-origin file; no new third-party dependency | — |
 | Reliability | No uncaught exception on any of the five pages with the engine present or blocked | Runtime gate counts `pageerror` events: 0 |
-| Accessibility | axe-core (vendored `tools/vendor/axe.min.js` 4.10.2): 0 critical/serious on the five pages × light/dark × engine present/missing. Planted-line method: before scanning the missing-engine state, the gate inserts a line with `color` equal to the box background into the validation box, runs axe, and requires a `color-contrast` violation on it (proves the region is scanned); it then removes the line and requires 0. The gate waits for finite animations to end before scanning | Runtime gate (L8 part) |
+| Accessibility | axe-core (vendored `tools/vendor/axe.min.js` 4.10.2): 0 critical/serious on the five pages × light/dark × engine present/missing. Planted-line method: before scanning the missing-engine state, the gate inserts a line with `color` equal to the computed background next to `#rz-prov-calc` in `.res-head`, runs axe, and requires a `color-contrast` violation on it (proves the region is scanned); it then removes the line and requires 0. The gate waits for finite animations to end before scanning | Runtime gate (L8 part) |
 | Keyboard | Disabled exports reachable and inert; no focus jumps on recalculation | Runtime gate: Tab through the results panel, press Enter on a disabled export, assert no download and no navigation |
 | Reduced motion | Nothing animates (§9.13) | — |
 | Maintainability | One function per metric; registry diff visible in review | L1 |
@@ -1408,7 +1444,7 @@ stateDiagram-v2
 - The LTC freshness check evaluates object literals from `js/ltc-system-modelling-lab.js` with `new Function` inside
   the Node gate only; it reads repo code, never user input, and never runs in a page.
 - Abuse: nothing to abuse; no network endpoint.
-- Approval: the decisions in §12.3 are the approval requirements; D-8 needs the explicit owner confirmation noted
+- Approval: the decisions in §12.3 are the approval requirements; D-Q04-8 needs the explicit owner confirmation noted
   in §1.
 
 ## 17. Edge cases and failure scenarios
@@ -1424,7 +1460,7 @@ stateDiagram-v2
 | Compliance price missing (`null`) | Carbon Tax "— (no price data)"; DCMOC basis "<t> tCO₂ × no compliance price data", annual 0 is not shown as a price |
 | Compliance price 0 | "$0 (no scheme)" |
 | DCMOC tier outside 2–4 | Clamped by `arch-adapter.ts:46`; `getPUE` treats any other value as Tier 3 |
-| Validation error and engine missing | Only the engine sentence (§9.6) |
+| Validation error and engine missing | Only the Q06 `Fallback` line; the validation box is hidden (§9.6) |
 | Restored carbon scenario with an old `gridIntensity` | Overwritten from the engine on restore (§10.1) |
 | Restored tco scenario | Option values unchanged; restores |
 | Float differences after moving code | Operation order kept (R12); fixtures use `===`; a mismatch fails L2/L6 with the fixture id |
@@ -1508,10 +1544,10 @@ sequenceDiagram
     U->>P: input or change event
     P->>P: guard: RZEngine and the function exist?
     alt engine missing
-        P->>V: showEngineMissing(boxId, resultRoot)
-        V->>D: sentence, "—" cells, exports aria-disabled
+        P->>V: showEngineMissing(resultRoot)
+        V->>D: RZProvenance.mark(#rz-prov-calc, fallback F-CALC-ENGINE-MISSING), "—" cells, exports aria-disabled + aria-describedby
     else engine present
-        P->>V: clearEngineMissing(boxId)
+        P->>V: clearEngineMissing() (RZProvenance.clear)
         P->>V: validateNumbers(fields) and showErrors(box, errors)
         P->>E: canonical function(input)
         alt engine throws
@@ -1529,7 +1565,7 @@ sequenceDiagram
 | Decision | Chosen | Alternatives | Why |
 |---|---|---|---|
 | Where models live | Moved into `rz-engine.js` verbatim, then called | Keep page models and add parity tests | The charter makes the engine the single brain (`ENGINE_UNIFICATION.md:8`); a parity test on five pages repeats the LTC cost five times |
-| Engine missing on calculators | No numbers (D-8) | Parity-proven fallback per page | The local copies are the paths that drifted; a fallback needs its own gate forever |
+| Engine missing on calculators | No numbers (D-Q04-8) | Parity-proven fallback per page | The local copies are the paths that drifted; a fallback needs its own gate forever |
 | Two carbon price tables | Keep both, add an explicit basis (`price(code, basis)`) | Merge into one table | They answer different questions (compliance cost vs shadow value); merging loses one |
 | Scanner | Statement scanner + anchor entries, no new dependency | AST parser (acorn, typescript) | No parser is installed (`node_modules` has `puppeteer` only); anchors cover the multi-line cases; L2–L7 test values, not text |
 | Registry format | JSON in `tools/` | Data inside the engine | Read only by gates; pages never need it |
@@ -1551,22 +1587,22 @@ T-15 (DCMOC carbon), which the addendum did not count.
 
 | Id | Description | Depends | Files | Approach | Effort | Verification | DoD |
 |---|---|---|---|---|---|---|---|
-| T-1 | Registry and static gate (FR-1; L1, L3, L4, L7 checks; L2/L5/L6 static parts) | — | NEW `tools/engine-paths.json`, NEW `tools/test-engine-paths.mjs` | Port the statement scanner (§20.1); seed the registry from `--init` plus the reading finds (§10.2); classify by hand | 1.5 d | On today's tree `--law L1` prints `local=60` (± recount recorded in `verifiedCount`) and exits 1; output saved to `05-test-evidence/Q4/L1-red.txt` | Every law prints a FAIL line on today's tree (`--strict` exit 1) |
-| T-2 | Fixtures, runtime gate, evidence (FR-2, FR-18) | T-1 | NEW `tools/fixtures/engine-parity.json`, NEW `tools/test-engine-paths-runtime.mjs`, NEW `documentation/product-transformation/05-test-evidence/Q4/D-1.md` … `D-9.md` | Seeded fixture sets (§10.3); `--capture-before` on the served tree; Node part computes engine values; evidence tables per decision; runtime L2/L5/L6/L8 assertions written now | 1.5 d | `--capture-before` fills every `before`; runtime `--strict` exits 1 on today's tree (L2, L5, L6, L8 FAIL lines) | Nine evidence files sent to the owner by the main session |
-| T-3 | Engine: `defaultFor` key sets, rear-door key (FR-3, D-9) | T-1 | `rz-engine.js`, `tools/test-rz-engine.mjs` | Key resolution per FR-3; `rearDoor.pueKey = 'rdhx'` | 0.5 d | U-1, U-2; `test-rz-engine.mjs:171-172` pass | Engine gate green |
-| T-4 | Engine: carbon resolution and price basis (FR-4, D-1, D-2); Ember check of six overlapping countries | T-2 evidence approved | `rz-engine.js`, `tools/test-rz-engine.mjs` (`:218`, `:219`), possibly `dcmoc/src/constants/countries.ts` + `node tools/build-countries-data.mjs` | `resolveGrid`, `price`, `annualCost` basis, opex carbon lines, refrigerant and renewables price basis; source row text | 1.5 d | U-3 to U-5; L4 (a)-(c) pass; `node tools/test-reference-parity.mjs` 155/0 | Evidence D-1/D-2 shows owner yes |
-| T-5 | Engine: `scopes` inputs (FR-5, D-4) | T-4 | `rz-engine.js`, tests | Additive inputs and outputs | 1 d | U-6; `:966-970` pass; default Scope 1 = 36.2 | Engine gate green |
+| T-1 | Registry and static gate (FR-1; L1, L3, L4, L7 checks; L2/L5/L6 static parts) | — | NEW `tools/engine-paths.json`, NEW `tools/test-engine-paths.mjs` | Port the statement scanner (§20.1); seed the registry from `--init` plus the reading finds (§10.2); classify by hand | 1.5 d | On today's tree `--law L1` prints `local=61` (the recount, written to `verifiedCount.local`; a different number stops T-1 until §3.2, O1 and L1 are corrected) and exits 1; output saved to `05-test-evidence/Q4/L1-red.txt` | Every law prints a FAIL line on today's tree (`--strict` exit 1) |
+| T-2 | Fixtures, runtime gate, evidence (FR-2, FR-18) | T-1 | NEW `tools/fixtures/engine-parity.json`, NEW `tools/test-engine-paths-runtime.mjs`, NEW `documentation/product-transformation/05-test-evidence/Q4/D-Q04-1.md` … `D-Q04-9.md` | Seeded fixture sets (§10.3); `--capture-before` on the served tree; Node part computes engine values; evidence tables per decision; runtime L2/L5/L6/L8 assertions written now | 1.5 d | `--capture-before` fills every `before`; runtime `--strict` exits 1 on today's tree (L2, L5, L6, L8 FAIL lines) | Nine evidence files sent to the owner by the main session |
+| T-3 | Engine: `defaultFor` key sets, rear-door key (FR-3, D-Q04-9) | T-1 | `rz-engine.js`, `tools/test-rz-engine.mjs` | Key resolution per FR-3; `rearDoor.pueKey = 'rdhx'` | 0.5 d | U-1, U-2; `test-rz-engine.mjs:171-172` pass | Engine gate green |
+| T-4 | Engine: carbon resolution and price basis (FR-4, D-Q04-1, D-Q04-2); Ember check of six overlapping countries | T-2 evidence approved | `rz-engine.js`, `tools/test-rz-engine.mjs` (`:218`, `:219`), possibly `dcmoc/src/constants/countries.ts` + `node tools/build-countries-data.mjs` | `resolveGrid`, `price`, `annualCost` basis, opex carbon lines, refrigerant and renewables price basis; source row text | 1.5 d | U-3 to U-5; L4 (a)-(c) pass; `node tools/test-reference-parity.mjs` 155/0 | Evidence D-Q04-1/D-Q04-2 shows owner yes |
+| T-5 | Engine: `scopes` inputs (FR-5, D-Q04-4) | T-4 | `rz-engine.js`, tests | Additive inputs and outputs | 1 d | U-6; `:966-970` pass; default Scope 1 = 36.2 | Engine gate green |
 | T-6 | Engine: `advise` raw scores, confidence, contributions, sub-weights (FR-6) | T-1 | `rz-engine.js`, tests | Move sub-weights to `DATA.tier.subWeights`; add fields | 0.5 d | U-7; 5,000-case parity with the page formula (F2 harness, now in the gate) | Bit-identical composites |
-| T-7 | Engine: opex energy model (FR-7, D-3) | T-2 | `rz-engine.js`, tests | Copy tables verbatim; same operation order as `opex-calculator.html:1691-1694` | 1 d | U-8; 42/42 `energyCost` `===` fixture `before` | Source row added |
+| T-7 | Engine: opex energy model (FR-7, D-Q04-3) | T-2 | `rz-engine.js`, tests | Copy tables verbatim; same operation order as `opex-calculator.html:1691-1694` | 1 d | U-8; 42/42 `energyCost` `===` fixture `before` | Source row added |
 | T-8 | Engine: pue build-up, UPS, monthly, improved, climate-adjusted (FR-8, FR-14 data) | T-2 | `rz-engine.js`, tests | Copy `pue-calculator.html:701-743`, `:858-892`, `:1156`, `:1490`; DCMOC penalty table | 1.5 d | U-9 to U-11; 200 F-PUE fixtures `===` | Engine gzip delta recorded (§15) |
-| T-9 | tier-advisor switch (FR-9) + `RZCalc.showEngineMissing` / `clearEngineMissing` and the radius fix (FR-16) | T-6, D-8 | `tier-advisor.html`, `js/rz-calc-utils.js` | Script tags, validation box, engine call, tornado and PDF tornado from `contributions`, static numbers → "—", basis copy | 1.5 d | L2 static + runtime; L8 for tier-advisor; X5 lines untouched (`git diff` shows no change at the three lines) | Screenshots 1440/390 × light/dark looked at |
-| T-10 | carbon-footprint switch (FR-10, FR-16) | T-5, D-1, D-2, D-4 | `carbon-footprint.html` | Engine call, tax rule, tooltip and basis copy, constants deleted, `data-rz-result` | 1.5 d | L5; L8; restored-scenario check (UC3) | Screenshots looked at |
-| T-11 | opex switch (FR-11, FR-16) | T-7, D-3 | `opex-calculator.html`, `css/rz-tool.css` (`.field-note`) | Engine energy and carbon; tables read from `RZEngine.data.opexCalculator`; delete unused `totalPowerKW` (`:1690`); effective-PUE line | 1.5 d | L6 (Node + DOM); L8 | Screenshots looked at |
-| T-12 | pue-calculator switch (FR-12, FR-16, D-7) | T-8, D-7 | `pue-calculator.html` | `buildUp` for main, what-ifs and monthly; tables deleted | 1 d | 200 F-PUE fixtures on the page; L8 | Free-user outputs unchanged |
-| T-13 | tco labels and dead tables; capex grid factor (FR-13, FR-16 tco, D-5) | T-4, D-5 | `tco-calculator.html`, `capex-calculator.html` | Per FR-13 | 1 d | AC-13 greps; 8 F-CAPEX-GRID fixtures; L8 for tco | Unused `BENCHMARKS` reported in the task notes |
-| T-14 | DCMOC PUE (FR-14, D-6) + rebuild | T-8, D-6 | `dcmoc/src/constants/pue.ts`, `state/adapters/arch-adapter.ts`, `state/adapters/capex-adapter.ts`, `lib/CapexEngine.ts`, `lib/decision/deterministicProvider.ts`, `lib/diagnostics.ts`, `lib/value-trace.ts`, `modules/analytics/BenchmarkEngine.ts`, `modules/analytics/SensitivityEngine.ts`, `modules/infrastructure/FuelGenEngine.ts`, `components/modules/StrategicPlanningDashboard.tsx`, `CapexDashboard.tsx`, `DesignToolsDashboards.tsx`, `sustainability/EnergyAuditPage.tsx`; export under `dcmoc/` | Per FR-14; link or install `dcmoc/node_modules`; `npx next build --webpack`; copy | 2 d | L3 incl. the bundle check; `_dcmoc_trace_parity_probe.mjs` | 12 F-DCMOC-PUE fixtures equal |
-| T-15 | DCMOC carbon (FR-15) | T-5, T-14 | `modules/analytics/CarbonEngine.ts`, `lib/diagnostics.ts` (`:341-350` input), `lib/value-trace.ts` (`:265`, `:803`, `:1897-1900`) | ISO code input, engine scopes, `CARBON_FALLBACK` | 1.5 d | L4, L7 (e); trace probe | Rebuild copied |
-| T-16 | LTC parity wiring and freshness (FR-17) | T-1 | `tools/ship-gate.sh`, `tools/test-engine-paths.mjs` | Gate line after `:62`; body and table equality in L7 | 0.5 d | L7 (a), (b) | — |
+| T-9 | tier-advisor switch (FR-9) + `RZCalc.showEngineMissing` / `clearEngineMissing` through Q06's `RZProvenance`, the `#rz-prov-calc` line on all five pages, the five F-CALC-ENGINE-MISSING registry entries and the radius fix (FR-16) | T-6, D-Q04-8, PRD-Q06 shipped | `tier-advisor.html`, `js/rz-calc-utils.js`, `tools/provenance-registry.json` (Q06's file, entries added) | Script tags (incl. `js/rz-provenance.js`), validation box, engine call, tornado and PDF tornado from `contributions`, static numbers → "—", basis copy | 1.5 d | L2 static + runtime; L8 for tier-advisor; X5 lines untouched (`git diff` shows no change at the three lines) | Screenshots 1440/390 × light/dark looked at |
+| T-10 | carbon-footprint switch (FR-10, FR-16) | T-5, D-Q04-1, D-Q04-2, D-Q04-4 | `carbon-footprint.html` | Engine call, tax rule, tooltip and basis copy, constants deleted, `data-rz-result` | 1.5 d | L5; L8; restored-scenario check (UC3) | Screenshots looked at |
+| T-11 | opex switch (FR-11, FR-16) | T-7, D-Q04-3 | `opex-calculator.html`, `css/rz-tool.css` (`.field-note`) | Engine energy and carbon; tables read from `RZEngine.data.opexCalculator`; delete unused `totalPowerKW` (`:1690`); effective-PUE line | 1.5 d | L6 (Node + DOM); L8 | Screenshots looked at |
+| T-12 | pue-calculator switch (FR-12, FR-16, D-Q04-7) | T-8, D-Q04-7 | `pue-calculator.html` | `buildUp` for main, what-ifs and monthly; tables deleted | 1 d | 200 F-PUE fixtures on the page; L8 | Free-user outputs unchanged |
+| T-13 | tco labels and dead tables; capex grid factor (FR-13, FR-16 tco, D-Q04-5) | T-4, D-Q04-5 | `tco-calculator.html`, `capex-calculator.html` | Per FR-13 | 1 d | AC-13 greps; 8 F-CAPEX-GRID fixtures; L8 for tco | Unused `BENCHMARKS` reported in the task notes |
+| T-14 | DCMOC PUE (FR-14, D-Q04-6) + rebuild | T-8, D-Q04-6 | `dcmoc/src/constants/pue.ts`, `state/adapters/arch-adapter.ts`, `state/adapters/capex-adapter.ts`, `lib/CapexEngine.ts`, `lib/decision/deterministicProvider.ts`, `lib/diagnostics.ts`, `lib/value-trace.ts`, `modules/analytics/BenchmarkEngine.ts`, `modules/analytics/SensitivityEngine.ts`, `modules/infrastructure/FuelGenEngine.ts`, `components/modules/StrategicPlanningDashboard.tsx`, `CapexDashboard.tsx`, `DesignToolsDashboards.tsx`, `sustainability/EnergyAuditPage.tsx`; export under `dcmoc/` | Per FR-14; link or install `dcmoc/node_modules`; `npx next build --webpack`; copy | 2 d | L3 incl. the bundle check; `_dcmoc_trace_parity_probe.mjs` | 12 F-DCMOC-PUE fixtures equal |
+| T-15 | DCMOC carbon (FR-15) | T-5, T-14 | `modules/analytics/CarbonEngine.ts`, `lib/diagnostics.ts` (`:341-350` input), `lib/value-trace.ts` (`:265`, `:803`, `:1897-1900`) | ISO code input, engine scopes, `CARBON_FALLBACK` | 1.5 d | L4, L7 (e); trace probe | Rebuild copied; this is Q04's last DCMOC rebuild, and Q06 T-13 rebuilds after it (or the release carries one rebuild of both, §13 PRD-Q06 row) |
+| T-16 | LTC parity wiring and behavioural golden (FR-17) | T-1, before any change to `js/ltc-system-modelling-lab.js` (Q06 T-12 included) | `tools/ship-gate.sh`, `tools/test-engine-paths-runtime.mjs`, NEW `tools/fixtures/ltc-legacy-golden.json` | Gate line after `:62`; `--record-ltc-legacy` on the pre-change tree (engine blocked and engine present; if the two branches differ at recording, both are stored and the difference is reported to the owner as a finding, never averaged) | 0.5 d | L7 LTC part green; two red proofs saved to `05-test-evidence/Q4/L7-red.txt`: a `CLIMATE_FACTORS` value changed in a temp copy → `L7 FAIL ltc-legacy …`; a `RZProvenance.mark` added inside `computeModelLegacy` → L7 passes | — |
 | T-17 | Manuals, standards, catalog, generators (FR-19, §22.4) | T-9 to T-15 | manuals, `standarization/*.md`, `CLAUDE.md`, `dcmoc/src/lib/engine-catalog.json` | Hand edits; `build-engine-catalog.mjs`; generators | 1.5 d | `test-value-bindings.mjs`; `test-generator-freshness.py`; `test-gate-wiring.mjs` | R089 list complete |
 | T-18 | Gate wiring, release, live validation (§20.3, §22) | all | `tools/ship-gate.sh`, `CLAUDE.md`, `js/rz-version.js`, `CHANGELOG.md`, `changelog.html`, `sw.js`, tokens | Wire four gates; release chain; push; live checks | 1.5 d | Full ship gate under `rz-lane`; §22.7 output saved to `05-test-evidence/Q4/live.txt` | Live checks pass; owner informed |
 
@@ -1610,14 +1646,14 @@ entries. The value laws (L2–L7) test numbers, so a missed text pattern cannot 
 
 | Law | Claim | Command | How it fails today (`2f458f7c5`) |
 |---|---|---|---|
-| L1 | Every PUE, tier, carbon and OPEX-energy statement in scope is registered, none is `local`, no anchor is stale | `node tools/test-engine-paths.mjs --law L1` | No registry (exit 2); after T-1 seeds it from today's code: `local=60`, exit 1 |
+| L1 | Every PUE, tier, carbon and OPEX-energy statement in scope is registered, none is `local`, no anchor is stale | `node tools/test-engine-paths.mjs --law L1` | No registry (exit 2); after T-1 seeds it from today's code: `L1 candidates=… local=61 …`, exit 1 (the number is `verifiedCount.local`) |
 | L2 | tier-advisor computes with `models.tier.advise`: engine tag outside strings, no local tables, no static numbers, 200 seeded DOM cases equal the engine | `node tools/test-engine-paths.mjs --law L2` and `env RZ_BASE=<url> node tools/test-engine-paths-runtime.mjs --law L2` | The only engine tag is inside the print string (`:1457`); `WEIGHTS` `:552` and `SCORE_MAPS` `:554` exist; static "72", "B", "88%" at `:428-430`; with the engine blocked the page still shows a score |
 | L3 | DCMOC: `PUE_FALLBACK` equals `DATA.pueMatrix` for 12/12 cooling × tier; every `getPUE(` call passes a tier; no `LOCAL_PUE`, no literal PUE fallbacks after a matrix read; the built export has no `inrow:1.35,rdhx:1.25` | `node tools/test-engine-paths.mjs --law L3` | `PUE_FALLBACK` does not exist (Tier 3 values only: 4/12); 10 one-argument calls (F9); `LOCAL_PUE` at `arch-adapter.ts:59`; `grep -rl 'inrow:1.35,rdhx:1.25' dcmoc/_next` → `dcmoc/_next/static/chunks/app/page-5ae902f0d83092a9.js` |
 | L4 | 40/40 countries resolve to their own grid factor; the DCMOC levy equals tonnes × compliance price for every country with a price; `annualCost(1, 1.52, 'US')` = 0; no page carbon table left | `node tools/test-engine-paths.mjs --law L4` | 0 of 40 own values; 6 distinct levy values across 40 countries (US, FR, SE, ZA, TH all 194,472); `annualCost` 197,064; six page tables or constants (`carbon-footprint.html:845` `grid` fields, `:965`; `opex-calculator.html:1510`, `:1529`; `capex-calculator.html:1111`; `CarbonEngine.ts:83`) |
 | L5 | carbon-footprint shows `models.carbon.scopes` for F-CO2-01…05 (0.05 t) and the compliance tax rule; no page carbon constants | static `--law L5` + runtime `--law L5` | F-CO2-01: Scope 1 192.1 vs 116.5, Scope 2 5,326.1 vs 4,926.6, Scope 3 150.0 vs 213.3; constants at `:964-968` |
 | L6 | opex: shown PUE = `facilityKw / itKw` of the charged energy in 42/42; energy cost bit-identical to the fixture `before`; one kWh feeds the cost, the derived metrics and the per-kWh metric | static `--law L6` + runtime `--law L6` | 41 of 42 combinations differ (F3); three kWh formulas (`:1552`, `:1693`, `:2653`) |
-| L7 | Every kept fallback has a wired, passing parity check. After the change there are six: the LTC inline model (test in the ship gate; body and three tables equal the test's copies), DCMOC `PUE_FALLBACK` and `getPUE` (`pue.ts`), the `PUE_TARGET` copy (`deterministicProvider.ts`), the climate-penalty copy (`StrategicPlanningDashboard.tsx`) and `CARBON_FALLBACK` (`CarbonEngine.ts`), each equal to the engine; every `fallback`/`authority` entry names a gate the ship gate runs. `diagnostics.ts:236` and `DesignToolsDashboards.tsx:385` call `getPUE` and become class `engine` | `node tools/test-engine-paths.mjs --law L7` | `grep -c 'test-ltc-parity' tools/ship-gate.sh` → 0; `PUE_FALLBACK` and `CARBON_FALLBACK` do not exist |
-| L8 | With `rz-engine.min.js` blocked, the five calculators show the sentence, "—" in every `[data-rz-result]` cell, inert exports, 0 page errors, axe 0 critical/serious (planted line detected) | `env RZ_BASE=<url> node tools/test-engine-paths-runtime.mjs --law L8` | `grep -c 'data-rz-result'` → 0 on all five pages; tier-advisor never loads the engine, so blocking it changes nothing and numbers stay |
+| L7 | Every kept fallback has a wired, passing parity check. After the change there are six: the LTC inline model (checked by behaviour, never by its source text: `test-ltc-parity.mjs` in the ship gate, and the runtime golden of FR-17 — the 12 scenarios × 28 outputs of `computeModelLegacy`, engine blocked and engine present, equal `tools/fixtures/ltc-legacy-golden.json`), DCMOC `PUE_FALLBACK` and `getPUE` (`pue.ts`), the `PUE_TARGET` copy (`deterministicProvider.ts`), the climate-penalty copy (`StrategicPlanningDashboard.tsx`) and `CARBON_FALLBACK` (`CarbonEngine.ts`), each equal to the engine; every `fallback`/`authority` entry names a gate the ship gate runs. `diagnostics.ts:236` and `DesignToolsDashboards.tsx:385` call `getPUE` and become class `engine` | `node tools/test-engine-paths.mjs --law L7` and `env RZ_BASE=<url> node tools/test-engine-paths-runtime.mjs --law L7` | `grep -c 'test-ltc-parity' tools/ship-gate.sh` → 0; `PUE_FALLBACK` and `CARBON_FALLBACK` do not exist. Behaviour red proof (T-16): a temp copy with `CLIMATE_FACTORS.tropical` changed by one value → `L7 FAIL ltc-legacy <scenario> <output id>`; a temp copy with a `RZProvenance.mark(…)` call added inside `computeModelLegacy` → L7 still passes (behaviour unchanged) |
+| L8 | With `rz-engine.min.js` blocked, the five calculators show the Q06 `Fallback` line (`#rz-prov-calc`, `data-rz-provenance="fallback"`, text equal to `RZProvenance.format` of the F-CALC-ENGINE-MISSING record), "—" in every `[data-rz-result]` cell, inert exports carrying `aria-describedby="rz-prov-calc"`, 0 page errors, axe 0 critical/serious (planted line detected); statically, each page loads `js/rz-provenance.js` before its page script | `node tools/test-engine-paths.mjs --law L8` (static part) and `env RZ_BASE=<url> node tools/test-engine-paths-runtime.mjs --law L8` | `grep -c 'data-rz-result'` → 0 and `grep -c 'rz-provenance.js'` → 0 on all five pages; tier-advisor never loads the engine, so blocking it changes nothing and numbers stay |
 
 Red-first procedure: T-1 and T-2 run both gates on a worktree of `2f458f7c5` and on the working tree before any
 switch; the FAIL lines are saved in `05-test-evidence/Q4/red/`. A law that does not fail there is rewritten before
@@ -1630,14 +1666,14 @@ it is trusted. After each switch task, the law for that page turns green and the
   `gate "Q4 one engine path — registry, tier, DCMOC PUE, carbon per country, opex energy, fallbacks (L1-L7)" node tools/test-engine-paths.mjs --strict`
 - Existing `tools/test-reference-parity.mjs` (155/0 today) is not run by the ship gate or by any workflow
   (`grep -c test-reference-parity tools/ship-gate.sh` → 0; `.github/workflows/` has only `supabase-keepalive.yml`),
-  although `ENGINE_UNIFICATION.md:74` says it "fails CI". D-2 depends on it. Wire it next to the line above:
+  although `ENGINE_UNIFICATION.md:74` says it "fails CI". D-Q04-2 depends on it. Wire it next to the line above:
   `gate "reference parity — DATA.countries equals dcmoc/src/constants/countries.ts" node tools/test-reference-parity.mjs`
 - Existing `tools/test-ltc-parity.mjs`. Wire after the LTC plant gate (`:62`):
   `gate "LTC lab inline model — parity with models.ltc.compute (15,750 checks)" node tools/test-ltc-parity.mjs`
 - NEW `tools/test-engine-paths-runtime.mjs` (browser; L2, L5, L6 DOM parts, L8, J1–J5, axe). Wire in the served-tree
   block after the LTC step-thread gate (`:328-329`) and after Q6's runtime gate if it is already there, before the
   slop scans (`:343-346`):
-  `gate "Q4 engine paths runtime — tier, carbon, opex on screen; no numbers without the engine; axe (L2, L5, L6, L8)" env RZ_BASE=$LTC_BASE timeout 900 node tools/test-engine-paths-runtime.mjs --strict`
+  `gate "Q4 engine paths runtime — tier, carbon, opex on screen; no numbers without the engine; LTC legacy golden; axe (L2, L5, L6, L7, L8)" env RZ_BASE=$LTC_BASE timeout 900 node tools/test-engine-paths-runtime.mjs --strict`
 - `CLAUDE.md` "Audit before push" block (`:36-73`): add four lines, so `node tools/test-gate-wiring.mjs` stays green:
   `node   tools/test-engine-paths.mjs --strict          # Q4 one engine path per metric: registry, DCMOC PUE, carbon per country, opex energy, fallbacks`,
   `node   tools/test-engine-paths-runtime.mjs --strict  # Q4 runtime: tier/carbon/opex on screen = engine; no numbers without the engine`,
@@ -1666,8 +1702,8 @@ it is trusted. After each switch task, the law for that page turns green and the
 | AC-13 | tco and capex | The pages load | `grep -c 'COOLING_PUE\|globalAvgPUE\|PUE ~' tco-calculator.html` = 0; capex CO₂ = annual MWh × `resolveGrid(code).value` for 8 regions |
 | AC-14 | DCMOC scenario Tier 4, liquid | Summary, Capex, FuelGen, Benchmark, Sensitivity render | All use 1.10 |
 | AC-15 | DCMOC, Indonesia | The Carbon module computes | Scope 2 uses ID's grid factor (not India's); no blend; EU-ETS exposure uses the compliance price |
-| AC-16 | Any of the five calculators, engine blocked | The page loads and an input changes | The sentence, "—" in every result cell, inert exports, no page error |
-| AC-17 | The ship gate | It runs | `test-ltc-parity.mjs` passes; L7 body and table equality pass |
+| AC-16 | Any of the five calculators, engine blocked | The page loads and an input changes | The Q06 `Fallback` line (F-CALC-ENGINE-MISSING), "—" in every result cell, inert exports with `aria-describedby="rz-prov-calc"`, no page error |
+| AC-17 | The ship gate | It runs | `test-ltc-parity.mjs` passes; the L7 runtime golden (12 × 28 outputs, engine blocked and engine present) equals `tools/fixtures/ltc-legacy-golden.json` |
 | AC-18 | Every changed number class | The CHANGELOG is read | It names the class, the decision and the evidence file |
 | AC-19 | Manuals and generated files | The freshness gates run | Green; `manual/opex.html` formula equals FR-7 |
 
@@ -1701,15 +1737,15 @@ FR → tests:
 
 1. T-1, T-2: both gates exist and fail on today's tree; the red output and the nine evidence files are saved. Nothing
    user-visible changes, and the gates are not yet in the ship gate.
-2. The main session sends the owner the evidence (§12.3) and records each answer in `D-<n>.md`.
+2. The main session sends the owner the evidence (§12.3) and records each answer in `D-Q04-<n>.md`.
 3. Engine tasks T-3 to T-8. T-3, T-6, T-7 and T-8 change no output (new functions, verbatim data). T-4 and T-5
-   change engine outputs that DCMOC already shows ("Carbon Levy", OPEX totals with carbon), so they wait for D-1, D-2
-   and D-4.
+   change engine outputs that DCMOC already shows ("Carbon Levy", OPEX totals with carbon), so they wait for D-Q04-1, D-Q04-2
+   and D-Q04-4.
 4. Page tasks T-9 to T-13 and DCMOC tasks T-14, T-15, each after its decision. One DCMOC rebuild after T-15 is enough;
    T-14 may rebuild earlier for its own checks.
 5. T-16, T-17, then T-18: the four gate lines go into `tools/ship-gate.sh` in the same release, when they pass.
 6. One release. If the owner rejects a decision, the affected registry entries keep class `local` and get
-   `"hold": "D-<n> rejected <date>"`; L1 prints them as `L1 HOLD` lines (not FAIL) only when the evidence file records
+   `"hold": "D-Q04-<n> rejected <date>"`; L1 prints them as `L1 HOLD` lines (not FAIL) only when the evidence file records
    the owner's no; the summary line counts `hold=<n>` and the CHANGELOG lists them. A `local` entry without that
    record is still a FAIL.
 
@@ -1725,11 +1761,16 @@ first. Then `cd dcmoc && npx next build --webpack` (Turbopack fails on a symlink
 replace the export: `rm -rf _next _not-found && cp -r out/. .` (inside `dcmoc/`). Then run L3 (its bundle check reads
 `dcmoc/_next`), `node tools/_dcmoc_trace_parity_probe.mjs` and `node tools/test-dcmoc-cx-plan.mjs`.
 
+Order with PRD-Q06 (coordinator decision D3, stated identically in PRD-Q06 §22.3): Q04's engine changes and DCMOC
+source changes go in first, then Q06's `EngineFallbackNotice` (Q06 T-13). When both ship in one release there is one
+rebuild, from a tree that holds both changes, and the three checks above run on that one export. When Q04 ships
+alone, Q06 T-13 later rebuilds on top of Q04's committed export and re-runs the same checks.
+
 ### 22.4 Standards docs in the same release (rule R089)
 
 | Doc | Change |
 |---|---|
-| `standarization/ENGINE_UNIFICATION.md` | New section "One path per metric": canonical functions, registry classes, the `hold` rule, the two gates, decisions D-1 to D-9. Phase A line (`:85`) "Root-calculator consumers still to migrate" → done for PUE, tier, carbon and OPEX energy, with the follow-ups. DoD (`:76-82`) adds `node tools/test-engine-paths.mjs --strict`. `:74` names the ship-gate line that now runs `test-reference-parity.mjs` |
+| `standarization/ENGINE_UNIFICATION.md` | New section "One path per metric": canonical functions, registry classes, the `hold` rule, the two gates, decisions D-Q04-1 to D-Q04-9. Phase A line (`:85`) "Root-calculator consumers still to migrate" → done for PUE, tier, carbon and OPEX energy, with the follow-ups. DoD (`:76-82`) adds `node tools/test-engine-paths.mjs --strict`. `:74` names the ship-gate line that now runs `test-reference-parity.mjs` |
 | `standarization/SUPER_ENGINE.md` | The NEW functions (§11.1) and `DATA` keys (§10.4) |
 | `standarization/ACCURACY_VALIDATION.md` | Rules R5 and R6 (price basis, grid factor); "a basis line names the function that computed the figure"; cite L1 and L4 |
 | `standarization/VALUE_TRACE_STANDARD.md` | The "Carbon Levy" formula template (compliance price per country) and the tier-aware PUE in trace templates |
@@ -1776,10 +1817,10 @@ and the Pages build for it succeeded (a green push is not a deploy).
 2. `terser rz-engine.js -c -m -o rz-engine.min.js`.
 3. `CHANGELOG.md` entry `## v<next> — <date> — "One engine path per metric: PUE, tier, carbon and OPEX energy"`
    listing every changed number class with its decision and evidence file: tier-advisor now computes with the engine
-   (no change at any input); opex shows the PUE its energy cost uses (D-3); carbon costs use each country's
-   compliance price and own grid factor (D-1, D-2); carbon-footprint Scope 1 and 3 from engine data (D-4); tco labels
-   (D-5); capex grid factor (D-5); DCMOC tier-aware PUE (D-6); pue-calculator what-ifs (D-7); calculators show no
-   numbers without the engine (D-8); rear-door PUE key (D-9); any `hold` entries.
+   (no change at any input); opex shows the PUE its energy cost uses (D-Q04-3); carbon costs use each country's
+   compliance price and own grid factor (D-Q04-1, D-Q04-2); carbon-footprint Scope 1 and 3 from engine data (D-Q04-4); tco labels
+   (D-Q04-5); capex grid factor (D-Q04-5); DCMOC tier-aware PUE (D-Q04-6); pue-calculator what-ifs (D-Q04-7); calculators show no
+   numbers without the engine (D-Q04-8); rear-door PUE key (D-Q04-9); any `hold` entries.
 4. `python3 tools/build-changelog-html.py --apply`.
 5. `python3 tools/sync-sw-version.py`.
 6. `node tools/test-asset-cache-tokens.mjs --fix rz-engine.min.js js/rz-calc-utils.js css/rz-tool.css js/rz-version.js`
@@ -1823,11 +1864,11 @@ and the Pages build for it succeeded (a green push is not a deploy).
 | R9 | The engine version bump breaks a pinned consumer | Low | High | `grep` finds no page that pins `RZEngine.data.version` (the Worker only reports it, `cf-worker/src/calc.js:78`, `:110`); the cockpit pin is `js/dcai-engine.js`, which Q4 does not touch; P16 owns the manifest |
 | R10 | Another session commits on the same checkout | Medium | Medium | Commit only Q4 files; re-check cache tokens against `HEAD` before push |
 | R11 | Effort over the addendum estimate (22.5 d vs 20 d) | Medium | Low | T-2 and T-15 are the extra; they can move to a second release if needed, with their laws scoped |
-| R12 | An unknown consumer of the changed carbon or OPEX functions | Low | Medium | Consumers listed by `grep` (DCMOC: `useDashboardData.ts`, `FinancialPage.tsx`, `OpexBreakdown.tsx`, `dimension-explain.ts`, `EnergyAuditPage.tsx`, `SustainabilityEnginePage.tsx`, `scenarioSummary.ts`, `value-bindings.ts`, `value-trace.ts`, `CarbonEngine.ts`; manuals carbon, dcmoc, pue; the `/calc` Worker); each is in the D-1/D-2 evidence or the trace probe |
+| R12 | An unknown consumer of the changed carbon or OPEX functions | Low | Medium | Consumers listed by `grep` (DCMOC: `useDashboardData.ts`, `FinancialPage.tsx`, `OpexBreakdown.tsx`, `dimension-explain.ts`, `EnergyAuditPage.tsx`, `SustainabilityEnginePage.tsx`, `scenarioSummary.ts`, `value-bindings.ts`, `value-trace.ts`, `CarbonEngine.ts`; manuals carbon, dcmoc, pue; the `/calc` Worker); each is in the D-Q04-1/D-Q04-2 evidence or the trace probe |
 | R13 | The `/calc` Worker serves an old engine after the release | Unknown | Medium | Asked in T-18; owner redeploys if deployed; `calc.test.mjs` run |
 
-Dependencies: X5, P8 and P16 (peer sessions); PRD-Q06 (fallback lines and runtime-gate order); owner answers D-1 to
-D-9.
+Dependencies: X5, P8 and P16 (peer sessions); PRD-Q06 (fallback lines and runtime-gate order); owner answers D-Q04-1 to
+D-Q04-9.
 
 ## 24. Definition of done
 
