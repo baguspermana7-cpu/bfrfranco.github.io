@@ -61,7 +61,8 @@ const server = createServer(async (req, res) => {
     const path = decodeURIComponent(new URL(req.url, 'http://x').pathname);
     const file = join(ROOT, path === '/' ? 'index.html' : path);
     if (!file.startsWith(ROOT)) { res.writeHead(403).end(); return; }
-    res.writeHead(200, { 'content-type': MIME[extname(file)] || 'application/octet-stream' }).end(await readFile(file));
+    const body = await readFile(file);
+    res.writeHead(200, { 'content-type': MIME[extname(file)] || 'application/octet-stream' }).end(body);
   } catch { res.writeHead(404).end(); }
 });
 await new Promise((ok) => server.listen(0, '127.0.0.1', ok));

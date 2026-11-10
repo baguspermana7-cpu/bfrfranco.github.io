@@ -120,6 +120,9 @@
   }
 
   function init() {
+    // Embedded for compute (rz-embed-compute.js, ?embed=<mode>): the reader is on the host page, which shows its
+    // own banner. No banner here, and analytics off for this frame so one visit is not counted twice.
+    if (/[?&]embed=(compare|pack|sensitivity|article)(&|$)/.test(location.search)) { window[GA_DISABLE] = true; return; }
     var consent = getConsent();
     var banner = document.getElementById('cookieBanner');
 
