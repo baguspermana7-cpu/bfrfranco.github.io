@@ -278,6 +278,7 @@ gate "Manuals (K26) — every manual link resolves, each manual links its tool, 
 gate "Manual contents (K26) — every long manual has an On-this-page rail (1440) or disclosure (390) from its own headings; links land under the bar; current section marked" node tools/test-manual-toc.mjs
 gate "Saved-scenario Open routes — every calculator id opens its own page; unknown ids never navigate (X2)" node tools/test-scenario-open-routes.mjs
 gate "Calculator inline handlers — every onclick on the 11 calculators calls a function that exists (X3)" node tools/test-calc-onclick-handlers.mjs
+gate "Calculator registry — data/calculators.json pages, fields and result selectors match the 11 rendered calculators (F1)" node tools/test-calculator-registry.mjs
 gate "Sustainability page (K25) — generator-fresh, worked example recomputed, citations and FAQ JSON-LD consistent" python3 tools/test-pillar-sustainability.py
 gate "WAN traffic study — every printed figure follows from the view's own inputs" node tools/test-dcai-wan-study.mjs
 gate "security zone ladder — SL-T never drops inward, life safety is monitor-only" node tools/test-dcai-security-zones.mjs
