@@ -11,6 +11,21 @@ release sections rather than semver.
 
 ---
 
+## v3.35.10 — 2026-11-10 — "Opening a saved scenario reaches its calculator on all eleven"
+
+Found by the parallel assessment (addendum X2) and widened by its test: "Open" on a saved scenario built the target as
+`<id>-calculator.html` for any id outside five, so carbon, rfs, spares, tia and tier landed on a 404.
+
+### Fixed
+- `js/rz-scenario.js` `openInCalc`: one explicit route per `<body data-rz-calc>` page (11); an unknown id no longer
+  navigates or stashes a pending scenario.
+
+### Added
+- `tools/test-scenario-open-routes.mjs` (ship gate): runs `openInCalc` for every id a page declares and requires it
+  to open that page; unknown ids must stay put. RED on v3.35.9 (5 wrong routes + 2 guessed navigations), GREEN now.
+
+---
+
 ## v3.35.9 — 2026-11-10 — "Every long manual can be navigated: an On-this-page rail built from its own headings"
 
 Owner K26: manuals must be "bener2 intuitive dan menarik utk dibaca". Measured first: 0 of 42 manuals had any

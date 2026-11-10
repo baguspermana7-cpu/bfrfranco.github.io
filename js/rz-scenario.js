@@ -80,9 +80,16 @@
     // calc is set by each calculator's own Save button (a known literal), but sanitize before it
     // reaches location.href so a malformed stored value can never build an unexpected path.
     if (!/^[a-z0-9-]{1,40}$/.test(String(calc || ''))) return;
-    try { w.localStorage.setItem('rz_open_scenario', JSON.stringify({ calc: calc, inputs: inputs, ts: Date.now() })); } catch (e) {}
+    // One entry per <body data-rz-calc> page; tools/test-scenario-open-routes.mjs keeps this in step.
+    // An id with no entry does not navigate (it used to guess "<id>-calculator.html" — 404 for carbon,
+    // rfs, spares, tia and tier).
     var file = ({ capex: 'capex-calculator.html', opex: 'opex-calculator.html', roi: 'roi-calculator.html',
-                  tco: 'tco-calculator.html', pue: 'pue-calculator.html' })[calc] || (calc + '-calculator.html');
+                  tco: 'tco-calculator.html', pue: 'pue-calculator.html', carbon: 'carbon-footprint.html',
+                  cx: 'cx-calculator.html', rfs: 'rfs-readiness-workbench.html',
+                  spares: 'spares-readiness-calculator.html', tia: 'tia-942-checklist.html',
+                  tier: 'tier-advisor.html' })[calc];
+    if (!file) return;
+    try { w.localStorage.setItem('rz_open_scenario', JSON.stringify({ calc: calc, inputs: inputs, ts: Date.now() })); } catch (e) {}
     w.location.href = file;
   }
 
