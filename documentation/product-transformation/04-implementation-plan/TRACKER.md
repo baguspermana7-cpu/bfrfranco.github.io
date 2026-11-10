@@ -42,3 +42,18 @@ other session first.
 | Cross-PRD review | all of this session's PRDs + interfaces with the peer | 0c | QA | main | NOT STARTED | — |
 
 <!-- peer rows below this line -->
+
+## C. PRD-driven program (calculator/product session rows: P1–P26, X2, X3, X5, X9)
+
+| Task | Source PRD | Wave | Depends on | Owner | Status | Evidence |
+|---|---|---|---|---|---|---|
+| X2 | PX | 1 | — | calc session | VERIFIED COMPLETE | live v3.35.10 `5216448ca`; ship gate 167/168 + [131] Cx rerun alone 112/112; live byte-equal rz-version.js, rz-scenario.js, sw.js |
+| X3 | PX | 1 | — | calc session | IMPLEMENTED — NOT VERIFIED (not live) | v3.35.11 `57905e28d`; test-calc-onclick-handlers RED on tia → PASS |
+| F1 calculator registry | ARCH C1 | 1 | — | calc session | IMPLEMENTED — NOT VERIFIED (not live) | `dfff4b121`; test-calculator-registry RED 6 → "11 calculators, 17 fields, 22 results" |
+| F2 embed compute | ARCH C2 | 1 | F1 | calc session | IMPLEMENTED — NOT VERIFIED (not live) | `2f6374bda`; test-embed-compute E1–E7 8/8, RED on old consent script |
+| P02 share links | P02 | 1 | X2 | calc session | IMPLEMENTED — NOT VERIFIED (not live) | v3.36.0 `c9964d039`; test-scenario-share-links 71 checks |
+| P08 seeded uncertainty | P08 | 1 | — | calc session | IMPLEMENTED — NOT VERIFIED (not live) | v3.36.0; test-seeded-uncertainty 24 checks, RED in old tree |
+| P23 register CSS | P23 | 1 | — | calc session | IMPLEMENTED — NOT VERIFIED (not live) | v3.36.0; test-register-css RED 6 → 96/96; a11y CLEAN 13 pages × 2 themes |
+| P25 offline calculators | P25 | 1 | — | calc session | IMPLEMENTED — NOT VERIFIED (not live) | v3.37.0 `a48f6e62e`; test-sw-precache 60, test-offline-calculators 11/11 (RED on old tree); index.html swap = LTC |
+| P16 engine version module | P16 | 1 | — | calc session | IMPLEMENTED — NOT VERIFIED (not live) | v3.37.0; pins gate RED ×2 → PASS; versions-missing fixture RED on literal pin → PASS |
+| Ship v3.35.11–v3.37.0 | — | 1 | all above | calc session | IN PROGRESS | full ship gate next |
