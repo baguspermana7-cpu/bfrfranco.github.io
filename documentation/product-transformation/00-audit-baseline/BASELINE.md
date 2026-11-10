@@ -53,8 +53,9 @@ re-check changed an earlier audit claim, the row says **CORRECTED**.
 |---|---|
 | Content relation data | `journal.json` and the dossier JSON have no `tools`, `incidents` or `terms` fields |
 | Fault scenarios | No scenario data exists. Cockpit alarms are random. |
-| Learning paths | None. `achievements.html` is orphaned. |
-| Incident aggregate view | None |
+| Learning paths | None. **CORRECTED (PRD-Q17):** `achievements.html` is not orphaned (3 inbound links, in the sitemap). The real defect: `rz-gamification.js` loads on only 2 pages, so badges cannot be earned. |
+| Air-side thermal transient model | **CORRECTED (PRD-Q07):** none exists (rz-engine and conv-engine have none; ltc-plant covers the liquid loop only). Q7 must add a minimum sourced model. |
+| Incident aggregate view | **CORRECTED (PRD-Q18):** `dc-incidents.html` already has a library-wide FMEA view. It groups by first category only, and 5 categories have no label. No mode × cause matrix exists. |
 | Server-side feature flags | `feature_overrides` is referenced only inside `js/rz-supabase.js` |
 | Finance terminal sync | `rz-ft-sync.js` is loaded only by `Apps/second brain/codebase-graph.html` |
 | Data refresh automation | The only workflow is `supabase-keepalive.yml` (Q8 belongs to the peer) |
