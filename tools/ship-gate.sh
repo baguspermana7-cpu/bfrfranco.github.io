@@ -275,6 +275,7 @@ gate "Cx campus motion (K27) — one eased camera move per focus, fading neighbo
 gate "Cx program breakdown (K28) — treegrid five deep under the plan editor, every row = RZCxTree, parent-only edit carries, weight/exclude re-share with ghost rows, persists, grid fits its panel at 1440 and 390 px, one-line rows, accent include, button-height import labels (K13/K14)" node tools/test-cx-tree-ui.mjs
 gate "Explorable figures — hover lights the edges, tap opens the panel, keys walk; spacing law on fire pillar + article 30" node tools/test-figure-interact.mjs
 gate "Manuals (K26) — every manual link resolves, each manual links its tool, every manual has an index card; drift list monitored" python3 tools/audit-manuals.py --strict
+gate "Manual contents (K26) — every long manual has an On-this-page rail (1440) or disclosure (390) from its own headings; links land under the bar; current section marked" node tools/test-manual-toc.mjs
 gate "Sustainability page (K25) — generator-fresh, worked example recomputed, citations and FAQ JSON-LD consistent" python3 tools/test-pillar-sustainability.py
 gate "WAN traffic study — every printed figure follows from the view's own inputs" node tools/test-dcai-wan-study.mjs
 gate "security zone ladder — SL-T never drops inward, life safety is monitor-only" node tools/test-dcai-security-zones.mjs

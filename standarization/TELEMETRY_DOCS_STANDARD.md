@@ -165,3 +165,12 @@ Owner: *"page manual/ pastikan ini selalu diupdate dan align dengan toolsnya dan
   manual, achievements the standards lab; none of the three hubs links them. The tool is the authority: the manual
   lines went, the hubs were not changed to match the manual.
 - A manual names standards by their exact part and year, and never claims a calculation the page does not make.
+- **Reading (K26 tahap 2, v3.35.9):** every manual with four or more sections carries an "On this page" navigation built
+  by `js/rz-manual-toc.js` + `css/rz-manual-toc.css` from its OWN h2 headings, so it cannot drift from the text: a fixed
+  rail beside the column where the margin holds at least a 150 px rail, else a collapsed `<details>` under the header
+  (skipped where the manual already has a static contents block); the current section carries `aria-current`; a link
+  lands its heading 16 px under the fixed bar; reduced motion jumps instead of gliding. Before it, 0 of 42 manuals had
+  any navigation on pages up to 15,000 px tall. Gate `node tools/test-manual-toc.mjs` (ship gate): T1 wired on every
+  long manual, T2 1440 rail lists every content h2 and sits beside the column, T3 390 disclosure + no sideways scroll,
+  T4 landing and current-section marking on three manuals, T5 rail text AA in both themes. Red on its first run: T1 0/35,
+  T2 0/35, T4 3 failures; T5 red 68/70 (two manuals without `--mn` tokens fell back to dark-theme greys in light).

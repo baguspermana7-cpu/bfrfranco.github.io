@@ -11,6 +11,39 @@ release sections rather than semver.
 
 ---
 
+## v3.35.9 — 2026-11-10 — "Every long manual can be navigated: an On-this-page rail built from its own headings"
+
+Owner K26: manuals must be "bener2 intuitive dan menarik utk dibaca". Measured first: 0 of 42 manuals had any
+navigation, on pages up to 15,000 px tall with 8–12 sections; only 7 carried a static contents list at the top, and
+almost no heading had an id, so no section could be linked.
+
+### Added
+- `js/rz-manual-toc.js` + `css/rz-manual-toc.css`, wired on all 41 manuals (it acts on the 35 with four or more
+  sections): an "On this page" navigation built from the manual's own h2 headings, so it cannot drift from the text.
+  At desktop width it is a fixed rail beside the text column (hairline, mono caption, numbered entries; the rail
+  narrows with the margin and gives way below 150 px); on phones it is a collapsed disclosure under the header,
+  skipped where the manual already carries its own contents block. The current section is marked with
+  `aria-current`, a link lands its heading 16 px below the fixed bar, sections that had no id get one from their
+  title, and reduced motion jumps instead of gliding.
+
+### Fixed
+- `id/index.html`: meta description 191 → 142 characters (the English tail is dropped; Google cuts at ~155–160).
+  `tools/audit-seo.py` walks root pages only, so the subfolder page was never flagged — measured with `--file`.
+  `tools/test-meta-description-fit.mjs` had it on its self-expiring PENDING list; the gate then failed M4 ("now fits
+  in 142 chars — delete it from PENDING"), so the deferral is removed and the list is empty again.
+
+### Gates
+- New `tools/test-manual-toc.mjs` (wired after the K26 manuals gate): T1 every long manual loads the module (red 0/35),
+  T2 1440 rail lists every content h2 once, all links resolve, beside the column (red 0/35; on the first green run
+  three wide-column manuals hid the rail — fixed by a margin-sized rail), T3 390 collapsed contents and no sideways
+  scroll, T4 landing under the bar and current-section marking on three manuals (red 3, then a section's padding put
+  datahallai's heading 124 px low — links now scroll the heading itself). T5 1440 light + dark: every rail text meets AA on the
+  page background — added after the first full gate: `tools/test-telemetry-e2e.mjs` caught 2.89:1 on
+  `manual/epms-telemetry.html` light (one of two manuals without the `--mn` tokens; the fallback greys were dark-theme
+  values) and a rail placed as main's first child, which that gate reads as the content top. Fallbacks are now
+  theme-aware and the rail is appended last (it is fixed, so nothing moves). T5 red 68/70, green 70/70. Standard: TELEMETRY_DOCS_STANDARD
+  "Manual currency" gains the reading rule.
+
 ## v3.35.8 — 2026-11-10 — "Cards glow from the bottom again, and the employer card turns like a real card"
 
 Owner R106–R108: "Continue polish more, khususnya motion micro interaction juga, gradien dan effect2 smooth"; "Gak ada

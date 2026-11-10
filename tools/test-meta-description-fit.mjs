@@ -46,7 +46,6 @@ const LIST = process.argv.includes('--list');
    quietly become the place descriptions go to avoid the rule. */
 const PENDING = new Map([
     /* empty — add [page, reason] only for a file another session is actively changing */
-    ['id/index.html', 'v3.34.0: the gate first saw directory URLs; this page runs 191 characters and two other agent worktrees hold uncommitted edits to it, so it is rewritten by the session that owns those edits'],
 ]);
 
 const MAX = 160;          /* the display cut this gate exists to fit inside */
