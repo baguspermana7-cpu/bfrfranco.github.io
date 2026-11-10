@@ -58,6 +58,10 @@ const DIAGRAMS = Object.freeze([
   /* EPMS: the root SVG (viewBox 0 0 3600 2600) holds every layer — wires, flow, devices, breakers and
      the telemetry text. Targeting a single layer (e.g. #l-wires) reports texts=0 and measures nothing. */
   { page: 'EPMS_Telemetry.html', selector: 'svg#viewport', label: 'EPMS single-line' },
+  /* v3.37.0 — cdu-mini-bms loads the instrument shell since P23 (it declares that register), and the
+     survey-coverage gate rightly asked who measures its two process drawings. */
+  { page: 'cdu-mini-bms.html', selector: 'svg[aria-label^="CDU piping"]', label: 'CDU P&ID' },
+  { page: 'cdu-mini-bms.html', selector: 'svg[aria-label="datahall layout"]', label: 'CDU datahall layout' },
   /* v1.135.0 — the tabbed cockpit. Its thirteen diagrams live on eight different tabs and five
      electrical sub-panels, none of which any gate had ever opened: the default tab holds no SVG
      at all, so every render gate measured an empty set and reported the page clean while it
@@ -358,12 +362,20 @@ try {
    day the page arrived (1.5px overlap, 1.0px clip, 8.5px legibility floor).
 
    Keep this set empty. A page added here is a page that stops being enforced, and the comment
-   above is what it costs to get it back out. */
-const MONITOR_PAGES = new Set();
+   above is what it costs to get it back out.
+
+   v3.37.0 — ONE page re-enters, with its condition written the same way. cdu-mini-bms.html was
+   never in DIAGRAMS; P23 made it load the instrument shell, and test-diagram-survey-coverage asked
+   who measures its two drawings. Measured on arrival: 84 rows, 36 distinct (3 collisions: "MV-01" x
+   "makeup", "HV-01" x "supply", "FACILITY WATER · FWS" x "TCV-01"; 33 labels at 6-8 px). A 500-unit
+   P&ID in a card cannot clear 8.5 px at 360 px without LOD or zoom, which is a redesign, not a nudge.
+   Flip condition: remove it from this set when its rows read zero, tolerances unchanged.
+   Ledger: standarization/UIUX_AUDIT_LEDGER.md row 26 (OPEN). */
+const MONITOR_PAGES = new Set(['cdu-mini-bms.html']);
 const blocking = findings.filter((f) => !MONITOR_PAGES.has(f.page));
 const monitored = findings.length - blocking.length;
 if (monitored) {
   console.log(`\n  NOTE — ${monitored} finding(s) on ${[...MONITOR_PAGES].join(', ')} are REPORTED, not gating.`);
-  console.log('         They entered measurement in v1.135.0; flip to strict when they reach zero.');
+  console.log('         Each entered measurement with a written flip condition (see MONITOR_PAGES); flip to strict when its rows reach zero.');
 }
 process.exit(MEASURE_ONLY || blocking.length === 0 ? 0 : 1);

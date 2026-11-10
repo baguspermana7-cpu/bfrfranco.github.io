@@ -52,6 +52,10 @@ Product transformation, Wave 1: P25 (offline calculators, absorbs Q16) and P16 (
 - `versions-missing` fixture added to `test-datahall-ai-authority.mjs` and `test-conv-dashboard-authority.mjs`: with
   the module removed the page renders UNAVAILABLE. RED against a literal pin (the page rendered numbers).
 - Generator freshness gains `js/rz-engine-versions.js` (17 artefacts).
+- `cdu-mini-bms.html` enters `test-conv-geometry.mjs` (its CDU P&ID and datahall plan). P23 gave it the instrument
+  shell, and `test-diagram-survey-coverage` failed because nothing measured it. Measured on arrival: 84 rows, 36
+  distinct (3 label collisions, 33 labels at 6-8 px). It is REPORTED in MONITOR_PAGES with a written flip condition,
+  not fixed here: clearing 8.5 px at 360 px needs LOD or zoom on a 500-unit P&ID. UIUX ledger row 26, OPEN.
 
 ### Not covered
 - The 36 article and other pages that load Chart.js keep the CDN (out of P25's scope).
