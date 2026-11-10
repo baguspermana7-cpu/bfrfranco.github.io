@@ -8,7 +8,7 @@
 | Feature | One provenance line idiom (`Simulated` / `Snapshot` / `Model output` / `Fallback`) from one small module, the shared simulated banner on all 10 cockpits, removal of every "Live" and "real-time" claim the site cannot back, visible fallbacks in the LTC lab and DCMOC, the X4 interim label and the X6 fix |
 | Version | 1.0 |
 | Status | Draft |
-| Author | Opus 5.5 (Fable quota exhausted) |
+| Author | Opus 5.5; Fable quota exhausted |
 | Date | 2026-11-10 |
 | Owner requests | R110 (a PRD per idea), R111 (24-section structure) |
 | Priority | 74.5 (addendum rank 1: I 7, N 4, C 9, E 2, effort 1.5 weeks; `documentation/PRODUCT_INNOVATION_ASSESSMENT_2026-11_ADDENDUM.md:76`) |
