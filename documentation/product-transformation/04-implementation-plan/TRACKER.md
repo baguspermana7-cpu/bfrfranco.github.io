@@ -32,11 +32,11 @@ other session first.
 | PRD-Q07 | Q7 | 0 | Q6 | Opus agent C | IMPLEMENTED — NOT VERIFIED (PRD written, self-score ≥4 all 12; main QA pending) | 02-prds/PRD-Q07/PRD.md |
 | PRD-Q17 | Q17 | 0 | Q1, P2 | Opus agent C | IMPLEMENTED — NOT VERIFIED (PRD written, self-score ≥4 all 12; main QA pending) | 02-prds/PRD-Q17/PRD.md |
 | PRD-Q18 | Q18 | 0 | Q1 | Opus agent C | IMPLEMENTED — NOT VERIFIED (PRD written, self-score ≥4 all 12; main QA pending) | 02-prds/PRD-Q18/PRD.md |
-| PRD-Q09 | Q9 | 0 | — | Opus agent D | IN PROGRESS | — |
-| PRD-Q15 | Q15 | 0 | — | Opus agent D | IN PROGRESS | — |
+| PRD-Q09 | Q9 | 0 | — | Opus agent D | IMPLEMENTED — NOT VERIFIED (PRD written, self-score ≥4 all 12; main QA pending) | 02-prds/PRD-Q09/PRD.md |
+| PRD-Q15 | Q15 | 0 | — | Opus agent D | IMPLEMENTED — NOT VERIFIED (PRD written, self-score ≥4 all 12; main QA pending) | 02-prds/PRD-Q15/PRD.md |
 | PRD-Q10 | Q10 | 0 | owner approval | Opus agent E | IN PROGRESS | — |
 | PRD-Q11 | Q11 | 0 | owner approval | Opus agent E | IN PROGRESS | — |
-| PRD-Q12 | Q12 | 0 | X1 | Opus agent D | IN PROGRESS | — |
+| PRD-Q12 | Q12 | 0 | X1 | Opus agent D | IMPLEMENTED — NOT VERIFIED (PRD written, self-score ≥4 all 12; main QA pending) | 02-prds/PRD-Q12/PRD.md |
 | PRD-X-DEFECTS | X1, X4, X6–X8, X10–X12 | 0 | — | Opus agent E | IN PROGRESS | — |
 | QA review | all of this session's PRDs | 0b | PRDs | main | NOT STARTED | — |
 | Cross-PRD review | all of this session's PRDs + interfaces with the peer | 0c | QA | main | NOT STARTED | — |

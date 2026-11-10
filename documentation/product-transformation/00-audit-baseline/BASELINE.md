@@ -22,8 +22,8 @@ re-check changed an earlier audit claim, the row says **CORRECTED**.
 | Capability | Gap | Evidence |
 |---|---|---|
 | Cross-linking | All 36 journal pages carry the same 6 template tool links. There are 0 article↔incident links. | Audit agent 2. To be re-counted in PRD-Q01 §3. |
-| Incident library | 15 dossiers are still seed-only. Only 43 of the 113 candidates are built. | `grep -l 'seed — pending' data/incidents/*.json \| wc -l` = 15 |
-| Indonesian | 3 pages. The glossary has 90 term matches against 449 in English. 0 English pages carry `hreflang="id"`. | `grep -c` on `id/glosarium.html` = 90; `grep -l 'hreflang="id"' *.html` = 0 |
+| Incident library | 15 dossiers are still seed-only. **CORRECTED (PRD-Q09):** 75 distinct candidates are unbuilt, the master list has 7 unmarked duplicates, and the hub claims "Official RCA" for 30 dossiers where the references support 28. | `grep -l 'seed — pending' data/incidents/*.json \| wc -l` = 15 |
+| Indonesian | 3 pages. **CORRECTED (PRD-Q15):** the Indonesian glossary has exactly 89 terms against 449 in English. 0 English pages carry `hreflang="id"`. | `grep -c` on `id/glosarium.html` = 90; `grep -l 'hreflang="id"' *.html` = 0 |
 | tools.html | Lists none of: cdu-calculator, chiller-plant, ltc-system-modelling-lab, EPMS_Telemetry | `grep -c` on tools.html = 0 for each. **CORRECTED:** the EPMS page is `EPMS_Telemetry.html`. |
 
 ## 3. Existing but defective
@@ -57,7 +57,7 @@ re-check changed an earlier audit claim, the row says **CORRECTED**.
 | Air-side thermal transient model | **CORRECTED (PRD-Q07):** none exists (rz-engine and conv-engine have none; ltc-plant covers the liquid loop only). Q7 must add a minimum sourced model. |
 | Incident aggregate view | **CORRECTED (PRD-Q18):** `dc-incidents.html` already has a library-wide FMEA view. It groups by first category only, and 5 categories have no label. No mode × cause matrix exists. |
 | Server-side feature flags | `feature_overrides` is referenced only inside `js/rz-supabase.js` |
-| Finance terminal sync | `rz-ft-sync.js` is loaded only by `Apps/second brain/codebase-graph.html` |
+| Finance terminal sync | **CORRECTED (PRD-Q12):** no page loads `rz-ft-sync.js`; codebase-graph only lists it as a graph node. The module also overwrites local edits on pull and swallows errors. |
 | Data refresh automation | The only workflow is `supabase-keepalive.yml` (Q8 belongs to the peer) |
 
 ## 6. Proposed improvements (this session's scope)
