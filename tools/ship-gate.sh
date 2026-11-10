@@ -283,6 +283,8 @@ gate "Embedded compute — hidden-iframe loop: fixture 2x, queue of one, refusal
 gate "Scenario share links — #rzs= round trip on 11 calculators, schema parity, login-field filter, corrupted link, precedence (P02)" node tools/test-scenario-share-links.mjs
 gate "Register CSS — every page that declares data-rz-register loads a stylesheet carrying that register (P23)" node tools/test-register-css.mjs
 gate "Seeded uncertainty — no unseeded draws on the 11 calculators, page LCGs = engine sim.rng, 7 bands identical across fresh loads with their seed printed (P08)" node tools/test-seeded-uncertainty.mjs
+gate "Service worker precache — every PRE_CACHE_URLS path on disk, per-URL precache reports failures, kill switch, offline page, vendored Chart.js bytes (P25)" node tools/test-sw-precache.mjs
+gate "Offline calculators — 11 calculators visited once, network gone (origin refused + DevTools offline): reload, recompute, Chart.js built (P25)" node tools/test-offline-calculators.mjs
 gate "Sustainability page (K25) — generator-fresh, worked example recomputed, citations and FAQ JSON-LD consistent" python3 tools/test-pillar-sustainability.py
 gate "WAN traffic study — every printed figure follows from the view's own inputs" node tools/test-dcai-wan-study.mjs
 gate "security zone ladder — SL-T never drops inward, life safety is monitor-only" node tools/test-dcai-security-zones.mjs
@@ -304,7 +306,7 @@ gate "cache-bust normalizer — reports without writing, never picks an older to
 # recognise — correct behaviour, and the reason bumping the engine 2.0.0 -> 2.1.0 in v1.134.23
 # blanked all eight at once: no page threw, nothing logged, the authority check just returned
 # false and nineteen unrelated gates timed out waiting for elements that were never drawn.
-gate "engine version pins — pages agree with the engine they load" node tools/test-conv-engine-version-pins.mjs
+gate "engine version pins — pages read the generated js/rz-engine-versions.js, which equals the engines they load (P16)" node tools/test-conv-engine-version-pins.mjs
 # THE HALL PLAN says what it draws. Three owner rejections in a row were the same class of defect
 # and no gate saw any of them: the mimic renders, the engine tests pass, the numbers are traceable,
 # and the drawing still puts the CDUs on the wrong wall, animates nothing out of them, prints one

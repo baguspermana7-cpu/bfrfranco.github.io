@@ -46,6 +46,8 @@ const MODEL_FIXTURES = Object.freeze({
   ),
   'request-mismatch': MODEL_SOURCE,
   'registry-missing': MODEL_SOURCE,
+  /* P16: the pin is read from the generated js/rz-engine-versions.js — without it there is no pin */
+  'versions-missing': MODEL_SOURCE,
 });
 
 function safeFilePath(pathname) {
@@ -104,6 +106,10 @@ async function preparePage(browser, origin, fixture, javaScriptEnabled = true) {
     if (/\/js\/dcai-engine\.js(?:\?|$)/.test(url)) {
       const body = fixture === 'missing' ? 'window.DCAI_CALC = undefined;' : CALC_SOURCE;
       request.respond({ status: 200, contentType: 'text/javascript', body });
+      return;
+    }
+    if (/\/js\/rz-engine-versions\.js(?:\?|$)/.test(url) && fixture === 'versions-missing') {
+      request.respond({ status: 200, contentType: 'text/javascript', body: 'window.RZ_ENGINE_VERSIONS = undefined;' });
       return;
     }
     if (/\/js\/dcai-parameters\.js(?:\?|$)/.test(url)) {
@@ -296,7 +302,7 @@ const browser = await puppeteer.launch({
 try {
   await assertNeutralFirstPaint(browser, origin);
   await assertHealthyAuthority(browser, origin);
-  for (const fixture of ['missing', 'legacy', 'incomplete', 'request-mismatch', 'registry-missing']) {
+  for (const fixture of ['missing', 'legacy', 'incomplete', 'request-mismatch', 'registry-missing', 'versions-missing']) {
     await assertInvalidAuthority(browser, origin, fixture);
   }
   console.log('PASS AI Data Hall current-authority fail-closed contract (GB300 / dcai-engine.js)');

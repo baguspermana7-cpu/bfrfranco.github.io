@@ -462,12 +462,13 @@
     font-variant-numeric: tabular-nums slashed-zero;
 }
 </style>
-    <script src="js/rz-version.js?v=20261110-05cf4722" defer></script>
+    <script src="js/rz-version.js?v=20261110-dd456869" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- v1.24.0: bring EPMS onto the engine + BMS Shell. conv-engine.js loads
          non-deferred so window.CONV_CALC exists when the status strip renders.
          Spec: conv/review/14 §2 ; standarization/BMS_SHELL.md -->
+    <script src="js/rz-engine-versions.js?v=20261110-a5518a77"></script>
     <script src="js/conv-engine.js?v=2.2.0"></script>
     <!-- v1.134.3 — generated parameter registry + the ONE shared basis drawer.
          Replaces provenance restated by hand; see js/rz-basis-drawer.js. -->
@@ -742,7 +743,7 @@
    the IT load per system, a PDU its share of that, a rack its share of a PDU. The old ladder
    was seven authored constants at the retired 1.85 MW scale. */
 function epmsRuntimeAuthorityAvailable() {
-  const currentEngineVersion = '2.2.0';
+  const currentEngineVersion = (window.RZ_ENGINE_VERSIONS || {}).conv || null;
   const engineScript = document.querySelector('script[src^="js/conv-engine.js"]');
   const versionMatch = engineScript && engineScript.getAttribute('src').match(/[?&]v=([^&]+)/);
   const requestedVersion = versionMatch ? decodeURIComponent(versionMatch[1]) : null;

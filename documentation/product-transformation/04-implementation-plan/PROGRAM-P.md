@@ -21,8 +21,8 @@
 | W1-5 P02 share links (+ 4 pages get rz-scenario) | P02 | W1-1 | rz-scenario.js, account.html, 4 pages | 2 | share E2E 11/11, security fixture | v3.36.0 (spares keeps its own #s= share: inputs exceed the 8,000-char cap) |
 | W1-6 P08 seeded uncertainty | P08 | — | rz-engine.js, 7 pages | 3 | determinism gate RED → GREEN | v3.36.0 (committed) |
 | W1-7 P23 register CSS | P23 | — | 7 pages, gate | 0.75 | gate RED 6 → 0 | v3.36.0 (committed; article-9-paper declaration removed, rz-dark-beforeafter declares on a div by design) |
-| W1-8 P25 offline calculators | P25 | — | sw.js, register module, vendor Chart.js, 9 pages | 2.5 | precache gate, offline E2E 11/11 | live |
-| W1-9 P16 version module | P16 | — | generator, 9 cockpits | 0.75 | freshness + fail-closed fixture | live |
+| W1-8 P25 offline calculators | P25 | — | sw.js, register module, vendor Chart.js, 9 pages | 2.5 | precache gate, offline E2E 11/11 | v3.37.0 (committed; precache gate RED on old sw.js, offline E2E RED on old tree, 11/11 GREEN; index.html swap = LTC) |
+| W1-9 P16 version module | P16 | — | generator, 9 cockpits | 0.75 | freshness + fail-closed fixture | v3.37.0 (committed; pins gate RED on stale module + typed literal, versions-missing fixture RED on a literal pin) |
 
 ## Wave 2: core journeys
 | Task | Source | Depends | Est | Verification |

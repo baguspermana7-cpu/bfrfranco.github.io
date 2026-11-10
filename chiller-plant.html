@@ -554,7 +554,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
         ]
     }
     </script>
-    <script src="js/rz-version.js?v=20261110-05cf4722" defer></script>
+    <script src="js/rz-version.js?v=20261110-dd456869" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- Conventional BMS single scenario engine — single source of truth for the
@@ -564,6 +564,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
          window.CONV_CALC exists before the inline SCADA script runs.
          Basis: conv/review/09-engineering-basis-and-calculations.md ;
          CHW-relabel decision: conv/review/04-chiller-plant-review.md -->
+    <script src="js/rz-engine-versions.js?v=20261110-a5518a77"></script>
     <script src="js/conv-engine.js?v=2.2.0"></script>
     <!-- v1.134.2 — generated parameter registry + the shared basis drawer. -->
     <script src="js/conv-parameters.js?v=20261108-11e845ad"></script>
@@ -915,7 +916,7 @@ function selectHallView(hall){
  * CHW-relabel decision: conv/review/04-chiller-plant-review.md (Recommended
  * Decision → Option A) ; basis: conv/review/09-engineering-basis-and-calculations.md
  */
-const CONV_CURRENT_ENGINE_VERSION = '2.2.0';
+const CONV_CURRENT_ENGINE_VERSION = (window.RZ_ENGINE_VERSIONS || {}).conv || null;
 const EXPECTED_CONV_ENGINE_VERSION = (function(){
   const engineScript = document.querySelector('script[src*="conv-engine.js"]');
   const match = engineScript ? engineScript.getAttribute('src').match(/[?&]v=([^&]+)/) : null;

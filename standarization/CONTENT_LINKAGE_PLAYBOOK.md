@@ -102,6 +102,9 @@ right column in the SAME change. Verify, then tick it in the CHANGELOG entry.
 2. `CHANGELOG.md` — entry quoting the user's request; then
    `python3 tools/build-changelog-html.py --apply`.
 3. `python3 tools/sync-sw-version.py`.
+   Engine bump (`js/conv-engine.js` / `js/dcai-engine.js` `meta.version`): also
+   `node tools/build-engine-versions.mjs --apply` then `node tools/test-asset-cache-tokens.mjs --fix js/rz-engine-versions.js <engine>`.
+   The 9 cockpits read their pin from `js/rz-engine-versions.js` (P16, v3.37.0); never type a version into a page.
 4. Pre-push gates ALL green: `audit-script-tags.py --strict`,
    `audit-js-syntax.py --strict`, `audit-version-stamp.py --strict`,
    `audit-mobile-responsive.py --strict`.

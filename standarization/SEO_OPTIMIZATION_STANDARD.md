@@ -216,7 +216,7 @@ The following SEO growth features were implemented as part of the viral growth p
 | **Multilingual (Bahasa Indonesia)** | `id/index.html`, `id/artikel.html`, `id/glosarium.html` | Indonesian market targeting, hreflang id/en |
 | **Interactive Infographics** — 3 shareable visualizations | `infographic-pue-global.html`, `infographic-dc-cost-breakdown.html`, `infographic-dc-sustainability.html` | Social sharing, CSS-only animations, embedded calculators |
 | **Embeddable Widgets** — iframe calculator versions | `embed/pue-widget.html`, `embed/capex-widget.html`, `embed/carbon-widget.html` | Backlink generation, "Powered by ResistanceZero" |
-| **PWA** — Progressive Web App support | `manifest.json`, `sw.js` | Offline access, installable, cache-first for assets |
+| **PWA** — Progressive Web App support | `manifest.json`, `sw.js`, `js/rz-sw-register.js`, `sw-kill.json` | Offline access, installable, cache-first for assets; the 11 calculators work offline after one visit (P25, v3.37.0 — see §Service worker below) |
 | **Gamification** — Achievement badges + tracking | `achievements.html`, `rz-gamification.js` | User engagement, 17 achievements across 5 categories |
 | **Schema Markup Expansion** | BreadcrumbList on 24+ pages | Rich results, site links |
 | **Core Web Vitals** | width/height on images, lazy loading | LCP, CLS optimization |
@@ -349,3 +349,23 @@ The earlier Content Linkage Playbook note about manually adding nested Network H
 - [Google sitemap guidance](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap): canonical URLs, optional accurate significant-update `lastmod`, and ignored priority/change frequency signals.
 - [Google noindex guidance](https://developers.google.com/search/docs/crawling-indexing/block-indexing): crawling must be allowed to observe noindex; robots is not authentication.
 - [llms.txt proposal](https://llmstxt.org/): an LLM discovery map complements but does not replace robots/sitemaps or grant access.
+
+## Service worker (P25, v3.37.0)
+
+- **Registration** is one shared module, `js/rz-sw-register.js` (load + idle, https/localhost only, errors to one
+  `console.warn`). Never inline `navigator.serviceWorker.register` on a page. `index.html` still carries its own inline
+  copy; the LTC session swaps it for the module.
+- **Precache** adds each `PRE_CACHE_URLS` entry on its own under `Promise.allSettled`; failures are posted to the page as
+  `{type:'rz-sw-precache', failed:[…]}`. `cache.addAll` is banned: it is atomic, so one missing file precached nothing
+  while install still succeeded. Gate: `node tools/test-sw-precache.mjs` (every path on disk + fake-cache unit tests).
+- **Strategies**: HTML network-first with the 2 s timeout; `?v=` assets cache-first; `NETWORK_FIRST_PATHS` keep priority;
+  cross-origin requests are never handled. The offline page lists the pages this browser already holds.
+- **Kill switch**: a revert cannot evict an installed worker. Set `sw-kill.json` to `{"kill": true}` and push: on its next
+  activation or hourly navigation check the worker deletes every cache and unregisters. Committed state is `{"kill": false}`
+  (gated).
+- **Chart.js is self-hosted** at `js/vendor/chart.umd.min.js` (4.4.1, npm bytes, sha256 in `js/vendor/README.md`, gated);
+  a calculator that loads a chart library from a CDN cannot draw offline.
+- **Proof**: `node tools/test-offline-calculators.mjs` — 11 calculators visited online, origin refused + DevTools offline,
+  reload, an input changed, a result moved, Chart.js built its charts. Puppeteer request interception bypasses the service
+  worker, so this gate must not use it.
+

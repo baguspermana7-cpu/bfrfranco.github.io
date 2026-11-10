@@ -2,7 +2,7 @@
 // Cache-first for static assets, network-first for HTML pages
 // CACHE_NAME is auto-synced from js/rz-version.js by tools/sync-sw-version.py
 
-const CACHE_NAME = 'rz-cache-v3.36.0'; // version-aware: invalidates on every site bump
+const CACHE_NAME = 'rz-cache-v3.37.0'; // version-aware: invalidates on every site bump
 
 // v1.29.0 — Critical auth/config files that MUST be fetched fresh when online.
 // Cached only as offline fallback. Rescues users stranded on a stale SW
@@ -49,16 +49,29 @@ const PRE_CACHE_URLS = [
 // Network-timeout for slow connections — fall back to cache after 2s
 const NETWORK_TIMEOUT_MS = 2000;
 
-// Install: pre-cache key resources
+// Install: pre-cache key resources.
+// P25 (v3.36.x): one cache.add per URL under allSettled. cache.addAll is ATOMIC, so one missing
+// file used to precache NOTHING while install still reported success. Failures are posted to
+// every client as {type:'rz-sw-precache', failed:[...]}; tools/test-sw-precache.mjs keeps the
+// list honest before a ship.
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(PRE_CACHE_URLS).catch(() => {})) // tolerant
+      .then((cache) => Promise.allSettled(PRE_CACHE_URLS.map((url) =>
+        cache.add(url).then(() => null, () => url))))
+      .then((results) => {
+        const failed = results.map((r) => r.value).filter(Boolean);
+        if (failed.length) {
+          self.clients.matchAll({ includeUncontrolled: true }).then((clients) => {
+            clients.forEach((c) => c.postMessage({ type: 'rz-sw-precache', failed: failed }));
+          });
+        }
+      })
       .then(() => self.skipWaiting())
   );
 });
 
-// Activate: clean up old caches
+// Activate: clean up old caches, then honour the kill switch.
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
@@ -70,8 +83,30 @@ self.addEventListener('activate', (event) => {
         );
       })
       .then(() => self.clients.claim())
+      .then(() => checkKillSwitch(true))
   );
 });
+
+// P25 kill switch: a plain revert cannot evict an installed worker, so /sw-kill.json is the
+// rollback. {kill:true} -> delete every cache and unregister. Checked on activate and at most
+// hourly on navigation; a fetch error is ignored (offline must not kill the worker).
+const KILL_CHECK_MS = 3600 * 1000;
+let lastKillCheck = 0;
+function checkKillSwitch(force) {
+  const now = Date.now();
+  if (!force && now - lastKillCheck < KILL_CHECK_MS) return Promise.resolve(false);
+  lastKillCheck = now;
+  return fetch('/sw-kill.json', { cache: 'no-store' })
+    .then((r) => (r.ok ? r.json() : null))
+    .then((body) => {
+      if (!body || body.kill !== true) return false;
+      return caches.keys()
+        .then((names) => Promise.all(names.map((n) => caches.delete(n))))
+        .then(() => self.registration.unregister())
+        .then(() => true);
+    })
+    .catch(() => false);
+}
 
 // Fetch: route requests to appropriate strategy
 self.addEventListener('fetch', (event) => {
@@ -100,6 +135,7 @@ self.addEventListener('fetch', (event) => {
       url.pathname.endsWith('.html') ||
       url.pathname === '/' ||
       url.pathname === '') {
+    if (request.mode === 'navigate') event.waitUntil(checkKillSwitch(false));
     event.respondWith(networkFirstWithTimeout(request));
     return;
   }
@@ -166,7 +202,8 @@ async function networkFirstWithTimeout(request) {
       return await fetch(request);
     } catch (e) {
       // Nothing in cache + network dead — return offline page
-      return new Response(offlineHTML(), {
+      const saved = await savedPages();
+      return new Response(offlineHTML(saved), {
         status: 503,
         headers: { 'Content-Type': 'text/html' }
       });
@@ -192,25 +229,56 @@ async function cacheFirst(request) {
   }
 }
 
+// P25: the pages this browser already holds, for the offline page. Titles are read from the
+// cached HTML, escaped, and never trusted as markup.
+async function savedPages() {
+  try {
+    const cache = await caches.open(CACHE_NAME);
+    const keys = await cache.keys();
+    const out = [];
+    for (const req of keys) {
+      const u = new URL(req.url);
+      if (u.origin !== self.location.origin || !/\.html$/.test(u.pathname)) continue;
+      const res = await cache.match(req);
+      const html = res ? await res.text() : '';
+      const m = html.match(/<title>([^<]{1,140})<\/title>/i);
+      out.push({ href: u.pathname, title: (m ? m[1] : u.pathname).trim() });
+    }
+    return out.sort((a, b) => a.title.localeCompare(b.title));
+  } catch (e) {
+    return [];
+  }
+}
+
+function escapeHTML(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
 // Inline offline page — graphite surface, one amber accent (site register, W1 2026-10-31)
-function offlineHTML() {
-  return '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
+function offlineHTML(saved) {
+  const list = (saved && saved.length)
+    ? '<ul class="saved">' + saved.map((p) => '<li><a href="' + escapeHTML(p.href) + '">' + escapeHTML(p.title) + '</a></li>').join('') + '</ul>'
+    : '<p class="none">No pages saved yet. Open a calculator online once.</p>';
+  return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">' +
     '<meta name="viewport" content="width=device-width,initial-scale=1">' +
     '<title>Offline · Resistance Zero</title>' +
     '<style>' +
-      'body{font-family:IBM Plex Sans,-apple-system,sans-serif;display:flex;align-items:center;' +
-      'justify-content:center;min-height:100vh;margin:0;' +
-      'background:#0b0c0e;' +
-      'color:#f1f5f9;text-align:center;padding:2rem}' +
-      'h1{color:#F6F7F9;font-weight:600;' +
-      'font-size:2rem;margin-bottom:1rem;letter-spacing:-0.02em}' +
-      'p{color:#cbd5e1;max-width:420px;line-height:1.6}' +
-      '.btn{display:inline-block;margin-top:1.5rem;padding:0.75rem 1.5rem;' +
-      'background:#E8B563;color:#0b0c0e;border-radius:4px;text-decoration:none;' +
-      'font-weight:600;font-size:0.9rem}' +
-    '</style></head><body><div>' +
-      '<h1>You\'re offline</h1>' +
-      '<p>This page hasn\'t been cached yet. Reconnect and we\'ll grab it next time.</p>' +
-      '<a class="btn" href="/" onclick="window.location.reload();return false;">Try again →</a>' +
-    '</div></body></html>';
+      'body{font-family:IBM Plex Sans,-apple-system,sans-serif;margin:0;' +
+      'background:#0b0c0e;color:#f1f5f9;padding:2rem 1rem}' +
+      'main{max-width:560px;margin:0 auto}' +
+      'h1{color:#F6F7F9;font-weight:600;font-size:2rem;margin:0 0 1rem;letter-spacing:-0.02em}' +
+      'p{color:#cbd5e1;line-height:1.6}' +
+      '.saved{list-style:none;padding:0;margin:1rem 0;border-top:1px solid rgba(255,255,255,.12)}' +
+      '.saved li{border-bottom:1px solid rgba(255,255,255,.12)}' +
+      '.saved a{display:flex;align-items:center;min-height:44px;color:#E8B563;text-decoration:none}' +
+      '.saved a:focus-visible{outline:2px solid #E8B563;outline-offset:2px}' +
+      '.note{color:#9aa3ad;font-size:.875rem}' +
+      '.btn{display:inline-flex;align-items:center;min-height:44px;margin-top:1rem;padding:0 1.5rem;' +
+      'background:#E8B563;color:#0b0c0e;border-radius:4px;text-decoration:none;font-weight:600;font-size:0.9rem}' +
+    '</style></head><body><main>' +
+      '<h1>You are offline</h1>' +
+      '<p>This page has not been saved on this device yet.</p>' + list +
+      '<p class="note">Pages you open while online are kept for offline use.</p>' +
+      '<a class="btn" href="/" onclick="window.location.reload();return false;">Try again</a>' +
+    '</main></body></html>';
 }

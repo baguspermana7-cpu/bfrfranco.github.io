@@ -768,7 +768,7 @@ body[data-datahall-authority="unavailable"] #tabs,
 body[data-datahall-authority="unavailable"] .wrap{display:none !important}
 body[data-datahall-authority="unavailable"] .hdr-r>.dot{background:#64748b !important;box-shadow:none !important;animation:none !important}
 body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:none}
-</style>    <script src="js/rz-version.js?v=20261110-05cf4722" defer></script>
+</style>    <script src="js/rz-version.js?v=20261110-dd456869" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <!-- v3.5.0 — hold the 8.5px legibility floor by SCALE, not by font size. Five of this page's
          fifteen diagrams were already clear; the dense ones (cooling P&ID, the four SLDs, the hall
@@ -786,6 +786,7 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
          byte-frozen by the ship gate and still proving its own 57 worked examples, but this
          page no longer loads it. The ?v= token IS the version pin the authority block checks
          (= DCAI_CALC.snapshot.meta.version); tools/test-dcai-engine-version-pin.mjs asserts it. -->
+    <script src="js/rz-engine-versions.js?v=20261110-a5518a77"></script>
     <script src="js/dcai-model.js?v=1.6.0" data-datahall-model-authority></script>
     <script src="js/dcai-engine.js?v=1.6.0" data-datahall-calc-authority></script>
     <!-- generated registry twin: the authority block validates the live snapshot against
@@ -1442,7 +1443,7 @@ Requested model/calculation versions and the complete locked schema must validat
 <script>
 (function(root,d){
 'use strict';
-var DATAHALL_CURRENT_ASSET_VERSION='1.6.0';                 /* = DCAI_CALC.snapshot.meta.version */
+var DATAHALL_CURRENT_ASSET_VERSION=(window.RZ_ENGINE_VERSIONS||{}).dcai||null;                 /* = DCAI_CALC.snapshot.meta.version */
 var DATAHALL_CURRENT_SPEC_VERSION='gb300-500mw-2026-09-06';  /* = DCAI_MODEL.specVersion */
 /* v2.0.0 — the allow-list is the REGISTRY. v1.20.0 typed 68 numeric + 15 string model paths,
    28 function names and 33 state keys into this page by hand; the generated registry

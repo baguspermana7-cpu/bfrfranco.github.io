@@ -42,6 +42,8 @@ const FIXTURE_SOURCES = Object.freeze({
     };
   `,
   'request-mismatch': ENGINE_SOURCE,
+  /* P16: the pin is read from the generated js/rz-engine-versions.js — without it there is no pin */
+  'versions-missing': ENGINE_SOURCE,
 });
 
 function safeFilePath(pathname) {
@@ -87,6 +89,10 @@ async function preparePage(browser, origin, fixture, javaScriptEnabled = true) {
         ? PAGE_SOURCE.replace('js/conv-engine.js?v=2.2.0', 'js/conv-engine.js?v=1.9.0')
         : PAGE_SOURCE;
       request.respond({ status: 200, contentType: 'text/html', body });
+      return;
+    }
+    if (/\/js\/rz-engine-versions\.js(?:\?|$)/.test(url) && fixture === 'versions-missing') {
+      request.respond({ status: 200, contentType: 'text/javascript', body: 'window.RZ_ENGINE_VERSIONS = undefined;' });
       return;
     }
     if (/\/js\/conv-engine\.js(?:\?|$)/.test(url)) {
@@ -252,7 +258,7 @@ const browser = await puppeteer.launch({
 try {
   await assertNeutralFirstPaint(browser, origin);
   await assertHealthyAuthority(browser, origin);
-  for (const fixture of ['missing', 'legacy', 'incomplete', 'request-mismatch']) {
+  for (const fixture of ['missing', 'legacy', 'incomplete', 'request-mismatch', 'versions-missing']) {
     await assertInvalidAuthority(browser, origin, fixture);
   }
   console.log('PASS Conventional dashboard current-authority fail-closed contract');
