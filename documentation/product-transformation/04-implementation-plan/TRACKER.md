@@ -27,11 +27,11 @@ other session first.
 |---|---|---|---|---|---|---|
 | PRD-Q06 | Q6 | 0 (PRD) | — | Opus agent A | IN PROGRESS | — |
 | PRD-Q04 | Q4 | 0 | — | Opus agent A | IN PROGRESS | — |
-| PRD-Q01 | Q1 | 0 | — | Opus agent B | IN PROGRESS | — |
-| PRD-Q03 | Q3 | 0 | P2 | Opus agent B | IN PROGRESS | — |
-| PRD-Q07 | Q7 | 0 | Q6 | next wave | NOT STARTED | — |
-| PRD-Q17 | Q17 | 0 | Q1, P2 | next wave | NOT STARTED | — |
-| PRD-Q18 | Q18 | 0 | Q1 | next wave | NOT STARTED | — |
+| PRD-Q01 | Q1 | 0 | — | Opus agent B | IMPLEMENTED — NOT VERIFIED (PRD written, 1041 lines, self-score ≥4 all 12; main QA pending) | 02-prds/PRD-Q01/PRD.md |
+| PRD-Q03 | Q3 | 0 | P2 | Opus agent B | IMPLEMENTED — NOT VERIFIED (PRD written, 1023 lines; only 3 of 43 dossiers qualify; FR-13 asks peer P2 hooks) | 02-prds/PRD-Q03/PRD.md |
+| PRD-Q07 | Q7 | 0 | Q6 | Opus agent C | IN PROGRESS | — |
+| PRD-Q17 | Q17 | 0 | Q1, P2 | Opus agent C | IN PROGRESS | — |
+| PRD-Q18 | Q18 | 0 | Q1 | Opus agent C | IN PROGRESS | — |
 | PRD-Q09 | Q9 | 0 | — | next wave | NOT STARTED | — |
 | PRD-Q15 | Q15 | 0 | — | next wave | NOT STARTED | — |
 | PRD-Q10 | Q10 | 0 | owner approval | next wave | NOT STARTED | — |
