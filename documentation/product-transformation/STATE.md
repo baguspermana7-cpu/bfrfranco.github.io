@@ -51,3 +51,13 @@ items merged into them, and X2, X3, X5, X9.
 - X1 key rotation: owner only.
 - Q10 and Q11 change auth boundaries: they need the owner's explicit approval before implementation (PRDs proceed).
 - Push hold: waiting for the peer's v3.35.10 push SHA.
+
+## Interface agreements with the peer (2026-11-11)
+- P2 scenario link: hash `#rzs=`, schema `data/scenario-link.schema.json` v1.
+  - Optional `origin`: a string of at most 80 characters, pattern `^[A-Za-z0-9_.:/-]+$`. It is never used for navigation and
+    never inserted as HTML.
+- P2 task T-P02-C loads `js/rz-scenario.js` and the `#rzs=` reader on tia-942-checklist, tier-advisor, spares and rfs. This
+  covers Q3 FR-13 (1).
+- TIA Tier and DC type: hidden mirror inputs `#tiaTier` and `#tiaDcType`, kept in step by the setters. P2's E2E test asserts
+  the round trip. This covers Q3 FR-13 (3).
+- Q3 implementation waits for P2 to land on main. P2 currently lives on the peer's local `feat/p-wave1`.
