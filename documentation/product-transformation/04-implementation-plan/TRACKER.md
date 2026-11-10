@@ -19,7 +19,7 @@ other session first.
 | Id | Item | Owner | Status | Evidence |
 |---|---|---|---|---|
 | R001–R108 | Owner requests (homepage, LTC, index) | homepage/LTC | VERIFIED COMPLETE | Live v3.35.9 `4cccad1d5` carries `3983bea5c`; live micro, depth, r079 PASS; slop 0; a11y clean |
-| X2 | `openInCalc` routes for all 11 calculators | peer | IN PROGRESS | v3.35.10, gate running |
+| X2 | `openInCalc` routes for all 11 calculators | peer | VERIFIED COMPLETE | live v3.35.10 5216448ca (gate 167/168, the one fail was the Cx fps under load, 112/112 on rerun; live byte-compare equal) |
 
 ## B. PRD-driven program (homepage/LTC session rows)
 

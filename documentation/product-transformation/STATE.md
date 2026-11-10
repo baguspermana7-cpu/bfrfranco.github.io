@@ -61,3 +61,8 @@ items merged into them, and X2, X3, X5, X9.
 - TIA Tier and DC type: hidden mirror inputs `#tiaTier` and `#tiaDcType`, kept in step by the setters. P2's E2E test asserts
   the round trip. This covers Q3 FR-13 (3).
 - Q3 implementation waits for P2 to land on main. P2 currently lives on the peer's local `feat/p-wave1`.
+- P25 service-worker module (v3.37.0, not live yet): `<script src="js/rz-sw-register.js?v=<token>" defer></script>`.
+  - Get the token with `node tools/test-asset-cache-tokens.mjs --fix js/rz-sw-register.js`. No config. The `__rzSwRegister` guard
+    makes a second tag a no-op.
+  - My task, after v3.37.0 is live: delete index.html's inline `serviceWorker.register` block (~1534-1538) and add the tag before
+    `</body>`.
