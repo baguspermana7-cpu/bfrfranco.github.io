@@ -15,12 +15,12 @@
 | Task | Source | Depends | Files | Est | Verification | Done when |
 |---|---|---|---|---|---|---|
 | W1-1 X2 open routes | PX | — | rz-scenario.js, test-scenario-open-routes | done | RED 5 routes → GREEN | v3.35.10 live |
-| W1-2 X3 tia theme + onclick gate | PX | — | tia page, test-calc-onclick-handlers | 0.5 | RED on tia → GREEN | live |
-| W1-3 F1 calculator registry + gate | ARCH C1 | — | data/calculators.json, test-calculator-registry | 1 | gate RED on a planted bad selector | live |
-| W1-4 F2 embed-compute module | ARCH C2 | W1-3 | js/rz-embed-compute.js, embed flag | 1 | unit fixture page | live |
-| W1-5 P02 share links (+ 4 pages get rz-scenario) | P02 | W1-1 | rz-scenario.js, account.html, 4 pages | 2 | share E2E 11/11, security fixture | live |
-| W1-6 P08 seeded uncertainty | P08 | — | rz-engine.js, 7 pages | 3 | determinism gate RED → GREEN | live |
-| W1-7 P23 register CSS | P23 | — | 7 pages, gate | 0.75 | gate RED 7 → 0 | live |
+| W1-2 X3 tia theme + onclick gate | PX | — | tia page, test-calc-onclick-handlers | 0.5 | RED on tia → GREEN | v3.35.11 (committed) |
+| W1-3 F1 calculator registry + gate | ARCH C1 | — | data/calculators.json, test-calculator-registry | 1 | gate RED on a planted bad selector | v3.36.0 (committed) |
+| W1-4 F2 embed-compute module | ARCH C2 | W1-3 | js/rz-embed-compute.js, embed flag | 1 | unit fixture page | v3.36.0 (committed) |
+| W1-5 P02 share links (+ 4 pages get rz-scenario) | P02 | W1-1 | rz-scenario.js, account.html, 4 pages | 2 | share E2E 11/11, security fixture | v3.36.0 (spares keeps its own #s= share: inputs exceed the 8,000-char cap) |
+| W1-6 P08 seeded uncertainty | P08 | — | rz-engine.js, 7 pages | 3 | determinism gate RED → GREEN | v3.36.0 (committed) |
+| W1-7 P23 register CSS | P23 | — | 7 pages, gate | 0.75 | gate RED 6 → 0 | v3.36.0 (committed; article-9-paper declaration removed, rz-dark-beforeafter declares on a div by design) |
 | W1-8 P25 offline calculators | P25 | — | sw.js, register module, vendor Chart.js, 9 pages | 2.5 | precache gate, offline E2E 11/11 | live |
 | W1-9 P16 version module | P16 | — | generator, 9 cockpits | 0.75 | freshness + fail-closed fixture | live |
 

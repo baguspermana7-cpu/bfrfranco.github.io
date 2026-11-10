@@ -280,6 +280,9 @@ gate "Saved-scenario Open routes — every calculator id opens its own page; unk
 gate "Calculator inline handlers — every onclick on the 11 calculators calls a function that exists (X3)" node tools/test-calc-onclick-handlers.mjs
 gate "Calculator registry — data/calculators.json pages, fields and result selectors match the 11 rendered calculators (F1)" node tools/test-calculator-registry.mjs
 gate "Embedded compute — hidden-iframe loop: fixture 2x, queue of one, refusals, timeout, real calculator, ?embed flag (F2)" node tools/test-embed-compute.mjs
+gate "Scenario share links — #rzs= round trip on 11 calculators, schema parity, login-field filter, corrupted link, precedence (P02)" node tools/test-scenario-share-links.mjs
+gate "Register CSS — every page that declares data-rz-register loads a stylesheet carrying that register (P23)" node tools/test-register-css.mjs
+gate "Seeded uncertainty — no unseeded draws on the 11 calculators, page LCGs = engine sim.rng, 7 bands identical across fresh loads with their seed printed (P08)" node tools/test-seeded-uncertainty.mjs
 gate "Sustainability page (K25) — generator-fresh, worked example recomputed, citations and FAQ JSON-LD consistent" python3 tools/test-pillar-sustainability.py
 gate "WAN traffic study — every printed figure follows from the view's own inputs" node tools/test-dcai-wan-study.mjs
 gate "security zone ladder — SL-T never drops inward, life safety is monitor-only" node tools/test-dcai-security-zones.mjs

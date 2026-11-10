@@ -9,7 +9,8 @@
  *
  * Auto-restore: a page sets `<body data-rz-calc="capex">`; on load, if
  * localStorage.rz_open_scenario matches that calc, its inputs are restored then the key
- * is cleared. Exposes window.rzScenario = { capture, restore, openInCalc }.
+ * is cleared. A `#rzs=` share link (P02) is read the same way and wins over a pending Open.
+ * Exposes window.rzScenario = { capture, restore, openInCalc, saveToAccount, shareLink, readLink, encodeLink, restoreFiltered }.
  */
 (function (w, d) {
   'use strict';
@@ -75,6 +76,13 @@
     });
   }
 
+  // One entry per <body data-rz-calc> page; tools/test-scenario-open-routes.mjs and test-calculator-registry.mjs keep it in step.
+  var ROUTES = { capex: 'capex-calculator.html', opex: 'opex-calculator.html', roi: 'roi-calculator.html',
+                 tco: 'tco-calculator.html', pue: 'pue-calculator.html', carbon: 'carbon-footprint.html',
+                 cx: 'cx-calculator.html', rfs: 'rfs-readiness-workbench.html',
+                 spares: 'spares-readiness-calculator.html', tia: 'tia-942-checklist.html',
+                 tier: 'tier-advisor.html' };
+
   /** From account.html: stash a scenario's inputs and navigate to its calculator. */
   function openInCalc(calc, inputs) {
     // calc is set by each calculator's own Save button (a known literal), but sanitize before it
@@ -83,14 +91,227 @@
     // One entry per <body data-rz-calc> page; tools/test-scenario-open-routes.mjs keeps this in step.
     // An id with no entry does not navigate (it used to guess "<id>-calculator.html" — 404 for carbon,
     // rfs, spares, tia and tier).
-    var file = ({ capex: 'capex-calculator.html', opex: 'opex-calculator.html', roi: 'roi-calculator.html',
-                  tco: 'tco-calculator.html', pue: 'pue-calculator.html', carbon: 'carbon-footprint.html',
-                  cx: 'cx-calculator.html', rfs: 'rfs-readiness-workbench.html',
-                  spares: 'spares-readiness-calculator.html', tia: 'tia-942-checklist.html',
-                  tier: 'tier-advisor.html' })[calc];
+    var file = ROUTES[calc];
     if (!file) return;
     try { w.localStorage.setItem('rz_open_scenario', JSON.stringify({ calc: calc, inputs: inputs, ts: Date.now() })); } catch (e) {}
     w.location.href = file;
+  }
+
+
+  /* ── Share links (P02): #rzs=<base64url(JSON {v:1, calc, inputs, origin?})> ─────────────────────────────
+     The fragment never reaches a server. The payload is untrusted: strict schema, size caps, id pattern, and it is
+     written only into elements that pass isCapturable (so a link can never fill a login field).
+     Limits are mirrored in data/scenario-link.schema.json; tools/test-scenario-share-links.mjs keeps them equal. */
+  var LINK = {
+    prefix: '#rzs=', version: 1, maxLength: 8000, maxKeys: 500, maxValue: 2000,
+    keyPattern: /^[A-Za-z0-9_:-]{1,80}$/, originPattern: /^[A-Za-z0-9_.:\/-]{1,80}$/,
+    types: ['text', 'number', 'range', 'select', 'checkbox', 'radio', 'date', 'textarea', 'search', 'tel', 'url',
+            'color', 'month', 'week', 'time', 'datetime-local']
+  };
+  // Where Copy link goes when a page has no #btnSaveAccount. null = the page keeps its own share (spares: "Share URL", #s=).
+  var COPY_ANCHORS = { tier: '#btnExportPDF', tia: '#btnExportPDF', rfs: '#rfsBtnSave', spares: null };
+
+  function b64urlEncode(str) {
+    var bin = unescape(encodeURIComponent(str));
+    return w.btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  function b64urlDecode(s) {
+    if (!/^[A-Za-z0-9_-]+$/.test(s)) throw new Error('bad base64');
+    var b = s.replace(/-/g, '+').replace(/_/g, '/');
+    while (b.length % 4) b += '=';
+    return decodeURIComponent(escape(w.atob(b)));
+  }
+
+  function validatePayload(obj, calc) {
+    if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return 'not an object';
+    if (obj.v !== LINK.version) return 'unsupported version';
+    if (typeof obj.calc !== 'string' || obj.calc !== calc) return 'link is for another calculator';
+    if (obj.origin != null && (typeof obj.origin !== 'string' || !LINK.originPattern.test(obj.origin))) return 'bad origin';
+    var inputs = obj.inputs;
+    if (!inputs || typeof inputs !== 'object' || Array.isArray(inputs)) return 'no inputs';
+    var keys = Object.keys(inputs);
+    if (keys.length > LINK.maxKeys) return 'too many inputs';
+    for (var i = 0; i < keys.length; i++) {
+      var k = keys[i], rec = inputs[k];
+      if (!LINK.keyPattern.test(k)) return 'bad input id';
+      if (!rec || typeof rec !== 'object' || LINK.types.indexOf(rec.t) < 0) return 'bad input type';
+      if (typeof rec.v === 'string') { if (rec.v.length > LINK.maxValue) return 'value too long'; }
+      else if (typeof rec.v !== 'boolean') return 'bad input value';
+    }
+    return null;
+  }
+
+  function encodeLink(calc, inputs, origin) {
+    var payload = { v: LINK.version, calc: calc, inputs: inputs || {} };
+    if (origin) payload.origin = origin;
+    return LINK.prefix + b64urlEncode(JSON.stringify(payload));
+  }
+
+  /** Parse and validate a location.hash for `calc`. → {ok:true, map, origin} | {ok:false, reason} */
+  function readLink(hash, calc) {
+    hash = String(hash || '');
+    if (hash.indexOf(LINK.prefix) !== 0) return { ok: false, reason: 'no link' };
+    if (hash.length > LINK.maxLength + 200) return { ok: false, reason: 'link too long' };
+    var obj;
+    try { obj = JSON.parse(b64urlDecode(hash.slice(LINK.prefix.length))); } catch (e) { return { ok: false, reason: 'unreadable' }; }
+    var bad = validatePayload(obj, calc);
+    if (bad) return { ok: false, reason: bad };
+    return { ok: true, map: obj.inputs, origin: obj.origin || null };
+  }
+
+  /** The current page's share URL. → {ok:true, url} | {ok:false, reason:'no-calc'|'too-large'} */
+  function shareLink(inputs) {
+    var calc = d.body && d.body.getAttribute('data-rz-calc');
+    if (!calc) return { ok: false, reason: 'no-calc' };
+    var url = w.location.origin + w.location.pathname + encodeLink(calc, inputs || capture());
+    if (url.length > LINK.maxLength) return { ok: false, reason: 'too-large' };
+    return { ok: true, url: url };
+  }
+
+  /** A share URL for any calculator (account.html rows). → {ok:true, url} | {ok:false, reason:'no-calc'|'too-large'} */
+  function linkFor(calc, inputs) {
+    if (!/^[a-z0-9-]{1,40}$/.test(String(calc || '')) || !ROUTES[calc]) return { ok: false, reason: 'no-calc' };
+    var dir = w.location.pathname.replace(/[^/]*$/, '');
+    var url = w.location.origin + dir + ROUTES[calc] + encodeLink(calc, inputs || {});
+    if (url.length > LINK.maxLength) return { ok: false, reason: 'too-large' };
+    return { ok: true, url: url };
+  }
+
+  /** Restore only ids that exist here and are capturable; count the rest. */
+  function restoreFiltered(map) {
+    var allowed = {}, restored = 0, skipped = 0;
+    Object.keys(map || {}).forEach(function (id) {
+      if (isCapturable(d.getElementById(id))) { allowed[id] = map[id]; restored++; } else skipped++;
+    });
+    restore(allowed);
+    return { restored: restored, skipped: skipped, allowed: allowed };
+  }
+
+  // Read at script evaluation: a page with its own hash router (rfs: '#setup') may rewrite the hash before
+  // DOMContentLoaded, and the link must still be read.
+  var BOOT_HASH = String((w.location && w.location.hash) || '');
+
+  function clearHash() {
+    // Only remove our own fragment; a router that already moved on keeps its hash.
+    if (String(w.location.hash).indexOf(LINK.prefix) !== 0) return;
+    try { w.history.replaceState(null, '', w.location.pathname + w.location.search); } catch (e) {}
+  }
+
+  function showBanner(text, isError) {
+    var old = d.getElementById('rzShareBanner');
+    if (old) old.parentNode.removeChild(old);
+    var b = d.createElement('div');
+    b.id = 'rzShareBanner';
+    b.setAttribute('role', isError ? 'alert' : 'status');
+    b.style.cssText = 'display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px 12px;margin:0 0 12px;padding:8px 12px;' +
+      'border:1px solid var(--rzt-line, rgba(127,127,127,.35));border-radius:4px;background:var(--rzt-bg-2, transparent);' +
+      'color:var(--rzt-text, inherit);font-size:14px;line-height:1.4';
+    var t = d.createElement('span');
+    t.textContent = text;
+    var x = d.createElement('button');
+    x.type = 'button';
+    x.className = 'tool-btn';
+    x.textContent = 'Dismiss';
+    x.style.minHeight = '44px';
+    var main = d.querySelector('main') || d.body;
+    // Sit directly above the calculator's action row, inside the content column, when the page has one.
+    var calc = d.body.getAttribute('data-rz-calc');
+    var sel = Object.prototype.hasOwnProperty.call(COPY_ANCHORS, calc) ? COPY_ANCHORS[calc] : '#btnSaveAccount';
+    var anchor = sel && d.querySelector(sel);
+    var bar = anchor && anchor.parentNode;
+    x.addEventListener('click', function () {
+      if (b.parentNode) b.parentNode.removeChild(b);
+      if (!main.hasAttribute('tabindex')) main.setAttribute('tabindex', '-1');
+      try { main.focus(); } catch (e) {}
+    });
+    b.appendChild(t); b.appendChild(x);
+    // .tool-btn is styled only inside the action row, so the Dismiss button takes the look of the row's own button.
+    if (anchor) {
+      var cs = w.getComputedStyle(anchor);
+      ['fontFamily', 'fontSize', 'fontWeight', 'letterSpacing', 'color', 'backgroundColor', 'borderTop', 'borderRight',
+       'borderBottom', 'borderLeft', 'borderRadius', 'paddingLeft', 'paddingRight', 'textTransform'].forEach(function (k) { x.style[k] = cs[k]; });
+    }
+    if (bar && bar.parentNode) bar.parentNode.insertBefore(b, bar);
+    else { b.style.margin = '12px 16px'; main.insertBefore(b, main.firstChild); }
+    return b;
+  }
+
+  /** On load: a valid #rzs= link wins over a pending local "Open"; an invalid one says so and changes nothing. */
+  function handleLink() {
+    var calc = d.body && d.body.getAttribute('data-rz-calc');
+    if (!calc || BOOT_HASH.indexOf(LINK.prefix) !== 0) return false;
+    var r = readLink(BOOT_HASH, calc);
+    clearHash();
+    if (!r.ok) { showBanner('This shared link could not be read (' + r.reason + '). The calculator shows its defaults.', true); return true; }
+    var pending = false;
+    try { pending = !!w.localStorage.getItem('rz_open_scenario'); w.localStorage.removeItem('rz_open_scenario'); } catch (e) {}
+    var first = restoreFiltered(r.map);
+    setTimeout(function () { restoreFiltered(r.map); }, 350);
+    setTimeout(function () { restoreFiltered(r.map); }, 900);
+    showBanner('Shared scenario: ' + first.restored + ' input' + (first.restored === 1 ? '' : 's') + ' loaded from a link' +
+      (first.skipped ? ', ' + first.skipped + ' not on this page skipped' : '') + '. Results recalculated on this page.' +
+      (pending ? ' A scenario opened from your account was set aside in favour of the link.' : ''), false);
+    return true;
+  }
+
+  function msgLine(anchor) {
+    var m = d.getElementById('acctSaveMsg') || d.getElementById('rzScenarioMsg');
+    if (m) return m;
+    m = d.createElement('p');
+    m.id = 'rzScenarioMsg';
+    m.className = 'tool-msg';
+    m.setAttribute('role', 'status');
+    var bar = anchor.parentNode;
+    bar.parentNode.insertBefore(m, bar.nextSibling);
+    return m;
+  }
+
+  function copyLink(btn) {
+    var msg = msgLine(btn);
+    function say(t) { msg.style.display = 'block'; msg.textContent = t; }
+    var r = shareLink();
+    if (!r.ok) {
+      say(r.reason === 'too-large' ? 'This scenario is too large for a link. Save it to your account instead.' : 'This page cannot be shared.');
+      var save = d.getElementById('btnSaveAccount');
+      if (save) save.focus();
+      return;
+    }
+    function fallback() {
+      say('Copy this link:');
+      var inp = d.createElement('input');
+      inp.type = 'text'; inp.readOnly = true; inp.value = r.url; inp.id = 'rzShareLinkField';
+      inp.setAttribute('aria-label', 'Shareable link');
+      inp.style.cssText = 'display:block;width:100%;margin-top:6px;font:inherit;font-size:16px';
+      msg.appendChild(inp); inp.focus(); inp.select();
+    }
+    try {
+      if (!w.navigator.clipboard || !w.navigator.clipboard.writeText) return fallback();
+      // A clipboard write can hang (unfocused document, a pending permission prompt): show the link after 1.5 s.
+      var settled = false;
+      var guard = setTimeout(function () { if (!settled) { settled = true; fallback(); } }, 1500);
+      w.navigator.clipboard.writeText(r.url).then(function () {
+        if (settled) return;
+        settled = true; clearTimeout(guard);
+        say('Link copied. Anyone who opens it sees these inputs.');
+        setTimeout(function () { if (msg.textContent.indexOf('Link copied') === 0) msg.style.display = 'none'; }, 4000);
+      }, function () { if (!settled) { settled = true; clearTimeout(guard); fallback(); } });
+    } catch (e) { fallback(); }
+  }
+
+  function injectCopyButton() {
+    var calc = d.body && d.body.getAttribute('data-rz-calc');
+    if (!calc || d.getElementById('btnCopyLink')) return;
+    if (/[?&]embed=(compare|pack|sensitivity|article)(&|$)/.test(w.location.search || '')) return;
+    var sel = Object.prototype.hasOwnProperty.call(COPY_ANCHORS, calc) ? COPY_ANCHORS[calc] : '#btnSaveAccount';
+    var anchor = sel && d.querySelector(sel);
+    if (!anchor) return;
+    var b = d.createElement('button');
+    b.type = 'button';
+    b.className = 'tool-btn';
+    b.id = 'btnCopyLink';
+    b.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" style="vertical-align:-1px;margin-right:6px"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/></svg>Copy link';
+    b.addEventListener('click', function () { copyLink(b); });
+    anchor.parentNode.insertBefore(b, anchor.nextSibling);
   }
 
   /** On a calculator page, restore a pending "Open" scenario for this calc (once). */
@@ -111,8 +332,9 @@
     }
     try { w.localStorage.removeItem('rz_open_scenario'); } catch (e) {}
     // Restore after the page's own init has run.
-    setTimeout(function () { restore(obj.inputs); }, 350);
-    setTimeout(function () { restore(obj.inputs); }, 900);
+    // Filtered like a shared link: a stored map is replayed only into capturable fields.
+    setTimeout(function () { restoreFiltered(obj.inputs); }, 350);
+    setTimeout(function () { restoreFiltered(obj.inputs); }, 900);
   }
 
   /**
@@ -179,9 +401,10 @@
     d.body.appendChild(a);
   }
 
-  w.rzScenario = { capture: capture, restore: restore, openInCalc: openInCalc, saveToAccount: saveToAccount };
+  w.rzScenario = { capture: capture, restore: restore, openInCalc: openInCalc, saveToAccount: saveToAccount,
+                   shareLink: shareLink, linkFor: linkFor, readLink: readLink, encodeLink: encodeLink, restoreFiltered: restoreFiltered, LINK: LINK };
 
-  function onReady() { autoRestore(); injectAccountLink(); }
+  function onReady() { if (!handleLink()) autoRestore(); injectAccountLink(); injectCopyButton(); }
   if (d.readyState === 'loading') w.addEventListener('DOMContentLoaded', onReady);
   else onReady();
 })(typeof window !== 'undefined' ? window : this, typeof document !== 'undefined' ? document : null);

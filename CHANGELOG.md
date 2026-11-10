@@ -11,6 +11,90 @@ release sections rather than semver.
 
 ---
 
+## v3.36.0 — 2026-11-11 — "A calculator scenario can be shared as a link, and every uncertainty band is reproducible"
+
+Product transformation, Wave 1. This release adds P02 share links, P08 seeded uncertainty and P23 register CSS, plus
+the two shared foundations that later features build on (F1, F2).
+
+### Added
+- **Copy link** on the calculators (P02). It encodes the current inputs into the page address after `#rzs=`. The
+  fragment never reaches the server, so a link needs no account and nothing is stored. Opening the link restores the
+  inputs, recalculates, and shows a "Shared scenario" line with a Dismiss button.
+  - The payload is untrusted. It is checked against `data/scenario-link.schema.json`: version, calculator, at most
+    500 ids matching a fixed pattern, values up to 2,000 characters, links up to 8,000 characters. It is written
+    only into fields that `isCapturable` allows, so a link can never fill a login or password field. Saved-scenario
+    "Open" now goes through the same filter.
+  - A link that cannot be read says so, and the calculator keeps its defaults. A link wins over a pending
+    "Open" from the account page, and the banner says it set that scenario aside.
+  - If the clipboard is refused or does not answer within 1.5 s, the link is shown in a selectable field.
+- **Copy link** on each saved scenario in `account.html`. It is disabled, with a reason, when the row has no
+  saved inputs.
+- `tier-advisor`, `tia-942-checklist`, `rfs-readiness-workbench` and `spares-readiness-calculator` now load
+  `js/rz-scenario.js`, so "Open" from the account page restores their inputs too.
+  - TIA's Tier and facility-type buttons are carried by two hidden mirror fields, so they survive a link or a
+    saved scenario.
+  - Spares keeps its own "Share URL" (`#s=`). Its inputs exceed the 8,000-character link cap, and the gate checks
+    that it is refused for that reason.
+- `data/calculators.json` (F1): one map of the 11 calculators. It holds each page, its project fields (IT load
+  with a unit factor, PUE, country, tier) and its headline result selectors. One gate guards everything that
+  reads it.
+- `js/rz-embed-compute.js` (F2): one hidden-iframe compute loop for compare, report pack and sensitivity.
+  - It runs one frame at a time, refuses unsafe paths and unknown modes, and times out cleanly.
+  - With `?embed=<mode>` the embedded page shows no cookie banner and no account pill, and analytics stay off in
+    the frame, so a visit is not counted twice.
+
+- **Every uncertainty band is reproducible (P08).** carbon, tier, TIA, spares (M8 and the supply-chain simulation)
+  and Cx drew their Monte-Carlo samples from `Math.random`, so P5/P50/P95 changed on every load. tco and roi had an
+  unseeded fallback.
+  - All of them now draw from one seeded generator: `RZEngine.models.sim.rng(seed)` (new), or the same LCG
+    inline on pages that do not load the engine. Each run restarts it, so the same inputs give the same band.
+  - Without the engine, the tco and roi bands show "—" and say why.
+  - Each band prints a basis line under it: spreads, distribution, draws and seed. The tier and TIA spreads are
+    labelled as assumed, not derived from the answers.
+  - Measured on v3.35.11 with two fresh loads: carbon P50 12,360 then 12,343, and the spares supply-chain P50
+    41.6 then 42.3 weeks.
+- **Six pages declared a design register without loading it (P23).**
+  - Five now load their register file: glossary, asean-dc-report-2026, pillar-cooling, pillar-power and
+    cdu-mini-bms. The pixel change is 0.0–1.1 %, checked in screenshots at 390 and 1440 px in both themes.
+  - `article-9-paper` dropped its declaration instead. It is a standalone print paper, and the editorial file
+    faded its text.
+  - Loading the register brought these pages into the journal register sweep, which fixed 9 inline rules on 4 pages:
+    grey-on-dark text, a dark panel, and one gradient bar.
+  - On asean-dc-report-2026, pillar-cooling and pillar-power, the transparent nav sits on a hero that is dark in
+    both themes. In day mode the register coloured the Login button dark-on-dark, and it was already poor before
+    (brown on near-black). `body[data-rz-nav-over-dark]` now gives the unscrolled nav the dark-panel colours. Two
+    of these pages joined the a11y audit.
+
+### Gates (ship gate)
+- `tools/test-seeded-uncertainty.mjs`, 24 checks: no unseeded draw on the 11 calculators (except id generation), the page
+  LCGs equal the engine's, and 7 bands are identical across two fresh loads with the seed printed. RED on v3.35.11:
+  unseeded draws on every page it checks, no `sim.rng`, and two bands that differed between loads.
+- `tools/test-register-css.mjs`: a declared register must load a file carrying its rules. The map is read from
+  the CSS. RED on v3.35.11 with 6 pages.
+- `tools/test-scenario-share-links.mjs`, 71 checks:
+  - unit and schema parity;
+  - a fresh-context round trip on all 11 calculators, where every captured input and every registry headline
+    result must match;
+  - the login-field filter, a corrupted link, precedence over "Open", the TIA buttons, and the button click.
+  - RED on v3.35.11, whose module has no link encoder.
+- `tools/test-calculator-registry.mjs`: pages, fields and results are checked against the rendered calculators
+  and against `openInCalc`. RED on a planted bad selector, page and field (6 problems).
+- `tools/test-embed-compute.mjs`, 8 checks. RED on the previous consent script: the banner showed and analytics
+  ran inside the frame.
+- `tools/audit-a11y.mjs` covers a calculator opened from a share link, with its banner showing.
+
+### Not covered
+- The account-row Copy link is checked in Node (a link for every calculator reads back). A signed-in browser run
+  is not part of the gate, because it needs a real account session.
+- On `rfs-readiness-workbench` a link carries the setup form only. The project itself lives in that browser's
+  storage.
+
+Standards: `standarization/ACCURACY_VALIDATION.md` Rule 2 (uncertainty bands), `standarization/UIUX_AUDIT_LEDGER.md`
+row 25, `documentation/product-transformation/` (PRD-P02, P08, P23; ARCHITECTURE-P C1, C2, C4). Engine: `rz-engine.min.js`
+rebuilt with terser, engine catalog regenerated.
+
+---
+
 ## v3.35.11 — 2026-11-10 — "The TIA-942 checklist can switch to dark, and tool breadcrumbs read as links"
 
 Found by the product-transformation baseline (defect X3): the theme button on `tia-942-checklist.html` called

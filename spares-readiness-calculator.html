@@ -62,7 +62,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha384-iw3OoTErCYJJB9mCa8LNS2hbsQ7M3C0EpIsO/H5+EGAkPGc6rk+V8i04oW/K5xq0" crossorigin="anonymous">
 <!-- Chart.js loaded blocking (non-deferred) per site convention to avoid sync init issues -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" integrity="sha384-e6nUZLBkQ86NJ6TVVKAeSaK8jWa3NhkYWZFomE39AvDbQWeie9PlQqM3pmYW5d1g" crossorigin="anonymous"></script>
-<script src="js/rz-version.js?v=20261110-b57138f3" defer></script>
+<script src="js/rz-version.js?v=20261110-05cf4722" defer></script>
 <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
 <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
 <script src="js/spares-parts-catalog.js?v=20260920-1487b6d8" defer></script>    <meta property="og:image:alt" content="Critical Spares Engine | DC M&amp;E Spares Readiness Calculator">
@@ -1378,6 +1378,7 @@
               <div class="metric-box"><div class="metric-label">Exp. Downtime Cost <span class="tip" tabindex="0" data-tip="Expected annual downtime cost averaged across all MC trials. ExpDT = mean(stockout_events x downtime_cost_per_hr x MTTR). Unit: $. Key input for ROI of increasing stock level. Multiply by years to assess NPV of stocking investment. See methodology: MC cost." aria-label="Expected Downtime Cost tooltip">ⓘ</span></div><div class="metric-value" id="mc_exp_down">—</div></div>
               <div class="metric-box"><div class="metric-label">Worst-Case Cost <span class="tip" tabindex="0" data-tip="95th-percentile downtime cost across all MC trials. Unit: $. Represents a plausible bad year rather than the absolute extreme. Use for risk reserve or insurance sizing. Higher than Exp. Cost indicates fat-tail demand risk. See methodology: MC P95 cost." aria-label="Worst Case Cost tooltip">ⓘ</span></div><div class="metric-value" id="mc_worst">—</div></div>
             </div>
+            <p class="basis" id="mc_basis" data-rz-authored-basis="P08: draws and seed of this Monte-Carlo run, written by the run itself">Seeded run: press Run to compute.</p>
           </div>
           <div class="result-card" style="margin-top:0.85rem;">
             <div class="card-title"><i class="fas fa-chart-bar"></i> Readiness Distribution</div>
@@ -3209,6 +3210,7 @@
         <span class="msb-label" style="margin-left:1rem;">Exp Expedite $</span><span class="msb-value" id="scsim_exp_expedite_sb">—</span>
         <span class="msb-label" style="margin-left:1rem;">% On-Time</span><span class="msb-value" id="scsim_ontime_pct_sb">—</span>
       </div>
+      <p class="basis" id="scsim_basis" data-rz-authored-basis="P08: draws and seed of the supply-chain simulation, written by the run itself">Seeded run: press Run to compute.</p>
       <div class="catalog-header">
         <strong><i class="fas fa-tornado"></i> Disruption Scenario / Resilience Sim</strong> — Monte-Carlo simulation (≥1,000 iterations) combining lane delay variability, tariff shock, supplier-commit slip, demand spike, and chokepoint reroute. Outputs: % on-time, P10/P50/P90 of lead time and expedite cost, tornado chart, and with/without-hub + dual-source comparison.
       </div>
@@ -3537,7 +3539,7 @@
 
 <!-- Scripts -->
 <script src="auth.js?v=20261031-f01cb5a3" defer></script>
-<script src="rz-engine.min.js?v=20261107-df30269e" defer></script>
+<script src="rz-engine.min.js?v=20261110-cfbdaa79" defer></script>
 <script src="script.min.js?v=20261101-0e062c54" defer></script>
 
 <script>
@@ -4797,14 +4799,22 @@ function calcKraljic() {
    =========================================== */
 function updateMCLabels() { /* inputs updated, run not triggered until button press */ }
 
+// P08: every draw in M8 Monte-Carlo and the supply-chain simulation comes from one seeded LCG, the same generator
+// as RZEngine.models.sim.rng (constants + default seed; tools/test-seeded-uncertainty.mjs). Each run restarts the
+// stream, so the same inputs always give the same result. The seed is printed under each result.
+var MC_SEED = 123456789, _mcState = MC_SEED;
+function mcReseed() { _mcState = MC_SEED >>> 0; }
+function mcRand() { _mcState = (1103515245 * _mcState + 12345) >>> 0; return _mcState / 4294967296; }
+
 // Box-Muller normal variate
 function randNorm(mu, sigma) {
-  var u1 = Math.random(), u2 = Math.random();
+  var u1 = mcRand(), u2 = mcRand();
   var z = Math.sqrt(-2 * Math.log(Math.max(u1, 1e-12))) * Math.cos(2 * Math.PI * u2);
   return mu + sigma * z;
 }
 
 function runMonteCarlo() {
+  mcReseed();
   var ltBase = clamp(getVal('mc_lt_base', 16), 1, 200);
   var ltSigma = clamp(getVal('mc_lt_sigma', 6), 0, 100);
   var demandBase = clamp(getVal('mc_demand_base', 1.0), 0.01, 500);
@@ -4868,6 +4878,7 @@ function runMonteCarlo() {
     setText('mc_p90', p90.toFixed(1) + '%');
     setText('mc_exp_down', fmt$(avgDowntime));
     setText('mc_worst', fmt$(maxDowntime));
+    setText('mc_basis', 'Seeded run: ' + iterations.toLocaleString('en-US') + ' draws \u00b7 seed ' + MC_SEED + ' (same inputs, same result)');
 
     // Histogram
     var bins = 20;
@@ -8934,6 +8945,7 @@ function exportRiskMapPDF() {
 function scsimPreview() { /* placeholder — auto-display preview stats when inputs change */ }
 
 function runSCSim() {
+  mcReseed();
   var ltBase = parseFloat((document.getElementById('scsim_lt_base')||{}).value)||39;
   var ltSigma = parseFloat((document.getElementById('scsim_lt_sigma')||{}).value)||8;
   var needWks = parseFloat((document.getElementById('scsim_need_wks')||{}).value)||52;
@@ -8962,25 +8974,25 @@ function runSCSim() {
 
   for (var i = 0; i < N; i++) {
     // Box-Muller normal sample
-    var u1 = Math.max(1e-10, Math.random()), u2 = Math.random();
+    var u1 = Math.max(1e-10, mcRand()), u2 = mcRand();
     var z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
     var ltSample = ltBase + ltSigma * z;
     ltSample = Math.max(1, ltSample);
 
     // Disruptions
-    var tariffHit = Math.random() < tariffProb / 100;
+    var tariffHit = mcRand() < tariffProb / 100;
     var tariffMultiplier = tariffHit ? (1 + tariffMag / 100) : 1;
-    var commitSlip = Math.random() < (dualSource ? commitProb / 200 : commitProb / 100);
+    var commitSlip = mcRand() < (dualSource ? commitProb / 200 : commitProb / 100);
     var slipWks = commitSlip ? (dualSource ? commitSlipWks * 0.6 : commitSlipWks) : 0;
-    var rerouteHit = Math.random() < rerouteProb / 100;
+    var rerouteHit = mcRand() < rerouteProb / 100;
     var rerouteWks = rerouteHit ? 12 / 7 : 0; // 12 days ≈ 1.7 wks
-    var demandSpike = Math.random() < demandSpikeProb / 100;
+    var demandSpike = mcRand() < demandSpikeProb / 100;
     var effectiveNeedWks = needWks + safetyStockWks - (demandSpike ? 4 : 0); // demand spike compresses window
 
     var effLT = ltSample + slipWks + rerouteWks;
 
     // Hub toggle: 70% chance hub has stock
-    var hubResolved = hubAvail && Math.random() < 0.70;
+    var hubResolved = hubAvail && mcRand() < 0.70;
     var finalLT = hubResolved ? Math.min(effLT, 1) : effLT; // hub cuts to ~1 wk
 
     var onTime = finalLT <= effectiveNeedWks;
@@ -9016,7 +9028,7 @@ function runSCSim() {
     hubLTs.push(hubFinalLT2);
     if (hubFinalLT2 <= effectiveNeedWks) hubOT++;
 
-    var dualSlip2 = Math.random() < commitProb / 200 ? commitSlipWks * 0.6 : 0;
+    var dualSlip2 = mcRand() < commitProb / 200 ? commitSlipWks * 0.6 : 0;
     var dualLT2 = ltSample + dualSlip2 + rerouteWks;
     dualLTs.push(dualLT2);
     if (dualLT2 <= effectiveNeedWks) dualOT++;
@@ -9058,6 +9070,7 @@ function runSCSim() {
   setText('scsim_p90_sb', p90.toFixed(1)+' wk');
   setText('scsim_exp_expedite_sb', '$'+(expExp>=1000?(expExp/1000).toFixed(1)+'K':expExp.toFixed(0)));
   setText('scsim_ontime_pct_sb', onTimePct+'%');
+  setText('scsim_basis', 'Seeded run: ' + N.toLocaleString('en-US') + ' draws \u00b7 seed ' + MC_SEED + ' (same inputs, same result)');
 
   function fmtK(v){ return '$'+(v>=1000000?(v/1000000).toFixed(2)+'M':v>=1000?(v/1000).toFixed(1)+'K':v.toFixed(0)); }
 
@@ -10261,5 +10274,6 @@ if(window.MutationObserver)new MutationObserver(m).observe(document.documentElem
   if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();
 </script>
+<script src="js/rz-scenario.js?v=20261110-8a06cf0c"></script><!-- P02: save/open/share links (rz-scenario) -->
 </body>
 </html>

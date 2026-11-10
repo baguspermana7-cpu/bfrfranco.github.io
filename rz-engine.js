@@ -12160,6 +12160,29 @@
 
             /* ── A7: uncertainty / sensitivity drivers ── */
             sim: {
+                /** P08: the seed every band uses unless a caller passes its own; printed next to each band. */
+                DEFAULT_SEED: 123456789,
+                /**
+                 * Seeded uniform generator in [0,1) — the same LCG as monteCarlo below, so a band drawn
+                 * through rng(seed) and one drawn by monteCarlo(…, seed) start from the same sequence.
+                 * rng.normal(mu, sd) draws a Box–Muller deviate from the same stream. rng.seed is the seed.
+                 */
+                rng: function (seed) {
+                    var s0 = (seed == null ? 123456789 : seed) >>> 0, s = s0;
+                    function rnd() { s = (1103515245 * s + 12345) >>> 0; return s / 4294967296; }
+                    rnd.seed = s0;
+                    rnd.normal = function (mu, sd) {
+                        var u = rnd(), u2 = rnd();
+                        return (mu || 0) + (sd == null ? 1 : sd) * Math.sqrt(-2 * Math.log(u || 1e-9)) * Math.cos(2 * Math.PI * u2);
+                    };
+                    return rnd;
+                },
+                /** One engine-wide seeded stream for callers that do not keep their own (lazy). */
+                shared: function () {
+                    var S = RZEngine.models.sim;
+                    if (!S._shared) S._shared = S.rng(S.DEFAULT_SEED);
+                    return S._shared;
+                },
                 /**
                  * Monte-Carlo driver. `fn(sample)` maps a {key:value} sample → number.
                  * `distributions` = { key: { dist:'normal'|'uniform'|'triangular'|'categorical', ...params } }.
@@ -13228,10 +13251,10 @@
                     return { tree: tree, totalMonths: rich.calendarMonths, calendarMonths: rich.calendarMonths, laborDays: rich.laborDays, crewEquivalent: rich.crewEquivalent };
                 },
 
-                /** Normal deviate (Box-Muller). rng defaults to Math.random; pass a
-                 *  seeded rng for a deterministic path (tests). */
+                /** Normal deviate (Box-Muller). Without an rng it draws from one engine-wide seeded
+                 *  stream (P08: never Math.random), so a repeat of the same sequence of calls repeats. */
                 _randNorm: function (mu, sigma, rng) {
-                    rng = rng || Math.random;
+                    rng = rng || RZEngine.models.sim.shared();
                     var u1 = rng(), u2 = rng();
                     return mu + sigma * Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
                 },
@@ -13241,7 +13264,7 @@
                 monteCarlo: function (input, opts) {
                     opts = opts || {}; var C = RZEngine.models.commissioning;
                     var base = C.mapInput(input);
-                    var N = opts.n || 10000, rng = opts.rng || Math.random, results = [];
+                    var N = opts.n || 10000, rng = opts.rng || RZEngine.models.sim.rng(RZEngine.models.sim.DEFAULT_SEED), results = []; // P08: seeded by default
                     for (var i = 0; i < N; i++) {
                         var vi = {}; for (var kk in base) { if (base.hasOwnProperty(kk)) vi[kk] = base[kk]; }
                         vi.itLoad = Math.max(100, Math.round(base.itLoad * (1 + C._randNorm(0, 0.075, rng))));
@@ -15757,7 +15780,7 @@
                 // `</script>` characters which the print-window's HTML parser
                 // will see (correctly) as a tag closer.
                 return '<script src="auth.js?v=20260324b"><\/script>' +
-                       '<script src="rz-engine.min.js?v=2026-11-06-tariffs"><\/script>';
+                       '<script src="rz-engine.min.js?v=2026-11-11-seeded-rng"><\/script>';
             }
         },
         /* ── A7: lightweight framework-free SVG chart builders. Each returns an SVG string

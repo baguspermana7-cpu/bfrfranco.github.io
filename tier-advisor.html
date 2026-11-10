@@ -85,7 +85,7 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'" integrity="sha384-iw3OoTErCYJJB9mCa8LNS2hbsQ7M3C0EpIsO/H5+EGAkPGc6rk+V8i04oW/K5xq0" crossorigin="anonymous">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha384-iw3OoTErCYJJB9mCa8LNS2hbsQ7M3C0EpIsO/H5+EGAkPGc6rk+V8i04oW/K5xq0" crossorigin="anonymous"></noscript>
-    <script src="js/rz-version.js?v=20261110-b57138f3" defer></script>
+    <script src="js/rz-version.js?v=20261110-05cf4722" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>    <meta property="og:image:width" content="1200">    <meta property="og:image:height" content="630">    <meta property="og:image:alt" content="Tier Advisor | Data Center Tier Classification Calculator">
 
@@ -452,7 +452,7 @@
                             <div class="metric-box"><div class="metric-label">Upgrade cost estimate</div><div class="metric-value" id="upgradeCostVal">—</div></div>
                             <div class="metric-box"><div class="metric-label">Monte Carlo P50 score</div><div class="metric-value" id="mcP50Val">—</div></div>
                             <div class="metric-box"><div class="metric-label">Probability of the target tier</div><div class="metric-value" id="tierProbVal">—</div></div>
-                        </div></div>
+                        </div><p class="basis" id="mcBasis" data-rz-authored-basis="P08: spread, draws and seed of the score band, written from the constants the simulation uses">Uncertainty: computing…</p></div>
                     </div>
                 </div>
             </div>
@@ -782,8 +782,26 @@
     }
 
     // ═══ MONTE CARLO WEB WORKER ═══
+    // P08: the score band draws from a seeded LCG — the same generator as RZEngine.models.sim.rng (same constants,
+    // same default seed; tools/test-seeded-uncertainty.mjs checks the sequences agree). One function serves the worker,
+    // the main-thread fallback and the PDF, so all three give the same band for the same answers.
+    // The ±12.5 % spread is ASSUMED: it is not derived from the answers, and the basis line says so.
+    var MC_SEED = 123456789, MC_SPREAD = 0.25, MC_N = 10000;
+    function mcScoreBand(c, spread, seed, n) {
+        var s = seed >>> 0;
+        function R() { s = (1103515245 * s + 12345) >>> 0; return s / 4294967296; }
+        var r = [];
+        for (var i = 0; i < n; i++) { var v = c * (1 + (R() - 0.5) * spread); r.push(Math.max(0, Math.min(100, v))); }
+        r.sort(function (a, b) { return a - b; });
+        return r;
+    }
+    function mcBasisText() {
+        return 'Uncertainty: score \u00b1' + (MC_SPREAD * 50) + ' % (uniform, assumed score spread, not derived from your answers) \u00b7 ' +
+            MC_N.toLocaleString('en-US') + ' draws \u00b7 seed ' + MC_SEED;
+    }
     var mcWorkerBlob = new Blob([
-        'onmessage=function(e){var c=e.data.composite,t=e.data.targetTier,r=[];for(var i=0;i<10000;i++){var v=c*(1+(Math.random()-0.5)*0.25);r.push(Math.max(0,Math.min(100,v)))}r.sort(function(a,b){return a-b});var above=r.filter(function(x){return x>=t}).length;postMessage({results:r,p5:Math.round(r[499]),p50:Math.round(r[4999]),p95:Math.round(r[9499]),prob:Math.round(above/100)})}'
+        'var mcScoreBand=' + mcScoreBand.toString() + ';' +
+        'onmessage=function(e){var t=e.data.targetTier,r=mcScoreBand(e.data.composite,e.data.spread,e.data.seed,e.data.n);var above=r.filter(function(x){return x>=t}).length;postMessage({results:r,p5:Math.round(r[499]),p50:Math.round(r[4999]),p95:Math.round(r[9499]),prob:Math.round(above/100)})}'
     ], {type:'application/javascript'});
     var mcWorkerUrl = URL.createObjectURL(mcWorkerBlob);
     var mcWorker = null;
@@ -795,6 +813,8 @@
         document.getElementById('regionalScoreVal').textContent = Math.round(reg);
 
         // Monte Carlo — use Web Worker if available, fallback to main thread
+        var mcBasisEl = document.getElementById('mcBasis');
+        if (mcBasisEl) mcBasisEl.textContent = mcBasisText();
         if (mcWorker) {
             mcWorker.onmessage = function(e) {
                 var d = e.data;
@@ -802,15 +822,10 @@
                 document.getElementById('tierProbVal').textContent = d.prob + '%';
                 renderHistogram(d.results, d.p5, d.p50, d.p95);
             };
-            mcWorker.postMessage({composite: composite, targetTier: targetTier});
+            mcWorker.postMessage({composite: composite, targetTier: targetTier, spread: MC_SPREAD, seed: MC_SEED, n: MC_N});
         } else {
-            // Fallback: run on main thread
-            var results = [];
-            for (var i = 0; i < 10000; i++) {
-                var v = composite * (1 + (Math.random() - 0.5) * 0.25);
-                results.push(Math.max(0, Math.min(100, v)));
-            }
-            results.sort(function(a,b){return a-b;});
+            // Fallback: run on main thread (same function, same seed)
+            var results = mcScoreBand(composite, MC_SPREAD, MC_SEED, MC_N);
             var p5 = Math.round(results[499]), p50 = Math.round(results[4999]), p95 = Math.round(results[9499]);
             var aboveTarget = results.filter(function(r){return r>=targetTier;}).length;
             document.getElementById('mcP50Val').textContent = p50;
@@ -1162,9 +1177,7 @@
         var svgDetail = pdfSubsystemDetailSVG(barItems);
 
         // Monte Carlo
-        var mcResults = [];
-        for(var i=0;i<10000;i++){mcResults.push(Math.max(0,Math.min(100,score*(1+(Math.random()-0.5)*0.25))));}
-        mcResults.sort(function(a,b){return a-b;});
+        var mcResults = mcScoreBand(score, MC_SPREAD, MC_SEED, MC_N);
         var p5=Math.round(mcResults[499]),p50=Math.round(mcResults[4999]),p95=Math.round(mcResults[9499]);
         var svgHist = pdfHistogramSVG(mcResults);
 
@@ -1454,7 +1467,7 @@
         // Footer
         html+='<div style="text-align:center;margin-top:20px;padding-top:12px;border-top:2px solid #64748b;font-size:8px;color:#94a3b8;">resistancezero.com &middot; Generated '+dateStr+' &middot; All calculations performed client-side &middot; Tier Advisor v1.0 &middot; &copy; 2026 Bagus Dwi Permana</div>';
         html+='<script src="auth.js?v=20261031-f01cb5a3" defer><\/script>';
-        html+='<script src="rz-engine.min.js?v=20261107-df30269e" defer><\/script>';
+        html+='<script src="rz-engine.min.js?v=20261110-cfbdaa79" defer><\/script>';
         html+='</body></html>';
         w.document.write(html);
         w.document.close();
@@ -1659,5 +1672,6 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1" onload="if(typeof onChartsReady==='function')onChartsReady();" defer integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.1.0" onload="if(typeof onAnnotationReady==='function')onAnnotationReady();" defer integrity="sha384-3N9GHhCtN3CQef6tNfqgZlv7sQLYIkcChN+uaTZ7xVdzKYp/SjBNPxa92+hM7EAY" crossorigin="anonymous"></script>
+<script src="js/rz-scenario.js?v=20261110-8a06cf0c"></script><!-- P02: save/open/share links (rz-scenario) -->
 </body>
 </html>

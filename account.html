@@ -173,7 +173,7 @@
 
   <script src="js/rz-version.js" defer></script>
   <script src="js/rz-config.js"></script>
-  <script src="js/rz-scenario.js?v=20261110-8719f171"></script>
+  <script src="js/rz-scenario.js?v=20261110-8a06cf0c"></script>
   <script type="module" src="js/rz-supabase.js?v=20260920-90bd6417"></script>
   <script type="module">
     const $ = (id) => document.getElementById(id);
@@ -231,11 +231,16 @@
           + '<div class="m">'+escapeHtml(r.calc)+' · '+when+extra+'</div></div>'
           + '<div style="display:flex;gap:6px;">'
           + (hasInputs ? '<button class="link open" data-open="'+r.id+'">Open</button>' : '')
+          + '<button class="link" data-share="'+r.id+'"'+(hasInputs ? '' : ' disabled title="This scenario has no saved inputs, so it cannot be shared"')+'>Copy link</button>'
           + '<button class="link del" data-id="'+r.id+'">Delete</button></div></div>';
         list.appendChild(el);
       });
       list.querySelectorAll('button[data-id]').forEach(b => b.onclick = async () => {
         await S.deleteScenario(b.getAttribute('data-id')); render();
+      });
+      list.querySelectorAll('button[data-share]').forEach(b => b.onclick = () => {
+        const row = rows.find(x => x.id === b.getAttribute('data-share'));
+        if (row) shareRow(b, row);
       });
       list.querySelectorAll('button[data-open]').forEach(b => b.onclick = () => {
         const id = b.getAttribute('data-open');
@@ -243,6 +248,22 @@
         if (row && row.payload && row.payload.inputs && window.rzScenario)
           window.rzScenario.openInCalc(row.calc, row.payload.inputs);
       });
+    }
+    // P02: a saved scenario's share link, built from its stored inputs (same encoder as the calculators).
+    function shareRow(b, row) {
+      const r = window.rzScenario && window.rzScenario.linkFor(row.calc, row.payload && row.payload.inputs);
+      const host = b.closest('.scn');
+      let msg = host.querySelector('.scn-share');
+      if (!msg) { msg = document.createElement('p'); msg.className = 'scn-share muted'; msg.setAttribute('role', 'status'); msg.style.fontSize = '0.85rem'; host.appendChild(msg); }
+      if (!r || !r.ok) { msg.textContent = r && r.reason === 'too-large' ? 'This scenario is too large for a link.' : 'This scenario cannot be shared.'; return; }
+      const fallback = () => {
+        msg.textContent = 'Copy this link:';
+        const f = document.createElement('input'); f.type = 'text'; f.readOnly = true; f.value = r.url; f.className = 'scn-share-field';
+        f.setAttribute('aria-label', 'Shareable link'); f.style.cssText = 'display:block;width:100%;font-size:16px;margin-top:4px';
+        msg.appendChild(f); f.focus(); f.select();
+      };
+      if (!navigator.clipboard || !navigator.clipboard.writeText) return fallback();
+      navigator.clipboard.writeText(r.url).then(() => { msg.textContent = 'Link copied.'; }, fallback);
     }
     function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
     function fmtMoney(n){ n = Number(n)||0; return n>=1e9 ? '$'+(n/1e9).toFixed(2)+'B' : n>=1e6 ? '$'+(n/1e6).toFixed(1)+'M' : n>=1e3 ? '$'+Math.round(n/1e3)+'K' : '$'+Math.round(n); }

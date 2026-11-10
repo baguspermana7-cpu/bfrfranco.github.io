@@ -1716,3 +1716,12 @@ html[data-rz-register="editorial"] .rz-login-btn i{color:var(--rz-art-accent)!im
 html[data-rz-register="editorial"] .rz-user-btn{background:transparent!important;color:var(--rz-art-strong)!important;border:1px solid var(--rz-art-line)!important}
 html[data-rz-register="editorial"] .rz-user-avatar{background:var(--rz-art-panel)!important;color:var(--rz-art-accent)!important;border:1px solid var(--rz-art-line)}
 html[data-rz-register="editorial"] .rz-user-dropdown{background:var(--rz-art-panel)!important;border-color:var(--rz-art-line)!important;box-shadow:none!important}
+/* P23 (v3.36.0): pages whose hero is a dark panel in both themes (body[data-rz-nav-over-dark]) sit the
+   transparent nav on that dark hero until the page scrolls. In day mode the nav then needs the dark-panel
+   colours, or the links and the Login button read dark-on-dark. Once .scrolled (or the mobile menu is open)
+   the nav paints its own light background and the day colours return. */
+html[data-rz-register="editorial"]:not([data-theme="dark"]) body[data-rz-nav-over-dark]:not(.rz-nav-open) .navbar:not(.scrolled){
+  --rz-art-accent:#E8B563 !important; --rz-art-strong:#F6F7F9; --rz-art-line:rgba(255,255,255,.18);
+}
+html[data-rz-register="editorial"]:not([data-theme="dark"]) body[data-rz-nav-over-dark]:not(.rz-nav-open) .navbar:not(.scrolled) .nav-link,
+html[data-rz-register="editorial"]:not([data-theme="dark"]) body[data-rz-nav-over-dark]:not(.rz-nav-open) .navbar:not(.scrolled) .nav-search-btn{color:#CFD3DA!important}

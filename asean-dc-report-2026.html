@@ -71,6 +71,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet"></noscript>
+    <link rel="stylesheet" href="css/rz-article-dark.css?v=20261110-4c50f484"><!-- P23: the editorial register this page declares -->
     <link rel="stylesheet" href="styles.min.css?v=20261108-ff5c7268">
     <style>
     :root{--rpt-accent:var(--rz-accent-ui);--rpt-accent-light:var(--rz-accent-ui);--rpt-accent-dark:var(--rz-accent-ui);--rpt-accent-bg:rgba(232,181,99,.08);--rpt-accent-border:rgba(232,181,99,.25);--rpt-accent-text:#92400e;--rpt-bar-bg:rgba(232,181,99,.12);--rpt-table-stripe:rgba(232,181,99,.04);--rpt-table-header:var(--rz-accent-ui);--rpt-check:var(--rz-accent-ui);--rpt-cross:#ef4444;--rpt-toc-bg:rgba(255,255,255,.98);--rpt-toc-border:#e2e8f0;--rpt-toc-active:var(--rz-accent-ui);--rpt-card-bg:#fff}
@@ -86,7 +87,7 @@
     .rpt-hero-stats{display:flex;justify-content:center;gap:2rem;flex-wrap:wrap;margin-top:2rem}
     .rpt-hero-stat{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:4px;padding:1rem 1.5rem;text-align:center;min-width:130px}
     .rpt-hero-stat .num{font-size:1.8rem;font-weight:800;color:var(--rpt-accent-light);display:block}
-    .rpt-hero-stat .label{font-size:.78rem;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-top:.25rem}
+    .rpt-hero-stat .label{font-size:.78rem;color: #9aa3ad;text-transform:uppercase;letter-spacing:.5px;margin-top:.25rem}
     .rpt-layout{display:grid;grid-template-columns:220px 1fr;max-width:1200px;margin:0 auto;gap:2rem;padding:2rem 1.5rem 4rem}
     .rpt-toc{position:sticky;top:80px;align-self:start;background:var(--rpt-toc-bg);border:1px solid var(--rpt-toc-border);border-radius:4px;padding:1.25rem;max-height:calc(100vh - 100px);overflow-y:auto}
     .rpt-toc h3{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-secondary);margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid var(--rpt-toc-border)}
@@ -297,12 +298,17 @@
 .rpt-hl{display:block;margin:1.25rem 0;border-top:1px solid var(--border-color,rgba(128,128,128,.25))}
 .rpt-hl-card{display:grid;grid-template-columns:minmax(6rem,auto) 1fr;column-gap:1.25rem;align-items:baseline;background:transparent;border:0;border-bottom:1px solid var(--border-color,rgba(128,128,128,.25));border-radius:0;padding:.7rem 0}
 .rpt-hl-card .num{font-size:1.15rem;margin:0;font-family:'IBM Plex Mono','JetBrains Mono',monospace}
+/* P23 (v3.36.0, found when this page joined audit-a11y): in dark mode the accent is the light amber #E8B563, and
+   white text on it read 1.87:1. Text on an accent fill takes dark ink in dark mode. A bar value on a phone sits
+   beside its bar (max-width:560px rule above), so it keeps the page text colour there. */
+[data-theme="dark"] .rpt-t thead,[data-theme="dark"] .rpt-findings li::before{color:#1a1d23}
+@media(min-width:561px){[data-theme="dark"] .bar-v{color:#1a1d23}}
 </style>
-    <script src="js/rz-version.js?v=20261110-b57138f3" defer></script>
+    <script src="js/rz-version.js?v=20261110-05cf4722" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
 </head>
-<body>
+<body data-rz-nav-over-dark><!-- P23: the hero under the transparent nav is dark in both themes; css/rz-article-dark.css gives the unscrolled nav dark-panel colours -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <nav class="navbar">
         <div class="nav-container">
@@ -472,7 +478,7 @@
     <h3>Average PUE by Country</h3>
     <div class="rpt-chart">
         <div class="rpt-chart-title">Power Usage Effectiveness (PUE) -- Lower is Better</div>
-        <div class="bar-r"><span class="bar-l">Singapore</span><div class="bar-t"><div class="bar-f" style="width:68%;background:linear-gradient(90deg,#059669,#34d399)"><span class="bar-v">1.55</span></div></div></div>
+        <div class="bar-r"><span class="bar-l">Singapore</span><div class="bar-t"><div class="bar-f" style="width:68%"><span class="bar-v">1.55</span></div></div></div>
         <div class="bar-r"><span class="bar-l">Malaysia</span><div class="bar-t"><div class="bar-f" style="width:62%"><span class="bar-v">1.48</span></div></div></div>
         <div class="bar-r"><span class="bar-l">Thailand</span><div class="bar-t"><div class="bar-f" style="width:68%"><span class="bar-v">1.55</span></div></div></div>
         <div class="bar-r"><span class="bar-l">Indonesia</span><div class="bar-t"><div class="bar-f" style="width:72%"><span class="bar-v">1.60</span></div></div></div>
@@ -748,7 +754,7 @@
 
     <script src="script.min.js?v=20261101-0e062c54"></script>
 <script src="auth.js?v=20261031-f01cb5a3" defer></script>
-<script src="rz-engine.min.js?v=20261107-df30269e" defer></script>
+<script src="rz-engine.min.js?v=20261110-cfbdaa79" defer></script>
 <script src="rz-tracker.js" defer></script>
 
 

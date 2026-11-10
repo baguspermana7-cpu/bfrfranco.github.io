@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://resistancezero.com/data/scenario-link.schema.json",
+  "title": "Scenario share link payload (#rzs=)",
+  "description": "Decoded payload of a calculator share link: base64url(UTF-8 JSON) after '#rzs='. Readers: js/rz-scenario.js readLink(). A new field means a version bump plus a reader update in the same release (ARCHITECTURE-P C4); tools/test-scenario-share-links.mjs checks the reader's limits equal the ones here.",
+  "type": "object",
+  "required": ["v", "calc", "inputs"],
+  "additionalProperties": false,
+  "x-rz-max-link-length": 8000,
+  "properties": {
+    "v": { "const": 1 },
+    "calc": { "type": "string", "pattern": "^[a-z0-9-]{1,40}$" },
+    "origin": { "type": "string", "pattern": "^[A-Za-z0-9_.:/-]{1,80}$", "description": "Optional. Where the link was made (e.g. an incident dossier). Never navigated to, never inserted as HTML." },
+    "inputs": {
+      "type": "object",
+      "maxProperties": 500,
+      "propertyNames": { "pattern": "^[A-Za-z0-9_:-]{1,80}$" },
+      "additionalProperties": {
+        "type": "object",
+        "required": ["t", "v"],
+        "properties": {
+          "t": { "enum": ["text", "number", "range", "select", "checkbox", "radio", "date", "textarea", "search", "tel", "url", "color", "month", "week", "time", "datetime-local"] },
+          "v": { "oneOf": [ { "type": "string", "maxLength": 2000 }, { "type": "boolean" } ] }
+        }
+      }
+    }
+  }
+}

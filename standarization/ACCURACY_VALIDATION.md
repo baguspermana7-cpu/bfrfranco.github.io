@@ -39,6 +39,16 @@ Random IS allowed for:
 callouts + per-hall metrics + facility totals MUST be identical every
 time. Only outdoor weather values change.
 
+**Uncertainty bands on the calculators (P08, v3.36.0).** A Monte-Carlo band (P5/P50/P95, histogram,
+probability) is a derived KPI, so it falls under this rule too. Every band draws from one seeded generator:
+`RZEngine.models.sim.rng(seed)` / `sim.monteCarlo(…, seed)`, or a page-local twin of the same LCG
+(constants `1103515245`, `12345`, default seed `123456789`) where the engine is not loaded (tier, TIA,
+spares, Cx). Each run restarts its stream, so the same inputs give the same band on every load.
+There is no unseeded fallback: if the engine is missing, the band shows "—" and says why. Under each band, a basis line
+prints the assumed spreads, the distribution, the number of draws and the seed. Gate:
+`tools/test-seeded-uncertainty.mjs`. It checks that no `Math.random` remains except for id generation, that the
+twins equal the engine, and that 7 bands are identical across two fresh loads with the seed printed.
+
 **v2.2.0 (Track A §A5) — the rule at full depth.** `datahallAI.html` no longer defines `R()` /
 `RI()`, and the 22 deep-mimic renderers read every value from their equipment payload
 (`RZ_HMI_P`). The "random IS allowed" list above now means *seeded*: a sensor-class value comes from

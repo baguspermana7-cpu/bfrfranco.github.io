@@ -166,7 +166,7 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha384-iw3OoTErCYJJB9mCa8LNS2hbsQ7M3C0EpIsO/H5+EGAkPGc6rk+V8i04oW/K5xq0" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4" crossorigin="anonymous"></script>
-    <script src="js/rz-version.js?v=20261110-b57138f3" defer></script>
+    <script src="js/rz-version.js?v=20261110-05cf4722" defer></script>
     <script src="js/rz-calc-utils.js?v=20260920-ef3425ae" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
@@ -761,7 +761,7 @@
                     <div class="metric-box"><div class="metric-label">P95, high case</div><div class="metric-value" id="mcP95">--</div><div class="metric-sub">tCO&#8322;e/yr</div></div>
                     <div class="metric-box"><div class="metric-label">Standard deviation</div><div class="metric-value" id="mcStdDev">--</div><div class="metric-sub">tCO&#8322;e/yr</div></div>
                 </div></div>
-                <figure class="fig res-fig"><div class="chart-container"><canvas id="histogramChart" role="img" aria-label="Distribution of annual emissions over 10,000 runs"></canvas></div><figcaption><b>FIG. 3</b> · Annual emissions over 10,000 runs · PUE ±10 %, grid factor ±15 %, generator hours ±30 % · amber = above P95</figcaption></figure>
+                <figure class="fig res-fig"><div class="chart-container"><canvas id="histogramChart" role="img" aria-label="Distribution of annual emissions over 10,000 runs"></canvas></div><figcaption><b>FIG. 3</b> · Annual emissions over 10,000 runs · amber = above P95<br><span class="basis" id="mcBasis" data-rz-authored-basis="P08: spreads, draws and seed of this band, written from the same object the simulation samples">Uncertainty: computing…</span></figcaption></figure>
             </div>
             <div class="cf-pro-panel tool-results" id="panelTornado">
                 <div class="res-head"><h2>Sensitivity</h2><span class="basis">each input ±20 %, the others at base</span></div>
@@ -1612,15 +1612,32 @@ var _cap = {
         generateNarrative(totalEmissions, rating, intensity, offsetCost, taxExposure, totalLifecycle);
     }
 
+    // P08: one seeded stream (RZEngine.models.sim.rng), so the same inputs always give the same band. The spreads
+    // below are both the sampling source and the printed basis line.
+    var MC_SPREADS = [
+        { key: 'pue', label: 'PUE', min: 0.9, max: 1.1 },
+        { key: 'grid', label: 'grid factor', min: 0.85, max: 1.15 },
+        { key: 'gen', label: 'generator hours', min: 0.7, max: 1.3 }
+    ];
     function runMonteCarlo(baseEmissions) {
         var N = 10000;
         var results = [];
-        for (var i = 0; i < N; i++) {
-            var pueVar = 0.9 + Math.random() * 0.2;
-            var gridVar = 0.85 + Math.random() * 0.3;
-            var genVar = 0.7 + Math.random() * 0.6;
-            results.push(baseEmissions * ((pueVar + gridVar + genVar) / 3));
+        var basisEl = document.getElementById('mcBasis');
+        var sim = window.RZEngine && RZEngine.models && RZEngine.models.sim;
+        if (!sim || typeof sim.rng !== 'function') {
+            ['mcP5', 'mcP50', 'mcP95', 'mcStdDev'].forEach(function (id) { var e = document.getElementById(id); if (e) e.textContent = '—'; });
+            if (basisEl) basisEl.textContent = 'Uncertainty unavailable: the engine did not load.';
+            return;
         }
+        var rng = sim.rng(sim.DEFAULT_SEED);
+        for (var i = 0; i < N; i++) {
+            var sum = 0;
+            for (var k = 0; k < MC_SPREADS.length; k++) sum += MC_SPREADS[k].min + rng() * (MC_SPREADS[k].max - MC_SPREADS[k].min);
+            results.push(baseEmissions * (sum / MC_SPREADS.length));
+        }
+        if (basisEl) basisEl.textContent = 'Uncertainty: ' + MC_SPREADS.map(function (d) {
+            return d.label + ' \u00b1' + Math.round((d.max - d.min) / 2 * 100) + ' %';
+        }).join(', ') + ' (uniform, assumed) \u00b7 ' + N.toLocaleString('en-US') + ' draws \u00b7 seed ' + rng.seed;
         results.sort(function(a, b) { return a - b; });
         var mean = results.reduce(function(a, b) { return a + b; }, 0) / N;
         var p5 = results[Math.floor(N * 0.05)];
@@ -1916,7 +1933,7 @@ var _cap = {
         html += '<div class="pdf-footer">resistancezero.com \u00b7 Generated ' + dateStr + ' \u00b7 All calculations performed client-side \u00b7 No data transmitted to any server<br>Carbon Footprint Calculator v1.0 \u2014 Bagus Dwi Permana Portfolio</div>';
 
         html += '<script src="auth.js?v=20261031-f01cb5a3" defer><\/script>';
-        html += '<script src="rz-engine.min.js?v=20261107-df30269e" defer><\/script>';
+        html += '<script src="rz-engine.min.js?v=20261110-cfbdaa79" defer><\/script>';
         html += '</body></html>';
         w.document.write(html);
         w.document.close();
@@ -2162,11 +2179,11 @@ var _cap = {
     }
     </script>
     <script src="rz-tracker.js" defer></script>
-<script src="rz-engine.min.js?v=20261107-df30269e" defer></script>
+<script src="rz-engine.min.js?v=20261110-cfbdaa79" defer></script>
 
 <!-- Supabase save/reload scenario (additive) -->
 <script src="js/rz-config.js?v=20260920-eed056f9"></script>
-<script src="js/rz-scenario.js?v=20261110-8719f171"></script>
+<script src="js/rz-scenario.js?v=20261110-8a06cf0c"></script>
 <script type="module" src="js/rz-supabase.js?v=20260920-90bd6417"></script>
 <script>
 (function(){function m(){[].forEach.call(document.querySelectorAll('svg:not([aria-label]):not([aria-hidden])'),function(s){s.setAttribute('aria-hidden','true');});}

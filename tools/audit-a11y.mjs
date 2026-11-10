@@ -43,6 +43,9 @@ const PAGES = [
   'glossary.html',
   'datacenter-solutions.html',
   'cx-calculator.html',   // K34 (v3.35.6): gradient surfaces + a reveal-armed #cxResults; axe judges flat-panel text, test-cx-gradient the hero
+  'opex-calculator.html#rzs=eyJ2IjoxLCJjYWxjIjoib3BleCIsImlucHV0cyI6eyJpdExvYWQiOnsidCI6Im51bWJlciIsInYiOiIxNTAwIn19fQ', // P02 (v3.36.0): a calculator opened from a share link, with its Shared-scenario banner shown
+  'pillar-cooling.html', // P23 (v3.36.0): now loads the editorial register; nav over a dark hero in day mode
+  'asean-dc-report-2026.html', // P23 (v3.36.0): same
   'tia-942-checklist.html', // X3 (v3.35.11): dark mode was unreachable (dead theme button), so its contrast was never judged
 ];
 const THEMES = ['light', 'dark'];
