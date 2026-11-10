@@ -11,6 +11,27 @@ release sections rather than semver.
 
 ---
 
+## v3.35.11 — 2026-11-10 — "The TIA-942 checklist can switch to dark, and tool breadcrumbs read as links"
+
+Found by the product-transformation baseline (defect X3): the theme button on `tia-942-checklist.html` called
+`toggleCalcTheme()`, a function that page never defined, so the button did nothing and dark mode was unreachable.
+
+### Fixed
+- `tia-942-checklist.html`: a head script applies the saved theme before first paint, and `toggleCalcTheme()` flips
+  `data-theme`, saves it and swaps the sun/moon icon. Checked headlessly: light → dark on click, dark after reload,
+  light again on the second click, 0 page errors.
+- `css/rz-tool.css`: breadcrumb links on tool pages are underlined (1px, 3px offset). Colour alone marked them, which
+  axe reports as serious `link-in-text-block` (WCAG 1.4.1) in both themes.
+
+### Added
+- `tools/test-calc-onclick-handlers.mjs` (ship gate): loads the 11 calculators and requires every inline `onclick`
+  to call a function that exists. RED on v3.35.10 (1 dead handler of 1,254: the TIA-942 theme button), GREEN now.
+- `tools/audit-a11y.mjs` covers `tia-942-checklist.html` (10 pages × 2 themes, 0 critical/serious).
+
+Standards: `standarization/UIUX_AUDIT_LEDGER.md` row 24.
+
+---
+
 ## v3.35.10 — 2026-11-10 — "Opening a saved scenario reaches its calculator on all eleven"
 
 Found by the parallel assessment (addendum X2) and widened by its test: "Open" on a saved scenario built the target as
