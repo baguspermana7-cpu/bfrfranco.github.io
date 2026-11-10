@@ -274,6 +274,8 @@ supersede what items 1, 3, 6 and 7 once recommended as the replacement; the full
 12. **Neon green `#00FF88`** and any second accent hue in chrome; cyan/blue floating buttons (§A32).
     Exception, by the owner's choice (2026-11-09, K33): the HOMEPAGE runs 60/30/10 — graphite/white base, electric
     blue as light behind panels (not bands), orange accent — gated by `tools/test-index-depth.mjs`; see ANTI_VIBECODE_STANDARD §B. Other pages unchanged.
+    Also by the owner (2026-11-10, R107): homepage cards carry a coloured light rising from their bottom edge (inset
+    box-shadow only, never a pseudo-element or gradient fill — axe goes blind), gated by `tools/test-index-micro.mjs`.
 13. **Serif display + mono-uppercase chrome** (Fraunces hero, tracked mono nav/buttons) (§A34).
 14. **Stat-tile strips, glass by token, hover lift, keyword marquee/ticker** (§A28–31). Facts render as a
     fact list (`data-rz-fact-list`), one per row.

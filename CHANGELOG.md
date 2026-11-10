@@ -11,6 +11,38 @@ release sections rather than semver.
 
 ---
 
+## v3.35.8 — 2026-11-10 — "Cards glow from the bottom again, and the employer card turns like a real card"
+
+Owner R106–R108: "Continue polish more, khususnya motion micro interaction juga, gradien dan effect2 smooth"; "Gak ada
+effect flip yg sangat bagus itu cardnya … gradien yg di versi awal yg gradien bawah jangn dihilangkan"; "Design better";
+answers: the old card-bottom glow, the employer card flip; Astra Agro: "deliver 7 mills baru, 2 refinery dan 2
+fertilizer plan dan 2 ports".
+
+### Changed
+- **The card-bottom glow is back.** The result panel, the three case cards, both contact panels and every employer card
+  carry a coloured light rising from their lower edge (blue, indigo, and the orange accent on the third case card and the
+  current employer). Hovering a card strengthens the light; nothing moves.
+- **The employer card turns like a real card.** The card rises toward you as it turns, the turning face casts a shadow,
+  a glare band crosses it, and the back's facts arrive one after another once the face is past 90°.
+- **Smaller motion:** the light behind results, cases and contact drifts gently with the scroll; the copy button turns its
+  icon into a check in blue (it flashed an off-palette green); result rows tint on hover and their bar brightens.
+- **Astra Agro Lestari** leads with the delivery: 7 new mills, 2 refineries, 2 fertilizer plants and 2 ports (front and
+  back of the card).
+
+### Fixed
+- **Employer card text was never measured for contrast.** The v1.4.0 hero aurora layers (`.hero::before/::after`) made
+  axe give up on everything in the hero in dark, and the hidden back face lying over the front did the same in light.
+  The aurora is now a plain background colour (pixel diff at most 5/255) and the face not shown is hidden at rest; 8 of 8
+  planted low-contrast lines now fail as they should (3 of 8 before). Measuring the hero exposed its disclaimer at
+  3.08:1 in dark; it now uses the muted token (AA).
+
+### Gates
+- New `tools/test-index-micro.mjs` (G1–G3 bottom glow and measurable contrast, F1–F3 physical flip / cascade / reduced
+  motion, M5 scroll drift, M6 copy feedback, M8 row hover), wired into ship-gate. Red on v3.35.7: 16 laws; green after.
+  It runs Chrome with a fine hovering pointer — headless reports `hover: none`, which left every hover-gated rule dead.
+- Docs: CLAUDE.md homepage exception, ANTI_VIBECODE_STANDARD card-bottom glow line, MOTION_STANDARD rows,
+  AGENT_HARNESS_STANDARD E7/E8, UIUX_AUDIT_LEDGER R106–R108.
+
 ## v3.35.7 — 2026-11-10 — "The homepage light becomes a scene, and its text is measured again"
 
 Owner R105: "Mainkan gradien. Yg sangat cantik" (sent to the homepage session, building on R101–R104 blue as light).

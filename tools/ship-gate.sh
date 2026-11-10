@@ -331,10 +331,12 @@ gate "LTC lab step thread — S1-S36: every shown figure follows the plant model
 # --strict exits 1 on a dirty page (the fixture is not in the tree, so the source audits never read it).
 gate "Cx program tree — five deep, exact allocation of programPlan, handbook shares (128 laws)" \
   timeout 120 node tools/test-cx-tree.mjs
-gate "R098-R104 homepage depth + 60/30/10 — blue as light, measured bars, AA, one accent, aligned, bar motion, tier rhythm, two hues, entrance choreography (D1-D14)" \
+gate "R098-R104 homepage depth + 60/30/10 — blue as light, measured bars, AA, one accent, aligned, bar motion, tier rhythm, two hues, entrance choreography, contrast measurable under the light, light scene (D1-D16)" \
   env RZ_BASE=$LTC_BASE timeout 300 node tools/test-index-depth.mjs
 gate "R079 homepage — employer cards flip on a click (3D, mid-turn, keyboard), capsule nav + Contact pill, footer wordmark, ids kept (27 laws)" \
   env RZ_BASE=$LTC_BASE timeout 300 node tools/test-index-r079.mjs
+gate "R106-R108 homepage polish — card-bottom glow (measurable), physical employer flip, light drift, copy feedback, row hover (G1-G3, F1-F3, M5-M8)" \
+  env RZ_BASE=$LTC_BASE timeout 400 node tools/test-index-micro.mjs
 gate "R079 footer wordmark — outlined glyphs match a fresh build" \
   "$HOME/.venvs/pdfkit/bin/python" tools/build-wordmark.py --check
 gate "slop render scan precision — circle and hairline exempt, --strict fails a dirty page" \

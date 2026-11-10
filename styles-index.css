@@ -4313,32 +4313,13 @@ section {
    "Keren, tidak default Claude"
    ========================================================================== */
 
-/* -- Animated aurora mesh on hero (multi-stop radial gradients drifting) -- */
+/* -- The v1.4.0 aurora layers (hero ::before/::after, a blurred var(--card-bg) fill) are gone: the hero keeps the same
+      tone as a plain background colour (pixel diff max 5/255 over 0.3 % of the hero). A full-cover ancestor
+      pseudo-element made axe file every text inside the hero — the employer cards — as "pseudoContent" (incomplete,
+      never failed); test-index-micro G3. -- */
 [data-theme="dark"] .hero::before,
-[data-theme="dark"] .hero::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-}
-[data-theme="dark"] .hero::before {
-    background:
-        var(--card-bg);
-    filter: blur(40px);
-    z-index: -1;
-}
-[data-theme="dark"] .hero::after {
-    background:
-        var(--card-bg);
-    filter: blur(50px);
-    z-index: -1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    [data-theme="dark"] .hero::before,
-    [data-theme="dark"] .hero::after { animation: none !important; }
-}
+[data-theme="dark"] .hero::after { content: none; }
+[data-theme="dark"] .hero { background-color: var(--card-bg); }
 
 /* -- Film grain noise overlay — DISABLED on the homepage (index-only stylesheet)
       so the background stays a clean smooth gradient in dark + rainbow, matching
@@ -5449,6 +5430,12 @@ section.dp-band .sec-eyebrow::after { background: var(--dp-on-line); }
     box-shadow: none; transform: none; animation: none; opacity: 1; text-align: left;
 }
 #metrics .res-row:first-of-type { border-top: 0; }
+#metrics .res-row { transition: background-color 220ms ease-out; }
+#metrics .res-fill { transition: filter 220ms ease-out; }
+@media (hover: hover) and (pointer: fine) {
+    #metrics .res-row:hover { background-color: color-mix(in srgb, var(--dp-blue) 6%, transparent); }
+    #metrics .res-row:hover .res-fill { filter: brightness(1.15) saturate(1.1); }
+}
 #metrics .res-row::before, #metrics .res-row::after { display: none; }
 #metrics .res-row:hover { transform: none; box-shadow: none; border-color: var(--dp-line); }
 #metrics .res-row .metric-value { margin: 0; font: 500 2.25rem/1 'JetBrains Mono', 'IBM Plex Mono', monospace; color: var(--dp-ink); letter-spacing: -0.01em; }
@@ -5629,11 +5616,6 @@ section.dp-band .sec-eyebrow::after { background: linear-gradient(90deg, var(--d
 .emp-card.emp-armed:not(.is-flipped) .emp-front { animation: none; }
 /* the hidden face leaves the flow, so a card is as tall as the face it shows (R079 L3); JS animates the height change */
 .emp-card:not(.is-flipped) .emp-back, .emp-card.is-flipped .emp-front { position: absolute; top: 0; left: 0; right: 0; pointer-events: none; }
-.emp-face::after { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: 0; background: linear-gradient(90deg, rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0.04)); }
-.emp-card.emp-turning { animation: emp-dip 800ms cubic-bezier(0.45, 0, 0.25, 1); }
-.emp-card.emp-turning .emp-face::after { animation: emp-shade 800ms cubic-bezier(0.45, 0, 0.25, 1); }
-@keyframes emp-dip { 0%, 100% { transform: scale(1); } 45% { transform: scale(0.965); } }
-@keyframes emp-shade { 0%, 100% { opacity: 0; } 40% { opacity: 1; } }
 .emp-btn.emp-open, .emp-btn.emp-close {
     position: absolute; right: 12px; bottom: 12px; z-index: 1;
     width: 36px; min-height: 36px; height: 36px; padding: 0; margin: 0;
@@ -5653,9 +5635,73 @@ section.dp-band .sec-eyebrow::after { background: linear-gradient(90deg, var(--d
     .emp-back { opacity: 0; }
     .emp-card.is-flipped .emp-front { opacity: 0; }
     .emp-card.is-flipped .emp-back { opacity: 1; }
-    .emp-card.emp-turning, .emp-card.emp-turning .emp-face::after { animation: none; }
+    .emp-card.emp-turning, .emp-card.emp-turning .emp-face, .emp-card.emp-arrive .emp-back .emp-facts > div { animation: none; }
+    .emp-card.emp-turning .emp-glare { background: none; animation: none; }
 }
 
+/* R106/R107 (owner 2026-11-10: "polish more … motion micro interaction … gradien dan effect2 smooth"; "Gak ada effect flip
+   yg sangat bagus itu cardnya … gradien yg di versi awal yg gradien bawah jangn dihilangkan"; "Design better"; answers:
+   the OLD card-bottom glow, the EMPLOYER flip). The bottom glow returns as LIGHT rising from each card's lower edge —
+   an inset box-shadow, so the text above it stays measurable by axe (a pseudo-element or gradient fill would blind it:
+   test-index-depth D15, test-index-micro G3). Colour rotates on the case cards (blue, indigo, orange = the 10 %), and a
+   hover strengthens the light without moving the card. */
+:root { --gl-blue: rgba(36, 86, 230, 0.16); --gl-indigo: rgba(80, 56, 220, 0.13); --gl-warm: rgba(194, 65, 12, 0.13); --gl-k: 1; }
+[data-theme="dark"] { --gl-blue: rgba(59, 107, 255, 0.34); --gl-indigo: rgba(110, 84, 255, 0.30); --gl-warm: rgba(255, 122, 26, 0.26); }
+#metrics .res-panel, #contact .contact-info, #contact .contact-form, #case-studies .case-card:nth-of-type(3n+1), .emp-card:nth-of-type(odd) .emp-face { --glow-c: var(--gl-blue); }
+#case-studies .case-card:nth-of-type(3n+2), .emp-card:nth-of-type(even) .emp-face { --glow-c: var(--gl-indigo); }
+#case-studies .case-card:nth-of-type(3n), .emp-card.is-current .emp-face { --glow-c: var(--gl-warm); }
+#metrics .res-panel, #case-studies .case-card, #contact .contact-info, #contact .contact-form {
+    --glow-h: 130px;
+    box-shadow: inset 0 1px 0 0 var(--dp-glow-edge), inset 0 110px 90px -90px var(--g-catch), inset 0 calc(var(--glow-h) * -1) 110px -70px var(--glow-c), 0 -30px 90px -40px var(--dp-glow-edge);
+    transition: box-shadow 520ms cubic-bezier(0.23, 1, 0.32, 1), border-color 200ms ease-out;
+}
+.emp-face { --glow-h: 110px; box-shadow: inset 0 calc(var(--glow-h) * -1) 100px -70px var(--glow-c); }
+@media (hover: hover) and (pointer: fine) {
+    #case-studies .case-card:hover, #contact .contact-info:hover, #contact .contact-form:hover { --glow-h: 210px; }
+    .emp-card:hover .emp-face { --glow-h: 170px; }
+}
+.emp-face { transition: transform 800ms linear(0, 0.0249, 0.0878, 0.1729, 0.2697, 0.3709, 0.4706, 0.5649, 0.6513, 0.7281, 0.7948, 0.8513, 0.8979, 0.9354, 0.9647, 0.9868, 1.0027, 1.0136, 1.0204, 1.0239, 1.0251, 1.0245, 1.0228, 1.0204, 1.0177, 1.0149, 1.0122, 1.0097, 1.0075, 1.0056, 1.004, 1.0027, 1.0016, 1.0008, 1.0002, 1), border-color 160ms, box-shadow 520ms cubic-bezier(0.23, 1, 0.32, 1); }
+/* The turn is physical: the card rises toward the viewer, the turning face casts a shadow, a glare band crosses it,
+   and the back's facts arrive one after another once the face is past 90°. */
+.emp-card { perspective: 1000px; }
+.emp-card:not(.is-flipped):not(.emp-turning) .emp-back, .emp-card.is-flipped:not(.emp-turning) .emp-front { visibility: hidden; }
+.emp-glare { display: none; position: absolute; inset: 0; z-index: 3; pointer-events: none; border-radius: inherit; background: none; }
+.emp-card.emp-turning .emp-glare { display: block; }
+.emp-card.emp-turning { animation: emp-lift 800ms cubic-bezier(0.45, 0, 0.25, 1); }
+.emp-card.emp-turning .emp-face { animation: emp-cast 800ms cubic-bezier(0.45, 0, 0.25, 1); }
+.emp-card.emp-turning .emp-glare {
+    background: linear-gradient(105deg, rgba(255, 255, 255, 0) 38%, rgba(255, 255, 255, 0.20) 50%, rgba(255, 255, 255, 0) 62%), linear-gradient(90deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.02));
+    background-size: 260% 100%, 100% 100%; background-repeat: no-repeat;
+    animation: emp-glare 800ms cubic-bezier(0.45, 0, 0.25, 1);
+}
+.emp-card.emp-arrive .emp-back .emp-facts > div, .emp-card.emp-arrive .emp-back .emp-period { animation: emp-rise 460ms cubic-bezier(0.23, 1, 0.32, 1) both; animation-delay: 360ms; }
+.emp-card.emp-arrive .emp-back .emp-facts > div:nth-child(1) { animation-delay: 420ms; }
+.emp-card.emp-arrive .emp-back .emp-facts > div:nth-child(2) { animation-delay: 480ms; }
+.emp-card.emp-arrive .emp-back .emp-facts > div:nth-child(3) { animation-delay: 540ms; }
+.emp-card.emp-arrive .emp-back .emp-facts > div:nth-child(4) { animation-delay: 600ms; }
+.emp-card.emp-arrive .emp-back .emp-facts > div:nth-child(5) { animation-delay: 660ms; }
+.emp-card.emp-arrive .emp-back .emp-facts > div:nth-child(n+6) { animation-delay: 720ms; }
+@keyframes emp-lift { 0%, 100% { transform: scale(1); } 45% { transform: translateY(-6px) scale(1.035); } }
+@keyframes emp-cast { 0%, 100% { box-shadow: inset 0 calc(var(--glow-h) * -1) 100px -70px var(--glow-c); } 45% { box-shadow: inset 0 calc(var(--glow-h) * -1) 100px -70px var(--glow-c), 0 34px 60px -26px rgba(0, 0, 0, 0.45); } }
+@keyframes emp-glare { 0% { opacity: 0; background-position: 130% 0, 0 0; } 25% { opacity: 1; } 75% { opacity: 1; } 100% { opacity: 0; background-position: -30% 0, 0 0; } }
+@keyframes emp-rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+/* The light layer drifts with the scroll (scroll-driven, off the main thread); reduced motion keeps it still. */
+@supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+        .dp-light { animation: dp-drift linear both; animation-timeline: view(); animation-range: cover; }
+        @keyframes dp-drift { from { transform: translateY(-5%); } to { transform: translateY(5%); } }
+    }
+}
+/* Copy feedback: the copy icon crossfades to a check, in the light's blue (no off-palette green). */
+.copy-btn .copy-ico { position: relative; display: inline-grid; width: 13px; height: 13px; }
+.copy-btn .copy-ico svg { grid-area: 1 / 1; transition: opacity 160ms ease-out, transform 220ms cubic-bezier(0.23, 1, 0.32, 1); }
+.copy-btn .ico-check { opacity: 0; transform: scale(0.6); }
+.copy-btn.copied, #contact .copy-btn.copied, [data-theme="dark"] #contact .copy-btn.copied { color: var(--dp-blue-text); border-color: var(--dp-blue-text); background: color-mix(in srgb, var(--dp-blue) 10%, transparent); }
+.copy-btn.copied .ico-copy { opacity: 0; transform: scale(0.6); }
+.copy-btn.copied .ico-check { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+    .emp-face { transition: opacity 180ms ease-out, border-color 160ms ease-out, box-shadow 520ms ease-out; }
+}
 /* R103/R104 (owner "animasi motionnya sangat2 kurang payah. Cari inspirasi"; "bener2 keren effect2 motion"): one
    entrance choreography per section, after the owner's echo reference and Emil Kowalski's enter recipe — the eyebrow
    rule draws from the left, the title sharpens out of a 6 px blur, the content follows on a 70 ms stagger, and the blue

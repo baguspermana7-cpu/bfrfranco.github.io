@@ -78,6 +78,12 @@ file/rule findings across 172 files despite exit 0**.
   must be a real element, not a `::before`: axe files every text under an ancestor pseudo-element larger than a quarter
   of the text box as "incomplete" (`pseudoContent`), never as a failure — v3.35.5's section `::before` halo left the
   results, cases and contact text unmeasured (0/6 planted lines caught; 6/6 after; `tools/test-index-depth.mjs` D15).
+  Homepage card-bottom glow (R107, v3.35.8; owner 2026-11-10 "gradien yg di versi awal yg gradien bawah jangn
+  dihilangkan", answer "Glow bawah kartu lama"): result panel, case cards, contact panels and employer card faces carry a
+  light rising from the bottom edge as an INSET `box-shadow` (blue, indigo, the orange accent on the third case card and
+  the current employer); hover strengthens the light and never moves the card. Never as `::before/::after` or a gradient
+  fill: both make axe file the text as incomplete. The v1.4.0 hero aurora (`.hero::before/::after`, a blurred
+  `var(--card-bg)` fill) is removed for the same reason — it hid every employer card from the contrast gate (G3).
   Where a gradient fill does carry text, `tools/test-cx-gradient.mjs` measures every run against the worst
   background pixel under it (1440/390, both themes; red with the muted tier put back). 3D canvas unchanged (K16).
 - **A gradient hides a contrast failure (v3.27.0):** axe cannot measure text over a gradient and files it

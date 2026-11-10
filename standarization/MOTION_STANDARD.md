@@ -205,6 +205,10 @@ blur on the section title only):
 | Moment | What moves | Timing |
 |---|---|---|
 | Section enters (below the fold only) | eyebrow rule draws from the left; title sharpens out of a 6 px blur; lede, then the content items on a 70 ms stagger; the light layer behind the section (`.dp-light`, a real element since v3.35.7) fades up | 600–900 ms, `cubic-bezier(0.23, 1, 0.32, 1)`; light 1400 ms |
+| Employer card turns (click, Enter) | both faces rotate on the spring `linear()`; the card rises (translateY −6 px, scale 1.035 at 45 %), the turning face casts a shadow and a glare band crosses it (`.emp-glare`, painted only while turning); the back's facts arrive on a 60 ms cascade from 420 ms | 800 ms turn, facts 460 ms `cubic-bezier(0.23, 1, 0.32, 1)`; reduced motion: opacity swap, no lift/glare/cascade |
+| Card hover (homepage) | the bottom glow grows (`--glow-h` 130 → 210 px), border colour; never a transform | 520 ms `cubic-bezier(0.23, 1, 0.32, 1)`, hover-gated |
+| Light layer (`.dp-light`) | drifts −5 % → 5 % with the scroll (`animation-timeline: view()`) | scroll-linked; reduced motion: still |
+| Copy button | copy icon crossfades to a check, in the light's blue | 160–220 ms |
 | Result bars | grow from 0 to their value | 600 ms, 60 ms row stagger |
 | Employer card click (anywhere on the card) | both faces turn in 3D (front 0→180°, back −180→0°), the card dips to 0.965 and a shade crosses each face mid-turn; the height follows the shown face | 800 ms damped spring as `linear()` (ζ 0.78, ~2 % settle, no bounce); height 500 ms |
 
