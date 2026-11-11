@@ -110,6 +110,10 @@ TechnicalArticle → BreadcrumbList → FAQPage
 - Add 3-5 FAQs based on likely search queries for the article topic
 - Keep answers concise (1-2 sentences)
 - Place after BreadcrumbList schema
+- Every question in FAQPage JSON-LD must also be visible on the page (Google's FAQ structured-data guideline:
+  the marked-up content must be visible to the reader). Gate: `node tools/test-faq-visible.mjs` (2026-11-11,
+  PRD-X-DEFECTS FR-X7B.1, law X7.2, report mode). It found 77 pages with 263 hidden questions; what happens to them
+  is owner decision D-XDEF-1. Do not add a question that is not on the page.
 
 ---
 

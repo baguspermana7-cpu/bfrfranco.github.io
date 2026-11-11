@@ -80,7 +80,15 @@ function lawX12_1a() {
   return bad.length ? { ok: false, reason: bad.length + ': ' + bad.join('; ') } : { ok: true, reason: '0 placeholders' };
 }
 
-const LAWS = { 'X7.1': lawX7_1, 'X12.1a': lawX12_1a, 'X18.1': lawX18_1, 'X19.1': lawX19_1 };
+/* X7.2 — every FAQPage question on every sitemap page is visible on that page (FR-X7B.1). Report mode until the
+   owner decides D-XDEF-1 (remove the hidden questions); then it joins --blocking. */
+function lawX7_2() {
+  const r = spawnSync('node', ['tools/test-faq-visible.mjs'], { cwd: ROOT, encoding: 'utf8', timeout: 120000 });
+  const sum = ((r.stdout || '').match(/test-faq-visible: .*/) || ['no summary line'])[0];
+  return { ok: r.status === 0, reason: sum };
+}
+
+const LAWS = { 'X7.1': lawX7_1, 'X7.2': lawX7_2, 'X12.1a': lawX12_1a, 'X18.1': lawX18_1, 'X19.1': lawX19_1 };
 
 function parse(argv) {
   const a = { strict: false, blocking: new Set(), law: null, json: false };
