@@ -6,23 +6,24 @@
 |---|---|
 | PRD id | PRD-Q09 |
 | Feature | Every incident dossier and the hub show the dossier's verification state in words; the 15 seed dossiers are verified against primary sources through a recorded, machine-checked checklist; reference types mean what they say (who published a source is checked, not assumed); the owner's open review queue is decided; the 75 unbuilt candidates of `_master-list.json` get a generated build order from a stated rule |
-| Version | 1.0 |
+| Version | 1.1 |
 | Status | Draft |
 | Author | Opus 5.5 (Fable quota exhausted) |
 | Date | 2026-11-11 |
 | Owner requests | R110 (PRD per idea), R111 (24-section structure) |
 | Priority | 57.0 (addendum rank 17: I 6, N 3, C 8, E 6, effort 5 weeks; `documentation/PRODUCT_INNOVATION_ASSESSMENT_2026-11_ADDENDUM.md:92`) |
 | Related findings | Q9 (`…_ADDENDUM.md:422-438`); maturity row "Incident library: 3" (`:30`); BASELINE §2 row "Incident library" (`00-audit-baseline/BASELINE.md:25`). New findings F1–F15 (§3.1); corrections C1–C6 (§3.3) |
-| Dependencies | None blocking for Phase A. Reads the seed rule of PRD-Q18 (§3 F1, assumption A1: Q9 keeps it) and the access decision of PRD-Q01 (F5, §16: dossiers stay root-only and noindex). Interacts with PRD-Q03 law L7 (a verified facility seed needs a `_reproduce-review.json` verdict once Q3 has shipped). Owner decisions D-1…D-12 and OQ-1…OQ-4 (§23) |
-| Related modules | `tools/build-incidents.py`, `tools/test-incidents-corpus.mjs`, `tools/_ingest_rca.py`, `tools/_ingest_deep.py`, `tools/_incidents_next_batch.py`, new `tools/incidents_verify.py`, new `tools/incidents_build_order.py`, new `tools/test-incident-verification.mjs`, `data/incidents/*.json`, `data/incidents/_master-list.json`, `data/incidents/_review-queue.md`, new `data/incidents/_publishers.json`, new `data/incidents/_build-order.json`, generated `dc-incidents.html` and 43 `incident-*.html`, `tools/ship-gate.sh` |
+| Dependencies | None blocking for Phase A. **Owns the dossier state model** (coordinator decision D12): the field `sourcing.state` and the shared rules module `tools/lib/incident_rules.py`, which PRD-Q18 and PRD-Q03 consume (dependency edge Q09 → Q18 and Q09 → Q03 only). Shared, built outside this PRD: `tools/owner_decisions.py` (one approval CLI, D15; specified by `03-architecture`). Reads the access decision of PRD-Q01 (F5, §16: dossiers stay root-only and noindex). Interacts with PRD-Q03 law L7 (a verified facility seed needs a `_reproduce-review.json` verdict once Q3 has shipped). Owner decisions D-Q09-1…D-Q09-16 in `documentation/product-transformation/DECISIONS.md` (§23) |
+| Related modules | `tools/build-incidents.py`, `tools/test-incidents-corpus.mjs`, `tools/_ingest_rca.py`, `tools/_ingest_deep.py`, `tools/_incidents_next_batch.py`, new `tools/incidents_verify.py`, new `tools/lib/incident_rules.py` (shared rules, owned here), shared `tools/owner_decisions.py` (record writes), new `tools/incidents_build_order.py`, new `tools/test-incident-verification.mjs`, `data/incidents/*.json`, `data/incidents/_master-list.json`, `data/incidents/_review-queue.md`, new `data/incidents/_publishers.json`, new `data/incidents/_build-order.json`, generated `dc-incidents.html` and 43 `incident-*.html`, `tools/ship-gate.sh` |
 | Target wave | Addendum roadmap "Strategic, week 17 onward" (`…_ADDENDUM.md:558`). Phase A (visible state, reference corrections, tooling) may run earlier: it removes claims the pages cannot back, the same class as the honesty work of Q6 |
-| Approval status | Approved by owner R110/R111 2026-11-10 (the PRD set); approval class "ordinary (content)" (`01-improvement-register/REGISTER.md:22`). Owner decisions still needed: D-1…D-12 (review-queue items and two "official" questions) and OQ-1…OQ-4 (rule order, library size, legacy state, press-only exception) |
+| Approval status | Approved by owner R110/R111 2026-11-10 (the PRD set); approval class "ordinary (content)" (`01-improvement-register/REGISTER.md:22`). Owner decisions still needed, recorded in `DECISIONS.md` (status PROPOSED, recommendation as default): D-Q09-1…D-Q09-12 (review-queue items and two "official" questions, were D-1…D-12) and D-Q09-13…D-Q09-16 (rule order, library size, legacy state, press-only exception, were OQ-1…OQ-4) |
 
 Change history
 
 | Version | Date | Author | Change |
 |---|---|---|---|
 | 1.0 | 2026-11-11 | Opus 5.5 | First complete draft, 24 sections. Every count verified against `wt-hub3` at `fcaa892df` (branch `hub-r3`) with the scripts in Appendix A |
+| 1.1 | 2026-11-11 | Opus 5.5 | QA batch 2 revisions (D9–D16). D9: gate `--phase A|B|C|D` and `--fixture`; a law-wiring table (§20.2) states for each law the phase it blocks from and its precondition, and laws whose preconditions are unmet run in report mode (PASS/FAIL lines, never fail the gate); one planted-violation fixture per law replaces the "file missing" red proofs (§20.5); AC-5 rewritten to the existing hub word "Press-sourced", which §9.6 and FR-3 now define. D12: this PRD owns the state model as the explicit field `sourcing.state` (A1, FR-1, §10.2, V15) and one rules module `tools/lib/incident_rules.py` (§11.7) consumed by PRD-Q18 and PRD-Q03. D15: decisions renamed D-Q09-1…16 and moved to `DECISIONS.md`; request pattern `^R[0-9]{3,4}$`; the verification write moves from `incidents_verify.py stamp` to `tools/owner_decisions.py record incident-verification`. D16: no Supabase, so `tools/lib/rz-supa-stub.mjs` is named and not used (§20.1). `ship-gate.sh` insertions by anchor text, not line number |
 
 ## 2. Executive summary
 
@@ -34,7 +35,7 @@ This PRD delivers:
 
 1. **A visible state on every dossier and on the hub.** "Seed — sources pending" with a plain explanatory note; "Last verified {date}" for the 28 researched dossiers; "Verified {date}" for dossiers that pass the new checklist.
 2. **Reference integrity.** A controlled type vocabulary and a small publisher registry (`_publishers.json`). The `officialPostmortem` flag must equal what the references prove.
-3. **A verification CLI.** `tools/incidents_verify.py` with `brief`, `check` and `stamp`. A dossier can lose its seed marker only through `stamp`, after every machine check passes and a reviewer is recorded.
+3. **A verification CLI.** `tools/incidents_verify.py` with `brief` and `check`; the write (the "stamp") goes through the shared approval CLI as `python3 tools/owner_decisions.py record incident-verification <slug>` (coordinator decision D15). A dossier leaves the state `seed` only through that record, after every machine check passes and a reviewer is recorded.
 4. **The 15 seeds verified in five batches**, in an order given by a stated rule. Every event and metric points at the reference that supports it, and the page shows those pointers.
 5. **Decisions on the 10 open review-queue items**, each with a recommendation, plus two new questions about what "official" means.
 6. **A generated build order** (`tools/incidents_build_order.py` → `_build-order.json`) for the 75 distinct unbuilt candidates. The rule: (R1) a primary document whose publisher is confirmed, then (R2) a facility category the site's tools model, then (R3) newest first. The top 15 are listed in §5.7.
@@ -78,9 +79,9 @@ No fact is added by this PRD. Every claim a dossier makes after verification cit
 | C1 | Addendum: "Only 43 of the 113 candidates in `_master-list.json` are built" (`:30`); "70 candidates are unbuilt" (`:423`) | 37 list entries are covered by 34 built dossiers, and 9 built dossiers are not in the list; 76 entries remain, which are 75 distinct incidents (F8) | Q9 works from 75 candidates |
 | C2 | Addendum: "15 seed dossiers are unverified" | True of their verification, but they are researched drafts with full structure (F2); the marker was never resolved | The work is a verification pass against primary sources, not research from zero; effort per seed is lower (§19) |
 | C3 | Addendum acceptance: "0 dossiers read 'seed' without the visible note" | Today the marker is visible only as the last line of the page (F3) | Acceptance moves to the top of the page and to the hub (FR-2, FR-3; L1) |
-| C4 | Addendum acceptance: "Each verified dossier has at least 1 primary source" (`:438`) | 3 researched dossiers have no reference of an official type, 8 have no reference whose publisher is confirmed (F6), and a reference's type does not prove its publisher (F4) | The rule counts only references whose publisher is confirmed; an owner-accepted search record is the documented exception (FR-5, L3, OQ-4) |
+| C4 | Addendum acceptance: "Each verified dossier has at least 1 primary source" (`:438`) | 3 researched dossiers have no reference of an official type, 8 have no reference whose publisher is confirmed (F6), and a reference's type does not prove its publisher (F4) | The rule counts only references whose publisher is confirmed; an owner-accepted search record is the documented exception (FR-5, L3, D-Q09-16) |
 | C5 | BASELINE §2: "15 dossiers are still seed-only. Only 43 of the 113 candidates are built." | Seeds confirmed (15); the 43-of-113 reading is wrong as in C1 | As C1 |
-| C6 | Addendum Q9 workflow: "Research, verify sources, flip the flag." | No tool or rule governs the flip; any edit of `lastVerified` flips the state | The flip happens only through `incidents_verify.py stamp` after the checks pass (FR-7, L3) |
+| C6 | Addendum Q9 workflow: "Research, verify sources, flip the flag." | No tool or rule governs the flip; any edit of `lastVerified` flips the state | The flip happens only through the `incident-verification` record (`tools/owner_decisions.py record`) after the checks pass (FR-7, L3) |
 
 The addendum's other figures hold: 43 dossiers, 228 references, 15 seeds, `withPostmortem` 60, last update 2026-08-08 (Q18 A1: `lastUpdated` range 2026-07-31 to 2026-08-08).
 
@@ -105,13 +106,13 @@ The addendum's other figures hold: 43 dossiers, 228 references, 15 seeds, `withP
 |---|---|---|---|---|---|
 | O1 | Readers see the state | Seed dossiers without the state line and note; hub rows of seeds without the word; generated strings claiming the facts come from post-incident reports | 0 / 0 / 0 (today 15 / 15 / 47: 4 on the hub, the meta on each of 43 dossiers) | L1 | — |
 | O2 | "Official" is true | Official-typed references failing the publisher rule; dossiers whose `officialPostmortem` differs from the derived value | 0 / 0 (today 17 refs on 12 dossiers / 8) | L2 | Registry v1 (§10.3) is correct; every addition is reviewed |
-| O3 | Every non-seed dossier stands on a primary source | Non-seed dossiers with no confirmed primary reference and no accepted search record | 0 (today 8; 5 after the corrections of T-4) | L3 | OQ-4 accepts the search-record exception |
+| O3 | Every non-seed dossier stands on a primary source | Non-seed dossiers with no confirmed primary reference and no accepted search record | 0 (today 8; 5 after the corrections of T-4) | L3 | D-Q09-16 accepts the search-record exception |
 | O4 | Seeds burn down | Dossiers carrying the seed marker | 15 → 0 across five batches | `node tools/test-incident-verification.mjs --report` prints the count | One batch of 3 per 2 working days (§19); the owner may stop at any batch |
-| O5 | The queue is decided | Open items without a decision line; machine-checkable items still failing | 0 / 0 (today 10 / Q-9 fails on 17 dossiers) | L4 | Owner answers D-1…D-12 |
+| O5 | The queue is decided | Open items without a decision line; machine-checkable items still failing | 0 / 0 (today 10 / Q-9 fails on 17 dossiers) | L4 | Owner answers D-Q09-1…D-Q09-12 |
 | O6 | The order is reproducible | `_build-order.json` equals a fresh recompute; list entries not classified exactly once | equal / 0 (today: file missing; 7 duplicates unmarked) | L5 | — |
 | O7 | Nothing is silently left out | Dossiers without coordinates, cluster point or chunks | 0 (today 3 without coordinates) | L6 | — |
 | O8 | Gates run | Incident gates documented as mandatory but not in `ship-gate.sh` | 0 (today `test-incidents-corpus.mjs` and the new gate) | L7 | — |
-| O9 | New dossiers | Candidates built from the order | UNKNOWN — the owner sets the number (OQ-2); the PRD specifies the first 15 | `_build-order.json` coverage block | Earlier scope note "20–50 incidents" (project memory, 2026-07) may still apply |
+| O9 | New dossiers | Candidates built from the order | UNKNOWN — the owner sets the number (D-Q09-14); the PRD specifies the first 15 | `_build-order.json` coverage block | Earlier scope note "20–50 incidents" (project memory, 2026-07) may still apply |
 
 No target is a user-behaviour number: the library has two readers (F14) and no usage tracking.
 
@@ -121,10 +122,10 @@ No target is a user-behaviour number: the library has two readers (F14) and no u
 
 1. Builder: the state line on every dossier, the seed note, reference markers on events and metrics, numbered references, the seed word and count on the hub, corrected hub copy, and no silent skip for missing coordinates (`tools/build-incidents.py`).
 2. Data rules: the type vocabulary (adds `party-statement`), the publisher registry `data/incidents/_publishers.json`, the `officialPostmortem` consistency rule, the `sourcing.verification` and `sourcing.primarySearch` records, `refs` pointers on events and metrics, and removal of `referenceCount`.
-3. Tools: `tools/incidents_verify.py` (`brief`, `check`, `stamp`); `tools/incidents_build_order.py` (`--apply`, `--check`, `--report`); `tools/_incidents_next_batch.py` reading the order; `_TYPE_MAP` updated in both ingest scripts.
+3. Tools: `tools/incidents_verify.py` (`brief`, `check`); the `incident-verification` record kind for `tools/owner_decisions.py record`; the shared rules module `tools/lib/incident_rules.py`; `tools/incidents_build_order.py` (`--apply`, `--check`, `--report`); `tools/_incidents_next_batch.py` reading the order; `_TYPE_MAP` updated in both ingest scripts.
 4. Data corrections: the 36 reference corrections of Appendix C on 21 dossiers (the 17 references of F4, 6 more official-typed references that are not incident reports or are an operator's update log, and the 13 references of F5); mark the 7 duplicates in `_master-list.json`; add coordinates for 3 dossiers.
 5. Content: verify the 15 seeds (five batches); apply the owner's decisions on Q-1…Q-10; find primary sources, or record the search, for the 5 non-seed dossiers left without one after T-4 (F6).
-6. Content, Phase D (behind OQ-2): build new dossiers in rank order, with the same checklist.
+6. Content, Phase D (behind D-Q09-14): build new dossiers in rank order, with the same checklist.
 7. Gates: wire `node tools/test-incidents-corpus.mjs`; add `tools/test-incident-verification.mjs` (L1–L8); run the visual QA on every batch's slugs.
 8. Standards and changelog per §22.
 
@@ -132,11 +133,11 @@ No target is a user-behaviour number: the library has two readers (F14) and no u
 
 | Item | Why |
 |---|---|
-| Opening the library to non-root readers | Access change, owner only (PRD-Q01 §16, PRD-Q18 OQ-1) |
-| Re-verifying the 28 researched dossiers claim by claim | They keep the state "Last verified {date}" (OQ-3); only their reference types, publisher rule and queue items are corrected here. Full re-verification is a Phase 3 option |
+| Opening the library to non-root readers | Access change, owner only (PRD-Q01 §16, D-Q18-1) |
+| Re-verifying the 28 researched dossiers claim by claim | They keep the state "Last verified {date}" (D-Q09-15); only their reference types, publisher rule and queue items are corrected here. Full re-verification is a Phase 3 option |
 | Re-scoring any FMEA mode | Scores belong to the dossiers and `tools/test-incidents-fmea.py`. If an edit to event text breaks a verbatim FMEA or response quote, the quote is repaired; no score changes |
 | A "Seed" filter chip on the hub list | Not needed for the state to be visible; PRD-Q18's patterns page already lists seeds for the owner |
-| Renaming the hub chips' visual style (`sev-chip`, `st-chip`) | Existing hub idiom; only the words change, and only after D-10 |
+| Renaming the hub chips' visual style (`sev-chip`, `st-chip`) | Existing hub idiom; only the words change, and only after D-Q09-10 |
 | Adding the 9 built dossiers that have no entry to `_master-list.json` | The list is a candidate list; the build-order file reports them as "built outside the list" |
 | Any LLM at run time | The pages are static; research agents work only in the authoring path (§14) |
 
@@ -153,14 +154,15 @@ No target is a user-behaviour number: the library has two readers (F14) and no u
 | Visual QA with ungate snippet | `tools/incidents-visual-qa.mjs:28-34` | Per batch; also the ungate method for L8 |
 | Research pipeline and ingest | `standarization/DC_INCIDENTS_STANDARD.md:65-73`; `tools/_ingest_rca.py`, `tools/_ingest_deep.py` | Research for seeds and new dossiers |
 | Writer prompt and reviewer checklist | `standarization/DC_INCIDENTS_QA_STANDARD.md:27-58` | Embedded in the verification brief |
-| Seed rule | PRD-Q18 F1 (`"seed" in lastVerified.lower()`) | Unchanged, so Q18 and Q3 need no edit |
+| Seed rule | PRD-Q18 F1 (`"seed" in lastVerified.lower()`) | Becomes the one-time migration rule: T-2 writes `sourcing.state` from it (15 `seed`, 28 `legacy`). From then on the field is the state, owned by this PRD (D12); Q18 and Q3 read it through `tools/lib/incident_rules.py` |
 | Vector index and cluster | `tools/build-incidents-vectors.py` (ollama `nomic-embed-text`) | New dossiers only |
 
 ### 5.4 Dependencies
 
-- PRD-Q18 and PRD-Q03 read the seed marker; Q9 keeps the rule, and the counts move as seeds are verified (§13).
+- PRD-Q18 and PRD-Q03 consume this PRD's state model (`sourcing.state`) and rules module (`tools/lib/incident_rules.py`); their counts move as seeds are verified, and their gates compute expected counts from the data at gate time (§13). The edge runs Q09 → Q18 and Q09 → Q03 only.
+- `tools/owner_decisions.py` (shared approval CLI, coordinator decision D15) must exist before the first seed batch (T-8); it is specified in `03-architecture`, not here.
 - PRD-Q01 relations mark seed dossiers in the proposal report (Q01 BR7); after a stamp the mark disappears on the next report.
-- Owner: D-1…D-12 and OQ-1…OQ-4.
+- Owner: D-Q09-1…D-Q09-16 (`DECISIONS.md`).
 - Network access for research (WebSearch and WebFetch in the authoring session). There is no network in any gate.
 - No peer-owned file is touched.
 
@@ -177,9 +179,9 @@ No target is a user-behaviour number: the library has two readers (F14) and no u
 
 | # | Assumption | If wrong |
 |---|---|---|
-| A1 | The seed marker stays the rule for "not yet verified" (PRD-Q18 A1) | A field `sourcing.state` replaces it in the builder, Q18, Q3 and the gate together; one line each |
+| A1 | The dossier state is the explicit field `sourcing.state` ∈ {`seed`, `legacy`, `verified`}, owned by this PRD (coordinator decision D12). T-2 writes it once from today's marker; `lastVerified` keeps its marker text for seeds, and V15 keeps the two consistent | A consumer that still reads the marker keeps working until the seed is verified, because V15 forbids `state: seed` without the marker; consumers move to `tools/lib/incident_rules.state()` in their own releases (Q18 v1.1, Q03 v1.2) |
 | A2 | The publisher of a document can be decided from its URL plus an optional explicit `publisher` | The registry gains path prefixes (already supported) or the reviewer sets `publisher` with `mirror: true` |
-| A3 | Most seeds have a reachable primary document | Where none exists, the dossier keeps press sources and needs an accepted search record (OQ-4) |
+| A3 | Most seeds have a reachable primary document | Where none exists, the dossier keeps press sources and needs an accepted search record (D-Q09-16) |
 | A4 | One verification batch of 3 seeds takes about 2 working days with agents | The schedule in §19 stretches; scope does not change |
 | A5 | City-centre coordinates are acceptable anchors for global incidents, as the standard already does (`standarization/DC_INCIDENTS_STANDARD.md:42`) | Owner gives a different anchor |
 
@@ -213,7 +215,7 @@ No target is a user-behaviour number: the library has two readers (F14) and no u
 | 14 | `slack-database-config-outage-2022` | 2022-02-22 | software | Slack status incident (operator) | 0 |
 | 15 | `roblox-consul-boltdb-73h-outage-2021` | 2021-10-28 | software, network | Roblox blog (operator) | 0 |
 
-Only 6 candidates satisfy both R1 and R2, so ranks 7–15 are non-facility incidents with operator reports. Under the alternative order R2 > R1 > R3 (OQ-1), ranks 7–15 would be facility incidents with press sources only (vantage-san-antonio-transformer-2026, azure-west-europe-power-2023, cyxtera-boston-battery-fire-2023, kt-ahyeon-exchange-fire-2018, ovh-roubaix-strasbourg-power-2017, telstra-chatswood-exchange-fire-2017, global-switch-sydney-fire-trip-2016, salesforce-na14-power-2016, telecity-meridian-gate-london-2015). Those conflict with the primary-source rule of this PRD. The recommendation is the briefed order. The sources named in the table are leads recorded in the list; none is a verified fact until the dossier's verification passes.
+Only 6 candidates satisfy both R1 and R2, so ranks 7–15 are non-facility incidents with operator reports. Under the alternative order R2 > R1 > R3 (D-Q09-13), ranks 7–15 would be facility incidents with press sources only (vantage-san-antonio-transformer-2026, azure-west-europe-power-2023, cyxtera-boston-battery-fire-2023, kt-ahyeon-exchange-fire-2018, ovh-roubaix-strasbourg-power-2017, telstra-chatswood-exchange-fire-2017, global-switch-sydney-fire-trip-2016, salesforce-na14-power-2016, telecity-meridian-gate-london-2015). Those conflict with the primary-source rule of this PRD. The recommendation is the briefed order. The sources named in the table are leads recorded in the list; none is a verified fact until the dossier's verification passes.
 
 ## 6. User personas and use cases
 
@@ -222,7 +224,7 @@ Tiers as implemented: `free | demo | pro | root` (`js/rz-feature-flags.js:6`); `
 | Persona | Role | Goal | Access | Outcome |
 |---|---|---|---|---|
 | P1 Owner (root, admin) | Engineering operations leader; curates the library and teaches from it | Know which dossiers can be quoted as confirmed; decide queue items; choose what to build next | Full | The state at the top of every dossier; a decision packet; a ranked, reproducible build list |
-| P2 Implementer (main session or agent) | Runs research, verification and builds | Verify a seed without inventing anything; flip it only when it truly passes | Repository | `brief` → research → `check` → review → `stamp`; gates name every gap |
+| P2 Implementer (main session or agent) | Runs research, verification and builds | Verify a seed without inventing anything; flip it only when it truly passes | Repository | `brief` → research → `check` → review → record (`owner_decisions.py record incident-verification`); gates name every gap |
 | P3 Adversarial reviewer (second agent or owner) | Checks a batch against QA §3 | Find unsupported claims and render defects | Repository and screenshots | Named in the verification record |
 | P4 DC / facility engineer, educator (pro) | Would read dossiers if the owner shares them | Trust a figure enough to teach with it | None in v1 (root gate) | Covered if the owner opens access later |
 | P5 Signed-out visitor | — | — | Root gate card | No content |
@@ -232,7 +234,7 @@ Tiers as implemented: `free | demo | pro | root` (`js/rz-feature-flags.js:6`); `
 | UC1 | P1 | Opens a seed dossier and reads "Seed — sources pending" with the note before any figure |
 | UC2 | P1 | On the hub, sees which rows are seeds and how many remain |
 | UC3 | P2 | Verifies a seed: gets a worksheet, maps every event and metric to a reference, fixes or strikes claims, passes `check`, gets review, stamps |
-| UC4 | P1 | Answers the queue decisions D-1…D-12 by request id; the session applies them |
+| UC4 | P1 | Answers the queue decisions D-Q09-1…D-Q09-12 by request id; the session applies them |
 | UC5 | P2 | Builds the next candidate: `incidents_build_order.py --report`, then `_incidents_next_batch.py 3`, research, ingest, verify, stamp |
 | UC6 | P1 | Clicks a reference marker on an event and lands on the numbered reference |
 
@@ -253,15 +255,15 @@ Tiers as implemented: `free | demo | pro | root` (`js/rz-feature-flags.js:6`); `
 ### J3 Implementer verifies a seed (UC3)
 1. `python3 tools/incidents_verify.py brief <slug> > /tmp/…/brief-<slug>.md` produces a worksheet: every event, metric, root-cause sentence and severity field with its current source text; the references with resolved publishers; the leads from the master twin; the slug's open queue items; the checklist (§12.2).
 2. Research (agents with WebSearch and WebFetch, public sources only) finds the primary documents. Each claim is checked against the document's text: a mismatch is corrected; an unsupported claim is struck or rewritten as an attributed report. Edits go into the dossier JSON. New references carry `type`, `title`, `url`, `quote`, `accessed` and, where needed, `publisher` and `mirror`. Every event and metric gets `refs`.
-3. `python3 tools/incidents_verify.py check <slug>` runs V1–V14 (§10.6). Exit 1 names each failure, for example "V6 sequenceOfEvents[4] has no refs" or "V3 references[0] typed vendor-status: idcnova.com is not registered for operator 'Digital Realty'".
+3. `python3 tools/incidents_verify.py check <slug>` runs V1–V15 (§10.6). Exit 1 names each failure, for example "V6 sequenceOfEvents[4] has no refs" or "V3 references[0] typed vendor-status: idcnova.com is not registered for operator 'Digital Realty'".
 4. `python3 tools/build-incidents.py --apply`, then the incident gates (`test-incidents-corpus`, `test-incidents-fmea`, `test-incidents-response`, `build-incident-diagrams --check`). If edits broke a verbatim FMEA or response quote, the gates name it; the quote is repaired from the new text.
 5. Adversarial review (QA §3 A and B) plus `node tools/incidents-visual-qa.mjs <out> <slug>`; the screenshots at 390 and 1440 are looked at.
-6. `python3 tools/incidents_verify.py stamp <slug> --reviewer "<who>" --request R<nnn> --checked <n> --corrected <n> --struck <n>` refuses unless `check` passes. It writes `sourcing.verification`, sets `lastVerified` to the stamp date and removes `referenceCount`.
+6. `python3 tools/owner_decisions.py record incident-verification <slug> --reviewer "<who>" --request R<nnn> --checked <n> --corrected <n> --struck <n>` (the stamp) refuses unless `incidents_verify.py check <slug>` passes. It sets `sourcing.state` to `verified`, writes `sourcing.verification`, sets `lastVerified` to the stamp date and removes `referenceCount`.
 7. Rebuild; the page now reads "Verified {date} · …". Run L1–L8; ship the batch.
 - Recovery: a stamp can be undone only by `git revert`; the CLI never un-stamps (BR-6).
 
 ### J4 Owner decides the queue (UC4)
-The session sends one packet (T-7) listing D-1…D-12 with the evidence and a recommendation each. The owner answers by id. The session writes the decision line under each item in `_review-queue.md` with the request id, applies the data change in the next batch, and the line's status becomes "done v{version}".
+The session sends one packet (T-7) listing D-Q09-1…D-Q09-12 with the evidence and a recommendation each. The owner answers by id. The session writes the decision line under each item in `_review-queue.md` with the request id, applies the data change in the next batch, and the line's status becomes "done v{version}".
 
 ### J5 Implementer builds the next candidate (UC5)
 `python3 tools/incidents_build_order.py --report` → `python3 tools/_incidents_next_batch.py 3` (now reading `_build-order.json`) → research workflow → `_ingest_deep.py` → coordinates, vectors and diagrams → the J3 checks → stamp → release. A new dossier never ships as a seed in Phase D; it ships verified or not at all (BR-7).
@@ -269,15 +271,15 @@ The session sends one packet (T-7) listing D-1…D-12 with the evidence and a re
 ## 8. Functional requirements
 
 **FR-1 Verification state model**
-- Description: a dossier is in exactly one of three states, derived from data. **Seed**: `sourcing.lastVerified` contains "seed" (PRD-Q18 rule). **Last verified** (legacy): `lastVerified` is an ISO date and there is no `sourcing.verification`. **Verified**: `lastVerified` is an ISO date equal to `sourcing.verification.date`.
+- Description: a dossier is in exactly one of three states, stored in the field `sourcing.state` (this PRD owns the field and its name, coordinator decision D12). **`seed`**: `lastVerified` carries the seed marker. **`legacy`** (shown "Last verified"): `lastVerified` is an ISO date and there is no `sourcing.verification`. **`verified`**: `lastVerified` is an ISO date equal to `sourcing.verification.date`. T-2 writes the field into all 43 dossiers from today's marker (15 `seed`, 28 `legacy`); only the `incident-verification` record (FR-7) changes it afterwards.
 - Trigger: every build and every gate run.
 - Preconditions: dossiers load.
-- Inputs: `sourcing.lastVerified`, `sourcing.verification`.
-- Processing: `state(d)` in the builder (Python) and independently in the gate (Node); `lastVerified` must match `^\d{4}-\d{2}-\d{2}$` or exactly `^\d{4}-\d{2}-\d{2} \(seed — pending deep research\)$`.
+- Inputs: `sourcing.state`, `sourcing.lastVerified`, `sourcing.verification`.
+- Processing: `state(d)` in `tools/lib/incident_rules.py` (§11.7), imported by the builder, `incidents_verify.py`, PRD-Q18 and PRD-Q03; the Node gate reads the field and the module's `dump` output. V15 checks the field against the other two fields; `lastVerified` must match `^\d{4}-\d{2}-\d{2}$` or exactly `^\d{4}-\d{2}-\d{2} \(seed — pending deep research\)$`.
 - Outputs: the state used by FR-2 and FR-3.
 - State changes: none (pure).
 - Dependencies: none.
-- Exceptions: any other form makes the builder exit 1 with "lastVerified of <slug> is neither a date nor the seed marker".
+- Exceptions: any other form makes the builder exit 1 with "lastVerified of <slug> is neither a date nor the seed marker"; a missing or inconsistent `sourcing.state` exits 1 with "sourcing.state of <slug> is '<v>', expected '<derived>'" (V15).
 - Acceptance: L1, L3; unit U1.
 
 **FR-2 Dossier state line and seed note**
@@ -293,12 +295,12 @@ The session sends one packet (T-7) listing D-1…D-12 with the evidence and a re
 - Acceptance: L1, L8; AC-1, AC-2.
 
 **FR-3 Hub state**
-- Description: (a) the status cell of each seed row adds `<span class="st-seed">Seed — sources pending</span>` after the existing `st-chip` (`:603`); (b) the metabar (`:617`) gains the segment "{s} seed, sources pending" when s > 0; (c) the lede sentence at `:616`, the FAQ sentence at `:620`, the hero footer "Source public post-incident reports" (`:1377`) and the page-shell meta `ai-content-declaration` (`:490`, all 44 pages) are replaced by the copy in §9.6; (d) after decision D-10 only, the status word "Official RCA" (`:591`) becomes "Official record", together with the filter chip label (`:647`), the hero footer count (`:1380`) and the metabar ("with an official record").
+- Description: (a) the status cell of each seed row adds `<span class="st-seed">Seed — sources pending</span>` after the existing `st-chip` (`:603`); (b) the metabar (`:617`) gains the segment "{s} seed, sources pending" when s > 0; (c) the lede sentence at `:616`, the FAQ sentence at `:620`, the hero footer "Source public post-incident reports" (`:1377`) and the page-shell meta `ai-content-declaration` (`:490`, all 44 pages) are replaced by the copy in §9.6; (d) after decision D-Q09-10 only, the status word "Official RCA" (`:591`) becomes "Official record", together with the filter chip label (`:647`), the hero footer count (`:1380`) and the metabar ("with an official record"); (e) a row whose `officialPostmortem` is false keeps the existing status word "Press-sourced" (`tools/build-incidents.py:591`, class `st-press`), unchanged by this PRD and by D-Q09-10, so a dossier whose flag T-4 turns false (x-twitter-oregon-fire-2025, and equinix-ld8-london-ups-2020 under D-Q09-11) shows "Press-sourced" after the rebuild.
 - Trigger: build.
 - Inputs: states; `officialPostmortem`.
 - Outputs: `dc-incidents.html`.
 - Exceptions: none.
-- Acceptance: L1; AC-3, AC-4.
+- Acceptance: L1; AC-3, AC-4, AC-5.
 
 **FR-4 Reference type vocabulary**
 - Description: `references[].type` ∈ {`official-postmortem`, `regulatory`, `vendor-status`, `party-statement`, `press`, `news`, `analysis`, `encyclopedia`, `forum`, `aggregator`, `other`}. A one-time normalisation retypes the 13 references of F5 and the references corrected under FR-5 (table in Appendix C). `REF_TONE` (`tools/build-incidents.py:39-42`) gains `party-statement: "cyan"` and keeps its other entries. `_TYPE_MAP` in `tools/_ingest_rca.py:25-30` and the matching map in `_ingest_deep.py` change as follows: `official-statement`, `statement`, `press-release` and `vendor` map to `party-statement`; `official-status` maps to `vendor-status`; `analysis`, `encyclopedia`, `forum` and `aggregator` map to themselves instead of falling through to `press`.
@@ -319,7 +321,7 @@ The session sends one packet (T-7) listing D-1…D-12 with the evidence and a re
   - A `web.archive.org` URL resolves through the archived URL.
 - Trigger: build, `check`, gates.
 - Inputs: dossier, registry.
-- Processing: pure functions `resolve_publisher(url, ref)` and `official_ok(dossier)`, implemented in Python (`tools/incidents_verify.py`, imported by the builder for the count p) and independently in Node (gate).
+- Processing: pure functions `resolve_publisher(url, ref, registry)` and `official_ok(dossier, registry)`, implemented once in `tools/lib/incident_rules.py` (D12) and imported by the builder (for the count p), `incidents_verify.py`, PRD-Q18 and PRD-Q03. The gate reads the module's `dump` output and proves each rule with a planted-violation fixture (§20.5).
 - Outputs: pass or fail with the slug, reference index, type, host and reason.
 - State changes: none.
 - Exceptions: an unregistered host fails with "host <h> not in _publishers.json". The fix is a reviewed registry entry or a retype, never a silent pass.
@@ -334,16 +336,16 @@ The session sends one packet (T-7) listing D-1…D-12 with the evidence and a re
 - Exceptions: entries without `refs` render as today (seed and legacy dossiers).
 - Acceptance: L3 (V6), L8; AC-7.
 
-**FR-7 Verification CLI `tools/incidents_verify.py`**
-- Description: three commands.
+**FR-7 Verification CLI `tools/incidents_verify.py` and the verification record**
+- Description: two read-only commands here, one write through the shared approval CLI (coordinator decision D15).
   - `brief <slug>`: prints the Markdown worksheet of J3 step 1 (format §11.1). Read-only.
-  - `check <slug>|--all`: runs V1–V14 and exits 0 or 1. Read-only.
-  - `stamp <slug> …`: refuses unless `check` passes, then writes `sourcing.verification` and `lastVerified`, removes `sourcing.referenceCount`, and writes atomically (temp file + rename) in the F15 byte format.
+  - `check <slug>|--all`: runs V1–V15 and exits 0 or 1. Read-only.
+  - The stamp: `python3 tools/owner_decisions.py record incident-verification <slug>` `--reviewer … --request R<nnn> --checked n --corrected n --struck n [--primary-refs i,j] [--restamp]`. The shared CLI owns request-id validation, the date, the atomic write (temp file + rename) and "refusal leaves the file unchanged"; this PRD registers the record kind `incident-verification` in `tools/lib/incident_rules.py` with its precondition (`check <slug>` exits 0) and its writer (sets `sourcing.state` to `verified`, writes `sourcing.verification` and `lastVerified`, removes `sourcing.referenceCount`, F15 byte format).
 - Trigger: implementer.
-- Preconditions: dossier exists; for `stamp`, a reviewer string and a request id `^R\d{3,}$`.
+- Preconditions: dossier exists; for the record, a reviewer string and a request id matching `^R[0-9]{3,4}$`.
 - Inputs: §11.1.
 - Outputs: worksheet, check report, updated dossier.
-- State changes: `stamp` only.
+- State changes: the `incident-verification` record only.
 - Dependencies: registry; `_review-queue.md` (read, for the brief); `_master-list.json` (read, for leads).
 - Exceptions: §11.1 exit codes.
 - Acceptance: U6–U10; L3.
@@ -351,16 +353,16 @@ The session sends one packet (T-7) listing D-1…D-12 with the evidence and a re
 **FR-8 Seed verification program**
 - Description: verify the 15 seeds in five batches of three, in the rule order of §12.3, each through J3. The checklist of §12.2 applies.
 - Trigger: T-8…T-12.
-- Outputs: 15 dossiers in state Verified, or in state Seed with a recorded reason (OQ-4).
-- Exceptions: no primary document reachable for a seed → record the search in `sourcing.primarySearch`; the dossier stays a seed unless the owner accepts the record (OQ-4).
+- Outputs: 15 dossiers in state Verified, or in state Seed with a recorded reason (D-Q09-16).
+- Exceptions: no primary document reachable for a seed → record the search in `sourcing.primarySearch`; the dossier stays a seed unless the owner accepts the record (D-Q09-16).
 - Acceptance: O4; L1–L3; AC-8.
 
 **FR-9 Review-queue decisions**
-- Description: T-7 sends D-1…D-12 (§23) to the owner. Each answer is recorded under its item in `_review-queue.md` in the format of §10.8 and applied: Q-7 and Q-8 in their seed batch, the others in T-13.
+- Description: T-7 sends D-Q09-1…D-Q09-12 (§23) to the owner. Each answer is recorded under its item in `_review-queue.md` in the format of §10.8 and applied: Q-7 and Q-8 in their seed batch, the others in T-13.
 - Acceptance: L4; AC-9.
 
 **FR-10 Remove `referenceCount`**
-- Description: delete `sourcing.referenceCount` from the 28 dossiers that carry it (decision D-9). No code reads it (F11). `stamp` removes it on stamped dossiers.
+- Description: delete `sourcing.referenceCount` from the 28 dossiers that carry it (decision D-Q09-9). No code reads it (F11). The `incident-verification` record removes it on verified dossiers.
 - Acceptance: L4 (machine part of Q-9).
 
 **FR-11 Master-list hygiene**
@@ -372,7 +374,7 @@ The session sends one packet (T-7) listing D-1…D-12 with the evidence and a re
 - Exceptions: a list entry whose `builtAs` names a missing dossier → error.
 - Acceptance: L5; U11–U13.
 
-**FR-13 New-dossier program (Phase D, behind OQ-2)**
+**FR-13 New-dossier program (Phase D, behind D-Q09-14)**
 - Description: build candidates in rank order, in batches of 2–3, through the research workflow and then J3. Additional checks for a new dossier: coordinates, cluster point, chunks (FR-14), diagrams (`build-incident-diagrams.mjs`), FMEA (`test-incidents-fmea.py`), response layer (`test-incidents-response.py`) and `operatorShort` ≤ 18 characters (QA §2 viz-safe labels).
 - Acceptance: L1–L6 stay green with the new dossier; AC-10.
 
@@ -382,8 +384,8 @@ The session sends one packet (T-7) listing D-1…D-12 with the evidence and a re
 
 **FR-15 Gates**
 - Description:
-  - Wire `gate "incident corpus — provenance and structure on every dossier" node tools/test-incidents-corpus.mjs` after `tools/ship-gate.sh:67`.
-  - Add `tools/test-incident-verification.mjs` with laws L1–L8 (§20.4) and wire it after `:71`.
+  - Wire `gate "incident corpus — provenance and structure on every dossier" node tools/test-incidents-corpus.mjs` after the anchor line `gate "incident pages — generated pages match the builder"` (today `tools/ship-gate.sh:67`; insert by anchor text).
+  - Add `tools/test-incident-verification.mjs` with laws L1–L8 (§20.4), `--phase` and `--fixture`, and wire it with `--strict --phase A` after the anchor line `gate "incident figures — drawn by the diagram engine…"` (today `:71`). Which law blocks from which phase: §20.2.
   - Add both to CLAUDE.md's audit list.
   - Run `node tools/incidents-visual-qa.mjs` on every batch's slugs. It needs a browser, so it runs under `rz-lane` in the batch procedure; its full run stays outside the ship gate, as today.
 - Acceptance: L7.
@@ -392,19 +394,19 @@ The session sends one packet (T-7) listing D-1…D-12 with the evidence and a re
 
 | FR | Trigger | Preconditions | Inputs | Outputs | State change | Dependencies | Exceptions | Acceptance |
 |---|---|---|---|---|---|---|---|---|
-| FR-1 | Build, gate | Dossiers load | `lastVerified`, `verification` | State | — | — | Bad form → exit 1 | L1, L3, U1 |
+| FR-1 | Build, gate | Dossiers load | `state`, `lastVerified`, `verification` | State | `sourcing.state` written once (T-2) | `tools/lib/incident_rules.py` | Bad form or V15 → exit 1 | L1, L3, U1 |
 | FR-2 | Build | FR-1 | State, refs, registry | State line, note | Pages | FR-5 | — | L1, L8 |
-| FR-3 | Build | FR-1 | States, PM | Hub words, copy | Hub | D-10 for (d) | — | L1 |
+| FR-3 | Build | FR-1 | States, PM | Hub words, copy | Hub | D-Q09-10 for (d) | — | L1, AC-5 |
 | FR-4 | T-4, ingest | — | Refs | Retyped refs | Dossier JSON | — | Unknown type → V2 | L2, U2 |
 | FR-5 | Build, check, gate | Registry | Dossier | Pass/fail | — | Registry | Unregistered host | L2, U3–U5 |
 | FR-6 | Build | — | `refs` | Markers, ids | Pages | — | Bad index → error | L3, L8 |
-| FR-7 | Implementer | Reviewer, request | §11.1 | Worksheet, report, stamp | Dossier (stamp) | FR-5 | §11.1 | U6–U10, L3 |
-| FR-8 | T-8…T-12 | FR-1…FR-7 | Seeds | Verified dossiers | Dossiers | Owner (OQ-4) | No primary → search record | L1–L3 |
+| FR-7 | Implementer | Reviewer, request `^R[0-9]{3,4}$` | §11.1 | Worksheet, report, verification record | Dossier (record) | FR-5, `tools/owner_decisions.py` | §11.1 | U6–U10, L3 |
+| FR-8 | T-8…T-12 | FR-1…FR-7 | Seeds | Verified dossiers | Dossiers | Owner (D-Q09-16) | No primary → search record | L1–L3 |
 | FR-9 | T-7, T-13 | Owner answers | Queue | Decision lines, data fixes | Queue, dossiers | Owner | Unanswered → stays open | L4 |
-| FR-10 | T-13 | D-9 | 28 dossiers | Field removed | Dossiers | — | — | L4 |
+| FR-10 | T-13 | D-Q09-9 | 28 dossiers | Field removed | Dossiers | — | — | L4 |
 | FR-11 | T-6 | — | List | Statuses | List | — | — | L5 |
 | FR-12 | Build order run | FR-11, registry | List, dossiers | `_build-order.json` | File | — | Missing `builtAs` target | L5, U11–U13 |
-| FR-13 | Phase D | OQ-2 | Candidates | New dossiers | Files | FR-12, FR-14 | — | L1–L6 |
+| FR-13 | Phase D | D-Q09-14 | Candidates | New dossiers | Files | FR-12, FR-14 | — | L1–L6 |
 | FR-14 | T-15 | — | 3 dossiers | Coordinates; builder raises | Builder | — | Missing coords → error | L6 |
 | FR-15 | T-1, T-16 | — | — | Wiring | `ship-gate.sh`, CLAUDE.md | — | — | L7 |
 
@@ -446,7 +448,7 @@ References and provenance
 
 Hub row, status cell (seed):
 ```
-│ Official RCA │      ← existing st-chip, unchanged until D-10
+│ Official RCA │      ← existing st-chip, unchanged until D-Q09-10
 │ Seed — sources pending │   ← new, muted text, wraps under the chip
 ```
 Hub metabar: `43 catalogued · 30 with official RCA · 15 seed, sources pending · provenance-mandatory · root access`. After T-4 the 30 reads 29 under the recommended decisions (§10.4).
@@ -482,7 +484,7 @@ Hub: `<td><span class="st-chip st-off">Official RCA</span><span class="st-seed">
 | Reference marker `[k]` | Link to `#ref-k`. The page scrolls with the shell's existing `scroll-margin-top`; the target `<li>` shows `:target { outline: 1px solid var(--amber); outline-offset: 2px }`. Keyboard: Tab reaches it, Enter activates it |
 | Reference `<li>` | Not focusable itself; its URL link works as today (`target="_blank" rel="noopener nofollow"`) |
 | Hub row | Unchanged (whole-row click to the dossier) |
-| Hub filter chips | Unchanged; after D-10 the label "Official RCA" reads "Official record" |
+| Hub filter chips | Unchanged; after D-Q09-10 the label "Official RCA" reads "Official record" |
 There are no new buttons, forms, filters, dialogs or toasts. Nothing in this feature needs `RZToast`: every state is static text.
 
 ### 9.5 States
@@ -513,7 +515,9 @@ Loading, empty and error states do not apply (static pages; empty is impossible 
 | hub hero footer (replaces `:1377`) | **Source** cited public reports, primary where one exists |
 | page meta `ai-content-declaration` (replaces `:490`) | human-curated from cited public reports; seed dossiers are marked until checked against primary sources |
 | marker aria-label | Source {k}: {reference title} |
-| D-10 (conditional) status word | Official record (replaces "Official RCA" in the row, filter chip and metabar) |
+| hub status word, `officialPostmortem` true | Official RCA (existing, `tools/build-incidents.py:591`) |
+| hub status word, `officialPostmortem` false | Press-sourced (existing, `tools/build-incidents.py:591`, class `st-press`; this PRD keeps it unchanged, also after D-Q09-10; FR-3 (e), AC-5) |
+| D-Q09-10 (conditional) status word | Official record (replaces "Official RCA" in the row, filter chip and metabar; "Press-sourced" is unchanged) |
 
 ### 9.7 Styling (added to `DOSSIER_CSS` and the hub CSS in `tools/build-incidents.py`; budget ≤ 1 KB)
 - `.inc-verif`: inherits `.metabar`; `<b>` in `--text-body`. One amber element per view stays the `:target` outline and the focus ring.
@@ -547,6 +551,7 @@ Dossier schema per `standarization/DC_INCIDENTS_STANDARD.md:19` and Q18 F2. Fiel
 | `references[].mirror` | bool, optional | True when the URL hosts a copy of the publisher's document (for example msxfaq.de hosting Microsoft's MO502273 report) | New |
 | `references[].mirrorNote` | string, required when `mirror` | Why the copy is the same document (for example the report id and date match) | New |
 | `sequenceOfEvents[].refs`, `metrics[].refs` | int[] | 0-based indices into `references`; required on Verified dossiers | New |
+| `sourcing.state` | enum `seed` \| `legacy` \| `verified` | Owned by this PRD (D12). Written once by T-2 from the marker; afterwards only by the `incident-verification` record. Consistent with `lastVerified` and `verification` (V15) | New |
 | `sourcing.lastVerified` | string | `YYYY-MM-DD` or `YYYY-MM-DD (seed — pending deep research)` | Format enforced |
 | `sourcing.verification` | object | §10.6 | New |
 | `sourcing.primarySearch` | object, optional | `{date, routes:[{route, query, result}] (≥3), decision: "R…"}` | New |
@@ -559,7 +564,7 @@ Dossier schema per `standarization/DC_INCIDENTS_STANDARD.md:19` and Q18 F2. Fiel
  "method": "rz-incident-verify/1",
  "date": "2026-11-20",
  "reviewer": "adversarial review: Opus 5.5 agent (batch B3); owner spot-check of 5 claims",
- "request": "R1xx",
+ "request": "R1xx (pattern ^R[0-9]{3,4}$)",
  "claims": {"checked": 31, "corrected": 4, "struck": 1},
  "primaryRefs": [0, 2]
 }
@@ -620,13 +625,13 @@ Validation R1–R5: schema const; ids `^[a-z0-9-]+$`; kind ∈ {organisation, au
 ### 10.4 Reference correction table
 Appendix C lists all 36 corrections on 21 dossiers: from type, to type, publisher, mirror, reason. Applied in memory with the v1 registry (Appendix A4), they leave 0 publisher failures and 0 flag mismatches, and change `officialPostmortem` on 3 dossiers:
 - x-twitter-oregon-fire-2025 `true` → `false` (its only "official" source is a news article).
-- equinix-ld8-london-ups-2020 `true` → `false` (LINX is an affected party, D-11), unless T-13 finds an Equinix document.
-- northc-almere-fire-2026 `false` → `true` (the operator's own update log is `vendor-status`, D-12).
+- equinix-ld8-london-ups-2020 `true` → `false` (LINX is an affected party, D-Q09-11), unless T-13 finds an Equinix document.
+- northc-almere-fire-2026 `false` → `true` (the operator's own update log is `vendor-status`, D-Q09-12).
 - azure-wan-router-global-2023 stays `true` (mirror of the operator's report, plus the status-history PIR retyped from `official`).
 - kakao-sk-cc-pangyo-fire-2022, nirs-daejeon-battery-fire-2025 and ovhcloud-sbg2-fire-2021 stay `true` (their korea.kr and IGEDD references are retyped `regulatory`).
 - aws-us-east-1-thermal-2025 and azure-china-north3-regional-2024 stay `false` (their mis-typed index, documentation, certificate and history-page references become `other`).
 
-The hub count "with official RCA" moves from 30 to 29 under the recommended D-11 and D-12, or to 28 if D-12 types the NorthC log as a party statement. Today the references themselves support 28 (A4).
+The hub count "with official RCA" moves from 30 to 29 under the recommended D-Q09-11 and D-Q09-12, or to 28 if D-Q09-12 types the NorthC log as a party statement. Today the references themselves support 28 (A4).
 
 ### 10.5 `data/incidents/_build-order.json` (schema `rz-incident-build-order/1`, generated)
 ```json
@@ -649,7 +654,7 @@ The hub count "with official RCA" moves from 30 to 29 under the recommended D-11
 ```
 Constraints: every list slug appears exactly once across the coverage classes and `candidates`; ranks run 1…N with no gaps; `listFlag` copies the list's `officialPostmortem` for information only; written with `indent=1, sort_keys=False, ensure_ascii=False` plus a trailing newline. Size: UNKNOWN until T-6 writes it; budget ≤ 128 KB.
 
-### 10.6 Verification checks V1–V14 (in `incidents_verify.py check` and in the gate)
+### 10.6 Verification checks V1–V15 (in `tools/lib/incident_rules.py`, run by `incidents_verify.py check` and read by the gate)
 
 | V | Check |
 |---|---|
@@ -661,12 +666,13 @@ Constraints: every list slug appears exactly once across the coverage classes an
 | V6 | Every event and metric has `refs` with valid indices (Verified only) |
 | V7 | No event or metric `source` contains a process note matching `unverified|not re-verified|not verified|not re-fetched|could not be verified|not independently|crawl-cited|\(flagged\)|not fetch-verified|unconfirmed` (Verified only). Uncertainty about a fact belongs in the event text, attributed |
 | V8 | `sourcing.referenceCount` absent |
-| V9 | `verification.date` = `lastVerified`; `method` const; `reviewer` non-empty; `request` matches `^R\d{3,}$`; `claims.checked` ≥ events + metrics; `primaryRefs` ⊆ indices passing V3 with a primary type (or empty when V5 is met by `primarySearch`) |
+| V9 | `verification.date` = `lastVerified`; `method` const; `reviewer` non-empty; `request` matches `^R[0-9]{3,4}$`; `claims.checked` ≥ events + metrics; `primaryRefs` ⊆ indices passing V3 with a primary type (or empty when V5 is met by `primarySearch`) |
 | V10 | `python3 tools/test-incidents-fmea.py --strict --require-all` and `python3 tools/test-incidents-response.py --strict --require-all` pass for the slug (verbatim quotes still hold) |
 | V11 | `node tools/test-incidents-corpus.mjs` passes for the slug |
 | V12 | The slug has coordinates, a cluster point and chunks (FR-14) |
 | V13 | `operatorShort` ≤ 18 characters (QA standard §2) |
 | V14 | No open queue item names the slug without a decision line (§10.8) |
+| V15 | `sourcing.state` is present and agrees with the record: `seed` ⇔ `lastVerified` carries the seed marker; `verified` ⇔ `sourcing.verification` present and `verification.date` = `lastVerified`; `legacy` otherwise |
 
 V10 and V11 run their own gates; `check` reports them.
 
@@ -685,7 +691,7 @@ Under each item, two lines indented by two spaces:
 The gate parses the "Internal contradictions" section: every top-level item needs both lines once T-13 has shipped; until then L4 reports them as open.
 
 ### 10.9 Migration, compatibility, retention
-- Additive fields; consumers that ignore them (Q18, Q3, the vector tools) keep working.
+- Additive fields; consumers that ignore them (the vector tools) keep working. `sourcing.state` is written into all 43 dossiers by T-2 (one scripted change, F15 byte format); PRD-Q18 and PRD-Q03 read it through `tools/lib/incident_rules.py`.
 - `referenceCount` removal: no reader (F11).
 - The JSON byte format is preserved (F15), so untouched dossiers stay byte-identical; the freshness gate rebuilds the pages.
 - Rollback is `git revert` of the release; generated pages revert with it.
@@ -701,9 +707,9 @@ No server endpoint, Supabase table or Worker is involved: the library is generat
 |---|---|---|---|
 | `brief <slug>` | — | Markdown to stdout: (1) the state, (2) the references table with index, type, resolved publisher or "UNREGISTERED", quote, (3) one row per event and metric: index, text, `source`, `refs`, (4) root-cause sentences split on `. `, (5) severity fields, (6) master-list leads (twin by slug, `builtAs` or same date and operator) with type and URL, (7) open queue items for the slug, (8) checklist §12.2 | 0; 2 when the slug is unknown |
 | `check <slug>` / `check --all` | `--json` optional | One line per failed V-check: `V3 references[0] vendor-status idcnova.com: not registered for operator 'Digital Realty'` | 0 pass; 1 fail; 2 bad input |
-| `stamp <slug>` | `--reviewer` (non-empty), `--request R\d{3,}`, `--checked n --corrected n --struck n`, `--date YYYY-MM-DD` (default: today, UTC), `--primary-refs i,j` | The changed `sourcing` block | 0 written; 1 refused (prints the failed checks); 2 bad input |
+| (write) `tools/owner_decisions.py record incident-verification <slug>` | `--reviewer` (non-empty), `--request` matching `^R[0-9]{3,4}$`, `--checked n --corrected n --struck n`, `--date YYYY-MM-DD` (default: today, UTC), `--primary-refs i,j`, `--restamp` | The changed `sourcing` block | 0 written; 1 refused (prints the failed checks); 2 bad input. Exit codes and flags are the shared CLI's (D15; specified in `03-architecture`); this PRD fixes only the record kind's precondition and writer |
 
-Contracts: `brief` and `check` never write. `stamp` writes one file atomically and never touches any other field. A second `stamp` on a Verified dossier is allowed only with `--restamp`, which replaces the record (new date) and keeps the old one under `verification.previous[]`.
+Contracts: `brief` and `check` never write. The `incident-verification` record writes one file atomically and never touches any field outside `sourcing.state`, `sourcing.verification`, `sourcing.lastVerified` and `sourcing.referenceCount`. A second record on a Verified dossier is allowed only with `--restamp`, which replaces the record (new date) and keeps the old one under `verification.previous[]`.
 
 ### 11.2 `tools/incidents_build_order.py`
 
@@ -718,13 +724,31 @@ Contracts: `brief` and `check` never write. `stamp` writes one file atomically a
 `python3 tools/_incidents_next_batch.py N` emits the first N candidates of `_build-order.json` in the existing JSON shape (`slug, title, operator, dcName, location, date, category, brief, officialPostmortem, sources`), sources limited to the R1 basis plus up to two others. Its stderr line keeps the form `[next-batch] n incidents · m remain after · k done`.
 
 ### 11.4 Builder contract (`tools/build-incidents.py`)
-New pure helpers: `state(inc) -> "seed"|"legacy"|"verified"`, `primary_count(inc, registry) -> int`, `verif_line(inc, registry) -> str`, `ref_markers(refs, references) -> str`. The registry is loaded once from `data/incidents/_publishers.json`; when the file is missing, the build fails with "publisher registry missing" (no default). The `--check` output count stays "all 44 generated pages", or 46 if PRD-Q18 has shipped.
+Imports `state`, `primary_count` and `official_ok` from `tools/lib/incident_rules.py` (§11.7). New render helpers in the builder: `verif_line(inc, registry) -> str`, `ref_markers(refs, references) -> str`. The registry is loaded once from `data/incidents/_publishers.json`; when the file is missing, the build fails with "publisher registry missing" (no default). The `--check` output count stays "all 44 generated pages", or 46 if PRD-Q18 has shipped.
 
 ### 11.5 Gate CLI `tools/test-incident-verification.mjs`
-`--law L1…L8` runs one law; `--strict` runs all and exits 1 on any failure; `--report` prints counts (seeds left, states, refs failing) and exits 0; `--base <url>` checks the static laws L1 and L5 against a live origin. It uses no network otherwise; L8 uses puppeteer on `file://` pages with the ungate snippet of `tools/incidents-visual-qa.mjs:28-34`.
+`--law L1…L8` runs one law; `--phase A|B|C|D` selects which laws are blocking (the wiring table of §20.2); `--strict` runs every law, exits 1 only when a law that is blocking at the given phase fails, and prints every other law as `REPORT Ln PASS|FAIL …` without failing (coordinator decision D9); `--report` prints counts (seeds left, states, refs failing) and every law's PASS/FAIL line and exits 0; `--fixture <dir> --law Ln` runs one law against a planted-violation tree (§20.5) and must exit 1 with the expected line; `--base <url>` checks the static laws L1 and L5 against a live origin. It uses no network otherwise; L8 uses puppeteer on `file://` pages with the ungate snippet of `tools/incidents-visual-qa.mjs:28-34`.
 
 ### 11.6 Consumers
-PRD-Q18 and PRD-Q03 read `lastVerified` and `officialPostmortem` unchanged. PRD-Q01's report reads the seed rule. All three see corrected values after T-4 with no code change.
+PRD-Q18 and PRD-Q03 consume the state model through `tools/lib/incident_rules.py` (`state`, `is_seed`, `official_ok`) and read `officialPostmortem`; Node gates read `sourcing.state` directly or the module's `dump`. PRD-Q01's report and PRD-Q17 read `sourcing.state`. None of them defines its own seed or "official" rule (coordinator decision D12), and none hardcodes a count that this PRD's work moves.
+
+### 11.7 Shared rules module `tools/lib/incident_rules.py` (owned by this PRD, D12)
+The builder is Python (`tools/build-incidents.py`), so the module is Python, stdlib only, importable by path from `tools/` scripts.
+
+| Member | Signature | Contract |
+|---|---|---|
+| `STATES` | `("seed", "legacy", "verified")` | The only state values |
+| `state` | `(inc: dict) -> str` | Returns `sourcing.state`; raises `ValueError` naming the slug when it is missing or fails V15 |
+| `is_seed` | `(inc: dict) -> bool` | `state(inc) == "seed"` |
+| `load_registry` | `(path="data/incidents/_publishers.json") -> dict` | Validates R1–R5; raises "publisher registry missing" |
+| `resolve_publisher` | `(url: str, ref: dict, registry: dict) -> str \| None` | Prefix match on host + path; archive URLs resolve through the archived URL; `publisher` when `mirror` is true |
+| `primary_refs` / `primary_count` | `(inc, registry) -> list[int]` / `-> int` | Indices of primary-typed references that pass the publisher rule (FR-5) |
+| `official_ok` | `(inc, registry) -> bool` | The derived `officialPostmortem` (FR-5) |
+| `checks` | `(inc, registry, *, slugs_ctx) -> list[str]` | V1–V15 failure lines, the text `incidents_verify.py check` prints |
+| `RECORD_KINDS["incident-verification"]` | `{precondition(slug) -> list[str], apply(inc, record) -> dict}` | Used by `tools/owner_decisions.py record`; `apply` returns a new dict (no mutation) |
+| CLI `python3 tools/lib/incident_rules.py dump [--fixture <dir>]` | JSON to stdout | `{slug: {state, primaryCount, officialDerived, officialStored, failures[]}}` for every dossier; the Node gates of this PRD, PRD-Q18 and PRD-Q03 read it instead of re-implementing the rules |
+
+Unit tests: `tools/test-incidents-verify.py` (U1–U10, U14 below).
 
 ## 12. Business rules and state machines
 
@@ -733,7 +757,7 @@ PRD-Q18 and PRD-Q03 read `lastVerified` and `officialPostmortem` unchanged. PRD-
 - BR-2: "Official" requires a confirmed publisher. A document's type does not prove who wrote it.
 - BR-3: A claim survives verification only if a primary reference states it, or if it is written as an attributed report that cites the report. Unsupported claims are struck. Where two primary sources disagree, both are stated with attribution.
 - BR-4: Seeds are never counted as verified anywhere (hub, Q18, Q3).
-- BR-5: Only `stamp` moves a dossier into Verified, and only after V1–V14 pass and a reviewer is named.
+- BR-5: Only the `incident-verification` record (`tools/owner_decisions.py record`, "the stamp") moves a dossier into `verified`, and only after V1–V15 pass and a reviewer is named.
 - BR-6: No tool moves a dossier back to Seed. Reverting a stamp is a `git revert` with a CHANGELOG line.
 - BR-7: A new dossier (Phase D) ships Verified or not at all.
 - BR-8: Registry additions need the evidence of who runs the domain in the commit message.
@@ -787,12 +811,14 @@ A route that fails is recorded (route, query, result) in `sourcing.primarySearch
 
 ### 12.5 State machines
 
+"stamp" below is the `incident-verification` record written by `tools/owner_decisions.py record`; the states are the values of `sourcing.state`.
+
 ```mermaid
 stateDiagram-v2
-  [*] --> Seed: new skeleton or researched draft (lastVerified = date + seed marker)
-  Seed --> Verified: stamp (V1–V14 pass, reviewer named, request id)
+  [*] --> Seed: new skeleton or researched draft (state seed, lastVerified = date + seed marker)
+  Seed --> Verified: stamp (V1–V15 pass, reviewer named, request id)
   Seed --> Seed: research and edits (check fails, page keeps the note)
-  Legacy --> Verified: optional re-verification (Phase 3, OQ-3) via stamp
+  Legacy --> Verified: optional re-verification (Phase 3, D-Q09-15) via stamp
   Verified --> Verified: restamp after a correction (previous record kept)
   Verified --> [*]
   note right of Seed: hub word and note shown; Q18 "+n seed"; Q3 refuses (RV12)
@@ -820,10 +846,12 @@ stateDiagram-v2
 | `tools/test-incidents-corpus.mjs` | Unchanged code, wired into the ship gate | Runs on every ship |
 | `tools/_ingest_rca.py`, `tools/_ingest_deep.py` | `_TYPE_MAP` (FR-4) | New research arrives with vocabulary types; V3 catches wrong publishers |
 | `tools/_incidents_next_batch.py` | Reads `_build-order.json` | No duplicate proposals (F9 closed) |
-| PRD-Q18 patterns page | Counts move from "+n seed" to researched as stamps land; postmortem shares change after T-4 | Q18's gate recounts from data, so it stays green. Q18's AC-4 and AC-5 quote today's numbers; they need restating after T-4 (coordinate in the cross-PRD review) |
-| PRD-Q03 reproduce | RV12 keeps refusing seeds; a verified facility seed falls under L7 and needs a verdict | C-17 in the checklist |
+| PRD-Q18 patterns page | Consumes `sourcing.state` through `tools/lib/incident_rules.py`; counts move from "+n seed" to researched as records land; postmortem shares change after T-4 | Q18 v1.1 computes every expected count from the data at gate time and states its ACs as formulas (D12), so nothing needs restating. Order: Q09 Phase A (state field, module) before Q18 T-2 |
+| PRD-Q03 reproduce | RV12 refuses seeds through `incident_rules.is_seed` (Q03 v1.2, D12); a verified facility seed falls under L7 and needs a verdict | C-17 in the checklist; Q03 ships after Q09 Phase A |
 | PRD-Q01 relations | Seed mark in the proposal report disappears after a stamp | Re-run the report after each batch |
-| PRD-Q17 learning paths | If a path uses an incident step, it may prefer Verified dossiers | Optional; Q17 reads `lastVerified` |
+| PRD-Q17 learning paths | If a path uses an incident step, it may prefer Verified dossiers | Optional; Q17 reads `sourcing.state` |
+| `tools/ship-gate.sh` (shared with PRD-Q01, PRD-Q03, PRD-Q18) | Two new gate lines | Inserted by anchor text (the line after `gate "incident pages — generated pages match the builder"` and after `gate "incident figures — drawn by the diagram engine…"`), never by line number; release order Q09 Phase A → Q18 → Q01 phase 2 → Q03, each rebasing on the last |
+| `tools/owner_decisions.py`, `DECISIONS.md` | D-Q09-1…16 recorded; `incident-verification` record kind registered | Shared CLI (D15) |
 | Vector index (`incidents-chunks.jsonl`, `_cluster.json`) | Changed text on seeds: re-embed the changed chunks (incremental by content hash); new dossiers: required | V12; `python3 tools/build-incidents-vectors.py` per batch |
 | Diagrams (`_diagrams.json`) | Only when FMEA labels change | `node tools/build-incident-diagrams.mjs --check` |
 | Explain DB | New outage terms for new dossiers go to `tools/explain-extra-batch-incidents.json` | `tools/test-explain-db.mjs` |
@@ -836,9 +864,9 @@ stateDiagram-v2
 ## 14. AI and automation requirements
 
 - **Deterministic first.** State, counts, publisher resolution, checks, build order and markers are deterministic code (Python builder and CLIs, Node gate). No LLM in any build, gate or page.
-- **Authoring path.** Research and verification use agents (WebSearch and WebFetch) in the authoring session, under the QA standard's writer prompt and reviewer checklist (`standarization/DC_INCIDENTS_QA_STANDARD.md:27-58`), batched at ≤ 3 dossiers (QA §5 allows ≤ 5; 3 keeps review effort per batch inside 2 days). Agents may propose edits, retypes and registry entries. They may not run `stamp` unless the reviewer is a different agent, or the owner, from the one that wrote the edits.
+- **Authoring path.** Research and verification use agents (WebSearch and WebFetch) in the authoring session, under the QA standard's writer prompt and reviewer checklist (`standarization/DC_INCIDENTS_QA_STANDARD.md:27-58`), batched at ≤ 3 dossiers (QA §5 allows ≤ 5; 3 keeps review effort per batch inside 2 days). Agents may propose edits, retypes and registry entries. They may not write the `incident-verification` record unless the reviewer is a different agent, or the owner, from the one that wrote the edits.
 - **Anti-fabrication.** Every quote must be verbatim from the fetched document. The existing `_ingest_rca.py` rule stays: a verdict with `fabricationRisk == "high"` is skipped (`tools/_ingest_rca.py:8-10`).
-- **Human approval points.** D-1…D-12 and OQ-1…OQ-4 (owner); accepting a `primarySearch` exception (owner); every stamp (named reviewer).
+- **Human approval points.** D-Q09-1…D-Q09-16 in `DECISIONS.md` (owner); accepting a `primarySearch` exception (owner, D-Q09-16); every verification record (named reviewer).
 - **No scheduled job.** A periodic `check --all` could later join the homelab timers; not specified here.
 
 ## 15. Non-functional requirements
@@ -851,13 +879,13 @@ stateDiagram-v2
 | CLI speed | `check --all` < 5 s; `incidents_build_order.py --check` < 2 s | `time` |
 | Scalability | Registry grows by a few entries per batch; the build order is O(list size) | — |
 | Availability | GitHub Pages static; no runtime dependency | — |
-| Reliability | `stamp` is atomic; the gate and the CLI implement the rules independently (Node and Python), so a bug in one shows as disagreement | Unit tests and L2 and L3 comparisons |
+| Reliability | The record write is atomic (shared CLI); the rules live in one module (D12), so the builder, the CLI and the gates cannot disagree; each rule is proven by a planted-violation fixture that must fail (§20.5) | Unit tests and L2 and L3 comparisons |
 | Accessibility | Text states; `aria-label` on markers; axe 0 serious or critical at 390 and 1440 in both themes, with a planted low-contrast line caught first | L8 |
 | Security | §16 | — |
 | Privacy | No user data; guardrail C-14 on personal data | Review |
-| Maintainability | `incidents_verify.py` < 600 lines, `incidents_build_order.py` < 300, gate < 800; standards updated (§22) | Review |
+| Maintainability | `tools/lib/incident_rules.py` < 500 lines, `incidents_verify.py` < 300 lines, `incidents_build_order.py` < 300, gate < 800; standards updated (§22) | Review |
 | Observability | `check --all --json`; gate `--report`; build-order `--report` | — |
-| Data integrity | Byte-format round trip (F15); V1–V14; freshness gate | U10, L3 |
+| Data integrity | Byte-format round trip (F15); V1–V15; freshness gate | U10, L3 |
 | Backup and recovery | Git; verification records kept under `previous[]` on restamp | — |
 
 ## 16. Security and access control
@@ -866,7 +894,7 @@ stateDiagram-v2
 - Input handling in the builder: every dossier string passes `html.escape(…, quote=True)`, as today. Marker `href`s are built from integers; `aria-label` text from the reference title is escaped. U5 plants `<img src=x onerror=…>` in a reference title and expects escaped output.
 - External links keep `target="_blank" rel="noopener nofollow"` (`tools/build-incidents.py:1560`).
 - Registry and URL parsing: the registry is matched on prefixes, never evaluated as patterns, so no regex injection is possible. Archive URLs are parsed with `urllib.parse`.
-- CLI safety: `stamp` writes only the named dossier inside `data/incidents/`; the slug must match `^[a-z0-9-]+$`, and paths are joined, never concatenated from user text. No shell calls with user input; V10 and V11 run fixed argv lists.
+- CLI safety: the `incident-verification` record writes only the named dossier inside `data/incidents/`; the slug must match `^[a-z0-9-]+$`, and paths are joined, never concatenated from user text. No shell calls with user input; V10 and V11 run fixed argv lists.
 - Secrets: none. The research agents need no keys beyond the session's own tools.
 - Research guardrails: no auth-walled or intranet content (C-14). The `accessed` date is recorded on every reference.
 - Audit: verification records with reviewer and request id, queue decision lines and git history.
@@ -881,10 +909,10 @@ stateDiagram-v2
 | Operator later revises its report | `accessed` shows when it was read; a restamp after re-reading; the previous record is kept |
 | Host not in the registry | V3 fails naming the host; fix by a reviewed registry entry (BR-8) or a retype |
 | A mirror of an operator document | `publisher` + `mirror: true` + `mirrorNote`; reviewer confirms the identity of the document |
-| Seed with no primary anywhere | `primarySearch` with ≥ 3 routes; stays Seed unless the owner accepts (OQ-4) |
+| Seed with no primary anywhere | `primarySearch` with ≥ 3 routes; stays Seed unless the owner accepts (D-Q09-16) |
 | Edit breaks a verbatim FMEA or response quote | V10 fails naming the mode and pointer; repair the quote from the new text (no score change) |
 | `refs` index out of range | Build error naming slug, field, index |
-| `stamp` run while checks fail | Refused, exit 1, nothing written |
+| Record (stamp) run while checks fail | Refused, exit 1, nothing written |
 | Two sessions edit the same dossier | Git conflict on the JSON; resolve, re-run `check`; never stamp on a merge without re-checking |
 | Queue item answered "keep both" | Decision line records it; data unchanged; status done |
 | Candidate built under a new slug | `_master-list.json` entry gets `builtAs`; build order excludes it |
@@ -899,11 +927,14 @@ stateDiagram-v2
 ```mermaid
 flowchart LR
   R[(Research: public primary sources)] --> J[(data/incidents/<slug>.json)]
-  P[(_publishers.json)] --> V[incidents_verify.py check/stamp]
-  J --> V
-  V -- stamp --> J
-  J --> B[build-incidents.py]
-  P --> B
+  P[(_publishers.json)] --> RL[tools/lib/incident_rules.py]
+  J --> RL
+  RL --> V[incidents_verify.py brief/check]
+  RL --> OD[owner_decisions.py record incident-verification]
+  OD -- stamp --> J
+  RL --> Q18[PRD-Q18 incidents_patterns.py]
+  RL --> Q03[PRD-Q03 reproduce tools]
+  RL --> B[build-incidents.py]
   B --> D[incident-*.html: state line, note, markers]
   B --> H[dc-incidents.html: seed word, count, copy]
   M[(_master-list.json)] --> O[incidents_build_order.py]
@@ -911,7 +942,7 @@ flowchart LR
   J --> O
   O --> BO[(_build-order.json)]
   BO --> NB[_incidents_next_batch.py] --> R
-  G[test-incident-verification.mjs] -. independent Node rules .-> J
+  G[test-incident-verification.mjs] -. reads incident_rules.py dump + fixtures .-> RL
   G -.-> P
   G -.-> BO
   G -.-> D
@@ -928,18 +959,20 @@ sequenceDiagram
   participant B as build-incidents.py
   participant Q as Gates
   participant Rv as Reviewer
+  participant OD as owner_decisions.py
   I->>V: brief <slug>
   V-->>I: worksheet (claims, refs, leads, queue items)
   I->>W: find primary documents, check each claim
   W-->>I: edits + references + refs pointers
   I->>V: check <slug>
-  V-->>I: V1–V14 report
+  V-->>I: V1–V15 report
   I->>B: --apply
   I->>Q: corpus, FMEA, response, diagrams, L1–L8
   I->>Rv: adversarial review + visual QA
   Rv-->>I: pass (named)
-  I->>V: stamp <slug> --reviewer --request …
-  V-->>I: sourcing.verification written
+  I->>OD: record incident-verification <slug> --reviewer --request …
+  OD->>V: check <slug> (precondition)
+  OD-->>I: sourcing.state verified, sourcing.verification written
   I->>B: --apply (page reads "Verified")
 ```
 
@@ -947,13 +980,13 @@ Alternatives and trade-offs:
 
 | Decision | Chosen | Alternative | Why |
 |---|---|---|---|
-| State field | Keep the `lastVerified` marker + optional record | New `sourcing.state` enum | Q18 and Q3 already read the marker; no consumer change |
+| State field | Explicit `sourcing.state` enum, owned here (D12), consistent with the marker (V15) | Keep the marker as the only state | One owner and one field name for every consumer (Q18, Q03, Q01, Q17); the marker alone let two PRDs name a future field differently (QA K3) |
 | Official rule | Publisher registry + derived flag | Keep type-only rule | Type-only lets news count as official (F4) |
 | Claim links | `refs` indices + rendered markers | Keep free-text `source` | Free text cannot be checked (F7); markers make "cites its source" visible |
-| Flip | CLI `stamp` after checks | Edit the date by hand | Hand edits flipped nothing reliably (C6) |
+| Flip | Shared `owner_decisions.py record` after checks (D15) | Edit the date by hand; a Q09-only `stamp` command | Hand edits flipped nothing reliably (C6); one approval CLI for every PRD |
 | Build order | Generated file from a stated rule | Hand list | Reproducible; F9 showed the hand-kept skip set rot |
 | Hub seed filter | Not added | Filter chip | Not needed for visibility; Q18 lists seeds |
-| Gate language | Node gate independent of Python CLI | One shared module | Two implementations catch each other's mistakes |
+| Rules | One Python module read by builder, CLI, gates and consumers (D12) | Independent Node re-implementation in each gate | Three PRDs re-implementing the seed and official rules is how the field names diverged; correctness is proven by planted fixtures instead of by a second implementation |
 
 Deployment: static GitHub Pages; no Supabase, no Worker.
 
@@ -961,25 +994,25 @@ Deployment: static GitHub Pages; no Supabase, no Worker.
 
 | T | Description | Depends | Files | Approach | Effort | Verification | DoD |
 |---|---|---|---|---|---|---|---|
-| T-1 | Gate skeleton with L1–L8, red on today's tree | — | `tools/test-incident-verification.mjs` | Node; rules re-implemented from §10; puppeteer on `file://` for L8 | 1.5 d | Every law fails with the §20.4 message | Red output stored in `05-test-evidence/Q09/` |
-| T-2 | Registry v1 + vocabulary + `_TYPE_MAP`; both ingest writers append the final newline (F15) | — | `data/incidents/_publishers.json`, `tools/_ingest_rca.py`, `tools/_ingest_deep.py` | §10.3 table; R1–R5 validation | 0.5 d | L2 runs and names the 15 dossiers | — |
+| T-1 | Gate skeleton with L1–L8, `--phase`, `--fixture`; one planted-violation fixture per law (§20.5) | — | `tools/test-incident-verification.mjs`, `tools/fixtures/incident-verification/` | Node; reads `incident_rules.py dump`; puppeteer on `file://` for L8 | 2 d | Every fixture run exits 1 with its expected line; `--strict --phase A` on today's tree fails only on Phase A laws | Red output stored in `05-test-evidence/Q09/` |
+| T-2 | Registry v1 + vocabulary + `_TYPE_MAP`; both ingest writers append the final newline (F15); shared rules module; `sourcing.state` written into 43 dossiers | — | `data/incidents/_publishers.json`, `tools/_ingest_rca.py`, `tools/_ingest_deep.py`, `tools/lib/incident_rules.py`, 43 dossier JSONs | §10.3 table; R1–R5 validation; §11.7; one scripted migration (15 `seed`, 28 `legacy`) | 1 d | L2 runs in report mode and names the 12 dossiers; V15 passes on 43; `build-incidents.py --check` unchanged | — |
 | T-3 | Builder: state line, note, hub word, count, copy, markers, numbered refs, registry load | T-2 | `tools/build-incidents.py` | FR-2, FR-3, FR-6; CSS §9.7 | 1.5 d | L1 green after rebuild; bytes measured | Screenshots 390/1440 both themes looked at |
-| T-4 | Reference corrections (Appendix C), PM recomputed, count reported | T-2 | 21 dossier JSONs | Scripted retype with the byte format; then `--apply` | 1 d | L2 green except items waiting on D-11 and D-12 | Count change in CHANGELOG |
-| T-5 | `incidents_verify.py` (`brief`, `check`, `stamp`) + unit tests | T-2 | `tools/incidents_verify.py`, `tools/test-incidents-verify.py` | §11.1 | 1.5 d | U1–U10 green | — |
+| T-4 | Reference corrections (Appendix C), PM recomputed, count reported | T-2 | 21 dossier JSONs | Scripted retype with the byte format; then `--apply` | 1 d | L2 green except items waiting on D-Q09-11 and D-Q09-12 | Count change in CHANGELOG |
+| T-5 | `incidents_verify.py` (`brief`, `check`) + the `incident-verification` record kind + unit tests | T-2; `tools/owner_decisions.py` (shared, D15) for U8–U9 | `tools/incidents_verify.py`, `tools/lib/incident_rules.py`, `tools/test-incidents-verify.py` | §11.1, §11.7 | 1.5 d | U1–U10 green | — |
 | T-6 | Master-list hygiene + build-order generator + next-batch | T-2 | `_master-list.json`, `tools/incidents_build_order.py`, `tools/_incidents_next_batch.py` | FR-11, FR-12 | 1 d | L5 green; `--report` top 15 equals §5.7 | — |
-| T-7 | Decision packet D-1…D-12, OQ-1…OQ-4 to the owner | — | message only | Evidence from §3.4 and §23 | 0.5 d | Owner answers recorded | Queue lines written |
+| T-7 | Decision packet D-Q09-1…D-Q09-16 to the owner (rows already in `DECISIONS.md`) | — | message; answers recorded with `tools/owner_decisions.py decide` | Evidence from §3.4 and §23 | 0.5 d | Owner answers recorded | Queue lines written |
 | T-8 | Seed batch B1 | T-3…T-6 | 3 dossiers | J3 | 2 d | `check` 0; L1–L3; visual QA | 3 stamps; release |
 | T-9 | Seed batch B2 | T-8 | 3 dossiers | J3 | 2 d | same | same |
 | T-10 | Seed batch B3 | T-9 | 3 dossiers | J3 | 2 d | same | same |
-| T-11 | Seed batch B4 (includes Q-7) | T-10, D-7 | 3 dossiers | J3 | 2 d | same | same |
-| T-12 | Seed batch B5 (includes Q-8) | T-11, D-8 | 3 dossiers | J3 | 2 d | same | same |
+| T-11 | Seed batch B4 (includes Q-7) | T-10, D-Q09-7 | 3 dossiers | J3 | 2 d | same | same |
+| T-12 | Seed batch B5 (includes Q-8) | T-11, D-Q09-8 | 3 dossiers | J3 | 2 d | same | same |
 | T-13 | Apply queue decisions on legacy dossiers (Q-1…Q-6, Q-9, Q-10) and FR-10 | T-7 | nirs, kakao, equinix, unisuper, red-sea, facebook, google-council-bluffs, 28 × `referenceCount` | Per decision; FMEA/response quotes repaired | 1.5 d | L4 green; incident gates green | Decision lines "done" |
-| T-14 | Primary search for the 5 non-seed dossiers without a primary after T-4: alibaba-cloud-global-2023, aws-us-east-1-thermal-2025, british-airways-heathrow-power-2017, delta-atlanta-switchgear-2016, red-sea-subsea-cables-2024 | T-4, T-5, OQ-4 | 5 dossiers | §12.4 routes; references or `primarySearch` | 2 d | L3 green | Owner accepts any exception |
+| T-14 | Primary search for the 5 non-seed dossiers without a primary after T-4: alibaba-cloud-global-2023, aws-us-east-1-thermal-2025, british-airways-heathrow-power-2017, delta-atlanta-switchgear-2016, red-sea-subsea-cables-2024 | T-4, T-5, D-Q09-16 | 5 dossiers | §12.4 routes; references or `primarySearch` | 2 d | L3 green | Owner accepts any exception |
 | T-15 | Coordinates for 3 dossiers; builder raises on missing coordinates | — | `tools/build-incidents.py` | FR-14 | 0.5 d | L6 green | Map shows 43 markers |
-| T-16 | Wiring, standards, CLAUDE.md lines, CHANGELOG, release (Phase A) | T-1…T-6, T-15 | §22 | — | 0.5 d | Full ship gate green | Live checks §22 |
-| T-17…T-24 | Phase D: new dossiers in rank order, 2 per task (ranks 1–2, 3–4, …, 15) | OQ-2, T-16 | new dossier JSONs, coordinates, vectors | Research workflow → `_ingest_deep.py` → J3 → stamp | 2 d each | L1–L6 green with the new dossiers | Each ships Verified |
+| T-16 | Wiring with `--phase A` (by anchor text), standards, CLAUDE.md lines, CHANGELOG, release (Phase A) | T-1…T-6, T-15 | §22 | — | 0.5 d | Full ship gate green; L2–L4 print REPORT lines and do not fail it | Live checks §22 |
+| T-17…T-24 | Phase D: new dossiers in rank order, 2 per task (ranks 1–2, 3–4, …, 15) | D-Q09-14, T-16 | new dossier JSONs, coordinates, vectors | Research workflow → `_ingest_deep.py` → J3 → record | 2 d each | L1–L6 green with the new dossiers | Each ships Verified |
 
-Totals: Phase A (T-1…T-7, T-15, T-16) ≈ 8.5 days; seeds (T-8…T-12) 10 days; legacy fixes (T-13, T-14) 3.5 days; Phase D 16 days for the first 15 candidates. That is ≈ 38 working days, against the addendum's 5 weeks for seeds plus the first builds. Phase D is the part the owner can scale (OQ-2).
+Totals: Phase A (T-1…T-7, T-15, T-16) ≈ 8.5 days; seeds (T-8…T-12) 10 days; legacy fixes (T-13, T-14) 3.5 days; Phase D 16 days for the first 15 candidates. That is ≈ 38 working days, against the addendum's 5 weeks for seeds plus the first builds. Phase D is the part the owner can scale (D-Q09-14).
 
 ## 20. Test strategy
 
@@ -987,25 +1020,43 @@ Totals: Phase A (T-1…T-7, T-15, T-16) ≈ 8.5 days; seeds (T-8…T-12) 10 days
 
 | Level | What | Ids |
 |---|---|---|
-| Unit (Python, `tools/test-incidents-verify.py`) | U1 state for the three forms and a bad form; U2 vocabulary rejects `official`; U3 publisher resolution: prefix, archive URL, mirror with publisher, unregistered host; U4 derived PM for regulatory, vendor-status, party-statement; U5 escaped title in the marker label; U6 `brief` lists every event and metric; U7 `check` names V6 on a missing `refs`; U8 `stamp` refuses on a failing check and writes nothing; U9 `stamp` writes the record and removes `referenceCount`; U10 round trip keeps an untouched dossier byte-identical | U1–U10 |
+| Unit (Python, `tools/test-incidents-verify.py`) | U1 state for the three forms and a bad form; U2 vocabulary rejects `official`; U3 publisher resolution: prefix, archive URL, mirror with publisher, unregistered host; U4 derived PM for regulatory, vendor-status, party-statement; U5 escaped title in the marker label; U6 `brief` lists every event and metric; U7 `check` names V6 on a missing `refs`; U8 the `incident-verification` record refuses on a failing check and writes nothing; U9 the record sets `sourcing.state` to `verified`, writes `verification` and removes `referenceCount`; U10 round trip keeps an untouched dossier byte-identical; U14 `state()` raises on each V15 mismatch (seed without marker, verified without record, missing field) | U1–U10, U14 |
 | Unit (build order) | U11 classification of a 6-entry fixture (built, covered, duplicate-of, excluded, two candidates); U12 rule order and tie-break; U13 `--check` detects a hand edit | U11–U13 |
 | Contract | `_publishers.json` R1–R5; `_build-order.json` constraints §10.5; verification record V9 | in the gate |
-| Independent recount (Node) | L2, L3 and L5 re-implement the Python rules; disagreement fails | L2, L3, L5 |
+| Rules (Node reads the module) | L2 and L3 read `python3 tools/lib/incident_rules.py dump` and assert its lines; L5 recomputes the build order (no shared rule involved); every rule is proven by its fixture (§20.5) | L2, L3, L5 |
+| Supabase stub | Not applicable: no Supabase anywhere in this PRD. The shared stub `tools/lib/rz-supa-stub.mjs` (coordinator decision D16) is not loaded | — |
 | Static HTML | L1 states and copy; markers resolve to `#ref-k` ids; hub word and count | L1 |
 | E2E (puppeteer via `rz-lane`) | Seed and verified dossier and the hub at 390 and 1440 px, both themes: state line visible above the nav, note present, a marker click lands on `#ref-k` with the outline, no horizontal overflow, no page error | L8 |
 | Accessibility | axe with a planted low-contrast line caught first; then 0 serious or critical | L8 |
-| Security | Fixture dossier with `<img onerror>` in a reference title renders as text (U5); slug validation in `stamp` | U5, U8 |
+| Security | Fixture dossier with `<img onerror>` in a reference title renders as text (U5); slug validation in the record writer | U5, U8 |
 | Performance | Byte budgets §15 on two dossiers | T-3 report |
 | Regression | `python3 tools/build-incidents.py --check`, `node tools/test-incidents-corpus.mjs`, `python3 tools/test-incidents-fmea.py --strict --require-all`, `node tools/test-fmea-sim.mjs --strict`, `python3 tools/test-incidents-response.py --strict --require-all`, `node tools/build-incident-diagrams.mjs --check`, `node tools/audit-page-gates.mjs --strict`, and PRD-Q18's gate if shipped | ship gate |
-| Failure recovery | Planted failures: a news URL typed `vendor-status` (L2 red); a stamped dossier with a missing `refs` (L3 red); `_build-order.json` edited by hand (L5 red); coordinates removed (L6 red) | red proofs |
+| Failure recovery | One planted-violation fixture per law (§20.5) | red proofs |
 | Visual | `node tools/incidents-visual-qa.mjs <out> <slugs>` per batch; screenshots in `documentation/product-transformation/05-test-evidence/Q09/` looked at | C-16 |
 
 ### 20.2 Gate wiring in `tools/ship-gate.sh`
-- After line 67 (`gate "incident pages — generated pages match the builder" …`):
+Insertion is by anchor text, never by line number (PRD-Q01, PRD-Q03 and PRD-Q18 insert near the same lines; today the anchors are at `:67` and `:71`).
+- After the line `gate "incident pages — generated pages match the builder" python3 tools/build-incidents.py --check`:
   `gate "incident corpus — provenance and structure on every dossier" node tools/test-incidents-corpus.mjs`
-- After line 71 (`gate "incident figures — drawn by the diagram engine, zero warnings, file current" …`):
-  `gate "incident verification — state visible, official means official, primary sources, queue decided, build order current" node tools/test-incident-verification.mjs --strict`
+- After the line `gate "incident figures — drawn by the diagram engine, zero warnings, file current" node tools/build-incident-diagrams.mjs --check`:
+  `gate "incident verification — state visible, official means official, primary sources, queue decided, build order current" node tools/test-incident-verification.mjs --strict --phase A`
+- The release that meets the next phase's preconditions changes `--phase A` to `B`, then `C`, in the same commit as the work (one line). No release raises the phase while a precondition below is unmet.
 - The unit tests run inside the second gate's L3 and L5 (the gate invokes `python3 tools/test-incidents-verify.py` first).
+
+Law wiring (coordinator decision D9). A law is blocking from the phase in the second column. Before that, `--strict` runs it in report mode: it prints `REPORT Ln PASS` or `REPORT Ln FAIL <reason>` and never fails the gate.
+
+| Law | Blocking from (phase · task) | Precondition (all must hold) |
+|---|---|---|
+| L1 state visible, honest copy | A · T-16 | T-2 (`sourcing.state` on 43 dossiers), T-3 (builder renders it). No owner input: the D-Q09-10 word is not part of L1 |
+| L2 vocabulary, publisher rule, derived flag | C · T-13 | T-2 registry, T-4 corrections applied; D-Q09-11 and D-Q09-12 not PROPOSED in `DECISIONS.md` and applied by T-13 (the Equinix LD8 and NorthC flags depend on them). Until then each batch's dossiers still pass V2–V4 through `check`, the record's precondition |
+| L3 primary source on every non-seed dossier; records pass V1–V15 | C · T-14 | T-4, T-5, T-14 done; D-Q09-16 (the `primarySearch` exception) not PROPOSED. The record part (V1–V15 on every dossier with `verification`) is blocking from B · T-8, once the first record exists |
+| L4 queue decided, `referenceCount` gone | C · T-13 | D-Q09-1…D-Q09-12 not PROPOSED; T-13 applied |
+| L5 build order current | A · T-16 | T-6. D-Q09-13 (rule order) only re-ranks; the law checks the file against the rule in force |
+| L6 coordinates, cluster, chunks | A · T-16 | T-15 |
+| L7 wiring | A · T-16 | T-16 itself (the gate lines and CLAUDE.md lines land in the same commit) |
+| L8 render, axe, design rules | A · T-16 for the hub, one seed and one legacy dossier; the verified-dossier item from B · T-8 | T-3; a verified dossier exists (B1). Before B1 the item prints `REPORT L8 verified dossier: none yet` |
+
+Phase B starts with the first seed batch (T-8); Phase C with T-13 and T-14; Phase D (new dossiers, D-Q09-14) adds no law.
 
 ### 20.3 Test data
 Fixtures live under `tools/fixtures/incident-verification/`: a seed, a legacy and a verified dossier (small, synthetic, clearly named `fixture-*`), a 6-entry master list and a registry with 3 entries. They are never read by the builder (outside `data/incidents/`).
@@ -1014,14 +1065,31 @@ Fixtures live under `tools/fixtures/incident-verification/`: a seed, a legacy an
 
 | Law | Claim | Command | How it fails on today's tree |
 |---|---|---|---|
-| L1 | Every dossier shows its state line `#verification` before the section nav, with the copy of §9.6 for its state; every seed also shows the note; every seed's hub row shows "Seed — sources pending"; the hub metabar shows the seed count; no generated page claims that its facts come from post-incident reports (lede, FAQ, hero footer, page meta) | `node tools/test-incident-verification.mjs --law L1` | No page has `#verification`; the hub contains "seed" 0 times; the hub carries 4 "post-incident report(s)" claims (lede, FAQ, hero footer, meta) and every dossier the meta claim → `L1 FAIL 43 dossiers without #verification; 15 seed rows without the word; 4 overclaiming strings on the hub, 43 on dossiers` |
-| L2 | Every reference type is in the vocabulary; every official- or party-typed reference has a confirmed publisher; `officialPostmortem` equals the derived value on every dossier | `--law L2` | Registry missing → `L2 FAIL _publishers.json missing`. With the v1 registry in place (T-2) but before T-4: `L2 FAIL 17 references on 12 dossiers; officialPostmortem mismatch on 8 (x-twitter-oregon-fire-2025 true, derived false; …)`; plus 13 references with off-vocabulary types |
-| L3 | Every non-seed dossier has ≥ 1 confirmed primary reference or an accepted `primarySearch`; every dossier carrying `sourcing.verification` passes V1–V14; `python3 tools/test-incidents-verify.py` passes | `--law L3` | `L3 FAIL no confirmed primary (8): alibaba-cloud-global-2023, azure-wan-router-global-2023, british-airways-heathrow-power-2017, delta-atlanta-switchgear-2016, equinix-ld8-london-ups-2020, kakao-sk-cc-pangyo-fire-2022, nirs-daejeon-battery-fire-2025, red-sea-subsea-cables-2024` (A4). After T-4 it still fails on 5 until T-14 closes them. Red proof for the record part: a fixture stamped with one event lacking `refs` → `L3 FAIL fixture-verified sequenceOfEvents[2] has no refs` |
-| L4 | Every item under "Internal contradictions" in `_review-queue.md` carries a decision line and a status line; no dossier stores `referenceCount`; the machine-checkable decisions hold (x-twitter `impactUsd` equals the value decided in D-7; psn `location.city` per D-8) | `--law L4` | `L4 FAIL 10 items without a decision line; referenceCount present on 28 dossiers (stale on 17)` |
-| L5 | `_build-order.json` equals a fresh recomputation (Node, independent of Python); every master-list entry is classified exactly once; no candidate is a known duplicate; `_incidents_next_batch.py 100` proposes only candidates; sitemap, llms and search contain no incident URL | `--law L5` | File missing → `L5 FAIL _build-order.json missing`; recount names the 7 unmarked duplicates; `_incidents_next_batch.py` proposes 8 duplicates (F9) |
+| L1 | Every dossier carries `sourcing.state` consistent with its record (V15) and shows its state line `#verification` before the section nav, with the copy of §9.6 for its state; every seed also shows the note; every seed's hub row shows "Seed — sources pending"; the hub metabar shows the seed count; no generated page claims that its facts come from post-incident reports (lede, FAQ, hero footer, page meta) | `node tools/test-incident-verification.mjs --law L1` | No page has `#verification`; the hub contains "seed" 0 times; the hub carries 4 "post-incident report(s)" claims (lede, FAQ, hero footer, meta) and every dossier the meta claim → `L1 FAIL 43 dossiers without #verification; 15 seed rows without the word; 4 overclaiming strings on the hub, 43 on dossiers` |
+| L2 | Every reference type is in the vocabulary; every official- or party-typed reference has a confirmed publisher; `officialPostmortem` equals the derived value on every dossier | `--law L2` | Fixture `l2-news-as-vendor` (§20.5). On today's data with the v1 registry in place (T-2) but before T-4: `L2 FAIL 17 references on 12 dossiers; officialPostmortem mismatch on 8 (x-twitter-oregon-fire-2025 true, derived false; …)`; plus 13 references with off-vocabulary types |
+| L3 | Every non-seed dossier has ≥ 1 confirmed primary reference or an accepted `primarySearch`; every dossier carrying `sourcing.verification` passes V1–V15; `python3 tools/test-incidents-verify.py` passes | `--law L3` | `L3 FAIL no confirmed primary (8): alibaba-cloud-global-2023, azure-wan-router-global-2023, british-airways-heathrow-power-2017, delta-atlanta-switchgear-2016, equinix-ld8-london-ups-2020, kakao-sk-cc-pangyo-fire-2022, nirs-daejeon-battery-fire-2025, red-sea-subsea-cables-2024` (A4). After T-4 it still fails on 5 until T-14 closes them (report mode until then, §20.2). Red proof: fixtures `l3-no-primary` and `l3-verified-missing-refs` (§20.5) |
+| L4 | Every item under "Internal contradictions" in `_review-queue.md` carries a decision line and a status line; no dossier stores `referenceCount`; the machine-checkable decisions hold (x-twitter `impactUsd` equals the value decided in D-Q09-7; psn `location.city` per D-Q09-8) | `--law L4` | `L4 FAIL 10 items without a decision line; referenceCount present on 28 dossiers (stale on 17)` |
+| L5 | `_build-order.json` equals a fresh recomputation (Node, independent of Python); every master-list entry is classified exactly once; no candidate is a known duplicate; `_incidents_next_batch.py 100` proposes only candidates; sitemap, llms and search contain no incident URL | `--law L5` | Fixture `l5-hand-edited-order` (§20.5). On today's tree the recount names the 7 unmarked duplicates and `_incidents_next_batch.py` proposes 8 duplicates (F9) |
 | L6 | Every dossier has map coordinates, a `_cluster.json` point and chunks in `incidents-chunks.jsonl`; the builder raises on a missing coordinate | `--law L6` | `L6 FAIL no coordinates: alibaba-cloud-global-2023, aws-ebs-ec2-rds-us-east-1-2011, azure-wan-router-global-2023` |
 | L7 | `tools/ship-gate.sh` runs `node tools/test-incidents-corpus.mjs` and `node tools/test-incident-verification.mjs --strict`; CLAUDE.md's audit list names both | `--law L7` | `L7 FAIL ship-gate.sh does not run test-incidents-corpus.mjs` (F13) |
 | L8 | At 390 and 1440 px in both themes, on one seed, one legacy and (after B1) one verified dossier and on the hub: the state line is visible above the nav without horizontal overflow; a marker click focuses `#ref-k` with its outline; axe reports 0 serious or critical after a planted low-contrast line is caught; computed `transition-property` never `all`; no transform on hover; radius ≤ 4 px; fonts IBM Plex Sans and JetBrains Mono; layout-shift inside `#verification` = 0 | `--law L8` (puppeteer under `rz-lane`) | `#verification` absent → `L8 FAIL state line not found on incident-fastly-global-cdn-2021.html` |
+
+### 20.5 Planted-violation fixtures (the red proof of every law)
+Each fixture is a small tree under `tools/fixtures/incident-verification/<name>/` (dossiers named `fixture-*`, never read by the builder). `node tools/test-incident-verification.mjs --fixture <dir> --law <Ln>` must exit 1 and print the expected line; the gate's own self-test runs all of them before the real laws, so a law that cannot fail turns the gate red. "File missing" is not a red proof.
+
+| Fixture | Law | Plant | Expected failure line |
+|---|---|---|---|
+| `l1-no-state-line` | L1 | A built seed page without `#verification` | `L1 FAIL incident-fixture-seed.html: no #verification` |
+| `l1-state-mismatch` | L1 | `sourcing.state: "seed"` on a dossier whose `lastVerified` is an ISO date | `L1 FAIL fixture-legacy V15 sourcing.state 'seed', expected 'legacy'` |
+| `l1-overclaim` | L1 | Hub lede still says "Every fact traces to a public post-incident report." | `L1 FAIL dc-incidents.html: overclaiming string 'post-incident report'` |
+| `l2-news-as-vendor` | L2 | A news URL (`www.idcnova.com/…`) typed `vendor-status`, flag `true` | `L2 FAIL fixture-legacy references[0] vendor-status idcnova.com: not registered for operator 'Fixture Op'; officialPostmortem true, derived false` |
+| `l3-no-primary` | L3 | A legacy dossier with press references only and no `primarySearch` | `L3 FAIL no confirmed primary (1): fixture-legacy` |
+| `l3-verified-missing-refs` | L3 | A verified dossier whose `sequenceOfEvents[2]` has no `refs` | `L3 FAIL fixture-verified sequenceOfEvents[2] has no refs` |
+| `l4-undecided-item` | L4 | A queue file with one item lacking its decision line; one dossier with `referenceCount` | `L4 FAIL 1 items without a decision line; referenceCount present on 1 dossiers` |
+| `l5-hand-edited-order` | L5 | `_build-order.json` with ranks 1 and 2 swapped | `L5 FAIL _build-order.json differs from recomputation at candidates[0].slug` |
+| `l6-no-coords` | L6 | A dossier slug absent from the coordinate table | `L6 FAIL no coordinates: fixture-legacy` |
+| `l7-unwired` | L7 | A copy of `ship-gate.sh` without the corpus line | `L7 FAIL ship-gate.sh does not run test-incidents-corpus.mjs` |
+| `l8-transition-all` | L8 | A dossier page whose `.inc-verif` has `transition: all` and a planted low-contrast line | `L8 FAIL transition-property all on .inc-verif` and the planted line reported by axe |
 
 ## 21. Acceptance criteria
 
@@ -1031,11 +1099,11 @@ Fixtures live under `tools/fixtures/incident-verification/`: a seed, a legacy an
 | AC-2 | A legacy dossier | Opens `incident-aws-s3-us-east-1-2017.html` | "Last verified 2026-07-31 · 4 sources, 1 primary"; no note |
 | AC-3 | The hub | Reads the metabar | "… 15 seed, sources pending …" before B1; the segment is absent after B5 when all are stamped |
 | AC-4 | The hub | Reads the lede, the FAQ and the hero footer | None says the facts come from public post-incident reports; each carries the §9.6 copy |
-| AC-5 | After T-4 | Opens the X/Oregon dossier | Its row reads "Press-sourced" unless B4 has found an authority record; the gate passes |
+| AC-5 | After T-4, before B4 | Opens the hub and the X/Oregon dossier (`x-twitter-oregon-fire-2025`) | The hub row's status cell reads "Press-sourced" (§9.6, FR-3 (e): its `officialPostmortem` is now false), and the dossier's state line reads "Seed — sources pending · drafted 2026-08-02 · 3 sources, 0 primary". If B4 confirms an authority record, the row reads "Official RCA" (or "Official record" after D-Q09-10) and p ≥ 1. L2 passes (report mode until Phase C) |
 | AC-6 | A reference typed `vendor-status` on a news host | Gate runs | L2 fails naming slug, index, host |
 | AC-7 | A dossier stamped in B1 | Clicks the marker [1] on an event | Lands on reference [1] with its outline; Back returns |
 | AC-8 | B1–B5 done | Gate `--report` | "seed dossiers: 0" or the remaining ones each with an owner-accepted search record |
-| AC-9 | Owner answered D-1…D-12 | Opens `_review-queue.md` | Each item has a decision line with its request id and a status |
+| AC-9 | Owner answered D-Q09-1…D-Q09-12 | Opens `_review-queue.md` and `DECISIONS.md` | Each item has a decision line with its request id (`^R[0-9]{3,4}$`) and a status; each `DECISIONS.md` row is ACCEPTED, REJECTED or DEFAULTED |
 | AC-10 | Phase D batch 1 shipped | Opens the hub | Two new dossiers (ranks 1–2) listed, each "Verified {date}", each on the map |
 | AC-11 | `_incidents_next_batch.py 3` | Runs | Proposes ranks 1–3 of `_build-order.json`, none a duplicate |
 | AC-12 | A signed-out visitor | Opens any dossier | Root gate card; no content (unchanged) |
@@ -1044,9 +1112,9 @@ FR → test mapping
 
 | FR | Tests |
 |---|---|
-| FR-1 | U1, L1, L3 |
+| FR-1 | U1, U14, L1, L3 |
 | FR-2 | L1, L8, AC-1, AC-2 |
-| FR-3 | L1, AC-3, AC-4 |
+| FR-3 | L1, AC-3, AC-4, AC-5 |
 | FR-4 | U2, L2 |
 | FR-5 | U3, U4, L2, AC-5, AC-6 |
 | FR-6 | U5, L3, L8, AC-7 |
@@ -1066,12 +1134,12 @@ FR → test mapping
   - Phase A, one release: T-1 red, then T-2…T-6, T-15, T-16. This gives the visible state, reference corrections, tools, wiring and the build order.
   - Phase B: five seed batches, one release each.
   - Phase C: T-13, T-14, after the owner's decisions.
-  - Phase D: new dossiers, one release per 2–3 dossiers, behind OQ-2.
+  - Phase D: new dossiers, one release per 2–3 dossiers, behind D-Q09-14.
 - **Flags.** None; root-only pages.
 - **Data migration.** T-4 retypes (Appendix C), T-6 statuses and FR-10 deletion. All are scripted with the F15 byte format and reviewed as diffs.
-- **Compatibility.** Additive fields; Q18 and Q3 unchanged; hub anchors and dossier ids unchanged; reference ids are new.
+- **Compatibility.** Additive fields; `sourcing.state` written once (T-2); Q18 and Q3 read it through the shared module in their own releases, which ship after Phase A; hub anchors and dossier ids unchanged; reference ids are new.
 - **Rollback.** `git revert` of a release; a reverted stamp returns the dossier to Seed with its old JSON.
-- **Monitoring.** The two gates on every ship; `check --all` before each batch.
+- **Monitoring.** The two gates on every ship (verification gate at the current `--phase`, report lines for the other laws); `check --all` before each batch.
 - **Post-deploy live validation.**
   - `curl -s https://resistancezero.com/incident-optus-australia-nationwide-2023.html | grep -c 'id="verification"'` → 1.
   - `curl -s https://resistancezero.com/dc-incidents.html | grep -c 'Seed — sources pending'` → the seed count.
@@ -1085,7 +1153,7 @@ FR → test mapping
   - `bash tools/ship-gate.sh`; push. No IndexNow: the pages are gated.
 - **Standards docs in the same release (R089).**
   - `standarization/DC_INCIDENTS_STANDARD.md`: the three states and their copy; type vocabulary; publisher registry; derived `officialPostmortem`; build-order rule; the two new gates in "Gates".
-  - `standarization/DC_INCIDENTS_QA_STANDARD.md`: §1 gains `refs` on events and metrics; new §3C "Verification checklist" (C-1…C-17); writer prompt line "every event and metric carries `refs`"; §5 gains `brief`/`check`/`stamp`.
+  - `standarization/DC_INCIDENTS_QA_STANDARD.md`: §1 gains `refs` on events and metrics; new §3C "Verification checklist" (C-1…C-17); writer prompt line "every event and metric carries `refs`"; §5 gains `brief`/`check` and the `owner_decisions.py record incident-verification` step.
   - `standarization/CONTENT_LINKAGE_PLAYBOOK.md`: new or verified dossier → build order regenerated, vectors re-embedded, Q3 verdict (C-17), Q1 report re-run.
   - `standarization/UIUX_AUDIT_LEDGER.md`: rows "seed state invisible" and "hub overclaims post-incident sourcing", closed with the version and L1.
   - CLAUDE.md: two audit-list lines next to `:59-64`.
@@ -1096,45 +1164,46 @@ FR → test mapping
 |---|---|---|---|---|
 | R1 | A verifier "fills" a gap with plausible text | Medium | False facts in a reference library | BR-3; verbatim quotes; adversarial reviewer different from the writer; V10 quote checks; `fabricationRisk` skip |
 | R2 | Registry entry wrong (domain mis-attributed) | Low | Wrong "official" | BR-8 evidence in commit; small table; reviewer |
-| R3 | The hub's official count drops and reads as a regression | Medium | Owner surprise | CHANGELOG names each change and why; D-10 to D-12 decided first |
-| R4 | Seeds cannot reach primaries (fires under investigation, private operators) | Medium | Seeds remain | `primarySearch` + OQ-4; honest state stays visible |
+| R3 | The hub's official count drops and reads as a regression | Medium | Owner surprise | CHANGELOG names each change and why; D-Q09-10 to D-Q09-12 decided first |
+| R4 | Seeds cannot reach primaries (fires under investigation, private operators) | Medium | Seeds remain | `primarySearch` + D-Q09-16; honest state stays visible |
 | R5 | Editing event text breaks FMEA and response quotes widely | Medium | Rework | V10 names each; repair from new text; budgeted in batch effort |
 | R6 | Local embedding is slow (project memory: 37–87 s per chunk on this machine) | High for Phase D | Batch delay | Incremental by content hash; run overnight; V12 checks presence only |
-| R7 | Build order disputed (facility-first wanted) | Medium | Re-planning | OQ-1 with both lists in §5.7 |
-| R8 | Library growth beyond the owner's intended size | Medium | Wasted effort | OQ-2; Phase D per batch, stoppable |
-| R9 | Q18 acceptance numbers go stale | High | Q18 AC text mismatch | Cross-PRD review restates them; Q18's gate recounts from data |
+| R7 | Build order disputed (facility-first wanted) | Medium | Re-planning | D-Q09-13 with both lists in §5.7 |
+| R8 | Library growth beyond the owner's intended size | Medium | Wasted effort | D-Q09-14; Phase D per batch, stoppable |
+| R9 | Q18 acceptance numbers go stale | Low (was High) | Q18 AC text mismatch | Q18 v1.1 states its ACs as formulas and computes expected counts at gate time from `sourcing.state` (D12) |
 | R10 | Concurrent sessions edit `build-incidents.py` | Low | Merge conflicts | Peer message before each push (STATE.md rules) |
 
-Decisions for the owner (each with a recommendation):
+Decisions for the owner (each with a recommendation). They are recorded in `documentation/product-transformation/DECISIONS.md` as D-Q09-1…D-Q09-16 (status PROPOSED, the recommendation as default); D-Q09-13…16 were OQ-1…OQ-4. The owner's answer is recorded with `tools/owner_decisions.py decide` and the request id (D15):
 
 | Id | Question | Recommendation |
 |---|---|---|
-| D-1 | NIRS: first report before ignition; extinguished time; "96" used twice; 5 charged vs "Lee and three"; 191,000 vs ~125,000 users | Re-read the MOIS and National Fire Agency releases (korea.kr) and keep what they state; where two primaries differ, state both; "96" split into its two meanings with sources |
-| D-2 | Kakao: ignition 15:30 vs spark 15:19; disruption 15:20 vs building cut 16:52 | Keep 15:19 per the MSIT and NFS records if they state it; state 15:20 as onset of disruption and 16:52 as the full cut (both events, not a conflict) |
-| D-3 | Equinix LD8: 04:23–04:24 customer loss, 04:33 static switch, 04:40 Equinix onset; 21:49 "could not be verified" vs LINX | Show the three times as three attributed events; drop "could not be verified" if LINX's page states 21:49, citing it |
-| D-4 | UniSuper: SOE 13 "~9 May" vs "8 May" | Use the date printed on the joint statement (primary) |
-| D-5 | Red Sea: "exact UTC not published" vs Kentik 09:46 UTC; TGN-EA vs TGN-Eurasia | "No operator time published; Kentik measured 09:46 UTC" (attributed); use the cable name as its owner publishes it, one name throughout |
-| D-6 | Facebook: Wikipedia vs Cloudflare restoration times | Confirm both are attributed in the text; close |
-| D-7 | X/Oregon `impactUsd` ~$260k vs ~$250k | Use the figure in the fire authority's record if B4 finds it; otherwise state the press figure as reported, attributed |
-| D-8 | PSN `location` San Mateo | `location.city` "Not disclosed"; map anchor stays at the operator's head office per the standard's anchor rule, labelled as an anchor |
-| D-9 | `referenceCount` | Delete the field (no reader) |
-| D-10 | "Official RCA" for regulator records (Council Bluffs OSHA) and status logs | Rename the hub word to "Official record"; the dossier's state line already shows "p primary"; Council Bluffs' page states the basis via its references |
-| D-11 | Equinix LD8 `officialPostmortem` rests on LINX (an affected party) | Retype LINX as `party-statement`; flag becomes false unless an Equinix document is found in T-13 |
-| D-12 | NorthC's running update log | Type `vendor-status`; flag becomes true (operator's own record) |
-| OQ-1 | Build order: R1 > R2 > R3 (briefed) or facility first? | R1 > R2 > R3: facility-first puts nine press-only candidates at ranks 7–15 |
-| OQ-2 | How many new dossiers? (Project memory of 2026-07 records an owner scope of 20–50; the library has 43) | Verify all 15 seeds first; then build ranks 1–7 (to 50) and ask again |
-| OQ-3 | Keep three visible states, or re-verify the 28 legacy dossiers to "Verified"? | Keep three states now; re-verification as Phase 3 |
-| OQ-4 | Accept a `primarySearch` record as the exception for press-only dossiers? | Yes, per dossier, owner-accepted; the state line then reads "0 primary" honestly |
+| D-Q09-1 | NIRS: first report before ignition; extinguished time; "96" used twice; 5 charged vs "Lee and three"; 191,000 vs ~125,000 users | Re-read the MOIS and National Fire Agency releases (korea.kr) and keep what they state; where two primaries differ, state both; "96" split into its two meanings with sources |
+| D-Q09-2 | Kakao: ignition 15:30 vs spark 15:19; disruption 15:20 vs building cut 16:52 | Keep 15:19 per the MSIT and NFS records if they state it; state 15:20 as onset of disruption and 16:52 as the full cut (both events, not a conflict) |
+| D-Q09-3 | Equinix LD8: 04:23–04:24 customer loss, 04:33 static switch, 04:40 Equinix onset; 21:49 "could not be verified" vs LINX | Show the three times as three attributed events; drop "could not be verified" if LINX's page states 21:49, citing it |
+| D-Q09-4 | UniSuper: SOE 13 "~9 May" vs "8 May" | Use the date printed on the joint statement (primary) |
+| D-Q09-5 | Red Sea: "exact UTC not published" vs Kentik 09:46 UTC; TGN-EA vs TGN-Eurasia | "No operator time published; Kentik measured 09:46 UTC" (attributed); use the cable name as its owner publishes it, one name throughout |
+| D-Q09-6 | Facebook: Wikipedia vs Cloudflare restoration times | Confirm both are attributed in the text; close |
+| D-Q09-7 | X/Oregon `impactUsd` ~$260k vs ~$250k | Use the figure in the fire authority's record if B4 finds it; otherwise state the press figure as reported, attributed |
+| D-Q09-8 | PSN `location` San Mateo | `location.city` "Not disclosed"; map anchor stays at the operator's head office per the standard's anchor rule, labelled as an anchor |
+| D-Q09-9 | `referenceCount` | Delete the field (no reader) |
+| D-Q09-10 | "Official RCA" for regulator records (Council Bluffs OSHA) and status logs | Rename the hub word to "Official record"; the dossier's state line already shows "p primary"; Council Bluffs' page states the basis via its references |
+| D-Q09-11 | Equinix LD8 `officialPostmortem` rests on LINX (an affected party) | Retype LINX as `party-statement`; flag becomes false unless an Equinix document is found in T-13 |
+| D-Q09-12 | NorthC's running update log | Type `vendor-status`; flag becomes true (operator's own record) |
+| D-Q09-13 | Build order: R1 > R2 > R3 (briefed) or facility first? | R1 > R2 > R3: facility-first puts nine press-only candidates at ranks 7–15 |
+| D-Q09-14 | How many new dossiers? (Project memory of 2026-07 records an owner scope of 20–50; the library has 43) | Verify all 15 seeds first; then build ranks 1–7 (to 50) and ask again |
+| D-Q09-15 | Keep three visible states, or re-verify the 28 legacy dossiers to "Verified"? | Keep three states now; re-verification as Phase 3 |
+| D-Q09-16 | Accept a `primarySearch` record as the exception for press-only dossiers? | Yes, per dossier, owner-accepted; the state line then reads "0 primary" honestly |
 
 ## 24. Definition of done
 
 - [ ] Every dossier shows its state line; every seed shows the note; the hub shows the seed word and count; no overclaiming copy (L1).
 - [ ] Reference types in the vocabulary; every official- and party-typed reference has a confirmed publisher; `officialPostmortem` derived-consistent on 43 dossiers; CHANGELOG lists each changed flag (L2).
-- [ ] Every non-seed dossier stands on a confirmed primary reference or an owner-accepted search record; every verified dossier passes V1–V14 (L3).
+- [ ] Every non-seed dossier stands on a confirmed primary reference or an owner-accepted search record; every verified dossier passes V1–V15 (L3).
 - [ ] All 10 queue items decided and recorded; `referenceCount` gone (L4).
 - [ ] `_build-order.json` current; duplicates marked; next-batch proposes only candidates (L5).
 - [ ] Every dossier on the map, in the cluster and in the chunks; the builder fails on a missing coordinate (L6).
-- [ ] Both gates wired and listed in CLAUDE.md (L7).
+- [ ] Both gates wired by anchor text and listed in CLAUDE.md (L7); the verification gate runs at `--phase C` with every law blocking (§20.2).
+- [ ] Every law's fixture fails with its expected line (§20.5).
 - [ ] Render, axe and design rules pass at 390/1440 in both themes; screenshots looked at (L8).
 - [ ] The 15 seeds stamped Verified, or each remaining one carries an owner-accepted search record (O4).
 - [ ] Standards docs and CHANGELOG updated in each release; versions claimed with the peer.
@@ -1356,7 +1425,7 @@ hub mentions of 'seed': 0
 incident-att-nationwide-outage-2024.html: seed marker on line(s) [943] of 993
 incident-x-twitter-oregon-fire-2025.html: seed marker on line(s) [992] of 1042
 ```
-The kakao, nirs and ovhcloud rows fail only because a government document is typed `official-postmortem`; retyped `regulatory` (Appendix C) they pass and the flags stay true. The aws-thermal, azure-china and northc rows fail the other way: an official type on a page that is not an incident report (aws-thermal, azure-china) or that is the operator's update log (northc, D-12).
+The kakao, nirs and ovhcloud rows fail only because a government document is typed `official-postmortem`; retyped `regulatory` (Appendix C) they pass and the flags stay true. The aws-thermal, azure-china and northc rows fail the other way: an official type on a page that is not an incident report (aws-thermal, azure-china) or that is the operator's update log (northc, D-Q09-12).
 
 ### A3 Event and metric sources against references
 
@@ -1448,7 +1517,7 @@ def report(label, D):
     print(f"[{label}] non-seed without a confirmed primary ({len(noprim)}): {noprim}")
     print(f"[{label}] derived PM true: {derived_pm} | stored PM true: {sum(1 for d in D.values() if d['sourcing'].get('officialPostmortem'))}")
 report("today", docs)
-# Appendix C applied (D-11: LINX -> party-statement; D-12: northc log -> vendor-status; ovh ref2 -> press = worst case)
+# Appendix C applied (D-Q09-11: LINX -> party-statement; D-Q09-12: northc log -> vendor-status; ovh ref2 -> press = worst case)
 FIX = {("azure-wan-router-global-2023", 0): {"publisher": "microsoft", "mirror": True}, ("azure-wan-router-global-2023", 1): "vendor-status",
        ("azure-wan-router-global-2023", 3): "analysis", ("crowdstrike-falcon-global-outage-2024", 6): "party-statement",
        ("crowdstrike-falcon-global-outage-2024", 7): "party-statement", ("dyn-mirai-ddos-2016", 0): "press", ("dyn-mirai-ddos-2016", 3): "analysis",
@@ -1509,7 +1578,7 @@ flag changes after T-4: [('equinix-ld8-london-ups-2020', True, False), ('northc-
 | crowdstrike-falcon-global-outage-2024 | 6 | vendor-status | party-statement | microsoft (affected platform vendor) |
 | dyn-mirai-ddos-2016 | 0 | regulatory | press | krebsonsecurity.com is a journalist's site |
 | dyn-mirai-ddos-2016 | 3 | vendor-status | analysis | Cloudflare is not the operator |
-| equinix-ld8-london-ups-2020 | 0, 1 | official-postmortem, vendor-status | party-statement | linx (affected party), per D-11 |
+| equinix-ld8-london-ups-2020 | 0, 1 | official-postmortem, vendor-status | party-statement | linx (affected party), per D-Q09-11 |
 | gcp-global-service-control-2025 | 1 | vendor-status | analysis | ThousandEyes is a third party |
 | gcp-global-service-control-2025 | 2 | vendor-status | party-statement | cloudflare (affected customer of Google Cloud) |
 | kakao-sk-cc-pangyo-fire-2022 | 0 | official-postmortem | regulatory | kr-gov |
@@ -1524,7 +1593,7 @@ flag changes after T-4: [('equinix-ld8-london-ups-2020', True, False), ('northc-
 | azure-china-north3-regional-2024 | 0, 1 | official-postmortem | other | Documentation pages, not incident reports |
 | azure-china-north3-regional-2024 | 2 | vendor-status | other | Status history; quote records the incident is not listed |
 | azure-china-north3-regional-2024 | 3 | official-postmortem | other | TLS-certificate observation |
-| northc-almere-fire-2026 | 0 | official-postmortem | vendor-status | northc running update log, per D-12 |
+| northc-almere-fire-2026 | 0 | official-postmortem | vendor-status | northc running update log, per D-Q09-12 |
 | gcp-stt-gdc-delhi-fire-2026 | 2, 3 | official-status | vendor-status | google (status.cloud.google.com) |
 | unisuper-gcp-account-deletion-2024 | 5 | official-statement | party-statement | unisuper (unisuper.com.au) |
 | ovhcloud-sbg2-fire-2021 | 7 | vendor | party-statement | ovhcloud (corporate.ovhcloud.com) |
@@ -1536,4 +1605,4 @@ flag changes after T-4: [('equinix-ld8-london-ups-2020', True, False), ('northc-
 | facebook-meta-bgp-dns-2021 | 2, 3 | external-analysis, secondary | analysis, encyclopedia | blog.cloudflare.com (third party); en.wikipedia.org |
 | cloudflare-bot-management-feature-file-2025 | 3 | secondary-aggregator | aggregator | controld.com |
 
-Indices are 0-based positions in each dossier's `references` at `fcaa892df`. The table holds 36 reference changes on 21 dossiers, the same set A4 applies in memory. Equinix's two LINX references depend on D-11 and NorthC's on D-12; T-4 applies those three only after the decisions, and ovhcloud reference 2 only after the reviewer has read the PDF.
+Indices are 0-based positions in each dossier's `references` at `fcaa892df`. The table holds 36 reference changes on 21 dossiers, the same set A4 applies in memory. Equinix's two LINX references depend on D-Q09-11 and NorthC's on D-Q09-12; T-4 applies those three only after the decisions, and ovhcloud reference 2 only after the reviewer has read the PDF.

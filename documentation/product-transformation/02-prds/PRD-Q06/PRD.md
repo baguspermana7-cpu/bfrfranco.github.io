@@ -6,7 +6,7 @@
 |---|---|
 | PRD id | PRD-Q06 |
 | Feature | One provenance line idiom (`Simulated` / `Snapshot` / `Model output` / `Fallback`) from one small module, the shared simulated banner on all 10 cockpits, removal of every "Live" and "real-time" claim the site cannot back, visible fallbacks in the LTC lab and DCMOC, the X4 interim label and the X6 fix |
-| Version | 1.1 |
+| Version | 1.2 |
 | Status | Draft |
 | Author | Opus 5.5; Fable quota exhausted |
 | Date | 2026-11-10 |
@@ -26,6 +26,7 @@ Change history
 |---|---|---|---|
 | 1.0 | 2026-11-10 | Opus 5.5 | First complete draft, all 24 sections. Every fact re-verified on `1cb6dd292` with the commands quoted in §3 |
 | 1.1 | 2026-11-11 | Opus 5.5 | QA batch 1 revisions (D1–D8). D3: FR-13 places every `RZProvenance.mark/clear` call in the wrapper `computeModel`, never inside `computeModelLegacy` (§18.2, T-12 follow); `dcmoc/` rebuild order fixed (Q04 then Q06, one rebuild per release, §13, §22.3). D5: owner decisions are D-Q06-1 and D-Q06-2 in `DECISIONS.md`. D6/D7: §13 records that Q04 and Q07 use this PRD's fallback contract and styling contract |
+| 1.2 | 2026-11-11 | Opus 5.5 | QA batch 2 carry-over only: FR-3 removes the `demo` state's light-theme `background:#FFF8D6!important` (`js/rz-telemetry-quality.js:79`); new AC-17 checks the computed background and the source |
 
 ## 2. Executive summary
 
@@ -552,12 +553,16 @@ Each FR lists: description · trigger · preconditions · inputs · processing �
   `:59-92` with the styling contract in §9.8; do not render `.rz-tq-banner-dot` (remove the span from the markup at
   `:156-158` and the `rzTqPulse` keyframes at `:80-82`); change the `simulated` tooltip (`:154`) to "Simulated
   values from the engine model. They are not measured at a site."; bump the module `version` from `'1.43.4'` to
-  `'1.44.0'` (`:254`).
+  `'1.44.0'` (`:254`). The replacement explicitly removes the `demo` state's light-theme fill: today `:79` carries
+  `[data-theme="light"] .rz-tq-banner[data-rz-tq-state="demo"]{color:#684F00!important;background:#FFF8D6!important;border-color:#8B6A00!important}`;
+  the `background:#FFF8D6!important` declaration is deleted (no `background` on the demo banner in either theme, as for
+  every other state in §9.8), and the text and hairline colours follow the §9.8 contract without `!important`. PRD-Q07
+  training runs use the `demo` state, so this is the carry-over from QA batch 1 (STATE.md).
 - Outputs: same labels as today: "Simulated telemetry — engine-derived basis", the slot's custom label,
   "COMMS LOST — AUTHORITY UNAVAILABLE", "Demo mode — training values only".
 - State changes: none new.
 - Exceptions: none.
-- Acceptance: L8; the pins in F2 stay green after the test update in T-3.
+- Acceptance: L8; AC-17; the pins in F2 stay green after the test update in T-3.
 
 **FR-4 Page-level declaration on 4 cockpits.**
 - Description: add `data-rz-data-mode="simulated"` to `<body>`, the script tag
@@ -1561,6 +1566,7 @@ red counts above, then against the branch and confirm 0.
 | AC-14 | any line in either theme at 390 px | it renders | contrast ≥ 4.5:1, no animation, no horizontal scroll |
 | AC-15 | the gate set | `bash tools/ship-gate.sh` runs | both new gates pass and `test-gate-wiring` agrees |
 | AC-16 | the live site after deploy | §22.7 runs | every check matches |
+| AC-17 | any cockpit in the light theme | the banner is in the `demo` state (`data-rz-tq-state="demo"`) | its computed `background-color` is transparent (`rgba(0, 0, 0, 0)`), not `#FFF8D6`; `grep -c FFF8D6 js/rz-telemetry-quality.js` → 0. Red today: `:79` sets `background:#FFF8D6!important` |
 
 FR → test mapping:
 

@@ -500,3 +500,40 @@ because one is a release-sequencing rule for a shared export and the other a cod
    `ship-gate.sh :67–:71` (Q01, Q03, Q09, Q18), `glossary.html`/`articles.html`/explain DB (Q15, Q17), two `app_state`
    sync engines and three `rzSupa` stubs (Q07, Q12, Q17), and the five unbuilt shared helpers from batch 1. Laws wired
    before their owner or peer inputs exist (Q09 L3/L4, Q15 L4) repeat the batch 1 Q01 defect.
+
+---
+
+## Re-score after revision (self-score, not independent)
+
+Scorer: the revising agent (Opus 5.5), 2026-11-11, applying coordinator decisions D9–D16. **This is a self-score, not an
+independent review**; batch 1 showed a reviser can score one point high (Q04 cross-module 5 → 4). An independent re-check
+is still owed. Evidence is `grep -c <pattern> PRD-<id>/PRD.md` on the revised files (uncommitted in `wt-hub3`) unless
+stated otherwise. No gate was run, because the gates, fixtures, `tools/owner_decisions.py`, `tools/lib/incident_rules.py`,
+`js/rz-app-state.js` and `tools/lib/rz-supa-stub.mjs` are specified, not built.
+
+Versions: Q09 1.1, Q12 1.1, Q15 1.1, Q17 1.1, Q18 1.1, Q03 1.2 (D12 only), Q04 1.2 (D11 note only), Q06 1.2 (carry-over only).
+`DECISIONS.md`: 56 rows from the ten PRDs (22 + 34 migrated); D-Q01-3 names `/dc-incident-patterns.html`.
+
+| PRD · dimension | Batch 2 | Self-score | Evidence | Why not higher / residual risk |
+|---|---|---|---|---|
+| Q09 · Testability | 3 | 4 | `--phase` 9; `REPORT` 4; §20.2 law-wiring table (law, blocking from, precondition): L1, L5–L7 block from Phase A, L2 and L4 from C · T-13, L3 from C · T-14 (record part from B · T-8); §20.5 lists 11 planted fixtures with expected lines, replacing the "file missing" red proofs | Fixtures specified, not built; the phase raise is a manual one-line edit per release |
+| Q09 · Functional clarity | 4 | 4 | "Press-sourced" 5: it is the existing hub word for `officialPostmortem` false (`tools/build-incidents.py:591`, class `st-press`), now in §9.6, FR-3 (e) and AC-5 | — |
+| Q09 · API contracts | 4 | 4 | `^R[0-9]{3,4}$` 7; §11.7 contract for `tools/lib/incident_rules.py` incl. `dump` CLI for Node gates; write via `tools/owner_decisions.py record incident-verification` | Shared CLI flags belong to `03-architecture` |
+| Q09 · Cross-module | 4 | 4 | Owns `sourcing.state` (field name per D12, V15) and the rules module (`incident_rules` 26); §13 rows for Q18, Q03, Q17, `ship-gate.sh` by anchor text | — |
+| Q12 · all | ≥ 4 | ≥ 4 | `D-Q12-` ids; new §11.2a specifies `js/rz-app-state.js` (`RZAppState` 7: `register(cloudKey, {merge, read, write, maxBytes, debounceMs, allowed, metaKey})`, `push`, `pull`, `state`, `retry`, `ensure`, event `rz-app-state`; storage keys and key registry `ft_wl`, `ft_port`, `ft_alerts`, `learning-paths/v1`; what it does not do) | The PRD-X-DEFECTS dependency note is unchanged by instruction |
+| Q15 · Error handling | 4 | 4 | L4b 7: `id/index.html` claims in their own law, report mode until the peer's edit; §17 and the wiring now say the same thing | — |
+| Q15 · Cross-module | 4 | 4 | PRD-Q17 row in §13; order Q17 T-1 → Q15 → Q17 T-9; §5.2 and §11 no longer say the explain DB never changes | — |
+| Q15 · Implementation readiness | 4 | 4 | T-5 moved to Phase B; Phase A needs no owner input; T-9 sent at the start of Phase A | Phase C pace still depends on owner review time (UNKNOWN, stated) |
+| Q17 · API contracts | 3 | 4 | `ensureSupabase` 2, both in withdrawal text (change history, §11.6); FR-7 precondition is `window.rzSupa`, `rzSupa.ready` / `rz-supa-ready`, `rzSupa.getUser()`; registration call matches Q12 §11.2a | Depends on Q12 option A (D-Q12-1); under option C, sync is device-only (stated in Q12 §11.2a) |
+| Q17 · Cross-module | 3 | 4 | `PRD-Q04` 10 (dependency, edit order P2 → Q04 → Q01 → Q03 → Q17, §11.8 output contract; Q04 FR-9 note present, `grep -c 'depends on its output contract' PRD-Q04` 1); `rz-app-state` 16; Q15 and Q09 rows; Root-access row rendered through Q01's renderer | Two upstream specs (Q04 FR-9, Q12 §11.2a) must stay in step |
+| Q17 · Security | 3 | 4 | No `auth.js` change (§11.6, §16, T-7 files, DoD `git diff --stat auth.js auth.min.js` empty); `auth.js auth.min.js` removed from the §22 token list | — |
+| Q17 · Implementation readiness | 3 | 4 | T-7 depends on Q12's module, not a withdrawn export; T-8 has a rejected-D-Q01-3 path (`D-Q01-3 is rejected/REJECTED` 4); path files store no answer numbers (V7), L3 computes them from the live page at gate time | The builder needs a browser run to fill the placeholders |
+| Q17 · Data model | 4 | 4 | Path status `proposed\|accepted\|rejected\|retired`, `decidedBy`, `decidedOn`, `request ^R[0-9]{3,4}$` | — |
+| Q18 · Cross-module | 3 | 4 | `PRD-Q09` 30; seed via `incident_rules.is_seed` / `sourcing.state`; L7 = dossiers + 3 computed; AC-1…AC-5 are formulas with labelled illustrations at `644b810d4`; link lock via D-Q01-3 with the dossiers' page-level check (`tools/build-incidents.py:424`, `:501`, `:489`) if rejected; `ship-gate.sh` by anchor text | — |
+| Q18 · Completeness | 4 | 4 | `iid_catbars` 2: F3 now names the dashboard bars (all categories, Human error 10, `build-incidents.py:1254`); the "2 of 43" claim survives only in the change-history line that records its removal (`grep -c '2 of 43'` 1). Re-counted at `644b810d4`: 43 dossiers, 15 seed, 284 modes (189/95), 34 multi-category, PM 30 (22/28 researched, 8/15 seed), power bands 1/19/22/37 and +3/+15/+9/+11, software 90 in 14 (+37 in 6), operators AWS 5, Google Cloud 4, Azure 3 (+1), Cloudflare 2 (+1), Digital Realty 0 (+3) | — |
+| Q03 · Cross-module (D12) | — | 4 | `is_seed` 5: RV12, verdict S and L7 read Q09's state model; PRD-Q09 a hard dependency; L7's count computed | Only the D12 point was revised |
+| Q06 · carry-over | open | closed in spec | `FFF8D6` 4: FR-3 deletes the demo state's light-theme `background:#FFF8D6!important` (`js/rz-telemetry-quality.js:79`); AC-17 checks the computed background and `grep -c FFF8D6 js/rz-telemetry-quality.js` → 0 | Code not changed (spec only) |
+
+Dimensions still below 4 on self-score: **none**. Open: the shared modules (`tools/owner_decisions.py`, `tools/lib/incident_rules.py`,
+`js/rz-app-state.js`, `tools/lib/rz-supa-stub.mjs`) need their `03-architecture` specs before the first PRD that uses them;
+no PRD in this set adds a paid service or pay-per-use API (owner rule R114).

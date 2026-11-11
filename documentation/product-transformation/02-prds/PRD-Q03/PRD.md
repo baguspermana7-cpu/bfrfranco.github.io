@@ -6,14 +6,14 @@
 |---|---|
 | PRD id | PRD-Q03 |
 | Feature | `reproduce[]` entries in incident dossiers, rendered as a "Reproduce" section whose links open a site calculator with exactly the conditions the dossier states |
-| Version | 1.1 |
+| Version | 1.2 |
 | Status | Draft |
 | Author | Opus 5.5 (Fable quota exhausted) |
 | Date | 2026-11-10 |
 | Owner requests | R110 (PRD per idea), R111 (24-section structure) |
 | Priority | 71.0 (addendum Q3: I 8, N 8, C 6, E 5; `documentation/PRODUCT_INNOVATION_ASSESSMENT_2026-11_ADDENDUM.md:201-220`; register row `documentation/product-transformation/01-improvement-register/REGISTER.md:15`) |
 | Related findings | Addendum Q3. Corrections D1–D6 in §3.3. Cross-link with Q1 (`02-prds/PRD-Q01/PRD.md`) |
-| Dependencies | **P2 Part 2** (peer session, hard): the `#rzs=` reader on `tia-942-checklist.html` and `tier-advisor.html`. Contract = peer PRD-P02 (path in §11.3) plus the interface agreed with the peer on 2026-11-11 (`documentation/product-transformation/STATE.md`, "Interface agreements with the peer": `origin` string, mirror inputs `#tiaTier`/`#tiaDcType`); not re-specified here. Q1 (soft, one direction only: Q3 → Q1 through rule R2I, FR-12; Q1 never reads Q3 data). Owner decisions D-Q03-1…4 in `documentation/product-transformation/DECISIONS.md` |
+| Dependencies | **P2 Part 2** (peer session, hard): the `#rzs=` reader on `tia-942-checklist.html` and `tier-advisor.html`. Contract = peer PRD-P02 (path in §11.3) plus the interface agreed with the peer on 2026-11-11 (`documentation/product-transformation/STATE.md`, "Interface agreements with the peer": `origin` string, mirror inputs `#tiaTier`/`#tiaDcType`); not re-specified here. Q1 (soft, one direction only: Q3 → Q1 through rule R2I, FR-12; Q1 never reads Q3 data). Owner decisions D-Q03-1…4 in `documentation/product-transformation/DECISIONS.md`. **PRD-Q09 Phase A** (hard, coordinator decision D12): Q09 owns the dossier state model (`sourcing.state`) and the shared rules module `tools/lib/incident_rules.py`; this PRD consumes `is_seed` and defines no seed rule of its own (edge Q09 → Q03 only) |
 | Related modules | `tools/build-incidents.py`, `tools/incidents_fmea.py` (evidence resolver), new `tools/incidents_reproduce.py`, new `tools/build-reproduce-baselines.py`, `data/incidents/{ovhcloud-sbg2-fire-2021,equinix-ld8-london-ups-2020,delta-atlanta-switchgear-2016}.json`, new `data/reproduce-baselines.json`, new `data/incidents/_reproduce-review.json`, `tia-942-checklist.html`, `tier-advisor.html`, `js/rz-scenario.js` (changed by P2, peer) |
 | Target wave | "Connected reference, weeks 9–16: Q1 relation file, then Q3 (needs P2)" (`…_ADDENDUM.md:557`) |
 | Approval status | Approved by owner R110/R111 2026-11-10 (the PRD set). The addendum marks Q3 "Needs owner approval" (`…_ADDENDUM.md:217`): implementation starts only after the owner says yes to the feature (D-Q03-1), to business rule BR-2 (the named baseline, §12; D-Q03-2) and to the entries (D-Q03-3, with D-Q03-4 on Delta's non-postmortem source); each accepted entry is then recorded by `decide` with the request id |
@@ -24,6 +24,7 @@ Change history
 |---|---|---|---|
 | 1.0 | 2026-11-10 | Opus 5.5 | First complete draft. Facts verified on `wt-hub3` (branch `hub-r3`) at `803253314` and re-checked at `1cb6dd292` (docs-only commit between them); peer state read from `~/.cache/rz-k28` at `b80fd7bca` and the peer PRD-P02 |
 | 1.1 | 2026-11-11 | Opus 5.5 | QA batch 1 revisions (D1–D8). D2: `origin` is the agreed string `incident:<slug>:<entry>` (≤ 80 characters, `^[A-Za-z0-9_.:/-]+$`, optional, never used for navigation, never inserted as HTML; new RV17); the stale object shape and its `set[]` are removed (FR-6, FR-13, §5.4, §9.6, §11.3, §16, §23); the TIA baseline includes P2's capturable mirror inputs `tiaTier`/`tiaDcType`, so it holds 64 inputs (FR-2, §10.4, A1, L3, AC1, AC3, T-2). D5: owner decisions D-Q03-1…4 in `DECISIONS.md`. D8: the Q3 → Q1 direction is the only one |
+| 1.2 | 2026-11-11 | Opus 5.5 | QA batch 2 revisions (D9–D16), D12 only: the seed rule (RV12, verdict S, L7) is no longer defined here. It is consumed from PRD-Q09's state model, the field `sourcing.state`, through the shared module `tools/lib/incident_rules.py` (`is_seed`); PRD-Q09 added as a dependency (Q09 Phase A before this PRD's implementation); L7's count is computed from the data at gate time instead of the literal 11 |
 
 ## 2. Executive summary
 
@@ -78,7 +79,7 @@ A dossier explains what failed, and a calculator lets a reader test a design, bu
 | O2 | A link opens its calculator with exactly the stored inputs | Entries whose restored inputs equal the stored map | 4/4 | `node tools/test-incidents-reproduce.mjs --law L3` | P2 Part 2 is live |
 | O3 | The calculator shows the difference at the stated inputs and nowhere else | Entries whose outputs match the expected model outputs (Appendix A) | 4/4 | `--law L4` | Model code unchanged since this PRD; a model change updates Appendix A in the same release |
 | O4 | No entry rests on an unverifiable statement | Evidence pointers that fail `resolve_evidence`; entries on seed dossiers | 0; 0 | `--law L1` | — |
-| O5 | Every facility dossier has a recorded verdict | Non-seed dossiers in power, cooling or fire with entries or a review record | 11/11 | `--law L7` | — |
+| O5 | Every facility dossier has a recorded verdict | Non-seed dossiers in power, cooling or fire with entries or a review record | All of them, n computed at gate time (11 at `2f458f7c5`) | `--law L7` | — |
 | O6 | No runtime cost on dossiers | JS bytes added to dossier pages | 0 | diff of `<script` tags in a regenerated dossier | — |
 | O7 | Dossier page weight stays small | Bytes added per dossier with entries | UNKNOWN — measure in T-3; budget ≤ 8,192 B per dossier (the TIA link alone is 3,914 characters) | `wc -c` before/after on the 3 pages | — |
 | O8 | Restore is quick | Time from navigation to restored state on TIA, free and premium sessions | UNKNOWN — measure in T-6; budget ≤ 1,500 ms after `DOMContentLoaded` | performance marks in the browser gate | Premium sessions run `runMonteCarlo(10000)` on every recalculation (`tia-942-checklist.html:746`, `:857`) |
@@ -227,7 +228,7 @@ A checklist item is renamed → `build-reproduce-baselines.py --check` goes stal
 
 **FR-3 Review records and report**
 - Description: `data/incidents/_reproduce-review.json` holds a verdict per non-seed dossier whose `category` includes `power`, `cooling` or `fire` and which has no accepted entry. `python3 tools/incidents_reproduce.py report [--entries] [--format md|json]` lists all 43 with a code.
-- Codes: Q (has accepted entries), B (blocked on sourcing), C (no calculator input expresses the stated condition), S (seed-only, automatic), N (no facility category, automatic).
+- Codes: Q (has accepted entries), B (blocked on sourcing), C (no calculator input expresses the stated condition), S (seed-only, automatic, from `incident_rules.is_seed`, PRD-Q09), N (no facility category, automatic).
 - Acceptance: L7; `report` prints 43 rows; v1 counts Q 3, B 1, C 7, S 15, N 17 (Appendix B).
 
 **FR-4 Draft entries**
@@ -521,7 +522,7 @@ Mapping to the addendum's shape: `calc` = calc; `inputs` = baseline ⊕ set (com
 | RV9 | At least one `violated` item per entry |
 | RV10 | Every evidence pointer resolves through `incidents_fmea.resolve_evidence` (quote verbatim) |
 | RV11 | Every `violated` item has at least one pointer that is a `ref`, or a `soe`/`metric` whose item has a non-empty `source`. A `factor` alone is not enough (Kakao fails here, F15) |
-| RV12 | No entry on a seed dossier (`sourcing.lastVerified` contains "seed", case-insensitive) |
+| RV12 | No entry on a seed dossier: `tools/lib/incident_rules.is_seed(dossier)` is true (PRD-Q09 owns the rule and the field `sourcing.state`, D12). Before Q09 Phase A ships, this PRD is not implemented (dependency, §1) |
 | RV13 | `accepted`/`rejected`/`retired` carry `decidedBy: "owner"`, `decidedOn`, `request`; `proposed` carries none of them |
 | RV14 | The built link is ≤ 8,000 characters (PRD-P02 FR-P02-6) |
 | RV15 | The payload validates against `data/scenario-link.schema.json` (once P2 ships it) |
@@ -897,7 +898,7 @@ The second line is added in phase 1, when P2 Part 2 is live; `--phase 0` is remo
 | L4 | The output changes exactly at the stated inputs (signed-out): TIA "Top gaps" headings equal the violated labels and `#scoreValue` reads `92%` (OVH) or `98%` (LD8, Delta) against `100%` for the baseline-only link; tier advisor `#physicalVal` 56 → 34 and `#scoreValue` 58 → 56 | `--law L4` | Nothing restores (as L3) → TIA shows `0%` and no gaps list → `L4 FAIL 0/4` |
 | L5 | Exactly the 3 dossiers render `#reproduce` after `#fmea`, the nav entry and the FMEA back-link; one row per set item with its evidence label and quote; the other 40 dossiers are byte-identical to a build without Q3; `build-incidents.py --check` is CURRENT | `python3 tools/test-incidents-reproduce.py --law L5` | 0 sections → `L5 FAIL 0/3 dossiers` |
 | L6 | At 390 and 1440 px in both themes: no horizontal overflow in `#reproduce`; axe reports 0 serious/critical after first catching a planted 2:1 line; computed styles: no `transition: all`, no transform, radius ≤ 4 px, IBM Plex Sans / JetBrains Mono | `node tools/test-incidents-reproduce.mjs --law L6` | No `#reproduce` element → `L6 FAIL no section` |
-| L7 | Each of the 11 non-seed dossiers in power, cooling or fire has accepted entries or a review record with verdict B or C and a reason | `python3 tools/test-incidents-reproduce.py --law L7` | `_reproduce-review.json` does not exist → `L7 FAIL 3/11` once entries exist, `0/11` today |
+| L7 | Each non-seed dossier (`incident_rules.is_seed` false) whose `category` includes power, cooling or fire has accepted entries or a review record with verdict B or C and a reason. The gate computes that set from the data at gate time; it holds no literal count (11 at `2f458f7c5`, an illustration; PRD-Q09 seed records grow it) | `python3 tools/test-incidents-reproduce.py --law L7` | `_reproduce-review.json` does not exist → `L7 FAIL 3/<n>` once entries exist, `0/<n>` today, with n computed (11 today) |
 
 Red-first proofs beyond today's tree, recorded in the evidence folder: L1 with one quote character changed; L2 with one checkbox flipped in a built link; L4 with the TIA fire weight changed in a temp copy; L5 with a hand edit in a dossier page.
 

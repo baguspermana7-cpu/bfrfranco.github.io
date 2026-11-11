@@ -6,23 +6,24 @@
 |---|---|
 | PRD id | PRD-Q17 |
 | Feature | Learning paths on a new public page `learning-paths.html`: each path chains one journal article section, a set of explained terms, a calculator exercise whose answer is stated and proven against the calculator's own code, and an incident dossier case (root access). Progress is kept on the device and, when signed in, in the account. Three paths ship in v1 |
-| Version | 1.0 |
+| Version | 1.1 |
 | Status | Draft |
 | Author | Opus 5.5 (Fable quota exhausted) |
 | Date | 2026-11-11 |
 | Owner requests | R110 (PRD per idea), R111 (24-section structure) |
 | Priority | 65.5 (addendum rank: I 7, N 7, C 6, E 5, effort 4 weeks; `documentation/PRODUCT_INNOVATION_ASSESSMENT_2026-11_ADDENDUM.md:85`) |
 | Related findings | Q17 (`…_ADDENDUM.md:300-316`), sequencing "Q1 before Q3 and Q17" (`:562`), maturity row "Accounts and persistence" (`:36`; it lists zero-caller tables, not the educator helpers, which also have none: F7), BASELINE §5 "Learning paths: None. `achievements.html` is orphaned." (`00-audit-baseline/BASELINE.md:56`). New findings: F5 (achievements tracker loaded on 2 pages only), F7 (educator tables hold no learning data), F8 (`app_state` has no page caller), F9 (229 of 1,020 explain-DB titles carry a duplicated parenthetical, and all 229 also sit in the palette's `search-terms.json`), corrections C1–C4 (§3.3) |
-| Dependencies | **Q1** relation file `rz-relations/1` (PRD-Q01; accepted article→tool and tool/article→incident edges; consumer contract PRD-Q01 §11.4). **P2** share links `#rzs=` (peer, `PRD-P02`, on the peer branch `feat/p-wave1`, not on main) — soft: the exercise works without it. **Q01 FR-13** (`auth.js` dossier matcher) for the incident step's lock. Shared with Q7: one-line export `window._rzAuth.ensureSupabase` (`PRD-Q07` §11.5) |
-| Related modules | `data/journal.json`, `js/rz-explain-db.js` + `tools/build-explain-db.py`, `glossary.html`, `tier-advisor.html`, `data/incidents/*.json` (read), `data/relations.json` (Q1, read), `js/rz-scenario.js` (P2, read), `js/rz-supabase.js` (`app_state` wrappers), `auth.js`, `tools/build-journal.py`, `achievements.html`, `rz-gamification.js`, `tools/test-generator-freshness.py`, `tools/ship-gate.sh` |
+| Dependencies | **Q1** relation file `rz-relations/1` (PRD-Q01; accepted article→tool and tool/article→incident edges; consumer contract PRD-Q01 §11.4). **P2** share links `#rzs=` (peer, `PRD-P02`, on the peer branch `feat/p-wave1`, not on main) — soft: the exercise works without it. **Q01 FR-13** (`auth.js` dossier matcher, D-Q01-3) for the incident step's lock, with a stated path if it is rejected (FR-8). **PRD-Q04 FR-9** (blocking for L3): it replaces `tier-advisor.html`'s scoring with `RZEngine.models.tier.advise`; the fixed edit order of that page is P2 → Q04 → Q01 → Q03 → Q17 (coordinator decision D11), and this PRD depends on Q04's output contract. **PRD-Q12** owns the shared `app_state` sync module `js/rz-app-state.js` (its option A sync engine, coordinator decision D16), which this PRD consumes. Supabase is reached the way PRD-Q07 v1.1 §11.5 does: `js/rz-config.js` + module `js/rz-supabase.js`, no `auth.js` change (D10). Reads PRD-Q09's `sourcing.state` (D12) |
+| Related modules | `data/journal.json`, `js/rz-explain-db.js` + `tools/build-explain-db.py`, `glossary.html`, `tier-advisor.html`, `data/incidents/*.json` (read), `data/relations.json` (Q1, read), `js/rz-scenario.js` (P2, read), `js/rz-config.js` + `js/rz-supabase.js` (`app_state` wrappers, read), `js/rz-app-state.js` (PRD-Q12, read), `auth.js` (read only: `isRootSession`, `isRootOnlyHref`), `tools/build-journal.py`, `achievements.html`, `rz-gamification.js`, `tools/test-generator-freshness.py`, `tools/ship-gate.sh` |
 | Target wave | "Strategic, week 17+" (`…_ADDENDUM.md:558`), after Q1 (`:562`) |
-| Approval status | Approved by owner R110/R111 2026-11-10 (the PRD set). Each path file needs the owner's acceptance (`status: approved`) and its Q1 edges must be accepted. Retiring `achievements.html` is a feature removal and is only proposed here (OQ-2) |
+| Approval status | Approved by owner R110/R111 2026-11-10 (the PRD set). Each path file needs the owner's acceptance (`status: accepted`, recorded with `tools/owner_decisions.py record learning-path <id>`; the batch decision is D-Q17-1 in `DECISIONS.md`) and its Q1 edges must be accepted. No `auth.js` change (coordinator decision D10). Retiring `achievements.html` is a feature removal and is only proposed here (D-Q17-2) |
 
 Change history
 
 | Version | Date | Author | Change |
 |---|---|---|---|
 | 1.0 | 2026-11-11 | Opus 5.5 | First complete draft, 24 sections. Facts verified against `wt-hub3` at `2f458f7c5` (branch `hub-r3`); every exercise answer computed by running `tier-advisor.html`'s own scoring code (Appendix A) |
+| 1.1 | 2026-11-11 | Opus 5.5 | QA batch 2 revisions (D9–D16). D10: T-7's `auth.js` edit and every `_rzAuth.ensureSupabase` use withdrawn; account sync reaches Supabase through `js/rz-config.js` + module `js/rz-supabase.js` (`rzSupa.ready` / `rz-supa-ready`, `rzSupa.getUser()`), as PRD-Q07 v1.1 §11.5; `auth.js` is read only (§11.6, §16); a rejected-D-Q01-3 path (FR-8): the incident step stays a plain link the dossier gates itself, non-root learners see 3 steps, the step completes only for root; path files use the D5 decision format (`proposed\|accepted\|rejected\|retired`, `decidedBy`, `decidedOn`, `request ^R[0-9]{3,4}$`). D11: PRD-Q04 is a dependency; tier-advisor edit order P2 → Q04 → Q01 → Q03 → Q17; L3 computes every expected answer at gate time from the scoring live on the page, and path files store no answer numbers (§10.2); missing engine handled (§17). D16: own sync engine dropped for PRD-Q12's `js/rz-app-state.js`; tests use `tools/lib/rz-supa-stub.mjs`. D15: OQ-1…4 → D-Q17-1…4; approvals through `tools/owner_decisions.py`. D9: law-wiring table (§20.3). Cross-module: Q15 and Q09 rows, `ship-gate.sh` insertion by anchor text |
 
 ## 2. Executive summary
 
@@ -64,8 +65,8 @@ Each path uses only links the owner has accepted in the Q1 relation file. The ex
 
 | # | Source says | Verified | Correction |
 |---|---|---|---|
-| C1 | Addendum Q17: "It fits the existing educator tables" (`:305`) | The educator tables store who is an educator and nothing else; no caller exists (F7) | Progress uses `app_state` (generic per-user key/value, F8) and the device; educator class features would need new tables (out of scope, OQ-3) |
-| C2 | BASELINE §5 (`BASELINE.md:56`) and addendum (`:301`): "`achievements.html` is orphaned" | It has three inbound links and is in the sitemap and llms.txt; what is broken is that its tracker runs on two pages only (F5) | Not reused; retirement proposed (OQ-2) |
+| C1 | Addendum Q17: "It fits the existing educator tables" (`:305`) | The educator tables store who is an educator and nothing else; no caller exists (F7) | Progress uses `app_state` (generic per-user key/value, F8) and the device; educator class features would need new tables (out of scope, D-Q17-3) |
+| C2 | BASELINE §5 (`BASELINE.md:56`) and addendum (`:301`): "`achievements.html` is orphaned" | It has three inbound links and is in the sitemap and llms.txt; what is broken is that its tracker runs on two pages only (F5) | Not reused; retirement proposed (D-Q17-2) |
 | C3 | Addendum: "learn 5 terms (explain-db)" (`:302`) | Workable; 3 of the 17 terms have no glossary entry (F3) | Paths list 6 terms; a term without a glossary link shows its definition inline and links nothing |
 | C4 | Addendum: "An exercise is checked against the engine output" (`:304`) | The tier advisor scores in its own page script (`tier-advisor.html:552-650`); `rz-engine` is loaded only into its PDF window (`:1457`) | Answers are proven against the calculator's own output: shown values in a real browser, raw values by running the page's scoring code (L3) |
 
@@ -78,7 +79,7 @@ Each path uses only links the owner has accepted in the Q1 relation file. The ex
 | O3 End to end | A headless run completes each path and progress survives reload | 3 of 3 | L4 | Root session used for the incident step in the test |
 | O4 No gamification | Badge, level, streak, points, confetti or completion animation | 0 | L5 | — |
 | O5 Clean titles | Explain-DB titles with a duplicated parenthetical | 0 (today 229) | L6 | Source fix in the generator |
-| O6 Use | Paths started and completed per month | UNKNOWN — measure in task T-12 | No cross-visitor channel exists: `rz-tracker.js` keeps events in each visitor's own localStorage (`rz-tracker.js:3`, `:95-101`); the owner picks the channel (OQ-4) | No target before a baseline |
+| O6 Use | Paths started and completed per month | UNKNOWN — measure in task T-12 | No cross-visitor channel exists: `rz-tracker.js` keeps events in each visitor's own localStorage (`rz-tracker.js:3`, `:95-101`); the owner picks the channel (D-Q17-4) | No target before a baseline |
 
 ## 5. Scope
 
@@ -86,7 +87,7 @@ Each path uses only links the owner has accepted in the Q1 relation file. The ex
 1. Path format `rz-learning-path/1`, three path files in `data/paths/`.
 2. Builder `tools/build-learning-paths.py` (`--apply`, `--check`), validating ids, Q1 edges and P2 support, writing the static path block into `learning-paths.html`.
 3. New public page `learning-paths.html` (hub register shell like `datacenter-solutions.html`, `css/rz-hub.css`).
-4. `js/rz-paths.js`: step states, answer check, device progress, account sync through `app_state`.
+4. `js/rz-paths.js`: step states, answer check, device progress; account sync by registering key `learning-paths/v1` with PRD-Q12's shared module `js/rz-app-state.js` (D16), no sync engine of its own.
 5. Gate `tools/test-learning-paths.mjs`.
 6. Source fix of the explain-DB title defect (`tools/build-explain-db.py:37-47`) and regeneration.
 7. Entry links: the journal hub (generated by `tools/build-journal.py`) and `glossary.html` intro.
@@ -97,10 +98,10 @@ Each path uses only links the owner has accepted in the Q1 relation file. The ex
 | Item | Why |
 |---|---|
 | Badges, levels, points, streaks, confetti, leaderboards | Excluded by the brief and rejected patterns |
-| Reusing `achievements.html` or `rz-gamification.js` | F5; retirement is OQ-2 |
-| Educator classes, rosters, assignments, progress views | No tables (F7); new infra = owner approval (OQ-3) |
+| Reusing `achievements.html` or `rz-gamification.js` | F5; retirement is D-Q17-2 |
+| Educator classes, rosters, assignments, progress views | No tables (F7); new infra = owner approval (D-Q17-3) |
 | Quizzes beyond the one exercise per path | Keep the path short; extend later |
-| Opening dossiers to non-root learners | Access change (PRD-Q01 OQ); the incident step shows "Root access" |
+| Opening dossiers to non-root learners | Access change (D-Q01-1); the incident step shows "Root access" |
 | A fault-scenario path on `datahall.html` | After Q7 ships (link `datahall.html#scn=…`, PRD-Q07 FR-14); v2 |
 | PUE / efficiency path on `pue-calculator.html` | Candidate v2 (containment none → PUE 1.58 from defaults 1.46, computed in this research, Appendix A2); not resilience-themed like the three incidents |
 | Editing `js/rz-scenario.js` | Peer-owned work in flight (P2); read only |
@@ -117,7 +118,8 @@ Each path uses only links the owner has accepted in the Q1 relation file. The ex
 | Relations | Q1 `data/relations.json` accepted edges | Allowed transitions |
 | Dossier anchors | `incident-<slug>.html#FM-nn` (`<details class="fm-row">`) | Incident step |
 | Account key/value store | `app_state` + `getAppState`/`setAppState` | Progress sync |
-| Supabase loader | `auth.js:432-455` via the shared export (`PRD-Q07` §11.5) | One client per page |
+| Supabase loader | `<script src="js/rz-config.js?v=<token>">` + `<script type="module" src="js/rz-supabase.js?v=<token>">`, then `await window.rzSupa.ready` (`js/rz-supabase.js:16`, `:488-489`), as PRD-Q07 v1.1 §11.5 and `opex-calculator.html:3980,3982` | One client per page; no `auth.js` change |
+| `app_state` sync | `js/rz-app-state.js` (PRD-Q12, option A sync engine, D16): dirty flag, merge callback per key, debounce, error copy | Progress sync |
 | Hub register | `css/rz-hub.css` (`:11-39` tokens); shell of `datacenter-solutions.html` (`<body class="hub pp">`, `:89`, `:188-189`, `:676`) | Page |
 | Toast | `js/rz-toast.js` (`RZToast.ok/warn`) | Sync feedback |
 | Generator freshness gate | `tools/test-generator-freshness.py:56-73` | `--check` of the builder |
@@ -125,8 +127,11 @@ Each path uses only links the owner has accepted in the Q1 relation file. The ex
 ### 5.4 Dependencies
 - Q1 shipped with the edges in §10.4 accepted (blocking for listing a path).
 - P2 (`/home/baguspermana7/.local/state/rzharness/projects/PRJ-RZ-WEB/work-items/WI-PRODUCT-TRANSFORM-001/repo/documentation/product-transformation/02-prds/PRD-P02/PRD.md`) merged to main for the shortcut link (soft).
-- Q01 FR-13 for the dossier lock (L7).
-- The `ensureSupabase` export (first of Q7/Q17 to ship adds it).
+- Q01 FR-13 for the dossier lock (L7), decided by D-Q01-3; if rejected, FR-8's rejected path applies and nothing here is blocked.
+- **PRD-Q04 FR-9** shipped (blocking for T-6 and L3): the exercise is proven against the engine-backed tier advisor (D11). Order on `tier-advisor.html`: P2 → Q04 → Q01 → Q03 → Q17.
+- **PRD-Q12** `js/rz-app-state.js` (blocking for T-7 only; the device-only path ships without it).
+- `js/rz-config.js` + `js/rz-supabase.js` exist unchanged (no `auth.js` change, D10).
+- PRD-Q15: Q17 T-1 (explain-DB fix) ships before Q15 T-7; Q15 Phase A/B on `glossary.html` and `articles.html` ships before Q17 T-9.
 
 ### 5.5 Constraints
 - Static page; generated block never hand-edited.
@@ -178,6 +183,7 @@ Tiers: `free | demo | pro | root` (`js/rz-feature-flags.js:6`); `getTier()` retu
 - Validation: none (reading).
 
 ### J4 Step 3 — Exercise (UC1, UC4)
+(Numbers in this journey are illustrations at `2f458f7c5`; the page shows the values the builder computed from the live tier advisor, §10.2.)
 - Shows: the question; "Open the tier advisor" (plain link: defaults); when P2 is live on the calculator, "Open it with UPS Configuration = N" (`#rzs=` link, new tab, `rel="noopener"`); an answer field "Composite score you see" (number, 16 px on phones); **Check**; **Show the answer**.
 - Check: the value is normalised (trim, comma → point); compared with the accepted answers.
   - Match → "Matches the calculator: 56." Step Done; the explanation appears (raw value, why it moved, the follow-up 2N result).
@@ -189,10 +195,11 @@ Tiers: `free | demo | pro | root` (`js/rz-feature-flags.js:6`); `getTier()` retu
 ### J5 Step 4 — Incident (UC5)
 - Root: "Equinix LD8 Docklands UPS failure, 2020 · FM-02 Customer A/B 'diverse' power feeds" linking `incident-equinix-ld8-london-ups-2020.html#FM-02`, the accepted Q1 edge's `why` line, and a checkbox "I have read this case".
 - Non-root: the same title line followed by "Root access", no link target opened for them (the link exists but the dossier shows its root gate; `isRootOnlyHref` makes site-wide link handlers treat it as locked once Q01 FR-13 ships), and the step is left out of their count ("3 of 3 steps done · the incident needs root access").
+- If D-Q01-3 is rejected: the incident step stays a plain link to the dossier, which gates itself (`<body class="locked">` and `enforceTierFeatureAccess('dc-incidents')`, `tools/build-incidents.py:424`, `:501`); non-root learners see a path of 3 steps; the step counts as complete only for root (FR-8).
 
 ### J6 Progress and sync (UC2)
 - Every change writes `localStorage['rz_paths_v1']`.
-- Signed in: on page load, `getAppState('learning-paths/v1')`; merge (latest `at` per step wins); write back if the merge changed anything. On each change, a debounced (2 s) `setAppState`. Errors → one toast "Progress is saved on this device; account sync failed." and retry on the next change.
+- Signed in: `js/rz-app-state.js` (PRD-Q12) reads key `learning-paths/v1` on load through `rzSupa.getAppState` once `rzSupa.ready` resolves and `rzSupa.getUser()` returns a user; it calls this PRD's merge callback (latest `at` per step wins) and writes back if the merge changed anything. On each change, its debounced (2 s) `setAppState`. Errors → one toast "Progress is saved on this device; account sync failed." and retry on the next change.
 - Reset: per path "Reset this path" → inline confirm "Clear progress for this path?" **Clear** / **Keep**.
 
 ### J7 Owner maintenance (UC3)
@@ -203,7 +210,7 @@ Edit `data/paths/<id>.json` → `python3 tools/build-learning-paths.py --apply` 
 **FR-1 Path files**
 - Description: `data/paths/<id>.json` per schema §10.2.
 - Trigger: authoring.
-- Preconditions: owner acceptance for `status: approved`.
+- Preconditions: owner acceptance for `status: accepted` (D5 format, `tools/owner_decisions.py record`).
 - Inputs: ids of article, anchor, terms, tool, calc inputs, incident slug and mode.
 - Processing: validated by the builder (FR-2) and the gate.
 - Outputs: path data.
@@ -213,7 +220,7 @@ Edit `data/paths/<id>.json` → `python3 tools/build-learning-paths.py --apply` 
 - Acceptance: L1.
 
 **FR-2 Builder**
-- Description: `tools/build-learning-paths.py [--apply|--check]` renders approved paths into `learning-paths.html` between `<!--rz-paths:start-->` and `<!--rz-paths:end-->`, and writes the JSON data block `<script type="application/json" id="rz-paths-data">` (step ids, accepted answers) inside the same markers.
+- Description: `tools/build-learning-paths.py [--apply|--check]` renders accepted paths into `learning-paths.html` between `<!--rz-paths:start-->` and `<!--rz-paths:end-->`, and writes the JSON data block `<script type="application/json" id="rz-paths-data">` (step ids, accepted answers) inside the same markers.
 - Trigger: authoring, release, freshness gate.
 - Preconditions: Q1 file present (`schema == "rz-relations/1"`).
 - Inputs: path files, `data/journal.json`, `js/rz-explain-db.js` (`entries` of the object `tools/build-explain-db.py:90-97` writes with `json.dumps` after `window.RZ_EXPLAIN_DB = `), `data/relations.json`, `data/incidents/<slug>.json`, the calculator HTML (P2 detection: the page loads `js/rz-scenario.js` and that file defines `readLink`).
@@ -262,17 +269,18 @@ Edit `data/paths/<id>.json` → `python3 tools/build-learning-paths.py --apply` 
 **FR-7 Account sync**
 - Description: signed-in users sync the same record to `app_state` key `learning-paths/v1`.
 - Trigger: load (read + merge), changes (debounced write 2 s).
-- Preconditions: `window._rzAuth.ensureSupabase` available and a signed-in Supabase user.
-- Processing: merge per step by `at`; write only when changed; one write in flight; size ≤ 131,072 bytes (check before write).
+- Preconditions: `window.rzSupa` present (the page loads `js/rz-config.js?v=<token>` and `<script type="module" src="js/rz-supabase.js?v=<token>">`), `rzSupa.ready` resolved (or the `rz-supa-ready` event fired, `js/rz-supabase.js:488-489`) and `rzSupa.getUser()` returns a user; `js/rz-app-state.js` (PRD-Q12) loaded. No `auth.js` member is used (D10).
+- Processing: `RZAppState.register('learning-paths/v1', {merge, read, write, maxBytes: 131072, debounceMs: 2000, metaKey: 'rz_paths_sync'})` (PRD-Q12 §11.2a); Q12's module owns the dirty flag, debounce, one write in flight and the state events; this PRD supplies the merge callback (per step by `at`), `read`/`write` over `localStorage['rz_paths_v1']`, and renders the state words. `allowed` is left at its default (every signed-in user syncs).
 - Outputs: synced record.
 - State change: one `app_state` row per user (RLS own row, `supabase/schema.sql:676-679`).
 - Exceptions: not signed in → skip silently; error → toast once per session, retry next change; key-limit error (`app_state key limit reached (200).`, `schema.sql:690`) → toast "Account storage is full; progress stays on this device."
-- Acceptance: L4 with a stubbed `rzSupa` (one read, ≤ 1 write per change burst).
+- Acceptance: L4 with the shared stub `tools/lib/rz-supa-stub.mjs` (D16): one read, ≤ 1 write per change burst.
 
 **FR-8 Incident step access**
 - Description: root sees the link as a normal step; others see "Root access".
-- Processing: render both texts statically; `js/rz-paths.js` hides the checkbox for non-root.
-- Dependencies: Q01 FR-13 for `isRootOnlyHref`.
+- Processing: the builder renders the row through PRD-Q01's renderer contract (the "Root access" word comes from Q01's labels, the only writer of that word, batch 1 rule); `js/rz-paths.js` hides the checkbox for non-root (`window._rzAuth.isRootSession()`, read only) and excludes the step from their count.
+- Dependencies: Q01 FR-13 for `isRootOnlyHref` (D-Q01-3).
+- **If D-Q01-3 is rejected**: the incident step stays a plain link to `incident-<slug>.html#FM-nn`; the dossier page gates itself (`tools/build-incidents.py:424`, `:501`); non-root users see a path of 3 steps; the step counts as complete only for root (a stored `incident.done` from a non-root session is ignored in the count). L7 then checks the row text and the dossier's own gate instead of the matcher.
 - Acceptance: L7, AC-6.
 
 **FR-9 Explain-DB title fix (prerequisite)**
@@ -294,7 +302,7 @@ Edit `data/paths/<id>.json` → `python3 tools/build-learning-paths.py --apply` 
 - Acceptance: SEO gates in `tools/ship-gate.sh` (`:285-286`), L8 metadata part.
 
 **FR-12 Use measurement (owner decision)**
-- Description: v1 sends no events. `rz-tracker.js` cannot count use across visitors: it keeps events in the visitor's own localStorage (`rz-tracker.js:3`, `:95-101`) and adds IP, city, device and browser fields to each one (`:106-123`). OQ-4 asks the owner to choose: no metric, or analytics events `path_step_done` `{path, step}` and `path_done` `{path}` sent only after cookie consent (`js/rz-cookie-consent.js`).
+- Description: v1 sends no events. `rz-tracker.js` cannot count use across visitors: it keeps events in the visitor's own localStorage (`rz-tracker.js:3`, `:95-101`) and adds IP, city, device and browser fields to each one (`:106-123`). D-Q17-4 asks the owner to choose: no metric, or analytics events `path_step_done` `{path, step}` and `path_done` `{path}` sent only after cookie consent (`js/rz-cookie-consent.js`).
 - Acceptance: decision recorded in T-12; if events are chosen, none fires before consent (L4 runs with consent declined and accepted).
 
 ### 8.1 FR field matrix
@@ -307,12 +315,12 @@ Edit `data/paths/<id>.json` → `python3 tools/build-learning-paths.py --apply` 
 | FR-4 | Checkbox, answer, reset | Data block | Record | Words, line | Storage | `_rzAuth` | No data block | L4 |
 | FR-5 | Check | Exercise step | Answer | Copy, state | Record | — | NaN | L4, AC-4/5 |
 | FR-6 | Any change | — | Record | — | localStorage | — | Blocked storage | L4 |
-| FR-7 | Load, change | Signed in | Record | Synced row | `app_state` | Q7 export | Errors, key limit | L4 |
-| FR-8 | Render | Q01 FR-13 | Session | Lock text | — | `auth.js` | — | L7 |
+| FR-7 | Load, change | Signed in, `rzSupa.ready` | Record | Synced row | `app_state` | `js/rz-app-state.js` (Q12), `js/rz-config.js` + `js/rz-supabase.js` | Errors, key limit | L4 |
+| FR-8 | Render | Q01 FR-13 or its rejected path | Session | Lock text, count | — | `auth.js` (read only), Q01 renderer | D-Q01-3 rejected → plain link, 3 steps | L7 |
 | FR-9 | T-1 | — | Glossary | Clean titles | Generated DB, tokens | DB gate | Curated "((" | L6 |
 | FR-10 | Build | — | — | Links | Generated hub, glossary | Journal builder | — | AC-8 |
 | FR-11 | Release | — | Page | Metadata | Generated files | SEO tools | — | SEO gates |
-| FR-12 | OQ-4 decision | Owner choice | Ids | None in v1 | — | Cookie consent | — | T-12 |
+| FR-12 | D-Q17-4 decision | Owner choice | Ids | None in v1 | — | Cookie consent | — | T-12 |
 
 ## 9. UI/UX specification
 
@@ -469,8 +477,8 @@ None. `<details>` opens natively. No completion effect (O4).
     "schema": {"const": "rz-learning-path/1"},
     "id": {"type": "string", "pattern": "^[a-z0-9-]{3,48}$"},
     "version": {"type": "integer", "minimum": 1},
-    "status": {"enum": ["draft","approved","retired"]},
-    "approvedBy": {"const": "owner"}, "approvedOn": {"type": "string", "format": "date"},
+    "status": {"enum": ["proposed","accepted","rejected","retired"]},
+    "decidedBy": {"const": "owner"}, "decidedOn": {"type": "string", "format": "date"},
     "request": {"type": "string", "pattern": "^R[0-9]{3,4}$"},
     "title": {"type": "string", "minLength": 10, "maxLength": 80},
     "summary": {"type": "string", "minLength": 40, "maxLength": 280},
@@ -488,8 +496,8 @@ None. `<details>` opens natively. No completion effect (O4).
         "tool": {"type": "string", "pattern": "^[a-z0-9-]{2,60}$"}, "calc": {"type": "string", "pattern": "^[a-z0-9-]{1,40}$"},
         "question": {"type": "string", "maxLength": 300},
         "change": {"type": "array", "minItems": 1, "maxItems": 3, "items": {"type": "object", "required": ["input","t","from","to","label","toLabel"]}},
-        "expect": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["selector","before","beforeRaw","after","raw","decimals"]}},
-        "answer": {"type": "object", "required": ["label","accept","decimals"]},
+        "expect": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["selector","decimals"], "additionalProperties": false}},
+        "answer": {"type": "object", "required": ["label","selector","decimals"]},
         "followUp": {"type": "object"}, "explain": {"type": "string", "maxLength": 400}}},
       {"type": "object", "required": ["id","kind","slug","mode"], "properties": {
         "id": {"const": "incident"}, "kind": {"const": "incident"},
@@ -501,7 +509,7 @@ None. `<details>` opens natively. No completion effect (O4).
 }
 ```
 
-Validation rules (builder and gate): V1 schema const; V2 `id` = file name; V3 article id in `data/journal.json` and `id="<anchor>"` present in the article HTML; V4 every term key in the explain DB; V5 tool in the Q1 registry with `access: "public"` and its page has `data-rz-calc="<calc>"`; V6 every `change[].input` is a control id on the page with an `<option value="<to>">` (selects) and `from` equal to the page default; V7 `expect[].before` equals the page's default output and `after` the changed output (gate, browser); V8 `answer.accept` ⊆ formatted `after` values; V9 incident slug exists, mode id exists in its FMEA; V10 every `requiresEdges` item is an accepted Q1 edge; V11 every decimal number in `question`, `explain` and `followUp` text appears among the `expect` values (`before`, `beforeRaw`, `after`, `raw`) or the `followUp` values; digits inside names ("N+1", "2N", "Tier III", "FM-03") are ignored; V12 file ≤ 8,192 bytes.
+Validation rules (builder and gate): V1 schema const; V2 `id` = file name; V3 article id in `data/journal.json` and `id="<anchor>"` present in the article HTML; V4 every term key in the explain DB; V5 tool in the Q1 registry with `access: "public"` and its page has `data-rz-calc="<calc>"`; V6 every `change[].input` is a control id on the page with an `<option value="<to>">` (selects) and `from` equal to the page default; V7 path files store no answer numbers: `expect[]` names selectors and decimals only, and question, explain and followUp text use placeholders `{before}`, `{after}`, `{raw}`, `{beforeRaw}`, `{followUp.<sel>}`; the builder fills them from a browser run of the live page (§11.2) and the gate recomputes them at gate time (L3, coordinator decision D11); V8 the accepted answer is the formatted `after` of `answer.selector`, computed, never typed; V9 incident slug exists, mode id exists in its FMEA; V10 every `requiresEdges` item is an accepted Q1 edge; V11 no literal decimal number appears in `question`, `explain` or `followUp` text outside a placeholder; digits inside names ("N+1", "2N", "Tier III", "FM-03") are ignored; V12 file ≤ 8,192 bytes.
 
 ### 10.3 Progress record (`localStorage['rz_paths_v1']` and `app_state` key `learning-paths/v1`)
 ```json
@@ -518,6 +526,8 @@ Validation rules (builder and gate): V1 schema const; V2 `id` = file name; V3 ar
 - No personal data: no name, no email in the record.
 
 ### 10.4 The three v1 paths (complete data; drafts for owner acceptance)
+
+The numbers below are illustrations computed at `2f458f7c5` by Appendix A1 against the page as it was before PRD-Q04 FR-9. They are not stored in the path files (V7): after Q04 ships, the builder fills them from the engine-backed page and L3 re-proves them at every gate run, so they will differ wherever `RZEngine.models.tier` differs from the old page tables.
 
 **Path 1 `power-ups-redundancy`** — "UPS redundancy and the shared single point of failure"
 - read: `article-7`, anchor `limitations` (`article-7.html:1634`), label "Section 04 · Limitations of Tier Classification".
@@ -572,9 +582,9 @@ Events on `document`: `rz-path-step` `{path, step, done}`, `rz-path-done` `{path
 | (none) | Dry run: lists paths and validation | 0 / 1 |
 | `--apply` | Writes the block into `learning-paths.html` | 0 / 1 / 2 |
 | `--check` | Exit 1 if the page differs from a fresh render | 0 / 1 |
-Exit 2: Q1 file missing or unreadable.
+Exit 2: Q1 file missing or unreadable. `--apply` and `--check` also run `node tools/test-learning-paths.mjs --compute --json` (browser, live page) to fill the placeholders of §10.2; `--check` fails when the block's values differ from a fresh run.
 
-### 11.3 Supabase (existing, verified)
+### 11.3 Supabase (existing, verified; called by PRD-Q12's `js/rz-app-state.js`, not by this page's code)
 
 | Operation | Call | Auth / RLS | Limits | Errors |
 |---|---|---|---|---|
@@ -588,12 +598,18 @@ Read `data/relations.json`, require `schema == "rz-relations/1"`, use only edges
 ### 11.5 P2 contract (read only)
 `#rzs=` payload `{v:1, calc, inputs:{[id]:{t, v}}}` (PRD-P02 `:125`); detection: the calculator page has a `<script src="js/rz-scenario.js…">` and `js/rz-scenario.js` contains `readLink`. Learning paths never call `rzScenario` themselves; they only link.
 
-### 11.6 `auth.js`
-Uses `window._rzAuth.isRootSession()` (`auth.js:309`, exported at `:788`) and `window._rzAuth.ensureSupabase` (export added by the first of Q7/Q17 to ship, PRD-Q07 §11.5).
+### 11.6 `auth.js` (read only)
+Uses `window._rzAuth.isRootSession()` (`auth.js:309`, exported at `:788`) and, in the gate, `isRootOnlyHref()`. No `auth.js` or `auth.min.js` change and no new export (coordinator decision D10; PRD-Q07 v1.1 §11.5 withdrew `ensureSupabase` as an export). The Supabase client comes from `js/rz-config.js` + `js/rz-supabase.js` (§5.3).
+
+### 11.7 `js/rz-app-state.js` (PRD-Q12, consumed)
+One `app_state` sync module for the site, owned by PRD-Q12 (coordinator decision D16). This PRD registers key `learning-paths/v1` with a merge callback and a size limit; Q12 registers its `ft_*` keys. Key registry: `ft_wl`, `ft_port`, `ft_alerts` (Q12), `learning-paths/v1` (Q17), recorded in `standarization/SUPABASE_INTEGRATION.md`; 4 of the 200 keys per user.
+
+### 11.8 PRD-Q04 output contract (consumed)
+After Q04 FR-9 the tier advisor scores through `RZEngine.models.tier.advise(input)` and renders the same element ids (`#scoreValue`, `#powerVal`, `#physicalVal`, `#coolingVal`, …). The gate reads the displayed values and, for raw values, calls `RZEngine.models.tier.advise` in the page's own browser context with the input the page built. When the engine is missing, Q04 FR-16 shows "—" with Q06's Fallback line; the path step then reads "The calculator is unavailable right now; try again later." and L3 fails.
 
 ## 12. Business rules and state machines
 
-1. A path is listed only when approved and every required Q1 edge is accepted.
+1. A path is listed only when accepted and every required Q1 edge is accepted.
 2. An exercise answer is a value the calculator's own code produces from its defaults plus the stated change; the gate proves it before every release.
 3. No badges, levels, points, streaks or completion effects; progress is words and one count line.
 4. The incident step is counted only for root.
@@ -612,10 +628,11 @@ stateDiagram-v2
 Path file:
 ```mermaid
 stateDiagram-v2
-  [*] --> Draft
-  Draft --> Approved: owner accepts file and Q1 edges are accepted
-  Approved --> Draft: gate finds a stated answer no longer true (build fails until fixed)
-  Approved --> Retired: owner retires
+  [*] --> Proposed
+  Proposed --> Accepted: owner accepts (owner_decisions.py record, request id) and Q1 edges are accepted
+  Proposed --> Rejected: owner declines
+  Accepted --> Proposed: an id no longer resolves (build fails until fixed)
+  Accepted --> Retired: owner retires
 ```
 
 ## 13. Cross-module integration
@@ -624,16 +641,22 @@ stateDiagram-v2
 |---|---|
 | Q1 `data/relations.json` | Read; six edges required (§10.4); unaccepted → path not built |
 | P2 `js/rz-scenario.js` | Read; links only |
-| `tier-advisor.html` | Unchanged; its defaults become a tested contract (L3) — a change to its maps or defaults now requires re-proving the paths, which the gate enforces |
+| `tier-advisor.html` | Not edited by this PRD. Edited by P2, PRD-Q04 FR-9, PRD-Q01 and PRD-Q03 in that order; this PRD comes last (D11) and depends on Q04's output contract (§11.8). L3 recomputes answers from the live page at every gate run, so a scoring change moves the answers instead of breaking a frozen contract |
+| PRD-Q04 | Dependency (FR-9); Q04 FR-9 (v1.2) notes that Q17 depends on its output contract |
+| PRD-Q12 `js/rz-app-state.js` | Consumed; key registry shared (§11.7) |
+| PRD-Q15 | Both edit `glossary.html` and `articles.html`; Q17 T-1 regenerates the explain DB Q15 relies on. Order: Q17 T-1 → Q15 (Phase A/B) → Q17 T-9 |
+| PRD-Q09 | Incident step may prefer `sourcing.state == "verified"` dossiers; read only |
+| `tools/ship-gate.sh` | One gate line by anchor text (§20.3) |
 | `js/rz-explain-db.js` + `tools/build-explain-db.py` | Source fix FR-9; regenerated; tokens bumped on every loader page |
 | `glossary.html` | Intro link |
 | Journal hub `articles.html` | One hand-written `.jrow` line beside "Case library" (`:482`); generator markers untouched; `tools/test-journal.mjs` stays green |
 | Incidents | Read only; anchors `#FM-nn` |
 | Q3 reproduce | LD8 is one of the three reproducible dossiers in PRD-Q03 Appendix A; path 1 may add "Reproduce on the TIA-942 checklist" once Q3 ships (v2) |
 | Q7 training | A v2 alarm path may link `datahall.html#scn=<id>` (PRD-Q07 FR-14) |
-| Q18 patterns | Path pages may link `dc-incident-patterns.html#c-<cat>` for root (v2) |
-| `achievements.html`, `rz-gamification.js` | Unchanged in v1; retirement proposed (OQ-2) |
+| Q18 patterns | Path pages may link `dc-incident-patterns.html#c-<cat>` for root (v2), only through Q01's "Root access" row and only if D-Q01-3 is accepted |
+| `achievements.html`, `rz-gamification.js` | Unchanged in v1; retirement proposed (D-Q17-2) |
 | Account page | No change (progress lives in `app_state`, not `saved_scenarios`) |
+| `auth.js`, `auth.min.js` | Not changed (D10) |
 | Sitemap, llms, llms-full, search index, OG | Regenerated for the new page (FR-11) |
 | Service worker | HTML network-first; `js/rz-paths.js` cache-first under the versioned cache (`sw.js:5`) |
 | Manuals | New `manual/learning-paths.html` is not required; the page's method section explains the check (owner may ask for one later) |
@@ -641,7 +664,7 @@ stateDiagram-v2
 ## 14. AI and automation requirements
 - No LLM. Paths are authored by the owner (or drafted for owner review) as JSON; answers are computed by the calculator in a browser.
 - Automation: the gate re-proves every answer; `--compute <path-id>` prints computed values for authoring (no write).
-- Approval points: each path file; each Q1 edge; OQ-1..OQ-4.
+- Approval points: each path file and each Q1 edge (`tools/owner_decisions.py record`); D-Q17-1…D-Q17-4 in `DECISIONS.md`.
 
 ## 15. Non-functional requirements
 
@@ -663,7 +686,7 @@ stateDiagram-v2
 - Inputs: the only user input is the answer field (parsed as a number, never inserted as HTML; result text uses `textContent`).
 - Path text is escaped by the builder; JSON data block escapes `</` as `<\/` (PDF/script rule, CLAUDE.md).
 - Incident links: root-only content stays behind the dossier gate; the path page shows only the title, mode name and the accepted Q1 `why` line, which PRD-Q01 already shows publicly.
-- No change to access rules. Opening dossiers to learners is the owner's decision (PRD-Q01).
+- No change to access rules and no `auth.js` change (D10). Opening dossiers to learners is the owner's decision (PRD-Q01, D-Q01-1). The Supabase anon config is loaded the way the calculators load it (`js/rz-config.js`).
 
 ## 17. Edge cases and failure scenarios
 
@@ -685,6 +708,9 @@ stateDiagram-v2
 | Stale cached `js/rz-paths.js` | Token bump with the release (`test-asset-cache-tokens.mjs`) |
 | JS disabled | Readable page, disabled checkboxes, note |
 | Non-root opens the incident link | Dossier root gate (PRD-Q01 F5) |
+| D-Q01-3 rejected | Plain dossier link, dossier gates itself, 3-step path for non-root, step completes only for root (FR-8) |
+| `rz-engine.min.js` blocked or missing on the tier advisor | Q04 FR-16 "—" + Q06 Fallback line; the exercise step says the calculator is unavailable; L3 fails on the gate run |
+| `js/rz-supabase.js` blocked or `rzSupa.configured` false | Account sync skipped; device progress works; no toast |
 
 ## 18. Technical architecture
 
@@ -699,7 +725,7 @@ flowchart LR
   B --> P[learning-paths.html static block + data block]
   P --> M[js/rz-paths.js]
   M --> LS[(localStorage rz_paths_v1)]
-  M --> A[_rzAuth.ensureSupabase] --> S[(Supabase app_state learning-paths/v1)]
+  M --> AS[js/rz-app-state.js PRD-Q12] --> RS[rzSupa via rz-config.js + rz-supabase.js] --> S[(Supabase app_state learning-paths/v1)]
   P -->|links| ART[article-N.html#anchor]
   P -->|links| CALC[tier-advisor.html / #rzs=]
   P -->|links| INC[incident-slug.html#FM-nn]
@@ -731,7 +757,7 @@ Alternatives:
 | Progress store | Device + `app_state` | `saved_scenarios` | Scenario rows are user-visible saved calculator inputs with a 200-row cap shared by calculators; progress is one small record |
 | Gamified tracker | None | Reuse `achievements.html` | Badges excluded; its tracker measures nothing (F5) |
 | Page model | One page, static blocks | One page per path | ≤ 8 paths read well on one page; fewer SEO surfaces to maintain |
-| Answer proof | Browser run of the real page | Node extraction of the page script | The browser is the authority; Node extraction (Appendix A1) is only an authoring aid |
+| Answer proof | Browser run of the live page at gate time, raw values from `RZEngine.models.tier.advise` in that page | Node extraction of the page script; numbers frozen in path files | Q04 FR-9 deletes the code Node extraction sliced (D11); frozen numbers go stale on any scoring change |
 | Links | Only accepted Q1 edges | Hand-picked links | Keeps paths inside the owner-reviewed relation graph |
 
 Deployment: static GitHub Pages + existing Supabase table; no Worker.
@@ -745,13 +771,13 @@ Deployment: static GitHub Pages + existing Supabase table; no Worker.
 | T-3 | Schema + three path files (draft) | — | `data/paths/*` | §10.4 | 0.5 d | V1–V9, V11, V12 | Owner review requested |
 | T-4 | Builder | T-3, Q1 | `tools/build-learning-paths.py` | FR-2 | 1.5 d | L1, L2; `--check` | Wired in freshness BUILDERS |
 | T-5 | Page shell | — | `learning-paths.html` | Copy the hub shell of `datacenter-solutions.html` (head, nav, footer, scripts) | 1 d | SEO gates | Both themes |
-| T-6 | `js/rz-paths.js` (states, check, device) | T-4, T-5 | `js/rz-paths.js` | FR-4..FR-6 | 1.5 d | L4 device part | — |
-| T-7 | Account sync | T-6, `ensureSupabase` export | same, `auth.js` (if first) | FR-7 | 1 d | L4 stub part | One read, debounced writes |
-| T-8 | Incident lock | Q01 FR-13 | page, module | FR-8 | 0.5 d | L7 | — |
+| T-6 | `js/rz-paths.js` (states, check, device) | T-4, T-5, PRD-Q04 FR-9 shipped | `js/rz-paths.js` | FR-4..FR-6 | 1.5 d | L4 device part | — |
+| T-7 | Account sync | T-6, PRD-Q12 `js/rz-app-state.js` | `js/rz-paths.js`, `learning-paths.html` (tags `js/rz-config.js`, module `js/rz-supabase.js`, `js/rz-app-state.js`). Not `auth.js` | FR-7 | 0.5 d | L4 stub part with `tools/lib/rz-supa-stub.mjs`; `git diff --stat auth.js auth.min.js` empty | One read, debounced writes |
+| T-8 | Incident lock | Q01 FR-13 (D-Q01-3), or its rejected path | page, module | FR-8 | 0.5 d | L7 (matcher, or the rejected-path check) | — |
 | T-9 | Entry links | T-5 | `articles.html`, `glossary.html` | FR-10 | 0.5 d | `tools/test-journal.mjs`, AC-8 | — |
 | T-10 | SEO and discovery | T-5 | sitemap, llms, search index, OG | FR-11 | 0.5 d | SEO gates | — |
-| T-11 | Owner acceptance of paths and Q1 edges | T-3, Q1 | path files, Q1 CLI | Batch review | 0.5 d | L2 green | `status: approved` |
-| T-12 | Use-measurement decision | OQ-4 | `js/rz-paths.js` only if events are chosen | FR-12 | 0.5 d | Decision recorded; consent check if events | No event before consent |
+| T-11 | Owner acceptance of paths and Q1 edges | T-3, Q1, D-Q17-1 | path files via `tools/owner_decisions.py record` | Batch review | 0.5 d | L2 green | `status: accepted`, `decidedBy`, `decidedOn`, `request` |
+| T-12 | Use-measurement decision | D-Q17-4 | `js/rz-paths.js` only if events are chosen | FR-12 | 0.5 d | Decision recorded; consent check if events | No event before consent |
 | T-13 | Release | all | §22 | — | 0.5 d | Live checks | DoD |
 
 Total ≈ 10 days plus review; the addendum's 4 weeks covers Q1 acceptance waits.
@@ -765,7 +791,7 @@ Total ≈ 10 days plus review; the addendum's 4 weeks covers Q1 acceptance waits
 | Unit (Node) | `check()` normalisation table (12 inputs); merge by `at` (6 cases incl. version change); size guard |
 | Contract | Path schema V1–V12; Q1 consumer (accepted only); P2 payload shape and length ≤ 8,000 |
 | Calculator proof (browser) | For each path: open `tier-advisor.html` plain → read `expect[].before`; open the `#rzs=` link (or set the select and dispatch `change` when P2 is absent) → read `after`; repeat with a premium session (`rz_premium_session` seeded, as `tools/probe-calc-tia942.mjs` does); 3 reloads give identical values |
-| E2E (puppeteer via `rz-lane`) | Full path run signed out (incident step locked) and as root (incident opens at `#FM-nn`); reload keeps state; stubbed `rzSupa` sync |
+| E2E (puppeteer via `rz-lane`) | Full path run signed out (incident step locked) and as root (incident opens at `#FM-nn`); reload keeps state; sync against the shared stub `tools/lib/rz-supa-stub.mjs` (D16) |
 | UI interaction | Every control in §9.4; Enter submits; Reset confirm |
 | Accessibility | axe planted-line method at 390 and 1440, both themes |
 | Security | Answer field with `<img onerror>` stays text; data block contains no raw `</script` |
@@ -778,21 +804,34 @@ Authoring aid (not a gate): `node tools/test-learning-paths.mjs --compute <path-
 Screenshots at 1440 and 390, dark and light: closed list, open path 1 with a wrong answer, open path 2 answered right; stored in `documentation/product-transformation/05-test-evidence/Q17/` and looked at.
 
 ### 20.3 Gate wiring in `tools/ship-gate.sh`
-After line 261 (`gate "hub tools render — …"`):
+By anchor text, never by line number: after the line `gate "hub tools render — …"` (today `:261`):
 `gate "learning paths — ids resolve, Q1 edges accepted, answers proven on the calculator, end-to-end run, no gamification" node tools/test-learning-paths.mjs --strict`
 And in `tools/test-generator-freshness.py` `BUILDERS` (`:56-73`): `("data/paths -> learning-paths.html", ["python3", "tools/build-learning-paths.py", "--check"])` (run by `ship-gate.sh:257`).
+
+Law wiring (coordinator decision D9). Before its "blocking from" point a law runs in report mode inside `--strict`: `REPORT Ln PASS|FAIL …`, never failing the gate.
+
+| Law | Blocking from (phase · task) | Precondition |
+|---|---|---|
+| L1 ids resolve | release · T-13 | T-3, T-4; PRD-Q15 Phase A/B merged on `glossary.html` |
+| L2 Q1 edges accepted, page fresh | release · T-13 | Q1 shipped; the six edges and D-Q17-1 accepted |
+| L3 answers proven on the live page | release · T-13 | PRD-Q04 FR-9 shipped (D11); P2 optional |
+| L4 end-to-end + sync | device part: T-13; sync part: the release after PRD-Q12 ships `js/rz-app-state.js` | T-6; for sync, PRD-Q12 option A (D-Q12-1) and `tools/lib/rz-supa-stub.mjs` |
+| L5 no gamification | T-2 onward (no precondition) | — |
+| L6 explain-DB titles | T-1 (ships alone) | — |
+| L7 incident lock | the release after Q01 FR-13 ships (matcher form), or T-13 if D-Q01-3 is REJECTED (rejected-path form) | D-Q01-3 not PROPOSED |
+| L8 render, axe, SEO | release · T-13 | T-5, T-10 |
 
 ### 20.4 LAWS
 
 | Law | Claim | Command | How it fails on today's tree |
 |---|---|---|---|
-| L1 | Every approved path validates (V1–V9, V11, V12): article and anchor exist, all terms exist in the explain DB, the tool page carries `data-rz-calc="tier"`, the select options exist and `from` equals the page default, the incident slug and mode exist | `node tools/test-learning-paths.mjs --law L1` | `data/paths/` does not exist → `L1 FAIL no paths`, exit 1 |
+| L1 | Every accepted path validates (V1–V9, V11, V12): article and anchor exist, all terms exist in the explain DB, the tool page carries `data-rz-calc="tier"`, the select options exist and `from` equals the page default, the incident slug and mode exist | `node tools/test-learning-paths.mjs --law L1` | `data/paths/` does not exist → `L1 FAIL no paths`, exit 1 |
 | L2 | Every `requiresEdges` item is an accepted edge in `data/relations.json`, and `learning-paths.html` equals a fresh build (`--check`) | `--law L2` | `data/relations.json` and the builder do not exist → `L2 FAIL Q1 relation file missing`, exit 1 |
-| L3 | For each path, the tier advisor in a real browser shows `expect[].before` with defaults and `expect[].after` with the change (via `#rzs=` when P2 is present, else by setting the select and dispatching `change`), signed out and with a premium session, identical over 3 reloads; `beforeRaw` and `raw` equal the page's own scoring code run in Node (Appendix A1 method) and round to the shown values | `--law L3` | No path files → `L3 FAIL`. Red proof after build: change `fireSuppression.none` from 0 to 10 in a temp copy of the page → `L3 FAIL battery-room-fire #physicalVal expected 34 got 38` |
-| L4 | Headless end-to-end: tick read and terms, open the exercise link, type the stated answer, Check → "Matches the calculator: …", reload → all three steps Done; as root the incident link lands on its `<details class="fm-row" id="FM-nn">`; with a stubbed `rzSupa`, one `getAppState` on load and one `setAppState` per change burst with key `learning-paths/v1` | `--law L4` | `learning-paths.html` does not exist → `L4 FAIL`, exit 1 |
+| L3 | For each path, at gate time, the gate opens the live `tier-advisor.html` in a real browser, reads every `expect[].selector` with defaults and with the change (via `#rzs=` when P2 is present, else by setting the select and dispatching `change`), signed out and with a premium session, identical over 3 reloads, and takes raw values from `RZEngine.models.tier.advise` in the same page; the values it computes must equal the ones the builder wrote into the data block, and the raw values must round to the shown ones. No expected number is stored in the gate or the path files (D11) | `--law L3` | No path files → `L3 FAIL`. Red proof: fixture `l3-stale-block` (a data block built before a planted scoring change: `DATA.tier.scoreMaps` fire `none` raised in a fixture copy of the engine) → `L3 FAIL battery-room-fire #physicalVal block <old> live <new>` |
+| L4 | Headless end-to-end: tick read and terms, open the exercise link, type the stated answer, Check → "Matches the calculator: …", reload → all three steps Done; as root the incident link lands on its `<details class="fm-row" id="FM-nn">`; with `tools/lib/rz-supa-stub.mjs` (D16), one `getAppState` on load and one `setAppState` per change burst with key `learning-paths/v1` | `--law L4` | `learning-paths.html` does not exist → `L4 FAIL`, exit 1 |
 | L5 | No gamification: the page, `js/rz-paths.js` and their computed DOM contain none of the words badge, level, streak, points, XP, trophy, unlock, confetti, Novice, Master; no progress bar or ring element; no `animation` or `transition` other than border/colour on any element after a step is marked Done | `--law L5` | Page missing → `L5 FAIL`. Red proof: add "Badge unlocked" to a temp copy → `L5 FAIL word 'badge'` |
 | L6 | No explain-DB title contains "((" (all 1,020) | `--law L6` | 229 titles do today (F9) → `L6 FAIL 229 titles contain '((', first 'abliteration'`, exit 1 |
-| L7 | Every incident link on the page sits in a row containing the text "Root access", and `isRootOnlyHref()` from `auth.js` (loaded in a Node `vm`) returns true for it | `--law L7` | Page missing; and `isRootOnlyHref('/incident-equinix-ld8-london-ups-2020.html')` returns false today (PRD-Q01 F6) → `L7 FAIL matcher`, exit 1 |
+| L7 | Every incident link on the page sits in a row containing the text "Root access", and `isRootOnlyHref()` from `auth.js` (loaded in a Node `vm`) returns true for it. If D-Q01-3 is REJECTED: every incident link targets an `incident-<slug>.html` whose page carries `<body class="locked">` and `enforceTierFeatureAccess('dc-incidents')`, and a non-root session counts 3 steps | `--law L7` | Page missing; and `isRootOnlyHref('/incident-equinix-ld8-london-ups-2020.html')` returns false today (PRD-Q01 F6) → `L7 FAIL matcher`, exit 1 |
 | L8 | At 390 and 1440 px in both themes: no horizontal overflow; axe 0 serious/critical after the planted line is caught; answer inputs 16 px at 390; radius ≤ 4 px; fonts IBM Plex Sans / JetBrains Mono; the page has title, meta description, canonical, JSON-LD `ItemList`, OG image, and is listed in `sitemap.xml` and `llms.txt` | `--law L8` | Page missing → `L8 FAIL`, exit 1 |
 
 ## 21. Acceptance criteria
@@ -802,8 +841,8 @@ And in `tools/test-generator-freshness.py` `BUILDERS` (`:56-73`): `("data/paths 
 | AC-1 | Signed-out visitor | Opens the page | Three paths, each "0 of 3 steps done · the incident needs root access" |
 | AC-2 | Root | Opens the page | Each path "0 of 4 steps done" |
 | AC-3 | Path 1 open | Ticks read and terms | Line "2 of 4 steps done" (root) and state words Done |
-| AC-4 | Path 1 exercise | Types 56, Check | "Matches the calculator: 56."; explanation shows 55.869, Tier III gap, and 2N = 60 |
-| AC-5 | Path 3 exercise | Types 58, Check | "The calculator gives 54 for this change. Check that only Cooling Redundancy changed and every other input is at its default." |
+| AC-4 | Path 1 exercise | Types the composite the live tier advisor shows for UPS Configuration = N (computed at gate time, L3), Check | "Matches the calculator: {after}."; the explanation shows the raw value, the Tier III gap and the 2N follow-up, all filled from the same run. *Illustration at `2f458f7c5`, pre-Q04:* 56; raw 55.869; 2N = 60 |
+| AC-5 | Path 3 exercise | Types any number other than the computed `after` (illustration: 58), Check | "The calculator gives {after} for this change (illustration: 54). Check that only Cooling Redundancy changed and every other input is at its default." |
 | AC-6 | Signed-out learner | Reaches step 4 | Title line with "Root access"; no checkbox |
 | AC-7 | Signed in on two devices | Completes step 1 on A, opens B | Step 1 Done on B after load |
 | AC-8 | Journal hub, glossary | Opened | Each shows a "Learning paths" link |
@@ -832,11 +871,11 @@ FR → test mapping
 - Data migration: none.
 - Compatibility: explain-DB title change is text only; tooltips keep working.
 - Rollback: set a path `retired` and rebuild; or `git revert` the release (the T-1 fix can stay).
-- Monitoring: the gate on every release; a use metric only if the owner picks one (OQ-4).
+- Monitoring: the gate on every release; a use metric only if the owner picks one (D-Q17-4).
 - Post-deploy live validation: `curl -s https://resistancezero.com/learning-paths.html | grep -c 'data-path='` → 3; `curl -s https://resistancezero.com/js/rz-explain-db.js | grep -c '))"'` → 0; `node tools/test-learning-paths.mjs --law L3 --base https://resistancezero.com`; compare the live `js/rz-version.js` with the release (deploys are not guaranteed, addendum `:576`).
-- Release chain: next free version, claimed with the peer (MINOR: new page); `js/rz-version.js`; `CHANGELOG.md`; `python3 tools/build-changelog-html.py --apply`; `python3 tools/sync-sw-version.py`; generators `python3 tools/build-explain-db.py` (T-1), `python3 tools/build-learning-paths.py --apply`, `python3 tools/build-sitemap.py --apply`, `python3 tools/build-llms-txt.py --apply`, `python3 tools/build-llms-full.py --apply`, `python3 tools/build-search-sections.py --apply`, `python3 tools/build-og-images.py --apply --discover` (new card; the default is a dry run; `tools/test-og-card-freshness.py` proves it); `node tools/test-asset-cache-tokens.mjs --fix js/rz-explain-db.js js/rz-paths.js auth.js auth.min.js`; `bash tools/ship-gate.sh`; push; `python3 tools/indexnow-submit.py --since HEAD~1`.
+- Release chain: next free version, claimed with the peer (MINOR: new page); `js/rz-version.js`; `CHANGELOG.md`; `python3 tools/build-changelog-html.py --apply`; `python3 tools/sync-sw-version.py`; generators `python3 tools/build-explain-db.py` (T-1), `python3 tools/build-learning-paths.py --apply`, `python3 tools/build-sitemap.py --apply`, `python3 tools/build-llms-txt.py --apply`, `python3 tools/build-llms-full.py --apply`, `python3 tools/build-search-sections.py --apply`, `python3 tools/build-og-images.py --apply --discover` (new card; the default is a dry run; `tools/test-og-card-freshness.py` proves it); `node tools/test-asset-cache-tokens.mjs --fix js/rz-explain-db.js js/rz-paths.js js/rz-config.js js/rz-supabase.js js/rz-app-state.js` (the last three only to stamp their tags on the new page; no `auth.js`); `bash tools/ship-gate.sh`; push; `python3 tools/indexnow-submit.py --since HEAD~1`.
 - Standards docs in the same release (R089): new `standarization/LEARNING_PATHS_STANDARD.md` (path format, proof rule, no gamification, Q1 dependency); `standarization/EXPLAIN_ENGINE_STANDARD.md` (title rule, the "((" defect and its gate); `standarization/CONTENT_LINKAGE_PLAYBOOK.md` (new article or calculator change → check paths; L3 enforces); `standarization/ANTI_VIBECODE_STANDARD.md` (learning features: no badges/levels/streaks, with L5 as its detector); `standarization/KNOWLEDGE_LABS_STANDARD.md` if it lists learning surfaces (check in T-13); CLAUDE.md audit list line for the new gate.
-- Peer coordination: version claim; P2 merge timing; `auth.js` export ownership with Q7; tell the peer that `js/rz-explain-db.js` and `search-terms.json` regenerate (wide token bump).
+- Peer coordination: version claim; P2 merge timing; tier-advisor edit order P2 → Q04 → Q01 → Q03 → Q17; tell the peer that `js/rz-explain-db.js` and `search-terms.json` regenerate (wide token bump).
 
 ## 23. Risks and dependencies
 
@@ -844,28 +883,29 @@ FR → test mapping
 |---|---|---|---|---|
 | R1 | Q1 slips | Medium | No path can be listed | Build T-1..T-7 meanwhile; L2 keeps unaccepted paths out |
 | R2 | P2 not merged | Medium | No one-click "applied" link | Plain link + instructions; link appears automatically when P2 is detected |
-| R3 | Tier advisor maps change | Medium | Wrong answers | L3 fails before release; path version bump |
+| R3 | Tier advisor scoring changes (PRD-Q04 FR-9 is one such change) | High | Stated answers move | Answers are computed from the live page at build and gate time (D11); the builder refreshes the block, L3 fails only if the block is stale |
 | R4 | The tier advisor's scores are themselves unsourced weights | High | Learners treat a score as a standard | Each explanation says what the score is (the page's own composite) and contrasts it with the incident; the method note says answers are the calculator's output, not a rating |
 | R5 | Explain-DB regeneration collides with peer edits | Medium | Merge conflict, token churn | T-1 coordinated with the peer, shipped alone |
 | R6 | Learners without root never finish | High | Frustration | Count excludes the locked step; title and the accepted `why` line still teach the point |
-| R7 | Retiring `achievements.html` | Low | Feature removal without approval | Only proposed (OQ-2) |
-| R8 | Educators expect class tools | Medium | Scope pressure | OQ-3 with the table gap stated (F7) |
+| R7 | Retiring `achievements.html` | Low | Feature removal without approval | Only proposed (D-Q17-2) |
+| R8 | Educators expect class tools | Medium | Scope pressure | D-Q17-3 with the table gap stated (F7) |
 
-Open questions for the owner:
-- OQ-1 Accept the three path files and the six Q1 edges in §10.4.
-- OQ-2 Retire `achievements.html` and `rz-gamification.js` (feature removal), redirecting to `learning-paths.html`?
-- OQ-3 Educator class features (roster, assignment, progress view) need new tables: proceed later or not?
-- OQ-4 Measure use: no metric (default), or consent-gated analytics events (FR-12)?
+Decisions for the owner, recorded in `documentation/product-transformation/DECISIONS.md` (status PROPOSED, recommendation as default; answered with `tools/owner_decisions.py decide`):
+- D-Q17-1 (was OQ-1) Accept the three path files and the six Q1 edges in §10.4.
+- D-Q17-2 (was OQ-2) Retire `achievements.html` and `rz-gamification.js` (feature removal), redirecting to `learning-paths.html`?
+- D-Q17-3 (was OQ-3) Educator class features (roster, assignment, progress view) need new tables: proceed later or not?
+- D-Q17-4 (was OQ-4) Measure use: no metric (default), or consent-gated analytics events (FR-12)?
 
 ## 24. Definition of done
 - [ ] Explain-DB titles clean site-wide (L6).
-- [ ] Three approved paths; every id resolves (L1); every transition is an accepted Q1 edge; page equals a fresh build (L2).
+- [ ] Three accepted paths; every id resolves (L1); every transition is an accepted Q1 edge; page equals a fresh build (L2).
 - [ ] Every stated answer proven in a browser, signed out and signed in (L3).
 - [ ] End-to-end run passes; progress survives reload; account sync works against the stub and once live with the owner's account (L4).
 - [ ] No gamification anywhere in the feature (L5).
-- [ ] Incident steps carry "Root access" and the matcher locks them (L7).
+- [ ] Incident steps carry "Root access" and the matcher locks them, or, with D-Q01-3 rejected, the dossier gates itself and non-root counts 3 steps (L7).
+- [ ] No `auth.js` change: `git diff --stat auth.js auth.min.js` empty for the release.
 - [ ] Page passes render, accessibility, design and SEO checks; listed in sitemap and llms (L8); screenshots looked at.
-- [ ] Gate wired after `tools/ship-gate.sh:261`; builder in freshness BUILDERS; full ship gate green.
+- [ ] Gate wired by anchor text (§20.3); builder in freshness BUILDERS; full ship gate green.
 - [ ] Journal hub and glossary link the page.
 - [ ] Standards, changelog, version claimed with the peer; live checks pass.
 

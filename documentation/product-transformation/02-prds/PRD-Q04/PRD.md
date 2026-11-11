@@ -6,7 +6,7 @@
 |---|---|
 | PRD id | PRD-Q04 |
 | Feature | Every calculator page and every DCMOC module gets PUE, the tier rating, carbon (grid factor, carbon price, Scope 1/2/3) and OPEX energy from one engine function per metric. Before a page is switched, a parity fixture records the local result and the engine result. Where they differ, a decision record says which is right, and the change ships with its evidence. A registry and two gates keep the rule after this release |
-| Version | 1.1 |
+| Version | 1.2 |
 | Status | Draft |
 | Author | Opus 5.5; Fable quota exhausted |
 | Date | 2026-11-11 |
@@ -25,6 +25,7 @@ Change history
 |---|---|---|---|
 | 1.0 | 2026-11-11 | Opus 5.5 | First complete draft, all 24 sections. Every fact re-verified on `2f458f7c5` with the commands quoted in §3 |
 | 1.1 | 2026-11-11 | Opus 5.5 | QA batch 1 revisions (D1–D8). D3: L7 checks the LTC legacy model by behaviour (golden outputs), never by its body; DCMOC rebuild order fixed (Q04 then Q06, one rebuild per release); `local` total corrected to 24 PUE + 20 + 7 + 10 = 61, "±" removed. D5: decisions renamed D-Q04-1…9 and moved to `DECISIONS.md`. D6: the missing-engine state uses Q06's `RZProvenance` `kind=fallback` line (F-CALC-ENGINE-MISSING); exports gain `aria-describedby` |
+| 1.2 | 2026-11-11 | Opus 5.5 | QA batch 2 revisions (D9–D16), D11 note only: FR-9 states that PRD-Q17 depends on its output contract, and the fixed `tier-advisor.html` edit order P2 → Q04 → Q01 → Q03 → Q17 |
 
 ## 2. Executive summary
 
@@ -719,6 +720,7 @@ exceptions, acceptance.
   `composite`.
 - Exceptions: engine missing → FR-16.
 - Acceptance: AC-9, L2.
+- Note (coordinator decision D11, QA batch 2): PRD-Q17 depends on this FR's output contract. After FR-9 the tier advisor keeps the element ids it renders today (`#scoreValue`, `#powerVal`, `#physicalVal`, `#coolingVal` and the other subsystem values) and exposes `RZEngine.models.tier.advise(input)` in the page, from which Q17's gate reads raw values; Q17 computes its exercise answers from this live scoring at gate time. A change to these ids or to `advise`'s result shape needs a Q17 re-check. Fixed edit order on `tier-advisor.html`: P2 → Q04 → Q01 → Q03 → Q17.
 
 **FR-10 carbon-footprint uses `models.carbon.scopes` (D-Q04-1, D-Q04-2, D-Q04-4).**
 - Processing: `calculate()` builds `{ mw: itLoad / 1000, pue, region: country, renewablePct, genHours, fuelType:

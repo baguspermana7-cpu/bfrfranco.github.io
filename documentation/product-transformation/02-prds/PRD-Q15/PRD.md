@@ -6,23 +6,24 @@
 |---|---|
 | PRD id | PRD-Q15 |
 | Feature | The three Indonesian pages and their English pairs declare each other through reciprocal hreflang, and the sitemap repeats those declarations as `xhtml:link` alternates. English readers get a language link to the Indonesian pages. Both glossary pages are generated from one source that holds an Indonesian field per term. Indonesian text reaches the live page only after the owner accepts it, and a review file records the status of every term. Page counts state what the page holds |
-| Version | 1.0 |
+| Version | 1.1 |
 | Status | Draft |
 | Author | Opus 5.5 (Fable quota exhausted) |
 | Date | 2026-11-11 |
 | Owner requests | R110 (PRD per idea), R111 (24-section structure) |
 | Priority | 60.5. Addendum rank 13: I 5, N 3, C 8, E 3, effort 2 weeks (`documentation/PRODUCT_INNOVATION_ASSESSMENT_2026-11_ADDENDUM.md:88`) |
 | Related findings | Q15 (`…_ADDENDUM.md:352-368`); maturity row "Indonesian: 1" (`:39`); BASELINE §2 row "Indonesian" (`00-audit-baseline/BASELINE.md:26`). New findings F1–F14 (§3.1); corrections C1–C4 (§3.3) |
-| Dependencies | None blocking. Coordination with the peer session for `id/index.html`, whose meta the peer owns (`STATE.md:46`). Owner decisions D-1…D-7 (§23) |
+| Dependencies | None blocking. Coordination with the peer session for `id/index.html`, whose meta the peer owns (`STATE.md:46`). Owner decisions D-Q15-1…D-Q15-7 in `documentation/product-transformation/DECISIONS.md` (§23). PRD-Q17 T-1 (explain-DB title fix) ships before this PRD's T-7, so the lossless proof is taken against the fixed explain DB |
 | Related modules | `glossary.html`, `id/glosarium.html`, `id/index.html`, `id/artikel.html`, `index.html`, `articles.html`, new `data/glossary.json`, new `data/glossary-id-review.json`, new `tools/build-glossary.py`, `tools/build-sitemap.py`, `tools/crawler_inventory.py`, `tools/test-glossary.py`, `tools/test-generator-freshness.py`, new `tools/test-i18n.mjs`, `tools/ship-gate.sh`, `search-index.json`, generated `sitemap.xml` and `llms.txt` |
 | Target wave | Addendum roadmap "Foundations, weeks 3–8", noted "Q15 needs translation review" (`…_ADDENDUM.md:556`). Phase A (hreflang, sitemap, links, honest counts) is 5 days of work and Phase B (one source, review file) 5.5 days (§19). Phase C (translation batches) is paced by owner review |
-| Approval status | Approved by owner R110/R111 2026-11-10 (the PRD set). Register approval class: "translations need owner review" (`01-improvement-register/REGISTER.md:20`). Owner decisions still needed: D-1…D-7 |
+| Approval status | Approved by owner R110/R111 2026-11-10 (the PRD set). Register approval class: "translations need owner review" (`01-improvement-register/REGISTER.md:20`). Owner decisions still needed: D-Q15-1…D-Q15-7 |
 
 Change history
 
 | Version | Date | Author | Change |
 |---|---|---|---|
 | 1.0 | 2026-11-11 | Opus 5.5 | First complete draft, 24 sections. Every count verified against `wt-hub3` at `fcaa892df` (branch `hub-r3`) with the commands and the script in Appendix A |
+| 1.1 | 2026-11-11 | Opus 5.5 | QA batch 2 revisions (D9–D16). D9: law-wiring table (§20.2); L4 split into L4 (own pages) and L4b (`id/index.html`, peer-owned), each in report mode until its precondition holds, so §17's peer-refusal fallback and the Phase A wiring agree; the Indonesian count copy needs the owner's copy acceptance (T-9), so T-5 and L4 move to Phase B and Phase A ships English-side structure only. D15: D-1…D-7 → D-Q15-1…D-Q15-7 in `DECISIONS.md`; request pattern `^R[0-9]{3,4}$`; per-entry acceptance through `tools/owner_decisions.py record glossary-review` instead of `build-glossary.py --accept/--reject`. D16: no Supabase; the shared stub is named and not used. Cross-module: PRD-Q17 added (explain-DB title fix regenerates `js/rz-explain-db.js`; both PRDs edit `glossary.html` and `articles.html`), order Q17 T-1 → Q15 → Q17 T-9; §5.2/§13 no longer claim the explain DB never changes. `ship-gate.sh` insertion by anchor text |
 
 ## 2. Executive summary
 
@@ -75,8 +76,8 @@ Matching counts (449 of 449), the addendum's acceptance, is the end state of Pha
 | # | Source says | Verified | Correction |
 |---|---|---|---|
 | C1 | BASELINE §2: "The glossary has 90 term matches" (`BASELINE.md:26`) | `grep -c 'class="term'` counts 89 terms plus the counter line | 89 terms (the addendum's figure) |
-| C2 | Addendum acceptance: "Glossary term counts match" (`…_ADDENDUM.md:368`) and effort 2 weeks | Matching needs Indonesian text for at least 378 more terms (F7), each accepted by the owner. 2 weeks covers the structure (Phases A and B, ≈ 10.5 days, §19), not the content | Acceptance is split. Structural acceptance at the end of Phase B (L1–L8 green, counts honest). Content acceptance when 449 of 449 are accepted, at a pace the owner sets (D-4) |
-| C3 | Addendum: "The nav links to `/id/`" | The homepage nav is an owner shape under a 27-law gate (F12) | The homepage gets a footer link now; a header link waits for the owner's call (D-3). The two English twins get a header link |
+| C2 | Addendum acceptance: "Glossary term counts match" (`…_ADDENDUM.md:368`) and effort 2 weeks | Matching needs Indonesian text for at least 378 more terms (F7), each accepted by the owner. 2 weeks covers the structure (Phases A and B, ≈ 10.5 days, §19), not the content | Acceptance is split. Structural acceptance at the end of Phase B (L1–L8 green, counts honest). Content acceptance when 449 of 449 are accepted, at a pace the owner sets (D-Q15-4) |
+| C3 | Addendum: "The nav links to `/id/`" | The homepage nav is an owner shape under a 27-law gate (F12) | The homepage gets a footer link now; a header link waits for the owner's call (D-Q15-3). The two English twins get a header link |
 | C4 | Addendum: "hreflang is one-way" | True. In addition, the homepage's English URL disagrees with its canonical (F3) | FR-1 fixes both |
 
 ## 4. Objectives and success metrics
@@ -87,10 +88,10 @@ Matching counts (449 of 449), the addendum's acceptance, is the end state of Pha
 | O2 | Sitemap agrees | `xhtml:link` alternates in `sitemap.xml` equal to the page declarations | 18 on 6 URLs (today 0) | L2 | x-default included in the sitemap (FR-2) |
 | O3 | One source | Glossary pages whose term block equals a fresh render of `data/glossary.json` | 2 of 2 (today 0; the source does not exist) | L3 | — |
 | O4 | Honest counts | False count claims across the Indonesian pages, `search-index.json` and `llms.txt` | 0 (today 11: 7 "100+" and the "105" counter on `id/glosarium.html`, 2 on `id/index.html`, 1 in `search-index.json`; `llms.txt:232` follows the title) | L4 | Peer applies the `id/index.html:94` meta change |
-| O5 | Reviewed text only | Live Indonesian entries without an accepted review record bound to their exact text | 0 (today 89 with no record at all) | L5 | D-1 settles the 89 legacy entries |
-| O6 | A way in | English pages linking to their Indonesian twin, plus the homepage footer link | 3 (today 0) | L6 | D-3 for the homepage header |
+| O5 | Reviewed text only | Live Indonesian entries without an accepted review record bound to their exact text | 0 (today 89 with no record at all) | L5 | D-Q15-1 settles the 89 legacy entries |
+| O6 | A way in | English pages linking to their Indonesian twin, plus the homepage footer link | 3 (today 0) | L6 | D-Q15-3 for the homepage header |
 | O7 | The gate sees the Indonesian page | Indonesian terms checked by glossary rule G1 | all listed (today 0 of 89) | L7 | — |
-| O8 | Coverage | Accepted Indonesian entries out of 449 English terms | 449 at the end of Phase C (today at most 71 mapped); pace UNKNOWN until the owner's first review batch is measured in T-12 | `python3 tools/build-glossary.py --stats` | D-4 sets the target and order |
+| O8 | Coverage | Accepted Indonesian entries out of 449 English terms | 449 at the end of Phase C (today at most 71 mapped); pace UNKNOWN until the owner's first review batch is measured in T-12 | `python3 tools/build-glossary.py --stats` | D-Q15-4 sets the target and order |
 | O9 | Search traffic to `/id/` | Impressions and clicks for the three Indonesian URLs | UNKNOWN. No Search Console baseline is in the repo; measure in T-6 from the owner's Search Console export, before and 8 weeks after Phase A | Owner's Search Console | The owner shares the export |
 
 ## 5. Scope
@@ -107,25 +108,25 @@ Matching counts (449 of 449), the addendum's acceptance, is the end state of Pha
 4. Count claims on `id/glosarium.html` (head and lede) and in `search-index.json`. The two claims on `id/index.html` are coordinated with the peer.
 5. Glossary source:
    - `data/glossary.json`, extracted once from the two pages.
-   - `tools/build-glossary.py` with `--extract`, `--apply`, `--check`, `--import-drafts`, `--accept`, `--reject`, `--review-sheet` and `--stats`.
+   - `tools/build-glossary.py` with `--extract`, `--apply`, `--check`, `--import-drafts`, `--review-sheet` and `--stats`; acceptance and rejection of entries go through the shared approval CLI `tools/owner_decisions.py record glossary-review` (coordinator decision D15), with the record kind `glossary-review` registered by this PRD.
    - Marker-bounded term blocks in both pages.
    - The Indonesian page rendered with the same `section` structure and the same `term-<key>` anchors as the English page.
 6. Review file `data/glossary-id-review.json`, with a status per term bound to the text's hash.
-7. Legacy import of the 89 Indonesian entries under decisions D-1 and D-2.
+7. Legacy import of the 89 Indonesian entries under decisions D-Q15-1 and D-Q15-2.
 8. Gate `tools/test-i18n.mjs` (L1–L8), wired into the ship gate; `build-glossary.py --check` added to the freshness builders.
-9. Translation batches (Phase C) under the review rules, as far as the owner takes them (D-4).
+9. Translation batches (Phase C) under the review rules, as far as the owner takes them (D-Q15-4).
 10. Standards docs and changelog (§22).
 
 ### 5.2 Out of scope
 
 | Item | Why |
 |---|---|
-| Translating articles, tools or any page other than the glossary | Not part of Q15. `id/artikel.html` keeps its 10 hand-picked entries (F11); generating it from `data/journal.json` is a later option (D-6) |
+| Translating articles, tools or any page other than the glossary | Not part of Q15. `id/artikel.html` keeps its 10 hand-picked entries (F11); generating it from `data/journal.json` is a later option (D-Q15-6) |
 | Machine translation at build or run time | Forbidden: text reaches the page only after acceptance (BR-2) |
 | Changing `id/index.html` meta ourselves | Peer-owned (F13); we send the change, the peer applies it |
-| Changing the homepage header | Owner shape R079; D-3 decides |
-| New English glossary terms | Only as the outcome of D-2, where an Indonesian-only term needs an English twin, and then through the same review |
-| Changing `js/rz-explain-db.js` or the explain engine | `glossary.html` keeps its term ids and text (lossless migration, L3), so the explain builder's output does not change |
+| Changing the homepage header | Owner shape R079; D-Q15-3 decides |
+| New English glossary terms | Only as the outcome of D-Q15-2, where an Indonesian-only term needs an English twin, and then through the same review |
+| Changing `js/rz-explain-db.js` or the explain engine | This PRD does not change it: `glossary.html` keeps its term ids and text (lossless migration, L3), so the explain builder's output is the same before and after this PRD's T-7. PRD-Q17 T-1 does change the DB (title fix) and ships first; this PRD's lossless proof is taken after it |
 | Per-language URLs for other pages, or a language switch on the 178 other English pages | No Indonesian twin exists for them; a link would promise a page that is not there |
 
 ### 5.3 Existing capabilities reused
@@ -144,7 +145,7 @@ Matching counts (449 of 449), the addendum's acceptance, is the end state of Pha
 ### 5.4 Dependencies
 
 - Peer session: applies the `id/index.html` meta change (`:94`), and agrees to the body change (`:605`) and the toggle change (`:243-250`, `:487-490`). STATE.md requires a peer message before and after each push.
-- Owner: D-1…D-7, and every translation batch.
+- Owner: D-Q15-1…D-Q15-7, and every translation batch.
 - No server, database or Worker.
 
 ### 5.5 Constraints
@@ -159,7 +160,7 @@ Matching counts (449 of 449), the addendum's acceptance, is the end state of Pha
 | # | Assumption | If wrong |
 |---|---|---|
 | A1 | Google and Bing accept hreflang in both the head and the sitemap when the two agree | Keep the head declarations and drop the sitemap alternates; L2 becomes "absent" instead of "equal" |
-| A2 | The owner, a native speaker, is the reviewer of record | D-5 names another reviewer; the review file records the name either way |
+| A2 | The owner, a native speaker, is the reviewer of record | D-Q15-5 names another reviewer; the review file records the name either way |
 | A3 | Definitions keep the small HTML allowlist they use today (`sub` 23, `sup` 6, `em` 5, `a` 3 in English; none in Indonesian) | The allowlist grows by a reviewed change to the generator |
 | A4 | The existing page scripts keep working on generated markup with the same class names | The generator emits the old markup byte for byte for English (FR-3 proof) |
 
@@ -202,8 +203,8 @@ The tiers are `free | demo | pro | root` (`js/rz-feature-flags.js:6`). The gloss
 1. The session runs `python3 tools/build-glossary.py --review-sheet --status draft --limit 25`. This prints a numbered Markdown table: key, English name, English definition, Indonesian name and definition, and the label "draft — not reviewed".
 2. The session sends it to the owner (replies in Indonesian per STATE.md), naming the request id.
 3. The owner answers: accept all, accept with exceptions, or correct.
-4. The session applies corrections to the Indonesian text, then runs `--accept <keys> --reviewer owner --request R<nnn>` and `--reject <keys> --note "<reason>"`. Then `--apply`, the gates and a release.
-- Recovery: a wrong acceptance is reverted with `git revert` or with a new `--reject`. The review file keeps its history in git.
+4. The session applies corrections to the Indonesian text, then runs `tools/owner_decisions.py record glossary-review` `<keys> --status accepted --reviewer owner --request R<nnn>` and `tools/owner_decisions.py record glossary-review` `<keys> --status rejected --note "<reason>" --request R<nnn>`. Then `--apply`, the gates and a release.
+- Recovery: a wrong acceptance is reverted with `git revert` or with a new `rejected` record. The review file keeps its history in git.
 
 ### J4 Implementer adds a term (UC5) or edits accepted text (UC6)
 - Adds an entry to `data/glossary.json` with `id: null`; the review status defaults to `missing`; `--apply` renders English; the Indonesian page and its counter are unchanged.
@@ -256,21 +257,21 @@ The tiers are `free | demo | pro | root` (`js/rz-feature-flags.js:6`). The gloss
 **FR-4 Legacy Indonesian entries**
 - Description: `--extract` attaches the 89 entries from today's `id/glosarium.html` to English keys.
   - The 67 unique matches of script B1 attach automatically.
-  - The 4 ambiguous and 18 unmatched entries attach by the table of decision D-2 (Appendix B), either to an English key or as `idOnly`.
-  - Each attached entry gets `origin: "legacy"` and the review status of decision D-1.
+  - The 4 ambiguous and 18 unmatched entries attach by the table of decision D-Q15-2 (Appendix B), either to an English key or as `idOnly`.
+  - Each attached entry gets `origin: "legacy"` and the review status of decision D-Q15-1.
 - Trigger: T-10.
-- Exceptions: an entry without a D-2 decision stops the extraction and names the entry.
+- Exceptions: an entry without a D-Q15-2 decision stops the extraction and names the entry.
 - Acceptance: L5; AC-6.
 
 **FR-5 Review file and review commands**
 - Description: `data/glossary-id-review.json` (§10.3) holds one record per key with status `missing`, `draft`, `accepted` or `rejected`, the hash of the Indonesian text the status refers to, and the hash of the English text at review time.
 - Commands:
   - `--import-drafts <file> --origin machine|human` adds Indonesian text as `draft`. It refuses to overwrite `accepted` text unless `--replace-accepted` is given, which sets the entry back to `draft`.
-  - `--accept <keys> --reviewer <name> --request R<nnn>` records `accepted` with both hashes and the date.
-  - `--reject <keys> --note <text>` records `rejected`; the text stays in the source for the record and stays off the page.
+  - `tools/owner_decisions.py record glossary-review` `<keys> --status accepted --reviewer <name> --request R<nnn>` records `accepted` with both hashes and the date (the shared CLI owns request-id validation and the atomic write; this PRD's record kind computes the hashes).
+  - `tools/owner_decisions.py record glossary-review` `<keys> --status rejected --note <text> --request R<nnn>` records `rejected`; the text stays in the source for the record and stays off the page.
   - `--review-sheet [--status draft|missing|stale] [--limit N]` prints Markdown. Every draft row carries the words "draft — not reviewed". Rows whose English text changed since acceptance carry "English changed since review".
   - `--stats` prints counts by status.
-- Exceptions: `--accept` on an entry without Indonesian text exits 1.
+- Exceptions: an `accepted` record on an entry without Indonesian text exits 1.
 - Acceptance: L5; U7–U10.
 
 **FR-6 Indonesian page content around the terms**
@@ -304,7 +305,7 @@ The tiers are `free | demo | pro | root` (`js/rz-feature-flags.js:6`). The gloss
 **FR-10 Gate and wiring**
 - Description:
   - `tools/test-i18n.mjs` implements L1–L8 (§20.4), with `--law`, `--strict`, `--phase A|B` and `--report`.
-  - Phase A wires `node tools/test-i18n.mjs --strict --phase A` (L1, L2, L4, L6, L8) after `tools/ship-gate.sh:313`. Phase B replaces it with `--strict` (all laws).
+  - Phase A wires `node tools/test-i18n.mjs --strict --phase A` (blocking L1, L2, L6, L8) after the anchor line `gate "glossary — cards on the register, every term filed under its own letter"` (today `tools/ship-gate.sh:313`; insert by anchor text). Phase B switches it to `--strict --phase B`. Laws not yet blocking print report lines and never fail the gate (§20.2).
   - `("glossary pages (EN + ID term blocks)", ["python3", "tools/build-glossary.py", "--check"])` joins `BUILDERS` in `tools/test-generator-freshness.py`.
 - Acceptance: L1–L8 wired; AC-8.
 
@@ -315,12 +316,12 @@ The tiers are `free | demo | pro | root` (`js/rz-feature-flags.js:6`). The gloss
 | FR-1 | T-2 | Canonicals as today | Heads | 3 heads | Files | — | Twin noindex or moved | L1 |
 | FR-2 | `--apply` | FR-1 | Heads | `sitemap.xml` | File | Parser | Non-canonical href | L2 |
 | FR-3 | `--apply` / `--check` | Markers | Source, review | 2 term blocks | Files | FR-5 | Key, tag, marker errors | L3, L7 |
-| FR-4 | T-10 | D-1, D-2 | Old page | Source + review | Files | B1 | Undecided entry | L5 |
+| FR-4 | T-10 | D-Q15-1, D-Q15-2 | Old page | Source + review | Files | B1 | Undecided entry | L5 |
 | FR-5 | Review commands | Source | Keys, reviewer, request | Review records | File | — | Accept without text | L5 |
 | FR-6 | T-5, `--apply` | FR-3 | Counts | Counter, coverage line, head copy | Files | — | — | L4 |
 | FR-7 | T-4 | Peer for `id/index.html` | — | Toggles, footer link | Files | Peer | R079 link resolution | L6, L8 |
-| FR-8 | T-5 | Peer agrees | — | 2 strings | File | Peer | Peer declines → L4 lists `id/index.html` as open | L4 |
-| FR-9 | Phase C | D-4, D-5 | Drafts | Accepted entries | Source, review | Owner | No answer → stays draft | O8, L5 |
+| FR-8 | T-5 | Peer agrees | — | 2 strings | File | Peer | Peer declines → L4b stays in report mode and lists `id/index.html` as open | L4b |
+| FR-9 | Phase C | D-Q15-4, D-Q15-5 | Drafts | Accepted entries | Source, review | Owner | No answer → stays draft | O8, L5 |
 | FR-10 | T-1, T-6, T-11 | — | — | Wiring | `ship-gate.sh`, freshness list | — | — | L1–L8 |
 
 ## 9. UI/UX specification
@@ -356,7 +357,7 @@ A
 AHU  Air Handling Unit
 Unit Penanganan Udara. Perangkat besar yang …
 ```
-(The 71 is the most the legacy import can yield. The real number follows D-1 and D-2, and the page computes it.)
+(The 71 is the most the legacy import can yield. The real number follows D-Q15-1 and D-Q15-2, and the page computes it.)
 
 Homepage footer, "Pages" column:
 ```
@@ -487,7 +488,7 @@ Colour transition on the link only, on the existing duration token; reduced moti
  ]
 }
 ```
-(The first entry is real: `glossary.html:590`. The second shows the shape. Its key is whatever B1 or D-2 resolves "AHU" to.)
+(The first entry is real: `glossary.html:590`. The second shows the shape. Its key is whatever B1 or D-Q15-2 resolves "AHU" to.)
 
 | Field | Type | Rule |
 |---|---|---|
@@ -526,7 +527,7 @@ Size: about the English term block (217,534 B today) plus the Indonesian text. T
 | `textHash` | `sha256` of `id.name + "\n" + id.def` (UTF-8). Required for `draft`, `accepted` and `rejected` |
 | `enHash` | `sha256` of `en.name + "\n" + en.def` at the time of review |
 | Derived `stale` | `accepted` whose `textHash` differs from the current text: a build error (V5). `accepted` whose `enHash` differs: a report line, not an error |
-| `reviewer`, `request`, `date` | Required for `accepted` and `rejected`; `request` matches `^R\d{3,}$` |
+| `reviewer`, `request`, `date` | Required for `accepted` and `rejected`; `request` matches `^R[0-9]{3,4}$` |
 | `history` | Append-only log of commands. Never edited by hand |
 
 Every key in the source has exactly one review entry, and every review entry has a source key.
@@ -550,7 +551,7 @@ Every key in the source has exactly one review entry, and every review entry has
 
 ### 10.6 Migration, compatibility, retention
 - One-time `--extract`. The lossless proof in FR-3 runs before the extraction is committed.
-- `build-explain-db.py` keeps reading `glossary.html`; its `--check` stays green, because ids, names and definitions are unchanged.
+- `build-explain-db.py` keeps reading `glossary.html`; its `--check` stays green, because this PRD leaves ids, names and definitions unchanged. The baseline is the DB after PRD-Q17 T-1.
 - Rollback is `git revert`; the pages return to their hand-made state.
 - Retention: the source, the review file and its history are kept in git.
 
@@ -562,12 +563,12 @@ No server endpoint. Every page is static on GitHub Pages. The contracts are the 
 
 | Command | Effect | Exit |
 |---|---|---|
-| `--extract [--decisions <file>]` | Reads both pages and the D-2 decision table. Writes `data/glossary.json`, `data/glossary-id-review.json` and the page markers. Refuses if the source exists | 0; 1 on an undecided legacy entry |
+| `--extract [--decisions <file>]` | Reads both pages and the D-Q15-2 decision table. Writes `data/glossary.json`, `data/glossary-id-review.json` and the page markers. Refuses if the source exists | 0; 1 on an undecided legacy entry |
 | `--apply` | Renders both term blocks, counters and the coverage line | 0; 1 on a source error |
 | `--check` | Fresh render equals files; source and review rules V1–V8 (§12.2) | 0; 1 with the first difference or violation |
 | `--import-drafts <file> --origin machine\|human [--replace-accepted]` | Input file `[{key, name, def}]` sets the entries to `draft` | 0; 1 on an unknown key, a tag outside the allowlist, or accepted text without the flag |
-| `--accept <k1,k2,…> --reviewer <s> --request R<nnn>` | Sets `accepted` with the hashes and the date (UTC) | 0; 1 on an entry without text |
-| `--reject <keys> --note <s> --request R<nnn>` | Sets `rejected` | 0 |
+| (moved) `tools/owner_decisions.py record glossary-review <k1,k2,…> --status accepted --reviewer <s> --request R<nnn>` | Sets `accepted` with the hashes and the date (UTC); the record kind lives in `tools/build-glossary.py` | 0; 1 on an entry without text. Exit codes and flags are the shared CLI's (specified in `03-architecture`) |
+| (moved) `tools/owner_decisions.py record glossary-review <keys> --status rejected --note <s> --request R<nnn>` | Sets `rejected` | 0 |
 | `--review-sheet [--status …] [--limit N]` | Markdown to stdout | 0 |
 | `--stats` | `missing n · draft n · accepted n · rejected n · stale-en n` | 0 |
 
@@ -589,8 +590,9 @@ New attribute `alternates: list[tuple[str, str]]`, filled for `<link rel="altern
 | Flag | Behaviour |
 |---|---|
 | `--law L1…L8` | One law |
-| `--strict` | All laws (or those of `--phase`); exit 1 on any failure |
-| `--phase A` | L1, L2, L4, L6, L8 |
+| `--strict` | Runs every law; exit 1 only when a law that is blocking at the given `--phase` fails; every other law prints `REPORT Ln PASS\|FAIL …` (coordinator decision D9) |
+| `--phase A` | Blocking: L1, L2, L6, L8 |
+| `--phase B` | Blocking: L1–L8, L4b only once its precondition holds (§20.2) |
 | `--report` | Counts per status, pairs, claims; exit 0 |
 | `--base <url>` | L1, L2, L4 against a live origin (post-deploy) |
 
@@ -625,11 +627,11 @@ New attribute `alternates: list[tuple[str, str]]`, filled for `<link rel="altern
 stateDiagram-v2
   [*] --> missing: English term added, no Indonesian text
   missing --> draft: --import-drafts (origin machine or human)
-  draft --> accepted: --accept (owner or named reviewer, request id)
-  draft --> rejected: --reject (note)
+  draft --> accepted: owner_decisions.py record (owner or named reviewer, request id)
+  draft --> rejected: owner_decisions.py record (note)
   rejected --> draft: corrected text imported
   accepted --> draft: --import-drafts --replace-accepted (text changed)
-  accepted --> accepted: --accept again after a reviewed edit
+  accepted --> accepted: a new accepted record after a reviewed edit
   note right of draft: off the live page, "draft — not reviewed"
   note right of accepted: on the live page while textHash matches
 ```
@@ -657,7 +659,10 @@ stateDiagram-v2
 | `sitemap.xml` | Namespace plus 18 alternates | `build-sitemap.py --check` in the freshness gate |
 | `llms.txt`, `llms-full.txt` | The `id/glosarium.html` title changes | `build-llms-txt.py --apply`, `build-llms-full.py --apply`; freshness gate |
 | `search-index.json` | One title changes (hand edit) | L4 reads it |
-| `js/rz-explain-db.js` | None: ids and texts unchanged | `build-explain-db.py --check` |
+| `js/rz-explain-db.js` | None from this PRD: ids and texts unchanged. PRD-Q17 T-1 regenerates it (title fix) before T-7 | `build-explain-db.py --check` |
+| PRD-Q17 (learning paths) | Edits `glossary.html` (intro link `:564`) and `articles.html` (a `.jrow` at `:482`) and regenerates the explain DB. Order: Q17 T-1 → this PRD (Phase A/B) → Q17 T-9 | Each rebases on the last; L3 runs after Q17 T-1 |
+| `tools/ship-gate.sh` | One gate line by anchor text (§20.2) | — |
+| `tools/owner_decisions.py`, `DECISIONS.md` | D-Q15-1…7; record kind `glossary-review` | Shared CLI (D15) |
 | `tools/test-glossary.py` | Starts checking the Indonesian terms (G1) once the page uses `<section>` | L7 asserts it |
 | `tools/sweep-site-register.py` | Its `--check` covers the same pages; the generated block holds no CSS | Run after `--apply` in T-7; freshness gate |
 | `tools/test-audit-coverage.mjs` | Unchanged URL set | ship gate `:204` |
@@ -675,8 +680,8 @@ stateDiagram-v2
   4. Where a term has a legal definition in an Indonesian regulation the English definition cites, quote the Indonesian wording from the regulation's text (peraturan.bpk.go.id, reachable by plain curl per project memory). Do not paraphrase it.
   5. Mark uncertainty in the import file's `note`, never in the text.
   6. Output only the JSON import file.
-- **Human approval points:** every Indonesian text, including the UI copy in §9.6 (owner, per batch); D-1…D-7 (owner); the peer's `id/index.html` meta.
-- **No auto-accept.** A second agent may pre-review a batch (terminology consistency against accepted entries), but only the reviewer of record can run `--accept`. The review file records who did.
+- **Human approval points:** every Indonesian text, including the UI copy in §9.6 (owner, per batch, recorded with `tools/owner_decisions.py record glossary-review`); D-Q15-1…D-Q15-7 in `DECISIONS.md` (owner); the peer's `id/index.html` meta.
+- **No auto-accept.** A second agent may pre-review a batch (terminology consistency against accepted entries), but only the reviewer of record can write an `accepted` record. The review file records who did.
 
 ## 15. Non-functional requirements
 
@@ -708,15 +713,15 @@ stateDiagram-v2
 | Case | Behaviour |
 |---|---|
 | English term removed | Its Indonesian entry would be orphaned. `--check` fails with V6 until the entry is removed or turned into an Indonesian-only entry with a decision |
-| English key renamed | Handled as a remove plus an add. The review entry moves only by an explicit `--import-drafts` and `--accept`; acceptance is not carried over silently |
-| English definition changed after acceptance | Report line "English changed since review" in the review sheet and `--stats`; the page keeps the accepted text until the owner re-reviews (owner's choice, D-7 default) |
+| English key renamed | Handled as a remove plus an add. The review entry moves only by an explicit `--import-drafts` and a new `accepted` record; acceptance is not carried over silently |
+| English definition changed after acceptance | Report line "English changed since review" in the review sheet and `--stats`; the page keeps the accepted text until the owner re-reviews (owner's choice, D-Q15-7 default) |
 | Indonesian text edited after acceptance | V5 build error until re-accepted or reverted (BR-4) |
 | Two Indonesian names identical | Allowed; the anchors differ by key; the review sheet warns |
-| Legacy entry that maps to two English terms | Decided in D-2 before `--extract` |
+| Legacy entry that maps to two English terms | Decided in D-Q15-2 before `--extract` |
 | Indonesian-only term (no English twin) | `idOnly` with a decision. Rendered without `term-en`; counted in the Indonesian total, so the coverage line counts against 449 plus the Indonesian-only entries |
 | Draft with disallowed HTML | Import refused |
 | Owner does not answer a batch | Entries stay `draft`, off the page |
-| Peer declines the `id/index.html` changes | L4 reports `id/index.html` claims as open; Phase A ships the rest with that law item marked open in the CHANGELOG and the ledger |
+| Peer declines the `id/index.html` changes | L4b stays in report mode (it prints `REPORT L4b FAIL id/index.html …` and never fails the gate) and the CHANGELOG and the ledger list it as open; L4 for this PRD's own pages is unaffected. This is the same rule as the wiring table (§20.2) |
 | R079 L5 cannot resolve `id/` | Use `id/index.html` in the footer link (FR-7 exception) |
 | Twin page later set to `noindex` | L1 fails, naming both pages |
 | `x-default` debate (Indonesian default for Indonesian visitors) | Not done: language-based defaulting is the engine's job; `x-default` stays English (BR-6) |
@@ -733,12 +738,12 @@ flowchart LR
   end
   D[agent drafts JSON] -- --import-drafts --> G
   D -- status draft --> R
-  O[owner review] -- --accept / --reject --> R
+  O[owner review] -- owner_decisions.py record --> R
   G --> B[tools/build-glossary.py]
   R --> B
   B --> EN[glossary.html term block]
   B --> ID[id/glosarium.html term block + counter + coverage]
-  EN --> X[build-explain-db.py reads glossary.html, unchanged output]
+  EN --> X[build-explain-db.py reads glossary.html, output unchanged by this PRD]
   H[page heads: hreflang en/id/x-default] --> P[crawler_inventory.HeadMetadata.alternates]
   P --> S[build-sitemap.py] --> SM[sitemap.xml with xhtml:link]
   T[tools/test-i18n.mjs L1-L8] -.-> H
@@ -768,14 +773,14 @@ Deployment: static files; GitHub Pages; no infrastructure.
 | T-2 | Head declarations on 3 English pages | T-1 | `index.html`, `articles.html`, `glossary.html` | FR-1 | 0.5 d | L1 green | — |
 | T-3 | Parser alternates + sitemap alternates | T-2 | `tools/crawler_inventory.py`, `tools/build-sitemap.py`, `sitemap.xml` | FR-2; `tools/test-crawler-seo.py` still green | 1 d | L2 green; `build-sitemap.py --check` | — |
 | T-4 | Toggles and footer link; toggle CSS on 5 pages | T-1, peer for `id/index.html` | 2 English twins, `index.html` footer, 3 `id/` pages | FR-7, §9.7 | 1 d | L6, L8; R079 gate green | Screenshots at 390 and 1440, both themes, looked at |
-| T-5 | Count claims (head and lede of `id/glosarium.html`, `search-index.json`; `id/index.html` via peer) | T-9 (copy accepted) | 3 files | FR-6, FR-8 | 0.5 d | L4 green, or `id/index.html` open per §17 | — |
+| T-5 (Phase B) | Count claims (head and lede of `id/glosarium.html`, `search-index.json`; `id/index.html` via peer) | T-9 (copy accepted) | 3 files | FR-6, FR-8 | 0.5 d | L4 green, or `id/index.html` open per §17 | — |
 | T-6 | Phase A release; record the Search Console baseline if the owner shares it | T-2…T-5 | standards, CHANGELOG | §22 | 0.5 d | Ship gate green; live curl checks | Live |
 | T-7 | Generator: `--extract`, `--apply`, `--check`; markers; lossless proof | T-1 | `tools/build-glossary.py`, `tools/test-build-glossary.py` | FR-3 | 2 d | U1–U6; proof output stored | — |
 | T-8 | Review file and commands | T-7 | same + `data/glossary-id-review.json` | FR-5 | 1.5 d | U7–U10 | — |
-| T-9 | Decision packet D-1…D-7, including the Indonesian UI copy of §9.6 and the D-2 mapping table | B1 | message | Appendix B; sent in Indonesian | 0.5 d | Owner answers recorded with request ids | — |
-| T-10 | Legacy import per D-1 and D-2; Indonesian page generated | T-7, T-8, T-9 | sources, `id/glosarium.html` | FR-4 | 1 d | L3, L5, L7 green | Counts on the page equal `--stats` |
+| T-9 | Decision packet D-Q15-1…D-Q15-7 (rows already in `DECISIONS.md`), including the Indonesian UI copy of §9.6 and the D-Q15-2 mapping table. Sent at the start of Phase A so the answers are in before Phase B | B1 | message; answers recorded with `tools/owner_decisions.py decide` | Appendix B; sent in Indonesian | 0.5 d | Owner answers recorded with request ids | — |
+| T-10 | Legacy import per D-Q15-1 and D-Q15-2; Indonesian page generated | T-7, T-8, T-9 | sources, `id/glosarium.html` | FR-4 | 1 d | L3, L5, L7 green | Counts on the page equal `--stats` |
 | T-11 | Phase B release; gate switched to `--strict`; freshness builder added | T-10 | `tools/ship-gate.sh`, `tools/test-generator-freshness.py` | FR-10 | 0.5 d | Ship gate green | Live |
-| T-12 | Phase C batch 1 (25 terms); measure owner review time | T-11, D-4, D-5 | sources | FR-9, J3 | 1 d of implementer time plus owner time (UNKNOWN; measured here) | L5 green | Released; O8 updated |
+| T-12 | Phase C batch 1 (25 terms); measure owner review time | T-11, D-Q15-4, D-Q15-5 | sources | FR-9, J3 | 1 d of implementer time plus owner time (UNKNOWN; measured here) | L5 green | Released; O8 updated |
 | T-13… | Phase C batches 2…n (≤ 15 more for ≤ 378 terms) | T-12 | sources | Same | 1 d each | Same | Same |
 
 Totals: Phase A (T-1…T-6) 5 days; Phase B (T-7…T-11) 5.5 days; ≈ 10.5 days of implementer time. Phase C is about 1 implementer day per 25 terms, at most 16 batches, plus owner review time measured in T-12.
@@ -786,7 +791,8 @@ Totals: Phase A (T-1…T-6) 5 days; Phase B (T-7…T-11) 5.5 days; ≈ 10.5 days
 
 | Level | Tests | Ids |
 |---|---|---|
-| Unit (Python, `tools/test-build-glossary.py`) | U1 English render of a 3-term fixture equals the expected lines; U2 section filing by first letter, digits skipped; U3 Indonesian sort and filing by `id.name`; U4 allowlist accepts `sub`, `sup`, `em`, `a[href]` and refuses `onerror` and `javascript:`; U5 import of a draft with `<img onerror>` refused; U6 lossless round trip on a fixture page; U7 `--accept` writes both hashes and history; U8 an edit after acceptance fails V5; U9 `--import-drafts` refuses accepted text without `--replace-accepted`; U10 review sheet prints "draft — not reviewed" for every draft | U1–U10 |
+| Supabase stub | Not applicable: no Supabase. The shared stub `tools/lib/rz-supa-stub.mjs` (coordinator decision D16) is not loaded | — |
+| Unit (Python, `tools/test-build-glossary.py`) | U1 English render of a 3-term fixture equals the expected lines; U2 section filing by first letter, digits skipped; U3 Indonesian sort and filing by `id.name`; U4 allowlist accepts `sub`, `sup`, `em`, `a[href]` and refuses `onerror` and `javascript:`; U5 import of a draft with `<img onerror>` refused; U6 lossless round trip on a fixture page; U7 the `glossary-review` record kind (called through `tools/owner_decisions.py record`) writes both hashes and history; U8 an edit after acceptance fails V5; U9 `--import-drafts` refuses accepted text without `--replace-accepted`; U10 review sheet prints "draft — not reviewed" for every draft | U1–U10 |
 | Unit (Python, sitemap) | Alternates emitted only for pages with two or more languages; order `en`, `id`, `x-default`; a non-canonical href fails | in `tools/test-crawler-seo.py`, extended |
 | Contract | Head declarations (§11.2); JSON schemas (§10.2, §10.3); sitemap shape (§10.5) | L1–L3, L5 |
 | Independent recount (Node) | Reciprocity, counts, hashes recomputed in the gate | L1, L4, L5 |
@@ -797,9 +803,23 @@ Totals: Phase A (T-1…T-6) 5 days; Phase B (T-7…T-11) 5.5 days; ≈ 10.5 days
 | Visual | Screenshots of the 5 toggles and the Indonesian glossary at 390 and 1440, both themes, looked at | T-4, T-10 |
 
 ### 20.2 Wiring in `tools/ship-gate.sh`
-- After line 313 (`gate "glossary — cards on the register, every term filed under its own letter" python3 tools/test-glossary.py`):
-  - Phase A: `gate "Indonesian layer — reciprocal hreflang, sitemap alternates, honest counts, language links" node tools/test-i18n.mjs --strict --phase A`
-  - Phase B onward: `gate "Indonesian layer — hreflang, sitemap, one glossary source, reviewed text only, honest counts, links" node tools/test-i18n.mjs --strict`
+- By anchor text, never by line number: after the line `gate "glossary — cards on the register, every term filed under its own letter" python3 tools/test-glossary.py` (today `:313`):
+  - Phase A: `gate "Indonesian layer — reciprocal hreflang, sitemap alternates, language links" node tools/test-i18n.mjs --strict --phase A`
+  - Phase B onward: `gate "Indonesian layer — hreflang, sitemap, one glossary source, reviewed text only, honest counts, links" node tools/test-i18n.mjs --strict --phase B`
+
+Law wiring (coordinator decision D9). Before its "blocking from" point a law runs in report mode: it prints `REPORT Ln PASS|FAIL …` and never fails the gate.
+
+| Law | Blocking from (phase · task) | Precondition |
+|---|---|---|
+| L1 reciprocal hreflang | A · T-6 | T-1, T-2 |
+| L2 sitemap alternates | A · T-6 | T-3 |
+| L3 one glossary source, lossless | B · T-11 | T-7, T-8; PRD-Q17 T-1 merged (explain-DB baseline) |
+| L4 honest counts, own pages (`id/glosarium.html`, `glossary.html`, `search-index.json`, `llms.txt`) | B · T-11 | T-9 answered: the Indonesian count copy of §9.6 accepted (D-Q15-1, D-Q15-2 not PROPOSED); T-5, T-10 |
+| L4b honest counts, `id/index.html` (peer-owned) | the release after the peer's edit lands | Peer agreement and edit (STATE.md: `id/index.html` meta is peer-owned). Report mode until then, also after Phase B |
+| L5 reviewed text only | B · T-11 | D-Q15-1 and D-Q15-2 not PROPOSED; T-10 |
+| L6 language links | A · T-6 | T-4 (homepage footer only; the header link waits for D-Q15-3) |
+| L7 Indonesian glossary gate | B · T-11 | T-10 |
+| L8 render, axe, design | A · T-6 | T-4 |
 - `tools/test-generator-freshness.py` `BUILDERS`: add `("glossary pages (EN + ID term blocks)", ["python3", "tools/build-glossary.py", "--check"])` (T-11). The unit tests run first inside L3 (the gate invokes `python3 tools/test-build-glossary.py`).
 
 ### 20.3 Test data
@@ -812,7 +832,8 @@ Fixtures under `tools/fixtures/i18n/`: a 3-term English page, a 2-term Indonesia
 | L1 | Each of the 3 pairs declares exactly `en`, `id` and `x-default` on both pages, every URL equal to the named page's canonical; every `id/*.html` page is in a pair; no other root page declares `hreflang="id"` | `node tools/test-i18n.mjs --law L1` | `L1 FAIL index.html: no hreflang="id"; hreflang en and x-default name https://resistancezero.com/index.html, canonical is https://resistancezero.com/ · articles.html: no hreflang="id" · glossary.html: no hreflang="id"` |
 | L2 | `sitemap.xml` declares the `xhtml` namespace, and for each of the 6 paired URLs carries exactly the page's own declarations as `xhtml:link` (18 in all); `python3 tools/build-sitemap.py --check` passes | `--law L2` | `L2 FAIL sitemap.xml: 0 xhtml:link, expected 18; xmlns:xhtml missing` |
 | L3 | `data/glossary.json` exists and validates (V1–V4, V6, V7); its 449 English keys equal the `term-*` ids of `glossary.html`; `python3 tools/build-glossary.py --check` passes (both term blocks equal a fresh render); `python3 tools/test-build-glossary.py` passes | `--law L3` | `L3 FAIL data/glossary.json missing` |
-| L4 | No count claim exceeds the truth: on `id/glosarium.html` the static counter equals the number of rendered terms; no "N+ istilah", "N+ terms" or "N istilah" claim on the 3 Indonesian pages, `glossary.html`, `search-index.json` or `llms.txt` exceeds the number of terms the named page lists; the coverage line's two numbers equal `--stats` | `--law L4` | `L4 FAIL id/glosarium.html: claims 100+ (7×) and counter 105 with 89 terms · id/index.html: claims 100+ and 300+ istilah for a page with 89 · search-index.json: "100+ Istilah" for 89 · llms.txt: "100+ Istilah" for 89` |
+| L4 | No count claim exceeds the truth on this PRD's own surfaces: on `id/glosarium.html` the static counter equals the number of rendered terms; no "N+ istilah", "N+ terms" or "N istilah" claim on `id/glosarium.html`, `id/artikel.html`, `glossary.html`, `search-index.json` or `llms.txt` exceeds the number of terms the named page lists; the coverage line's two numbers equal `--stats` | `--law L4` | `L4 FAIL id/glosarium.html: claims 100+ (7×) and counter 105 with 89 terms · search-index.json: "100+ Istilah" for 89 · llms.txt: "100+ Istilah" for 89` |
+| L4b | The same rule on `id/index.html` (peer-owned meta) | `--law L4b` | `L4b FAIL id/index.html: claims 100+ and 300+ istilah for a page with 89` (report mode until the peer's edit, §20.2) |
 | L5 | `data/glossary-id-review.json` exists; every Indonesian term on the live page has status `accepted` with a `textHash` equal to its current text; no `draft`, `rejected` or `missing` entry is rendered; every `draft` has an origin; the review sheet labels every draft "draft — not reviewed"; a fixture draft planted in a copy of the source is absent from the rendered fixture page | `--law L5` | `L5 FAIL review file missing; 89 Indonesian terms live with no review record` |
 | L6 | `articles.html` and `glossary.html` carry a `.lang-toggle` link to their twin with `hreflang="id"` and `lang="id"`; the homepage footer links to `id/` with the same attributes; each Indonesian page's toggle links to its English twin with `hreflang="en"` and `lang="en"`; the active language is `aria-current="true"` | `--law L6` | `L6 FAIL 0 English pages link to an Indonesian twin; homepage footer has no link to id/; id/*.html "EN" links carry no hreflang/lang` |
 | L7 | The glossary gate sees every term: splitting each glossary page the way `tools/test-glossary.py:36` does yields as many terms as the page lists (449 and the Indonesian count); both pages use `<section class="letter-section">` | `--law L7` | `L7 FAIL id/glosarium.html: G1 split finds 0 sections and 0 of 89 terms (page uses <div class="letter-section">)` |
@@ -844,14 +865,14 @@ FR → test mapping
 | FR-5 | U7–U10, L5, AC-7 |
 | FR-6 | L4, AC-4, AC-9 |
 | FR-7 | L6, L8, AC-5, AC-10 |
-| FR-8 | L4 |
+| FR-8 | L4b |
 | FR-9 | L5, AC-7, AC-9 |
 | FR-10 | AC-8 |
 
 ## 22. Rollout and migration
 
-- **Phase A** (one release, MINOR): T-1…T-6. Gate wired with `--phase A`.
-- **Phase B** (one release, MINOR): T-7…T-11. Gate switched to `--strict`; freshness builder added.
+- **Phase A** (one release, MINOR): T-1…T-4, T-6 (English-side structure: hreflang, sitemap, toggles, footer link). Gate wired with `--phase A`. No owner input needed.
+- **Phase B** (one release, MINOR): T-5, T-7…T-11, after T-9's answers and after PRD-Q17 T-1. Gate switched to `--strict --phase B`; freshness builder added.
 - **Phase C**: one PATCH release per accepted batch.
 - **Version**: the next free version, claimed with the peer before each push (STATE.md). Peer message before and after each push, naming the `id/index.html` lines touched.
 - **Release chain, each release**:
@@ -876,26 +897,26 @@ FR → test mapping
 
 | # | Risk | Likelihood | Impact | Mitigation |
 |---|---|---|---|---|
-| R1 | Owner review bandwidth stalls Phase C | High | Coverage stays low | Batches of 25; one-line answers; the page stays honest at any coverage (BR-5); D-4 can narrow the target to linked terms |
+| R1 | Owner review bandwidth stalls Phase C | High | Coverage stays low | Batches of 25; one-line answers; the page stays honest at any coverage (BR-5); D-Q15-4 can narrow the target to linked terms |
 | R2 | Draft quality (meaning drift, invented detail) | Medium | Wrong definitions in Indonesian | BR-8; owner review; second-agent consistency pre-check; nothing publishes unaccepted |
 | R3 | Extraction changes an English definition by accident | Low | Explain DB and page drift | Lossless proof before commit; `build-explain-db.py --check` |
 | R4 | Sweeps edit inside the generated block | Medium | Reverted edits | Marker comments; `--check` in the freshness gate; CLAUDE.md note |
 | R5 | Peer conflict on `id/index.html` | Medium | Merge conflict, or the claim stays false | Peer message first; §17 fallback keeps the law item visible |
 | R6 | R079 homepage gate fails on the new footer link | Low | Phase A blocked | FR-7 fallback href; run the R079 gate in T-4 |
 | R7 | Hreflang mistakes hurt indexing | Low | SEO loss | L1 and L2 plus the live `--base` run; canonical-only URLs |
-| R8 | Legacy entries were never reviewed | Unknown | Questionable text stays live | D-1 makes the choice explicit; legacy origin is visible in the review sheet for spot checks |
+| R8 | Legacy entries were never reviewed | Unknown | Questionable text stays live | D-Q15-1 makes the choice explicit; legacy origin is visible in the review sheet for spot checks |
 
-Decisions for the owner (each with a recommendation):
+Decisions for the owner (each with a recommendation). Recorded in `documentation/product-transformation/DECISIONS.md` as D-Q15-1…D-Q15-7 (were D-1…D-7; status PROPOSED, recommendation as default; answered with `tools/owner_decisions.py decide`, coordinator decision D15):
 
 | Id | Question | Recommendation |
 |---|---|---|
-| D-1 | The 89 legacy Indonesian entries are live today with no review record. Keep them live as `accepted` with origin `legacy`, or take them off until reviewed? | Keep live as accepted-legacy (removal would shrink the page to 0); spot-check 20 in the first Phase C batch |
-| D-2 | Mapping for the 4 ambiguous and 18 unmatched legacy entries (Appendix B) | Ambiguous: map to the general term (`cdu`, `cross-connect`, `generator`, `white-space`). Unmatched: the session proposes an English key by meaning for each; where none exists, keep the entry Indonesian-only rather than write a new English term |
-| D-3 | Homepage header language link (changes the R079 owner shape) or footer only | Footer only for now; revisit with the next homepage request |
-| D-4 | Target and order of Phase C | All 449, linked terms first (185 with `term-links`), 25 per batch |
-| D-5 | Reviewer of record | Owner; a named bilingual reviewer can be added later and is recorded per entry |
-| D-6 | `id/artikel.html` lists 10 of 36 journal entries (F11) | Out of Q15; a later PRD can generate it from `data/journal.json` with reviewed Indonesian summaries |
-| D-7 | When an English definition changes after its translation was accepted | Keep the accepted Indonesian text live and list it as "English changed since review" until the next batch |
+| D-Q15-1 | The 89 legacy Indonesian entries are live today with no review record. Keep them live as `accepted` with origin `legacy`, or take them off until reviewed? | Keep live as accepted-legacy (removal would shrink the page to 0); spot-check 20 in the first Phase C batch |
+| D-Q15-2 | Mapping for the 4 ambiguous and 18 unmatched legacy entries (Appendix B) | Ambiguous: map to the general term (`cdu`, `cross-connect`, `generator`, `white-space`). Unmatched: the session proposes an English key by meaning for each; where none exists, keep the entry Indonesian-only rather than write a new English term |
+| D-Q15-3 | Homepage header language link (changes the R079 owner shape) or footer only | Footer only for now; revisit with the next homepage request |
+| D-Q15-4 | Target and order of Phase C | All 449, linked terms first (185 with `term-links`), 25 per batch |
+| D-Q15-5 | Reviewer of record | Owner; a named bilingual reviewer can be added later and is recorded per entry |
+| D-Q15-6 | `id/artikel.html` lists 10 of 36 journal entries (F11) | Out of Q15; a later PRD can generate it from `data/journal.json` with reviewed Indonesian summaries |
+| D-Q15-7 | When an English definition changes after its translation was accepted | Keep the accepted Indonesian text live and list it as "English changed since review" until the next batch |
 
 ## 24. Definition of done
 
@@ -907,9 +928,9 @@ Decisions for the owner (each with a recommendation):
 - [ ] Language links on both English twins and the homepage footer; Indonesian links carry `hreflang` and `lang` (L6).
 - [ ] Glossary gate checks every Indonesian term (L7).
 - [ ] Render, axe and design rules at 390 and 1440 in both themes; screenshots looked at (L8).
-- [ ] D-1…D-7 answered and recorded; peer changes to `id/index.html` applied or recorded as open.
+- [ ] D-Q15-1…D-Q15-7 answered and recorded in `DECISIONS.md`; peer changes to `id/index.html` applied or recorded as open.
 - [ ] Standards docs, CHANGELOG and CLAUDE.md updated; versions claimed with the peer; live checks run.
-- [ ] Phase C: 449 of 449 accepted, or the owner's D-4 target met.
+- [ ] Phase C: 449 of 449 accepted, or the owner's D-Q15-4 target met.
 
 ## Appendix A — Recount script and commands (run 2026-11-11, `fcaa892df`)
 
@@ -1001,7 +1022,7 @@ count claims: {'glossary.html': ['300+ Terms', '300+ Terms', '300+ Terms'], 'id/
 - `sed -n 232p llms.txt` → the page title with "100+ Istilah".
 - `python3 tools/test-glossary.py` → `PASS glossary.html: 0 finding(s)` and `PASS id/glosarium.html: 0 finding(s)`, exit 0. The second line covers 0 terms (F9).
 
-## Appendix B — Legacy entries needing decision D-2
+## Appendix B — Legacy entries needing decision D-Q15-2
 
 | # | Indonesian name (as on the page) | `term-en` | Candidates from script B1 | Proposal |
 |---|---|---|---|---|

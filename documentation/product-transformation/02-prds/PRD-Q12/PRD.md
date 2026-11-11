@@ -6,23 +6,24 @@
 |---|---|
 | PRD id | PRD-Q12 |
 | Feature | The Finance Terminal's watchlist, portfolio and price alerts follow a signed-in account across devices. They are stored in the existing `app_state` table through a repaired `js/rz-ft-sync.js`, with a visible sync state and no silent loss (option A, recommended). If the owner declines sync, the unused module is removed instead (option C, a feature removal) |
-| Version | 1.0 |
+| Version | 1.1 |
 | Status | Draft |
 | Author | Opus 5.5 (Fable quota exhausted) |
 | Date | 2026-11-11 |
 | Owner requests | R110 (PRD per idea), R111 (24-section structure) |
 | Priority | 63.0. Addendum rank 11: I 5, N 3, C 8, E 2, effort 1 week (`documentation/PRODUCT_INNOVATION_ASSESSMENT_2026-11_ADDENDUM.md:86`) |
 | Related findings | Q12 (`…_ADDENDUM.md:318-332`); BASELINE §5 row "Finance terminal sync" (`00-audit-baseline/BASELINE.md:60`); X1 (`…_ADDENDUM.md:47`, `BASELINE.md:46`). New findings F1–F13 (§3.1); corrections C1–C4 (§3.3) |
-| Dependencies | **Blocking.** X1: the owner rotates the Finnhub key, and PRD-X-DEFECTS removes the hardcoded fallback (REGISTER.md:24, :36; BASELINE.md:76 "Q12 must not start before the key is rotated"). PRD-X-DEFECTS is being written in bundle E; Q12 depends on its X1 item, whatever id it receives. Non-blocking: owner decisions D-1…D-5 (§23) |
+| Dependencies | **Blocking.** X1: the owner rotates the Finnhub key, and PRD-X-DEFECTS removes the hardcoded fallback (REGISTER.md:24, :36; BASELINE.md:76 "Q12 must not start before the key is rotated"). PRD-X-DEFECTS is being written in bundle E; Q12 depends on its X1 item, whatever id it receives. Non-blocking: owner decisions D-Q12-1…D-Q12-5 (§23) |
 | Related modules | `Apps/finance-terminal/index.html` (289 KB, read by grep only), `js/rz-ft-sync.js`, `js/rz-supabase.js`, `js/rz-config.js`, `js/rz-feature-flags.js`, `supabase/schema.sql` (Module 4), `account.html`, new gate `tools/test-ft-sync.mjs`, `tools/ship-gate.sh` |
 | Target wave | Addendum roadmap: after X1 ("X1 before Q12, so no feature work is built on an exposed key", `…_ADDENDUM.md:565`) |
-| Approval status | Approved by owner R110/R111 2026-11-10 (the PRD set). Register: "removal needs owner approval" (`01-improvement-register/REGISTER.md:19`). Option A starts a new flow of personal data to Supabase, so choosing it in D-1 is the owner's approval of that flow. Option C is a feature removal and needs D-1 as well |
+| Approval status | Approved by owner R110/R111 2026-11-10 (the PRD set). Register: "removal needs owner approval" (`01-improvement-register/REGISTER.md:19`). Option A starts a new flow of personal data to Supabase, so choosing it in D-Q12-1 is the owner's approval of that flow. Option C is a feature removal and needs D-Q12-1 as well |
 
 Change history
 
 | Version | Date | Author | Change |
 |---|---|---|---|
 | 1.0 | 2026-11-11 | Opus 5.5 | First complete draft, 24 sections. Facts verified against `wt-hub3` at `fcaa892df` (branch `hub-r3`). The 289 KB terminal was read with `grep` and `sed` on line ranges only, with long alphanumeric strings masked so that no key value enters this document |
+| 1.1 | 2026-11-11 | Opus 5.5 | QA batch 2 revisions (D9–D16). Decision ids only (D15): local D-1…D-5 renamed D-Q12-1…D-Q12-5 and recorded in `documentation/product-transformation/DECISIONS.md`. Coordinator follow-up (D16): new §11.2a specifies the shared `app_state` sync module `js/rz-app-state.js` (registration API, storage keys, key registry, what it does not do), with `js/rz-ft-sync.js` v2 as an adapter on it; T-3 and §13 updated; the PRD-X-DEFECTS dependency note is left as written (that PRD is still in progress) |
 
 ## 2. Executive summary
 
@@ -84,24 +85,24 @@ If the owner prefers not to sync, **option C** deletes the module and leaves the
 |---|---|---|---|
 | C1 | BASELINE §5: "`rz-ft-sync.js` is loaded only by `Apps/second brain/codebase-graph.html`" (`:60`); addendum: "loads only in a second-brain page" (`:319`) | That page lists the file as a node in graph data (`codebase-graph.html:118,120`); no page loads it (F4) | The module is loaded by no page |
 | C2 | Addendum: "One script tag plus auth on the terminal" (`:323`) | The module loses data (F5 D1, D2), hides failures (D3), may drop the last edit (D4), uses stale tokens (D5) and ignores the tier rule (D6). The terminal also needs a hook in `saveLS`, a reload listener and a visible state | Scope in §5; effort ≈ 6.5 days (§19), consistent with the addendum's 1 week |
-| C3 | Addendum acceptance: "A watchlist added on device A appears on device B (two browser profiles)" (`:332`) | A live run needs a signed-in Pro account, and the session may not use the owner's credentials | Proved by the gate against an in-memory stand-in for the client (L3). A live run follows if the owner provisions a test account (D-4); otherwise the release states that the live round trip is unverified |
+| C3 | Addendum acceptance: "A watchlist added on device A appears on device B (two browser profiles)" (`:332`) | A live run needs a signed-in Pro account, and the session may not use the owner's credentials | Proved by the gate against an in-memory stand-in for the client (L3). A live run follows if the owner provisions a test account (D-Q12-4); otherwise the release states that the live round trip is unverified |
 | C4 | Addendum: "Integration points: … Supabase `app_state`" | Correct, but whether `app_state` exists live is unknown (F8) | T-1 confirms it before any release |
 
 ## 4. Objectives and success metrics
 
 | # | Objective | Metric | Target | Measurement | Assumption |
 |---|---|---|---|---|---|
-| O1 | Lists follow the account | Two-device round trip (add on A, see on B; delete on B, gone on A) | Pass (today: fails, nothing syncs) | L3 (stub); live per D-4 | `app_state` exists live (T-1) |
+| O1 | Lists follow the account | Two-device round trip (add on A, see on B; delete on B, gone on A) | Pass (today: fails, nothing syncs) | L3 (stub); live per D-Q12-4 | `app_state` exists live (T-1) |
 | O2 | No silent loss | Data-loss cases a–e of §12.2 passing | 5 of 5 (today: the module, injected, fails case b) | L4 | — |
 | O3 | Key stays on the device | Synced keys outside `{ft_wl, ft_port, ft_alerts}`; payloads containing the API key | 0 / 0 | L2 | — |
 | O4 | State is visible | Sync outcomes shown as a word in the header | 4 of 4 states (today 0: no element) | L5, L8 | — |
-| O5 | Tier rule honoured | Uploads by free or demo accounts (client side) | 0, with Pro and root syncing (today: no sync for anyone) | L6 | D-2 keeps the flag rule |
+| O5 | Tier rule honoured | Uploads by free or demo accounts (client side) | 0, with Pro and root syncing (today: no sync for anyone) | L6 | D-Q12-2 keeps the flag rule |
 | O6 | Users who sync | Signed-in users with `ft_*` rows | UNKNOWN. No analytics exist for the terminal; count rows 30 days after release with a read-only SQL query the owner runs (T-6) | Owner query | — |
 
 ## 5. Scope
 
 ### 5.1 In scope (option A)
-1. **T-1 checks:** the live existence of `app_state` (owner-run read-only SQL), and decisions D-1…D-5.
+1. **T-1 checks:** the live existence of `app_state` (owner-run read-only SQL), and decisions D-Q12-1…D-Q12-5.
 2. **`js/rz-ft-sync.js` v2:**
    - key allowlist kept
    - merge rules (§12.2)
@@ -118,12 +119,12 @@ If the owner prefers not to sync, **option C** deletes the module and leaves the
    - a listener that reloads the three lists and re-renders
    - a status word in `.hdr-right` (`:352-356`)
    - nothing else in the 289 KB file changes
-4. **`account.html:144-146` copy,** set by D-2.
+4. **`account.html:144-146` copy,** set by D-Q12-2.
 5. **Gate `tools/test-ft-sync.mjs`** with an in-memory stand-in for `rzSupa`, and its ship-gate wiring.
-6. Standards, changelog, and a live check if D-4 provides an account.
+6. Standards, changelog, and a live check if D-Q12-4 provides an account.
 
-### 5.2 Option C (if D-1 = remove)
-Delete `js/rz-ft-sync.js`. Record the removal in `Apps/second brain` (the graph snapshot keeps listing the file until it is regenerated; T-C1 regenerates it if its generator exists, otherwise the CHANGELOG notes the stale node). Keep `account.html` as is. Keep every table and client method (D-3). The gate becomes laws LR1–LR3 (§20.5).
+### 5.2 Option C (if D-Q12-1 = remove)
+Delete `js/rz-ft-sync.js`. Record the removal in `Apps/second brain` (the graph snapshot keeps listing the file until it is regenerated; T-C1 regenerates it if its generator exists, otherwise the CHANGELOG notes the stale node). Keep `account.html` as is. Keep every table and client method (D-Q12-3). The gate becomes laws LR1–LR3 (§20.5).
 
 ### 5.3 Out of scope
 
@@ -156,7 +157,7 @@ Delete `js/rz-ft-sync.js`. Record the removal in `Apps/second brain` (the graph 
 
 ### 5.6 Constraints
 - The terminal is read and edited only in the named regions. Edits go through `Edit` with exact anchors; no reformatting of the 289 KB file.
-- No credential is read, printed or stored by the session. Live checks use only a test account the owner provisions for that purpose (D-4).
+- No credential is read, printed or stored by the session. Live checks use only a test account the owner provisions for that purpose (D-Q12-4).
 - Design rules: a state is a word; one amber accent; no badge or pill; radius ≤ 4 px; no `transition: all`; both themes; 390 and 1440 px.
 - ES5 in shared site modules (the module is ES5 today); the client module `rz-supabase.js` stays an ES module.
 
@@ -177,7 +178,7 @@ Tiers: `free | demo | pro | root` (`js/rz-feature-flags.js:6`). The terminal its
 | P1 Pro user, two devices | Engineer or investor with a laptop and a phone | Same watchlist, holdings and alerts on both | Lists follow the account; the header shows "Synced" |
 | P2 Free or demo user | Signed in on the free tier, or using a demo account | Use the terminal | Lists stay on the device, as today; the header says "Saved on this device" |
 | P3 Signed-out visitor | Anyone | Use the terminal | Unchanged behaviour; "Saved on this device" |
-| P4 Owner (root) | Uses the terminal inside the admin panel (`rz-ops-p7x3k9m.html:2013`) and on the phone | Same as P1; decides D-1…D-5 | Same as P1 |
+| P4 Owner (root) | Uses the terminal inside the admin panel (`rz-ops-p7x3k9m.html:2013`) and on the phone | Same as P1; decides D-Q12-1…D-Q12-5 | Same as P1 |
 | P5 Implementer | Session or agent | Prove the sync without real credentials | A gate with an in-memory client; laws red first |
 
 | UC | Persona | Use case |
@@ -259,7 +260,7 @@ The metadata records the user id last synced. If another user signs in, the modu
 
 **FR-6 Tier rule**
 - Description: the module calls `getProfile()`. Sync runs only when `RZ_FEATURE_FLAGS['finance-terminal']['portfolio-save'][tier] === true`, with the matrix loaded from `js/rz-feature-flags.js` and no copy in the module. If the profile cannot be read, sync does not run and the state is "Saved on this device".
-- Exceptions: the result of D-2 replaces the rule if the owner chooses otherwise.
+- Exceptions: the result of D-Q12-2 replaces the rule if the owner chooses otherwise.
 - Acceptance: L6.
 
 **FR-7 Terminal integration**
@@ -280,7 +281,7 @@ The metadata records the user id last synced. If another user signs in, the modu
 - Acceptance: L7.
 
 **FR-10 Account page copy**
-- Description: `account.html:144-146` gets the text of §9.6 matching D-2.
+- Description: `account.html:144-146` gets the text of §9.6 matching D-Q12-2.
 - Acceptance: AC-7.
 
 **FR-11 Gate**
@@ -300,7 +301,7 @@ The metadata records the user id last synced. If another user signs in, the modu
 | FR-7 | Page load | X1 done | — | Hooks | Terminal file | FR-2…FR-6 | Module load failure | L2–L5, L8 |
 | FR-8 | State events | — | State | Word | DOM | — | — | L5, L8 |
 | FR-9 | Load | — | Tokens | Current files | — | Token gate | — | L7 |
-| FR-10 | Release | D-2 | — | Copy | `account.html` | — | — | AC-7 |
+| FR-10 | Release | D-Q12-2 | — | Copy | `account.html` | — | — | AC-7 |
 | FR-11 | Ship | — | — | Wiring | `ship-gate.sh` | — | — | all |
 
 ## 9. UI/UX specification
@@ -344,7 +345,7 @@ In the failed state: `<span class="hdr-sync" …>Sync failed — saved on this d
 
 | State | Word | Tooltip (`title`) | When |
 |---|---|---|---|
-| local | Saved on this device | Lists sync across devices when you are signed in with a Pro account. (Text per D-2) | Signed out; not entitled; module or client unavailable |
+| local | Saved on this device | Lists sync across devices when you are signed in with a Pro account. (Text per D-Q12-2) | Signed out; not entitled; module or client unavailable |
 | syncing | Syncing… | — | Request in flight |
 | synced | Synced | Synced to your account at {HH:MM} | Last request succeeded and nothing is dirty |
 | failed | Sync failed — saved on this device | {reason}: Database not set up / Network error / Too large to sync (limit 128 KB per list) / Cloud copy unreadable / Server error | Any failure; dirty keys kept |
@@ -355,14 +356,14 @@ Empty lists are not a sync state; the terminal's own empty states apply.
 | Key | Text |
 |---|---|
 | local | Saved on this device |
-| local tooltip (D-2 = flag rule) | Lists sync across devices when you are signed in with a Pro account. |
-| local tooltip (D-2 = all signed-in users) | Lists sync across devices when you are signed in. |
+| local tooltip (D-Q12-2 = flag rule) | Lists sync across devices when you are signed in with a Pro account. |
+| local tooltip (D-Q12-2 = all signed-in users) | Lists sync across devices when you are signed in. |
 | syncing | Syncing… |
 | synced | Synced |
 | synced tooltip | Synced to your account at {HH:MM} |
 | failed | Sync failed — saved on this device |
 | retry button | Retry |
-| account page (D-2 = flag rule) | Finance Terminal watchlist, portfolio and price alerts are stored on this device. With a Pro account they also sync to your account when you are signed in. Open the <a href="Apps/finance-terminal/index.html">Finance Terminal</a> to manage them. |
+| account page (D-Q12-2 = flag rule) | Finance Terminal watchlist, portfolio and price alerts are stored on this device. With a Pro account they also sync to your account when you are signed in. Open the <a href="Apps/finance-terminal/index.html">Finance Terminal</a> to manage them. |
 | account page (option C) | unchanged (`account.html:144-146`) |
 
 ### 9.7 Styling
@@ -464,6 +465,25 @@ Static site. Supabase is reached only through the existing browser client. There
 | Event `rz-ft-synced` | Existing name. NEW detail: `{keys: string[], merged: string[], replaced: string[]}` |
 | Event `rz-ft-sync-state` | NEW. Detail as `state()` |
 
+### 11.2a Shared `app_state` sync module `js/rz-app-state.js` (NEW, option A only; coordinator decision D16)
+The key-independent half of the v2 engine above is written once as `js/rz-app-state.js` (ES5, `window.RZAppState`, guard `window.__rzAppState`) so a second consumer (PRD-Q17, key `learning-paths/v1`) does not build a second engine on the same table. `js/rz-ft-sync.js` v2 becomes a thin adapter on it: it keeps the finance allowlist, the `rz_ft_*` ↔ `ft_*` key mapping, the one-generation backup `rz_ft_backup`, the reconciliation cases of §12.2 (as its merge callback) and the members of §11.2, which keep their names.
+
+| Member | Contract |
+|---|---|
+| `RZAppState.register(cloudKey, opts)` | `cloudKey` 1–120 chars (the `app_state.key` check). `opts`: `merge(local, remote) → merged` (pure, required); `read() → value` and `write(value)` (the consumer's device copy, required); `maxBytes` (≤ 131,072, the row check at `schema.sql:669`); `debounceMs` (default 800); `allowed() → bool` (entitlement, presentational; default `true`); `metaKey` (the `localStorage` key holding this consumer's sync metadata). Returns `false` and does nothing for a key already registered or invalid |
+| `RZAppState.push(cloudKey)` | Marks the key dirty in its `metaKey` record, debounces, upserts with `rzSupa.setAppState`; on `pagehide` / `visibilitychange` hidden sends pending keys at once. Never throws |
+| `RZAppState.pull(cloudKey?)` | `Promise<boolean>`. Reads with `rzSupa.getAppState`, calls `merge`, writes back through `write` and upserts only when the merge changed something |
+| `RZAppState.state(cloudKey)` | `{state: 'local' \| 'syncing' \| 'synced' \| 'failed', reason?, at?}` |
+| `RZAppState.retry()` | `pull()` then push every dirty key |
+| `RZAppState.ensure()` | Resolves with `window.rzSupa` after `rzSupa.ready`; adds `js/rz-config.js` and module `js/rz-supabase.js` with the site's current tokens only when the page has not loaded them (L7) |
+| Event `rz-app-state` on `window` | Detail `{key, state, reason?}` on every state change |
+
+Storage. Device: each consumer's own keys plus its `metaKey` record `{v:1, user, keys:{<cloudKey>:{hash, at, dirty}}}`; the finance adapter passes `metaKey: 'rz_ft_sync'` (the record of FR-2, unchanged), PRD-Q17 passes its own. Cloud: one `app_state` row per registered key. Key registry (recorded in `standarization/SUPABASE_INTEGRATION.md` in T-5): `ft_wl`, `ft_port`, `ft_alerts` (this PRD), `learning-paths/v1` (PRD-Q17); 4 of the 200 keys per user.
+
+What it does not do: no allowlist of its own (only registered keys move; the API key can never be registered, L2 still checks the finance adapter); no entitlement decision (the caller's `allowed()`; RLS is the boundary); no backups (consumer's job); no `auth.js` change and no auth export (it uses `window.rzSupa` only); no UI and no copy (it emits states, consumers render them); no merge policy (consumer's callback); no network call other than the two `rzSupa` wrappers; no paid service.
+
+Under option C the module is not written; PRD-Q17 then ships device-only progress until a later decision.
+
 ### 11.3 Terminal hooks (the only terminal edits)
 1. Script tags after `:16`.
 2. `saveLS` (`:1337`): one call after `localStorage.setItem`.
@@ -480,7 +500,7 @@ Static site. Supabase is reached only through the existing browser client. There
 - BR-2: No sync step deletes or overwrites a local list without first writing the backup.
 - BR-3: One person's lists are never merged into another person's account (J5).
 - BR-4: Failures are visible. A dirty list stays marked until a push succeeds.
-- BR-5: Entitlement follows `portfolio-save` (or D-2). The check is presentational; RLS is the boundary.
+- BR-5: Entitlement follows `portfolio-save` (or D-Q12-2). The check is presentational; RLS is the boundary.
 - BR-6: Sync never runs before X1 is closed (FR-1).
 
 ### 12.2 Reconciliation per list (on pull)
@@ -514,10 +534,11 @@ stateDiagram-v2
 | Module | Effect | Propagation |
 |---|---|---|
 | `Apps/finance-terminal/index.html` | 4 hooks (§11.3) | Token gate; L2–L5, L8; `tools/probe-finance-terminal.mjs` still runs |
-| `js/rz-ft-sync.js` | v2 | Cache token bumped on the terminal |
+| `js/rz-ft-sync.js` | v2, adapter on `js/rz-app-state.js` | Cache token bumped on the terminal |
+| `js/rz-app-state.js` (NEW, §11.2a) | Shared `app_state` sync module (D16); consumers: this PRD and PRD-Q17 (`learning-paths/v1`) | Token stamped on every page that loads it; key registry in `SUPABASE_INTEGRATION.md` |
 | `js/rz-supabase.js`, `js/rz-config.js` | Loaded by the module on the terminal; unchanged | Tokens equal to the site's (L7) |
 | `js/rz-feature-flags.js` | Loaded by the terminal (32,842 B, no DOM access) | Matrix is the single source of the tier rule |
-| `account.html` | Copy per D-2 | AC-7 |
+| `account.html` | Copy per D-Q12-2 | AC-7 |
 | `rz-ops-p7x3k9m.html` (iframe at `:2013`) | Same-origin; sync runs inside the admin panel too | None |
 | `Apps/second brain/codebase-graph.html` | Unchanged under A. Under C, lists a deleted file until regenerated | CHANGELOG note under C |
 | PRD-X-DEFECTS (X1) | Precondition; should also clear the `rz_ft_key` copy written by `:4359` | L1; cross-PRD review |
@@ -525,7 +546,7 @@ stateDiagram-v2
 | Service worker | The terminal's caching is unchanged; the module is a normal static asset with a token | Token gate |
 
 ## 14. AI and automation requirements
-None at run time. The sync is deterministic code. The gate is deterministic, with an in-memory client stand-in and no model. Human approval points: D-1…D-5, and the owner's read-only SQL in T-1.
+None at run time. The sync is deterministic code. The gate is deterministic, with an in-memory client stand-in and no model. Human approval points: D-Q12-1…D-Q12-5, and the owner's read-only SQL in T-1.
 
 ## 15. Non-functional requirements
 
@@ -615,13 +636,13 @@ Alternatives: see §10.5. Option B was rejected for the lossy mapping and the ex
 | T | Description | Depends | Files | Approach | Effort | Verification | DoD |
 |---|---|---|---|---|---|---|---|
 | T-0 | Wait for X1: the owner rotates the key; PRD-X-DEFECTS removes the fallback | — | — | — | — | L1 green | X1 closed |
-| T-1 | Owner packet D-1…D-5, plus the read-only SQL for the owner: `select to_regclass('public.app_state'), to_regclass('public.watchlists'), to_regclass('public.portfolios'), to_regclass('public.price_alerts');` | — | message | §23 | 0.5 d | Owner's answers and the query result recorded | A1 confirmed or Module 4 applied by the owner |
+| T-1 | Owner packet D-Q12-1…D-Q12-5, plus the read-only SQL for the owner: `select to_regclass('public.app_state'), to_regclass('public.watchlists'), to_regclass('public.portfolios'), to_regclass('public.price_alerts');` | — | message | §23 | 0.5 d | Owner's answers and the query result recorded | A1 confirmed or Module 4 applied by the owner |
 | T-2 | Gate with in-memory client stand-in; L1–L8 red | — | `tools/test-ft-sync.mjs` | §20 | 1.5 d | Each law prints its §20.4 failure | Red output in `05-test-evidence/Q12/` |
-| T-3 | Module v2 | T-2 | `js/rz-ft-sync.js` | FR-2…FR-6, FR-9 | 2 d | L2, L4, L6, L7 green against the stand-in | — |
+| T-3 | Module v2: shared `js/rz-app-state.js` (§11.2a) plus the finance adapter `js/rz-ft-sync.js` | T-2 | `js/rz-app-state.js`, `js/rz-ft-sync.js` | FR-2…FR-6, FR-9 | 2.5 d | L2, L4, L6, L7 green against the stand-in | — |
 | T-4 | Terminal hooks, status word, CSS, renderer escape check | T-3, T-0 | `Apps/finance-terminal/index.html` | FR-7, FR-8; exact-anchor edits | 1.5 d | L3, L5, L8 green; `probe-finance-terminal.mjs` still passes | Screenshots at 390 and 1440, both themes, looked at |
-| T-5 | Account copy, standards, CHANGELOG, release | T-4, D-2 | `account.html`, docs | FR-10, §22 | 0.5 d | Ship gate green | Live |
-| T-6 | Live round trip with the owner-provisioned test account (D-4) in two browser profiles; row count after 30 days by owner SQL | T-5, D-4 | — | Session drives two profiles | 0.5 d | Watchlist added in profile A appears in profile B | Evidence stored, or "live round trip unverified" stated first in the report |
-| T-C1 | Option C only: delete the module; CHANGELOG; graph note | D-1 = C | `js/rz-ft-sync.js` | §5.2 | 0.5 d | LR1–LR3 | — |
+| T-5 | Account copy, standards, CHANGELOG, release | T-4, D-Q12-2 | `account.html`, docs | FR-10, §22 | 0.5 d | Ship gate green | Live |
+| T-6 | Live round trip with the owner-provisioned test account (D-Q12-4) in two browser profiles; row count after 30 days by owner SQL | T-5, D-Q12-4 | — | Session drives two profiles | 0.5 d | Watchlist added in profile A appears in profile B | Evidence stored, or "live round trip unverified" stated first in the report |
+| T-C1 | Option C only: delete the module; CHANGELOG; graph note | D-Q12-1 = C | `js/rz-ft-sync.js` | §5.2 | 0.5 d | LR1–LR3 | — |
 | T-C2 | Option C only: gate LR1–LR3 red, then green; release | T-C1 | gate | §20.5 | 1 d | Ship gate green | Live |
 
 Totals: option A ≈ 6.5 days after X1 (T-1…T-6). Option C ≈ 1.5 days.
@@ -639,7 +660,7 @@ Totals: option A ≈ 6.5 days after X1 (T-1…T-6). Option C ≈ 1.5 days.
 | Accessibility | axe at 390 and 1440, both themes, with a planted low-contrast line caught first | L8 |
 | Regression | `node tools/probe-finance-terminal.mjs` (tab population), `node tools/test-asset-cache-tokens.mjs`, `node tools/test-auth-surface.mjs` | ship gate and T-4 |
 | Failure recovery | Stand-in modes: `missing-table`, `network`, `too-large`, `garbage` | L4, L5 |
-| Live | Two browser profiles with the D-4 test account | T-6 |
+| Live | Two browser profiles with the D-Q12-4 test account | T-6 |
 
 ### 20.2 Wiring in `tools/ship-gate.sh`
 After line 279 (`gate "Saved-scenario Open routes — …" …`), the other per-user data gate:
@@ -665,7 +686,7 @@ Under option C: `… node tools/test-ft-sync.mjs --strict --option C`.
 | L7 | The terminal loads `js/rz-feature-flags.js` and `js/rz-ft-sync.js` with tokens that `node tools/test-asset-cache-tokens.mjs` accepts. The module's dynamic loads of `rz-config.js` and `rz-supabase.js` use the same tokens as the site's page loaders (`20260920-90bd6417` for `rz-supabase.js` today) | `--law L7` | `L7 FAIL terminal does not load rz-ft-sync.js; rz-ft-sync.js loads rz-supabase.js?v=2026-07-16 (pages: 20260920-90bd6417) and rz-config.js?v=2026-07-16` |
 | L8 | At 390 and 1440 px in both themes, in each of the four states:<br>• `#syncState` is visible inside `.hdr-right`, with no horizontal overflow<br>• no layout shift of `.hdr-right` when the state changes<br>• the Retry button is focusable, with a touch target ≥ 44 px tall at 390 px<br>• the computed `transition-property` is never `all`; no background fill, border or radius above 4 px on the word<br>• axe reports 0 serious or critical, after a planted low-contrast line is caught | `--law L8` | `L8 FAIL #syncState not found at 390 (dark)` |
 
-### 20.5 LAWS (option C, replaces L2–L8 if D-1 = remove)
+### 20.5 LAWS (option C, replaces L2–L8 if D-Q12-1 = remove)
 
 | Law | Claim | Command | Red today |
 |---|---|---|---|
@@ -684,7 +705,7 @@ Under option C: `… node tools/test-ft-sync.mjs --strict --option C`.
 | AC-4 | Free user signed in | Uses the terminal | No sync request; header "Saved on this device" |
 | AC-5 | Network fails during a push | User keeps working | Header "Sync failed — saved on this device", with Retry; the next load pushes |
 | AC-6 | Any time | Inspect every sync payload | No API key, theme or gateway setting |
-| AC-7 | Release with D-2 = flag rule | Open `account.html` | The paragraph reads as in §9.6 |
+| AC-7 | Release with D-Q12-2 = flag rule | Open `account.html` | The paragraph reads as in §9.6 |
 | AC-8 | Option C chosen | Search the repo | No page or script references `js/rz-ft-sync.js`; the terminal works locally |
 
 FR → test mapping
@@ -723,7 +744,7 @@ FR → test mapping
 - **Live validation:**
   - `curl -s https://resistancezero.com/Apps/finance-terminal/index.html | grep -c 'rz-ft-sync.js'` → 1.
   - `curl -s https://resistancezero.com/js/rz-ft-sync.js | grep -c 'rz_ft_key'` → 0.
-  - T-6 two-profile run if D-4 provides an account.
+  - T-6 two-profile run if D-Q12-4 provides an account.
   - Compare live `js/rz-version.js`; deploys are not guaranteed (`…_ADDENDUM.md:576`).
 
 ## 23. Risks and dependencies
@@ -735,23 +756,23 @@ FR → test mapping
 | R3 | Merge resurrects deleted items | Medium (multi-device users) | Minor annoyance | Documented; dirty window short (800 ms debounce, flush on hide) |
 | R4 | Data loss from a sync bug | Low | Lost holdings | Backup before every change; L4; dirty flag |
 | R5 | Terminal edit breaks the 289 KB page | Low | Terminal down | Anchor edits only; `probe-finance-terminal.mjs` and L8 |
-| R6 | No live verification possible | Medium | Claim rests on the stand-in | D-4; otherwise reported first as unverified |
+| R6 | No live verification possible | Medium | Claim rests on the stand-in | D-Q12-4; otherwise reported first as unverified |
 | R7 | Tier mismatch between the `rz_premium_session` tier and the profile tier | Low | Wrong entitlement | FR-6 reads the profile tier, which the database holds |
 | R8 | Second session edits the same files | Low | Conflict | Peer messages; no peer-owned file touched |
 
-Decisions for the owner:
+Decisions for the owner (recorded as D-Q12-1…D-Q12-5 in `documentation/product-transformation/DECISIONS.md`, status PROPOSED with the recommendation below as default; the owner's answer is recorded there by `tools/owner_decisions.py`, coordinator decision D15):
 
 | Id | Question | Recommendation |
 |---|---|---|
-| D-1 | Sync (option A) or remove the dead path (option C)? | A: the flag matrix already sells `portfolio-save` to Pro, and the module exists. Choose C if cross-device lists are not wanted |
-| D-2 | Who syncs: Pro and root per `portfolio-save`, or every signed-in user? | Follow the flag (Pro and root) |
-| D-3 | Keep the unused option B tables and their 12 client methods? | Keep both. Removing the methods saves nothing material; dropping tables is a destructive operation and needs its own approval |
-| D-4 | Provision a dedicated Pro test account whose session the implementer may use for the live two-profile check? | Yes, a dedicated account with no real data, deleted after T-6 |
-| D-5 | Run the read-only existence query of T-1 (or apply Module 4 if a table is missing)? | Run the query; apply Module 4 only if `app_state` is missing |
+| D-Q12-1 | Sync (option A) or remove the dead path (option C)? | A: the flag matrix already sells `portfolio-save` to Pro, and the module exists. Choose C if cross-device lists are not wanted |
+| D-Q12-2 | Who syncs: Pro and root per `portfolio-save`, or every signed-in user? | Follow the flag (Pro and root) |
+| D-Q12-3 | Keep the unused option B tables and their 12 client methods? | Keep both. Removing the methods saves nothing material; dropping tables is a destructive operation and needs its own approval |
+| D-Q12-4 | Provision a dedicated Pro test account whose session the implementer may use for the live two-profile check? | Yes, a dedicated account with no real data, deleted after T-6 |
+| D-Q12-5 | Run the read-only existence query of T-1 (or apply Module 4 if a table is missing)? | Run the query; apply Module 4 only if `app_state` is missing |
 
 ## 24. Definition of done
 - [ ] X1 closed; L1 green.
-- [ ] D-1…D-5 answered and recorded; `app_state` confirmed live.
+- [ ] D-Q12-1…D-Q12-5 answered and recorded; `app_state` confirmed live.
 - [ ] Option A: L2–L8 green; U1–U8 green; terminal diff limited to the four hooks.
 - [ ] Option C: LR1–LR3 green, each proven red by mutation.
 - [ ] Header state word in both themes at 390 and 1440, screenshots looked at.
