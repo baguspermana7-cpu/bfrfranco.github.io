@@ -167,6 +167,28 @@ Any rebuild reverted all of it. Those fixes now live in the builder; tokens are 
 site already serves (`_asset_token`). **Never hand-edit an `incident-*.html` page again** — change
 the builder or the dossier, then rebuild.
 
+## 4c · Provider post-incident sources (2026-11-11, R112)
+
+The cloud providers publish their own reviews; use them first and cite them as `official-postmortem`.
+
+| Provider | Where | How to crawl |
+|---|---|---|
+| Google Cloud | `status.cloud.google.com/incidents/<id>` | `status.cloud.google.com/incidents.json` lists only recent incidents (8 when checked); older reports need the id. |
+| AWS | `aws.amazon.com/message/<id>/` | Index: `aws.amazon.com/premiumsupport/technology/pes/` (18 summaries, 2011–2025). Fetch through `r.jina.ai/<url>`; several pages are multilingual, so pick the English block. |
+| Azure | `azure.status.microsoft/en-us/status/history/?trackingId=<id>` | `azure.status.microsoft/en-us/statushistoryapi/?serviceSlug=all&regionSlug=all&startDate=all&page=N` returns the PIR list as HTML, about 10 per page (9 pages, 84 PIRs when checked). Without `startDate=all` only the latest month comes back. |
+
+Rules learned on the first crawl:
+- **Date every event from the text, not the index.** The AWS index files the EU West summary (2329B7) under
+  7 August 2014; the summary says "Sunday" and 7 August was a Sunday in 2011, which a same-day news report confirms.
+- **A review without a restoration time is a candidate, not a dossier.** AWS SA-EAST-1 2013 (656481) gives an onset
+  but no restore time, so it went to `_master-list.json` and not into the library (§1 needs a measured duration).
+- **Location:** the city may be the provider's own published region location (AWS "Sydney Region", Azure
+  "Australia East" = New South Wales); the facility stays "not named" unless the review names it. Where the region
+  covers a wide area with no published city, write "Site not named". Never fill a city from guesswork about where
+  a campus is.
+- Unbuilt candidates go to `_master-list.json` with the review URL in `candidateSources`, magnitude marked
+  provisional in `verifyNote`.
+
 ## 5 · Model + process
 
 Research/QA runs on the **top Opus tier (Opus-5 class)**, multi-agent: crawlers (official · fire-authority/regulator · engineering/technical · facility-forensic) → assembler (this §2 prompt) → adversarial reviewer (this §3 checklist), minimum iterations until the depth floor is met with zero unverified claims. Batched (≤5 incidents/run) to respect session limits; ingest via `tools/_ingest_rca.py`; regenerate; run the §4 visual-QA gate; then the standard gate suite before ship.
