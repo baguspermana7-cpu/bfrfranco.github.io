@@ -94,8 +94,13 @@ The inspector Alarms tab (v1.43.0) now renders:
 | v1.43.4 | `chiller-plant.html` | ✓ | ISA-18.2 chip + summary |
 | v1.43.4 | `water-system.html` | ✓ | ISA-18.2 chip + summary |
 | v1.43.4 | `fire-system.html` | ✓ | ISA-18.2 chip + summary |
+| v1.43.21 | `ict.html` | ✓ | ISA-18.2 chip + summary (through `js/rz-inspector.js`, which calls `RZAlarmState`) |
 
-EPMS_Telemetry.html untouched per owner mandate.
+`EPMS_Telemetry.html`: the byte-untouched designation was revoked (`BMS_SHELL.md:534-536`). It does not load
+`js/rz-alarm-state.js`; its alarms come from `js/conv-alarm-events.js` and `js/conv-alarm-workspace.js`.
+
+Gate: `node tools/test-x-defects.mjs --law X19.1` compares this table's page set with the root pages that load
+`js/rz-alarm-state.js` and fails on the retired phrase (PRD-X-DEFECTS FR-X19.2).
 
 ## Authoring guidelines
 
