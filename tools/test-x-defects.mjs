@@ -55,7 +55,32 @@ function lawX19_1() {
     : { ok: true, reason: `table ${table.size} pages = loaders ${loaders.size}` };
 }
 
-const LAWS = { 'X7.1': lawX7_1, 'X19.1': lawX19_1 };
+/* X18.1 — achievements.html says what it records (FR-X18.1): the promise sentence is gone, the interim one is there.
+   If the page is retired (D-Q17-2) the law passes as "page retired". */
+function lawX18_1() {
+  if (!fs.existsSync(path.join(ROOT, 'achievements.html'))) return { ok: true, reason: 'page retired' };
+  const s = read('achievements.html');
+  const promise = /Start earning badges/i.test(s);
+  const interim = s.includes('only what you do on this page is recorded. Reading articles and using calculators does not add progress.');
+  return (promise || !interim)
+    ? { ok: false, reason: `promise sentence ${promise ? 'present' : 'absent'}, interim sentence ${interim ? 'present' : 'absent'}` }
+    : { ok: true, reason: 'interim sentence present, promise gone' };
+}
+
+/* X12.1a — no placeholder or dead control on dashboard.html and dc-market-tracker.html (FR-X12.5). */
+function lawX12_1a() {
+  const bad = [];
+  for (const f of ['dashboard.html', 'dc-market-tracker.html']) {
+    read(f).split('\n').forEach((line, i) => {
+      if (/coming soon/i.test(line)) bad.push(`${f}:${i + 1} "coming soon"`);
+      if (line.includes('handleManageSub')) bad.push(`${f}:${i + 1} handleManageSub`);
+      if (/onclick=[^>]*>[^<]*(<i[^>]*><\/i>)?\s*Account Settings/.test(line)) bad.push(`${f}:${i + 1} onclick on Account Settings`);
+    });
+  }
+  return bad.length ? { ok: false, reason: bad.length + ': ' + bad.join('; ') } : { ok: true, reason: '0 placeholders' };
+}
+
+const LAWS = { 'X7.1': lawX7_1, 'X12.1a': lawX12_1a, 'X18.1': lawX18_1, 'X19.1': lawX19_1 };
 
 function parse(argv) {
   const a = { strict: false, blocking: new Set(), law: null, json: false };
