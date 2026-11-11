@@ -328,7 +328,9 @@ try {
   assert.ok(epmsClosed.viewportWidth >= 380, `EPMS SLD had only ${epmsClosed.viewportWidth}px of mobile width`);
   assert.ok(epmsClosed.viewportHeight >= epmsClosed.availableViewportHeight - 2,
     `EPMS SLD did not own the remaining viewport (${epmsClosed.viewportHeight}px of ${epmsClosed.availableViewportHeight}px)`);
-  assert.ok(epmsClosed.viewportHeight >= 590,
+  // PRD-Q06 FR-4/FR-5: the simulated banner (45 px) and the provenance line (54 px) are mandatory context chrome
+  // on a 390x844 phone; the strip's row gap was tightened to win most of it back (measured 569). Floor 590 -> 560.
+  assert.ok(epmsClosed.viewportHeight >= 560,
     `EPMS context chrome left only ${epmsClosed.viewportHeight}px for the mobile SLD`);
   assert.equal(epmsClosed.sceneClearsControls, true, 'EPMS fitted scene must clear top and status controls');
   assert.deepEqual(epmsClosed.contractLinks, [true, true], 'EPMS PRD and Manual must stay in the initial mobile viewport');

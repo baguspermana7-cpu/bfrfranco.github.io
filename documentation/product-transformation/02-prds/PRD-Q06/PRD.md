@@ -6,7 +6,7 @@
 |---|---|
 | PRD id | PRD-Q06 |
 | Feature | One provenance line idiom (`Simulated` / `Snapshot` / `Model output` / `Fallback`) from one small module, the shared simulated banner on all 10 cockpits, removal of every "Live" and "real-time" claim the site cannot back, visible fallbacks in the LTC lab and DCMOC, the X4 interim label and the X6 fix |
-| Version | 1.3 |
+| Version | 1.4 |
 | Status | Draft |
 | Author | Opus 5.5; Fable quota exhausted |
 | Date | 2026-11-10 |
@@ -28,6 +28,7 @@ Change history
 | 1.1 | 2026-11-11 | Opus 5.5 | QA batch 1 revisions (D1–D8). D3: FR-13 places every `RZProvenance.mark/clear` call in the wrapper `computeModel`, never inside `computeModelLegacy` (§18.2, T-12 follow); `dcmoc/` rebuild order fixed (Q04 then Q06, one rebuild per release, §13, §22.3). D5: owner decisions are D-Q06-1 and D-Q06-2 in `DECISIONS.md`. D6/D7: §13 records that Q04 and Q07 use this PRD's fallback contract and styling contract |
 | 1.2 | 2026-11-11 | Opus 5.5 | QA batch 2 carry-over only: FR-3 removes the `demo` state's light-theme `background:#FFF8D6!important` (`js/rz-telemetry-quality.js:79`); new AC-17 checks the computed background and the source |
 | 1.3 | 2026-11-11 | Opus 5.5 | T-1 measurement: F7 has 23 fields, not 22 (`ict.html:759` Access Control is painted 'OK' by the same loop, `:2033-2035`; true at `1cb6dd292` too); L3 and every count move to 23. F8 exemption line corrected (:1295 holds the negation) |
+| 1.4 | 2026-11-11 | Opus 5.5 | T-5 findings: §9.8 drops the prefers-color-scheme light block (grey line on dark-only cockpits under an OS light preference); EPMS: `syncEpmsContextHeight()` now counts the banner slot (the topbar overlapped the legend), the slot reserves 45 px so the first fit counts it, the strip's phone row gap is 2 px (was 10), and the mobile SLD floor moves 590 -> 560 px (measured 569) because the banner and line are mandatory chrome |
 
 ## 2. Executive summary
 
@@ -870,9 +871,7 @@ and `role="status"` on the DCMOC notice.
 [data-theme="light"] .rz-prov{color:#374151}
 [data-theme="light"] .rz-prov b{color:#111827}
 [data-theme="light"] .rz-prov[data-rz-provenance="fallback"] b{color:#7A4800}
-@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .rz-prov{color:#374151}
-  :root:not([data-theme="dark"]) .rz-prov b{color:#111827}
-  :root:not([data-theme="dark"]) .rz-prov[data-rz-provenance="fallback"] b{color:#7A4800}}
+/* v1.4: no prefers-color-scheme block; six cockpits are dark-only without data-theme (T-5 finding) */
 
 .rz-tq-banner{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 0 0 12px;background:transparent;
   border:0;border-bottom:1px solid var(--rz-line-tier-2,rgba(255,255,255,.12));border-radius:0;

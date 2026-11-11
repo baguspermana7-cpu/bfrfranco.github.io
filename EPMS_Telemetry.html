@@ -502,6 +502,7 @@
 }
 </style>
 <script src="js/rz-telemetry-quality.js?v=20260920-90aca1fe" defer></script>
+<script src="js/rz-provenance.js?v=20261111-q06" defer></script>
 </head>
 <body data-rz-basis-authority="unavailable" data-rz-data-mode="simulated">
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -534,8 +535,12 @@
     <span style="color:#94a3b8;font-size:11px;">Per system <b id="epms-ups-sys" data-basis-param="electrical.ups_system_kw" tabindex="0" role="button" title="Load per UPS system — click for basis" style="color:#94a3b8;">&mdash;</b></span>
     <span style="color:#94a3b8;font-size:11px;">Data <b id="epms-dq" style="color:#94a3b8;" title="Awaiting engine snapshot">—</b></span>
     <span style="color:#94a3b8;font-size:11px;">Scenario <b id="epms-scn" style="color:#94a3b8;" title="Awaiting engine snapshot">—</b></span>
+    <p class="rz-prov" id="rz-prov-epms-strip" data-rz-provenance="simulated" data-rz-prov-basis="single-line simulation on this page and conv-engine.js; system state, breakers, quality and scenario are not read from a site" style="flex-basis:100%;margin:0"><b>Simulated</b> · single-line simulation on this page and conv-engine.js; system state, breakers, quality and scenario are not read from a site</p>
 </div>
-<div data-rz-telemetry-banner-slot></div>
+<style>/* PRD-Q06 T-5: the provenance line and banner added ~109 px of chrome; on phones the strip's rows sit 2 px apart (was 10)
+   so the single-line still opens clear of the status bar. */
+@media (max-width:600px){#epms-status-strip{row-gap:2px!important;padding-top:4px!important;padding-bottom:4px!important;line-height:1.35}}</style>
+<div data-rz-telemetry-banner-slot style="min-height:45px"></div><!-- PRD-Q06 FR-4: height reserved so the first SLD fit already counts the banner (module is deferred) -->
 
 <!-- v1.24.0 doc-14 §2: Visible legend for line/breaker state (operator-facing, no doc lookup needed). -->
 <div id="epms-legend" aria-label="EPMS line and breaker status legend" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:6px 14px;background:#0e0f12;border-bottom:1px solid #2a2d33;font-family:'JetBrains Mono','IBM Plex Sans',sans-serif;font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:#94a3b8;">
@@ -691,7 +696,7 @@
             <div class="status-led off" id="ind-system"></div>
             <div>
                 <div class="status-label">System</div>
-                <div class="status-value" id="val-system">UNAVAILABLE</div>
+                <div class="status-value" aria-describedby="rz-prov-epms-strip" id="val-system">UNAVAILABLE</div>
             </div>
         </div>
         <div class="status-box">
@@ -1385,8 +1390,11 @@ const STATUSBAR_HEIGHT_PX = 50;
 function syncEpmsContextHeight() {
     const statusStrip = document.getElementById('epms-status-strip');
     const legend = document.getElementById('epms-legend');
+    // PRD-Q06 FR-4: the simulated banner slot sits between the strip and the legend and is part of the context chrome.
+    const bannerSlot = document.querySelector('[data-rz-telemetry-banner-slot]');
     const contextHeight = Math.ceil(
         (statusStrip ? statusStrip.getBoundingClientRect().height : 0)
+        + (bannerSlot ? bannerSlot.getBoundingClientRect().height : 0)
         + (legend ? legend.getBoundingClientRect().height : 0)
     );
     document.documentElement.style.setProperty('--epms-context-height', contextHeight + 'px');
@@ -1403,6 +1411,8 @@ if (typeof ResizeObserver === 'function') {
     const epmsChromeObserver = new ResizeObserver(syncEpmsContextHeight);
     epmsChromeObserver.observe(document.getElementById('epms-status-strip'));
     epmsChromeObserver.observe(document.getElementById('epms-legend'));
+    const epmsBannerSlot = document.querySelector('[data-rz-telemetry-banner-slot]');
+    if (epmsBannerSlot) epmsChromeObserver.observe(epmsBannerSlot);
 } else {
     window.addEventListener('resize', syncEpmsContextHeight);
 }

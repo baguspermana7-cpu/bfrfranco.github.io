@@ -121,6 +121,7 @@
     <script src="js/rz-inspector.js?v=20260920-5efe4744" defer></script>
     <!-- v1.43.2 — Data-quality service: top-banner + per-element chip. -->
     <script src="js/rz-telemetry-quality.js?v=20260920-90aca1fe" defer></script>
+    <script src="js/rz-provenance.js?v=20261111-q06" defer></script>
     <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
          Loaded for cross-page consistency; body does NOT carry rz-bms-shell
          class. Spec: standarization/BMS_SHELL.md ; conv/review/14 §5. -->
@@ -471,7 +472,7 @@
     <!-- ===== Top Alarm Strip (alarm-first, doc-13 / doc-10) ===== -->
     <div id="alarm-strip" class="alarm-strip state-warn mb-3" role="status" aria-live="polite">
         <span class="as-banner" id="as-banner" style="color:var(--st-warn)">FIRE AUTHORITY UNAVAILABLE</span>
-        <span class="as-item"><span class="as-dot warn" id="as-dot-facp"></span>FACP <b id="as-facp">UNAVAILABLE</b></span>
+        <span class="as-item"><span class="as-dot warn" id="as-dot-facp"></span>FACP <b aria-describedby="rz-prov-fire-strip" id="as-facp">UNAVAILABLE</b></span>
         <span class="as-item"><span class="as-dot warn" id="as-dot-vesda"></span>VESDA <b id="as-vesda">UNAVAILABLE</b></span>
         <span class="as-item"><span class="as-dot warn" id="as-dot-crit"></span>Critical <b id="as-crit">UNAVAILABLE</b></span>
         <span class="as-item"><span class="as-dot warn" id="as-dot-sup"></span>Supervisory <b id="as-sup">UNAVAILABLE</b></span>
@@ -482,10 +483,11 @@
         <span class="as-item">Disabled Pts <b id="as-disabled">—</b></span>
         <span class="as-item">Tank <b id="as-tank">UNAVAILABLE</b></span>
         <span class="as-item">Static <b id="as-press">UNAVAILABLE</b></span>
-        <span class="as-item">Quality <b id="as-quality">UNAVAILABLE</b></span>
+        <span class="as-item">Quality <b aria-describedby="rz-prov-fire-strip" id="as-quality">UNAVAILABLE</b></span>
         <span class="as-item">Scenario <b id="as-scenario">UNAVAILABLE</b></span>
-        <span class="as-item">Updated <b id="as-updated">UNAVAILABLE</b></span>
+        <span class="as-item">Rendered <b aria-describedby="rz-prov-fire-strip" id="as-updated">UNAVAILABLE</b></span>
     </div>
+    <p class="rz-prov" id="rz-prov-fire-strip" data-rz-provenance="simulated" data-rz-prov-basis="conv-engine.js scenario; FACP and quality describe the model; rendered = your browser time at the last render"><b>Simulated</b> · conv-engine.js scenario; FACP and quality describe the model; rendered = your browser time at the last render</p>
 
     <!-- ===== v1.23.5 doc-14 §5: Fire-stages legend — visible reference of the 6-stage progression.
          Active stage is highlighted by setFireStageChip() whenever the simulation state changes.

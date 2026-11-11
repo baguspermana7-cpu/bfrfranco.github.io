@@ -164,10 +164,9 @@
     '.rz-prov b{font-weight:600;color:var(--rz-text-primary,#E8EDF5)}' +
     '.rz-prov[data-rz-provenance="fallback"] b{color:var(--rz-text-accent,#FFAA00)}' +
     '[data-theme="light"] .rz-prov{color:#374151}[data-theme="light"] .rz-prov b{color:#111827}' +
-    '[data-theme="light"] .rz-prov[data-rz-provenance="fallback"] b{color:#7A4800}' +
-    '@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) .rz-prov{color:#374151}' +
-    ':root:not([data-theme="dark"]) .rz-prov b{color:#111827}' +
-    ':root:not([data-theme="dark"]) .rz-prov[data-rz-provenance="fallback"] b{color:#7A4800}}';
+    /* Light ink only under an explicit [data-theme="light"]: six cockpits are dark-only and never set data-theme,
+       so an OS light preference must not turn the line grey-on-graphite (found in T-5 screenshots). */
+    '[data-theme="light"] .rz-prov[data-rz-provenance="fallback"] b{color:#7A4800}';
 
   var api = { version: '1.0.0', KINDS: KINDS, format: format, validate: validate, fromElement: fromElement,
     mark: mark, clear: clear, audit: audit };
