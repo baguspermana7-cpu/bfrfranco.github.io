@@ -110,6 +110,7 @@
   };
   // Where Copy link goes when a page has no #btnSaveAccount. null = the page keeps its own share (spares: "Share URL", #s=).
   var COPY_ANCHORS = { tier: '#btnExportPDF', tia: '#btnExportPDF', rfs: '#rfsBtnSave', spares: null };
+  var ADOPT_SHARE = { cx: '.cx-share-btn' };
 
   function b64urlEncode(str) {
     var bin = unescape(encodeURIComponent(str));
@@ -303,6 +304,16 @@
     if (!calc || d.getElementById('btnCopyLink')) return;
     if (/[?&]embed=(compare|pack|sensitivity|article)(&|$)/.test(w.location.search || '')) return;
     var sel = Object.prototype.hasOwnProperty.call(COPY_ANCHORS, calc) ? COPY_ANCHORS[calc] : '#btnSaveAccount';
+    // A page that already has its own "copy a link" control adopts the shared one instead of growing a duplicate
+    // (cx: .cx-share-btn copied a ?query link, with a prompt() fallback). Its old ?query links still restore.
+    var own = ADOPT_SHARE[calc] && d.querySelector(ADOPT_SHARE[calc]);
+    if (own) {
+      own.id = 'btnCopyLink';
+      own.removeAttribute('onclick');
+      own.setAttribute('title', 'Copy a link that opens this calculator with these inputs');
+      own.addEventListener('click', function (e) { e.preventDefault(); copyLink(own); });
+      return;
+    }
     var anchor = sel && d.querySelector(sel);
     if (!anchor) return;
     var b = d.createElement('button');
@@ -311,7 +322,30 @@
     b.id = 'btnCopyLink';
     b.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" style="vertical-align:-1px;margin-right:6px"><path d="M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1"/><path d="M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"/></svg>Copy link';
     b.addEventListener('click', function () { copyLink(b); });
+    // The register holds a tool bar to 6 controls (test-tool-register T13; owner, ledger "toolbars of 6-18
+    // buttons"). When the bar is full, the link goes on its own quiet row directly under the bar.
+    var bar = anchor.closest ? anchor.closest('.tool-bar') : null;
+    if (bar && barControls(bar) >= 6) {
+      var row = d.createElement('div');
+      row.className = 'rz-scn-share-row';
+      row.style.cssText = 'display:flex;justify-content:flex-end;margin:6px 0 0';
+      row.appendChild(b);
+      bar.parentNode.insertBefore(row, bar.nextSibling);
+      return;
+    }
     anchor.parentNode.insertBefore(b, anchor.nextSibling);
+  }
+
+  // Controls in a bar, counted the way the register gate counts them: aria-pressed chips are one group.
+  function barControls(bar) {
+    var all = bar.querySelectorAll('button, a[role=button], select, a.btn, a[class*="btn"]');
+    var n = 0, pressed = 0;
+    for (var i = 0; i < all.length; i++) {
+      var e = all[i];
+      if (!(e.offsetWidth || e.offsetHeight || e.getClientRects().length)) continue;
+      if (e.hasAttribute('aria-pressed') && !(e.closest && e.closest('.seg'))) pressed++; else n++;
+    }
+    return n + (pressed ? 1 : 0);
   }
 
   /** On a calculator page, restore a pending "Open" scenario for this calc (once). */

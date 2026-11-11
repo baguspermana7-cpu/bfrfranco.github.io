@@ -29,9 +29,15 @@ const spec = model.specVersion;
 const html = await readFile(join(ROOT, 'datahallAI.html'), 'utf8');
 const registry = JSON.parse(await readFile(join(ROOT, 'data', 'dcai-parameters.json'), 'utf8'));
 
-const pin = html.match(/var DATAHALL_CURRENT_ASSET_VERSION='([^']+)'/);
-assert.ok(pin, 'datahallAI.html pins no DATAHALL_CURRENT_ASSET_VERSION');
-assert.equal(pin[1], published, `page pins engine ${pin[1]} but the engine publishes ${published} — the page would render UNAVAILABLE everywhere, silently`);
+/* P16 (v3.37.0): the page no longer types its pin; it reads the GENERATED js/rz-engine-versions.js
+   (tools/build-engine-versions.mjs). The pin is that module's dcai value, evaluated as a browser would. */
+assert.ok(/var DATAHALL_CURRENT_ASSET_VERSION=\(window\.RZ_ENGINE_VERSIONS\|\|\{\}\)\.dcai\|\|null/.test(html),
+  'datahallAI.html must read DATAHALL_CURRENT_ASSET_VERSION from (window.RZ_ENGINE_VERSIONS||{}).dcai — a typed pin is the 2-edit bump P16 removed');
+const sandbox = {};
+new Function('window', 'globalThis', await readFile(join(ROOT, 'js', 'rz-engine-versions.js'), 'utf8'))(sandbox, sandbox);
+const pin = [null, (sandbox.RZ_ENGINE_VERSIONS || {}).dcai];
+assert.ok(pin[1], 'js/rz-engine-versions.js publishes no dcai version');
+assert.equal(pin[1], published, `js/rz-engine-versions.js pins engine ${pin[1]} but the engine publishes ${published} — the page would render UNAVAILABLE everywhere, silently. Run node tools/build-engine-versions.mjs --apply`);
 
 const specPin = html.match(/var DATAHALL_CURRENT_SPEC_VERSION='([^']+)'/);
 assert.ok(specPin, 'datahallAI.html pins no DATAHALL_CURRENT_SPEC_VERSION');

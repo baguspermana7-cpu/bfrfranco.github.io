@@ -94,6 +94,12 @@ the two shared foundations that later features build on (F1, F2).
   - With `?embed=<mode>` the embedded page shows no cookie banner and no account pill, and analytics stay off in
     the frame, so a visit is not counted twice.
 
+- The share-link button no longer grows a full tool bar. On capex, opex, tco, roi, pue, carbon and cx the bar already
+  held 6 controls, and the register allows 6 (`test-tool-register` T13 failed 28 times). Where the bar is full the
+  "Copy link" button sits on its own row under the bar. cx already had a share button (it copied a `?query` link,
+  with a `prompt()` fallback); that button now IS the shared Copy link, and old `?query` links still restore.
+- `test-dcai-engine-version-pin.mjs` reads the pin from `js/rz-engine-versions.js` (it still looked for the typed
+  literal P16 removed). The DC AI and Conventional parameter registries are regenerated.
 - **Every uncertainty band is reproducible (P08).** carbon, tier, TIA, spares (M8 and the supply-chain simulation)
   and Cx drew their Monte-Carlo samples from `Math.random`, so P5/P50/P95 changed on every load. tco and roi had an
   unseeded fallback.
