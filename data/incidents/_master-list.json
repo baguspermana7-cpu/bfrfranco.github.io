@@ -1,7 +1,7 @@
 {
- "generated": "2026-07-31",
- "count": 113,
- "withPostmortem": 60,
+ "generated": "2026-11-11",
+ "count": 130,
+ "withPostmortem": 77,
  "incidents": [
   {
    "slug": "aws-us-east-1-dynamodb-dns-2025",
@@ -4594,6 +4594,589 @@
     }
    ],
    "verifyNote": "Confirmed via AWS Q1 2020 Shield threat report. Caveat: this was a MITIGATED attack with no significant service outage — it is a record-scale security event more than an incident; lowest magnitude in the batch. Kept as a notable DDoS-scale data point."
+  },
+  {
+   "slug": "aws-sa-east-1-generator-cascade-2013",
+   "title": "AWS São Paulo 2013: Two Generators Fail, the Rest Overload",
+   "operator": "Amazon Web Services",
+   "dcName": "AWS SA-EAST-1 Availability Zone facility (not named)",
+   "location": {
+    "city": "São Paulo",
+    "country": "Brazil",
+    "region": "AMER",
+    "az": "sa-east-1"
+   },
+   "date": "2013-12-17",
+   "category": [
+    "power"
+   ],
+   "brief": "A substation fault cut utility power to one SA-EAST-1 zone. During transfer a breaker opened in front of one generator and a second failed mechanically; the remaining generators overloaded and shut down. An automated paralleling control system malfunctioned, so staff brought generators back by hand. A bad network configuration during recovery degraded both zones for 20 minutes.",
+   "magnitude": {
+    "usersScore": 4,
+    "financialScore": 3,
+    "durationScore": 4,
+    "blastRadiusScore": 3
+   },
+   "magnitudeScore": 3.5,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Summary of the December 17th event in the South America Region (SA-EAST-1)",
+     "url": "https://aws.amazon.com/message/656481/",
+     "type": "official-postmortem"
+    }
+   ],
+   "verifyNote": "Added 2026-11-11 (R112) from the provider's own post-incident review; magnitude scores provisional until the dossier is researched. The summary gives the onset (22:05 PST 17 Dec) but no restoration time; a dossier needs another timed source."
+  },
+  {
+   "slug": "aws-tokyo-direct-connect-2021",
+   "title": "AWS Tokyo 2021: Direct Connect Packet Loss from Failing Network Devices",
+   "operator": "Amazon Web Services",
+   "dcName": "AWS Direct Connect network, Tokyo Region",
+   "location": {
+    "city": "Tokyo",
+    "country": "Japan",
+    "region": "APAC",
+    "az": "ap-northeast-1"
+   },
+   "date": "2021-09-02",
+   "category": [
+    "network"
+   ],
+   "brief": "From 07:30 JST, Direct Connect customers saw packet loss into the Tokyo Region because several devices in one network layer stopped forwarding correctly but were not removed automatically. Recovery began by 12:30 and was complete at 13:42 JST.",
+   "magnitude": {
+    "usersScore": 5,
+    "financialScore": 4,
+    "durationScore": 4,
+    "blastRadiusScore": 4
+   },
+   "magnitudeScore": 4.2,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Summary of AWS Direct Connect Event in the Tokyo (AP-NORTHEAST-1) Region",
+     "url": "https://aws.amazon.com/message/17908/",
+     "type": "official-postmortem"
+    }
+   ],
+   "verifyNote": "Added 2026-11-11 (R112) from the provider's own post-incident review; magnitude scores provisional until the dossier is researched."
+  },
+  {
+   "slug": "aws-seoul-ec2-dns-2018",
+   "title": "AWS Seoul 2018: EC2 DNS Resolver Fleet Loses Healthy Hosts",
+   "operator": "Amazon Web Services",
+   "dcName": "AWS Seoul Region resolver fleet",
+   "location": {
+    "city": "Seoul",
+    "country": "South Korea",
+    "region": "APAC",
+    "az": "ap-northeast-2"
+   },
+   "date": "2018-11-22",
+   "category": [
+    "network",
+    "software"
+   ],
+   "brief": "From 08:19 to 09:43 KST, EC2 instances in the Seoul Region could not resolve DNS because the number of healthy hosts in the EC2 resolver fleet fell; resolution returned as the fleet recovered. Instance networking and DNS outside EC2 were unaffected.",
+   "magnitude": {
+    "usersScore": 5,
+    "financialScore": 4,
+    "durationScore": 3,
+    "blastRadiusScore": 4
+   },
+   "magnitudeScore": 4.0,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Summary of the Amazon EC2 DNS Resolution Issues in the Asia Pacific (Seoul) Region (AP-NORTHEAST-2)",
+     "url": "https://aws.amazon.com/message/74876-2/",
+     "type": "official-postmortem"
+    }
+   ],
+   "verifyNote": "Added 2026-11-11 (R112) from the provider's own post-incident review; magnitude scores provisional until the dossier is researched."
+  },
+  {
+   "slug": "aws-us-east-1-kinesis-cell-2024",
+   "title": "AWS US-EAST-1 2024: Degraded Kinesis Cell Slows CloudWatch, Lambda and More",
+   "operator": "Amazon Web Services",
+   "dcName": "AWS US-EAST-1 Region",
+   "location": {
+    "city": "Northern Virginia",
+    "country": "USA",
+    "region": "AMER",
+    "az": "us-east-1"
+   },
+   "date": "2024-07-30",
+   "category": [
+    "software"
+   ],
+   "brief": "Between 14:45 and 21:37 PDT, a degraded internal cell of Kinesis Data Streams caused latency and errors for CloudWatch Logs, Data Firehose, S3 event publishing, ECS, Lambda, Redshift and Glue in US-EAST-1.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 5,
+    "durationScore": 4,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 5.0,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Summary of the Amazon Kinesis Data Streams Service Event in Northern Virginia (US-EAST-1) Region",
+     "url": "https://aws.amazon.com/message/073024/",
+     "type": "official-postmortem"
+    }
+   ],
+   "verifyNote": "Added 2026-11-11 (R112) from the provider's own post-incident review; magnitude scores provisional until the dossier is researched."
+  },
+  {
+   "slug": "aws-elb-state-deletion-2012",
+   "title": "AWS ELB Christmas Eve 2012: Maintenance Job Deletes Production State",
+   "operator": "Amazon Web Services",
+   "dcName": "AWS US-East Elastic Load Balancing control plane",
+   "location": {
+    "city": "Northern Virginia",
+    "country": "USA",
+    "region": "AMER",
+    "az": "us-east-1"
+   },
+   "date": "2012-12-24",
+   "category": [
+    "config-error"
+   ],
+   "brief": "At 12:24 PST on 24 December 2012 a maintenance process was run by mistake against production ELB state data and logically deleted part of it. The control plane then mis-managed affected load balancers, and a fraction of ELB customers in US-East saw prolonged impact over Christmas.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 5,
+    "durationScore": 6,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 5.5,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Summary of the December 24, 2012 Amazon ELB Service Event in the US-East Region",
+     "url": "https://aws.amazon.com/message/680587/",
+     "type": "official-postmortem"
+    }
+   ],
+   "verifyNote": "Added 2026-11-11 (R112) from the provider's own post-incident review; magnitude scores provisional until the dossier is researched."
+  },
+  {
+   "slug": "aws-ebs-agent-memory-leak-2012",
+   "title": "AWS US-East October 2012: EBS Data-Collection Agent Leak Sticks Volumes",
+   "operator": "Amazon Web Services",
+   "dcName": "AWS US-East Availability Zone (EBS)",
+   "location": {
+    "city": "Northern Virginia",
+    "country": "USA",
+    "region": "AMER",
+    "az": "us-east-1"
+   },
+   "date": "2012-10-22",
+   "category": [
+    "software"
+   ],
+   "brief": "From 10:00 PDT on 22 October 2012, EBS volumes in one US-East zone degraded and some became stuck. A latent bug in an operational data-collection agent on the storage servers, triggered after a collection server was replaced, leaked memory until the servers slowed.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 5,
+    "durationScore": 5,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 5.2,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Summary of the October 22, 2012 AWS Service Event in the US-East Region",
+     "url": "https://aws.amazon.com/message/680342/",
+     "type": "official-postmortem"
+    }
+   ],
+   "verifyNote": "Added 2026-11-11 (R112) from the provider's own post-incident review; magnitude scores provisional until the dossier is researched."
+  },
+  {
+   "slug": "aws-simpledb-us-east-2014",
+   "title": "AWS SimpleDB June 2014: Two Hours of API Unavailability in US East",
+   "operator": "Amazon Web Services",
+   "dcName": "AWS US East SimpleDB",
+   "location": {
+    "city": "Northern Virginia",
+    "country": "USA",
+    "region": "AMER",
+    "az": "us-east-1"
+   },
+   "date": "2014-06-13",
+   "category": [
+    "software"
+   ],
+   "brief": "SimpleDB in US East was unavailable to almost all API calls from 21:16 to 23:16 PDT on 13 June, with elevated CreateDomain/DeleteDomain errors until 01:30.",
+   "magnitude": {
+    "usersScore": 3,
+    "financialScore": 3,
+    "durationScore": 4,
+    "blastRadiusScore": 3
+   },
+   "magnitudeScore": 3.2,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Summary of the Amazon SimpleDB Service Disruption",
+     "url": "https://aws.amazon.com/message/65649/",
+     "type": "official-postmortem"
+    }
+   ],
+   "verifyNote": "Added 2026-11-11 (R112) from the provider's own post-incident review; magnitude scores provisional until the dossier is researched. The summary text gives no year; 2014 is from the AWS Post-Event Summaries index, which misdated the EU West 2011 summary, so verify."
+  },
+  {
+   "slug": "azure-south-central-us-ups-battery-2024",
+   "title": "Azure South Central US 2024: Underground Feeder Fault and UPS Battery Faults",
+   "operator": "Microsoft Azure",
+   "dcName": "South Central US datacenter, physical zone AZ03 (not named)",
+   "location": {
+    "city": "Site not named",
+    "country": "USA",
+    "region": "AMER",
+    "az": "southcentralus"
+   },
+   "date": "2024-12-26",
+   "category": [
+    "power"
+   ],
+   "brief": "A ground fault in a buried high-voltage feeder tripped utility power to one datacenter at 18:40 UTC. Two of three data halls transferred to generators; the third dropped load when its UPS batteries faulted during the transition. Staff re-energised the hall on generator power by bypassing the failed UPS; some services were affected until 19:30 UTC the next day.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 5,
+    "durationScore": 7,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 5.8,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Azure PIR CNF4-N_0: power event in one datacenter, South Central US",
+     "url": "https://azure.status.microsoft/en-us/status/history/?trackingId=CNF4-N_0",
+     "type": "official-postmortem"
+    }
+   ],
+   "verifyNote": "Added 2026-11-11 (R112) from the provider's own post-incident review; magnitude scores provisional until the dossier is researched."
+  },
+  {
+   "slug": "azure-west-us-transformer-control-2026",
+   "title": "Azure West US 2026: Onsite Transformer Failure and Generator Control Cascade",
+   "operator": "Microsoft Azure",
+   "dcName": "West US datacenter (not named)",
+   "location": {
+    "city": "Site not named",
+    "country": "USA",
+    "region": "AMER",
+    "az": "westus"
+   },
+   "date": "2026-02-07",
+   "category": [
+    "power"
+   ],
+   "brief": "An electrical failure in an onsite transformer cut utility power to one West US datacenter. Generators started, but a cascading failure in a control system complicated recovery; 90% of IT racks were on generator power by 09:31 UTC, and service impact lasted from 07:58 UTC on 7 February to 04:24 UTC on 8 February.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 5,
+    "durationScore": 7,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 5.8,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Azure PIR _SVS-5_G: power interruption in one West US datacenter",
+     "url": "https://azure.status.microsoft/en-us/status/history/?trackingId=_SVS-5_G",
+     "type": "official-postmortem"
+    }
+   ],
+   "verifyNote": "Added 2026-11-11 (R112) from the provider's own post-incident review; magnitude scores provisional until the dossier is researched."
+  },
+  {
+   "slug": "azure-east-us-sts-transfer-2023",
+   "title": "Azure East US 2023: UPS Rectifier Failure and Static Transfer Switch Logic",
+   "operator": "Microsoft Azure",
+   "dcName": "East US datacenter in one Availability Zone (not named)",
+   "location": {
+    "city": "Site not named",
+    "country": "USA",
+    "region": "AMER",
+    "az": "eastus"
+   },
+   "date": "2023-09-16",
+   "category": [
+    "power"
+   ],
+   "brief": "A UPS rectifier failed; static transfer switches moved to the redundant UPS, then back when the primary briefly recovered. Logic that staggers repeated transfers then kept them on the primary when it failed for good, dropping power to some scale units. VMs had connectivity issues from 07:24 to 19:00 UTC.",
+   "magnitude": {
+    "usersScore": 5,
+    "financialScore": 4,
+    "durationScore": 6,
+    "blastRadiusScore": 4
+   },
+   "magnitudeScore": 4.8,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Azure PIR 2LZ0-3DG: Virtual Machines connectivity, East US",
+     "url": "https://azure.status.microsoft/en-us/status/history/?trackingId=2LZ0-3DG",
+     "type": "official-postmortem"
+    }
+   ],
+   "verifyNote": "Added 2026-11-11 (R112) from the provider's own post-incident review; magnitude scores provisional until the dossier is researched."
+  },
+  {
+   "slug": "azure-west-us2-utility-rups-2022",
+   "title": "Azure West US 2 2022: Regional Utility Loss Exposes Rack UPS Failures",
+   "operator": "Microsoft Azure",
+   "dcName": "West US 2 datacenters in two Availability Zones (not named)",
+   "location": {
+    "city": "Site not named",
+    "country": "USA",
+    "region": "AMER",
+    "az": "westus2"
+   },
+   "date": "2022-08-27",
+   "category": [
+    "power"
+   ],
+   "brief": "A distribution-line failure took out at least two substations and every West US 2 datacenter lost utility power at 02:47 UTC. Backup power worked almost everywhere, but in two datacenters in different zones unrelated faults, including rack-level UPS units that dropped during transfer, cut power to some servers. Impact lasted until 02:00 UTC on 28 August.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 5,
+    "durationScore": 7,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 5.8,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Azure PIR MMXN-RZ0: West US 2 power event",
+     "url": "https://azure.status.microsoft/en-us/status/history/?trackingId=MMXN-RZ0",
+     "type": "official-postmortem"
+    }
+   ],
+   "verifyNote": "Added 2026-11-11 (R112) from the provider's own post-incident review; magnitude scores provisional until the dossier is researched."
+  },
+  {
+   "slug": "azure-east-us2-ups-oscillation-2022",
+   "title": "Azure East US 2 2022: UPS Power Oscillation Trips Air Handlers",
+   "operator": "Microsoft Azure",
+   "dcName": "East US 2 datacenter in one Availability Zone (not named)",
+   "location": {
+    "city": "Site not named",
+    "country": "USA",
+    "region": "AMER",
+    "az": "eastus2"
+   },
+   "date": "2022-06-07",
+   "category": [
+    "power",
+    "cooling"
+   ],
+   "brief": "UPS modules with gain set too high created power oscillations that propagated through the distribution, including the mechanical plant. Air handling units saw a fault and shut themselves down pending manual reset, cutting cooling. Storage and compute in one zone were affected from 02:41 to 14:30 UTC; UPS gain settings were adjusted.",
+   "magnitude": {
+    "usersScore": 5,
+    "financialScore": 4,
+    "durationScore": 6,
+    "blastRadiusScore": 4
+   },
+   "magnitudeScore": 4.8,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Azure PIR NMB2-ND0: East US 2 Availability Zone",
+     "url": "https://azure.status.microsoft/en-us/status/history/?trackingId=NMB2-ND0",
+     "type": "official-postmortem"
+    }
+   ],
+   "verifyNote": "Added 2026-11-11 (R112) from the provider's own post-incident review; magnitude scores provisional until the dossier is researched."
+  },
+  {
+   "slug": "azure-west-europe-voltage-sag-cooling-2025",
+   "title": "Azure West Europe 2025: Voltage Sag Stops Cooling, Storage Powers Down",
+   "operator": "Microsoft Azure",
+   "dcName": "West Europe datacenter, physical zone 01 (not named)",
+   "location": {
+    "city": "Site not named",
+    "country": "Netherlands",
+    "region": "EMEA",
+    "az": "westeurope"
+   },
+   "date": "2025-11-05",
+   "category": [
+    "cooling",
+    "power"
+   ],
+   "brief": "A utility voltage sag shut down cooling units in one West Europe datacenter; as temperatures rose, storage scale units powered down to protect hardware. Recovery was slowed by degraded storage servers needing sequential validation and by thermal audits; impact ran from about 16:53 UTC on 5 November to 02:25 UTC on 6 November.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 5,
+    "durationScore": 5,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 5.2,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Azure PIR 2LGD-9VG: West Europe service disruptions",
+     "url": "https://azure.status.microsoft/en-us/status/history/?trackingId=2LGD-9VG",
+     "type": "official-postmortem"
+    }
+   ],
+   "verifyNote": "Added 2026-11-11 (R112) from the provider's own post-incident review; magnitude scores provisional until the dossier is researched."
+  },
+  {
+   "slug": "azure-east-us-fiber-cut-2025",
+   "title": "Azure East US 2025: Third-Party Fiber Cut and Tooling Failure",
+   "operator": "Microsoft Azure",
+   "dcName": "East US region network",
+   "location": {
+    "city": "Site not named",
+    "country": "USA",
+    "region": "AMER",
+    "az": "eastus"
+   },
+   "date": "2025-03-18",
+   "category": [
+    "network"
+   ],
+   "brief": "A third-party fiber cut and an internal tooling failure caused intermittent connectivity for a subset of East US customers between 13:37 and 16:52 UTC on 18 March, and again from 23:20 UTC to 00:30 UTC on 19 March.",
+   "magnitude": {
+    "usersScore": 5,
+    "financialScore": 4,
+    "durationScore": 4,
+    "blastRadiusScore": 4
+   },
+   "magnitudeScore": 4.2,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Azure PIR Z_SZ-NV8: East US networking",
+     "url": "https://azure.status.microsoft/en-us/status/history/?trackingId=Z_SZ-NV8",
+     "type": "official-postmortem"
+    }
+   ],
+   "verifyNote": "Added 2026-11-11 (R112) from the provider's own post-incident review; magnitude scores provisional until the dossier is researched."
+  },
+  {
+   "slug": "azure-west-europe-storm-fiber-2023",
+   "title": "Azure West Europe 2023: Storm Cuts Fiber Paths Between Datacenters",
+   "operator": "Microsoft Azure",
+   "dcName": "West Europe region network",
+   "location": {
+    "city": "Site not named",
+    "country": "Netherlands",
+    "region": "EMEA",
+    "az": "westeurope"
+   },
+   "date": "2023-07-05",
+   "category": [
+    "network",
+    "weather"
+   ],
+   "brief": "Severe weather in the Netherlands caused a fiber cut on the West Europe region's inter-datacenter paths, which are designed with four independent routes. Customers saw packet drops, timeouts and latency from about 07:22 to 16:00 UTC.",
+   "magnitude": {
+    "usersScore": 5,
+    "financialScore": 4,
+    "durationScore": 4,
+    "blastRadiusScore": 4
+   },
+   "magnitudeScore": 4.2,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Azure PIR FVHB-188: West Europe networking",
+     "url": "https://azure.status.microsoft/en-us/status/history/?trackingId=FVHB-188",
+     "type": "official-postmortem"
+    }
+   ],
+   "verifyNote": "Added 2026-11-11 (R112) from the provider's own post-incident review; magnitude scores provisional until the dossier is researched."
+  },
+  {
+   "slug": "azure-south-africa-subsea-cables-2024",
+   "title": "Azure South Africa 2024: West African Subsea Cable Cuts",
+   "operator": "Microsoft Azure",
+   "dcName": "South Africa North and West regions (network)",
+   "location": {
+    "city": "Johannesburg / Cape Town",
+    "country": "South Africa",
+    "region": "AFR",
+    "az": "southafricanorth"
+   },
+   "date": "2024-03-14",
+   "category": [
+    "network"
+   ],
+   "brief": "As part of a continental telecom outage, subsea cable damage degraded connectivity to Azure South Africa North and West from 10:33 UTC on 14 March to 11:00 UTC on 15 March, with latency and packet loss.",
+   "magnitude": {
+    "usersScore": 5,
+    "financialScore": 4,
+    "durationScore": 6,
+    "blastRadiusScore": 5
+   },
+   "magnitudeScore": 5.0,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Azure PIR VT60-RPZ: South Africa networking",
+     "url": "https://azure.status.microsoft/en-us/status/history/?trackingId=VT60-RPZ",
+     "type": "official-postmortem"
+    }
+   ],
+   "verifyNote": "Added 2026-11-11 (R112) from the provider's own post-incident review; magnitude scores provisional until the dossier is researched."
+  },
+  {
+   "slug": "azure-gateway-control-plane-2026",
+   "title": "Azure Networking 2026: Gateway Update Overloads the Control Plane",
+   "operator": "Microsoft Azure",
+   "dcName": "Azure regional gateway control plane, multiple regions",
+   "location": {
+    "city": "Multiple regions",
+    "country": "Global",
+    "region": "AMER",
+    "az": "multi-region"
+   },
+   "date": "2026-09-30",
+   "category": [
+    "config-error",
+    "software"
+   ],
+   "brief": "From 20:30 UTC on 30 September to 02:15 UTC on 1 October, ExpressRoute Gateway, Application Gateway, Firewall, Bastion and Virtual WAN management operations failed intermittently after a resumed gateway OS update raised load on the regional control plane; a performance change was rolled back.",
+   "magnitude": {
+    "usersScore": 6,
+    "financialScore": 5,
+    "durationScore": 4,
+    "blastRadiusScore": 6
+   },
+   "magnitudeScore": 5.2,
+   "officialPostmortem": true,
+   "confidence": "high",
+   "candidateSources": [
+    {
+     "title": "Azure PIR 7Q30-010: Azure networking services",
+     "url": "https://azure.status.microsoft/en-us/status/history/?trackingId=7Q30-010",
+     "type": "official-postmortem"
+    }
+   ],
+   "verifyNote": "Added 2026-11-11 (R112) from the provider's own post-incident review; magnitude scores provisional until the dossier is researched."
   }
  ]
 }
