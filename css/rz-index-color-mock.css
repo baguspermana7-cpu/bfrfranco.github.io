@@ -1,0 +1,139 @@
+/* R119 MOCK (owner 2026-11-11: "Gradien dan kombinasi warna dari index masih sangat kurang … elemen2 seperti menyatu dan
+   match"). Loaded LAST, by index-color-mock.html only. Not live.
+   The reference video's model: 60 % main = ONE soft field behind the whole page (lighter centre, darker edges, same hue
+   family, never flat, never per section); 30 % second = on the OBJECT (rim, top edge, bars, the light rising from a
+   card's bottom); 10 % accent = one heading word, a light behind the portrait, tiny indicators.
+   Kept: R101 (blue is light, never bands), R107 (card-bottom light = inset box-shadow only), no aurora/mesh, no navy
+   cast, no gradient text, no glass, no hover lift, no blur filter. */
+
+/* ── palette ─────────────────────────────────────────────────────────────────────────────────────────────────── */
+:root:not([data-theme="dark"]) {
+    --m-edge: #e9ecf0;          /* 60: field edge, cool white */
+    --m-mid: #f4f4f3;
+    --m-centre: #fdfcf9;        /* 60: field centre, warm white */
+    --m-blue: #2456e6;          /* 30 */
+    --m-rim: rgba(36, 86, 230, 0.42);
+    --m-edge-light: rgba(36, 86, 230, 0.55);
+    --m-spill: rgba(36, 86, 230, 0.20);
+    --m-bottom: rgba(36, 86, 230, 0.14);
+    --m-orange: #c2410c;        /* 10 */
+    --m-orange-light: rgba(194, 65, 12, 0.22);
+    --m-ink: #1a1d23;
+    --m-muted: #4f5866;
+    --m-line: #dcd8cf;
+}
+[data-theme="dark"] {
+    --m-edge: #0a0b0d;
+    --m-mid: #111316;
+    --m-centre: #1b1d22;
+    --m-blue: #3b6bff;
+    --m-rim: rgba(98, 140, 255, 0.40);
+    --m-edge-light: rgba(150, 180, 255, 0.60);
+    --m-spill: rgba(59, 107, 255, 0.30);
+    --m-bottom: rgba(59, 107, 255, 0.30);
+    --m-orange: #ff7a1a;
+    --m-orange-light: rgba(255, 122, 26, 0.30);
+    --m-ink: #eceae5;
+    --m-muted: #a3aab5;
+    --m-line: #2a2e35;
+    --body-bg: #0a0b0d;
+}
+
+/* ── a) ONE page field: three large static radials on the body, sized to the document, scroll attachment ─────────── */
+html, body { background-color: var(--m-edge) !important; }
+body {
+    background-image:
+        radial-gradient(75% 1500px at 50% 520px, var(--m-centre) 0%, var(--m-mid) 55%, transparent 100%),
+        radial-gradient(70% 2200px at 48% 50%, var(--m-centre) 0%, var(--m-mid) 50%, transparent 100%),
+        radial-gradient(75% 1800px at 52% 94%, var(--m-centre) 0%, var(--m-mid) 52%, transparent 100%) !important;
+    background-repeat: no-repeat !important;
+    background-attachment: scroll !important;
+    background-size: 100% 100% !important;
+}
+/* every section lets the field through; no halo starts at a section edge */
+.hero, .hero-background, main > section, section#metrics, section#operational-excellence, section#case-studies,
+section#about, section#faq, section#contact, [data-theme="dark"] .hero,
+[data-theme="dark"] #metrics, [data-theme="dark"] #case-studies, [data-theme="dark"] #contact { background: transparent !important; }
+.hero-background::before, .hero-background::after { display: none !important; }
+.dp-light { display: none !important; }
+
+/* ── b) blue = the 30 %, as light ON objects ──────────────────────────────────────────────────────────────────── */
+/* panels: rim on the top edge, a cool catch under it, the light rising from the bottom (R107), a spill above */
+#metrics .res-panel, #case-studies .case-card, #contact .contact-info, #contact .contact-form,
+#case-studies .case-card:nth-of-type(n) { --glow-c: var(--m-bottom); border-top-color: var(--m-rim); }
+#metrics .res-panel, #case-studies .case-card, #contact .contact-info, #contact .contact-form {
+    box-shadow: inset 0 1px 0 0 var(--m-edge-light), inset 0 calc(var(--glow-h) * -1) 110px -70px var(--m-bottom),
+        0 -24px 80px -44px var(--m-spill) !important;
+}
+/* hero + employer panels catch the same light */
+.bento-identity, .bento-governance, .bento-sap, .bento-more {
+    border-top-color: var(--m-rim) !important;
+    box-shadow: inset 0 1px 0 0 var(--m-edge-light), inset 0 -110px 110px -80px var(--m-bottom) !important;
+}
+[data-theme="dark"] .bento-identity { border-color: var(--m-line); border-top-color: var(--m-rim) !important; }
+.emp-card .emp-face, .emp-card.is-current .emp-face, .emp-card:nth-of-type(n) .emp-face { --glow-c: var(--m-bottom); }
+.emp-face { border-top-color: var(--m-rim); }
+.emp-face { box-shadow: inset 0 1px 0 0 var(--m-edge-light), inset 0 calc(var(--glow-h) * -1) 100px -70px var(--glow-c); }
+/* results: every bar is blue light; the numbers are text */
+#metrics .res-fill, #metrics .res-row:first-of-type .res-fill { background: linear-gradient(90deg, color-mix(in srgb, var(--m-blue) 55%, transparent), var(--m-blue)) !important; }
+/* the portrait: a blue rim and key from the upper left, an orange light behind it, lower right (c) */
+.bento-photo-card {
+    border-color: var(--m-rim) !important;
+    box-shadow: 0 0 0 1px var(--m-rim), inset 0 1px 0 0 var(--m-edge-light),
+        -26px -18px 70px -38px var(--m-spill),
+        34px 46px 120px -34px var(--m-orange-light) !important;
+}
+/* blue is not text colour: the section numbers go to the ink */
+section.dp-band .sec-eyebrow span, .sec-eyebrow span { color: var(--m-ink) !important; }
+
+/* ── c) orange = the 10 % ─────────────────────────────────────────────────────────────────────────────────────── */
+.dp-hl { color: var(--m-orange) !important; }                                          /* one heading word */
+.bento-desc .bento-accent-text { color: var(--m-orange); }                               /* "Hyperscale" stays */
+.emp-now, .emp-card.is-current .emp-face { --emp-amber: var(--m-orange); }              /* Current marker */
+/* removed: Login, award text, the big numbers, the hero readout rail, the second accent phrase, case-card bottoms */
+#rzAuthWrap .rz-login-btn, #rzAuthWrap .rz-user-btn, [data-theme="light"] #rzAuthWrap .rz-login-btn, [data-theme="light"] #rzAuthWrap .rz-user-btn {
+    background: transparent !important; border-color: var(--m-line) !important; color: var(--m-ink) !important;
+}
+#rzAuthWrap .rz-login-btn:hover, #rzAuthWrap .rz-user-btn:hover { border-color: var(--m-ink) !important; background: transparent !important; }
+.emp-award { color: var(--emp-muted) !important; font-weight: 500; }
+#metrics .res-row .metric-value, #metrics .res-row:first-of-type .metric-value { color: var(--m-ink) !important; }
+#case-studies .stat-value { color: var(--m-ink) !important; }
+[data-theme="dark"] .bento-readout .ro { border-left-color: var(--m-line) !important; }
+[data-theme="dark"] .bento-readout .v .sfx { color: var(--m-muted) !important; }
+.bento-sap .bento-accent-text { color: var(--m-ink) !important; font-style: normal; font-weight: 600; }
+#contact .contact-form .btn-primary, #contact .contact-form .btn-primary:hover { background: var(--m-ink) !important; color: var(--m-edge) !important; }
+/* slate-cast greys (#64748b / #94a3b8 / #cbd5e1 family) read as a weak third blue on text: neutral greys instead */
+.bento-tag, .bento-tag-accent, .bento-more-desc, .bento-gov-desc, #contact .contact-form p, .bento-desc { color: var(--m-muted) !important; }
+.bento-desc { color: var(--m-ink) !important; }
+[data-theme="dark"] .bento-readout { border-top-color: var(--m-line) !important; }
+/* the bar at the top of the page shows the field until the page scrolls; scrolled it stays solid (no blur) */
+.navbar:not(.scrolled), [data-theme="dark"] .navbar:not(.scrolled) { background: transparent !important; border-bottom-color: transparent !important; }
+/* big hero panels: the bottom light is a low glow, not a wash (it read as a navy cast on the identity card) */
+.bento-identity, .bento-governance, .bento-sap, .bento-more {
+    box-shadow: inset 0 1px 0 0 var(--m-edge-light), inset 0 -70px 80px -70px var(--m-bottom) !important;
+}
+/* the operations table is a panel like the others: same surface, same top-edge light */
+#operational-excellence .oe-grid {
+    background: var(--dp-panel) !important; border-top-color: var(--m-rim) !important;
+    box-shadow: inset 0 1px 0 0 var(--m-edge-light), inset 0 -70px 80px -70px var(--m-bottom), 0 -24px 80px -44px var(--m-spill);
+}
+/* softer bottom light on every panel (R107 form kept: inset box-shadow) */
+:root:not([data-theme="dark"]) { --m-bottom: rgba(36, 86, 230, 0.10); }
+[data-theme="dark"] { --m-bottom: rgba(59, 107, 255, 0.22); }
+/* light theme: the orange light behind the portrait stays a hint, the blue light carries more of the 30 % */
+:root:not([data-theme="dark"]) { --m-orange-light: rgba(194, 65, 12, 0.12); --m-spill: rgba(36, 86, 230, 0.28); --m-rim: rgba(36, 86, 230, 0.55); --m-bottom: rgba(36, 86, 230, 0.13); }
+/* text over the field must clear 4.5:1 against its darkest edge (axe cannot measure a gradient backdrop) */
+:root:not([data-theme="dark"]) .emp-eyebrow, :root:not([data-theme="dark"]) .about-text p, :root:not([data-theme="dark"]) .about-text .sec-eyebrow,
+:root:not([data-theme="dark"]) .about-text > .rv { color: var(--m-muted) !important; }
+.rz-version-num, .rz-version-label, [data-theme="dark"] .rz-version-num, [data-theme="dark"] .rz-version-label { color: var(--m-muted) !important; }
+:root:not([data-theme="dark"]) .bento-more-arrow { color: var(--m-orange) !important; }
+[data-theme="dark"] .bento-desc .bento-accent-text { font-style: normal; }   /* item 10: accent never italic */
+/* the About portrait sits in the same scene as the hero one: blue rim, orange light behind */
+.about-image-wrapper {
+    box-shadow: 0 0 0 1px var(--m-rim), -26px -18px 70px -38px var(--m-spill), 34px 46px 120px -34px var(--m-orange-light) !important;
+}
+/* dark: a little more light in the field's centres and in the spill above each panel */
+[data-theme="dark"] { --m-centre: #1f2126; --m-spill: rgba(59, 107, 255, 0.38); }
+/* light: at .13 the blue light on white stayed below a visible chroma (226,231,252); .17 lets the lower edge of each
+   panel read as blue light without turning the panel lavender */
+:root:not([data-theme="dark"]) { --m-bottom: rgba(36, 86, 230, 0.17); --m-spill: rgba(36, 86, 230, 0.32); }
