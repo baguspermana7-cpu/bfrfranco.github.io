@@ -11,13 +11,35 @@ release sections rather than semver.
 
 ---
 
-## v3.40.0 — 2026-11-11 — "What drives this result" on pue and tia
+## v3.40.0 — 2026-11-11 — "What drives this result", and the sensitivity charts that did not describe their page
 
-Product transformation, Wave 2: P07 part A (sensitivity panels; the tornado correctness gate on the 8 existing
-calculators is part B).
+Product transformation, Wave 2: P07 (sensitivity panels on pue, tia, roi and carbon; a correctness check on every
+calculator's own sensitivity chart).
+
+### Fixed
+- **The ROI "Sensitivity" chart was not computed.** Each bar was |NPV| times a fixed weight (revenue 0.35, occupancy
+  0.25, electricity 0.15, PUE 0.12, CAPEX 0.10, interest 0.08) times 0.4, so the ranking never changed with the inputs.
+  The chart is removed; the page now has the shared panel, which moves 16 inputs and recomputes the NPV.
+- **The carbon "Sensitivity" chart re-implemented the model and got three of six bars wrong.** "Grid intensity" moved a
+  read-only field that the page never recalculates from (the page itself shows no change), "IT load" left out the terms
+  that scale with load (2,130 against 2,267 tCO2e), and "Leak rate" used its own constants. Removed; the shared panel
+  covers 11 inputs, with grid intensity moved through the country.
+- **The TCO tornado ran its own copy of the cost model.** The copy had no colo "other" 3 %, a fixed 5 % staff inflation,
+  no maintenance or power inflation path and its own power formula, so "Growth rate" read $7.2M where the page moves
+  $7.5M, "Staff cost" $4.9M where the model gives $3.3M and "Colo rate" $35.0M against $36.1M. The model is now one
+  function, `tcoCore()`, called by `calculate()` and by the tornado (the page's output is byte-identical before and after
+  on four input sets, Pro panels included). "Cloud discount" left the tornado: the chart ranks the build-minus-colo gap,
+  which the cloud discount does not enter, so its bar was always $0.
+- **A typed power price did nothing in the TCO calculator** in any market with a published price path: the path was
+  read first and the override never reached the result ($106.4M with or without 0.30 $/kWh). A typed price now wins
+  ($157.1M at 0.30 $/kWh).
+- **The spares sensitivity heatmap computed RPN without the redundancy factor**, so its centre cell (every input at its
+  current value) disagreed with the RPN the criticality module shows on the same page. One `sparesRpn()` serves both.
+- **The tier advisor's "Sensitivity Analysis" chart is a contribution chart**: it shows the points each input adds to the
+  composite score now. Its numbers match the score formula; the title (page and PDF) now says what it shows.
 
 ### Added
-- **"What drives this result" on the PUE calculator and the TIA-942 checklist.** A collapsed `<details>` panel under the
+- **"What drives this result" on the PUE, ROI and carbon calculators and the TIA-942 checklist.** A collapsed `<details>` panel under the
   results. **Compute sensitivity** moves each declared input 10 % down and up (a select: the option before and after),
   recomputes the page itself in a hidden iframe and ranks the inputs by how far the result moves. Each row shows the low
   and high result with the input values used, "clamped to the field limit" or "end of the list" where it applies, and
@@ -30,10 +52,18 @@ calculators is part B).
   a fixed value" instead of looking like inputs that do nothing.
 - `js/rz-sensitivity.js` + `css/rz-sensitivity.css`; `RZEmbedCompute.session()` in `js/rz-embed-compute.js` (one iframe
   load for all measurements: pue's 20 inputs in about 12 s instead of about 60 s).
-- `data/calculators.json`: a `sensitivity` entry for pue (20 factors) and tia (unmet items). `test-calculator-registry.mjs`
+- `data/calculators.json`: a `sensitivity` entry for pue (20 factors), roi (16), carbon (11) and tia (unmet items). `test-calculator-registry.mjs`
   R5 checks every factor, result and anchor against the rendered page.
-- `tools/test-sensitivity.mjs` (23 checks, ship gate): a fixture page with an exact answer per factor kind; on pue every
-  factor's low and high equal the page's own result after setting that input on the page; the page's inputs are unchanged
+- `tools/ship-gate.sh` shards: `RZ_GATE_SHARD=i/n` splits the 179 gates over browser lanes (two shards run at once),
+  `RZ_GATE_LIST=1` lists them without running; the two halves were proven to cover every gate exactly once
+  (AGENT_HARNESS_STANDARD.md).
+- `tools/test-tornado-correctness.mjs` (18 checks, ship gate): tco bars equal the page's own swing and the tornado calls
+  `tcoCore`; every cx sensitivity row equals the page total after setting that input; the spares heatmap centre equals
+  the module's RPN, optimal quantity and fill rate; tier sub-weights equal the score formula; capex and opex run their
+  tornado on the Monte Carlo's driver function. Proven RED on the previous tree (6 failures) and by restoring the old
+  heatmap RPN (54 against 35).
+- `tools/test-sensitivity.mjs` (34 checks, ship gate): a fixture page with an exact answer per factor kind; on pue, roi and
+  carbon every factor's low and high equal the page's own result after setting that input on the page; the page's inputs are unchanged
   after a run; tia's top gain equals ticking that item. Proven RED: removing the revert step and the clamp fails 7 checks
   (pue 18 of 20 rows wrong).
 

@@ -8,6 +8,7 @@
  *  U2  pue: the panel is collapsed <details>; Compute fills one row per declared factor with no failure; for EVERY
  *      factor the low and high equal the page's own #pueValue after setting that input on the page (UI path);
  *      the page's inputs are unchanged afterwards; a row click focuses its input; 390 px has no horizontal scroll
+ *  U4  roi + carbon: their old charts are gone; every factor equals the page's own NPV after moving that input
  *  U3  tia: one row per unmet applicable item (collapsed categories included); the top row's gain equals the score
  *      change when that item is ticked on the page
  *
@@ -60,7 +61,8 @@ try {
       const full = await rzSensitivity.run(spec, { inputs });
       let n = 0;
       const part = await rzSensitivity.run(spec, { inputs, onProgress: (i) => { n = i; }, isCancelled: () => n >= 2 });
-      return { full, part };
+      const parse = ['-$41.4M', '($2.5K)', '−3.1', '$1,234.5', '72%', '1.46', 'Tier 3 - 82 %'].map((x) => rzSensitivity.num(x));
+      return { full, part, parse };
     });
     const by = Object.fromEntries(r.full.rows.map((x) => [x.id, x]));
     ok(near(r.full.base, 21.5), `U1 base ${r.full.base}, expected 21.5`);
@@ -74,6 +76,7 @@ try {
     const order = r.full.rows.map((x) => x.id).join(',');
     ok(order.startsWith('chk-a,x,mode,chk-b,r,'), `U1 order ${order} (swing desc, ties in declaration order, failures last)`);
     ok(r.part.cancelled && r.part.rows.length === 2 && r.part.total === 8, `U1 cancel: ${r.part.rows.length} rows of ${r.part.total}, cancelled=${r.part.cancelled}`);
+    ok(JSON.stringify(r.parse) === JSON.stringify([-41400000, -2500, -3.1, 1234.5, 72, 1.46, 3]), `U1 number parsing ${JSON.stringify(r.parse)}`);
     ok(errs.length === 0, `U1 page errors: ${errs.join(' | ')}`);
     await tab.close();
   }
@@ -123,6 +126,38 @@ try {
     await tab.setViewport({ width: 390, height: 844 });
     await new Promise((r) => setTimeout(r, 300));
     ok(await tab.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), 'U2 390 px: horizontal scroll with the panel open');
+    await tab.close();
+  }
+  /* U4 roi + carbon: their own charts are gone (roi: fixed weights x |NPV|; carbon: a copied formula that moved a read-only
+     field and left out terms); every factor equals the page's own result after moving that input on the page */
+  for (const [calc, page] of [['roi', 'roi-calculator.html'], ['carbon', 'carbon-footprint.html']]) {
+    const src = await readFile(join(ROOT, page), 'utf8');
+    ok(!/tornadoChart|runSensitivity\(/.test(src), `U4 ${calc} still carries its old tornado`);
+    const { tab, errs } = await open(page);
+    await tab.waitForSelector('details.rz-sens', { timeout: 15000 });
+    const v = await tab.evaluate(async (calc) => {
+      const reg = await (await fetch('data/calculators.json')).json();
+      const c = reg.calculators.find((x) => x.calc === calc);
+      const before = JSON.stringify(rzScenario.capture());
+      const res = await rzSensitivity.run(Object.assign({ calc: c.calc, page: c.page }, c.sensitivity));
+      const pick = (id, val) => { const el = document.getElementById(id); el.value = val; el.dispatchEvent(new Event('input', { bubbles: true })); el.dispatchEvent(new Event('change', { bubbles: true })); };
+      const read = () => rzSensitivity.num(document.querySelector(c.sensitivity.result).textContent);
+      const same = JSON.stringify(rzScenario.capture()) === before;
+      const bad = [];
+      for (const row of res.rows) {
+        if (row.locked || row.failed) { bad.push(row.id + ': ' + (row.reason || 'locked')); continue; }
+        const el = document.getElementById(row.id), keep = el.value;
+        pick(row.id, row.lowValue); await new Promise((r) => setTimeout(r, 30)); const lo = read();
+        pick(row.id, row.highValue); await new Promise((r) => setTimeout(r, 30)); const hi = read();
+        pick(row.id, keep);
+        if (lo !== row.low || hi !== row.high) bad.push(`${row.id}: panel ${row.low}/${row.high}, page ${lo}/${hi}`);
+      }
+      return { n: res.rows.length, want: c.sensitivity.factors.length, bad, base: res.base, page: read(), same, err: res.error };
+    }, calc);
+    ok(v.n === v.want && v.bad.length === 0, `U4 ${calc} mismatch on ${v.bad.length} of ${v.n}: ${v.bad.slice(0, 3).join('; ')}`);
+    ok(v.base === v.page, `U4 ${calc} base ${v.base} vs page ${v.page}`);
+    ok(v.same && !v.err, `U4 ${calc} inputs changed during the run or base not reproduced (${v.err})`);
+    ok(errs.length === 0, `U4 ${calc} page errors: ${errs.join(' | ')}`);
     await tab.close();
   }
   /* U3 */

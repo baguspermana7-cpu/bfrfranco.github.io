@@ -4084,6 +4084,13 @@ function recalcAll() {
 /* ===========================================
    MODULE 1: CRITICALITY SCORING (FMECA + RCM)
    =========================================== */
+/* RPN, one formula for the criticality module and the sensitivity heatmap (P07, v3.40.0: the heatmap used the raw
+   severity and ignored redundancy, so its RPN read 120 where this module read 78 at the defaults). */
+function sparesRpn(severity, detect, lambda, redundancy) {
+  var redFactor = redundancy === '2n' ? 0.4 : (redundancy === 'n1' ? 0.65 : 1.0);
+  return Math.round(severity * redFactor * detect * Math.min(10, lambda * 10));
+}
+
 function calcCriticality() {
   var lambda = clamp(getVal('c1_lambda', 0.25), 0.001, 20);
   var installed = clamp(getVal('c1_installed', 4), 1, 1000);
@@ -4100,7 +4107,7 @@ function calcCriticality() {
   var cm = (sEff/10) * (detect/10) * lambda * installed;
 
   // RPN = Seff * Detectability * Occurrence(scaled)
-  var rpn = Math.round(sEff * detect * Math.min(10, lambda * 10));
+  var rpn = sparesRpn(severity, detect, lambda, redundancy);
 
   // Fleet failures per year
   var fleetFail = lambda * installed;
@@ -9556,7 +9563,8 @@ function calcSensitivity() {
     backorder_cost: clamp(getVal('s_understk_cost', 85000), 1, 1e10),
     demand_sigma:   clamp(getVal('s_demand_sigma', 0.6), 0, 100),
     part_life:      clamp(getVal('s_part_life', 8), 1, 30),
-    stock_level:    clamp(getVal('mc_stock_level', 2), 0, 1000)
+    stock_level:    clamp(getVal('mc_stock_level', 2), 0, 1000),
+    redundancy:     getStr('c1_redundancy', 'n1')
   };
 
   function applyOverride(s, vName, val) {
@@ -9601,8 +9609,7 @@ function calcSensitivity() {
         var annualCost    = (co / partLife) * expectedOver + cu * muAnnual * (1 - fillAchieved);
         return annualCost;
       case 'rpn':
-        var effSev = Math.min(10, severity);
-        return Math.min(1000, effSev * detectability * Math.min(10, lambda * 10));
+        return sparesRpn(severity, detectability, lambda, s.redundancy);
       case 'p_stockout':
         return (1 - poissonCDF(stockLevel, lambdaLT)) * 100;
       case 'optimal_qty':
@@ -9631,6 +9638,8 @@ function calcSensitivity() {
     }
   }
   var totalRange = maxVal - minVal;
+  // Test seam (tools/test-tornado-correctness.mjs): the centre cell is the page's own base case.
+  window.__rzSensLast = { metric: metric, grid: grid, n: N, xMin: xMinM, xMax: xMaxM, yMin: yMinM, yMax: yMaxM };
 
   // Determine most sensitive axis (OAT: vary one axis, hold other at mid)
   var midIdx = Math.floor(N / 2);

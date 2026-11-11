@@ -1183,37 +1183,11 @@
         }
 
         /* ─────────── CALCULATION ENGINE ─────────── */
-        function calculate() {
-            // Production hardening: non-blocking input feedback (calc is defensive via
-            // getVal(id,default), so we flag out-of-range inputs rather than gate).
-            if (window.RZCalc) {
-                var _vr = RZCalc.validateNumbers([
-                    { id: 'tcoItLoad', label: 'IT load' },
-                    { id: 'tcoPue', label: 'PUE' },
-                    { id: 'tcoUtil', label: 'Utilization' },
-                    { id: 'tcoGrowth', label: 'Growth rate' }
-                ]);
-                RZCalc.showErrors('tcoValidation', _vr.errors);
-            }
-            /* Resolve the selected COUNTRY/LOCATION → market record (metro key = golden
-             * MARKET_DATA; "country:XX" = engine-derived record). Region select only filters. */
-            var mkt = resolveMarket(getSelect('tcoCountry'));
-            var itMW = getVal('tcoItLoad', 5);
-            var years = parseInt(getSelect('tcoPeriod'));
-            var tier = getSelect('tcoTier');
-            var pue = getVal('tcoPue', 1.3);
-            var util = getVal('tcoUtil', 70) / 100;
-            var cooling = getSelect('tcoCooling');
-            var growthRate = getVal('tcoGrowth', 10) / 100;
-
-            // Pro overrides
-            var powerRate = getVal('tcoPowerOverride', 0) || mkt.power;
-            var staffSalary = mkt.staff;
-            var staffOverride = getVal('tcoStaffOverride', 0);
-            var coloEsc = isPremiumUser ? getVal('tcoColoEsc', 3) / 100 : PROJECTIONS.coloEscalation;
-            var cloudDiscount = isPremiumUser ? getVal('tcoCloudDiscount', 30) / 100 : 0.30;
-            var debtEquity = isPremiumUser ? getVal('tcoDebtEquity', 60) / 100 : 0.60;
-
+        /* The TCO model: inputs in, totals out. calculate() reads the page and calls it; renderTornado() calls it with one
+           input moved, so the tornado cannot drift from the numbers on the page (P07, v3.40.0). */
+        function tcoCore(p) {
+            var mkt = p.mkt, itMW = p.itMW, years = p.years, tier = p.tier, pue = p.pue, util = p.util,
+                growthRate = p.growthRate, powerRate = p.powerRate, staffSalary = p.staffSalary, staffOverride = p.staffOverride, coloEsc = p.coloEsc, cloudDiscount = p.cloudDiscount;
             var tierMult = TIER_MULT[tier] || 1.0;
             var staffPerMW = TIER_STAFF_PER_MW[tier] || 5;
 
@@ -1312,6 +1286,56 @@
                 cloudYearly.push({ total: yCloudTotal, cumulative: cloudComputeTotal + cloudEgressTotal + cloudSupportTotal + cloudOtherTotal });
             }
 
+            return { tierMult: tierMult, staffPerMW: staffPerMW, capex: capex, buildStaffCount: buildStaffCount, annualPower: annualPower, annualStaff: annualStaff, annualMaint: annualMaint, annualNetwork: annualNetwork, yr1Opex: yr1Opex, buildTotal: buildTotal, buildPowerTotal: buildPowerTotal, buildStaffTotal: buildStaffTotal, buildMaintTotal: buildMaintTotal, buildNetworkTotal: buildNetworkTotal, buildOtherTotal: buildOtherTotal, buildYearly: buildYearly, yr1Colo: yr1Colo, yr1ColoStaff: yr1ColoStaff, yr1ColoNetwork: yr1ColoNetwork, coloSetup: coloSetup, coloTotal: coloTotal, coloLeaseTotal: coloLeaseTotal, coloStaffTotal: coloStaffTotal, coloNetworkTotal: coloNetworkTotal, coloOtherTotal: coloOtherTotal, coloYearly: coloYearly, yr1Cloud: yr1Cloud, cloudEgress: cloudEgress, cloudSupport: cloudSupport, cloudTotal: cloudTotal, cloudComputeTotal: cloudComputeTotal, cloudEgressTotal: cloudEgressTotal, cloudSupportTotal: cloudSupportTotal, cloudOtherTotal: cloudOtherTotal, cloudYearly: cloudYearly };
+        }
+
+        function calculate() {
+            // Production hardening: non-blocking input feedback (calc is defensive via
+            // getVal(id,default), so we flag out-of-range inputs rather than gate).
+            if (window.RZCalc) {
+                var _vr = RZCalc.validateNumbers([
+                    { id: 'tcoItLoad', label: 'IT load' },
+                    { id: 'tcoPue', label: 'PUE' },
+                    { id: 'tcoUtil', label: 'Utilization' },
+                    { id: 'tcoGrowth', label: 'Growth rate' }
+                ]);
+                RZCalc.showErrors('tcoValidation', _vr.errors);
+            }
+            /* Resolve the selected COUNTRY/LOCATION → market record (metro key = golden
+             * MARKET_DATA; "country:XX" = engine-derived record). Region select only filters. */
+            var mkt = resolveMarket(getSelect('tcoCountry'));
+            var itMW = getVal('tcoItLoad', 5);
+            var years = parseInt(getSelect('tcoPeriod'));
+            var tier = getSelect('tcoTier');
+            var pue = getVal('tcoPue', 1.3);
+            var util = getVal('tcoUtil', 70) / 100;
+            var cooling = getSelect('tcoCooling');
+            var growthRate = getVal('tcoGrowth', 10) / 100;
+
+            // Pro overrides
+            var powerRate = getVal('tcoPowerOverride', 0) || mkt.power;
+            // A typed power price must win over the market's own price path; before v3.40.0 the projection was read first
+            // and an override changed nothing in any market that has one (found by the P07 sensitivity check).
+            if (getVal('tcoPowerOverride', 0) > 0 && mkt.projections && mkt.projections.powerCostByYear) {
+                mkt = Object.assign({}, mkt, { projections: Object.assign({}, mkt.projections, { powerCostByYear: null }) });
+            }
+            var staffSalary = mkt.staff;
+            var staffOverride = getVal('tcoStaffOverride', 0);
+            var coloEsc = isPremiumUser ? getVal('tcoColoEsc', 3) / 100 : PROJECTIONS.coloEscalation;
+            var cloudDiscount = isPremiumUser ? getVal('tcoCloudDiscount', 30) / 100 : 0.30;
+            var debtEquity = isPremiumUser ? getVal('tcoDebtEquity', 60) / 100 : 0.60;
+
+            /* Build, colo and cloud TCO: one model, tcoCore(), also used by the tornado (P07; its own copy had drifted). */
+            var C = tcoCore({ mkt: mkt, itMW: itMW, years: years, tier: tier, pue: pue, util: util, growthRate: growthRate, powerRate: powerRate, staffSalary: staffSalary, staffOverride: staffOverride, coloEsc: coloEsc, cloudDiscount: cloudDiscount });
+            var tierMult = C.tierMult, staffPerMW = C.staffPerMW, capex = C.capex, buildStaffCount = C.buildStaffCount;
+            var annualPower = C.annualPower, annualStaff = C.annualStaff, annualMaint = C.annualMaint, annualNetwork = C.annualNetwork;
+            var yr1Opex = C.yr1Opex, buildTotal = C.buildTotal, buildPowerTotal = C.buildPowerTotal, buildStaffTotal = C.buildStaffTotal;
+            var buildMaintTotal = C.buildMaintTotal, buildNetworkTotal = C.buildNetworkTotal, buildOtherTotal = C.buildOtherTotal, buildYearly = C.buildYearly;
+            var yr1Colo = C.yr1Colo, yr1ColoStaff = C.yr1ColoStaff, yr1ColoNetwork = C.yr1ColoNetwork, coloSetup = C.coloSetup;
+            var coloTotal = C.coloTotal, coloLeaseTotal = C.coloLeaseTotal, coloStaffTotal = C.coloStaffTotal, coloNetworkTotal = C.coloNetworkTotal;
+            var coloOtherTotal = C.coloOtherTotal, coloYearly = C.coloYearly, yr1Cloud = C.yr1Cloud, cloudEgress = C.cloudEgress;
+            var cloudSupport = C.cloudSupport, cloudTotal = C.cloudTotal, cloudComputeTotal = C.cloudComputeTotal, cloudEgressTotal = C.cloudEgressTotal;
+            var cloudSupportTotal = C.cloudSupportTotal, cloudOtherTotal = C.cloudOtherTotal, cloudYearly = C.cloudYearly;
             /* ── DETERMINE WINNER ── */
             var options = [
                 { name: 'Build', tco: buildTotal },
@@ -1374,7 +1398,7 @@
                 // For pro
                 annualPower: annualPower, annualStaff: annualStaff, annualMaint: annualMaint,
                 annualNetwork: annualNetwork, yr1Colo: yr1Colo, yr1Cloud: yr1Cloud,
-                buildStaffCount: buildStaffCount, staffSalary: staffSalary,
+                buildStaffCount: buildStaffCount, staffSalary: staffSalary, staffOverride: staffOverride,
                 yr1ColoStaff: yr1ColoStaff, yr1ColoNetwork: yr1ColoNetwork, coloSetup: coloSetup,
                 cloudEgress: cloudEgress, cloudSupport: cloudSupport
             };
@@ -2059,74 +2083,32 @@
                 { label: 'PUE', key: 'pue', base: r.pue },
                 { label: 'Utilization', key: 'util', base: r.util },
                 { label: 'Colo Rate', key: 'colo', base: r.mkt.coloKW },
-                { label: 'Cloud Discount', key: 'cloud_disc', base: r.cloudDiscount },
                 { label: 'Staff Cost', key: 'staff', base: r.staffSalary },
                 { label: 'Growth Rate', key: 'growth', base: r.growthRate }
             ];
 
             var baseDiff = r.buildTotal - r.coloTotal;
 
+            // One input moved by `mult`, everything else as computed; the same model the page shows (tcoCore).
             function calcWithVar(key, mult) {
-                var tmpMkt = Object.assign({}, r.mkt);
-                // Deep copy projections if present
-                if (r.mkt.projections) {
-                    tmpMkt.projections = JSON.parse(JSON.stringify(r.mkt.projections));
+                var mkt = Object.assign({}, r.mkt);
+                if (r.mkt.projections) mkt.projections = JSON.parse(JSON.stringify(r.mkt.projections));
+                var p = { mkt: mkt, itMW: r.itMW, years: r.years, tier: r.tier, pue: r.pue, util: r.util, growthRate: r.growthRate,
+                    powerRate: r.powerRate, staffSalary: r.staffSalary, staffOverride: r.staffOverride, coloEsc: r.coloEsc, cloudDiscount: r.cloudDiscount };
+                function scaleProj(name) {
+                    if (mkt.projections && mkt.projections[name]) mkt.projections[name] = mkt.projections[name].map(function (v) { return v * mult; });
                 }
-                var tmpPue = r.pue;
-                var tmpUtil = r.util;
-                var tmpCloudDisc = r.cloudDiscount;
-                var tmpGrowth = r.growthRate;
-
-                switch(key) {
-                    case 'power':
-                        tmpMkt.power = r.powerRate * mult;
-                        if (tmpMkt.projections && tmpMkt.projections.powerCostByYear) {
-                            tmpMkt.projections.powerCostByYear = tmpMkt.projections.powerCostByYear.map(function(v) { return v * mult; });
-                        }
-                        break;
-                    case 'construction': tmpMkt.buildCost = r.mkt.buildCost * mult; break;
-                    case 'pue': tmpPue = r.pue * mult; break;
-                    case 'util': tmpUtil = Math.min(1, r.util * mult); break;
-                    case 'colo':
-                        tmpMkt.coloKW = r.mkt.coloKW * mult;
-                        if (tmpMkt.projections && tmpMkt.projections.coloPriceByYear) {
-                            tmpMkt.projections.coloPriceByYear = tmpMkt.projections.coloPriceByYear.map(function(v) { return v * mult; });
-                        }
-                        break;
-                    case 'cloud_disc': tmpCloudDisc = Math.min(0.6, r.cloudDiscount * mult); break;
-                    case 'staff':
-                        tmpMkt.staff = r.staffSalary * mult;
-                        if (tmpMkt.projections && tmpMkt.projections.staffCostByYear) {
-                            tmpMkt.projections.staffCostByYear = tmpMkt.projections.staffCostByYear.map(function(v) { return v * mult; });
-                        }
-                        break;
-                    case 'growth': tmpGrowth = Math.min(0.30, r.growthRate * mult); break;
+                switch (key) {
+                    case 'power': p.powerRate = r.powerRate * mult; mkt.power = r.mkt.power * mult; scaleProj('powerCostByYear'); break;
+                    case 'construction': mkt.buildCost = r.mkt.buildCost * mult; break;
+                    case 'pue': p.pue = r.pue * mult; break;
+                    case 'util': p.util = Math.min(1, r.util * mult); break;
+                    case 'colo': mkt.coloKW = r.mkt.coloKW * mult; scaleProj('coloPriceByYear'); break;
+                    case 'staff': p.staffSalary = r.staffSalary * mult; mkt.staff = r.mkt.staff * mult; scaleProj('staffCostByYear'); break;
+                    case 'growth': p.growthRate = Math.min(0.30, r.growthRate * mult); break;
                 }
-
-                var capex = r.itMW * tmpMkt.buildCost * r.tierMult * 1e6;
-                var bTotal = capex;
-                for (var y = 0; y < r.years; y++) {
-                    var yPwrR = getMktProjection(tmpMkt, 'powerCostByYear', y, tmpMkt.power * Math.pow(1.04, y));
-                    var yStfR = getMktProjection(tmpMkt, 'staffCostByYear', y, (tmpMkt.staff || r.staffSalary) * Math.pow(1.05, y));
-                    var pw = r.itMW * tmpPue * 8760 * tmpUtil * yPwrR * 1000;
-                    var st = r.buildStaffCount * yStfR;
-                    var mt = capex * 0.03 * Math.pow(1.03, y);
-                    var ins = capex * 0.007;
-                    var nt = r.itMW * 20000 * 12;
-                    var ot = (pw + st + mt + ins + nt) * 0.04;
-                    bTotal += pw + st + mt + ins + nt + ot;
-                }
-
-                var cTotal = r.coloSetup;
-                for (var y = 0; y < r.years; y++) {
-                    var sc = Math.pow(1 + tmpGrowth, y);
-                    var yCP = getMktProjection(tmpMkt, 'coloPriceByYear', y, tmpMkt.coloKW * Math.pow(1 + r.coloEsc, y));
-                    cTotal += (r.itMW * 1000 * yCP * 12 * sc)
-                        + (r.yr1ColoStaff * Math.pow(1.05, y))
-                        + r.yr1ColoNetwork;
-                }
-
-                return bTotal - cTotal;
+                var c = tcoCore(p);
+                return c.buildTotal - c.coloTotal;
             }
 
             var bars = variables.map(function(v) {

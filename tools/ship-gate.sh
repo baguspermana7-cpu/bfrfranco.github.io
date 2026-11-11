@@ -20,9 +20,25 @@ set -u
 fail=0
 runs=0
 
+# Sharding: RZ_GATE_SHARD=i/n runs every n-th gate starting at i, so two shards can run at once on two browser lanes
+#   rz-lane -l 1 -- env RZ_GATE_SHARD=1/2 bash tools/ship-gate.sh --probe
+#   rz-lane -l 2 -- env RZ_GATE_SHARD=2/2 bash tools/ship-gate.sh --probe
+# Gate numbers stay global. Shard 1 also runs the non-gate checks and the probe. A tree ships only when EVERY shard passed.
+shard="${RZ_GATE_SHARD:-}"
+shard_i=1; shard_n=1
+if [ -n "$shard" ]; then
+  shard_i="${shard%/*}"; shard_n="${shard#*/}"
+  case "$shard_i/$shard_n" in *[!0-9/]*|/*|*/) echo "RZ_GATE_SHARD must be i/n, got '$shard'"; exit 2;; esac
+  if [ "$shard_i" -lt 1 ] || [ "$shard_i" -gt "$shard_n" ]; then echo "RZ_GATE_SHARD $shard: i must be 1..n"; exit 2; fi
+  echo "shard $shard_i of $shard_n"
+fi
+skipped=0
+
 gate() {
   local name="$1"; shift
   runs=$((runs+1))
+  if [ $(( (runs - 1) % shard_n )) -ne $(( shard_i - 1 )) ]; then skipped=$((skipped+1)); return 0; fi
+  if [ -n "${RZ_GATE_LIST:-}" ]; then echo "GATE [$runs] $name"; return 0; fi   # list mode: name only, nothing runs
   echo
   echo "── [$runs] $name ──"
   if "$@"; then
@@ -287,7 +303,8 @@ gate "Service worker precache — every PRE_CACHE_URLS path on disk, per-URL pre
 gate "Offline calculators — 11 calculators visited once, network gone (origin refused + DevTools offline): reload, recompute, Chart.js built (P25)" node tools/test-offline-calculators.mjs
 gate "Search + palette — every public page indexed and loading the palette, 10/10 fixed queries top-3, palette opens styled with working page actions on 5 families (P14)" node tools/test-search-palette.mjs
 gate "Activity log — own-rows history table with empty/error/retry states, one event per Open/Copy/Delete/PDF, action+meta allowlists, signed-out silence (P15)" node tools/test-activity-log.mjs
-gate "Sensitivity — fixture exact per factor kind, pue every factor equals the page recompute, inputs untouched, tia top gain equals ticking it (P07)" node tools/test-sensitivity.mjs
+gate "Sensitivity — fixture exact per factor kind, pue/roi/carbon every factor equals the page recompute, inputs untouched, tia top gain equals ticking it (P07)" node tools/test-sensitivity.mjs
+gate "Tornado correctness — tco = page swing via tcoCore, cx rows = page totals, spares heatmap centre = module, tier weights = score, capex/opex = MC driver (P07)" node tools/test-tornado-correctness.mjs
 gate "Sustainability page (K25) — generator-fresh, worked example recomputed, citations and FAQ JSON-LD consistent" python3 tools/test-pillar-sustainability.py
 gate "WAN traffic study — every printed figure follows from the view's own inputs" node tools/test-dcai-wan-study.mjs
 gate "security zone ladder — SL-T never drops inward, life safety is monitor-only" node tools/test-dcai-security-zones.mjs
@@ -363,7 +380,9 @@ echo
 runs=$((runs+1))
 echo "── [$runs] engine files byte-identical guard ──"
 engine_diff=$(git diff HEAD -- js/datahall-model.js js/datahall-calculations.js js/conv-engine.js | wc -l)
-if [ "$engine_diff" -eq 0 ]; then
+[ "$shard_i" -ne 1 ] && engine_diff=skip
+if [ "$engine_diff" = skip ]; then :
+elif [ "$engine_diff" -eq 0 ]; then
   echo "   ✓ PASS — engine files unchanged"
 else
   echo "   ✗ FAIL — engine files have $engine_diff lines of unstaged diff"
@@ -373,7 +392,10 @@ else
 fi
 
 # 8: optional accuracy probe (file:// or http://)
-case "${1:-}" in
+probe_arg="${1:-}"
+[ "$shard_i" -ne 1 ] && probe_arg=""
+[ "$shard_i" -eq 1 ] && shard_n=1   # the probe belongs to shard 1 whatever its number
+case "$probe_arg" in
   --probe)
     gate "probe-accuracy-validation — 82/82 (file://)" \
       bash -c "RZ_BASE=file timeout 180 node tools/probe-accuracy-validation.mjs > /tmp/_probe.log 2>&1 || (cat /tmp/_probe.log; exit 1)"
@@ -397,6 +419,10 @@ esac
 
 echo
 echo "────────────────────────────────────────"
+if [ -n "$shard" ]; then
+  if [ $fail -eq 0 ]; then echo "✓ SHARD $shard_i/$shard_n: ALL $((runs - skipped)) OF ITS GATES PASS ($skipped belong to other shards) — every shard must pass"; exit 0
+  else echo "✗ SHARD $shard_i/$shard_n: $fail / $((runs - skipped)) GATES FAILED"; exit 1; fi
+fi
 if [ $fail -eq 0 ]; then
   echo "✓ ALL $runs GATES PASS — safe to push"
   exit 0

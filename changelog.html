@@ -495,12 +495,45 @@
       </div>
       
       <div class="changelog-body">
-        <p>— "What drives this result" on pue and tia</p>
-<p>Product transformation, Wave 2: P07 part A (sensitivity panels; the tornado correctness gate on the 8 existing</p>
-<p>calculators is part B).</p>
+        <p>— "What drives this result", and the sensitivity charts that did not describe their page</p>
+<p>Product transformation, Wave 2: P07 (sensitivity panels on pue, tia, roi and carbon; a correctness check on every</p>
+<p>calculator's own sensitivity chart).</p>
+<h3 class="cl-subhead">Fixed</h3>
+<ul>
+  <li><strong>The ROI "Sensitivity" chart was not computed.</strong> Each bar was |NPV| times a fixed weight (revenue 0.35, occupancy</li>
+</ul>
+<p>0.25, electricity 0.15, PUE 0.12, CAPEX 0.10, interest 0.08) times 0.4, so the ranking never changed with the inputs.</p>
+<p>The chart is removed; the page now has the shared panel, which moves 16 inputs and recomputes the NPV.</p>
+<ul>
+  <li><strong>The carbon "Sensitivity" chart re-implemented the model and got three of six bars wrong.</strong> "Grid intensity" moved a</li>
+</ul>
+<p>read-only field that the page never recalculates from (the page itself shows no change), "IT load" left out the terms</p>
+<p>that scale with load (2,130 against 2,267 tCO2e), and "Leak rate" used its own constants. Removed; the shared panel</p>
+<p>covers 11 inputs, with grid intensity moved through the country.</p>
+<ul>
+  <li><strong>The TCO tornado ran its own copy of the cost model.</strong> The copy had no colo "other" 3 %, a fixed 5 % staff inflation,</li>
+</ul>
+<p>no maintenance or power inflation path and its own power formula, so "Growth rate" read $7.2M where the page moves</p>
+<p>$7.5M, "Staff cost" $4.9M where the model gives $3.3M and "Colo rate" $35.0M against $36.1M. The model is now one</p>
+<p>function, <code>tcoCore()</code>, called by <code>calculate()</code> and by the tornado (the page's output is byte-identical before and after</p>
+<p>on four input sets, Pro panels included). "Cloud discount" left the tornado: the chart ranks the build-minus-colo gap,</p>
+<p>which the cloud discount does not enter, so its bar was always $0.</p>
+<ul>
+  <li><strong>A typed power price did nothing in the TCO calculator</strong> in any market with a published price path: the path was</li>
+</ul>
+<p>read first and the override never reached the result ($106.4M with or without 0.30 $/kWh). A typed price now wins</p>
+<p>($157.1M at 0.30 $/kWh).</p>
+<ul>
+  <li><strong>The spares sensitivity heatmap computed RPN without the redundancy factor</strong>, so its centre cell (every input at its</li>
+</ul>
+<p>current value) disagreed with the RPN the criticality module shows on the same page. One <code>sparesRpn()</code> serves both.</p>
+<ul>
+  <li><strong>The tier advisor's "Sensitivity Analysis" chart is a contribution chart</strong>: it shows the points each input adds to the</li>
+</ul>
+<p>composite score now. Its numbers match the score formula; the title (page and PDF) now says what it shows.</p>
 <h3 class="cl-subhead">Added</h3>
 <ul>
-  <li><strong>"What drives this result" on the PUE calculator and the TIA-942 checklist.</strong> A collapsed <code>&lt;details&gt;</code> panel under the</li>
+  <li><strong>"What drives this result" on the PUE, ROI and carbon calculators and the TIA-942 checklist.</strong> A collapsed <code>&lt;details&gt;</code> panel under the</li>
 </ul>
 <p>results. <strong>Compute sensitivity</strong> moves each declared input 10 % down and up (a select: the option before and after),</p>
 <p>recomputes the page itself in a hidden iframe and ranks the inputs by how far the result moves. Each row shows the low</p>
@@ -519,13 +552,25 @@
 </ul>
 <p>load for all measurements: pue's 20 inputs in about 12 s instead of about 60 s).</p>
 <ul>
-  <li><code>data/calculators.json</code>: a <code>sensitivity</code> entry for pue (20 factors) and tia (unmet items). <code>test-calculator-registry.mjs</code></li>
+  <li><code>data/calculators.json</code>: a <code>sensitivity</code> entry for pue (20 factors), roi (16), carbon (11) and tia (unmet items). <code>test-calculator-registry.mjs</code></li>
 </ul>
 <p>R5 checks every factor, result and anchor against the rendered page.</p>
 <ul>
-  <li><code>tools/test-sensitivity.mjs</code> (23 checks, ship gate): a fixture page with an exact answer per factor kind; on pue every</li>
+  <li><code>tools/ship-gate.sh</code> shards: <code>RZ_GATE_SHARD=i/n</code> splits the 179 gates over browser lanes (two shards run at once),</li>
 </ul>
-<p>factor's low and high equal the page's own result after setting that input on the page; the page's inputs are unchanged</p>
+<p><code>RZ_GATE_LIST=1</code> lists them without running; the two halves were proven to cover every gate exactly once</p>
+<p>(AGENT_HARNESS_STANDARD.md).</p>
+<ul>
+  <li><code>tools/test-tornado-correctness.mjs</code> (18 checks, ship gate): tco bars equal the page's own swing and the tornado calls</li>
+</ul>
+<p><code>tcoCore</code>; every cx sensitivity row equals the page total after setting that input; the spares heatmap centre equals</p>
+<p>the module's RPN, optimal quantity and fill rate; tier sub-weights equal the score formula; capex and opex run their</p>
+<p>tornado on the Monte Carlo's driver function. Proven RED on the previous tree (6 failures) and by restoring the old</p>
+<p>heatmap RPN (54 against 35).</p>
+<ul>
+  <li><code>tools/test-sensitivity.mjs</code> (34 checks, ship gate): a fixture page with an exact answer per factor kind; on pue, roi and</li>
+</ul>
+<p>carbon every factor's low and high equal the page's own result after setting that input on the page; the page's inputs are unchanged</p>
 <p>after a run; tia's top gain equals ticking that item. Proven RED: removing the revert step and the clamp fails 7 checks</p>
 <p>(pue 18 of 20 rows wrong).</p>
 <h3 class="cl-subhead">Not done</h3>

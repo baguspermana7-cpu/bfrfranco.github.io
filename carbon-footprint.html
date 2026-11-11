@@ -763,14 +763,10 @@
                 </div></div>
                 <figure class="fig res-fig"><div class="chart-container"><canvas id="histogramChart" role="img" aria-label="Distribution of annual emissions over 10,000 runs"></canvas></div><figcaption><b>FIG. 3</b> · Annual emissions over 10,000 runs · amber = above P95<br><span class="basis" id="mcBasis" data-rz-authored-basis="P08: spreads, draws and seed of this band, written from the same object the simulation samples">Uncertainty: computing…</span></figcaption></figure>
             </div>
-            <div class="cf-pro-panel tool-results" id="panelTornado">
-                <div class="res-head"><h2>Sensitivity</h2><span class="basis">each input ±20 %, the others at base</span></div>
-                <figure class="fig res-fig"><div class="chart-container"><canvas id="tornadoChart" role="img" aria-label="Swing in annual emissions per input"></canvas></div><figcaption><b>FIG. 4</b> · Swing in annual emissions per input, tCO&#8322;e · amber = the largest driver</figcaption></figure>
-            </div>
             <div class="cf-pro-panel tool-results" id="panelScenarios">
                 <div class="res-head"><h2>Reduction path</h2><span class="basis">measures applied in order, cumulative</span></div>
                 <div class="res-group"><div id="scenarioResults" data-rz-fact-list></div></div>
-                <figure class="fig res-fig"><div class="chart-container"><canvas id="scenarioChart" role="img" aria-label="Remaining annual emissions after each measure"></canvas></div><figcaption><b>FIG. 5</b> · Remaining annual emissions after each measure, tCO&#8322;e/yr</figcaption></figure>
+                <figure class="fig res-fig"><div class="chart-container"><canvas id="scenarioChart" role="img" aria-label="Remaining annual emissions after each measure"></canvas></div><figcaption><b>FIG. 4</b> · Remaining annual emissions after each measure, tCO&#8322;e/yr</figcaption></figure>
             </div>
             <div class="cf-pro-panel tool-results" id="panelCompliance">
                 <div class="res-head"><h2>Cost and compliance</h2><span class="basis">offset $35/t · EU ETS $65/t</span></div>
@@ -1607,7 +1603,6 @@ var _cap = {
     // ══════════════════════════════════════════════════════════════
     function updateProPanels(totalEmissions, scope1, scope2, scope3, totalLifecycle, annualBudgetPerMW, rating, intensity, offsetCost, taxExposure) {
         runMonteCarlo(totalEmissions);
-        runSensitivity(totalEmissions);
         runScenarios(totalEmissions, scope2);
         generateNarrative(totalEmissions, rating, intensity, offsetCost, taxExposure, totalLifecycle);
     }
@@ -1685,54 +1680,6 @@ var _cap = {
                 plugins: { legend: { display: false } },
                 scales: { x: { display: false }, y: { display: false } }
             }
-        });
-    }
-
-    function runSensitivity(baseEmissions) {
-        var inputs = {
-            'PUE': { vary: 0.2, impact: 0 },
-            'Grid Intensity': { vary: 0.2, impact: 0 },
-            'IT Load': { vary: 0.2, impact: 0 },
-            'Gen Hours': { vary: 0.2, impact: 0 },
-            'Renewable %': { vary: 0.2, impact: 0 },
-            'Leak Rate': { vary: 0.2, impact: 0 }
-        };
-        var pue = parseFloat(document.getElementById('pueValue').value) || 1.52;
-        var grid = parseFloat(document.getElementById('gridIntensity').value) || 0.40;
-        var itLoad = parseFloat(document.getElementById('itLoad').value) || 1000;
-        var genHours = parseFloat(document.getElementById('genHours').value) || 200;
-        var renew = parseFloat(document.getElementById('renewablePct').value) || 0;
-        var leak = parseFloat(document.getElementById('leakRate').value) || 5;
-
-        // Vary each +-20% and compute impact
-        inputs['PUE'].impact = Math.abs(itLoad * (pue * 1.2) * 8.76 * grid * (1 - renew / 100) - itLoad * (pue * 0.8) * 8.76 * grid * (1 - renew / 100));
-        inputs['Grid Intensity'].impact = Math.abs(itLoad * pue * 8.76 * (grid * 1.2) * (1 - renew / 100) - itLoad * pue * 8.76 * (grid * 0.8) * (1 - renew / 100));
-        inputs['IT Load'].impact = Math.abs((itLoad * 1.2) * pue * 8.76 * grid * (1 - renew / 100) - (itLoad * 0.8) * pue * 8.76 * grid * (1 - renew / 100));
-        inputs['Gen Hours'].impact = Math.abs(itLoad * 0.3 * (genHours * 1.2) * 2.68 / 1000 - itLoad * 0.3 * (genHours * 0.8) * 2.68 / 1000);
-        inputs['Renewable %'].impact = Math.abs(itLoad * pue * 8.76 * grid * (1 - Math.min(100, renew * 1.2) / 100) - itLoad * pue * 8.76 * grid * (1 - Math.max(0, renew * 0.8) / 100));
-        inputs['Leak Rate'].impact = Math.abs(leak * 1.2 - leak * 0.8) / 100 * itLoad * 0.3 * 2088 / 1000;
-
-        // Sort by impact
-        var sorted = Object.keys(inputs).map(function(k) { return { name: k, impact: inputs[k].impact }; });
-        sorted.sort(function(a, b) { return b.impact - a.impact; });
-
-        // Render tornado as horizontal bar chart
-        var ctx = document.getElementById('tornadoChart');
-        if (!ctx) return;
-        if (window._tornadoChart) window._tornadoChart.destroy();
-
-        window._tornadoChart = new Chart(ctx.getContext('2d'), {
-            type: 'bar',
-            data: {
-                labels: sorted.map(function(s) { return s.name; }),
-                datasets: [{
-                    label: 'Impact (tCO\u2082e)',
-                    data: sorted.map(function(s) { return Math.round(s.impact); }),
-                    backgroundColor: sorted.map(function(s, i) { return i === 0 ? 'rgb(212, 154, 42)' : '#7D8794'; }),
-                    borderRadius: 0
-                }]
-            },
-            options: { indexAxis: 'y', responsive: true, interaction:{mode:'index',intersect:false}, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true } } }
         });
     }
 
@@ -2184,6 +2131,8 @@ var _cap = {
 <!-- Supabase save/reload scenario (additive) -->
 <script src="js/rz-config.js?v=20260920-eed056f9"></script>
 <script src="js/rz-scenario.js?v=20261111-9f2ae47f"></script>
+<script src="js/rz-embed-compute.js?v=20261111-8c827926"></script><!-- P07: sensitivity panel (replaces a copied-formula chart) -->
+<script src="js/rz-sensitivity.js?v=20261111-3cab8280"></script>
 <script type="module" src="js/rz-supabase.js?v=20261111-3c801534"></script>
 <script>
 (function(){function m(){[].forEach.call(document.querySelectorAll('svg:not([aria-label]):not([aria-hidden])'),function(s){s.setAttribute('aria-hidden','true');});}

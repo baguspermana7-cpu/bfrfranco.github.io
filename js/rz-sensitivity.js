@@ -20,9 +20,11 @@
   function num(text) {
     if (text == null) return NaN;
     var s = String(text).replace(/,/g, '').replace(/−/g, '-');
-    var m = s.match(/-?\d+(?:\.\d+)?/);
+    var m = s.match(/\d+(?:\.\d+)?/);
     if (!m) return NaN;
     var v = parseFloat(m[0]);
+    // a sign may sit before a currency symbol ("-$41.4M") or as accounting parentheses ("($41.4M)")
+    if (/[-(]\s*[^\d\s]{0,3}\s*$/.test(s.slice(0, m.index))) v = -v;
     var suf = s.slice(m.index + m[0].length).trim().charAt(0);
     if (suf === 'K' || suf === 'k') v *= 1e3; else if (suf === 'M') v *= 1e6; else if (suf === 'B') v *= 1e9;
     return v;

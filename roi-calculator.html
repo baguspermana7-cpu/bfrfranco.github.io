@@ -517,9 +517,6 @@
                 </div>
                 <figure class="fig res-fig chart-card" data-rz-series-meaning><div class="chart-container"><canvas id="histogramChart" width="600" height="280"></canvas></div><figcaption><b>FIG. 3</b> · NPV over 10,000 Monte Carlo runs · red bins = NPV below zero · RZEngine sim<br><span class="basis" id="roiMcBasis" data-rz-authored-basis="P08: spreads, draws and seed of the NPV band, written from the distributions the simulation samples">Uncertainty: computing…</span></figcaption></figure>
             </div>
-            <div class="roi-pro-panel" id="panelTornado"><h2 class="pro-h">Sensitivity</h2>
-                <figure class="fig res-fig chart-card"><div class="chart-container"><canvas id="tornadoChart" width="600" height="350"></canvas></div><figcaption><b>FIG. 4</b> · NPV swing per driver, USD M · the largest driver in amber</figcaption></figure>
-            </div>
             <div class="roi-pro-panel" id="panelScenarios"><h2 class="pro-h">Scenarios</h2>
                 <div id="scenarioResults"></div>
             </div>
@@ -1121,7 +1118,6 @@
     // ══════════════════════════════════════════════════════════════
     function updateProPanels(projectCF, npv, irr, years, revenues, opexes, nois, netCF, debtSvc, taxes, cumCF, totalCapex, terminalVal, rating, ratingColor, paybackYr, pi, yoc) {
         runMonteCarlo(projectCF);
-        runSensitivity(npv);
         runScenarios(projectCF, revenues);
         buildCashflowTable(years, revenues, opexes, nois, debtSvc, taxes, netCF, cumCF);
         generateNarrative(npv, irr, paybackYr, pi, yoc, totalCapex, terminalVal, rating);
@@ -1208,48 +1204,8 @@
         });
     }
 
-    // ══════════════════════════════════════════════════════════════
-    // 12. SENSITIVITY TORNADO
-    // ══════════════════════════════════════════════════════════════
-    function runSensitivity(baseNPV) {
-        var dr = (parseFloat(document.getElementById('discountRate').value) || 10) / 100;
-        var baseCF = window._calcResults ? window._calcResults.netCashflows : [];
-        var capex = (parseFloat(document.getElementById('totalCapex').value) || 80) * 1e6;
-
-        var factors = [
-            { name: 'Revenue/kW', weight: 0.35 },
-            { name: 'Occupancy', weight: 0.25 },
-            { name: 'Electricity Rate', weight: 0.15 },
-            { name: 'PUE', weight: 0.12 },
-            { name: 'CAPEX', weight: 0.10 },
-            { name: 'Interest Rate', weight: 0.08 }
-        ];
-
-        // Estimate impact as +-20% of NPV weighted by factor importance
-        var sorted = factors.map(function(f) {
-            return { name: f.name, impact: Math.abs(baseNPV) * f.weight * 0.4 };
-        });
-        sorted.sort(function(a, b) { return b.impact - a.impact; });
-
-        var ctx = document.getElementById('tornadoChart');
-        if (!ctx) return;
-        if (window._tornadoChart) window._tornadoChart.destroy();
-
-        window._tornadoChart = new Chart(ctx.getContext('2d'), {
-            type: 'bar',
-            data: {
-                labels: sorted.map(function(s) { return s.name; }),
-                datasets: [{
-                    label: 'NPV Impact ($M)',
-                    data: sorted.map(function(s) { return +(s.impact / 1e6).toFixed(1); }),
-                    backgroundColor: sorted.map(function(s, i) { return i === 0 ? 'rgb(212,154,42)' : '#7D8794'; }),
-                    borderRadius: 0
-                }]
-            },
-            options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, animation: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true } } }
-        });
-    }
-
+    // 12. Sensitivity: the shared "What drives this result" panel (js/rz-sensitivity.js, P07). The weight-based
+    //     chart that stood here multiplied |NPV| by fixed weights and never recomputed anything; removed v3.40.0.
     // ══════════════════════════════════════════════════════════════
     // 13. SCENARIO ANALYSIS
     // ══════════════════════════════════════════════════════════════
@@ -1607,6 +1563,8 @@
 <!-- Supabase save/reload scenario (additive) -->
 <script src="js/rz-config.js?v=20260920-eed056f9"></script>
 <script src="js/rz-scenario.js?v=20261111-9f2ae47f"></script>
+<script src="js/rz-embed-compute.js?v=20261111-8c827926"></script><!-- P07: sensitivity panel (replaces a weight-based chart) -->
+<script src="js/rz-sensitivity.js?v=20261111-3cab8280"></script>
 <script type="module" src="js/rz-supabase.js?v=20261111-3c801534"></script>
 
 <script>

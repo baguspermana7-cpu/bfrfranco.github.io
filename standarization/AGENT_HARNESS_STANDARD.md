@@ -291,6 +291,24 @@ of the evidence history and must remain distinguishable from the final PASS.
 Result: the daemon verifies WI-HARNESS-002 through its own machinery. The last criterion, A15, is this
 standard, the changelog and the site version shipping together, in site release v3.24.36.
 
+### 2026-11-11 — the full gate in two shards (v3.40.0)
+
+The full ship gate is 179 gates and ran for about three hours on one browser lane while the next release waited.
+`tools/ship-gate.sh` now takes `RZ_GATE_SHARD=i/n`: shard i runs gate numbers i, i+n, i+2n … (numbers stay global, so a
+failure names the same gate as an unsharded run). Shard 1 also runs the engine guard and the probe. A tree ships only
+when every shard exits 0; each shard prints `SHARD i/n: ALL k OF ITS GATES PASS`.
+
+```
+rz-lane -l 1 -t 7200 -- env RZ_GATE_SHARD=1/2 bash tools/ship-gate.sh --probe > gate-1.log 2>&1 &
+rz-lane -l 2 -t 7200 -- env RZ_GATE_SHARD=2/2 bash tools/ship-gate.sh --probe > gate-2.log 2>&1 &
+```
+
+`RZ_GATE_LIST=1` prints `GATE [n] name` for each gate without running it. The split was proven with it: shard 1 lists 90,
+shard 2 lists 89, together exactly the 179 of an unsharded run and none twice (the first cut lost the probe to shard 2,
+which never runs it; the probe is now pinned to shard 1). Safe to run concurrently because every gate server binds port
+0 and the only shared temp file (`/tmp/_probe.log`) belongs to the probe. Two shards load the machine twice: rz-lane's
+thermal pause still applies, and a single failure under load is rerun alone before it is believed.
+
 ### 2026-11-08 — release environment traps (v3.27.0 – v3.28.1)
 
 | # | Symptom (measured) | Root cause | Fix | Kept by |
