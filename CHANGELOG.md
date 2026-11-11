@@ -11,6 +11,42 @@ release sections rather than semver.
 
 ---
 
+## v3.49.0 — 2026-11-12 — Tier Advisor sizes spares, RFS gaps become Cx issues, and the extra text goes to tooltips
+
+Product transformation, Wave 3: P13 parts A and B (lifecycle hand-offs).
+
+### Added
+- **"Size spares for this design →" on Tier Advisor.** Opens the spares calculator with the computed tier and the cooling
+  redundancy (2(N+1) and N+2 map to what spares models: 2N and N+1).
+- **One hand-off contract.** `js/rz-handoff.js` holds the spares link parameters (type, range, unit, target fields), the
+  same table as `data/calculators.json` → `spares.handoff`. Senders build the URL from it; spares validates against it.
+
+- **RFS gap → Cx issue.** Each open requirement in the RFS gates checklist has "→ Cx": pick the Cx system (pre-selected
+  from the discipline where one fits) and the level it blocks (default L3), then Send. The Cx calculator's Issues panel
+  shows "1 readiness gap waiting · Add to register · Dismiss". Add creates one issue per gap, category from the blocker
+  class (hard A, soft B, info C), title suffixed "(RFS)" and linked back to the gap. A gap already queued or added is
+  refused; queued gaps expire after 7 days. Local to this browser (`rz_handoff_cx`, `rz-cx-issue-sources`); nothing is
+  sent automatically. `js/rz-handoff-cx.js`.
+
+### Fixed
+- **Spares accepted any positive link value.** `?mttr=99999` set the stock-out MTTR to 99,999 hours, and `?tier=7`
+  was dropped silently. Every value is now range-checked; rejected values show as "1 ignored", with the reason in the
+  tooltip, and are never applied. Fields filled from a link carry a thin accent marker until "Clear".
+
+### Changed
+- **Less visible text** (owner request). The spares hand-off line reads "From Tier Advisor · Tier 3 · N+1 · ID"; the
+  carbon and OPEX source lines (v3.47.0) show only the word ASSUMED, with the source sentence in the tooltip.
+
+### Gates
+- `tools/test-handoff-contract.mjs` (61 checks): RED on the previous tree (13 failed, including `mttr=99999` accepted
+  and no Tier Advisor link), GREEN after. `tools/test-locations-ui.mjs` now asserts the evidence word is the only
+  visible text (119 checks).
+- `tools/test-handoff-cx.mjs` (33 checks: queue, duplicates, expiry, intake with the real issue store, RFS and Cx in
+  one browser, 390 px both themes): RED on the part-A tree (no "→ Cx" control), GREEN after.
+
+### Not in this release
+- Project → spares (FR-P13-5): spares and Tier Advisor do not load the project module yet. Cx Tier 3 records are not
+  active anywhere, so intake writes the Tier 1 register (amendment C3 applies once P06 lands).
 ## v3.48.0 — 2026-11-12 — P&ID engine split and extended; index colour mock for review
 
 Owner requests R117, R119 and R120. Two noindex mock pages; no live page changes appearance.

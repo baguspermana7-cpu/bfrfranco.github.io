@@ -1,7 +1,7 @@
 // P11 — rendered location values agree across calculators, and each prefilled value says where it comes from.
 // L1 same ISO code → same energy price on carbon, opex, tco (country:XX) and same grid factor on carbon;
 //    the value equals RZEngine.data.countries (the one dataset).
-// L2 carbon (grid + energy) and opex (energy) show a source line containing the word ASSUMED, both themes, 390 px fits.
+// L2 carbon (grid + energy) and opex (energy) show the evidence word ASSUMED; the source sentence is its tooltip; both themes, 390 px fits.
 // L3 an opex row the engine does not carry (HK) reads "legacy page value, no source on file".
 // Run: node tools/test-locations-ui.mjs [--base=http://127.0.0.1:PORT]
 import { createRequire } from 'node:module';
@@ -46,21 +46,24 @@ for (const theme of ['dark', 'light']) {
   for (const code of CODES) {
     await cp.select('#countrySelect', code); await settle();
     const r = await cp.evaluate(() => ({ rate: +document.getElementById('electricityRate').value, grid: +document.getElementById('gridIntensity').value,
-      rs: (document.getElementById('electricityRateSrc') || {}).textContent || '', gs: (document.getElementById('gridIntensitySrc') || {}).textContent || '',
+      rs: (document.getElementById('electricityRateSrc') || {}).title || '', gs: (document.getElementById('gridIntensitySrc') || {}).title || '',
+      rv: (document.getElementById('electricityRateSrc') || {}).textContent || '', gv: (document.getElementById('gridIntensitySrc') || {}).textContent || '',
       word: getComputedStyle(document.querySelector('#electricityRateSrc b') || document.body).color }));
     seen.carbon[code] = r;
     ok(`carbon ${theme} ${code} rate = engine`, r.rate === C[code].economy.electricityRate, r.rate);
     ok(`carbon ${theme} ${code} grid = engine`, r.grid === C[code].environment.gridCarbonIntensity, r.grid);
-    ok(`carbon ${theme} ${code} source lines say ASSUMED`, /^ASSUMED · DCMOC country reference/.test(r.rs) && /^ASSUMED · /.test(r.gs), [r.rs, r.gs]);
+    ok(`carbon ${theme} ${code} source tooltips say ASSUMED · DCMOC country reference`, /^ASSUMED · DCMOC country reference/.test(r.rs) && /^ASSUMED · /.test(r.gs), [r.rs, r.gs]);
+    ok(`carbon ${theme} ${code} visible line is the evidence word only`, r.rv === 'ASSUMED' && r.gv === 'ASSUMED', [r.rv, r.gv]);
   }
   await cp.close();
   const op = await open('opex-calculator.html', theme, 1440);
   for (const code of [...CODES, 'HK']) {
     if (!(await op.$(`#countrySelect option[value="${code}"]`))) { ok(`opex has ${code}`, false); continue; }
     await op.select('#countrySelect', code); await settle();
-    const r = await op.evaluate(() => ({ rate: parseFloat(document.getElementById('energyRate').textContent.replace('$', '')), src: (document.getElementById('energyRateSrc') || {}).textContent || '' }));
+    const r = await op.evaluate(() => ({ rate: parseFloat(document.getElementById('energyRate').textContent.replace('$', '')), src: (document.getElementById('energyRateSrc') || {}).title || '', vis: (document.getElementById('energyRateSrc') || {}).textContent || '' }));
     seen.opex[code] = r;
-    if (code === 'HK') ok(`opex ${theme} HK legacy page value`, /^ASSUMED · legacy page value, no source on file$/.test(r.src), r.src);
+    ok(`opex ${theme} ${code} visible line is the evidence word only`, r.vis === 'ASSUMED', r.vis);
+    if (code === 'HK') ok(`opex ${theme} HK legacy page value`, /^ASSUMED · legacy page value, no source on file/.test(r.src), r.src);
     else {
       ok(`opex ${theme} ${code} rate = engine`, Math.abs(r.rate - C[code].economy.electricityRate) < 5e-4, r.rate);
       ok(`opex ${theme} ${code} source says ASSUMED`, /^ASSUMED · DCMOC country reference/.test(r.src), r.src);

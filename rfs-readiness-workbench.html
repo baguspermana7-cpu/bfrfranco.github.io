@@ -77,9 +77,11 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha384-iw3OoTErCYJJB9mCa8LNS2hbsQ7M3C0EpIsO/H5+EGAkPGc6rk+V8i04oW/K5xq0" crossorigin="anonymous">
-    <script src="js/rz-version.js?v=20261111-fd9f0150" defer></script>
+    <script src="js/rz-version.js?v=20261112-1d3a0452" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-scenario.js?v=20261111-01011425"></script>
+    <script src="js/rz-cx-plan.js?v=20261111-b5d2837d"></script>
+    <script src="js/rz-handoff-cx.js?v=20261111-70cf1858"></script>
 <script src="js/rz-manual-links.js?v=20261111-33875d8f" defer></script><!-- P02: save/open/share links (rz-scenario) ; in the head here because the page routes by hash (#setup) during its own first script, so the link must be read before that -->
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>    <meta property="og:image:width" content="1200">    <meta property="og:image:height" content="630">    <meta property="og:image:alt" content="RFS Readiness Workbench | Data Center Ready-for-Service Planning">    <meta name="twitter:image" content="https://resistancezero.com/assets/og/rfs-readiness-workbench.webp">
 
@@ -105,7 +107,7 @@
 }
 </style>
     <link rel="stylesheet" href="css/rz-hub.css?v=20261015-f49c6a25">
-    <link rel="stylesheet" href="css/rz-tool.css?v=20261111-55dd0365">
+    <link rel="stylesheet" href="css/rz-tool.css?v=20261111-d5d93146">
 </head>
 <body class="hub tool" data-rz-calc="rfs" data-rz-account-pill="off">
     <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
@@ -3947,7 +3949,7 @@ var RfsUI = {
                     var hasEv = evidence.some(function(e){return e.requirementId===r.id && e.unitId===unitId && e.status==='accepted';});
                     var wClass = r.weight >= 10 ? 'rfs-cl-w3' : (r.weight >= 7 ? 'rfs-cl-w2' : 'rfs-cl-w1');
                     var wLabel = r.weight >= 10 ? 'W3' : (r.weight >= 7 ? 'W2' : 'W1');
-                    html += '<div class="rfs-cl-item">';
+                    html += '<div class="rfs-cl-item" id="gap-'+(unitId+':'+r.id).replace(/[^\w:.-]/g,'-')+'">';
                     html += '<input type="checkbox" class="rfs-cl-checkbox" '+(hasEv?'checked':'')+' onchange="RfsUI.onChecklistCheck(\''+r.id+'\',this.checked)">';
                     html += '<span class="rfs-cl-label">'+(r.mandatory?'<i class="fas fa-asterisk rfs-cl-mandatory"></i> ':'')+r.title+'</span>';
                     html += '<span class="rfs-tip">?<div class="rfs-tip-data" data-title="'+r.title.replace(/"/g,'&quot;')+'" data-desc="'+r.criteria.replace(/"/g,'&quot;')+'" data-ref="'+disc+' | '+r.evidenceType.replace(/_/g,' ')+' | '+r.sourceClass+'"></div></span>';
@@ -3955,6 +3957,7 @@ var RfsUI = {
                     html += '<span class="rfs-src rfs-src-'+r.sourceClass.toLowerCase()+'">'+r.sourceClass+'</span>';
                     if (r.blockerClass==='hard') html += '<span class="rfs-cl-blocker-hard" title="Hard blocker"></span>';
                     else if (r.blockerClass==='soft') html += '<span class="rfs-cl-blocker-soft" title="Soft blocker"></span>';
+                    if (!hasEv) html += RfsUI.cxCell(unitId, r);
                     html += '</div>';
                 });
             });
@@ -5026,6 +5029,45 @@ var RfsUI = {
         RfsStore.saveDomain(activeProjectId, 'photoLog', photos);
         this.showToast('Photo entry added.', 'success');
         RfsUtils.logAction('Photo log', fileRef);
+    },
+
+    // P13 part B: an open checklist gap can be sent to the Cx issue register (local queue rz_handoff_cx).
+    // Visible text stays short; the rule (severity from the blocker class) lives in the tooltip.
+    _cxQueue: function() { try { return window.RZHandoffCx ? RZHandoffCx.queue(localStorage) : null; } catch (e) { return null; } },
+    _cxGap: function(unitId, reqId) {
+        var r = (RfsLibrary.requirements || []).filter(function(x){ return x.id === reqId; })[0];
+        if (!r) return null;
+        var ev = (projectData.evidence || []).filter(function(e){ return e.requirementId === reqId && e.unitId === unitId; }).map(function(e){ return e.id; });
+        return RZHandoffCx.fromGap({ unitId: unitId, reqId: reqId, title: r.title, discipline: r.discipline, blockerClass: r.blockerClass, evidenceIds: ev });
+    },
+    cxCell: function(unitId, r) {
+        var q = this._cxQueue(); if (!q) return '';
+        unitId = String(unitId).replace(/[^\w.-]/g, '');
+        var gid = unitId + ':' + r.id;
+        var inner = q.has(gid) ? '<a class="rfs-cl-cx-sent" href="cx-calculator.html?tab=analysis#cxIsPanel">Sent · Open Cx</a>'
+            : '<button type="button" class="rfs-cl-cx-btn" title="Send this gap to the Cx issue register" onclick="RfsUI.cxForm(this)">→ Cx</button>';
+        return '<span class="rfs-cl-cx" data-unit="'+unitId+'" data-req="'+r.id+'">'+inner+'</span>';
+    },
+    cxForm: function(btn) {
+        var cell = btn.parentNode, unitId = cell.getAttribute('data-unit'), reqId = cell.getAttribute('data-req');
+        var g = this._cxGap(unitId, reqId); if (!g || !window.RZCxPlan) return;
+        var opts = '<option value="">System…</option>' + RZCxPlan.SYSTEMS.map(function(s){ return '<option value="'+s.id+'"'+(s.id===g.system?' selected':'')+'>'+s.label.replace(/[<>&"]/g,'')+'</option>'; }).join('');
+        var gates = ['L1','L2','L3','L4','L5'].map(function(x){ return '<option'+(x===g.gate?' selected':'')+'>'+x+'</option>'; }).join('');
+        cell.innerHTML = '<select class="rfs-select rfs-cl-cx-sys" aria-label="Cx system">'+opts+'</select>'
+            + '<select class="rfs-select rfs-cl-cx-gate" aria-label="Blocks Cx level" title="Cx level this gap blocks">'+gates+'</select>'
+            + '<button type="button" class="rfs-cl-cx-btn" title="Category '+g.severity+' (from the '+(g.severity==='A'?'hard':g.severity==='B'?'soft':'info')+' blocker class)" onclick="RfsUI.cxSend(this)">Send</button>';
+        cell.querySelector('select').focus();
+    },
+    cxSend: function(btn) {
+        var cell = btn.parentNode, q = this._cxQueue();
+        var g = this._cxGap(cell.getAttribute('data-unit'), cell.getAttribute('data-req')); if (!g || !q) return;
+        g.system = cell.querySelector('.rfs-cl-cx-sys').value || null;
+        g.gate = cell.querySelector('.rfs-cl-cx-gate').value;
+        if (!g.system) { this.showToast('Pick a Cx system.', 'warning'); return; }
+        var r = q.send(g);
+        if (r.ok || r.code === 'DUP') {
+            cell.innerHTML = '<a class="rfs-cl-cx-sent" href="cx-calculator.html?tab=analysis#cxIsPanel">'+(r.ok ? 'Sent' : 'Already sent')+' · Open Cx</a>';
+        } else this.showToast(r.code === 'FULL' ? 'The Cx queue is full (100).' : 'Could not queue this gap.', 'error');
     },
 
     showToast: function(msg, type) {

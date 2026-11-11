@@ -148,7 +148,8 @@ Traps catalogued in memory: pue.defaultFor key mismatch (use pueMatrix direct), 
 - One dataset for country energy price and grid factor: `RZEngine.data.countries` (generated from
   `dcmoc/src/constants/countries.ts`). Calculators read it; a page table is a fallback only for a row the engine does not
   carry. Do not add a second copy (no `data/locations.json`).
-- Every prefilled country value shows a source line from `js/rz-locations.js`: "ASSUMED · DCMOC country reference, as of
+- Every prefilled country value carries a source line from `js/rz-locations.js`. Since v3.49.0 (owner: less visible
+  text) only the evidence word ASSUMED is visible; the sentence is its tooltip: "ASSUMED · DCMOC country reference, as of
   <date>" (the dataset cites its sources once, not per value), or "ASSUMED · legacy page value, no source on file" for a
   page-only row. The word ASSUMED is always visible beside an ASSUMED value.
 - Open: `DATA.electricityTariffs` differs from `DATA.countries` for all 14 countries it covers, and its provenance note
@@ -157,3 +158,22 @@ Traps catalogued in memory: pue.defaultFor key mismatch (use pueMatrix direct), 
   field's title names the cited alternative.
 - Gates: `tools/test-locations.mjs` (core) and `tools/test-locations-ui.mjs` (carbon, opex and tco render the same
   value as the engine for the same code).
+
+## Calculator hand-offs (P13, v3.49.0)
+
+- A calculator sends values to another only through a URL built by `RZHandoff.url(contract, values)` (`js/rz-handoff.js`).
+  The receiving page reads them with `RZHandoff.parse()`: each value is checked against its type and range, applied
+  values are tagged on their fields (`data-rz-handoff`), and invalid values are never applied. Hand-offs prefill and
+  never lock; "Clear" removes the tags and keeps the values.
+- The spares contract lives once in `data/calculators.json` → `spares.handoff` and is mirrored in the module; the gate
+  asserts they are equal, that every target field exists, and that the enums equal the page's own option lists.
+  Breaking the URL contract needs a version param (`hv=2`). LTC's incident links use the same contract (`from=incident`).
+- `mtbf` is in years (the spares field is an annual failure rate); `tier` 1–4 maps to redundancy n / n1 / n1 / 2n and an
+  explicit `redundancy` wins.
+- Visible text is short ("From Tier Advisor · Tier 3 · N+1 · ID", "1 ignored"); the reasons and the how-to are tooltips.
+- RFS → Cx (part B): a gap is queued only by the user ("→ Cx", system and level chosen in the row) in `rz_handoff_cx`
+  (`js/rz-handoff-cx.js`: max 100, 7-day expiry, duplicate guard by `unitId:reqId` across the queue and the intaken
+  issues). Cx adds it through `RZCxIssues.store().add()` with the UI's own store instance (its cache), never by writing
+  the key; the back-link lives in `rz-cx-issue-sources` because the Tier 1 schema has no source field.
+- Gates: `tools/test-handoff-contract.mjs`, `tools/test-handoff-cx.mjs`. Not yet: project → spares (spares and tier do
+  not load `rz-project.js`).

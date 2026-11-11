@@ -313,6 +313,8 @@ gate "Project pack in the browser — printed CAPEX numbers = what the page show
 gate "Data dates — every engine source has a refresh policy and a parseable date, fixed-clock staleness, min twin, tracker + tco dates and the stale flag (P26A)" node tools/test-asof.mjs
 gate "Location values — engine country value wins, ASSUMED source line per value, page-only rows say legacy, tariff conflicts listed (P11)" node tools/test-locations.mjs
 gate "Location render — carbon, opex and tco show the engine's energy price for the same code; source lines in both themes; fits 390 px (P11)" node tools/test-locations-ui.mjs
+gate "Hand-off contract — spares validates every link value against one contract (registry = module), lists what it ignored, Tier Advisor sends the contract URL; 390 px both themes (P13 A)" node tools/test-handoff-contract.mjs
+gate "Hand-off RFS → Cx — an open readiness gap becomes one Cx issue (\"(RFS)\", back-link), duplicates refused, 7-day expiry, refused items kept; 390 px both themes (P13 B)" node tools/test-handoff-cx.mjs
 gate "Sensitivity — fixture exact per factor kind, pue/roi/carbon every factor equals the page recompute, inputs untouched, tia top gain equals ticking it (P07)" node tools/test-sensitivity.mjs
 gate "Tornado correctness — tco = page swing via tcoCore, cx rows = page totals, spares heatmap centre = module, tier weights = score, capex/opex = MC driver (P07)" node tools/test-tornado-correctness.mjs
 gate "Sustainability page (K25) — generator-fresh, worked example recomputed, citations and FAQ JSON-LD consistent" python3 tools/test-pillar-sustainability.py

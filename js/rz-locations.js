@@ -82,9 +82,9 @@
       b.className = 'rz-asof'; b.setAttribute('data-tone', 'warn'); b.style.fontWeight = '600';
       b.textContent = r.evidence;
       el.appendChild(b);
-      el.appendChild(w.document.createTextNode(r.text.slice(r.evidence.length)));
     } else el.textContent = r.text;
-    el.title = r.title;
+    // Only the evidence word is visible; the source sentence lives in the tooltip (owner 2026-11-12: less text).
+    el.title = r.evidence ? r.text + (r.title ? '. ' + r.title : '') : r.title;
     el.setAttribute('data-rz-loc-evidence', r.evidence || 'none');
     return r;
   };

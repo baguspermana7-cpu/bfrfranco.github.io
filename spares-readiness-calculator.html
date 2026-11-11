@@ -62,7 +62,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha384-iw3OoTErCYJJB9mCa8LNS2hbsQ7M3C0EpIsO/H5+EGAkPGc6rk+V8i04oW/K5xq0" crossorigin="anonymous">
 <!-- Chart.js loaded blocking (non-deferred) per site convention to avoid sync init issues -->
 <script src="js/vendor/chart.umd.min.js?v=20261110-74401d73"></script>
-<script src="js/rz-version.js?v=20261111-fd9f0150" defer></script>
+<script src="js/rz-version.js?v=20261112-1d3a0452" defer></script>
 <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
 <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
 <script src="js/spares-parts-catalog.js?v=20260920-1487b6d8" defer></script>    <meta property="og:image:alt" content="Critical Spares Engine | DC M&amp;E Spares Readiness Calculator">
@@ -87,7 +87,7 @@
 }
 </style>
     <link rel="stylesheet" href="css/rz-hub.css?v=20261015-f49c6a25">
-    <link rel="stylesheet" href="css/rz-tool.css?v=20261111-55dd0365">
+    <link rel="stylesheet" href="css/rz-tool.css?v=20261111-d5d93146">
 </head>
 <body class="hub tool" data-rz-calc="spares" data-rz-account-pill="off">
 <script>
@@ -159,7 +159,7 @@
   </header>
 
   <div class="wrap">
-  <div class="carrier-banner" id="carrierBanner"><i class="fas fa-link"></i> <span id="carrierBannerText">Your config carried over from another calculator.</span></div>
+  <div class="carrier-banner" id="carrierBanner" role="status"><span id="carrierBannerText"></span><span class="carrier-ignored" id="carrierIgnored" tabindex="0" hidden></span> <button type="button" class="carrier-clear" id="carrierClear" hidden>Clear</button></div>
   <div class="tool-bar" role="toolbar" aria-label="Scenario">
     <button type="button" class="tool-btn" onclick="saveScenario()" aria-label="Save current scenario to browser storage">Save</button>
     <button type="button" class="tool-btn" onclick="loadScenario()" aria-label="Load saved scenario from browser storage">Load</button>
@@ -3540,6 +3540,7 @@
 <!-- Scripts -->
 <script src="auth.js?v=20261031-f01cb5a3" defer></script>
 <script src="rz-engine.min.js?v=20261111-b132f06f" defer></script>
+<script src="js/rz-handoff.js?v=20261111-7561617b"></script>
 <script src="script.min.js?v=20261101-0e062c54" defer></script>
 
 <script>
@@ -5126,88 +5127,54 @@ window.addEventListener('scroll', function() {
 
 /* ===========================================
    URL PARAM DEEP-LINK
-   /*
-    * Supported URL params (query string):
-    *   ?itLoad=         IT load in kW or MW (context, shown in banner)
-    *   ?tier=           DC tier (3 or 4) → maps redundancy to n1 / 2n
-    *   ?redundancy=     n | n1 | 2n → c1_redundancy
-    *   ?mtbf=           MTBF in years → lambda = 1/mtbf
-    *   ?mttr=           MTTR in hours → mc_mttr
-    *   ?downtimeCostPerHr=  $/hr → mc_downtime_cost + s_understk_cost default
-    *   ?country=        2-letter ISO code → regional lead-time multiplier (lookup table)
-    * Deep-link from OPEX/TCO/ROI/PUE calculator pages.
-    */
+   The parameter table (names, types, ranges, units, target fields) is the hand-off contract in
+   js/rz-handoff.js, equal to data/calculators.json spares.handoff (gate: tools/test-handoff-contract.mjs).
+   tier 1–4 → redundancy n / n1 / n1 / 2n; an explicit redundancy wins; mtbf is in YEARS (c1_lambda is per year).
+   =========================================== */
 (function() {
-  var params = new URLSearchParams(window.location.search);
-  var carrierParams = [];
+  // P13: every query parameter is validated against the shared contract (js/rz-handoff.js =
+  // data/calculators.json spares.handoff). Invalid values are listed, never applied; applied fields are tagged.
+  var H = window.RZHandoff, contract = H && H.CONTRACTS.spares;
+  var result = H ? H.parse(contract, window.location.search) : { applied: [], ignored: [] };
+  var carrierParams = [], from = null, tagged = {};
 
   // Country → lead-time multiplier + carrying cost adjustment
   var countryLT = { US:1.0, GB:1.0, DE:1.05, FR:1.05, AU:1.15, IN:1.25, SG:1.10, ID:1.30, JP:1.10, BR:1.40, CN:0.90, MY:1.20 };
   var countryCarry = { US:20, GB:22, DE:22, FR:22, AU:24, IN:18, SG:22, ID:20, JP:22, BR:25, CN:18, MY:20 };
 
-  function setField(id, val) { var el = document.getElementById(id); if (el && val !== null) { el.value = val; } }
-
-  if (params.has('redundancy')) {
-    var r = params.get('redundancy').toLowerCase();
-    if (['n','n1','2n'].indexOf(r) >= 0) { setField('c1_redundancy', r); carrierParams.push('redundancy=' + r); }
+  function setField(id, val) {
+    var el = document.getElementById(id);
+    if (el && val !== null) { el.value = val; el.setAttribute('data-rz-handoff', ''); tagged[id] = true; }
   }
-  if (params.has('tier')) {
-    var tier = parseInt(params.get('tier'));
-    if (tier === 4) { setField('c1_redundancy', '2n'); carrierParams.push('tier=4'); }
-    else if (tier === 3) { setField('c1_redundancy', 'n1'); carrierParams.push('tier=3'); }
+  var v = {};
+  result.applied.forEach(function (a) { v[a.param] = a.value; });
+  var order = ['tier', 'redundancy', 'mtbf', 'mttr', 'downtimeCostPerHr', 'country', 'itLoad', 'commodity', 'installedBase', 'leadTime', 'unitCost'];
+  if ('from' in v) from = v.from;
+  // tier first, so an explicit redundancy (more specific) wins
+  if ('tier' in v) setField('c1_redundancy', ({ 1: 'n', 2: 'n1', 3: 'n1', 4: '2n' })[v.tier]);
+  if ('redundancy' in v) setField('c1_redundancy', v.redundancy);
+  if ('mtbf' in v) setField('c1_lambda', (1 / v.mtbf).toFixed(3));
+  if ('mttr' in v) setField('mc_mttr', v.mttr);
+  if ('downtimeCostPerHr' in v) {
+    setField('mc_downtime_cost', v.downtimeCostPerHr);
+    var mttrVal = parseFloat(document.getElementById('mc_mttr') && document.getElementById('mc_mttr').value) || 168;
+    setField('s_understk_cost', Math.round(v.downtimeCostPerHr * mttrVal));
   }
-  if (params.has('mtbf')) {
-    var mtbf = parseFloat(params.get('mtbf'));
-    if (mtbf > 0) { setField('c1_lambda', (1/mtbf).toFixed(3)); carrierParams.push('mtbf=' + mtbf); }
-  }
-  if (params.has('mttr')) {
-    var mttr = parseFloat(params.get('mttr'));
-    if (mttr > 0) { setField('mc_mttr', mttr); carrierParams.push('mttr=' + mttr); }
-  }
-  if (params.has('downtimeCostPerHr')) {
-    var dtc = parseFloat(params.get('downtimeCostPerHr'));
-    if (dtc > 0) {
-      setField('mc_downtime_cost', dtc);
-      var mttrVal = parseFloat(document.getElementById('mc_mttr') && document.getElementById('mc_mttr').value) || 168;
-      setField('s_understk_cost', Math.round(dtc * mttrVal));
-      carrierParams.push('downtime=$' + dtc.toLocaleString() + '/hr');
-    }
-  }
-  if (params.has('country')) {
-    var cc = params.get('country').toUpperCase();
-    var ltMult = countryLT[cc] || 1.0;
-    var carryAdj = countryCarry[cc] || 22;
+  if ('country' in v) {
     var baseLT = parseFloat(document.getElementById('r_lt_weeks').value) || 16;
-    setField('r_lt_weeks', Math.round(baseLT * ltMult));
-    setField('s_lt_weeks', Math.round(baseLT * ltMult));
-    setField('s_carry_rate', carryAdj);
-    setField('ltb_carry_rate', carryAdj);
-    carrierParams.push('country=' + cc);
+    setField('r_lt_weeks', Math.round(baseLT * countryLT[v.country]));
+    setField('s_lt_weeks', Math.round(baseLT * countryLT[v.country]));
+    setField('s_carry_rate', countryCarry[v.country]);
+    setField('ltb_carry_rate', countryCarry[v.country]);
   }
-  if (params.has('itLoad')) {
-    carrierParams.push('itLoad=' + params.get('itLoad') + ' kW');
+  if ('commodity' in v && typeof COMMODITY_DEFAULTS !== 'undefined' && COMMODITY_DEFAULTS[v.commodity]) {
+    setField('c1_commodity', v.commodity);
+    applyCommodityDefaults(v.commodity, 'url');
   }
-  if (params.has('commodity')) {
-    var comm = params.get('commodity').toLowerCase();
-    var commEl = document.getElementById('c1_commodity');
-    if (commEl && COMMODITY_DEFAULTS[comm]) {
-      commEl.value = comm;
-      applyCommodityDefaults(comm, 'url');
-      carrierParams.push('commodity=' + comm);
-    }
-  }
-  if (params.has('installedBase')) {
-    var ib = parseInt(params.get('installedBase'));
-    if (ib > 0) { setField('c1_installed', ib); setField('s_installed_base', ib); setField('h_sites', Math.min(ib, 50)); carrierParams.push('installedBase=' + ib); }
-  }
-  if (params.has('leadTime')) {
-    var lt = parseFloat(params.get('leadTime'));
-    if (lt > 0) { setField('r_lt_weeks', lt); setField('s_lt_weeks', lt); setField('h_oem_lt', lt); setField('mc_lt_base', lt); carrierParams.push('leadTime=' + lt + 'wk'); }
-  }
-  if (params.has('unitCost')) {
-    var uc = parseFloat(params.get('unitCost'));
-    if (uc > 0) { setField('s_unit_cost', uc); setField('h_unit_cost', uc); setField('ltb_unit_cost', uc); carrierParams.push('unitCost=$' + uc.toLocaleString()); }
-  }
+  if ('installedBase' in v) { setField('c1_installed', v.installedBase); setField('s_installed_base', v.installedBase); setField('h_sites', Math.min(v.installedBase, 50)); }
+  if ('leadTime' in v) { ['r_lt_weeks', 's_lt_weeks', 'h_oem_lt', 'mc_lt_base'].forEach(function (id) { setField(id, v.leadTime); }); }
+  if ('unitCost' in v) { ['s_unit_cost', 'h_unit_cost', 'ltb_unit_cost'].forEach(function (id) { setField(id, v.unitCost); }); }
+  order.forEach(function (k) { if (k in v) carrierParams.push(H.label(contract, k, v[k])); });
 
   // Hash-based scenario restore (from shareScenario)
   var hash = window.location.hash;
@@ -5220,12 +5187,27 @@ window.addEventListener('scroll', function() {
     } catch(e) { /* ignore malformed hash */ }
   }
 
-  if (carrierParams.length > 0) {
-    var banner = document.getElementById('carrierBanner');
-    var bannerText = document.getElementById('carrierBannerText');
-    if (banner && bannerText) {
-      bannerText.textContent = '← Config carried over: ' + carrierParams.join(', ') + '. Inputs pre-filled — review before running.';
-      banner.classList.add('visible');
+  var banner = document.getElementById('carrierBanner');
+  var bannerText = document.getElementById('carrierBannerText');
+  if ((carrierParams.length || result.ignored.length) && banner && bannerText) {
+    // Short line; the explanation and the reasons live in the tooltips (owner 2026-11-12: less text).
+    var src = from ? H.label(contract, 'from', from) : 'link';
+    bannerText.textContent = carrierParams.length ? 'From ' + src + ' · ' + carrierParams.join(' · ') : '';
+    banner.title = 'Prefilled from a link. Edit any field to override; Clear removes the markers and keeps the values.';
+    var ign = document.getElementById('carrierIgnored');
+    if (ign && result.ignored.length) {
+      ign.hidden = false;
+      ign.textContent = result.ignored.length + ' ignored';
+      ign.title = result.ignored.map(function (x) { return x.param + '=' + x.raw + ': ' + x.reason; }).join('\n');
+    }
+    banner.classList.add('visible');
+    var clear = document.getElementById('carrierClear');
+    if (clear) {
+      clear.hidden = !Object.keys(tagged).length;
+      clear.addEventListener('click', function () {
+        document.querySelectorAll('[data-rz-handoff]').forEach(function (el) { el.removeAttribute('data-rz-handoff'); });
+        banner.classList.remove('visible');
+      });
     }
   }
 })();

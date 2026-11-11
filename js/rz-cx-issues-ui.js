@@ -17,6 +17,9 @@
     var opts = P.SYSTEMS.map(function (s) { return '<option value="' + s.id + '">' + esc(s.label) + '</option>'; }).join('');
     var p = doc.createElement('div'); p.className = 'cx-an-panel'; p.id = 'cxIsPanel';
     p.innerHTML = '<div class="cx-an-panel-head"><h3>Issues</h3><span class="cx-an-sub">local register, this browser · handbook 02.5.4: A blocks the gate; B blocks unless the CxM and EoR record the next level is not affected; C is a condition</span></div>' +
+      '<div class="cx-is-intake" id="cxIsIntake" role="status" hidden><span id="cxIsIntakeText"></span>' +
+      '<button type="button" class="cx-is-intake-btn" id="cxIsIntakeAdd">Add to register</button>' +
+      '<button type="button" class="cx-is-intake-btn" id="cxIsIntakeDismiss">Dismiss</button></div>' +
       '<form class="cx-is-form" id="cxIsForm" novalidate>' +
       '<label>Title <input type="text" id="cxIsTitle" maxlength="120" class="input-field" placeholder="e.g. UPS-A1 bypass breaker fails to close"></label>' +
       '<label>Category <select id="cxIsSev" class="input-field"><option value="A">A · critical</option><option value="B">B · major</option><option value="C">C · minor</option></select></label>' +
@@ -30,6 +33,10 @@
     return true;
   }
 
+  function titleCell(x) {
+    var rec = SRC ? SRC.get(x.id) : null, u = rec && root.RZHandoffCx ? root.RZHandoffCx.safeUrl(rec.url) : null;
+    return u ? '<a href="' + esc(u) + '" title="Open the readiness gap in the RFS workbench">' + esc(x.title) + '</a>' : esc(x.title);
+  }
   function renderList() {
     var h = $('cxIsList'); if (!h) return;
     var reg = R.load(), open = reg.items.filter(function (x) { return x.status === 'open'; }).length;
@@ -38,7 +45,7 @@
     for (var i = 0; i < reg.items.length; i++) {
       var x = reg.items[i], blocks = x.status === 'open' && (x.severity === 'A' || (x.severity === 'B' && !x.waiver));
       t += '<tr data-is="' + x.id + '"' + (x.status === 'closed' ? ' class="is-closed"' : '') + '><th scope="row">' + x.id + '</th><td><span class="cx-is-cat" data-cat="' + x.severity + '">' + x.severity + '</span></td>' +
-        '<td><span class="cx-is-title">' + esc(x.title) + '</span><span class="cx-an-sub cx-is-meta">owner ' + (x.owner || '—') + ' · due ' + (x.due == null ? '—' : 'M' + x.due.toFixed(1)) + '</span></td>' +
+        '<td><span class="cx-is-title">' + titleCell(x) + '</span><span class="cx-an-sub cx-is-meta">owner ' + (x.owner || '—') + ' · due ' + (x.due == null ? '—' : 'M' + x.due.toFixed(1)) + '</span></td>' +
         '<td><button type="button" class="cx-an-link" data-sel="sys:' + x.system + '">' + esc(sysLabel(x.system)) + '</button></td><td>' + x.gate + '</td>' +
         '<td class="cx-is-acts">' + (x.status === 'closed' ? 'closed' : (blocks ? '<b class="cx-is-blocks">open · blocks ' + x.gate + '</b>' : 'open · condition')) +
         (x.severity === 'B' && x.status === 'open' ? '<label class="cx-is-waive"><input type="checkbox" data-is-waive="' + x.id + '"' + (x.waiver ? ' checked' : '') + '> CxM + EoR: next level not affected</label>' : '') +
@@ -115,6 +122,30 @@
       else if (d) { R.remove(d); say(d + ' deleted'); rerender(); }
     });
   }
+  /* P13 part B: readiness gaps queued by the RFS workbench (RZHandoffCx, key rz_handoff_cx) wait here until the user
+   * adds them (one issue each, title suffixed "(RFS)", source link in rz-cx-issue-sources) or dismisses them. */
+  var Q = null, SRC = null;
+  function renderIntake() {
+    var box = $('cxIsIntake'); if (!box || !Q) return;
+    var st = Q.load(), n = st.items.length;
+    box.hidden = !n;
+    $('cxIsIntakeText').textContent = n ? n + ' readiness gap' + (n > 1 ? 's' : '') + ' waiting' : '';
+    box.title = n ? st.items.map(function (x) { return x.title + ' · ' + x.severity + ' · ' + sysLabel(x.system) + ' · ' + x.gate; }).join('\n') : '';
+    if (st.expired) say(st.expired + ' queued gap' + (st.expired > 1 ? 's' : '') + ' older than 7 days discarded');
+  }
+  function bindIntake() {
+    var st = null; try { st = root.localStorage; } catch (e) { st = null; }
+    if (!root.RZHandoffCx || !st) return;
+    Q = root.RZHandoffCx.queue(st); SRC = root.RZHandoffCx.sources(st);
+    $('cxIsIntakeAdd').addEventListener('click', function () {
+      var r = root.RZHandoffCx.intake(Q, R, SRC);
+      say(r.added.length + ' added' + (r.added.length ? ' (' + r.added.map(function (x) { return x.id; }).join(', ') + ')' : '') +
+          (r.refused.length ? ' · ' + r.refused.length + ' refused: ' + r.refused.map(function (x) { return x.gap_id + ' ' + x.code; }).join(', ') : ''));
+      rerender(); renderIntake();
+    });
+    $('cxIsIntakeDismiss').addEventListener('click', function () { Q.clear(); say('Queued gaps dismissed'); renderIntake(); });
+    renderIntake();
+  }
   function restoreFocus(sel) { var q = doc.querySelector(sel); if (q) q.focus(); }
   function hook(plan) { renderList(); decorate(plan); readinessBlock(plan); }
   function init() {
@@ -122,7 +153,7 @@
     if (!A || !P || !I || !A.state || !A.state.hooks) return;
     S = A.state; var st = null; try { st = root.localStorage; } catch (e) { st = null; }
     R = I.store(st); if (!build()) return;
-    bind(); S.hooks.push(hook); A.render();
+    bind(); bindIntake(); S.hooks.push(hook); A.render();
   }
   root.RZCxIssuesUI = { version: '3.33.0' };
   if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', init); else init();

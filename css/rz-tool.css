@@ -1671,6 +1671,14 @@ body.tool[data-rz-calc="spares"] .ca-opp-grid { display: block; }
 body.tool[data-rz-calc="spares"] .ca-opp-card { border: 0; border-bottom: 1px solid var(--rzt-line-soft); border-radius: 0; padding: 10px 0; background: none; }
 body.tool[data-rz-calc="spares"] .ca-opp-count { font-size: 1rem; }
 body.tool[data-rz-calc="spares"] .carrier-banner { max-width: none; margin: var(--rz-space-4) 0 0; background: none; border-color: var(--rzt-line); color: var(--rzt-text-2); font-weight: 400; }
+/* P13 hand-off provenance line: mono 12 px, hairline; tagged fields carry a 2px accent rail until "Clear hand-off" */
+body.tool[data-rz-calc="spares"] .carrier-banner.visible { flex-wrap: wrap; justify-content: space-between; font: 400 12px/1.5 var(--rzt-mono); }
+body.tool[data-rz-calc="spares"] .carrier-banner #carrierBannerText { flex: 1 1 16rem; min-width: 0; overflow-wrap: anywhere; }
+body.tool[data-rz-calc="spares"] .carrier-clear { min-height: 44px; padding: 0 12px; background: none; border: 1px solid var(--rzt-line-strong); border-radius: var(--rz-radius); color: var(--rzt-text); font: 400 12px var(--rzt-mono); cursor: pointer; }
+body.tool[data-rz-calc="spares"] .carrier-clear:hover { border-color: var(--rzt-accent); }
+body.tool[data-rz-calc="spares"] .carrier-clear:focus-visible { outline: 2px solid var(--rzt-accent); outline-offset: 2px; }
+body.tool[data-rz-calc="spares"] [data-rz-handoff] { box-shadow: inset 2px 0 0 var(--rzt-accent); }
+body.tool[data-rz-calc="spares"] .carrier-ignored { margin-left: 0.75em; color: var(--rzt-fault); text-decoration: underline dotted; text-underline-offset: 3px; cursor: help; }
 body.tool[data-rz-calc="spares"] .tool-bar .preset-select { max-width: 280px; }
 body.tool[data-rz-calc="spares"] .scenario-saved-msg { font: 400 11px var(--rzt-mono); color: var(--rzt-muted); }
 body.tool[data-rz-calc="spares"] .sp-howto { margin: var(--rz-space-6) 0 0; padding-top: var(--rz-space-4); border-top: 1px solid var(--rzt-line); }
@@ -2272,3 +2280,17 @@ html[data-rz-register="tool"]:where(:not(:has(> body.tool))):is(:root, #rzt-weig
 html[data-rz-register="tool"]:where(:not(:has(> body.tool))):is(:root, #rzt-weight) :is(.rfs-btn-primary, #rzt-weight) .rfs-tip { color: inherit !important; border-color: currentColor !important; }
 /* phones: source tags inside a table wrap, so a three-column checklist fits 360 px */
 @media (max-width: 600px) { body.tool .ck-tbl .src { white-space: normal; } body.tool .ck-tbl td, body.tool .ck-tbl th { padding: 8px 7px; overflow-wrap: anywhere; hyphens: auto; } body.tool .ck-tbl th { letter-spacing: .02em; } }
+/* P13 tier-advisor → spares hand-off: a link styled as a button (navigation, same tab); the explanation is its tooltip */
+body.tool[data-rz-calc="tier"] .tool-results .res-group.tier-handoff { display: block; padding-top: var(--rz-space-3); padding-bottom: var(--rz-space-3); }
+body.tool[data-rz-calc="tier"] .tier-spares-link { display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; max-width: 100%; border: 1px solid var(--rzt-line-strong); border-radius: var(--rz-radius); color: var(--rzt-text); font: 400 13px var(--rzt-mono); text-decoration: none; transition: border-color 160ms ease; }
+body.tool[data-rz-calc="tier"] .tier-spares-link:hover { border-color: var(--rzt-accent); }
+body.tool[data-rz-calc="tier"] .tier-spares-link:focus-visible { outline: 2px solid var(--rzt-accent); outline-offset: 2px; }
+/* P13 part B: RFS checklist gap → Cx issue register (short controls; the rules live in tooltips) */
+body.tool[data-rz-calc="rfs"] .rfs-cl-item { flex-wrap: wrap; }
+body.tool[data-rz-calc="rfs"] .rfs-cl-cx { margin-left: auto; display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+body.tool[data-rz-calc="rfs"] .rfs-cl-cx-btn { min-height: 32px; padding: 0 10px; background: none; border: 1px solid var(--rzt-line-strong); border-radius: var(--rz-radius); color: var(--rzt-text); font: 400 12px var(--rzt-mono); cursor: pointer; position: relative; }
+body.tool[data-rz-calc="rfs"] .rfs-cl-cx-btn::after { content: ""; position: absolute; inset: -6px; }
+body.tool[data-rz-calc="rfs"] .rfs-cl-cx-btn:hover { border-color: var(--rzt-accent); }
+body.tool[data-rz-calc="rfs"] .rfs-cl-cx-btn:focus-visible, body.tool[data-rz-calc="rfs"] .rfs-cl-cx-sent:focus-visible { outline: 2px solid var(--rzt-accent); outline-offset: 2px; }
+body.tool[data-rz-calc="rfs"] .rfs-cl-cx .rfs-select { min-height: 32px; max-width: 12rem; font-size: 12px; }
+body.tool[data-rz-calc="rfs"] .rfs-cl-cx-sent { font: 400 12px var(--rzt-mono); color: var(--rzt-text-2); }
