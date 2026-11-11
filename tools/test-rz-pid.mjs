@@ -10,7 +10,14 @@
  *    ids exist in the graph, the flow steps cover every equipment item exactly once, every value names a
  *    source that exists, every low-confidence item says why, and every route passes its line's path items.
  *
- * Exit 1 on any failure. Usage: node tools/test-rz-pid.mjs
+ * 4. R117: the module is split (graph model / renderer, each <= 800 lines) with the same public API; the heat
+ *    balance closes or is CARRIED as a marked discrepancy (an unmarked mismatch > 3 % fails, proven on a mutated
+ *    copy); loops are walked in coolant order; every tag's ISA-5.1 meaning is a DB entry equal to decodeTag().
+ * 5. In a real browser (own server, lane-safe): tags go through RZExplain, the page shows the balance arithmetic,
+ *    and at 390 px there is no sideways pan, every step's lit path is inside the drawing and no visible label
+ *    renders under 11 px.
+ *
+ * Exit 1 on any failure. Usage: node tools/test-rz-pid.mjs [--no-browser]   (run the browser part through rz-lane)
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -19,7 +26,10 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(import.meta.url);
-const P = require(path.join(ROOT, 'js/rz-pid.js'));
+const GRAPH = path.join(ROOT, 'js/rz-pid-graph.js');
+const P = require(fs.existsSync(GRAPH) ? GRAPH : path.join(ROOT, 'js/rz-pid.js'));
+const CDU = require(path.join(ROOT, 'js/cdu-engine.js'));
+const NO_BROWSER = process.argv.includes('--no-browser');
 const FIX = path.join(ROOT, 'tools/fixtures/pid-mini-plant');
 
 let pass = 0;
@@ -190,6 +200,192 @@ for (const pg of doc.pages) for (const l of pg.lines) {
     if (i < 0) ok = false; else at = i;
   }
   check('cdu: route ' + l.id + ' passes its path items in order', ok);
+}
+
+/* ---------------------------------------------------------------- 4. R117 */
+/* 4a. split: graph model + renderer, each <= 800 lines, same public API (plus balance/flowRank/explainKey) */
+const MODS = ['js/rz-pid-build.js', 'js/rz-pid-graph.js', 'js/rz-pid-render.js'];
+for (const f of MODS) {
+  const p = path.join(ROOT, f), n = fs.existsSync(p) ? fs.readFileSync(p, 'utf8').split('\n').length : -1;
+  check('split: ' + f + ' exists and is <= 800 lines', n > 0 && n <= 800, n < 0 ? 'missing' : n + ' lines');
+}
+check('split: js/rz-pid.js is gone (no third copy of the model)', !fs.existsSync(path.join(ROOT, 'js/rz-pid.js')));
+for (const k of ['buildGraph', 'explain', 'normalizeTag', 'normalizeLabel', 'parseIsaTag', 'decodeTag', 'loopVariable', 'LOW_CONFIDENCE', 'LOCATION_WORD', 'balance', 'flowRank', 'explainKey'])
+  check('api: RZPid.' + k + ' exported in Node', P[k] !== undefined);
+{
+  const html = fs.readFileSync(path.join(ROOT, 'rz-pid-mock.html'), 'utf8');
+  const order = ['js/cdu-model.js', 'js/cdu-engine.js', 'js/rz-pid-build.js', 'js/rz-pid-graph.js', 'js/rz-pid-render.js', 'js/rz-explain-db.js', 'js/rz-explain.js'].map((s) => html.indexOf('src="' + s));
+  check('page: loads model, engine, the three pid modules and RZExplain in dependency order', order.every((i, k) => i > 0 && (!k || i > order[k - 1])), JSON.stringify(order));
+  check('page: no page-own tooltip markup left', !/rzpid-tip/.test(html) && !/rzpid-tip/.test(fs.existsSync(path.join(ROOT, 'js/rz-pid-render.js')) ? fs.readFileSync(path.join(ROOT, 'js/rz-pid-render.js'), 'utf8') : 'rzpid-tip'));
+}
+
+/* 4b. heat balance. Hand computation (cdu-engine.js PG25 at the mean of 32 and 43 °C = 37.5 °C):
+ *   water rho = 1000.6 - 0.0476*37.5 - 0.0034*37.5^2 = 994.034 kg/m3; PG25 x 1.024 = 1017.89 kg/m3 = 1.01789 kg/L
+ *   cp = 4.186 x 0.905 = 3.78833 kJ/kgK
+ *   Q = 390 x 1.01789 x 3.78833 x 11 / 60 = 275.71 kW;  300 kW needs 300 x 60 / (1.01789 x 3.78833 x 11) = 424.36 LPM = 1.4145 LPM/kW */
+const balOf = (gr) => (typeof P.balance === 'function' ? P.balance(gr, CDU.fluidProps) : []);
+const bal = balOf(g), hx = bal.find((r) => r.node === 'E-01');
+check('balance: the CDU plant has a balance on E-01 (the check cannot pass vacuously)', !!hx, JSON.stringify(bal).slice(0, 200));
+if (hx) {
+  const near = (a, b) => Math.abs(a - b) / b < 0.005;
+  check('balance: Q = 275.71 kW within 0.5 %', near(hx.q_kw, 275.71), String(hx.q_kw));
+  check('balance: 300 kW needs 424.36 LPM within 0.5 %', near(hx.need_lpm, 424.36), String(hx.need_lpm));
+  check('balance: 1.4145 LPM/kW within 0.5 %', near(hx.need_lpm_per_kw, 1.4145), String(hx.need_lpm_per_kw));
+  check('balance: declared 300 kW, short by about 8 %', hx.declared_kw === 300 && Math.abs(hx.diff + 0.081) < 0.002, String(hx.diff));
+  check('balance: outside the 3 % tolerance and therefore marked', !hx.within && hx.marked, JSON.stringify({ within: hx.within, marked: hx.marked }));
+  const qs = (g.byId['E-01'].attributes.discrepancy || {}).quotes || [];
+  check('balance: the mark quotes both figures, each with a source that exists', qs.length === 2 && qs.every((q) => q.text && doc.sources[q.src]), JSON.stringify(qs));
+}
+check('balance: no finding on the committed data', bal.length > 0 && bal.every((r) => !r.finding), JSON.stringify(bal.map((r) => r.finding)));
+{
+  /* mutated copies: the gate must be able to fail */
+  const unmarked = JSON.parse(JSON.stringify(doc));
+  delete unmarked.pages[0].equipment.find((e) => e.id === 'E-01').attributes.discrepancy;
+  const ru = balOf(P.buildGraph(unmarked.pages, 'x', 'x'));
+  check('balance: an UNMARKED 8 % mismatch is a finding (seeded copy)', ru.some((r) => r.finding && /unmarked/.test(r.finding)), JSON.stringify(ru.map((r) => r.finding)));
+  const stale = JSON.parse(JSON.stringify(doc));
+  stale.pages[0].instruments.find((i) => i.id === 'FT-01').attributes.flow_lpm = 424;
+  const rs = balOf(P.buildGraph(stale.pages, 'x', 'x'));
+  check('balance: a mark on a balance that closes is a finding too (seeded copy)', rs.some((r) => r.finding && /closes/.test(r.finding)), JSON.stringify(rs.map((r) => r.finding)));
+  const blind = JSON.parse(JSON.stringify(doc));
+  blind.pages[0].instruments.find((i) => i.id === 'TT-02').attributes.value = 'about 43';
+  const rb = balOf(P.buildGraph(blind.pages, 'x', 'x'));
+  check('balance: a value that is not a number is reported, never guessed (seeded copy)', rb.some((r) => r.finding && /not a number/.test(r.finding)), JSON.stringify(rb.map((r) => r.finding)));
+}
+
+/* 4c. loops in coolant order: rank = earliest flow position of a point a loop's sensors measure; off-path last */
+{
+  const got = ex.steps.filter((s) => s.section === 'loop' && s.part === 'overview').map((s) => s.loop);
+  check('loop order follows the coolant: T-01 (supply temperature) -> PD-02 (loop dP) -> LS-01 (skid floor, off the flow path)',
+    eq(got, ['LOOP:T-01', 'LOOP:PD-02', 'LOOP:LS-01']), JSON.stringify(got));
+  if (typeof P.flowRank === 'function') {
+    const r = P.flowRank(g);
+    check('flowRank: TT-01 point is upstream of the PDT-02 point', r['P01.L-SUP.2'] < r['P01.L-SUP.3'], JSON.stringify([r['P01.L-SUP.2'], r['P01.L-SUP.3']]));
+    check('flowRank: the skid floor is off the flow path', r['BOUNDARY:CDU SKID FLOOR · LEAK ROPE'] === undefined);
+  }
+}
+
+/* 4d. ISA decode lives in the RZExplain DB, one entry per letter set, title = decodeTag() */
+const dbSrc = fs.readFileSync(path.join(ROOT, 'js/rz-explain-db.js'), 'utf8');
+const DB = JSON.parse(dbSrc.slice(dbSrc.indexOf('{', dbSrc.indexOf('RZ_EXPLAIN_DB')), dbSrc.lastIndexOf('}') + 1)).entries;
+check('explain: generic isa-5-1-tag entry in the DB', !!DB['isa-5-1-tag']);
+/* every instrument, every actuated/relief valve the builder read as ISA, and hand valves (H). MV-01 is not ISA:
+   M would decode as "moisture", so it must get no key. */
+const isaItems = g.nodes.filter((x) => x.tag && (x.type === 'Instrument' || (x.type === 'Component' && (x.attributes.isa_letters || /^H/.test(x.tag)))));
+check('explain: 20 ISA-tagged items on the CDU page', isaItems.length === 20, String(isaItems.length));
+check('explain: MV-01 gets no ISA key (M would read as moisture)', typeof P.explainKey === 'function' && P.explainKey(g.byId['MV-01']) === null);
+for (const n of isaItems) {
+  const key = typeof P.explainKey === 'function' ? P.explainKey(n) : null, d = P.decodeTag(n.tag);
+  check('explain: ' + n.id + ' -> ' + key + ' in the DB, title = decodeTag()', !!key && !!DB[key] && DB[key].t === d.text, key && DB[key] ? DB[key].t + ' vs ' + d.text : 'no entry');
+  if (key && DB[key]) check('explain: ' + key + ' links to isa-5-1-tag', (DB[key].rel || []).includes('isa-5-1-tag'));
+}
+
+/* ---------------------------------------------------------------- 5. browser */
+if (!NO_BROWSER) await browserChecks();
+
+async function browserChecks() {
+  const http = await import('node:http');
+  let puppeteer;
+  try { puppeteer = (await import('puppeteer')).default; } catch (e) { check('browser: puppeteer available', false, e.message); return; }
+  const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.css': 'text/css' };
+  const srv = http.createServer((q, r) => {
+    const f = path.join(ROOT, decodeURIComponent(q.url.split('?')[0]));
+    if (!f.startsWith(ROOT)) { r.writeHead(403); r.end(); return; }
+    fs.readFile(f, (e, b) => { if (e) { r.writeHead(404); r.end(); return; } r.writeHead(200, { 'content-type': TYPES[path.extname(f)] || 'application/octet-stream' }); r.end(b); });
+  });
+  await new Promise((res) => srv.listen(0, '127.0.0.1', res));
+  const url = 'http://127.0.0.1:' + srv.address().port + '/rz-pid-mock.html';
+  const browser = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox'] });
+  async function open(width, reduce) {
+    const p = await browser.newPage(), errs = [];
+    p.on('pageerror', (e) => errs.push(e.message));
+    await p.setRequestInterception(true);
+    p.on('request', (q) => (q.url().startsWith('http://127.0.0.1') ? q.continue() : q.abort()));
+    await p.evaluateOnNewDocument(() => { try { localStorage.setItem('theme', 'dark'); } catch (e) { /* none */ } });
+    if (reduce) await p.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+    await p.setViewport({ width, height: 844, deviceScaleFactor: 1 });
+    await p.goto(url, { waitUntil: 'load' });
+    await p.waitForFunction(() => document.querySelector('.rzpid') && document.querySelector('.rzpid').__rzpid, { timeout: 15000 });
+    return { p, errs };
+  }
+  try {
+    /* 1440: RZExplain wiring + the discrepancy panel */
+    const { p, errs } = await open(1440, false);
+    const w = await p.evaluate(() => {
+      const api = document.querySelector('.rzpid').__rzpid, out = { bad: [], n: 0 };
+      api.graph.nodes.forEach((n) => {
+        if (!(RZPid.explainKey ? RZPid.explainKey(n) : (n.type === 'Instrument' || n.type === 'Component') && n.tag)) return;
+        out.n++;
+        const el = api.svg.querySelector('g.node[data-id="' + n.id + '"]');
+        const key = el && el.getAttribute('data-explain');
+        if (!el || !key || !(window.RZExplain && RZExplain.has(key)) || el.getAttribute('tabindex') !== '0' || !el.classList.contains('rzx-trigger')) out.bad.push(n.id + ':' + key);
+      });
+      out.tip = !!document.querySelector('.rzpid-tip');
+      const tic = api.svg.querySelector('g.node[data-id="TIC-01"]');
+      tic.focus();
+      const panel = document.getElementById('rzExplainPanel');
+      out.title = panel && panel.style.display === 'block' ? panel.querySelector('.rzx-title').textContent : null;
+      out.low = document.getElementById('lowList').textContent;
+      return out;
+    });
+    check('browser 1440: every ISA tag is an RZExplain trigger (data-explain key in the DB, tabindex 0)', w.n === 20 && !w.bad.length, w.n + ' tags; bad ' + w.bad.join(', '));
+    check('browser 1440: no page-own tooltip element', !w.tip);
+    check('browser 1440: focusing TIC-01 opens the RZExplain panel with the decode', w.title === P.decodeTag('TIC-01').text, String(w.title));
+    for (const s of ['E-01', '390 LPM', '11 K', '275.7 kW', '300 kW', '8.1 %', '424 LPM', '1.41 LPM/kW'])
+      check('browser 1440: the "marked, not guessed" panel shows the balance: ' + s, w.low.includes(s), w.low.slice(0, 300));
+    check('browser 1440: no page errors', !errs.length, errs.join(' | '));
+    await p.close();
+
+    /* 390: one column, no sideways pan, every step's lit path inside the drawing, labels >= 11 px */
+    const ph = await open(390, true);
+    const r = await ph.p.evaluate(() => {
+      const api = document.querySelector('.rzpid').__rzpid, svg = api.svg, frame = svg.closest('.rzpid-frame');
+      const out = { sw: document.documentElement.scrollWidth, fw: frame.scrollWidth, fc: frame.clientWidth, outside: [], small: [], shown: 0, steps: api.explanation.steps.length };
+      const fig = frame.getBoundingClientRect(), steps = document.getElementById('stepsHost').getBoundingClientRect();
+      out.below = steps.top >= fig.bottom - 1;
+      api.explanation.steps.forEach((s, i) => {
+        api.select(i);
+        const sb = svg.getBoundingClientRect(), fb = frame.getBoundingClientRect();   /* what the reader can see: the svg clipped by its frame */
+        const box = { left: Math.max(sb.left, fb.left), right: Math.min(sb.right, fb.right), top: Math.max(sb.top, fb.top), bottom: Math.min(sb.bottom, fb.bottom) };
+        svg.querySelectorAll('.is-lit').forEach((e) => {
+          const b = e.getBoundingClientRect(); if (!b.width && !b.height) return;
+          if (b.left < box.left - 1 || b.right > box.right + 1 || b.top < box.top - 1 || b.bottom > box.bottom + 1)
+            out.outside.push((i + 1) + ':' + (e.getAttribute('data-id') || e.getAttribute('data-edge')));
+        });
+        svg.querySelectorAll('text').forEach((t) => {
+          const b = t.getBoundingClientRect();
+          if (b.right < box.left || b.left > box.right || b.bottom < box.top || b.top > box.bottom) return;
+          if (parseFloat(getComputedStyle(t).opacity) < 0.01) return;
+          const m = t.getScreenCTM(), px = parseFloat(getComputedStyle(t).fontSize) * Math.hypot(m.a, m.b);
+          out.shown++;
+          if (px < 10.95) out.small.push((i + 1) + ':' + t.textContent + '@' + px.toFixed(1));
+        });
+      });
+      out.sw2 = document.documentElement.scrollWidth;
+      return out;
+    });
+    check('browser 390: document scrollWidth <= 390', r.sw <= 390 && r.sw2 <= 390, r.sw + ' / ' + r.sw2);
+    check('browser 390: the drawing does not pan sideways (frame scrollWidth <= clientWidth)', r.fw <= r.fc + 1, r.fw + ' > ' + r.fc);
+    check('browser 390: the step list sits under the drawing', r.below);
+    check('browser 390: every step\'s lit path is inside the visible drawing (' + r.steps + ' steps)', !r.outside.length, r.outside.length + ': ' + r.outside.slice(0, 8).join(', '));
+    check('browser 390: no visible label renders under 11 px', r.shown > 0 && !r.small.length, r.shown + ' shown; ' + r.small.length + ' small: ' + r.small.slice(0, 6).join(', '));
+    check('browser 390: no page errors', !ph.errs.length, ph.errs.join(' | '));
+    await ph.p.close();
+
+    /* 390, full motion: the camera moves by transform on the motion tokens, never transition:all */
+    const mv = await open(390, false);
+    const t = await mv.p.evaluate(() => {
+      const cam = document.querySelector('.rzpid-cam'); if (!cam) return null;
+      const cs = getComputedStyle(cam); return { prop: cs.transitionProperty, dur: cs.transitionDuration, ease: cs.transitionTimingFunction };
+    });
+    check('browser 390: camera transition is transform only, 280 ms, on the token ease', !!t && t.prop === 'transform' && t.dur === '0.28s' && /cubic-bezier\(0\.77, 0, 0\.175, 1\)/.test(t.ease), JSON.stringify(t));
+    await mv.p.close();
+  } catch (e) {
+    check('browser: run completed', false, e.message);
+  } finally {
+    await browser.close();
+    srv.close();
+  }
 }
 
 const loops = (gr) => gr.nodes.filter((n) => n.type === 'ControlLoop').length;

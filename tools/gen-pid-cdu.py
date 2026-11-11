@@ -21,7 +21,14 @@ LOW = 0.5  # the reference's own value for an item it had to infer
 
 equipment = [
     {"id": "E-01", "tag": "E-01", "kind": "heat_exchanger", "name": "Plate HX", "bbox": bb(265, 315, 50, 400),
-     "attributes": {"src": "types", "capacity": "300 kW (in-row CDU)", "explain": "One plate pack carries both streams: facility water on the primary side, TCS coolant on the secondary side."}},
+     "attributes": {"src": "types", "capacity": "300 kW (in-row CDU)", "explain": "One plate pack carries both streams: facility water on the primary side, TCS coolant on the secondary side.",
+                    # R117 heat balance on the secondary side: Q = V x rho x cp x dT / 60 (js/rz-pid-graph.js balance()).
+                    "duty_kw": 300,
+                    "balance": {"flow": "FT-01", "t_supply": "TT-01", "t_return": "TT-02", "fluid": "pg25", "fluid_src": "tiles"},
+                    "discrepancy": {"what": "heat balance",
+                                    "note": "At 390 LPM and an 11 °C rise, PG25 cannot carry the declared 300 kW: the page's flow ratio and its capacity disagree. Both are quoted; neither is chosen.",
+                                    "quotes": [{"src": "types", "text": "TYPES.inrow capacity 300 kW"},
+                                               {"src": "types", "text": "TYPES.inrow flow 1.30 LPM/kW, so 390 LPM at 300 kW, with dT 11 °C"}]}}},
     {"id": "P-01A", "tag": "P-01A", "kind": "centrifugal_pump", "name": "Duty pump", "bbox": bb(400, 250, 32, 32),
      "attributes": {"src": "note", "driver": "VFD", "duty": "duty", "explain": "P-01A is the duty pump; its speed is set by the VFD."}},
     {"id": "P-01B", "tag": "P-01B", "kind": "centrifugal_pump", "name": "Standby pump (N+1)", "bbox": bb(400, 360, 32, 32),
@@ -59,7 +66,7 @@ def inst(i, loc, cx, cy, measures=None, **kw):
 
 instruments = [
     inst("FT-01", "field", 630, 210, attributes={"src": "tiles", "value": "1.30", "unit": "LPM/kW", "band": "1.0–1.5",
-         "total": "390 LPM (1.30 × 300 kW)", "standalone": "flow indication and band alarm on the BMS tile; the page draws no flow controller"}),
+         "total": "390 LPM (1.30 × 300 kW)", "flow_lpm": 390, "standalone": "flow indication and band alarm on the BMS tile; the page draws no flow controller"}),
     inst("PT-01", "field", 690, 200, {"line": "L-SUP", "after": "FT-01"},
          attributes={"src": "tiles", "value": "4.0", "unit": "bar", "band": "2–6", "standalone": "system pressure indication; held by expansion + make-up"}),
     inst("TT-01", "field", 790, 72, {"line": "L-SUP", "after": "FT-01"},

@@ -64,7 +64,29 @@
      "attributes": {
       "src": "types",
       "capacity": "300 kW (in-row CDU)",
-      "explain": "One plate pack carries both streams: facility water on the primary side, TCS coolant on the secondary side."
+      "explain": "One plate pack carries both streams: facility water on the primary side, TCS coolant on the secondary side.",
+      "duty_kw": 300,
+      "balance": {
+       "flow": "FT-01",
+       "t_supply": "TT-01",
+       "t_return": "TT-02",
+       "fluid": "pg25",
+       "fluid_src": "tiles"
+      },
+      "discrepancy": {
+       "what": "heat balance",
+       "note": "At 390 LPM and an 11 °C rise, PG25 cannot carry the declared 300 kW: the page's flow ratio and its capacity disagree. Both are quoted; neither is chosen.",
+       "quotes": [
+        {
+         "src": "types",
+         "text": "TYPES.inrow capacity 300 kW"
+        },
+        {
+         "src": "types",
+         "text": "TYPES.inrow flow 1.30 LPM/kW, so 390 LPM at 300 kW, with dT 11 °C"
+        }
+       ]
+      }
      }
     },
     {
@@ -238,6 +260,7 @@
       "unit": "LPM/kW",
       "band": "1.0–1.5",
       "total": "390 LPM (1.30 × 300 kW)",
+      "flow_lpm": 390,
       "standalone": "flow indication and band alarm on the BMS tile; the page draws no flow controller"
      }
     },

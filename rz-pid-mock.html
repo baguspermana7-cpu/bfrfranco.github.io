@@ -36,7 +36,8 @@
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; }
-  body { background: var(--bg); color: var(--ink); font: 15px/1.55 "IBM Plex Sans", system-ui, sans-serif; overflow-x: hidden; }
+  /* clip, not hidden: hidden makes body a scroll container and the phone drawing could no longer stick */
+  body { background: var(--bg); color: var(--ink); font: 15px/1.55 "IBM Plex Sans", system-ui, sans-serif; overflow-x: hidden; overflow-x: clip; }
   .wrap { max-width: 1440px; margin: 0 auto; padding: 24px 32px 48px; }
   .eyebrow { font: 500 11.5px/1 "JetBrains Mono", monospace; letter-spacing: .06em; color: var(--muted); margin: 0 0 10px; }
   h1 { font-weight: 600; font-size: 26px; letter-spacing: -.02em; line-height: 1.25; margin: 0 0 8px; }
@@ -76,9 +77,12 @@
   .facts li { padding: 6px 0; border-top: 1px solid var(--line); }
   .facts li:first-child { border-top: 0; }
   .facts code, .mono { font: 12.5px "JetBrains Mono", monospace; }
-  .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 10px 14px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--muted); }
+  .legend-panel { margin-top: 20px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 18px; padding: 10px 14px; font-size: 12.5px; color: var(--muted); }
   .legend svg { vertical-align: middle; margin-right: 6px; }
   .legend svg * { vector-effect: non-scaling-stroke; }
+  .facts .disc { padding-bottom: 8px; }
+  .facts .disc .calc { display: block; margin-top: 4px; color: var(--muted); }
   .attr { font-size: 12.5px; color: var(--muted); margin-top: 24px; max-width: 90ch; }
   .attr a { color: var(--pid-accent-text); }
   @media (max-width: 1023px) {
@@ -87,13 +91,21 @@
     .below { grid-template-columns: 1fr; }
   }
   @media (max-width: 768px) {
-    html, body { overflow-x: hidden; max-width: 100vw; }
+    html, body { overflow-x: hidden; overflow-x: clip; max-width: 100vw; }
     .wrap { padding: 16px 16px 40px; }
     h1 { font-size: 21px; }
     .bar { flex-direction: column; }
   }
+  /* phone: the drawing fits its frame (the renderer moves a camera over it) and stays in view while the steps scroll */
+  @media (max-width: 600px) {
+    .rzpid-frame { overflow: hidden; }
+    .rzpid-frame svg { min-width: 0; }
+    .grid { display: block; }   /* a grid item can only stick inside its own row */
+    .steps { margin-top: 16px; }
+    #figHost { position: sticky; top: 0; z-index: 2; }
+    .rzpid-cap { display: none; }
+  }
 </style>
-<script src="js/rz-version.js?v=20261111-ee17ed72" defer></script>
 </head>
 <body>
 <main class="wrap">
@@ -101,25 +113,26 @@
     <div>
       <p class="eyebrow">R116 MOCK · NOT PUBLISHED · FOR THE OWNER'S DECISION</p>
       <h1>CDU secondary loop <span>— P&amp;ID with the flow explained</span></h1>
-      <p class="lede">The drawing and the steps come from one graph. Pick a step to light its path; click a symbol to jump to its step; hover or tap a tag for its ISA-5.1 meaning. Dashed outlines are items the source page implies but does not draw.</p>
+      <p class="lede">The drawing and the steps come from one graph. Pick a step to light its path; click a symbol to jump to its step; hover, focus or tap a tag for its ISA-5.1 meaning. Dashed outlines are items the source page implies but does not draw.</p>
     </div>
     <button class="theme" id="themeBtn" type="button" aria-label="Switch colour theme">Theme</button>
   </div>
 
   <div class="grid">
-    <div class="panel" id="figHost" aria-busy="true">
-      <div class="legend" id="legend" aria-label="Legend">
-        <span><svg width="26" height="8"><line x1="0" y1="4" x2="26" y2="4" stroke="var(--pid-cold)" stroke-width="2.2"/></svg>supply (cool)</span>
-        <span><svg width="26" height="8"><line x1="0" y1="4" x2="26" y2="4" stroke="var(--pid-warm)" stroke-width="2.2"/></svg>return (warm)</span>
-        <span><svg width="26" height="8"><line x1="0" y1="4" x2="26" y2="4" stroke="var(--pid-ink2)" stroke-width="1" stroke-dasharray="5 3"/></svg>electrical signal</span>
-        <span><svg width="26" height="8"><line x1="0" y1="4" x2="26" y2="4" stroke="var(--pid-ink2)" stroke-width="1" stroke-dasharray="2 3"/></svg>software link</span>
-        <span><svg width="26" height="10"><line x1="0" y1="5" x2="26" y2="5" stroke="var(--pid-ink2)" stroke-width="1"/><path d="M8 8 l3 -6 M11 8 l3 -6" stroke="var(--pid-ink2)" fill="none"/></svg>pneumatic</span>
-        <span><svg width="18" height="18"><circle cx="9" cy="9" r="7.5" fill="none" stroke="var(--pid-ink)"/></svg>field instrument</span>
-        <span><svg width="18" height="18"><rect x="1" y="1" width="16" height="16" fill="none" stroke="var(--pid-ink)"/><circle cx="9" cy="9" r="7" fill="none" stroke="var(--pid-ink)"/></svg>DCS / shared display</span>
-        <span><svg width="18" height="18"><circle cx="9" cy="9" r="7.5" fill="none" stroke="var(--pid-ink)" stroke-dasharray="3 2.5"/></svg>low confidence</span>
-      </div>
+    <div class="panel" id="figHost"></div>
+    <aside class="panel steps" id="stepsHost" aria-label="Explanation steps"></aside>
+  </div>
+  <div class="panel legend-panel">
+    <div class="legend" id="legend" aria-label="Legend">
+      <span><svg width="26" height="8"><line x1="0" y1="4" x2="26" y2="4" stroke="var(--pid-cold)" stroke-width="2.2"/></svg>supply (cool)</span>
+      <span><svg width="26" height="8"><line x1="0" y1="4" x2="26" y2="4" stroke="var(--pid-warm)" stroke-width="2.2"/></svg>return (warm)</span>
+      <span><svg width="26" height="8"><line x1="0" y1="4" x2="26" y2="4" stroke="var(--pid-ink2)" stroke-width="1" stroke-dasharray="5 3"/></svg>electrical signal</span>
+      <span><svg width="26" height="8"><line x1="0" y1="4" x2="26" y2="4" stroke="var(--pid-ink2)" stroke-width="1" stroke-dasharray="2 3"/></svg>software link</span>
+      <span><svg width="26" height="10"><line x1="0" y1="5" x2="26" y2="5" stroke="var(--pid-ink2)" stroke-width="1"/><path d="M8 8 l3 -6 M11 8 l3 -6" stroke="var(--pid-ink2)" fill="none"/></svg>pneumatic</span>
+      <span><svg width="18" height="18"><circle cx="9" cy="9" r="7.5" fill="none" stroke="var(--pid-ink)"/></svg>field instrument</span>
+      <span><svg width="18" height="18"><rect x="1" y="1" width="16" height="16" fill="none" stroke="var(--pid-ink)"/><circle cx="9" cy="9" r="7" fill="none" stroke="var(--pid-ink)"/></svg>DCS / shared display</span>
+      <span><svg width="18" height="18"><circle cx="9" cy="9" r="7.5" fill="none" stroke="var(--pid-ink)" stroke-dasharray="3 2.5"/></svg>low confidence</span>
     </div>
-    <aside class="panel steps" id="stepsHost" aria-label="Explanation steps" aria-busy="true"><p class="loading">Loading the plant data…</p></aside>
   </div>
 
   <div class="below">
@@ -133,9 +146,15 @@
     </section>
   </div>
 
-  <p class="attr">Graph model and rules ported from <a href="https://github.com/ScottDuncanAI/PID-to-Knowledge-Graph">PID-to-Knowledge-Graph</a> (MIT, © 2026 The pid-to-kg contributors). Tags, values and bands from <span class="mono">cdu-mini-bms.html</span>; each one names its line in the tooltip.</p>
+  <p class="attr">Graph model and rules ported from <a href="https://github.com/ScottDuncanAI/PID-to-Knowledge-Graph">PID-to-Knowledge-Graph</a> (MIT, © 2026 The pid-to-kg contributors). Tags, values and bands from <span class="mono">cdu-mini-bms.html</span>; each one names its source line in the data line under the drawing.</p>
 </main>
-<script src="js/rz-pid.js?v=20261111-6a0b096e"></script>
+<script src="js/cdu-model.js?v=20261111-r117"></script>
+<script src="js/cdu-engine.js?v=20261111-r117"></script>
+<script src="js/rz-pid-build.js?v=20261111-r117"></script>
+<script src="js/rz-pid-graph.js?v=20261111-r117"></script>
+<script src="js/rz-pid-render.js?v=20261111-r117"></script>
+<script src="js/rz-explain-db.js?v=20261111-r117"></script>
+<script src="js/rz-explain.js?v=20261111-r117"></script>
 <script>
 (function () {
   var btn = document.getElementById('themeBtn');
@@ -156,14 +175,18 @@
     return r.json();
   }).then(function (doc) {
     var figHost = document.getElementById('figHost');
-    var stepsBox = document.getElementById('stepsHost');
-    figHost.removeAttribute('aria-busy'); stepsBox.removeAttribute('aria-busy'); stepsBox.textContent = '';
     var holder = document.createElement('div');
     figHost.insertBefore(holder, figHost.firstChild);
     var api = RZPid.render({ doc: doc, host: holder, figureHost: holder, stepsHost: document.getElementById('stepsHost'),
       caption: doc.pages[0].sheet.title + ' · ' + doc.pages[0].sheet.drawing_number + ' · values for the in-row type', initial: 0,
       onSymbol: function (b) { if (b && b.scrollIntoView) b.scrollIntoView({ block: 'nearest' }); } });
     var g = api.graph, low = document.getElementById('lowList');
+    RZPid.balance(g, CDU_ENGINE.fluidProps).forEach(function (r) {
+      var d = r.discrepancy, l = document.createElement('li'); l.className = 'disc';
+      l.innerHTML = '<code>' + esc(r.node) + '</code> ' + esc(d ? d.what : 'heat balance') + ' — ' + esc(d ? d.note + ' Quoted: ' + d.quotes.map(function (q) { return '“' + q.text + '” (' + doc.sources[q.src].file + ')'; }).join('; ') + '.' : r.finding || 'closes within tolerance.') +
+        '<span class="calc mono">' + esc(RZPid.balanceText(r)) + '</span>';
+      low.appendChild(l);
+    });
     g.nodes.forEach(function (n) {
       if (n.confidence < RZPid.LOW_CONFIDENCE && n.type !== 'PipeSegment' && n.type !== 'ControlLoop')
         li(low, '<code>' + esc(n.label) + '</code> — ' + esc(n.attributes.basis || n.name || ''));
@@ -176,8 +199,6 @@
     li(gl, '<span class="mono">' + e.FEEDS + '</span> equipment-level FEEDS, <span class="mono">' + e.MEASURES + '</span> MEASURES, <span class="mono">' + e.SIGNAL_TO + '</span> signals, <span class="mono">' + (e.TRIPS || 0) + '</span> TRIPS');
     doc.pages[0].sheet.legend_notes.slice(1, 3).forEach(function (t) { li(gl, esc(t)); });
   }).catch(function (err) {
-    document.getElementById('figHost').removeAttribute('aria-busy');
-    document.getElementById('stepsHost').removeAttribute('aria-busy');
     document.getElementById('stepsHost').textContent = 'The plant data could not be loaded (' + err.message + ').';
   });
 })();
