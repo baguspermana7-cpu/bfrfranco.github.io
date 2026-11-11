@@ -695,19 +695,6 @@
         .pjg-kpi-val { color: var(--pjg-text); font-weight: 700; font-family: 'JetBrains Mono', monospace; }
         .pjg-kpi-val-warm { color: #ef4444; }
         .pjg-kpi-mono { font-family: 'JetBrains Mono', monospace; }
-        .pjg-kpi-pill {
-            display: inline-block; padding: 0.18rem 0.6rem;
-            background: var(--pjg-bg3); color: var(--pjg-text2);
-            border-radius: 4px; font-size: 0.7rem; font-weight: 700;
-            cursor: pointer; user-select: none; margin-right: 0.3rem;
-        }
-        .pjg-kpi-pill:last-child { margin-right: 0; }
-        .pjg-kpi-pill.active, .pjg-kpi-pill-live.active {
-            background: var(--pjg-primary); color: var(--pjg-on-primary);
-        }
-        .pjg-kpi-pill-live.active {
-            background: #ef4444;  /* red "LIVE" tag like the reference */
-        }
         @media (max-width: 880px) {
             .pjg-kpi-cell { padding: 0.55rem 0.7rem; font-size: 0.72rem; }
             .pjg-kpi-cell:last-child { width: 100%; flex: 1 1 100%; justify-content: flex-start; border-top: 1px solid var(--pjg-border); }
@@ -1020,7 +1007,8 @@
     </style>
     <script src="js/rz-version.js?v=20261111-6eb1e2a4" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
-    <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>    <meta property="og:image:alt" content="PLN Java-Bali Grid Monitor | 500/275/150 kV Single-Line Diagram">
+    <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
+    <script src="js/rz-provenance.js?v=20261111-q06" defer></script>    <meta property="og:image:alt" content="PLN Java-Bali Grid Monitor | 500/275/150 kV Single-Line Diagram">
 
 <style id="rz-skiplink-v1">
 .skip-link{position:absolute;top:-50px;left:0;background:#1a1d23;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 4px 0;transition:top .2s ease}
@@ -1089,6 +1077,7 @@
             <h2 class="pjg-section-title">Java-Bali System Headlines</h2>
             <p class="pjg-section-desc">Subsystem totals from PLN AR 2024 and the RUPTL 2025-2034 baseline. The Java-Bali backbone supplies roughly 70% of national peak demand on a single synchronous island chain.</p>
             <div class="pjg-stat-row" id="pjg-stat-row" data-rz-fact-list></div>
+            <p class="rz-prov" id="rz-prov-pln-stats" data-rz-provenance="snapshot" data-rz-prov-basis="national block of the topology dataset" data-rz-prov-asof="2024" data-rz-prov-source="PLN AR 2024" data-rz-prov-version="2026-04-29-v3" aria-live="polite"><b>Snapshot</b> · national block of the topology dataset · as of 2024 · PLN AR 2024 · data 2026-04-29-v3</p>
         </section>
 
         <!-- VIEW SWITCHER + LAYER BAR -->
@@ -1133,14 +1122,14 @@
         <!-- VIEW: MAP -->
         <section class="pjg-section pjg-view active" id="pjg-view-map" role="tabpanel" aria-label="Geographic map">
             <!-- TOP KPI STRIP (mirrors energydashboard.co.uk/map) -->
-            <div class="pjg-map-kpi-strip" id="pjg-map-kpi-strip" aria-label="Live grid KPIs">
+            <div class="pjg-map-kpi-strip" id="pjg-map-kpi-strip" aria-label="Grid KPIs, snapshot">
                 <div class="pjg-kpi-cell"><i class="fas fa-bolt" aria-hidden="true"></i><span class="pjg-kpi-label">Sites</span><span class="pjg-kpi-val" id="pjg-kpi-sites">--</span></div>
-                <div class="pjg-kpi-cell"><span class="pjg-kpi-pill" id="pjg-kpi-pill-all">All</span><span class="pjg-kpi-pill pjg-kpi-pill-live" id="pjg-kpi-pill-live">Live</span></div>
                 <div class="pjg-kpi-cell"><i class="fas fa-broadcast-tower" aria-hidden="true"></i><span class="pjg-kpi-label">Net Output</span><span class="pjg-kpi-val pjg-kpi-val-warm" id="pjg-kpi-output">-- MW</span></div>
                 <div class="pjg-kpi-cell"><i class="fas fa-arrow-down" aria-hidden="true"></i><span class="pjg-kpi-label">Turn Down</span><span class="pjg-kpi-val" id="pjg-kpi-turndown">-- MW</span></div>
                 <div class="pjg-kpi-cell"><i class="fas fa-arrow-up" aria-hidden="true"></i><span class="pjg-kpi-label">Turn Up</span><span class="pjg-kpi-val" id="pjg-kpi-turnup">-- MW</span></div>
                 <div class="pjg-kpi-cell"><i class="far fa-clock" aria-hidden="true"></i><span class="pjg-kpi-val pjg-kpi-mono" id="pjg-kpi-time">--:-- WIB</span></div>
             </div>
+            <p class="rz-prov" id="rz-prov-pln-map" data-rz-provenance="snapshot" data-rz-prov-basis="representative evening peak; site count from topology data 2026-04-29-v3" data-rz-prov-asof="2026-05-01T18:00:00+07:00" data-rz-prov-source="PLN AR 2024; RUPTL 2025–2034" data-rz-prov-version="2026-05-01-v5"><b>Snapshot</b> · representative evening peak; site count from topology data 2026-04-29-v3 · as of 1 May 2026, 18:00 WIB · PLN AR 2024; RUPTL 2025–2034 · data 2026-05-01-v5</p>
             <div class="pjg-map-wrap">
                 <div id="pjg-map" aria-label="Geographic map of the Java-Bali transmission grid"></div>
             </div>
@@ -1181,7 +1170,7 @@
         <!-- PROVINCE CARDS -->
         <section class="pjg-section">
             <h2 class="pjg-section-title">Drill Down by Province</h2>
-            <p class="pjg-section-desc">Open a province sub-page for the 20 kV DC-feeder overlay and operator-level detail. Two showcase pages are live; the remaining provinces are scheduled.</p>
+            <p class="pjg-section-desc">Open a province sub-page for the 20 kV DC-feeder overlay and operator-level detail. Province pages exist for Jawa Barat, Jakarta-Banten, Jawa Tengah and Jawa Timur.</p>
             <div class="ds-strategic-grid">
                 <!-- Card 1: Jakarta+Banten -->
                 <div class="ds-strat-card" style="--card-border: rgba(6,182,212,0.45); --card-glow: rgba(6,182,212,0.22); --card-gradient: linear-gradient(rgba(22,24,29,1),rgba(22,24,29,1));">
@@ -1287,17 +1276,18 @@
 
         <!-- LIVE ENERGY DASHBOARD (mirrors energydashboard.co.uk/live) -->
         <section class="pjg-section" id="pjg-live-dashboard">
-            <h2 class="pjg-section-title">Live Energy Dashboard</h2>
+            <h2 class="pjg-section-title">Energy snapshot</h2>
             <p class="pjg-section-desc">
                 Java-Bali generation mix, demand, and carbon intensity — modeled after
                 <a href="https://www.energydashboard.co.uk/live" target="_blank" rel="noopener noreferrer">energydashboard.co.uk/live</a>.
                 Static representative figures based on PLN AR 2024, RUPTL 2025-2034, BPS Statistical Indonesia 2024,
                 and IEA Indonesia 2024 — not real-time telemetry.
             </p>
+            <p class="rz-prov" id="rz-prov-pln-energy" data-rz-provenance="snapshot" data-rz-prov-basis="representative evening peak" data-rz-prov-asof="2026-05-01T18:00:00+07:00" data-rz-prov-source="PLN AR 2024; RUPTL 2025–2034; BPS 2024; IEA Indonesia 2024" data-rz-prov-version="2026-05-01-v5"><b>Snapshot</b> · representative evening peak · as of 1 May 2026, 18:00 WIB · PLN AR 2024; RUPTL 2025–2034; BPS 2024; IEA Indonesia 2024 · data 2026-05-01-v5</p>
 
             <!-- Top KPI bar (mirrors grid.iamkate.com compact KPI row) -->
-            <div class="pjg-live-kpi-bar" aria-label="Live KPIs">
-                <div class="pjg-live-kpi" title="Local Western Indonesia Time (WIB / GMT+7) of the snapshot."><span class="pjg-live-kpi-label">Time</span><span class="pjg-live-kpi-val pjg-kpi-mono" id="pjg-live-time">--:--</span></div>
+            <div class="pjg-live-kpi-bar" aria-label="Snapshot KPIs">
+                <div class="pjg-live-kpi" title="Local Western Indonesia Time (WIB / GMT+7) of the snapshot."><span class="pjg-live-kpi-label">Snapshot time</span><span class="pjg-live-kpi-val pjg-kpi-mono" id="pjg-live-time">--:--</span></div>
                 <div class="pjg-live-kpi" title="System-wide demand on the Java-Bali synchronous grid (GW). Indonesian peak is evening 18:00-20:00 driven by residential return + AC + lighting."><span class="pjg-live-kpi-label">Demand</span><span class="pjg-live-kpi-val" id="pjg-live-demand">-- GW</span><span class="pjg-live-kpi-delta" id="pjg-live-demand-delta"></span><svg class="pjg-spark" id="pjg-spark-demand" viewBox="0 0 80 18" preserveAspectRatio="none"></svg></div>
                 <div class="pjg-live-kpi" title="Total dispatched generation (GW). Equals demand for an islanded system (no exports/imports on Java-Bali besides the small 275 kV submarine to Bali)."><span class="pjg-live-kpi-label">Generation</span><span class="pjg-live-kpi-val" id="pjg-live-gen">-- GW</span><svg class="pjg-spark" id="pjg-spark-gen" viewBox="0 0 80 18" preserveAspectRatio="none"></svg></div>
                 <div class="pjg-live-kpi" title="Spinning + standby reserve = installed capacity (47 GW) − current demand. Java-Bali target ≥25% per RUPTL 2025-2034."><span class="pjg-live-kpi-label">Reserve</span><span class="pjg-live-kpi-val" id="pjg-live-reserve">-- GW</span><svg class="pjg-spark" id="pjg-spark-reserve" viewBox="0 0 80 18" preserveAspectRatio="none"></svg></div>
@@ -1543,16 +1533,40 @@
         }
 
         // ========== STAT TILES ==========
+        /* rz-provenance.js is deferred; if it has not run yet, mark once every deferred script has. */
+        function markStatsProvenance(missing) {
+            function apply() {
+                var P = window.RZProvenance;
+                if (!P) return;
+                if (missing.length) P.mark('#rz-prov-pln-stats', { kind: 'fallback',
+                    basis: 'national block incomplete in topology data 2026-04-29-v3',
+                    reason: 'missing: ' + missing.join(', ') });
+                else P.clear('#rz-prov-pln-stats');
+            }
+            if (window.RZProvenance) apply();
+            else window.addEventListener('load', apply);
+        }
         function renderStatTiles() {
             var data = (window.PLN_JAVA_GRID && window.PLN_JAVA_GRID.national) || {};
+            // No silent constants (PRD-Q06 FR-8): a missing field shows "—" and is named on #rz-prov-pln-stats.
+            var missing = [];
+            function num(k, f) {
+                var v = data[k];
+                if (typeof v === 'number' && isFinite(v)) return f(v);
+                missing.push(k);
+                return '—';
+            }
+            function mw(v) { return fmtNum(v) + ' MW'; }
+            function pct(v) { return v.toFixed(1) + '%'; }
             var tiles = [
-                { label: 'Installed', value: fmtNum(data.installedMW || 47000) + ' MW', sub: 'Java-Bali subsystem (PLN AR 2024)' },
-                { label: 'Peak Load', value: fmtNum(data.peakMW || 32000) + ' MW', sub: '2024 system peak' },
-                { label: 'Reserve', value: (data.reservePct || 31.0).toFixed(1) + '%', sub: 'Margin over peak' },
-                { label: 'Renewable', value: (data.renewablePct || 13.5).toFixed(1) + '%', sub: 'Generation share' },
-                { label: 'DC Capacity', value: fmtNum(data.dcMW || 950) + ' MW', sub: 'Subscribed data-centre load' },
-                { label: 'Substations', value: fmtNum(data.substations || 142), sub: '500/275/150 kV named' }
+                { label: 'Installed', value: num('installedMW', mw), sub: 'Java-Bali subsystem (PLN AR 2024)' },
+                { label: 'Peak Load', value: num('peakMW', mw), sub: '2024 system peak' },
+                { label: 'Reserve', value: num('reservePct', pct), sub: 'Margin over peak' },
+                { label: 'Renewable', value: num('renewablePct', pct), sub: 'Generation share' },
+                { label: 'DC Capacity', value: num('dcMW', mw), sub: 'Subscribed data-centre load' },
+                { label: 'Substations', value: num('substations', fmtNum), sub: '500/275/150 kV named' }
             ];
+            markStatsProvenance(missing);
             var row = $('pjg-stat-row');
             row.innerHTML = '';
             for (var i = 0; i < tiles.length; i++) {
@@ -1687,6 +1701,13 @@
         }
 
         /* Populate the top KPI strip with site count + live snapshot from PLN_ENERGY_DATA. */
+        /* Snapshot time in WIB (UTC+7) whatever the visitor's time zone; null if unparsable. */
+        function wibHM(ts) {
+            var d = new Date(ts);
+            if (isNaN(d.getTime())) return null;
+            var w = new Date(d.getTime() + 7 * 3600000);
+            return String(w.getUTCHours()).padStart(2, '0') + ':' + String(w.getUTCMinutes()).padStart(2, '0') + ' WIB';
+        }
         function populateMapKpiStrip(nodes) {
             var $sites = document.getElementById('pjg-kpi-sites');
             var $output = document.getElementById('pjg-kpi-output');
@@ -1700,24 +1721,10 @@
                 if ($turndown) $turndown.textContent = snap.turn_down_mw + ' MW';
                 if ($turnup) $turnup.textContent = snap.turn_up_mw + ' MW';
                 if ($time) {
-                    var d = new Date(snap.timestamp);
-                    if (!isNaN(d.getTime())) {
-                        $time.textContent = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0') + ' WIB';
-                    }
+                    var hm = wibHM(snap.timestamp);
+                    if (hm) $time.textContent = hm;
                 }
             }
-            // Pill toggle (visual only; both All and Live default visible)
-            var pillAll = document.getElementById('pjg-kpi-pill-all');
-            var pillLive = document.getElementById('pjg-kpi-pill-live');
-            if (pillLive) pillLive.classList.add('active');
-            if (pillAll) pillAll.addEventListener('click', function () {
-                pillAll.classList.add('active');
-                if (pillLive) pillLive.classList.remove('active');
-            });
-            if (pillLive) pillLive.addEventListener('click', function () {
-                pillLive.classList.add('active');
-                if (pillAll) pillAll.classList.remove('active');
-            });
         }
 
         /* Mount the right-side floating Technology panel via RZMap's addInfoPanel.
@@ -2434,13 +2441,12 @@
             }
             var snap = ED.snapshot;
             // ---- KPI bar ----
-            function updateClock() {
-                var now = new Date();
-                var wib = new Date(now.getTime() + (7 * 60 * 60 * 1000) - (now.getTimezoneOffset() * 60 * 1000));
-                setText('pjg-live-time', String(wib.getHours()).padStart(2, '0') + ':' + String(wib.getMinutes()).padStart(2, '0') + ' WIB');
+            // Snapshot time: written once from the dataset, in WIB (UTC+7) whatever the visitor's time zone.
+            var snapT = new Date(snap.timestamp);
+            if (!isNaN(snapT.getTime())) {
+                var snapW = new Date(snapT.getTime() + 7 * 3600000);
+                setText('pjg-live-time', String(snapW.getUTCHours()).padStart(2, '0') + ':' + String(snapW.getUTCMinutes()).padStart(2, '0') + ' WIB');
             }
-            updateClock();
-            setInterval(updateClock, 60000);
             setText('pjg-live-demand', (snap.demand_mw / 1000).toFixed(1) + ' GW');
             setText('pjg-live-gen', (snap.generation_mw / 1000).toFixed(1) + ' GW');
             setText('pjg-live-reserve', (snap.reserve_mw / 1000).toFixed(1) + ' GW');
