@@ -6,6 +6,8 @@
 //   R2 every field id is an input/select; numeric fields hold a number; select formats match their options
 //   R3 every result selector resolves to exactly one element that shows a number after load
 //   R4 rz-scenario.js openInCalc opens the registry page for every calc (same map, two places, until P02 reads this file)
+//   R5 a `sensitivity` entry (P07): result and anchor resolve once; every factor id is an input/select of a kind that
+//      fits (continuous = numeric input, step = select with >= 2 options); an `unmet` selector matches checkboxes
 // Usage: node tools/test-calculator-registry.mjs [--registry <path>]   (a planted bad entry must fail it)
 import { createServer } from 'node:http';
 import { readFile, readdir } from 'node:fs/promises';
@@ -68,7 +70,7 @@ const server = createServer(async (req, res) => {
 await new Promise((ok) => server.listen(0, '127.0.0.1', ok));
 const base = `http://127.0.0.1:${server.address().port}/`;
 const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
-let fieldsChecked = 0, resultsChecked = 0;
+let fieldsChecked = 0, resultsChecked = 0, factorsChecked = 0;
 try {
   for (const c of reg.calculators) {
     if (!declared[c.page]) continue; // already failed R1
@@ -89,8 +91,33 @@ try {
         const els = document.querySelectorAll(res.selector);
         r.results.push({ key: res.key, selector: res.selector, n: els.length, text: els[0] ? els[0].textContent.trim().slice(0, 40) : '' });
       }
+      if (entry.sensitivity) {
+        const sv = entry.sensitivity;
+        r.sens = {
+          result: document.querySelectorAll(sv.result).length,
+          anchor: sv.anchor ? document.querySelectorAll(sv.anchor).length : 0,
+          unmet: sv.unmet ? [...document.querySelectorAll(sv.unmet.selector)].map((e) => e.type) : null,
+          factors: (sv.factors || []).map((f) => {
+            const el = document.getElementById(f.id);
+            return { id: f.id, kind: f.kind, tag: el ? el.tagName : null, type: el ? el.type : null,
+              value: el ? el.value : null, nopts: el && el.tagName === 'SELECT' ? [...el.options].filter((o) => !o.disabled).length : 0 };
+          }),
+        };
+      }
       return r;
     }, c);
+    if (out.sens) {
+      if (out.sens.result !== 1) fails.push(`R5 ${c.calc}: sensitivity result ${c.sensitivity.result} matches ${out.sens.result}`);
+      if (out.sens.anchor !== 1) fails.push(`R5 ${c.calc}: sensitivity anchor ${c.sensitivity.anchor} matches ${out.sens.anchor}`);
+      if (out.sens.unmet && (!out.sens.unmet.length || out.sens.unmet.some((t) => t !== 'checkbox'))) fails.push(`R5 ${c.calc}: unmet selector matches ${out.sens.unmet.length} elements, not all checkboxes`);
+      for (const f of out.sens.factors) {
+        factorsChecked++;
+        if (!f.tag) { fails.push(`R5 ${c.calc}: factor #${f.id} not on the page`); continue; }
+        if (f.kind === 'step' && (f.tag !== 'SELECT' || f.nopts < 2)) fails.push(`R5 ${c.calc}: step factor #${f.id} is ${f.tag} with ${f.nopts} options`);
+        else if (f.kind === 'continuous' && !(f.tag === 'INPUT' && (f.type === 'number' || f.type === 'range') && Number.isFinite(parseFloat(f.value)))) fails.push(`R5 ${c.calc}: continuous factor #${f.id} is ${f.tag}[${f.type}] value "${f.value}"`);
+        else if (f.kind !== 'step' && f.kind !== 'continuous') fails.push(`R5 ${c.calc}: factor #${f.id} has unknown kind "${f.kind}"`);
+      }
+    }
     for (const f of out.fields) {
       fieldsChecked++;
       const spec = c.fields[f.key];
@@ -122,4 +149,4 @@ if (fails.length) {
   for (const f of fails) console.log('  ' + f);
   process.exit(1);
 }
-console.log(`PASS test-calculator-registry — ${reg.calculators.length} calculators, ${fieldsChecked} fields, ${resultsChecked} results match the rendered pages`);
+console.log(`PASS test-calculator-registry — ${reg.calculators.length} calculators, ${fieldsChecked} fields, ${resultsChecked} results, ${factorsChecked} sensitivity factors match the rendered pages`);

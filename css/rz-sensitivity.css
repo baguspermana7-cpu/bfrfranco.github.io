@@ -1,0 +1,50 @@
+/* css/rz-sensitivity.css — "What drives this result" panel (P07, js/rz-sensitivity.js loads it).
+   Site register: hairline panel, radius 4px, mono values, one accent (signal amber) for the "up" side and a
+   neutral slate for the "down" side, no shadow, no lift, named transitions only. */
+:root { --rzs-bg: #ffffff; --rzs-line: #d6dbe1; --rzs-text: #1d232b; --rzs-muted: #56606c;
+        --rzs-hi: #9a5b00; --rzs-lo: #5f6b78; --rzs-axis: #8a94a0; --rzs-warn: #8a3b00; }
+[data-theme="dark"] { --rzs-bg: #121316; --rzs-line: #2a2d33; --rzs-text: #e8edf5; --rzs-muted: #a3acb8;
+        --rzs-hi: #e8b563; --rzs-lo: #8d99a8; --rzs-axis: #6b7480; --rzs-warn: #f0a868; }
+details.rz-sens { margin: 24px auto; padding: 0; border: 1px solid var(--rzs-line); border-radius: 4px;
+        background: var(--rzs-bg); color: var(--rzs-text); max-width: 1200px; box-sizing: border-box; }
+details.rz-sens > summary { cursor: pointer; padding: 14px 16px; font: 600 0.8rem/1.2 'JetBrains Mono', ui-monospace, monospace;
+        letter-spacing: 0.06em; text-transform: uppercase; list-style-position: inside; }
+details.rz-sens > summary:focus-visible { outline: 2px solid var(--rzs-hi); outline-offset: -2px; }
+.rz-sens-body { padding: 0 16px 16px; border-top: 1px solid var(--rzs-line); }
+.rz-sens-note, .rz-sens-base { color: var(--rzs-muted); font-size: 0.85rem; margin: 12px 0; }
+.rz-sens-base b { color: var(--rzs-text); font-family: 'JetBrains Mono', ui-monospace, monospace; }
+.rz-sens-warn { color: var(--rzs-warn); font-size: 0.85rem; }
+.rz-sens-actions { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.rz-sens-run, .rz-sens-cancel { min-height: 40px; padding: 0 14px; border-radius: 4px; font: 600 0.85rem/1 inherit;
+        cursor: pointer; transition: border-color 0.15s ease, background-color 0.15s ease; }
+.rz-sens-run { border: 1px solid var(--rzs-hi); background: transparent; color: var(--rzs-text); }
+.rz-sens-run:hover { background: color-mix(in srgb, var(--rzs-hi) 12%, transparent); }
+.rz-sens-run:disabled { cursor: progress; opacity: 0.75; }
+.rz-sens-cancel { border: 1px solid transparent; background: transparent; color: var(--rzs-muted); text-decoration: underline; }
+.rz-sens-status { color: var(--rzs-muted); font: 0.8rem/1.2 'JetBrains Mono', ui-monospace, monospace; }
+.rz-sens-partial, .rz-sens-clamp { color: var(--rzs-warn); }
+.rz-sens-rows { list-style: none; margin: 8px 0 0; padding: 0; }
+.rz-sens-row { display: grid; grid-template-columns: minmax(140px, 28%) 1fr minmax(170px, 30%); gap: 12px; align-items: center;
+        width: 100%; padding: 8px 4px; border: 0; border-bottom: 1px solid var(--rzs-line); background: transparent;
+        color: var(--rzs-text); text-align: left; font: inherit; cursor: pointer; transition: background-color 0.15s ease; }
+.rz-sens-row:hover { background: color-mix(in srgb, var(--rzs-line) 35%, transparent); }
+.rz-sens-row:focus-visible { outline: 2px solid var(--rzs-hi); outline-offset: -2px; }
+.rz-sens-label { font-size: 0.85rem; }
+.rz-sens-track { position: relative; height: 14px; }
+.rz-sens-axis { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--rzs-axis); }
+.rz-sens-bar { position: absolute; top: 2px; height: 10px; }
+.rz-sens-bar.is-hi { background: var(--rzs-hi); }
+.rz-sens-bar.is-lo { background: var(--rzs-lo); }
+.rz-sens-bar.is-failed { background: repeating-linear-gradient(45deg, var(--rzs-axis) 0 3px, transparent 3px 7px); }
+.rz-sens-vals { font: 0.8rem/1.35 'JetBrains Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+.rz-sens-in { color: var(--rzs-muted); }
+.rz-sens-row.is-failed .rz-sens-vals { color: var(--rzs-muted); }
+@media (max-width: 640px) {
+  details.rz-sens { margin: 16px; }
+  .rz-sens-row { grid-template-columns: 1fr; gap: 4px; }
+}
+.rz-sens-legend { color: var(--rzs-muted); font-size: 0.8rem; margin: 0 0 4px; display: flex; flex-wrap: wrap; gap: 4px 6px; align-items: center; }
+.rz-sens-key { display: inline-block; width: 12px; height: 8px; margin-left: 6px; }
+.rz-sens-key:first-child { margin-left: 0; }
+.rz-sens-key.is-hi { background: var(--rzs-hi); }
+.rz-sens-key.is-lo { background: var(--rzs-lo); }

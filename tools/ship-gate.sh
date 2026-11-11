@@ -287,6 +287,7 @@ gate "Service worker precache — every PRE_CACHE_URLS path on disk, per-URL pre
 gate "Offline calculators — 11 calculators visited once, network gone (origin refused + DevTools offline): reload, recompute, Chart.js built (P25)" node tools/test-offline-calculators.mjs
 gate "Search + palette — every public page indexed and loading the palette, 10/10 fixed queries top-3, palette opens styled with working page actions on 5 families (P14)" node tools/test-search-palette.mjs
 gate "Activity log — own-rows history table with empty/error/retry states, one event per Open/Copy/Delete/PDF, action+meta allowlists, signed-out silence (P15)" node tools/test-activity-log.mjs
+gate "Sensitivity — fixture exact per factor kind, pue every factor equals the page recompute, inputs untouched, tia top gain equals ticking it (P07)" node tools/test-sensitivity.mjs
 gate "Sustainability page (K25) — generator-fresh, worked example recomputed, citations and FAQ JSON-LD consistent" python3 tools/test-pillar-sustainability.py
 gate "WAN traffic study — every printed figure follows from the view's own inputs" node tools/test-dcai-wan-study.mjs
 gate "security zone ladder — SL-T never drops inward, life safety is monitor-only" node tools/test-dcai-security-zones.mjs

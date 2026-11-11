@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>sensitivity fixture</title></head>
+<body>
+<!-- P07 gate fixture (tools/test-sensitivity.mjs): out = 2*x + mode; z poisons the result; c is a checkbox worth 5. -->
+<input type="number" id="x" value="10" min="0" max="10.5">
+<input type="range" id="r" value="50" min="0" max="100" step="5">
+<select id="mode"><option value="0">zero</option><option value="1" selected>one</option><option value="3">three</option></select>
+<select id="solo"><option value="1">only</option></select>
+<input type="number" id="z" value="1">
+<input type="checkbox" id="chk-a"><input type="checkbox" id="chk-b">
+<div id="out"></div>
+<script>
+function calc() {
+  var x = parseFloat(document.getElementById('x').value), r = parseFloat(document.getElementById('r').value);
+  var m = parseFloat(document.getElementById('mode').value), z = parseFloat(document.getElementById('z').value);
+  var v = 2 * x + m + r / 100 + (document.getElementById('chk-a').checked ? 5 : 0) + (document.getElementById('chk-b').checked ? 1 : 0);
+  document.getElementById('out').textContent = z === 1 ? v.toFixed(2) : 'error';
+}
+document.addEventListener('input', calc); document.addEventListener('change', calc); calc();
+</script>
+<script src="../../js/rz-embed-compute.js"></script>
+<script src="../../js/rz-sensitivity.js"></script>
+</body></html>

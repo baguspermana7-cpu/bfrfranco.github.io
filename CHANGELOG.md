@@ -11,6 +11,38 @@ release sections rather than semver.
 
 ---
 
+## v3.40.0 — 2026-11-11 — "What drives this result" on pue and tia
+
+Product transformation, Wave 2: P07 part A (sensitivity panels; the tornado correctness gate on the 8 existing
+calculators is part B).
+
+### Added
+- **"What drives this result" on the PUE calculator and the TIA-942 checklist.** A collapsed `<details>` panel under the
+  results. **Compute sensitivity** moves each declared input 10 % down and up (a select: the option before and after),
+  recomputes the page itself in a hidden iframe and ranks the inputs by how far the result moves. Each row shows the low
+  and high result with the input values used, "clamped to the field limit" or "end of the list" where it applies, and
+  "no change at the precision the page shows" when the displayed result does not move. A row click focuses its input.
+  Progress "Computing… 3/20", Cancel ("partial: n of m"), a failed input reads "could not compute (reason)" while the
+  others still rank. On the TIA-942 checklist it ticks each unmet item instead: the items that raise the score most.
+- **Found by the panel:** on pue, 8 of the 20 inputs (utilisation, economizer, supply temperature, transformer loss, PDU type,
+  load growth, Green Grid level, ASHRAE class) sit in the Pro
+  section and the free calculation uses fixed values for them. Those rows now read "Pro input: the free calculation uses
+  a fixed value" instead of looking like inputs that do nothing.
+- `js/rz-sensitivity.js` + `css/rz-sensitivity.css`; `RZEmbedCompute.session()` in `js/rz-embed-compute.js` (one iframe
+  load for all measurements: pue's 20 inputs in about 12 s instead of about 60 s).
+- `data/calculators.json`: a `sensitivity` entry for pue (20 factors) and tia (unmet items). `test-calculator-registry.mjs`
+  R5 checks every factor, result and anchor against the rendered page.
+- `tools/test-sensitivity.mjs` (23 checks, ship gate): a fixture page with an exact answer per factor kind; on pue every
+  factor's low and high equal the page's own result after setting that input on the page; the page's inputs are unchanged
+  after a run; tia's top gain equals ticking that item. Proven RED: removing the revert step and the clamp fails 7 checks
+  (pue 18 of 20 rows wrong).
+
+### Not done
+- **rfs has no panel.** Its workbench saves the open project to localStorage on every change, so an embedded copy would
+  overwrite the reader's saved project while it measures. It needs a no-save embed path first.
+
+---
+
 ## v3.39.0 — 2026-11-11 — "The account shows what you did"
 
 Product transformation, Wave 2: P15 part A (activity history). Part B is server SQL the owner runs.
