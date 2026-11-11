@@ -1,0 +1,1019 @@
+{
+ "slug": "gcp-europe-west2-b-plc-power-2026",
+ "title": "Google Cloud europe-west2-b Power Loss: PLC Logic Stops Generator Start",
+ "operator": "Google Cloud (facility operator not named)",
+ "dcName": "Facility hosting zone europe-west2-b",
+ "location": {
+  "city": "Site not named",
+  "country": "United Kingdom",
+  "region": "EMEA",
+  "az": "europe-west2-b"
+ },
+ "date": "2026-10-20",
+ "durationMin": 368,
+ "category": [
+  "power",
+  "config-error"
+ ],
+ "severity": {
+  "usersAffected": "Google Cloud customers with workloads in europe-west2-b lost them for the outage; customers elsewhere in europe-west2 saw latency and errors during failover. No customer count is given.",
+  "impactUsd": "Not disclosed",
+  "servicesDown": [
+   "Compute Engine and Persistent Disk (zonal)",
+   "Google Kubernetes Engine",
+   "Cloud SQL",
+   "BigQuery",
+   "Looker",
+   "AlloyDB",
+   "Memorystore",
+   "Apigee"
+  ],
+  "tier": "Zonal outage (one facility) with regional degradation"
+ },
+ "brief": "On 20 Oct 2026 a utility cable fault took out the only live feed to the UK facility hosting Google Cloud zone europe-west2-b, which was on a single feed during maintenance. The PLCs read live voltage on the line side of the open second feeder, so they never started the generators. The UPS ran out after about five minutes and the zone went dark for about 80 minutes; majority recovery took 6 hours 8 minutes.",
+ "magnitude": {
+  "usersScore": 6,
+  "financialScore": 4,
+  "durationScore": 5,
+  "blastRadiusScore": 6,
+  "note": "One availability zone went fully dark and the rest of europe-west2 degraded during failover (40 services listed, no impact outside the region). Duration (5): the main impact lasted 6 h 8 min, inside the 4–12 h band. No cost or customer count is disclosed, so financial and users are judged moderate."
+ },
+ "sequenceOfEvents": [
+  {
+   "t": "2026-10-14",
+   "phase": "TRIGGER",
+   "event": "A quarterly generator load test finds issues on the B feeder pathway. Circuit breaker feeder B is opened for corrective repairs, leaving the site in a temporary single-feed (1N) bridged maintenance posture on primary utility feed A.",
+   "source": "Google Cloud incident report Xs2XTHzAVC9YnafnPyzj: 'a quarterly generator load test on 14 Oct 2026'"
+  },
+  {
+   "t": "2026-10-20 06:53 BST",
+   "phase": "TRIGGER",
+   "event": "The primary utility provider experienced an outage on primary utility feed A, caused by an underground cable fault on the utility network outside the facility.",
+   "source": "Google Cloud incident report Xs2XTHzAVC9YnafnPyzj: 'external underground cable fault'"
+  },
+  {
+   "t": "2026-10-20 06:53 BST",
+   "phase": "TRIGGER",
+   "event": "Both master PLCs read live voltage from feed B on the line side of its open breaker, treat the utility as healthy, and did not issue a start command to the generator plant.",
+   "source": "Google Cloud incident report Xs2XTHzAVC9YnafnPyzj: 'did not issue a start command to the generator plant'"
+  },
+  {
+   "t": "2026-10-20 06:53 BST",
+   "phase": "MITIGATION",
+   "event": "Static UPS battery banks carry the critical load as designed; their rated autonomy is about five minutes.",
+   "source": "Google Cloud incident report Xs2XTHzAVC9YnafnPyzj: 'approximately five minutes of autonomous runtime'"
+  },
+  {
+   "t": "2026-10-20 06:53–07:00 BST",
+   "phase": "MITIGATION",
+   "event": "The onsite facilities team attempted to execute a remote load transfer via the PLC; the PLC inhibited it because of the live upstream voltage reading on feed B.",
+   "source": "Google Cloud incident report Xs2XTHzAVC9YnafnPyzj: 'the system inhibited the action'"
+  },
+  {
+   "t": "2026-10-20 07:00 BST",
+   "phase": "IMPACT",
+   "event": "The batteries are exhausted. Host servers, local storage and network aggregation hardware in europe-west2-b lose power; instances, database replicas and worker nodes in the zone become unreachable.",
+   "source": "Google Cloud incident report Xs2XTHzAVC9YnafnPyzj: 'Impact start'"
+  },
+  {
+   "t": "2026-10-20 07:02 BST",
+   "phase": "IMPACT",
+   "event": "Google Kubernetes Engine impact begins: zonal clusters in europe-west2-b go fully unavailable and regional clusters lose their worker nodes in the zone.",
+   "source": "Google Cloud incident report Xs2XTHzAVC9YnafnPyzj, GKE section: 'starting at 23:02 US/Pacific'"
+  },
+  {
+   "t": "2026-10-20 07:04 BST",
+   "phase": "DETECTION",
+   "event": "Google engineers were alerted to the disruption via automated monitoring systems and probers showing elevated API error ratios, job submission timeouts and loss of reachability in the zone.",
+   "source": "Google Cloud incident report Xs2XTHzAVC9YnafnPyzj: 'automated monitoring systems and probers'"
+  },
+  {
+   "t": "2026-10-20 07:09 BST",
+   "phase": "CASCADE",
+   "event": "Automated failover moves work to adjacent zones. Cross-zone calls to metadata in the dark zone time out, and the redirected load saturates the surviving zones, giving queueing, slow database failovers and intermittent 500 and 503 errors across europe-west2.",
+   "source": "Google Cloud incident report Xs2XTHzAVC9YnafnPyzj: 'intermittent 500 and 503 API errors across the region'"
+  },
+  {
+   "t": "2026-10-20 07:09–07:54 BST (exact time not stated)",
+   "phase": "MITIGATION",
+   "event": "Engineers isolated the offline availability zone by routing regional services away from it, and reprioritised scheduler capacity in the surviving zones toward active customer reservations.",
+   "source": "Google Cloud incident report Xs2XTHzAVC9YnafnPyzj: 'Traffic Isolation'"
+  },
+  {
+   "t": "2026-10-20 07:54 BST",
+   "phase": "RECOVERY",
+   "event": "The facility team transferred the facility load to the standby utility source; power from the standby source is restored and re-energisation of the data halls begins.",
+   "source": "Google Cloud incident report Xs2XTHzAVC9YnafnPyzj: 'Utility Power Restoration'"
+  },
+  {
+   "t": "2026-10-20 08:20 BST",
+   "phase": "RECOVERY",
+   "event": "Utility power is re-established to the data halls. Site teams and OEM vendors reconfigured and validated PLC functionality on both undervoltage and breaker status, and the generator automation controllers are reset and tested.",
+   "source": "Google Cloud incident report Xs2XTHzAVC9YnafnPyzj: 'Datahall Power Restoration'"
+  },
+  {
+   "t": "2026-10-20 08:40–08:45 BST",
+   "phase": "RECOVERY",
+   "event": "Cluster managers start rescheduling compute jobs and network devices come back online.",
+   "source": "Google Cloud incident report Xs2XTHzAVC9YnafnPyzj: 'Network devices were back online'"
+  },
+  {
+   "t": "2026-10-20 08:50 BST",
+   "phase": "RECOVERY",
+   "event": "Storage devices that shut down uncleanly start recovery. Responders chose not to restore services that would otherwise make this worse, which lengthens the outage to protect data.",
+   "source": "Google Cloud incident report Xs2XTHzAVC9YnafnPyzj: 'unclean shutdowns began recovery'"
+  },
+  {
+   "t": "2026-10-20 11:13 BST",
+   "phase": "RECOVERY",
+   "event": "Power redundancy is verified and storage is far enough recovered to prepare controlled traffic re-admission.",
+   "source": "Google Cloud incident report Xs2XTHzAVC9YnafnPyzj: 'Power redundancy was verified'"
+  },
+  {
+   "t": "2026-10-20 11:45 BST",
+   "phase": "RECOVERY",
+   "event": "Engineers begin gradual, controlled traffic re-admission to europe-west2-b so accumulated job backlogs drain without a second surge.",
+   "source": "Google Cloud incident report Xs2XTHzAVC9YnafnPyzj: 'Controlled Traffic Re-admission'"
+  },
+  {
+   "t": "2026-10-20 12:01–12:29 BST",
+   "phase": "RECOVERY",
+   "event": "Compute Engine VMs and zonal disks in the zone come back online; regional services and compute management are fully undrained by 12:29 BST.",
+   "source": "Google Cloud incident report Xs2XTHzAVC9YnafnPyzj, Compute Engine section"
+  },
+  {
+   "t": "2026-10-20 13:08 BST",
+   "phase": "RESTORED",
+   "event": "Majority workload recovery: Compute Engine VMs are 99.5% operational and new VM creation is fully supported.",
+   "source": "Google Cloud incident report Xs2XTHzAVC9YnafnPyzj: 'Majority Workload Recovery'"
+  },
+  {
+   "t": "2026-10-20 15:03 BST",
+   "phase": "RESTORED",
+   "event": "After a tail of isolated workloads recovers, the closure notification for the incident was posted on the status page.",
+   "source": "Google Cloud incident report Xs2XTHzAVC9YnafnPyzj: closure posted 07:03 US/Pacific"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "UPS autonomy (rated)",
+   "value": "about 5 minutes",
+   "source": "Google Cloud incident report Xs2XTHzAVC9YnafnPyzj"
+  },
+  {
+   "label": "Utility loss to zone power loss",
+   "value": "7 minutes (06:53 → 07:00 BST)",
+   "source": "Google Cloud incident report Xs2XTHzAVC9YnafnPyzj, sequence of events"
+  },
+  {
+   "label": "Zone without power",
+   "value": "07:00 → 08:20 BST data-hall power, about 80 minutes; standby source restored at 07:54",
+   "source": "Google Cloud incident report Xs2XTHzAVC9YnafnPyzj, sequence of events"
+  },
+  {
+   "label": "Main impact resolved",
+   "value": "6 hours 8 minutes (07:00 → 13:08 BST)",
+   "source": "Google Cloud incident report Xs2XTHzAVC9YnafnPyzj: 'within 6 hours and 8 minutes'"
+  },
+  {
+   "label": "Compute Engine health at majority recovery",
+   "value": "99.5% of VMs operational at 13:08 BST",
+   "source": "Google Cloud incident report Xs2XTHzAVC9YnafnPyzj"
+  },
+  {
+   "label": "GKE incident duration",
+   "value": "7 hours 34 minutes (07:02 → 14:37 BST)",
+   "source": "Google Cloud incident report Xs2XTHzAVC9YnafnPyzj, GKE section"
+  },
+  {
+   "label": "BigQuery disruption in europe-west2",
+   "value": "about 5 hours 9 minutes (07:03 → 12:12 BST)",
+   "source": "Google Cloud incident report Xs2XTHzAVC9YnafnPyzj, BigQuery section"
+  },
+  {
+   "label": "Looker instances unresponsive at peak",
+   "value": "about 45%",
+   "source": "Google Cloud incident report Xs2XTHzAVC9YnafnPyzj, Looker section"
+  },
+  {
+   "label": "Services listed as impacted",
+   "value": "40 Google Cloud services, all within europe-west2",
+   "source": "Google Cloud incident report Xs2XTHzAVC9YnafnPyzj, list of impacted services"
+  },
+  {
+   "label": "Days in single-feed posture before the event",
+   "value": "6 (feeder B opened after the 14 Oct load test; outage 20 Oct)",
+   "source": "Google Cloud incident report Xs2XTHzAVC9YnafnPyzj"
+  }
+ ],
+ "rootCause": "PROXIMATE CAUSE: an external underground cable fault took out primary utility feed A at 06:53 BST on 20 Oct 2026. Feed A was the only utility path carrying the site, because feeder B had been opened six days earlier for repairs found in a quarterly generator load test.\n\nWHY THE GENERATORS NEVER STARTED: the generator plant is started by a dual-redundant PLC. Google's report says the PLC logic did not verify both an undervoltage condition and physical breaker position for both utility feeders. Its undervoltage sensing inputs were wired on the line side of the feeder breakers, and the start permissive only asked whether voltage was present there. Feed B was still energised upstream of its open breaker, so both the active and the standby master PLC, running identical logic on shared sensors, concluded a healthy source existed and did not issue a start command to the generator plant.\n\nWHY THE BATTERIES RAN OUT: the static UPS gives about five minutes of autonomy, sized for an automatic generator start and transfer, not for manual recovery. The onsite team tried a remote load transfer through the PLC, which the same wrong voltage reading blocked. The team then moved the site to the standby utility source, but the batteries were exhausted first and the data halls went dark at 07:00 BST.\n\nLATENT ROOT: a control-logic design and commissioning defect (sensing placed upstream of the isolation point, no breaker-status interlock) that only becomes dangerous in a maintenance line-up with one feeder breaker open. Redundant PLCs did not help because they shared the same logic and sensors. Nothing in the record shows the generator auto-start was tested in the 1N maintenance posture before the site was left in it; Google's new actions add exactly that test.",
+ "contributingFactors": [
+  "Single-feed maintenance posture: after issues found in the 14 Oct 2026 quarterly generator load test, feeder B's breaker was opened for repairs, so feed A carried the whole critical load for six days (Google report).",
+  "PLC start logic checked voltage on the line side of the feeder breakers and did not check breaker position, so an open but upstream-energised feeder B read as a healthy source (Google report).",
+  "Common-mode redundancy: the active and standby master PLCs ran identical control logic on shared upstream sensors, so both made the same wrong decision (Google report).",
+  "UPS autonomy of about five minutes left no time for manual recovery once the PLC blocked the remote load transfer (Google report).",
+  "Testing gap (analyst inference from the new actions): the record shows no test of generator auto-start in the 1N posture before the site was left in it; Google's actions now require load-transfer tests 'within the backup battery timer'.",
+  "Customer failover was limited by capacity constraints in the surviving zones and by difficulty replicating the underlying storage (Google report, Compute Engine section).",
+  "Unclean power loss to storage forced a long, deliberate integrity recovery before compute could return (Google report)."
+ ],
+ "coe": [
+  {
+   "action": "Utility provider locates the damaged cable with low-frequency radar testing",
+   "owner": "Utility provider",
+   "status": "Completed 26 Oct 2026"
+  },
+  {
+   "action": "Utility provider repairs the cable and restores primary feed A",
+   "owner": "Utility provider",
+   "status": "Committed, estimated 13 Nov 2026"
+  },
+  {
+   "action": "Transfer the facility back to primary feeds A and B from the standby source under a controlled method of procedure",
+   "owner": "Google / site operations",
+   "status": "Committed, estimated 17 Nov 2026"
+  },
+  {
+   "action": "Full generator load-transfer tests, including PLC automatic generator start within the battery timer, and review of backup procedures",
+   "owner": "Google / site operations",
+   "status": "Completed 20 Oct and 26 Oct 2026"
+  },
+  {
+   "action": "Full generator load-transfer tests with feeds A and B after the utility repair",
+   "owner": "Google / site operations",
+   "status": "Committed, estimated 17 Nov 2026"
+  },
+  {
+   "action": "Reconfigure and validate the PLC on both undervoltage and breaker status",
+   "owner": "Google with facility and OEM vendors",
+   "status": "Completed 26 Oct 2026"
+  },
+  {
+   "action": "Comprehensive PLC code review and resilience review against multiple failure scenarios",
+   "owner": "Google with facility vendor teams",
+   "status": "Committed, estimated 6 Nov 2026"
+  },
+  {
+   "action": "Validate PLC configurations at other sites with similar topologies and PLC manufacturers",
+   "owner": "Google",
+   "status": "Committed, estimated 15 Nov 2026"
+  },
+  {
+   "action": "Update the emergency operating procedure for unexpected loss of the active utility source: manual feed restore, manual generator restart and manual transfer within the UPS runtime",
+   "owner": "Google / site operations",
+   "status": "Completed 26 Oct 2026"
+  },
+  {
+   "action": "Practise the updated emergency operating procedure twice per shift",
+   "owner": "On-site facility team",
+   "status": "Completed 24 Oct 2026, checked daily by Google DC Operations"
+  },
+  {
+   "action": "Make PLC code review part of commissioning and integrated systems testing before Facility Ready, with a second-team validation within a quarter",
+   "owner": "Google",
+   "status": "Committed, estimated 18 Dec 2026"
+  },
+  {
+   "action": "Freeze planned maintenance at sites with similar topologies and require elevated approval for non-standard configuration changes",
+   "owner": "Google",
+   "status": "Completed 30 Oct 2026"
+  },
+  {
+   "action": "Automated alert-to-communication for location-impacting incidents",
+   "owner": "Google Cloud",
+   "status": "Committed, no date given"
+  },
+  {
+   "action": "Expand platform-wide testing for infrastructure-level events",
+   "owner": "Google Cloud",
+   "status": "Committed, no date given"
+  },
+  {
+   "action": "Faster recovery for high-availability database instances on Regional Persistent Disk",
+   "owner": "Google Cloud (Cloud SQL, storage)",
+   "status": "Committed, no date given"
+  },
+  {
+   "action": "Remove the autoscaling dependency from BigQuery job provisioning",
+   "owner": "Google Cloud (BigQuery)",
+   "status": "Done, stated as updated in the report"
+  }
+ ],
+ "lessonsLearnt": [
+  "A start permissive must measure the bus it protects. Voltage on the line side of an open breaker proves the utility is alive, not that the load is fed: interlock voltage with breaker position.",
+  "Duplicated controllers are not diverse controllers. Two PLCs with the same code and the same sensors fail together on a logic error.",
+  "Every maintenance line-up is a new configuration. Before leaving a site in a reduced posture, test the automatic transfer in that exact line-up.",
+  "Five minutes of UPS is a window for automation, not for people. The manual fallback must be rehearsed to fit inside it, or the battery must be sized for it.",
+  "A hard power loss costs far more time in storage integrity recovery than the power outage itself: here about 80 minutes dark, over 6 hours to majority recovery.",
+  "Zonal failover only works if the surviving zones have capacity and the storage layer can actually fail over under load."
+ ],
+ "improvements": [
+  "Design: verify both undervoltage and breaker position for each feeder before deciding a source is healthy (Google completed PLC reconfiguration).",
+  "Design: review PLC code for resilience to multiple simultaneous failures and validate the configuration at similar sites (Google committed).",
+  "Maintenance regime: full generator load-transfer tests that prove automatic start within the battery timer, repeated after the utility line-up is restored (Google completed and committed).",
+  "Maintenance regime: freeze planned maintenance at similar-topology sites and add elevated approval for non-standard configuration changes (Google completed).",
+  "Safety and operations: updated emergency procedure for loss of the active source, practised twice per shift (Google completed).",
+  "Process: PLC code review inside commissioning and integrated systems testing before Facility Ready, with independent second-team validation (Google committed).",
+  "Analyst recommendation (not in the report): add a diverse, independent loss-of-supply detector on the critical bus that can start generators even if the master PLC logic is wrong."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "A correct-looking signal at the wrong point",
+   "body": "The PLC did exactly what its logic asked. The defect is the measurement point: line-side voltage on a feeder whose breaker is open. In normal 2N operation that reading is harmless; in the maintenance posture it hid the loss of the only live feed. Control logic that infers 'supply healthy' from upstream voltage needs the breaker state in the same decision."
+  },
+  {
+   "heading": "Redundancy that shared one mistake",
+   "body": "The site had two utility feeders, a standby utility, a generator bank and two master PLCs. Three of those were unavailable or blind at once: feeder B was open by design, the generators were never asked to start, and both PLCs shared the same logic and sensors. Redundancy counted by box does not equal redundancy against a logic error."
+  },
+  {
+   "heading": "The maintenance window as the real hazard",
+   "body": "The trigger was ordinary, a utility cable fault. What made it a full outage was the six-day single-feed posture after a load-test finding. Google's response freezes similar maintenance elsewhere and adds approvals for non-standard configurations, which treats the line-up itself as a change that needs review."
+  },
+  {
+   "heading": "Recovery dominated by storage, not power",
+   "body": "Data-hall power was back at 08:20 BST, about 80 minutes after the halls went dark. Majority workload recovery came at 13:08. The gap is storage integrity work after an unclean shutdown and controlled traffic re-admission, a deliberate choice to protect data over speed."
+  },
+  {
+   "heading": "What the record does not say",
+   "body": "The report does not name the facility operator, the PLC manufacturer, the generator count or rating, the cost of the outage, or why the 14 Oct load-test issues required opening feeder B. Those gaps are stated here rather than filled in."
+  }
+ ],
+ "technicalDeepDive": "The facility is designed 2N on utility (feeders A and B to separate intake switchboards), with a standby utility connection for manual campus-wide transfer and a central high-voltage generator bank. Start logic: on utility undervoltage the PLC starts and synchronises the diesel generators and transfers the load, inside the roughly five-minute UPS window.\n\nThe failure is a permissive built on the wrong measurement point. A voltage transformer on the line side of an open breaker tells you the utility is alive, not that the load is fed. With feeder B open, the only correct signal that the critical bus had lost supply was feed A's undervoltage combined with feeder B's breaker position. The logic checked voltage alone, so the open breaker made the loss of the last live feed invisible. Duplicate PLCs running the same code on the same inputs are redundant against hardware failure but share every logic error: a common-mode failure.\n\nDownstream, the outage was a hard power loss, not an orderly shutdown. Storage that lost power uncleanly needed a long integrity recovery, and Google chose to hold services back rather than risk data. Customer-side zonal failover was partly undermined by capacity limits in the surviving zones and slow Regional Persistent Disk recovery. BigQuery's data-plane job could not scale up during failover because of an autoscaling dependency.",
+ "references": [
+  {
+   "title": "Google Cloud Service Health, incident Xs2XTHzAVC9YnafnPyzj, final incident report (4 Nov 2026)",
+   "url": "https://status.cloud.google.com/incidents/Xs2XTHzAVC9YnafnPyzj",
+   "type": "official-postmortem",
+   "accessed": "2026-11-11",
+   "quote": "did not issue a start command to the generator plant"
+  },
+  {
+   "title": "Google Cloud Service Health incident feed (incidents.json), entry Xs2XTHzAVC9YnafnPyzj",
+   "url": "https://status.cloud.google.com/incidents.json",
+   "type": "vendor-status",
+   "accessed": "2026-11-11",
+   "quote": "Multiple services were experiencing issues in the europe-west2 region."
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": true,
+  "referenceCount": 2,
+  "lastVerified": "2026-11-11",
+  "confidence": "High: every fact is from Google's own final incident report. The facility operator, PLC make and generator rating are not disclosed."
+ },
+ "lastUpdated": "2026-11-11",
+ "operatorShort": "Google Cloud",
+ "fmea": {
+  "scope": "The power chain of the UK facility hosting europe-west2-b (utility feeds A and B, standby utility, dual master PLCs and generator start logic, static UPS) and Google Cloud's zonal failover and storage recovery. Analysed from Google's final incident report, which is the operator's own account; the facility operator and equipment makes are not named.",
+  "modes": [
+   {
+    "id": "FM-01",
+    "item": "Generator start logic in the dual master PLCs",
+    "function": "Start, synchronise and connect the generator plant when the critical load loses utility supply",
+    "failureMode": "The start permissive reads live line-side voltage on open feeder B and decides a healthy source exists, so no generator start is commanded",
+    "effect": "The generators never start; the UPS carries the load until its batteries are exhausted and the data halls lose power",
+    "cause": "Undervoltage sensing wired upstream of the feeder breakers and logic that does not check breaker position, identical in both PLCs",
+    "prevention": "Dual-redundant master PLCs; quarterly generator load tests",
+    "detection": "None that flagged the logic; it surfaced only when feed A failed in the 1N posture",
+    "S": 9,
+    "O": 4,
+    "D": 9,
+    "rationale": {
+     "S": "It takes a whole facility, a full availability zone, off power: the rubric's 9. Not 10, because no hazard to people and no loss of the facility or of several regions is recorded.",
+     "O": "It needs a feeder breaker open while that feeder stays live upstream, plus loss of the other feed: an uncommon line-up, so 'infrequent'.",
+     "D": "The defect was latent through commissioning and routine load testing and was found only by the outage itself."
+    },
+    "evidence": [
+     {
+      "src": "rootCause",
+      "quote": "did not verify both an undervoltage condition and physical breaker position for both utility feeders"
+     },
+     {
+      "src": "soe",
+      "i": 2,
+      "quote": "did not issue a start command to the generator plant"
+     },
+     {
+      "src": "ref",
+      "i": 0,
+      "quote": "did not issue a start command to the generator plant"
+     },
+     {
+      "src": "factor",
+      "i": 1
+     }
+    ],
+    "actions": [
+     {
+      "text": "PLC reconfigured and validated on undervoltage and breaker status (Google, completed)",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     },
+     {
+      "text": "Generator load-transfer tests proving automatic start within the battery timer (Google, completed)",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "text": "PLC code review against multiple failure scenarios (Google, committed)",
+      "evidence": {
+       "src": "coe",
+       "i": 6
+      }
+     },
+     {
+      "text": "PLC code review inside commissioning before Facility Ready (Google, committed)",
+      "evidence": {
+       "src": "coe",
+       "i": 10
+      }
+     }
+    ],
+    "revised": {
+     "S": 9,
+     "O": 2,
+     "D": 4
+    },
+    "revisedRationale": "Severity is unchanged: the same failure would still darken the zone. Occurrence falls because the logic now checks breaker status, and detection improves because load tests now prove the automatic start. The code reviews are committed, not yet confirmed done, so the lower scores are a claim about those actions.",
+    "short": "PLC blocks generator start",
+    "symbol": "genset",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Interlock generator-start logic with breaker position as well as undervoltage on every feeder, and prove it in each maintenance line-up",
+      "basis": "nfpa-110",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     },
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Review PLC start logic against multiple simultaneous failures before the next transfer test",
+      "basis": "nfpa-110",
+      "evidence": {
+       "src": "coe",
+       "i": 6
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "On loss of a utility feed, confirm at the switchgear that generators are running within the first minute of UPS autonomy",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "lesson",
+       "i": 3
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "If the PLC blocks transfer, start generators or switch to the standby source by the rehearsed manual procedure",
+      "basis": "nfpa-110",
+      "evidence": {
+       "src": "coe",
+       "i": 8
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "recover",
+      "do": "Restore storage integrity before re-admitting traffic after a hard power loss",
+      "basis": "nist-800-34",
+      "evidence": {
+       "src": "lesson",
+       "i": 4
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-02",
+    "item": "Utility line-up during maintenance (feeder B open, 1N posture)",
+    "function": "Keep two independent utility paths to the critical load, or compensate when one is out",
+    "failureMode": "The site runs on feed A alone for six days with no proof that generator auto-start works in that line-up",
+    "effect": "A single external utility fault becomes the trigger for total facility power loss",
+    "cause": "Feeder B opened for repairs after the 14 Oct load test; the reduced posture was not treated as a configuration needing its own transfer test",
+    "prevention": "2N utility design; standby utility connection for manual transfer",
+    "detection": "None recorded that tested the generator start in the 1N posture",
+    "S": 8,
+    "O": 5,
+    "D": 7,
+    "rationale": {
+     "S": "On its own the posture removes one utility path; combined with the PLC defect it led to a zone-wide outage. Scored 8 so the same outage is not counted at full weight twice.",
+     "O": "Maintenance postures with one feeder out are routine in a facility's life: 'occasional'.",
+     "D": "Nothing recorded checked the posture against the start logic; the gap was found by the outage."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 0,
+      "quote": "temporary single-feed (1N) bridged maintenance posture"
+     },
+     {
+      "src": "factor",
+      "i": 0
+     },
+     {
+      "src": "metric",
+      "i": 9
+     }
+    ],
+    "actions": [
+     {
+      "text": "Freeze planned maintenance at similar-topology sites and add elevated approval for non-standard configuration changes (Google, completed)",
+      "evidence": {
+       "src": "coe",
+       "i": 11
+      }
+     },
+     {
+      "text": "Restore normal A and B line-up under a controlled method of procedure (Google, committed)",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     }
+    ],
+    "revised": {
+     "S": 8,
+     "O": 4,
+     "D": 5
+    },
+    "revisedRationale": "The freeze and the approval step are complete, so reduced postures are now reviewed before use. They do not remove the need for maintenance, so occurrence only drops one step.",
+    "short": "Single-feed maintenance",
+    "symbol": "breaker",
+    "playbook": [
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Treat every reduced utility posture as a change: review it and test the automatic transfer in that line-up before leaving the site in it",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 11
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "detect",
+      "do": "While one feeder is out, watch the remaining feed and generator readiness continuously and alarm on any deviation",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "factor",
+       "i": 0
+      }
+     },
+     {
+      "role": "utility",
+      "phase": "contain",
+      "do": "Coordinate switching to the standby source with the site when the active feed fails",
+      "basis": "nfpa-110",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "recover",
+      "do": "Return to the full A and B line-up under a written method of procedure, then repeat the generator transfer test",
+      "basis": "en-50110",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-03",
+    "item": "UPS ride-through and manual fallback",
+    "function": "Bridge the critical load until generators or another source take over, and give operators time to act if automation fails",
+    "failureMode": "About five minutes of battery autonomy runs out before the team can complete a manual transfer",
+    "effect": "The data halls go dark at 07:00 BST, seven minutes after the utility loss",
+    "cause": "Battery autonomy sized for automatic generator start; the remote load transfer was blocked by the same PLC reading",
+    "prevention": "Static UPS with about five minutes of autonomy; standby utility connection",
+    "detection": "The facility team saw the problem and tried a remote transfer within the window",
+    "S": 8,
+    "O": 4,
+    "D": 4,
+    "rationale": {
+     "S": "Losing the bridge is what turns a control fault into a full outage; scored 8 to avoid double-counting FM-01's outage.",
+     "O": "It only matters when automation has already failed: 'infrequent'.",
+     "D": "The team knew within the window and acted; the failure was time, not awareness."
+    },
+    "evidence": [
+     {
+      "src": "metric",
+      "i": 0
+     },
+     {
+      "src": "soe",
+      "i": 4,
+      "quote": "attempted to execute a remote load transfer via the PLC"
+     },
+     {
+      "src": "factor",
+      "i": 3
+     }
+    ],
+    "actions": [
+     {
+      "text": "Emergency procedure for loss of the active source, including manual steps within the UPS runtime (Google, completed)",
+      "evidence": {
+       "src": "coe",
+       "i": 8
+      }
+     },
+     {
+      "text": "Procedure practised twice per shift (Google, completed)",
+      "evidence": {
+       "src": "coe",
+       "i": 9
+      }
+     }
+    ],
+    "revised": {
+     "S": 8,
+     "O": 3,
+     "D": 4
+    },
+    "revisedRationale": "A rehearsed manual procedure makes it more likely the team finishes inside the window. Battery autonomy itself is unchanged, so the improvement rests on practice, not on more time.",
+    "short": "UPS runs out first",
+    "symbol": "ups",
+    "playbook": [
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Start the battery-time clock the moment the UPS goes on battery and call the manual procedure at a set threshold",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "coe",
+       "i": 9
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Execute the rehearsed transfer to the standby source within the UPS window",
+      "basis": "nfpa-110",
+      "evidence": {
+       "src": "coe",
+       "i": 8
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Own the go or no-go on manual switching so the team does not wait on remote commands",
+      "basis": "nims-ics",
+      "evidence": {
+       "src": "lesson",
+       "i": 3
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Hold services back until storage integrity is confirmed after the hard power loss",
+      "basis": "nist-800-34",
+      "evidence": {
+       "src": "lesson",
+       "i": 4
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-04",
+    "item": "External utility cable (feed A)",
+    "function": "Supply primary utility power to the facility",
+    "failureMode": "Underground cable fault on the utility network outside the facility",
+    "effect": "Loss of the only live utility feed at 06:53 BST",
+    "cause": "External underground cable fault; mechanism beyond the location not described in the report",
+    "prevention": "2N utility design (reduced to 1N at the time); standby utility",
+    "detection": "Immediate loss of supply",
+    "S": 7,
+    "O": 5,
+    "D": 2,
+    "rationale": {
+     "S": "On a healthy 2N site this would be a non-event; here it removed the last feed. Scored 7 because the site-level consequence is counted in FM-01 to FM-03.",
+     "O": "Utility cable faults are a normal occurrence over a facility's life: 'occasional'.",
+     "D": "Loss of supply is seen at once by the electrical system."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 1,
+      "quote": "caused by an underground cable fault on the utility network outside the facility"
+     },
+     {
+      "src": "rootCause",
+      "quote": "external underground cable fault"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Utility locates the cable fault (completed) and repairs feed A (committed)",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     }
+    ],
+    "short": "Utility cable fault",
+    "symbol": "utility",
+    "playbook": [
+     {
+      "role": "utility",
+      "phase": "detect",
+      "do": "Notify the site of a feed loss and its expected duration",
+      "basis": "nfpa-110",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Confirm the site has transferred to generators or another source and stays there until the feed is repaired",
+      "basis": "nfpa-110",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Post a location-specific status update as soon as a facility-level event is confirmed",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 12
+      }
+     },
+     {
+      "role": "utility",
+      "phase": "recover",
+      "do": "Repair and test the faulted cable, then restore the feed in coordinated switching with the site",
+      "basis": "en-50110",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-05",
+    "item": "Zonal failover and storage recovery",
+    "function": "Move customer workloads to surviving zones and bring storage back without data loss",
+    "failureMode": "Failover is limited by capacity in surviving zones and slow storage recovery; regional services see queueing and 500/503 errors",
+    "effect": "Recovery takes more than six hours after about 80 minutes without power; regional degradation beyond the dark zone",
+    "cause": "Capacity constraints, Regional Persistent Disk recovery, a BigQuery autoscaling dependency, and unclean storage shutdown",
+    "prevention": "Multi-zone region design; automated failover",
+    "detection": "Automated monitoring and probers alerted engineers at 07:04 BST",
+    "S": 7,
+    "O": 5,
+    "D": 3,
+    "rationale": {
+     "S": "Regional degradation and slow recovery across many services, but most impact stayed in one zone: 7.",
+     "O": "Any zonal power loss produces this load on the survivors: 'occasional'.",
+     "D": "Monitoring alerted within four minutes of impact."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 8,
+      "quote": "intermittent 500 and 503 errors across europe-west2"
+     },
+     {
+      "src": "factor",
+      "i": 5
+     },
+     {
+      "src": "metric",
+      "i": 3
+     }
+    ],
+    "actions": [
+     {
+      "text": "BigQuery job provisioning no longer depends on autoscaling (Google, done)",
+      "evidence": {
+       "src": "coe",
+       "i": 15
+      }
+     },
+     {
+      "text": "Faster Regional Persistent Disk recovery for HA databases (Google, committed)",
+      "evidence": {
+       "src": "coe",
+       "i": 14
+      }
+     },
+     {
+      "text": "Expanded platform testing for infrastructure-level events (Google, committed)",
+      "evidence": {
+       "src": "coe",
+       "i": 13
+      }
+     }
+    ],
+    "revised": {
+     "S": 7,
+     "O": 4,
+     "D": 3
+    },
+    "revisedRationale": "One named dependency is removed; the storage and testing work is committed but not confirmed, so only a one-step fall in occurrence is claimed.",
+    "short": "Failover overloads region",
+    "symbol": "rack",
+    "playbook": [
+     {
+      "role": "ops-lead",
+      "phase": "detect",
+      "do": "Alert on zone reachability and cross-zone timeout rates together so a zonal loss is declared within minutes",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 5
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Route regional services away from the dark zone and protect capacity for active reservations",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "factor",
+       "i": 5
+      }
+     },
+     {
+      "role": "customer",
+      "phase": "prevent",
+      "do": "Keep cross-zone failover tested with capacity reserved in the other zones",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "lesson",
+       "i": 5
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Re-admit traffic gradually so backlogs drain without a second surge",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 4
+      }
+     }
+    ]
+   }
+  ],
+  "impactShort": "Zone dark 80 min · 6 h recovery"
+ },
+ "durationStatus": "measured",
+ "durationEvidence": {
+  "onset": {
+   "src": "soe",
+   "i": 5,
+   "quote": "07:00 BST"
+  },
+  "restored": {
+   "src": "soe",
+   "i": 17,
+   "quote": "13:08 BST"
+  }
+ },
+ "durationBasis": "Zone lost power 07:00 BST 20 Oct → majority workload recovery 13:08 BST (6 h 8 min)",
+ "response": {
+  "roles": {
+   "utility": "The primary utility provider for feeds A and B, not named",
+   "electrical": "The onsite facilities team, not named",
+   "vendor": "The facility vendor and OEM vendors who reconfigured the PLC, not named",
+   "first-responder": "On-shift facility staff who saw the UPS go on battery, not named in the record",
+   "incident-commander": "No incident commander is named in the record",
+   "ops-lead": "Google engineering teams alerted by monitoring",
+   "service-recovery": "Google engineers restoring storage, compute and traffic",
+   "comms": "Google Cloud Service Health status page",
+   "customer": "Google Cloud customers running workloads in europe-west2"
+  },
+  "recorded": [
+   {
+    "role": "utility",
+    "soe": 1,
+    "quote": "experienced an outage on primary utility feed A",
+    "did": "Lost primary feed A to an underground cable fault outside the facility"
+   },
+   {
+    "role": "electrical",
+    "soe": 4,
+    "quote": "attempted to execute a remote load transfer via the PLC",
+    "did": "Tried a remote load transfer through the PLC, which blocked it"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 7,
+    "quote": "alerted to the disruption via automated monitoring systems and probers",
+    "did": "Were paged by monitoring and probers four minutes after impact"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 9,
+    "quote": "isolated the offline availability zone",
+    "did": "Routed regional services away from the dark zone and reprioritised capacity"
+   },
+   {
+    "role": "electrical",
+    "soe": 10,
+    "quote": "transferred the facility load to the standby utility source",
+    "did": "Moved the site to the standby utility source and began re-energising the halls"
+   },
+   {
+    "role": "vendor",
+    "soe": 11,
+    "quote": "reconfigured and validated PLC functionality",
+    "did": "Reconfigured the PLC with the site team to check breaker status as well as voltage"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 13,
+    "quote": "chose not to restore services that would otherwise make this worse",
+    "did": "Held services back while storage recovered from the unclean shutdown"
+   },
+   {
+    "role": "comms",
+    "soe": 18,
+    "quote": "the closure notification for the incident was posted",
+    "did": "Posted the closure notice on Service Health at 15:03 BST"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "europe-west2-b zone dark",
+  "bones": [
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Sensing on line side",
+      "factor": 1
+     },
+     {
+      "label": "PLCs share one logic",
+      "factor": 2
+     },
+     {
+      "label": "Failover short on capacity",
+      "factor": 5
+     }
+    ]
+   },
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "UPS lasts 5 minutes",
+      "factor": 3
+     },
+     {
+      "label": "Unclean storage stop",
+      "factor": 6
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "1N posture for 6 days",
+      "factor": 0
+     },
+     {
+      "label": "No test in 1N line-up",
+      "factor": 4
+     }
+    ]
+   },
+   {
+    "cat": "External",
+    "causes": [
+     {
+      "label": "Utility cable fault",
+      "mode": "FM-04"
+     }
+    ]
+   }
+  ]
+ }
+}
