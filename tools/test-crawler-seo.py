@@ -154,7 +154,9 @@ class SitemapRegressionTests(unittest.TestCase):
         cases = {
             'prd/datahall.html': ('Product outcome', 'Decision supported', 'AC-01'),
             'manual/cdu-mini-bms.html': ('Example A', 'Example B'),
-            'datacenter-solutions.html': ('Data Center', 'Do you store my calculation data?'),
+            # Late sentinel = the last visible <h2> in <main> (X-DEFECTS FR-X7A.1). The old one lived only in
+            # FAQPage JSON-LD, which extract_page never reads; the visible FAQ left in v3.24.0.
+            'datacenter-solutions.html': ('Data Center', 'Built by a certified data-center engineer.'),
         }
         from crawler_inventory import read_metadata
         for name, sentinels in cases.items():
