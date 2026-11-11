@@ -37,7 +37,7 @@ right column in the SAME change. Verify, then tick it in the CHANGELOG entry.
 | Series landing | `future-forward.html` (FF-n) or `geopolitics.html` (geopolitics-n) — add the entry + update series counts/stats (no `0 / New` placeholders). |
 | `glossary.html` | ≥5 new terms with backlinks (existing glossary mandate — `TOOLTIP_STANDARD.md`). |
 | `sitemap.xml` | `python3 tools/build-sitemap.py --apply`. |
-| `search-index.json` | Add the page entry. |
+| `search-index.json` | `python3 tools/build-search-index.py --apply` (P14, v3.38.0): every public root page gets an entry from its own title/description/keywords; curated entries (articles) are kept. Freshness-gated. A public page also loads `js/rz-command-palette.js` (`test-search-palette.mjs` S2). |
 | `llms.txt` / `llms-full.txt` | `python3 tools/build-llms-txt.py --apply` + `build-llms-full.py --apply`. |
 | `standarization/Indexing gconsole/top-urls-request-indexing.txt` | Add the new URL. |
 | Related-articles | Cross-link from 2–3 sibling articles. |

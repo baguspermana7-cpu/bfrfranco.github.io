@@ -71,6 +71,7 @@ BUILDERS = [
     ("CTA accent sweep (button/CTA chrome on the one accent)", ["python3", "tools/sweep-cta-accent.py", "--check"]),
     ("cx-handbook/ (Cx field manual pages)", ["python3", "tools/build-cx-handbook.py", "--check"]),
     ("js/rz-engine-versions.js (P16 engine pins)", ["node", "tools/build-engine-versions.mjs", "--check"]),
+    ("search-index.json (P14 every public page)", ["python3", "tools/build-search-index.py", "--check"]),
 ]
 
 

@@ -11,6 +11,44 @@ release sections rather than semver.
 
 ---
 
+## v3.38.0 — 2026-11-11 — "Every public page can be found, and Ctrl+K works on the calculators"
+
+Product transformation, Wave 2: P14 (search and command palette).
+
+### Fixed
+- **The search button on the 11 calculators did nothing.** They carry `#navSearchBtn`, but none loaded the palette that
+  binds it. 37 public pages had no palette at all (the calculators, the 9 cockpits, the 6 PLN grid monitors, tools.html,
+  glossary, pillar-cooling, pillar-power and others); every public root page now loads `js/rz-command-palette.js`.
+- **Pages without `styles.css` could not show the palette.** Its `.search-*` rules live there, so on the calculators and
+  cockpits an open palette would have rendered as raw blocks. The palette now loads `css/rz-command-palette.css` when the
+  page has not styled it. That sheet is the old rules put on the site register: one amber accent, neutral result chips,
+  radius 4 px, named transitions.
+- **"java grid" found the Sumatra page.** Fuse matched the whole phrase, and the Java page title says "Java-Bali Grid".
+  Each word is now matched on its own (`useExtendedSearch`); the other fixture queries return the same results.
+
+### Added
+- `tools/build-search-index.py`: `search-index.json` now covers every public root page (140 to 158 entries). Curated
+  article entries are kept; missing pages get an entry from their own title, description, keywords, og:image and
+  datePublished; entries whose file is gone are dropped (`pillar-standards.html`, `manual/pillar-standards.html`).
+  The 43 incident dossiers, dc-incidents and the LTC labs stay out: they are `noindex` by design, behind the tier gate.
+- **Page actions** in the palette, listed only when the control exists on that page: "Copy link to this scenario",
+  "Save scenario to my account", "Export PDF report" (they click the page's own button, so its gating and feedback
+  apply), plus "Open my account".
+- **Fuse.js self-hosted** at `js/vendor/fuse.min.js` (7.0.0, npm bytes; the same sha384 the old jsDelivr SRI pinned),
+  so search also works offline.
+
+### Gates
+- `tools/test-search-palette.mjs`: S1 every public page indexed; S2 every public page loads the palette; S3 ten fixed
+  queries return the expected page in the top 3 with the palette's own Fuse options; S4 in a browser on 5 families,
+  the palette opens STYLED (from the calculator's nav button and from Ctrl+K), page actions are listed only where they
+  exist and run the page's control, a query returns results, Esc closes. RED on the previous tree: 20 pages without an
+  entry, 37 without the palette, 6 of 10 queries missing.
+- Generator freshness gains `search-index.json` (18 artefacts).
+
+### Deviation from PRD-P14
+- The PRD's query fixture used two incident dossiers ("ovh", "crowdstrike"), while its own exclusion rule drops
+  noindex pages. Incidents are gated, so the fixture uses two public pages instead ("water treatment", "jawa barat").
+
 ## v3.37.0 — 2026-11-11 — "A calculator opened once keeps working offline, and an engine bump is one generator run"
 
 Product transformation, Wave 1: P25 (offline calculators, absorbs Q16) and P16 (engine version declared once).
@@ -56,6 +94,12 @@ Product transformation, Wave 1: P25 (offline calculators, absorbs Q16) and P16 (
   shell, and `test-diagram-survey-coverage` failed because nothing measured it. Measured on arrival: 84 rows, 36
   distinct (3 label collisions, 33 labels at 6-8 px). It is REPORTED in MONITOR_PAGES with a written flip condition,
   not fixed here: clearing 8.5 px at 360 px needs LOD or zoom on a 500-unit P&ID. UIUX ledger row 26, OPEN.
+- The share-link button no longer grows a full tool bar. On capex, opex, tco, roi, pue, carbon and cx the bar already
+  held 6 controls, and the register allows 6 (`test-tool-register` T13 failed 28 times). Where the bar is full the
+  "Copy link" button sits on its own row under the bar. cx already had a share button (it copied a `?query` link,
+  with a `prompt()` fallback); that button now IS the shared Copy link, and old `?query` links still restore.
+- `test-dcai-engine-version-pin.mjs` reads the pin from `js/rz-engine-versions.js` (it still looked for the typed
+  literal P16 removed). The DC AI and Conventional parameter registries are regenerated.
 
 ### Not covered
 - The 36 article and other pages that load Chart.js keep the CDN (out of P25's scope).
@@ -94,12 +138,6 @@ the two shared foundations that later features build on (F1, F2).
   - With `?embed=<mode>` the embedded page shows no cookie banner and no account pill, and analytics stay off in
     the frame, so a visit is not counted twice.
 
-- The share-link button no longer grows a full tool bar. On capex, opex, tco, roi, pue, carbon and cx the bar already
-  held 6 controls, and the register allows 6 (`test-tool-register` T13 failed 28 times). Where the bar is full the
-  "Copy link" button sits on its own row under the bar. cx already had a share button (it copied a `?query` link,
-  with a `prompt()` fallback); that button now IS the shared Copy link, and old `?query` links still restore.
-- `test-dcai-engine-version-pin.mjs` reads the pin from `js/rz-engine-versions.js` (it still looked for the typed
-  literal P16 removed). The DC AI and Conventional parameter registries are regenerated.
 - **Every uncertainty band is reproducible (P08).** carbon, tier, TIA, spares (M8 and the supply-chain simulation)
   and Cx drew their Monte-Carlo samples from `Math.random`, so P5/P50/P95 changed on every load. tco and roi had an
   unseeded fallback.

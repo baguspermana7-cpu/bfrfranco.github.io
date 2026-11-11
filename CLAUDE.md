@@ -404,7 +404,7 @@ unified in v1.50.23–.27). When editing any of these, **cache-bust the `?v=` on
 
 | Module | Feature | Notes |
 |---|---|---|
-| `js/rz-command-palette.js` | Site search + command palette (Ctrl/Cmd+K, "/", Fuse.js over search-index.json, Commands group) | Self-injects modal markup if absent; guard `window.__rzPalette`. NEVER re-add an inline search block. |
+| `js/rz-command-palette.js` | Site search + command palette (Ctrl/Cmd+K, "/", self-hosted Fuse.js `js/vendor/fuse.min.js` over search-index.json with per-word matching, Commands group + page actions: Copy link / Save / Export PDF where the page has them). Loads `css/rz-command-palette.css` itself on pages without styles.css (P14). Index: `tools/build-search-index.py`; gate `tools/test-search-palette.mjs` | Self-injects modal markup if absent; guard `window.__rzPalette`. NEVER re-add an inline search block. |
 | `js/rz-article-editorial.js` | Editorial runtime: read-progress, related rail, entrance stagger, heading anchors, "≈N min left" chip | Activates only under `data-rz-register="editorial"`. |
 | `js/rz-article-chart.js` | Interactive sourced charts (`[data-rz-chart]` + `rz-chart-cfg` JSON) | Provenance gated (`audit-article-charts.mjs`). See ARTICLE_DATAVIZ_STANDARD.md. |
 | `js/rz-article-diagram.js` | Living diagrams — animated SVG schematics + ticker + fault scenarios (`[data-rz-diagram]`) | Same provenance gate; conduit stroke idiom (4px base + 2px dash). |

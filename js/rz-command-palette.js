@@ -50,6 +50,33 @@
     { title: 'Go: Insights', url: 'insights.html' }
   ];
 
+  /* P14 (v3.38.0): page actions, listed only when the control exists on THIS page (never a dead
+     command). They click the page's own button, so the page's gating, feedback and validation apply. */
+  var PAGE_ACTIONS = [
+    { title: 'Copy link to this scenario', sel: ['#btnCopyLink'] },
+    { title: 'Save scenario to my account', sel: ['#btnSaveAccount'] },
+    { title: 'Export PDF report', sel: ['#btnExportPDF', '#tcoExportPdf', 'button[onclick^="exportOpexPDF"]',
+      'button[onclick^="cxExportPDF"]', 'button[onclick^="exportFullReportPDF"]', 'button[onclick^="RfsReportEngine.exportPdf"]'] }
+  ];
+  function findControl(sels) {
+    for (var i = 0; i < sels.length; i++) {
+      var el = null;
+      try { el = document.querySelector(sels[i]); } catch (e) {}
+      if (el && !el.disabled) return el;
+    }
+    return null;
+  }
+  function refreshPageCommands() {
+    for (var i = COMMANDS.length - 1; i >= 0; i--) if (COMMANDS[i].page) COMMANDS.splice(i, 1);
+    var add = [];
+    PAGE_ACTIONS.forEach(function (a) {
+      var el = findControl(a.sel);
+      if (el) add.push({ title: a.title, kbd: 'page', page: true, run: function () { el.click(); } });
+    });
+    add.push({ title: 'Open my account', url: 'account.html', page: true });
+    COMMANDS.unshift.apply(COMMANDS, add);
+  }
+
   function ensureMarkup() {
     overlay = document.getElementById('searchOverlay');
     modal = document.getElementById('searchModal');
@@ -78,6 +105,20 @@
     input = document.getElementById('searchInput');
     resultsEl = document.getElementById('searchResults');
     chipsEl = document.getElementById('searchChips');
+  }
+
+  /* P14 (v3.38.0): pages that do not load styles.css (the 11 calculators, the cockpits, the grid
+     monitors) never had .search-* rules, so an opened palette rendered as raw blocks. Load the
+     palette's own sheet only where the page has not styled the overlay itself. */
+  function ensureStyles() {
+    if (!overlay || document.getElementById('rzPaletteCss')) return;
+    var pos = '';
+    try { pos = window.getComputedStyle(overlay).position; } catch (e) {}
+    if (pos === 'fixed') return;
+    var l = document.createElement('link');
+    l.id = 'rzPaletteCss'; l.rel = 'stylesheet';
+    l.href = at('css/rz-command-palette.css') + '?v=' + encodeURIComponent(window.RZ_VERSION || '1');
+    document.head.appendChild(l);
   }
 
   function getRecent() { try { return JSON.parse(localStorage.getItem(RECENT_KEY)) || []; } catch (e) { return []; } }
@@ -137,6 +178,7 @@
   }
 
   function openSearch() {
+    refreshPageCommands();
     rzt('rz_search_open');
     overlay.style.display = '';
     modal.style.display = '';
@@ -156,7 +198,10 @@
             { name: 'keywords', weight: 0.25 },
             { name: 'category', weight: 0.1 }
           ],
-          threshold: 0.35, includeScore: true, includeMatches: true, minMatchCharLength: 2
+          threshold: 0.35, includeScore: true, includeMatches: true, minMatchCharLength: 2,
+          /* P14: each word is matched on its own (AND). Whole-phrase fuzzy matching sent "java grid"
+             to the Sumatra page, because the Java page's title says "Java-Bali Grid". */
+          useExtendedSearch: true
         });
       };
       var loadData = function () {
@@ -172,8 +217,8 @@
       };
       if (typeof Fuse === 'undefined') {
         var s = document.createElement('script');
-        s.src = 'https://cdn.jsdelivr.net/npm/fuse.js@7.0.0';
-        s.integrity = 'sha384-PCSoOZTpbkikBEtd/+uV3WNdc676i9KUf01KOA8CnJotvlx8rRrETbDuwdjqTYvt'; /* SRI: a changed CDN file is refused, not run */
+        s.src = at('js/vendor/fuse.min.js');   /* P14: self-hosted (was jsDelivr), so search works offline too */
+        s.integrity = 'sha384-PCSoOZTpbkikBEtd/+uV3WNdc676i9KUf01KOA8CnJotvlx8rRrETbDuwdjqTYvt'; /* SRI: the npm bytes in js/vendor (same hash as the old CDN file); a changed file is refused, not run */
         s.crossOrigin = 'anonymous';
         s.onload = loadData;
         document.head.appendChild(s);
@@ -362,6 +407,7 @@
 
   function init() {
     ensureMarkup();
+    ensureStyles();
     if (!modal || !input || !resultsEl) return;
 
     var searchBtn = document.getElementById('navSearchBtn');
