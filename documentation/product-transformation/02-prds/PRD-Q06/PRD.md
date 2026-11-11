@@ -6,7 +6,7 @@
 |---|---|
 | PRD id | PRD-Q06 |
 | Feature | One provenance line idiom (`Simulated` / `Snapshot` / `Model output` / `Fallback`) from one small module, the shared simulated banner on all 10 cockpits, removal of every "Live" and "real-time" claim the site cannot back, visible fallbacks in the LTC lab and DCMOC, the X4 interim label and the X6 fix |
-| Version | 1.2 |
+| Version | 1.3 |
 | Status | Draft |
 | Author | Opus 5.5; Fable quota exhausted |
 | Date | 2026-11-10 |
@@ -27,6 +27,7 @@ Change history
 | 1.0 | 2026-11-10 | Opus 5.5 | First complete draft, all 24 sections. Every fact re-verified on `1cb6dd292` with the commands quoted in §3 |
 | 1.1 | 2026-11-11 | Opus 5.5 | QA batch 1 revisions (D1–D8). D3: FR-13 places every `RZProvenance.mark/clear` call in the wrapper `computeModel`, never inside `computeModelLegacy` (§18.2, T-12 follow); `dcmoc/` rebuild order fixed (Q04 then Q06, one rebuild per release, §13, §22.3). D5: owner decisions are D-Q06-1 and D-Q06-2 in `DECISIONS.md`. D6/D7: §13 records that Q04 and Q07 use this PRD's fallback contract and styling contract |
 | 1.2 | 2026-11-11 | Opus 5.5 | QA batch 2 carry-over only: FR-3 removes the `demo` state's light-theme `background:#FFF8D6!important` (`js/rz-telemetry-quality.js:79`); new AC-17 checks the computed background and the source |
+| 1.3 | 2026-11-11 | Opus 5.5 | T-1 measurement: F7 has 23 fields, not 22 (`ict.html:759` Access Control is painted 'OK' by the same loop, `:2033-2035`; true at `1cb6dd292` too); L3 and every count move to 23. F8 exemption line corrected (:1295 holds the negation) |
 
 ## 2. Executive summary
 
@@ -50,7 +51,7 @@ laws fail on today's tree; §20.2 states how.
 |---|---|---|
 | Cockpits that declare `data-rz-data-mode="simulated"` and show the banner | 6 of 10 | 10 of 10 |
 | Registry panels with a valid provenance line | 0 of 21 | 21 of 21 |
-| Data-path status fields (comms, quality, clocks, "Online") tied to a simulated line | 0 of 22 | 22 of 22 |
+| Data-path status fields (comms, quality, clocks, "Online") tied to a simulated line | 0 of 23 | 23 of 23 |
 | "live" / "real-time" claims on the 30 scanned pages | 43 on 15 pages | 0 |
 | Forced fallbacks that show on screen (LTC ×3, DCMOC ×1) | 0 of 4 | 4 of 4 |
 | Banner animations running on a cockpit | 1 per adopting page (`rzTqPulse`, infinite) | 0 |
@@ -154,7 +155,7 @@ the other two rows are tagged `native` and `network`, which are not gateways. 16
 `#bmsGwOnline` is never written by script (`grep -rn bmsGwOnline` finds only the HTML and two docs). The docs repeat
 the error: `manual/datahallai.html:711` "16/16 gateways is modeled", `prd/datahallai.html:190` "16/16 gateways".
 
-**F7. Twenty-two data-path status fields on 8 cockpits read like a site data path.** They show `OK`, `Online`,
+**F7. Twenty-three data-path status fields on 8 cockpits read like a site data path.** They show `OK`, `Online`,
 `ONLINE`, `GOOD` or a clock, and nothing ties them to the simulated basis:
 
 | Page | Field (selector, line) | What fills it |
@@ -170,7 +171,7 @@ the error: `manual/datahallai.html:711` "16/16 gateways is modeled", `prd/dataha
 | fire-system.html | `#as-updated` "Updated" (:486) | browser time at render (:1443, :1767) |
 | ict.html | `#m-quality` (:725) | engine meta |
 | ict.html | `#as-updated` "Last Update" (:745) | time since page load, `uptime()` (:2090-2100) |
-| ict.html | `[data-ict-ops-state]` ×3: WAN, BMS Fabric, Cameras (:756-758) | literal `'OK'` (:2034) |
+| ict.html | `[data-ict-ops-state]` ×4: WAN, BMS Fabric, Cameras, Access Control (:756-759) | literal `'OK'` (:2034) |
 | water-system.html | `#lastUpdate` "Last Update" (:525) | browser time (:1584; the comment at :1581-1582 admits it) |
 | water-system.html | `#dataQuality` (:527) | engine meta |
 | water-system.html | `#status-time` "UPDATED" (:900) | browser time (:1583) |
@@ -204,7 +205,7 @@ pln-java-grid-historical.html 1 [515]   pln-java-grid.html 5 [1136, 1138, 1184, 
 ltc-system-modelling-lab.html 4 [4909, 4931, 5091, 5202]   dc-market-tracker.html 2 [30, 737]
 tools.html 1 [624]   insights.html 4 [35, 55, 67, 256]   datacenter-solutions.html 1 [457]   cdu-selection-guide.html 1 [621]
 FINDINGS 43   EXEMPT 5 (cdu-mini-bms:399 "not a live feed"; pln-java-grid-historical:517 and :655 negations;
-pln-java-grid:1293 the cited URL and its negation)
+pln-java-grid:1293 the cited URL and :1295 its negation)
 ```
 
 The same claims reach generated and image artefacts: `llms-full.txt` has "Live Energy Dashboard" twice;
@@ -278,7 +279,7 @@ invented-looking constant, and a real `0` would be replaced by the constant.
 | C5 | `ltc-system-modelling-lab.js:2704` (`:96`) | The file is `js/ltc-system-modelling-lab.js`; the catch logs to the console | As `BASELINE.md:48` already corrected: silent on screen, not in the console |
 | C6 | "Gate … no element contains Live unless its kind is telemetry" (`:113`) | No telemetry kind can exist: the site has no measured feed | Law L4 bans the claim outright on the scanned pages; there is no `telemetry` kind |
 | N1 | — | 43 claims on 15 pages, incl. "real-time" meta on chiller, water, fuel, EPMS (F8) | In scope (FR-15) |
-| N2 | — | 22 data-path fields (F7) | In scope (FR-5) |
+| N2 | — | 23 data-path fields (F7) | In scope (FR-5) |
 | N3 | — | Random ripple on the water trend (F11) | In scope as a label (FR-11); a deterministic replacement belongs to Q7 |
 | N4 | — | PLN stat tiles' constant fallbacks (F12) | In scope (FR-8) |
 | N5 | — | Two OG cards draw the claims (F8) | In scope (FR-15) |
@@ -293,7 +294,7 @@ No target below is a guess: each is "all" or "none" of an enumerated set, and th
 |---|---|---|---|---|
 | O1 | Every cockpit declares itself simulated at page level | cockpits passing L1: 6/10 | 10/10 | `node tools/test-provenance.mjs --law L1` |
 | O2 | Every registry panel names its basis | panels passing L2: 0/21 | 21/21 | `--law L2` |
-| O3 | No status field reads like a site data path without a line that explains it | fields passing L3: 0/22 | 22/22 | `--law L3` |
+| O3 | No status field reads like a site data path without a line that explains it | fields passing L3: 0/23 | 23/23 | `--law L3` |
 | O4 | No false "live" / "real-time" claim | 43 findings (F8) + retired phrases in 4 generated files | 0 and 0 | `--law L4` |
 | O5 | Restated dataset and model figures equal their source | 3 parity failures (no PLN lines, wall clock, 16 vs 15) | 0 | `--law L5` (static + one browser check) |
 | O6 | A forced fallback is visible | 0/4 forced paths show a line | 4/4 within 5 s; 0 lines on the normal path | `tools/test-provenance-runtime.mjs --law L6` |
@@ -314,7 +315,7 @@ should plan for that, not for 7.5 days.
    no tinted background, no pulsing dot, honest tooltip (FR-3).
 3. Banner adoption on `fuel-system.html`, `EPMS_Telemetry.html`, `dc-conventional.html`, `cdu-mini-bms.html`;
    EPMS exception removed from the standard (FR-4).
-4. A simulated line on each cockpit status strip, `aria-describedby` from each of the 22 fields, and honest labels
+4. A simulated line on each cockpit status strip, `aria-describedby` from each of the 23 fields, and honest labels
    for the clock fields (FR-5).
 5. PLN: X6 fix on `pln-java-grid.html`, lines on the historical page, the 4 province pages and Sumatra, missing-field
    handling on the stat tiles (FR-6, FR-7, FR-8).
@@ -581,7 +582,7 @@ Each FR lists: description · trigger · preconditions · inputs · processing �
   `telemetryPages`, `:211-214`).
 
 **FR-5 Data-path status fields.**
-- Description: one simulated strip line per page and `aria-describedby="<line id>"` on each of the 22 fields in F7.
+- Description: one simulated strip line per page and `aria-describedby="<line id>"` on each of the 23 fields in F7.
 - Lines (ids and exact text in §9.10): `rz-prov-dh-strip` (datahall, after `.alarm-strip` `#alarmStrip`,
   `:632`), `rz-prov-conv-strip` (dc-conventional, after the strip containing `#as-comms`), `rz-prov-fire-strip`
   (after `#alarm-strip`, `fire-system.html:471`), `rz-prov-ict-strip` (after `#ict-ops-strip`, `ict.html:754`),
@@ -594,7 +595,7 @@ Each FR lists: description · trigger · preconditions · inputs · processing �
   fuel `:716` "Updated" → "Since render".
 - Trigger: authoring. Processing: none at runtime.
 - Exceptions: a field id renamed later → L3 fails with the registry selector.
-- Acceptance: L3 22/22; existing value pins (F7) unchanged.
+- Acceptance: L3 23/23; existing value pins (F7) unchanged.
 
 **FR-6 PLN main page (X6).**
 - `:1290` heading → "Energy snapshot". `:1136` aria-label → "Grid KPIs, snapshot". `:1299` aria-label →
@@ -1101,7 +1102,7 @@ In HTML the WORD is wrapped in `<b>`; equality is checked on `textContent` with 
 ```
 
 The example shows the shape; the shipped file lists all 10 cockpits, all 21 panels (the 21 line ids in §9.10 minus
-`rz-prov-water-trend`'s ON text, which is runtime state of the same panel), all 22 fields (F7) and all four
+`rz-prov-water-trend`'s ON text, which is runtime state of the same panel), all 23 fields (F7) and all four
 fallbacks. Validation: `test-provenance.mjs` checks the registry against a JSON schema embedded in the gate
 (required keys, unique ids, every page exists on disk, every `line` id is declared by some panel).
 
@@ -1419,7 +1420,7 @@ sequenceDiagram
     G->>F: tokenize each page (skip script/style/noscript/template)
     G->>G: L1 body mode, script tag, one slot (10 cockpits)
     G->>P: format(attrs) per line; compare text (L2)
-    G->>G: L3 aria-describedby -> existing simulated line (22 fields)
+    G->>G: L3 aria-describedby -> existing simulated line (23 fields)
     G->>G: L4 live/real-time scan (30 pages) + retired phrases (5 files)
     G->>V: run dataset files; read version / timestamp / gateway tags
     G->>G: L5 parity + no wall-clock writer for #pjg-live-time
@@ -1461,7 +1462,7 @@ static export under `dcmoc/`, so its change needs a rebuild (§22.3) before the 
 | T-2 | `js/rz-provenance.js` | T-1 | NEW `js/rz-provenance.js` | §11.2, §10.2, §9.8; `textContent` only; signature cache | 1 d | U1–U14 pass; size budget; `grep -c innerHTML js/rz-provenance.js` = 0 | Module merged; L2 still red (no lines yet) |
 | T-3 | Banner restyle + test update | — | `js/rz-telemetry-quality.js`, `tools/test-conv-alarm-runtime.mjs` | FR-3; in the test replace the dot assertion (`:250-260`) with "banner subtree has 0 running animations in both motion modes"; add the 4 pages to `telemetryPages` (`:211-214`) after T-4 | 1 d | existing pins (F2) green; screenshots of 2 cockpits × 2 themes | Banner is a still line on 6 pages |
 | T-4 | Adopt the banner on 4 cockpits | T-3 | `fuel-system.html`, `EPMS_Telemetry.html`, `dc-conventional.html`, `cdu-mini-bms.html`, `standarization/TELEMETRY_QUALITY.md` | FR-4 | 1 d | L1 10/10; `node tools/test-conv-alarm-runtime.mjs` green with 10 pages; `node tools/test-conv-dashboard-authority.mjs` green | Banner on 10/10 |
-| T-5 | Strip lines, field links, clock labels | T-2 | 8 cockpits (F7) | FR-5 | 1.5 d | L3 22/22; L2 strip lines valid; existing value pins green | 22/22 |
+| T-5 | Strip lines, field links, clock labels | T-2 | 8 cockpits (F7) | FR-5 | 1.5 d | L3 23/23; L2 strip lines valid; existing value pins green | 23/23 |
 | T-6 | PLN main page (X6) | T-2 | `pln-java-grid.html` | FR-6, FR-8 | 1 d | L2 (3), L4 (−5), L5 static + fake-clock browser check | Snapshot time fixed at 18:00 WIB |
 | T-7 | PLN historical, provinces, Sumatra | T-2 | 6 PLN pages | FR-7 | 0.5 d | L2 (6), L4 (−1), L5 versions | Lines on 6 pages |
 | T-8 | datahallAI BMS strip + docs | T-2 | `datahallAI.html`, `manual/datahallai.html`, `prd/datahallai.html` | FR-9 | 0.5 d | L3 (3), L5 (15); `node tools/test-datahall-ai-authority.mjs` green | "15 modelled" |
@@ -1504,7 +1505,7 @@ Total ≈ 15 engineer-days.
 |---|---|---|---|
 | L1 | All 10 cockpits declare `data-rz-data-mode="simulated"`, load `js/rz-telemetry-quality.js` and have exactly one banner slot | `node tools/test-provenance.mjs --law L1` | 6/10. Reproduce now: `for f in fuel-system.html EPMS_Telemetry.html dc-conventional.html cdu-mini-bms.html; do grep -c 'data-rz-data-mode="simulated"' $f; done` prints `0` four times |
 | L2 | All 21 registry panels have a line that validates and whose text equals `format()`; `js/rz-provenance.js` exists within its size budget and is loaded by each page that has a line | `node tools/test-provenance.mjs --law L2` | 0/21. Reproduce: `grep -rl --include=*.html 'data-rz-provenance=' . \| wc -l` prints `0` |
-| L3 | All 22 data-path fields carry `aria-describedby` that resolves to a `data-rz-provenance="simulated"` line on the same page | `node tools/test-provenance.mjs --law L3` | 0/22. Reproduce: `grep -c 'aria-describedby="rz-prov-' datahall.html dc-conventional.html fire-system.html ict.html water-system.html fuel-system.html EPMS_Telemetry.html datahallAI.html` prints `0` for each |
+| L3 | All 23 data-path fields carry `aria-describedby` that resolves to a `data-rz-provenance="simulated"` line on the same page | `node tools/test-provenance.mjs --law L3` | 0/23. Reproduce: `grep -c 'aria-describedby="rz-prov-' datahall.html dc-conventional.html fire-system.html ict.html water-system.html fuel-system.html EPMS_Telemetry.html datahallAI.html` prints `0` for each |
 | L4 | 0 "live"/"real-time" claims on the 30 scanned pages (rules in F8: Set A any word, Set B word + data noun, negation within 40 chars in the same clause exempt, cited-URL link text exempt), and 0 retired phrases (§10.3) in `llms.txt`, `llms-full.txt`, `search-index.json`, `search-sections.json`, `tools/build-og-images.py` | `node tools/test-provenance.mjs --law L4` | 43 findings on 15 pages (F8); retired phrases present, e.g. `grep -c 'Live Energy Dashboard' llms-full.txt` prints `2`, `grep -c 'real-time map' tools/build-og-images.py` prints `1` |
 | L5 | Restated figures equal their source: every snapshot line's asOf and version equal the dataset named in its `parity` entry; `pln-java-grid.html` has no code that writes the wall clock into `#pjg-live-time` (no `setInterval(updateClock`, no `new Date()` feeding it); `#bmsGwOnline` equals the gateway count derived from `datahallAI.html:9224-9231` (15). Browser part: with the clock faked to 03:17 UTC+7 and the time zone emulated as `America/New_York`, `#pjg-live-time` reads `18:00 WIB` | `node tools/test-provenance.mjs --law L5 && node tools/test-provenance-runtime.mjs --law L5` | 3 failures: no lines; `grep -n 'setInterval(updateClock' pln-java-grid.html` prints `2443:`; `grep -o 'bmsGwOnline[^<]*' datahallAI.html` prints `bmsGwOnline" style="font-weight:700;">16 / 16` |
 | L6 | Each forced fallback shows a `data-rz-provenance="fallback"` line with the expected code text within 5 s: LTC plant blocked (F-PLANT-MISSING), LTC plant throwing (F-PLANT-ERROR), LTC engine blocked (F-ENGINE-MISSING), DCMOC engine blocked; the normal path shows 0 fallback lines; restoring the plant restores the model line; a repeated identical `mark()` makes 0 DOM mutations. L6b (same command): PLN stats with `national.peakMW` removed show "—" and a fallback line; water trend line switches with the toggle | `env RZ_BASE=$LTC_BASE node tools/test-provenance-runtime.mjs --law L6` | 0/4: no `[data-rz-provenance]` element exists on any page, so every wait times out |
@@ -1518,7 +1519,7 @@ red counts above, then against the branch and confirm 0.
 
 - NEW `tools/test-provenance.mjs` (static, ~2 s). Wire in `tools/ship-gate.sh` directly after the telemetry docs
   gate (`:167`):
-  `gate "Q6 provenance — 10 cockpits declare simulated, 21 panel lines, 22 fields, no live/real-time claims, snapshot parity (L1-L5)" node tools/test-provenance.mjs --strict`
+  `gate "Q6 provenance — 10 cockpits declare simulated, 21 panel lines, 23 fields, no live/real-time claims, snapshot parity (L1-L5)" node tools/test-provenance.mjs --strict`
 - NEW `tools/test-provenance-runtime.mjs` (browser). Wire inside the served-tree block, after the LTC step-thread
   gate (`:326-329`) and before the slop scan:
   `gate "Q6 provenance runtime — fallbacks visible, excursions labelled, banner a still line in both themes (L5b, L6-L8)" env RZ_BASE=$LTC_BASE timeout 900 node tools/test-provenance-runtime.mjs --strict`
@@ -1692,7 +1693,7 @@ a deploy).
 
 - [ ] `js/rz-provenance.js` shipped, ≤ 8,192 bytes raw and ≤ 3,072 gzip, U1–U14 green.
 - [ ] Banner is a still in-flow line on all 10 cockpits; all existing banner pins green.
-- [ ] 21/21 panel lines valid; 22/22 fields described; 0 live/real-time claims; parity 0 failures (L1–L5 green).
+- [ ] 21/21 panel lines valid; 23/23 fields described; 0 live/real-time claims; parity 0 failures (L1–L5 green).
 - [ ] Forced fallbacks 4/4 visible and restored; excursions labelled 3/3; L8 green in both themes at 1440 and 390,
       with the planted line caught.
 - [ ] LTC golden and step gates, cockpit gates, slop scan strict, dark coverage, a11y, generator freshness, cache
