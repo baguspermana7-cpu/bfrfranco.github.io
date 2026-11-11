@@ -126,3 +126,19 @@ Conventions now binding for DCMOC work:
 - **Owner UX rules**: CreatableCombobox is dropdown-FIRST (simple select preserved; "Custom value…" row opt-in); no fabricated entities (sites start at 1, scenario-bound); editable inputs carry a violet left-accent label, generated values render as tinted read-only panels with provenance chips; RZExplain tooltips on technical KPI labels.
 - **Engine additive-only**: the single engine change was v2.5.1 `models.opex.totalAnnual` basisPresets (dcContract/retailScreening) — default bit-identical, gate-asserted; opex-calculator.html untouched.
 Traps catalogued in memory: pue.defaultFor key mismatch (use pueMatrix direct), zustand v5 object-selector infinite render, Shell leaf() crash on missing navItem, capacityPhases write-back, construction zero-duration mapping.
+
+
+## Data dates and refresh intervals (P26A, v3.46.0)
+
+- `DATA.sources[key].asOf` is the date of each dataset (`YYYY`, `YYYY-MM`, `YYYY-MM-DD` or `YYYY-Qn`; `const` for a
+  calendar constant). `DATA.sourceRefresh` gives each data class (longest key prefix wins) a refresh interval in months,
+  or `null` with a reason for a method, standard or physical constant. markets 6, tariffs 12, tariffs.gaas 3 (PRD-P26);
+  the other intervals are stated in the table as assumptions.
+- `js/rz-asof.js` renders `as of Mon YYYY` and, past the interval, `· older than N months` in the warning colour.
+  Age is counted from the latest month the stamp allows, so the "older than" claim is always true.
+- Gate `tools/test-asof.mjs`: every source key has a policy, every policy is used, every date parses and is not in the
+  future, and `rz-engine.min.js` carries the same table (a stale twin showed the tracker date as current under a 2031
+  clock — proven RED).
+- Adopted on dc-market-tracker (dataset line) and tco (market rates under Country / Location: metro = markets,
+  `country:XX` = countries, a metro the engine does not carry = "date not recorded"). roi reads no engine dataset, so it
+  carries no stamp. Part B (a scheduled fetch of external sources) is BLOCKED on the owner.

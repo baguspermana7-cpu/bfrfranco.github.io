@@ -33,8 +33,14 @@ const P = require(resolve(ROOT, 'js', 'rz-cx-plan.js'));
 /* ── browser laws ── */
 let server = null, base = arg('base', '');
 if (!base) {
-  const port = 8123; server = spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1'], { cwd: ROOT, stdio: 'ignore' });
+  // A free port, never a fixed one: a fixed 8123 held by another session's server made this gate test THAT tree (2026-11-12).
+  const port = await new Promise((res) => { const s = require('node:net').createServer(); s.listen(0, '127.0.0.1', () => { const q = s.address().port; s.close(() => res(q)); }); });
+  server = spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1'], { cwd: ROOT, stdio: 'ignore' });
   base = 'http://127.0.0.1:' + port; await new Promise((r) => setTimeout(r, 900));
+}
+{ // identity: the server answering must serve THIS tree
+  const served = await fetch(base + '/js/rz-version.js').then((r) => r.text()).catch(() => '');
+  if (served !== readFileSync(join(ROOT, 'js/rz-version.js'), 'utf8')) { console.error('FAIL — ' + base + ' does not serve this tree'); if (server) server.kill(); process.exit(1); }
 }
 const puppeteer = require('puppeteer');
 const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-dev-shm-usage', '--disable-audio-output'], protocolTimeout: 90000 });

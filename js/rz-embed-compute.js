@@ -6,7 +6,9 @@
  *     page    calculator file, e.g. 'capex-calculator.html' (same origin only; no scheme, no '..')
  *     mode    'compare' | 'pack' | 'sensitivity' | 'article' -> appended as ?embed=<mode>
  *     inputs  { id: {t, v} } — the rz-scenario capture format; set through the page's own input/change events
+ *             (run only) or function(doc) returning that map, called once the page has loaded
  *     read    array of CSS selectors; values[selector] = trimmed textContent, or null when absent
+ *     probe   optional function(doc) run after the read; its return value comes back as result.probe
  *   Runs are queued: one iframe exists at a time and it is removed when the run ends, success or not.
  *
  *   RZEmbedCompute.session({ page, mode, inputs, settleMs, stepMs, stepTimeoutMs })
@@ -68,7 +70,7 @@
         var doc;
         try { doc = win.document; } catch (e) { ok({ ok: false, values: {}, error: 'not same-origin' }); return; }
         if (!doc || !doc.body || !doc.body.childElementCount) { ok({ ok: false, values: {}, error: 'page did not load' }); return; }
-        wait(150).then(function () { apply(win, opts.inputs); return wait(settleMs); })
+        wait(150).then(function () { apply(win, typeof opts.inputs === 'function' ? opts.inputs(doc) : opts.inputs); return wait(settleMs); })
           .then(function () { return frames(win, 2); })
           .then(function () {
             var values = {};
@@ -82,7 +84,10 @@
             if (read.length && read.every(function (sel) { return values[sel] === null; })) {
               ok({ ok: false, values: values, error: 'none of the requested results is on the page' }); return;
             }
-            ok({ ok: true, values: values, error: null });
+            // probe(doc): optional caller-side read of the computed page (compare: input labels and shown values).
+            var probe = null;
+            if (typeof opts.probe === 'function') { try { probe = opts.probe(doc); } catch (e) { probe = null; } }
+            ok({ ok: true, values: values, probe: probe, error: null });
           }, function (e) { ok({ ok: false, values: {}, error: String(e && e.message || e) }); });
       });
       f.addEventListener('error', function () { ok({ ok: false, values: {}, error: 'page did not load' }); });

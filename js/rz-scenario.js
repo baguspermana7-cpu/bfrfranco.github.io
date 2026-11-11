@@ -353,6 +353,9 @@
   function autoRestore() {
     var calc = d.body && d.body.getAttribute('data-rz-calc');
     if (!calc) return;
+    // An embedded copy (compare / pack / sensitivity frames) must not take the reader's pending scenario: it would
+    // delete it before the visible page reads it, and apply it to the case being measured.
+    if (/[?&]embed=/.test(w.location.search || '')) return;
     var raw;
     try { raw = w.localStorage.getItem('rz_open_scenario'); } catch (e) { return; }
     if (!raw) return;
@@ -381,7 +384,7 @@
   /* P15 part A (v3.39.0): the signed-in user's own activity, written to audit_log through the existing
      log_event RPC. Fire-and-forget: a logging failure never touches the action. Meta carries only the
      calculator id and a format, never inputs or personal data. */
-  var TRACK_ACTIONS = ['scenario_saved', 'scenario_deleted', 'scenario_opened', 'scenario_link_copied', 'pdf_exported'];
+  var TRACK_ACTIONS = ['scenario_saved', 'scenario_deleted', 'scenario_opened', 'scenario_link_copied', 'scenario_compared', 'pdf_exported'];
   var TRACK_META = ['calc', 'format'];
   function track(action, targetType, targetId, meta) {
     try {

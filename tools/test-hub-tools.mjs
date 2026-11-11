@@ -85,7 +85,8 @@ try {
         const asOf = await p.evaluate(() => document.getElementById('dmtAsOf')?.textContent);
         const [y, m] = E.sources.markets.asOf.split('-');
         const want = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][+m - 1] + ' ' + y;
-        ok('T4 market tracker: data date = engine provenance (' + want + ')', asOf === want, { asOf });
+        // P26A: js/rz-asof.js renders "as of <Mon YYYY>", plus " · older than N months" past the refresh interval
+        ok('T4 market tracker: data date = engine provenance (' + want + ')', new RegExp('^as of ' + want + '( · older than \\d+ months)?$').test(asOf || ''), { asOf });
         await p._ctx.close();
     }
     { // T5

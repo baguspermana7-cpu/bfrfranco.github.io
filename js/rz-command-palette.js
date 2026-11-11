@@ -55,6 +55,7 @@
   var PAGE_ACTIONS = [
     { title: 'Copy link to this scenario', sel: ['#btnCopyLink'] },
     { title: 'Save scenario to my account', sel: ['#btnSaveAccount'] },
+    { title: 'Add these inputs to compare', sel: ['#btnAddCompare'] },
     { title: 'Export PDF report', sel: ['#btnExportPDF', '#tcoExportPdf', 'button[onclick^="exportOpexPDF"]',
       'button[onclick^="cxExportPDF"]', 'button[onclick^="exportFullReportPDF"]', 'button[onclick^="RfsReportEngine.exportPdf"]'] }
   ];

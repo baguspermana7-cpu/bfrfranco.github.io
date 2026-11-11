@@ -311,6 +311,25 @@ function exportPDF() {
 
 ---
 
+## Project pack (P04, v3.45.0) — one document across calculators
+
+`js/rz-pack.js` builds a multi-calculator document for a facility project (P01). Rules it follows, each gated by
+`tools/test-pack-ui.mjs`:
+
+1. **The page computes, the pack copies.** Every section is recomputed by the calculator's own page in a hidden copy
+   (`?embed=pack`), never re-derived. Gate U3: the numerals in the CAPEX section equal what the live page shows.
+2. **Print what the reader sees.** Elements the page hides (`display:none`) are dropped; a value the page masks behind
+   sign-in (`visibility:hidden` + `::after "—"`) prints as `—`. Copying `innerHTML` alone printed 17 masked numerals on CAPEX
+   (proven by mutation, U3 RED 91 vs 74 numerals).
+3. **SVG colours are inlined from the computed style** (fill, stroke, opacity, fonts). The print document has none of
+   the page's CSS variables, so an uninlined chart prints solid black.
+4. **No pop-up during the build.** A window opened at click time takes focus, the opener tab goes hidden, and
+   `requestAnimationFrame` stops in its hidden iframes — the build never finished. The pack is built in the visible tab;
+   Print uses a hidden `srcdoc` frame, Open a `blob:` tab, both from a click.
+5. **Every value is accounted for.** The assumptions register lists each mapped field with its source: project,
+   project clamped to the field's limit, override on this page, page default, from CAPEX (out of date), field not on
+   the page. A calculator that cannot compute prints "Section not available" with the reason; the others still print.
+
 ## Lesson learnt — 2026-05-09 — Critical: escape `</script>` inside JS-built print-window HTML
 
 A series of pages (`capex-calculator`, `opex-calculator`, `carbon-footprint`, `tia-942-checklist`, `tier-advisor`) had **all interactive features dead**. Symptoms: login button click did nothing; parameter inputs didn't trigger recalc; Simple/Advanced tab toggle dead; Pro mode toggle dead; Save A/B dead; Export PDF dead.

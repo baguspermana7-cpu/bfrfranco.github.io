@@ -72,6 +72,8 @@
     .act-table th { color:var(--fs-t3); font-weight:600; font-size:0.75rem; }
     .act-table td:first-child { font-variant-numeric:tabular-nums; }
     #actList { overflow-x:auto; max-width:100%; }
+    .scn-cmpbar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:0 0 10px; font-size:0.85rem; }
+    .scn-cmp { display:inline-flex; gap:4px; align-items:center; min-height:32px; font-size:0.8rem; color:var(--fs-t2); }
     @media (min-width:600px) { .act-table td:first-child { white-space:nowrap; } }
     button.link.del { color:var(--fs-red); border-color:rgba(239,68,68,0.4); }
 
@@ -177,6 +179,12 @@
 
     </div>
 
+    <!-- P01 stage 1: facility projects live in this browser, signed in or not -->
+    <div class="card" id="projCard" style="margin-top:16px;">
+      <h2>Facility projects in this browser</h2>
+      <div id="projList" aria-live="polite"><div class="fs-skel skelrow"></div></div>
+    </div>
+
     <p class="foot">
       Your login is a real account stored securely in the project database. Data is protected by
       Row Level Security — you can only ever see your own rows. This page uses only the public
@@ -186,7 +194,49 @@
 
   <script src="js/rz-version.js" defer></script>
   <script src="js/rz-config.js"></script>
-  <script src="js/rz-scenario.js?v=20261111-9f2ae47f"></script>
+  <script src="js/rz-project.js?v=20261111-4db75da3"></script>
+  <script src="js/rz-scenario.js?v=20261111-01011425"></script>
+  <script>
+  (function () {
+    var box = document.getElementById('projList'), P = window.RZProject;
+    var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); };
+    var store;
+    try { store = P.createStore(window.localStorage); } catch (e) { store = null; }
+    function draw() {
+      if (!P || !store || store.mode() !== 'ok') { box.innerHTML = '<p class="muted" style="font-size:0.85rem;">Projects are unavailable: this browser blocks local storage.</p>'; return; }
+      var list = store.list();
+      if (!list.length) { box.innerHTML = '<p class="muted" style="font-size:0.85rem;">No facility project in this browser yet. Open a calculator and use the Facility project button under its title.</p>'; return; }
+      var act = store.active();
+      var h = '<table class="act-table"><thead><tr><th scope="col">Project</th><th scope="col">Revision</th><th scope="col">Updated</th><th scope="col">Calculators with results</th><th scope="col"><span style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap">Actions</span></th></tr></thead><tbody>';
+      list.forEach(function (p) {
+        var calcs = Object.keys(p.results || {});
+        var stale = calcs.filter(function (c) { return Object.keys(p.results[c]).some(function (k) { return P.isStale(p.results[c][k], p); }); });
+        h += '<tr><td>' + esc(p.name) + (act && act.id === p.id ? ' <span class="muted">(active)</span>' : '') + '</td><td>' + p.rev + '</td><td>'
+          + esc(new Date(p.updated_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })) + '</td><td>'
+          + (calcs.length ? esc(calcs.join(', ')) + (stale.length ? ' <span class="muted">· out of date: ' + esc(stale.join(', ')) + '</span>' : '') : '<span class="muted">none</span>')
+          + '</td><td style="white-space:nowrap"><button type="button" class="link" data-pexp="' + esc(p.id) + '">Export</button> <button type="button" class="link del" data-pdel="' + esc(p.id) + '">Delete</button></td></tr>';
+      });
+      box.innerHTML = h + '</tbody></table><p id="projConfirm" class="status hidden"></p>';
+    }
+    box.addEventListener('click', function (e) {
+      var b = e.target.closest('button'); if (!b) return;
+      var id = b.getAttribute('data-pexp') || b.getAttribute('data-pdel'), p = id && store.get(id);
+      if (b.hasAttribute('data-pexp') && p) {
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([store.exportJson(id)], { type: 'application/json' }));
+        a.download = p.name.replace(/[^\w.-]+/g, '-').slice(0, 60) + '.rz-project.json';
+        document.body.appendChild(a); a.click(); a.remove();
+      } else if (b.hasAttribute('data-pdel') && p) {
+        var c = document.getElementById('projConfirm');
+        c.className = 'status';
+        c.innerHTML = 'Delete "' + esc(p.name) + '" and its results from this browser? <button type="button" class="link del" data-pyes="' + esc(id) + '">Delete</button> <button type="button" class="link" data-pno="1">Keep</button>';
+        c.querySelector('[data-pno]').focus();
+      } else if (b.hasAttribute('data-pyes')) { store.remove(b.getAttribute('data-pyes')); draw(); }
+      else if (b.hasAttribute('data-pno')) { document.getElementById('projConfirm').className = 'status hidden'; }
+    });
+    draw();
+  })();
+  </script>
   <script type="module" src="js/rz-supabase.js?v=20261111-3c801534"></script>
   <script type="module">
     const $ = (id) => document.getElementById(id);
@@ -231,7 +281,8 @@
       if (sErr) { list.innerHTML = '<p class="err status">'+escapeHtml(String(sErr))+'</p>'; return; }
       $('scnCount').textContent = rows.length;
       if (!rows.length) { list.innerHTML = '<p class="muted" style="font-size:0.85rem;">No saved scenarios yet. Open a calculator and click <b>Save scenario</b>.</p>'; return; }
-      list.innerHTML = '';
+      list.innerHTML = '<div class="scn-cmpbar"><button type="button" class="fs-btn" id="scnCompare" disabled>Compare selected</button>'
+        + '<span id="scnCmpMsg" class="muted" role="status" aria-live="polite">Tick 2 to 4 scenarios of one calculator.</span></div>';
       rows.forEach(r => {
         const el = document.createElement('div');
         el.className = 'scn';
@@ -243,12 +294,31 @@
         if (sum.total != null) extra = ' · total ' + fmtMoney(sum.total);
         el.innerHTML = '<div class="row"><div><div class="t">'+escapeHtml(r.name)+'</div>'
           + '<div class="m">'+escapeHtml(r.calc)+' · '+when+extra+'</div></div>'
-          + '<div style="display:flex;gap:6px;">'
+          + '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">'
+          + (hasInputs && r.calc !== 'rfs' ? '<label class="scn-cmp"><input type="checkbox" data-cmp="'+r.id+'" data-calc="'+escapeHtml(r.calc)+'"> Compare</label>' : '')
           + (hasInputs ? '<button class="link open" data-open="'+r.id+'">Open</button>' : '')
           + '<button class="link" data-share="'+r.id+'"'+(hasInputs ? '' : ' disabled title="This scenario has no saved inputs, so it cannot be shared"')+'>Copy link</button>'
           + '<button class="link del" data-id="'+r.id+'">Delete</button></div></div>';
         list.appendChild(el);
       });
+      /* P03: tick 2-4 scenarios of ONE calculator, then compare them (compare.html fetches its own rows under RLS). */
+      const cmpBtn = $('scnCompare'), cmpMsg = $('scnCmpMsg');
+      const cmpPicked = () => [...list.querySelectorAll('input[data-cmp]:checked')];
+      list.querySelectorAll('input[data-cmp]').forEach(c => c.onchange = () => {
+        const p = cmpPicked(), calcs = [...new Set(p.map(x => x.getAttribute('data-calc')))];
+        let why = '';
+        if (calcs.length > 1) why = 'Compare works within one calculator: you ticked ' + calcs.join(' and ') + '.';
+        else if (p.length > 4) why = 'Compare holds 4 cases: untick ' + (p.length - 4) + '.';
+        else if (p.length < 2) why = p.length ? 'Tick one more scenario of ' + calcs[0] + '.' : 'Tick 2 to 4 scenarios of one calculator.';
+        cmpBtn.disabled = !!why;
+        cmpMsg.textContent = why || p.length + ' ' + calcs[0] + ' scenarios selected.';
+      });
+      cmpBtn.onclick = () => {
+        const p = cmpPicked(); if (p.length < 2 || p.length > 4) return;
+        const calc = p[0].getAttribute('data-calc'), ids = p.map(x => x.getAttribute('data-cmp'));
+        if (window.rzScenario && window.rzScenario.track) window.rzScenario.track('scenario_compared', 'calc', null, { calc: calc });
+        location.href = 'compare.html?calc=' + encodeURIComponent(calc) + '&ids=' + ids.map(encodeURIComponent).join(',');
+      };
       list.querySelectorAll('button[data-id]').forEach(b => b.onclick = async () => {
         const id = b.getAttribute('data-id');
         const row = rows.find(x => x.id === id);
@@ -289,7 +359,7 @@
     }
     /* P15 part A: the signed-in user's own recent actions (audit_log, own rows only). */
     const ACT_LABEL = { scenario_saved: 'Saved scenario', scenario_deleted: 'Deleted scenario', scenario_opened: 'Opened scenario',
-      scenario_link_copied: 'Copied link', pdf_exported: 'Exported PDF', tier_change: 'Tier changed', role_change: 'Role changed' };
+      scenario_link_copied: 'Copied link', scenario_compared: 'Compared scenarios', pdf_exported: 'Exported PDF', tier_change: 'Tier changed', role_change: 'Role changed' };
     async function loadActivity(rows) {
       const box = $('actList');
       let res;

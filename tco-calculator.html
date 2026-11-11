@@ -175,7 +175,7 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha384-t1nt8BQoYMLFN5p42tRAtuAAFQaCQODekUVeKKZrEnEyp4H2R0RHFz0KWpmj7i8g" crossorigin="anonymous">
     <script defer src="js/vendor/chart.umd.min.js?v=20261110-74401d73"></script>
-    <script src="js/rz-version.js?v=20261111-6320d939" defer></script>
+    <script src="js/rz-version.js?v=20261111-c7e39fdb" defer></script>
     <script src="js/rz-calc-utils.js?v=20260920-ef3425ae" defer></script>
     <script src="js/rz-explain-db.js?v=20261111-8afae929" defer></script>
     <script src="js/rz-explain.js?v=20261103-f581e6ac" defer></script>
@@ -218,7 +218,9 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
 
     <link rel="stylesheet" href="css/rz-hub.css?v=20261015-f49c6a25">
-    <link rel="stylesheet" href="css/rz-tool.css?v=20261110-38477737">
+    <link rel="stylesheet" href="css/rz-tool.css?v=20261111-55dd0365">
+    <link rel="stylesheet" href="css/rz-asof.css?v=20261111-413c77d5">
+<link rel="stylesheet" href="css/rz-project.css?v=20261111-31355e5e" data-rz-proj-css>
 </head>
 <body class="hub tool" data-rz-calc="tco" data-rz-account-pill="off">
     <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
@@ -338,6 +340,7 @@
                             <select class="tco-input-field" id="tcoCountry" aria-label="TCO Country / Location">
                                 <!-- populated by populateCountrySelect() on load -->
                             </select>
+                            <p class="rz-asof-line">Market rates <span id="tcoAsOf" data-rz-asof="markets"></span></p>
                         </div>
                     </div>
                     <!-- IT Load spans full width (its former row-mate, Region, is now paired with Country) -->
@@ -440,7 +443,7 @@
                                 <label class="tco-input-label" data-explain="escalation">
                                     Colo Escalation %/yr
                                 </label>
-                                <input type="number" class="tco-input-field" id="tcoColoEsc" value="3" min="0" max="10" step="0.5" aria-label="TCO Colo Esc">
+                                <input type="number" class="tco-input-field" id="tcoColoEsc" placeholder="Market projection" min="0" max="10" step="0.5" aria-label="Colo escalation, blank for the market projection">
                             </div>
                         </div>
 
@@ -959,6 +962,17 @@
         /* On country change → recalc (calculate() re-resolves the record + repaints snapshot). */
         function onCountryChange() {
             calculate();
+            tcoAsOf();
+        }
+        /* P26A: date of the market rates in use. A metro reads the engine's market dataset when the engine carries it,
+         * a "country:XX" record reads the country dataset, any other metro uses the page's own seed (no recorded date). */
+        function tcoAsOf() {
+            var el = document.getElementById('tcoAsOf'), val = (document.getElementById('tcoCountry') || {}).value || '';
+            var M = window.RZEngine && window.RZEngine.data && window.RZEngine.data.markets;
+            if (!el || !window.rzAsOf || !window.rzAsOf.render) return;
+            var key = val.indexOf('country:') === 0 ? 'countries' : (M && M[val || 'n-virginia'] ? 'markets' : 'tco.pageSeed');
+            el.setAttribute('data-rz-asof', key);
+            window.rzAsOf.render(el, key);
         }
 
         var TIER_MULT = { 'tier-2': 0.85, 'tier-3': 1.0, 'tier-4': 1.35 };
@@ -971,6 +985,7 @@
             if (_pue && _pue.air && _pue.air.tier3 != null)
                 COOLING_PUE['air'] = _pue.air.tier3;
             syncMarketRatesFromEngine();
+            setTimeout(tcoAsOf, 0);
         });
 
         /* Single-source the market RATES (power/colo/CAGR) from RZEngine.data.markets
@@ -1318,6 +1333,11 @@
             // and an override changed nothing in any market that has one (found by the P07 sensitivity check).
             if (getVal('tcoPowerOverride', 0) > 0 && mkt.projections && mkt.projections.powerCostByYear) {
                 mkt = Object.assign({}, mkt, { projections: Object.assign({}, mkt.projections, { powerCostByYear: null }) });
+            }
+            // A typed colo escalation replaces the market's colo price path (it used to be ignored: the projection
+            // always won). Blank keeps the market projection.
+            if (isPremiumUser && !isNaN(parseFloat(el('tcoColoEsc').value)) && mkt.projections && mkt.projections.coloPriceByYear) {
+                mkt = Object.assign({}, mkt, { projections: Object.assign({}, mkt.projections, { coloPriceByYear: null }) });
             }
             var staffSalary = mkt.staff;
             var staffOverride = getVal('tcoStaffOverride', 0);
@@ -2295,7 +2315,7 @@
                 el('tcoLandOverride').value = '';
                 el('tcoPowerOverride').value = '';
                 el('tcoStaffOverride').value = '';
-                el('tcoColoEsc').value = '3';
+                el('tcoColoEsc').value = '';
                 el('tcoCloudDiscount').value = '30';
                 el('tcoDebtEquity').value = '60';
             }
@@ -2658,10 +2678,14 @@
 
     <script src="rz-tracker.js" defer></script>
     <script src="auth.js?v=20261031-f01cb5a3" defer></script>
-<script src="rz-engine.min.js?v=20261110-cfbdaa79" defer></script>
+<script src="rz-engine.min.js?v=20261111-b132f06f" defer></script>
 <!-- Supabase save/reload scenario (additive) -->
 <script src="js/rz-config.js?v=20260920-eed056f9"></script>
-<script src="js/rz-scenario.js?v=20261111-9f2ae47f"></script>
+<script src="js/rz-project.js?v=20261111-4db75da3"></script>
+<script src="js/rz-asof.js?v=20261111-4826471d" defer></script>
+<script src="js/rz-scenario.js?v=20261111-01011425"></script>
+<script src="js/rz-manual-links.js?v=20261111-33875d8f" defer></script>
+<script src="js/rz-compare.js?v=20261111-a1ef3c69"></script>
 <script type="module" src="js/rz-supabase.js?v=20261111-3c801534"></script>
 <script>
 (function(){function m(){[].forEach.call(document.querySelectorAll('svg:not([aria-label]):not([aria-hidden])'),function(s){s.setAttribute('aria-hidden','true');});}
@@ -2669,6 +2693,6 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 if(window.MutationObserver)new MutationObserver(m).observe(document.documentElement,{childList:true,subtree:true});})();
 </script>
 <script src="js/rz-sw-register.js?v=20261110-ce520462" defer></script>
-<script src="js/rz-command-palette.js?v=20261110-38e137a9" defer></script>
+<script src="js/rz-command-palette.js?v=20261111-5028a9f4" defer></script>
 </body>
 </html>

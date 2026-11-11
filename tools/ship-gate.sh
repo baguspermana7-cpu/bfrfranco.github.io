@@ -303,6 +303,14 @@ gate "Service worker precache — every PRE_CACHE_URLS path on disk, per-URL pre
 gate "Offline calculators — 11 calculators visited once, network gone (origin refused + DevTools offline): reload, recompute, Chart.js built (P25)" node tools/test-offline-calculators.mjs
 gate "Search + palette — every public page indexed and loading the palette, 10/10 fixed queries top-3, palette opens styled with working page actions on 5 families (P14)" node tools/test-search-palette.mjs
 gate "Activity log — own-rows history table with empty/error/retry states, one event per Open/Copy/Delete/PDF, action+meta allowlists, signed-out silence (P15)" node tools/test-activity-log.mjs
+gate "Facility project core — ranges, CRUD, quarantine, blocked storage, registry formats, publish/stale, overrides, export/import, 256 KB cap (P01)" node tools/test-project-core.mjs
+gate "Facility project in the browser — create from page, apply + MW conversion, CAPEX into ROI, trusted override + Reset, stale, scenario precedence, kill switch, account listing, no iframe/embed writes, 390 px (P01)" node tools/test-project-ui.mjs
+gate "Compare core — number parse, deltas, tone, input diff, CSV (BOM, formula-safe), tray (P03)" node tools/test-compare-core.mjs
+gate "Compare in the browser — recomputed equals the page, A vs A zero, one-input attribution on capex/roi/tco, failed case, CSV, account multi-select, 390 px (P03)" node tools/test-compare-ui.mjs
+gate "Manual links — every calculator input group links to an existing manual anchor, banner + Back, hostile from= ignored, embed, 390 px (P17)" node tools/test-manual-links.mjs
+gate "Project pack core — project/clamp/override/default/select/missing field, consumes + stale, status, register escaping, no mutation (P04)" node tools/test-pack-core.mjs
+gate "Project pack in the browser — printed CAPEX numbers = what the page shows (sign-in-masked values stay masked), charts as images, register sources, not-run note, no writes, failed section, Print + Open, blocked tab, cancel, 390 px (P04)" node tools/test-pack-ui.mjs
+gate "Data dates — every engine source has a refresh policy and a parseable date, fixed-clock staleness, min twin, tracker + tco dates and the stale flag (P26A)" node tools/test-asof.mjs
 gate "Sensitivity — fixture exact per factor kind, pue/roi/carbon every factor equals the page recompute, inputs untouched, tia top gain equals ticking it (P07)" node tools/test-sensitivity.mjs
 gate "Tornado correctness — tco = page swing via tcoCore, cx rows = page totals, spares heatmap centre = module, tier weights = score, capex/opex = MC driver (P07)" node tools/test-tornado-correctness.mjs
 gate "Sustainability page (K25) — generator-fresh, worked example recomputed, citations and FAQ JSON-LD consistent" python3 tools/test-pillar-sustainability.py

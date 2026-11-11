@@ -56,4 +56,11 @@ other session first.
 | P23 register CSS | P23 | 1 | — | calc session | IMPLEMENTED — NOT VERIFIED (not live) | v3.36.0; test-register-css RED 6 → 96/96; a11y CLEAN 13 pages × 2 themes |
 | P25 offline calculators | P25 | 1 | — | calc session | IMPLEMENTED — NOT VERIFIED (not live) | v3.37.0 `a48f6e62e`; test-sw-precache 60, test-offline-calculators 11/11 (RED on old tree); index.html swap = LTC |
 | P16 engine version module | P16 | 1 | — | calc session | IMPLEMENTED — NOT VERIFIED (not live) | v3.37.0; pins gate RED ×2 → PASS; versions-missing fixture RED on literal pin → PASS |
-| Ship v3.35.11–v3.37.0 | — | 1 | all above | calc session | IN PROGRESS | full ship gate next |
+| Ship v3.35.11–v3.37.0 | — | 1 | all above | calc session | IN PROGRESS | rolled into the v3.38.0 push (5f34cf631): full gate 175/177, both fails Cx timing under load |
+| P14 discoverability | P14 | 2 | — | calc session | IMPLEMENTED — NOT VERIFIED (not live) | v3.38.0 `5f34cf631`; Ctrl+K + search button on the calculators |
+| P15A activity history | P15 | 2 | — | calc session | IMPLEMENTED — NOT VERIFIED (not live) | v3.39.0 `69b360f21`; test-activity-log; part B = owner SQL |
+| P07 sensitivity | P07 | 2 | F2 | calc session | IMPLEMENTED — NOT VERIFIED (not live) | v3.40.0 `f1b6b5b39` + fixture fix `663d3071f`; test-sensitivity 34; sharded gate: shard 1 90/91 (Cx fps only), shard 2 running |
+| P01 facility project S1 | P01 | 3 | F1 | calc session | IMPLEMENTED — NOT VERIFIED (not live) | v3.42.0 `882c0c352`; test-project-core 54, test-project-ui 46; S2 = owner SQL |
+| P03 compare | P03 | 3 | F2 | calc session | IMPLEMENTED — NOT VERIFIED (not live) | v3.43.0 `6c0547e13` + `3d413685f`; test-compare-core 55, test-compare-ui 38 |
+| P17 manual links | P17 | 3 | F1 | calc session | IMPLEMENTED — NOT VERIFIED (not live) | v3.44.0 `e3b4ed7bc`; test-manual-links 202 (72 groups measured) |
+| P04 project pack | P04 | 3 | P01, F2 | calc session | IMPLEMENTED — NOT VERIFIED (not live) | v3.45.0 `15d6b8bdb`; test-pack-core 21 (RED ×3), test-pack-ui 25 (RED ×2: page defaults, masked values) |

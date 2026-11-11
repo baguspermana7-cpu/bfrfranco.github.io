@@ -56,7 +56,9 @@ const pinned = new Set();
    stale auth.min.js that once made the HOMEPAGE run old code. A gate that walks one directory
    reports a clean site by not looking at it. */
 const VENDORED = /^(standarization|prompts|Automation|Article|Apps|Data|dcmoc|games|Dunia-Emosi|worktrees|backups|node_modules|my-video|TestEA|Documents|cf-worker|obsidian-knowledge-vault)\//;
-const pages = execFileSync('git', ['ls-files', '*.html'], { cwd: ROOT, encoding: 'utf8' })
+// --others: a NEW page is untracked until its commit, and the commit is exactly when its tokens must be right
+// (v3.43.0 shipped compare.html with ?v=x placeholders because this list could not see it).
+const pages = execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard', '*.html'], { cwd: ROOT, encoding: 'utf8' })
     .split('\n').filter(Boolean).filter((f) => !VENDORED.test(f)).sort();
 
 /* First pass: an asset is a version pin if ANY page loads it under an authority attribute (or the

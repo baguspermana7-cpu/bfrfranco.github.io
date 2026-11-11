@@ -11,6 +11,190 @@ release sections rather than semver.
 
 ---
 
+## v3.46.0 — 2026-11-11 — Market figures show how old their data is
+
+Product transformation, Wave 3: P26 part A.
+
+### Added
+- **The date of the data, beside the figure.** The market tracker's data line and the TCO calculator's market rates
+  (under Country / Location) read "as of Sep 2026" from the engine's provenance record. A country record reads the
+  country dataset's date; a metro the engine does not carry reads "date not recorded" instead of borrowing a date.
+- **Old data is flagged.** Past its refresh interval the date turns amber and adds "· older than 6 months" (the words
+  carry it, not only the colour); hovering shows the source and the interval.
+- **Every engine dataset has a refresh interval.** `DATA.sourceRefresh` covers all 168 provenance records by data class:
+  markets 6 months, tariffs 12, GPU-hour prices 3, the other price-like data 6 to 24, and methods, standards and
+  constants none (each with its reason). Age counts from the last month a date allows ("2025" counts from December
+  2025), so "older than" is never overstated.
+
+### Gates
+- `tools/test-asof.mjs` (955 checks): every source has a policy and a parseable, non-future date; the PRD acceptance
+  (Jul 2026 data, 6-month interval, clock Feb 2027 = "older than 6 months"); the minified engine carries the same table;
+  tracker and tco show the engine's date and the stale flag under a pinned clock. Proven RED by removing the markets
+  entry and by loading the previous minified engine (the tracker then read current under a 2031 clock).
+- `tools/test-hub-tools.mjs` T4 reads the tracker's new "as of Sep 2026" wording (optionally "· older than N months")
+  instead of the bare month.
+- `tools/test-cx-analysis.mjs` serves this tree on a free port and checks the server is serving it. The fixed port 8123
+  was held by another session's server for a deleted tree, so the gate had been testing that tree; proven RED by
+  pointing it at that server ("does not serve this tree").
+
+Standards: `standarization/ENGINE_UNIFICATION.md` § Data dates. Part B (scheduled refresh) is blocked on the owner.
+
+---
+
+## v3.45.0 — 2026-11-11 — One printed pack for a facility project
+
+Product transformation, Wave 3: P04.
+
+### Added
+- **Project pack.** The facility-project popover (P01) gains "Project pack": tick the calculators (those with results,
+  and this page, start ticked; the rest say "not run"), choose the assumptions register and basis notes, add an issue
+  note of up to 500 characters, and press Build. Each calculator is computed now from the project values in a hidden
+  copy of its own page, so the printed numbers are the page's numbers, not a second calculation.
+- **Assumptions register.** Every value each calculator was given and where it came from: project, project clamped to
+  the field's limit, override on this page, page default, from CAPEX (with "out of date" when the project moved on), or
+  field not on the page.
+- The cover names the project and its revision, the time (local and ISO) and the site version; a calculator never run
+  for the project says so above its section; a calculator that cannot be computed prints "Section not available" with
+  the reason and the rest still print. Cancel stops after the current calculator and prints nothing.
+- When the pack is ready: **Print or save as PDF** (prints a hidden frame of the pack) or **Open in a new tab**.
+
+### Fixed (found while building it)
+- A first cut opened the print window at click time. The new window hid the calculator tab, the hidden tab stopped
+  animation frames, and the hidden copies never finished computing. The pack is now built in the visible tab.
+- A first cut copied the result blocks' HTML as-is, which printed values the page masks behind sign-in. The pack now
+  prints only what the page shows: masked values print as "—", hidden elements are left out.
+- Charts drawn as SVG printed black (their colours come from the page's CSS variables); colours are now copied from
+  the computed style. Tooltip "?" markers and controls are left out.
+- The project popover redrew its default view whenever the page published new results, which would have thrown the
+  pack form away mid-build; a background refresh now keeps the pack view.
+
+### Changed
+- `RZEmbedCompute.run` accepts `inputs` as a function of the loaded page, so the pack can clamp project values to that
+  page's own field limits.
+
+### Gates
+- `tools/test-pack-core.mjs` (21 checks, Node): every register source, consumes + stale, select not offered, missing
+  field, escaping of every register cell, no mutation of the project. Proven RED by three mutations (clamp not said,
+  override ignored, escaping removed).
+- `tools/test-pack-ui.mjs` (25 checks, browser): the CAPEX section's numerals equal what the live CAPEX page shows,
+  charts travel as images, ROI's Total CAPEX reads "from CAPEX Calculator", a not-run note, stored projects
+  byte-identical after a build, a failed calculator, Print prints the pack once, a blocked tab, Cancel, 390 px.
+  Proven RED twice: packing page defaults instead of the project (5.90 vs 23.61) and copying masked values (91 vs 74
+  numerals).
+
+Standards: `standarization/PDF_EXPORT_STANDARD.md` § Project pack.
+
+---
+
+## v3.44.0 — 2026-11-11 — Each input group links to its manual, and the manual links back
+
+Product transformation, Wave 3: P17.
+
+### Added
+- **"Manual →" beside every input group heading** on the 11 calculators (72 groups, measured; the carbon calculator, whose
+  groups carry no heading, gets the link at the top of each group). It opens the calculator's manual at its Inputs
+  section.
+- **The manual knows where you came from.** Opened from a calculator, it shows "← Back to <calculator> · <group>"
+  above the content and marks the Inputs section for two seconds (not under reduced motion). Back returns to the same
+  group on the calculator. The return address is accepted only as a bare calculator page name with an optional
+  `#id`; an absolute URL, `../`, `javascript:` or a path is ignored, and the group label is shown as text.
+- The map lives in the calculator registry (`manual: { page, anchor, groups }` in `data/calculators.json`), not in
+  page code; one module, `js/rz-manual-links.js`, serves both sides.
+
+### Gates
+- `tools/test-manual-links.mjs` (202 checks, browser): every calculator has a complete entry and a manual that loads
+  the module; exactly one link per matched group (the first build mapped groups that share a container to one id and
+  dropped 9 of them: opex showed 2 of 7); every link's group id exists on the page and its manual anchor exists; the banner names the calculator
+  and the group; real clicks there and back; six hostile `from` values; markup in the label stays text; reduced motion;
+  no links in an embedded copy; 390 px. RED proven: a permissive `from`, a highlight under reduced motion and links in
+  embedded copies gave 8 failures; restoring the shared-container mapping gave 3.
+
+## v3.43.0 — 2026-11-11 — Compare two to four cases of one calculator
+
+Product transformation, Wave 3: P03 compare. (v3.41.0 is held by a parallel release.)
+
+### Added
+- **compare.html.** Two to four cases of one calculator side by side: the inputs that differ (or all of them), every
+  result the calculator declares, and each result's change from the first column in absolute terms and per cent
+  (per cent omitted when the baseline is zero). A change is coloured only when the result says which direction is
+  better (cost: lower). Set as baseline, Remove, Open in the calculator, Export CSV (UTF-8 with BOM for Excel; text
+  that a spreadsheet would run as a formula is neutralised).
+- **The results are recomputed, never copied.** Each case is loaded into a hidden copy of the calculator page and its
+  results are read from that page, one case at a time; the copies are removed afterwards. A saved scenario's stored
+  summary is never used, so every column reflects today's model. A case whose page cannot compute shows "Could not
+  compute this case" and the other columns still render.
+- **Three ways in.** "Add to compare" under the toolbar of ten calculators (kept in this tab, up to 4, the same inputs
+  twice are refused) and in the command palette; ticking 2 to 4 saved scenarios of one calculator on account.html
+  (ticking two calculators disables Compare and says why); `compare.html?calc=…&links=…` from shared links.
+- The RFS workbench is not offered: it saves its own state on every change, so a hidden copy would overwrite the
+  reader's data. The registry says so (`noCompare`) and the page shows the reason.
+
+### Fixed
+- **TCO "Colo Escalation %/yr" did nothing.** The market's colo price path was read first, so the Pro input never
+  reached the colocation TCO in any market (found by the compare attribution check: escalation 3 % to 8 % left colo
+  TCO at $99.0M). The field is now blank by default, meaning the market projection, and a typed escalation replaces
+  that path. Defaults are unchanged; a saved scenario that stored the old default 3 now applies 3 % explicitly.
+- An embedded copy of a calculator (sensitivity or compare frames) took the reader's pending "Open scenario" from
+  storage and deleted it. Embedded copies now leave it alone.
+- The Copy link button under a full toolbar had no register styling (a grey browser button). It, and Add to compare,
+  now use the toolbar's outline style.
+
+- `tools/test-asset-cache-tokens.mjs` listed pages with `git ls-files`, so a NEW page was invisible until committed:
+  compare.html was committed with `?v=x` placeholders while the gate read PASS. It now lists untracked pages too
+  (a planted untracked page with a wrong token: PASS before, FAIL after).
+
+### Gates
+- `tools/test-compare-core.mjs` (55 checks, Node): number parsing (sign, parentheses, K/M/B only as multipliers,
+  never kW or MWh), deltas, tone, input diff, hash, CSV, the tray. RED proven by 3 mutations.
+- `tools/test-compare-ui.mjs` (38 checks, browser): the tray, a recomputed column equal to the calculator's own
+  number, A against A reads 0 on capex, roi and tco, one changed input moves only its results (capex fuel autonomy
+  moves CAPEX and not energy cost; roi discount rate moves NPV and not IRR; tco colo escalation moves colo and not build
+  or cloud), a failed case, baseline swap, CSV bytes, refusals, the account multi-select, 390 px. RED proven: deltas
+  copied from the case itself, a failed frame reported as computed, and the old TCO behaviour gave 7 failures.
+
+## v3.42.0 — 2026-11-11 — One facility project across six calculators
+
+Product transformation, Wave 3: P01 stage 1 (local-first, this browser). v3.41.0 is held by a parallel release.
+
+### Added
+- **Facility project.** A button under the title of the CAPEX, OPEX, TCO, ROI, Carbon and PUE calculators opens a
+  project: name, IT load, country, Uptime tier, design PUE, energy price, horizon. Creating one starts from the
+  values already on the page. Every calculator then reads the project as its defaults, converts units where the page
+  uses another (5,000 kW reads 5 MW on TCO), and tags each field it filled ("project", or "clamped to this field's
+  limit" when the page's own range is narrower).
+- **Results travel between calculators.** Each page publishes its headline results into the project after it
+  recomputes. ROI takes Total CAPEX from the CAPEX result (USD to $M) and says so beside the field, with its age.
+  Editing the project raises its revision, and every result computed before it reads "out of date" until that
+  calculator is opened again. The popover lists all six calculators with "not run", "current" or "out of date".
+- **Your edits win.** Typing into a field the project filled records an override for that page only and tags it
+  "overridden · Reset"; Reset puts the project value back. Only real input counts: a page's own scripts and presets
+  never create an override.
+- **A saved scenario wins over the project.** A page opened from a `#rzs=` link or from the account's Open button
+  keeps the scenario's values and offers "Apply project values" instead.
+- Duplicate, Switch, Export (JSON file), Import (validated, 256 KB cap), Delete with a confirm line.
+- account.html lists the projects in this browser, signed in or not, with revision, calculators with results and
+  which of them are out of date; Export and Delete (asks first).
+- `data-rz-project="off"` on a page's body turns the button off there, for rollback without a revert.
+
+### Fixed while building it
+- Clicking the project's name inside the button closed the popover it had just opened: the redraw replaced the
+  clicked node, so the outside-click check saw a node that was no longer inside. The check now reads the event path
+  fixed at dispatch, and the button is only redrawn when its text changes.
+
+### Not done (stage 2 and later)
+- Cloud sync across devices needs a `projects` table; the SQL is the owner's to apply (PRD-P01 stage 2, blocked).
+- Share links (P02) do not yet carry the project snapshot.
+- When storage is blocked the button reads "unavailable" and nothing is stored.
+
+### Gates
+- `tools/test-project-core.mjs` (54 checks, Node): ranges, CRUD, quarantine of a damaged store, blocked storage,
+  every registry format, publish and staleness, overrides, export/import, the size cap. RED proven with 3 mutations.
+- `tools/test-project-ui.mjs` (browser): create from the page, apply, MW conversion, CAPEX into ROI, trusted override
+  and Reset, stale after a revision, scenario precedence, kill switch, Duplicate, the account listing and its confirm,
+  blocked storage, an iframe or `?embed=` copy never mounting or writing, 390 px. RED proven: removing the trusted-input
+  check, ignoring the scenario hash and inverting the CAPEX factor gave 4 failures; reverting the outside-click fix
+  failed the name-click check.
+
 ## v3.41.0 — 2026-11-11 — Every number says what kind it is; defect gates; the P&ID mock
 
 Product transformation, Wave 1: PRD-Q06 (provenance), PRD-X-DEFECTS (gates and copy), PRD-Q17 (explain DB),
