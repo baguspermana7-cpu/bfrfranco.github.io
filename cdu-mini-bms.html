@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>CDU Mini-BMS — Layout, P&amp;ID &amp; Live Parameters</title>
-    <meta name="description" content="Per-type datahall layout, animated P&ID and live simulated parameters (flow, ΔT, dP, pump, leak) for liquid-cooling CDUs — inject faults live.">
+    <title>CDU Mini-BMS — Layout, P&amp;ID &amp; Simulated Parameters</title>
+    <meta name="description" content="Per-type datahall layout, animated P&ID and simulated parameters (flow, ΔT, dP, pump, leak) for liquid-cooling CDUs, with fault injection.">
     <meta name="ai-content-declaration" content="human-authored">
     <meta name="keywords" content="CDU BMS, CDU P&ID, coolant distribution unit schematic, datahall cooling layout, liquid cooling visualisation, CDU monitoring, in-row CDU, in-rack CDU, L2L L2A, direct-to-chip">
     <meta name="author" content="Bagus Dwi Permana">
@@ -14,16 +14,16 @@
     <link rel="canonical" href="https://resistancezero.com/cdu-mini-bms.html">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://resistancezero.com/cdu-mini-bms.html">
-    <meta property="og:title" content="CDU Mini-BMS — Datahall Layout, P&ID & Live Parameters">
-    <meta property="og:description" content="Per-CDU-type datahall layout + animated P&ID + live parameters. A mini building-management cockpit for liquid-cooling CDUs.">
+    <meta property="og:title" content="CDU Mini-BMS — Datahall Layout, P&ID & Simulated Parameters">
+    <meta property="og:description" content="Per-CDU-type datahall layout + animated P&ID + simulated parameters. A mini building-management cockpit for liquid-cooling CDUs.">
     <meta property="og:image" content="https://resistancezero.com/assets/og/cdu-mini-bms.webp">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="CDU Mini-BMS — Layout, P&ID & Live Parameters">
+    <meta property="og:image:alt" content="CDU Mini-BMS — Layout, P&ID & Simulated Parameters">
     <meta property="og:site_name" content="Bagus Dwi Permana Portfolio">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="CDU Mini-BMS — Layout, P&ID & Live Parameters">
-    <meta name="twitter:description" content="Per-CDU-type datahall layout + animated P&ID + live simulated parameters with fault-injection scenarios.">
+    <meta name="twitter:title" content="CDU Mini-BMS — Layout, P&ID & Simulated Parameters">
+    <meta name="twitter:description" content="Per-CDU-type datahall layout + animated P&ID + simulated parameters with fault-injection scenarios.">
     <meta name="twitter:image" content="https://resistancezero.com/assets/og/cdu-mini-bms.webp">
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -93,10 +93,11 @@
         .panel-bd svg{ width:100%; height:auto; display:block; }
 
         /* live state pill in header */
-        .statepill{ font-family:var(--bm-mono); font-size:.6rem; font-weight:700; padding:2px 8px; border-radius:5px; letter-spacing:.05em; text-transform:uppercase; }
-        .st-ok{ background:rgba(10,138,90,.16); color:var(--bm-green); }
-        .st-warn{ background:rgba(180,83,9,.16); color:var(--bm-amber); }
-        .st-alarm{ background:rgba(220,38,38,.16); color:var(--bm-red); }
+        /* PRD-Q06 FR-12: the state word is plain text (no box, no fill); colour carries the state */
+        .statepill{ font:600 11px var(--bm-mono); padding:0; background:none; border-radius:0; letter-spacing:.05em; text-transform:uppercase; }
+        .st-ok{ color:var(--bm-green); }
+        .st-warn{ color:var(--bm-amber); }
+        .st-alarm{ color:var(--bm-red); }
 
         /* parameter tiles */
         .tile-guide{ font-size:.72rem; line-height:1.5; color:var(--bm-muted); margin:0 0 .7rem; padding:.5rem .65rem; border:1px solid var(--bm-border); border-radius:4px; background:var(--bm-inset); }
@@ -171,10 +172,11 @@
         .sim-speed{ display:inline-flex; gap:2px; margin-left:4px; }
         .seg .spd{ min-width:36px; padding:.4rem .5rem; }
         .seg .spd[aria-pressed="true"]{ background:var(--bm-ui); border-color:var(--bm-ui); color:#fff; }
-        #simState{ font-size:.58rem; }
-        #simState.st-paused{ background:rgba(180,83,9,.16); color:var(--bm-amber); }
+        #simState{ font:600 11px var(--bm-mono); color:var(--bm-text); }
+        #simState.st-ok{ color:var(--bm-text); }
+        #simState.st-paused{ color:var(--bm-amber); }
         #simStep[disabled]{ opacity:.4; cursor:not-allowed; }
-        /* play/pause is a toggle (not a radio) — keep it neutral; the LIVE/PAUSED pill shows state */
+        /* play/pause is a toggle (not a radio) — keep it neutral; the RUNNING/PAUSED word shows state */
         .seg #simPlay[aria-pressed="true"], .seg #simPlay[aria-pressed="false"]{ background:var(--bm-inset); border-color:var(--bm-border); color:var(--bm-text); }
         .seg #simPlay:hover{ border-color:var(--bm-ui); color:var(--bm-text); }
         /* paused → freeze the data-driven motion (flow + pump + sparkline-feed visuals) */
@@ -318,8 +320,8 @@
     <header class="bm-hero">
         <div class="bm-wrap">
             <span class="bm-kick">CDU Mini-BMS · Instrument view</span>
-            <h1>Layout, P&amp;ID &amp; live parameters — per CDU type</h1>
-            <p>A miniature building-management cockpit for liquid-cooling Coolant Distribution Units. Pick a CDU type to see where it sits in the datahall, how its piping &amp; instrumentation is arranged, and a live (simulated) parameter feed. Inject a fault and watch the control logic respond — the same flow, pressure, temperature, pump-redundancy and leak signals a real CDU controller exposes to the BMS/DCIM.</p>
+            <h1>Layout, P&amp;ID &amp; simulated parameters — per CDU type</h1>
+            <p>A miniature building-management cockpit for liquid-cooling Coolant Distribution Units. Pick a CDU type to see where it sits in the datahall, how its piping &amp; instrumentation is arranged, and a simulated parameter feed. Inject a fault and watch the control logic respond — the same flow, pressure, temperature, pump-redundancy and leak signals a real CDU controller exposes to the BMS/DCIM.</p>
             <div class="crumb"><a href="datacenter-solutions.html">DC Solutions</a> → <a href="cdu-hub.html">CDU Toolkit</a> → Mini-BMS · size a loop in the <a href="cdu-calculator.html">CDU Calculator</a></div>
         </div>
     </header>
@@ -359,7 +361,7 @@
                         <button class="spd" data-spd="2" aria-pressed="false">2×</button>
                         <button class="spd" data-spd="4" aria-pressed="false">4×</button>
                     </span>
-                    <span class="statepill st-ok" id="simState" style="align-self:center;">LIVE</span>
+                    <span class="statepill st-ok" id="simState" style="align-self:center;">RUNNING</span>
                     <button id="walkToggle" type="button" aria-pressed="false" title="Guided walkthrough of the selected scenario" style="margin-left:6px;">▷ Walkthrough</button>
                 </div>
             </div>
@@ -380,9 +382,9 @@
                 <div class="panel-bd"><div id="layoutBox"></div></div>
             </div>
             <div class="panel">
-                <div class="panel-hd"><h3>Live parameters (simulated)</h3><span class="tag" id="capTag"></span></div>
+                <div class="panel-hd"><h3>Simulated parameters</h3><span class="tag" id="capTag"></span></div>
                 <div class="panel-bd">
-                    <p class="tile-guide">How to read a tile: <span class="tg-tag">FT-01</span> instrument tag (matches the P&amp;ID) · big value &amp; unit · the bar shows the <b>normal band</b> (shaded) with a marker for the <b>live value</b> · the status line reads <b style="color:var(--bm-green)">NORMAL</b> / <b style="color:var(--bm-amber)">WARN</b> / <b style="color:var(--bm-red)">ALARM</b>. Click a tile for its trend &amp; reference.</p>
+                    <p class="tile-guide">How to read a tile: <span class="tg-tag">FT-01</span> instrument tag (matches the P&amp;ID) · big value &amp; unit · the bar shows the <b>normal band</b> (shaded) with a marker for the <b>current value</b> · the status line reads <b style="color:var(--bm-green)">NORMAL</b> / <b style="color:var(--bm-amber)">WARN</b> / <b style="color:var(--bm-red)">ALARM</b>. Click a tile for its trend &amp; reference.</p>
                     <div class="tiles" id="tiles"></div>
                 </div>
             </div>
@@ -987,7 +989,7 @@
             simPlay.textContent = simPaused ? '▶ Resume' : '⏸ Pause';
             simPlay.setAttribute('aria-pressed', simPaused ? 'false' : 'true');
             simStepBtn.disabled = !simPaused;
-            simState.textContent = simPaused ? 'PAUSED' : 'LIVE';
+            simState.textContent = simPaused ? 'PAUSED' : 'RUNNING';
             simState.className = 'statepill ' + (simPaused ? 'st-paused' : 'st-ok');
         }
         function setPaused(p){ simPaused=p; document.body.classList.toggle('sim-paused', p); if(p) simStop(); else simStart(); simUI(); }
