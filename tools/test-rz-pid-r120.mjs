@@ -329,11 +329,13 @@ export async function browserR120(ctx) {
     const fr = await f.p.evaluate(() => {
       const api = document.querySelector('.rzpid').__rzpid, frame = api.svg.closest('.rzpid-frame');
       return { plant: api.graph.plant.id, sw: document.documentElement.scrollWidth, fw: frame.scrollWidth, fc: frame.clientWidth, steps: api.explanation.steps.length,
+        src: (document.getElementById('srcPage') || {}).textContent, busy: document.querySelectorAll('[aria-busy]').length,
         live: !!document.getElementById('loadCtl') && document.getElementById('loadCtl').offsetParent !== null };
     });
     check('r120 fuel page ' + w + ': renders the fuel plant with its steps', fr.plant === 'fuel-day-tank' && fr.steps > 5, JSON.stringify(fr));
     check('r120 fuel page ' + w + ': no sideways pan', fr.sw <= w && (w > 600 || fr.fw <= fr.fc + 1), JSON.stringify(fr));
     check('r120 fuel page ' + w + ': no load control (the fuel page gives no heat balance)', !fr.live);
+    check('r120 fuel page ' + w + ': credit line names the fuel source page, loading state cleared', fr.src === 'fuel-system.html' && fr.busy === 0, JSON.stringify(fr));
     check('r120 fuel page ' + w + ': no page errors', !f.errs.length, f.errs.join(' | '));
     await f.p.close();
   }

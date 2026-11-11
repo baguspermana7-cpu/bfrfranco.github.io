@@ -140,8 +140,8 @@
   </div>
 
   <div class="grid">
-    <div class="panel" id="figHost"></div>
-    <aside class="panel steps" id="stepsHost" aria-label="Explanation steps"></aside>
+    <div class="panel" id="figHost" aria-busy="true"></div>
+    <aside class="panel steps" id="stepsHost" aria-label="Explanation steps" aria-busy="true"><p class="loading">Loading the plant data…</p></aside>
   </div>
   <section class="panel live" id="liveBox" hidden aria-labelledby="liveH">
     <h2 id="liveH">IT load</h2>
@@ -178,14 +178,15 @@
 
   <p class="attr">Graph model and rules ported from <a href="https://github.com/ScottDuncanAI/PID-to-Knowledge-Graph">PID-to-Knowledge-Graph</a> (MIT, © 2026 The pid-to-kg contributors). Tags, values and bands from <span class="mono" id="srcPage">cdu-mini-bms.html</span>; each one names its source line in the data line under the drawing.</p>
 </main>
-<script src="js/cdu-model.js?v=20261111-r117"></script>
-<script src="js/cdu-engine.js?v=20261111-r117"></script>
-<script src="js/rz-pid-build.js?v=20261111-r120"></script>
-<script src="js/rz-pid-graph.js?v=20261111-r120"></script>
-<script src="js/rz-pid-render.js?v=20261111-r120"></script>
-<script src="js/rz-provenance.js?v=20261111-r120"></script>
-<script src="js/rz-explain-db.js?v=20261111-r120"></script>
-<script src="js/rz-explain.js?v=20261111-r117"></script>
+<script src="js/rz-version.js?v=20261111-6320d939" defer></script>
+<script src="js/cdu-model.js?v=20261111-3aee8d6a"></script>
+<script src="js/cdu-engine.js?v=20261111-f5abd3c1"></script>
+<script src="js/rz-pid-build.js?v=20261111-3d795544"></script>
+<script src="js/rz-pid-graph.js?v=20261111-ddc34499"></script>
+<script src="js/rz-pid-render.js?v=20261111-83f1e25c"></script>
+<script src="js/rz-provenance.js?v=20261111-6f1cd061"></script>
+<script src="js/rz-explain-db.js?v=20261111-a4d62e38"></script>
+<script src="js/rz-explain.js?v=20261111-f581e6ac"></script>
 <script>
 (function () {
   var btn = document.getElementById('themeBtn');
@@ -259,6 +260,8 @@
     if (!r.ok) throw new Error('HTTP ' + r.status);
     return r.json();
   }).then(function (doc) {
+    var stepsBox = document.getElementById('stepsHost');
+    document.getElementById('figHost').removeAttribute('aria-busy'); stepsBox.removeAttribute('aria-busy'); stepsBox.textContent = '';
     document.getElementById('plantName').textContent = doc.plant.name;
     if (doc.source_page) document.getElementById('srcPage').textContent = doc.source_page;
     var sh = doc.pages[0].sheet, figHost = document.getElementById('figHost');
@@ -271,6 +274,8 @@
     graphPanel(api.graph, doc);
     livePanel(api, api.graph, doc);
   }).catch(function (err) {
+    document.getElementById('figHost').removeAttribute('aria-busy');
+    document.getElementById('stepsHost').removeAttribute('aria-busy');
     document.getElementById('stepsHost').textContent = 'The plant data could not be loaded (' + err.message + ').';
   });
 })();
