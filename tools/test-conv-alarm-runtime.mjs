@@ -211,6 +211,8 @@ try {
   const telemetryPages = [
     'datahall.html', 'chiller-plant.html', 'fire-system.html',
     'water-system.html', 'ict.html', 'datahallAI.html',
+    // PRD-Q06 FR-4: the four cockpits that now declare the simulated page mode.
+    'fuel-system.html', 'EPMS_Telemetry.html', 'dc-conventional.html', 'cdu-mini-bms.html',
   ];
   for (const telemetryPage of telemetryPages) {
     await page.goto(`${origin}/${telemetryPage}`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
@@ -246,19 +248,25 @@ try {
     assert.ok(bannerLayout.closeFocusOutline >= 2, `${telemetryPage}: telemetry dismiss focus outline was missing`);
   }
 
-  await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
-  await page.goto(`${origin}/datahall.html`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
-  await page.waitForSelector('.rz-tq-banner', { timeout: 10_000 });
-  const reducedMotion = await page.evaluate(() => {
-    const banner = document.querySelector('.rz-tq-banner');
-    const dot = document.querySelector('.rz-tq-banner-dot');
-    return {
-      dotAnimation: getComputedStyle(dot).animationName,
-      bannerTransition: getComputedStyle(banner).transitionDuration,
-    };
-  });
-  assert.equal(reducedMotion.dotAnimation, 'none', 'telemetry pulse must stop for reduced motion');
-  assert.match(reducedMotion.bannerTransition, /^(0s)(, 0s)*$/, 'banner transition must stop for reduced motion');
+  // PRD-Q06 FR-3: the banner is a still text line in BOTH motion preferences: no dot, no running
+  // animation anywhere in its subtree, no transition.
+  for (const motion of ['no-preference', 'reduce']) {
+    await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: motion }]);
+    await page.goto(`${origin}/datahall.html`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
+    await page.waitForSelector('.rz-tq-banner', { timeout: 10_000 });
+    const still = await page.evaluate(() => {
+      const banner = document.querySelector('.rz-tq-banner');
+      const nodes = [banner, ...banner.querySelectorAll('*')];
+      return {
+        dot: Boolean(banner.querySelector('.rz-tq-banner-dot')),
+        running: nodes.reduce((n, el) => n + el.getAnimations().length, 0),
+        transition: getComputedStyle(banner).transitionDuration,
+      };
+    });
+    assert.equal(still.dot, false, `banner still renders the pulsing dot (${motion})`);
+    assert.equal(still.running, 0, `banner subtree has ${still.running} running animations (${motion})`);
+    assert.match(still.transition, /^(0s)(, 0s)*$/, `banner has a transition (${motion})`);
+  }
   await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'no-preference' }]);
 
   await page.goto(`${origin}/datahallAI.html`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
@@ -268,10 +276,11 @@ try {
     const style = getComputedStyle(document.querySelector('.rz-tq-banner'));
     return { color: style.color, background: style.backgroundColor };
   });
+  // PRD-Q06 §9.8: no fill in any state or theme; grey text on the page's own surface (9.60:1 on #F5F7FA).
   assert.deepEqual(lightBanner, {
-    color: 'rgb(7, 84, 106)',
-    background: 'rgb(227, 248, 252)',
-  }, 'light-theme simulated provenance must retain readable instrument-cyan contrast');
+    color: 'rgb(55, 65, 81)',
+    background: 'rgba(0, 0, 0, 0)',
+  }, 'light-theme simulated banner must be a transparent text line in #374151');
 
   await page.goto(`${origin}/EPMS_Telemetry.html`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
   await page.waitForSelector('#epmsSidebarToggle', { timeout: 10_000 });

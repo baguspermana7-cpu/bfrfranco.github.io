@@ -57,29 +57,26 @@
     var st = doc.createElement('style');
     st.id = STYLE_ID;
     st.textContent = '' +
-      '.rz-tq-banner{position:fixed;top:0;left:50%;transform:translateX(-50%);' +
-        'z-index:9998;padding:5px 14px 5px 12px;border-radius:0 0 8px 8px;' +
-        'font-family:JetBrains Mono,monospace;font-size:10.5px;font-weight:600;' +
-        'letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:8px;' +
-        'box-shadow:0 4px 12px rgba(0,0,0,0.32);transition:transform .2s,opacity .2s;' +
-        'pointer-events:none}' +
-      '.rz-tq-banner.dismissed{transform:translateX(-50%) translateY(-110%);opacity:0;pointer-events:none}' +
-      '.rz-tq-banner--in-flow{position:static;top:auto;left:auto;transform:none;width:100%;max-width:none;' +
-        'box-sizing:border-box;justify-content:center;border-radius:0;box-shadow:none}' +
-      '.rz-tq-banner--in-flow.dismissed{display:none;transform:none}' +
+      /* PRD-Q06 FR-3 (v1.44.0): a still, in-flow text line. No fill, pill, shadow, dot, pulse or transition;
+         state colour only on the label (comms_lost). The fixed variant stays for legacy adopters (none after FR-4)
+         and keeps a surface so it stays legible over content. */
+      '.rz-tq-banner{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 0 0 12px;background:transparent;' +
+        'border:0;border-bottom:1px solid var(--rz-line-tier-2,rgba(255,255,255,.12));border-radius:0;box-sizing:border-box;' +
+        'font:400 12px/1.4 var(--rz-font-mono,\'JetBrains Mono\',monospace);letter-spacing:.02em;' +
+        'color:var(--rz-text-secondary,#A0AEC0)}' +
+      '.rz-tq-banner-label{font-weight:600;color:var(--rz-text-primary,#E8EDF5)}' +
+      '.rz-tq-banner[data-rz-tq-state="comms_lost"] .rz-tq-banner-label{color:var(--rz-accent-alert,#FF3030)}' +
+      '[data-theme="light"] .rz-tq-banner{color:#374151;border-bottom-color:rgba(17,24,39,.14)}' +
+      '[data-theme="light"] .rz-tq-banner-label{color:#111827}' +
+      '[data-theme="light"] .rz-tq-banner[data-rz-tq-state="comms_lost"] .rz-tq-banner-label{color:#CC1F1F}' +
+      '.rz-tq-banner:not(.rz-tq-banner--in-flow){position:fixed;top:0;left:50%;transform:translateX(-50%);z-index:9998;' +
+        'padding-right:0;background:var(--rz-bg-elevated,#121316);pointer-events:none}' +
+      '[data-theme="light"] .rz-tq-banner:not(.rz-tq-banner--in-flow){background:#FFFFFF}' +
+      '.rz-tq-banner.dismissed{display:none}' +
+      '.rz-tq-banner--in-flow{position:static;width:100%;max-width:none}' +
       '.rz-tq-banner--compact{width:auto;max-width:280px;min-width:0;height:44px;padding:0 0 0 9px;' +
-        'justify-content:flex-start;border-radius:3px;box-shadow:none;white-space:nowrap;flex:0 1 auto}' +
+        'justify-content:flex-start;white-space:nowrap;flex:0 1 auto}' +
       '.rz-tq-banner--compact .rz-tq-banner-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
-      '[data-theme="light"] .rz-tq-banner[data-rz-tq-state="live"]{color:#0B5D31!important;background:#E6F7ED!important;border-color:#167A45!important}' +
-      '[data-theme="light"] .rz-tq-banner[data-rz-tq-state="simulated"]{color:#07546A!important;background:#E3F8FC!important;border-color:#087D9A!important}' +
-      '[data-theme="light"] .rz-tq-banner[data-rz-tq-state="stale"]{color:#6B4500!important;background:#FFF4D6!important;border-color:#946400!important}' +
-      '[data-theme="light"] .rz-tq-banner[data-rz-tq-state="manual"]{color:#07546A!important;background:#E3F8FC!important;border-color:#087D9A!important}' +
-      '[data-theme="light"] .rz-tq-banner[data-rz-tq-state="comms_lost"]{color:#8B1515!important;background:#FFEAEA!important;border-color:#B52222!important}' +
-      '[data-theme="light"] .rz-tq-banner[data-rz-tq-state="inhibited"]{color:#344254!important;background:#EEF2F6!important;border-color:#5A6C80!important}' +
-      '[data-theme="light"] .rz-tq-banner[data-rz-tq-state="demo"]{color:#684F00!important;background:#FFF8D6!important;border-color:#8B6A00!important}' +
-      '.rz-tq-banner-dot{width:8px;height:8px;border-radius:50%;background:currentColor;' +
-        'animation:rzTqPulse 1.8s ease-in-out infinite}' +
-      '@keyframes rzTqPulse{0%,100%{opacity:.45}50%{opacity:1}}' +
       '.rz-tq-banner-close{background:transparent;border:none;color:inherit;cursor:pointer;' +
         'font-size:14px;line-height:1;padding:0;opacity:.65;pointer-events:auto;min-width:44px;' +
         'min-height:44px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 44px}' +
@@ -89,10 +86,7 @@
         'font-family:JetBrains Mono,monospace;font-size:9px;font-weight:700;' +
         'letter-spacing:.05em;text-transform:uppercase;line-height:1.4;' +
         'vertical-align:baseline;margin-left:6px}' +
-      '@media(prefers-reduced-motion:reduce){.rz-tq-banner-dot{animation:none}.rz-tq-banner{transition:none}}' +
-      '@media(max-width:768px){.rz-tq-banner:not(.rz-tq-banner--in-flow){top:0;bottom:auto;max-width:calc(100vw - 16px);' +
-        'border-radius:0 0 4px 4px;white-space:normal}.rz-tq-banner:not(.rz-tq-banner--in-flow).dismissed{' +
-        'transform:translateX(-50%) translateY(-110%)}}';
+      '@media(max-width:768px){.rz-tq-banner:not(.rz-tq-banner--in-flow){max-width:calc(100vw - 16px);white-space:normal}}';
     (doc.head || doc.documentElement).appendChild(st);
   }
 
@@ -140,8 +134,7 @@
     else { bannerEl.classList.remove('rz-tq-banner--in-flow'); }
     bannerEl.classList.toggle('rz-tq-banner--compact', compact);
     if (bannerEl.parentElement !== (slot || doc.body)) { (slot || doc.body).appendChild(bannerEl); }
-    bannerEl.style.cssText = 'background:' + st.bg + ';color:' + st.color +
-                             ';border:1px solid ' + st.bd + ';border-top:0';
+    bannerEl.style.cssText = '';
     bannerEl.setAttribute('data-rz-tq-state', effectiveMode);
     var customLabel = slot && slot.getAttribute('data-rz-telemetry-label');
     var label = effectiveMode === 'comms_lost' ? 'COMMS LOST — AUTHORITY UNAVAILABLE' :
@@ -151,10 +144,9 @@
     bannerEl.title = effectiveMode === 'comms_lost'
       ? 'Governed engineering authority did not validate. Telemetry and controls are unavailable.'
       : effectiveMode === 'simulated'
-      ? 'Non-live deterministic telemetry generated from the governed engineering basis.'
+      ? 'Simulated values from the engine model. They are not measured at a site.'
       : label;
     bannerEl.innerHTML =
-      '<span class="rz-tq-banner-dot"></span>' +
       '<span class="rz-tq-banner-label">' + esc(label) + '</span>' +
       '<button class="rz-tq-banner-close" aria-label="Dismiss banner" type="button">×</button>';
     var closeBtn = bannerEl.querySelector('.rz-tq-banner-close');
@@ -251,7 +243,7 @@
     getPointState: getPointState,
     chipHtml: chipHtml,
     audit: audit,
-    version: '1.43.4'
+    version: '1.44.0'
   };
   if (root) { root.RZTelemetryQuality = API; }
 

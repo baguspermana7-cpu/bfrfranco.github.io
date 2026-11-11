@@ -37,7 +37,7 @@ Set `<body data-rz-data-mode="...">` to declare what the page is showing. The se
    `data-datahall-authority="unavailable"` as dominant over the declared page mode. The banner and
    inherited point quality become `comms_lost` and read `COMMS LOST — AUTHORITY UNAVAILABLE`.
 
-All four BMS cockpit pages currently declare `data-rz-data-mode="simulated"`. Reviewer mandate (doc-28): "Jika menggunakan sample data, beri label sample/simulated agar tidak terlihat seperti live."
+All ten BMS cockpit pages declare `data-rz-data-mode="simulated"` (gate: `node tools/test-provenance.mjs --law L1`). Reviewer mandate (doc-28): "Jika menggunakan sample data, beri label sample/simulated agar tidak terlihat seperti live."
 
 ## Point-level quality
 
@@ -70,6 +70,10 @@ window.RZTelemetryQuality.audit(document);     /* { mode, bannerVisible, points,
 | v1.43.2 | `fire-system.html` | `simulated` | ✓ | Live tab shows chip |
 | v1.131.0 | `datahall.html` | `simulated` | ✓ in-flow | N/A |
 | v1.131.0 | `ict.html` | `simulated` | ✓ in-flow | N/A |
+| next release (PRD-Q06 FR-4) | `fuel-system.html` | `simulated` | ✓ in-flow, after the header | N/A |
+| next release (PRD-Q06 FR-4) | `EPMS_Telemetry.html` | `simulated` | ✓ in-flow, after `#epms-status-strip` | N/A |
+| next release (PRD-Q06 FR-4) | `dc-conventional.html` | `simulated` | ✓ in-flow, after the header | N/A |
+| next release (PRD-Q06 FR-4) | `cdu-mini-bms.html` | `simulated` | ✓ in-flow, custom label | N/A |
 
 At v1.134.14 all six current adopting cockpits (`datahallAI`, Data Hall, Chiller, Water, Fire and
 ICT) provide an in-flow banner slot. A dense cockpit may use the compact variant inside a header
@@ -79,8 +83,17 @@ overlap the tab rail and that the remaining cockpit is reachable through its own
 On narrow screens the provenance slot is the first in-flow item after the protected header; no
 navigation, tab or action may visually occupy its reserved row.
 
-`EPMS_Telemetry.html` retains its own operator status strip rather than this shared banner; its
-complete v2 authority gate independently withholds the single-line and commands on authority loss.
+`EPMS_Telemetry.html` keeps its operator status strip first and carries the shared banner directly under
+it; its v2 authority gate still withholds the single-line and commands on authority loss, and the banner
+reads `COMMS LOST — AUTHORITY UNAVAILABLE` while the page's authority is unavailable.
+
+### Banner look (v1.44.0, PRD-Q06 FR-3)
+
+The banner is a still, in-flow text line: 12 px mono, grey text, a bold label, one 1 px bottom hairline, no
+fill, pill, shadow, dot, pulse or transition, in every state and theme. Only `comms_lost` colours its label
+(#FF3030 dark, #CC1F1F light). A page must not restyle it into a chip (datahallAI's cyan header chip was
+removed). Gate: `node tools/test-conv-alarm-runtime.mjs` (0 running animations in both motion preferences,
+transparent light-theme background, 10 pages in flow).
 
 ## Authoring guidelines
 
