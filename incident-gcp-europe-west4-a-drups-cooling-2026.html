@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Cloud europe-west4-a: Grid Transient, DRUPS Failure and Chiller Shutdown | ResistanceZero</title>
+    <meta name="description" content="On 15 July 2026 a 3 ms grid transient tripped both utility feeds at the facility hosting Google Cloud zone europe-west4-a. The side A rotary UPS failed, one row lost power on trans">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="ai-content-declaration" content="human-curated, sourced from public post-incident reports">
+    <meta name="author" content="Bagus Dwi Permana">
+    <link rel="canonical" href="https://resistancezero.com/incident-gcp-europe-west4-a-drups-cooling-2026.html">
+    <meta name="theme-color" content="#0e0f12">
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+    <style>
+    /* ── Governed Incident Dossier — editorial register (v3): graphite + one amber, as the journal (owner 2026-10-15),
+       IBM Plex Sans throughout, evidence-class provenance. Accent vars remapped so all components
+       re-skin. AA-contrast in both themes. No gradients / glass / dot-grid (anti-slop). */
+    :root:not([data-theme="dark"]) {
+        --bg:#f8f9fa; --surface:#ffffff; --surface-2:#eef0f2; --line:rgba(40,44,52,0.12);
+        --text:#343a40; --text-strong:#16181d; --text-body:#3f454d; --muted:#5c6470;
+        --cyan:#5c6470; --amber:#92400e; --green:#2f7d54; --red:#9c3b32; --gold:#92400e;
+        --hero-ink:#f8f9fa; --hero-bg:#16181d; --shadow-deep:rgba(40,44,52,0.10);
+    }
+    [data-theme="dark"] {
+        --bg:#0e0f12; --surface:#16181d; --surface-2:#1c1e23; --line:rgba(160,168,180,0.14);
+        --text:#cfd3da; --text-strong:#eef0f3; --text-body:#bfc4cc; --muted:#969eaa;
+        --cyan:#969eaa; --amber:#e8b563; --green:#6aa588; --red:#cf9384; --gold:#e8b563;
+        --hero-ink:#cfd3da; --hero-bg:#121316; --shadow-deep:rgba(0,0,0,0.5);
+    }
+    * { box-sizing:border-box; }
+    html,body { margin:0; padding:0; }
+    body { background:var(--bg); color:var(--text); font-family:"IBM Plex Sans",system-ui,sans-serif; line-height:1.62; }
+    a { color:var(--cyan); }
+    h1,h2,.serif { font-family:'IBM Plex Sans',system-ui,sans-serif; font-weight:600; letter-spacing:-0.01em; }
+    .wrap { max-width:1120px; margin:0 auto; padding:1.5rem 1.1rem 3rem; }
+    .navbar { display:flex; align-items:center; justify-content:space-between; padding:0.7rem 1.1rem; border-bottom:1px solid var(--line); background:var(--surface); position:sticky; top:0; z-index:50; }
+    .nav-container { display:flex; align-items:center; justify-content:space-between; width:100%; max-width:1120px; margin:0 auto; }
+    .nav-logo { display:flex; align-items:center; }
+    .nav-avatar { width:34px; height:34px; border-radius:50%; }
+    .nav-menu { display:flex; gap:1rem; list-style:none; margin:0; padding:0; }
+    .nav-menu a { color:var(--text-body); text-decoration:none; font-size:0.85rem; font-weight:600; }
+    .nav-menu a:hover { color:var(--cyan); }
+    .nav-right { display:flex; align-items:center; gap:0.6rem; }
+    .theme-btn { background:none; border:1px solid var(--line); color:var(--text); border-radius:4px; padding:0.35rem 0.5rem; cursor:pointer; font-size:0.8rem; }
+    .lock-tag { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--red); border:1px solid var(--red); border-radius:2px; padding:0.12rem 0.5rem; }
+    h1 { font-size:2.4rem; color:var(--text-strong); margin:0.35rem 0 0.5rem; line-height:1.12; }
+    h2 { font-size:1.4rem; color:var(--text-strong); margin:2rem 0 0.7rem; }
+    .eyebrow { font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); }
+    .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
+    .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
+    .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:2px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    /* A chip carries the operator name, which can be a whole sentence ("Google Cloud
+       (impacted tenant); STT GDC / Tata Communications JV (named as the third-party …").
+       nowrap made that one chip 1120px wide and pushed the GCP Delhi dossier into a
+       1260px page at a 1100px viewport. Short chips are unaffected: normal wrapping
+       only engages when a chip would not fit its row. */
+    .chips .chip { max-width:100%; white-space:normal; overflow-wrap:anywhere; }
+    /* State lives in the text colour; a coloured left stripe is the decoration UX law #14 bans. */
+    .chip.cyan { color:var(--cyan); }
+    .chip.amber { color:var(--amber); }
+    .chip.green { color:var(--green); }
+    .chip.red { color:var(--red); }
+    .metabar { font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.04em; color:var(--muted); margin:0.7rem 0; display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; font-variant-numeric:tabular-nums slashed-zero; }
+    .metabar b { color:var(--text-body); font-weight:600; }
+    .metabar .sep { color:var(--line); }
+    .chip.muted { color:var(--muted); }
+    .card { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:1rem 1.1rem; margin-top:0.9rem; }
+    .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:4px; margin-top:0.9rem; }
+    table.inc-index { width:100%; border-collapse:collapse; font-size:0.86rem; min-width:760px; font-variant-numeric:tabular-nums slashed-zero; }
+    table.inc-index th { text-align:left; font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); background:var(--surface-2); }
+    table.inc-index td { padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); color:var(--text-body); vertical-align:top; }
+    table.inc-index tr:hover td { background:var(--surface-2); }
+    table.inc-index a { font-weight:700; color:var(--text-strong); text-decoration:none; }
+    table.inc-index a:hover { color:var(--cyan); text-decoration:underline; }
+    /* rich incident table (reference-2 style) */
+    table.itbl { min-width:1120px; }
+    table.itbl td { vertical-align:middle; }
+    /* v1.134.20 — the title and summary columns ellipsise so the table's columns line up,
+       which is the right call for a dense index. But the cut text was reachable only by
+       navigating to the incident: a summary lost 238-298px of its sentence with no way to read
+       it in place. Each carries its full text in a title attribute now, so the truncation is
+       deliberate AND non-lossy — which is the condition the legibility audit checks for. */
+    .itr { cursor:pointer; }
+    .itr:hover td { background:var(--surface-2); }
+    .c-id .itid { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); white-space:nowrap; }
+    .c-title { max-width:300px; }
+    /* Titles wrap instead of ending in an ellipsis: eight titles were cut by 28-183 px and
+       tools/audit-legibility.mjs counts a clipped title as unreadable, which it is. */
+    .c-title .itt { display:block; font-weight:700; color:var(--text-strong); text-decoration:none; font-size:0.9rem; line-height:1.25; }
+    .itr:hover .itt { color:var(--cyan); }
+    .c-title .its { color:var(--muted); font-size:0.76rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:0.1rem; }
+    .sev-chip { font-family:'JetBrains Mono',monospace; font-size:0.66rem; font-weight:600; padding:0.12rem 0.5rem; border-radius:2px; border:1px solid; white-space:nowrap; }
+    .sev-b-critical { color:var(--red); border-color:var(--red); }
+    .sev-b-high { color:var(--amber); border-color:var(--amber); }
+    .sev-b-medium { color:var(--green); border-color:var(--green); }
+    .sev-b-low { color:var(--muted); border-color:var(--line); }
+    .st-chip { font-family:'JetBrains Mono',monospace; font-size:0.64rem; padding:0.12rem 0.45rem; border-radius:2px; border:1px solid var(--line); white-space:nowrap; }
+    .st-off { color:var(--green); border-color:color-mix(in srgb, var(--green) 45%, var(--line)); }
+    .st-press { color:var(--amber); border-color:color-mix(in srgb, var(--amber) 45%, var(--line)); }
+    .c-region { min-width:170px; }
+    .c-region .iflag { font-size:1.05rem; margin-right:0.45rem; vertical-align:middle; }
+    .c-region .ireg { display:inline-flex; flex-direction:column; vertical-align:middle; }
+    .c-region .ireg b { color:var(--text-body); font-weight:600; font-size:0.82rem; }
+    .c-region .ireg i { color:var(--muted); font-style:normal; font-size:0.72rem; }
+    .c-mono { font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:var(--text-body); white-space:nowrap; }
+    .c-blast { color:var(--text-strong); font-weight:600; } .c-blast .c-u { color:var(--muted); font-weight:400; font-size:0.68rem; }
+    .ibars { display:inline-flex; gap:2px; }
+    .ibars i { width:7px; height:9px; border-radius:1px; display:block; }
+    .itags { display:flex; gap:0.25rem; max-width:150px; flex-wrap:wrap; }
+    .c-go { color:var(--muted); font-size:1rem; text-align:center; }
+    .itr:hover .c-go { color:var(--cyan); }
+    /* incident-view tabs (List / Risk map / Semantic / Analytics) */
+    .iv-tabs { display:flex; gap:1.2rem; border-bottom:1px solid var(--line); margin:0.4rem 0 0.2rem; flex-wrap:wrap; }
+    .iv-tabs a { font-family:'JetBrains Mono',monospace; font-size:0.74rem; letter-spacing:0.03em; color:var(--muted); text-decoration:none; padding:0.5rem 0.1rem; border-bottom:2px solid transparent; }
+    .iv-tabs a:hover { color:var(--text-strong); }
+    .iv-tabs a.on { color:var(--text-strong); border-bottom-color:var(--cyan); }
+    .rank-badge { font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--amber); font-variant-numeric:tabular-nums slashed-zero; }
+    .mag-bar { height:5px; border-radius:0; background:var(--line); margin-top:0.35rem; overflow:hidden; }
+    .mag-bar > span { display:block; height:4px; background:var(--amber); }
+    ul.tight { margin:0.4rem 0 0; padding-left:1.15rem; }
+    ul.tight li { color:var(--text-body); margin:0.3rem 0; font-size:0.92rem; }
+    .soe { list-style:none; margin:0.6rem 0 0; padding:0; }
+    .soe li { display:grid; grid-template-columns:170px 1fr; gap:0.7rem; padding:0.5rem 0; border-bottom:1px solid var(--line); }
+    .soe time { font-family:'JetBrains Mono',monospace; font-size:0.76rem; color:var(--muted); font-variant-numeric:tabular-nums slashed-zero; }
+    .soe .ev { color:var(--text-body); font-size:0.9rem; }
+    .phase-chip { font-family:'JetBrains Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--amber); border:1px solid var(--line); border-radius:2px; padding:0.05rem 0.4rem; margin-right:0.4rem; white-space:nowrap; font-variant-numeric:tabular-nums; }
+    table.metrics { width:100%; border-collapse:collapse; font-size:0.88rem; font-variant-numeric:tabular-nums slashed-zero; }
+    table.metrics td { padding:0.5rem 0.7rem; border-bottom:1px solid var(--line); vertical-align:top; }
+    table.metrics .mlabel { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; width:38%; white-space:nowrap; }
+    table.metrics .mval { color:var(--text-body); }
+    .ca-block { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0.7rem 1rem; margin-top:0.7rem; }
+    .ca-block h3 { margin:0 0 0.3rem; font-size:0.92rem; color:var(--text-strong); }
+    .ca-block p { margin:0; color:var(--text-body); font-size:0.9rem; }
+    /* reading column — constrain prose to a comfortable measure, justified like RZ articles */
+    .reading-col { max-width:820px; margin:0 auto; }
+    .reading-col p.lede, .reading-col .card p, .reading-col .ca-block p, .reading-col ul.tight li { text-align:justify; -webkit-hyphens:auto; hyphens:auto; }
+    .card p { margin:0; }
+    .card > p + p, .card p + p { margin-top:0.7rem; }
+    .mag-trace { font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:var(--text-body); background:var(--surface-2); border:1px solid var(--line); border-radius:4px; padding:0.5rem 0.7rem; margin-top:0.5rem; font-variant-numeric:tabular-nums slashed-zero; }
+    .mag-trace b { color:var(--text-strong); }
+    .imp-tag { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.04em; text-transform:uppercase; color:var(--cyan); font-weight:700; margin-right:0.35rem; }
+    .coe-meta { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); background:var(--surface-2); border:1px solid var(--line); border-radius:2px; padding:0.05rem 0.4rem; margin-left:0.2rem; white-space:normal; }
+    /* FAQ / methodology */
+    details.faq { border:1px solid var(--line); border-radius:4px; background:var(--surface); margin:0.8rem 0 0.4rem; }
+    details.faq > summary { cursor:pointer; padding:0.7rem 0.9rem; font-family:'JetBrains Mono',monospace; font-size:0.74rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-strong); list-style:none; }
+    details.faq > summary::-webkit-details-marker { display:none; }
+    details.faq > summary::before { content:"+ "; color:var(--cyan); }
+    details.faq[open] > summary::before { content:"– "; }
+    details.faq .faq-body { padding:0 0.9rem 0.9rem; }
+    details.faq h4 { font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:0.98rem; color:var(--text-strong); margin:0.8rem 0 0.2rem; }
+    details.faq p, details.faq li { color:var(--text-body); font-size:0.88rem; }
+    /* share bar (RZ standard) — editorial thin buttons */
+    .share-buttons { display:flex; align-items:center; gap:0.5rem; margin:1.4rem 0 0.4rem; padding-top:1rem; border-top:1px solid var(--line); }
+    .share-label { font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin-right:0.2rem; }
+    .share-btn { width:32px; height:32px; display:inline-flex; align-items:center; justify-content:center; background:var(--surface-2); border:1px solid var(--line); border-radius:4px; color:var(--text-body); cursor:pointer; padding:0; }
+    .share-btn:hover { border-color:var(--cyan); color:var(--cyan); }
+    .share-btn svg { width:15px; height:15px; }
+    /* ── inline-SVG visualizations (theme-aware via vars) ── */
+    .inc-map { height:410px; margin-top:0.4rem; border:1px solid var(--line); border-radius:4px; overflow:hidden; background:#121316; z-index:1; }
+    .inc-map .leaflet-container { background:#121316; font-family:"IBM Plex Sans",sans-serif; }
+    .inc-map .leaflet-popup-content-wrapper { background:#16181d !important; color:#eef0f3 !important; border:1px solid #2a2d33 !important; border-radius:10px !important; box-shadow:0 8px 24px rgba(0,0,0,0.45) !important; }
+    .inc-map .leaflet-popup-tip { background:#16181d !important; border:1px solid #2a2d33 !important; }
+    .inc-map .leaflet-popup-content { margin:9px 12px !important; }
+    .inc-map .leaflet-control-attribution { background:rgba(14,15,18,0.8) !important; color:#969eaa !important; font-size:9px !important; }
+    .inc-map .leaflet-control-attribution a { color:#9fb3a8 !important; }
+    .inc-map .leaflet-bar a { background:#16181d !important; color:#cfd3da !important; border-color:#2a2d33 !important; }
+    .leaflet-tooltip.inc-tip { background:#16181d; color:#eef0f3; border:1px solid #2a2d33; border-radius:3px; font-family:'JetBrains Mono',monospace; font-size:0.66rem; padding:2px 7px; box-shadow:0 6px 18px rgba(0,0,0,0.5); }
+    .leaflet-tooltip.inc-tip:before { border-top-color:#2a2d33; }
+    /* ── Incident Intelligence dashboard (editorial, no neon) ── */
+    .iid { margin:1.4rem 0 1rem; }
+    .iid-head { display:flex; align-items:flex-end; justify-content:space-between; gap:1rem; flex-wrap:wrap; margin-bottom:0.9rem; }
+    .iid-title { font-size:1.6rem; margin:0; color:var(--text-strong); }
+    .iid-sub { margin:0.15rem 0 0; color:var(--muted); font-size:0.86rem; }
+    .iid-range { font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:0.05em; color:var(--muted); border:1px solid var(--line); border-radius:3px; padding:0.3rem 0.6rem; white-space:nowrap; }
+    .iid-num { font-variant-numeric:tabular-nums slashed-zero; }
+    .iid-kpis { display:grid; grid-template-columns:repeat(5,1fr); gap:0.7rem; margin-bottom:0.9rem; }
+    .iid-kpi { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0.75rem 0.85rem; }
+    .iid-kpi-l { font-family:'JetBrains Mono',monospace; font-size:0.62rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); }
+    .iid-kpi-v { display:flex; align-items:baseline; gap:0.3rem; margin:0.25rem 0 0.15rem; }
+    .iid-kpi-v .iid-num, .iid-kpi-v > span:first-child { font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:1.8rem; font-weight:600; color:var(--text-strong); line-height:1; }
+    .iid-kpi-u { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .iid-kpi-s { font-size:0.72rem; color:var(--muted); }
+    .iid-grid { display:grid; grid-template-columns:290px 1fr 300px; gap:0.9rem; align-items:start; }
+    .iid-col-l, .iid-col-c, .iid-col-r { display:flex; flex-direction:column; gap:0.9rem; min-width:0; }
+    .iid-panel { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0.85rem 0.95rem; }
+    .iid-panel-map { padding:0.85rem 0.95rem 0.6rem; }
+    .iid-panel-map .inc-map { height:360px; margin-top:0.5rem; }
+    .iid-ph { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin-bottom:0.5rem; }
+    .iid-note { font-size:0.74rem; color:var(--muted); margin:0 0 0.5rem; }
+    .iid-donut-wrap { display:flex; align-items:center; gap:0.9rem; }
+    .iid-donut { width:130px; height:130px; flex:0 0 auto; }
+    .iid-arc { transition:stroke-dasharray 0.9s cubic-bezier(0.22,1,0.36,1); }
+    .iid-donut-c { font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:19px; font-weight:600; fill:var(--text-strong); }
+    .iid-donut-t { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.1em; text-transform:uppercase; fill:var(--muted); }
+    .iid-legend { list-style:none; margin:0; padding:0; flex:1; min-width:0; }
+    .iid-legend li { display:flex; align-items:center; gap:0.45rem; font-size:0.82rem; color:var(--text-body); padding:0.16rem 0; }
+    .iid-legend b { margin-left:auto; color:var(--text-strong); font-family:'JetBrains Mono',monospace; font-size:0.82rem; }
+    .iid-legend .iid-pct { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.72rem; width:2.4em; text-align:right; }
+    .iid-dot { width:9px; height:9px; border-radius:50%; flex:0 0 auto; }
+    .iid-catbars, .iid-durbars, .iid-sigs { list-style:none; margin:0; padding:0; }
+    .iid-catbars li, .iid-durbars li, .iid-sigs li { display:grid; grid-template-columns:1fr 90px auto; align-items:center; gap:0.5rem; padding:0.24rem 0; font-size:0.82rem; }
+    .iid-sigs li { grid-template-columns:1fr 64px auto auto; }
+    .iid-catbars li { cursor:pointer; }
+    .iid-catbars li:hover .iid-cbl { color:var(--cyan); }
+    .iid-cbl, .iid-dbl, .iid-sig-n { color:var(--text-body); overflow-wrap:anywhere; }
+    .iid-cbar, .iid-dbar, .iid-sig-bar { height:7px; background:var(--surface-2); border-radius:0; overflow:hidden; }
+    .iid-cbar i, .iid-sig-bar i { display:block; height:100%; width:var(--w); background:var(--amber); transform:scaleX(0); transform-origin:left; transition:transform 0.9s cubic-bezier(0.22,1,0.36,1); }
+    .iid-dbar i { display:block; height:100%; width:var(--w); background:var(--cyan); transform:scaleX(0); transform-origin:left; transition:transform 0.9s cubic-bezier(0.22,1,0.36,1); }
+    .iid-in .iid-cbar i, .iid-in .iid-dbar i, .iid-in .iid-sig-bar i { transform:scaleX(1); }
+    .iid-catbars b, .iid-durbars b, .iid-sigs b { font-family:'JetBrains Mono',monospace; color:var(--text-strong); font-size:0.82rem; text-align:right; }
+    .iid-durbars b { color:var(--muted); }
+    .iid-sig-m { font-family:'JetBrains Mono',monospace; font-size:0.66rem; color:var(--muted); }
+    .iid-recent { display:flex; flex-direction:column; }
+    .iid-rec { display:flex; align-items:center; gap:0.55rem; padding:0.45rem 0; border-bottom:1px solid var(--line); text-decoration:none; }
+    .iid-rec:last-child { border-bottom:none; }
+    .iid-rec-sev { width:8px; height:8px; border-radius:50%; flex:0 0 auto; }
+    .iid-rec-b { display:flex; flex-direction:column; min-width:0; flex:1; }
+    .iid-rec-t { color:var(--text-strong); font-size:0.84rem; font-weight:600; overflow-wrap:anywhere; }
+    .iid-rec:hover .iid-rec-t { color:var(--cyan); }
+    .iid-rec-m { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.68rem; }
+    .iid-rec-tag { font-family:'JetBrains Mono',monospace; font-size:0.58rem; letter-spacing:0.04em; padding:0.1rem 0.35rem; border:1px solid var(--line); border-radius:2px; flex:0 0 auto; }
+    .sev-critical { background:var(--red); } .iid-rec-tag.sev-critical { color:var(--red); background:transparent; border-color:var(--red); }
+    .sev-high { background:var(--amber); } .iid-rec-tag.sev-high { color:var(--amber); background:transparent; border-color:var(--amber); }
+    .sev-medium { background:var(--green); } .iid-rec-tag.sev-medium { color:var(--green); background:transparent; border-color:var(--green); }
+    .sev-low { background:var(--muted); } .iid-rec-tag.sev-low { color:var(--muted); background:transparent; border-color:var(--line); }
+    .iid-graph { width:100%; height:auto; display:block; }
+    .iid-edge { stroke:var(--line); stroke-width:1; opacity:0.55; transition:stroke 0.15s, opacity 0.15s; }
+    .iid-edge.on { stroke:var(--cyan); opacity:0.9; stroke-width:1.3; }
+    .iid-node circle { transition:transform 0.15s ease, opacity 0.15s; transform-origin:center; }
+    .iid-node:hover circle { stroke:var(--text-strong); stroke-width:1.4; }
+    .iid-graph.iid-focus .iid-node.dim circle { opacity:0.22; }
+    .iid-maplegend { display:flex; flex-wrap:wrap; gap:0.4rem 1rem; margin-top:0.5rem; font-family:'JetBrains Mono',monospace; font-size:0.66rem; color:var(--muted); }
+    .iid-maplegend span { display:inline-flex; align-items:center; gap:0.35rem; }
+    .iid-maplegend i { width:10px; height:10px; border-radius:50%; }
+    .iid-maplegend .iid-mln { font-style:italic; opacity:0.8; }
+    .iid-foot { display:flex; flex-wrap:wrap; gap:0.5rem 1.4rem; align-items:center; margin-top:0.9rem; padding-top:0.8rem; border-top:1px solid var(--line); font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .iid-foot b { color:var(--text-body); font-weight:600; margin-right:0.3rem; }
+    .iid-foot-link { margin-left:auto; color:var(--cyan); text-decoration:none; }
+    @media (max-width:1000px){ .iid-grid { grid-template-columns:1fr; } .iid-kpis { grid-template-columns:repeat(2,1fr); } }
+    @media (max-width:520px){ .iid-kpis { grid-template-columns:1fr 1fr; } .iid-kpi-v .iid-num, .iid-kpi-v > span:first-child { font-size:1.5rem; } }
+    @media (prefers-reduced-motion:reduce){ .iid-arc,.iid-cbar i,.iid-dbar i,.iid-sig-bar i,.iid-kpi,.iid-node circle,.iid-edge { transition:none !important; } .iid-cbar i,.iid-dbar i,.iid-sig-bar i { transform:scaleX(1); } }
+    .viz { overflow-x:auto; margin-top:0.9rem; background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0.9rem 1rem; }
+    .viz svg { display:block; max-width:100%; height:auto; }
+    /* v1.134.20 — the timeline's viewBox WIDTH grows with the number of events (1420 for a
+       short incident, 2248 for a long one) while `.viz svg { max-width:100% }` squeezed it into
+       the column. So the more an incident had to say, the smaller its own timeline printed it:
+       phase chips and clock times rendered at 4px. The container was already a scroller
+       (`.viz { overflow-x:auto }`) — max-width was defeating it.
+       Pinning the intrinsic HEIGHT (every timeline viewBox is `0 0 W 96`) makes the browser
+       derive width = W px from the aspect ratio, so the drawing renders 1:1 at any event count
+       and the panel scrolls instead of shrinking. */
+    .viz-timeline svg { max-width:none; height:96px; width:auto; }
+    .viz-radar svg { max-width:320px; margin:0 auto; }
+    .vz-num { font-variant-numeric:tabular-nums slashed-zero; }
+    .vz-box-t, .vz-box-s, .vz-lbl, .vz-hb-lbl, .vz-tl-t, .vz-pt, .vz-tick { pointer-events:auto; }
+    .vz-grid { fill:none; stroke:var(--line); stroke-width:1; }
+    .vz-accent-fill { fill:var(--cyan); fill-opacity:0.16; stroke:var(--cyan); stroke-width:1.4; }
+    .vz-accent-dot { fill:var(--cyan); }
+    .vz-accent-bar { fill:var(--cyan); }
+    .vz-cat-bar { fill:var(--amber); }
+    .vz-lbl { font-family:'JetBrains Mono',monospace; font-size:9px; fill:var(--muted); }
+    .vz-box-trigger { fill:color-mix(in srgb, var(--red) 12%, var(--surface)); stroke:var(--red); stroke-width:1.2; }
+    .vz-box-fault { fill:color-mix(in srgb, var(--amber) 12%, var(--surface)); stroke:var(--amber); stroke-width:1.2; }
+    .vz-box-down { fill:color-mix(in srgb, var(--cyan) 10%, var(--surface)); stroke:var(--cyan); stroke-width:1; }
+    .vz-box-t { font-family:"IBM Plex Sans",sans-serif; font-size:11px; font-weight:600; fill:var(--text-strong); }
+    .vz-box-s { font-family:'JetBrains Mono',monospace; font-size:9px; fill:var(--muted); }
+    .vz-flow { stroke:var(--muted); stroke-width:1.3; fill:none; }
+    .vz-arrhead { fill:var(--muted); }
+    .vz-tl-ph { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.04em; text-transform:uppercase; fill:var(--amber); }
+    .vz-tl-t { font-family:'JetBrains Mono',monospace; font-size:8.5px; fill:var(--muted); }
+    .vz-hb-lbl { font-family:"IBM Plex Sans",sans-serif; font-size:11px; fill:var(--text-body); }
+    .vz-hb-val { font-family:'JetBrains Mono',monospace; font-size:10px; fill:var(--muted); font-variant-numeric:tabular-nums slashed-zero; }
+    .vz-tick { font-family:'JetBrains Mono',monospace; font-size:8.5px; fill:var(--muted); }
+    .vz-quad { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.05em; text-transform:uppercase; fill:var(--muted); opacity:0.7; }
+    .vz-pt { font-family:'JetBrains Mono',monospace; font-size:8px; fill:var(--text-body); }
+    .viz a { text-decoration:none; }
+    .viz a:hover .vz-pt { fill:var(--cyan); font-weight:600; }
+    .viz a:hover circle { stroke:var(--text-strong); stroke-width:1.4; }
+    .vz-legend { display:flex; flex-wrap:wrap; gap:0.5rem 1.1rem; margin-top:0.7rem; padding-top:0.6rem; border-top:1px solid var(--line); }
+    .vz-key { display:inline-flex; align-items:center; gap:0.4rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .vz-key i { width:11px; height:11px; border-radius:50%; display:inline-block; }
+    .vz-key-note { font-style:italic; opacity:0.8; }
+    .viz-grid3 { display:grid; grid-template-columns:1fr 1fr; gap:0.9rem; }
+    @media (max-width:720px){ .viz-grid3 { grid-template-columns:1fr; } }
+    .filterbar { display:flex; flex-wrap:wrap; align-items:center; gap:0.4rem 0.6rem; margin:0.9rem 0 0.2rem; }
+    .fb-group { display:flex; flex-wrap:wrap; gap:0.35rem; }
+    .fb-chip { font-family:'JetBrains Mono',monospace; font-size:0.72rem; padding:0.28rem 0.6rem; border-radius:2px; border:1px solid var(--line); background:var(--surface); color:var(--text-body); cursor:pointer; }
+    .fb-chip:hover { border-color:var(--cyan); }
+    .fb-chip.active { background:var(--surface-2); border-color:var(--line); border-bottom:2px solid var(--cyan); color:var(--text-strong); font-weight:700; }
+    .fb-search { flex:1 1 200px; min-width:160px; font-family:"IBM Plex Sans",sans-serif; font-size:0.82rem; padding:0.3rem 0.6rem; border-radius:4px; border:1px solid var(--line); background:var(--surface); color:var(--text); }
+    .fb-count { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); margin-left:auto; }
+    .kv { display:grid; grid-template-columns:180px 1fr; gap:0.5rem 0.9rem; margin-top:0.5rem; font-size:0.9rem; }
+    .kv dt { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; }
+    .kv dd { margin:0; color:var(--text-body); }
+    .refs { list-style:none; margin:0.6rem 0 0; padding:0; }
+    .refs li { padding:0.55rem 0; border-bottom:1px solid var(--line); }
+    .refs .rtitle { color:var(--text-strong); font-weight:600; font-size:0.9rem; }
+    .refs .rquote { color:var(--muted); font-size:0.84rem; font-style:italic; margin-top:0.2rem; display:block; }
+    .refs a { font-size:0.78rem; word-break:break-all; }
+    .backlink { display:inline-block; margin-bottom:0.6rem; font-size:0.82rem; color:var(--cyan); text-decoration:none; }
+    footer { border-top:1px solid var(--line); margin-top:2.5rem; padding:1.4rem 1.1rem; text-align:center; }
+    footer .ver { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .disclaimer { font-size:0.76rem; color:var(--muted); margin-top:0.8rem; max-width:80ch; }
+    .skip-link { position:absolute; top:-50px; left:0; background:var(--cyan); color:var(--hero-bg); padding:10px 20px; text-decoration:none; font-weight:600; z-index:10000; border-radius:0 0 4px 0; transition:top 0.2s; }
+    .skip-link:focus { top:0; }
+    .root-gate { position:fixed; inset:0; z-index:99999; display:none; align-items:center; justify-content:center; background:rgba(10,11,13,0.74); padding:1rem; backdrop-filter:blur(6px); }
+    body.locked .root-gate { display:flex; }
+    body.locked .wrap { filter:blur(4px); pointer-events:none; user-select:none; }
+    .root-card { max-width:430px; width:100%; background:var(--surface); border:1px solid var(--cyan); border-radius:4px; padding:1.3rem 1.15rem; text-align:center; box-shadow:0 18px 36px var(--shadow-deep); }
+    .root-card h2 { margin:0 0 0.4rem; font-size:1.1rem; color:var(--text-strong); }
+    .root-card p { font-size:0.86rem; color:var(--text-body); }
+    .root-actions { margin-top:0.9rem; display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; }
+    .root-actions button, .root-actions a { border-radius:4px; padding:0.5rem 0.85rem; font-size:0.8rem; font-weight:700; border:1px solid var(--line); text-decoration:none; cursor:pointer; color:var(--text); font-family:inherit; }
+    .root-actions button { background:var(--cyan); color:var(--hero-bg); border:none; }
+    .rz-nav-burger { display:none; }
+    /* v1.8.0 — mobile responsive patch */
+    @media (max-width:768px) {
+        html,body { overflow-x:hidden; max-width:100vw; }
+        img { max-width:100%; height:auto; display:block; }
+        .nav-menu, .nav-links { display:none; }
+        .navbar { padding:0.5rem 0.75rem; }
+        footer .footer-grid { grid-template-columns:1fr; gap:1.25rem; padding:1rem; }
+        button, a.btn, [role="button"] { min-height:44px; }
+        h1 { font-size:1.4rem; }
+        .soe li { grid-template-columns:1fr; gap:0.15rem; }
+        /* Chips are `white-space: nowrap` and some carry a full operator name with a
+           parenthetical ("CrowdStrike (impacting Microsoft Windows hosts)"), which measured
+           389px on a 390px screen and ran off behind body's overflow-x clip. */
+        .chip { white-space:normal; overflow-wrap:anywhere; }
+        .kv { grid-template-columns:1fr; }
+        .root-card { max-width:92vw; }
+    }
+    @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
+</style>
+    <style>
+    /* ── FMEA (v3.12.3) — one hairline panel of rows, like the rest of the dossier.
+       No cards, no stripes: a row is a disclosure, state is a 7px dot. ── */
+    .fm-scope { color:var(--text-body); max-width:70ch; }
+    .fm-meta { flex-wrap:wrap; row-gap:0.25rem; }
+    .fm-viz { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:1.6rem; align-items:start; margin:1.2rem 0; }
+    @media (max-width:820px){ .fm-viz { grid-template-columns:1fr; } }
+    .fm-pb-row, .fm-pb-axis { display:grid; grid-template-columns:3.6rem minmax(0,1fr) 6.6rem; gap:0.6rem; align-items:center; }
+    .fm-pb-row { padding:0.32rem 0; }
+    .fm-pb-id, .fm-pb-val { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.8rem; }
+    .fm-pb-id { color:var(--muted); }
+    .fm-pb-val { color:var(--text-strong); white-space:nowrap; }
+    .fm-pb-track { display:flex; flex-direction:column; gap:3px; }
+    .fm-pb-bar, .fm-pb-rev { display:block; width:100%; transform-origin:left center; }
+    .fm-pb-bar { height:12px; }
+    .fm-pb-rev { height:4px; background:var(--text-body); opacity:0.55; }
+    .fm-pb-none { font-size:0.74rem; color:var(--muted); line-height:1.2; }
+    .fm-pb-axis { margin-top:0.3rem; border-top:1px solid var(--line); padding-top:0.25rem; font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:var(--muted); }
+    .fm-pb-ticks { display:flex; justify-content:space-between; }
+    .fm-fig { margin:0; }
+    .fm-fig figcaption { font-size:0.8rem; color:var(--muted); margin-bottom:0.35rem; }
+    .fm-fig svg { width:100%; height:auto; display:block; }
+    .fm-fig-m svg { max-width:340px; }
+    .fm-matrix .fm-c { fill:var(--surface); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-zone { fill:none; stroke:var(--text-body); stroke-width:1; opacity:0.6; }
+    .fm-matrix .vz-axis { font-size:10px; fill:var(--muted); font-family:'IBM Plex Sans',sans-serif; }
+    .fm-matrix .fm-pt { stroke:var(--surface); stroke-width:1.5; }
+    .fm-matrix .fm-pt-l { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; fill:var(--text-strong);
+      paint-order:stroke; stroke:var(--surface); stroke-width:3px; stroke-linejoin:round; }
+    .fm-sheet { border:1px solid var(--line); border-radius:4px; margin-top:0.8rem; }
+    .fm-head, .fm-row > summary { display:grid; grid-template-columns:4.2rem minmax(0,1fr) 4.4rem 4.6rem 3.4rem; gap:0.6rem; align-items:baseline; padding:0.6rem 0.9rem; }
+    .fm-head { font-size:0.74rem; color:var(--muted); border-bottom:1px solid var(--line); }
+    .fm-row { border-top:1px solid var(--line); }
+    .fm-row:first-of-type { border-top:0; }
+    .fm-row { scroll-margin-top:4.5rem; }
+    .fm-row > summary { cursor:pointer; list-style:none; }
+    .fm-row > summary::-webkit-details-marker { display:none; }
+    .fm-row > summary:hover { background:var(--surface-2); }
+    .fm-row > summary:focus-visible { outline:2px solid var(--cyan); outline-offset:-2px; }
+    .fm-id-cell, .fm-sod, .fm-rpn, .fm-rpn-rev { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.86rem; }
+    .fm-id-cell { color:var(--muted); }
+    .fm-mode { color:var(--text-strong); font-size:0.92rem; line-height:1.4; }
+    .fm-item { display:block; color:var(--muted); font-size:0.8rem; }
+    .fm-sod { color:var(--text-body); }
+    .fm-rpn { color:var(--text-strong); }
+    .fm-rpn-rev { color:var(--muted); }
+    .fm-dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:0.45rem; vertical-align:0.1em; }
+    .fm-body { padding:0.2rem 0.9rem 1rem 5.7rem; }
+    @media (max-width:640px){
+      .fm-head { display:none; }
+      .fm-row > summary { grid-template-columns:3.2rem minmax(0,1fr) auto; }
+      .fm-sod, .fm-rpn-rev { display:none; }
+      .fm-body { padding:0.2rem 0.9rem 1rem; }
+    }
+    .fm-kv { display:grid; grid-template-columns:9.5rem minmax(0,1fr); gap:0.3rem 0.9rem; margin:0.4rem 0 0.8rem; font-size:0.86rem; }
+    .fm-kv dt { color:var(--muted); }
+    .fm-kv dd { margin:0; color:var(--text-body); }
+    @media (max-width:640px){ .fm-kv { grid-template-columns:1fr; } .fm-kv dd { margin-bottom:0.4rem; } }
+    .fm-scores { margin:0 0 0.6rem; border-top:1px solid var(--line); }
+    .fm-sc { display:grid; grid-template-columns:3.2rem minmax(0,1fr); gap:0.6rem; padding:0.45rem 0; border-bottom:1px solid var(--line); font-size:0.86rem; }
+    .fm-sc dt { font-family:'JetBrains Mono',monospace; color:var(--muted); }
+    .fm-sc dt b { color:var(--text-strong); }
+    .fm-sc dd { margin:0; color:var(--text-body); }
+    .fm-sub { font-size:0.8rem; color:var(--muted); margin:0.7rem 0 0.25rem; }
+    .fm-sub b { color:var(--text-strong); }
+    .fm-acts, .fm-ev { margin:0; padding-left:1.1rem; font-size:0.86rem; color:var(--text-body); }
+    .fm-acts li, .fm-ev li { margin:0.25rem 0; }
+    .fm-residual { color:var(--red); }
+    .fm-revline { font-size:0.86rem; color:var(--text-body); margin:0.4rem 0 0; }
+    .fm-ev-src { display:block; font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:var(--muted); }
+    .fm-ev-src a { color:var(--cyan); }
+    .fm-ev-txt { display:block; }
+    .fm-method { margin-top:1rem; border:1px solid var(--line); border-radius:4px; }
+    .fm-method > summary { padding:0.6rem 0.9rem; cursor:pointer; font-size:0.92rem; color:var(--text-strong); }
+    .fm-method-body { padding:0 0.9rem 0.9rem; font-size:0.86rem; color:var(--text-body); }
+    .fm-rubrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
+    @media (max-width:760px){ .fm-rubrics { grid-template-columns:1fr; } }
+    .fm-rubric { width:100%; border-collapse:collapse; font-size:0.8rem; }
+    .fm-rubric td { padding:0.25rem 0.4rem; border-top:1px solid var(--line); vertical-align:top; }
+    .fm-rubric td:first-child { font-family:'JetBrains Mono',monospace; width:2rem; color:var(--text-strong); }
+
+    /* ── simulator (js/rz-fmea-sim.js). Hidden without JS; the static figures stand alone. ── */
+    .fm-sim { --fm-ease:cubic-bezier(.77,0,.175,1); }
+    .fm-replay, .fm-wi { border:1px solid var(--line); border-radius:4px; padding:0.8rem 0.9rem; margin:1rem 0; }
+    .fm-rp-bar { display:flex; align-items:center; gap:0.5rem; }
+    .fm-sim button { font:inherit; font-size:0.86rem; color:var(--text-strong); background:transparent;
+      border:1px solid var(--line); border-radius:4px; padding:0.35rem 0.7rem; cursor:pointer; }
+    .fm-sim button:focus-visible, .fm-sim input:focus-visible, .fm-pb-row:focus-visible, .fm-matrix .fm-pt:focus-visible { outline:2px solid var(--cyan); outline-offset:2px; }
+    .fm-sim button:disabled { opacity:0.45; cursor:default; }
+    .fm-sim button:active:not(:disabled) { transform:scale(0.97); transition:transform 120ms var(--fm-ease); }
+    @media (hover:hover) and (pointer:fine){ .fm-sim button:hover:not(:disabled) { background:var(--surface-2); } }
+    .fm-rp-play { min-width:5.6rem; }
+    .fm-rp-step { min-width:2.2rem; font-family:'JetBrains Mono',monospace; }
+    .fm-rp-track { flex:1; min-width:0; }
+    @media (max-width:640px){ .fm-rp-bar { flex-wrap:wrap; } .fm-rp-track { flex-basis:100%; order:-1; margin-bottom:0.5rem; } }
+    .fm-sim input[type=range] { width:100%; accent-color:var(--cyan); margin:0; }
+    .fm-rp-ticks { display:flex; align-items:flex-start; gap:2px; margin-top:4px; }
+    .fm-rp-ticks i { flex:1; height:3px; background:var(--line); transition:background-color 150ms ease; }
+    .fm-rp-ticks i.is-past { background:var(--muted); }
+    .fm-rp-ticks i.has-new { height:7px; }  /* a new failure mode appears at this event */
+    .fm-rp-ticks i.has-new.is-past { background:var(--text-strong); }
+    .fm-rp-meta { font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:var(--muted); margin:1rem 0 0.25rem; }
+    .fm-rp-ev { color:var(--text-strong); font-size:0.92rem; line-height:1.5; margin:0; min-height:4.5em; }
+    .fm-rp-new { list-style:none; margin:0.6rem 0 0; padding:0; display:grid; gap:0.35rem; }
+    .fm-rp-new button { display:block; width:100%; text-align:left; line-height:1.4; color:var(--text-body); }
+    .fm-rp-id { font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:var(--muted); margin-right:0.55rem; }
+    .fm-rp-none { font-size:0.86rem; color:var(--muted); }
+    .fm-rp-count { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.8rem; color:var(--text-body); margin:0.7rem 0 0; padding-top:0.55rem; border-top:1px solid var(--line); }
+    .fm-scn { margin:1rem 0 0; }
+    .fm-seg { display:inline-flex; flex-wrap:wrap; border:1px solid var(--line); border-radius:4px; overflow:hidden; }
+    .fm-sim .fm-seg button { border:0; border-radius:0; border-right:1px solid var(--line); color:var(--muted); }
+    .fm-sim .fm-seg button:last-child { border-right:0; }
+    .fm-sim .fm-seg button[aria-checked=true] { color:var(--text-strong); background:var(--surface-2); font-weight:600; }
+    .fm-scn-note { font-size:0.8rem; color:var(--muted); margin:0.45rem 0 0.6rem; }
+    .fm-readout { flex-wrap:wrap; row-gap:0.25rem; margin:0; }
+    @media (max-width:640px){
+      .fm-seg { display:grid; grid-template-columns:1fr 1fr; }
+      .fm-sim .fm-seg button:nth-child(2n) { border-right:0; }
+      .fm-sim .fm-seg button:nth-child(-n+2) { border-bottom:1px solid var(--line); }
+    }
+    .fm-sim.is-live .fm-pb-bar, .fm-sim.is-live .fm-pb-rev { transition:transform 200ms var(--fm-ease), opacity 150ms ease; }
+    .fm-sim.is-live .fm-pb-row { cursor:pointer; transition:opacity 150ms ease; }
+    @media (hover:hover) and (pointer:fine){ .fm-sim.is-live .fm-pb-row:hover { background:var(--surface-2); } }
+    .fm-pb-row[aria-current=true] { background:var(--surface-2); }
+    .fm-pb-row[aria-current=true] .fm-pb-id { color:var(--cyan); }
+    .fm-pb-ref { height:4px; background:var(--text-body); opacity:0.55; }
+    .is-dim { opacity:0.45; }
+    .fm-matrix .fm-pt { cursor:pointer; transition:opacity 150ms ease; }
+    .fm-matrix .fm-pt-l { transition:opacity 150ms ease; pointer-events:none; }
+    .fm-matrix .fm-pt.is-sel { stroke:var(--cyan); stroke-width:2.5; }
+    .fm-matrix .fm-wi-from { fill:none; stroke:var(--muted); stroke-width:1; stroke-dasharray:2 2; }
+    .fm-matrix .fm-wi-path { stroke:var(--cyan); stroke-width:1; stroke-dasharray:3 3; }
+    .fm-wi-head { display:flex; gap:0.7rem; align-items:baseline; }
+    .fm-wi-id { font-family:'JetBrains Mono',monospace; font-size:0.8rem; color:var(--cyan); }
+    .fm-wi-title { flex:1; color:var(--text-strong); font-size:0.92rem; line-height:1.4; }
+    .fm-wi-out { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.92rem; color:var(--text-body); margin:0.5rem 0 0.3rem; }
+    .fm-wi-out b { color:var(--text-strong); font-size:1rem; }
+    .fm-wi-row { display:grid; grid-template-columns:9rem minmax(0,1fr) 2rem; gap:0.2rem 0.9rem; align-items:center; padding:0.6rem 0; border-top:1px solid var(--line); }
+    .fm-wi-k { font-size:0.86rem; color:var(--muted); }
+    .fm-wi-v { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.92rem; color:var(--text-strong); text-align:right; }
+    .fm-wi-was { display:block; font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:var(--muted); }
+    .fm-wi-rub, .fm-wi-why { grid-column:2 / -1; margin:0; font-size:0.86rem; line-height:1.45; }
+    .fm-wi-rub { color:var(--text-strong); }
+    .fm-wi-why { color:var(--muted); }
+    @media (max-width:640px){ .fm-wi-row { grid-template-columns:minmax(0,1fr) 2rem; } .fm-wi-k { grid-column:1 / -1; } .fm-wi-rub, .fm-wi-why { grid-column:1 / -1; } }
+    @media (max-width:640px){ .fm-sim button, .fm-wi-open { min-height:44px; } .fm-sim input[type=range] { min-height:32px; } }
+    .fm-wi-head:focus-visible { outline:2px solid var(--cyan); outline-offset:4px; }
+    .fm-wi-acts { display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; padding-top:0.6rem; border-top:1px solid var(--line); }
+    .fm-wi-open { margin-top:0.8rem; font:inherit; font-size:0.86rem; color:var(--text-strong); background:transparent; border:1px solid var(--line); border-radius:4px; padding:0.35rem 0.7rem; cursor:pointer; }
+    .fm-facts { display:grid; grid-template-columns:repeat(auto-fit,minmax(13rem,1fr)); gap:0 1.6rem; margin:1rem 0 0; }
+    .fm-facts > div { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:0.8rem; align-items:baseline; padding:0.45rem 0; border-top:1px solid var(--line); }
+    .fm-facts dt { font-size:0.86rem; color:var(--text-body); }
+    .fm-facts dt small { display:block; font-size:0.74rem; color:var(--muted); }
+    .fm-facts dd { margin:0; font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; color:var(--text-strong); }
+    @media (prefers-reduced-motion:reduce){
+      .fm-sim.is-live .fm-pb-bar, .fm-sim.is-live .fm-pb-rev { transition:opacity 150ms ease; }
+      .fm-sim button:active:not(:disabled) { transform:none; }
+    }
+</style><script src="js/rz-fmea-sim.js?v=20261010-6843b03d" defer></script><style>
+    .rs-h { font-size:0.95rem; margin:1.4rem 0 0.2rem; color:var(--text-strong); font-family:'IBM Plex Sans',system-ui,sans-serif; font-weight:600; }
+    .rs-cap { color:var(--muted); font-size:0.8rem; margin:0 0 0.6rem; }
+    .rs-matrix { border:1px solid var(--line); border-radius:4px; font-size:0.84rem; }
+    .rs-mr { display:grid; grid-template-columns:minmax(9rem,1.1fr) repeat(3,minmax(0,2fr)); border-top:1px solid var(--line); }
+    .rs-mr:first-child { border-top:0; }
+    .rs-mhead { background:var(--surface-2); }
+    .rs-mh { font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); padding:0.5rem 0.7rem; }
+    .rs-role { padding:0.6rem 0.7rem; border-right:1px solid var(--line); }
+    .rs-role b { display:block; color:var(--text-strong); font-weight:600; }
+    .rs-role small { display:block; color:var(--muted); font-size:0.74rem; line-height:1.35; margin-top:0.15rem; }
+    .rs-mc { padding:0.55rem 0.7rem; border-right:1px solid var(--line); color:var(--text-body); }
+    .rs-mc:last-child { border-right:0; }
+    .rs-mc ul { list-style:none; margin:0; padding:0; display:grid; gap:0.45rem; }
+    .rs-mc li { line-height:1.4; }
+    .rs-mc time, .rs-rec time, .rs-at time { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); margin-right:0.45rem; white-space:nowrap; }
+    .rs-mc a, .rs-rec a, .rs-at a { text-decoration:none; }
+    .rs-mc a:hover time, .rs-rec a:hover time, .rs-at a:hover time { color:var(--amber); }
+    .rs-empty span { font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); opacity:0.7; }
+    .rs-roles { display:grid; grid-template-columns:13.5rem minmax(0,1fr); gap:0 1.4rem; border-top:1px solid var(--line); margin-top:0.3rem; }
+    .rs-tabs { display:flex; flex-direction:column; border-right:1px solid var(--line); padding:0.4rem 0; }
+    .rs-tabs button { display:flex; justify-content:space-between; align-items:center; gap:0.6rem; text-align:left; background:none; border:0; border-left:2px solid transparent; color:var(--muted); font:500 0.84rem 'IBM Plex Sans',system-ui,sans-serif; padding:0.5rem 0.7rem; cursor:pointer; min-height:44px; }
+    .rs-tabs button:hover { color:var(--text-strong); }
+    .rs-tabs button[aria-selected=true] { color:var(--text-strong); border-left-color:var(--amber); background:var(--surface-2); }
+    .rs-tabs button:focus-visible { outline:1px solid var(--amber); outline-offset:-1px; }
+    .rs-tc { font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; }
+    .rs-panel { padding:0.9rem 0 0.2rem; }
+    .rs-panel h3 { font:600 0.86rem 'IBM Plex Sans',system-ui,sans-serif; color:var(--text-strong); margin:1rem 0 0.4rem; }
+    .rs-panel h3 small { font-weight:400; color:var(--muted); font-size:0.76rem; margin-left:0.4rem; }
+    .rs-who { color:var(--text-body); font-size:0.88rem; margin:0; }
+    .rs-who b { color:var(--text-strong); font-weight:600; }
+    .rs-rec { list-style:none; margin:0; padding:0; display:grid; gap:0.5rem; font-size:0.86rem; }
+    .rs-rec li { display:grid; grid-template-columns:6.5rem 1fr; gap:0.6rem; color:var(--text-body); }
+    .rs-rec q { display:block; color:var(--muted); font-size:0.78rem; margin-top:0.15rem; quotes:'“' '”'; }
+    .rs-gap { color:var(--amber); font-size:0.86rem; margin:0; }
+    .rs-phases { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); border:1px solid var(--line); border-radius:4px; }
+    .rs-ph { padding:0.6rem 0.7rem; border-right:1px solid var(--line); }
+    .rs-ph:last-child { border-right:0; }
+    .rs-ph h4 { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin:0 0 0.45rem; font-weight:500; }
+    .rs-ph ul, .rs-modepb ul, .rs-at { list-style:none; margin:0; padding:0; display:grid; gap:0.55rem; font-size:0.82rem; color:var(--text-body); line-height:1.42; }
+    .rs-fm { font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); margin-right:0.4rem; text-decoration:none; }
+    .rs-fm:hover { color:var(--amber); }
+    .rs-none { color:var(--muted); }
+    .rs-basis { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:0.62rem; color:var(--muted); border:1px solid var(--line); border-radius:2px; padding:0 0.3rem; margin-left:0.35rem; white-space:nowrap; vertical-align:1px; }
+    .rs-basis-ev { color:var(--text-body); }
+    .rs-modepb { display:grid; gap:0.5rem; }
+    .rs-rolepb { gap:0.8rem; }
+    .rs-mp { display:grid; grid-template-columns:5.5rem 1fr; gap:0.6rem; }
+    .rs-mp-ph { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); padding-top:0.15rem; }
+    .rs-modepb b, .rs-at b { color:var(--text-strong); font-weight:600; margin-right:0.3rem; }
+    .soe .rs-tag { font-family:'JetBrains Mono',monospace; font-size:0.64rem; color:var(--muted); border:1px solid var(--line); border-radius:2px; padding:0 0.3rem; margin-left:0.35rem; white-space:nowrap; }
+    @media (max-width: 900px) {
+        .rs-phases { grid-template-columns:repeat(2,minmax(0,1fr)); }
+        .rs-ph:nth-child(2) { border-right:0; }
+        .rs-ph:nth-child(-n+2) { border-bottom:1px solid var(--line); }
+    }
+    @media (max-width: 720px) {
+        .rs-mhead { display:none; }
+        .rs-mr { grid-template-columns:1fr; }
+        .rs-role { border-right:0; border-bottom:1px solid var(--line); background:var(--surface-2); }
+        .rs-mc { border-right:0; }
+        .rs-mc::before { content:attr(data-phase); display:block; font-family:'JetBrains Mono',monospace; font-size:0.62rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin-bottom:0.25rem; }
+        .rs-empty { display:none; }
+        .rs-phases { grid-template-columns:1fr; }
+        .rs-ph { border-right:0; border-bottom:1px solid var(--line); }
+        .rs-ph:last-child { border-bottom:0; }
+        .rs-rec li { grid-template-columns:1fr; gap:0.1rem; }
+        .rs-mp { grid-template-columns:1fr; gap:0.2rem; }
+        .rs-roles { grid-template-columns:1fr; }
+        .rs-tabs { flex-direction:row; overflow-x:auto; border-right:0; border-bottom:1px solid var(--line); padding:0; scrollbar-width:thin; }
+        .rs-tabs button { white-space:nowrap; border-left:0; border-bottom:2px solid transparent; }
+        .rs-tabs button[aria-selected=true] { border-bottom-color:var(--amber); }
+    }
+
+    .vh { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+    .inc-nav { position:sticky; top:var(--rz-nav-h,53px); z-index:40; background:var(--bg); border-bottom:1px solid var(--line); margin:1rem -1.1rem 0; }
+    .inc-nav-in { max-width:820px; margin:0 auto; display:flex; gap:1.4rem; overflow-x:auto; scrollbar-width:none; padding:0 1.1rem; }
+    .inc-nav-in::-webkit-scrollbar { display:none; }
+    .inc-nav a { font-family:'JetBrains Mono',monospace; font-size:0.74rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); text-decoration:none; padding:0.75rem 0 0.65rem; border-bottom:2px solid transparent; white-space:nowrap; min-height:44px; box-sizing:border-box; display:inline-flex; align-items:center; }
+    .inc-nav a:hover { color:var(--text-strong); }
+    .inc-nav a[aria-current=true] { color:var(--text-strong); border-bottom-color:var(--amber); }
+    .inc-nav a:focus-visible { outline:1px solid var(--amber); outline-offset:-1px; }
+    .inc-sec { scroll-margin-top:112px; padding-top:0.4rem; }
+    .inc-sec h2 { scroll-margin-top:112px; }
+    .inc-h3 { font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:0.95rem; font-weight:600; color:var(--text-strong); margin:1.6rem 0 0.5rem; }
+    .reading-col ul.tight li { text-align:left; -webkit-hyphens:manual; hyphens:manual; }
+    .facts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); margin:1.1rem 0 0; border-top:1px solid var(--line); }
+    .facts > div { padding:0.65rem 0.9rem 0.7rem 0; border-bottom:1px solid var(--line); }
+    .facts dt { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); }
+    .facts dd { margin:0.2rem 0 0; color:var(--text-body); font-size:0.86rem; line-height:1.45; }
+    .inc-fig { margin:0.4rem 0 0; --bg1:var(--surface); --bg3:var(--surface-2); --t1:var(--text-strong); --t2:var(--text-body); --t3:var(--muted); --bd:var(--line); --bd2:color-mix(in srgb, var(--text) 30%, transparent); --o:var(--amber); --c:var(--cyan); --g:var(--green); --r:var(--red); }
+    .inc-fig-scroll { overflow-x:auto; border:1px solid var(--line); border-radius:4px; background:var(--surface); }
+    .inc-fig-svg svg { display:block; width:100%; height:auto; }
+    .inc-fig-svg.fig-narrow { display:none; }
+    @media (max-width: 640px) { .inc-fig-svg.fig-wide { display:none; } .inc-fig-svg.fig-narrow { display:block; } }
+    .inc-fig figcaption { color:var(--muted); font-size:0.78rem; margin-top:0.45rem; line-height:1.45; }
+    .mag-row { display:grid; grid-template-columns:240px 1fr; gap:1.2rem; align-items:center; margin-top:1.4rem; }
+    .mag-row .viz { margin:0; }
+    details.inc-more { border-top:1px solid var(--line); margin-top:0.2rem; }
+    details.inc-more:last-of-type { border-bottom:1px solid var(--line); }
+    details.inc-more > summary { cursor:pointer; list-style:none; padding:0.7rem 0; color:var(--text-strong); font-weight:600; font-size:0.9rem; display:flex; gap:0.6rem; align-items:baseline; min-height:44px; box-sizing:border-box; }
+    details.inc-more > summary::-webkit-details-marker { display:none; }
+    details.inc-more > summary::before { content:"+"; font-family:'JetBrains Mono',monospace; color:var(--muted); width:0.8em; }
+    details.inc-more[open] > summary::before { content:"\2212"; }
+    details.inc-more > p, details.inc-more > .card, details.inc-more > .table-wrap { margin:0 0 0.9rem; color:var(--text-body); font-size:0.9rem; }
+    table.coe { width:100%; border-collapse:collapse; font-size:0.86rem; }
+    table.coe th { text-align:left; font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); padding:0.55rem 0.7rem; border-bottom:1px solid var(--line); font-weight:500; }
+    table.coe td { padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); color:var(--text-body); vertical-align:top; line-height:1.45; }
+    table.coe tr:last-child td { border-bottom:0; }
+    table.coe .c-own { color:var(--text-strong); width:22%; }
+    table.coe .c-st { color:var(--muted); font-size:0.8rem; width:32%; }
+    .soe li:target { background:var(--surface-2); }
+    @media (max-width: 720px) {
+        .facts { grid-template-columns:1fr 1fr; }
+        .mag-row { grid-template-columns:1fr; }
+        table.coe thead { display:none; }
+        table.coe tr { display:block; padding:0.55rem 0.7rem; border-bottom:1px solid var(--line); }
+        table.coe td { display:block; padding:0.1rem 0; border:0; width:auto !important; }
+        .inc-nav { margin:1rem -1.1rem 0; }
+    }
+</style>
+</head>
+<body class="locked">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <nav class="navbar"><div class="nav-container">
+        <a href="index.html" class="nav-logo"><img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dc-incidents.html">DC Incidents</a></li>
+            <li><a href="datacenter-solutions.html">DC Solutions</a></li>
+        </ul>
+        <div class="nav-right">
+            <span class="lock-tag" title="Root-only module">ROOT</span>
+            <button class="theme-btn" id="themeToggle" type="button" aria-label="Toggle theme">◐</button>
+        </div>
+    </div></nav>
+    <main class="wrap" id="main-content">
+        <div class="reading-col">
+        <a class="backlink" href="dc-incidents.html">← All incidents</a>
+        <div class="eyebrow">Incident dossier · Rank #40 · magnitude 4.7</div>
+        <h1>Google Cloud europe-west4-a: Grid Transient, DRUPS Failure and Chiller Shutdown</h1>
+        <div class="chips">
+            <span class="chip">Google Cloud (data center provider not named)</span>
+            <span class="chip cyan">2026-07-15</span>
+            <span class="chip amber" title="Customer disruption from 16:39 PDT 15 Jul → 07:34 PDT 16 Jul (14 h 55 min)">14h 55m to substantial restoration</span>
+            <span class="chip amber">Power</span><span class="chip cyan">Cooling</span>
+        </div>
+        </div>
+        <nav class="inc-nav" aria-label="Dossier sections"><div class="inc-nav-in"><a href="#summary">Summary</a><a href="#timeline">Timeline</a><a href="#response">Response</a><a href="#fmea">FMEA</a><a href="#causes">Causes</a><a href="#actions">Actions</a><a href="#sources">Sources</a></div></nav>
+        <div class="reading-col">
+
+        <section class="inc-sec" id="summary" aria-labelledby="h-summary">
+        <h2 id="h-summary" class="vh">Summary</h2>
+        <p class="lede">On 15 July 2026 a 3 ms grid transient tripped both utility feeds at the facility hosting Google Cloud zone europe-west4-a. The side A rotary UPS failed, one row lost power on transfer, and the chiller controller dropped out so the pumps stopped while the backup cooling was out for construction. The hall reached 44°C and equipment was shut down; customer disruption lasted 14 hours 55 minutes.</p>
+        <dl class="facts">
+            <div><dt>Users affected</dt><dd>24 VMware Engine private clouds of 20 customers, 9 Bare Metal Solution customers, and NetApp Volumes customers on all 6 clusters in europe-west4-a.</dd></div>
+            <div><dt>Duration</dt><dd>14h 55m — Customer disruption from 16:39 PDT 15 Jul → 07:34 PDT 16 Jul (14 h 55 min)</dd></div>
+            <div><dt>Financial</dt><dd>Not disclosed</dd></div>
+            <div><dt>Scope</dt><dd>Single data hall: power loss to one row and hall-wide thermal shutdown</dd></div>
+            <div><dt>Site</dt><dd>Facility hosting zone europe-west4-a · Site not named, Netherlands, europe-west4-a</dd></div>
+            <div><dt>Services down</dt><dd>Google Cloud VMware Engine, Bare Metal Solution, Google Cloud NetApp Volumes</dd></div>
+        </dl>
+        <h3 class="inc-h3">How the defences failed</h3><figure class="inc-fig"><div class="inc-fig-scroll"><div class="inc-fig-svg fig-wide" style="max-width:692px;min-width:554px"><svg viewBox="0 0 692 684" role="img" aria-labelledby="fc-gcp-europe-west4-a-drups-title fc-gcp-europe-west4-a-drups-desc" preserveAspectRatio="xMidYMid meet"><title id="fc-gcp-europe-west4-a-drups-title">How the defences failed — Google Cloud</title><desc id="fc-gcp-europe-west4-a-drups-desc">5 failure modes in the order the sequence of events first shows them, 0 latent conditions with no moment in the record, ending in the outcome: Hall at 44°C · 14 h 55 min.</desc><defs><marker id="fc-gcp-europe-west4-a-drups-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="var(--t2)"/></marker></defs><rect width="692" height="684" fill="var(--bg1)"/><rect x="12" y="24" width="656" height="438" rx="8" fill="none" stroke="var(--bd)" stroke-width="1.4"/><path d="M 312 106 L 368 106" fill="none" stroke="var(--t1)" stroke-width="1" marker-end="url(#fc-gcp-europe-west4-a-drups-arrow)" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 512 158 L 512 198" fill="none" stroke="var(--t1)" stroke-width="1" marker-end="url(#fc-gcp-europe-west4-a-drups-arrow)" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 368 250 L 312 250" fill="none" stroke="var(--t1)" stroke-width="1" marker-end="url(#fc-gcp-europe-west4-a-drups-arrow)" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 168 302 L 168 342" fill="none" stroke="var(--t1)" stroke-width="1" marker-end="url(#fc-gcp-europe-west4-a-drups-arrow)" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 168 446 L 168 451 A 5 5 0 0 0 173 456 L 335 456 A 5 5 0 0 1 340 461 L 340 510" fill="none" stroke="var(--t1)" stroke-width="1" marker-end="url(#fc-gcp-europe-west4-a-drups-arrow)" data-rzd-transit="0" data-rzd-rerouted="0"/><rect x="24" y="54" width="288" height="104" rx="6" fill="var(--bg1)"/><rect x="24" y="54" width="288" height="104" rx="6" fill="var(--bg1)" stroke="var(--t2)" stroke-width="1"/><rect x="36" y="66" width="115" height="12" rx="2" fill="none" stroke="var(--t2)" stroke-width="0.8" opacity="0.5"/><g class="rzd-sym" transform="translate(154,84) scale(0.5833333333333334)" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="26" height="28" rx="2" /><path d="M6 36 L28 12" stroke-width="1.2" /><path d="M9 18 q3 -4 6 0 q3 4 6 0" stroke-width="1.4" /><path d="M10 28 H22 M10 32 H18" stroke-width="1.4" /><rect x="34" y="14" width="10" height="20" rx="1.5" /><path d="M34 22 H44 M34 27 H44" stroke-width="1.2" /><path d="M37 14 v-3 h4" stroke-width="1.3" /><path d="M30 24 H34" stroke-width="1.4" /></g><rect x="368" y="54" width="288" height="104" rx="6" fill="var(--bg1)"/><rect x="368" y="54" width="288" height="104" rx="6" fill="var(--bg3)" stroke="var(--r)" stroke-width="1.4"/><rect x="380" y="66" width="115" height="12" rx="2" fill="none" stroke="var(--r)" stroke-width="0.8" opacity="0.5"/><g class="rzd-sym" transform="translate(498,84) scale(0.5833333333333334)" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="24" cy="12" r="7" /><path d="M21 12 L27 8 V16 Z" stroke-width="1.3" /><rect x="7" y="22" width="34" height="8" rx="4" /><rect x="7" y="34" width="34" height="8" rx="4" /><path d="M15 19 V22 M33 19 V22 M15 30 V34 M33 30 V34" stroke-width="1.3" /></g><rect x="368" y="198" width="288" height="104" rx="6" fill="var(--bg1)"/><rect x="368" y="198" width="288" height="104" rx="6" fill="var(--bg1)" stroke="var(--t2)" stroke-width="1" stroke-dasharray="4,3"/><rect x="380" y="210" width="115" height="12" rx="2" fill="none" stroke="var(--t2)" stroke-width="0.8" opacity="0.5"/><g class="rzd-sym" transform="translate(498,228) scale(0.5833333333333334)" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 43 C17 27 17 21 13 6 H35 C31 21 31 27 37 43 Z" /><circle cx="24" cy="12" r="5" stroke-width="1.4" /><path d="M19 12 H29 M24 7 V17" stroke-width="1.4" /><path d="M15 30 H33 M14 36 H34" stroke-width="1.2" /></g><rect x="24" y="198" width="288" height="104" rx="6" fill="var(--bg1)"/><rect x="24" y="198" width="288" height="104" rx="6" fill="var(--bg1)" stroke="var(--t2)" stroke-width="1"/><rect x="36" y="210" width="115" height="12" rx="2" fill="none" stroke="var(--t2)" stroke-width="0.8" opacity="0.5"/><g class="rzd-sym" transform="translate(154,228) scale(0.5833333333333334)" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M24 4 V15 M24 33 V44" stroke-width="1.8" /><rect x="16" y="15" width="16" height="18" rx="1" /><path d="M18 17 L30 31 M30 17 L18 31" stroke-width="1.6" /></g><rect x="24" y="342" width="288" height="104" rx="6" fill="var(--bg1)"/><rect x="24" y="342" width="288" height="104" rx="6" fill="var(--bg1)" stroke="var(--t2)" stroke-width="1"/><rect x="36" y="354" width="115" height="12" rx="2" fill="none" stroke="var(--t2)" stroke-width="0.8" opacity="0.5"/><g class="rzd-sym" transform="translate(154,372) scale(0.5833333333333334)" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="10" y="4" width="28" height="40" rx="2" /><path d="M15 4 V44 M33 4 V44" stroke-width="1.1" /><path d="M15 11 H33 M15 17 H33 M15 23 H33 M15 29 H33 M15 35 H33" stroke-width="1.2" /><circle cx="30" cy="14" r="1.2" fill="var(--t2)" stroke="none" /><circle cx="30" cy="26" r="1.2" fill="var(--t2)" stroke="none" /></g><rect x="196" y="510" width="288" height="60" rx="6" fill="var(--bg1)"/><rect x="196" y="510" width="288" height="60" rx="6" fill="var(--bg3)" stroke="var(--o)" stroke-width="1.4"/><rect x="208" y="522" width="59" height="12" rx="2" fill="none" stroke="var(--o)" stroke-width="0.8" opacity="0.5"/><text x="24" y="38" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" style="font-variant-numeric:tabular-nums">ACTIVE — IN THE ORDER THE RECORD SHOWS THEM</text><text x="93.5" y="74.5" fill="var(--t2)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">FM-01 · RPN 224</text><text x="168" y="126" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">DRUPS A fails</text><text x="168" y="140" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="400" text-anchor="middle" style="font-variant-numeric:tabular-nums">S8 · O4 · D7</text><text x="437.5" y="74.5" fill="var(--r)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">FM-03 · RPN 144</text><text x="512" y="126" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Chiller pumps stop</text><text x="512" y="140" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="400" text-anchor="middle" style="font-variant-numeric:tabular-nums">S9 · O4 · D4</text><text x="437.5" y="218.5" fill="var(--t2)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">FM-04 · RPN 280</text><text x="512" y="270" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Backup cooling offline</text><text x="512" y="284" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="400" text-anchor="middle" style="font-variant-numeric:tabular-nums">S8 · O5 · D7</text><text x="93.5" y="218.5" fill="var(--t2)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">FM-02 · RPN 224</text><text x="168" y="270" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Row 3 overload trip</text><text x="168" y="284" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="400" text-anchor="middle" style="font-variant-numeric:tabular-nums">S7 · O4 · D8</text><text x="93.5" y="362.5" fill="var(--t2)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">FM-05 · RPN 105</text><text x="168" y="414" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Slow thermal recovery</text><text x="168" y="428" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="400" text-anchor="middle" style="font-variant-numeric:tabular-nums">S7 · O5 · D3</text><text x="237.5" y="530.5" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">OUTCOME</text><text x="340" y="550" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Hall at 44°C · 14 h 55 min</text><line x1="24" y1="620" x2="668" y2="620" stroke="var(--bd)" stroke-width="0.8"/><text x="24" y="636" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" style="font-variant-numeric:tabular-nums">LEGEND</text><rect x="24" y="646" width="14" height="10" rx="2" fill="var(--bg1)" stroke="var(--t2)" stroke-width="1.4"/><text x="46" y="654" fill="var(--t2)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="9" font-weight="400">Medium or low priority</text><rect x="167.0234" y="646" width="14" height="10" rx="2" fill="var(--bg3)" stroke="var(--r)" stroke-width="1.4"/><text x="189.0234" y="654" fill="var(--t2)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="9" font-weight="400">High priority</text><rect x="270.1138" y="646" width="14" height="10" rx="2" fill="var(--bg1)" stroke="var(--t2)" stroke-width="1.4" stroke-dasharray="3,2"/><text x="292.1138" y="654" fill="var(--t2)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="9" font-weight="400">Medium or low priority, no published action</text><line x1="506.3141999999999" y1="651" x2="522.3141999999999" y2="651" stroke="var(--t1)" stroke-width="1.4"/><text x="528.3141999999999" y="654" fill="var(--t2)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="9" font-weight="400">Next failure in the record</text></svg></div><div class="inc-fig-svg fig-narrow" style="max-width:348px;min-width:279px"><svg viewBox="0 0 348 1016" role="img" aria-labelledby="fn-gcp-europe-west4-a-drups-title fn-gcp-europe-west4-a-drups-desc" preserveAspectRatio="xMidYMid meet"><title id="fn-gcp-europe-west4-a-drups-title">How the defences failed — Google Cloud</title><desc id="fn-gcp-europe-west4-a-drups-desc">5 failure modes in the order the sequence of events first shows them, 0 latent conditions with no moment in the record, ending in the outcome: Hall at 44°C · 14 h 55 min.</desc><defs><marker id="fn-gcp-europe-west4-a-drups-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="var(--t2)"/></marker></defs><rect width="348" height="1016" fill="var(--bg1)"/><rect x="12" y="24" width="312" height="726" rx="8" fill="none" stroke="var(--bd)" stroke-width="1.4"/><path d="M 168 158 L 168 198" fill="none" stroke="var(--t1)" stroke-width="1" marker-end="url(#fn-gcp-europe-west4-a-drups-arrow)" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 168 302 L 168 342" fill="none" stroke="var(--t1)" stroke-width="1" marker-end="url(#fn-gcp-europe-west4-a-drups-arrow)" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 168 446 L 168 486" fill="none" stroke="var(--t1)" stroke-width="1" marker-end="url(#fn-gcp-europe-west4-a-drups-arrow)" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 168 590 L 168 630" fill="none" stroke="var(--t1)" stroke-width="1" marker-end="url(#fn-gcp-europe-west4-a-drups-arrow)" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 168 734 L 168 798" fill="none" stroke="var(--t1)" stroke-width="1" marker-end="url(#fn-gcp-europe-west4-a-drups-arrow)" data-rzd-transit="0" data-rzd-rerouted="0"/><rect x="24" y="54" width="288" height="104" rx="6" fill="var(--bg1)"/><rect x="24" y="54" width="288" height="104" rx="6" fill="var(--bg1)" stroke="var(--t2)" stroke-width="1"/><rect x="36" y="66" width="115" height="12" rx="2" fill="none" stroke="var(--t2)" stroke-width="0.8" opacity="0.5"/><g class="rzd-sym" transform="translate(154,84) scale(0.5833333333333334)" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="10" width="26" height="28" rx="2" /><path d="M6 36 L28 12" stroke-width="1.2" /><path d="M9 18 q3 -4 6 0 q3 4 6 0" stroke-width="1.4" /><path d="M10 28 H22 M10 32 H18" stroke-width="1.4" /><rect x="34" y="14" width="10" height="20" rx="1.5" /><path d="M34 22 H44 M34 27 H44" stroke-width="1.2" /><path d="M37 14 v-3 h4" stroke-width="1.3" /><path d="M30 24 H34" stroke-width="1.4" /></g><rect x="24" y="198" width="288" height="104" rx="6" fill="var(--bg1)"/><rect x="24" y="198" width="288" height="104" rx="6" fill="var(--bg3)" stroke="var(--r)" stroke-width="1.4"/><rect x="36" y="210" width="115" height="12" rx="2" fill="none" stroke="var(--r)" stroke-width="0.8" opacity="0.5"/><g class="rzd-sym" transform="translate(154,228) scale(0.5833333333333334)" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="24" cy="12" r="7" /><path d="M21 12 L27 8 V16 Z" stroke-width="1.3" /><rect x="7" y="22" width="34" height="8" rx="4" /><rect x="7" y="34" width="34" height="8" rx="4" /><path d="M15 19 V22 M33 19 V22 M15 30 V34 M33 30 V34" stroke-width="1.3" /></g><rect x="24" y="342" width="288" height="104" rx="6" fill="var(--bg1)"/><rect x="24" y="342" width="288" height="104" rx="6" fill="var(--bg1)" stroke="var(--t2)" stroke-width="1" stroke-dasharray="4,3"/><rect x="36" y="354" width="115" height="12" rx="2" fill="none" stroke="var(--t2)" stroke-width="0.8" opacity="0.5"/><g class="rzd-sym" transform="translate(154,372) scale(0.5833333333333334)" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 43 C17 27 17 21 13 6 H35 C31 21 31 27 37 43 Z" /><circle cx="24" cy="12" r="5" stroke-width="1.4" /><path d="M19 12 H29 M24 7 V17" stroke-width="1.4" /><path d="M15 30 H33 M14 36 H34" stroke-width="1.2" /></g><rect x="24" y="486" width="288" height="104" rx="6" fill="var(--bg1)"/><rect x="24" y="486" width="288" height="104" rx="6" fill="var(--bg1)" stroke="var(--t2)" stroke-width="1"/><rect x="36" y="498" width="115" height="12" rx="2" fill="none" stroke="var(--t2)" stroke-width="0.8" opacity="0.5"/><g class="rzd-sym" transform="translate(154,516) scale(0.5833333333333334)" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M24 4 V15 M24 33 V44" stroke-width="1.8" /><rect x="16" y="15" width="16" height="18" rx="1" /><path d="M18 17 L30 31 M30 17 L18 31" stroke-width="1.6" /></g><rect x="24" y="630" width="288" height="104" rx="6" fill="var(--bg1)"/><rect x="24" y="630" width="288" height="104" rx="6" fill="var(--bg1)" stroke="var(--t2)" stroke-width="1"/><rect x="36" y="642" width="115" height="12" rx="2" fill="none" stroke="var(--t2)" stroke-width="0.8" opacity="0.5"/><g class="rzd-sym" transform="translate(154,660) scale(0.5833333333333334)" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="10" y="4" width="28" height="40" rx="2" /><path d="M15 4 V44 M33 4 V44" stroke-width="1.1" /><path d="M15 11 H33 M15 17 H33 M15 23 H33 M15 29 H33 M15 35 H33" stroke-width="1.2" /><circle cx="30" cy="14" r="1.2" fill="var(--t2)" stroke="none" /><circle cx="30" cy="26" r="1.2" fill="var(--t2)" stroke="none" /></g><rect x="24" y="798" width="288" height="60" rx="6" fill="var(--bg1)"/><rect x="24" y="798" width="288" height="60" rx="6" fill="var(--bg3)" stroke="var(--o)" stroke-width="1.4"/><rect x="36" y="810" width="59" height="12" rx="2" fill="none" stroke="var(--o)" stroke-width="0.8" opacity="0.5"/><text x="24" y="38" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" style="font-variant-numeric:tabular-nums">ACTIVE — RECORD ORDER</text><text x="93.5" y="74.5" fill="var(--t2)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">FM-01 · RPN 224</text><text x="168" y="126" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">DRUPS A fails</text><text x="168" y="140" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="400" text-anchor="middle" style="font-variant-numeric:tabular-nums">S8 · O4 · D7</text><text x="93.5" y="218.5" fill="var(--r)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">FM-03 · RPN 144</text><text x="168" y="270" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Chiller pumps stop</text><text x="168" y="284" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="400" text-anchor="middle" style="font-variant-numeric:tabular-nums">S9 · O4 · D4</text><text x="93.5" y="362.5" fill="var(--t2)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">FM-04 · RPN 280</text><text x="168" y="414" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Backup cooling offline</text><text x="168" y="428" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="400" text-anchor="middle" style="font-variant-numeric:tabular-nums">S8 · O5 · D7</text><text x="93.5" y="506.5" fill="var(--t2)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">FM-02 · RPN 224</text><text x="168" y="558" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Row 3 overload trip</text><text x="168" y="572" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="400" text-anchor="middle" style="font-variant-numeric:tabular-nums">S7 · O4 · D8</text><text x="93.5" y="650.5" fill="var(--t2)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">FM-05 · RPN 105</text><text x="168" y="702" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Slow thermal recovery</text><text x="168" y="716" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="400" text-anchor="middle" style="font-variant-numeric:tabular-nums">S7 · O5 · D3</text><text x="65.5" y="818.5" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">OUTCOME</text><text x="168" y="838" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Hall at 44°C · 14 h 55 min</text><line x1="24" y1="908" x2="324" y2="908" stroke="var(--bd)" stroke-width="0.8"/><text x="24" y="924" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" style="font-variant-numeric:tabular-nums">LEGEND</text><rect x="24" y="934" width="14" height="10" rx="2" fill="var(--bg1)" stroke="var(--t2)" stroke-width="1.4"/><text x="46" y="942" fill="var(--t2)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="9" font-weight="400">Medium or low priority</text><rect x="167.0234" y="934" width="14" height="10" rx="2" fill="var(--bg3)" stroke="var(--r)" stroke-width="1.4"/><text x="189.0234" y="942" fill="var(--t2)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="9" font-weight="400">High priority</text><rect x="24" y="956" width="14" height="10" rx="2" fill="var(--bg1)" stroke="var(--t2)" stroke-width="1.4" stroke-dasharray="3,2"/><text x="46" y="964" fill="var(--t2)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="9" font-weight="400">Medium or low priority, no published action</text><line x1="24" y1="983" x2="40" y2="983" stroke="var(--t1)" stroke-width="1.4"/><text x="46" y="986" fill="var(--t2)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="9" font-weight="400">Next failure in the record</text></svg></div></div><figcaption>Every failure mode of the FMEA below. Active modes run in the order the sequence of events first shows them — record order, not a proof of cause; latent modes were in place before the event. Red outline: high priority. Dashed: no published corrective action.</figcaption></figure>
+        <div class="mag-row">
+            <div class="mag-viz"><div class="viz viz-radar"><svg viewBox="0 0 290 215" role="img" aria-label="Magnitude sub-scores radar chart"><title>Magnitude sub-scores (0–10)</title><polygon class="vz-grid" points="145.0,83.2 166.8,105.0 145.0,126.8 123.2,105.0"/><polygon class="vz-grid" points="145.0,62.1 187.9,105.0 145.0,147.9 102.1,105.0"/><polygon class="vz-grid" points="145.0,41.0 209.0,105.0 145.0,169.0 81.0,105.0"/><line class="vz-grid" x1="145" y1="105" x2="145.0" y2="41.0"/><line class="vz-grid" x1="145" y1="105" x2="209.0" y2="105.0"/><line class="vz-grid" x1="145" y1="105" x2="145.0" y2="169.0"/><line class="vz-grid" x1="145" y1="105" x2="81.0" y2="105.0"/><polygon class="vz-accent-fill" points="145.0,73.0 170.6,105.0 145.0,143.4 119.4,105.0"><title>Magnitude sub-scores (0–10)</title></polygon><circle class="vz-accent-dot" cx="145.0" cy="73.0" r="2.4"/><circle class="vz-accent-dot" cx="170.6" cy="105.0" r="2.4"/><circle class="vz-accent-dot" cx="145.0" cy="143.4" r="2.4"/><circle class="vz-accent-dot" cx="119.4" cy="105.0" r="2.4"/><text class="vz-lbl vz-num" x="145.0" y="20.0" text-anchor="middle">Users 5<title>Users affected (0–10) — breadth of the user/customer population impacted. — scored 5/10.</title></text><text class="vz-lbl vz-num" x="223.0" y="109.0" text-anchor="start">Financial 4<title>Financial impact (0–10) — direct + consequential cost. — scored 4/10.</title></text><text class="vz-lbl vz-num" x="145.0" y="198.0" text-anchor="middle">Duration 6<title>Outage duration (0–10), from the measured duration by fixed bands: &lt;1 h 3 · 1–4 h 4 · 4–12 h 5 · 12–24 h 6 · 1–3 d 7 · 3–7 d 8 · 7–30 d 9 · &gt;30 d 10; no customer downtime 1. — scored 6/10.</title></text><text class="vz-lbl vz-num" x="67.0" y="109.0" text-anchor="end">Blast 4<title>Blast radius (0–10) — how wide the fault propagated across systems/regions. — scored 4/10.</title></text></svg></div></div>
+            <div class="mag-txt"><div class="mag-trace">Magnitude <b>4.7</b> = blast 4×0.35 + users 5×0.25 + financial 4×0.20 + duration 6×0.20 <span style="opacity:0.7">(sub-scores 0–10 · weighted composite)</span></div><p class="disclaimer">One data hall serving three specialised products; 33 named customers plus NetApp Volumes users. Duration (6): 14 h 55 min, inside the 12–24 h band. No cost is disclosed, so financial is judged moderate.</p></div>
+        </div>
+        <details class="inc-more"><summary>All 9 impact metrics</summary><div class="table-wrap"><table class="metrics"><tbody><tr><td class="mlabel">Utility voltage transient</td><td class="mval">3 ms, on both feeds A and B</td></tr><tr><td class="mlabel">Peak data hall temperature</td><td class="mval">44°C at 18:29 PDT</td></tr><tr><td class="mlabel">Power event to 44°C</td><td class="mval">2 hours 5 minutes (16:24 → 18:29 PDT)</td></tr><tr><td class="mlabel">Cooling lost</td><td class="mval">about 4 hours 41 minutes (16:24 → 21:05 PDT)</td></tr><tr><td class="mlabel">Total customer disruption</td><td class="mval">14 hours 55 minutes (16:39 15 Jul → 07:34 16 Jul PDT)</td></tr><tr><td class="mlabel">VMware Engine customers affected</td><td class="mval">24 private clouds of 20 customers</td></tr><tr><td class="mlabel">Bare Metal Solution customers affected</td><td class="mval">9 customers</td></tr><tr><td class="mlabel">NetApp clusters shut down</td><td class="mval">all 6</td></tr><tr><td class="mlabel">Rows on feed A that had to transfer</td><td class="mval">3; Rows 1 and 2 transferred, Row 3 lost power</td></tr></tbody></table></div></details>
+        </section>
+
+        <section class="inc-sec" id="timeline" aria-labelledby="h-timeline">
+        <h2 id="h-timeline">Sequence of events</h2>
+        <ol class="soe"><li id="soe-1"><time>2026-07-15 16:24 PDT</time><span class="ev"><span class="phase-chip">TRIGGER</span> An electrical fault occurred on the utility grid upstream of the data center: a 3 ms voltage transient hits both utility feeds A and B, both utility breakers trip and the site transfers to its diesel rotary UPS (DRUPS).<span class="rs-tag">Utility / grid operator</span></span></li><li id="soe-2"><time>2026-07-15 16:24 PDT</time><span class="ev"><span class="phase-chip">TRIGGER</span> Side B transfers to DRUPS without interruption. The DRUPS for side A fails to take over the load because of electrical component failures.</span></li><li id="soe-3"><time>2026-07-15 16:24 PDT</time><span class="ev"><span class="phase-chip">TRIGGER</span> The chiller controller drops offline during the transient, so the chilled-water distribution pumps stop and cannot restart and chiller system A shuts down. The redundant cooling source is out of service because of known ongoing construction work.</span></li><li id="soe-4"><time>2026-07-15 16:30 PDT</time><span class="ev"><span class="phase-chip">DETECTION</span> Google engineers were alerted to the infrastructure power loss by automated monitoring; the VMware Engine power-monitoring alert fires.<span class="rs-tag">Operations lead</span></span></li><li id="soe-5"><time>2026-07-15 16:32 PDT</time><span class="ev"><span class="phase-chip">DETECTION</span> NetApp&#x27;s remote facility monitoring alerts on high temperature and network switch failure.</span></li><li id="soe-6"><time>2026-07-15 16:37 PDT</time><span class="ev"><span class="phase-chip">CASCADE</span> The three rows on feed A transfer to feed B. Rows 1 and 2 transfer; Row 3 fails to transfer because an overload protection breaker trips, and loses both feeds.</span></li><li id="soe-7"><time>2026-07-15 16:39 PDT</time><span class="ev"><span class="phase-chip">IMPACT</span> Customer disruption begins in europe-west4-a for VMware Engine, Bare Metal Solution and NetApp Volumes.</span></li><li id="soe-8"><time>2026-07-15 17:05 PDT</time><span class="ev"><span class="phase-chip">IMPACT</span> Network switch temperature alerts above 60°C trigger as the hall heats without chilled-water flow.</span></li><li id="soe-9"><time>2026-07-15 17:32 PDT</time><span class="ev"><span class="phase-chip">CASCADE</span> All 6 NetApp clusters shut down automatically because of high temperature.</span></li><li id="soe-10"><time>2026-07-15 18:29 PDT</time><span class="ev"><span class="phase-chip">IMPACT</span> Data hall temperatures reach 44°C and cross the safe machine operating threshold.</span></li><li id="soe-11"><time>2026-07-15 18:37 PDT</time><span class="ev"><span class="phase-chip">CASCADE</span> Four NetApp SAN storage nodes serving Bare Metal Solution fail and shut down from overheating; the first customer server shutdown follows.</span></li><li id="soe-12"><time>2026-07-15 19:00–19:55 PDT</time><span class="ev"><span class="phase-chip">MITIGATION</span> Google engineers start machine shutdown procedures for the reachable devices as part of the cooling emergency shutdown; all reachable server and network devices are off by 19:55.<span class="rs-tag">Service recovery lead</span></span></li><li id="soe-13"><time>2026-07-15 (time not stated)</time><span class="ev"><span class="phase-chip">MITIGATION</span> The facility team switched the distribution pumps from auto to hand mode to restore circulation and cooling, and deployed an interim portable UPS to keep the chiller controllers powered.<span class="rs-tag">Mechanical / cooling engineer</span></span></li><li id="soe-14"><time>2026-07-15 21:05 PDT</time><span class="ev"><span class="phase-chip">RECOVERY</span> The cooling system is fully recovered and data hall temperatures return to the normal operating range.</span></li><li id="soe-15"><time>2026-07-15 21:24–21:46 PDT</time><span class="ev"><span class="phase-chip">RECOVERY</span> Notification about cooling recovery sent by provider at 21:24, followed by the power recovery notice at 21:46.<span class="rs-tag">Vendor / upstream provider</span></span></li><li id="soe-16"><time>2026-07-15 (time not stated)</time><span class="ev"><span class="phase-chip">RECOVERY</span> With the fault isolated, teams reset the tripped breakers to re-energise Row 3; two remote power panels needed manual verification, and a swing DRUPS unit was aligned to restore redundancy on feed A.<span class="rs-tag">Authorised electrical person</span></span></li><li id="soe-17"><time>2026-07-15 22:40–23:10 PDT</time><span class="ev"><span class="phase-chip">RECOVERY</span> Onsite technician arrived to recover the console servers; console recovery completes at 23:10.<span class="rs-tag">First responder</span></span></li><li id="soe-18"><time>2026-07-15 23:55 PDT</time><span class="ev"><span class="phase-chip">RECOVERY</span> All 6 NetApp clusters and their customers are recovered and validated.</span></li><li id="soe-19"><time>2026-07-16 02:36 PDT</time><span class="ev"><span class="phase-chip">RECOVERY</span> VMware Engine incident mitigated: all customer private clouds are healthy.</span></li><li id="soe-20"><time>2026-07-16 07:34 PDT</time><span class="ev"><span class="phase-chip">RESTORED</span> End of the customer disruption window across the affected products in europe-west4-a.</span></li><li id="soe-21"><time>2026-07-16 08:42 PDT</time><span class="ev"><span class="phase-chip">RESTORED</span> Bare Metal Solution mitigated: every impacted customer server rebooted and confirmed healthy.</span></li></ol>
+        </section>
+        
+        <section class="inc-sec" id="response" aria-labelledby="h-response">
+        <h2 id="h-response">Response by role</h2>
+        <p class="metabar"><span><b>9</b> roles</span><span class="sep">/</span><span><b>7</b> recorded actions</span><span class="sep">/</span><span><b>21</b> playbook actions across 5 failure modes</span><span class="sep">/</span><span>no recorded action: <b>Incident commander, Communications lead</b></span></p>
+        <h3 class="rs-h">What each role did</h3>
+        <p class="rs-cap">Roles the sequence of events shows acting; every entry quotes its source line. Select a time to jump to it.</p>
+        <div class="rs-matrix" role="table" aria-label="Recorded actions by role and phase"><div class="rs-mr rs-mhead"><div class="rs-mh">Role</div><div class="rs-mh">Detect</div><div class="rs-mh">Contain</div><div class="rs-mh">Recover</div></div><div class="rs-mr"><div class="rs-role"><b>Utility / grid operator</b><small>The grid operator upstream of the facility, not named</small></div><div class="rs-mc" data-phase="Detect"><ul><li><a href="#soe-1"><time>2026-07-15 16:24 PDT</time></a>Grid fault upstream caused the 3 ms transient on both feeds</li></ul></div><div class="rs-mc rs-empty" data-phase="Contain"><span>no record</span></div><div class="rs-mc rs-empty" data-phase="Recover"><span>no record</span></div></div><div class="rs-mr"><div class="rs-role"><b>Vendor / upstream provider</b><small>The data center provider operating the facility, not named</small></div><div class="rs-mc rs-empty" data-phase="Detect"><span>no record</span></div><div class="rs-mc rs-empty" data-phase="Contain"><span>no record</span></div><div class="rs-mc" data-phase="Recover"><ul><li><a href="#soe-15"><time>2026-07-15 21:24–21:46 PDT</time></a>Notified recovery of cooling and then power</li></ul></div></div><div class="rs-mr"><div class="rs-role"><b>Authorised electrical person</b><small>The facility team that reset breakers and aligned a swing DRUPS, not named</small></div><div class="rs-mc rs-empty" data-phase="Detect"><span>no record</span></div><div class="rs-mc rs-empty" data-phase="Contain"><span>no record</span></div><div class="rs-mc" data-phase="Recover"><ul><li><a href="#soe-16"><time>2026-07-15 (time not stated)</time></a>Re-energised Row 3 after isolating the fault and aligned a swing DRUPS</li></ul></div></div><div class="rs-mr"><div class="rs-role"><b>Mechanical / cooling engineer</b><small>The facility team that put the pumps in hand mode, not named</small></div><div class="rs-mc rs-empty" data-phase="Detect"><span>no record</span></div><div class="rs-mc" data-phase="Contain"><ul><li><a href="#soe-13"><time>2026-07-15 (time not stated)</time></a>Restored chilled-water circulation by running the pumps in hand mode</li></ul></div><div class="rs-mc rs-empty" data-phase="Recover"><span>no record</span></div></div><div class="rs-mr"><div class="rs-role"><b>First responder</b><small>The onsite technician who recovered the console servers</small></div><div class="rs-mc rs-empty" data-phase="Detect"><span>no record</span></div><div class="rs-mc rs-empty" data-phase="Contain"><span>no record</span></div><div class="rs-mc" data-phase="Recover"><ul><li><a href="#soe-17"><time>2026-07-15 22:40–23:10 PDT</time></a>Recovered the console servers on site</li></ul></div></div><div class="rs-mr"><div class="rs-role"><b>Operations lead</b><small>Google engineers alerted by automated monitoring</small></div><div class="rs-mc" data-phase="Detect"><ul><li><a href="#soe-4"><time>2026-07-15 16:30 PDT</time></a>Alerted by monitoring six minutes after the transient</li></ul></div><div class="rs-mc rs-empty" data-phase="Contain"><span>no record</span></div><div class="rs-mc rs-empty" data-phase="Recover"><span>no record</span></div></div><div class="rs-mr"><div class="rs-role"><b>Service recovery lead</b><small>Google and NetApp teams shutting down and restoring equipment</small></div><div class="rs-mc rs-empty" data-phase="Detect"><span>no record</span></div><div class="rs-mc" data-phase="Contain"><ul><li><a href="#soe-12"><time>2026-07-15 19:00–19:55 PDT</time></a>Ran the cooling emergency shutdown for reachable devices</li></ul></div><div class="rs-mc rs-empty" data-phase="Recover"><span>no record</span></div></div></div>
+        <h3 class="rs-h">Role by role</h3>
+        <p class="rs-cap">Recorded actions / playbook actions per role. A role with 0 recorded actions does not appear in the sources.</p>
+        <div class="rs-roles"><div class="rs-tabs" role="tablist" aria-label="Roles" aria-orientation="vertical"><button type="button" role="tab" id="rs-tab-utility" aria-controls="rs-p-utility" aria-selected="true" tabindex="0">Utility / grid operator<span class="rs-tc">1/0</span></button><button type="button" role="tab" id="rs-tab-vendor" aria-controls="rs-p-vendor" aria-selected="false" tabindex="-1">Vendor / upstream provider<span class="rs-tc">1/2</span></button><button type="button" role="tab" id="rs-tab-electrical" aria-controls="rs-p-electrical" aria-selected="false" tabindex="-1">Authorised electrical person<span class="rs-tc">1/4</span></button><button type="button" role="tab" id="rs-tab-mechanical" aria-controls="rs-p-mechanical" aria-selected="false" tabindex="-1">Mechanical / cooling engineer<span class="rs-tc">1/4</span></button><button type="button" role="tab" id="rs-tab-first-responder" aria-controls="rs-p-first-responder" aria-selected="false" tabindex="-1">First responder<span class="rs-tc">1/2</span></button><button type="button" role="tab" id="rs-tab-incident-commander" aria-controls="rs-p-incident-commander" aria-selected="false" tabindex="-1">Incident commander<span class="rs-tc">0/1</span></button><button type="button" role="tab" id="rs-tab-ops-lead" aria-controls="rs-p-ops-lead" aria-selected="false" tabindex="-1">Operations lead<span class="rs-tc">1/4</span></button><button type="button" role="tab" id="rs-tab-service-recovery" aria-controls="rs-p-service-recovery" aria-selected="false" tabindex="-1">Service recovery lead<span class="rs-tc">1/3</span></button><button type="button" role="tab" id="rs-tab-comms" aria-controls="rs-p-comms" aria-selected="false" tabindex="-1">Communications lead<span class="rs-tc">0/1</span></button></div><div class="rs-panels"><section class="rs-panel" role="tabpanel" id="rs-p-utility" aria-labelledby="rs-tab-utility">
+  <p class="rs-who"><b>The grid operator upstream of the facility, not named</b> — External owner of the supply: switching at the substation, load shedding, restoration.</p>
+  <h3>On the record</h3><ol class="rs-rec"><li><a href="#soe-1"><time>2026-07-15 16:24 PDT</time></a><span>Grid fault upstream caused the 3 ms transient on both feeds<q>An electrical fault occurred on the utility grid upstream of the data center</q></span></li></ol>
+  <h3>Playbook <small>analyst guidance by failure mode, not a record of what happened</small></h3>
+  <div class="rs-modepb rs-rolepb"></div>
+</section><section class="rs-panel" role="tabpanel" id="rs-p-vendor" aria-labelledby="rs-tab-vendor" data-rs-hidden>
+  <p class="rs-who"><b>The data center provider operating the facility, not named</b> — Third party whose product, service or network sits in the failure path.</p>
+  <h3>On the record</h3><ol class="rs-rec"><li><a href="#soe-15"><time>2026-07-15 21:24–21:46 PDT</time></a><span>Notified recovery of cooling and then power<q>Notification about cooling recovery sent by provider</q></span></li></ol>
+  <h3>Playbook <small>analyst guidance by failure mode, not a record of what happened</small></h3>
+  <div class="rs-modepb rs-rolepb"><div class="rs-mp"><span class="rs-mp-ph">Recover</span><ul><li><a class="rs-fm" href="#FM-04">FM-04</a>Restore the redundant source and confirm both loops before ending the emergency<span class="rs-basis" title="Uptime Institute Tier Standard: Operational Sustainability — staffing, procedures, maintenance, drills">Uptime OS</span><span class="rs-basis rs-basis-ev" title="Taking cooling redundancy out for construction turns the next routine event into a thermal emergency. Plan compensating measures for the construction window.">Lesson #3</span></li><li><a class="rs-fm" href="#FM-01">FM-01</a>Repair the failed DRUPS components and prove the unit under load before returning it to service<span class="rs-basis" title="Standard for Emergency and Standby Power Systems">NFPA 110</span><span class="rs-basis rs-basis-ev" title="Swing DRUPS unit aligned to restore feed A redundancy while the faulty DRUPS is repaired (Swing unit in place; repair in progress at the time of the report)">Correction of errors #9</span></li></ul></div></div>
+</section><section class="rs-panel" role="tabpanel" id="rs-p-electrical" aria-labelledby="rs-tab-electrical" data-rs-hidden>
+  <p class="rs-who"><b>The facility team that reset breakers and aligned a swing DRUPS, not named</b> — Switching, isolation and lock-out of power sources, and safe re-energisation.</p>
+  <h3>On the record</h3><ol class="rs-rec"><li><a href="#soe-16"><time>2026-07-15 (time not stated)</time></a><span>Re-energised Row 3 after isolating the fault and aligned a swing DRUPS<q>teams reset the tripped breakers to re-energise Row 3</q></span></li></ol>
+  <h3>Playbook <small>analyst guidance by failure mode, not a record of what happened</small></h3>
+  <div class="rs-modepb rs-rolepb"><div class="rs-mp"><span class="rs-mp-ph">Prevent</span><ul><li><a class="rs-fm" href="#FM-01">FM-01</a>Load-test each rotary UPS on a schedule and after any component work, and track faults to closure<span class="rs-basis" title="Standard for Emergency and Standby Power Systems">NFPA 110</span><span class="rs-basis rs-basis-ev" title="Investigate the sequence that stopped the load transfer to DRUPS and identify system improvements (Committed, ETA Aug 2026 (completion not reported))">Correction of errors #1</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Detect</span><ul><li><a class="rs-fm" href="#FM-02">FM-02</a>Alarm when any row&#x27;s measured load exceeds single-feed capacity<span class="rs-basis" title="Uptime Institute Tier Standard: Operational Sustainability — staffing, procedures, maintenance, drills">Uptime OS</span><span class="rs-basis rs-basis-ev" title="Automatic transfer schemes only work if each row&#x27;s load fits the surviving feed. Track deployed load per row against single-feed capacity.">Lesson #4</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Contain</span><ul><li><a class="rs-fm" href="#FM-01">FM-01</a>Isolate the failed DRUPS and align a swing unit to restore redundancy<span class="rs-basis" title="Operation of electrical installations — switching, isolation, safe working">EN 50110-1</span><span class="rs-basis rs-basis-ev" title="Swing DRUPS unit aligned to restore feed A redundancy while the faulty DRUPS is repaired (Swing unit in place; repair in progress at the time of the report)">Correction of errors #9</span></li><li><a class="rs-fm" href="#FM-02">FM-02</a>Once the fault is isolated, reset the tripped breakers and verify panels before re-energising<span class="rs-basis" title="Standard for Electrical Safety in the Workplace — energised work, isolation, lock-out">NFPA 70E</span><span class="rs-basis rs-basis-ev" title="Row 3 tripped an overload protection breaker on transfer to feed B: a load deployment discrepancy, still under investigation (Google report).">Contributing factor #2</span></li></ul></div></div>
+</section><section class="rs-panel" role="tabpanel" id="rs-p-mechanical" aria-labelledby="rs-tab-mechanical" data-rs-hidden>
+  <p class="rs-who"><b>The facility team that put the pumps in hand mode, not named</b> — Chillers, CRAH/CRAC, pumps, cooling towers and the thermal envelope of the white space.</p>
+  <h3>On the record</h3><ol class="rs-rec"><li><a href="#soe-13"><time>2026-07-15 (time not stated)</time></a><span>Restored chilled-water circulation by running the pumps in hand mode<q>switched the distribution pumps from auto to hand mode</q></span></li></ol>
+  <h3>Playbook <small>analyst guidance by failure mode, not a record of what happened</small></h3>
+  <div class="rs-modepb rs-rolepb"><div class="rs-mp"><span class="rs-mp-ph">Prevent</span><ul><li><a class="rs-fm" href="#FM-03">FM-03</a>Put chiller controllers on protected power and make pumps restart on their own after power returns<span class="rs-basis" title="Thermal Guidelines for Data Processing Environments — allowable envelopes and excursions">ASHRAE TC 9.9</span><span class="rs-basis rs-basis-ev" title="Interim portable UPS to keep the chiller controllers powered (Done, stated in the report)">Correction of errors #8</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Detect</span><ul><li><a class="rs-fm" href="#FM-04">FM-04</a>Watch supply temperature and flow continuously while cooling runs without redundancy<span class="rs-basis" title="Thermal Guidelines for Data Processing Environments — allowable envelopes and excursions">ASHRAE TC 9.9</span><span class="rs-basis rs-basis-ev" title="Taking cooling redundancy out for construction turns the next routine event into a thermal emergency. Plan compensating measures for the construction window.">Lesson #3</span></li><li><a class="rs-fm" href="#FM-03">FM-03</a>Alarm on loss of chilled-water flow, not only on rising room temperature<span class="rs-basis" title="Thermal Guidelines for Data Processing Environments — allowable envelopes and excursions">ASHRAE TC 9.9</span><span class="rs-basis rs-basis-ev" title="Pumps that need a restart command after a power event are a single point of failure; restart-on-power-return or hand-mode fallback must be designed in and drilled.">Lesson #2</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Contain</span><ul><li><a class="rs-fm" href="#FM-03">FM-03</a>Switch pumps to hand mode to restore flow at once when the controller is down<span class="rs-basis" title="Uptime Institute Tier Standard: Operational Sustainability — staffing, procedures, maintenance, drills">Uptime OS</span><span class="rs-basis rs-basis-ev" title="Pumps that need a restart command after a power event are a single point of failure; restart-on-power-return or hand-mode fallback must be designed in and drilled.">Lesson #2</span></li></ul></div></div>
+</section><section class="rs-panel" role="tabpanel" id="rs-p-first-responder" aria-labelledby="rs-tab-first-responder" data-rs-hidden>
+  <p class="rs-who"><b>The onsite technician who recovered the console servers</b> — Meets the first alarm: on-shift technician or security in a facility, on-call engineer in a service.</p>
+  <h3>On the record</h3><ol class="rs-rec"><li><a href="#soe-17"><time>2026-07-15 22:40–23:10 PDT</time></a><span>Recovered the console servers on site<q>Onsite technician arrived to recover the console servers</q></span></li></ol>
+  <h3>Playbook <small>analyst guidance by failure mode, not a record of what happened</small></h3>
+  <div class="rs-modepb rs-rolepb"><div class="rs-mp"><span class="rs-mp-ph">Detect</span><ul><li><a class="rs-fm" href="#FM-01">FM-01</a>Confirm at the switchboard which side is on DRUPS and which has dropped within the first minute<span class="rs-basis" title="Uptime Institute Tier Standard: Operational Sustainability — staffing, procedures, maintenance, drills">Uptime OS</span><span class="rs-basis rs-basis-ev" title="The side A DRUPS failed to take the load because of electrical component failures (Google report).">Contributing factor #1</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Recover</span><ul><li><a class="rs-fm" href="#FM-05">FM-05</a>Keep a technician on call for console servers during any major facility event<span class="rs-basis" title="Uptime Institute Tier Standard: Operational Sustainability — staffing, procedures, maintenance, drills">Uptime OS</span><span class="rs-basis rs-basis-ev" title="Update incident classification and SLO definitions to improve personnel availability during major data center events (Committed, ETA Sep 2026 (completion not reported))">Correction of errors #6</span></li></ul></div></div>
+</section><section class="rs-panel" role="tabpanel" id="rs-p-incident-commander" aria-labelledby="rs-tab-incident-commander" data-rs-hidden>
+  <p class="rs-who"><b>No incident commander is named in the record</b> — Owns every decision until formally relieved: site duty manager on scene, or the declared IC of a service incident.</p>
+  <h3>On the record</h3><p class="rs-gap">No action by this role appears in the sources.</p>
+  <h3>Playbook <small>analyst guidance by failure mode, not a record of what happened</small></h3>
+  <div class="rs-modepb rs-rolepb"><div class="rs-mp"><span class="rs-mp-ph">Contain</span><ul><li><a class="rs-fm" href="#FM-04">FM-04</a>Declare a thermal emergency early and start shutdown before the envelope is crossed<span class="rs-basis" title="FEMA National Incident Management System — Incident Command System: single command, span of control, unified command with outside agencies">NIMS / ICS</span><span class="rs-basis rs-basis-ev" title="Thermal events move fast: 44°C two hours after the trigger. Shutdown triggers and onsite staffing must be faster than the temperature rise.">Lesson #5</span></li></ul></div></div>
+</section><section class="rs-panel" role="tabpanel" id="rs-p-ops-lead" aria-labelledby="rs-tab-ops-lead" data-rs-hidden>
+  <p class="rs-who"><b>Google engineers alerted by automated monitoring</b> — Technical lead who diagnoses and drives the fix; the subject-matter expert at the keyboard or the switchboard.</p>
+  <h3>On the record</h3><ol class="rs-rec"><li><a href="#soe-4"><time>2026-07-15 16:30 PDT</time></a><span>Alerted by monitoring six minutes after the transient<q>Google engineers were alerted to the infrastructure power loss</q></span></li></ol>
+  <h3>Playbook <small>analyst guidance by failure mode, not a record of what happened</small></h3>
+  <div class="rs-modepb rs-rolepb"><div class="rs-mp"><span class="rs-mp-ph">Prevent</span><ul><li><a class="rs-fm" href="#FM-04">FM-04</a>Treat removal of cooling redundancy as a change with a compensating plan such as temporary chillers or reduced load<span class="rs-basis" title="Staged rollout, canary, automated rollback and peer review of changes (ITIL 4 change enablement; SRE release engineering)">Change management</span><span class="rs-basis rs-basis-ev" title="Analyst recommendation (not in the report): treat removal of cooling redundancy for construction as a change that needs a compensating plan, such as temporary chillers or reduced load.">Improvement #6</span></li><li><a class="rs-fm" href="#FM-02">FM-02</a>Keep deployed load per row within what one feed can carry, and check it at every deployment<span class="rs-basis" title="Uptime Institute Tier Standard: Operational Sustainability — staffing, procedures, maintenance, drills">Uptime OS</span><span class="rs-basis rs-basis-ev" title="Find and resolve the cause of the overload that cut power to Row 3 (Committed, ETA Aug 2026 (completion not reported))">Correction of errors #2</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Detect</span><ul><li><a class="rs-fm" href="#FM-05">FM-05</a>Trigger shutdown automatically on a temperature rate of rise, not only on a fixed threshold<span class="rs-basis" title="Thermal Guidelines for Data Processing Environments — allowable envelopes and excursions">ASHRAE TC 9.9</span><span class="rs-basis rs-basis-ev" title="Automate shutdown triggering during fast thermal runaway for VMware Engine (Committed, ETA Oct 2026 (completion not reported))">Correction of errors #5</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Recover</span><ul><li><a class="rs-fm" href="#FM-03">FM-03</a>Restart workloads only after the hall is back inside the allowable range<span class="rs-basis" title="Thermal Guidelines for Data Processing Environments — allowable envelopes and excursions">ASHRAE TC 9.9</span><span class="rs-basis rs-basis-ev" title="Thermal events move fast: 44°C two hours after the trigger. Shutdown triggers and onsite staffing must be faster than the temperature rise.">Lesson #5</span></li></ul></div></div>
+</section><section class="rs-panel" role="tabpanel" id="rs-p-service-recovery" aria-labelledby="rs-tab-service-recovery" data-rs-hidden>
+  <p class="rs-who"><b>Google and NetApp teams shutting down and restoring equipment</b> — Restores customer service: failover, workload moves, capacity, backlog drain.</p>
+  <h3>On the record</h3><ol class="rs-rec"><li><a href="#soe-12"><time>2026-07-15 19:00–19:55 PDT</time></a><span>Ran the cooling emergency shutdown for reachable devices<q>start machine shutdown procedures for the reachable devices</q></span></li></ol>
+  <h3>Playbook <small>analyst guidance by failure mode, not a record of what happened</small></h3>
+  <div class="rs-modepb rs-rolepb"><div class="rs-mp"><span class="rs-mp-ph">Contain</span><ul><li><a class="rs-fm" href="#FM-03">FM-03</a>Shut down equipment in priority order before the hall passes the allowable envelope<span class="rs-basis" title="Thermal Guidelines for Data Processing Environments — allowable envelopes and excursions">ASHRAE TC 9.9</span><span class="rs-basis rs-basis-ev" title="Automate shutdown triggering during fast thermal runaway for VMware Engine (Committed, ETA Oct 2026 (completion not reported))">Correction of errors #5</span></li><li><a class="rs-fm" href="#FM-05">FM-05</a>Shut down in a set order so storage and network recover cleanly<span class="rs-basis" title="Google SRE: Managing Incidents — incident commander, operations, communications and planning roles; declare early">SRE incident mgmt</span><span class="rs-basis rs-basis-ev" title="Review incident SLAs and runbooks with the data center team, create playbooks, run a monthly joint emergency drill and speed up NetApp cluster recovery (Committed, ETA Aug 2026 (completion not reported))">Correction of errors #7</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Recover</span><ul><li><a class="rs-fm" href="#FM-02">FM-02</a>Bring Row 3 workloads back in order and verify redundancy on both feeds<span class="rs-basis" title="Google SRE: Managing Incidents — incident commander, operations, communications and planning roles; declare early">SRE incident mgmt</span><span class="rs-basis rs-basis-ev" title="Automatic transfer schemes only work if each row&#x27;s load fits the surviving feed. Track deployed load per row against single-feed capacity.">Lesson #4</span></li></ul></div></div>
+</section><section class="rs-panel" role="tabpanel" id="rs-p-comms" aria-labelledby="rs-tab-comms" data-rs-hidden>
+  <p class="rs-who"><b>Google Cloud Service Health status page</b> — Status page, customer notices, regulators and press; one voice, timed updates.</p>
+  <h3>On the record</h3><p class="rs-gap">No action by this role appears in the sources.</p>
+  <h3>Playbook <small>analyst guidance by failure mode, not a record of what happened</small></h3>
+  <div class="rs-modepb rs-rolepb"><div class="rs-mp"><span class="rs-mp-ph">Recover</span><ul><li><a class="rs-fm" href="#FM-05">FM-05</a>Give customers restoration times per product as each one recovers<span class="rs-basis" title="Google SRE: Managing Incidents — incident commander, operations, communications and planning roles; declare early">SRE incident mgmt</span><span class="rs-basis rs-basis-ev" title="Review incident SLAs and runbooks with the data center team, create playbooks, run a monthly joint emergency drill and speed up NetApp cluster recovery (Committed, ETA Aug 2026 (completion not reported))">Correction of errors #7</span></li></ul></div></div>
+</section></div></div>
+        </section>
+        <section class="inc-sec" id="fmea" aria-labelledby="h-fmea">
+        <h2 id="h-fmea">Failure mode &amp; effects analysis (FMEA)</h2>
+        <p class="fm-scope">The power chain (utility feeds, rotary UPS on each side, row transfer between feeds) and the cooling chain (chiller controller, chilled-water pumps, redundant source) of the facility hosting europe-west4-a, plus Google&#x27;s thermal shutdown and recovery. Analysed from Google&#x27;s own reports; the facility provider is not named and its view is not on record.</p>
+        <p class="metabar fm-meta"><span><b>5</b> failure modes</span><span class="sep">/</span><span><b>1</b> high priority</span><span class="sep">/</span><span><b>3 of 5</b> with a published action</span><span class="sep">/</span><span>total RPN <b>977 → 822</b> (−16%)</span></p>
+        <div class="fm-sim" data-fm-sim>
+            <div class="fm-replay" hidden></div>
+            <div class="fm-scn" hidden></div>
+            <div class="fm-viz">
+                <figure class="fm-fig"><figcaption class="fm-pb-cap">RPN = S × O × D, worst first. Thin bar: after the published action.</figcaption><div class="fm-pb" role="list" data-scale="300" aria-label="Risk priority number per failure mode, before and after corrective action"><div class="fm-pb-row" role="listitem" data-id="FM-04" data-prio="medium" title="FM-04 The redundant source is out of service for known construction work when the primary plant stops"><span class="fm-pb-id">FM-04</span><span class="fm-pb-track"><i class="fm-pb-bar" style="transform:scaleX(0.933);background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">280</span></div><div class="fm-pb-row" role="listitem" data-id="FM-01" data-prio="medium" title="FM-01 The DRUPS fails to take over the side A load because of electrical component failures"><span class="fm-pb-id">FM-01</span><span class="fm-pb-track"><i class="fm-pb-bar" style="transform:scaleX(0.747);background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">224</span></div><div class="fm-pb-row" role="listitem" data-id="FM-02" data-prio="medium" title="FM-02 Row 3&#x27;s transfer trips an overload protection breaker and the row loses both feeds"><span class="fm-pb-id">FM-02</span><span class="fm-pb-track"><i class="fm-pb-bar" style="transform:scaleX(0.747);background:var(--amber)"></i><i class="fm-pb-rev" style="transform:scaleX(0.420)"></i></span><span class="fm-pb-val">224 → 126</span></div><div class="fm-pb-row" role="listitem" data-id="FM-03" data-prio="high" title="FM-03 The chiller controller drops offline on the transient; pumps stop and do not restart, and chiller A shuts down"><span class="fm-pb-id">FM-03</span><span class="fm-pb-track"><i class="fm-pb-bar" style="transform:scaleX(0.480);background:var(--red)"></i><i class="fm-pb-rev" style="transform:scaleX(0.360)"></i></span><span class="fm-pb-val">144 → 108</span></div><div class="fm-pb-row" role="listitem" data-id="FM-05" data-prio="medium" title="FM-05 Shutdown is manual and recovery needs an onsite technician for console servers"><span class="fm-pb-id">FM-05</span><span class="fm-pb-track"><i class="fm-pb-bar" style="transform:scaleX(0.350);background:var(--amber)"></i><i class="fm-pb-rev" style="transform:scaleX(0.280)"></i></span><span class="fm-pb-val">105 → 84</span></div><div class="fm-pb-axis" aria-hidden="true"><span></span><span class="fm-pb-ticks"><span>0</span><span>150</span><span>300</span></span><span></span></div></div></figure>
+                <figure class="fm-fig fm-fig-m"><figcaption>Severity × occurrence. Lines bound the medium and high zones.</figcaption><svg class="fm-matrix" viewBox="0 0 360 330" role="img" aria-label="Criticality matrix, severity against occurrence"><rect class="fm-c" x="44" y="266" width="28" height="28"/><rect class="fm-c" x="72" y="266" width="28" height="28"/><rect class="fm-c" x="100" y="266" width="28" height="28"/><rect class="fm-c" x="128" y="266" width="28" height="28"/><rect class="fm-c" x="156" y="266" width="28" height="28"/><rect class="fm-c" x="184" y="266" width="28" height="28"/><rect class="fm-c" x="212" y="266" width="28" height="28"/><rect class="fm-c" x="240" y="266" width="28" height="28"/><rect class="fm-c" x="268" y="266" width="28" height="28"/><rect class="fm-c" x="296" y="266" width="28" height="28"/><rect class="fm-c" x="44" y="238" width="28" height="28"/><rect class="fm-c" x="72" y="238" width="28" height="28"/><rect class="fm-c" x="100" y="238" width="28" height="28"/><rect class="fm-c" x="128" y="238" width="28" height="28"/><rect class="fm-c" x="156" y="238" width="28" height="28"/><rect class="fm-c" x="184" y="238" width="28" height="28"/><rect class="fm-c" x="212" y="238" width="28" height="28"/><rect class="fm-c" x="240" y="238" width="28" height="28"/><rect class="fm-c" x="268" y="238" width="28" height="28"/><rect class="fm-c" x="296" y="238" width="28" height="28"/><rect class="fm-c" x="44" y="210" width="28" height="28"/><rect class="fm-c" x="72" y="210" width="28" height="28"/><rect class="fm-c" x="100" y="210" width="28" height="28"/><rect class="fm-c" x="128" y="210" width="28" height="28"/><rect class="fm-c" x="156" y="210" width="28" height="28"/><rect class="fm-c" x="184" y="210" width="28" height="28"/><rect class="fm-c" x="212" y="210" width="28" height="28"/><rect class="fm-c" x="240" y="210" width="28" height="28"/><rect class="fm-c" x="268" y="210" width="28" height="28"/><rect class="fm-c" x="296" y="210" width="28" height="28"/><rect class="fm-c" x="44" y="182" width="28" height="28"/><rect class="fm-c" x="72" y="182" width="28" height="28"/><rect class="fm-c" x="100" y="182" width="28" height="28"/><rect class="fm-c" x="128" y="182" width="28" height="28"/><rect class="fm-c" x="156" y="182" width="28" height="28"/><rect class="fm-c" x="184" y="182" width="28" height="28"/><rect class="fm-c" x="212" y="182" width="28" height="28"/><rect class="fm-c" x="240" y="182" width="28" height="28"/><rect class="fm-c" x="268" y="182" width="28" height="28"/><rect class="fm-c" x="296" y="182" width="28" height="28"/><rect class="fm-c" x="44" y="154" width="28" height="28"/><rect class="fm-c" x="72" y="154" width="28" height="28"/><rect class="fm-c" x="100" y="154" width="28" height="28"/><rect class="fm-c" x="128" y="154" width="28" height="28"/><rect class="fm-c" x="156" y="154" width="28" height="28"/><rect class="fm-c" x="184" y="154" width="28" height="28"/><rect class="fm-c" x="212" y="154" width="28" height="28"/><rect class="fm-c" x="240" y="154" width="28" height="28"/><rect class="fm-c" x="268" y="154" width="28" height="28"/><rect class="fm-c" x="296" y="154" width="28" height="28"/><rect class="fm-c" x="44" y="126" width="28" height="28"/><rect class="fm-c" x="72" y="126" width="28" height="28"/><rect class="fm-c" x="100" y="126" width="28" height="28"/><rect class="fm-c" x="128" y="126" width="28" height="28"/><rect class="fm-c" x="156" y="126" width="28" height="28"/><rect class="fm-c" x="184" y="126" width="28" height="28"/><rect class="fm-c" x="212" y="126" width="28" height="28"/><rect class="fm-c" x="240" y="126" width="28" height="28"/><rect class="fm-c" x="268" y="126" width="28" height="28"/><rect class="fm-c" x="296" y="126" width="28" height="28"/><rect class="fm-c" x="44" y="98" width="28" height="28"/><rect class="fm-c" x="72" y="98" width="28" height="28"/><rect class="fm-c" x="100" y="98" width="28" height="28"/><rect class="fm-c" x="128" y="98" width="28" height="28"/><rect class="fm-c" x="156" y="98" width="28" height="28"/><rect class="fm-c" x="184" y="98" width="28" height="28"/><rect class="fm-c" x="212" y="98" width="28" height="28"/><rect class="fm-c" x="240" y="98" width="28" height="28"/><rect class="fm-c" x="268" y="98" width="28" height="28"/><rect class="fm-c" x="296" y="98" width="28" height="28"/><rect class="fm-c" x="44" y="70" width="28" height="28"/><rect class="fm-c" x="72" y="70" width="28" height="28"/><rect class="fm-c" x="100" y="70" width="28" height="28"/><rect class="fm-c" x="128" y="70" width="28" height="28"/><rect class="fm-c" x="156" y="70" width="28" height="28"/><rect class="fm-c" x="184" y="70" width="28" height="28"/><rect class="fm-c" x="212" y="70" width="28" height="28"/><rect class="fm-c" x="240" y="70" width="28" height="28"/><rect class="fm-c" x="268" y="70" width="28" height="28"/><rect class="fm-c" x="296" y="70" width="28" height="28"/><rect class="fm-c" x="44" y="42" width="28" height="28"/><rect class="fm-c" x="72" y="42" width="28" height="28"/><rect class="fm-c" x="100" y="42" width="28" height="28"/><rect class="fm-c" x="128" y="42" width="28" height="28"/><rect class="fm-c" x="156" y="42" width="28" height="28"/><rect class="fm-c" x="184" y="42" width="28" height="28"/><rect class="fm-c" x="212" y="42" width="28" height="28"/><rect class="fm-c" x="240" y="42" width="28" height="28"/><rect class="fm-c" x="268" y="42" width="28" height="28"/><rect class="fm-c" x="296" y="42" width="28" height="28"/><rect class="fm-c" x="44" y="14" width="28" height="28"/><rect class="fm-c" x="72" y="14" width="28" height="28"/><rect class="fm-c" x="100" y="14" width="28" height="28"/><rect class="fm-c" x="128" y="14" width="28" height="28"/><rect class="fm-c" x="156" y="14" width="28" height="28"/><rect class="fm-c" x="184" y="14" width="28" height="28"/><rect class="fm-c" x="212" y="14" width="28" height="28"/><rect class="fm-c" x="240" y="14" width="28" height="28"/><rect class="fm-c" x="268" y="14" width="28" height="28"/><rect class="fm-c" x="296" y="14" width="28" height="28"/><path class="fm-zone" d="M268 266h28M296 266h28M184 238h28M212 238h28M268 238v28M240 238h28M184 210v28M156 210h28M296 210h28M156 182v28M128 182h28M240 182h28M296 182v28M268 182h28M128 154v28M100 154h28M240 154v28M212 154h28M100 126v28M212 126v28M184 126h28M100 98v28M184 98v28M156 98h28M44 70h28M100 70v28M72 70h28M100 70h28M156 70v28M128 70h28"/><text class="vz-tick" x="58.0" y="308" text-anchor="middle">1</text><text class="vz-tick" x="36" y="284.0" text-anchor="end">1</text><text class="vz-tick" x="86.0" y="308" text-anchor="middle">2</text><text class="vz-tick" x="36" y="256.0" text-anchor="end">2</text><text class="vz-tick" x="114.0" y="308" text-anchor="middle">3</text><text class="vz-tick" x="36" y="228.0" text-anchor="end">3</text><text class="vz-tick" x="142.0" y="308" text-anchor="middle">4</text><text class="vz-tick" x="36" y="200.0" text-anchor="end">4</text><text class="vz-tick" x="170.0" y="308" text-anchor="middle">5</text><text class="vz-tick" x="36" y="172.0" text-anchor="end">5</text><text class="vz-tick" x="198.0" y="308" text-anchor="middle">6</text><text class="vz-tick" x="36" y="144.0" text-anchor="end">6</text><text class="vz-tick" x="226.0" y="308" text-anchor="middle">7</text><text class="vz-tick" x="36" y="116.0" text-anchor="end">7</text><text class="vz-tick" x="254.0" y="308" text-anchor="middle">8</text><text class="vz-tick" x="36" y="88.0" text-anchor="end">8</text><text class="vz-tick" x="282.0" y="308" text-anchor="middle">9</text><text class="vz-tick" x="36" y="60.0" text-anchor="end">9</text><text class="vz-tick" x="310.0" y="308" text-anchor="middle">10</text><text class="vz-tick" x="36" y="32.0" text-anchor="end">10</text><text class="vz-axis" x="184" y="328" text-anchor="middle">Occurrence →</text><text class="vz-axis" transform="translate(11 154) rotate(-90)" text-anchor="middle">Severity →</text><g class="fm-pts"><circle class="fm-pt" data-ids="FM-03" cx="142.0" cy="56.0" r="6" fill="var(--red)"><title>FM-03 The chiller controller drops offline on the transient; pumps stop and do not restart, and chiller A shuts down (S9 O4 D4)</title></circle><text class="fm-pt-l" x="142.0" y="46.0" text-anchor="middle">03</text><circle class="fm-pt" data-ids="FM-01" cx="142.0" cy="84.0" r="6" fill="var(--amber)"><title>FM-01 The DRUPS fails to take over the side A load because of electrical component failures (S8 O4 D7)</title></circle><text class="fm-pt-l" x="142.0" y="74.0" text-anchor="middle">01</text><circle class="fm-pt" data-ids="FM-04" cx="170.0" cy="84.0" r="6" fill="var(--amber)"><title>FM-04 The redundant source is out of service for known construction work when the primary plant stops (S8 O5 D7)</title></circle><text class="fm-pt-l" x="170.0" y="74.0" text-anchor="middle">04</text><circle class="fm-pt" data-ids="FM-02" cx="142.0" cy="112.0" r="6" fill="var(--amber)"><title>FM-02 Row 3&#x27;s transfer trips an overload protection breaker and the row loses both feeds (S7 O4 D8)</title></circle><text class="fm-pt-l" x="142.0" y="102.0" text-anchor="middle">02</text><circle class="fm-pt" data-ids="FM-05" cx="170.0" cy="112.0" r="6" fill="var(--amber)"><title>FM-05 Shutdown is manual and recovery needs an onsite technician for console servers (S7 O5 D3)</title></circle><text class="fm-pt-l" x="170.0" y="102.0" text-anchor="middle">05</text></g></svg></figure>
+            </div>
+            <div class="fm-wi" hidden></div>
+            <dl class="fm-facts"><div><dt>Caught only after impact<small>D ≥ 8</small></dt><dd>1 of 5</dd></div><div><dt>Actions that cut occurrence<small>O lowered</small></dt><dd>3</dd></div><div><dt>Actions that cut detection<small>D lowered</small></dt><dd>1</dd></div><div><dt>Actions that cut severity<small>blast radius unchanged</small></dt><dd>0</dd></div></dl>
+        </div>
+        <script type="application/json" id="fmea-sim-data">{"modes":[{"id":"FM-01","fm":"The DRUPS fails to take over the side A load because of electrical component failures","item":"Side A diesel rotary UPS (DRUPS)","S":8,"O":4,"D":7,"rev":null,"why":{"S":"It removes one whole power side; with the transfer scheme working it would have been survivable, so 8 rather than 9.","O":"A rotary UPS failing at the moment of demand is uncommon but plausible: 'infrequent'.","D":"No recorded test or alarm found the faulty components beforehand."},"soe":[1]},{"id":"FM-02","fm":"Row 3's transfer trips an overload protection breaker and the row loses both feeds","item":"Row 3 automatic transfer to feed B","S":7,"O":4,"D":8,"rev":{"S":7,"O":3,"D":6},"why":{"S":"One row loses power completely; the hall-wide outage came from cooling, so this is scored 7.","O":"Rows drifting past single-feed capacity is a known operational risk: 'infrequent'.","D":"Nothing caught the discrepancy before the transfer was demanded."},"soe":[5]},{"id":"FM-03","fm":"The chiller controller drops offline on the transient; pumps stop and do not restart, and chiller A shuts down","item":"Chiller controller and chilled-water pumps","S":9,"O":4,"D":4,"rev":{"S":9,"O":3,"D":4},"why":{"S":"It forced a hall-wide thermal shutdown of every product in the zone's affected hall: 9. Not 10, because no hazard to people is recorded.","O":"Controller dropouts on transients happen but are not frequent: 'infrequent'.","D":"Temperature alerts came within minutes, but they did not stop the rise."},"soe":[2]},{"id":"FM-04","fm":"The redundant source is out of service for known construction work when the primary plant stops","item":"Redundant cooling source during construction","S":8,"O":5,"D":7,"rev":null,"why":{"S":"It removes the fallback that would have prevented the thermal event; scored 8 so the thermal outage is not counted at full weight twice.","O":"Construction and maintenance windows recur through a facility's life: 'occasional'.","D":"The degradation was known, but no recorded control weighed the exposure it created."},"soe":[2]},{"id":"FM-05","fm":"Shutdown is manual and recovery needs an onsite technician for console servers","item":"Thermal shutdown and recovery","S":7,"O":5,"D":3,"rev":{"S":7,"O":4,"D":3},"why":{"S":"It stretches the outage for 33 customers well past the physical fix: 7.","O":"Any thermal event needs shutdown and restart: 'occasional'.","D":"Monitoring detected the problem quickly; the gap is in response speed."},"soe":[16]}],"soe":[{"t":"2026-07-15 16:24 PDT","ph":"TRIGGER","ev":"An electrical fault occurred on the utility grid upstream of the data center: a 3 ms voltage transient hits both utility feeds A and B, both utility breakers trip and the site transfers to its diesel rotary UPS (DRUPS)."},{"t":"2026-07-15 16:24 PDT","ph":"TRIGGER","ev":"Side B transfers to DRUPS without interruption. The DRUPS for side A fails to take over the load because of electrical component failures."},{"t":"2026-07-15 16:24 PDT","ph":"TRIGGER","ev":"The chiller controller drops offline during the transient, so the chilled-water distribution pumps stop and cannot restart and chiller system A shuts down. The redundant cooling source is out of service because of known ongoing construction work."},{"t":"2026-07-15 16:30 PDT","ph":"DETECTION","ev":"Google engineers were alerted to the infrastructure power loss by automated monitoring; the VMware Engine power-monitoring alert fires."},{"t":"2026-07-15 16:32 PDT","ph":"DETECTION","ev":"NetApp's remote facility monitoring alerts on high temperature and network switch failure."},{"t":"2026-07-15 16:37 PDT","ph":"CASCADE","ev":"The three rows on feed A transfer to feed B. Rows 1 and 2 transfer; Row 3 fails to transfer because an overload protection breaker trips, and loses both feeds."},{"t":"2026-07-15 16:39 PDT","ph":"IMPACT","ev":"Customer disruption begins in europe-west4-a for VMware Engine, Bare Metal Solution and NetApp Volumes."},{"t":"2026-07-15 17:05 PDT","ph":"IMPACT","ev":"Network switch temperature alerts above 60°C trigger as the hall heats without chilled-water flow."},{"t":"2026-07-15 17:32 PDT","ph":"CASCADE","ev":"All 6 NetApp clusters shut down automatically because of high temperature."},{"t":"2026-07-15 18:29 PDT","ph":"IMPACT","ev":"Data hall temperatures reach 44°C and cross the safe machine operating threshold."},{"t":"2026-07-15 18:37 PDT","ph":"CASCADE","ev":"Four NetApp SAN storage nodes serving Bare Metal Solution fail and shut down from overheating; the first customer server shutdown follows."},{"t":"2026-07-15 19:00–19:55 PDT","ph":"MITIGATION","ev":"Google engineers start machine shutdown procedures for the reachable devices as part of the cooling emergency shutdown; all reachable server and network devices are off by 19:55."},{"t":"2026-07-15 (time not stated)","ph":"MITIGATION","ev":"The facility team switched the distribution pumps from auto to hand mode to restore circulation and cooling, and deployed an interim portable UPS to keep the chiller controllers powered."},{"t":"2026-07-15 21:05 PDT","ph":"RECOVERY","ev":"The cooling system is fully recovered and data hall temperatures return to the normal operating range."},{"t":"2026-07-15 21:24–21:46 PDT","ph":"RECOVERY","ev":"Notification about cooling recovery sent by provider at 21:24, followed by the power recovery notice at 21:46."},{"t":"2026-07-15 (time not stated)","ph":"RECOVERY","ev":"With the fault isolated, teams reset the tripped breakers to re-energise Row 3; two remote power panels needed manual verification, and a swing DRUPS unit was aligned to restore redundancy on feed A."},{"t":"2026-07-15 22:40–23:10 PDT","ph":"RECOVERY","ev":"Onsite technician arrived to recover the console servers; console recovery completes at 23:10."},{"t":"2026-07-15 23:55 PDT","ph":"RECOVERY","ev":"All 6 NetApp clusters and their customers are recovered and validated."},{"t":"2026-07-16 02:36 PDT","ph":"RECOVERY","ev":"VMware Engine incident mitigated: all customer private clouds are healthy."},{"t":"2026-07-16 07:34 PDT","ph":"RESTORED","ev":"End of the customer disruption window across the affected products in europe-west4-a."},{"t":"2026-07-16 08:42 PDT","ph":"RESTORED","ev":"Bare Metal Solution mitigated: every impacted customer server rebooted and confirmed healthy."}],"rubric":{"S":[[10,"Hazard to people, or loss of the facility / several regions"],[9,"Region-wide or provider-wide outage of a foundational service, no workaround"],[8,"Full outage of a major service for hours"],[7,"Major degradation of a major service"],[6,"Partial outage confined to one zone or one service"],[5,"Customer-visible degradation"],[4,"Limited customer impact"],[3,"Internal impact only"],[2,"Negligible"],[1,"No effect"]],"O":[[10,"Near certain: the cause is present in normal operation"],[8,"Frequent: routine work exercises the cause"],[6,"Occasional: a foreseeable slip or condition, weakly guarded"],[4,"Infrequent: needs an unusual combination"],[2,"Remote: guarded by design"],[1,"Eliminated by design"]],"D":[[10,"No control could detect it"],[9,"Detected only through customer impact"],[8,"Detected after impact by internal monitoring"],[6,"Detected at onset, not prevented"],[4,"Detected before impact with time to act"],[2,"Automated interlock almost certainly stops it"],[1,"Certain to be stopped"]]}}</script>
+        <div class="fm-sheet">
+            <div class="fm-head" aria-hidden="true"><span>ID</span><span>Failure mode</span><span>S·O·D</span><span>RPN</span><span>After</span></div>
+            <details class="fm-row" id="FM-04" data-id="FM-04">
+  <summary>
+    <span class="fm-id-cell">FM-04</span>
+    <span class="fm-mode">The redundant source is out of service for known construction work when the primary plant stops<span class="fm-item">Redundant cooling source during construction</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 5, detection 7">8·5·7</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>280</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Provide a second source of cooling if the primary plant stops</dd>
+      <dt>Effect</dt><dd>No fallback cooling; the single failure becomes a hall-wide thermal event</dd>
+      <dt>Cause</dt><dd>Planned degradation of cooling redundancy without a compensating measure in the record</dd>
+      <dt>Prevention in place</dt><dd>N+1 or 2N cooling design (degraded for construction)</dd>
+      <dt>Detection in place</dt><dd>Known to the facility; nothing recorded flagged the risk of running degraded</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>It removes the fallback that would have prevented the thermal event; scored 8 so the thermal outage is not counted at full weight twice.</dd></div>
+      <div class="fm-sc"><dt>O <b>5</b></dt><dd>Construction and maintenance windows recur through a facility&#x27;s life: &#x27;occasional&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>7</b></dt><dd>The degradation was known, but no recorded control weighed the exposure it created.</dd></div>
+    </dl>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li class="fm-residual">None published — residual risk.</li></ul>
+    
+    <p class="fm-sub">Who acts — playbook</p><div class="rs-modepb"><div class="rs-mp"><span class="rs-mp-ph">Prevent</span><ul><li><b>Operations lead</b> Treat removal of cooling redundancy as a change with a compensating plan such as temporary chillers or reduced load<span class="rs-basis" title="Staged rollout, canary, automated rollback and peer review of changes (ITIL 4 change enablement; SRE release engineering)">Change management</span><span class="rs-basis rs-basis-ev" title="Analyst recommendation (not in the report): treat removal of cooling redundancy for construction as a change that needs a compensating plan, such as temporary chillers or reduced load.">Improvement #6</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Detect</span><ul><li><b>Mechanical / cooling engineer</b> Watch supply temperature and flow continuously while cooling runs without redundancy<span class="rs-basis" title="Thermal Guidelines for Data Processing Environments — allowable envelopes and excursions">ASHRAE TC 9.9</span><span class="rs-basis rs-basis-ev" title="Taking cooling redundancy out for construction turns the next routine event into a thermal emergency. Plan compensating measures for the construction window.">Lesson #3</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Contain</span><ul><li><b>Incident commander</b> Declare a thermal emergency early and start shutdown before the envelope is crossed<span class="rs-basis" title="FEMA National Incident Management System — Incident Command System: single command, span of control, unified command with outside agencies">NIMS / ICS</span><span class="rs-basis rs-basis-ev" title="Thermal events move fast: 44°C two hours after the trigger. Shutdown triggers and onsite staffing must be faster than the temperature rise.">Lesson #5</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Recover</span><ul><li><b>Vendor / upstream provider</b> Restore the redundant source and confirm both loops before ending the emergency<span class="rs-basis" title="Uptime Institute Tier Standard: Operational Sustainability — staffing, procedures, maintenance, drills">Uptime OS</span><span class="rs-basis rs-basis-ev" title="Taking cooling redundancy out for construction turns the next routine event into a thermal emergency. Plan compensating measures for the construction window.">Lesson #3</span></li></ul></div></div>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://status.cloud.google.com/incidents/3BvH3LVGcupoYqV6F4Nw" target="_blank" rel="noopener nofollow">Reference #1 · official-postmortem</a></span><span class="fm-ev-txt">“known ongoing construction work at the facility”</span></li><li><span class="fm-ev-src">Contributing factor #4</span><span class="fm-ev-txt">The redundant cooling source was out of service because of known ongoing construction work (Google report).</span></li><li><span class="fm-ev-src"><a href="https://Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw: &#x27;known ongoing construction work at the facility&#x27;" target="_blank" rel="noopener nofollow">Sequence of events #3</a></span><span class="fm-ev-txt">“The redundant cooling source is out of service because of known ongoing construction work”</span></li></ul>
+    <button type="button" class="fm-wi-open" data-id="FM-04" hidden>Open in what-if</button>
+  </div>
+</details><details class="fm-row" id="FM-01" data-id="FM-01">
+  <summary>
+    <span class="fm-id-cell">FM-01</span>
+    <span class="fm-mode">The DRUPS fails to take over the side A load because of electrical component failures<span class="fm-item">Side A diesel rotary UPS (DRUPS)</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 4, detection 7">8·4·7</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>224</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Carry side A of the facility through a utility disturbance until diesel or utility power returns</dd>
+      <dt>Effect</dt><dd>Side A is lost; three rows must transfer to feed B, and one of them fails</dd>
+      <dt>Cause</dt><dd>Electrical component failures in the side A DRUPS; details not disclosed</dd>
+      <dt>Prevention in place</dt><dd>A rotary UPS on each side; automatic row transfer to the other feed</dd>
+      <dt>Detection in place</dt><dd>None recorded before the event; the failure showed only when the DRUPS was called on</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>It removes one whole power side; with the transfer scheme working it would have been survivable, so 8 rather than 9.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>A rotary UPS failing at the moment of demand is uncommon but plausible: &#x27;infrequent&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>7</b></dt><dd>No recorded test or alarm found the faulty components beforehand.</dd></div>
+    </dl>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Investigate the DRUPS transfer failure (Google, committed; completion not reported) <span class="fm-ev-src">Correction of errors #1</span></li><li>Swing DRUPS in place while the faulty unit is repaired (facility team) <span class="fm-ev-src">Correction of errors #9</span></li></ul>
+    
+    <p class="fm-sub">Who acts — playbook</p><div class="rs-modepb"><div class="rs-mp"><span class="rs-mp-ph">Prevent</span><ul><li><b>Authorised electrical person</b> Load-test each rotary UPS on a schedule and after any component work, and track faults to closure<span class="rs-basis" title="Standard for Emergency and Standby Power Systems">NFPA 110</span><span class="rs-basis rs-basis-ev" title="Investigate the sequence that stopped the load transfer to DRUPS and identify system improvements (Committed, ETA Aug 2026 (completion not reported))">Correction of errors #1</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Detect</span><ul><li><b>First responder</b> Confirm at the switchboard which side is on DRUPS and which has dropped within the first minute<span class="rs-basis" title="Uptime Institute Tier Standard: Operational Sustainability — staffing, procedures, maintenance, drills">Uptime OS</span><span class="rs-basis rs-basis-ev" title="The side A DRUPS failed to take the load because of electrical component failures (Google report).">Contributing factor #1</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Contain</span><ul><li><b>Authorised electrical person</b> Isolate the failed DRUPS and align a swing unit to restore redundancy<span class="rs-basis" title="Operation of electrical installations — switching, isolation, safe working">EN 50110-1</span><span class="rs-basis rs-basis-ev" title="Swing DRUPS unit aligned to restore feed A redundancy while the faulty DRUPS is repaired (Swing unit in place; repair in progress at the time of the report)">Correction of errors #9</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Recover</span><ul><li><b>Vendor / upstream provider</b> Repair the failed DRUPS components and prove the unit under load before returning it to service<span class="rs-basis" title="Standard for Emergency and Standby Power Systems">NFPA 110</span><span class="rs-basis rs-basis-ev" title="Swing DRUPS unit aligned to restore feed A redundancy while the faulty DRUPS is repaired (Swing unit in place; repair in progress at the time of the report)">Correction of errors #9</span></li></ul></div></div>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw: &#x27;failed to take over the facility load due to electrical component failures&#x27;" target="_blank" rel="noopener nofollow">Sequence of events #2</a></span><span class="fm-ev-txt">“fails to take over the load because of electrical component failures”</span></li><li><span class="fm-ev-src">Contributing factor #1</span><span class="fm-ev-txt">The side A DRUPS failed to take the load because of electrical component failures (Google report).</span></li><li><span class="fm-ev-src">Root cause</span><span class="fm-ev-txt">“The side A DRUPS failed to take over the facility load due to electrical component failures”</span></li></ul>
+    <button type="button" class="fm-wi-open" data-id="FM-01" hidden>Open in what-if</button>
+  </div>
+</details><details class="fm-row" id="FM-02" data-id="FM-02">
+  <summary>
+    <span class="fm-id-cell">FM-02</span>
+    <span class="fm-mode">Row 3&#x27;s transfer trips an overload protection breaker and the row loses both feeds<span class="fm-item">Row 3 automatic transfer to feed B</span></span>
+    <span class="fm-sod" aria-label="Severity 7, occurrence 4, detection 8">7·4·8</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>224</span>
+    <span class="fm-rpn-rev">126</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Move each row&#x27;s load to the surviving feed when one feed is lost</dd>
+      <dt>Effect</dt><dd>Complete power loss to every rack in Row 3</dd>
+      <dt>Cause</dt><dd>Load deployment discrepancy: the row&#x27;s load did not fit the surviving feed (under investigation)</dd>
+      <dt>Prevention in place</dt><dd>2N distribution with automatic transfer between feeds</dd>
+      <dt>Detection in place</dt><dd>None recorded; the mismatch surfaced only on transfer</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>7</b></dt><dd>One row loses power completely; the hall-wide outage came from cooling, so this is scored 7.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>Rows drifting past single-feed capacity is a known operational risk: &#x27;infrequent&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>8</b></dt><dd>Nothing caught the discrepancy before the transfer was demanded.</dd></div>
+    </dl>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Find and resolve the overload cause (Google, committed; completion not reported) <span class="fm-ev-src">Correction of errors #2</span></li></ul>
+    <p class="fm-revline">After action: S7 · O3 · D6 → RPN 126. Committed but not reported complete: if the load discrepancy is found and per-row load is checked against single-feed capacity, both occurrence and detection improve. This is a claim about the action, not a confirmed result.</p>
+    <p class="fm-sub">Who acts — playbook</p><div class="rs-modepb"><div class="rs-mp"><span class="rs-mp-ph">Prevent</span><ul><li><b>Operations lead</b> Keep deployed load per row within what one feed can carry, and check it at every deployment<span class="rs-basis" title="Uptime Institute Tier Standard: Operational Sustainability — staffing, procedures, maintenance, drills">Uptime OS</span><span class="rs-basis rs-basis-ev" title="Find and resolve the cause of the overload that cut power to Row 3 (Committed, ETA Aug 2026 (completion not reported))">Correction of errors #2</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Detect</span><ul><li><b>Authorised electrical person</b> Alarm when any row&#x27;s measured load exceeds single-feed capacity<span class="rs-basis" title="Uptime Institute Tier Standard: Operational Sustainability — staffing, procedures, maintenance, drills">Uptime OS</span><span class="rs-basis rs-basis-ev" title="Automatic transfer schemes only work if each row&#x27;s load fits the surviving feed. Track deployed load per row against single-feed capacity.">Lesson #4</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Contain</span><ul><li><b>Authorised electrical person</b> Once the fault is isolated, reset the tripped breakers and verify panels before re-energising<span class="rs-basis" title="Standard for Electrical Safety in the Workplace — energised work, isolation, lock-out">NFPA 70E</span><span class="rs-basis rs-basis-ev" title="Row 3 tripped an overload protection breaker on transfer to feed B: a load deployment discrepancy, still under investigation (Google report).">Contributing factor #2</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Recover</span><ul><li><b>Service recovery lead</b> Bring Row 3 workloads back in order and verify redundancy on both feeds<span class="rs-basis" title="Google SRE: Managing Incidents — incident commander, operations, communications and planning roles; declare early">SRE incident mgmt</span><span class="rs-basis rs-basis-ev" title="Automatic transfer schemes only work if each row&#x27;s load fits the surviving feed. Track deployed load per row against single-feed capacity.">Lesson #4</span></li></ul></div></div>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw: &#x27;Row 3 failed to transfer to power feed B and lost power&#x27;" target="_blank" rel="noopener nofollow">Sequence of events #6</a></span><span class="fm-ev-txt">“Row 3 fails to transfer because an overload protection breaker trips”</span></li><li><span class="fm-ev-src">Contributing factor #2</span><span class="fm-ev-txt">Row 3 tripped an overload protection breaker on transfer to feed B: a load deployment discrepancy, still under investigation (Google report).</span></li><li><span class="fm-ev-src"><a href="https://Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw, Root Cause" target="_blank" rel="noopener nofollow">Metric #9</a></span><span class="fm-ev-txt">Rows on feed A that had to transfer: 3; Rows 1 and 2 transferred, Row 3 lost power</span></li></ul>
+    <button type="button" class="fm-wi-open" data-id="FM-02" hidden>Open in what-if</button>
+  </div>
+</details><details class="fm-row" id="FM-03" data-id="FM-03">
+  <summary>
+    <span class="fm-id-cell">FM-03</span>
+    <span class="fm-mode">The chiller controller drops offline on the transient; pumps stop and do not restart, and chiller A shuts down<span class="fm-item">Chiller controller and chilled-water pumps</span></span>
+    <span class="fm-sod" aria-label="Severity 9, occurrence 4, detection 4">9·4·4</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>144</span>
+    <span class="fm-rpn-rev">108</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Keep chilled water flowing to the data hall through a power disturbance</dd>
+      <dt>Effect</dt><dd>No chilled water to the hall; temperature reaches 44°C and equipment is shut down</dd>
+      <dt>Cause</dt><dd>Controller without ride-through on the transient; pumps depend on a restart command</dd>
+      <dt>Prevention in place</dt><dd>Chillers on power; redundant cooling source (unavailable at the time)</dd>
+      <dt>Detection in place</dt><dd>Remote monitoring alerted on high temperature at 16:32 and switch temperature alerts at 17:05</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>9</b></dt><dd>It forced a hall-wide thermal shutdown of every product in the zone&#x27;s affected hall: 9. Not 10, because no hazard to people is recorded.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>Controller dropouts on transients happen but are not frequent: &#x27;infrequent&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>4</b></dt><dd>Temperature alerts came within minutes, but they did not stop the rise.</dd></div>
+    </dl>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Interim portable UPS for the chiller controllers (facility team, done) <span class="fm-ev-src">Correction of errors #8</span></li><li>Investigate pump control redundancy (Google, committed; completion not reported) <span class="fm-ev-src">Correction of errors #3</span></li></ul>
+    <p class="fm-revline">After action: S9 · O3 · D4 → RPN 108. The portable UPS is in place, so the same transient should no longer drop the controller. It is an interim measure; the permanent pump-control review is committed but not reported complete.</p>
+    <p class="fm-sub">Who acts — playbook</p><div class="rs-modepb"><div class="rs-mp"><span class="rs-mp-ph">Prevent</span><ul><li><b>Mechanical / cooling engineer</b> Put chiller controllers on protected power and make pumps restart on their own after power returns<span class="rs-basis" title="Thermal Guidelines for Data Processing Environments — allowable envelopes and excursions">ASHRAE TC 9.9</span><span class="rs-basis rs-basis-ev" title="Interim portable UPS to keep the chiller controllers powered (Done, stated in the report)">Correction of errors #8</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Detect</span><ul><li><b>Mechanical / cooling engineer</b> Alarm on loss of chilled-water flow, not only on rising room temperature<span class="rs-basis" title="Thermal Guidelines for Data Processing Environments — allowable envelopes and excursions">ASHRAE TC 9.9</span><span class="rs-basis rs-basis-ev" title="Pumps that need a restart command after a power event are a single point of failure; restart-on-power-return or hand-mode fallback must be designed in and drilled.">Lesson #2</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Contain</span><ul><li><b>Mechanical / cooling engineer</b> Switch pumps to hand mode to restore flow at once when the controller is down<span class="rs-basis" title="Uptime Institute Tier Standard: Operational Sustainability — staffing, procedures, maintenance, drills">Uptime OS</span><span class="rs-basis rs-basis-ev" title="Pumps that need a restart command after a power event are a single point of failure; restart-on-power-return or hand-mode fallback must be designed in and drilled.">Lesson #2</span></li><li><b>Service recovery lead</b> Shut down equipment in priority order before the hall passes the allowable envelope<span class="rs-basis" title="Thermal Guidelines for Data Processing Environments — allowable envelopes and excursions">ASHRAE TC 9.9</span><span class="rs-basis rs-basis-ev" title="Automate shutdown triggering during fast thermal runaway for VMware Engine (Committed, ETA Oct 2026 (completion not reported))">Correction of errors #5</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Recover</span><ul><li><b>Operations lead</b> Restart workloads only after the hall is back inside the allowable range<span class="rs-basis" title="Thermal Guidelines for Data Processing Environments — allowable envelopes and excursions">ASHRAE TC 9.9</span><span class="rs-basis rs-basis-ev" title="Thermal events move fast: 44°C two hours after the trigger. Shutdown triggers and onsite staffing must be faster than the temperature rise.">Lesson #5</span></li></ul></div></div>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw: &#x27;known ongoing construction work at the facility&#x27;" target="_blank" rel="noopener nofollow">Sequence of events #3</a></span><span class="fm-ev-txt">“the chilled-water distribution pumps stop and cannot restart”</span></li><li><span class="fm-ev-src"><a href="https://Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw, DataCenter events" target="_blank" rel="noopener nofollow">Metric #2</a></span><span class="fm-ev-txt">Peak data hall temperature: 44°C at 18:29 PDT</span></li><li><span class="fm-ev-src">Contributing factor #3</span><span class="fm-ev-txt">The chiller controller dropped offline on the transient and the distribution pumps did not restart on their own (Google report).</span></li></ul>
+    <button type="button" class="fm-wi-open" data-id="FM-03" hidden>Open in what-if</button>
+  </div>
+</details><details class="fm-row" id="FM-05" data-id="FM-05">
+  <summary>
+    <span class="fm-id-cell">FM-05</span>
+    <span class="fm-mode">Shutdown is manual and recovery needs an onsite technician for console servers<span class="fm-item">Thermal shutdown and recovery</span></span>
+    <span class="fm-sod" aria-label="Severity 7, occurrence 5, detection 3">7·5·3</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>105</span>
+    <span class="fm-rpn-rev">84</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Protect equipment in a thermal event and bring services back quickly</dd>
+      <dt>Effect</dt><dd>Customer disruption lasts 14 hours 55 minutes, long after cooling returned at 21:05</dd>
+      <dt>Cause</dt><dd>Manual shutdown procedure; out-of-band console access needed physical recovery</dd>
+      <dt>Prevention in place</dt><dd>Cooling emergency shutdown procedure; NetApp clusters&#x27; automatic thermal shutdown</dd>
+      <dt>Detection in place</dt><dd>Monitoring and probers alerted within minutes</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>7</b></dt><dd>It stretches the outage for 33 customers well past the physical fix: 7.</dd></div>
+      <div class="fm-sc"><dt>O <b>5</b></dt><dd>Any thermal event needs shutdown and restart: &#x27;occasional&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>3</b></dt><dd>Monitoring detected the problem quickly; the gap is in response speed.</dd></div>
+    </dl>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Automated shutdown during fast thermal runaway (GCVE, committed) <span class="fm-ev-src">Correction of errors #5</span></li><li>Incident classification and staffing for major data center events (BMS, committed) <span class="fm-ev-src">Correction of errors #6</span></li><li>Joint runbooks, monthly emergency drill, faster cluster recovery (NetApp Volumes, committed) <span class="fm-ev-src">Correction of errors #7</span></li></ul>
+    <p class="fm-revline">After action: S7 · O4 · D3 → RPN 84. Automation and drills should shorten the next event&#x27;s tail; all three are committed but not reported complete.</p>
+    <p class="fm-sub">Who acts — playbook</p><div class="rs-modepb"><div class="rs-mp"><span class="rs-mp-ph">Detect</span><ul><li><b>Operations lead</b> Trigger shutdown automatically on a temperature rate of rise, not only on a fixed threshold<span class="rs-basis" title="Thermal Guidelines for Data Processing Environments — allowable envelopes and excursions">ASHRAE TC 9.9</span><span class="rs-basis rs-basis-ev" title="Automate shutdown triggering during fast thermal runaway for VMware Engine (Committed, ETA Oct 2026 (completion not reported))">Correction of errors #5</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Contain</span><ul><li><b>Service recovery lead</b> Shut down in a set order so storage and network recover cleanly<span class="rs-basis" title="Google SRE: Managing Incidents — incident commander, operations, communications and planning roles; declare early">SRE incident mgmt</span><span class="rs-basis rs-basis-ev" title="Review incident SLAs and runbooks with the data center team, create playbooks, run a monthly joint emergency drill and speed up NetApp cluster recovery (Committed, ETA Aug 2026 (completion not reported))">Correction of errors #7</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Recover</span><ul><li><b>First responder</b> Keep a technician on call for console servers during any major facility event<span class="rs-basis" title="Uptime Institute Tier Standard: Operational Sustainability — staffing, procedures, maintenance, drills">Uptime OS</span><span class="rs-basis rs-basis-ev" title="Update incident classification and SLO definitions to improve personnel availability during major data center events (Committed, ETA Sep 2026 (completion not reported))">Correction of errors #6</span></li><li><b>Communications lead</b> Give customers restoration times per product as each one recovers<span class="rs-basis" title="Google SRE: Managing Incidents — incident commander, operations, communications and planning roles; declare early">SRE incident mgmt</span><span class="rs-basis rs-basis-ev" title="Review incident SLAs and runbooks with the data center team, create playbooks, run a monthly joint emergency drill and speed up NetApp cluster recovery (Committed, ETA Aug 2026 (completion not reported))">Correction of errors #7</span></li></ul></div></div><p class="fm-sub">On the record at this failure</p><ul class="rs-at"><li><a href="#soe-17"><time>2026-07-15 22:40–23:10 PDT</time></a><b>First responder</b> Recovered the console servers on site</li></ul>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw, GCVE timeline" target="_blank" rel="noopener nofollow">Sequence of events #17</a></span><span class="fm-ev-txt">“Onsite technician arrived to recover the console servers”</span></li><li><span class="fm-ev-src"><a href="https://Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw: &#x27;a total duration of 14 hours, 55 minutes&#x27;" target="_blank" rel="noopener nofollow">Metric #5</a></span><span class="fm-ev-txt">Total customer disruption: 14 hours 55 minutes (16:39 15 Jul → 07:34 16 Jul PDT)</span></li><li><span class="fm-ev-src">Contributing factor #6</span><span class="fm-ev-txt">Console servers needed an onsite technician to recover, which delayed network restoration after cooling returned (Google report, GCVE timeline).</span></li></ul>
+    <button type="button" class="fm-wi-open" data-id="FM-05" hidden>Open in what-if</button>
+  </div>
+</details>
+        </div>
+        <details class="fm-method"><summary>Scoring rubric and method</summary><div class="fm-method-body"><p>Scales adapted from IEC 60812:2018 and AIAG-VDA. RPN = S × O × D. High: S ≥ 9 with O ≥ 4 or D ≥ 7, or RPN ≥ 300. Medium: RPN ≥ 120 or S ≥ 7. Severity overrides the product: 9 × 2 × 9 = 162 would otherwise hide a region-wide outage nothing could catch. Quotes are checked verbatim against this dossier; a revised score needs a published action. RZ analyst assessment, not an operator document.</p><div class="fm-rubrics"><div><p class="fm-sub">Severity</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Hazard to people, or loss of the facility / several regions</td></tr><tr><td>9</td><td>Region-wide or provider-wide outage of a foundational service, no workaround</td></tr><tr><td>8</td><td>Full outage of a major service for hours</td></tr><tr><td>7</td><td>Major degradation of a major service</td></tr><tr><td>6</td><td>Partial outage confined to one zone or one service</td></tr><tr><td>5</td><td>Customer-visible degradation</td></tr><tr><td>4</td><td>Limited customer impact</td></tr><tr><td>3</td><td>Internal impact only</td></tr><tr><td>2</td><td>Negligible</td></tr><tr><td>1</td><td>No effect</td></tr></tbody></table></div><div><p class="fm-sub">Occurrence</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Near certain: the cause is present in normal operation</td></tr><tr><td>8</td><td>Frequent: routine work exercises the cause</td></tr><tr><td>6</td><td>Occasional: a foreseeable slip or condition, weakly guarded</td></tr><tr><td>4</td><td>Infrequent: needs an unusual combination</td></tr><tr><td>2</td><td>Remote: guarded by design</td></tr><tr><td>1</td><td>Eliminated by design</td></tr></tbody></table></div><div><p class="fm-sub">Detection</p><table class="fm-rubric"><tbody><tr><td>10</td><td>No control could detect it</td></tr><tr><td>9</td><td>Detected only through customer impact</td></tr><tr><td>8</td><td>Detected after impact by internal monitoring</td></tr><tr><td>6</td><td>Detected at onset, not prevented</td></tr><tr><td>4</td><td>Detected before impact with time to act</td></tr><tr><td>2</td><td>Automated interlock almost certainly stops it</td></tr><tr><td>1</td><td>Certain to be stopped</td></tr></tbody></table></div></div></div></details>
+</section>
+
+        <section class="inc-sec" id="causes" aria-labelledby="h-causes">
+        <h2 id="h-causes">Root cause and contributing factors</h2>
+        <div class="card rc-lead">TRIGGER: a 3 ms voltage transient on the utility grid upstream of the data center hosting europe-west4-a tripped the utility breakers on both feeds A and B at 16:24 PDT on 15 July 2026, and the site transferred to its diesel rotary UPS (DRUPS).
+
+POWER CHAIN: side B went to DRUPS cleanly. The side A DRUPS failed to take over the facility load due to electrical component failures, so the three rows on feed A had to transfer automatically to feed B. Two rows did.</div><details class="inc-more"><summary>Full root-cause narrative</summary><div class="card">Row 3 hit an overload protection breaker trip and lost both feeds; Google attributes this to a load deployment discrepancy, still under investigation at the time of the report.
+
+COOLING CHAIN: the same transient knocked the chiller controller offline. The chillers kept power but the chilled-water distribution pumps stopped and could not restart, so with no water flow chiller system A shut down. The redundant cooling source was unavailable because of known ongoing construction work at the facility. The hall reached 44°C two hours later and the equipment had to be shut down.
+
+LATENT ROOT: three independent weaknesses lined up on one transient: a DRUPS that could not carry its load, a row whose load did not fit the surviving feed, and a cooling plant whose controls had no ride-through and whose redundancy had been removed for construction. The facility team&#x27;s own fix, a portable UPS for the chiller controllers, indicates the controllers were not on protected power (analyst inference from the action taken).</div></details>
+        <h3 class="inc-h3">Contributing factors by category</h3><figure class="inc-fig"><div class="inc-fig-scroll"><div class="inc-fig-svg" style="max-width:848px;min-width:679px"><svg viewBox="0 0 848 296" role="img" aria-labelledby="fb-gcp-europe-west4-a-drups-title fb-gcp-europe-west4-a-drups-desc" preserveAspectRatio="xMidYMid meet"><title id="fb-gcp-europe-west4-a-drups-title">Contributing factors by category — Google Cloud</title><desc id="fb-gcp-europe-west4-a-drups-desc">Equipment: DRUPS A fails; Chiller controller drops. Design: Row 3 over one feed; Controls unprotected. Process: Manual thermal shutdown; Console needs technician. Environment: Cooling backup offline. External: 3 ms grid transient. Effect: europe-west4-a hall shut down.</desc><defs><marker id="fb-gcp-europe-west4-a-drups-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="var(--t2)"/></marker></defs><rect width="848" height="296" fill="var(--bg1)"/><path d="M 185.53060000000005 64 L 185.53060000000005 148" fill="none" stroke="var(--t2)" stroke-width="1" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 175.53060000000005 88 L 184.53060000000005 88" fill="none" stroke="var(--t2)" stroke-width="0.6" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 175.53060000000005 112 L 184.53060000000005 112" fill="none" stroke="var(--t2)" stroke-width="0.6" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 369.53060000000005 64 L 369.53060000000005 148" fill="none" stroke="var(--t2)" stroke-width="1" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 359.53060000000005 88 L 368.53060000000005 88" fill="none" stroke="var(--t2)" stroke-width="0.6" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 359.53060000000005 112 L 368.53060000000005 112" fill="none" stroke="var(--t2)" stroke-width="0.6" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 553.5306 64 L 553.5306 148" fill="none" stroke="var(--t2)" stroke-width="1" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 543.5306 88 L 552.5306 88" fill="none" stroke="var(--t2)" stroke-width="0.6" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 185.53060000000005 232 L 185.53060000000005 148" fill="none" stroke="var(--t2)" stroke-width="1" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 175.53060000000005 172 L 184.53060000000005 172" fill="none" stroke="var(--t2)" stroke-width="0.6" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 175.53060000000005 196 L 184.53060000000005 196" fill="none" stroke="var(--t2)" stroke-width="0.6" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 369.53060000000005 232 L 369.53060000000005 148" fill="none" stroke="var(--t2)" stroke-width="1" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 359.53060000000005 172 L 368.53060000000005 172" fill="none" stroke="var(--t2)" stroke-width="0.6" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 32 148 L 601.5306 148" fill="none" stroke="var(--t1)" stroke-width="1.4" marker-end="url(#fb-gcp-europe-west4-a-drups-arrow)" data-rzd-transit="0" data-rzd-rerouted="0"/><rect x="601.5306" y="118" width="220" height="40" rx="6" fill="var(--bg1)"/><rect x="601.5306" y="118" width="220" height="40" rx="6" fill="var(--bg3)" stroke="var(--o)" stroke-width="1.4"/><rect x="139.53060000000005" y="24" width="92" height="40" rx="6" fill="var(--bg1)"/><rect x="139.53060000000005" y="24" width="92" height="40" rx="6" fill="var(--bg1)" stroke="var(--bd2)" stroke-width="1"/><rect x="329.53060000000005" y="24" width="80" height="40" rx="6" fill="var(--bg1)"/><rect x="329.53060000000005" y="24" width="80" height="40" rx="6" fill="var(--bg1)" stroke="var(--bd2)" stroke-width="1"/><rect x="511.53060000000005" y="24" width="84" height="40" rx="6" fill="var(--bg1)"/><rect x="511.53060000000005" y="24" width="84" height="40" rx="6" fill="var(--bg1)" stroke="var(--bd2)" stroke-width="1"/><rect x="151.53060000000005" y="232" width="68" height="40" rx="6" fill="var(--bg1)"/><rect x="151.53060000000005" y="232" width="68" height="40" rx="6" fill="var(--bg1)" stroke="var(--bd2)" stroke-width="1"/><rect x="317.53060000000005" y="232" width="104" height="40" rx="6" fill="var(--bg1)"/><rect x="317.53060000000005" y="232" width="104" height="40" rx="6" fill="var(--bg1)" stroke="var(--bd2)" stroke-width="1"/><text x="711.5306" y="140" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">europe-west4-a hall shut down</text><text x="185.53060000000005" y="46" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Equipment</text><text x="171.53060000000005" y="92" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="11" font-weight="400" text-anchor="end">DRUPS A fails</text><text x="171.53060000000005" y="116" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="11" font-weight="400" text-anchor="end">Chiller controller drops</text><text x="369.53060000000005" y="46" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Process</text><text x="355.53060000000005" y="92" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="11" font-weight="400" text-anchor="end">Manual thermal shutdown</text><text x="355.53060000000005" y="116" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="11" font-weight="400" text-anchor="end">Console needs technician</text><text x="553.5306" y="46" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">External</text><text x="539.5306" y="92" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="11" font-weight="400" text-anchor="end">3 ms grid transient</text><text x="185.53060000000005" y="254" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Design</text><text x="171.53060000000005" y="176" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="11" font-weight="400" text-anchor="end">Row 3 over one feed</text><text x="171.53060000000005" y="200" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="11" font-weight="400" text-anchor="end">Controls unprotected</text><text x="369.53060000000005" y="254" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Environment</text><text x="355.53060000000005" y="176" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="11" font-weight="400" text-anchor="end">Cooling backup offline</text></svg></div></div><figcaption>Each short label stands for a contributing factor or failure mode recorded in this dossier; the full sentences are listed below.</figcaption></figure>
+        <ul class="tight"><li>The side A DRUPS failed to take the load because of electrical component failures (Google report).</li><li>Row 3 tripped an overload protection breaker on transfer to feed B: a load deployment discrepancy, still under investigation (Google report).</li><li>The chiller controller dropped offline on the transient and the distribution pumps did not restart on their own (Google report).</li><li>The redundant cooling source was out of service because of known ongoing construction work (Google report).</li><li>Chiller controllers apparently lacked protected power: the fix was an interim portable UPS for them (analyst inference from the action).</li><li>Console servers needed an onsite technician to recover, which delayed network restoration after cooling returned (Google report, GCVE timeline).</li><li>Thermal shutdown was a manual procedure; Google is now automating shutdown for fast-moving thermal events (Google report).</li></ul>
+        <h3 class="inc-h3">Analysis</h3><details class="inc-more"><summary>One transient, three failures</summary><p>A 3 ms dip should be a non-event for a site with two feeds, a rotary UPS on each side and redundant cooling. Here it found a failed DRUPS on side A, an overloaded row that could not move to side B, and a <span data-explain="chiller" tabindex="0">chiller</span> controller with no ride-through while the second cooling source was out for construction. Each weakness alone would have been survivable.</p></details><details class="inc-more"><summary>Cooling failed through its controls</summary><p>The chillers kept power. What stopped was the controller and therefore the pumps. The repair was to put the pumps in hand mode. Controls and pumps belong in the same protected-power and restart design as the chillers, or cooling capacity on paper is not capacity in an event.</p></details><details class="inc-more"><summary>Construction as a hidden degradation</summary><p>The redundant cooling source was out for known construction work. Planned degradation is common, but the record shows no compensating measure for the window, and the event happened inside it.</p></details><details class="inc-more"><summary>Speed of a thermal event</summary><p>From transient to 44°C took about two hours; NetApp clusters shut themselves down after about an hour. Google ran manual shutdown procedures and is now automating them, and is changing incident classification so enough people are available during major data center events.</p></details><details class="inc-more"><summary>What the record does not say</summary><p>The report does not name the data center provider, the DRUPS make or the failed components, the chiller or pump models, or the cost. It also does not say whether the committed actions due in August to October 2026 have been completed.</p></details>
+        <details class="inc-more"><summary>Technical deep-dive</summary><div class="card">A rotary UPS bridges the gap to diesel with a flywheel; if its electrical components fail, the side it protects drops to the automatic transfer scheme. That scheme only works if every row&#x27;s load fits the surviving feed: Row 3 tripped its overload protection, the textbook symptom of a row loaded beyond what one feed can carry alone (Google calls it a load deployment discrepancy).
+
+The cooling failure is a controls failure, not a chiller failure. A brief transient reset or dropped the chiller controller; the pumps needed a restart command that never came. The quick fix was mechanical: pumps put in hand mode. With the redundant source out for construction there was no second loop, so the hall rose to 44°C in about two hours and Google shut down reachable equipment. Recovery then needed an onsite technician for console servers, which added time after cooling was back at 21:05.</div></details>
+        </section>
+
+        <section class="inc-sec" id="actions" aria-labelledby="h-actions">
+        <h2 id="h-actions">Corrective actions and lessons</h2>
+        <h3 class="inc-h3">Correction of errors</h3>
+        <div class="table-wrap"><table class="coe"><thead><tr><th>Action</th><th>Owner</th><th>Status</th></tr></thead><tbody><tr><td>Investigate the sequence that stopped the load transfer to DRUPS and identify system improvements</td><td class="c-own">Google with the data center provider</td><td class="c-st">Committed, ETA Aug 2026 (completion not reported)</td></tr><tr><td>Find and resolve the cause of the overload that cut power to Row 3</td><td class="c-own">Google</td><td class="c-st">Committed, ETA Aug 2026 (completion not reported)</td></tr><tr><td>Investigate chiller pump control redundancy to make the cooling system resilient</td><td class="c-own">Google with the data center provider</td><td class="c-st">Committed, ETA Sep 2026 (completion not reported)</td></tr><tr><td>Improve facility monitoring alerts for power events and set early thresholds for cooling excursions</td><td class="c-own">Google</td><td class="c-st">Committed, ETA Aug 2026 (completion not reported)</td></tr><tr><td>Automate shutdown triggering during fast thermal runaway for VMware Engine</td><td class="c-own">Google Cloud (GCVE)</td><td class="c-st">Committed, ETA Oct 2026 (completion not reported)</td></tr><tr><td>Update incident classification and SLO definitions to improve personnel availability during major data center events</td><td class="c-own">Google Cloud (BMS)</td><td class="c-st">Committed, ETA Sep 2026 (completion not reported)</td></tr><tr><td>Review incident SLAs and runbooks with the data center team, create playbooks, run a monthly joint emergency drill and speed up NetApp cluster recovery</td><td class="c-own">Google Cloud (NetApp Volumes)</td><td class="c-st">Committed, ETA Aug 2026 (completion not reported)</td></tr><tr><td>Interim portable UPS to keep the chiller controllers powered</td><td class="c-own">Facility team</td><td class="c-st">Done, stated in the report</td></tr><tr><td>Swing DRUPS unit aligned to restore feed A redundancy while the faulty DRUPS is repaired</td><td class="c-own">Facility team</td><td class="c-st">Swing unit in place; repair in progress at the time of the report</td></tr></tbody></table></div>
+        <h3 class="inc-h3">Lessons learnt</h3>
+        <ul class="tight"><li>A cooling plant&#x27;s controls are part of the critical load. If a 3 ms transient can drop the chiller controller, the cooling plant has no ride-through no matter how much the chillers can do.</li><li>Pumps that need a restart command after a power event are a single point of failure; restart-on-power-return or hand-mode fallback must be designed in and drilled.</li><li>Taking cooling redundancy out for construction turns the next routine event into a thermal emergency. Plan compensating measures for the construction window.</li><li>Automatic transfer schemes only work if each row&#x27;s load fits the surviving feed. Track deployed load per row against single-feed capacity.</li><li>Thermal events move fast: 44°C two hours after the trigger. Shutdown triggers and onsite staffing must be faster than the temperature rise.</li><li>Recovery depends on out-of-band access: needing a technician on site for console servers lengthened the outage after cooling returned.</li></ul>
+        <h3 class="inc-h3">Improvements</h3>
+        <ul class="tight"><li>Safety and cooling: keep chiller controllers on protected power (interim portable UPS done) and review pump control redundancy (Google committed).</li><li><span class="imp-tag">Design</span>investigate the DRUPS transfer failure and restore full A-side redundancy (swing DRUPS in place; investigation committed).</li><li><span class="imp-tag">Design</span>resolve the Row 3 overload so every row fits one surviving feed (Google committed).</li><li>Monitoring: earlier alerts for power events and cooling excursions (Google committed).</li><li><span class="imp-tag">Process</span>automated shutdown for fast thermal runaway, updated incident classification for staffing, joint runbooks and a monthly emergency drill with the data center team (Google committed).</li><li>Analyst recommendation (not in the report): treat removal of cooling redundancy for construction as a change that needs a compensating plan, such as temporary chillers or reduced load.</li></ul>
+        </section>
+
+        <section class="inc-sec" id="sources" aria-labelledby="h-sources">
+        <h2 id="h-sources">References and provenance</h2>
+        <ul class="refs"><li><span class="chip green">official-postmortem</span> <span class="rtitle">Google Cloud Service Health, incident 3BvH3LVGcupoYqV6F4Nw, final incident report (25 Jul 2026)</span><span class="rquote">“The redundant source was not available due to known ongoing construction work at the facility.”</span><a href="https://status.cloud.google.com/incidents/3BvH3LVGcupoYqV6F4Nw" target="_blank" rel="noopener nofollow">https://status.cloud.google.com/incidents/3BvH3LVGcupoYqV6F4Nw</a></li><li><span class="chip cyan">vendor-status</span> <span class="rtitle">Google Cloud Service Health, incident 3BvH3LVGcupoYqV6F4Nw, preliminary incident report (17 Jul 2026)</span><span class="rquote">“experienced a loss of utility power and subsequent cooling capacity”</span><a href="https://status.cloud.google.com/incidents/3BvH3LVGcupoYqV6F4Nw" target="_blank" rel="noopener nofollow">https://status.cloud.google.com/incidents/3BvH3LVGcupoYqV6F4Nw</a></li></ul>
+        <p class="disclaimer">Quotes are short, attributed, and for provenance only; the analysis is original. Last verified 2026-11-11.</p>
+        </section>
+        <aside class="share-buttons" aria-label="Share this dossier"><span class="share-label">Share</span><button class="share-btn" onclick="rzShare('li')" aria-label="Share on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 11 0-4.124 2.062 2.062 0 010 4.124zM7.119 20.452H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg></button><button class="share-btn" onclick="rzShare('x')" aria-label="Share on X" title="X"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></button><button class="share-btn" onclick="rzShare('wa')" aria-label="Share on WhatsApp" title="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347M12.05 21.785h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884"/></svg></button><button class="share-btn" onclick="rzShare('copy',this)" aria-label="Copy link" title="Copy link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></aside><script>function rzShare(k,btn){var u=encodeURIComponent(location.href),t=encodeURIComponent(document.title);if(k==="li")open("https://www.linkedin.com/sharing/share-offsite/?url="+u,"_blank","noopener");else if(k==="x")open("https://twitter.com/intent/tweet?url="+u+"&text="+t,"_blank","noopener");else if(k==="wa")open("https://wa.me/?text="+t+"%20"+u,"_blank","noopener");else if(k==="copy"){navigator.clipboard&&navigator.clipboard.writeText(location.href);if(btn){var o=btn.getAttribute("title");btn.setAttribute("title","Copied");setTimeout(function(){btn.setAttribute("title",o);},1500);}}}</script>
+        </div>
+<script>(function(){
+var tl=document.querySelector('.rs-tabs');if(!tl)return;
+var tabs=[].slice.call(tl.querySelectorAll('[role=tab]'));
+function sel(t,focus){tabs.forEach(function(b){var on=b===t;b.setAttribute('aria-selected',on?'true':'false');b.tabIndex=on?0:-1;
+var p=document.getElementById(b.getAttribute('aria-controls'));if(p){if(on)p.removeAttribute('hidden');else p.setAttribute('hidden','');}});if(focus)t.focus();}
+document.querySelectorAll('.rs-panel[data-rs-hidden]').forEach(function(p){p.setAttribute('hidden','');});
+tabs.forEach(function(b,i){b.addEventListener('click',function(){sel(b);});
+b.addEventListener('keydown',function(e){var j=null;if(e.key==='ArrowRight'||e.key==='ArrowDown')j=(i+1)%tabs.length;else if(e.key==='ArrowLeft'||e.key==='ArrowUp')j=(i-1+tabs.length)%tabs.length;else if(e.key==='Home')j=0;else if(e.key==='End')j=tabs.length-1;if(j!==null){e.preventDefault();sel(tabs[j],true);}});});
+})();</script><script>(function(){
+var nav=document.querySelector('.inc-nav');if(!nav||!('IntersectionObserver' in window))return;
+var links={};[].forEach.call(nav.querySelectorAll('a'),function(a){links[a.getAttribute('href').slice(1)]=a;});
+var cur=null;function set(id){if(id===cur||!links[id])return;if(cur&&links[cur])links[cur].removeAttribute('aria-current');links[id].setAttribute('aria-current','true');cur=id;
+var a=links[id],s=nav.querySelector('.inc-nav-in');if(s&&(a.offsetLeft<s.scrollLeft||a.offsetLeft+a.offsetWidth>s.scrollLeft+s.clientWidth))s.scrollLeft=a.offsetLeft-16;}
+var vis={};var io=new IntersectionObserver(function(es){es.forEach(function(e){vis[e.target.id]=e.isIntersecting;});
+var ids=Object.keys(links);for(var i=0;i<ids.length;i++){if(vis[ids[i]]){set(ids[i]);break;}}},{rootMargin:'-120px 0px -55% 0px'});
+Object.keys(links).forEach(function(id){var el=document.getElementById(id);if(el)io.observe(el);});
+})();</script>
+    </main>
+    <footer><div class="footer-grid"></div><span class="ver" id="versionStamp"></span></footer>
+    <div class="root-gate">
+        <div class="root-card">
+            <h2>Root access required</h2>
+            <p>The DC Incidents dossier is a root-only module. Sign in with an authorized account to continue.</p>
+            <div class="root-actions">
+                <button id="rootLoginBtn" type="button">Sign In</button>
+                <a href="index.html">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/rz-version.js?v=20261110-1f1c1f47"></script>
+    <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
+    <script src="auth.js?v=20261031-f01cb5a3" defer></script>
+    <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
+    <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
+    <script src="js/rz-explain-db.js?v=20261017-52b78d75" defer></script>
+    <script src="js/rz-explain.js?v=20261103-f581e6ac" defer></script>
+    <script>
+    (function(){var t=document.getElementById('themeToggle');function a(theme){document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('theme',theme);var m=document.querySelector('meta[name=\"theme-color\"]');if(m)m.setAttribute('content',theme==='dark'?'#0e0f12':'#f8f9fa');}a(localStorage.getItem('theme')||'dark');if(t)t.addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme');a(c==='dark'?'light':'dark');});})();
+    (function(){function ag(){if(window._rzAuth&&typeof window._rzAuth.enforceTierFeatureAccess==='function'){window._rzAuth.enforceTierFeatureAccess('dc-incidents');}else{try{var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null');var r=s&&s.role,t=s&&s.tier;var passes=!!s&&(r==='root'||t==='root');document.body.classList.toggle('locked',!passes);}catch(e){document.body.classList.add('locked');}}}var b=document.getElementById('rootLoginBtn');if(b)b.addEventListener('click',function(){if(window._rzAuth&&typeof window._rzAuth.showRootGatePrompt==='function'){window._rzAuth.showRootGatePrompt('Root account required for the DC Incidents dossier.');}else if(window._rzAuth&&typeof window._rzAuth.showModal==='function'){window._rzAuth.showModal();}});window.addEventListener('rz-auth-change',function(){setTimeout(ag,50);});window.addEventListener('storage',function(e){if(e.key==='rz_premium_session')ag();});ag();setTimeout(ag,60);setTimeout(ag,550);setTimeout(ag,1600);})();
+    (function(){var el=document.getElementById('versionStamp');if(!el)return;var v=window.RZ_VERSION||'1.x.x',d=window.RZ_VERSION_DATE||'',cn=window.RZ_VERSION_CODENAME||'';el.textContent='· ResistanceZero · v'+v+(d?' · '+d:'')+(cn?' · '+cn:'')+' ·';})();
+    (function(){var n=0;function sc(){if(window.RZExplain&&window.RZExplain.scanText&&window.RZ_EXPLAIN_DB){var m=document.getElementById('main-content');if(m)window.RZExplain.scanText(m,140);}else if(n++<40){setTimeout(sc,200);}}setTimeout(sc,350);})();
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,949 @@
+{
+ "slug": "gcp-europe-west4-a-drups-cooling-2026",
+ "title": "Google Cloud europe-west4-a: Grid Transient, DRUPS Failure and Chiller Shutdown",
+ "operator": "Google Cloud (data center provider not named)",
+ "dcName": "Facility hosting zone europe-west4-a",
+ "location": {
+  "city": "Site not named",
+  "country": "Netherlands",
+  "region": "EMEA",
+  "az": "europe-west4-a"
+ },
+ "date": "2026-07-15",
+ "durationMin": 895,
+ "category": [
+  "power",
+  "cooling"
+ ],
+ "severity": {
+  "usersAffected": "24 VMware Engine private clouds of 20 customers, 9 Bare Metal Solution customers, and NetApp Volumes customers on all 6 clusters in europe-west4-a.",
+  "impactUsd": "Not disclosed",
+  "servicesDown": [
+   "Google Cloud VMware Engine",
+   "Bare Metal Solution",
+   "Google Cloud NetApp Volumes"
+  ],
+  "tier": "Single data hall: power loss to one row and hall-wide thermal shutdown"
+ },
+ "brief": "On 15 July 2026 a 3 ms grid transient tripped both utility feeds at the facility hosting Google Cloud zone europe-west4-a. The side A rotary UPS failed, one row lost power on transfer, and the chiller controller dropped out so the pumps stopped while the backup cooling was out for construction. The hall reached 44°C and equipment was shut down; customer disruption lasted 14 hours 55 minutes.",
+ "magnitude": {
+  "usersScore": 5,
+  "financialScore": 4,
+  "durationScore": 6,
+  "blastRadiusScore": 4,
+  "note": "One data hall serving three specialised products; 33 named customers plus NetApp Volumes users. Duration (6): 14 h 55 min, inside the 12–24 h band. No cost is disclosed, so financial is judged moderate."
+ },
+ "sequenceOfEvents": [
+  {
+   "t": "2026-07-15 16:24 PDT",
+   "phase": "TRIGGER",
+   "event": "An electrical fault occurred on the utility grid upstream of the data center: a 3 ms voltage transient hits both utility feeds A and B, both utility breakers trip and the site transfers to its diesel rotary UPS (DRUPS).",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw: 'a 3ms voltage drop in the power feed'"
+  },
+  {
+   "t": "2026-07-15 16:24 PDT",
+   "phase": "TRIGGER",
+   "event": "Side B transfers to DRUPS without interruption. The DRUPS for side A fails to take over the load because of electrical component failures.",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw: 'failed to take over the facility load due to electrical component failures'"
+  },
+  {
+   "t": "2026-07-15 16:24 PDT",
+   "phase": "TRIGGER",
+   "event": "The chiller controller drops offline during the transient, so the chilled-water distribution pumps stop and cannot restart and chiller system A shuts down. The redundant cooling source is out of service because of known ongoing construction work.",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw: 'known ongoing construction work at the facility'"
+  },
+  {
+   "t": "2026-07-15 16:30 PDT",
+   "phase": "DETECTION",
+   "event": "Google engineers were alerted to the infrastructure power loss by automated monitoring; the VMware Engine power-monitoring alert fires.",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw, Remediation and GCVE timeline"
+  },
+  {
+   "t": "2026-07-15 16:32 PDT",
+   "phase": "DETECTION",
+   "event": "NetApp's remote facility monitoring alerts on high temperature and network switch failure.",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw, NetApp timeline"
+  },
+  {
+   "t": "2026-07-15 16:37 PDT",
+   "phase": "CASCADE",
+   "event": "The three rows on feed A transfer to feed B. Rows 1 and 2 transfer; Row 3 fails to transfer because an overload protection breaker trips, and loses both feeds.",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw: 'Row 3 failed to transfer to power feed B and lost power'"
+  },
+  {
+   "t": "2026-07-15 16:39 PDT",
+   "phase": "IMPACT",
+   "event": "Customer disruption begins in europe-west4-a for VMware Engine, Bare Metal Solution and NetApp Volumes.",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw, Detailed Description of Impact"
+  },
+  {
+   "t": "2026-07-15 17:05 PDT",
+   "phase": "IMPACT",
+   "event": "Network switch temperature alerts above 60°C trigger as the hall heats without chilled-water flow.",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw, GCVE timeline"
+  },
+  {
+   "t": "2026-07-15 17:32 PDT",
+   "phase": "CASCADE",
+   "event": "All 6 NetApp clusters shut down automatically because of high temperature.",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw, NetApp timeline"
+  },
+  {
+   "t": "2026-07-15 18:29 PDT",
+   "phase": "IMPACT",
+   "event": "Data hall temperatures reach 44°C and cross the safe machine operating threshold.",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw, DataCenter events"
+  },
+  {
+   "t": "2026-07-15 18:37 PDT",
+   "phase": "CASCADE",
+   "event": "Four NetApp SAN storage nodes serving Bare Metal Solution fail and shut down from overheating; the first customer server shutdown follows.",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw, BMS timeline"
+  },
+  {
+   "t": "2026-07-15 19:00–19:55 PDT",
+   "phase": "MITIGATION",
+   "event": "Google engineers start machine shutdown procedures for the reachable devices as part of the cooling emergency shutdown; all reachable server and network devices are off by 19:55.",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw: 'Machine shutdown procedures implemented'"
+  },
+  {
+   "t": "2026-07-15 (time not stated)",
+   "phase": "MITIGATION",
+   "event": "The facility team switched the distribution pumps from auto to hand mode to restore circulation and cooling, and deployed an interim portable UPS to keep the chiller controllers powered.",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw, Remediation and Prevention"
+  },
+  {
+   "t": "2026-07-15 21:05 PDT",
+   "phase": "RECOVERY",
+   "event": "The cooling system is fully recovered and data hall temperatures return to the normal operating range.",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw, DataCenter events"
+  },
+  {
+   "t": "2026-07-15 21:24–21:46 PDT",
+   "phase": "RECOVERY",
+   "event": "Notification about cooling recovery sent by provider at 21:24, followed by the power recovery notice at 21:46.",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw, DataCenter events"
+  },
+  {
+   "t": "2026-07-15 (time not stated)",
+   "phase": "RECOVERY",
+   "event": "With the fault isolated, teams reset the tripped breakers to re-energise Row 3; two remote power panels needed manual verification, and a swing DRUPS unit was aligned to restore redundancy on feed A.",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw, Remediation and Prevention"
+  },
+  {
+   "t": "2026-07-15 22:40–23:10 PDT",
+   "phase": "RECOVERY",
+   "event": "Onsite technician arrived to recover the console servers; console recovery completes at 23:10.",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw, GCVE timeline"
+  },
+  {
+   "t": "2026-07-15 23:55 PDT",
+   "phase": "RECOVERY",
+   "event": "All 6 NetApp clusters and their customers are recovered and validated.",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw, NetApp timeline"
+  },
+  {
+   "t": "2026-07-16 02:36 PDT",
+   "phase": "RECOVERY",
+   "event": "VMware Engine incident mitigated: all customer private clouds are healthy.",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw, GCVE timeline"
+  },
+  {
+   "t": "2026-07-16 07:34 PDT",
+   "phase": "RESTORED",
+   "event": "End of the customer disruption window across the affected products in europe-west4-a.",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw, Detailed Description of Impact"
+  },
+  {
+   "t": "2026-07-16 08:42 PDT",
+   "phase": "RESTORED",
+   "event": "Bare Metal Solution mitigated: every impacted customer server rebooted and confirmed healthy.",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw, BMS timeline"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Utility voltage transient",
+   "value": "3 ms, on both feeds A and B",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw"
+  },
+  {
+   "label": "Peak data hall temperature",
+   "value": "44°C at 18:29 PDT",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw, DataCenter events"
+  },
+  {
+   "label": "Power event to 44°C",
+   "value": "2 hours 5 minutes (16:24 → 18:29 PDT)",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw, DataCenter events"
+  },
+  {
+   "label": "Cooling lost",
+   "value": "about 4 hours 41 minutes (16:24 → 21:05 PDT)",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw, DataCenter events"
+  },
+  {
+   "label": "Total customer disruption",
+   "value": "14 hours 55 minutes (16:39 15 Jul → 07:34 16 Jul PDT)",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw: 'a total duration of 14 hours, 55 minutes'"
+  },
+  {
+   "label": "VMware Engine customers affected",
+   "value": "24 private clouds of 20 customers",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw, GCVE timeline"
+  },
+  {
+   "label": "Bare Metal Solution customers affected",
+   "value": "9 customers",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw, BMS timeline"
+  },
+  {
+   "label": "NetApp clusters shut down",
+   "value": "all 6",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw, NetApp timeline"
+  },
+  {
+   "label": "Rows on feed A that had to transfer",
+   "value": "3; Rows 1 and 2 transferred, Row 3 lost power",
+   "source": "Google Cloud incident report 3BvH3LVGcupoYqV6F4Nw, Root Cause"
+  }
+ ],
+ "rootCause": "TRIGGER: a 3 ms voltage transient on the utility grid upstream of the data center hosting europe-west4-a tripped the utility breakers on both feeds A and B at 16:24 PDT on 15 July 2026, and the site transferred to its diesel rotary UPS (DRUPS).\n\nPOWER CHAIN: side B went to DRUPS cleanly. The side A DRUPS failed to take over the facility load due to electrical component failures, so the three rows on feed A had to transfer automatically to feed B. Two rows did. Row 3 hit an overload protection breaker trip and lost both feeds; Google attributes this to a load deployment discrepancy, still under investigation at the time of the report.\n\nCOOLING CHAIN: the same transient knocked the chiller controller offline. The chillers kept power but the chilled-water distribution pumps stopped and could not restart, so with no water flow chiller system A shut down. The redundant cooling source was unavailable because of known ongoing construction work at the facility. The hall reached 44°C two hours later and the equipment had to be shut down.\n\nLATENT ROOT: three independent weaknesses lined up on one transient: a DRUPS that could not carry its load, a row whose load did not fit the surviving feed, and a cooling plant whose controls had no ride-through and whose redundancy had been removed for construction. The facility team's own fix, a portable UPS for the chiller controllers, indicates the controllers were not on protected power (analyst inference from the action taken).",
+ "contributingFactors": [
+  "The side A DRUPS failed to take the load because of electrical component failures (Google report).",
+  "Row 3 tripped an overload protection breaker on transfer to feed B: a load deployment discrepancy, still under investigation (Google report).",
+  "The chiller controller dropped offline on the transient and the distribution pumps did not restart on their own (Google report).",
+  "The redundant cooling source was out of service because of known ongoing construction work (Google report).",
+  "Chiller controllers apparently lacked protected power: the fix was an interim portable UPS for them (analyst inference from the action).",
+  "Console servers needed an onsite technician to recover, which delayed network restoration after cooling returned (Google report, GCVE timeline).",
+  "Thermal shutdown was a manual procedure; Google is now automating shutdown for fast-moving thermal events (Google report)."
+ ],
+ "coe": [
+  {
+   "action": "Investigate the sequence that stopped the load transfer to DRUPS and identify system improvements",
+   "owner": "Google with the data center provider",
+   "status": "Committed, ETA Aug 2026 (completion not reported)"
+  },
+  {
+   "action": "Find and resolve the cause of the overload that cut power to Row 3",
+   "owner": "Google",
+   "status": "Committed, ETA Aug 2026 (completion not reported)"
+  },
+  {
+   "action": "Investigate chiller pump control redundancy to make the cooling system resilient",
+   "owner": "Google with the data center provider",
+   "status": "Committed, ETA Sep 2026 (completion not reported)"
+  },
+  {
+   "action": "Improve facility monitoring alerts for power events and set early thresholds for cooling excursions",
+   "owner": "Google",
+   "status": "Committed, ETA Aug 2026 (completion not reported)"
+  },
+  {
+   "action": "Automate shutdown triggering during fast thermal runaway for VMware Engine",
+   "owner": "Google Cloud (GCVE)",
+   "status": "Committed, ETA Oct 2026 (completion not reported)"
+  },
+  {
+   "action": "Update incident classification and SLO definitions to improve personnel availability during major data center events",
+   "owner": "Google Cloud (BMS)",
+   "status": "Committed, ETA Sep 2026 (completion not reported)"
+  },
+  {
+   "action": "Review incident SLAs and runbooks with the data center team, create playbooks, run a monthly joint emergency drill and speed up NetApp cluster recovery",
+   "owner": "Google Cloud (NetApp Volumes)",
+   "status": "Committed, ETA Aug 2026 (completion not reported)"
+  },
+  {
+   "action": "Interim portable UPS to keep the chiller controllers powered",
+   "owner": "Facility team",
+   "status": "Done, stated in the report"
+  },
+  {
+   "action": "Swing DRUPS unit aligned to restore feed A redundancy while the faulty DRUPS is repaired",
+   "owner": "Facility team",
+   "status": "Swing unit in place; repair in progress at the time of the report"
+  }
+ ],
+ "lessonsLearnt": [
+  "A cooling plant's controls are part of the critical load. If a 3 ms transient can drop the chiller controller, the cooling plant has no ride-through no matter how much the chillers can do.",
+  "Pumps that need a restart command after a power event are a single point of failure; restart-on-power-return or hand-mode fallback must be designed in and drilled.",
+  "Taking cooling redundancy out for construction turns the next routine event into a thermal emergency. Plan compensating measures for the construction window.",
+  "Automatic transfer schemes only work if each row's load fits the surviving feed. Track deployed load per row against single-feed capacity.",
+  "Thermal events move fast: 44°C two hours after the trigger. Shutdown triggers and onsite staffing must be faster than the temperature rise.",
+  "Recovery depends on out-of-band access: needing a technician on site for console servers lengthened the outage after cooling returned."
+ ],
+ "improvements": [
+  "Safety and cooling: keep chiller controllers on protected power (interim portable UPS done) and review pump control redundancy (Google committed).",
+  "Design: investigate the DRUPS transfer failure and restore full A-side redundancy (swing DRUPS in place; investigation committed).",
+  "Design: resolve the Row 3 overload so every row fits one surviving feed (Google committed).",
+  "Monitoring: earlier alerts for power events and cooling excursions (Google committed).",
+  "Process: automated shutdown for fast thermal runaway, updated incident classification for staffing, joint runbooks and a monthly emergency drill with the data center team (Google committed).",
+  "Analyst recommendation (not in the report): treat removal of cooling redundancy for construction as a change that needs a compensating plan, such as temporary chillers or reduced load."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "One transient, three failures",
+   "body": "A 3 ms dip should be a non-event for a site with two feeds, a rotary UPS on each side and redundant cooling. Here it found a failed DRUPS on side A, an overloaded row that could not move to side B, and a chiller controller with no ride-through while the second cooling source was out for construction. Each weakness alone would have been survivable."
+  },
+  {
+   "heading": "Cooling failed through its controls",
+   "body": "The chillers kept power. What stopped was the controller and therefore the pumps. The repair was to put the pumps in hand mode. Controls and pumps belong in the same protected-power and restart design as the chillers, or cooling capacity on paper is not capacity in an event."
+  },
+  {
+   "heading": "Construction as a hidden degradation",
+   "body": "The redundant cooling source was out for known construction work. Planned degradation is common, but the record shows no compensating measure for the window, and the event happened inside it."
+  },
+  {
+   "heading": "Speed of a thermal event",
+   "body": "From transient to 44°C took about two hours; NetApp clusters shut themselves down after about an hour. Google ran manual shutdown procedures and is now automating them, and is changing incident classification so enough people are available during major data center events."
+  },
+  {
+   "heading": "What the record does not say",
+   "body": "The report does not name the data center provider, the DRUPS make or the failed components, the chiller or pump models, or the cost. It also does not say whether the committed actions due in August to October 2026 have been completed."
+  }
+ ],
+ "technicalDeepDive": "A rotary UPS bridges the gap to diesel with a flywheel; if its electrical components fail, the side it protects drops to the automatic transfer scheme. That scheme only works if every row's load fits the surviving feed: Row 3 tripped its overload protection, the textbook symptom of a row loaded beyond what one feed can carry alone (Google calls it a load deployment discrepancy).\n\nThe cooling failure is a controls failure, not a chiller failure. A brief transient reset or dropped the chiller controller; the pumps needed a restart command that never came. The quick fix was mechanical: pumps put in hand mode. With the redundant source out for construction there was no second loop, so the hall rose to 44°C in about two hours and Google shut down reachable equipment. Recovery then needed an onsite technician for console servers, which added time after cooling was back at 21:05.",
+ "references": [
+  {
+   "title": "Google Cloud Service Health, incident 3BvH3LVGcupoYqV6F4Nw, final incident report (25 Jul 2026)",
+   "url": "https://status.cloud.google.com/incidents/3BvH3LVGcupoYqV6F4Nw",
+   "type": "official-postmortem",
+   "accessed": "2026-11-11",
+   "quote": "The redundant source was not available due to known ongoing construction work at the facility."
+  },
+  {
+   "title": "Google Cloud Service Health, incident 3BvH3LVGcupoYqV6F4Nw, preliminary incident report (17 Jul 2026)",
+   "url": "https://status.cloud.google.com/incidents/3BvH3LVGcupoYqV6F4Nw",
+   "type": "vendor-status",
+   "accessed": "2026-11-11",
+   "quote": "experienced a loss of utility power and subsequent cooling capacity"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": true,
+  "referenceCount": 2,
+  "lastVerified": "2026-11-11",
+  "confidence": "High: every fact is from Google's preliminary and final incident reports. The provider, equipment makes and completion of the committed actions are not disclosed."
+ },
+ "lastUpdated": "2026-11-11",
+ "operatorShort": "Google Cloud",
+ "fmea": {
+  "scope": "The power chain (utility feeds, rotary UPS on each side, row transfer between feeds) and the cooling chain (chiller controller, chilled-water pumps, redundant source) of the facility hosting europe-west4-a, plus Google's thermal shutdown and recovery. Analysed from Google's own reports; the facility provider is not named and its view is not on record.",
+  "modes": [
+   {
+    "id": "FM-01",
+    "item": "Side A diesel rotary UPS (DRUPS)",
+    "function": "Carry side A of the facility through a utility disturbance until diesel or utility power returns",
+    "failureMode": "The DRUPS fails to take over the side A load because of electrical component failures",
+    "effect": "Side A is lost; three rows must transfer to feed B, and one of them fails",
+    "cause": "Electrical component failures in the side A DRUPS; details not disclosed",
+    "prevention": "A rotary UPS on each side; automatic row transfer to the other feed",
+    "detection": "None recorded before the event; the failure showed only when the DRUPS was called on",
+    "S": 8,
+    "O": 4,
+    "D": 7,
+    "rationale": {
+     "S": "It removes one whole power side; with the transfer scheme working it would have been survivable, so 8 rather than 9.",
+     "O": "A rotary UPS failing at the moment of demand is uncommon but plausible: 'infrequent'.",
+     "D": "No recorded test or alarm found the faulty components beforehand."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 1,
+      "quote": "fails to take over the load because of electrical component failures"
+     },
+     {
+      "src": "factor",
+      "i": 0
+     },
+     {
+      "src": "rootCause",
+      "quote": "The side A DRUPS failed to take over the facility load due to electrical component failures"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Investigate the DRUPS transfer failure (Google, committed; completion not reported)",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "text": "Swing DRUPS in place while the faulty unit is repaired (facility team)",
+      "evidence": {
+       "src": "coe",
+       "i": 8
+      }
+     }
+    ],
+    "short": "DRUPS A fails",
+    "symbol": "ups",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Load-test each rotary UPS on a schedule and after any component work, and track faults to closure",
+      "basis": "nfpa-110",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "detect",
+      "do": "Confirm at the switchboard which side is on DRUPS and which has dropped within the first minute",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "factor",
+       "i": 0
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Isolate the failed DRUPS and align a swing unit to restore redundancy",
+      "basis": "en-50110",
+      "evidence": {
+       "src": "coe",
+       "i": 8
+      }
+     },
+     {
+      "role": "vendor",
+      "phase": "recover",
+      "do": "Repair the failed DRUPS components and prove the unit under load before returning it to service",
+      "basis": "nfpa-110",
+      "evidence": {
+       "src": "coe",
+       "i": 8
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-02",
+    "item": "Row 3 automatic transfer to feed B",
+    "function": "Move each row's load to the surviving feed when one feed is lost",
+    "failureMode": "Row 3's transfer trips an overload protection breaker and the row loses both feeds",
+    "effect": "Complete power loss to every rack in Row 3",
+    "cause": "Load deployment discrepancy: the row's load did not fit the surviving feed (under investigation)",
+    "prevention": "2N distribution with automatic transfer between feeds",
+    "detection": "None recorded; the mismatch surfaced only on transfer",
+    "S": 7,
+    "O": 4,
+    "D": 8,
+    "rationale": {
+     "S": "One row loses power completely; the hall-wide outage came from cooling, so this is scored 7.",
+     "O": "Rows drifting past single-feed capacity is a known operational risk: 'infrequent'.",
+     "D": "Nothing caught the discrepancy before the transfer was demanded."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 5,
+      "quote": "Row 3 fails to transfer because an overload protection breaker trips"
+     },
+     {
+      "src": "factor",
+      "i": 1
+     },
+     {
+      "src": "metric",
+      "i": 8
+     }
+    ],
+    "actions": [
+     {
+      "text": "Find and resolve the overload cause (Google, committed; completion not reported)",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     }
+    ],
+    "revised": {
+     "S": 7,
+     "O": 3,
+     "D": 6
+    },
+    "revisedRationale": "Committed but not reported complete: if the load discrepancy is found and per-row load is checked against single-feed capacity, both occurrence and detection improve. This is a claim about the action, not a confirmed result.",
+    "short": "Row 3 overload trip",
+    "symbol": "breaker",
+    "playbook": [
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Keep deployed load per row within what one feed can carry, and check it at every deployment",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "detect",
+      "do": "Alarm when any row's measured load exceeds single-feed capacity",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "lesson",
+       "i": 3
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Once the fault is isolated, reset the tripped breakers and verify panels before re-energising",
+      "basis": "nfpa-70e",
+      "evidence": {
+       "src": "factor",
+       "i": 1
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Bring Row 3 workloads back in order and verify redundancy on both feeds",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 3
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-03",
+    "item": "Chiller controller and chilled-water pumps",
+    "function": "Keep chilled water flowing to the data hall through a power disturbance",
+    "failureMode": "The chiller controller drops offline on the transient; pumps stop and do not restart, and chiller A shuts down",
+    "effect": "No chilled water to the hall; temperature reaches 44°C and equipment is shut down",
+    "cause": "Controller without ride-through on the transient; pumps depend on a restart command",
+    "prevention": "Chillers on power; redundant cooling source (unavailable at the time)",
+    "detection": "Remote monitoring alerted on high temperature at 16:32 and switch temperature alerts at 17:05",
+    "S": 9,
+    "O": 4,
+    "D": 4,
+    "rationale": {
+     "S": "It forced a hall-wide thermal shutdown of every product in the zone's affected hall: 9. Not 10, because no hazard to people is recorded.",
+     "O": "Controller dropouts on transients happen but are not frequent: 'infrequent'.",
+     "D": "Temperature alerts came within minutes, but they did not stop the rise."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 2,
+      "quote": "the chilled-water distribution pumps stop and cannot restart"
+     },
+     {
+      "src": "metric",
+      "i": 1
+     },
+     {
+      "src": "factor",
+      "i": 2
+     }
+    ],
+    "actions": [
+     {
+      "text": "Interim portable UPS for the chiller controllers (facility team, done)",
+      "evidence": {
+       "src": "coe",
+       "i": 7
+      }
+     },
+     {
+      "text": "Investigate pump control redundancy (Google, committed; completion not reported)",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     }
+    ],
+    "revised": {
+     "S": 9,
+     "O": 3,
+     "D": 4
+    },
+    "revisedRationale": "The portable UPS is in place, so the same transient should no longer drop the controller. It is an interim measure; the permanent pump-control review is committed but not reported complete.",
+    "short": "Chiller pumps stop",
+    "symbol": "chiller",
+    "playbook": [
+     {
+      "role": "mechanical",
+      "phase": "prevent",
+      "do": "Put chiller controllers on protected power and make pumps restart on their own after power returns",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "coe",
+       "i": 7
+      }
+     },
+     {
+      "role": "mechanical",
+      "phase": "detect",
+      "do": "Alarm on loss of chilled-water flow, not only on rising room temperature",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "lesson",
+       "i": 1
+      }
+     },
+     {
+      "role": "mechanical",
+      "phase": "contain",
+      "do": "Switch pumps to hand mode to restore flow at once when the controller is down",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "lesson",
+       "i": 1
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Shut down equipment in priority order before the hall passes the allowable envelope",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "recover",
+      "do": "Restart workloads only after the hall is back inside the allowable range",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "lesson",
+       "i": 4
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-04",
+    "item": "Redundant cooling source during construction",
+    "function": "Provide a second source of cooling if the primary plant stops",
+    "failureMode": "The redundant source is out of service for known construction work when the primary plant stops",
+    "effect": "No fallback cooling; the single failure becomes a hall-wide thermal event",
+    "cause": "Planned degradation of cooling redundancy without a compensating measure in the record",
+    "prevention": "N+1 or 2N cooling design (degraded for construction)",
+    "detection": "Known to the facility; nothing recorded flagged the risk of running degraded",
+    "S": 8,
+    "O": 5,
+    "D": 7,
+    "rationale": {
+     "S": "It removes the fallback that would have prevented the thermal event; scored 8 so the thermal outage is not counted at full weight twice.",
+     "O": "Construction and maintenance windows recur through a facility's life: 'occasional'.",
+     "D": "The degradation was known, but no recorded control weighed the exposure it created."
+    },
+    "evidence": [
+     {
+      "src": "ref",
+      "i": 0,
+      "quote": "known ongoing construction work at the facility"
+     },
+     {
+      "src": "factor",
+      "i": 3
+     },
+     {
+      "src": "soe",
+      "i": 2,
+      "quote": "The redundant cooling source is out of service because of known ongoing construction work"
+     }
+    ],
+    "actions": [],
+    "short": "Backup cooling offline",
+    "symbol": "coolingTower",
+    "playbook": [
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Treat removal of cooling redundancy as a change with a compensating plan such as temporary chillers or reduced load",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "improvement",
+       "i": 5
+      }
+     },
+     {
+      "role": "mechanical",
+      "phase": "detect",
+      "do": "Watch supply temperature and flow continuously while cooling runs without redundancy",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "lesson",
+       "i": 2
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Declare a thermal emergency early and start shutdown before the envelope is crossed",
+      "basis": "nims-ics",
+      "evidence": {
+       "src": "lesson",
+       "i": 4
+      }
+     },
+     {
+      "role": "vendor",
+      "phase": "recover",
+      "do": "Restore the redundant source and confirm both loops before ending the emergency",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "lesson",
+       "i": 2
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-05",
+    "item": "Thermal shutdown and recovery",
+    "function": "Protect equipment in a thermal event and bring services back quickly",
+    "failureMode": "Shutdown is manual and recovery needs an onsite technician for console servers",
+    "effect": "Customer disruption lasts 14 hours 55 minutes, long after cooling returned at 21:05",
+    "cause": "Manual shutdown procedure; out-of-band console access needed physical recovery",
+    "prevention": "Cooling emergency shutdown procedure; NetApp clusters' automatic thermal shutdown",
+    "detection": "Monitoring and probers alerted within minutes",
+    "S": 7,
+    "O": 5,
+    "D": 3,
+    "rationale": {
+     "S": "It stretches the outage for 33 customers well past the physical fix: 7.",
+     "O": "Any thermal event needs shutdown and restart: 'occasional'.",
+     "D": "Monitoring detected the problem quickly; the gap is in response speed."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 16,
+      "quote": "Onsite technician arrived to recover the console servers"
+     },
+     {
+      "src": "metric",
+      "i": 4
+     },
+     {
+      "src": "factor",
+      "i": 5
+     }
+    ],
+    "actions": [
+     {
+      "text": "Automated shutdown during fast thermal runaway (GCVE, committed)",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "text": "Incident classification and staffing for major data center events (BMS, committed)",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     },
+     {
+      "text": "Joint runbooks, monthly emergency drill, faster cluster recovery (NetApp Volumes, committed)",
+      "evidence": {
+       "src": "coe",
+       "i": 6
+      }
+     }
+    ],
+    "revised": {
+     "S": 7,
+     "O": 4,
+     "D": 3
+    },
+    "revisedRationale": "Automation and drills should shorten the next event's tail; all three are committed but not reported complete.",
+    "short": "Slow thermal recovery",
+    "symbol": "rack",
+    "playbook": [
+     {
+      "role": "ops-lead",
+      "phase": "detect",
+      "do": "Trigger shutdown automatically on a temperature rate of rise, not only on a fixed threshold",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Shut down in a set order so storage and network recover cleanly",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 6
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "recover",
+      "do": "Keep a technician on call for console servers during any major facility event",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Give customers restoration times per product as each one recovers",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 6
+      }
+     }
+    ]
+   }
+  ],
+  "impactShort": "Hall at 44°C · 14 h 55 min"
+ },
+ "durationStatus": "measured",
+ "durationEvidence": {
+  "onset": {
+   "src": "soe",
+   "i": 6,
+   "quote": "16:39 PDT"
+  },
+  "restored": {
+   "src": "soe",
+   "i": 19,
+   "quote": "07:34 PDT"
+  }
+ },
+ "durationBasis": "Customer disruption from 16:39 PDT 15 Jul → 07:34 PDT 16 Jul (14 h 55 min)",
+ "response": {
+  "roles": {
+   "utility": "The grid operator upstream of the facility, not named",
+   "vendor": "The data center provider operating the facility, not named",
+   "electrical": "The facility team that reset breakers and aligned a swing DRUPS, not named",
+   "mechanical": "The facility team that put the pumps in hand mode, not named",
+   "first-responder": "The onsite technician who recovered the console servers",
+   "incident-commander": "No incident commander is named in the record",
+   "ops-lead": "Google engineers alerted by automated monitoring",
+   "service-recovery": "Google and NetApp teams shutting down and restoring equipment",
+   "comms": "Google Cloud Service Health status page"
+  },
+  "recorded": [
+   {
+    "role": "utility",
+    "soe": 0,
+    "quote": "An electrical fault occurred on the utility grid upstream of the data center",
+    "did": "Grid fault upstream caused the 3 ms transient on both feeds"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 3,
+    "quote": "Google engineers were alerted to the infrastructure power loss",
+    "did": "Alerted by monitoring six minutes after the transient"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 11,
+    "quote": "start machine shutdown procedures for the reachable devices",
+    "did": "Ran the cooling emergency shutdown for reachable devices"
+   },
+   {
+    "role": "mechanical",
+    "soe": 12,
+    "quote": "switched the distribution pumps from auto to hand mode",
+    "did": "Restored chilled-water circulation by running the pumps in hand mode"
+   },
+   {
+    "role": "vendor",
+    "soe": 14,
+    "quote": "Notification about cooling recovery sent by provider",
+    "did": "Notified recovery of cooling and then power"
+   },
+   {
+    "role": "electrical",
+    "soe": 15,
+    "quote": "teams reset the tripped breakers to re-energise Row 3",
+    "did": "Re-energised Row 3 after isolating the fault and aligned a swing DRUPS"
+   },
+   {
+    "role": "first-responder",
+    "soe": 16,
+    "quote": "Onsite technician arrived to recover the console servers",
+    "did": "Recovered the console servers on site"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "europe-west4-a hall shut down",
+  "bones": [
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "DRUPS A fails",
+      "factor": 0
+     },
+     {
+      "label": "Chiller controller drops",
+      "factor": 2
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Row 3 over one feed",
+      "factor": 1
+     },
+     {
+      "label": "Controls unprotected",
+      "factor": 4
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Manual thermal shutdown",
+      "factor": 6
+     },
+     {
+      "label": "Console needs technician",
+      "factor": 5
+     }
+    ]
+   },
+   {
+    "cat": "Environment",
+    "causes": [
+     {
+      "label": "Cooling backup offline",
+      "factor": 3
+     }
+    ]
+   },
+   {
+    "cat": "External",
+    "causes": [
+     {
+      "label": "3 ms grid transient",
+      "mode": "FM-01"
+     }
+    ]
+   }
+  ]
+ }
+}
