@@ -20,6 +20,12 @@ ok('every entry has t + d', keys.every(k => E[k].t && E[k].d), keys.filter(k => 
 ok('every d >= 40 chars (super-detail mandate)', keys.filter(k => E[k].d.length < 40).length === 0,
    keys.filter(k => E[k].d.length < 40).slice(0, 5).join(','));
 
+// PRD-Q17 FR-9 / L6: a title never repeats its parenthetical ("Abliteration (x) ((x))")
+const doubled = keys.filter(k => E[k].t.indexOf('((') !== -1);
+ok('no title with a duplicated parenthetical "(("', doubled.length === 0, doubled.length + ': ' + doubled.slice(0, 5).join(','));
+const emptyParen = keys.filter(k => /\(\s*\)/.test(E[k].t));
+ok('no title with an empty "()"', emptyParen.length === 0, emptyParen.slice(0, 5).join(','));
+
 // rel links resolve
 const badRel = [];
 keys.forEach(k => (E[k].rel || []).forEach(r => { if (!E[r]) badRel.push(k + '->' + r); }));

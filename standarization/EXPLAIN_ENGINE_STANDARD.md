@@ -53,6 +53,16 @@ mentioned INSIDE a tooltip body (e.g. "DSCR") are themselves hoverable (nested t
 }
 ```
 
+## Glossary titles and aliases (2026-11-11, PRD-Q17 FR-9)
+
+- The builder reads the `term-name` element up to its own closing tag, drops the nested `term-full` span from the name,
+  and strips one pair of surrounding parentheses from the full name. Title = `Name (Full name)`. Before this fix the
+  first `</` (the span's) ended the name, so 229 titles read like "Agent (LLM agent) ((LLM agent))" and the aliases
+  carried the brackets.
+- When two glossary terms claim one alias, the alias stays with the term whose slug or own name is that alias
+  ("circuit breaker" belongs to `circuit-breaker`, not to `breaker`), otherwise with the first key in sorted order.
+- Gate: `node tools/test-explain-db.mjs` fails on any title containing "((" or "()" and on any alias shared by two keys.
+
 ## Adopted surfaces (v1)
 
 capex-calculator (all inputs/outputs incl. deep-sea/refrigerant/space/renewables),

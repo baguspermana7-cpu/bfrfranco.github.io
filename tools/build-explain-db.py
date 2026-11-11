@@ -36,13 +36,18 @@ def parse_glossary() -> dict:
             r'<div class="term" id="term-([^"]+)">(.*?)(?=<div class="term" id="term-|</section>)',
             html, re.S):
         slug, block = m.group(1), m.group(2)
-        name_m = re.search(r'<[^>]*class="term-name"[^>]*>(.*?)</', block, re.S)
-        full_m = re.search(r'<[^>]*class="term-full"[^>]*>(.*?)</', block, re.S)
+        # PRD-Q17 FR-9: capture the term-name element up to ITS OWN closing tag (the first '</' was the nested
+        # term-full span's, so the name already carried the parenthetical and the title doubled it).
+        name_m = re.search(r'<(\w+)[^>]*class="term-name"[^>]*>(.*?)</\1>', block, re.S)
         def_m = re.search(r'<[^>]*class="term-def"[^>]*>(.*?)</(?:p|div)>', block, re.S)
         if not name_m or not def_m:
             continue
-        name = strip_tags(name_m.group(1))
-        full = strip_tags(full_m.group(1)) if full_m else ''
+        inner = name_m.group(2)
+        full_m = re.search(r'<span[^>]*class="term-full"[^>]*>(.*?)</span>', inner, re.S)
+        name = strip_tags(re.sub(r'<span[^>]*class="term-full"[^>]*>.*?</span>', '', inner, flags=re.S)).strip()
+        full = strip_tags(full_m.group(1)).strip() if full_m else ''
+        if full.startswith('(') and full.endswith(')'):
+            full = full[1:-1].strip()
         entry = {
             't': name + (' (' + full + ')' if full and full.lower() != name.lower() else ''),
             'd': strip_tags(def_m.group(1)),
@@ -77,6 +82,24 @@ def main() -> int:
         kept = [a for a in e.get('aliases', []) if a.lower() not in curated_aliases]
         if kept != e.get('aliases', []):
             e['aliases'] = kept
+    # glossary vs glossary: two terms may claim one alias (term "breaker" has full name "circuit breaker", and
+    # "circuit-breaker" is its own term). The alias stays with the entry whose slug or own name IS that alias;
+    # otherwise with the first key in sorted order. Deterministic, so the rebuild check stays byte-identical.
+    claims = {}
+    for k in sorted(merged):
+        for a in merged[k].get('aliases', []):
+            claims.setdefault(a.lower(), []).append(k)
+
+    def owns(k, low):
+        return k == re.sub(r'[^a-z0-9]+', '-', low).strip('-') or merged[k]['t'].split(' (')[0].lower() == low
+
+    for low, ks in claims.items():
+        if len(ks) < 2:
+            continue
+        owner = next((k for k in ks if owns(k, low)), ks[0])
+        for k in ks:
+            if k != owner:
+                merged[k]['aliases'] = [a for a in merged[k]['aliases'] if a.lower() != low]
     # validation
     bad = [k for k, e in merged.items() if not e.get('t') or not e.get('d')]
     if bad:
