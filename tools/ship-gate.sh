@@ -375,6 +375,17 @@ gate "slop render scan — 14 computed tells per page, light AND dark, STRICT (a
   env RZ_BASE=$LTC_BASE timeout 2400 node tools/audit-slop-render.mjs --strict
 [ -n "$ltc_srv_pid" ] && kill "$ltc_srv_pid" 2>/dev/null
 
+# X-DEFECTS + Q06 laws (v3.41.0): crawler suite, owner-decision CLI, defect law runner (X7.2 report mode), secret gate,
+# FAQ fixture self-test, provenance laws already green (L2/L4 join when Q06 T-14/T-15 land).
+gate "crawler SEO suite — 36 tests (X7.1)" python3 tools/test-crawler-seo.py
+gate "owner_decisions CLI — 8 laws" python3 tools/test-owner-decisions.py
+gate "X-DEFECTS laws — X7.1 X12.1a X18.1 X19.1 blocking, X7.2 report" \
+  node tools/test-x-defects.mjs --strict --blocking X7.1,X12.1a,X18.1,X19.1
+gate "secret gate — no hit outside the baseline (X1.2a) + self-test" \
+  bash -c "node tools/test-no-client-secrets.mjs --law X1.2a && node tools/test-no-client-secrets.mjs --self-test"
+gate "FAQ visibility gate fixtures (X7.2 runs in report mode above)" node tools/test-faq-visible.mjs --self-test
+gate "provenance — L1 L3 L5 + unit U1-U14 (PRD-Q06)" node tools/test-provenance.mjs --law L1,L3,L5,U
+
 # Engine-files byte-identical guard (locked since v1.32.x accuracy review)
 echo
 runs=$((runs+1))

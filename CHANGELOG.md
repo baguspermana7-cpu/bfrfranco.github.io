@@ -11,6 +11,33 @@ release sections rather than semver.
 
 ---
 
+## v3.41.0 — 2026-11-11 — Every number says what kind it is; defect gates; the P&ID mock
+
+Product transformation, Wave 1: PRD-Q06 (provenance), PRD-X-DEFECTS (gates and copy), PRD-Q17 (explain DB),
+R112 (incident library), R116 (P&ID, mock only).
+
+### Added
+- **Provenance line** (`js/rz-provenance.js`): one plain line under a panel saying Simulated, Snapshot, Model output
+  or Fallback, with basis, date in WIB and source. On the ten telemetry cockpits, eight cockpit data paths and the
+  seven PLN pages. Registry `tools/provenance-registry.json`, gate `tools/test-provenance.mjs`.
+- **Seven cloud-provider incident dossiers** from official post-incident reviews (Google Cloud europe-west2-b and
+  europe-west4-a, five more), and 17 AWS/Azure candidates in the research queue.
+- **Gates:** `tools/test-x-defects.mjs` (X-DEFECTS law runner), `tools/test-no-client-secrets.mjs` (secret scan over
+  every tracked file incl. `dcmoc/_next`, location only, never the value; 7 known hits baselined until the owner's
+  actions), `tools/test-faq-visible.mjs` (FAQ JSON-LD questions must be visible: 77 pages, 263 questions, report
+  mode until decision D-XDEF-1), `tools/owner_decisions.py` (owner-approval CLI). All wired into the ship gate.
+- **R116 P&ID mock** (`rz-pid-mock.html`, noindex, not linked): CDU secondary loop drawn from a typed graph, flow
+  explained step by step. Port of PID-to-Knowledge-Graph (MIT).
+
+### Changed
+- **Simulated banner** on the ten cockpits is a still 12 px text line with one hairline; no pill, pulse or fill.
+- **PLN pages say snapshot, not live**; the clock is the snapshot time in WIB; the All|Live pills are gone.
+- **achievements.html** says what it records; dashboard "Account Settings" opens account.html; no "coming soon".
+
+### Fixed
+- **Explain-DB titles** no longer repeat their parenthetical ("Agent (LLM agent) ((LLM agent))" on 229 entries).
+- **Crawler suite** sentinel is a visible heading (36/36).
+
 ## v3.40.0 — 2026-11-11 — "What drives this result", and the sensitivity charts that did not describe their page
 
 Product transformation, Wave 2: P07 (sensitivity panels on pue, tia, roi and carbon; a correctness check on every
