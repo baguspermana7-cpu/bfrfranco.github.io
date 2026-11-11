@@ -20,6 +20,8 @@ A module is listed when two or more PRDs name it, or when `DECISIONS.md` or the 
 
 ### 1.1 `tools/owner_decisions.py`: the single approval CLI
 
+**Built 2026-11-11 (Wave 1):** `tools/owner_decisions.py` with `decide`, `propose` (closes gap G2), `list` and `record`; gate `python3 tools/test-owner-decisions.py` (8 laws, red before the file existed, and red again with the PROPOSED guard removed). Record kinds load from any `tools/lib/*.py` that defines `RECORD_KINDS = {kind: {precondition, apply, load, save}}`. To wire into `tools/ship-gate.sh` after the peer's shard change lands on main.
+
 | Item | Content |
 |---|---|
 | Owner PRD | None. `DEC:17` assigns the specification to this file; Q09 says "Exit codes and flags are the shared CLI's (D15; specified in `03-architecture`)" (`Q09:710`). Build owner: the main session, in Wave 1 (`../04-implementation-plan/PROGRAM.md`) |
