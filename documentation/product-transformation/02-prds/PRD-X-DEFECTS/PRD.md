@@ -6,14 +6,14 @@
 |---|---|
 | PRD id | PRD-X-DEFECTS |
 | Feature | One PRD for every defect fix owned by session E. Each defect is its own FR group with its own laws and tasks. Active groups: X1 (secrets), X7 (corrected: crawler gate and hidden FAQ data), X8 (Worker identity), X10 (admin sample labels), X11 (tools hub coverage), X12 (placeholders), X15 (engine ASHRAE classes), X18 (achievements copy, interim), X19 (alarm-state doc). Pointer groups (owned by another PRD, nothing built here): X4, X6, X13, X14, X16, X17 |
-| Version | 1.0 |
+| Version | 1.1 |
 | Status | Draft |
 | Author | Opus 5.5; Fable quota exhausted |
 | Date | 2026-11-11 |
 | Owner requests | R110 (a PRD per idea), R111 (24-section structure) |
 | Priority | No addendum score: the X items are "quick fixes, not innovation" (`documentation/PRODUCT_INNOVATION_ASSESSMENT_2026-11_ADDENDUM.md:41-58`). X1 is a security item and goes first (`…_ADDENDUM.md:565`, `00-audit-baseline/BASELINE.md:76`) |
 | Related findings | X1, X4, X6, X7, X8, X10, X11, X12 (`…_ADDENDUM.md:47-58`); X13–X19 (raised by the other PRD agents, verified here, §3.1). Register row `01-improvement-register/REGISTER.md:24`; tracker row `04-implementation-plan/TRACKER.md:40`. New findings N1–N9 (§3.3) |
-| Dependencies | (1) Owner actions OA-1 to OA-4 and owner decisions D-XDEF-1 to D-XDEF-11 (§5.7, written as `DECISIONS.md` rows). X1 code removal waits for OA-1 (key rotation); the X7-B fix waits for D-XDEF-1; X8 waits for OA-4 and D-XDEF-8; the two X12 removals wait for D-XDEF-9 and D-XDEF-10. (2) PRD-Q11 FR-6 (page keys, decided by D-Q11-2) changes the access words of five tools-hub cards (FR-X11.3). (3) PRD-Q10 supersedes the X10 labels. (4) PRD-Q12 starts only after X1 closes (`PRD-Q12/PRD.md:16`, `:617`) |
+| Dependencies | (1) Owner actions OA-1 to OA-5 and owner decisions D-XDEF-1 to D-XDEF-11 (§5.7, written as `DECISIONS.md` rows). X1 code removal waits for OA-1 (key rotation); the X7-B fix waits for D-XDEF-1; X8 waits for OA-4 and D-XDEF-8; the two X12 removals wait for D-XDEF-9 and D-XDEF-10. (2) PRD-Q11 FR-6 (page keys, decided by D-Q11-2) changes the access words of five tools-hub cards (FR-X11.3). (3) PRD-Q10 supersedes the X10 labels. (4) PRD-Q12 starts only after X1 closes (`PRD-Q12/PRD.md:16`, `:617`) |
 | Related modules | `Apps/finance-terminal/index.html`; every git-tracked file (secret scan); `tools/test-crawler-seo.py`, `tools/build-llms-full.py`, 77 pages with FAQPage JSON-LD; `worker/`, `cf-worker/`; `rz-ops-p7x3k9m.html`; `tools.html`; `dashboard.html`, `account.html`, `all-in-one-dashboard.html`, `dc-market-tracker.html`; `rz-engine.js` + `rz-engine.min.js`; `achievements.html`; `standarization/ALARM_STATE.md`; `tools/ship-gate.sh`; `CLAUDE.md` "Audit before push" |
 | Target wave | Addendum roadmap: "X1 before Q12" (`…_ADDENDUM.md:565`). The other groups have no wave; the main session sets it in `04-implementation-plan/` |
 | Approval status | PRD approved by owner R110/R111 2026-11-10. Group X1, the X7-B fix, group X8 and the two X12 removals are BLOCKED until the owner acts or decides (OA-1 to OA-4; D-XDEF-1, D-XDEF-7 to D-XDEF-11). The other groups start on the recommended defaults of §5.7; a law blocks only once its precondition holds (§20.2) |
@@ -24,6 +24,7 @@ Change history
 | Version | Date | Author | Change |
 |---|---|---|---|
 | 1.0 | 2026-11-11 | Opus 5.5 | First complete draft. Every fact re-verified on `b8848af95` with the commands quoted in §3. Program conventions applied: owner decisions as `D-XDEF-n` rows in the `DECISIONS.md` format (coordinator decision D5), law wiring with report mode before each law's blocking point (D9), owner rule R114 (no paid services or pay-per-use APIs) |
+| 1.1 | 2026-11-11 | Opus 5.5 | QA batch 3 fixes: FR-X15.5 adds the engine catalog chain, a DCMOC rebuild and owner action OA-5 (`cf-worker` redeploy) with V-10; the secret scan covers published `dcmoc/_next/` with a planted-chunk self-test (FR-X1.3); `DATA.sources` keys named for `liquidClasses` (FR-X15.3, §10.4); X11 classification script committed in §20.3; §13 and self-score corrected. Facts added in v1.1 verified at `7335fd257` |
 
 Defect index (read this first)
 
@@ -402,6 +403,7 @@ Owner actions (not decisions; only the owner can do them):
 | OA-2 | Revoke the Google API key at `tools/Auto Update All/engine/validate-security.py:30`; confirm the old database in `standarization/SUPABASE_FIREBASE_SETUP.md:121-123` is gone or its password changed | FR-X1.4 | Owner says "revoked" per file |
 | OA-3 | Revoke every string that D-XDEF-11 classifies as a secret | FR-X1.4 | Owner says "revoked" per line |
 | OA-4 | Run the Cloudflare dashboard check (FR-X8.1) and report the five readings | FR-X8.2 | The filled table of FR-X8.1 |
+| OA-5 | After the R4 engine release is pushed, redeploy `cf-worker/` (`npx wrangler deploy` in `cf-worker/`). `cf-worker/src/calc.js:12` bundles `../../rz-engine.js` at deploy time and exposes the `architecture` namespace (`:19`, `:28`), so live `POST /calc` keeps the old classes until the owner redeploys | V-10 (FR-X15.5) | Owner says "redeployed"; the session runs V-10 |
 
 ## 6. User personas and use cases
 
@@ -542,8 +544,10 @@ Each FR is testable. Law ids (L-…) are defined in §20.2. "Gate" means the fil
 - Trigger: ship gate (every push); manual run.
 - Preconditions: none.
 - Inputs: `git ls-files -z`; `tools/secret-scan-baseline.json`; `tools/secret-scan-allowlist.json`.
-- Processing: skip `node_modules/`, `dcmoc/_next/` (build output of the scanned `dcmoc/src`), files over
-  5 MB and files that are not valid UTF-8. For each pattern hit, compute file, line, pattern name and match
+- Processing: skip `node_modules/`, files over 5 MB and files that are not valid UTF-8. `dcmoc/_next/` is
+  scanned: it is published output, and Next.js inlines environment values that are not in `dcmoc/src`
+  (44 git-tracked files at `7335fd257`; the §10.3 patterns give 0 hits there today, so it needs no baseline
+  entry). A later hit in `dcmoc/_next/` is baselined or fixed like any other file. For each pattern hit, compute file, line, pattern name and match
   length. Discard hits listed in the allowlist. Law X1.2a: a hit not covered by a baseline entry (`file` +
   `pattern`, `count` = the most hits allowed) fails. Law X1.2b: every remaining hit fails (the baseline must be
   empty). Under `--strict` a law missing from `--blocking` reports instead of failing (§11.4). `--report`: print
@@ -553,7 +557,9 @@ Each FR is testable. Law ids (L-…) are defined in §20.2. "Gate" means the fil
 - State changes: none.
 - Dependencies: none.
 - Exceptions: `git` missing → exit 2 with "git not found"; an unreadable file → reported as `SKIP <file> <reason>`, not a failure.
-- Acceptance: L-X1.2a and L-X1.2b red today with 6 hits in 4 files; a self-test plants a synthetic
+- Acceptance: L-X1.2a and L-X1.2b red today with 6 hits in 4 files; a second self-test copies one
+  `dcmoc/_next/static/chunks/*.js` file to a temporary tree, appends a synthetic `AIza`-shaped string, and
+  requires one `google-api-key` hit in that copy (red if the `_next` skip is ever restored); a self-test plants a synthetic
   key-shaped string (built at run time, not a real key) in a temp file and asserts the output contains its
   position but not its text.
 
@@ -851,7 +857,11 @@ and the five unlabelled categories. Acceptance: tracker row updated with the Q18
 **FR-X15.3 Provenance says what the table is**
 - `:9334` `architecture.ashraeClasses` source: "ASHRAE TC 9.9, Thermal Guidelines for Data Processing
   Environments, 5th ed. (2021): A1–A4 and H1 allowable and recommended inlet envelopes; values mirror
-  js/ltc-ashrae.js. maxDeltaTK: screening values, no ASHRAE table"; new `architecture.liquidClasses` source line;
+  js/ltc-ashrae.js. maxDeltaTK: screening values, no ASHRAE table" (same key, `asOf: '2021'` unchanged);
+  new `DATA.sources['architecture.liquidClasses']` = `{ source: 'ASHRAE TC 9.9, Water-Cooled Servers
+  (liquid cooling classes W17–W45 and W+, facility water supply temperature); values mirror js/ltc-ashrae.js
+  LIQUID', asOf: '2021', unit: '°C facility water supply max' }` next to the existing
+  `'architecture.ashraeClasses'` entry (`rz-engine.js:9334`);
   `:9333` "H1-H3 liquid envelopes" → "H1 high-density air class".
 
 **FR-X15.4 ΔT wording**
@@ -864,9 +874,19 @@ and the five unlabelled categories. Acceptance: tracker row updated with the Q18
   `terser rz-engine.js -c -m -o rz-engine.min.js` (`ENGINE_UNIFICATION.md:78`); `node tools/test-rz-engine.mjs`;
   `node tools/test-reference-parity.mjs`; cache tokens on the 71 HTML files that load the engine
   (`node tools/test-asset-cache-tokens.mjs --fix rz-engine.js` and `--fix rz-engine.min.js`); `node tools/audit-min-twins.mjs --strict`.
-- DCMOC reads the engine at run time (`rzModels()`, `arch-adapter.ts:161`); T-13 confirms on the served tree
-  that the Architecture page shows `W32 · ΔT …` for liquid at 30 °C and that no DCMOC rebuild is needed (if one
-  is, follow the DCMOC build traps in the owner's notes: `--webpack`, clean build id).
+- Engine catalog chain (owner mandate, `CLAUDE.md:92`): `node tools/build-engine-catalog.mjs` (regenerates
+  `dcmoc/src/lib/engine-catalog.json`, today `"dataVersion": "2.5.1"` at `:4`), then
+  `node tools/test-value-bindings.mjs` green. Note: `tools/ship-gate.sh` has no `test-value-bindings` line today
+  (`grep -n test-value-bindings tools/ship-gate.sh` → no output), so T-13 runs it by hand and records the
+  output; wiring it is left to the main session (same class as FR-X7A).
+- DCMOC rebuild: the catalog is a build-time import (`dcmoc/src/components/modules/FaqDashboard.tsx:4`,
+  `PlatformDashboards.tsx:24`), so `liquidClasses` and the version change reach the published `dcmoc/_next/`
+  only after `next build` (`dcmoc/package.json` `"build"`), following the DCMOC build traps in the owner's
+  notes (`--webpack`, clean build id). The Architecture page also reads the engine at run time (`rzModels()`,
+  `arch-adapter.ts:161`). T-13 confirms on the served tree that the Architecture page shows `W32 · ΔT …` for
+  liquid at 30 °C and that the rebuilt chunk carries the new `dataVersion`.
+- `cf-worker` (`/calc`): bundles the engine at deploy time (`cf-worker/src/calc.js:12`). Redeploy is owner
+  action OA-5; V-10 checks it live.
 
 ### Group X16 — pointer
 
@@ -1165,6 +1185,10 @@ liquidClasses: {
 }
 ```
 
+Provenance (engine rule, CLAUDE.md "Every `DATA` value must carry a `DATA.sources` entry"): `DATA.sources['architecture.ashraeClasses']`
+(existing, `rz-engine.js:9334`, text changed by FR-X15.3) and NEW `DATA.sources['architecture.liquidClasses']`
+(`source` + `asOf` + `unit`, text in FR-X15.3). `tools/test-rz-engine.mjs` provenance checks both keys.
+
 Backward compatibility: every existing key stays; `H1.maxDeltaTK` keeps its number with "screening" wording.
 A caller that asked for class `H1` for liquid now gets an air check; the only caller that does so implicitly is
 `thermalCheck` itself (X15-d), changed by FR-X15.2. Example record: `thermalCheck({ coolingType: 'liquid', supplyTempC: 30, deltaTK: 10 })`
@@ -1321,7 +1345,8 @@ stateDiagram-v2
 | Search palette (`search-terms.json`, `search-sections.json`) | X11 | New cards add no palette term; `build-search-sections.py` re-run picks up the new `tools.html` text | freshness gate |
 | Service worker `sw.js` | X11, X15 | `/tools.html` (`:29`) and `/rz-engine.js` (`:35`) are precached; `CACHE_NAME` follows the site version (`:5`, `tools/sync-sw-version.py`) | release chain step |
 | Cache tokens and min twins | X15 | 71 HTML files load the engine; tokens and `rz-engine.min.js` regenerate | `tools/test-asset-cache-tokens.mjs`, `tools/audit-min-twins.mjs --strict` |
-| DCMOC | X15 | `arch-adapter.ts:161-166`, `:198-201` read `class`, `compliant`, `flags` at run time; the note shows W classes for liquid | T-13 served check |
+| DCMOC | X15 | `arch-adapter.ts:161-166`, `:198-201` read `class`, `compliant`, `flags` at run time; the engine catalog is a build-time import (`FaqDashboard.tsx:4`, `PlatformDashboards.tsx:24`), so R4 regenerates it (`node tools/build-engine-catalog.mjs`) and rebuilds DCMOC | `node tools/test-value-bindings.mjs` green; T-13 served check |
+| `cf-worker` `/calc` | X15 | `cf-worker/src/calc.js:12` bundles `rz-engine.js` at deploy time; live `/calc` changes only after the owner redeploys (OA-5) | V-10 |
 | Manuals (`manual/`) | X7-B | 32 manual pages lose hidden FAQ JSON-LD; no visible change. No manual describes `thermalCheck` (`grep -rln "thermalCheck\|ashraeClasses" manual/` → none) | L-X7.2 |
 | Engine manual / standards | X15 | `standarization/ENGINE_UNIFICATION.md` gains the ASHRAE parity rule | R089 list §22.5 |
 | Feature-flag standard | X11 | `standarization/FEATURE_FLAGS_STANDARD.md`: the access sentence rule for catalogue cards | R089 list |
@@ -1337,7 +1362,7 @@ No LLM anywhere in this PRD, at run time or in the tools. Everything is determin
 - Generators re-run in each release (§22.5).
 - One scripted bulk edit: `node tools/test-faq-visible.mjs --fix` (77 files), idempotent, reviewed by diff
   filter before commit (FR-X7B.2).
-- Human approval points: OA-1 to OA-4 and D-XDEF-1 to D-XDEF-11 (§5.7), and the owner's look at the screenshots of
+- Human approval points: OA-1 to OA-5 and D-XDEF-1 to D-XDEF-11 (§5.7), and the owner's look at the screenshots of
   `tools.html` (T-11) before push.
 - The session never runs a probe or a command that sends a credential anywhere; the X8 probes carry none.
 
@@ -1381,7 +1406,7 @@ No LLM anywhere in this PRD, at run time or in the tools. Everything is determin
   The X8 probes are three GETs; no load.
 - **Sensitive data.** None added. The old database URL and the Google key are redacted only after revocation;
   until then they stay where they are (moving them would not unpublish them).
-- **Approval requirements.** OA-1 to OA-4; D-XDEF-7 to D-XDEF-11 (§5.7).
+- **Approval requirements.** OA-1 to OA-5; D-XDEF-7 to D-XDEF-11 (§5.7).
 
 ## 17. Edge cases and failure scenarios
 
@@ -1528,12 +1553,12 @@ change. No Worker deploy by the session; the owner's Worker secret update (OA-1)
 | T-10 | X11 manifest and static gate | — | NEW `tools/tools-hub-coverage.json`, NEW `tools/test-tools-hub-coverage.mjs` | FR-X11.1, FR-X11.4 static part | 1 d | `--law X11.1` red: 13 `MISSING-CARD`, 5 `ACCESS` | wired R1 `--strict` (report mode); report prints 59 rows |
 | T-11 | X11 cards | T-10 | `tools.html` | FR-X11.2, FR-X11.3, §9.10 on the D-XDEF-2 and D-XDEF-3 defaults; re-read each target page; count the network labs; generators | 1.5 d | L-X11.1, L-X11.2 green; owner looks at the screenshots | `X11.1` and `X11.2` blocking (R2) |
 | T-12 | X12 | T-1; the removals: D-XDEF-9, D-XDEF-10 | `dashboard.html`, `dc-market-tracker.html`, `all-in-one-dashboard.html`, `account.html` | FR-X12.1–X12.5; count markets without a profile on the served page | 0.5 d | L-X12.1a; a Pro session click lands on `account.html`; later L-X12.1b | `X12.1a` blocking (R1); `X12.1b` after the two decisions |
-| T-13 | X15 | T-1 | `rz-engine.js`, `rz-engine.min.js`, `tools/test-rz-engine.mjs`, 71 HTML token updates, `standarization/ENGINE_UNIFICATION.md` | FR-X15.1–X15.5 on the D-XDEF-4 and D-XDEF-5 defaults; engine DoD (`ENGINE_UNIFICATION.md:77-80`) | 1.5 d | L-X15.1, L-X15.2; engine suite green; DCMOC served check | engine version claimed; `X15.1,X15.2` blocking (R4) |
+| T-13 | X15 | T-1 | `rz-engine.js`, `rz-engine.min.js`, `tools/test-rz-engine.mjs`, 71 HTML token updates, `dcmoc/src/lib/engine-catalog.json` (regenerated), rebuilt `dcmoc/_next/`, `standarization/ENGINE_UNIFICATION.md` | FR-X15.1–X15.5 on the D-XDEF-4 and D-XDEF-5 defaults; engine DoD (`ENGINE_UNIFICATION.md:77-80`) | 1.5 d | L-X15.1, L-X15.2; engine suite green; DCMOC served check | engine version claimed; `X15.1,X15.2` blocking (R4) |
 | T-14 | X18 | T-1 | `achievements.html` | FR-X18.1 on the D-XDEF-6 default | 0.5 d | L-X18.1; screenshot both themes | `X18.1` blocking (R1) |
 | T-15 | X19 | T-1 | `standarization/ALARM_STATE.md` | FR-X19.1 with the two `git`/`grep` lookups | 0.5 d | L-X19.1 | `X19.1` blocking (R1) |
 | T-16 | Releases and live checks | each release's tasks | `js/rz-version.js`, `CHANGELOG.md`, `changelog.html`, `sw.js`, tokens, generators, tracker, register | §22 | 1.5 d (≈ 0.25 d per release unit) | §22.6 live checks | tracker rows closed |
 
-Total ≈ 14 days of session work, plus owner time for OA-1 to OA-4 and the decisions (UNKNOWN; the dashboard check is
+Total ≈ 14 days of session work, plus owner time for OA-1 to OA-5 and the decisions (UNKNOWN; the dashboard check is
 designed to take minutes).
 
 ## 20. Test strategy
@@ -1651,6 +1676,56 @@ for f in datahallAI ict chiller-plant water-system fire-system EPMS_Telemetry; d
 The FAQ scan (X7-g) and the tools classification (X11-b/c/e) were run as one-off scripts while writing this PRD;
 T-6a and T-10 turn them into the gates and must reproduce 77/263 and 13/5 before changing any page.
 
+X11 classification script (v1.1; run from the repository root with `python3 -I x11.py`). At `7335fd257` it
+prints `root html 188 detected 57 with card 21 cards missed by detector ['dc-conventional.html',
+'standards-ltc-lab.html']`, `hub-child 9 article 13 landing 1`, `MISSING-CARD 13 [...]` (the 13 pages of
+FR-X11.2) and `ACCESS 5` (`datahallAI`, `dc-conventional`, `ltc-ansi-tia-topology-readiness`,
+`ltc-uptime-tier-alignment`, `standards-ltc-lab`). The root-file count is 188, not 181, because 7
+`incident-*.html` pages were added after `b8848af95`; none is detected as a tool.
+
+```python
+import re, glob, os, subprocess, json
+tracked = set(x for x in subprocess.run(['git', 'ls-files', '-z', '*.html'], capture_output=True, text=True).stdout.split('\0') if x)
+pages = sorted(f for f in tracked if '/' not in f)
+def txt(f): return open(f, encoding='utf-8', errors='replace').read()
+NAME = re.compile(r'(-calculator|-checklist)\.html$|^(ltc|pln)-')
+def is_tool(f):
+    t = txt(f)
+    return bool(NAME.search(f) or re.search(r'"@type"\s*:\s*"(WebApplication|SoftwareApplication)"', t)
+                or 'class="tool-ref"' in t or 'data-rz-data-mode="simulated"' in t)
+det = [f for f in pages if f != 'tools.html' and is_tool(f)]
+tools = txt('tools.html')
+cards = re.findall(r'<a[^>]*class="tool-card"[^>]*href="([^"#?]+)', tools) + \
+        re.findall(r'<a[^>]*href="([^"#?]+)"[^>]*class="tool-card"', tools)
+cards = sorted(set(c.lstrip('/') for c in cards))
+def main_links(hub):
+    t = txt(hub); m = re.search(r'<main[\s\S]*?</main>', t); t = m.group(0) if m else t
+    return set(h.lstrip('/') for h in re.findall(r'href="([^"#?]+\.html)', t))
+hub_child = {f for f in det if f.startswith('cdu-') and f != 'cdu-calculator.html' and f in main_links('cdu-hub.html')} | \
+            {f for f in det if f.startswith('pln-java-grid-') and f in main_links('pln-java-grid.html')}
+article = {f for f in det if f not in cards and (f.startswith(('compare-', 'infographic-')) or f == 'ai-engineering-maintenance.html')}
+landing = {'datacenter-solutions.html'} & set(det)
+missing = [f for f in det if f not in cards and f not in hub_child and f not in article and f not in landing]
+print('root html', len(pages), 'detected', len(det), 'with card', len([f for f in det if f in cards]),
+      'cards missed by detector', [c for c in cards if c not in det])
+print('hub-child', len(hub_child), 'article', len(article), 'landing', len(landing))
+print('MISSING-CARD', len(missing), missing)
+# access: carded page gated by a key whose free page-access is not granted
+ff = txt('js/rz-feature-flags.js')
+acc = []
+for c in cards:
+    if not os.path.exists(c): continue
+    m = re.search(r"enforceTierFeatureAccess\(\s*'([^']+)'", txt(c))
+    if not m: continue
+    key = m.group(1)
+    blk = re.search(r"'" + re.escape(key) + r"'\s*:\s*\{[\s\S]*?'page-access'\s*:\s*\{([^}]*)\}", ff)
+    free = blk and re.search(r"free\s*:\s*true", blk.group(1))
+    card = re.search(r'<a[^>]*href="/?' + re.escape(c) + r'[^"]*"[\s\S]*?</a>', tools)
+    if not free and card and 'tool-access' not in card.group(0):
+        acc.append((c, key, 'matrix' if blk else 'key missing'))
+print('ACCESS', len(acc), acc)
+```
+
 ### 20.4 Test types
 
 | Type | What | Where |
@@ -1763,6 +1838,8 @@ enhancement report before and after (optional, owner's account).
 3. `python3 tools/sync-sw-version.py` (`sw.js:5`).
 4. Cache tokens: `node tools/test-asset-cache-tokens.mjs --fix <asset>` for every changed asset
    (R4: `rz-engine.js`, `rz-engine.min.js`); `node tools/audit-min-twins.mjs --fix` then `--strict`.
+   R4 only: `node tools/build-engine-catalog.mjs`, `node tools/test-value-bindings.mjs` (green), DCMOC
+   rebuild (FR-X15.5); after the push, owner action OA-5 and V-10.
 5. Generators: `python3 tools/build-sitemap.py`, `python3 tools/build-llms-txt.py`, `python3 tools/build-llms-full.py`,
    `python3 tools/build-search-sections.py`, `python3 tools/build-indexing-list.py`; then
    `python3 tools/test-generator-freshness.py`.
@@ -1794,6 +1871,7 @@ enhancement report before and after (optional, owner's account).
 | V-7 | R5 | `curl -s https://resistancezero.com/Apps/finance-terminal/index.html \| node tools/test-x-defects.mjs --law X1.1 --stdin` | `X1.1 PASS` |
 | V-8 | R5 | `curl -s -o /dev/null -w '%{http_code}' -H 'Origin: https://resistancezero.com' "https://rz-finance-gateway.resistancezero0us.workers.dev/q?syms=AAPL"` | 200 (the gateway works with the rotated server-side key; no credential in the request) |
 | V-9 | R6 | the three probes of FR-X8.1 | unchanged from T-7 (a repo deletion changes nothing live) |
+| V-10 | R4, after OA-5 | `curl -s -X POST https://rz-finance-gateway.resistancezero0us.workers.dev/calc -H 'Content-Type: application/json' -d '{"model":"architecture.thermalCheck","args":[{"coolingType":"liquid","supplyTempC":30,"deltaTK":10}]}'` (host as V-8; body `{ model, args }` per `cf-worker/src/calc.js:3-7`; add `Authorization: Bearer <root session>` if the Worker has `REQUIRE_AUTH` set, `:44-47`) | `"class":"W32"` |
 
 ## 23. Risks and dependencies
 
@@ -1822,7 +1900,7 @@ enhancement report before and after (optional, owner's account).
 - [ ] Admin sample notes present until PRD-Q10 replaces the sections.
 - [ ] `tools.html` has 36 cards, the manifest has 59 entries, both coverage laws wired; screenshots at 1440 and 390 in both themes looked at by the owner.
 - [ ] No placeholder or dead control on the four pages (accepted exceptions recorded with the owner's date).
-- [ ] Engine ASHRAE table equals `js/ltc-ashrae.js`; liquid cooling classified by W class; engine version claimed; min twin, tokens and DCMOC checked.
+- [ ] Engine ASHRAE table equals `js/ltc-ashrae.js`; liquid cooling classified by W class; engine version claimed; min twin and tokens current; engine catalog regenerated and `test-value-bindings.mjs` green; DCMOC rebuilt; OA-5 done and V-10 returns `W32`.
 - [ ] `achievements.html` copy true (or the page retired by PRD-Q17).
 - [ ] `ALARM_STATE.md` equals the pages.
 - [ ] Pointer groups X4, X6, X13, X14, X16, X17 closed in the tracker with their owner PRD's release id.
@@ -1841,7 +1919,7 @@ enhancement report before and after (optional, owner's account).
 | UI/UX depth | 4 | §9.1–§9.10 with exact strings for 13 cards and the access sentences, both themes, 1440 and 390; no visual mock before T-11's screenshots |
 | Data model | 5 | Manifest of 59 entries (§10.2), baseline and line-hash allowlist (§10.3), engine W-class shape (§10.4) |
 | API contracts | 4 | Probe contract (§11.2), `rzPurgeLeakedKey` signature (§11.3), five gate CLIs with exit codes and report mode (§11.4); the live Worker identity stays an owner reading |
-| Cross-module | 5 | §5.4 and §13 tie each pointer group to its owning PRD and decision (D-Q04-5, D-Q06-2, D-Q11-2, D-Q17-2) |
+| Cross-module | 4 | §5.4 and §13 tie each pointer group to its owning PRD and decision (D-Q04-5, D-Q06-2, D-Q11-2, D-Q17-2). v1.1 adds the three engine consumers v1.0 missed: catalog chain, DCMOC rebuild, `cf-worker` redeploy (OA-5) |
 | Error handling | 4 | E1–E24 (§17), including partial release, a rejected decision, a script-built FAQ and a credential that cannot be revoked |
 | Security | 5 | No gate prints a value; rotation and revocation are owner-only (OA-1 to OA-3); history rewrite is D-XDEF-7; R114 stated (§5.5) |
 | Testability | 5 | 17 laws, each red today with its failure line, mutation proofs, and the D9 table of blocking point and precondition (§20.2) |

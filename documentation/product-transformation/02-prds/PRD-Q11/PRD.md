@@ -6,7 +6,7 @@
 |---|---|
 | PRD id | PRD-Q11 |
 | Feature | `js/rz-feature-flags.js` reads per-page overrides from Supabase `feature_overrides` (cached, with a safe fallback to the shipped matrix) instead of the visitor's own localStorage. The admin console writes them there. Only root can write, every write is audited, and the flag keys that pages use match the matrix |
-| Version | 1.1 |
+| Version | 1.2 |
 | Status | Draft |
 | Author | Opus 5.5; Fable quota exhausted |
 | Date | 2026-11-11 |
@@ -14,10 +14,10 @@
 | Priority | 57.5 (addendum rank 16: I 4, N 2, C 8, E 2, effort 1 week; `documentation/PRODUCT_INNOVATION_ASSESSMENT_2026-11_ADDENDUM.md:91`) |
 | Related findings | Q11 (`…_ADDENDUM.md:404-420`). New findings N1–N8 in §3.3 |
 | Dependencies | (1) Owner approval: auth boundary (`documentation/product-transformation/STATE.md:52`, `01-improvement-register/REGISTER.md:21`); owner decisions D-Q11-1 to D-Q11-8 (§5.7, written as `DECISIONS.md` rows). (2) Owner action OA-1: the owner runs the SQL (§22.1). (3) PRD-Q10: shares `tools/lib/pg-harness.mjs` and `rzLoadConfig()`. Whichever PRD ships first creates them. PRD-Q10 deletes the fabricated "Per-User Overrides" card (its FR-8), and its Audit log panel shows this PRD's audit actions |
-| Related modules | `js/rz-feature-flags.js` (59 HTML files load it); `auth.js` and its twin `auth.min.js`; `rz-ops-p7x3k9m.html` Feature Flags section; `js/rz-supabase.js`; `supabase/schema.sql` (NEW Module 11); 5 LTC topic pages; `datacenter-solutions.html`; `standarization/FEATURE_FLAGS_STANDARD.md` |
+| Related modules | `js/rz-feature-flags.js` (66 HTML files load it at `7335fd257`; L6 computes the count); `auth.js` and its twin `auth.min.js`; `rz-ops-p7x3k9m.html` Feature Flags section; `js/rz-supabase.js`; `supabase/schema.sql` (NEW Module 11); 5 LTC topic pages; `datacenter-solutions.html`; `standarization/FEATURE_FLAGS_STANDARD.md` |
 | Target wave | Addendum roadmap: Q11 is not named in a wave row. The main session sets the wave in `04-implementation-plan/` |
 | Approval status | PRD approved by owner R110/R111 2026-11-10. Implementation is BLOCKED until D-Q11-1 to D-Q11-8 are decided in `DECISIONS.md` (ACCEPTED or DEFAULTED, each with the request id of the owner message). D-Q11-1, D-Q11-2, D-Q11-3 and D-Q11-8 are the auth boundary (`STATE.md:52`); D-Q11-6 is a feature removal. A law blocks the ship gate only once its precondition holds (§20.3) |
-| Facts verified at | `wt-hub3` commit `9e49bfefd` (2026-11-11). Site version `3.35.10` (`js/rz-version.js:2`) |
+| Facts verified at | `wt-hub3` commit `9e49bfefd` (2026-11-11). Site version `3.35.10` (`js/rz-version.js:2`). Reach re-counted at `7335fd257` (v1.2) |
 
 Change history
 
@@ -25,6 +25,7 @@ Change history
 |---|---|---|---|
 | 1.0 | 2026-11-11 | Opus 5.5 | First complete draft, all 24 sections. Every fact re-verified on `9e49bfefd` with the commands quoted in §3 |
 | 1.1 | 2026-11-11 | Opus 5.5 | Program conventions applied. Decisions of version 1.0 (local ids 1 to 7) renamed D-Q11-1…D-Q11-7 and written as `DECISIONS.md` rows (coordinator decisions D5, D15); new D-Q11-8 for the `auth.js` listener of FR-3 (auth boundary). Law wiring with report mode before each law's blocking point (D9, §20.3). Owner rule R114 (no paid services or pay-per-use APIs) stated in §5.5 |
+| 1.2 | 2026-11-11 | Opus 5.5 | QA batch 3 fixes: cache can only restrict (option b), future `fetchedAt` rejected, L2 forged-cache cases (FR-2, §10.3, §16, O2, L2); L4 module list; reach re-counted at `7335fd257` (66/64); OA-1 pre-check failure path |
 
 ## 2. Executive summary
 
@@ -77,7 +78,7 @@ today, prove the change (§20.2).
 | P12 | Dead legacy controls | `DEFAULT_FEATURES`/`featureFlags` in localStorage `rz_admin_features` (`:2570`), `toggleFeature`/`toggleExperimental` (`:3683-3684`), and the features report (`:2995-3011`, built from them). The key `rz_admin_features` is read nowhere outside the admin | `grep -rn "rz_admin_features['\"]" --include=*.js --include=*.html .` → `rz-ops-p7x3k9m.html` only |
 | P13 | Two presets are duplicates | `all_pro+` equals `pro_only`, and `all_demo+` equals `demo_up` (`:3669-3675`) | `sed -n 3669,3675p rz-ops-p7x3k9m.html` |
 | P14 | The standard documents the local mechanism | `standarization/FEATURE_FLAGS_STANDARD.md` §6 "Admin Console Integration" (`:244-286`) specifies the localStorage key; §3 lists "14 pages as of v1.18.0" (`:88`) while the matrix has 57; §7 requires page keys to equal the file name (`:289-294`), which the 5 LTC keys break | `grep -n "^## \|^### " standarization/FEATURE_FLAGS_STANDARD.md` |
-| P15 | Reach | 59 HTML files load the module (56 root, 3 under `Apps/`). 58 HTML files call `enforceTierFeatureAccess` with a literal key, using 14 distinct keys. `sw.js` already serves the module network-first (`sw.js:15`) | scan script in §20.2 L6 |
+| P15 | Reach | At `9e49bfefd`: 59 HTML files load the module (56 root, 3 under `Apps/`); 58 call `enforceTierFeatureAccess` with a literal key, using 14 distinct keys. Re-count at `7335fd257` (v1.2): 66 load it (63 root, 3 under `Apps/`), 64 call it with a literal key using 13 distinct keys; the 7 new `incident-*.html` dossiers gate on `dc-incidents` (51 calls). L6 and O9 compute these counts; no law quotes them. `sw.js` already serves the module network-first (`sw.js:15`) | scan script in §20.2 L6 |
 
 ### 3.2 Consequence of leaving it
 
@@ -93,7 +94,7 @@ today, prove the change (§20.2).
 
 | # | Addendum statement | What the code says | Effect on this PRD |
 |---|---|---|---|
-| C1 | "Wire the existing methods" (`…_ADDENDUM.md:410`) | `rzSupa` is an ES module that loads supabase-js from jsDelivr on 10 pages only (`js/rz-supabase.js`). The flag module runs on 59 pages as a classic script and cannot call it | The read path is one plain REST GET (FR-2). The admin write path does use `rzSupa`, extended (FR-8) |
+| C1 | "Wire the existing methods" (`…_ADDENDUM.md:410`) | `rzSupa` is an ES module that loads supabase-js from jsDelivr on 10 pages only (`js/rz-supabase.js`). The flag module runs on 66 pages (59 at `9e49bfefd`) as a classic script and cannot call it | The read path is one plain REST GET (FR-2). The admin write path does use `rzSupa`, extended (FR-8) |
 | C2 | "RLS must restrict writes to admins" (`:415`) | It already does (`schema.sql:380-382`). The real gaps are no audit, a client-supplied `updated_by`, an anon-readable `updated_by`, no key validation and no root guard (P4–P6) | FR-1 closes them |
 | C3 | "Effort 1 week" (`:412`) | The key mismatches (P7, P8), the inert cells (P9) and the migration of local overrides were not in the estimate | 11.5 days (§19) |
 
@@ -106,7 +107,7 @@ P5 (no root guard in SQL). **N7** P11 (duplicate schema). **N8** P13 (duplicate 
 | # | Objective | Metric | Today | Target | Method |
 |---|---|---|---|---|---|
 | O1 | An admin change reaches every visitor | a fresh profile B applies a row written by profile A | no (no request made) | yes, within the cache TTL of 10 min (immediately for a profile without a cache) | L1 |
-| O2 | A visitor cannot change their own flags | a forged `rz_admin_features_by_page` changes the result of `has()` | yes | no | L2 |
+| O2 | Nothing a visitor writes to localStorage widens their own access | a forged `rz_admin_features_by_page`, or a forged `rz_flags_cache_v1` (any `fetchedAt`, including now or the future) holding a row that grants more than the shipped matrix, changes `has()` from false to true | yes (old key) | no | L2 |
 | O3 | Flags fail safe | with the server down and no cache, `has()` equals the shipped matrix; page load is not delayed past 3 s | n/a | yes | L3 |
 | O4 | Only root writes, inputs are validated, root keeps access | SQL cases accepted or refused as specified | bad keys accepted; root page-access can be set false; `updated_by` forged | refused, refused, forced | L4 |
 | O5 | Every flag change is audited | `audit_log` rows per insert, update and delete | 0 | 1 each | L5 |
@@ -174,7 +175,7 @@ P5 (no root guard in SQL). **N7** P11 (duplicate schema). **N8** P13 (duplicate 
 
 ### 5.5 Constraints
 
-- Classic ES5 script on 59 pages; synchronous `has()` must stay synchronous (callers expect a boolean).
+- Classic ES5 script on 66 pages (at `7335fd257`); synchronous `has()` must stay synchronous (callers expect a boolean).
 - The publishable key in `js/rz-config.js` is public by design; RLS and grants are the boundary.
 - Peer-owned files: `cx-calculator.html` loads the module (it is one of the 56 root loaders). Its tag token
   changes when the module changes: coordinate with the peer.
@@ -245,7 +246,7 @@ user opens an LTC topic page; UC9 a non-root opens the panel.
 ## 7. Complete user journey
 
 ### J1 Visitor page load (UC6, UC7, UC8)
-1. Entry: any of the 59 pages that load the module, for example `ltc-ashrae-thermal-control.html`.
+1. Entry: any of the 66 pages that load the module, for example `ltc-ashrae-thermal-control.html`.
 2. The module evaluates at once: it reads `rz_flags_cache_v1`. A fresh cache (< 10 min) is used, with no
    request. A stale cache (≤ 7 days) is used now and a GET starts. With no usable cache, the canonical
    matrix is used now and a GET starts.
@@ -325,16 +326,27 @@ user opens an LTC topic page; UC9 a non-root opens the panel.
   1. Read the cache `{v:1, fetchedAt, rows}`. Reject it whole if the shape is wrong. Validate each row:
      `page_key` and `feature_key` match `^[a-z0-9][a-z0-9-]{0,63}$`, `tier` is one of the four, `enabled` is
      a boolean, and the row is not `page-access`/`root`/`false`. Drop invalid rows one by one.
-  2. Cache age ≤ 7 days: build the map from it. The source is `cache` if the age is ≤ 10 minutes, else
-     `stale-cache`. Older or missing: an empty map, source `canonical`.
-  3. If the source is not `cache`, start one GET (§11.2) with a 3 s abort. On 200 with an array: validate
+  2. Age = `Date.now() - fetchedAt`. If `fetchedAt` is more than 60 s in the future (age < −60,000 ms;
+     the 60 s allows clock skew), reject the cache whole. Cache age ≤ 7 days: build the map from it. The
+     source is `cache` if the age is ≤ 10 minutes, else `stale-cache`. Older or missing: an empty map,
+     source `canonical`.
+     **The cache can only restrict (option b of QA batch 3).** A cached row is applied only when its
+     `enabled` value is less than or equal to the shipped matrix value for the same page, feature and tier
+     (`false` rows, and `true` rows the matrix already grants). A cached row that grants more than the
+     shipped matrix (`enabled: true` where the matrix says `false`) is held as pending and is not applied;
+     if any pending row exists, the GET of step 3 starts even when the cache is fresh. A granting row
+     becomes effective only from the body of a GET made in this page view. If that GET fails, the pending
+     rows are never applied, so a forged or stale grant fails closed.
+  3. If the source is not `cache`, or step 2 holds pending rows, start one GET (§11.2) with a 3 s abort. On 200 with an array: validate
      the rows, build the new map, write the cache with `fetchedAt = Date.now()`, set the source to `server`,
      and dispatch `rz-features-changed` if the map differs from the previous one. On any failure: keep the
      current map and source, log nothing, show nothing.
   4. `has(page, feature)`: root page-access invariant (`:520`, unchanged) → educator admit (`:525`,
-     unchanged) → the map's value for `page/feature/tier` if present → canonical (`:542-548`, unchanged).
+     unchanged) → the map's value for `page/feature/tier` if present (server rows of this page view, or
+     restricting cache rows) → canonical (`:542-548`, unchanged).
   5. The `storage` listener (`:600-606`) watches `rz_flags_cache_v1` instead of the old key, rebuilds the
-     map from the new cache and dispatches `rz-features-changed`.
+     map from the new cache under the rules of steps 1–2 (restricting rows only; server rows already
+     received in this page view are kept) and dispatches `rz-features-changed`.
 - **Outputs:** `_rzFeatures.has` and `canAccess` (unchanged signatures); NEW `_rzFeatures.source()` returning
   `{source, fetchedAt, rows}`; NEW `_rzFeatures.refresh()` returning a promise (used by the admin after a
   write).
@@ -713,10 +725,15 @@ Trigger functions are not callable as RPCs (they return `trigger`); the revokes 
 | Field | Rule |
 |---|---|
 | `v` | `1`; another value means the cache is discarded |
-| `fetchedAt` | epoch ms of the successful GET |
+| `fetchedAt` | epoch ms of the successful GET; a value more than 60 s in the future discards the cache |
 | `rows` | ≤ 5,000 rows, each validated as FR-2 step 1 |
 
 Freshness: ≤ 10 minutes fresh (no request); ≤ 7 days usable while a GET is attempted; older means discarded.
+
+Trust: the cache is written by the visitor's own browser and can be edited by the visitor. It is a hint that
+can only restrict access: rows that grant more than the shipped matrix are applied only after a GET in the
+same page view returns them (FR-2 step 2). A forged cache can therefore lock the visitor out of their own
+view (harmless) but cannot unlock anything.
 
 ### 10.4 Retention, audit fields, migration, compatibility
 
@@ -838,7 +855,7 @@ stateDiagram-v2
 
 | Module | Change | Propagation |
 |---|---|---|
-| 59 module pages | new module code | `?v=` token refresh: `node tools/test-asset-cache-tokens.mjs --fix js/rz-feature-flags.js`; `cx-calculator.html` (peer-owned) needs its token refreshed: coordinate with the peer |
+| 66 module pages (at `7335fd257`; enumerated by grep, not by the number) | new module code | `?v=` token refresh: `node tools/test-asset-cache-tokens.mjs --fix js/rz-feature-flags.js`; `cx-calculator.html` (peer-owned) needs its token refreshed: coordinate with the peer |
 | `auth.js` / `auth.min.js` | FR-3 listener | `node tools/audit-min-twins.mjs --fix`; tokens `--fix auth.js` and `--fix auth.min.js` |
 | 5 LTC topic pages | none (their keys become valid) | pro and educator users can open them (D-Q11-2) |
 | `datacenter-solutions.html` | one script tag | the LTC card works for pro and educator users (D-Q11-3) |
@@ -890,7 +907,8 @@ standard (`--list`). Human approval points: D-Q11-1 to D-Q11-8, OA-1, and every 
 
 | Threat | Today | After |
 |---|---|---|
-| Visitor unlocks a page with localStorage | works (`:527-540`) | ignored |
+| Visitor unlocks a page with localStorage (`rz_admin_features_by_page`) | works (`:527-540`) | ignored |
+| Visitor forges `rz_flags_cache_v1` with a granting row and `fetchedAt` = now or in the future | key does not exist | future `fetchedAt` discards the cache; a granting row waits for a GET of this page view and is never applied from cache (FR-2 step 2) |
 | Root writes another root's UUID as `updated_by` | possible (`js/rz-supabase.js:458`) | forced by trigger |
 | Anyone reads who changed a flag | yes (all-read policy) | no (column grant) |
 | Admin locks root out of a page | blocked only in the client | blocked in SQL too |
@@ -926,7 +944,7 @@ standard (`--list`). Human approval points: D-Q11-1 to D-Q11-8, OA-1, and every 
 
 ```mermaid
 flowchart LR
-  subgraph Page [Any of 59 module pages]
+  subgraph Page [Any module page]
     FF[js/rz-feature-flags.js] -- has / canAccess --> AU[auth.js enforceTierFeatureAccess]
     FF -- rz-features-changed --> AU
     FF -- rzLoadConfig --> CFG[js/rz-config.js]
@@ -965,7 +983,7 @@ sequenceDiagram
 
 ### 18.3 Technology decisions
 
-- Plain REST GET in the module (C1): no supabase-js on 59 pages.
+- Plain REST GET in the module (C1): no supabase-js on the 66 module pages.
 - Client-side resolution kept: the matrix already lives in the module; the server stores only deviations.
 - Triggers rather than RPC-only writes: the existing RLS and `rzSupa` write path stay, and the audit cannot be
   bypassed by any client that can write.
@@ -1026,9 +1044,9 @@ Total 11.5 days, against the addendum's 1 week (C3).
 | Law | Claim | Command | Red on today's tree |
 |---|---|---|---|
 | L1 | Profile A (admin, stub store) unticks Free on `page-access` for a free page; profile B (fresh context, signed out) opening that page sees it locked after the GET; ticking it back unlocks it in B on reload. A pro session on `ltc-ashrae-thermal-control.html` is not locked | `env RZ_BASE=$LTC_BASE node tools/test-feature-flags-server.mjs --browser --case cross-profile` | the module makes no request, so B never changes; the admin writes localStorage in A only; the LTC page locks the pro session (P7) |
-| L2 | With `rz_admin_features_by_page` set to grant `free` page access on `standards-ltc-lab`, a signed-out visitor is still locked | `… --case local-key` | `has()` returns the local value (`js/rz-feature-flags.js:527-540`), so the page unlocks |
+| L2 | A signed-out visitor stays locked on `standards-ltc-lab` in each of four cases: (a) `rz_admin_features_by_page` grants `free` page access; (b) `rz_flags_cache_v1` = `{v:1, fetchedAt: now, rows:[{page_key:'standards-ltc-lab', feature_key:'page-access', tier:'free', enabled:true, …}]}` with the stub server returning no such row; (c) as (b) with `fetchedAt` = now + 1 year; (d) as (b) with the server returning 500. In (b)–(d) `source()` is not `cache` with that row applied, and in (c) the cache is discarded | `… --case local-key` and `… --case forged-cache` | (a) `has()` returns the local value (`js/rz-feature-flags.js:527-540`), so the page unlocks. (b)–(d) are red on the v1.1 design (a fresh cache was trusted with no request and no lower bound on age); the case also runs against a mutation of the module that applies granting cache rows, which must unlock and so fail the law |
 | L3 | Fresh profile: exactly 1 GET; fresh cache: 0 GET; server 500 or 3 s timeout with no cache: shipped matrix and no console error; 2-day-old cache with server down: cache values; 8-day-old cache with server down: shipped matrix; one malformed row does not drop the valid ones; `has()` answers before any network activity | `… --case failure` | there is no GET (the first assertion fails), no cache key and no `source()` |
-| L4 | On a real Postgres engine with Modules 0–11: anon insert refused; non-root insert refused (RLS); root insert of a valid row accepted with `updated_by` = root even when the body names another UUID; root insert of `page-access/root/false` refused (CHECK); keys `Bad_Key`, `../x`, `a b` refused; anon `select updated_by` refused; anon `select page_key,…,updated_at` returns rows | `node tools/test-feature-overrides-sql.mjs` | bad keys and root lock-out are accepted, the client UUID is kept, and anon can select `updated_by` (no CHECKs, no trigger, no column grant) |
+| L4 | On a real Postgres engine with Modules 0–9, plus Module 10 if present (PRD-Q10), plus Module 11: anon insert refused; non-root insert refused (RLS); root insert of a valid row accepted with `updated_by` = root even when the body names another UUID; root insert of `page-access/root/false` refused (CHECK); keys `Bad_Key`, `../x`, `a b` refused; anon `select updated_by` refused; anon `select page_key,…,updated_at` returns rows | `node tools/test-feature-overrides-sql.mjs` | bad keys and root lock-out are accepted, the client UUID is kept, and anon can select `updated_by` (no CHECKs, no trigger, no column grant) |
 | L5 | Root insert, update (value change), no-op update and delete produce exactly 1, 1, 0 and 1 `audit_log` rows with the right action, target and meta | `node tools/test-feature-overrides-sql.mjs --case audit` | no trigger: 0 rows for every operation |
 | L6 | Every literal `enforceTierFeatureAccess` key exists in the matrix; every HTML file that calls it loads the module; `Object.keys(RZ_FEATURE_FLAGS)` holds no function; `RZ_FEATURE_FLAGS_FALLBACK` is gone; `RZ_FLAG_CONSUMERS` equals the scanned readers; `rzLoadConfig()` text equals PRD-Q10's twin | `node tools/test-feature-flags-server.mjs --static` | 5 missing LTC keys; `datacenter-solutions.html` without the module; `canAccess` function key; fallback present at `rz-ops-p7x3k9m.html:3527`; `RZ_FLAG_CONSUMERS` undefined |
 | L7 | In the admin with the stub: a toggle calls `setFeatureOverride` (or `deleteFeatureOverride` when back to default) with the exact arguments and makes 0 `localStorage.setItem` calls; Apply sends one batch; Reset deletes the page; a refused write reverts the checkbox and toasts; inert rows are disabled; non-root is read-only; Upload sends only the valid differing items and removes the key; Discard removes the key; no `canAccess` tab; no `alert()` | `env RZ_BASE=$LTC_BASE node tools/test-feature-flags-server.mjs --browser --case admin` | `toggleFeatureFlag` writes localStorage (`:3643`); `rzSupa` is never called; a `canAccess` tab renders; inert rows are live toggles |
@@ -1069,7 +1087,7 @@ laws are expected to block from the Q11 release.
 | L1 | Q11 release · T-8 | D-Q11-1 ACCEPTED or DEFAULTED; D-Q11-2 and D-Q11-8 not PROPOSED (the pro clause follows D-Q11-2: A not locked, B locked; with D-Q11-8 declined the lock is asserted after a reload); T-2, T-3, T-6 |
 | L2 | Q11 release · T-8 | D-Q11-1 ACCEPTED or DEFAULTED; T-2 |
 | L3 | Q11 release · T-8 | D-Q11-1 ACCEPTED or DEFAULTED; D-Q11-4 decided A or B (L3 uses the chosen TTL, stale age and timeout); T-2 |
-| L4 | Q11 release · T-1 | D-Q11-1 ACCEPTED or DEFAULTED; `tools/lib/pg-harness.mjs` exists (this T-1 or PRD-Q10 T-1) |
+| L4 | Q11 release · T-1 | D-Q11-1 ACCEPTED or DEFAULTED; `tools/lib/pg-harness.mjs` exists (this T-1 or PRD-Q10 T-1). Module 10 is loaded only if `supabase/schema.sql` already holds it; L4 does not require PRD-Q10 to ship first |
 | L5 | Q11 release · T-1 | as L4 |
 | L6 | Q11 release · T-9 | D-Q11-2 and D-Q11-3 not PROPOSED (a declined option becomes a listed exception); T-4; `rzLoadConfig()` exists (PRD-Q10 or this PRD creates it) |
 | L7 | Q11 release · T-8 | D-Q11-1 ACCEPTED or DEFAULTED; D-Q11-5, D-Q11-6 and D-Q11-7 not PROPOSED; T-5, T-6, T-7 |
@@ -1114,7 +1132,11 @@ If D-Q11-1 is declined or REJECTED, or D-Q11-4 is REJECTED, PRD-Q11 does not shi
    or (feature_key = 'page-access' and tier = 'root' and enabled = false)
    or page_key in ('ltc-ashrae','ltc-uptime','ltc-ansi-tia','ltc-iso-energy','ltc-nfpa');` and
    `select count(*) from public.feature_overrides;`. Report the rows and the count. Expected: none, because
-   no client has ever written the table (P3).
+   no client has ever written the table (P3). If the first query returns any row, do not run Module 11:
+   the new CHECKs would fail on the live table and the whole block would roll back. The owner sends the
+   rows to the implementing session, which writes a one-off `delete` (keys that fail the pattern, the 5 dead
+   LTC keys, and any `page-access/root/false` row) for the owner to run, then repeats step 1 until it
+   returns no row.
 2. Run Module 11 (§10.2).
 3. Verify: `select has_column_privilege('anon','public.feature_overrides','updated_by','select');` → false;
    `select tgname from pg_trigger where tgrelid = 'public.feature_overrides'::regclass and not tgisinternal;`
@@ -1219,6 +1241,6 @@ Ongoing: the owner sees changes in the Audit log panel (PRD-Q10). The implemente
 | API contracts | 5 | Module GET with its column list (§11.2), supabase-js writes (§11.3), the JS module API (§11.4) |
 | Cross-module | 4 | Shared harness, `rzLoadConfig()` and audit panel with PRD-Q10; access words of PRD-X-DEFECTS (§13) |
 | Error handling | 4 | §17 edge cases, and L3 asserts timeout, 500, bad JSON, stale and missing cache |
-| Security | 5 | Root-only writes, CHECKs, forced writer, audit trigger and column grant; the four auth-boundary decisions are explicit; R114 (§5.5) |
+| Security | 4 | Root-only writes, CHECKs, forced writer, audit trigger and column grant; the four auth-boundary decisions are explicit; R114 (§5.5). v1.2: the visitor-written cache can only restrict and a future `fetchedAt` is rejected (FR-2 step 2), proven by L2 (b)–(d). The gate stays a UX gate (§16) |
 | Testability | 5 | L1–L8 red today with the reason; SQL laws on a real Postgres engine; a cross-profile browser law; the D9 table (§20.3) |
 | Implementation readiness | 4 | T-1 to T-11 with files, effort and verification (§19); the start waits on eight owner decisions and OA-1 |

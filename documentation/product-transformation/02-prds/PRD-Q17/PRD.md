@@ -6,7 +6,7 @@
 |---|---|
 | PRD id | PRD-Q17 |
 | Feature | Learning paths on a new public page `learning-paths.html`: each path chains one journal article section, a set of explained terms, a calculator exercise whose answer is stated and proven against the calculator's own code, and an incident dossier case (root access). Progress is kept on the device and, when signed in, in the account. Three paths ship in v1 |
-| Version | 1.1 |
+| Version | 1.2 |
 | Status | Draft |
 | Author | Opus 5.5 (Fable quota exhausted) |
 | Date | 2026-11-11 |
@@ -24,6 +24,7 @@ Change history
 |---|---|---|---|
 | 1.0 | 2026-11-11 | Opus 5.5 | First complete draft, 24 sections. Facts verified against `wt-hub3` at `2f458f7c5` (branch `hub-r3`); every exercise answer computed by running `tier-advisor.html`'s own scoring code (Appendix A) |
 | 1.1 | 2026-11-11 | Opus 5.5 | QA batch 2 revisions (D9–D16). D10: T-7's `auth.js` edit and every `_rzAuth.ensureSupabase` use withdrawn; account sync reaches Supabase through `js/rz-config.js` + module `js/rz-supabase.js` (`rzSupa.ready` / `rz-supa-ready`, `rzSupa.getUser()`), as PRD-Q07 v1.1 §11.5; `auth.js` is read only (§11.6, §16); a rejected-D-Q01-3 path (FR-8): the incident step stays a plain link the dossier gates itself, non-root learners see 3 steps, the step completes only for root; path files use the D5 decision format (`proposed\|accepted\|rejected\|retired`, `decidedBy`, `decidedOn`, `request ^R[0-9]{3,4}$`). D11: PRD-Q04 is a dependency; tier-advisor edit order P2 → Q04 → Q01 → Q03 → Q17; L3 computes every expected answer at gate time from the scoring live on the page, and path files store no answer numbers (§10.2); missing engine handled (§17). D16: own sync engine dropped for PRD-Q12's `js/rz-app-state.js`; tests use `tools/lib/rz-supa-stub.mjs`. D15: OQ-1…4 → D-Q17-1…4; approvals through `tools/owner_decisions.py`. D9: law-wiring table (§20.3). Cross-module: Q15 and Q09 rows, `ship-gate.sh` insertion by anchor text |
+| 1.2 | 2026-11-11 | Opus 5.5 | QA batch 3 fix: FR-7 and the L4 wiring row state the behaviour when D-Q12-1 = C (no `js/rz-app-state.js`; device-only progress) and the dependency chain X-DEFECTS X1 → Q12 → Q17 sync |
 
 ## 2. Executive summary
 
@@ -275,6 +276,8 @@ Edit `data/paths/<id>.json` → `python3 tools/build-learning-paths.py --apply` 
 - State change: one `app_state` row per user (RLS own row, `supabase/schema.sql:676-679`).
 - Exceptions: not signed in → skip silently; error → toast once per session, retry next change; key-limit error (`app_state key limit reached (200).`, `schema.sql:690`) → toast "Account storage is full; progress stays on this device."
 - Acceptance: L4 with the shared stub `tools/lib/rz-supa-stub.mjs` (D16): one read, ≤ 1 write per change burst.
+- If D-Q12-1 = C (remove the dead sync path): `js/rz-app-state.js` is never built (PRD-Q12 §11.2a is "option A only", `PRD-Q12/PRD.md:468`). FR-7 is dropped: the page loads neither `js/rz-config.js` nor `js/rz-supabase.js` for paths, writes no `app_state` row, and shows the fixed line "Progress is saved on this device only." under the progress summary for every visitor, signed in or not. L4 keeps its device part (FR-6) and loses its sync part. While D-Q12-1 is PROPOSED, the page ships device-only with the same line.
+- Dependency chain: PRD-Q12 starts only after PRD-X-DEFECTS X1 closes (`PRD-X-DEFECTS/PRD.md:16`; X1 code removal waits for owner action OA-1, the Finnhub key rotation). FR-7 therefore waits on that owner action, then on PRD-Q12 option A shipping.
 
 **FR-8 Incident step access**
 - Description: root sees the link as a normal step; others see "Root access".
@@ -441,6 +444,7 @@ No global keyboard shortcuts. Enter in the answer field submits Check.
 | no js | Progress needs JavaScript. |
 | storage blocked | Progress cannot be saved in this browser. |
 | sync failed | Progress is saved on this device; account sync failed. |
+| no sync (D-Q12-1 = C or PROPOSED) | Progress is saved on this device only. |
 | storage full | Account storage is full; progress stays on this device. |
 | method | Each answer is computed by the calculator's own code with its default inputs and one change. A test re-runs every exercise in a browser before each release. |
 
@@ -815,7 +819,7 @@ Law wiring (coordinator decision D9). Before its "blocking from" point a law run
 | L1 ids resolve | release · T-13 | T-3, T-4; PRD-Q15 Phase A/B merged on `glossary.html` |
 | L2 Q1 edges accepted, page fresh | release · T-13 | Q1 shipped; the six edges and D-Q17-1 accepted |
 | L3 answers proven on the live page | release · T-13 | PRD-Q04 FR-9 shipped (D11); P2 optional |
-| L4 end-to-end + sync | device part: T-13; sync part: the release after PRD-Q12 ships `js/rz-app-state.js` | T-6; for sync, PRD-Q12 option A (D-Q12-1) and `tools/lib/rz-supa-stub.mjs` |
+| L4 end-to-end + sync | device part: T-13; sync part: the release after PRD-Q12 ships `js/rz-app-state.js` (never, if D-Q12-1 = C; the sync part then leaves the law) | T-6; for sync, PRD-Q12 option A (D-Q12-1), X-DEFECTS X1 closed (Q12's own precondition), and `tools/lib/rz-supa-stub.mjs` |
 | L5 no gamification | T-2 onward (no precondition) | — |
 | L6 explain-DB titles | T-1 (ships alone) | — |
 | L7 incident lock | the release after Q01 FR-13 ships (matcher form), or T-13 if D-Q01-3 is REJECTED (rejected-path form) | D-Q01-3 not PROPOSED |
