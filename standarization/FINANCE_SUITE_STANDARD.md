@@ -27,8 +27,11 @@ every surface re-skins** (the owner's "auto update ini semua" contract).
    regardless of stylesheet order. Existing page CSS keeps working, now on shared values.
 3. **Never hardcode a suite color in an adopting page.** New components use the tokens
    or the §3 shell classes (`.fs-card`, `.fs-chip`, `.fs-btn[.primary]`, `.fs-num`, `.fs-skel`).
-4. **Cache-bust** the suite `?v=` on every adopting page when the file changes.
-5. **Light theme**: `html[data-rz-suite][data-theme="light"]` flips the `--fs-*` values.
+4. **No key in a page.** A provider token, API key or password never sits in suite HTML/JS or in a storage
+   fallback (`getItem(k) || '<literal>'`). The secret gate `node tools/test-no-client-secrets.mjs --law X1.2a`
+   (PRD-X-DEFECTS FR-X1.3) fails a new hit; `Apps/finance-terminal/index.html` is baselined until OA-1.
+5. **Cache-bust** the suite `?v=` on every adopting page when the file changes.
+6. **Light theme**: `html[data-rz-suite][data-theme="light"]` flips the `--fs-*` values.
    Surfaces with a different light mechanism (rz-ops `body.light-mode`) keep their own
    light literals — only their dark look is suite-governed.
 
