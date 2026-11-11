@@ -51,7 +51,7 @@ const open = async (url, width = 1280) => {
 try {
   /* U1 */
   {
-    const { tab, errs } = await open('tools/fixtures/sensitivity-fixture.html');
+    const { tab, errs } = await open('tools/fixtures/embed/sensitivity-fixture.html');
     const r = await tab.evaluate(async () => {
       const spec = { calc: 'fx', page: 'sensitivity-fixture.html', result: '#out', settleMs: 100, stepMs: 30,
         factors: [{ id: 'x', kind: 'continuous' }, { id: 'r', kind: 'continuous' }, { id: 'mode', kind: 'step' },
