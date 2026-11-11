@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS EU West (Dublin) 2011: Transformer Loss and a Generator PLC Halt | ResistanceZero</title>
+    <meta name="description" content="On Sunday 7 August 2011 a utility transformer feeding much of one AWS EU West zone in Dublin failed. A PLC that brings the backup generators onto the bus halted, the UPS drained an">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="ai-content-declaration" content="human-curated, sourced from public post-incident reports">
+    <meta name="author" content="Bagus Dwi Permana">
+    <link rel="canonical" href="https://resistancezero.com/incident-aws-eu-west-1-dublin-plc-2011.html">
+    <meta name="theme-color" content="#0e0f12">
+    <link rel="icon" type="image/png" href="assets/Favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap">
+    <style>
+    /* ── Governed Incident Dossier — editorial register (v3): graphite + one amber, as the journal (owner 2026-10-15),
+       IBM Plex Sans throughout, evidence-class provenance. Accent vars remapped so all components
+       re-skin. AA-contrast in both themes. No gradients / glass / dot-grid (anti-slop). */
+    :root:not([data-theme="dark"]) {
+        --bg:#f8f9fa; --surface:#ffffff; --surface-2:#eef0f2; --line:rgba(40,44,52,0.12);
+        --text:#343a40; --text-strong:#16181d; --text-body:#3f454d; --muted:#5c6470;
+        --cyan:#5c6470; --amber:#92400e; --green:#2f7d54; --red:#9c3b32; --gold:#92400e;
+        --hero-ink:#f8f9fa; --hero-bg:#16181d; --shadow-deep:rgba(40,44,52,0.10);
+    }
+    [data-theme="dark"] {
+        --bg:#0e0f12; --surface:#16181d; --surface-2:#1c1e23; --line:rgba(160,168,180,0.14);
+        --text:#cfd3da; --text-strong:#eef0f3; --text-body:#bfc4cc; --muted:#969eaa;
+        --cyan:#969eaa; --amber:#e8b563; --green:#6aa588; --red:#cf9384; --gold:#e8b563;
+        --hero-ink:#cfd3da; --hero-bg:#121316; --shadow-deep:rgba(0,0,0,0.5);
+    }
+    * { box-sizing:border-box; }
+    html,body { margin:0; padding:0; }
+    body { background:var(--bg); color:var(--text); font-family:"IBM Plex Sans",system-ui,sans-serif; line-height:1.62; }
+    a { color:var(--cyan); }
+    h1,h2,.serif { font-family:'IBM Plex Sans',system-ui,sans-serif; font-weight:600; letter-spacing:-0.01em; }
+    .wrap { max-width:1120px; margin:0 auto; padding:1.5rem 1.1rem 3rem; }
+    .navbar { display:flex; align-items:center; justify-content:space-between; padding:0.7rem 1.1rem; border-bottom:1px solid var(--line); background:var(--surface); position:sticky; top:0; z-index:50; }
+    .nav-container { display:flex; align-items:center; justify-content:space-between; width:100%; max-width:1120px; margin:0 auto; }
+    .nav-logo { display:flex; align-items:center; }
+    .nav-avatar { width:34px; height:34px; border-radius:50%; }
+    .nav-menu { display:flex; gap:1rem; list-style:none; margin:0; padding:0; }
+    .nav-menu a { color:var(--text-body); text-decoration:none; font-size:0.85rem; font-weight:600; }
+    .nav-menu a:hover { color:var(--cyan); }
+    .nav-right { display:flex; align-items:center; gap:0.6rem; }
+    .theme-btn { background:none; border:1px solid var(--line); color:var(--text); border-radius:4px; padding:0.35rem 0.5rem; cursor:pointer; font-size:0.8rem; }
+    .lock-tag { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--red); border:1px solid var(--red); border-radius:2px; padding:0.12rem 0.5rem; }
+    h1 { font-size:2.4rem; color:var(--text-strong); margin:0.35rem 0 0.5rem; line-height:1.12; }
+    h2 { font-size:1.4rem; color:var(--text-strong); margin:2rem 0 0.7rem; }
+    .eyebrow { font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--muted); }
+    .lede { color:var(--text-body); font-size:0.98rem; max-width:70ch; }
+    .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.7rem 0; }
+    .chip { font-family:'JetBrains Mono',monospace; font-size:0.7rem; padding:0.2rem 0.55rem; border-radius:2px; border:1px solid var(--line); color:var(--text-body); background:var(--surface-2); white-space:nowrap; }
+    /* A chip carries the operator name, which can be a whole sentence ("Google Cloud
+       (impacted tenant); STT GDC / Tata Communications JV (named as the third-party …").
+       nowrap made that one chip 1120px wide and pushed the GCP Delhi dossier into a
+       1260px page at a 1100px viewport. Short chips are unaffected: normal wrapping
+       only engages when a chip would not fit its row. */
+    .chips .chip { max-width:100%; white-space:normal; overflow-wrap:anywhere; }
+    /* State lives in the text colour; a coloured left stripe is the decoration UX law #14 bans. */
+    .chip.cyan { color:var(--cyan); }
+    .chip.amber { color:var(--amber); }
+    .chip.green { color:var(--green); }
+    .chip.red { color:var(--red); }
+    .metabar { font-family:'JetBrains Mono',monospace; font-size:0.72rem; letter-spacing:0.04em; color:var(--muted); margin:0.7rem 0; display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; font-variant-numeric:tabular-nums slashed-zero; }
+    .metabar b { color:var(--text-body); font-weight:600; }
+    .metabar .sep { color:var(--line); }
+    .chip.muted { color:var(--muted); }
+    .card { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:1rem 1.1rem; margin-top:0.9rem; }
+    .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:4px; margin-top:0.9rem; }
+    table.inc-index { width:100%; border-collapse:collapse; font-size:0.86rem; min-width:760px; font-variant-numeric:tabular-nums slashed-zero; }
+    table.inc-index th { text-align:left; font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); background:var(--surface-2); }
+    table.inc-index td { padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); color:var(--text-body); vertical-align:top; }
+    table.inc-index tr:hover td { background:var(--surface-2); }
+    table.inc-index a { font-weight:700; color:var(--text-strong); text-decoration:none; }
+    table.inc-index a:hover { color:var(--cyan); text-decoration:underline; }
+    /* rich incident table (reference-2 style) */
+    table.itbl { min-width:1120px; }
+    table.itbl td { vertical-align:middle; }
+    /* v1.134.20 — the title and summary columns ellipsise so the table's columns line up,
+       which is the right call for a dense index. But the cut text was reachable only by
+       navigating to the incident: a summary lost 238-298px of its sentence with no way to read
+       it in place. Each carries its full text in a title attribute now, so the truncation is
+       deliberate AND non-lossy — which is the condition the legibility audit checks for. */
+    .itr { cursor:pointer; }
+    .itr:hover td { background:var(--surface-2); }
+    .c-id .itid { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); white-space:nowrap; }
+    .c-title { max-width:300px; }
+    /* Titles wrap instead of ending in an ellipsis: eight titles were cut by 28-183 px and
+       tools/audit-legibility.mjs counts a clipped title as unreadable, which it is. */
+    .c-title .itt { display:block; font-weight:700; color:var(--text-strong); text-decoration:none; font-size:0.9rem; line-height:1.25; }
+    .itr:hover .itt { color:var(--cyan); }
+    .c-title .its { color:var(--muted); font-size:0.76rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:0.1rem; }
+    .sev-chip { font-family:'JetBrains Mono',monospace; font-size:0.66rem; font-weight:600; padding:0.12rem 0.5rem; border-radius:2px; border:1px solid; white-space:nowrap; }
+    .sev-b-critical { color:var(--red); border-color:var(--red); }
+    .sev-b-high { color:var(--amber); border-color:var(--amber); }
+    .sev-b-medium { color:var(--green); border-color:var(--green); }
+    .sev-b-low { color:var(--muted); border-color:var(--line); }
+    .st-chip { font-family:'JetBrains Mono',monospace; font-size:0.64rem; padding:0.12rem 0.45rem; border-radius:2px; border:1px solid var(--line); white-space:nowrap; }
+    .st-off { color:var(--green); border-color:color-mix(in srgb, var(--green) 45%, var(--line)); }
+    .st-press { color:var(--amber); border-color:color-mix(in srgb, var(--amber) 45%, var(--line)); }
+    .c-region { min-width:170px; }
+    .c-region .iflag { font-size:1.05rem; margin-right:0.45rem; vertical-align:middle; }
+    .c-region .ireg { display:inline-flex; flex-direction:column; vertical-align:middle; }
+    .c-region .ireg b { color:var(--text-body); font-weight:600; font-size:0.82rem; }
+    .c-region .ireg i { color:var(--muted); font-style:normal; font-size:0.72rem; }
+    .c-mono { font-family:'JetBrains Mono',monospace; font-size:0.78rem; color:var(--text-body); white-space:nowrap; }
+    .c-blast { color:var(--text-strong); font-weight:600; } .c-blast .c-u { color:var(--muted); font-weight:400; font-size:0.68rem; }
+    .ibars { display:inline-flex; gap:2px; }
+    .ibars i { width:7px; height:9px; border-radius:1px; display:block; }
+    .itags { display:flex; gap:0.25rem; max-width:150px; flex-wrap:wrap; }
+    .c-go { color:var(--muted); font-size:1rem; text-align:center; }
+    .itr:hover .c-go { color:var(--cyan); }
+    /* incident-view tabs (List / Risk map / Semantic / Analytics) */
+    .iv-tabs { display:flex; gap:1.2rem; border-bottom:1px solid var(--line); margin:0.4rem 0 0.2rem; flex-wrap:wrap; }
+    .iv-tabs a { font-family:'JetBrains Mono',monospace; font-size:0.74rem; letter-spacing:0.03em; color:var(--muted); text-decoration:none; padding:0.5rem 0.1rem; border-bottom:2px solid transparent; }
+    .iv-tabs a:hover { color:var(--text-strong); }
+    .iv-tabs a.on { color:var(--text-strong); border-bottom-color:var(--cyan); }
+    .rank-badge { font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--amber); font-variant-numeric:tabular-nums slashed-zero; }
+    .mag-bar { height:5px; border-radius:0; background:var(--line); margin-top:0.35rem; overflow:hidden; }
+    .mag-bar > span { display:block; height:4px; background:var(--amber); }
+    ul.tight { margin:0.4rem 0 0; padding-left:1.15rem; }
+    ul.tight li { color:var(--text-body); margin:0.3rem 0; font-size:0.92rem; }
+    .soe { list-style:none; margin:0.6rem 0 0; padding:0; }
+    .soe li { display:grid; grid-template-columns:170px 1fr; gap:0.7rem; padding:0.5rem 0; border-bottom:1px solid var(--line); }
+    .soe time { font-family:'JetBrains Mono',monospace; font-size:0.76rem; color:var(--muted); font-variant-numeric:tabular-nums slashed-zero; }
+    .soe .ev { color:var(--text-body); font-size:0.9rem; }
+    .phase-chip { font-family:'JetBrains Mono',monospace; font-size:0.62rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--amber); border:1px solid var(--line); border-radius:2px; padding:0.05rem 0.4rem; margin-right:0.4rem; white-space:nowrap; font-variant-numeric:tabular-nums; }
+    table.metrics { width:100%; border-collapse:collapse; font-size:0.88rem; font-variant-numeric:tabular-nums slashed-zero; }
+    table.metrics td { padding:0.5rem 0.7rem; border-bottom:1px solid var(--line); vertical-align:top; }
+    table.metrics .mlabel { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; width:38%; white-space:nowrap; }
+    table.metrics .mval { color:var(--text-body); }
+    .ca-block { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0.7rem 1rem; margin-top:0.7rem; }
+    .ca-block h3 { margin:0 0 0.3rem; font-size:0.92rem; color:var(--text-strong); }
+    .ca-block p { margin:0; color:var(--text-body); font-size:0.9rem; }
+    /* reading column — constrain prose to a comfortable measure, justified like RZ articles */
+    .reading-col { max-width:820px; margin:0 auto; }
+    .reading-col p.lede, .reading-col .card p, .reading-col .ca-block p, .reading-col ul.tight li { text-align:justify; -webkit-hyphens:auto; hyphens:auto; }
+    .card p { margin:0; }
+    .card > p + p, .card p + p { margin-top:0.7rem; }
+    .mag-trace { font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:var(--text-body); background:var(--surface-2); border:1px solid var(--line); border-radius:4px; padding:0.5rem 0.7rem; margin-top:0.5rem; font-variant-numeric:tabular-nums slashed-zero; }
+    .mag-trace b { color:var(--text-strong); }
+    .imp-tag { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.04em; text-transform:uppercase; color:var(--cyan); font-weight:700; margin-right:0.35rem; }
+    .coe-meta { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); background:var(--surface-2); border:1px solid var(--line); border-radius:2px; padding:0.05rem 0.4rem; margin-left:0.2rem; white-space:normal; }
+    /* FAQ / methodology */
+    details.faq { border:1px solid var(--line); border-radius:4px; background:var(--surface); margin:0.8rem 0 0.4rem; }
+    details.faq > summary { cursor:pointer; padding:0.7rem 0.9rem; font-family:'JetBrains Mono',monospace; font-size:0.74rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-strong); list-style:none; }
+    details.faq > summary::-webkit-details-marker { display:none; }
+    details.faq > summary::before { content:"+ "; color:var(--cyan); }
+    details.faq[open] > summary::before { content:"– "; }
+    details.faq .faq-body { padding:0 0.9rem 0.9rem; }
+    details.faq h4 { font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:0.98rem; color:var(--text-strong); margin:0.8rem 0 0.2rem; }
+    details.faq p, details.faq li { color:var(--text-body); font-size:0.88rem; }
+    /* share bar (RZ standard) — editorial thin buttons */
+    .share-buttons { display:flex; align-items:center; gap:0.5rem; margin:1.4rem 0 0.4rem; padding-top:1rem; border-top:1px solid var(--line); }
+    .share-label { font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin-right:0.2rem; }
+    .share-btn { width:32px; height:32px; display:inline-flex; align-items:center; justify-content:center; background:var(--surface-2); border:1px solid var(--line); border-radius:4px; color:var(--text-body); cursor:pointer; padding:0; }
+    .share-btn:hover { border-color:var(--cyan); color:var(--cyan); }
+    .share-btn svg { width:15px; height:15px; }
+    /* ── inline-SVG visualizations (theme-aware via vars) ── */
+    .inc-map { height:410px; margin-top:0.4rem; border:1px solid var(--line); border-radius:4px; overflow:hidden; background:#121316; z-index:1; }
+    .inc-map .leaflet-container { background:#121316; font-family:"IBM Plex Sans",sans-serif; }
+    .inc-map .leaflet-popup-content-wrapper { background:#16181d !important; color:#eef0f3 !important; border:1px solid #2a2d33 !important; border-radius:10px !important; box-shadow:0 8px 24px rgba(0,0,0,0.45) !important; }
+    .inc-map .leaflet-popup-tip { background:#16181d !important; border:1px solid #2a2d33 !important; }
+    .inc-map .leaflet-popup-content { margin:9px 12px !important; }
+    .inc-map .leaflet-control-attribution { background:rgba(14,15,18,0.8) !important; color:#969eaa !important; font-size:9px !important; }
+    .inc-map .leaflet-control-attribution a { color:#9fb3a8 !important; }
+    .inc-map .leaflet-bar a { background:#16181d !important; color:#cfd3da !important; border-color:#2a2d33 !important; }
+    .leaflet-tooltip.inc-tip { background:#16181d; color:#eef0f3; border:1px solid #2a2d33; border-radius:3px; font-family:'JetBrains Mono',monospace; font-size:0.66rem; padding:2px 7px; box-shadow:0 6px 18px rgba(0,0,0,0.5); }
+    .leaflet-tooltip.inc-tip:before { border-top-color:#2a2d33; }
+    /* ── Incident Intelligence dashboard (editorial, no neon) ── */
+    .iid { margin:1.4rem 0 1rem; }
+    .iid-head { display:flex; align-items:flex-end; justify-content:space-between; gap:1rem; flex-wrap:wrap; margin-bottom:0.9rem; }
+    .iid-title { font-size:1.6rem; margin:0; color:var(--text-strong); }
+    .iid-sub { margin:0.15rem 0 0; color:var(--muted); font-size:0.86rem; }
+    .iid-range { font-family:'JetBrains Mono',monospace; font-size:0.7rem; letter-spacing:0.05em; color:var(--muted); border:1px solid var(--line); border-radius:3px; padding:0.3rem 0.6rem; white-space:nowrap; }
+    .iid-num { font-variant-numeric:tabular-nums slashed-zero; }
+    .iid-kpis { display:grid; grid-template-columns:repeat(5,1fr); gap:0.7rem; margin-bottom:0.9rem; }
+    .iid-kpi { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0.75rem 0.85rem; }
+    .iid-kpi-l { font-family:'JetBrains Mono',monospace; font-size:0.62rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); }
+    .iid-kpi-v { display:flex; align-items:baseline; gap:0.3rem; margin:0.25rem 0 0.15rem; }
+    .iid-kpi-v .iid-num, .iid-kpi-v > span:first-child { font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:1.8rem; font-weight:600; color:var(--text-strong); line-height:1; }
+    .iid-kpi-u { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .iid-kpi-s { font-size:0.72rem; color:var(--muted); }
+    .iid-grid { display:grid; grid-template-columns:290px 1fr 300px; gap:0.9rem; align-items:start; }
+    .iid-col-l, .iid-col-c, .iid-col-r { display:flex; flex-direction:column; gap:0.9rem; min-width:0; }
+    .iid-panel { background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0.85rem 0.95rem; }
+    .iid-panel-map { padding:0.85rem 0.95rem 0.6rem; }
+    .iid-panel-map .inc-map { height:360px; margin-top:0.5rem; }
+    .iid-ph { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin-bottom:0.5rem; }
+    .iid-note { font-size:0.74rem; color:var(--muted); margin:0 0 0.5rem; }
+    .iid-donut-wrap { display:flex; align-items:center; gap:0.9rem; }
+    .iid-donut { width:130px; height:130px; flex:0 0 auto; }
+    .iid-arc { transition:stroke-dasharray 0.9s cubic-bezier(0.22,1,0.36,1); }
+    .iid-donut-c { font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:19px; font-weight:600; fill:var(--text-strong); }
+    .iid-donut-t { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.1em; text-transform:uppercase; fill:var(--muted); }
+    .iid-legend { list-style:none; margin:0; padding:0; flex:1; min-width:0; }
+    .iid-legend li { display:flex; align-items:center; gap:0.45rem; font-size:0.82rem; color:var(--text-body); padding:0.16rem 0; }
+    .iid-legend b { margin-left:auto; color:var(--text-strong); font-family:'JetBrains Mono',monospace; font-size:0.82rem; }
+    .iid-legend .iid-pct { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.72rem; width:2.4em; text-align:right; }
+    .iid-dot { width:9px; height:9px; border-radius:50%; flex:0 0 auto; }
+    .iid-catbars, .iid-durbars, .iid-sigs { list-style:none; margin:0; padding:0; }
+    .iid-catbars li, .iid-durbars li, .iid-sigs li { display:grid; grid-template-columns:1fr 90px auto; align-items:center; gap:0.5rem; padding:0.24rem 0; font-size:0.82rem; }
+    .iid-sigs li { grid-template-columns:1fr 64px auto auto; }
+    .iid-catbars li { cursor:pointer; }
+    .iid-catbars li:hover .iid-cbl { color:var(--cyan); }
+    .iid-cbl, .iid-dbl, .iid-sig-n { color:var(--text-body); overflow-wrap:anywhere; }
+    .iid-cbar, .iid-dbar, .iid-sig-bar { height:7px; background:var(--surface-2); border-radius:0; overflow:hidden; }
+    .iid-cbar i, .iid-sig-bar i { display:block; height:100%; width:var(--w); background:var(--amber); transform:scaleX(0); transform-origin:left; transition:transform 0.9s cubic-bezier(0.22,1,0.36,1); }
+    .iid-dbar i { display:block; height:100%; width:var(--w); background:var(--cyan); transform:scaleX(0); transform-origin:left; transition:transform 0.9s cubic-bezier(0.22,1,0.36,1); }
+    .iid-in .iid-cbar i, .iid-in .iid-dbar i, .iid-in .iid-sig-bar i { transform:scaleX(1); }
+    .iid-catbars b, .iid-durbars b, .iid-sigs b { font-family:'JetBrains Mono',monospace; color:var(--text-strong); font-size:0.82rem; text-align:right; }
+    .iid-durbars b { color:var(--muted); }
+    .iid-sig-m { font-family:'JetBrains Mono',monospace; font-size:0.66rem; color:var(--muted); }
+    .iid-recent { display:flex; flex-direction:column; }
+    .iid-rec { display:flex; align-items:center; gap:0.55rem; padding:0.45rem 0; border-bottom:1px solid var(--line); text-decoration:none; }
+    .iid-rec:last-child { border-bottom:none; }
+    .iid-rec-sev { width:8px; height:8px; border-radius:50%; flex:0 0 auto; }
+    .iid-rec-b { display:flex; flex-direction:column; min-width:0; flex:1; }
+    .iid-rec-t { color:var(--text-strong); font-size:0.84rem; font-weight:600; overflow-wrap:anywhere; }
+    .iid-rec:hover .iid-rec-t { color:var(--cyan); }
+    .iid-rec-m { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.68rem; }
+    .iid-rec-tag { font-family:'JetBrains Mono',monospace; font-size:0.58rem; letter-spacing:0.04em; padding:0.1rem 0.35rem; border:1px solid var(--line); border-radius:2px; flex:0 0 auto; }
+    .sev-critical { background:var(--red); } .iid-rec-tag.sev-critical { color:var(--red); background:transparent; border-color:var(--red); }
+    .sev-high { background:var(--amber); } .iid-rec-tag.sev-high { color:var(--amber); background:transparent; border-color:var(--amber); }
+    .sev-medium { background:var(--green); } .iid-rec-tag.sev-medium { color:var(--green); background:transparent; border-color:var(--green); }
+    .sev-low { background:var(--muted); } .iid-rec-tag.sev-low { color:var(--muted); background:transparent; border-color:var(--line); }
+    .iid-graph { width:100%; height:auto; display:block; }
+    .iid-edge { stroke:var(--line); stroke-width:1; opacity:0.55; transition:stroke 0.15s, opacity 0.15s; }
+    .iid-edge.on { stroke:var(--cyan); opacity:0.9; stroke-width:1.3; }
+    .iid-node circle { transition:transform 0.15s ease, opacity 0.15s; transform-origin:center; }
+    .iid-node:hover circle { stroke:var(--text-strong); stroke-width:1.4; }
+    .iid-graph.iid-focus .iid-node.dim circle { opacity:0.22; }
+    .iid-maplegend { display:flex; flex-wrap:wrap; gap:0.4rem 1rem; margin-top:0.5rem; font-family:'JetBrains Mono',monospace; font-size:0.66rem; color:var(--muted); }
+    .iid-maplegend span { display:inline-flex; align-items:center; gap:0.35rem; }
+    .iid-maplegend i { width:10px; height:10px; border-radius:50%; }
+    .iid-maplegend .iid-mln { font-style:italic; opacity:0.8; }
+    .iid-foot { display:flex; flex-wrap:wrap; gap:0.5rem 1.4rem; align-items:center; margin-top:0.9rem; padding-top:0.8rem; border-top:1px solid var(--line); font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .iid-foot b { color:var(--text-body); font-weight:600; margin-right:0.3rem; }
+    .iid-foot-link { margin-left:auto; color:var(--cyan); text-decoration:none; }
+    @media (max-width:1000px){ .iid-grid { grid-template-columns:1fr; } .iid-kpis { grid-template-columns:repeat(2,1fr); } }
+    @media (max-width:520px){ .iid-kpis { grid-template-columns:1fr 1fr; } .iid-kpi-v .iid-num, .iid-kpi-v > span:first-child { font-size:1.5rem; } }
+    @media (prefers-reduced-motion:reduce){ .iid-arc,.iid-cbar i,.iid-dbar i,.iid-sig-bar i,.iid-kpi,.iid-node circle,.iid-edge { transition:none !important; } .iid-cbar i,.iid-dbar i,.iid-sig-bar i { transform:scaleX(1); } }
+    .viz { overflow-x:auto; margin-top:0.9rem; background:var(--surface); border:1px solid var(--line); border-radius:4px; padding:0.9rem 1rem; }
+    .viz svg { display:block; max-width:100%; height:auto; }
+    /* v1.134.20 — the timeline's viewBox WIDTH grows with the number of events (1420 for a
+       short incident, 2248 for a long one) while `.viz svg { max-width:100% }` squeezed it into
+       the column. So the more an incident had to say, the smaller its own timeline printed it:
+       phase chips and clock times rendered at 4px. The container was already a scroller
+       (`.viz { overflow-x:auto }`) — max-width was defeating it.
+       Pinning the intrinsic HEIGHT (every timeline viewBox is `0 0 W 96`) makes the browser
+       derive width = W px from the aspect ratio, so the drawing renders 1:1 at any event count
+       and the panel scrolls instead of shrinking. */
+    .viz-timeline svg { max-width:none; height:96px; width:auto; }
+    .viz-radar svg { max-width:320px; margin:0 auto; }
+    .vz-num { font-variant-numeric:tabular-nums slashed-zero; }
+    .vz-box-t, .vz-box-s, .vz-lbl, .vz-hb-lbl, .vz-tl-t, .vz-pt, .vz-tick { pointer-events:auto; }
+    .vz-grid { fill:none; stroke:var(--line); stroke-width:1; }
+    .vz-accent-fill { fill:var(--cyan); fill-opacity:0.16; stroke:var(--cyan); stroke-width:1.4; }
+    .vz-accent-dot { fill:var(--cyan); }
+    .vz-accent-bar { fill:var(--cyan); }
+    .vz-cat-bar { fill:var(--amber); }
+    .vz-lbl { font-family:'JetBrains Mono',monospace; font-size:9px; fill:var(--muted); }
+    .vz-box-trigger { fill:color-mix(in srgb, var(--red) 12%, var(--surface)); stroke:var(--red); stroke-width:1.2; }
+    .vz-box-fault { fill:color-mix(in srgb, var(--amber) 12%, var(--surface)); stroke:var(--amber); stroke-width:1.2; }
+    .vz-box-down { fill:color-mix(in srgb, var(--cyan) 10%, var(--surface)); stroke:var(--cyan); stroke-width:1; }
+    .vz-box-t { font-family:"IBM Plex Sans",sans-serif; font-size:11px; font-weight:600; fill:var(--text-strong); }
+    .vz-box-s { font-family:'JetBrains Mono',monospace; font-size:9px; fill:var(--muted); }
+    .vz-flow { stroke:var(--muted); stroke-width:1.3; fill:none; }
+    .vz-arrhead { fill:var(--muted); }
+    .vz-tl-ph { font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.04em; text-transform:uppercase; fill:var(--amber); }
+    .vz-tl-t { font-family:'JetBrains Mono',monospace; font-size:8.5px; fill:var(--muted); }
+    .vz-hb-lbl { font-family:"IBM Plex Sans",sans-serif; font-size:11px; fill:var(--text-body); }
+    .vz-hb-val { font-family:'JetBrains Mono',monospace; font-size:10px; fill:var(--muted); font-variant-numeric:tabular-nums slashed-zero; }
+    .vz-tick { font-family:'JetBrains Mono',monospace; font-size:8.5px; fill:var(--muted); }
+    .vz-quad { font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:0.05em; text-transform:uppercase; fill:var(--muted); opacity:0.7; }
+    .vz-pt { font-family:'JetBrains Mono',monospace; font-size:8px; fill:var(--text-body); }
+    .viz a { text-decoration:none; }
+    .viz a:hover .vz-pt { fill:var(--cyan); font-weight:600; }
+    .viz a:hover circle { stroke:var(--text-strong); stroke-width:1.4; }
+    .vz-legend { display:flex; flex-wrap:wrap; gap:0.5rem 1.1rem; margin-top:0.7rem; padding-top:0.6rem; border-top:1px solid var(--line); }
+    .vz-key { display:inline-flex; align-items:center; gap:0.4rem; font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); }
+    .vz-key i { width:11px; height:11px; border-radius:50%; display:inline-block; }
+    .vz-key-note { font-style:italic; opacity:0.8; }
+    .viz-grid3 { display:grid; grid-template-columns:1fr 1fr; gap:0.9rem; }
+    @media (max-width:720px){ .viz-grid3 { grid-template-columns:1fr; } }
+    .filterbar { display:flex; flex-wrap:wrap; align-items:center; gap:0.4rem 0.6rem; margin:0.9rem 0 0.2rem; }
+    .fb-group { display:flex; flex-wrap:wrap; gap:0.35rem; }
+    .fb-chip { font-family:'JetBrains Mono',monospace; font-size:0.72rem; padding:0.28rem 0.6rem; border-radius:2px; border:1px solid var(--line); background:var(--surface); color:var(--text-body); cursor:pointer; }
+    .fb-chip:hover { border-color:var(--cyan); }
+    .fb-chip.active { background:var(--surface-2); border-color:var(--line); border-bottom:2px solid var(--cyan); color:var(--text-strong); font-weight:700; }
+    .fb-search { flex:1 1 200px; min-width:160px; font-family:"IBM Plex Sans",sans-serif; font-size:0.82rem; padding:0.3rem 0.6rem; border-radius:4px; border:1px solid var(--line); background:var(--surface); color:var(--text); }
+    .fb-count { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); margin-left:auto; }
+    .kv { display:grid; grid-template-columns:180px 1fr; gap:0.5rem 0.9rem; margin-top:0.5rem; font-size:0.9rem; }
+    .kv dt { color:var(--muted); font-family:'JetBrains Mono',monospace; font-size:0.76rem; }
+    .kv dd { margin:0; color:var(--text-body); }
+    .refs { list-style:none; margin:0.6rem 0 0; padding:0; }
+    .refs li { padding:0.55rem 0; border-bottom:1px solid var(--line); }
+    .refs .rtitle { color:var(--text-strong); font-weight:600; font-size:0.9rem; }
+    .refs .rquote { color:var(--muted); font-size:0.84rem; font-style:italic; margin-top:0.2rem; display:block; }
+    .refs a { font-size:0.78rem; word-break:break-all; }
+    .backlink { display:inline-block; margin-bottom:0.6rem; font-size:0.82rem; color:var(--cyan); text-decoration:none; }
+    footer { border-top:1px solid var(--line); margin-top:2.5rem; padding:1.4rem 1.1rem; text-align:center; }
+    footer .ver { font-family:'JetBrains Mono',monospace; font-size:0.72rem; color:var(--muted); }
+    .disclaimer { font-size:0.76rem; color:var(--muted); margin-top:0.8rem; max-width:80ch; }
+    .skip-link { position:absolute; top:-50px; left:0; background:var(--cyan); color:var(--hero-bg); padding:10px 20px; text-decoration:none; font-weight:600; z-index:10000; border-radius:0 0 4px 0; transition:top 0.2s; }
+    .skip-link:focus { top:0; }
+    .root-gate { position:fixed; inset:0; z-index:99999; display:none; align-items:center; justify-content:center; background:rgba(10,11,13,0.74); padding:1rem; backdrop-filter:blur(6px); }
+    body.locked .root-gate { display:flex; }
+    body.locked .wrap { filter:blur(4px); pointer-events:none; user-select:none; }
+    .root-card { max-width:430px; width:100%; background:var(--surface); border:1px solid var(--cyan); border-radius:4px; padding:1.3rem 1.15rem; text-align:center; box-shadow:0 18px 36px var(--shadow-deep); }
+    .root-card h2 { margin:0 0 0.4rem; font-size:1.1rem; color:var(--text-strong); }
+    .root-card p { font-size:0.86rem; color:var(--text-body); }
+    .root-actions { margin-top:0.9rem; display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; }
+    .root-actions button, .root-actions a { border-radius:4px; padding:0.5rem 0.85rem; font-size:0.8rem; font-weight:700; border:1px solid var(--line); text-decoration:none; cursor:pointer; color:var(--text); font-family:inherit; }
+    .root-actions button { background:var(--cyan); color:var(--hero-bg); border:none; }
+    .rz-nav-burger { display:none; }
+    /* v1.8.0 — mobile responsive patch */
+    @media (max-width:768px) {
+        html,body { overflow-x:hidden; max-width:100vw; }
+        img { max-width:100%; height:auto; display:block; }
+        .nav-menu, .nav-links { display:none; }
+        .navbar { padding:0.5rem 0.75rem; }
+        footer .footer-grid { grid-template-columns:1fr; gap:1.25rem; padding:1rem; }
+        button, a.btn, [role="button"] { min-height:44px; }
+        h1 { font-size:1.4rem; }
+        .soe li { grid-template-columns:1fr; gap:0.15rem; }
+        /* Chips are `white-space: nowrap` and some carry a full operator name with a
+           parenthetical ("CrowdStrike (impacting Microsoft Windows hosts)"), which measured
+           389px on a 390px screen and ran off behind body's overflow-x clip. */
+        .chip { white-space:normal; overflow-wrap:anywhere; }
+        .kv { grid-template-columns:1fr; }
+        .root-card { max-width:92vw; }
+    }
+    @media print { body.locked .wrap { filter:none !important; pointer-events:auto !important; } }
+</style>
+    <style>
+    /* ── FMEA (v3.12.3) — one hairline panel of rows, like the rest of the dossier.
+       No cards, no stripes: a row is a disclosure, state is a 7px dot. ── */
+    .fm-scope { color:var(--text-body); max-width:70ch; }
+    .fm-meta { flex-wrap:wrap; row-gap:0.25rem; }
+    .fm-viz { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:1.6rem; align-items:start; margin:1.2rem 0; }
+    @media (max-width:820px){ .fm-viz { grid-template-columns:1fr; } }
+    .fm-pb-row, .fm-pb-axis { display:grid; grid-template-columns:3.6rem minmax(0,1fr) 6.6rem; gap:0.6rem; align-items:center; }
+    .fm-pb-row { padding:0.32rem 0; }
+    .fm-pb-id, .fm-pb-val { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.8rem; }
+    .fm-pb-id { color:var(--muted); }
+    .fm-pb-val { color:var(--text-strong); white-space:nowrap; }
+    .fm-pb-track { display:flex; flex-direction:column; gap:3px; }
+    .fm-pb-bar, .fm-pb-rev { display:block; width:100%; transform-origin:left center; }
+    .fm-pb-bar { height:12px; }
+    .fm-pb-rev { height:4px; background:var(--text-body); opacity:0.55; }
+    .fm-pb-none { font-size:0.74rem; color:var(--muted); line-height:1.2; }
+    .fm-pb-axis { margin-top:0.3rem; border-top:1px solid var(--line); padding-top:0.25rem; font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:var(--muted); }
+    .fm-pb-ticks { display:flex; justify-content:space-between; }
+    .fm-fig { margin:0; }
+    .fm-fig figcaption { font-size:0.8rem; color:var(--muted); margin-bottom:0.35rem; }
+    .fm-fig svg { width:100%; height:auto; display:block; }
+    .fm-fig-m svg { max-width:340px; }
+    .fm-matrix .fm-c { fill:var(--surface); stroke:var(--line); stroke-width:0.5; }
+    .fm-matrix .fm-zone { fill:none; stroke:var(--text-body); stroke-width:1; opacity:0.6; }
+    .fm-matrix .vz-axis { font-size:10px; fill:var(--muted); font-family:'IBM Plex Sans',sans-serif; }
+    .fm-matrix .fm-pt { stroke:var(--surface); stroke-width:1.5; }
+    .fm-matrix .fm-pt-l { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; fill:var(--text-strong);
+      paint-order:stroke; stroke:var(--surface); stroke-width:3px; stroke-linejoin:round; }
+    .fm-sheet { border:1px solid var(--line); border-radius:4px; margin-top:0.8rem; }
+    .fm-head, .fm-row > summary { display:grid; grid-template-columns:4.2rem minmax(0,1fr) 4.4rem 4.6rem 3.4rem; gap:0.6rem; align-items:baseline; padding:0.6rem 0.9rem; }
+    .fm-head { font-size:0.74rem; color:var(--muted); border-bottom:1px solid var(--line); }
+    .fm-row { border-top:1px solid var(--line); }
+    .fm-row:first-of-type { border-top:0; }
+    .fm-row { scroll-margin-top:4.5rem; }
+    .fm-row > summary { cursor:pointer; list-style:none; }
+    .fm-row > summary::-webkit-details-marker { display:none; }
+    .fm-row > summary:hover { background:var(--surface-2); }
+    .fm-row > summary:focus-visible { outline:2px solid var(--cyan); outline-offset:-2px; }
+    .fm-id-cell, .fm-sod, .fm-rpn, .fm-rpn-rev { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.86rem; }
+    .fm-id-cell { color:var(--muted); }
+    .fm-mode { color:var(--text-strong); font-size:0.92rem; line-height:1.4; }
+    .fm-item { display:block; color:var(--muted); font-size:0.8rem; }
+    .fm-sod { color:var(--text-body); }
+    .fm-rpn { color:var(--text-strong); }
+    .fm-rpn-rev { color:var(--muted); }
+    .fm-dot { display:inline-block; width:7px; height:7px; border-radius:50%; margin-right:0.45rem; vertical-align:0.1em; }
+    .fm-body { padding:0.2rem 0.9rem 1rem 5.7rem; }
+    @media (max-width:640px){
+      .fm-head { display:none; }
+      .fm-row > summary { grid-template-columns:3.2rem minmax(0,1fr) auto; }
+      .fm-sod, .fm-rpn-rev { display:none; }
+      .fm-body { padding:0.2rem 0.9rem 1rem; }
+    }
+    .fm-kv { display:grid; grid-template-columns:9.5rem minmax(0,1fr); gap:0.3rem 0.9rem; margin:0.4rem 0 0.8rem; font-size:0.86rem; }
+    .fm-kv dt { color:var(--muted); }
+    .fm-kv dd { margin:0; color:var(--text-body); }
+    @media (max-width:640px){ .fm-kv { grid-template-columns:1fr; } .fm-kv dd { margin-bottom:0.4rem; } }
+    .fm-scores { margin:0 0 0.6rem; border-top:1px solid var(--line); }
+    .fm-sc { display:grid; grid-template-columns:3.2rem minmax(0,1fr); gap:0.6rem; padding:0.45rem 0; border-bottom:1px solid var(--line); font-size:0.86rem; }
+    .fm-sc dt { font-family:'JetBrains Mono',monospace; color:var(--muted); }
+    .fm-sc dt b { color:var(--text-strong); }
+    .fm-sc dd { margin:0; color:var(--text-body); }
+    .fm-sub { font-size:0.8rem; color:var(--muted); margin:0.7rem 0 0.25rem; }
+    .fm-sub b { color:var(--text-strong); }
+    .fm-acts, .fm-ev { margin:0; padding-left:1.1rem; font-size:0.86rem; color:var(--text-body); }
+    .fm-acts li, .fm-ev li { margin:0.25rem 0; }
+    .fm-residual { color:var(--red); }
+    .fm-revline { font-size:0.86rem; color:var(--text-body); margin:0.4rem 0 0; }
+    .fm-ev-src { display:block; font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:var(--muted); }
+    .fm-ev-src a { color:var(--cyan); }
+    .fm-ev-txt { display:block; }
+    .fm-method { margin-top:1rem; border:1px solid var(--line); border-radius:4px; }
+    .fm-method > summary { padding:0.6rem 0.9rem; cursor:pointer; font-size:0.92rem; color:var(--text-strong); }
+    .fm-method-body { padding:0 0.9rem 0.9rem; font-size:0.86rem; color:var(--text-body); }
+    .fm-rubrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:1rem; }
+    @media (max-width:760px){ .fm-rubrics { grid-template-columns:1fr; } }
+    .fm-rubric { width:100%; border-collapse:collapse; font-size:0.8rem; }
+    .fm-rubric td { padding:0.25rem 0.4rem; border-top:1px solid var(--line); vertical-align:top; }
+    .fm-rubric td:first-child { font-family:'JetBrains Mono',monospace; width:2rem; color:var(--text-strong); }
+
+    /* ── simulator (js/rz-fmea-sim.js). Hidden without JS; the static figures stand alone. ── */
+    .fm-sim { --fm-ease:cubic-bezier(.77,0,.175,1); }
+    .fm-replay, .fm-wi { border:1px solid var(--line); border-radius:4px; padding:0.8rem 0.9rem; margin:1rem 0; }
+    .fm-rp-bar { display:flex; align-items:center; gap:0.5rem; }
+    .fm-sim button { font:inherit; font-size:0.86rem; color:var(--text-strong); background:transparent;
+      border:1px solid var(--line); border-radius:4px; padding:0.35rem 0.7rem; cursor:pointer; }
+    .fm-sim button:focus-visible, .fm-sim input:focus-visible, .fm-pb-row:focus-visible, .fm-matrix .fm-pt:focus-visible { outline:2px solid var(--cyan); outline-offset:2px; }
+    .fm-sim button:disabled { opacity:0.45; cursor:default; }
+    .fm-sim button:active:not(:disabled) { transform:scale(0.97); transition:transform 120ms var(--fm-ease); }
+    @media (hover:hover) and (pointer:fine){ .fm-sim button:hover:not(:disabled) { background:var(--surface-2); } }
+    .fm-rp-play { min-width:5.6rem; }
+    .fm-rp-step { min-width:2.2rem; font-family:'JetBrains Mono',monospace; }
+    .fm-rp-track { flex:1; min-width:0; }
+    @media (max-width:640px){ .fm-rp-bar { flex-wrap:wrap; } .fm-rp-track { flex-basis:100%; order:-1; margin-bottom:0.5rem; } }
+    .fm-sim input[type=range] { width:100%; accent-color:var(--cyan); margin:0; }
+    .fm-rp-ticks { display:flex; align-items:flex-start; gap:2px; margin-top:4px; }
+    .fm-rp-ticks i { flex:1; height:3px; background:var(--line); transition:background-color 150ms ease; }
+    .fm-rp-ticks i.is-past { background:var(--muted); }
+    .fm-rp-ticks i.has-new { height:7px; }  /* a new failure mode appears at this event */
+    .fm-rp-ticks i.has-new.is-past { background:var(--text-strong); }
+    .fm-rp-meta { font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:var(--muted); margin:1rem 0 0.25rem; }
+    .fm-rp-ev { color:var(--text-strong); font-size:0.92rem; line-height:1.5; margin:0; min-height:4.5em; }
+    .fm-rp-new { list-style:none; margin:0.6rem 0 0; padding:0; display:grid; gap:0.35rem; }
+    .fm-rp-new button { display:block; width:100%; text-align:left; line-height:1.4; color:var(--text-body); }
+    .fm-rp-id { font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:var(--muted); margin-right:0.55rem; }
+    .fm-rp-none { font-size:0.86rem; color:var(--muted); }
+    .fm-rp-count { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.8rem; color:var(--text-body); margin:0.7rem 0 0; padding-top:0.55rem; border-top:1px solid var(--line); }
+    .fm-scn { margin:1rem 0 0; }
+    .fm-seg { display:inline-flex; flex-wrap:wrap; border:1px solid var(--line); border-radius:4px; overflow:hidden; }
+    .fm-sim .fm-seg button { border:0; border-radius:0; border-right:1px solid var(--line); color:var(--muted); }
+    .fm-sim .fm-seg button:last-child { border-right:0; }
+    .fm-sim .fm-seg button[aria-checked=true] { color:var(--text-strong); background:var(--surface-2); font-weight:600; }
+    .fm-scn-note { font-size:0.8rem; color:var(--muted); margin:0.45rem 0 0.6rem; }
+    .fm-readout { flex-wrap:wrap; row-gap:0.25rem; margin:0; }
+    @media (max-width:640px){
+      .fm-seg { display:grid; grid-template-columns:1fr 1fr; }
+      .fm-sim .fm-seg button:nth-child(2n) { border-right:0; }
+      .fm-sim .fm-seg button:nth-child(-n+2) { border-bottom:1px solid var(--line); }
+    }
+    .fm-sim.is-live .fm-pb-bar, .fm-sim.is-live .fm-pb-rev { transition:transform 200ms var(--fm-ease), opacity 150ms ease; }
+    .fm-sim.is-live .fm-pb-row { cursor:pointer; transition:opacity 150ms ease; }
+    @media (hover:hover) and (pointer:fine){ .fm-sim.is-live .fm-pb-row:hover { background:var(--surface-2); } }
+    .fm-pb-row[aria-current=true] { background:var(--surface-2); }
+    .fm-pb-row[aria-current=true] .fm-pb-id { color:var(--cyan); }
+    .fm-pb-ref { height:4px; background:var(--text-body); opacity:0.55; }
+    .is-dim { opacity:0.45; }
+    .fm-matrix .fm-pt { cursor:pointer; transition:opacity 150ms ease; }
+    .fm-matrix .fm-pt-l { transition:opacity 150ms ease; pointer-events:none; }
+    .fm-matrix .fm-pt.is-sel { stroke:var(--cyan); stroke-width:2.5; }
+    .fm-matrix .fm-wi-from { fill:none; stroke:var(--muted); stroke-width:1; stroke-dasharray:2 2; }
+    .fm-matrix .fm-wi-path { stroke:var(--cyan); stroke-width:1; stroke-dasharray:3 3; }
+    .fm-wi-head { display:flex; gap:0.7rem; align-items:baseline; }
+    .fm-wi-id { font-family:'JetBrains Mono',monospace; font-size:0.8rem; color:var(--cyan); }
+    .fm-wi-title { flex:1; color:var(--text-strong); font-size:0.92rem; line-height:1.4; }
+    .fm-wi-out { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.92rem; color:var(--text-body); margin:0.5rem 0 0.3rem; }
+    .fm-wi-out b { color:var(--text-strong); font-size:1rem; }
+    .fm-wi-row { display:grid; grid-template-columns:9rem minmax(0,1fr) 2rem; gap:0.2rem 0.9rem; align-items:center; padding:0.6rem 0; border-top:1px solid var(--line); }
+    .fm-wi-k { font-size:0.86rem; color:var(--muted); }
+    .fm-wi-v { font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; font-size:0.92rem; color:var(--text-strong); text-align:right; }
+    .fm-wi-was { display:block; font-family:'JetBrains Mono',monospace; font-size:0.74rem; color:var(--muted); }
+    .fm-wi-rub, .fm-wi-why { grid-column:2 / -1; margin:0; font-size:0.86rem; line-height:1.45; }
+    .fm-wi-rub { color:var(--text-strong); }
+    .fm-wi-why { color:var(--muted); }
+    @media (max-width:640px){ .fm-wi-row { grid-template-columns:minmax(0,1fr) 2rem; } .fm-wi-k { grid-column:1 / -1; } .fm-wi-rub, .fm-wi-why { grid-column:1 / -1; } }
+    @media (max-width:640px){ .fm-sim button, .fm-wi-open { min-height:44px; } .fm-sim input[type=range] { min-height:32px; } }
+    .fm-wi-head:focus-visible { outline:2px solid var(--cyan); outline-offset:4px; }
+    .fm-wi-acts { display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; padding-top:0.6rem; border-top:1px solid var(--line); }
+    .fm-wi-open { margin-top:0.8rem; font:inherit; font-size:0.86rem; color:var(--text-strong); background:transparent; border:1px solid var(--line); border-radius:4px; padding:0.35rem 0.7rem; cursor:pointer; }
+    .fm-facts { display:grid; grid-template-columns:repeat(auto-fit,minmax(13rem,1fr)); gap:0 1.6rem; margin:1rem 0 0; }
+    .fm-facts > div { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:0.8rem; align-items:baseline; padding:0.45rem 0; border-top:1px solid var(--line); }
+    .fm-facts dt { font-size:0.86rem; color:var(--text-body); }
+    .fm-facts dt small { display:block; font-size:0.74rem; color:var(--muted); }
+    .fm-facts dd { margin:0; font-family:'JetBrains Mono',monospace; font-variant-numeric:tabular-nums; color:var(--text-strong); }
+    @media (prefers-reduced-motion:reduce){
+      .fm-sim.is-live .fm-pb-bar, .fm-sim.is-live .fm-pb-rev { transition:opacity 150ms ease; }
+      .fm-sim button:active:not(:disabled) { transform:none; }
+    }
+</style><script src="js/rz-fmea-sim.js?v=20261010-6843b03d" defer></script><style>
+    .rs-h { font-size:0.95rem; margin:1.4rem 0 0.2rem; color:var(--text-strong); font-family:'IBM Plex Sans',system-ui,sans-serif; font-weight:600; }
+    .rs-cap { color:var(--muted); font-size:0.8rem; margin:0 0 0.6rem; }
+    .rs-matrix { border:1px solid var(--line); border-radius:4px; font-size:0.84rem; }
+    .rs-mr { display:grid; grid-template-columns:minmax(9rem,1.1fr) repeat(3,minmax(0,2fr)); border-top:1px solid var(--line); }
+    .rs-mr:first-child { border-top:0; }
+    .rs-mhead { background:var(--surface-2); }
+    .rs-mh { font-family:'JetBrains Mono',monospace; font-size:0.68rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); padding:0.5rem 0.7rem; }
+    .rs-role { padding:0.6rem 0.7rem; border-right:1px solid var(--line); }
+    .rs-role b { display:block; color:var(--text-strong); font-weight:600; }
+    .rs-role small { display:block; color:var(--muted); font-size:0.74rem; line-height:1.35; margin-top:0.15rem; }
+    .rs-mc { padding:0.55rem 0.7rem; border-right:1px solid var(--line); color:var(--text-body); }
+    .rs-mc:last-child { border-right:0; }
+    .rs-mc ul { list-style:none; margin:0; padding:0; display:grid; gap:0.45rem; }
+    .rs-mc li { line-height:1.4; }
+    .rs-mc time, .rs-rec time, .rs-at time { font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--muted); margin-right:0.45rem; white-space:nowrap; }
+    .rs-mc a, .rs-rec a, .rs-at a { text-decoration:none; }
+    .rs-mc a:hover time, .rs-rec a:hover time, .rs-at a:hover time { color:var(--amber); }
+    .rs-empty span { font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); opacity:0.7; }
+    .rs-roles { display:grid; grid-template-columns:13.5rem minmax(0,1fr); gap:0 1.4rem; border-top:1px solid var(--line); margin-top:0.3rem; }
+    .rs-tabs { display:flex; flex-direction:column; border-right:1px solid var(--line); padding:0.4rem 0; }
+    .rs-tabs button { display:flex; justify-content:space-between; align-items:center; gap:0.6rem; text-align:left; background:none; border:0; border-left:2px solid transparent; color:var(--muted); font:500 0.84rem 'IBM Plex Sans',system-ui,sans-serif; padding:0.5rem 0.7rem; cursor:pointer; min-height:44px; }
+    .rs-tabs button:hover { color:var(--text-strong); }
+    .rs-tabs button[aria-selected=true] { color:var(--text-strong); border-left-color:var(--amber); background:var(--surface-2); }
+    .rs-tabs button:focus-visible { outline:1px solid var(--amber); outline-offset:-1px; }
+    .rs-tc { font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); font-variant-numeric:tabular-nums; white-space:nowrap; }
+    .rs-panel { padding:0.9rem 0 0.2rem; }
+    .rs-panel h3 { font:600 0.86rem 'IBM Plex Sans',system-ui,sans-serif; color:var(--text-strong); margin:1rem 0 0.4rem; }
+    .rs-panel h3 small { font-weight:400; color:var(--muted); font-size:0.76rem; margin-left:0.4rem; }
+    .rs-who { color:var(--text-body); font-size:0.88rem; margin:0; }
+    .rs-who b { color:var(--text-strong); font-weight:600; }
+    .rs-rec { list-style:none; margin:0; padding:0; display:grid; gap:0.5rem; font-size:0.86rem; }
+    .rs-rec li { display:grid; grid-template-columns:6.5rem 1fr; gap:0.6rem; color:var(--text-body); }
+    .rs-rec q { display:block; color:var(--muted); font-size:0.78rem; margin-top:0.15rem; quotes:'“' '”'; }
+    .rs-gap { color:var(--amber); font-size:0.86rem; margin:0; }
+    .rs-phases { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); border:1px solid var(--line); border-radius:4px; }
+    .rs-ph { padding:0.6rem 0.7rem; border-right:1px solid var(--line); }
+    .rs-ph:last-child { border-right:0; }
+    .rs-ph h4 { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin:0 0 0.45rem; font-weight:500; }
+    .rs-ph ul, .rs-modepb ul, .rs-at { list-style:none; margin:0; padding:0; display:grid; gap:0.55rem; font-size:0.82rem; color:var(--text-body); line-height:1.42; }
+    .rs-fm { font-family:'JetBrains Mono',monospace; font-size:0.68rem; color:var(--muted); margin-right:0.4rem; text-decoration:none; }
+    .rs-fm:hover { color:var(--amber); }
+    .rs-none { color:var(--muted); }
+    .rs-basis { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:0.62rem; color:var(--muted); border:1px solid var(--line); border-radius:2px; padding:0 0.3rem; margin-left:0.35rem; white-space:nowrap; vertical-align:1px; }
+    .rs-basis-ev { color:var(--text-body); }
+    .rs-modepb { display:grid; gap:0.5rem; }
+    .rs-rolepb { gap:0.8rem; }
+    .rs-mp { display:grid; grid-template-columns:5.5rem 1fr; gap:0.6rem; }
+    .rs-mp-ph { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); padding-top:0.15rem; }
+    .rs-modepb b, .rs-at b { color:var(--text-strong); font-weight:600; margin-right:0.3rem; }
+    .soe .rs-tag { font-family:'JetBrains Mono',monospace; font-size:0.64rem; color:var(--muted); border:1px solid var(--line); border-radius:2px; padding:0 0.3rem; margin-left:0.35rem; white-space:nowrap; }
+    @media (max-width: 900px) {
+        .rs-phases { grid-template-columns:repeat(2,minmax(0,1fr)); }
+        .rs-ph:nth-child(2) { border-right:0; }
+        .rs-ph:nth-child(-n+2) { border-bottom:1px solid var(--line); }
+    }
+    @media (max-width: 720px) {
+        .rs-mhead { display:none; }
+        .rs-mr { grid-template-columns:1fr; }
+        .rs-role { border-right:0; border-bottom:1px solid var(--line); background:var(--surface-2); }
+        .rs-mc { border-right:0; }
+        .rs-mc::before { content:attr(data-phase); display:block; font-family:'JetBrains Mono',monospace; font-size:0.62rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); margin-bottom:0.25rem; }
+        .rs-empty { display:none; }
+        .rs-phases { grid-template-columns:1fr; }
+        .rs-ph { border-right:0; border-bottom:1px solid var(--line); }
+        .rs-ph:last-child { border-bottom:0; }
+        .rs-rec li { grid-template-columns:1fr; gap:0.1rem; }
+        .rs-mp { grid-template-columns:1fr; gap:0.2rem; }
+        .rs-roles { grid-template-columns:1fr; }
+        .rs-tabs { flex-direction:row; overflow-x:auto; border-right:0; border-bottom:1px solid var(--line); padding:0; scrollbar-width:thin; }
+        .rs-tabs button { white-space:nowrap; border-left:0; border-bottom:2px solid transparent; }
+        .rs-tabs button[aria-selected=true] { border-bottom-color:var(--amber); }
+    }
+
+    .vh { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+    .inc-nav { position:sticky; top:var(--rz-nav-h,53px); z-index:40; background:var(--bg); border-bottom:1px solid var(--line); margin:1rem -1.1rem 0; }
+    .inc-nav-in { max-width:820px; margin:0 auto; display:flex; gap:1.4rem; overflow-x:auto; scrollbar-width:none; padding:0 1.1rem; }
+    .inc-nav-in::-webkit-scrollbar { display:none; }
+    .inc-nav a { font-family:'JetBrains Mono',monospace; font-size:0.74rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); text-decoration:none; padding:0.75rem 0 0.65rem; border-bottom:2px solid transparent; white-space:nowrap; min-height:44px; box-sizing:border-box; display:inline-flex; align-items:center; }
+    .inc-nav a:hover { color:var(--text-strong); }
+    .inc-nav a[aria-current=true] { color:var(--text-strong); border-bottom-color:var(--amber); }
+    .inc-nav a:focus-visible { outline:1px solid var(--amber); outline-offset:-1px; }
+    .inc-sec { scroll-margin-top:112px; padding-top:0.4rem; }
+    .inc-sec h2 { scroll-margin-top:112px; }
+    .inc-h3 { font-family:'IBM Plex Sans',system-ui,sans-serif; font-size:0.95rem; font-weight:600; color:var(--text-strong); margin:1.6rem 0 0.5rem; }
+    .reading-col ul.tight li { text-align:left; -webkit-hyphens:manual; hyphens:manual; }
+    .facts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); margin:1.1rem 0 0; border-top:1px solid var(--line); }
+    .facts > div { padding:0.65rem 0.9rem 0.7rem 0; border-bottom:1px solid var(--line); }
+    .facts dt { font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); }
+    .facts dd { margin:0.2rem 0 0; color:var(--text-body); font-size:0.86rem; line-height:1.45; }
+    .inc-fig { margin:0.4rem 0 0; --bg1:var(--surface); --bg3:var(--surface-2); --t1:var(--text-strong); --t2:var(--text-body); --t3:var(--muted); --bd:var(--line); --bd2:color-mix(in srgb, var(--text) 30%, transparent); --o:var(--amber); --c:var(--cyan); --g:var(--green); --r:var(--red); }
+    .inc-fig-scroll { overflow-x:auto; border:1px solid var(--line); border-radius:4px; background:var(--surface); }
+    .inc-fig-svg svg { display:block; width:100%; height:auto; }
+    .inc-fig-svg.fig-narrow { display:none; }
+    @media (max-width: 640px) { .inc-fig-svg.fig-wide { display:none; } .inc-fig-svg.fig-narrow { display:block; } }
+    .inc-fig figcaption { color:var(--muted); font-size:0.78rem; margin-top:0.45rem; line-height:1.45; }
+    .mag-row { display:grid; grid-template-columns:240px 1fr; gap:1.2rem; align-items:center; margin-top:1.4rem; }
+    .mag-row .viz { margin:0; }
+    details.inc-more { border-top:1px solid var(--line); margin-top:0.2rem; }
+    details.inc-more:last-of-type { border-bottom:1px solid var(--line); }
+    details.inc-more > summary { cursor:pointer; list-style:none; padding:0.7rem 0; color:var(--text-strong); font-weight:600; font-size:0.9rem; display:flex; gap:0.6rem; align-items:baseline; min-height:44px; box-sizing:border-box; }
+    details.inc-more > summary::-webkit-details-marker { display:none; }
+    details.inc-more > summary::before { content:"+"; font-family:'JetBrains Mono',monospace; color:var(--muted); width:0.8em; }
+    details.inc-more[open] > summary::before { content:"\2212"; }
+    details.inc-more > p, details.inc-more > .card, details.inc-more > .table-wrap { margin:0 0 0.9rem; color:var(--text-body); font-size:0.9rem; }
+    table.coe { width:100%; border-collapse:collapse; font-size:0.86rem; }
+    table.coe th { text-align:left; font-family:'JetBrains Mono',monospace; font-size:0.66rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--muted); padding:0.55rem 0.7rem; border-bottom:1px solid var(--line); font-weight:500; }
+    table.coe td { padding:0.6rem 0.7rem; border-bottom:1px solid var(--line); color:var(--text-body); vertical-align:top; line-height:1.45; }
+    table.coe tr:last-child td { border-bottom:0; }
+    table.coe .c-own { color:var(--text-strong); width:22%; }
+    table.coe .c-st { color:var(--muted); font-size:0.8rem; width:32%; }
+    .soe li:target { background:var(--surface-2); }
+    @media (max-width: 720px) {
+        .facts { grid-template-columns:1fr 1fr; }
+        .mag-row { grid-template-columns:1fr; }
+        table.coe thead { display:none; }
+        table.coe tr { display:block; padding:0.55rem 0.7rem; border-bottom:1px solid var(--line); }
+        table.coe td { display:block; padding:0.1rem 0; border:0; width:auto !important; }
+        .inc-nav { margin:1rem -1.1rem 0; }
+    }
+</style>
+</head>
+<body class="locked">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <nav class="navbar"><div class="nav-container">
+        <a href="index.html" class="nav-logo"><img loading="lazy" src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a>
+        <ul class="nav-menu" id="navMenu">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="dc-incidents.html">DC Incidents</a></li>
+            <li><a href="datacenter-solutions.html">DC Solutions</a></li>
+        </ul>
+        <div class="nav-right">
+            <span class="lock-tag" title="Root-only module">ROOT</span>
+            <button class="theme-btn" id="themeToggle" type="button" aria-label="Toggle theme">◐</button>
+        </div>
+    </div></nav>
+    <main class="wrap" id="main-content">
+        <div class="reading-col">
+        <a class="backlink" href="dc-incidents.html">← All incidents</a>
+        <div class="eyebrow">Incident dossier · Rank #37 · magnitude 5.8</div>
+        <h1>AWS EU West (Dublin) 2011: Transformer Loss and a Generator PLC Halt</h1>
+        <div class="chips">
+            <span class="chip">Amazon Web Services</span>
+            <span class="chip cyan">2011-08-07</span>
+            <span class="chip amber" title="Trigger 10:41 PDT 7 Aug → 98% of recovery snapshots delivered 20:25 PDT 10 Aug (3 d 9 h 44 min)">3d 10h to substantial restoration</span>
+            <span class="chip amber">Power</span>
+        </div>
+        </div>
+        <nav class="inc-nav" aria-label="Dossier sections"><div class="inc-nav-in"><a href="#summary">Summary</a><a href="#timeline">Timeline</a><a href="#response">Response</a><a href="#fmea">FMEA</a><a href="#causes">Causes</a><a href="#actions">Actions</a><a href="#sources">Sources</a></div></nav>
+        <div class="reading-col">
+
+        <section class="inc-sec" id="summary" aria-labelledby="h-summary">
+        <h2 id="h-summary" class="vh">Summary</h2>
+        <p class="lede">On Sunday 7 August 2011 a utility transformer feeding much of one AWS EU West zone in Dublin failed. A PLC that brings the backup generators onto the bus halted, the UPS drained and the zone went dark. Staff synchronised generators by hand and restored the network by 13:49 PDT, but EBS recovery took until 10 August.</p>
+        <dl class="facts">
+            <div><dt>Users affected</dt><dd>Almost all EC2 instances and 58% of EBS volumes in one EU West zone; Single-AZ RDS in that zone; regional EC2 launch errors for over an hour.</dd></div>
+            <div><dt>Duration</dt><dd>3d 10h — Trigger 10:41 PDT 7 Aug → 98% of recovery snapshots delivered 20:25 PDT 10 Aug (3 d 9 h 44 min)</dd></div>
+            <div><dt>Financial</dt><dd>Not disclosed; AWS gave a 10-day 100% credit to customers in the zone</dd></div>
+            <div><dt>Scope</dt><dd>Single Availability Zone, with regional API impact</dd></div>
+            <div><dt>Site</dt><dd>AWS EU West Availability Zone, Dublin (facility not named) · Dublin, Ireland, eu-west-1</dd></div>
+            <div><dt>Services down</dt><dd>Amazon EC2, Amazon EBS, Amazon RDS, EC2 APIs (EU West)</dd></div>
+        </dl>
+        <h3 class="inc-h3">How the defences failed</h3><figure class="inc-fig"><div class="inc-fig-scroll"><div class="inc-fig-svg fig-wide" style="max-width:692px;min-width:554px"><svg viewBox="0 0 692 684" role="img" aria-labelledby="fc-aws-eu-west-1-dublin-plc-title fc-aws-eu-west-1-dublin-plc-desc" preserveAspectRatio="xMidYMid meet"><title id="fc-aws-eu-west-1-dublin-plc-title">How the defences failed — AWS</title><desc id="fc-aws-eu-west-1-dublin-plc-desc">5 failure modes in the order the sequence of events first shows them, 0 latent conditions with no moment in the record, ending in the outcome: Zone dark · EBS tail to 10 Aug.</desc><defs><marker id="fc-aws-eu-west-1-dublin-plc-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="var(--t2)"/></marker></defs><rect width="692" height="684" fill="var(--bg1)"/><rect x="12" y="24" width="656" height="438" rx="8" fill="none" stroke="var(--bd)" stroke-width="1.4"/><path d="M 312 106 L 368 106" fill="none" stroke="var(--t1)" stroke-width="1" marker-end="url(#fc-aws-eu-west-1-dublin-plc-arrow)" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 512 158 L 512 198" fill="none" stroke="var(--t1)" stroke-width="1" marker-end="url(#fc-aws-eu-west-1-dublin-plc-arrow)" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 368 250 L 312 250" fill="none" stroke="var(--t1)" stroke-width="1" marker-end="url(#fc-aws-eu-west-1-dublin-plc-arrow)" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 168 302 L 168 342" fill="none" stroke="var(--t1)" stroke-width="1" marker-end="url(#fc-aws-eu-west-1-dublin-plc-arrow)" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 168 446 L 168 451 A 5 5 0 0 0 173 456 L 335 456 A 5 5 0 0 1 340 461 L 340 510" fill="none" stroke="var(--t1)" stroke-width="1" marker-end="url(#fc-aws-eu-west-1-dublin-plc-arrow)" data-rzd-transit="0" data-rzd-rerouted="0"/><rect x="24" y="54" width="288" height="104" rx="6" fill="var(--bg1)"/><rect x="24" y="54" width="288" height="104" rx="6" fill="var(--bg3)" stroke="var(--r)" stroke-width="1.4"/><rect x="36" y="66" width="115" height="12" rx="2" fill="none" stroke="var(--r)" stroke-width="0.8" opacity="0.5"/><g class="rzd-sym" transform="translate(154,84) scale(0.5833333333333334)" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="16" width="17" height="20" rx="2" /><path d="M8 16 v-4 h4 M15 16 v-4 h4" stroke-width="1.3" /><path d="M21 26 H26" stroke-width="1.8" /><circle cx="34" cy="26" r="10" /><text x="34" y="30.5" font-family="sans-serif" font-size="13" font-weight="700" text-anchor="middle" fill="var(--t2)" stroke="none">G</text></g><rect x="368" y="54" width="288" height="104" rx="6" fill="var(--bg1)"/><rect x="368" y="54" width="288" height="104" rx="6" fill="var(--bg1)" stroke="var(--t2)" stroke-width="1" stroke-dasharray="4,3"/><rect x="380" y="66" width="108" height="12" rx="2" fill="none" stroke="var(--t2)" stroke-width="0.8" opacity="0.5"/><g class="rzd-sym" transform="translate(498,84) scale(0.5833333333333334)" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 14 L10 34 M15 14 L24 34 M15 14 L38 34 M33 14 L10 34 M33 14 L24 34 M33 14 L38 34" stroke-width="1.1" /><circle cx="15" cy="13" r="4.5" /><circle cx="33" cy="13" r="4.5" /><circle cx="10" cy="35" r="4.5" /><circle cx="24" cy="35" r="4.5" /><circle cx="38" cy="35" r="4.5" /></g><rect x="368" y="198" width="288" height="104" rx="6" fill="var(--bg1)"/><rect x="368" y="198" width="288" height="104" rx="6" fill="var(--bg1)" stroke="var(--t2)" stroke-width="1"/><rect x="380" y="210" width="108" height="12" rx="2" fill="none" stroke="var(--t2)" stroke-width="0.8" opacity="0.5"/><g class="rzd-sym" transform="translate(498,228) scale(0.5833333333333334)" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="10" y="4" width="28" height="40" rx="2" /><path d="M15 4 V44 M33 4 V44" stroke-width="1.1" /><path d="M15 11 H33 M15 17 H33 M15 23 H33 M15 29 H33 M15 35 H33" stroke-width="1.2" /><circle cx="30" cy="14" r="1.2" fill="var(--t2)" stroke="none" /><circle cx="30" cy="26" r="1.2" fill="var(--t2)" stroke="none" /></g><rect x="24" y="198" width="288" height="104" rx="6" fill="var(--bg1)"/><rect x="24" y="198" width="288" height="104" rx="6" fill="var(--bg1)" stroke="var(--t2)" stroke-width="1"/><rect x="36" y="210" width="108" height="12" rx="2" fill="none" stroke="var(--t2)" stroke-width="0.8" opacity="0.5"/><g class="rzd-sym" transform="translate(154,228) scale(0.5833333333333334)" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 14 L10 34 M15 14 L24 34 M15 14 L38 34 M33 14 L10 34 M33 14 L24 34 M33 14 L38 34" stroke-width="1.1" /><circle cx="15" cy="13" r="4.5" /><circle cx="33" cy="13" r="4.5" /><circle cx="10" cy="35" r="4.5" /><circle cx="24" cy="35" r="4.5" /><circle cx="38" cy="35" r="4.5" /></g><rect x="24" y="342" width="288" height="104" rx="6" fill="var(--bg1)"/><rect x="24" y="342" width="288" height="104" rx="6" fill="var(--bg1)" stroke="var(--t2)" stroke-width="1"/><rect x="36" y="354" width="115" height="12" rx="2" fill="none" stroke="var(--t2)" stroke-width="0.8" opacity="0.5"/><g class="rzd-sym" transform="translate(154,372) scale(0.5833333333333334)" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="10" y="4" width="28" height="40" rx="2" /><path d="M15 4 V44 M33 4 V44" stroke-width="1.1" /><path d="M15 11 H33 M15 17 H33 M15 23 H33 M15 29 H33 M15 35 H33" stroke-width="1.2" /><circle cx="30" cy="14" r="1.2" fill="var(--t2)" stroke="none" /><circle cx="30" cy="26" r="1.2" fill="var(--t2)" stroke="none" /></g><rect x="196" y="510" width="288" height="60" rx="6" fill="var(--bg1)"/><rect x="196" y="510" width="288" height="60" rx="6" fill="var(--bg3)" stroke="var(--o)" stroke-width="1.4"/><rect x="208" y="522" width="59" height="12" rx="2" fill="none" stroke="var(--o)" stroke-width="0.8" opacity="0.5"/><text x="24" y="38" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" style="font-variant-numeric:tabular-nums">ACTIVE — IN THE ORDER THE RECORD SHOWS THEM</text><text x="93.5" y="74.5" fill="var(--r)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">FM-01 · RPN 189</text><text x="168" y="126" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">PLC halts paralleling</text><text x="168" y="140" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="400" text-anchor="middle" style="font-variant-numeric:tabular-nums">S9 · O3 · D7</text><text x="434" y="74.5" fill="var(--t2)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">FM-02 · RPN 72</text><text x="512" y="126" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Network stays dark</text><text x="512" y="140" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="400" text-anchor="middle" style="font-variant-numeric:tabular-nums">S8 · O3 · D3</text><text x="434" y="218.5" fill="var(--t2)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">FM-05 · RPN 90</text><text x="512" y="270" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Slow Multi-AZ failover</text><text x="512" y="284" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="400" text-anchor="middle" style="font-variant-numeric:tabular-nums">S6 · O3 · D5</text><text x="90" y="218.5" fill="var(--t2)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">FM-03 · RPN 96</text><text x="168" y="270" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Regional API overload</text><text x="168" y="284" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="400" text-anchor="middle" style="font-variant-numeric:tabular-nums">S6 · O4 · D4</text><text x="93.5" y="362.5" fill="var(--t2)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">FM-04 · RPN 144</text><text x="168" y="414" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">EBS recovery tail</text><text x="168" y="428" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="400" text-anchor="middle" style="font-variant-numeric:tabular-nums">S8 · O3 · D6</text><text x="237.5" y="530.5" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">OUTCOME</text><text x="340" y="550" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Zone dark · EBS tail to 10 Aug</text><line x1="24" y1="620" x2="668" y2="620" stroke="var(--bd)" stroke-width="0.8"/><text x="24" y="636" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" style="font-variant-numeric:tabular-nums">LEGEND</text><rect x="24" y="646" width="14" height="10" rx="2" fill="var(--bg3)" stroke="var(--r)" stroke-width="1.4"/><text x="46" y="654" fill="var(--t2)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="9" font-weight="400">High priority</text><rect x="127.0904" y="646" width="14" height="10" rx="2" fill="var(--bg1)" stroke="var(--t2)" stroke-width="1.4" stroke-dasharray="3,2"/><text x="149.0904" y="654" fill="var(--t2)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="9" font-weight="400">Medium or low priority, no published action</text><rect x="363.2907999999999" y="646" width="14" height="10" rx="2" fill="var(--bg1)" stroke="var(--t2)" stroke-width="1.4"/><text x="385.2907999999999" y="654" fill="var(--t2)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="9" font-weight="400">Medium or low priority</text><line x1="506.3141999999999" y1="651" x2="522.3141999999999" y2="651" stroke="var(--t1)" stroke-width="1.4"/><text x="528.3141999999999" y="654" fill="var(--t2)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="9" font-weight="400">Next failure in the record</text></svg></div><div class="inc-fig-svg fig-narrow" style="max-width:348px;min-width:279px"><svg viewBox="0 0 348 1016" role="img" aria-labelledby="fn-aws-eu-west-1-dublin-plc-title fn-aws-eu-west-1-dublin-plc-desc" preserveAspectRatio="xMidYMid meet"><title id="fn-aws-eu-west-1-dublin-plc-title">How the defences failed — AWS</title><desc id="fn-aws-eu-west-1-dublin-plc-desc">5 failure modes in the order the sequence of events first shows them, 0 latent conditions with no moment in the record, ending in the outcome: Zone dark · EBS tail to 10 Aug.</desc><defs><marker id="fn-aws-eu-west-1-dublin-plc-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="var(--t2)"/></marker></defs><rect width="348" height="1016" fill="var(--bg1)"/><rect x="12" y="24" width="312" height="726" rx="8" fill="none" stroke="var(--bd)" stroke-width="1.4"/><path d="M 168 158 L 168 198" fill="none" stroke="var(--t1)" stroke-width="1" marker-end="url(#fn-aws-eu-west-1-dublin-plc-arrow)" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 168 302 L 168 342" fill="none" stroke="var(--t1)" stroke-width="1" marker-end="url(#fn-aws-eu-west-1-dublin-plc-arrow)" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 168 446 L 168 486" fill="none" stroke="var(--t1)" stroke-width="1" marker-end="url(#fn-aws-eu-west-1-dublin-plc-arrow)" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 168 590 L 168 630" fill="none" stroke="var(--t1)" stroke-width="1" marker-end="url(#fn-aws-eu-west-1-dublin-plc-arrow)" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 168 734 L 168 798" fill="none" stroke="var(--t1)" stroke-width="1" marker-end="url(#fn-aws-eu-west-1-dublin-plc-arrow)" data-rzd-transit="0" data-rzd-rerouted="0"/><rect x="24" y="54" width="288" height="104" rx="6" fill="var(--bg1)"/><rect x="24" y="54" width="288" height="104" rx="6" fill="var(--bg3)" stroke="var(--r)" stroke-width="1.4"/><rect x="36" y="66" width="115" height="12" rx="2" fill="none" stroke="var(--r)" stroke-width="0.8" opacity="0.5"/><g class="rzd-sym" transform="translate(154,84) scale(0.5833333333333334)" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="16" width="17" height="20" rx="2" /><path d="M8 16 v-4 h4 M15 16 v-4 h4" stroke-width="1.3" /><path d="M21 26 H26" stroke-width="1.8" /><circle cx="34" cy="26" r="10" /><text x="34" y="30.5" font-family="sans-serif" font-size="13" font-weight="700" text-anchor="middle" fill="var(--t2)" stroke="none">G</text></g><rect x="24" y="198" width="288" height="104" rx="6" fill="var(--bg1)"/><rect x="24" y="198" width="288" height="104" rx="6" fill="var(--bg1)" stroke="var(--t2)" stroke-width="1" stroke-dasharray="4,3"/><rect x="36" y="210" width="108" height="12" rx="2" fill="none" stroke="var(--t2)" stroke-width="0.8" opacity="0.5"/><g class="rzd-sym" transform="translate(154,228) scale(0.5833333333333334)" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 14 L10 34 M15 14 L24 34 M15 14 L38 34 M33 14 L10 34 M33 14 L24 34 M33 14 L38 34" stroke-width="1.1" /><circle cx="15" cy="13" r="4.5" /><circle cx="33" cy="13" r="4.5" /><circle cx="10" cy="35" r="4.5" /><circle cx="24" cy="35" r="4.5" /><circle cx="38" cy="35" r="4.5" /></g><rect x="24" y="342" width="288" height="104" rx="6" fill="var(--bg1)"/><rect x="24" y="342" width="288" height="104" rx="6" fill="var(--bg1)" stroke="var(--t2)" stroke-width="1"/><rect x="36" y="354" width="108" height="12" rx="2" fill="none" stroke="var(--t2)" stroke-width="0.8" opacity="0.5"/><g class="rzd-sym" transform="translate(154,372) scale(0.5833333333333334)" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="10" y="4" width="28" height="40" rx="2" /><path d="M15 4 V44 M33 4 V44" stroke-width="1.1" /><path d="M15 11 H33 M15 17 H33 M15 23 H33 M15 29 H33 M15 35 H33" stroke-width="1.2" /><circle cx="30" cy="14" r="1.2" fill="var(--t2)" stroke="none" /><circle cx="30" cy="26" r="1.2" fill="var(--t2)" stroke="none" /></g><rect x="24" y="486" width="288" height="104" rx="6" fill="var(--bg1)"/><rect x="24" y="486" width="288" height="104" rx="6" fill="var(--bg1)" stroke="var(--t2)" stroke-width="1"/><rect x="36" y="498" width="108" height="12" rx="2" fill="none" stroke="var(--t2)" stroke-width="0.8" opacity="0.5"/><g class="rzd-sym" transform="translate(154,516) scale(0.5833333333333334)" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 14 L10 34 M15 14 L24 34 M15 14 L38 34 M33 14 L10 34 M33 14 L24 34 M33 14 L38 34" stroke-width="1.1" /><circle cx="15" cy="13" r="4.5" /><circle cx="33" cy="13" r="4.5" /><circle cx="10" cy="35" r="4.5" /><circle cx="24" cy="35" r="4.5" /><circle cx="38" cy="35" r="4.5" /></g><rect x="24" y="630" width="288" height="104" rx="6" fill="var(--bg1)"/><rect x="24" y="630" width="288" height="104" rx="6" fill="var(--bg1)" stroke="var(--t2)" stroke-width="1"/><rect x="36" y="642" width="115" height="12" rx="2" fill="none" stroke="var(--t2)" stroke-width="0.8" opacity="0.5"/><g class="rzd-sym" transform="translate(154,660) scale(0.5833333333333334)" fill="none" stroke="var(--t2)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="10" y="4" width="28" height="40" rx="2" /><path d="M15 4 V44 M33 4 V44" stroke-width="1.1" /><path d="M15 11 H33 M15 17 H33 M15 23 H33 M15 29 H33 M15 35 H33" stroke-width="1.2" /><circle cx="30" cy="14" r="1.2" fill="var(--t2)" stroke="none" /><circle cx="30" cy="26" r="1.2" fill="var(--t2)" stroke="none" /></g><rect x="24" y="798" width="288" height="60" rx="6" fill="var(--bg1)"/><rect x="24" y="798" width="288" height="60" rx="6" fill="var(--bg3)" stroke="var(--o)" stroke-width="1.4"/><rect x="36" y="810" width="59" height="12" rx="2" fill="none" stroke="var(--o)" stroke-width="0.8" opacity="0.5"/><text x="24" y="38" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" style="font-variant-numeric:tabular-nums">ACTIVE — RECORD ORDER</text><text x="93.5" y="74.5" fill="var(--r)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">FM-01 · RPN 189</text><text x="168" y="126" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">PLC halts paralleling</text><text x="168" y="140" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="400" text-anchor="middle" style="font-variant-numeric:tabular-nums">S9 · O3 · D7</text><text x="90" y="218.5" fill="var(--t2)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">FM-02 · RPN 72</text><text x="168" y="270" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Network stays dark</text><text x="168" y="284" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="400" text-anchor="middle" style="font-variant-numeric:tabular-nums">S8 · O3 · D3</text><text x="90" y="362.5" fill="var(--t2)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">FM-05 · RPN 90</text><text x="168" y="414" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Slow Multi-AZ failover</text><text x="168" y="428" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="400" text-anchor="middle" style="font-variant-numeric:tabular-nums">S6 · O3 · D5</text><text x="90" y="506.5" fill="var(--t2)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">FM-03 · RPN 96</text><text x="168" y="558" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Regional API overload</text><text x="168" y="572" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="400" text-anchor="middle" style="font-variant-numeric:tabular-nums">S6 · O4 · D4</text><text x="93.5" y="650.5" fill="var(--t2)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">FM-04 · RPN 144</text><text x="168" y="702" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">EBS recovery tail</text><text x="168" y="716" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="400" text-anchor="middle" style="font-variant-numeric:tabular-nums">S8 · O3 · D6</text><text x="65.5" y="818.5" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" text-anchor="middle" style="font-variant-numeric:tabular-nums">OUTCOME</text><text x="168" y="838" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Zone dark · EBS tail to 10 Aug</text><line x1="24" y1="908" x2="324" y2="908" stroke="var(--bd)" stroke-width="0.8"/><text x="24" y="924" fill="var(--t3)" font-family="'JetBrains Mono', 'SF Mono', monospace" font-size="9" font-weight="500" letter-spacing="0.18em" style="font-variant-numeric:tabular-nums">LEGEND</text><rect x="24" y="934" width="14" height="10" rx="2" fill="var(--bg3)" stroke="var(--r)" stroke-width="1.4"/><text x="46" y="942" fill="var(--t2)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="9" font-weight="400">High priority</text><rect x="24" y="956" width="14" height="10" rx="2" fill="var(--bg1)" stroke="var(--t2)" stroke-width="1.4" stroke-dasharray="3,2"/><text x="46" y="964" fill="var(--t2)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="9" font-weight="400">Medium or low priority, no published action</text><rect x="24" y="978" width="14" height="10" rx="2" fill="var(--bg1)" stroke="var(--t2)" stroke-width="1.4"/><text x="46" y="986" fill="var(--t2)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="9" font-weight="400">Medium or low priority</text><line x1="167.0234" y1="983" x2="183.0234" y2="983" stroke="var(--t1)" stroke-width="1.4"/><text x="189.0234" y="986" fill="var(--t2)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="9" font-weight="400">Next failure in the record</text></svg></div></div><figcaption>Every failure mode of the FMEA below. Active modes run in the order the sequence of events first shows them — record order, not a proof of cause; latent modes were in place before the event. Red outline: high priority. Dashed: no published corrective action.</figcaption></figure>
+        <div class="mag-row">
+            <div class="mag-viz"><div class="viz viz-radar"><svg viewBox="0 0 290 215" role="img" aria-label="Magnitude sub-scores radar chart"><title>Magnitude sub-scores (0–10)</title><polygon class="vz-grid" points="145.0,83.2 166.8,105.0 145.0,126.8 123.2,105.0"/><polygon class="vz-grid" points="145.0,62.1 187.9,105.0 145.0,147.9 102.1,105.0"/><polygon class="vz-grid" points="145.0,41.0 209.0,105.0 145.0,169.0 81.0,105.0"/><line class="vz-grid" x1="145" y1="105" x2="145.0" y2="41.0"/><line class="vz-grid" x1="145" y1="105" x2="209.0" y2="105.0"/><line class="vz-grid" x1="145" y1="105" x2="145.0" y2="169.0"/><line class="vz-grid" x1="145" y1="105" x2="81.0" y2="105.0"/><polygon class="vz-accent-fill" points="145.0,66.6 177.0,105.0 145.0,156.2 113.0,105.0"><title>Magnitude sub-scores (0–10)</title></polygon><circle class="vz-accent-dot" cx="145.0" cy="66.6" r="2.4"/><circle class="vz-accent-dot" cx="177.0" cy="105.0" r="2.4"/><circle class="vz-accent-dot" cx="145.0" cy="156.2" r="2.4"/><circle class="vz-accent-dot" cx="113.0" cy="105.0" r="2.4"/><text class="vz-lbl vz-num" x="145.0" y="20.0" text-anchor="middle">Users 6<title>Users affected (0–10) — breadth of the user/customer population impacted. — scored 6/10.</title></text><text class="vz-lbl vz-num" x="223.0" y="109.0" text-anchor="start">Financial 5<title>Financial impact (0–10) — direct + consequential cost. — scored 5/10.</title></text><text class="vz-lbl vz-num" x="145.0" y="198.0" text-anchor="middle">Duration 8<title>Outage duration (0–10), from the measured duration by fixed bands: &lt;1 h 3 · 1–4 h 4 · 4–12 h 5 · 12–24 h 6 · 1–3 d 7 · 3–7 d 8 · 7–30 d 9 · &gt;30 d 10; no customer downtime 1. — scored 8/10.</title></text><text class="vz-lbl vz-num" x="67.0" y="109.0" text-anchor="end">Blast 5<title>Blast radius (0–10) — how wide the fault propagated across systems/regions. — scored 5/10.</title></text></svg></div></div>
+            <div class="mag-txt"><div class="mag-trace">Magnitude <b>5.8</b> = blast 5×0.35 + users 6×0.25 + financial 5×0.20 + duration 8×0.20 <span style="opacity:0.7">(sub-scores 0–10 · weighted composite)</span></div><p class="disclaimer">One zone plus regional API impact. Duration (8): about 3 days 10 hours from trigger to 98% of recovery snapshots, inside the 3–7 d band; most instances were back the same day.</p></div>
+        </div>
+        <details class="inc-more"><summary>All 8 impact metrics</summary><div class="table-wrap"><table class="metrics"><tbody><tr><td class="mlabel">Failed utility transformer</td><td class="mval">110 kV, 10 MW</td></tr><tr><td class="mlabel">EBS volumes in the zone that lost power</td><td class="mval">58%</td></tr><tr><td class="mlabel">Trigger to first generators online</td><td class="mval">1 hour 13 minutes (10:41 → 11:54 PDT)</td></tr><tr><td class="mlabel">Trigger to EC2 APIs recovered in other zones</td><td class="mval">1 hour 19 minutes (12:00 PDT)</td></tr><tr><td class="mlabel">Trigger to zone connectivity restored</td><td class="mval">3 hours 8 minutes (13:49 PDT)</td></tr><tr><td class="mlabel">RDS DNS connectivity restored</td><td class="mval">within 4 minutes; most failovers within 10 more</td></tr><tr><td class="mlabel">Recovery snapshots delivered</td><td class="mval">38% by 06:04 9 Aug · 85% by 02:37 10 Aug · 98% by 20:25 10 Aug PDT</td></tr><tr><td class="mlabel">Service credit</td><td class="mval">10 days at 100% of EBS, EC2 and RDS usage in the zone</td></tr></tbody></table></div></details>
+        </section>
+
+        <section class="inc-sec" id="timeline" aria-labelledby="h-timeline">
+        <h2 id="h-timeline">Sequence of events</h2>
+        <ol class="soe"><li id="soe-1"><time>2011-08-07 10:41 PDT</time><span class="ev"><span class="phase-chip">TRIGGER</span> The utility&#x27;s 110 kV 10 MW transformer fails, cutting supply to every customer on it, including a significant portion of one EU West Availability Zone in Dublin.<span class="rs-tag">Utility / grid operator</span></span></li><li id="soe-2"><time>2011-08-07 10:41 PDT</time><span class="ev"><span class="phase-chip">CASCADE</span> One of the PLCs that phase-synchronise the backup generators does not complete connecting a portion of them; AWS believes a large ground fault detected by the PLC stopped it.</span></li><li id="soe-3"><time>2011-08-07 (time not stated)</time><span class="ev"><span class="phase-chip">CASCADE</span> UPS batteries drain within minutes; power is lost to almost all EC2 instances and 58% of EBS volumes in the zone.</span></li><li id="soe-4"><time>2011-08-07 (time not stated)</time><span class="ev"><span class="phase-chip">IMPACT</span> EC2 networking gear loses power, cutting the zone off from the internet and the other zones; API calls aimed at the zone fail.</span></li><li id="soe-5"><time>2011-08-07 (time not stated)</time><span class="ev"><span class="phase-chip">CASCADE</span> A DNS connectivity issue blocks RDS Multi-AZ health checks; DNS returns within 4 minutes and most pairs fail over within 10 more, but a software bug stretches failover for a small subset.</span></li><li id="soe-6"><time>2011-08-07 11:05 PDT</time><span class="ev"><span class="phase-chip">DETECTION</span> Launch delays and API errors are seen in all EU West zones: management servers keep routing to the dead zone and queued launch requests overload them.</span></li><li id="soe-7"><time>2011-08-07 11:54 PDT</time><span class="ev"><span class="phase-chip">MITIGATION</span> Some backup generators are brought online by manually phase-synchronising the power sources; many instances get power but stay unreachable because most network gear is still dark.<span class="rs-tag">Authorised electrical person</span></span></li><li id="soe-8"><time>2011-08-07 12:00 PDT</time><span class="ev"><span class="phase-chip">MITIGATION</span> EC2 launches are disabled in the affected zone and the failed management servers are removed; launch times in the other zones recover.<span class="rs-tag">Operations lead</span></span></li><li id="soe-9"><time>2011-08-07 13:49 PDT</time><span class="ev"><span class="phase-chip">RECOVERY</span> Enough network devices have power to re-establish connectivity to the zone; many instances and volumes become accessible.</span></li><li id="soe-10"><time>2011-08-07 (time not stated)</time><span class="ev"><span class="phase-chip">MITIGATION</span> AWS posts frequent Service Health Dashboard updates and staffs up its Support team for forum and Premium Support contacts.<span class="rs-tag">Communications lead</span></span></li><li id="soe-11"><time>2011-08-07 (time not stated)</time><span class="ev"><span class="phase-chip">CASCADE</span> Re-mirroring of EBS volumes exhausts the zone&#x27;s spare capacity; many volumes stay stuck waiting for a new replica.</span></li><li id="soe-12"><time>2011-08-07 night, Dublin (time not stated)</time><span class="ev"><span class="phase-chip">RECOVERY</span> AWS brings in additional labour and trucks servers in from another zone to add EBS capacity; night-time logistics add delay.<span class="rs-tag">Service recovery lead</span></span></li><li id="soe-13"><time>2011-08-07 (time not stated)</time><span class="ev"><span class="phase-chip">CASCADE</span> Volumes whose every replica lost power are treated as possibly inconsistent and must be rebuilt as recovery snapshots through S3, a slow process.</span></li><li id="soe-14"><time>2011-08-07 (time not stated)</time><span class="ev"><span class="phase-chip">IMPACT</span> Almost all Single-AZ RDS databases in the zone are unavailable; customers without automated backups cannot do a point-in-time restore.</span></li><li id="soe-15"><time>2011-08-09 06:04 PDT</time><span class="ev"><span class="phase-chip">RECOVERY</span> About 38% of recovery snapshots for possibly inconsistent volumes are delivered.</span></li><li id="soe-16"><time>2011-08-10 02:37 PDT</time><span class="ev"><span class="phase-chip">RECOVERY</span> 85% of recovery snapshots are delivered.</span></li><li id="soe-17"><time>2011-08-10 20:25 PDT</time><span class="ev"><span class="phase-chip">RESTORED</span> Recovery snapshots are 98% complete; the remaining few need manual attention.</span></li></ol>
+        </section>
+        
+        <section class="inc-sec" id="response" aria-labelledby="h-response">
+        <h2 id="h-response">Response by role</h2>
+        <p class="metabar"><span><b>6</b> roles</span><span class="sep">/</span><span><b>5</b> recorded actions</span><span class="sep">/</span><span><b>21</b> playbook actions across 5 failure modes</span><span class="sep">/</span><span>no recorded action: <b>Vendor / upstream provider</b></span></p>
+        <h3 class="rs-h">What each role did</h3>
+        <p class="rs-cap">Roles the sequence of events shows acting; every entry quotes its source line. Select a time to jump to it.</p>
+        <div class="rs-matrix" role="table" aria-label="Recorded actions by role and phase"><div class="rs-mr rs-mhead"><div class="rs-mh">Role</div><div class="rs-mh">Detect</div><div class="rs-mh">Contain</div><div class="rs-mh">Recover</div></div><div class="rs-mr"><div class="rs-role"><b>Utility / grid operator</b><small>The utility (ESB Networks per DCK), not named in the AWS summary</small></div><div class="rs-mc" data-phase="Detect"><ul><li><a href="#soe-1"><time>2011-08-07 10:41 PDT</time></a>Lost the transformer that fed much of the zone</li></ul></div><div class="rs-mc rs-empty" data-phase="Contain"><span>no record</span></div><div class="rs-mc rs-empty" data-phase="Recover"><span>no record</span></div></div><div class="rs-mr"><div class="rs-role"><b>Authorised electrical person</b><small>AWS on-site staff</small></div><div class="rs-mc rs-empty" data-phase="Detect"><span>no record</span></div><div class="rs-mc" data-phase="Contain"><ul><li><a href="#soe-7"><time>2011-08-07 11:54 PDT</time></a>Synchronised generators by hand</li></ul></div><div class="rs-mc rs-empty" data-phase="Recover"><span>no record</span></div></div><div class="rs-mr"><div class="rs-role"><b>Operations lead</b><small>AWS EC2 operations</small></div><div class="rs-mc rs-empty" data-phase="Detect"><span>no record</span></div><div class="rs-mc" data-phase="Contain"><ul><li><a href="#soe-8"><time>2011-08-07 12:00 PDT</time></a>Disabled launches in the zone and removed failed management servers</li></ul></div><div class="rs-mc rs-empty" data-phase="Recover"><span>no record</span></div></div><div class="rs-mr"><div class="rs-role"><b>Service recovery lead</b><small>AWS EBS and RDS teams</small></div><div class="rs-mc rs-empty" data-phase="Detect"><span>no record</span></div><div class="rs-mc rs-empty" data-phase="Contain"><span>no record</span></div><div class="rs-mc" data-phase="Recover"><ul><li><a href="#soe-12"><time>2011-08-07 night, Dublin (time not stated)</time></a>Added EBS capacity with servers from another zone</li></ul></div></div><div class="rs-mr"><div class="rs-role"><b>Communications lead</b><small>AWS Service Health Dashboard and Support</small></div><div class="rs-mc rs-empty" data-phase="Detect"><span>no record</span></div><div class="rs-mc" data-phase="Contain"><ul><li><a href="#soe-10"><time>2011-08-07 (time not stated)</time></a>Updated the dashboard often and staffed up Support</li></ul></div><div class="rs-mc rs-empty" data-phase="Recover"><span>no record</span></div></div></div>
+        <h3 class="rs-h">Role by role</h3>
+        <p class="rs-cap">Recorded actions / playbook actions per role. A role with 0 recorded actions does not appear in the sources.</p>
+        <div class="rs-roles"><div class="rs-tabs" role="tablist" aria-label="Roles" aria-orientation="vertical"><button type="button" role="tab" id="rs-tab-utility" aria-controls="rs-p-utility" aria-selected="true" tabindex="0">Utility / grid operator<span class="rs-tc">1/0</span></button><button type="button" role="tab" id="rs-tab-electrical" aria-controls="rs-p-electrical" aria-selected="false" tabindex="-1">Authorised electrical person<span class="rs-tc">1/5</span></button><button type="button" role="tab" id="rs-tab-ops-lead" aria-controls="rs-p-ops-lead" aria-selected="false" tabindex="-1">Operations lead<span class="rs-tc">1/6</span></button><button type="button" role="tab" id="rs-tab-service-recovery" aria-controls="rs-p-service-recovery" aria-selected="false" tabindex="-1">Service recovery lead<span class="rs-tc">1/6</span></button><button type="button" role="tab" id="rs-tab-comms" aria-controls="rs-p-comms" aria-selected="false" tabindex="-1">Communications lead<span class="rs-tc">1/3</span></button><button type="button" role="tab" id="rs-tab-vendor" aria-controls="rs-p-vendor" aria-selected="false" tabindex="-1">Vendor / upstream provider<span class="rs-tc">0/1</span></button></div><div class="rs-panels"><section class="rs-panel" role="tabpanel" id="rs-p-utility" aria-labelledby="rs-tab-utility">
+  <p class="rs-who"><b>The utility (ESB Networks per DCK), not named in the AWS summary</b> — External owner of the supply: switching at the substation, load shedding, restoration.</p>
+  <h3>On the record</h3><ol class="rs-rec"><li><a href="#soe-1"><time>2011-08-07 10:41 PDT</time></a><span>Lost the transformer that fed much of the zone<q>The utility&#x27;s 110 kV 10 MW transformer fails</q></span></li></ol>
+  <h3>Playbook <small>analyst guidance by failure mode, not a record of what happened</small></h3>
+  <div class="rs-modepb rs-rolepb"></div>
+</section><section class="rs-panel" role="tabpanel" id="rs-p-electrical" aria-labelledby="rs-tab-electrical" data-rs-hidden>
+  <p class="rs-who"><b>AWS on-site staff</b> — Switching, isolation and lock-out of power sources, and safe re-energisation.</p>
+  <h3>On the record</h3><ol class="rs-rec"><li><a href="#soe-7"><time>2011-08-07 11:54 PDT</time></a><span>Synchronised generators by hand<q>manually phase-synchronising the power sources</q></span></li></ol>
+  <h3>Playbook <small>analyst guidance by failure mode, not a record of what happened</small></h3>
+  <div class="rs-modepb rs-rolepb"><div class="rs-mp"><span class="rs-mp-ph">Prevent</span><ul><li><a class="rs-fm" href="#FM-01">FM-01</a>Test generator paralleling with the primary controller failed, on a schedule<span class="rs-basis" title="Standard for Emergency and Standby Power Systems">NFPA 110</span><span class="rs-basis rs-basis-ev" title="Correct the isolation of the primary PLC and deploy a cold, environmentally isolated backup PLC with vendors (Committed, &#x27;as rapidly as possible&#x27; (completion not reported))">Correction of errors #1</span></li><li><a class="rs-fm" href="#FM-02">FM-02</a>Give network gear its own protected supply and first place in restoration<span class="rs-basis" title="Uptime Institute Tier Standard: Operational Sustainability — staffing, procedures, maintenance, drills">Uptime OS</span><span class="rs-basis rs-basis-ev" title="Analyst recommendation (not in the summary): test generator paralleling with the PLC failed, and give network gear its own protected supply priority.">Improvement #6</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Detect</span><ul><li><a class="rs-fm" href="#FM-01">FM-01</a>Alarm when generators run but their breakers stay open<span class="rs-basis" title="Standard for Emergency and Standby Power Systems">NFPA 110</span><span class="rs-basis rs-basis-ev" title="A generator-synchronising PLC did not complete connecting part of the generators, believed to be due to a large ground fault (AWS summary).">Contributing factor #2</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Contain</span><ul><li><a class="rs-fm" href="#FM-01">FM-01</a>Synchronise generators by hand onto the bus using a drilled procedure<span class="rs-basis" title="Standard for Electrical Safety in the Workplace — energised work, isolation, lock-out">NFPA 70E</span><span class="rs-basis rs-basis-ev" title="Manual phase synchronisation of backup generators (Done during the event, from 11:54 PDT)">Correction of errors #7</span></li><li><a class="rs-fm" href="#FM-02">FM-02</a>Switch restored generator capacity to network gear before compute<span class="rs-basis" title="Uptime Institute Tier Standard: Operational Sustainability — staffing, procedures, maintenance, drills">Uptime OS</span><span class="rs-basis rs-basis-ev" title="Network gear needs power as surely as servers: restored instances were useless for two hours while the network stayed dark.">Lesson #2</span></li></ul></div></div>
+</section><section class="rs-panel" role="tabpanel" id="rs-p-ops-lead" aria-labelledby="rs-tab-ops-lead" data-rs-hidden>
+  <p class="rs-who"><b>AWS EC2 operations</b> — Technical lead who diagnoses and drives the fix; the subject-matter expert at the keyboard or the switchboard.</p>
+  <h3>On the record</h3><ol class="rs-rec"><li><a href="#soe-8"><time>2011-08-07 12:00 PDT</time></a><span>Disabled launches in the zone and removed failed management servers<q>EC2 launches are disabled in the affected zone</q></span></li></ol>
+  <h3>Playbook <small>analyst guidance by failure mode, not a record of what happened</small></h3>
+  <div class="rs-modepb rs-rolepb"><div class="rs-mp"><span class="rs-mp-ph">Prevent</span><ul><li><a class="rs-fm" href="#FM-03">FM-03</a>Fail requests for an unreachable zone at once instead of queuing them<span class="rs-basis" title="Google SRE: Managing Incidents — incident commander, operations, communications and planning roles; declare early">SRE incident mgmt</span><span class="rs-basis rs-basis-ev" title="Better load balancing to take failed API management hosts out of service quickly (Committed (completion not reported))">Correction of errors #2</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Detect</span><ul><li><a class="rs-fm" href="#FM-04">FM-04</a>Alert when spare capacity falls below what pending re-mirrors need<span class="rs-basis" title="Google SRE: Managing Incidents — incident commander, operations, communications and planning roles; declare early">SRE incident mgmt</span><span class="rs-basis rs-basis-ev" title="Spare EBS capacity was too small for re-mirroring at this scale, and night-time logistics delayed extra servers (AWS summary).">Contributing factor #6</span></li><li><a class="rs-fm" href="#FM-03">FM-03</a>Alert on per-zone API error rate and queue depth<span class="rs-basis" title="Google SRE: Managing Incidents — incident commander, operations, communications and planning roles; declare early">SRE incident mgmt</span><span class="rs-basis rs-basis-ev" title="EC2 management servers kept routing to the dead zone and queued launches for it, overloading the regional API (AWS summary).">Contributing factor #5</span></li><li><a class="rs-fm" href="#FM-05">FM-05</a>Alert on any Multi-AZ pair whose failover passes a few minutes<span class="rs-basis" title="Google SRE: Managing Incidents — incident commander, operations, communications and planning roles; declare early">SRE incident mgmt</span><span class="rs-basis rs-basis-ev" title="A DNS connectivity issue and a software bug delayed failover of some RDS Multi-AZ databases (AWS summary).">Contributing factor #8</span></li><li><a class="rs-fm" href="#FM-02">FM-02</a>Track which network devices have power while generators come back<span class="rs-basis" title="Google SRE: Managing Incidents — incident commander, operations, communications and planning roles; declare early">SRE incident mgmt</span><span class="rs-basis rs-basis-ev" title="The zone&#x27;s network gear lost power too, so instances that regained power stayed unreachable until 13:49 (AWS summary).">Contributing factor #4</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Recover</span><ul><li><a class="rs-fm" href="#FM-01">FM-01</a>Restore network gear first so powered instances can be reached<span class="rs-basis" title="Uptime Institute Tier Standard: Operational Sustainability — staffing, procedures, maintenance, drills">Uptime OS</span><span class="rs-basis rs-basis-ev" title="Network gear needs power as surely as servers: restored instances were useless for two hours while the network stayed dark.">Lesson #2</span></li></ul></div></div>
+</section><section class="rs-panel" role="tabpanel" id="rs-p-service-recovery" aria-labelledby="rs-tab-service-recovery" data-rs-hidden>
+  <p class="rs-who"><b>AWS EBS and RDS teams</b> — Restores customer service: failover, workload moves, capacity, backlog drain.</p>
+  <h3>On the record</h3><ol class="rs-rec"><li><a href="#soe-12"><time>2011-08-07 night, Dublin (time not stated)</time></a><span>Added EBS capacity with servers from another zone<q>trucks servers in from another zone</q></span></li></ol>
+  <h3>Playbook <small>analyst guidance by failure mode, not a record of what happened</small></h3>
+  <div class="rs-modepb rs-rolepb"><div class="rs-mp"><span class="rs-mp-ph">Prevent</span><ul><li><a class="rs-fm" href="#FM-04">FM-04</a>Size re-mirroring spare for a full zone loss, or recover volumes in place<span class="rs-basis" title="Contingency planning for information systems — backup, alternate site, recovery">NIST SP 800-34</span><span class="rs-basis rs-basis-ev" title="Recover EBS volumes directly on the servers after power returns instead of via S3 snapshots (Committed (completion not reported))">Correction of errors #4</span></li><li><a class="rs-fm" href="#FM-05">FM-05</a>Remove DNS from the failover health-check path<span class="rs-basis" title="Google SRE: Managing Incidents — incident commander, operations, communications and planning roles; declare early">SRE incident mgmt</span><span class="rs-basis rs-basis-ev" title="RDS: health checks robust to DNS issues, fix the failover bug, and let the healthy member retry instead of waiting for an engineer (Committed (completion not reported))">Correction of errors #5</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Contain</span><ul><li><a class="rs-fm" href="#FM-04">FM-04</a>Bring in spare servers from other zones as soon as the shortfall shows<span class="rs-basis" title="Business continuity management systems">ISO 22301</span><span class="rs-basis rs-basis-ev" title="Add EBS capacity with extra labour and servers trucked from another zone (Done during the event)">Correction of errors #9</span></li><li><a class="rs-fm" href="#FM-03">FM-03</a>Disable launches in the failed zone and drain its management hosts<span class="rs-basis" title="Google SRE: Managing Incidents — incident commander, operations, communications and planning roles; declare early">SRE incident mgmt</span><span class="rs-basis rs-basis-ev" title="Disable launches in the affected zone and remove the failed management servers (Done during the event, 12:00 PDT)">Correction of errors #8</span></li><li><a class="rs-fm" href="#FM-05">FM-05</a>Decide promotion by hand for pairs the automation cannot settle<span class="rs-basis" title="Incident management and major-incident practice">ITIL 4</span><span class="rs-basis rs-basis-ev" title="RDS: health checks robust to DNS issues, fix the failover bug, and let the healthy member retry instead of waiting for an engineer (Committed (completion not reported))">Correction of errors #5</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Recover</span><ul><li><a class="rs-fm" href="#FM-02">FM-02</a>Bring instances back once the network path is verified<span class="rs-basis" title="Google SRE: Managing Incidents — incident commander, operations, communications and planning roles; declare early">SRE incident mgmt</span><span class="rs-basis rs-basis-ev" title="Network gear needs power as surely as servers: restored instances were useless for two hours while the network stayed dark.">Lesson #2</span></li></ul></div></div>
+</section><section class="rs-panel" role="tabpanel" id="rs-p-comms" aria-labelledby="rs-tab-comms" data-rs-hidden>
+  <p class="rs-who"><b>AWS Service Health Dashboard and Support</b> — Status page, customer notices, regulators and press; one voice, timed updates.</p>
+  <h3>On the record</h3><ol class="rs-rec"><li><a href="#soe-10"><time>2011-08-07 (time not stated)</time></a><span>Updated the dashboard often and staffed up Support<q>AWS posts frequent Service Health Dashboard updates</q></span></li></ol>
+  <h3>Playbook <small>analyst guidance by failure mode, not a record of what happened</small></h3>
+  <div class="rs-modepb rs-rolepb"><div class="rs-mp"><span class="rs-mp-ph">Recover</span><ul><li><a class="rs-fm" href="#FM-04">FM-04</a>Give each customer the state of each volume and how to use its recovery snapshot<span class="rs-basis" title="Incident management and major-incident practice">ITIL 4</span><span class="rs-basis rs-basis-ev" title="Communication: staff Support faster, expose per-resource impairment through the APIs, clearer recovery-snapshot instructions (Committed; impairment tools expected within months)">Correction of errors #6</span></li><li><a class="rs-fm" href="#FM-03">FM-03</a>Tell customers healthy zones are open for launches<span class="rs-basis" title="Incident management and major-incident practice">ITIL 4</span><span class="rs-basis rs-basis-ev" title="Customers running independently in several zones saw no interruption.">Lesson #6</span></li><li><a class="rs-fm" href="#FM-05">FM-05</a>Point Single-AZ customers to point-in-time restore from backups<span class="rs-basis" title="Incident management and major-incident practice">ITIL 4</span><span class="rs-basis rs-basis-ev" title="Customers running independently in several zones saw no interruption.">Lesson #6</span></li></ul></div></div>
+</section><section class="rs-panel" role="tabpanel" id="rs-p-vendor" aria-labelledby="rs-tab-vendor" data-rs-hidden>
+  <p class="rs-who"><b>The PLC supplier, not named</b> — Third party whose product, service or network sits in the failure path.</p>
+  <h3>On the record</h3><p class="rs-gap">No action by this role appears in the sources.</p>
+  <h3>Playbook <small>analyst guidance by failure mode, not a record of what happened</small></h3>
+  <div class="rs-modepb rs-rolepb"><div class="rs-mp"><span class="rs-mp-ph">Recover</span><ul><li><a class="rs-fm" href="#FM-01">FM-01</a>Analyse the PLC with the supplier before returning it to automatic duty<span class="rs-basis" title="Uptime Institute Tier Standard: Operational Sustainability — staffing, procedures, maintenance, drills">Uptime OS</span><span class="rs-basis rs-basis-ev" title="Correct the isolation of the primary PLC and deploy a cold, environmentally isolated backup PLC with vendors (Committed, &#x27;as rapidly as possible&#x27; (completion not reported))">Correction of errors #1</span></li></ul></div></div>
+</section></div></div>
+        </section>
+        <section class="inc-sec" id="fmea" aria-labelledby="h-fmea">
+        <h2 id="h-fmea">Failure mode &amp; effects analysis (FMEA)</h2>
+        <p class="fm-scope">The zone&#x27;s utility-to-generator transfer (paralleling PLC, UPS ride-through, network gear power) and the AWS recovery path (EC2 regional API, EBS re-mirroring and recovery snapshots, RDS Multi-AZ failover), from AWS&#x27;s summary.</p>
+        <p class="metabar fm-meta"><span><b>5</b> failure modes</span><span class="sep">/</span><span><b>1</b> high priority</span><span class="sep">/</span><span><b>4 of 5</b> with a published action</span><span class="sep">/</span><span>total RPN <b>591 → 408</b> (−31%)</span></p>
+        <div class="fm-sim" data-fm-sim>
+            <div class="fm-replay" hidden></div>
+            <div class="fm-scn" hidden></div>
+            <div class="fm-viz">
+                <figure class="fm-fig"><figcaption class="fm-pb-cap">RPN = S × O × D, worst first. Thin bar: after the published action.</figcaption><div class="fm-pb" role="list" data-scale="200" aria-label="Risk priority number per failure mode, before and after corrective action"><div class="fm-pb-row" role="listitem" data-id="FM-01" data-prio="high" title="FM-01 The PLC does not complete connecting a portion of the generators"><span class="fm-pb-id">FM-01</span><span class="fm-pb-track"><i class="fm-pb-bar" style="transform:scaleX(0.945);background:var(--red)"></i><i class="fm-pb-rev" style="transform:scaleX(0.540)"></i></span><span class="fm-pb-val">189 → 108</span></div><div class="fm-pb-row" role="listitem" data-id="FM-04" data-prio="medium" title="FM-04 Spare capacity runs out during re-mirroring, and volumes that lost every replica need slow recovery snapshots via S3"><span class="fm-pb-id">FM-04</span><span class="fm-pb-track"><i class="fm-pb-bar" style="transform:scaleX(0.720);background:var(--amber)"></i><i class="fm-pb-rev" style="transform:scaleX(0.630)"></i></span><span class="fm-pb-val">144 → 126</span></div><div class="fm-pb-row" role="listitem" data-id="FM-03" data-prio="low" title="FM-03 Management servers keep routing to the dead zone and queue launches for it, overloading the region"><span class="fm-pb-id">FM-03</span><span class="fm-pb-track"><i class="fm-pb-bar" style="transform:scaleX(0.480);background:var(--green)"></i><i class="fm-pb-rev" style="transform:scaleX(0.270)"></i></span><span class="fm-pb-val">96 → 54</span></div><div class="fm-pb-row" role="listitem" data-id="FM-05" data-prio="low" title="FM-05 A DNS issue blocks the health check, and a software bug stretches failover for some pairs"><span class="fm-pb-id">FM-05</span><span class="fm-pb-track"><i class="fm-pb-bar" style="transform:scaleX(0.450);background:var(--green)"></i><i class="fm-pb-rev" style="transform:scaleX(0.240)"></i></span><span class="fm-pb-val">90 → 48</span></div><div class="fm-pb-row" role="listitem" data-id="FM-02" data-prio="medium" title="FM-02 Network gear loses power with the servers and comes back two hours after the first generators"><span class="fm-pb-id">FM-02</span><span class="fm-pb-track"><i class="fm-pb-bar" style="transform:scaleX(0.360);background:var(--amber)"></i><i class="fm-pb-none">no published action</i></span><span class="fm-pb-val">72</span></div><div class="fm-pb-axis" aria-hidden="true"><span></span><span class="fm-pb-ticks"><span>0</span><span>100</span><span>200</span></span><span></span></div></div></figure>
+                <figure class="fm-fig fm-fig-m"><figcaption>Severity × occurrence. Lines bound the medium and high zones.</figcaption><svg class="fm-matrix" viewBox="0 0 360 330" role="img" aria-label="Criticality matrix, severity against occurrence"><rect class="fm-c" x="44" y="266" width="28" height="28"/><rect class="fm-c" x="72" y="266" width="28" height="28"/><rect class="fm-c" x="100" y="266" width="28" height="28"/><rect class="fm-c" x="128" y="266" width="28" height="28"/><rect class="fm-c" x="156" y="266" width="28" height="28"/><rect class="fm-c" x="184" y="266" width="28" height="28"/><rect class="fm-c" x="212" y="266" width="28" height="28"/><rect class="fm-c" x="240" y="266" width="28" height="28"/><rect class="fm-c" x="268" y="266" width="28" height="28"/><rect class="fm-c" x="296" y="266" width="28" height="28"/><rect class="fm-c" x="44" y="238" width="28" height="28"/><rect class="fm-c" x="72" y="238" width="28" height="28"/><rect class="fm-c" x="100" y="238" width="28" height="28"/><rect class="fm-c" x="128" y="238" width="28" height="28"/><rect class="fm-c" x="156" y="238" width="28" height="28"/><rect class="fm-c" x="184" y="238" width="28" height="28"/><rect class="fm-c" x="212" y="238" width="28" height="28"/><rect class="fm-c" x="240" y="238" width="28" height="28"/><rect class="fm-c" x="268" y="238" width="28" height="28"/><rect class="fm-c" x="296" y="238" width="28" height="28"/><rect class="fm-c" x="44" y="210" width="28" height="28"/><rect class="fm-c" x="72" y="210" width="28" height="28"/><rect class="fm-c" x="100" y="210" width="28" height="28"/><rect class="fm-c" x="128" y="210" width="28" height="28"/><rect class="fm-c" x="156" y="210" width="28" height="28"/><rect class="fm-c" x="184" y="210" width="28" height="28"/><rect class="fm-c" x="212" y="210" width="28" height="28"/><rect class="fm-c" x="240" y="210" width="28" height="28"/><rect class="fm-c" x="268" y="210" width="28" height="28"/><rect class="fm-c" x="296" y="210" width="28" height="28"/><rect class="fm-c" x="44" y="182" width="28" height="28"/><rect class="fm-c" x="72" y="182" width="28" height="28"/><rect class="fm-c" x="100" y="182" width="28" height="28"/><rect class="fm-c" x="128" y="182" width="28" height="28"/><rect class="fm-c" x="156" y="182" width="28" height="28"/><rect class="fm-c" x="184" y="182" width="28" height="28"/><rect class="fm-c" x="212" y="182" width="28" height="28"/><rect class="fm-c" x="240" y="182" width="28" height="28"/><rect class="fm-c" x="268" y="182" width="28" height="28"/><rect class="fm-c" x="296" y="182" width="28" height="28"/><rect class="fm-c" x="44" y="154" width="28" height="28"/><rect class="fm-c" x="72" y="154" width="28" height="28"/><rect class="fm-c" x="100" y="154" width="28" height="28"/><rect class="fm-c" x="128" y="154" width="28" height="28"/><rect class="fm-c" x="156" y="154" width="28" height="28"/><rect class="fm-c" x="184" y="154" width="28" height="28"/><rect class="fm-c" x="212" y="154" width="28" height="28"/><rect class="fm-c" x="240" y="154" width="28" height="28"/><rect class="fm-c" x="268" y="154" width="28" height="28"/><rect class="fm-c" x="296" y="154" width="28" height="28"/><rect class="fm-c" x="44" y="126" width="28" height="28"/><rect class="fm-c" x="72" y="126" width="28" height="28"/><rect class="fm-c" x="100" y="126" width="28" height="28"/><rect class="fm-c" x="128" y="126" width="28" height="28"/><rect class="fm-c" x="156" y="126" width="28" height="28"/><rect class="fm-c" x="184" y="126" width="28" height="28"/><rect class="fm-c" x="212" y="126" width="28" height="28"/><rect class="fm-c" x="240" y="126" width="28" height="28"/><rect class="fm-c" x="268" y="126" width="28" height="28"/><rect class="fm-c" x="296" y="126" width="28" height="28"/><rect class="fm-c" x="44" y="98" width="28" height="28"/><rect class="fm-c" x="72" y="98" width="28" height="28"/><rect class="fm-c" x="100" y="98" width="28" height="28"/><rect class="fm-c" x="128" y="98" width="28" height="28"/><rect class="fm-c" x="156" y="98" width="28" height="28"/><rect class="fm-c" x="184" y="98" width="28" height="28"/><rect class="fm-c" x="212" y="98" width="28" height="28"/><rect class="fm-c" x="240" y="98" width="28" height="28"/><rect class="fm-c" x="268" y="98" width="28" height="28"/><rect class="fm-c" x="296" y="98" width="28" height="28"/><rect class="fm-c" x="44" y="70" width="28" height="28"/><rect class="fm-c" x="72" y="70" width="28" height="28"/><rect class="fm-c" x="100" y="70" width="28" height="28"/><rect class="fm-c" x="128" y="70" width="28" height="28"/><rect class="fm-c" x="156" y="70" width="28" height="28"/><rect class="fm-c" x="184" y="70" width="28" height="28"/><rect class="fm-c" x="212" y="70" width="28" height="28"/><rect class="fm-c" x="240" y="70" width="28" height="28"/><rect class="fm-c" x="268" y="70" width="28" height="28"/><rect class="fm-c" x="296" y="70" width="28" height="28"/><rect class="fm-c" x="44" y="42" width="28" height="28"/><rect class="fm-c" x="72" y="42" width="28" height="28"/><rect class="fm-c" x="100" y="42" width="28" height="28"/><rect class="fm-c" x="128" y="42" width="28" height="28"/><rect class="fm-c" x="156" y="42" width="28" height="28"/><rect class="fm-c" x="184" y="42" width="28" height="28"/><rect class="fm-c" x="212" y="42" width="28" height="28"/><rect class="fm-c" x="240" y="42" width="28" height="28"/><rect class="fm-c" x="268" y="42" width="28" height="28"/><rect class="fm-c" x="296" y="42" width="28" height="28"/><rect class="fm-c" x="44" y="14" width="28" height="28"/><rect class="fm-c" x="72" y="14" width="28" height="28"/><rect class="fm-c" x="100" y="14" width="28" height="28"/><rect class="fm-c" x="128" y="14" width="28" height="28"/><rect class="fm-c" x="156" y="14" width="28" height="28"/><rect class="fm-c" x="184" y="14" width="28" height="28"/><rect class="fm-c" x="212" y="14" width="28" height="28"/><rect class="fm-c" x="240" y="14" width="28" height="28"/><rect class="fm-c" x="268" y="14" width="28" height="28"/><rect class="fm-c" x="296" y="14" width="28" height="28"/><path class="fm-zone" d="M268 266h28M296 266h28M184 238h28M212 238h28M268 238v28M240 238h28M184 210v28M156 210h28M296 210h28M156 182v28M128 182h28M240 182h28M296 182v28M268 182h28M128 154v28M100 154h28M240 154v28M212 154h28M100 126v28M212 126v28M184 126h28M100 98v28M184 98v28M156 98h28M44 70h28M100 70v28M72 70h28M100 70h28M156 70v28M128 70h28"/><text class="vz-tick" x="58.0" y="308" text-anchor="middle">1</text><text class="vz-tick" x="36" y="284.0" text-anchor="end">1</text><text class="vz-tick" x="86.0" y="308" text-anchor="middle">2</text><text class="vz-tick" x="36" y="256.0" text-anchor="end">2</text><text class="vz-tick" x="114.0" y="308" text-anchor="middle">3</text><text class="vz-tick" x="36" y="228.0" text-anchor="end">3</text><text class="vz-tick" x="142.0" y="308" text-anchor="middle">4</text><text class="vz-tick" x="36" y="200.0" text-anchor="end">4</text><text class="vz-tick" x="170.0" y="308" text-anchor="middle">5</text><text class="vz-tick" x="36" y="172.0" text-anchor="end">5</text><text class="vz-tick" x="198.0" y="308" text-anchor="middle">6</text><text class="vz-tick" x="36" y="144.0" text-anchor="end">6</text><text class="vz-tick" x="226.0" y="308" text-anchor="middle">7</text><text class="vz-tick" x="36" y="116.0" text-anchor="end">7</text><text class="vz-tick" x="254.0" y="308" text-anchor="middle">8</text><text class="vz-tick" x="36" y="88.0" text-anchor="end">8</text><text class="vz-tick" x="282.0" y="308" text-anchor="middle">9</text><text class="vz-tick" x="36" y="60.0" text-anchor="end">9</text><text class="vz-tick" x="310.0" y="308" text-anchor="middle">10</text><text class="vz-tick" x="36" y="32.0" text-anchor="end">10</text><text class="vz-axis" x="184" y="328" text-anchor="middle">Occurrence →</text><text class="vz-axis" transform="translate(11 154) rotate(-90)" text-anchor="middle">Severity →</text><g class="fm-pts"><circle class="fm-pt" data-ids="FM-01" cx="114.0" cy="56.0" r="6" fill="var(--red)"><title>FM-01 The PLC does not complete connecting a portion of the generators (S9 O3 D7)</title></circle><text class="fm-pt-l" x="114.0" y="46.0" text-anchor="middle">01</text><circle class="fm-pt" data-ids="FM-02 FM-04" cx="114.0" cy="84.0" r="6" fill="var(--amber)"><title>FM-02 Network gear loses power with the servers and comes back two hours after the first generators (S8 O3 D3); FM-04 Spare capacity runs out during re-mirroring, and volumes that lost every replica need slow recovery snapshots via S3 (S8 O3 D6)</title></circle><text class="fm-pt-l" x="114.0" y="74.0" text-anchor="middle">02, 04</text><circle class="fm-pt" data-ids="FM-05" cx="114.0" cy="140.0" r="6" fill="var(--green)"><title>FM-05 A DNS issue blocks the health check, and a software bug stretches failover for some pairs (S6 O3 D5)</title></circle><text class="fm-pt-l" x="114.0" y="130.0" text-anchor="middle">05</text><circle class="fm-pt" data-ids="FM-03" cx="142.0" cy="140.0" r="6" fill="var(--green)"><title>FM-03 Management servers keep routing to the dead zone and queue launches for it, overloading the region (S6 O4 D4)</title></circle><text class="fm-pt-l" x="142.0" y="130.0" text-anchor="middle">03</text></g></svg></figure>
+            </div>
+            <div class="fm-wi" hidden></div>
+            <dl class="fm-facts"><div><dt>Caught only after impact<small>D ≥ 8</small></dt><dd>0 of 5</dd></div><div><dt>Actions that cut occurrence<small>O lowered</small></dt><dd>3</dd></div><div><dt>Actions that cut detection<small>D lowered</small></dt><dd>3</dd></div><div><dt>Actions that cut severity<small>S lowered</small></dt><dd>1</dd></div></dl>
+        </div>
+        <script type="application/json" id="fmea-sim-data">{"modes":[{"id":"FM-01","fm":"The PLC does not complete connecting a portion of the generators","item":"Generator paralleling PLC","S":9,"O":3,"D":7,"rev":{"S":9,"O":2,"D":6},"why":{"S":"It took almost all instances in a zone offline: 9.","O":"A controller halting at the moment of demand is uncommon: 'remote to infrequent'.","D":"No recorded test failed the controller with live generators."},"soe":[1]},{"id":"FM-02","fm":"Network gear loses power with the servers and comes back two hours after the first generators","item":"Zone network gear power","S":8,"O":3,"D":3,"rev":null,"why":{"S":"It cut the whole zone off from customers and other zones: 8.","O":"Follows from any full power loss of the zone: 'remote to infrequent'.","D":"Loss of connectivity is visible at once."},"soe":[3,6]},{"id":"FM-03","fm":"Management servers keep routing to the dead zone and queue launches for it, overloading the region","item":"EC2 regional management API","S":6,"O":4,"D":4,"rev":{"S":6,"O":3,"D":3},"why":{"S":"It blocked the workaround (launch elsewhere) for over an hour: 6.","O":"Any zone failure tests this path: 'infrequent'.","D":"Errors were visible within 24 minutes; the fix was manual."},"soe":[5]},{"id":"FM-04","fm":"Spare capacity runs out during re-mirroring, and volumes that lost every replica need slow recovery snapshots via S3","item":"EBS re-mirroring and consistency recovery","S":8,"O":3,"D":6,"rev":{"S":7,"O":3,"D":6},"why":{"S":"Single-zone customers waited up to three days, with no workaround: 8.","O":"Needs a zone-wide power loss: 'remote to infrequent'.","D":"The capacity gap appeared only in the event."},"soe":[10,16]},{"id":"FM-05","fm":"A DNS issue blocks the health check, and a software bug stretches failover for some pairs","item":"RDS Multi-AZ failover","S":6,"O":3,"D":5,"rev":{"S":6,"O":2,"D":4},"why":{"S":"It failed customers who had paid for the multi-zone design: 6.","O":"Needs the DNS issue plus the bug: 'remote to infrequent'.","D":"Health checks detect the failure, but could not complete here."},"soe":[4]}],"soe":[{"t":"2011-08-07 10:41 PDT","ph":"TRIGGER","ev":"The utility's 110 kV 10 MW transformer fails, cutting supply to every customer on it, including a significant portion of one EU West Availability Zone in Dublin."},{"t":"2011-08-07 10:41 PDT","ph":"CASCADE","ev":"One of the PLCs that phase-synchronise the backup generators does not complete connecting a portion of them; AWS believes a large ground fault detected by the PLC stopped it."},{"t":"2011-08-07 (time not stated)","ph":"CASCADE","ev":"UPS batteries drain within minutes; power is lost to almost all EC2 instances and 58% of EBS volumes in the zone."},{"t":"2011-08-07 (time not stated)","ph":"IMPACT","ev":"EC2 networking gear loses power, cutting the zone off from the internet and the other zones; API calls aimed at the zone fail."},{"t":"2011-08-07 (time not stated)","ph":"CASCADE","ev":"A DNS connectivity issue blocks RDS Multi-AZ health checks; DNS returns within 4 minutes and most pairs fail over within 10 more, but a software bug stretches failover for a small subset."},{"t":"2011-08-07 11:05 PDT","ph":"DETECTION","ev":"Launch delays and API errors are seen in all EU West zones: management servers keep routing to the dead zone and queued launch requests overload them."},{"t":"2011-08-07 11:54 PDT","ph":"MITIGATION","ev":"Some backup generators are brought online by manually phase-synchronising the power sources; many instances get power but stay unreachable because most network gear is still dark."},{"t":"2011-08-07 12:00 PDT","ph":"MITIGATION","ev":"EC2 launches are disabled in the affected zone and the failed management servers are removed; launch times in the other zones recover."},{"t":"2011-08-07 13:49 PDT","ph":"RECOVERY","ev":"Enough network devices have power to re-establish connectivity to the zone; many instances and volumes become accessible."},{"t":"2011-08-07 (time not stated)","ph":"MITIGATION","ev":"AWS posts frequent Service Health Dashboard updates and staffs up its Support team for forum and Premium Support contacts."},{"t":"2011-08-07 (time not stated)","ph":"CASCADE","ev":"Re-mirroring of EBS volumes exhausts the zone's spare capacity; many volumes stay stuck waiting for a new replica."},{"t":"2011-08-07 night, Dublin (time not stated)","ph":"RECOVERY","ev":"AWS brings in additional labour and trucks servers in from another zone to add EBS capacity; night-time logistics add delay."},{"t":"2011-08-07 (time not stated)","ph":"CASCADE","ev":"Volumes whose every replica lost power are treated as possibly inconsistent and must be rebuilt as recovery snapshots through S3, a slow process."},{"t":"2011-08-07 (time not stated)","ph":"IMPACT","ev":"Almost all Single-AZ RDS databases in the zone are unavailable; customers without automated backups cannot do a point-in-time restore."},{"t":"2011-08-09 06:04 PDT","ph":"RECOVERY","ev":"About 38% of recovery snapshots for possibly inconsistent volumes are delivered."},{"t":"2011-08-10 02:37 PDT","ph":"RECOVERY","ev":"85% of recovery snapshots are delivered."},{"t":"2011-08-10 20:25 PDT","ph":"RESTORED","ev":"Recovery snapshots are 98% complete; the remaining few need manual attention."}],"rubric":{"S":[[10,"Hazard to people, or loss of the facility / several regions"],[9,"Region-wide or provider-wide outage of a foundational service, no workaround"],[8,"Full outage of a major service for hours"],[7,"Major degradation of a major service"],[6,"Partial outage confined to one zone or one service"],[5,"Customer-visible degradation"],[4,"Limited customer impact"],[3,"Internal impact only"],[2,"Negligible"],[1,"No effect"]],"O":[[10,"Near certain: the cause is present in normal operation"],[8,"Frequent: routine work exercises the cause"],[6,"Occasional: a foreseeable slip or condition, weakly guarded"],[4,"Infrequent: needs an unusual combination"],[2,"Remote: guarded by design"],[1,"Eliminated by design"]],"D":[[10,"No control could detect it"],[9,"Detected only through customer impact"],[8,"Detected after impact by internal monitoring"],[6,"Detected at onset, not prevented"],[4,"Detected before impact with time to act"],[2,"Automated interlock almost certainly stops it"],[1,"Certain to be stopped"]]}}</script>
+        <div class="fm-sheet">
+            <div class="fm-head" aria-hidden="true"><span>ID</span><span>Failure mode</span><span>S·O·D</span><span>RPN</span><span>After</span></div>
+            <details class="fm-row" id="FM-01" data-id="FM-01">
+  <summary>
+    <span class="fm-id-cell">FM-01</span>
+    <span class="fm-mode">The PLC does not complete connecting a portion of the generators<span class="fm-item">Generator paralleling PLC</span></span>
+    <span class="fm-sod" aria-label="Severity 9, occurrence 3, detection 7">9·3·7</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--red)"></i>189</span>
+    <span class="fm-rpn-rev">108</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Synchronise generator phase and close the generators onto the bus after a utility loss</dd>
+      <dt>Effect</dt><dd>Too little generation; UPS drains; most of the zone loses power</dd>
+      <dt>Cause</dt><dd>A large ground fault detected by the PLC, as AWS believes; supplier analysis pending</dd>
+      <dt>Prevention in place</dt><dd>Automatic paralleling with UPS ride-through</dd>
+      <dt>Detection in place</dt><dd>None before the event</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>9</b></dt><dd>It took almost all instances in a zone offline: 9.</dd></div>
+      <div class="fm-sc"><dt>O <b>3</b></dt><dd>A controller halting at the moment of demand is uncommon: &#x27;remote to infrequent&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>7</b></dt><dd>No recorded test failed the controller with live generators.</dd></div>
+    </dl>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Correct PLC isolation and add a cold isolated backup PLC (AWS, committed) <span class="fm-ev-src">Correction of errors #1</span></li></ul>
+    <p class="fm-revline">After action: S9 · O2 · D6 → RPN 108. A backup PLC removes the single point of failure if it works; AWS has not reported deployment.</p>
+    <p class="fm-sub">Who acts — playbook</p><div class="rs-modepb"><div class="rs-mp"><span class="rs-mp-ph">Prevent</span><ul><li><b>Authorised electrical person</b> Test generator paralleling with the primary controller failed, on a schedule<span class="rs-basis" title="Standard for Emergency and Standby Power Systems">NFPA 110</span><span class="rs-basis rs-basis-ev" title="Correct the isolation of the primary PLC and deploy a cold, environmentally isolated backup PLC with vendors (Committed, &#x27;as rapidly as possible&#x27; (completion not reported))">Correction of errors #1</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Detect</span><ul><li><b>Authorised electrical person</b> Alarm when generators run but their breakers stay open<span class="rs-basis" title="Standard for Emergency and Standby Power Systems">NFPA 110</span><span class="rs-basis rs-basis-ev" title="A generator-synchronising PLC did not complete connecting part of the generators, believed to be due to a large ground fault (AWS summary).">Contributing factor #2</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Contain</span><ul><li><b>Authorised electrical person</b> Synchronise generators by hand onto the bus using a drilled procedure<span class="rs-basis" title="Standard for Electrical Safety in the Workplace — energised work, isolation, lock-out">NFPA 70E</span><span class="rs-basis rs-basis-ev" title="Manual phase synchronisation of backup generators (Done during the event, from 11:54 PDT)">Correction of errors #7</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Recover</span><ul><li><b>Vendor / upstream provider</b> Analyse the PLC with the supplier before returning it to automatic duty<span class="rs-basis" title="Uptime Institute Tier Standard: Operational Sustainability — staffing, procedures, maintenance, drills">Uptime OS</span><span class="rs-basis rs-basis-ev" title="Correct the isolation of the primary PLC and deploy a cold, environmentally isolated backup PLC with vendors (Committed, &#x27;as rapidly as possible&#x27; (completion not reported))">Correction of errors #1</span></li><li><b>Operations lead</b> Restore network gear first so powered instances can be reached<span class="rs-basis" title="Uptime Institute Tier Standard: Operational Sustainability — staffing, procedures, maintenance, drills">Uptime OS</span><span class="rs-basis rs-basis-ev" title="Network gear needs power as surely as servers: restored instances were useless for two hours while the network stayed dark.">Lesson #2</span></li></ul></div></div>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://AWS Post-Event Summary 2329B7, Primary Outage" target="_blank" rel="noopener nofollow">Sequence of events #2</a></span><span class="fm-ev-txt">“does not complete connecting a portion of them”</span></li><li><span class="fm-ev-src">Contributing factor #2</span><span class="fm-ev-txt">A generator-synchronising PLC did not complete connecting part of the generators, believed to be due to a large ground fault (AWS summary).</span></li><li><span class="fm-ev-src"><a href="https://aws.amazon.com/message/2329B7/" target="_blank" rel="noopener nofollow">Reference #1 · official-postmortem</a></span><span class="fm-ev-txt">“did not complete the connection of a portion of the generators”</span></li></ul>
+    <button type="button" class="fm-wi-open" data-id="FM-01" hidden>Open in what-if</button>
+  </div>
+</details><details class="fm-row" id="FM-04" data-id="FM-04">
+  <summary>
+    <span class="fm-id-cell">FM-04</span>
+    <span class="fm-mode">Spare capacity runs out during re-mirroring, and volumes that lost every replica need slow recovery snapshots via S3<span class="fm-item">EBS re-mirroring and consistency recovery</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 3, detection 6">8·3·6</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>144</span>
+    <span class="fm-rpn-rev">126</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Restore every volume quickly and safely after a power loss</dd>
+      <dt>Effect</dt><dd>Some customers wait until 10 August for their volumes</dd>
+      <dt>Cause</dt><dd>Recovery capacity and path sized for routine failures, not a zone-wide loss</dd>
+      <dt>Prevention in place</dt><dd>Replication across nodes plus spare capacity</dd>
+      <dt>Detection in place</dt><dd>Seen during recovery</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>Single-zone customers waited up to three days, with no workaround: 8.</dd></div>
+      <div class="fm-sc"><dt>O <b>3</b></dt><dd>Needs a zone-wide power loss: &#x27;remote to infrequent&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>6</b></dt><dd>The capacity gap appeared only in the event.</dd></div>
+    </dl>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Recover volumes in place on the EBS servers (AWS, committed) <span class="fm-ev-src">Correction of errors #4</span></li></ul>
+    <p class="fm-revline">After action: S7 · O3 · D6 → RPN 126. In-place recovery removes the S3 copy and the capacity dependency, which shortens the tail; it is committed but not reported complete.</p>
+    <p class="fm-sub">Who acts — playbook</p><div class="rs-modepb"><div class="rs-mp"><span class="rs-mp-ph">Prevent</span><ul><li><b>Service recovery lead</b> Size re-mirroring spare for a full zone loss, or recover volumes in place<span class="rs-basis" title="Contingency planning for information systems — backup, alternate site, recovery">NIST SP 800-34</span><span class="rs-basis rs-basis-ev" title="Recover EBS volumes directly on the servers after power returns instead of via S3 snapshots (Committed (completion not reported))">Correction of errors #4</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Detect</span><ul><li><b>Operations lead</b> Alert when spare capacity falls below what pending re-mirrors need<span class="rs-basis" title="Google SRE: Managing Incidents — incident commander, operations, communications and planning roles; declare early">SRE incident mgmt</span><span class="rs-basis rs-basis-ev" title="Spare EBS capacity was too small for re-mirroring at this scale, and night-time logistics delayed extra servers (AWS summary).">Contributing factor #6</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Contain</span><ul><li><b>Service recovery lead</b> Bring in spare servers from other zones as soon as the shortfall shows<span class="rs-basis" title="Business continuity management systems">ISO 22301</span><span class="rs-basis rs-basis-ev" title="Add EBS capacity with extra labour and servers trucked from another zone (Done during the event)">Correction of errors #9</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Recover</span><ul><li><b>Communications lead</b> Give each customer the state of each volume and how to use its recovery snapshot<span class="rs-basis" title="Incident management and major-incident practice">ITIL 4</span><span class="rs-basis rs-basis-ev" title="Communication: staff Support faster, expose per-resource impairment through the APIs, clearer recovery-snapshot instructions (Committed; impairment tools expected within months)">Correction of errors #6</span></li></ul></div></div>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://AWS Post-Event Summary 2329B7, Recovering EBS" target="_blank" rel="noopener nofollow">Sequence of events #11</a></span><span class="fm-ev-txt">“exhausts the zone&#x27;s spare capacity”</span></li><li><span class="fm-ev-src"><a href="https://AWS Post-Event Summary 2329B7, Recovering EBS" target="_blank" rel="noopener nofollow">Sequence of events #17</a></span><span class="fm-ev-txt">“98% complete”</span></li><li><span class="fm-ev-src">Contributing factor #6</span><span class="fm-ev-txt">Spare EBS capacity was too small for re-mirroring at this scale, and night-time logistics delayed extra servers (AWS summary).</span></li><li><span class="fm-ev-src">Contributing factor #7</span><span class="fm-ev-txt">Volumes that lost every replica needed recovery snapshots through S3, a slow process for large volumes (AWS summary).</span></li></ul>
+    <button type="button" class="fm-wi-open" data-id="FM-04" hidden>Open in what-if</button>
+  </div>
+</details><details class="fm-row" id="FM-03" data-id="FM-03">
+  <summary>
+    <span class="fm-id-cell">FM-03</span>
+    <span class="fm-mode">Management servers keep routing to the dead zone and queue launches for it, overloading the region<span class="fm-item">EC2 regional management API</span></span>
+    <span class="fm-sod" aria-label="Severity 6, occurrence 4, detection 4">6·4·4</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--green)"></i>96</span>
+    <span class="fm-rpn-rev">54</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Serve launches in healthy zones while one zone is down</dd>
+      <dt>Effect</dt><dd>Launch delays and API errors in every EU West zone until 12:00</dd>
+      <dt>Cause</dt><dd>No fast removal of failed management hosts; requests queued instead of failed</dd>
+      <dt>Prevention in place</dt><dd>Management servers in every zone</dd>
+      <dt>Detection in place</dt><dd>Seen at 11:05 as regional launch delays</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>6</b></dt><dd>It blocked the workaround (launch elsewhere) for over an hour: 6.</dd></div>
+      <div class="fm-sc"><dt>O <b>4</b></dt><dd>Any zone failure tests this path: &#x27;infrequent&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>4</b></dt><dd>Errors were visible within 24 minutes; the fix was manual.</dd></div>
+    </dl>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>Faster removal of failed API management hosts (AWS, committed) <span class="fm-ev-src">Correction of errors #2</span></li><li>Per-zone isolation of control-plane components (AWS, in progress) <span class="fm-ev-src">Correction of errors #3</span></li></ul>
+    <p class="fm-revline">After action: S6 · O3 · D3 → RPN 54. Load balancing and isolation target both the routing and the queue; neither is reported complete.</p>
+    <p class="fm-sub">Who acts — playbook</p><div class="rs-modepb"><div class="rs-mp"><span class="rs-mp-ph">Prevent</span><ul><li><b>Operations lead</b> Fail requests for an unreachable zone at once instead of queuing them<span class="rs-basis" title="Google SRE: Managing Incidents — incident commander, operations, communications and planning roles; declare early">SRE incident mgmt</span><span class="rs-basis rs-basis-ev" title="Better load balancing to take failed API management hosts out of service quickly (Committed (completion not reported))">Correction of errors #2</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Detect</span><ul><li><b>Operations lead</b> Alert on per-zone API error rate and queue depth<span class="rs-basis" title="Google SRE: Managing Incidents — incident commander, operations, communications and planning roles; declare early">SRE incident mgmt</span><span class="rs-basis rs-basis-ev" title="EC2 management servers kept routing to the dead zone and queued launches for it, overloading the regional API (AWS summary).">Contributing factor #5</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Contain</span><ul><li><b>Service recovery lead</b> Disable launches in the failed zone and drain its management hosts<span class="rs-basis" title="Google SRE: Managing Incidents — incident commander, operations, communications and planning roles; declare early">SRE incident mgmt</span><span class="rs-basis rs-basis-ev" title="Disable launches in the affected zone and remove the failed management servers (Done during the event, 12:00 PDT)">Correction of errors #8</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Recover</span><ul><li><b>Communications lead</b> Tell customers healthy zones are open for launches<span class="rs-basis" title="Incident management and major-incident practice">ITIL 4</span><span class="rs-basis rs-basis-ev" title="Customers running independently in several zones saw no interruption.">Lesson #6</span></li></ul></div></div>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://AWS Post-Event Summary 2329B7, Primary Outage" target="_blank" rel="noopener nofollow">Sequence of events #6</a></span><span class="fm-ev-txt">“queued launch requests overload them”</span></li><li><span class="fm-ev-src">Contributing factor #5</span><span class="fm-ev-txt">EC2 management servers kept routing to the dead zone and queued launches for it, overloading the regional API (AWS summary).</span></li><li><span class="fm-ev-src"><a href="https://AWS Post-Event Summary 2329B7" target="_blank" rel="noopener nofollow">Metric #4</a></span><span class="fm-ev-txt">Trigger to EC2 APIs recovered in other zones: 1 hour 19 minutes (12:00 PDT)</span></li></ul>
+    <button type="button" class="fm-wi-open" data-id="FM-03" hidden>Open in what-if</button>
+  </div>
+</details><details class="fm-row" id="FM-05" data-id="FM-05">
+  <summary>
+    <span class="fm-id-cell">FM-05</span>
+    <span class="fm-mode">A DNS issue blocks the health check, and a software bug stretches failover for some pairs<span class="fm-item">RDS Multi-AZ failover</span></span>
+    <span class="fm-sod" aria-label="Severity 6, occurrence 3, detection 5">6·3·5</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--green)"></i>90</span>
+    <span class="fm-rpn-rev">48</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Promote the standby database at once when the primary&#x27;s zone fails</dd>
+      <dt>Effect</dt><dd>A small subset of Multi-AZ databases stays unavailable well beyond the usual minutes</dd>
+      <dt>Cause</dt><dd>Health check depends on DNS; failover bug; cautious split-brain handling needs an engineer</dd>
+      <dt>Prevention in place</dt><dd>Synchronous standby in another zone</dd>
+      <dt>Detection in place</dt><dd>Health checks</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>6</b></dt><dd>It failed customers who had paid for the multi-zone design: 6.</dd></div>
+      <div class="fm-sc"><dt>O <b>3</b></dt><dd>Needs the DNS issue plus the bug: &#x27;remote to infrequent&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>5</b></dt><dd>Health checks detect the failure, but could not complete here.</dd></div>
+    </dl>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li>DNS-robust health checks, failover bug fix and automatic retry for split-brain checks (AWS, committed) <span class="fm-ev-src">Correction of errors #5</span></li></ul>
+    <p class="fm-revline">After action: S6 · O2 · D4 → RPN 48. The bug fix and retry logic target the extended failovers directly; completion not reported.</p>
+    <p class="fm-sub">Who acts — playbook</p><div class="rs-modepb"><div class="rs-mp"><span class="rs-mp-ph">Prevent</span><ul><li><b>Service recovery lead</b> Remove DNS from the failover health-check path<span class="rs-basis" title="Google SRE: Managing Incidents — incident commander, operations, communications and planning roles; declare early">SRE incident mgmt</span><span class="rs-basis rs-basis-ev" title="RDS: health checks robust to DNS issues, fix the failover bug, and let the healthy member retry instead of waiting for an engineer (Committed (completion not reported))">Correction of errors #5</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Detect</span><ul><li><b>Operations lead</b> Alert on any Multi-AZ pair whose failover passes a few minutes<span class="rs-basis" title="Google SRE: Managing Incidents — incident commander, operations, communications and planning roles; declare early">SRE incident mgmt</span><span class="rs-basis rs-basis-ev" title="A DNS connectivity issue and a software bug delayed failover of some RDS Multi-AZ databases (AWS summary).">Contributing factor #8</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Contain</span><ul><li><b>Service recovery lead</b> Decide promotion by hand for pairs the automation cannot settle<span class="rs-basis" title="Incident management and major-incident practice">ITIL 4</span><span class="rs-basis rs-basis-ev" title="RDS: health checks robust to DNS issues, fix the failover bug, and let the healthy member retry instead of waiting for an engineer (Committed (completion not reported))">Correction of errors #5</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Recover</span><ul><li><b>Communications lead</b> Point Single-AZ customers to point-in-time restore from backups<span class="rs-basis" title="Incident management and major-incident practice">ITIL 4</span><span class="rs-basis rs-basis-ev" title="Customers running independently in several zones saw no interruption.">Lesson #6</span></li></ul></div></div>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://AWS Post-Event Summary 2329B7, Impact on Amazon RDS" target="_blank" rel="noopener nofollow">Sequence of events #5</a></span><span class="fm-ev-txt">“a software bug stretches failover for a small subset”</span></li><li><span class="fm-ev-src">Contributing factor #8</span><span class="fm-ev-txt">A DNS connectivity issue and a software bug delayed failover of some RDS Multi-AZ databases (AWS summary).</span></li><li><span class="fm-ev-src"><a href="https://AWS Post-Event Summary 2329B7" target="_blank" rel="noopener nofollow">Metric #6</a></span><span class="fm-ev-txt">RDS DNS connectivity restored: within 4 minutes; most failovers within 10 more</span></li></ul>
+    <button type="button" class="fm-wi-open" data-id="FM-05" hidden>Open in what-if</button>
+  </div>
+</details><details class="fm-row" id="FM-02" data-id="FM-02">
+  <summary>
+    <span class="fm-id-cell">FM-02</span>
+    <span class="fm-mode">Network gear loses power with the servers and comes back two hours after the first generators<span class="fm-item">Zone network gear power</span></span>
+    <span class="fm-sod" aria-label="Severity 8, occurrence 3, detection 3">8·3·3</span>
+    <span class="fm-rpn"><i class="fm-dot" style="background:var(--amber)"></i>72</span>
+    <span class="fm-rpn-rev">—</span>
+  </summary>
+  <div class="fm-body">
+    <dl class="fm-kv">
+      <dt>Function</dt><dd>Keep the zone&#x27;s network reachable through a power event</dd>
+      <dt>Effect</dt><dd>Instances that regained power stay unreachable until 13:49</dd>
+      <dt>Cause</dt><dd>Network gear shared the failed power path; restoration order not stated</dd>
+      <dt>Prevention in place</dt><dd>UPS ride-through only</dd>
+      <dt>Detection in place</dt><dd>Immediate: the zone went dark</dd>
+    </dl>
+    <dl class="fm-scores">
+      <div class="fm-sc"><dt>S <b>8</b></dt><dd>It cut the whole zone off from customers and other zones: 8.</dd></div>
+      <div class="fm-sc"><dt>O <b>3</b></dt><dd>Follows from any full power loss of the zone: &#x27;remote to infrequent&#x27;.</dd></div>
+      <div class="fm-sc"><dt>D <b>3</b></dt><dd>Loss of connectivity is visible at once.</dd></div>
+    </dl>
+    <p class="fm-sub">Corrective action</p>
+    <ul class="fm-acts"><li class="fm-residual">None published — residual risk.</li></ul>
+    
+    <p class="fm-sub">Who acts — playbook</p><div class="rs-modepb"><div class="rs-mp"><span class="rs-mp-ph">Prevent</span><ul><li><b>Authorised electrical person</b> Give network gear its own protected supply and first place in restoration<span class="rs-basis" title="Uptime Institute Tier Standard: Operational Sustainability — staffing, procedures, maintenance, drills">Uptime OS</span><span class="rs-basis rs-basis-ev" title="Analyst recommendation (not in the summary): test generator paralleling with the PLC failed, and give network gear its own protected supply priority.">Improvement #6</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Detect</span><ul><li><b>Operations lead</b> Track which network devices have power while generators come back<span class="rs-basis" title="Google SRE: Managing Incidents — incident commander, operations, communications and planning roles; declare early">SRE incident mgmt</span><span class="rs-basis rs-basis-ev" title="The zone&#x27;s network gear lost power too, so instances that regained power stayed unreachable until 13:49 (AWS summary).">Contributing factor #4</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Contain</span><ul><li><b>Authorised electrical person</b> Switch restored generator capacity to network gear before compute<span class="rs-basis" title="Uptime Institute Tier Standard: Operational Sustainability — staffing, procedures, maintenance, drills">Uptime OS</span><span class="rs-basis rs-basis-ev" title="Network gear needs power as surely as servers: restored instances were useless for two hours while the network stayed dark.">Lesson #2</span></li></ul></div><div class="rs-mp"><span class="rs-mp-ph">Recover</span><ul><li><b>Service recovery lead</b> Bring instances back once the network path is verified<span class="rs-basis" title="Google SRE: Managing Incidents — incident commander, operations, communications and planning roles; declare early">SRE incident mgmt</span><span class="rs-basis rs-basis-ev" title="Network gear needs power as surely as servers: restored instances were useless for two hours while the network stayed dark.">Lesson #2</span></li></ul></div></div><p class="fm-sub">On the record at this failure</p><ul class="rs-at"><li><a href="#soe-7"><time>2011-08-07 11:54 PDT</time></a><b>Authorised electrical person</b> Synchronised generators by hand</li></ul>
+    <p class="fm-sub">Evidence</p>
+    <ul class="fm-ev"><li><span class="fm-ev-src"><a href="https://AWS Post-Event Summary 2329B7, Primary Outage" target="_blank" rel="noopener nofollow">Sequence of events #4</a></span><span class="fm-ev-txt">“EC2 networking gear loses power”</span></li><li><span class="fm-ev-src"><a href="https://AWS Post-Event Summary 2329B7, Primary Outage" target="_blank" rel="noopener nofollow">Sequence of events #7</a></span><span class="fm-ev-txt">“most network gear is still dark”</span></li><li><span class="fm-ev-src">Contributing factor #4</span><span class="fm-ev-txt">The zone&#x27;s network gear lost power too, so instances that regained power stayed unreachable until 13:49 (AWS summary).</span></li></ul>
+    <button type="button" class="fm-wi-open" data-id="FM-02" hidden>Open in what-if</button>
+  </div>
+</details>
+        </div>
+        <details class="fm-method"><summary>Scoring rubric and method</summary><div class="fm-method-body"><p>Scales adapted from IEC 60812:2018 and AIAG-VDA. RPN = S × O × D. High: S ≥ 9 with O ≥ 4 or D ≥ 7, or RPN ≥ 300. Medium: RPN ≥ 120 or S ≥ 7. Severity overrides the product: 9 × 2 × 9 = 162 would otherwise hide a region-wide outage nothing could catch. Quotes are checked verbatim against this dossier; a revised score needs a published action. RZ analyst assessment, not an operator document.</p><div class="fm-rubrics"><div><p class="fm-sub">Severity</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Hazard to people, or loss of the facility / several regions</td></tr><tr><td>9</td><td>Region-wide or provider-wide outage of a foundational service, no workaround</td></tr><tr><td>8</td><td>Full outage of a major service for hours</td></tr><tr><td>7</td><td>Major degradation of a major service</td></tr><tr><td>6</td><td>Partial outage confined to one zone or one service</td></tr><tr><td>5</td><td>Customer-visible degradation</td></tr><tr><td>4</td><td>Limited customer impact</td></tr><tr><td>3</td><td>Internal impact only</td></tr><tr><td>2</td><td>Negligible</td></tr><tr><td>1</td><td>No effect</td></tr></tbody></table></div><div><p class="fm-sub">Occurrence</p><table class="fm-rubric"><tbody><tr><td>10</td><td>Near certain: the cause is present in normal operation</td></tr><tr><td>8</td><td>Frequent: routine work exercises the cause</td></tr><tr><td>6</td><td>Occasional: a foreseeable slip or condition, weakly guarded</td></tr><tr><td>4</td><td>Infrequent: needs an unusual combination</td></tr><tr><td>2</td><td>Remote: guarded by design</td></tr><tr><td>1</td><td>Eliminated by design</td></tr></tbody></table></div><div><p class="fm-sub">Detection</p><table class="fm-rubric"><tbody><tr><td>10</td><td>No control could detect it</td></tr><tr><td>9</td><td>Detected only through customer impact</td></tr><tr><td>8</td><td>Detected after impact by internal monitoring</td></tr><tr><td>6</td><td>Detected at onset, not prevented</td></tr><tr><td>4</td><td>Detected before impact with time to act</td></tr><tr><td>2</td><td>Automated interlock almost certainly stops it</td></tr><tr><td>1</td><td>Certain to be stopped</td></tr></tbody></table></div></div></div></details>
+</section>
+
+        <section class="inc-sec" id="causes" aria-labelledby="h-causes">
+        <h2 id="h-causes">Root cause and contributing factors</h2>
+        <div class="card rc-lead">TRIGGER: at 10:41 PDT on Sunday 7 August 2011 the utility&#x27;s 110 kV 10 MW transformer serving a large part of one AWS EU West Availability Zone in Dublin failed. The utility first blamed lightning and later withdrew that; the cause of the transformer failure is not given.
+
+POWER CHAIN: the generators started, but one of the PLCs that synchronise their phase before closing them onto the bus did not complete the connection of a portion of them.</div><details class="inc-more"><summary>Full root-cause narrative</summary><div class="card">AWS believes a large ground fault detected by the PLC made it stop. With no utility and too few generators online, the UPS batteries drained and almost all EC2 instances and 58% of EBS volumes in the zone lost power, together with the network gear that linked the zone to the internet and the other zones. Staff synchronised generators by hand from 11:54; network connectivity was back at 13:49.
+
+RECOVERY CHAIN: the regional EC2 APIs suffered because management servers kept routing to the dead zone and queued launches for it. EBS re-mirroring exhausted spare capacity, so servers were trucked in at night. Volumes that lost every replica had to be rebuilt as recovery snapshots through S3, which took until 10 August.
+
+LATENT ROOT: a single control device stood between a working generator fleet and the load, and the storage recovery design assumed far fewer simultaneous failures than a full zone power loss produces.</div></details>
+        <h3 class="inc-h3">Contributing factors by category</h3><figure class="inc-fig"><div class="inc-fig-scroll"><div class="inc-fig-svg" style="max-width:648px;min-width:519px"><svg viewBox="0 0 648 320" role="img" aria-labelledby="fb-aws-eu-west-1-dublin-plc-title fb-aws-eu-west-1-dublin-plc-desc" preserveAspectRatio="xMidYMid meet"><title id="fb-aws-eu-west-1-dublin-plc-title">Contributing factors by category — AWS</title><desc id="fb-aws-eu-west-1-dublin-plc-desc">Equipment: PLC halts paralleling; UPS drains fast. Design: Network gear dark; API routes to dead zone; RDS failover bug. Process: Spare capacity short; Snapshot recovery slow. External: Utility transformer fails. Effect: EU West zone dark for days.</desc><defs><marker id="fb-aws-eu-west-1-dublin-plc-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="var(--t2)"/></marker></defs><rect width="648" height="320" fill="var(--bg1)"/><path d="M 186.16860000000003 64 L 186.16860000000003 172" fill="none" stroke="var(--t2)" stroke-width="1" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 176.16860000000003 88 L 185.16860000000003 88" fill="none" stroke="var(--t2)" stroke-width="0.6" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 176.16860000000003 112 L 185.16860000000003 112" fill="none" stroke="var(--t2)" stroke-width="0.6" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 176.16860000000003 136 L 185.16860000000003 136" fill="none" stroke="var(--t2)" stroke-width="0.6" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 374.1686 64 L 374.1686 172" fill="none" stroke="var(--t2)" stroke-width="1" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 364.1686 88 L 373.1686 88" fill="none" stroke="var(--t2)" stroke-width="0.6" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 364.1686 112 L 373.1686 112" fill="none" stroke="var(--t2)" stroke-width="0.6" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 186.16860000000003 256 L 186.16860000000003 172" fill="none" stroke="var(--t2)" stroke-width="1" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 176.16860000000003 196 L 185.16860000000003 196" fill="none" stroke="var(--t2)" stroke-width="0.6" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 176.16860000000003 220 L 185.16860000000003 220" fill="none" stroke="var(--t2)" stroke-width="0.6" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 374.1686 256 L 374.1686 172" fill="none" stroke="var(--t2)" stroke-width="1" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 364.1686 196 L 373.1686 196" fill="none" stroke="var(--t2)" stroke-width="0.6" data-rzd-transit="0" data-rzd-rerouted="0"/><path d="M 32 172 L 422.1686 172" fill="none" stroke="var(--t1)" stroke-width="1.4" marker-end="url(#fb-aws-eu-west-1-dublin-plc-arrow)" data-rzd-transit="0" data-rzd-rerouted="0"/><rect x="422.1686" y="142" width="200" height="40" rx="6" fill="var(--bg1)"/><rect x="422.1686" y="142" width="200" height="40" rx="6" fill="var(--bg3)" stroke="var(--o)" stroke-width="1.4"/><rect x="152.16860000000003" y="24" width="68" height="40" rx="6" fill="var(--bg1)"/><rect x="152.16860000000003" y="24" width="68" height="40" rx="6" fill="var(--bg1)" stroke="var(--bd2)" stroke-width="1"/><rect x="334.1686" y="24" width="80" height="40" rx="6" fill="var(--bg1)"/><rect x="334.1686" y="24" width="80" height="40" rx="6" fill="var(--bg1)" stroke="var(--bd2)" stroke-width="1"/><rect x="140.16860000000003" y="256" width="92" height="40" rx="6" fill="var(--bg1)"/><rect x="140.16860000000003" y="256" width="92" height="40" rx="6" fill="var(--bg1)" stroke="var(--bd2)" stroke-width="1"/><rect x="332.1686" y="256" width="84" height="40" rx="6" fill="var(--bg1)"/><rect x="332.1686" y="256" width="84" height="40" rx="6" fill="var(--bg1)" stroke="var(--bd2)" stroke-width="1"/><text x="522.1686" y="164" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">EU West zone dark for days</text><text x="186.16860000000003" y="46" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Design</text><text x="172.16860000000003" y="92" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="11" font-weight="400" text-anchor="end">Network gear dark</text><text x="172.16860000000003" y="116" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="11" font-weight="400" text-anchor="end">API routes to dead zone</text><text x="172.16860000000003" y="140" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="11" font-weight="400" text-anchor="end">RDS failover bug</text><text x="374.1686" y="46" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Process</text><text x="360.1686" y="92" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="11" font-weight="400" text-anchor="end">Spare capacity short</text><text x="360.1686" y="116" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="11" font-weight="400" text-anchor="end">Snapshot recovery slow</text><text x="186.16860000000003" y="278" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Equipment</text><text x="172.16860000000003" y="200" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="11" font-weight="400" text-anchor="end">PLC halts paralleling</text><text x="172.16860000000003" y="224" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="11" font-weight="400" text-anchor="end">UPS drains fast</text><text x="374.1686" y="278" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">External</text><text x="360.1686" y="200" fill="var(--t1)" font-family="'IBM Plex Sans', system-ui, sans-serif" font-size="11" font-weight="400" text-anchor="end">Utility transformer fails</text></svg></div></div><figcaption>Each short label stands for a contributing factor or failure mode recorded in this dossier; the full sentences are listed below.</figcaption></figure>
+        <ul class="tight"><li>The utility&#x27;s 110 kV 10 MW transformer failed; the utility first cited lightning, then said it was not lightning (AWS summary; DCK).</li><li>A generator-synchronising PLC did not complete connecting part of the generators, believed to be due to a large ground fault (AWS summary).</li><li>UPS batteries gave only a short ride-through and drained before generators could be synchronised by hand (AWS summary).</li><li>The zone&#x27;s network gear lost power too, so instances that regained power stayed unreachable until 13:49 (AWS summary).</li><li>EC2 management servers kept routing to the dead zone and queued launches for it, overloading the regional API (AWS summary).</li><li>Spare EBS capacity was too small for re-mirroring at this scale, and night-time logistics delayed extra servers (AWS summary).</li><li>Volumes that lost every replica needed recovery snapshots through S3, a slow process for large volumes (AWS summary).</li><li>A DNS connectivity issue and a software bug delayed failover of some RDS Multi-AZ databases (AWS summary).</li></ul>
+        <h3 class="inc-h3">Analysis</h3><details class="inc-more"><summary>One controller between the generators and the load</summary><p>The generators started; the PLC that brings them onto the bus did not finish. That turned a routine utility loss into a zone outage. AWS&#x27;s answer, a cold isolated backup PLC, accepts that the controller is itself a <span data-explain="single-point-of-failure" tabindex="0">single point of failure</span>.</p></details><details class="inc-more"><summary>Power returned before service did</summary><p>Generators were online at 11:54 but most network gear stayed dark until 13:49, so powered instances could not be reached. Restoration order matters as much as restoration.</p></details><details class="inc-more"><summary>A zone failure that leaked into the region</summary><p>Management servers in healthy zones kept sending and queuing work for the dead zone, so launches slowed across EU West until AWS removed the failed servers at 12:00.</p></details><details class="inc-more"><summary>The three-day tail</summary><p>EBS spare capacity ran out during re-mirroring, and volumes that lost all replicas had to be rebuilt via S3. Recovery snapshots reached 98% only on the evening of 10 August.</p></details><details class="inc-more"><summary>A second, unrelated failure</summary><p>In the same week an EBS snapshot-cleanup bug deleted blocks still referenced by some snapshots. AWS paused that recovery to fight the power event, then finished it on 8 August.</p></details><details class="inc-more"><summary>Dating the event</summary><p>The summary says only &#x27;August 7th&#x27; and &#x27;Sunday&#x27;. The AWS summaries index lists it under 2014, but 7 August was a Sunday in 2011, not 2014, and Data Center Knowledge reported the outage on 7 August 2011.</p></details>
+        <details class="inc-more"><summary>Technical deep-dive</summary><div class="card">Paralleling <span data-explain="switchgear" tabindex="0">switchgear</span> lets several generators share a bus only once their voltage, frequency and phase match; a PLC decides when to close each breaker. If that PLC halts, perhaps on a ground-fault input as AWS believes, healthy generators run with nowhere to deliver power. Manual synchronisation works but takes time the UPS batteries do not have.
+
+EBS replicates each volume across nodes. When some replicas vanish the survivors block writes until they re-mirror onto spare capacity; a zone-wide event uses up the spare. When all replicas lose power at once, consistency of recent writes cannot be proven, so AWS rebuilt those volumes as recovery snapshots via S3 rather than risk silent corruption. Its fix was to recover volumes in place on the servers.
+
+Separately, an EBS snapshot-cleanup bug, unrelated to the power event, had deleted blocks still referenced by some customer snapshots on 5 August; AWS rebuilt those by 16:19 PDT on 8 August.</div></details>
+        </section>
+
+        <section class="inc-sec" id="actions" aria-labelledby="h-actions">
+        <h2 id="h-actions">Corrective actions and lessons</h2>
+        <h3 class="inc-h3">Correction of errors</h3>
+        <div class="table-wrap"><table class="coe"><thead><tr><th>Action</th><th>Owner</th><th>Status</th></tr></thead><tbody><tr><td>Correct the isolation of the primary PLC and deploy a cold, environmentally isolated backup PLC with vendors</td><td class="c-own">AWS</td><td class="c-st">Committed, &#x27;as rapidly as possible&#x27; (completion not reported)</td></tr><tr><td>Better load balancing to take failed API management hosts out of service quickly</td><td class="c-own">AWS</td><td class="c-st">Committed (completion not reported)</td></tr><tr><td>Further isolate EC2 control-plane components per Availability Zone</td><td class="c-own">AWS</td><td class="c-st">In progress; several more months at the time of the summary</td></tr><tr><td>Recover EBS volumes directly on the servers after power returns instead of via S3 snapshots</td><td class="c-own">AWS</td><td class="c-st">Committed (completion not reported)</td></tr><tr><td>RDS: health checks robust to DNS issues, fix the failover bug, and let the healthy member retry instead of waiting for an engineer</td><td class="c-own">AWS</td><td class="c-st">Committed (completion not reported)</td></tr><tr><td>Communication: staff Support faster, expose per-resource impairment through the APIs, clearer recovery-snapshot instructions</td><td class="c-own">AWS</td><td class="c-st">Committed; impairment tools expected within months</td></tr><tr><td>Manual phase synchronisation of backup generators</td><td class="c-own">AWS on-site staff</td><td class="c-st">Done during the event, from 11:54 PDT</td></tr><tr><td>Disable launches in the affected zone and remove the failed management servers</td><td class="c-own">AWS</td><td class="c-st">Done during the event, 12:00 PDT</td></tr><tr><td>Add EBS capacity with extra labour and servers trucked from another zone</td><td class="c-own">AWS</td><td class="c-st">Done during the event</td></tr><tr><td>Snapshot cleanup: alarm on unusual findings and a longer recoverable holding state before deletion</td><td class="c-own">AWS</td><td class="c-st">Changes made per the summary</td></tr></tbody></table></div>
+        <h3 class="inc-h3">Lessons learnt</h3>
+        <ul class="tight"><li>A generator fleet is only as available as the controller that parallels it. A single PLC must not be able to keep healthy generators off the bus.</li><li>Network gear needs power as surely as servers: restored instances were useless for two hours while the network stayed dark.</li><li>Regional control planes must stop routing to a failed zone at once; queuing work for it spreads the failure to every zone.</li><li>Recovery capacity must be sized for the zone-wide case, not for routine node failures.</li><li>Being conservative about data consistency was right, but the slow recovery path turned a three-hour power event into three days for some customers.</li><li>Customers running independently in several zones saw no interruption.</li></ul>
+        <h3 class="inc-h3">Improvements</h3>
+        <ul class="tight"><li>Power: correct PLC isolation and add a cold, isolated backup PLC (AWS committed).</li><li>Control plane: faster removal of failed API hosts and per-zone isolation (AWS committed / in progress).</li><li>Storage: recover EBS volumes in place after power returns (AWS committed).</li><li>Database: RDS Multi-AZ health checks and edge-case handling (AWS committed).</li><li>Communication: faster Support staffing and per-resource impairment visibility (AWS committed).</li><li>Analyst recommendation (not in the summary): test generator paralleling with the PLC failed, and give network gear its own protected supply priority.</li></ul>
+        </section>
+
+        <section class="inc-sec" id="sources" aria-labelledby="h-sources">
+        <h2 id="h-sources">References and provenance</h2>
+        <ul class="refs"><li><span class="chip green">official-postmortem</span> <span class="rtitle">AWS Post-Event Summary: Summary of the Amazon EC2, Amazon EBS, and Amazon RDS Service Event in the EU West Region</span><span class="rquote">“one of the PLCs did not complete the connection of a portion of the generators”</span><a href="https://aws.amazon.com/message/2329B7/" target="_blank" rel="noopener nofollow">https://aws.amazon.com/message/2329B7/</a></li><li><span class="chip amber">news</span> <span class="rtitle">Data Center Knowledge: Outage in Dublin Knocks Amazon, Microsoft Data Centers Offline (7 Aug 2011)</span><span class="rquote">“lightning was not the cause”</span><a href="https://www.datacenterknowledge.com/hyperscalers/outage-in-dublin-knocks-amazon-microsoft-data-centers-offline" target="_blank" rel="noopener nofollow">https://www.datacenterknowledge.com/hyperscalers/outage-in-dublin-knocks-amazon-microsoft-data-centers-offline</a></li></ul>
+        <p class="disclaimer">Quotes are short, attributed, and for provenance only; the analysis is original. Last verified 2026-11-11.</p>
+        </section>
+        <aside class="share-buttons" aria-label="Share this dossier"><span class="share-label">Share</span><button class="share-btn" onclick="rzShare('li')" aria-label="Share on LinkedIn" title="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 11 0-4.124 2.062 2.062 0 010 4.124zM7.119 20.452H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/></svg></button><button class="share-btn" onclick="rzShare('x')" aria-label="Share on X" title="X"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></button><button class="share-btn" onclick="rzShare('wa')" aria-label="Share on WhatsApp" title="WhatsApp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347M12.05 21.785h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884"/></svg></button><button class="share-btn" onclick="rzShare('copy',this)" aria-label="Copy link" title="Copy link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></aside><script>function rzShare(k,btn){var u=encodeURIComponent(location.href),t=encodeURIComponent(document.title);if(k==="li")open("https://www.linkedin.com/sharing/share-offsite/?url="+u,"_blank","noopener");else if(k==="x")open("https://twitter.com/intent/tweet?url="+u+"&text="+t,"_blank","noopener");else if(k==="wa")open("https://wa.me/?text="+t+"%20"+u,"_blank","noopener");else if(k==="copy"){navigator.clipboard&&navigator.clipboard.writeText(location.href);if(btn){var o=btn.getAttribute("title");btn.setAttribute("title","Copied");setTimeout(function(){btn.setAttribute("title",o);},1500);}}}</script>
+        </div>
+<script>(function(){
+var tl=document.querySelector('.rs-tabs');if(!tl)return;
+var tabs=[].slice.call(tl.querySelectorAll('[role=tab]'));
+function sel(t,focus){tabs.forEach(function(b){var on=b===t;b.setAttribute('aria-selected',on?'true':'false');b.tabIndex=on?0:-1;
+var p=document.getElementById(b.getAttribute('aria-controls'));if(p){if(on)p.removeAttribute('hidden');else p.setAttribute('hidden','');}});if(focus)t.focus();}
+document.querySelectorAll('.rs-panel[data-rs-hidden]').forEach(function(p){p.setAttribute('hidden','');});
+tabs.forEach(function(b,i){b.addEventListener('click',function(){sel(b);});
+b.addEventListener('keydown',function(e){var j=null;if(e.key==='ArrowRight'||e.key==='ArrowDown')j=(i+1)%tabs.length;else if(e.key==='ArrowLeft'||e.key==='ArrowUp')j=(i-1+tabs.length)%tabs.length;else if(e.key==='Home')j=0;else if(e.key==='End')j=tabs.length-1;if(j!==null){e.preventDefault();sel(tabs[j],true);}});});
+})();</script><script>(function(){
+var nav=document.querySelector('.inc-nav');if(!nav||!('IntersectionObserver' in window))return;
+var links={};[].forEach.call(nav.querySelectorAll('a'),function(a){links[a.getAttribute('href').slice(1)]=a;});
+var cur=null;function set(id){if(id===cur||!links[id])return;if(cur&&links[cur])links[cur].removeAttribute('aria-current');links[id].setAttribute('aria-current','true');cur=id;
+var a=links[id],s=nav.querySelector('.inc-nav-in');if(s&&(a.offsetLeft<s.scrollLeft||a.offsetLeft+a.offsetWidth>s.scrollLeft+s.clientWidth))s.scrollLeft=a.offsetLeft-16;}
+var vis={};var io=new IntersectionObserver(function(es){es.forEach(function(e){vis[e.target.id]=e.isIntersecting;});
+var ids=Object.keys(links);for(var i=0;i<ids.length;i++){if(vis[ids[i]]){set(ids[i]);break;}}},{rootMargin:'-120px 0px -55% 0px'});
+Object.keys(links).forEach(function(id){var el=document.getElementById(id);if(el)io.observe(el);});
+})();</script>
+    </main>
+    <footer><div class="footer-grid"></div><span class="ver" id="versionStamp"></span></footer>
+    <div class="root-gate">
+        <div class="root-card">
+            <h2>Root access required</h2>
+            <p>The DC Incidents dossier is a root-only module. Sign in with an authorized account to continue.</p>
+            <div class="root-actions">
+                <button id="rootLoginBtn" type="button">Sign In</button>
+                <a href="index.html">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/rz-version.js?v=20261110-1f1c1f47"></script>
+    <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
+    <script src="auth.js?v=20261031-f01cb5a3" defer></script>
+    <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
+    <script src="js/rz-cookie-consent.js?v=20261017-d2ba826a" defer></script>
+    <script src="js/rz-explain-db.js?v=20261017-52b78d75" defer></script>
+    <script src="js/rz-explain.js?v=20261103-f581e6ac" defer></script>
+    <script>
+    (function(){var t=document.getElementById('themeToggle');function a(theme){document.documentElement.setAttribute('data-theme',theme);localStorage.setItem('theme',theme);var m=document.querySelector('meta[name=\"theme-color\"]');if(m)m.setAttribute('content',theme==='dark'?'#0e0f12':'#f8f9fa');}a(localStorage.getItem('theme')||'dark');if(t)t.addEventListener('click',function(){var c=document.documentElement.getAttribute('data-theme');a(c==='dark'?'light':'dark');});})();
+    (function(){function ag(){if(window._rzAuth&&typeof window._rzAuth.enforceTierFeatureAccess==='function'){window._rzAuth.enforceTierFeatureAccess('dc-incidents');}else{try{var s=JSON.parse(localStorage.getItem('rz_premium_session')||'null');var r=s&&s.role,t=s&&s.tier;var passes=!!s&&(r==='root'||t==='root');document.body.classList.toggle('locked',!passes);}catch(e){document.body.classList.add('locked');}}}var b=document.getElementById('rootLoginBtn');if(b)b.addEventListener('click',function(){if(window._rzAuth&&typeof window._rzAuth.showRootGatePrompt==='function'){window._rzAuth.showRootGatePrompt('Root account required for the DC Incidents dossier.');}else if(window._rzAuth&&typeof window._rzAuth.showModal==='function'){window._rzAuth.showModal();}});window.addEventListener('rz-auth-change',function(){setTimeout(ag,50);});window.addEventListener('storage',function(e){if(e.key==='rz_premium_session')ag();});ag();setTimeout(ag,60);setTimeout(ag,550);setTimeout(ag,1600);})();
+    (function(){var el=document.getElementById('versionStamp');if(!el)return;var v=window.RZ_VERSION||'1.x.x',d=window.RZ_VERSION_DATE||'',cn=window.RZ_VERSION_CODENAME||'';el.textContent='· ResistanceZero · v'+v+(d?' · '+d:'')+(cn?' · '+cn:'')+' ·';})();
+    (function(){var n=0;function sc(){if(window.RZExplain&&window.RZExplain.scanText&&window.RZ_EXPLAIN_DB){var m=document.getElementById('main-content');if(m)window.RZExplain.scanText(m,140);}else if(n++<40){setTimeout(sc,200);}}setTimeout(sc,350);})();
+    </script>
+
+</body>
+</html>

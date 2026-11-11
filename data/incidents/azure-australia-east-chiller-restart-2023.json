@@ -1,0 +1,970 @@
+{
+ "slug": "azure-australia-east-chiller-restart-2023",
+ "title": "Azure Australia East 2023: Voltage Sag, Chillers That Would Not Restart",
+ "operator": "Microsoft Azure",
+ "dcName": "Australia East Availability Zone datacenters, Sydney (not named)",
+ "location": {
+  "city": "Sydney",
+  "country": "Australia",
+  "region": "APAC",
+  "az": "australiaeast"
+ },
+ "date": "2023-08-30",
+ "durationMin": 6330,
+ "category": [
+  "cooling",
+  "power"
+ ],
+ "severity": {
+  "usersAffected": "Customers in one Australia East zone across about 50 Azure services, plus Microsoft 365 and Power Platform; ARM errors worldwide for resource groups homed in the region; AKS in Australia Southeast.",
+  "impactUsd": "Not disclosed",
+  "servicesDown": [
+   "Azure Storage",
+   "Azure SQL Database",
+   "Azure Cosmos DB",
+   "Azure Virtual Machines",
+   "Azure Resource Manager",
+   "Azure Kubernetes Service"
+  ],
+  "tier": "Two data halls in one Availability Zone, with regional and global side effects"
+ },
+ "brief": "On 30 August 2023 a lightning-induced voltage sag tripped chillers at an Azure Australia East zone. A control timing defect kept 13 from restarting; by the time staff reached the last five by hand their water was too hot. Two halls overheated and were shut down. Most VMs were back that night; full recovery took until 3 September.",
+ "magnitude": {
+  "usersScore": 7,
+  "financialScore": 5,
+  "durationScore": 8,
+  "blastRadiusScore": 6,
+  "note": "Two halls in one zone, but about 50 services and global ARM effects. Duration (8): about 4 d 9.5 h from first impact to full mitigation, inside the 3–7 d band; 99% of VMs recovered in about 12 hours."
+ },
+ "sequenceOfEvents": [
+  {
+   "t": "2023-08-30 08:41 UTC",
+   "phase": "TRIGGER",
+   "event": "A lightning strike on electrical infrastructure about 18 miles away causes a utility voltage sag at one Australia East Availability Zone.",
+   "source": "Azure PIR VVTQ-J98, What went wrong"
+  },
+  {
+   "t": "2023-08-30 08:41 UTC",
+   "phase": "CASCADE",
+   "event": "The sag shuts down cooling chillers across multiple datacenters; some restart automatically.",
+   "source": "Azure PIR VVTQ-J98, What went wrong"
+  },
+  {
+   "t": "2023-08-30 08:43 UTC",
+   "phase": "CASCADE",
+   "event": "13 chillers fail to restart automatically and need manual intervention.",
+   "source": "Azure PIR VVTQ-J98, timeline"
+  },
+  {
+   "t": "2023-08-30 08:51 UTC",
+   "phase": "MITIGATION",
+   "event": "Remote resets of the chillers begin.",
+   "source": "Azure PIR VVTQ-J98, timeline"
+  },
+  {
+   "t": "2023-08-30 09:09 UTC",
+   "phase": "MITIGATION",
+   "event": "The onsite team reaches the first group of rooftop chillers and restarts them by hand, moving from one datacenter to the next.",
+   "source": "Azure PIR VVTQ-J98, timeline"
+  },
+  {
+   "t": "2023-08-30 09:45 UTC",
+   "phase": "CASCADE",
+   "event": "The team reaches the final five chillers, but their chilled-water loop is now too hot and the chillers' self-protection blocks a restart; these five cool two adjacent data halls.",
+   "source": "Azure PIR VVTQ-J98, timeline"
+  },
+  {
+   "t": "2023-08-30 10:30 UTC",
+   "phase": "IMPACT",
+   "event": "Networking, compute and storage in the two halls start shutting down automatically as temperatures rise; seven storage scale units are affected.",
+   "source": "Azure PIR VVTQ-J98, What went wrong"
+  },
+  {
+   "t": "2023-08-30 10:47 UTC",
+   "phase": "DETECTION",
+   "event": "Cosmos DB impact is detected by monitoring.",
+   "source": "Azure PIR VVTQ-J98, timeline"
+  },
+  {
+   "t": "2023-08-30 10:48 UTC",
+   "phase": "DETECTION",
+   "event": "First automated communications are sent to Azure Service Health; the public status page follows at 11:30.",
+   "source": "Azure PIR VVTQ-J98, timeline"
+  },
+  {
+   "t": "2023-08-30 10:45–12:25 UTC",
+   "phase": "CASCADE",
+   "event": "Azure Resource Manager availability for the region falls to 88% at its lowest, with a 62% write success rate, affecting customers worldwide whose resource groups live in Australia East.",
+   "source": "Azure PIR VVTQ-J98, ARM"
+  },
+  {
+   "t": "2023-08-30 11:34 UTC",
+   "phase": "MITIGATION",
+   "event": "The onsite team decides to shut down the remaining networking, compute and storage in the two halls remotely, to stop the thermal runaway and protect data.",
+   "source": "Azure PIR VVTQ-J98, timeline"
+  },
+  {
+   "t": "2023-08-30 12:07 UTC",
+   "phase": "MITIGATION",
+   "event": "Failover of eligible Cosmos DB accounts to other regions starts, 33 minutes after the shutdown decision; 95% are failed over by 12:42.",
+   "source": "Azure PIR VVTQ-J98, Cosmos DB"
+  },
+  {
+   "t": "2023-08-30 12:12 UTC",
+   "phase": "RECOVERY",
+   "event": "With the load off, the chilled-water loop cools and the five chillers are restarted by hand.",
+   "source": "Azure PIR VVTQ-J98, timeline"
+  },
+  {
+   "t": "2023-08-30 13:30 UTC",
+   "phase": "RECOVERY",
+   "event": "Data hall temperatures are back within operational thresholds.",
+   "source": "Azure PIR VVTQ-J98, timeline"
+  },
+  {
+   "t": "2023-08-30 14:10 UTC",
+   "phase": "RECOVERY",
+   "event": "A safety walkthrough of both halls is completed; at 14:25 the decision is made to power hardware back up.",
+   "source": "Azure PIR VVTQ-J98, timeline"
+  },
+  {
+   "t": "2023-08-30 15:10 UTC",
+   "phase": "RECOVERY",
+   "event": "Power is restored to all hardware; storage, networking and compute begin coming back from 15:25.",
+   "source": "Azure PIR VVTQ-J98, timeline"
+  },
+  {
+   "t": "2023-08-30 15:30 UTC",
+   "phase": "CASCADE",
+   "event": "Three storage scale units still show fault codes; engineers must check and reset fault-detection logic, slowed by tooling performance and automation wrongly marking recovered nodes unhealthy.",
+   "source": "Azure PIR VVTQ-J98, Storage"
+  },
+  {
+   "t": "2023-08-30 17:00 UTC",
+   "phase": "CASCADE",
+   "event": "All SQL Database tenant rings but one have recovered; in the last ring 20 nodes do not come back.",
+   "source": "Azure PIR VVTQ-J98, SQL Database"
+  },
+  {
+   "t": "2023-08-30 22:40 UTC",
+   "phase": "RECOVERY",
+   "event": "99% of VMs have recovered; the vast majority of services are back.",
+   "source": "Azure PIR VVTQ-J98, timeline"
+  },
+  {
+   "t": "2023-08-31 05:00 UTC",
+   "phase": "RECOVERY",
+   "event": "100% of VMs have recovered.",
+   "source": "Azure PIR VVTQ-J98, timeline"
+  },
+  {
+   "t": "2023-09-01 06:40 UTC",
+   "phase": "RECOVERY",
+   "event": "All standard storage scale units are recovered after hardware troubleshooting and replacement on a few nodes.",
+   "source": "Azure PIR VVTQ-J98, timeline"
+  },
+  {
+   "t": "2023-09-03 20:00 UTC",
+   "phase": "RESTORED",
+   "event": "The final SQL Database tenant ring is evacuated and all customer databases are online.",
+   "source": "Azure PIR VVTQ-J98, timeline"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Chillers that did not restart automatically",
+   "value": "13",
+   "source": "Azure PIR VVTQ-J98"
+  },
+  {
+   "label": "Chillers that could not be restarted in time",
+   "value": "5 (loop water too hot)",
+   "source": "Azure PIR VVTQ-J98"
+  },
+  {
+   "label": "Chiller plant for the two halls",
+   "value": "7 chillers: 5 running + 2 standby; minimum 4 needed",
+   "source": "Azure PIR VVTQ-J98"
+  },
+  {
+   "label": "Sag to first automatic shutdowns",
+   "value": "1 hour 49 minutes (08:41 → 10:30 UTC)",
+   "source": "Azure PIR VVTQ-J98"
+  },
+  {
+   "label": "Sag to chillers restarted",
+   "value": "3 hours 31 minutes (08:41 → 12:12 UTC)",
+   "source": "Azure PIR VVTQ-J98"
+  },
+  {
+   "label": "ARM availability for the region at worst",
+   "value": "88% (62% for writes), 10:45–12:25 UTC",
+   "source": "Azure PIR VVTQ-J98"
+  },
+  {
+   "label": "Storage scale units affected",
+   "value": "7 (5 standard, 2 premium)",
+   "source": "Azure PIR VVTQ-J98"
+  },
+  {
+   "label": "VMs recovered",
+   "value": "35% at 16:00 · 90% at 19:20 · 99% at 22:40 30 Aug · 100% at 05:00 31 Aug UTC",
+   "source": "Azure PIR VVTQ-J98"
+  },
+  {
+   "label": "Full mitigation",
+   "value": "20:00 UTC 3 Sep 2023, about 4 days 9.5 hours after first impact",
+   "source": "Azure PIR VVTQ-J98"
+  }
+ ],
+ "rootCause": "TRIGGER: at 08:41 UTC on 30 August 2023 lightning struck electrical infrastructure about 18 miles from one Australia East Availability Zone in Sydney. The resulting voltage sag shut down cooling chillers across several datacenters.\n\nCOOLING CHAIN: 13 chillers did not restart automatically. Microsoft later traced this to a timing defect in the Chiller Management System, exposed because load growth in the zone had left the chillers in a susceptible operating configuration. The onsite team restarted chillers by hand on the rooftop, moving datacenter by datacenter in adjacent order. By the time they reached the last five, which served two adjacent data halls, the chilled-water loop was too hot and the chillers' self-protection refused to start. The two halls needed at least four chillers out of their seven.\n\nIMPACT CHAIN: equipment began shutting down at 10:30; at 11:34 the team powered down the rest of the two halls to stop the thermal runaway, which let the loop cool and the chillers restart at 12:12. Recovery of storage, one SQL tenant ring and dependent services (Cosmos DB, AKS, ARM) stretched to 3 September.\n\nLATENT ROOT: a control-timing defect that only showed under a voltage dip, a manual restart order that did not protect every hall, and platform services (ARM storage, an AKS queue database, a SQL gateway) not yet zone-redundant inside a region built on zones.",
+ "contributingFactors": [
+  "A lightning-induced utility voltage sag shut down chillers across several datacenters (Azure PIR).",
+  "A timing defect in the Chiller Management System, exposed by load growth, stopped 13 chillers restarting automatically (Azure PIR).",
+  "Manual restarts followed an adjacent, building-by-building order; the last five chillers were reached after their loop water was too hot (Azure PIR).",
+  "Chiller self-protection blocks a restart when the chilled-water loop is too hot (Azure PIR).",
+  "Storage recovery was slowed by fault-detection resets, tooling performance and automation marking healthy nodes unhealthy (Azure PIR).",
+  "Some platform services were not zone-redundant: ARM storage, the AKS operation-queue database and one SQL gateway (Azure PIR).",
+  "One SQL Database tenant ring with 20 failed nodes had to be evacuated completely, extending recovery to 3 September (Azure PIR).",
+  "Cosmos DB failover waited 33 minutes to fail over its control plane, which was already zone-resilient (Azure PIR)."
+ ],
+ "coe": [
+  {
+   "action": "Change control timing logic in the Chiller Management System so voltage dips do not block restarts",
+   "owner": "Microsoft",
+   "status": "Completed"
+  },
+  {
+   "action": "Change the emergency manual-restart order from 'adjacent' to hall 'load based' so every hall keeps partial cooling",
+   "owner": "Microsoft",
+   "status": "Completed"
+  },
+  {
+   "action": "Raise technician staffing at the site as an interim measure",
+   "owner": "Microsoft",
+   "status": "Completed"
+  },
+  {
+   "action": "Storage: optimise large-scale recovery data and troubleshooting guides",
+   "owner": "Microsoft Azure Storage",
+   "status": "Estimated completion December 2023 (completion not reported in the PIR)"
+  },
+  {
+   "action": "Service Fabric and SQL Database: more reliable tenant-ring recovery, auto-failover group criteria, mass migration tooling",
+   "owner": "Microsoft",
+   "status": "Estimated October–December 2023 (completion not reported)"
+  },
+  {
+   "action": "Cosmos DB: faster Service Managed Failover for single-region-write accounts",
+   "owner": "Microsoft",
+   "status": "Estimated November 2023 (completion not reported)"
+  },
+  {
+   "action": "AKS: make operation-queue databases zone-redundant and replace cross-region SQL queues with zone-redundant Service Bus",
+   "owner": "Microsoft",
+   "status": "Estimated September 2023 (completion not reported)"
+  },
+  {
+   "action": "ARM: finish migration to zonally redundant storage",
+   "owner": "Microsoft",
+   "status": "Estimated December 2023 (completion not reported)"
+  },
+  {
+   "action": "Incident management: harden readiness and playbooks for power-down scenarios",
+   "owner": "Microsoft",
+   "status": "Estimated October 2023 (completion not reported)"
+  },
+  {
+   "action": "Remote shutdown of the remaining equipment in the two halls to stop the thermal runaway",
+   "owner": "Onsite datacenter team",
+   "status": "Done during the event, 11:34 UTC"
+  }
+ ],
+ "lessonsLearnt": [
+  "Chiller restart after a voltage dip is a control-logic problem as much as a mechanical one; test restart under real dip profiles as load grows.",
+  "Manual restart order matters: restore some cooling to every hall first, then finish each one.",
+  "Hot loop water locks chillers out; shedding IT load early can be the fastest way to get cooling back.",
+  "Zone redundancy only protects services that use it; internal platform dependencies must meet the same bar as customer guidance.",
+  "Recovery tooling and automation must work when many nodes come back at once and cannot report diagnostics.",
+  "Zone-redundant and multi-region configurations stayed available; locally redundant ones did not."
+ ],
+ "improvements": [
+  "Cooling controls: chiller management timing fix (Microsoft, completed).",
+  "Procedure: load-based emergency restart sequence and interim extra staffing (Microsoft, completed).",
+  "Platform: zone-redundant AKS queues, ARM storage and SQL gateway (Microsoft, scheduled).",
+  "Recovery: storage, SQL and Cosmos DB recovery improvements (Microsoft, scheduled).",
+  "Analyst recommendation (not in the PIR): periodic sag tests of chiller restart at current load, and a chilled-water temperature alarm tied to an early IT load-shed decision."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "Thirteen chillers and one timing defect",
+   "body": "The plant had spare chillers: seven for two halls that needed four. A control-timing defect, exposed by load growth, kept 13 chillers across the site from restarting after the sag, so the spare capacity existed but could not start."
+  },
+  {
+   "heading": "Restart order decided which halls overheated",
+   "body": "The team went building by building. The last five chillers, serving two adjacent halls, were reached after their loop water had become too hot to restart. Microsoft found that a load-based order with the same staff would have prevented impact."
+  },
+  {
+   "heading": "Shedding load to recover cooling",
+   "body": "The 11:34 decision to power down the two halls lowered the heat load, cooled the loop and let the chillers start 38 minutes later. It cost availability but ended the runaway."
+  },
+  {
+   "heading": "Two halls, worldwide effects",
+   "body": "ARM's storage for the region was not yet zone-redundant, so customers anywhere managing resource groups homed in Australia East saw errors, and AKS in Australia Southeast depended on a database in the failed zone."
+  },
+  {
+   "heading": "A four-day tail",
+   "body": "99% of VMs were back the same evening, but a few storage nodes needed hardware replacement and one SQL tenant ring had to be emptied, so full mitigation came on 3 September."
+  }
+ ],
+ "technicalDeepDive": "A chiller tripped by a voltage dip needs a restart; if the controller's timing logic misreads the dip, the restart never happens. Once the loop water warms beyond the chiller's safe entering temperature, the machine locks itself out to avoid damage, so every minute of delay makes the restart harder. Microsoft's fix was to the control timing, plus a new emergency restart order: restart by hall load so every hall keeps some cooling, instead of finishing one building before moving on.\n\nThe platform story is about zone redundancy. Zone-redundant storage, zone-redundant SQL and multi-region Cosmos DB stayed up. Locally redundant storage, a SQL gateway, the AKS operation-queue database and ARM's storage layer were not yet zone-redundant, so a failure of two halls in one zone reached customers in other zones and even other regions.",
+ "references": [
+  {
+   "title": "Azure status history, Post Incident Review VVTQ-J98: Services impacted after power/cooling issue, Australia East",
+   "url": "https://azure.status.microsoft/en-us/status/history/?trackingId=VVTQ-J98",
+   "type": "official-postmortem",
+   "accessed": "2026-11-11",
+   "quote": "the water inside the pump system for these chillers (chilled water loop) had reached temperatures that were too high"
+  },
+  {
+   "title": "Azure Incident Retrospective video VVTQ-J98",
+   "url": "https://aka.ms/AIR/VVTQ-J98",
+   "type": "vendor-status",
+   "accessed": "2026-11-11",
+   "quote": "Azure Incident Retrospective"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": true,
+  "referenceCount": 2,
+  "lastVerified": "2026-11-11",
+  "confidence": "High: from Microsoft's final Post Incident Review with a minute-level timeline. Facility names, equipment makes and cost are not disclosed."
+ },
+ "lastUpdated": "2026-11-11",
+ "operatorShort": "Azure",
+ "fmea": {
+  "scope": "The chiller plant serving the affected halls (restart control, manual restart procedure, thermal protection) and the Azure recovery path and platform zone redundancy, from Microsoft's PIR.",
+  "modes": [
+   {
+    "id": "FM-01",
+    "item": "Chiller Management System restart logic",
+    "function": "Restart chillers automatically after a power disturbance",
+    "failureMode": "A timing defect stops 13 chillers restarting after the voltage sag",
+    "effect": "Cooling capacity lost across several datacenters; manual restarts needed",
+    "cause": "Control timing defect exposed by the operating configuration that load growth had produced",
+    "prevention": "Automatic chiller restart; standby chillers",
+    "detection": "None before the event",
+    "S": 8,
+    "O": 4,
+    "D": 7,
+    "rationale": {
+     "S": "It caused the thermal shutdown of two halls: 8.",
+     "O": "Voltage sags are not rare on a grid; the defect needed one: 'infrequent'.",
+     "D": "The defect depended on load and was not caught by any recorded test."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 2,
+      "quote": "13 chillers fail to restart automatically"
+     },
+     {
+      "src": "factor",
+      "i": 1
+     },
+     {
+      "src": "metric",
+      "i": 0
+     }
+    ],
+    "actions": [
+     {
+      "text": "Control timing fix in the Chiller Management System (completed)",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     }
+    ],
+    "revised": {
+     "S": 8,
+     "O": 2,
+     "D": 6
+    },
+    "revisedRationale": "Microsoft reports the timing fix completed, which addresses the mechanism; detection improves only if restarts are tested under dips.",
+    "short": "Chillers won't restart",
+    "symbol": "chiller",
+    "playbook": [
+     {
+      "role": "mechanical",
+      "phase": "prevent",
+      "do": "Test chiller restart under recorded sag profiles whenever load or configuration changes",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "lesson",
+       "i": 0
+      }
+     },
+     {
+      "role": "mechanical",
+      "phase": "detect",
+      "do": "Alarm within a minute on any chiller that has not restarted after a power event",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "factor",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "contain",
+      "do": "Send technicians to the roof at once with a restart list ordered by hall load",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "recover",
+      "do": "Confirm every hall has its minimum running chillers before standing down",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "factor",
+       "i": 1
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-02",
+    "item": "Manual restart procedure",
+    "function": "Restore cooling to every hall quickly when automatic restart fails",
+    "failureMode": "Restarts follow an adjacent sequence, so the last chillers are reached after their loop is too hot",
+    "effect": "Five chillers cannot restart; two halls overheat",
+    "cause": "Procedure order did not weigh hall load or loop temperature",
+    "prevention": "Onsite technicians and an emergency operating procedure",
+    "detection": "Loop temperature visible, but not tied to the sequence",
+    "S": 8,
+    "O": 4,
+    "D": 5,
+    "rationale": {
+     "S": "Directly led to the two-hall shutdown: 8.",
+     "O": "Applies whenever many chillers trip together: 'infrequent'.",
+     "D": "Loop temperature was measurable but did not change the order."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 5,
+      "quote": "their chilled-water loop is now too hot"
+     },
+     {
+      "src": "factor",
+      "i": 2
+     },
+     {
+      "src": "factor",
+      "i": 3
+     }
+    ],
+    "actions": [
+     {
+      "text": "Load-based restart sequence (completed)",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "text": "Interim extra technician staffing (completed)",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     }
+    ],
+    "revised": {
+     "S": 8,
+     "O": 3,
+     "D": 4
+    },
+    "revisedRationale": "Microsoft judges that the load-based order with existing staff would have prevented impact; both actions are reported complete.",
+    "short": "Wrong restart order",
+    "symbol": "pump",
+    "playbook": [
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Write the emergency restart order by hall load so each hall gets some cooling first",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "mechanical",
+      "phase": "detect",
+      "do": "Watch each loop's water temperature against the chiller lockout limit during restarts",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "factor",
+       "i": 3
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Re-order the restart list as soon as any loop nears lockout",
+      "basis": "nims-ics",
+      "evidence": {
+       "src": "lesson",
+       "i": 1
+      }
+     },
+     {
+      "role": "first-responder",
+      "phase": "recover",
+      "do": "Restart locked-out chillers once the loop has cooled",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "lesson",
+       "i": 2
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-03",
+    "item": "Data hall thermal protection",
+    "function": "Protect hardware and data when cooling cannot keep up",
+    "failureMode": "Equipment shuts down piecemeal from 10:30; full controlled shutdown waits until 11:34",
+    "effect": "Uncontrolled loss of storage and compute, then a full shutdown of two halls",
+    "cause": "Thermal runaway with no early load-shed trigger",
+    "prevention": "Automatic thermal shutdown of hardware",
+    "detection": "Temperature monitoring",
+    "S": 8,
+    "O": 3,
+    "D": 4,
+    "rationale": {
+     "S": "Took two halls of compute and storage offline: 8.",
+     "O": "Needs a cooling loss beyond the standby: 'remote to infrequent'.",
+     "D": "Temperatures were monitored; the shutdown decision came an hour after impact began."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 6,
+      "quote": "start shutting down automatically"
+     },
+     {
+      "src": "soe",
+      "i": 10,
+      "quote": "to stop the thermal runaway"
+     },
+     {
+      "src": "coe",
+      "i": 9
+     }
+    ],
+    "actions": [
+     {
+      "text": "Harden power-down readiness and playbooks (scheduled)",
+      "evidence": {
+       "src": "coe",
+       "i": 8
+      }
+     }
+    ],
+    "revised": {
+     "S": 8,
+     "O": 3,
+     "D": 3
+    },
+    "revisedRationale": "Better power-down playbooks should bring the decision earlier; completion is not reported.",
+    "short": "Late load shed",
+    "symbol": "rack",
+    "playbook": [
+     {
+      "role": "incident-commander",
+      "phase": "prevent",
+      "do": "Set a loop-temperature trigger for an early controlled shutdown",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "lesson",
+       "i": 2
+      }
+     },
+     {
+      "role": "mechanical",
+      "phase": "detect",
+      "do": "Track hall inlet temperature and rate of rise against the allowable envelope",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "coe",
+       "i": 9
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Shut down storage and compute in an order that protects data",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 9
+      }
+     },
+     {
+      "role": "safety",
+      "phase": "recover",
+      "do": "Walk both halls for safety before re-energising",
+      "basis": "nfpa-70e",
+      "evidence": {
+       "src": "lesson",
+       "i": 2
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Power networking and storage before dependent compute",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 4
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-04",
+    "item": "Storage and SQL recovery",
+    "function": "Bring storage and databases back quickly after power returns",
+    "failureMode": "Fault-code resets, slow tooling, wrong health marking and one failed SQL ring stretch recovery to days",
+    "effect": "Some storage accounts until 1 September and databases until 3 September",
+    "cause": "Recovery tooling not built for mass restart; hardware faults on offline nodes hard to diagnose",
+    "prevention": "Automated recovery and Service Fabric ring management",
+    "detection": "Found during recovery",
+    "S": 7,
+    "O": 4,
+    "D": 6,
+    "rationale": {
+     "S": "Days of outage for affected customers: 7.",
+     "O": "Any mass power-down tests this path: 'infrequent'.",
+     "D": "The weaknesses showed only in the event."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 16,
+      "quote": "automation wrongly marking recovered nodes unhealthy"
+     },
+     {
+      "src": "soe",
+      "i": 17,
+      "quote": "in the last ring 20 nodes do not come back"
+     },
+     {
+      "src": "factor",
+      "i": 4
+     },
+     {
+      "src": "factor",
+      "i": 6
+     }
+    ],
+    "actions": [
+     {
+      "text": "Storage large-scale recovery optimisations (scheduled)",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "text": "SQL and Service Fabric ring recovery and migration tooling (scheduled)",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     }
+    ],
+    "revised": {
+     "S": 7,
+     "O": 4,
+     "D": 5
+    },
+    "revisedRationale": "Better guides and tooling shorten diagnosis; completion is not reported, so only a small change is claimed.",
+    "short": "Slow storage recovery",
+    "symbol": "rack",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Rehearse mass restart of storage and database rings",
+      "basis": "nist-800-34",
+      "evidence": {
+       "src": "lesson",
+       "i": 4
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "detect",
+      "do": "Flag automation that marks recovered nodes unhealthy",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "factor",
+       "i": 4
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Move databases off unhealthy nodes early",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Give per-service restoration status through Service Health",
+      "basis": "itil-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-05",
+    "item": "Zone redundancy of platform services",
+    "function": "Keep regional and global control planes up when one zone fails",
+    "failureMode": "ARM storage, the AKS queue database and a SQL gateway are not zone-redundant",
+    "effect": "Management errors worldwide for Australia East resource groups; AKS impact in another region",
+    "cause": "Migrations to zone-redundant designs not finished",
+    "prevention": "Zones with independent power, cooling and network",
+    "detection": "Known migration backlog",
+    "S": 7,
+    "O": 4,
+    "D": 5,
+    "rationale": {
+     "S": "Spread a two-hall failure to other regions and global management: 7.",
+     "O": "Any zone failure exposes it: 'infrequent'.",
+     "D": "The gaps were known but scheduled, not mitigated."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 9,
+      "quote": "falls to 88% at its lowest"
+     },
+     {
+      "src": "factor",
+      "i": 5
+     },
+     {
+      "src": "metric",
+      "i": 5
+     }
+    ],
+    "actions": [
+     {
+      "text": "Zone-redundant AKS queues (scheduled)",
+      "evidence": {
+       "src": "coe",
+       "i": 6
+      }
+     },
+     {
+      "text": "ARM zonally redundant storage (scheduled)",
+      "evidence": {
+       "src": "coe",
+       "i": 7
+      }
+     }
+    ],
+    "revised": {
+     "S": 6,
+     "O": 3,
+     "D": 5
+    },
+    "revisedRationale": "Completing the migrations removes the cross-zone spread; completion is not reported in the PIR.",
+    "short": "Platform not zonal",
+    "symbol": "fabric",
+    "playbook": [
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Hold internal platform services to the same zone-redundancy rule given to customers",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "lesson",
+       "i": 3
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "detect",
+      "do": "Keep a list of single-zone dependencies and review it before each region grows",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "factor",
+       "i": 5
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Fail over multi-region accounts at once instead of waiting on zone-resilient parts",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "factor",
+       "i": 7
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Tell customers which configurations stayed available and why",
+      "basis": "itil-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 5
+      }
+     }
+    ]
+   }
+  ],
+  "impactShort": "Two halls shut · 4 d to full recovery"
+ },
+ "durationStatus": "measured",
+ "durationEvidence": {
+  "onset": {
+   "src": "soe",
+   "i": 6,
+   "quote": "10:30 UTC"
+  },
+  "restored": {
+   "src": "soe",
+   "i": 21,
+   "quote": "20:00 UTC"
+  }
+ },
+ "durationBasis": "First impact 10:30 UTC 30 Aug → full mitigation 20:00 UTC 3 Sep (4 d 9 h 30 min)",
+ "response": {
+  "roles": {
+   "first-responder": "Onsite datacenter team at the chillers",
+   "mechanical": "Microsoft datacenter facilities",
+   "incident-commander": "Not named in the PIR",
+   "ops-lead": "Azure engineering on-call",
+   "service-recovery": "Azure Storage, SQL, Cosmos DB and compute teams",
+   "safety": "Team completing the safety walkthrough",
+   "comms": "Azure Service Health and the status page"
+  },
+  "recorded": [
+   {
+    "role": "first-responder",
+    "soe": 4,
+    "quote": "restarts them by hand",
+    "did": "Restarted chillers by hand on the roof"
+   },
+   {
+    "role": "mechanical",
+    "soe": 3,
+    "quote": "Remote resets of the chillers begin.",
+    "did": "Started remote chiller resets"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 7,
+    "quote": "Cosmos DB impact is detected by monitoring.",
+    "did": "Detected database impact through monitoring"
+   },
+   {
+    "role": "comms",
+    "soe": 8,
+    "quote": "First automated communications are sent to Azure Service Health",
+    "did": "Notified customers through Service Health and the status page"
+   },
+   {
+    "role": "first-responder",
+    "soe": 10,
+    "quote": "The onsite team decides to shut down the remaining networking",
+    "did": "Shut down the two halls to stop the runaway"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 11,
+    "quote": "Failover of eligible Cosmos DB accounts to other regions starts",
+    "did": "Failed eligible database accounts over to other regions"
+   },
+   {
+    "role": "safety",
+    "soe": 14,
+    "quote": "A safety walkthrough of both halls is completed",
+    "did": "Cleared both halls before power-up"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "Two halls shut down for heat",
+  "bones": [
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Chiller timing defect",
+      "factor": 1
+     },
+     {
+      "label": "Hot-loop lockout",
+      "factor": 3
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Adjacent restart order",
+      "factor": 2
+     },
+     {
+      "label": "Slow storage recovery",
+      "factor": 4
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Platform not zonal",
+      "factor": 5
+     },
+     {
+      "label": "SQL ring evacuation",
+      "factor": 6
+     }
+    ]
+   },
+   {
+    "cat": "External",
+    "causes": [
+     {
+      "label": "Lightning voltage sag",
+      "factor": 0
+     }
+    ]
+   }
+  ]
+ }
+}

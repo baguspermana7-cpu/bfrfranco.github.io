@@ -1,0 +1,760 @@
+{
+ "slug": "aws-tokyo-cooling-control-2019",
+ "title": "AWS Tokyo 2019: Cooling Control Failover Bug Overheats Part of a Zone",
+ "operator": "Amazon Web Services",
+ "dcName": "AWS ap-northeast-1 Availability Zone facility (not named)",
+ "location": {
+  "city": "Tokyo",
+  "country": "Japan",
+  "region": "APAC",
+  "az": "ap-northeast-1"
+ },
+ "date": "2019-08-23",
+ "durationMin": 354,
+ "category": [
+  "cooling",
+  "config-error"
+ ],
+ "severity": {
+  "usersAffected": "A small percentage of EC2 servers in one Tokyo zone and the services on them (RDS, Redshift, ElastiCache, WorkSpaces); Region-wide Auto Scaling launch errors for 90 minutes.",
+  "impactUsd": "Not disclosed",
+  "servicesDown": [
+   "Amazon EC2",
+   "Amazon EBS",
+   "EC2 RunInstances (idempotency token)",
+   "EC2 Auto Scaling"
+  ],
+  "tier": "Part of one Availability Zone, with a Region-wide API effect"
+ },
+ "brief": "On 23 August 2019 a bug in third-party cooling-control software hung the control system of an AWS Tokyo zone during a host failover. Air-handler PLCs hung too, so part of the hall lost cooling and even the manual purge failed. Servers overheated from 12:36 JST; cooling was back at 15:21 and most instances by 18:30.",
+ "magnitude": {
+  "usersScore": 5,
+  "financialScore": 4,
+  "durationScore": 5,
+  "blastRadiusScore": 4,
+  "note": "Small share of one zone, plus Region-wide Auto Scaling errors. Duration (5): 5 h 54 min from first shutdowns to most instances back, inside the 4–12 h band."
+ },
+ "sequenceOfEvents": [
+  {
+   "t": "2019-08-23 before 12:36 JST",
+   "phase": "TRIGGER",
+   "event": "The datacenter control system that runs the cooling plant is failing away from one of its control hosts.",
+   "source": "AWS Post-Event Summary 56489, root cause"
+  },
+  {
+   "t": "2019-08-23 before 12:36 JST",
+   "phase": "TRIGGER",
+   "event": "During the failover a bug in third-party control logic causes excessive interactions with the field devices, and the control system becomes unresponsive.",
+   "source": "AWS Post-Event Summary 56489, root cause"
+  },
+  {
+   "t": "2019-08-23 before 12:36 JST",
+   "phase": "CASCADE",
+   "event": "In a small portion of the datacenter the cooling does not go to its safe maximum-cooling mode and instead shuts down, because the PLCs on some air handling units have also stopped responding.",
+   "source": "AWS Post-Event Summary 56489, root cause"
+  },
+  {
+   "t": "2019-08-23 (time not stated)",
+   "phase": "MITIGATION",
+   "event": "Operators try to bypass the control system and put the affected areas into purge mode to exhaust hot air; purge also fails.",
+   "source": "AWS Post-Event Summary 56489, root cause"
+  },
+  {
+   "t": "2019-08-23 12:36 JST",
+   "phase": "IMPACT",
+   "event": "Temperatures rise and a small percentage of EC2 servers in one Availability Zone shut down from overheating; instances are impaired and EBS performance degrades.",
+   "source": "AWS Post-Event Summary 56489, summary"
+  },
+  {
+   "t": "2019-08-23 (time not stated)",
+   "phase": "DETECTION",
+   "event": "With the control system down, the operations team has minimum visibility into the state of the cooling systems.",
+   "source": "AWS Post-Event Summary 56489, root cause"
+  },
+  {
+   "t": "2019-08-23 13:21 JST",
+   "phase": "CASCADE",
+   "event": "RunInstances calls targeting the zone, and calls using the idempotency token anywhere in the Region, start returning errors; Auto Scaling launches stop.",
+   "source": "AWS Post-Event Summary 56489, API impact"
+  },
+  {
+   "t": "2019-08-23 (time not stated)",
+   "phase": "MITIGATION",
+   "event": "The team manually investigates and resets every affected piece of equipment and sets it to maximum cooling.",
+   "source": "AWS Post-Event Summary 56489, root cause"
+  },
+  {
+   "t": "2019-08-23 (time not stated)",
+   "phase": "MITIGATION",
+   "event": "The unresponsive air-handler PLCs are found and reset.",
+   "source": "AWS Post-Event Summary 56489, root cause"
+  },
+  {
+   "t": "2019-08-23 14:51 JST",
+   "phase": "RECOVERY",
+   "event": "Engineers resolve the idempotency-token issue; Auto Scaling launches work again.",
+   "source": "AWS Post-Event Summary 56489, API impact"
+  },
+  {
+   "t": "2019-08-23 15:21 JST",
+   "phase": "RECOVERY",
+   "event": "The affected cooling systems are restored and temperatures start to fall.",
+   "source": "AWS Post-Event Summary 56489, summary"
+  },
+  {
+   "t": "2019-08-23 (after 15:21 JST)",
+   "phase": "RECOVERY",
+   "event": "As temperatures normalise, power is restored to the affected instances.",
+   "source": "AWS Post-Event Summary 56489, summary"
+  },
+  {
+   "t": "2019-08-23 16:05 JST",
+   "phase": "RECOVERY",
+   "event": "The EC2 control-plane subsystem in the zone is restored and new launches there succeed.",
+   "source": "AWS Post-Event Summary 56489, API impact"
+  },
+  {
+   "t": "2019-08-23 18:30 JST",
+   "phase": "RESTORED",
+   "event": "The vast majority of affected instances and volumes have recovered.",
+   "source": "AWS Post-Event Summary 56489, summary"
+  },
+  {
+   "t": "2019-08-23 onward (time not stated)",
+   "phase": "IMPACT",
+   "event": "Instances and volumes on hardware damaged by the power loss and heat take longer; some have to be retired.",
+   "source": "AWS Post-Event Summary 56489, summary"
+  },
+  {
+   "t": "2019-08-28 JST",
+   "phase": "IMPACT",
+   "event": "AWS reports isolated cases where multi-zone applications also saw errors, such as Application Load Balancer used with WAF or sticky sessions returning a high share of Internal Server Errors.",
+   "source": "AWS Post-Event Summary 56489, update of 28 Aug"
+  },
+  {
+   "t": "2019-08-28 JST",
+   "phase": "MITIGATION",
+   "event": "AWS disables the control-system failover mode that triggered the bug, trains local operations teams on fast reset, and works on letting purge mode bypass the PLCs.",
+   "source": "AWS Post-Event Summary 56489, actions"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "First server shutdowns",
+   "value": "12:36 JST, 23 Aug 2019",
+   "source": "AWS Post-Event Summary 56489"
+  },
+  {
+   "label": "Cooling restored",
+   "value": "15:21 JST, 2 hours 45 minutes after the first shutdowns",
+   "source": "AWS Post-Event Summary 56489"
+  },
+  {
+   "label": "Idempotency-token / Auto Scaling errors",
+   "value": "13:21 → 14:51 JST (1 hour 30 minutes)",
+   "source": "AWS Post-Event Summary 56489"
+  },
+  {
+   "label": "Launches in the zone failing",
+   "value": "until 16:05 JST",
+   "source": "AWS Post-Event Summary 56489"
+  },
+  {
+   "label": "Vast majority recovered",
+   "value": "18:30 JST, 5 hours 54 minutes after the first shutdowns",
+   "source": "AWS Post-Event Summary 56489"
+  },
+  {
+   "label": "Share of servers affected",
+   "value": "a small percentage of EC2 servers in one zone",
+   "source": "AWS Post-Event Summary 56489"
+  }
+ ],
+ "rootCause": "TRIGGER: the datacenter control system that drives fans, chillers and air handlers in one Tokyo Availability Zone was failing away from one of its hosts. A bug in third-party control logic made the failover flood the field devices with interactions, and the control system stopped responding.\n\nCOOLING CHAIN: the design says cooling goes to maximum when the control system fails. In most of the building it did. In a small portion, PLCs on some air handling units had also become unresponsive, so the units shut down instead. The operators' manual fallback, purge mode, also ran through those PLCs and failed. Servers in the hot area powered off from 12:36 JST.\n\nRECOVERY: without the control system the team had little visibility. They reset equipment by hand, found and reset the air-handler PLCs, and cooling was back at 15:21. Most instances were back by 18:30; some on heat-damaged hardware were retired.\n\nLATENT ROOT: the fail-safe and the manual override both depended on the same PLCs, so the same software fault defeated the normal path, the safe default and the bypass.",
+ "contributingFactors": [
+  "A bug in third-party control-system logic, triggered by a host failover, made the control system unresponsive (AWS summary).",
+  "PLCs on some air handling units also became unresponsive, so the units shut down instead of going to maximum cooling (AWS summary).",
+  "Purge mode, the manual bypass, still depended on those PLCs and failed (AWS summary).",
+  "With the control system down the operations team had minimum visibility of the cooling plant (AWS summary).",
+  "The idempotency-token path of RunInstances failed Region-wide, blocking Auto Scaling launches (AWS summary).",
+  "Heat and power loss damaged some hardware, so some instances and volumes had to be retired (AWS summary)."
+ ],
+ "coe": [
+  {
+   "action": "Disable the control-system failover mode that triggered the bug",
+   "owner": "AWS",
+   "status": "Done per the summary"
+  },
+  {
+   "action": "Work with third-party vendors to understand the bug in the control system and PLCs",
+   "owner": "AWS with vendors",
+   "status": "In progress at the time of the summary"
+  },
+  {
+   "action": "Train local operations teams to identify and reset this situation quickly",
+   "owner": "AWS",
+   "status": "Done per the summary"
+  },
+  {
+   "action": "Change control of the affected air handling units so purge mode bypasses the PLCs completely",
+   "owner": "AWS",
+   "status": "In progress; already used in newest designs"
+  },
+  {
+   "action": "Manual reset of affected cooling equipment and the air-handler PLCs",
+   "owner": "AWS operations",
+   "status": "Done during the event"
+  },
+  {
+   "action": "Fix of the idempotency-token issue in RunInstances",
+   "owner": "AWS engineers",
+   "status": "Done during the event, 14:51 JST"
+  }
+ ],
+ "lessonsLearnt": [
+  "A fail-safe and its manual override must not share the component most likely to fail with the primary path.",
+  "Control-system failover is a risky moment; test it against the real device population, not a lab.",
+  "Losing the building management system means losing visibility: keep independent temperature and airflow readings.",
+  "Operators need a drilled, fast reset procedure for controllers; AWS now expects to reset before customers notice.",
+  "Multi-zone designs held, but some load-balancer features still showed errors; test multi-zone behaviour under a zone fault."
+ ],
+ "improvements": [
+  "Controls: disable the failover mode that triggered the bug (AWS, done).",
+  "Controls: purge mode that bypasses the PLCs (AWS, in progress).",
+  "Operations: training for fast identification and reset (AWS, done).",
+  "Vendor: root cause of the third-party bug (AWS with vendors, in progress).",
+  "Analyst recommendation (not in the summary): independent temperature monitoring outside the BMS and periodic tests of the cooling fail-safe with the supervisor offline."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "Three layers, one weak point",
+   "body": "Normal control, the fail-safe to maximum cooling, and the manual purge all ran through the same air-handler PLCs. When those hung, every layer failed in the affected area. Redundancy at the control-host level did not help, because the failover itself triggered the bug."
+  },
+  {
+   "heading": "Blind operators",
+   "body": "The control system was also the operators' window into the plant. Recovery meant walking the floor, checking and resetting equipment one by one, which took about two and three-quarter hours."
+  },
+  {
+   "heading": "Small area, real damage",
+   "body": "Only a small share of servers overheated, but some hardware was damaged and instances had to be retired. Heat is not always a clean shutdown."
+  },
+  {
+   "heading": "API side effects",
+   "body": "The idempotency-token path failed Region-wide for 90 minutes and blocked Auto Scaling, the tool customers would use to replace capacity."
+  },
+  {
+   "heading": "What the summary does not say",
+   "body": "It does not name the control-system vendor or the PLC model, the peak temperature, the number of affected servers, or when the purge bypass was finished."
+  }
+ ],
+ "technicalDeepDive": "Building management systems are usually redundant at the server level, but a failover is itself a busy moment: the new host must re-learn the state of every device. Here that resync hit a bug and overwhelmed the devices. The cooling plant's fail-safe (go to maximum cooling on loss of supervisory control) is sound only if the local controllers still act on it. The PLCs on some air handlers had hung, so they neither kept running nor obeyed the purge command. AWS's lasting fix is to wire purge mode around the PLCs entirely, an approach it says its newest designs already use.\n\nThe API symptoms were a separate path: launches using the idempotency token, which Auto Scaling relies on, failed across the Region for 90 minutes while ordinary launches in other zones worked.",
+ "references": [
+  {
+   "title": "AWS Post-Event Summary: Summary of the Amazon EC2 and Amazon EBS Service Event in the Tokyo (AP-NORTHEAST-1) Region",
+   "url": "https://aws.amazon.com/message/56489/",
+   "type": "official-postmortem",
+   "accessed": "2026-11-11",
+   "quote": "The team attempted to activate purge in the affected areas of the datacenter, but this also failed."
+  },
+  {
+   "title": "AWS Post-Event Summaries index",
+   "url": "https://aws.amazon.com/premiumsupport/technology/pes/",
+   "type": "vendor-status",
+   "accessed": "2026-11-11",
+   "quote": "Summary of the Amazon EC2 and Amazon EBS Service Event in the Tokyo (AP-NORTHEAST-1) Region"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": true,
+  "referenceCount": 2,
+  "lastVerified": "2026-11-11",
+  "confidence": "High: all facts from AWS's own summary and its 28 Aug 2019 update. Vendor, PLC model, peak temperature and server counts are not disclosed."
+ },
+ "lastUpdated": "2026-11-11",
+ "operatorShort": "AWS",
+ "fmea": {
+  "scope": "The cooling control chain of the affected Tokyo facility (supervisory control system, air-handler PLCs, purge override) and the EC2 launch path, from AWS's summary.",
+  "modes": [
+   {
+    "id": "FM-01",
+    "item": "Cooling control system failover",
+    "function": "Keep supervisory control of the cooling plant while moving to another control host",
+    "failureMode": "The failover triggers a third-party bug and the control system becomes unresponsive",
+    "effect": "Supervisory control and operator visibility of cooling are lost",
+    "cause": "Bug in third-party control logic during state resync with field devices",
+    "prevention": "Control system on multiple hosts",
+    "detection": "None before the event",
+    "S": 7,
+    "O": 3,
+    "D": 7,
+    "rationale": {
+     "S": "On its own the design should fall back to maximum cooling, so 7; the damage came from FM-02.",
+     "O": "Needs a failover plus the bug: 'remote to infrequent'.",
+     "D": "The bug was in vendor code and unseen in prior failovers."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 1,
+      "quote": "the control system becomes unresponsive"
+     },
+     {
+      "src": "factor",
+      "i": 0
+     },
+     {
+      "src": "factor",
+      "i": 3
+     }
+    ],
+    "actions": [
+     {
+      "text": "Failover mode disabled (AWS, done)",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "text": "Vendor root-cause work (in progress)",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     }
+    ],
+    "revised": {
+     "S": 7,
+     "O": 2,
+     "D": 7
+    },
+    "revisedRationale": "With the triggering failover mode disabled, the known path cannot recur; detection of other bugs is unchanged.",
+    "short": "BMS failover bug",
+    "symbol": "bms",
+    "playbook": [
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Test control-system failover against the full device population before enabling it",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "lesson",
+       "i": 1
+      }
+     },
+     {
+      "role": "mechanical",
+      "phase": "detect",
+      "do": "Keep temperature readings that do not depend on the control system",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "lesson",
+       "i": 2
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Disable the failover mode that triggers the fault until the vendor fixes it",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "mechanical",
+      "phase": "recover",
+      "do": "Reset the control system and confirm every device reports state",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-02",
+    "item": "Air handling unit PLCs",
+    "function": "Hold the air handlers in safe maximum cooling when supervisory control is lost",
+    "failureMode": "The PLCs hang, and their air handlers shut down instead of going to maximum cooling",
+    "effect": "No cooling in part of the zone; servers overheat and shut down",
+    "cause": "Same software interaction left the PLCs unresponsive",
+    "prevention": "Fail-safe to maximum cooling on loss of control",
+    "detection": "Found only during manual investigation",
+    "S": 8,
+    "O": 3,
+    "D": 8,
+    "rationale": {
+     "S": "Servers overheated and some hardware had to be retired: 8.",
+     "O": "Needs FM-01 plus PLC hang: 'remote to infrequent'.",
+     "D": "The hung PLCs were found only by walking the plant."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 2,
+      "quote": "instead shuts down"
+     },
+     {
+      "src": "soe",
+      "i": 8,
+      "quote": "The unresponsive air-handler PLCs are found and reset."
+     },
+     {
+      "src": "factor",
+      "i": 1
+     }
+    ],
+    "actions": [
+     {
+      "text": "Operator training for fast reset (AWS, done)",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     }
+    ],
+    "revised": {
+     "S": 8,
+     "O": 3,
+     "D": 5
+    },
+    "revisedRationale": "Trained operators should find and reset hung PLCs faster; occurrence is unchanged until the vendor bug is fixed.",
+    "short": "AHU PLCs hang",
+    "symbol": "crah",
+    "playbook": [
+     {
+      "role": "mechanical",
+      "phase": "prevent",
+      "do": "Test the maximum-cooling fail-safe with the supervisor offline, unit by unit",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "mechanical",
+      "phase": "detect",
+      "do": "Alarm on any air handler that stops while supervisory control is down",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "factor",
+       "i": 1
+      }
+     },
+     {
+      "role": "mechanical",
+      "phase": "contain",
+      "do": "Reset hung controllers and force units to maximum cooling by hand",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Shut down workloads in the hot area before servers trip on temperature",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 2
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "recover",
+      "do": "Power servers back only once inlet temperatures are in range",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-03",
+    "item": "Purge mode bypass",
+    "function": "Let operators exhaust hot air quickly when controls malfunction",
+    "failureMode": "Purge cannot be activated because it still runs through the hung PLCs",
+    "effect": "The manual override fails; temperatures keep rising",
+    "cause": "Override path shares the PLCs with normal control",
+    "prevention": "Manual bypass of the control system",
+    "detection": "Found when the operators tried it",
+    "S": 8,
+    "O": 3,
+    "D": 8,
+    "rationale": {
+     "S": "It removed the last defence before servers overheated: 8.",
+     "O": "Fails whenever the PLCs fail: 'remote to infrequent'.",
+     "D": "The dependency was not visible until purge was needed."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 3,
+      "quote": "purge also fails"
+     },
+     {
+      "src": "ref",
+      "i": 0,
+      "quote": "this also failed"
+     },
+     {
+      "src": "factor",
+      "i": 2
+     }
+    ],
+    "actions": [
+     {
+      "text": "Purge mode that bypasses the PLCs completely (AWS, in progress)",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     }
+    ],
+    "revised": {
+     "S": 8,
+     "O": 2,
+     "D": 5
+    },
+    "revisedRationale": "A purge path independent of the PLCs removes the shared dependency; completion in the Tokyo facility is not reported.",
+    "short": "Purge fails too",
+    "symbol": "valve",
+    "playbook": [
+     {
+      "role": "mechanical",
+      "phase": "prevent",
+      "do": "Wire the purge override so it does not pass through the controllers it backs up",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "detect",
+      "do": "Drill the purge override periodically and record whether it actually moves air",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "lesson",
+       "i": 0
+      }
+     },
+     {
+      "role": "mechanical",
+      "phase": "contain",
+      "do": "Open the area to purge by hard-wired controls as soon as temperatures rise",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Check hardware exposed to heat before returning it to service",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "factor",
+       "i": 5
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-04",
+    "item": "RunInstances idempotency path",
+    "function": "Let customers and Auto Scaling launch replacement capacity safely",
+    "failureMode": "Launches using the idempotency token fail across the Region",
+    "effect": "Auto Scaling cannot replace lost capacity for 90 minutes",
+    "cause": "Not detailed in the summary",
+    "prevention": "Regional API design",
+    "detection": "Error rates visible from 13:21",
+    "S": 6,
+    "O": 3,
+    "D": 4,
+    "rationale": {
+     "S": "It blocked the standard way to recover capacity elsewhere: 6.",
+     "O": "Needs a zone fault exposing this dependency: 'remote to infrequent'.",
+     "D": "Errors were visible at once; the fix took 90 minutes."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 6,
+      "quote": "Auto Scaling launches stop"
+     },
+     {
+      "src": "metric",
+      "i": 2
+     },
+     {
+      "src": "factor",
+      "i": 4
+     }
+    ],
+    "actions": [
+     {
+      "text": "Idempotency-token issue fixed during the event (AWS)",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     }
+    ],
+    "short": "Auto Scaling blocked",
+    "symbol": "fabric",
+    "playbook": [
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Make sure the token path does not depend on any single zone",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "factor",
+       "i": 4
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "detect",
+      "do": "Alert on launch errors by request type, not only overall",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "factor",
+       "i": 4
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Restore the token path first so Auto Scaling can replace capacity",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Tell customers when Auto Scaling launches work again",
+      "basis": "itil-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     }
+    ]
+   }
+  ],
+  "impactShort": "Part of a zone overheats · 5 h 54 min"
+ },
+ "durationStatus": "measured",
+ "durationEvidence": {
+  "onset": {
+   "src": "soe",
+   "i": 4,
+   "quote": "12:36 JST"
+  },
+  "restored": {
+   "src": "soe",
+   "i": 13,
+   "quote": "18:30 JST"
+  }
+ },
+ "durationBasis": "First server shutdowns 12:36 JST → vast majority recovered 18:30 JST (5 h 54 min)",
+ "response": {
+  "roles": {
+   "mechanical": "AWS datacenter operations team",
+   "ops-lead": "AWS engineers",
+   "service-recovery": "AWS EC2 and EBS teams",
+   "vendor": "Third-party control-system and PLC vendors, not named",
+   "comms": "AWS, Post-Event Summary and update"
+  },
+  "recorded": [
+   {
+    "role": "mechanical",
+    "soe": 3,
+    "quote": "Operators try to bypass the control system",
+    "did": "Tried to purge hot air; purge failed"
+   },
+   {
+    "role": "mechanical",
+    "soe": 7,
+    "quote": "The team manually investigates and resets every affected piece of equipment",
+    "did": "Reset equipment by hand to maximum cooling"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 9,
+    "quote": "Engineers resolve the idempotency-token issue",
+    "did": "Fixed the launch path used by Auto Scaling"
+   },
+   {
+    "role": "comms",
+    "soe": 15,
+    "quote": "AWS reports isolated cases where multi-zone applications also saw errors",
+    "did": "Updated the summary with multi-zone side effects"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "Tokyo zone servers overheat",
+  "bones": [
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "AHU PLCs hang",
+      "factor": 1
+     },
+     {
+      "label": "Hardware damaged by heat",
+      "factor": 5
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Purge runs via PLCs",
+      "factor": 2
+     },
+     {
+      "label": "Token path Region-wide",
+      "factor": 4
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Operators blind",
+      "factor": 3
+     }
+    ]
+   },
+   {
+    "cat": "External",
+    "causes": [
+     {
+      "label": "Vendor control bug",
+      "factor": 0
+     }
+    ]
+   }
+  ]
+ }
+}

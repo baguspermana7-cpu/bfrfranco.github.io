@@ -1,0 +1,901 @@
+{
+ "slug": "aws-eu-west-1-dublin-plc-2011",
+ "title": "AWS EU West (Dublin) 2011: Transformer Loss and a Generator PLC Halt",
+ "operator": "Amazon Web Services",
+ "dcName": "AWS EU West Availability Zone, Dublin (facility not named)",
+ "location": {
+  "city": "Dublin",
+  "country": "Ireland",
+  "region": "EMEA",
+  "az": "eu-west-1"
+ },
+ "date": "2011-08-07",
+ "durationMin": 4904,
+ "category": [
+  "power"
+ ],
+ "severity": {
+  "usersAffected": "Almost all EC2 instances and 58% of EBS volumes in one EU West zone; Single-AZ RDS in that zone; regional EC2 launch errors for over an hour.",
+  "impactUsd": "Not disclosed; AWS gave a 10-day 100% credit to customers in the zone",
+  "servicesDown": [
+   "Amazon EC2",
+   "Amazon EBS",
+   "Amazon RDS",
+   "EC2 APIs (EU West)"
+  ],
+  "tier": "Single Availability Zone, with regional API impact"
+ },
+ "brief": "On Sunday 7 August 2011 a utility transformer feeding much of one AWS EU West zone in Dublin failed. A PLC that brings the backup generators onto the bus halted, the UPS drained and the zone went dark. Staff synchronised generators by hand and restored the network by 13:49 PDT, but EBS recovery took until 10 August.",
+ "magnitude": {
+  "usersScore": 6,
+  "financialScore": 5,
+  "durationScore": 8,
+  "blastRadiusScore": 5,
+  "note": "One zone plus regional API impact. Duration (8): about 3 days 10 hours from trigger to 98% of recovery snapshots, inside the 3–7 d band; most instances were back the same day."
+ },
+ "sequenceOfEvents": [
+  {
+   "t": "2011-08-07 10:41 PDT",
+   "phase": "TRIGGER",
+   "event": "The utility's 110 kV 10 MW transformer fails, cutting supply to every customer on it, including a significant portion of one EU West Availability Zone in Dublin.",
+   "source": "AWS Post-Event Summary 2329B7, Primary Outage"
+  },
+  {
+   "t": "2011-08-07 10:41 PDT",
+   "phase": "CASCADE",
+   "event": "One of the PLCs that phase-synchronise the backup generators does not complete connecting a portion of them; AWS believes a large ground fault detected by the PLC stopped it.",
+   "source": "AWS Post-Event Summary 2329B7, Primary Outage"
+  },
+  {
+   "t": "2011-08-07 (time not stated)",
+   "phase": "CASCADE",
+   "event": "UPS batteries drain within minutes; power is lost to almost all EC2 instances and 58% of EBS volumes in the zone.",
+   "source": "AWS Post-Event Summary 2329B7, Primary Outage"
+  },
+  {
+   "t": "2011-08-07 (time not stated)",
+   "phase": "IMPACT",
+   "event": "EC2 networking gear loses power, cutting the zone off from the internet and the other zones; API calls aimed at the zone fail.",
+   "source": "AWS Post-Event Summary 2329B7, Primary Outage"
+  },
+  {
+   "t": "2011-08-07 (time not stated)",
+   "phase": "CASCADE",
+   "event": "A DNS connectivity issue blocks RDS Multi-AZ health checks; DNS returns within 4 minutes and most pairs fail over within 10 more, but a software bug stretches failover for a small subset.",
+   "source": "AWS Post-Event Summary 2329B7, Impact on Amazon RDS"
+  },
+  {
+   "t": "2011-08-07 11:05 PDT",
+   "phase": "DETECTION",
+   "event": "Launch delays and API errors are seen in all EU West zones: management servers keep routing to the dead zone and queued launch requests overload them.",
+   "source": "AWS Post-Event Summary 2329B7, Primary Outage"
+  },
+  {
+   "t": "2011-08-07 11:54 PDT",
+   "phase": "MITIGATION",
+   "event": "Some backup generators are brought online by manually phase-synchronising the power sources; many instances get power but stay unreachable because most network gear is still dark.",
+   "source": "AWS Post-Event Summary 2329B7, Primary Outage"
+  },
+  {
+   "t": "2011-08-07 12:00 PDT",
+   "phase": "MITIGATION",
+   "event": "EC2 launches are disabled in the affected zone and the failed management servers are removed; launch times in the other zones recover.",
+   "source": "AWS Post-Event Summary 2329B7, Primary Outage"
+  },
+  {
+   "t": "2011-08-07 13:49 PDT",
+   "phase": "RECOVERY",
+   "event": "Enough network devices have power to re-establish connectivity to the zone; many instances and volumes become accessible.",
+   "source": "AWS Post-Event Summary 2329B7, Primary Outage"
+  },
+  {
+   "t": "2011-08-07 (time not stated)",
+   "phase": "MITIGATION",
+   "event": "AWS posts frequent Service Health Dashboard updates and staffs up its Support team for forum and Premium Support contacts.",
+   "source": "AWS Post-Event Summary 2329B7, Improving Communication"
+  },
+  {
+   "t": "2011-08-07 (time not stated)",
+   "phase": "CASCADE",
+   "event": "Re-mirroring of EBS volumes exhausts the zone's spare capacity; many volumes stay stuck waiting for a new replica.",
+   "source": "AWS Post-Event Summary 2329B7, Recovering EBS"
+  },
+  {
+   "t": "2011-08-07 night, Dublin (time not stated)",
+   "phase": "RECOVERY",
+   "event": "AWS brings in additional labour and trucks servers in from another zone to add EBS capacity; night-time logistics add delay.",
+   "source": "AWS Post-Event Summary 2329B7, Recovering EBS"
+  },
+  {
+   "t": "2011-08-07 (time not stated)",
+   "phase": "CASCADE",
+   "event": "Volumes whose every replica lost power are treated as possibly inconsistent and must be rebuilt as recovery snapshots through S3, a slow process.",
+   "source": "AWS Post-Event Summary 2329B7, Recovering EBS"
+  },
+  {
+   "t": "2011-08-07 (time not stated)",
+   "phase": "IMPACT",
+   "event": "Almost all Single-AZ RDS databases in the zone are unavailable; customers without automated backups cannot do a point-in-time restore.",
+   "source": "AWS Post-Event Summary 2329B7, Impact on Amazon RDS"
+  },
+  {
+   "t": "2011-08-09 06:04 PDT",
+   "phase": "RECOVERY",
+   "event": "About 38% of recovery snapshots for possibly inconsistent volumes are delivered.",
+   "source": "AWS Post-Event Summary 2329B7, Recovering EBS"
+  },
+  {
+   "t": "2011-08-10 02:37 PDT",
+   "phase": "RECOVERY",
+   "event": "85% of recovery snapshots are delivered.",
+   "source": "AWS Post-Event Summary 2329B7, Recovering EBS"
+  },
+  {
+   "t": "2011-08-10 20:25 PDT",
+   "phase": "RESTORED",
+   "event": "Recovery snapshots are 98% complete; the remaining few need manual attention.",
+   "source": "AWS Post-Event Summary 2329B7, Recovering EBS"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Failed utility transformer",
+   "value": "110 kV, 10 MW",
+   "source": "AWS Post-Event Summary 2329B7"
+  },
+  {
+   "label": "EBS volumes in the zone that lost power",
+   "value": "58%",
+   "source": "AWS Post-Event Summary 2329B7"
+  },
+  {
+   "label": "Trigger to first generators online",
+   "value": "1 hour 13 minutes (10:41 → 11:54 PDT)",
+   "source": "AWS Post-Event Summary 2329B7"
+  },
+  {
+   "label": "Trigger to EC2 APIs recovered in other zones",
+   "value": "1 hour 19 minutes (12:00 PDT)",
+   "source": "AWS Post-Event Summary 2329B7"
+  },
+  {
+   "label": "Trigger to zone connectivity restored",
+   "value": "3 hours 8 minutes (13:49 PDT)",
+   "source": "AWS Post-Event Summary 2329B7"
+  },
+  {
+   "label": "RDS DNS connectivity restored",
+   "value": "within 4 minutes; most failovers within 10 more",
+   "source": "AWS Post-Event Summary 2329B7"
+  },
+  {
+   "label": "Recovery snapshots delivered",
+   "value": "38% by 06:04 9 Aug · 85% by 02:37 10 Aug · 98% by 20:25 10 Aug PDT",
+   "source": "AWS Post-Event Summary 2329B7"
+  },
+  {
+   "label": "Service credit",
+   "value": "10 days at 100% of EBS, EC2 and RDS usage in the zone",
+   "source": "AWS Post-Event Summary 2329B7"
+  }
+ ],
+ "rootCause": "TRIGGER: at 10:41 PDT on Sunday 7 August 2011 the utility's 110 kV 10 MW transformer serving a large part of one AWS EU West Availability Zone in Dublin failed. The utility first blamed lightning and later withdrew that; the cause of the transformer failure is not given.\n\nPOWER CHAIN: the generators started, but one of the PLCs that synchronise their phase before closing them onto the bus did not complete the connection of a portion of them. AWS believes a large ground fault detected by the PLC made it stop. With no utility and too few generators online, the UPS batteries drained and almost all EC2 instances and 58% of EBS volumes in the zone lost power, together with the network gear that linked the zone to the internet and the other zones. Staff synchronised generators by hand from 11:54; network connectivity was back at 13:49.\n\nRECOVERY CHAIN: the regional EC2 APIs suffered because management servers kept routing to the dead zone and queued launches for it. EBS re-mirroring exhausted spare capacity, so servers were trucked in at night. Volumes that lost every replica had to be rebuilt as recovery snapshots through S3, which took until 10 August.\n\nLATENT ROOT: a single control device stood between a working generator fleet and the load, and the storage recovery design assumed far fewer simultaneous failures than a full zone power loss produces.",
+ "contributingFactors": [
+  "The utility's 110 kV 10 MW transformer failed; the utility first cited lightning, then said it was not lightning (AWS summary; DCK).",
+  "A generator-synchronising PLC did not complete connecting part of the generators, believed to be due to a large ground fault (AWS summary).",
+  "UPS batteries gave only a short ride-through and drained before generators could be synchronised by hand (AWS summary).",
+  "The zone's network gear lost power too, so instances that regained power stayed unreachable until 13:49 (AWS summary).",
+  "EC2 management servers kept routing to the dead zone and queued launches for it, overloading the regional API (AWS summary).",
+  "Spare EBS capacity was too small for re-mirroring at this scale, and night-time logistics delayed extra servers (AWS summary).",
+  "Volumes that lost every replica needed recovery snapshots through S3, a slow process for large volumes (AWS summary).",
+  "A DNS connectivity issue and a software bug delayed failover of some RDS Multi-AZ databases (AWS summary)."
+ ],
+ "coe": [
+  {
+   "action": "Correct the isolation of the primary PLC and deploy a cold, environmentally isolated backup PLC with vendors",
+   "owner": "AWS",
+   "status": "Committed, 'as rapidly as possible' (completion not reported)"
+  },
+  {
+   "action": "Better load balancing to take failed API management hosts out of service quickly",
+   "owner": "AWS",
+   "status": "Committed (completion not reported)"
+  },
+  {
+   "action": "Further isolate EC2 control-plane components per Availability Zone",
+   "owner": "AWS",
+   "status": "In progress; several more months at the time of the summary"
+  },
+  {
+   "action": "Recover EBS volumes directly on the servers after power returns instead of via S3 snapshots",
+   "owner": "AWS",
+   "status": "Committed (completion not reported)"
+  },
+  {
+   "action": "RDS: health checks robust to DNS issues, fix the failover bug, and let the healthy member retry instead of waiting for an engineer",
+   "owner": "AWS",
+   "status": "Committed (completion not reported)"
+  },
+  {
+   "action": "Communication: staff Support faster, expose per-resource impairment through the APIs, clearer recovery-snapshot instructions",
+   "owner": "AWS",
+   "status": "Committed; impairment tools expected within months"
+  },
+  {
+   "action": "Manual phase synchronisation of backup generators",
+   "owner": "AWS on-site staff",
+   "status": "Done during the event, from 11:54 PDT"
+  },
+  {
+   "action": "Disable launches in the affected zone and remove the failed management servers",
+   "owner": "AWS",
+   "status": "Done during the event, 12:00 PDT"
+  },
+  {
+   "action": "Add EBS capacity with extra labour and servers trucked from another zone",
+   "owner": "AWS",
+   "status": "Done during the event"
+  },
+  {
+   "action": "Snapshot cleanup: alarm on unusual findings and a longer recoverable holding state before deletion",
+   "owner": "AWS",
+   "status": "Changes made per the summary"
+  }
+ ],
+ "lessonsLearnt": [
+  "A generator fleet is only as available as the controller that parallels it. A single PLC must not be able to keep healthy generators off the bus.",
+  "Network gear needs power as surely as servers: restored instances were useless for two hours while the network stayed dark.",
+  "Regional control planes must stop routing to a failed zone at once; queuing work for it spreads the failure to every zone.",
+  "Recovery capacity must be sized for the zone-wide case, not for routine node failures.",
+  "Being conservative about data consistency was right, but the slow recovery path turned a three-hour power event into three days for some customers.",
+  "Customers running independently in several zones saw no interruption."
+ ],
+ "improvements": [
+  "Power: correct PLC isolation and add a cold, isolated backup PLC (AWS committed).",
+  "Control plane: faster removal of failed API hosts and per-zone isolation (AWS committed / in progress).",
+  "Storage: recover EBS volumes in place after power returns (AWS committed).",
+  "Database: RDS Multi-AZ health checks and edge-case handling (AWS committed).",
+  "Communication: faster Support staffing and per-resource impairment visibility (AWS committed).",
+  "Analyst recommendation (not in the summary): test generator paralleling with the PLC failed, and give network gear its own protected supply priority."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "One controller between the generators and the load",
+   "body": "The generators started; the PLC that brings them onto the bus did not finish. That turned a routine utility loss into a zone outage. AWS's answer, a cold isolated backup PLC, accepts that the controller is itself a single point of failure."
+  },
+  {
+   "heading": "Power returned before service did",
+   "body": "Generators were online at 11:54 but most network gear stayed dark until 13:49, so powered instances could not be reached. Restoration order matters as much as restoration."
+  },
+  {
+   "heading": "A zone failure that leaked into the region",
+   "body": "Management servers in healthy zones kept sending and queuing work for the dead zone, so launches slowed across EU West until AWS removed the failed servers at 12:00."
+  },
+  {
+   "heading": "The three-day tail",
+   "body": "EBS spare capacity ran out during re-mirroring, and volumes that lost all replicas had to be rebuilt via S3. Recovery snapshots reached 98% only on the evening of 10 August."
+  },
+  {
+   "heading": "A second, unrelated failure",
+   "body": "In the same week an EBS snapshot-cleanup bug deleted blocks still referenced by some snapshots. AWS paused that recovery to fight the power event, then finished it on 8 August."
+  },
+  {
+   "heading": "Dating the event",
+   "body": "The summary says only 'August 7th' and 'Sunday'. The AWS summaries index lists it under 2014, but 7 August was a Sunday in 2011, not 2014, and Data Center Knowledge reported the outage on 7 August 2011."
+  }
+ ],
+ "technicalDeepDive": "Paralleling switchgear lets several generators share a bus only once their voltage, frequency and phase match; a PLC decides when to close each breaker. If that PLC halts, perhaps on a ground-fault input as AWS believes, healthy generators run with nowhere to deliver power. Manual synchronisation works but takes time the UPS batteries do not have.\n\nEBS replicates each volume across nodes. When some replicas vanish the survivors block writes until they re-mirror onto spare capacity; a zone-wide event uses up the spare. When all replicas lose power at once, consistency of recent writes cannot be proven, so AWS rebuilt those volumes as recovery snapshots via S3 rather than risk silent corruption. Its fix was to recover volumes in place on the servers.\n\nSeparately, an EBS snapshot-cleanup bug, unrelated to the power event, had deleted blocks still referenced by some customer snapshots on 5 August; AWS rebuilt those by 16:19 PDT on 8 August.",
+ "references": [
+  {
+   "title": "AWS Post-Event Summary: Summary of the Amazon EC2, Amazon EBS, and Amazon RDS Service Event in the EU West Region",
+   "url": "https://aws.amazon.com/message/2329B7/",
+   "type": "official-postmortem",
+   "accessed": "2026-11-11",
+   "quote": "one of the PLCs did not complete the connection of a portion of the generators"
+  },
+  {
+   "title": "Data Center Knowledge: Outage in Dublin Knocks Amazon, Microsoft Data Centers Offline (7 Aug 2011)",
+   "url": "https://www.datacenterknowledge.com/hyperscalers/outage-in-dublin-knocks-amazon-microsoft-data-centers-offline",
+   "type": "news",
+   "accessed": "2026-11-11",
+   "quote": "lightning was not the cause"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": true,
+  "referenceCount": 2,
+  "lastVerified": "2026-11-11",
+  "confidence": "High for the sequence (AWS's own summary). The year comes from the weekday in the summary and from DCK's same-day report; the AWS index lists the summary under 2014."
+ },
+ "lastUpdated": "2026-11-11",
+ "operatorShort": "AWS",
+ "fmea": {
+  "scope": "The zone's utility-to-generator transfer (paralleling PLC, UPS ride-through, network gear power) and the AWS recovery path (EC2 regional API, EBS re-mirroring and recovery snapshots, RDS Multi-AZ failover), from AWS's summary.",
+  "modes": [
+   {
+    "id": "FM-01",
+    "item": "Generator paralleling PLC",
+    "function": "Synchronise generator phase and close the generators onto the bus after a utility loss",
+    "failureMode": "The PLC does not complete connecting a portion of the generators",
+    "effect": "Too little generation; UPS drains; most of the zone loses power",
+    "cause": "A large ground fault detected by the PLC, as AWS believes; supplier analysis pending",
+    "prevention": "Automatic paralleling with UPS ride-through",
+    "detection": "None before the event",
+    "S": 9,
+    "O": 3,
+    "D": 7,
+    "rationale": {
+     "S": "It took almost all instances in a zone offline: 9.",
+     "O": "A controller halting at the moment of demand is uncommon: 'remote to infrequent'.",
+     "D": "No recorded test failed the controller with live generators."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 1,
+      "quote": "does not complete connecting a portion of them"
+     },
+     {
+      "src": "factor",
+      "i": 1
+     },
+     {
+      "src": "ref",
+      "i": 0,
+      "quote": "did not complete the connection of a portion of the generators"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Correct PLC isolation and add a cold isolated backup PLC (AWS, committed)",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     }
+    ],
+    "revised": {
+     "S": 9,
+     "O": 2,
+     "D": 6
+    },
+    "revisedRationale": "A backup PLC removes the single point of failure if it works; AWS has not reported deployment.",
+    "short": "PLC halts paralleling",
+    "symbol": "genset",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Test generator paralleling with the primary controller failed, on a schedule",
+      "basis": "nfpa-110",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "detect",
+      "do": "Alarm when generators run but their breakers stay open",
+      "basis": "nfpa-110",
+      "evidence": {
+       "src": "factor",
+       "i": 1
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Synchronise generators by hand onto the bus using a drilled procedure",
+      "basis": "nfpa-70e",
+      "evidence": {
+       "src": "coe",
+       "i": 6
+      }
+     },
+     {
+      "role": "vendor",
+      "phase": "recover",
+      "do": "Analyse the PLC with the supplier before returning it to automatic duty",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "recover",
+      "do": "Restore network gear first so powered instances can be reached",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "lesson",
+       "i": 1
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-02",
+    "item": "Zone network gear power",
+    "function": "Keep the zone's network reachable through a power event",
+    "failureMode": "Network gear loses power with the servers and comes back two hours after the first generators",
+    "effect": "Instances that regained power stay unreachable until 13:49",
+    "cause": "Network gear shared the failed power path; restoration order not stated",
+    "prevention": "UPS ride-through only",
+    "detection": "Immediate: the zone went dark",
+    "S": 8,
+    "O": 3,
+    "D": 3,
+    "rationale": {
+     "S": "It cut the whole zone off from customers and other zones: 8.",
+     "O": "Follows from any full power loss of the zone: 'remote to infrequent'.",
+     "D": "Loss of connectivity is visible at once."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 3,
+      "quote": "EC2 networking gear loses power"
+     },
+     {
+      "src": "soe",
+      "i": 6,
+      "quote": "most network gear is still dark"
+     },
+     {
+      "src": "factor",
+      "i": 3
+     }
+    ],
+    "actions": [],
+    "short": "Network stays dark",
+    "symbol": "fabric",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Give network gear its own protected supply and first place in restoration",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "improvement",
+       "i": 5
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "detect",
+      "do": "Track which network devices have power while generators come back",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "factor",
+       "i": 3
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "contain",
+      "do": "Switch restored generator capacity to network gear before compute",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "lesson",
+       "i": 1
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Bring instances back once the network path is verified",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 1
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-03",
+    "item": "EC2 regional management API",
+    "function": "Serve launches in healthy zones while one zone is down",
+    "failureMode": "Management servers keep routing to the dead zone and queue launches for it, overloading the region",
+    "effect": "Launch delays and API errors in every EU West zone until 12:00",
+    "cause": "No fast removal of failed management hosts; requests queued instead of failed",
+    "prevention": "Management servers in every zone",
+    "detection": "Seen at 11:05 as regional launch delays",
+    "S": 6,
+    "O": 4,
+    "D": 4,
+    "rationale": {
+     "S": "It blocked the workaround (launch elsewhere) for over an hour: 6.",
+     "O": "Any zone failure tests this path: 'infrequent'.",
+     "D": "Errors were visible within 24 minutes; the fix was manual."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 5,
+      "quote": "queued launch requests overload them"
+     },
+     {
+      "src": "factor",
+      "i": 4
+     },
+     {
+      "src": "metric",
+      "i": 3
+     }
+    ],
+    "actions": [
+     {
+      "text": "Faster removal of failed API management hosts (AWS, committed)",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "text": "Per-zone isolation of control-plane components (AWS, in progress)",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     }
+    ],
+    "revised": {
+     "S": 6,
+     "O": 3,
+     "D": 3
+    },
+    "revisedRationale": "Load balancing and isolation target both the routing and the queue; neither is reported complete.",
+    "short": "Regional API overload",
+    "symbol": "fabric",
+    "playbook": [
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Fail requests for an unreachable zone at once instead of queuing them",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "detect",
+      "do": "Alert on per-zone API error rate and queue depth",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "factor",
+       "i": 4
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Disable launches in the failed zone and drain its management hosts",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 7
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Tell customers healthy zones are open for launches",
+      "basis": "itil-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 5
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-04",
+    "item": "EBS re-mirroring and consistency recovery",
+    "function": "Restore every volume quickly and safely after a power loss",
+    "failureMode": "Spare capacity runs out during re-mirroring, and volumes that lost every replica need slow recovery snapshots via S3",
+    "effect": "Some customers wait until 10 August for their volumes",
+    "cause": "Recovery capacity and path sized for routine failures, not a zone-wide loss",
+    "prevention": "Replication across nodes plus spare capacity",
+    "detection": "Seen during recovery",
+    "S": 8,
+    "O": 3,
+    "D": 6,
+    "rationale": {
+     "S": "Single-zone customers waited up to three days, with no workaround: 8.",
+     "O": "Needs a zone-wide power loss: 'remote to infrequent'.",
+     "D": "The capacity gap appeared only in the event."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 10,
+      "quote": "exhausts the zone's spare capacity"
+     },
+     {
+      "src": "soe",
+      "i": 16,
+      "quote": "98% complete"
+     },
+     {
+      "src": "factor",
+      "i": 5
+     },
+     {
+      "src": "factor",
+      "i": 6
+     }
+    ],
+    "actions": [
+     {
+      "text": "Recover volumes in place on the EBS servers (AWS, committed)",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     }
+    ],
+    "revised": {
+     "S": 7,
+     "O": 3,
+     "D": 6
+    },
+    "revisedRationale": "In-place recovery removes the S3 copy and the capacity dependency, which shortens the tail; it is committed but not reported complete.",
+    "short": "EBS recovery tail",
+    "symbol": "rack",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Size re-mirroring spare for a full zone loss, or recover volumes in place",
+      "basis": "nist-800-34",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "detect",
+      "do": "Alert when spare capacity falls below what pending re-mirrors need",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "factor",
+       "i": 5
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Bring in spare servers from other zones as soon as the shortfall shows",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "coe",
+       "i": 8
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Give each customer the state of each volume and how to use its recovery snapshot",
+      "basis": "itil-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-05",
+    "item": "RDS Multi-AZ failover",
+    "function": "Promote the standby database at once when the primary's zone fails",
+    "failureMode": "A DNS issue blocks the health check, and a software bug stretches failover for some pairs",
+    "effect": "A small subset of Multi-AZ databases stays unavailable well beyond the usual minutes",
+    "cause": "Health check depends on DNS; failover bug; cautious split-brain handling needs an engineer",
+    "prevention": "Synchronous standby in another zone",
+    "detection": "Health checks",
+    "S": 6,
+    "O": 3,
+    "D": 5,
+    "rationale": {
+     "S": "It failed customers who had paid for the multi-zone design: 6.",
+     "O": "Needs the DNS issue plus the bug: 'remote to infrequent'.",
+     "D": "Health checks detect the failure, but could not complete here."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 4,
+      "quote": "a software bug stretches failover for a small subset"
+     },
+     {
+      "src": "factor",
+      "i": 7
+     },
+     {
+      "src": "metric",
+      "i": 5
+     }
+    ],
+    "actions": [
+     {
+      "text": "DNS-robust health checks, failover bug fix and automatic retry for split-brain checks (AWS, committed)",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     }
+    ],
+    "revised": {
+     "S": 6,
+     "O": 2,
+     "D": 4
+    },
+    "revisedRationale": "The bug fix and retry logic target the extended failovers directly; completion not reported.",
+    "short": "Slow Multi-AZ failover",
+    "symbol": "rack",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Remove DNS from the failover health-check path",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "detect",
+      "do": "Alert on any Multi-AZ pair whose failover passes a few minutes",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "factor",
+       "i": 7
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Decide promotion by hand for pairs the automation cannot settle",
+      "basis": "itil-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Point Single-AZ customers to point-in-time restore from backups",
+      "basis": "itil-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 5
+      }
+     }
+    ]
+   }
+  ],
+  "impactShort": "Zone dark · EBS tail to 10 Aug"
+ },
+ "durationStatus": "measured",
+ "durationEvidence": {
+  "onset": {
+   "src": "soe",
+   "i": 0,
+   "quote": "10:41 PDT"
+  },
+  "restored": {
+   "src": "soe",
+   "i": 16,
+   "quote": "20:25 PDT"
+  }
+ },
+ "durationBasis": "Trigger 10:41 PDT 7 Aug → 98% of recovery snapshots delivered 20:25 PDT 10 Aug (3 d 9 h 44 min)",
+ "response": {
+  "roles": {
+   "utility": "The utility (ESB Networks per DCK), not named in the AWS summary",
+   "electrical": "AWS on-site staff",
+   "ops-lead": "AWS EC2 operations",
+   "service-recovery": "AWS EBS and RDS teams",
+   "comms": "AWS Service Health Dashboard and Support",
+   "vendor": "The PLC supplier, not named"
+  },
+  "recorded": [
+   {
+    "role": "utility",
+    "soe": 0,
+    "quote": "The utility's 110 kV 10 MW transformer fails",
+    "did": "Lost the transformer that fed much of the zone"
+   },
+   {
+    "role": "electrical",
+    "soe": 6,
+    "quote": "manually phase-synchronising the power sources",
+    "did": "Synchronised generators by hand"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 7,
+    "quote": "EC2 launches are disabled in the affected zone",
+    "did": "Disabled launches in the zone and removed failed management servers"
+   },
+   {
+    "role": "comms",
+    "soe": 9,
+    "quote": "AWS posts frequent Service Health Dashboard updates",
+    "did": "Updated the dashboard often and staffed up Support"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 11,
+    "quote": "trucks servers in from another zone",
+    "did": "Added EBS capacity with servers from another zone"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "EU West zone dark for days",
+  "bones": [
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "PLC halts paralleling",
+      "factor": 1
+     },
+     {
+      "label": "UPS drains fast",
+      "factor": 2
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Network gear dark",
+      "factor": 3
+     },
+     {
+      "label": "API routes to dead zone",
+      "factor": 4
+     },
+     {
+      "label": "RDS failover bug",
+      "factor": 7
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Spare capacity short",
+      "factor": 5
+     },
+     {
+      "label": "Snapshot recovery slow",
+      "factor": 6
+     }
+    ]
+   },
+   {
+    "cat": "External",
+    "causes": [
+     {
+      "label": "Utility transformer fails",
+      "factor": 0
+     }
+    ]
+   }
+  ]
+ }
+}

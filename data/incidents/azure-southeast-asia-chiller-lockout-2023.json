@@ -1,0 +1,931 @@
+{
+ "slug": "azure-southeast-asia-chiller-lockout-2023",
+ "title": "Azure Southeast Asia 2023: Chillers Hang After a Dip, Then Lock Out",
+ "operator": "Microsoft Azure",
+ "dcName": "Southeast Asia Availability Zone datacenter, Singapore (not named)",
+ "location": {
+  "city": "Singapore",
+  "country": "Singapore",
+  "region": "APAC",
+  "az": "southeastasia"
+ },
+ "date": "2023-02-07",
+ "durationMin": 1931,
+ "category": [
+  "cooling",
+  "power"
+ ],
+ "severity": {
+  "usersAffected": "Customers in one Southeast Asia zone across about 30 services and the Azure portal; ARM management failures in Southeast Asia and East Asia; Site Recovery, Backup and GRS failover problems.",
+  "impactUsd": "Not disclosed",
+  "servicesDown": [
+   "Azure Virtual Machines",
+   "Azure Storage",
+   "Azure SQL Database",
+   "Azure Resource Manager",
+   "Azure Site Recovery",
+   "Azure Backup"
+  ],
+  "tier": "One Availability Zone, with control-plane effects in two regions"
+ },
+ "brief": "On 7 February 2023 a voltage dip tripped chillers at an Azure Southeast Asia zone in Singapore. Three chillers, over half the capacity, hung on a control-card fault the procedure did not cover; by the time it was reset the loop was too hot and they locked out. The zone was shut down from 20:19 UTC until the next day, and ARM and BCDR services failed with it.",
+ "magnitude": {
+  "usersScore": 6,
+  "financialScore": 5,
+  "durationScore": 7,
+  "blastRadiusScore": 6,
+  "note": "One zone, with management impact in two regions. Duration (7): 32 h 11 min of customer impact, inside the 1–3 d band."
+ },
+ "sequenceOfEvents": [
+  {
+   "t": "2023-02-07 15:17 UTC",
+   "phase": "TRIGGER",
+   "event": "A utility voltage dip hits one Southeast Asia Availability Zone in Singapore; power systems ride through, but a subset of chillers trips and shuts down.",
+   "source": "Azure PIR VN11-JD8, Chiller failures"
+  },
+  {
+   "t": "2023-02-07 15:17 UTC",
+   "phase": "CASCADE",
+   "event": "Chiller 5 is already offline for planned maintenance. Chiller 4 keeps running and chillers 1–3 restart, but chillers 6, 7 and 8 from the second supplier will not start.",
+   "source": "Azure PIR VN11-JD8, Chiller failures"
+  },
+  {
+   "t": "2023-02-07 (time not stated)",
+   "phase": "MITIGATION",
+   "event": "The documented emergency operating procedure is run on the tripped chillers, but the manual restarts fail.",
+   "source": "Azure PIR VN11-JD8, Chiller failures"
+  },
+  {
+   "t": "2023-02-07 (time not stated)",
+   "phase": "DETECTION",
+   "event": "The chiller HMI shows a phase sequence alarm; the compressor control card has stopped responding and needs a hard reset with at least 5 minutes powered off, a step the procedure did not list.",
+   "source": "Azure PIR VN11-JD8, Chiller failures"
+  },
+  {
+   "t": "2023-02-07 (time not stated)",
+   "phase": "MITIGATION",
+   "event": "Non-critical infrastructure is shut down to slow the temperature rise, and technicians from the chiller supplier are dispatched to site.",
+   "source": "Azure PIR VN11-JD8, Chiller failures"
+  },
+  {
+   "t": "2023-02-07 (time not stated)",
+   "phase": "CASCADE",
+   "event": "By the time the control cards are reset with the supplier, the chilled-water loop is above 28°C and the chillers enter thermal lockout.",
+   "source": "Azure PIR VN11-JD8, Chiller failures"
+  },
+  {
+   "t": "2023-02-07 20:19 UTC",
+   "phase": "IMPACT",
+   "event": "Thermal warnings direct a shutdown of critical compute, network and storage in the zone; resources there become unavailable.",
+   "source": "Azure PIR VN11-JD8, Chiller failures"
+  },
+  {
+   "t": "2023-02-07 (time not stated)",
+   "phase": "CASCADE",
+   "event": "ARM in Southeast Asia loses part of its metadata store, a Cosmos DB instance in the failed zone that should have been zone-resilient but was not because of a configuration error.",
+   "source": "Azure PIR VN11-JD8, ARM"
+  },
+  {
+   "t": "2023-02-07 (time not stated)",
+   "phase": "CASCADE",
+   "event": "Azure Site Recovery failovers fail because a recently updated workflow uses a non-zonal Service Bus instance in the failed zone.",
+   "source": "Azure PIR VN11-JD8, BCDR"
+  },
+  {
+   "t": "2023-02-08 04:10 UTC",
+   "phase": "MITIGATION",
+   "event": "ARM endpoints in Southeast Asia are manually removed from the global Traffic Manager profile.",
+   "source": "Azure PIR VN11-JD8, ARM"
+  },
+  {
+   "t": "2023-02-08 (after 04:10 UTC)",
+   "phase": "CASCADE",
+   "event": "The shifted ARM traffic overloads East Asia, extending management failures to that region.",
+   "source": "Azure PIR VN11-JD8, ARM"
+  },
+  {
+   "t": "2023-02-08 04:45 UTC",
+   "phase": "MITIGATION",
+   "event": "The new Site Recovery workflow is disabled in Southeast Asia, ending the Service Bus failures.",
+   "source": "Azure PIR VN11-JD8, BCDR"
+  },
+  {
+   "t": "2023-02-08 (time not stated)",
+   "phase": "RECOVERY",
+   "event": "Augmented cooling is brought in and IT load is reduced until the loop falls below the lockout threshold; chillers 6, 7 and 8 restart.",
+   "source": "Azure PIR VN11-JD8, Chiller failures"
+  },
+  {
+   "t": "2023-02-08 09:00 UTC",
+   "phase": "MITIGATION",
+   "event": "Microsoft proactively enables cross-region restore for all Azure Backup customers with geo-redundant vaults; a regional configuration issue then blocks some restores until 15:10.",
+   "source": "Azure PIR VN11-JD8, BCDR"
+  },
+  {
+   "t": "2023-02-08 09:30 UTC",
+   "phase": "RECOVERY",
+   "event": "ARM in East Asia is scaled up and fully recovered; Site Recovery failovers work reliably from 09:15.",
+   "source": "Azure PIR VN11-JD8, ARM"
+  },
+  {
+   "t": "2023-02-08 14:00 UTC",
+   "phase": "RECOVERY",
+   "event": "With all chillers back, temperatures return within operational thresholds.",
+   "source": "Azure PIR VN11-JD8, Chiller failures"
+  },
+  {
+   "t": "2023-02-08 (after 14:00 UTC)",
+   "phase": "RECOVERY",
+   "event": "Power is restored in phases, storage first and then compute once storage is verified healthy.",
+   "source": "Azure PIR VN11-JD8, Chiller failures"
+  },
+  {
+   "t": "2023-02-08 16:30 UTC",
+   "phase": "RECOVERY",
+   "event": "Most customers see platform services recover.",
+   "source": "Azure PIR VN11-JD8, Chiller failures"
+  },
+  {
+   "t": "2023-02-08 (time not stated)",
+   "phase": "CASCADE",
+   "event": "One SQL Database tenant ring does not reform: a BIOS bug stops its hosts recovering, then a Service Fabric heap-memory issue needs manual intervention.",
+   "source": "Azure PIR VN11-JD8, SQL Database"
+  },
+  {
+   "t": "2023-02-09 04:30 UTC",
+   "phase": "RESTORED",
+   "event": "The final SQL Database tenant ring becomes available and the incident ends.",
+   "source": "Azure PIR VN11-JD8, SQL Database"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Chiller plant",
+   "value": "8 chillers from 2 suppliers: 1–5 give 47% of capacity, 6–8 give 53%",
+   "source": "Azure PIR VN11-JD8"
+  },
+  {
+   "label": "Chillers out after the dip",
+   "value": "chiller 5 in maintenance; 6, 7, 8 would not start (53% of capacity)",
+   "source": "Azure PIR VN11-JD8"
+  },
+  {
+   "label": "Chiller thermal lockout threshold",
+   "value": "chilled-water loop above 28°C",
+   "source": "Azure PIR VN11-JD8"
+  },
+  {
+   "label": "Control card hard reset",
+   "value": "powered off for at least 5 minutes",
+   "source": "Azure PIR VN11-JD8"
+  },
+  {
+   "label": "Dip to zone shutdown",
+   "value": "5 hours 2 minutes (15:17 → 20:19 UTC)",
+   "source": "Azure PIR VN11-JD8"
+  },
+  {
+   "label": "Zone shutdown to temperatures normal",
+   "value": "17 hours 41 minutes (20:19 7 Feb → 14:00 8 Feb UTC)",
+   "source": "Azure PIR VN11-JD8"
+  },
+  {
+   "label": "SQL geo-replication with auto-failover downtime",
+   "value": "about 1.5 hours",
+   "source": "Azure PIR VN11-JD8"
+  },
+  {
+   "label": "Customer impact window",
+   "value": "20:19 UTC 7 Feb → 04:30 UTC 9 Feb (32 hours 11 minutes)",
+   "source": "Azure PIR VN11-JD8"
+  }
+ ],
+ "rootCause": "TRIGGER: at 15:17 UTC on 7 February 2023 a utility voltage dip hit one Azure Southeast Asia Availability Zone in Singapore. Power systems rode through, but several chillers tripped.\n\nCOOLING CHAIN: the plant had eight chillers from two suppliers. Chiller 5 was down for maintenance. Chillers 1–4 ran or restarted, but 6, 7 and 8, over half the capacity, would not start automatically or by the emergency procedure. Their compressor control cards had stopped responding after the dip and needed a hard power-off of at least five minutes, which the procedure did not include. By the time the supplier's technicians had reset them, the loop water was above 28°C and the chillers locked themselves out. The zone's critical equipment was shut down at 20:19.\n\nPLATFORM CHAIN: the loss of one zone spread. ARM's metadata store was on a Cosmos DB instance wrongly configured as non-zonal, so management failed in the region; moving ARM traffic away overloaded East Asia. Site Recovery and Backup, the services meant for this situation, had their own non-zonal dependencies and configuration faults.\n\nLATENT ROOT: a chiller control fault without a documented recovery step, a plant already one chiller down, and resilience services that were not themselves resilient to a zone loss.",
+ "contributingFactors": [
+  "A utility voltage dip tripped a subset of chillers (Azure PIR).",
+  "Compressor control cards on chillers 6–8 stopped responding and needed a cold reset that the emergency procedure did not list (Azure PIR).",
+  "Chiller 5 was already offline for planned maintenance, reducing spare capacity (Azure PIR).",
+  "Once the loop exceeded 28°C the chillers entered thermal lockout and could not restart (Azure PIR).",
+  "ARM's metadata store in the region was not zone-resilient because of a configuration error (Azure PIR).",
+  "Moving ARM traffic to East Asia exceeded its capacity, spreading impact to a second region (Azure PIR).",
+  "Site Recovery depended on a non-zonal Service Bus instance in the failed zone after a recent update (Azure PIR).",
+  "A BIOS bug and a Service Fabric memory issue kept one SQL tenant ring down until 04:30 on 9 February (Azure PIR)."
+ ],
+ "coe": [
+  {
+   "action": "Work with the chiller OEM to prevent, shorten and reliably recover these events",
+   "owner": "Microsoft datacenter team",
+   "status": "Completed"
+  },
+  {
+   "action": "Add the manual cold restart of chillers to the procedures, as the OEM recommends",
+   "owner": "Microsoft",
+   "status": "Completed"
+  },
+  {
+   "action": "OEM training for datacenter operations staff on the updated procedures",
+   "owner": "Microsoft",
+   "status": "Completed"
+  },
+  {
+   "action": "Validate ARM configuration in Southeast Asia and that all ARM instances are zone/region redundant",
+   "owner": "Microsoft",
+   "status": "Completed"
+  },
+  {
+   "action": "Ensure ARM capacity in all regions can absorb traffic from zonal or regional failures",
+   "owner": "Microsoft",
+   "status": "Completed"
+  },
+  {
+   "action": "Daily automated walk of the dependency graph of zonal services to close single points of failure",
+   "owner": "Microsoft",
+   "status": "Ongoing"
+  },
+  {
+   "action": "Correct the Backup cross-region-restore configuration in all regions; return Site Recovery to a zone-resilient workflow",
+   "owner": "Microsoft",
+   "status": "Completed"
+  },
+  {
+   "action": "Adjust safety-check thresholds for customer-initiated GRS storage failover",
+   "owner": "Microsoft",
+   "status": "Completed"
+  },
+  {
+   "action": "Expand Chaos Studio zonal-failure scenarios",
+   "owner": "Microsoft",
+   "status": "Planned for December 2023 (completion not reported)"
+  },
+  {
+   "action": "Give a recoverability expectation and timeline in incident communications",
+   "owner": "Microsoft",
+   "status": "Completed"
+  }
+ ],
+ "lessonsLearnt": [
+  "An emergency procedure is only as good as its rarest step; the cold reset the chillers needed was not written down.",
+  "Running a plant with a chiller out for maintenance removes the margin that would absorb a restart failure.",
+  "Thermal lockout turns minutes into hours; bring temporary cooling and shed load before the loop reaches the lockout limit.",
+  "Business-continuity services must be the most zone-resilient part of the platform, not the least.",
+  "Shifting a control plane to a neighbour region needs headroom there, or the failure moves with the traffic.",
+  "Zone-redundant workloads stayed largely available; regional services with hidden zonal dependencies did not."
+ ],
+ "improvements": [
+  "Cooling: OEM cold-restart step added to procedures, with training (Microsoft, completed).",
+  "Control plane: ARM zone redundancy validated and spare capacity in all regions (Microsoft, completed).",
+  "BCDR: Site Recovery workflow and Backup restore configuration fixed; storage failover checks adjusted (Microsoft, completed).",
+  "Architecture: daily dependency-graph walk for zonal services (Microsoft, ongoing).",
+  "Analyst recommendation (not in the PIR): treat a chiller out for maintenance as a reduced-redundancy state with a pre-staged temporary cooling plan."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "Half the plant would not start",
+   "body": "Chillers 6–8 supplied 53% of capacity and hung on the same control-card fault. With chiller 5 in maintenance, the four running units could not hold the hall."
+  },
+  {
+   "heading": "A missing line in the procedure",
+   "body": "The fix, power the control card off for at least five minutes, was known to the OEM but not in the emergency procedure. Finding it cost the time in which the loop passed 28°C and locked the chillers out."
+  },
+  {
+   "heading": "Lockout needs heat removed another way",
+   "body": "Escaping lockout required temporary cooling and shutting equipment down. Temperatures were back in range only at 14:00 the next day."
+  },
+  {
+   "heading": "Resilience services failed first",
+   "body": "ARM, Site Recovery and Backup each had a configuration or dependency that tied them to the failed zone, so customers trying to execute their continuity plans hit errors, some in East Asia as well."
+  },
+  {
+   "heading": "What the PIR does not say",
+   "body": "It does not name the facility, the chiller suppliers or models, peak hall temperature, or cost. Most actions are reported completed; the Chaos Studio expansion was due December 2023."
+  }
+ ],
+ "technicalDeepDive": "Chillers tripped by a voltage dip normally restart on their own. Here the compressor control cards hung after the dip and raised a phase sequence alarm; clearing it needed a cold restart with the capacitors drained. Each minute spent finding that out let the loop warm, and above 28°C the chillers' protection blocked any restart. Breaking out of lockout needed temporary cooling and less heat: both were done, and the chillers came back.\n\nThe platform failures were configuration errors against Azure's own zone-redundancy rules: an ARM metadata store not zonal in this region, a Site Recovery workflow on a single-zone Service Bus, a Backup cross-region-restore setting, and a storage failover check that was too strict. Microsoft reports most of these fixed.",
+ "references": [
+  {
+   "title": "Azure status history, Post Incident Review VN11-JD8: Southeast Asia and East Asia, cooling failure in one Availability Zone",
+   "url": "https://azure.status.microsoft/en-us/status/history/?trackingId=VN11-JD8",
+   "type": "official-postmortem",
+   "accessed": "2026-11-11",
+   "quote": "This condition is referred to as a thermal lockout."
+  },
+  {
+   "title": "Azure Incident Retrospective video VN11-JD8",
+   "url": "https://aka.ms/AIR/VN11-JD8",
+   "type": "vendor-status",
+   "accessed": "2026-11-11",
+   "quote": "Azure Incident Retrospective"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": true,
+  "referenceCount": 2,
+  "lastVerified": "2026-11-11",
+  "confidence": "High: from Microsoft's final Post Incident Review. Facility, chiller suppliers and models, peak temperature and cost are not disclosed."
+ },
+ "lastUpdated": "2026-11-11",
+ "operatorShort": "Azure",
+ "fmea": {
+  "scope": "The chiller plant of the affected facility (control cards, emergency procedure, chilled-water lockout) and Azure's control plane and BCDR services, from Microsoft's PIR.",
+  "modes": [
+   {
+    "id": "FM-01",
+    "item": "Chiller compressor control cards (chillers 6–8)",
+    "function": "Restart the chillers automatically after a power dip",
+    "failureMode": "The control cards stop responding after the dip and block restart",
+    "effect": "53% of cooling capacity unavailable",
+    "cause": "Control-card fault with a phase sequence alarm; OEM investigating",
+    "prevention": "Automatic restart after a trip",
+    "detection": "HMI alarm log, read during the event",
+    "S": 8,
+    "O": 3,
+    "D": 6,
+    "rationale": {
+     "S": "Led to the shutdown of a zone: 8.",
+     "O": "Needs a dip and this card fault: 'remote to infrequent'.",
+     "D": "The alarm was visible but its meaning was not in the procedure."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 1,
+      "quote": "will not start"
+     },
+     {
+      "src": "soe",
+      "i": 3,
+      "quote": "the compressor control card has stopped responding"
+     },
+     {
+      "src": "factor",
+      "i": 1
+     }
+    ],
+    "actions": [
+     {
+      "text": "OEM engagement on prevention and recovery (completed)",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     }
+    ],
+    "revised": {
+     "S": 8,
+     "O": 2,
+     "D": 4
+    },
+    "revisedRationale": "OEM follow-up is reported completed, and the cold-restart step makes the alarm actionable; the fault itself may still occur.",
+    "short": "Control cards hang",
+    "symbol": "chiller",
+    "playbook": [
+     {
+      "role": "vendor",
+      "phase": "prevent",
+      "do": "Have the OEM confirm control-card behaviour under voltage dips and fix it",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "mechanical",
+      "phase": "detect",
+      "do": "Map each chiller alarm code to its recovery step in the procedure",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "mechanical",
+      "phase": "contain",
+      "do": "Cold-restart hung control cards at once, power off for at least five minutes",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "recover",
+      "do": "Confirm every chiller is back before restoring IT load",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "lesson",
+       "i": 0
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-02",
+    "item": "Emergency operating procedure",
+    "function": "Get tripped chillers running again quickly",
+    "failureMode": "The procedure lacks the cold-reset step, so manual restarts fail",
+    "effect": "Hours lost until supplier technicians arrive",
+    "cause": "Procedure incomplete for this failure",
+    "prevention": "Documented EOP",
+    "detection": "Found when the EOP failed",
+    "S": 8,
+    "O": 3,
+    "D": 7,
+    "rationale": {
+     "S": "Its gap let the loop reach lockout: 8.",
+     "O": "Rare fault, rarely rehearsed: 'remote to infrequent'.",
+     "D": "No drill exposed the missing step."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 2,
+      "quote": "the manual restarts fail"
+     },
+     {
+      "src": "factor",
+      "i": 1
+     },
+     {
+      "src": "metric",
+      "i": 3
+     }
+    ],
+    "actions": [
+     {
+      "text": "Cold restart added to procedures (completed)",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "text": "OEM training for operations staff (completed)",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     }
+    ],
+    "revised": {
+     "S": 8,
+     "O": 2,
+     "D": 4
+    },
+    "revisedRationale": "Both actions are reported completed and directly close the gap.",
+    "short": "EOP missing step",
+    "symbol": "manualStation",
+    "playbook": [
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Review emergency procedures with the OEM for every alarm the HMI can raise",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "role": "mechanical",
+      "phase": "detect",
+      "do": "Escalate to the OEM as soon as a documented restart fails",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "lesson",
+       "i": 0
+      }
+     },
+     {
+      "role": "vendor",
+      "phase": "contain",
+      "do": "Keep OEM technicians on call with a response time shorter than lockout",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "recover",
+      "do": "Record the working fix and update the procedure before closing",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-03",
+    "item": "Chilled-water loop and thermal lockout",
+    "function": "Keep the loop cool enough for chillers to restart",
+    "failureMode": "The loop passes 28°C and the chillers lock out",
+    "effect": "Even repaired chillers cannot start; the zone is shut down",
+    "cause": "Too little running capacity with chiller 5 already in maintenance",
+    "prevention": "Spare chillers; shedding non-critical load",
+    "detection": "Loop temperature",
+    "S": 9,
+    "O": 3,
+    "D": 4,
+    "rationale": {
+     "S": "Forced a full zone shutdown lasting into the next day: 9.",
+     "O": "Needs a long restart failure: 'remote to infrequent'.",
+     "D": "Loop temperature is measured; the limit was reached anyway."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 5,
+      "quote": "the chilled-water loop is above 28°C"
+     },
+     {
+      "src": "metric",
+      "i": 2
+     },
+     {
+      "src": "factor",
+      "i": 2
+     },
+     {
+      "src": "factor",
+      "i": 3
+     }
+    ],
+    "actions": [],
+    "short": "Loop locks chillers out",
+    "symbol": "pump",
+    "playbook": [
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Pre-stage temporary cooling whenever a chiller is out for maintenance",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "improvement",
+       "i": 4
+      }
+     },
+     {
+      "role": "mechanical",
+      "phase": "detect",
+      "do": "Alarm on loop temperature well below the lockout limit",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "factor",
+       "i": 3
+      }
+     },
+     {
+      "role": "incident-commander",
+      "phase": "contain",
+      "do": "Shed IT load early to keep the loop under the lockout limit",
+      "basis": "nims-ics",
+      "evidence": {
+       "src": "lesson",
+       "i": 2
+      }
+     },
+     {
+      "role": "mechanical",
+      "phase": "recover",
+      "do": "Bring in temporary cooling to pull the loop below lockout",
+      "basis": "ashrae-tc99",
+      "evidence": {
+       "src": "lesson",
+       "i": 2
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-04",
+    "item": "ARM regional control plane",
+    "function": "Keep management working in the region and its neighbours during a zone failure",
+    "failureMode": "Metadata store not zone-resilient; traffic shifted to East Asia overloads it",
+    "effect": "Management failures in two regions; customers cannot run their continuity plans",
+    "cause": "Regional configuration error; no spare capacity in the neighbour region",
+    "prevention": "Zone-resilient design by intent",
+    "detection": "Seen during the event",
+    "S": 7,
+    "O": 3,
+    "D": 6,
+    "rationale": {
+     "S": "Blocked recovery actions in two regions: 7.",
+     "O": "A configuration error in one region: 'remote to infrequent'.",
+     "D": "The mis-configuration was not found until the zone failed."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 7,
+      "quote": "configuration error"
+     },
+     {
+      "src": "soe",
+      "i": 10,
+      "quote": "overloads East Asia"
+     },
+     {
+      "src": "factor",
+      "i": 4
+     },
+     {
+      "src": "factor",
+      "i": 5
+     }
+    ],
+    "actions": [
+     {
+      "text": "ARM configuration and redundancy validated (completed)",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "text": "ARM spare capacity in all regions (completed)",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     }
+    ],
+    "revised": {
+     "S": 7,
+     "O": 2,
+     "D": 4
+    },
+    "revisedRationale": "Both fixes are reported completed; the daily dependency walk improves detection.",
+    "short": "ARM not zonal",
+    "symbol": "fabric",
+    "playbook": [
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Check automatically that every control-plane store is zone-redundant",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "detect",
+      "do": "Alert on control-plane errors per region as soon as a zone drops",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "factor",
+       "i": 4
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Scale the receiving region before shifting traffic into it",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Tell customers when management actions are safe to retry",
+      "basis": "itil-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 9
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-05",
+    "item": "BCDR services (Site Recovery, Backup, GRS failover)",
+    "function": "Let customers fail over or restore when a zone or region fails",
+    "failureMode": "Site Recovery depends on a non-zonal Service Bus; Backup and storage failover hit configuration and check faults",
+    "effect": "Customer continuity plans fail or are delayed",
+    "cause": "Recent workflow update and regional configuration errors",
+    "prevention": "BCDR services designed for zonal and regional incidents",
+    "detection": "Customer failures",
+    "S": 7,
+    "O": 3,
+    "D": 6,
+    "rationale": {
+     "S": "Defeated the customers' own resilience plans: 7.",
+     "O": "Configuration drift in one region: 'remote to infrequent'.",
+     "D": "Found only when customers used them."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 8,
+      "quote": "non-zonal Service Bus instance"
+     },
+     {
+      "src": "soe",
+      "i": 13,
+      "quote": "a regional configuration issue then blocks some restores"
+     },
+     {
+      "src": "factor",
+      "i": 6
+     }
+    ],
+    "actions": [
+     {
+      "text": "Backup restore configuration and Site Recovery workflow corrected (completed)",
+      "evidence": {
+       "src": "coe",
+       "i": 6
+      }
+     },
+     {
+      "text": "Storage failover safety checks adjusted (completed)",
+      "evidence": {
+       "src": "coe",
+       "i": 7
+      }
+     }
+    ],
+    "revised": {
+     "S": 7,
+     "O": 2,
+     "D": 5
+    },
+    "revisedRationale": "The specific faults are reported fixed; the planned Chaos Studio zonal tests would further improve detection.",
+    "short": "BCDR not resilient",
+    "symbol": "fabric",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Run zonal-failure fault injection against BCDR services themselves",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "coe",
+       "i": 8
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "detect",
+      "do": "Watch BCDR failover success rates from the first minutes of a zone loss",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "factor",
+       "i": 6
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Disable a recent workflow change that ties failover to the failed zone",
+      "basis": "change-mgmt",
+      "evidence": {
+       "src": "coe",
+       "i": 6
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Give customers a recoverability timeline so they can decide whether to invoke BCDR",
+      "basis": "itil-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 9
+      }
+     }
+    ]
+   }
+  ],
+  "impactShort": "Zone shut down · 32 h impact"
+ },
+ "durationStatus": "measured",
+ "durationEvidence": {
+  "onset": {
+   "src": "soe",
+   "i": 6,
+   "quote": "20:19 UTC"
+  },
+  "restored": {
+   "src": "soe",
+   "i": 19,
+   "quote": "04:30 UTC"
+  }
+ },
+ "durationBasis": "Customer impact 20:19 UTC 7 Feb → 04:30 UTC 9 Feb (32 h 11 min)",
+ "response": {
+  "roles": {
+   "mechanical": "Microsoft datacenter operations",
+   "vendor": "The chiller supplier's technicians, supplier not named",
+   "incident-commander": "Not named in the PIR",
+   "ops-lead": "Azure ARM engineering",
+   "service-recovery": "Azure Site Recovery, Backup and SQL teams",
+   "comms": "Azure status page and Service Health"
+  },
+  "recorded": [
+   {
+    "role": "mechanical",
+    "soe": 2,
+    "quote": "The documented emergency operating procedure is run on the tripped chillers",
+    "did": "Ran the emergency procedure; restarts failed"
+   },
+   {
+    "role": "vendor",
+    "soe": 4,
+    "quote": "technicians from the chiller supplier are dispatched to site",
+    "did": "Came to site to reset the control cards"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 9,
+    "quote": "ARM endpoints in Southeast Asia are manually removed",
+    "did": "Shifted ARM traffic away from the region"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 11,
+    "quote": "The new Site Recovery workflow is disabled in Southeast Asia",
+    "did": "Disabled the workflow that tied failover to the failed zone"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 13,
+    "quote": "Microsoft proactively enables cross-region restore",
+    "did": "Enabled cross-region restore for geo-redundant vaults"
+   },
+   {
+    "role": "mechanical",
+    "soe": 12,
+    "quote": "Augmented cooling is brought in and IT load is reduced",
+    "did": "Cooled the loop below lockout and restarted chillers"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "Southeast Asia zone shut down",
+  "bones": [
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Control cards hang",
+      "factor": 1
+     },
+     {
+      "label": "Thermal lockout",
+      "factor": 3
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "EOP missing step",
+      "factor": 1
+     },
+     {
+      "label": "Chiller 5 in maintenance",
+      "factor": 2
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "ARM store not zonal",
+      "factor": 4
+     },
+     {
+      "label": "ASR on single-zone bus",
+      "factor": 6
+     },
+     {
+      "label": "SQL ring won't reform",
+      "factor": 7
+     }
+    ]
+   },
+   {
+    "cat": "External",
+    "causes": [
+     {
+      "label": "Utility voltage dip",
+      "factor": 0
+     }
+    ]
+   }
+  ]
+ }
+}

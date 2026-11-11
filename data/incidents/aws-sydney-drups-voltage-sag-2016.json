@@ -1,0 +1,871 @@
+{
+ "slug": "aws-sydney-drups-voltage-sag-2016",
+ "title": "AWS Sydney 2016: Voltage Sag Drains the Rotary UPS, One Zone Loses Power",
+ "operator": "Amazon Web Services",
+ "dcName": "AWS facility in the Sydney Region (not named)",
+ "location": {
+  "city": "Sydney",
+  "country": "Australia",
+  "region": "APAC",
+  "az": "ap-southeast-2"
+ },
+ "date": "2016-06-04",
+ "durationMin": 575,
+ "category": [
+  "power"
+ ],
+ "severity": {
+  "usersAffected": "A significant number of EC2 instances and EBS volumes in one Sydney Availability Zone; launch errors across the Region until failover.",
+  "impactUsd": "Not disclosed",
+  "servicesDown": [
+   "Amazon EC2",
+   "Amazon EBS",
+   "EC2 launch APIs",
+   "Elastic Load Balancing registration"
+  ],
+  "tier": "Single Availability Zone"
+ },
+ "brief": "On 4 June 2016 (5 June in Sydney) storms took out a substation and the grid sagged rather than failed. In one AWS facility the breakers isolating the rotary UPS opened too slowly, the flywheel energy drained into the grid and both power line-ups dropped. Power was back in 81 minutes; a recovery bug and storage drive failures stretched customer recovery to about 9.5 hours.",
+ "magnitude": {
+  "usersScore": 5,
+  "financialScore": 4,
+  "durationScore": 5,
+  "blastRadiusScore": 4,
+  "note": "One Availability Zone in a major region; multi-zone customers stayed up. Duration (5): about 9 h 35 min from trigger to nearly all instances back, inside the 4–12 h band. Cost not disclosed."
+ },
+ "sequenceOfEvents": [
+  {
+   "t": "2016-06-04 22:25 PDT",
+   "phase": "TRIGGER",
+   "event": "Severe weather causes the utility provider to lose a regional substation; utility power is lost to multiple AWS facilities in the Sydney Region.",
+   "source": "AWS Post-Event Summary 4372T8: 'a loss of power at a regional substation'"
+  },
+  {
+   "t": "2016-06-04 22:25 PDT",
+   "phase": "TRIGGER",
+   "event": "The grid failure arrives as an unusually long voltage sag rather than a clean outage.",
+   "source": "AWS Post-Event Summary 4372T8: 'an unusually long voltage sag'"
+  },
+  {
+   "t": "2016-06-04 22:25 PDT",
+   "phase": "CASCADE",
+   "event": "In one facility the breakers that isolate the diesel rotary UPS (DRUPS) from the utility fail to open quickly enough, and the DRUPS flywheel energy drains into the degraded grid.",
+   "source": "AWS Post-Event Summary 4372T8, Loss of Power"
+  },
+  {
+   "t": "2016-06-04 22:25 PDT",
+   "phase": "CASCADE",
+   "event": "Several DRUPS line-ups shut down, so generators that had started cannot be connected to the racks; affected instances lose both their primary and secondary power.",
+   "source": "AWS Post-Event Summary 4372T8: 'failed to transfer load to their generators'"
+  },
+  {
+   "t": "2016-06-04 (time not stated)",
+   "phase": "IMPACT",
+   "event": "A significant number of EC2 instances and their EBS volumes in one Availability Zone lose power.",
+   "source": "AWS Post-Event Summary 4372T8, Loss of Power"
+  },
+  {
+   "t": "2016-06-04 (time not stated)",
+   "phase": "IMPACT",
+   "event": "Customers get errors when launching new instances or scaling auto-scaling groups in the Region.",
+   "source": "AWS Post-Event Summary 4372T8, Recovery"
+  },
+  {
+   "t": "2016-06-04 (time not stated)",
+   "phase": "DETECTION",
+   "event": "On-site technicians inspect the power line-ups to establish when it is safe to re-engage them by hand; AWS calls a DRUPS shutting down this fast unusual.",
+   "source": "AWS Post-Event Summary 4372T8, Loss of Power"
+  },
+  {
+   "t": "2016-06-04 23:42 PDT",
+   "phase": "MITIGATION",
+   "event": "The team completes a manual failover away from degraded services in the affected zone; customers can launch instances in the unaffected Availability Zones.",
+   "source": "AWS Post-Event Summary 4372T8, Recovery"
+  },
+  {
+   "t": "2016-06-04 23:46 PDT",
+   "phase": "RECOVERY",
+   "event": "On-site technicians manually re-engage the power line-ups and power is restored.",
+   "source": "AWS Post-Event Summary 4372T8, Loss of Power"
+  },
+  {
+   "t": "2016-06-04 (after 23:46 PDT)",
+   "phase": "RECOVERY",
+   "event": "Automated systems begin bringing customer EC2 instances and EBS volumes back online.",
+   "source": "AWS Post-Event Summary 4372T8, Recovery"
+  },
+  {
+   "t": "2016-06-04 (time not stated)",
+   "phase": "CASCADE",
+   "event": "Some instances see DNS resolution failures while the zone's internal DNS hosts come back and carry the recovery load.",
+   "source": "AWS Post-Event Summary 4372T8, Recovery"
+  },
+  {
+   "t": "2016-06-04 (time not stated)",
+   "phase": "CASCADE",
+   "event": "The APIs recover but are slow to propagate state changes: new resources are not visible, some instances appear stuck in pending or shutting down, and adding instances to load balancers is slow.",
+   "source": "AWS Post-Event Summary 4372T8, Recovery"
+  },
+  {
+   "t": "2016-06-05 01:00 PDT",
+   "phase": "RECOVERY",
+   "event": "Over 80% of the impacted customer instances and volumes are back online.",
+   "source": "AWS Post-Event Summary 4372T8, Recovery"
+  },
+  {
+   "t": "2016-06-05 02:49 PDT",
+   "phase": "RECOVERY",
+   "event": "DNS error rates recover.",
+   "source": "AWS Post-Event Summary 4372T8, Recovery"
+  },
+  {
+   "t": "2016-06-05 (time not stated)",
+   "phase": "CASCADE",
+   "event": "A latent bug in the instance management software stops automatic recovery of the remaining instances; the team recovers the remaining instances by hand over several hours.",
+   "source": "AWS Post-Event Summary 4372T8: 'A latent bug in our instance management software'"
+  },
+  {
+   "t": "2016-06-05 (time not stated)",
+   "phase": "IMPACT",
+   "event": "A small number of storage servers suffered failed hard drives; EBS volumes whose replicas sat on two failed servers cannot be restored automatically (under 0.01% of the zone's volumes).",
+   "source": "AWS Post-Event Summary 4372T8, Recovery"
+  },
+  {
+   "t": "2016-06-05 (time not stated)",
+   "phase": "RECOVERY",
+   "event": "The EBS team manually recovers as many damaged storage servers as possible, a slow process that keeps some volumes out much longer.",
+   "source": "AWS Post-Event Summary 4372T8, Recovery"
+  },
+  {
+   "t": "2016-06-05 08:00 PDT",
+   "phase": "RESTORED",
+   "event": "Nearly all instances are recovered.",
+   "source": "AWS Post-Event Summary 4372T8, Recovery"
+  }
+ ],
+ "metrics": [
+  {
+   "label": "Utility loss",
+   "value": "22:25 PDT 4 Jun (15:25 AEST 5 Jun)",
+   "source": "AWS Post-Event Summary 4372T8"
+  },
+  {
+   "label": "Facility power out",
+   "value": "1 hour 21 minutes (22:25 → 23:46 PDT)",
+   "source": "AWS Post-Event Summary 4372T8"
+  },
+  {
+   "label": "Launch APIs failed away from the zone",
+   "value": "23:42 PDT, 1 hour 17 minutes after the trigger",
+   "source": "AWS Post-Event Summary 4372T8"
+  },
+  {
+   "label": "Instances and volumes back by 01:00 PDT",
+   "value": "over 80%",
+   "source": "AWS Post-Event Summary 4372T8"
+  },
+  {
+   "label": "DNS errors recovered",
+   "value": "02:49 PDT",
+   "source": "AWS Post-Event Summary 4372T8"
+  },
+  {
+   "label": "Nearly all instances recovered",
+   "value": "08:00 PDT, 9 hours 35 minutes after the trigger",
+   "source": "AWS Post-Event Summary 4372T8"
+  },
+  {
+   "label": "EBS volumes not automatically recoverable",
+   "value": "under 0.01% of the zone's volumes",
+   "source": "AWS Post-Event Summary 4372T8"
+  },
+  {
+   "label": "EBS design annual failure rate quoted",
+   "value": "0.1%–0.2%",
+   "source": "AWS Post-Event Summary 4372T8"
+  }
+ ],
+ "rootCause": "TRIGGER: severe weather took out a regional substation at 22:25 PDT on 4 June 2016 (15:25 Sydney time on 5 June). Several AWS facilities lost utility power. The failure did not look like a clean outage: it was an unusually long voltage sag.\n\nPOWER CHAIN: in one facility the instances were fed by two independent line-ups, each built on diesel rotary UPS (DRUPS) units, a flywheel plus an integrated diesel generator. To ride through, the DRUPS must be cut off from the grid so its flywheel feeds only the load until the diesel takes over. During the long sag the isolating breakers did not open quickly enough, the flywheel energy drained back into the degraded grid, and the DRUPS shut down. The generators that had started could no longer be connected, so both line-ups were lost together.\n\nRECOVERY CHAIN: power was back at 23:46 PDT, but customer recovery took until about 08:00. Internal DNS struggled under the recovery load, the APIs were slow to show new state, a latent bug in the instance management software stopped automatic recovery of part of the fleet, and drive failures on some storage servers left a very small share of EBS volumes unrecoverable automatically.\n\nLATENT ROOT: the two 'independent' line-ups shared one design and one weakness, so one grid signature defeated both at once, and the recovery tooling had a fault that only a real mass restart could expose.",
+ "contributingFactors": [
+  "The grid fault was a long voltage sag, not a clean outage, so it did not trip the protection the way a dead feed would (AWS summary).",
+  "The breakers isolating the DRUPS from the utility did not open quickly enough, and the flywheel energy drained into the grid (AWS summary).",
+  "Both power line-ups used the same DRUPS design, so the same sag defeated them together and instances lost primary and secondary power (AWS summary).",
+  "A latent bug in the instance management software blocked automatic recovery of part of the fleet (AWS summary).",
+  "Some storage servers lost hard drives in the event; volumes with both replicas on failed servers could not be restored automatically (AWS summary).",
+  "Instance launch APIs depended on the degraded zone until the team failed them away by hand (AWS summary).",
+  "Internal DNS hosts were overloaded by the recovery load after power returned (AWS summary)."
+ ],
+ "coe": [
+  {
+   "action": "Add breakers so connections to degraded utility power are broken faster and generators engage before the UPS energy is used up",
+   "owner": "AWS",
+   "status": "Committed (completion not reported)"
+  },
+  {
+   "action": "Fix the latent bug that stopped automatic recovery of some instances",
+   "owner": "AWS",
+   "status": "In testing at the time of the summary; deployment over the following days"
+  },
+  {
+   "action": "Start a program to test recovery processes regularly on unoccupied long-running hosts",
+   "owner": "AWS",
+   "status": "Committed (completion not reported)"
+  },
+  {
+   "action": "Make the instance launch APIs more resilient to a zone failure, with roll-out to the Sydney Region in July 2016",
+   "owner": "AWS",
+   "status": "Planned for July 2016 (completion not reported)"
+  },
+  {
+   "action": "Manual failover of launch APIs away from the degraded zone",
+   "owner": "AWS",
+   "status": "Done during the event, 23:42 PDT"
+  },
+  {
+   "action": "Manual recovery of the remaining instances and of damaged storage servers",
+   "owner": "AWS",
+   "status": "Done during the event"
+  }
+ ],
+ "lessonsLearnt": [
+  "Two power line-ups are only independent if they fail in different ways. Same DRUPS design on both sides means one grid signature can take both.",
+  "Protection must be tested against the grid's real failure shapes, including long sags, not only a clean loss of supply.",
+  "A rotary UPS has seconds of stored energy; anything that lets that energy leak back into the grid turns ride-through into a trip.",
+  "Mass recovery after a power loss exercises code paths that daily operation never touches; test them deliberately and often.",
+  "Control-plane APIs must not depend on the zone that has failed; failing them away by hand cost over an hour of launch errors.",
+  "Customers running across several Availability Zones stayed up; single-zone workloads carried the whole outage."
+ ],
+ "improvements": [
+  "Design: additional breakers to isolate degraded utility power faster (AWS committed).",
+  "Software: fix the latent instance-recovery bug (AWS, in testing at the time).",
+  "Process: regular recovery tests on unoccupied long-running hosts (AWS committed).",
+  "Control plane: more resilient launch APIs, Sydney roll-out planned for July 2016 (AWS).",
+  "Analyst recommendation (not in the summary): test UPS isolation logic against recorded sag profiles from the local grid, and avoid identical protection designs on both line-ups."
+ ],
+ "comprehensiveAnalysis": [
+  {
+   "heading": "A sag, not a blackout",
+   "body": "A dead feed is the easy case for protection. A long sag leaves enough voltage that the input breaker logic hesitates, and a flywheel UPS has only seconds of energy to spend. The design worked well for years and failed on a waveform it had not been built for."
+  },
+  {
+   "heading": "Common-mode failure across two line-ups",
+   "body": "Every instance had two independent line-ups. Both used the same DRUPS scheme, so the same sag defeated both. Redundancy counts only against failures that do not hit every copy the same way."
+  },
+  {
+   "heading": "The long tail was software",
+   "body": "Power returned 81 minutes after the trigger, but nearly all instances were back only after about nine and a half hours. DNS load, slow API state, a latent recovery bug and storage drive failures each added time."
+  },
+  {
+   "heading": "Multi-zone design held",
+   "body": "AWS notes that customers running across several Availability Zones kept their applications available. The event is a clear case for spreading critical workloads across zones."
+  },
+  {
+   "heading": "What the summary does not say",
+   "body": "It does not name the facility, the DRUPS make, the breaker type, how many instances were affected or the cost. It also does not report when the added breakers were installed."
+  }
+ ],
+ "technicalDeepDive": "A DRUPS bridges a utility loss with flywheel energy while its diesel starts. That only works if the unit is islanded from the grid the moment the grid is bad. A clean outage opens the input breaker almost at once; a long sag keeps the voltage just high enough that the breaker logic waits, and in that time the flywheel discharges into the faulted network instead of the load. When the flywheel speed falls too far the DRUPS trips, and the running diesel has nothing to synchronise to.\n\nAWS's fix is in the protection scheme: more breakers so the system breaks from degraded utility power faster. The recovery problems are a separate lesson: a mass power-on drives load patterns (DNS, instance state, storage re-replication) that ordinary operation never exercises, so recovery paths must be tested on purpose.",
+ "references": [
+  {
+   "title": "AWS Post-Event Summary: Summary of the AWS Service Event in the Sydney Region",
+   "url": "https://aws.amazon.com/message/4372T8/",
+   "type": "official-postmortem",
+   "accessed": "2026-11-11",
+   "quote": "a set of breakers responsible for isolating the DRUPS from utility power failed to open quickly enough"
+  },
+  {
+   "title": "AWS Post-Event Summaries index",
+   "url": "https://aws.amazon.com/premiumsupport/technology/pes/",
+   "type": "vendor-status",
+   "accessed": "2026-11-11",
+   "quote": "Summary of the AWS Service Event in the Sydney Region"
+  }
+ ],
+ "sourcing": {
+  "officialPostmortem": true,
+  "referenceCount": 2,
+  "lastVerified": "2026-11-11",
+  "confidence": "High: all facts from AWS's own Post-Event Summary. Facility, equipment makes, affected counts and completion of actions are not disclosed."
+ },
+ "lastUpdated": "2026-11-11",
+ "operatorShort": "AWS",
+ "fmea": {
+  "scope": "The facility's dual DRUPS power line-ups and their utility isolation, plus the EC2/EBS recovery path and launch APIs, from AWS's own summary.",
+  "modes": [
+   {
+    "id": "FM-01",
+    "item": "DRUPS input isolation breakers",
+    "function": "Island the rotary UPS from a bad grid so its flywheel feeds only the load until the diesel engages",
+    "failureMode": "During a long voltage sag the breakers do not open fast enough and the flywheel energy drains into the grid",
+    "effect": "DRUPS trips; running generators cannot be connected; the line-up drops",
+    "cause": "Protection logic not tuned for a long sag signature",
+    "prevention": "Isolating breakers and generator start built into each DRUPS line-up",
+    "detection": "None before the event; the weakness showed only under this sag",
+    "S": 9,
+    "O": 3,
+    "D": 8,
+    "rationale": {
+     "S": "It removed power from a significant part of an Availability Zone: 9.",
+     "O": "Long sags of this shape are uncommon: 'remote to infrequent'.",
+     "D": "No recorded test exercised the protection with a long sag."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 2,
+      "quote": "fail to open quickly enough"
+     },
+     {
+      "src": "factor",
+      "i": 1
+     },
+     {
+      "src": "ref",
+      "i": 0,
+      "quote": "failed to open quickly enough"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Additional breakers to break from degraded utility power faster (AWS, committed)",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     }
+    ],
+    "revised": {
+     "S": 9,
+     "O": 2,
+     "D": 6
+    },
+    "revisedRationale": "Faster isolation addresses the mechanism directly. AWS has not reported completion, so this is a claim about the action, not a measured result.",
+    "short": "Isolation too slow",
+    "symbol": "breaker",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Test UPS input isolation against long-sag profiles, not only a clean loss of supply",
+      "basis": "nfpa-110",
+      "evidence": {
+       "src": "lesson",
+       "i": 1
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "detect",
+      "do": "Alarm on flywheel speed falling while the input breaker is still closed",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "factor",
+       "i": 1
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "contain",
+      "do": "Fail control-plane services away from the zone as soon as a line-up drops",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "electrical",
+      "phase": "recover",
+      "do": "Re-engage line-ups by hand only after on-site checks show it is safe",
+      "basis": "nfpa-70e",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "recover",
+      "do": "Restart instances in order once both line-ups are proven stable",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-02",
+    "item": "Dual power line-ups of one design",
+    "function": "Keep each instance powered if either line-up fails",
+    "failureMode": "Both line-ups fail together because they share the same DRUPS design and weakness",
+    "effect": "Instances lose primary and secondary power at once",
+    "cause": "Common-mode design across the redundant paths",
+    "prevention": "Two independent line-ups per instance",
+    "detection": "None recorded; common-mode risk is not visible in normal operation",
+    "S": 9,
+    "O": 3,
+    "D": 7,
+    "rationale": {
+     "S": "It defeats the redundancy that protects every instance: 9.",
+     "O": "Requires a grid event that hits the shared weakness: 'remote to infrequent'.",
+     "D": "Common-mode weaknesses do not show in normal running or simple failover tests."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 3,
+      "quote": "affected instances lose both their primary and secondary power"
+     },
+     {
+      "src": "factor",
+      "i": 2
+     },
+     {
+      "src": "rootCause",
+      "quote": "both line-ups were lost together"
+     }
+    ],
+    "actions": [
+     {
+      "text": "Additional breakers on the line-ups (AWS, committed)",
+      "evidence": {
+       "src": "coe",
+       "i": 0
+      }
+     }
+    ],
+    "short": "Both line-ups fail",
+    "symbol": "ups",
+    "playbook": [
+     {
+      "role": "electrical",
+      "phase": "prevent",
+      "do": "Review redundant power paths for shared designs that one grid event can defeat together",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "lesson",
+       "i": 0
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "detect",
+      "do": "Alert when both feeds to a rack group drop within the same second",
+      "basis": "uptime-os",
+      "evidence": {
+       "src": "factor",
+       "i": 2
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Move customer launches to unaffected zones while power is out",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Tell customers which zone failed and that multi-zone workloads are unaffected",
+      "basis": "itil-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 5
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-03",
+    "item": "Instance recovery software",
+    "function": "Bring all instances back automatically when power returns",
+    "failureMode": "A latent bug stops automatic recovery of part of the fleet",
+    "effect": "The remaining instances need manual recovery over several hours",
+    "cause": "Recovery path rarely exercised at scale",
+    "prevention": "Automated recovery workflows",
+    "detection": "Visible only when a mass recovery ran",
+    "S": 6,
+    "O": 4,
+    "D": 7,
+    "rationale": {
+     "S": "It stretched the outage from about 2.5 hours for most customers to about 9.5 hours for the rest: 6.",
+     "O": "Mass recoveries are rare, but each one can expose such bugs: 'infrequent'.",
+     "D": "Nothing exercised the path before the event."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 14,
+      "quote": "A latent bug in the instance management software"
+     },
+     {
+      "src": "factor",
+      "i": 3
+     },
+     {
+      "src": "metric",
+      "i": 5
+     }
+    ],
+    "actions": [
+     {
+      "text": "Fix the latent bug (AWS, in testing)",
+      "evidence": {
+       "src": "coe",
+       "i": 1
+      }
+     },
+     {
+      "text": "Regular recovery tests on unoccupied long-running hosts (AWS, committed)",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     }
+    ],
+    "revised": {
+     "S": 6,
+     "O": 3,
+     "D": 4
+    },
+    "revisedRationale": "Regular recovery testing is aimed exactly at detection; the bug fix lowers occurrence. Neither is reported complete.",
+    "short": "Recovery bug",
+    "symbol": "rack",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "prevent",
+      "do": "Run recovery workflows on spare long-running hosts on a schedule",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 2
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "detect",
+      "do": "Track the share of instances recovered automatically and alert when it stalls",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 3
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Switch to manual recovery for instances the automation cannot restore",
+      "basis": "itil-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Give affected customers a per-instance recovery status",
+      "basis": "itil-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 3
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-04",
+    "item": "EBS storage servers",
+    "function": "Keep volume data durable through a power loss",
+    "failureMode": "Hard drives fail on several storage servers; volumes with both replicas on failed servers cannot be restored automatically",
+    "effect": "A very small share of volumes stays out much longer; some data is at risk",
+    "cause": "Drive failures in the power event, with both replicas on failed hardware",
+    "prevention": "Replication of each volume to multiple servers in the zone",
+    "detection": "Found during recovery",
+    "S": 7,
+    "O": 2,
+    "D": 5,
+    "rationale": {
+     "S": "Possible data loss for the affected volumes is serious even at a small share: 7.",
+     "O": "Under 0.01% of volumes: 'remote'.",
+     "D": "The replication system knows replica health, but the double loss was found only in recovery."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 15,
+      "quote": "storage servers suffered failed hard drives"
+     },
+     {
+      "src": "metric",
+      "i": 6
+     },
+     {
+      "src": "factor",
+      "i": 4
+     }
+    ],
+    "actions": [],
+    "short": "EBS replica loss",
+    "symbol": "rack",
+    "playbook": [
+     {
+      "role": "service-recovery",
+      "phase": "detect",
+      "do": "List volumes whose replicas are all on failed servers as soon as power returns",
+      "basis": "nist-800-34",
+      "evidence": {
+       "src": "factor",
+       "i": 4
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Prioritise manual repair of the storage servers that hold the only copies",
+      "basis": "nist-800-34",
+      "evidence": {
+       "src": "coe",
+       "i": 5
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "contain",
+      "do": "Tell owners of affected volumes early and point them to their snapshots",
+      "basis": "itil-incident",
+      "evidence": {
+       "src": "factor",
+       "i": 4
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "recover",
+      "do": "Restore from snapshots where a server cannot be repaired",
+      "basis": "iso-22301",
+      "evidence": {
+       "src": "lesson",
+       "i": 5
+      }
+     }
+    ]
+   },
+   {
+    "id": "FM-05",
+    "item": "Instance launch APIs",
+    "function": "Let customers launch and scale in healthy zones during a zone failure",
+    "failureMode": "Launch and scaling calls fail until the APIs are failed away from the degraded zone by hand",
+    "effect": "Customers cannot launch or scale for about 77 minutes; later, stale state confuses them",
+    "cause": "Control-plane dependence on the failed zone; slow propagation of state after recovery",
+    "prevention": "Regional APIs spanning several zones",
+    "detection": "Customer-visible errors",
+    "S": 6,
+    "O": 4,
+    "D": 4,
+    "rationale": {
+     "S": "It blocks the workaround customers need (launch elsewhere): 6.",
+     "O": "Any zone failure tests this dependency: 'infrequent'.",
+     "D": "Errors were visible, but the response was manual."
+    },
+    "evidence": [
+     {
+      "src": "soe",
+      "i": 5,
+      "quote": "Customers get errors when launching new instances"
+     },
+     {
+      "src": "soe",
+      "i": 7,
+      "quote": "manual failover away from degraded services"
+     },
+     {
+      "src": "factor",
+      "i": 5
+     }
+    ],
+    "actions": [
+     {
+      "text": "More resilient launch APIs, Sydney roll-out planned for July 2016 (AWS)",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     }
+    ],
+    "revised": {
+     "S": 6,
+     "O": 3,
+     "D": 4
+    },
+    "revisedRationale": "API changes target the dependency; completion is not reported.",
+    "short": "Launch APIs fail",
+    "symbol": "fabric",
+    "playbook": [
+     {
+      "role": "ops-lead",
+      "phase": "prevent",
+      "do": "Design regional APIs so they shed a failed zone automatically",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 3
+      }
+     },
+     {
+      "role": "ops-lead",
+      "phase": "detect",
+      "do": "Alert on launch error rate per zone, not only per region",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "factor",
+       "i": 5
+      }
+     },
+     {
+      "role": "service-recovery",
+      "phase": "contain",
+      "do": "Fail launches away from the degraded zone at once",
+      "basis": "sre-incident",
+      "evidence": {
+       "src": "coe",
+       "i": 4
+      }
+     },
+     {
+      "role": "comms",
+      "phase": "recover",
+      "do": "Warn customers that resource state may lag while the APIs catch up",
+      "basis": "itil-incident",
+      "evidence": {
+       "src": "lesson",
+       "i": 4
+      }
+     }
+    ]
+   }
+  ],
+  "impactShort": "One zone dark · ~9.5 h to recover"
+ },
+ "durationStatus": "measured",
+ "durationEvidence": {
+  "onset": {
+   "src": "soe",
+   "i": 0,
+   "quote": "22:25 PDT"
+  },
+  "restored": {
+   "src": "soe",
+   "i": 17,
+   "quote": "08:00 PDT"
+  }
+ },
+ "durationBasis": "Trigger 22:25 PDT 4 Jun → nearly all instances recovered 08:00 PDT 5 Jun (9 h 35 min)",
+ "response": {
+  "roles": {
+   "utility": "The utility provider, not named",
+   "electrical": "AWS on-site technicians",
+   "ops-lead": "AWS operations team",
+   "service-recovery": "AWS EC2 and EBS recovery teams",
+   "comms": "The AWS Team, Post-Event Summary"
+  },
+  "recorded": [
+   {
+    "role": "utility",
+    "soe": 0,
+    "quote": "the utility provider to lose a regional substation",
+    "did": "Lost a regional substation in severe weather"
+   },
+   {
+    "role": "electrical",
+    "soe": 6,
+    "quote": "On-site technicians inspect the power line-ups",
+    "did": "Inspected the line-ups to decide when re-engaging was safe"
+   },
+   {
+    "role": "ops-lead",
+    "soe": 7,
+    "quote": "manual failover away from degraded services",
+    "did": "Failed launch services away from the degraded zone"
+   },
+   {
+    "role": "electrical",
+    "soe": 8,
+    "quote": "manually re-engage the power line-ups",
+    "did": "Re-engaged the line-ups by hand and restored power"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 14,
+    "quote": "the team recovers the remaining instances by hand",
+    "did": "Recovered instances the automation could not"
+   },
+   {
+    "role": "service-recovery",
+    "soe": 16,
+    "quote": "The EBS team manually recovers",
+    "did": "Repaired damaged storage servers by hand"
+   }
+  ]
+ },
+ "fishbone": {
+  "effect": "Sydney zone lost power",
+  "bones": [
+   {
+    "cat": "Equipment",
+    "causes": [
+     {
+      "label": "Breakers open too slowly",
+      "factor": 1
+     },
+     {
+      "label": "Drives fail on storage",
+      "factor": 4
+     }
+    ]
+   },
+   {
+    "cat": "Design",
+    "causes": [
+     {
+      "label": "Same DRUPS both sides",
+      "factor": 2
+     },
+     {
+      "label": "APIs tied to the zone",
+      "factor": 5
+     }
+    ]
+   },
+   {
+    "cat": "Process",
+    "causes": [
+     {
+      "label": "Recovery path untested",
+      "factor": 3
+     },
+     {
+      "label": "DNS overloaded",
+      "factor": 6
+     }
+    ]
+   },
+   {
+    "cat": "External",
+    "causes": [
+     {
+      "label": "Long voltage sag",
+      "factor": 0
+     }
+    ]
+   }
+  ]
+ }
+}
