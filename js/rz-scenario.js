@@ -294,6 +294,7 @@
         if (settled) return;
         settled = true; clearTimeout(guard);
         say('Link copied. Anyone who opens it sees these inputs.');
+        track('scenario_link_copied', 'calc', null, { calc: (d.body && d.body.getAttribute('data-rz-calc')) || '' });
         setTimeout(function () { if (msg.textContent.indexOf('Link copied') === 0) msg.style.display = 'none'; }, 4000);
       }, function () { if (!settled) { settled = true; clearTimeout(guard); fallback(); } });
     } catch (e) { fallback(); }
@@ -377,6 +378,54 @@
    * saves {summary, inputs} to Supabase for the signed-in user, and reports into #msgEl.
    * Signed-out users are pointed to account.html. Uses window.rzSupa at call time.
    */
+  /* P15 part A (v3.39.0): the signed-in user's own activity, written to audit_log through the existing
+     log_event RPC. Fire-and-forget: a logging failure never touches the action. Meta carries only the
+     calculator id and a format, never inputs or personal data. */
+  var TRACK_ACTIONS = ['scenario_saved', 'scenario_deleted', 'scenario_opened', 'scenario_link_copied', 'pdf_exported'];
+  var TRACK_META = ['calc', 'format'];
+  function track(action, targetType, targetId, meta) {
+    try {
+      if (TRACK_ACTIONS.indexOf(action) < 0) return Promise.resolve(false);
+      var S = w.rzSupa;
+      if (!S || !S.configured || !S.logEvent) return Promise.resolve(false);
+      var clean = {};
+      Object.keys(meta || {}).forEach(function (k) {
+        if (TRACK_META.indexOf(k) >= 0 && typeof meta[k] === 'string' && meta[k].length <= 40) clean[k] = meta[k];
+      });
+      return Promise.resolve(S.getUser()).then(function (u) {
+        if (!u) return false;
+        return Promise.resolve(S.logEvent(action, targetType || null, targetId ? String(targetId) : null, clean))
+          .then(function (r) { return !(r && r.error); });
+      }).catch(function () { return false; });
+    } catch (e) { return Promise.resolve(false); }
+  }
+
+  /* PDF exports: every calculator's builder, wrapped once here instead of edited on 11 pages. A builder
+     that returns without throwing counts as exported. Names absent on a page are skipped. */
+  var PDF_BUILDERS = ['exportPDF', 'exportOpexPDF', 'cxExportPDF', 'cxExportActivityPDF', 'exportFullReportPDF',
+    'exportCriticalityPDF', 'exportReadinessPDF', 'RfsReportEngine.exportPdf', 'RfsUI.exportCurrentTabPdf'];
+  function hookPdfExports() {
+    var calc = d.body && d.body.getAttribute('data-rz-calc');
+    if (!calc) return 0;
+    var n = 0;
+    PDF_BUILDERS.forEach(function (path) {
+      var parts = path.split('.'), owner = w;
+      for (var i = 0; i < parts.length - 1; i++) { owner = owner && owner[parts[i]]; }
+      var key = parts[parts.length - 1];
+      var fn = owner && owner[key];
+      if (typeof fn !== 'function' || fn.__rzTracked) return;
+      var wrapped = function () {
+        var out = fn.apply(this, arguments);
+        var done = function () { track('pdf_exported', 'calc', null, { calc: calc, format: 'pdf' }); };
+        if (out && typeof out.then === 'function') out.then(done, function () {}); else done();
+        return out;
+      };
+      wrapped.__rzTracked = true;
+      try { owner[key] = wrapped; n++; } catch (e) {}
+    });
+    return n;
+  }
+
   async function saveToAccount(calc, opts) {
     opts = opts || {};
     var msg = opts.msgEl && d.getElementById(opts.msgEl);
@@ -391,6 +440,7 @@
       var name = opts.name || (calc.toUpperCase() + ' · ' + new Date().toLocaleDateString());
       var res = await S.saveScenario(calc, name, { summary: opts.summary || {}, inputs: inputs });
       if (res.error) { show('Save failed: ' + res.error, false); return; }
+      track('scenario_saved', 'scenario', res.data && res.data.id, { calc: calc });
       // Trusted, hardcoded content — safe to use innerHTML for the account link (discoverability).
       showOk('<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="vertical-align:-1px;margin-right:5px" aria-hidden="true"><path d="M6.5 19a4.5 4.5 0 0 1 0-9 6 6 0 0 1 11.6-1.6A4 4 0 0 1 18 19z"/></svg>Saved — <a href="account.html" style="color:#67e8f9;text-decoration:underline;">open My Account</a>');
     } catch (e) { show('Save failed: ' + (e && e.message || e), false); }
@@ -435,10 +485,11 @@
     d.body.appendChild(a);
   }
 
-  w.rzScenario = { capture: capture, restore: restore, openInCalc: openInCalc, saveToAccount: saveToAccount,
+  w.rzScenario = { capture: capture, restore: restore, openInCalc: openInCalc, saveToAccount: saveToAccount, track: track,
+                   TRACK_ACTIONS: TRACK_ACTIONS, PDF_BUILDERS: PDF_BUILDERS, hookPdfExports: hookPdfExports,
                    shareLink: shareLink, linkFor: linkFor, readLink: readLink, encodeLink: encodeLink, restoreFiltered: restoreFiltered, LINK: LINK };
 
-  function onReady() { if (!handleLink()) autoRestore(); injectAccountLink(); injectCopyButton(); }
+  function onReady() { if (!handleLink()) autoRestore(); injectAccountLink(); injectCopyButton(); hookPdfExports(); }
   if (d.readyState === 'loading') w.addEventListener('DOMContentLoaded', onReady);
   else onReady();
 })(typeof window !== 'undefined' ? window : this, typeof document !== 'undefined' ? document : null);

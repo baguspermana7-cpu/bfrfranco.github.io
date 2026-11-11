@@ -417,13 +417,15 @@ const api = {
     });
     return { data, error: friendly(error) };
   },
-  async listAuditLog(limit) {
+  async listAuditLog(limit, opts) {
     if (!client) return { data: [], error: initError };
-    if (!(await this.getUser())) return { data: [], error: 'not signed in' };
+    const user = await this.getUser();
+    if (!user) return { data: [], error: 'not signed in' };
     // RLS: a user sees own events; root sees all. Pinned columns + bounded limit.
-    const { data, error } = await client.from('audit_log')
-      .select('id, actor_id, action, target_type, target_id, meta, created_at')
-      .order('created_at', { ascending: false }).limit(Math.min(limit || 100, 500));
+    // opts.own (P15): only the caller's rows, so a root account's own history is not crowded out by everyone else's.
+    let q = client.from('audit_log').select('id, actor_id, action, target_type, target_id, meta, created_at');
+    if (opts && opts.own) q = q.eq('actor_id', user.id);
+    const { data, error } = await q.order('created_at', { ascending: false }).limit(Math.min(limit || 100, 500));
     return { data: data || [], error: friendly(error) };
   },
 

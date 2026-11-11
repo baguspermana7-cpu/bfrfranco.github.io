@@ -11,6 +11,34 @@ release sections rather than semver.
 
 ---
 
+## v3.39.0 — 2026-11-11 — "The account shows what you did"
+
+Product transformation, Wave 2: P15 part A (activity history). Part B is server SQL the owner runs.
+
+### Added
+- **Recent activity on the account page.** A table of the signed-in user's last 50 actions: when, what (saved, opened,
+  deleted a scenario, copied a link, exported a PDF), which scenario (or "deleted scenario" when it is gone) and which
+  calculator. Empty: "No activity recorded yet. Saving or opening a scenario adds an entry." Failure: "Activity could not
+  be loaded." with a Retry button. It reads `audit_log` through `rzSupa.listAuditLog(50, { own: true })`; the new `own`
+  option filters on `actor_id`, so a root account sees its own history here, not everyone's.
+- `rzScenario.track(action, targetType, targetId, meta)` in `js/rz-scenario.js`: fire-and-forget through
+  `rzSupa.logEvent`, signed-in only, failures swallowed. Two allowlists: actions (`scenario_saved`, `scenario_deleted`,
+  `scenario_opened`, `scenario_link_copied`, `pdf_exported`) and meta keys (`calc`, `format`, strings of 40 characters at
+  most). Nothing else reaches the table.
+- PDF exports are tracked on all 11 calculators by wrapping each page's own builder once (`hookPdfExports()`, nine names:
+  `exportPDF`, `exportOpexPDF`, `cxExportPDF`, `cxExportActivityPDF`, `exportFullReportPDF`, `exportCriticalityPDF`,
+  `exportReadinessPDF`, `RfsReportEngine.exportPdf`, `RfsUI.exportCurrentTabPdf`). A builder that throws logs nothing.
+- `tools/test-activity-log.mjs` (27 checks, wired into the ship gate): account page with a stubbed `rzSupa` — table,
+  own-rows query, empty and error states, Retry, one event each for Open / Copy link / Delete; capex and pue — every real
+  builder wrapped, `pdf_exported` with `{calc, format}`, a throwing builder silent, allowlists hold, signed out silent.
+  Proven RED: dropping the `own` flag, the delete event and the meta allowlist fails 6 checks.
+- `supabase/p15-log-event-guard.sql` (also folded into `supabase/schema.sql`): `log_event()` now refuses a caller that is
+  not signed in, an action outside `^[a-z_]{3,40}$`, meta over 2 KB, and more than 60 events per user in 10 minutes.
+  Tested in a disposable Postgres 16 with a stubbed `auth.uid()`: all five cases behave as written. **Not yet applied to
+  the live project — the owner runs it.**
+
+---
+
 ## v3.38.0 — 2026-11-11 — "Every public page can be found, and Ctrl+K works on the calculators"
 
 Product transformation, Wave 2: P14 (search and command palette).

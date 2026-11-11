@@ -67,6 +67,12 @@
                   padding:5px 12px; border-radius:var(--fs-rx); font-size:0.75rem; cursor:pointer; font-family:var(--fs-sans); }
     button.link:hover { color:var(--fs-t1); border-color:var(--fs-t4); }
     button.link.open { color:var(--fs-blu); border-color:rgba(96,165,250,0.4); }
+    .act-table { width:100%; border-collapse:collapse; font-size:0.85rem; }
+    .act-table th, .act-table td { text-align:left; padding:8px 6px; border-bottom:1px solid var(--fs-bd); }
+    .act-table th { color:var(--fs-t3); font-weight:600; font-size:0.75rem; }
+    .act-table td:first-child { font-variant-numeric:tabular-nums; }
+    #actList { overflow-x:auto; max-width:100%; }
+    @media (min-width:600px) { .act-table td:first-child { white-space:nowrap; } }
     button.link.del { color:var(--fs-red); border-color:rgba(239,68,68,0.4); }
 
     .future { display:flex; align-items:center; justify-content:space-between; gap:10px;
@@ -147,6 +153,13 @@
         </p>
       </div>
 
+      <div class="card span2" id="actCard">
+        <h2>Recent activity</h2>
+        <div id="actList" aria-live="polite">
+          <div class="fs-skel skelrow"></div>
+        </div>
+      </div>
+
       <div class="card" id="prefCard">
         <h2>Preferences</h2>
         <div class="kv">
@@ -173,8 +186,8 @@
 
   <script src="js/rz-version.js" defer></script>
   <script src="js/rz-config.js"></script>
-  <script src="js/rz-scenario.js?v=20261111-fd2d4b6d"></script>
-  <script type="module" src="js/rz-supabase.js?v=20260920-90bd6417"></script>
+  <script src="js/rz-scenario.js?v=20261111-9f2ae47f"></script>
+  <script type="module" src="js/rz-supabase.js?v=20261111-3c801534"></script>
   <script type="module">
     const $ = (id) => document.getElementById(id);
     const show = (el, on) => el.classList.toggle('hidden', !on);
@@ -214,6 +227,7 @@
       /* scenarios */
       const list = $('scnList');
       const { data: rows, error: sErr } = await S.listScenarios();
+      loadActivity(rows || []);
       if (sErr) { list.innerHTML = '<p class="err status">'+escapeHtml(String(sErr))+'</p>'; return; }
       $('scnCount').textContent = rows.length;
       if (!rows.length) { list.innerHTML = '<p class="muted" style="font-size:0.85rem;">No saved scenarios yet. Open a calculator and click <b>Save scenario</b>.</p>'; return; }
@@ -236,7 +250,11 @@
         list.appendChild(el);
       });
       list.querySelectorAll('button[data-id]').forEach(b => b.onclick = async () => {
-        await S.deleteScenario(b.getAttribute('data-id')); render();
+        const id = b.getAttribute('data-id');
+        const row = rows.find(x => x.id === id);
+        const res = await S.deleteScenario(id);
+        if (!(res && res.error) && window.rzScenario && window.rzScenario.track) window.rzScenario.track('scenario_deleted', 'scenario', id, { calc: row ? row.calc : '' });
+        render();
       });
       list.querySelectorAll('button[data-share]').forEach(b => b.onclick = () => {
         const row = rows.find(x => x.id === b.getAttribute('data-share'));
@@ -245,8 +263,12 @@
       list.querySelectorAll('button[data-open]').forEach(b => b.onclick = () => {
         const id = b.getAttribute('data-open');
         const row = rows.find(x => x.id === id);
-        if (row && row.payload && row.payload.inputs && window.rzScenario)
-          window.rzScenario.openInCalc(row.calc, row.payload.inputs);
+        if (row && row.payload && row.payload.inputs && window.rzScenario) {
+          // P15: record the open, but never hold the navigation for more than 400 ms waiting on it.
+          const t = window.rzScenario.track ? window.rzScenario.track('scenario_opened', 'scenario', id, { calc: row.calc }) : null;
+          Promise.race([t || Promise.resolve(), new Promise(r => setTimeout(r, 400))])
+            .then(() => window.rzScenario.openInCalc(row.calc, row.payload.inputs));
+        }
       });
     }
     // P02: a saved scenario's share link, built from its stored inputs (same encoder as the calculators).
@@ -263,7 +285,31 @@
         msg.appendChild(f); f.focus(); f.select();
       };
       if (!navigator.clipboard || !navigator.clipboard.writeText) return fallback();
-      navigator.clipboard.writeText(r.url).then(() => { msg.textContent = 'Link copied.'; }, fallback);
+      navigator.clipboard.writeText(r.url).then(() => { msg.textContent = 'Link copied.'; if (window.rzScenario && window.rzScenario.track) window.rzScenario.track('scenario_link_copied', 'scenario', row.id, { calc: row.calc }); }, fallback);
+    }
+    /* P15 part A: the signed-in user's own recent actions (audit_log, own rows only). */
+    const ACT_LABEL = { scenario_saved: 'Saved scenario', scenario_deleted: 'Deleted scenario', scenario_opened: 'Opened scenario',
+      scenario_link_copied: 'Copied link', pdf_exported: 'Exported PDF', tier_change: 'Tier changed', role_change: 'Role changed' };
+    async function loadActivity(rows) {
+      const box = $('actList');
+      let res;
+      try { res = await S.listAuditLog(50, { own: true }); } catch (e) { res = { data: [], error: String(e && e.message || e) }; }
+      if (res.error) {
+        box.innerHTML = '<p class="err status">Activity could not be loaded.</p><button type="button" class="link" id="actRetry">Retry</button>';
+        $('actRetry').onclick = () => { box.innerHTML = '<div class="fs-skel skelrow"></div>'; loadActivity(rows); };
+        return;
+      }
+      const ev = res.data || [];
+      if (!ev.length) { box.innerHTML = '<p class="muted" style="font-size:0.85rem;">No activity recorded yet. Saving or opening a scenario adds an entry.</p>'; return; }
+      const names = {}; rows.forEach(r => { names[r.id] = r.name; });
+      let h = '<table class="act-table"><thead><tr><th scope="col">When</th><th scope="col">Action</th><th scope="col">Item</th><th scope="col">Calculator</th></tr></thead><tbody>';
+      ev.forEach(e => {
+        const meta = e.meta || {};
+        const item = e.target_type === 'scenario' ? (names[e.target_id] ? escapeHtml(names[e.target_id]) : '<span class="muted">deleted scenario</span>') : '—';
+        h += '<tr><td>' + escapeHtml(new Date(e.created_at).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })) + '</td><td>' + escapeHtml(ACT_LABEL[e.action] || e.action)
+          + '</td><td>' + item + '</td><td>' + escapeHtml(meta.calc || '—') + '</td></tr>';
+      });
+      box.innerHTML = h + '</tbody></table>';
     }
     function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
     function fmtMoney(n){ n = Number(n)||0; return n>=1e9 ? '$'+(n/1e9).toFixed(2)+'B' : n>=1e6 ? '$'+(n/1e6).toFixed(1)+'M' : n>=1e3 ? '$'+Math.round(n/1e3)+'K' : '$'+Math.round(n); }

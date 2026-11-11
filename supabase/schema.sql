@@ -739,11 +739,20 @@ as $$
 declare
   new_id uuid;
 begin
-  if p_action is null or char_length(p_action) = 0 then
-    raise exception 'action is required';
+  -- P15 part B: a signed-in caller, a lowercase snake_case action, a small meta, and at most 60 events
+  -- per 10 minutes per user, so a script holding a session cannot flood the table.
+  if auth.uid() is null then
+    raise exception 'sign in required';
   end if;
-  if pg_column_size(coalesce(p_meta, '{}'::jsonb)) > 32768 then
-    raise exception 'meta too large (32 KB max)';
+  if p_action is null or p_action !~ '^[a-z_]{3,40}$' then
+    raise exception 'action must match ^[a-z_]{3,40}$';
+  end if;
+  if pg_column_size(coalesce(p_meta, '{}'::jsonb)) > 2048 then
+    raise exception 'meta too large (2 KB max)';
+  end if;
+  if (select count(*) from public.audit_log
+        where actor_id = auth.uid() and created_at > now() - interval '10 minutes') >= 60 then
+    raise exception 'rate limit: 60 events per 10 minutes';
   end if;
   insert into public.audit_log (actor_id, action, target_type, target_id, meta)
   values (auth.uid(), p_action, p_target_type, p_target_id, coalesce(p_meta, '{}'::jsonb))

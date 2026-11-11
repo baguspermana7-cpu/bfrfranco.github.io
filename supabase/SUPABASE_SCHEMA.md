@@ -37,7 +37,7 @@ a per-user row-count cap trigger (SECURITY DEFINER), and jsonb size CHECKs.
 
 | Table | Scope | Write path |
 |---|---|---|
-| `audit_log` | read own OR root-all | **No client insert** — only `log_event()` (actor = `auth.uid()`) + the profile privilege-change trigger. `actor_id → profiles`. |
+| `audit_log` | read own OR root-all | **No client insert** — only `log_event()` (actor = `auth.uid()`) + the profile privilege-change trigger. `actor_id → profiles`. Since P15 (v3.39.0) `log_event()` refuses anon callers, actions outside `^[a-z_]{3,40}$`, meta > 2 KB and > 60 events/user/10 min (`supabase/p15-log-event-guard.sql`). Client writers: `rzScenario.track()` only, with an action + meta allowlist; reader: account.html "Recent activity" via `listAuditLog(n, { own: true })`. |
 | `newsletter_subscribers` | root-read only | **No public select, no raw public insert** — signup via `subscribe_newsletter()` (validates email, upserts). |
 | `subscriptions` | read own | **No client write** — Mayar webhook via `service_role`. `user_id → auth.users`. |
 | `payments` | read own | **No client write** — webhook via `service_role`. `subscription_id → subscriptions (on delete set null)`. |
