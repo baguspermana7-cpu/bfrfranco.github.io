@@ -11,6 +11,47 @@ release sections rather than semver.
 
 ---
 
+## v3.47.0 — 2026-11-12 — Country prices and grid factors say where they come from
+
+Product transformation, Wave 3: P11 (location dataset), re-scoped by measurement.
+
+### Measured first
+- **The calculators already agree.** The PRD measured the page tables (carbon Indonesia $0.08/kWh, opex $0.075/kWh),
+  but on load both pages overwrite those literals from the engine's country dataset (`RZEngine.data.countries`), and the
+  TCO calculator reads it directly. Rendered, Indonesia is $0.09/kWh and 0.70 kg/kWh on all three, and the 24 countries
+  carbon and opex share agree. So no `data/locations.json` was made: a JSON copy would be the second source P11 exists
+  to remove. The one dataset is the engine's, generated from `dcmoc/src/constants/countries.ts`.
+- **The real disagreement is inside the engine.** `DATA.electricityTariffs` (cited per country: EIA, Eurostat, EMA,
+  PLN B3, TNB, METI) differs from `DATA.countries` for all 14 countries it covers (Indonesia $0.082 vs $0.09, US $0.079
+  vs $0.13, Australia $0.095 vs $0.18), and its provenance note says it "does not diverge". Which table wins changes
+  DCMOC financials in 10 modules, so it is an owner decision (O-P11). No value was changed in this release.
+
+### Added
+- **A source line under each prefilled country value.** Carbon footprint (grid factor and electricity rate) and OPEX
+  (energy price) show "ASSUMED · DCMOC country reference, as of Q1 2026": the dataset cites its sources once for the
+  whole table, not per value, so each value is labelled ASSUMED, with the word in the warning colour. Hovering names the
+  dataset's sources and, where the cited tariff table differs, its value (O-P11).
+- **Rows the engine does not carry say so.** OPEX's Hong Kong, China (Tier 2) and the three US state rows read
+  "ASSUMED · legacy page value, no source on file".
+- `js/rz-locations.js`: `field(code, 'energy'|'grid', data, pageValue)` and `conflicts(data)`.
+
+### Changed
+- The carbon calculator's tooltip no longer says the rate is "auto-populated from IEA and regional utility data";
+  it points to the source line.
+
+### Gates
+- `tools/test-locations.mjs` (12 checks): value, evidence and wording per case (engine country, page-only row,
+  unknown code, engine absent), the engine value wins over a stale page literal, and the 14-country conflict list.
+  Proven RED with the module absent.
+- `tools/test-locations-ui.mjs` (89 checks): the same energy price on carbon, opex and tco (`country:XX`) for 7
+  countries, equal to the engine, in both themes; source lines with ASSUMED; Hong Kong's legacy line; the line fits at
+  390 px; no page errors. Proven RED on the previous tree (32 failures) and by making opex skip the engine rate
+  (Indonesia 0.075 vs 0.09).
+
+Standards: `standarization/ENGINE_UNIFICATION.md` § Location values (P11).
+
+---
+
 ## v3.46.0 — 2026-11-11 — Market figures show how old their data is
 
 Product transformation, Wave 3: P26 part A.

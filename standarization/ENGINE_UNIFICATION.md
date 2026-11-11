@@ -142,3 +142,18 @@ Traps catalogued in memory: pue.defaultFor key mismatch (use pueMatrix direct), 
 - Adopted on dc-market-tracker (dataset line) and tco (market rates under Country / Location: metro = markets,
   `country:XX` = countries, a metro the engine does not carry = "date not recorded"). roi reads no engine dataset, so it
   carries no stamp. Part B (a scheduled fetch of external sources) is BLOCKED on the owner.
+
+## Location values (P11, v3.47.0)
+
+- One dataset for country energy price and grid factor: `RZEngine.data.countries` (generated from
+  `dcmoc/src/constants/countries.ts`). Calculators read it; a page table is a fallback only for a row the engine does not
+  carry. Do not add a second copy (no `data/locations.json`).
+- Every prefilled country value shows a source line from `js/rz-locations.js`: "ASSUMED · DCMOC country reference, as of
+  <date>" (the dataset cites its sources once, not per value), or "ASSUMED · legacy page value, no source on file" for a
+  page-only row. The word ASSUMED is always visible beside an ASSUMED value.
+- Open: `DATA.electricityTariffs` differs from `DATA.countries` for all 14 countries it covers, and its provenance note
+  says it does not. Owner decision O-P11: adopt the cited tariff values into `countries.ts` (DCMOC financials move;
+  rebuild DCMOC) or keep the current values and correct the tariff table's note. Until then nothing is merged and the
+  field's title names the cited alternative.
+- Gates: `tools/test-locations.mjs` (core) and `tools/test-locations-ui.mjs` (carbon, opex and tco render the same
+  value as the engine for the same code).

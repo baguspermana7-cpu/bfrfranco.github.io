@@ -174,7 +174,7 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha384-iw3OoTErCYJJB9mCa8LNS2hbsQ7M3C0EpIsO/H5+EGAkPGc6rk+V8i04oW/K5xq0" crossorigin="anonymous">
     <script src="js/vendor/chart.umd.min.js?v=20261110-74401d73" defer></script>
-    <script src="js/rz-version.js?v=20261111-c7e39fdb" defer></script>
+    <script src="js/rz-version.js?v=20261111-ee17ed72" defer></script>
     <script src="js/rz-calc-utils.js?v=20260920-ef3425ae" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
@@ -225,6 +225,8 @@
     <link rel="stylesheet" href="css/rz-hub.css?v=20261015-f49c6a25">
     <link rel="stylesheet" href="css/rz-tool.css?v=20261111-55dd0365">
 <link rel="stylesheet" href="css/rz-project.css?v=20261111-31355e5e" data-rz-proj-css>
+<link rel="stylesheet" href="css/rz-asof.css?v=20261111-413c77d5">
+<script src="js/rz-locations.js?v=20261112-c4db3d49" defer></script>
 </head>
 <body class="hub tool" data-rz-calc="opex" data-rz-account-pill="off">
     <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
@@ -382,6 +384,7 @@
                     </div>
                     <div id="countryInfo" class="in-note">
                         <div><strong>Labor:</strong> <span id="laborMult">1.00x</span> | <strong>Energy:</strong> <span id="energyRate">$0.075/kWh</span></div>
+                        <p class="rz-asof-line" id="energyRateSrc" aria-live="polite"></p>
                     </div>
                 </div>
 
@@ -2047,6 +2050,8 @@
                 document.getElementById('selectedFlag').textContent = cf.flag;
                 document.getElementById('laborMult').textContent = cf.laborMult.toFixed(2) + 'x';
                 document.getElementById('energyRate').textContent = '$' + cf.energyRate.toFixed(3) + '/kWh';
+                /* P11: source line under the prefilled energy price (js/rz-locations.js) */
+                if (window.rzLocations && window.rzLocations.render) window.rzLocations.render(document.getElementById('energyRateSrc'), country, 'energy', cf.energyRate);
 
                 // Update climate info
                 document.getElementById('coolingEnergyFactor').textContent = result.climate.coolingEnergyMult.toFixed(2) + 'x';

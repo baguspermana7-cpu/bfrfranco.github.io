@@ -311,6 +311,8 @@ gate "Manual links — every calculator input group links to an existing manual 
 gate "Project pack core — project/clamp/override/default/select/missing field, consumes + stale, status, register escaping, no mutation (P04)" node tools/test-pack-core.mjs
 gate "Project pack in the browser — printed CAPEX numbers = what the page shows (sign-in-masked values stay masked), charts as images, register sources, not-run note, no writes, failed section, Print + Open, blocked tab, cancel, 390 px (P04)" node tools/test-pack-ui.mjs
 gate "Data dates — every engine source has a refresh policy and a parseable date, fixed-clock staleness, min twin, tracker + tco dates and the stale flag (P26A)" node tools/test-asof.mjs
+gate "Location values — engine country value wins, ASSUMED source line per value, page-only rows say legacy, tariff conflicts listed (P11)" node tools/test-locations.mjs
+gate "Location render — carbon, opex and tco show the engine's energy price for the same code; source lines in both themes; fits 390 px (P11)" node tools/test-locations-ui.mjs
 gate "Sensitivity — fixture exact per factor kind, pue/roi/carbon every factor equals the page recompute, inputs untouched, tia top gain equals ticking it (P07)" node tools/test-sensitivity.mjs
 gate "Tornado correctness — tco = page swing via tcoCore, cx rows = page totals, spares heatmap centre = module, tier weights = score, capex/opex = MC driver (P07)" node tools/test-tornado-correctness.mjs
 gate "Sustainability page (K25) — generator-fresh, worked example recomputed, citations and FAQ JSON-LD consistent" python3 tools/test-pillar-sustainability.py
