@@ -74,3 +74,7 @@ items merged into them, and X2, X3, X5, X9.
   (`js/rz-telemetry-quality.js:79`), because Q07 training runs use the demo state.
 - Q01 has 9 laws, above the brief's 3–8. Accepted: D1 required the idempotence law.
 - Owner decisions: `DECISIONS.md` (22 so far, all PROPOSED with a recommended default).
+
+## Pending for 2026-11-12 (owner R115)
+- Start Postiz (`~/homelab/dockge/stacks/postiz`, images pulled, not started), owner creates first account + connects socials, then `DISABLE_REGISTRATION=true`.
+- Tolaria installed at `~/tools/tolaria` (not opened). Owner to delete empty `~/tools/tolaria-dl`.

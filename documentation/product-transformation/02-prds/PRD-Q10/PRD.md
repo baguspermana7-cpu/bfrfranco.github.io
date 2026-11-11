@@ -13,10 +13,10 @@
 | Owner requests | R110 (a PRD per idea), R111 (24-section structure) |
 | Priority | 56.0 (addendum rank 18: I 5, N 3, C 7, E 4, effort 3 weeks; `documentation/PRODUCT_INNOVATION_ASSESSMENT_2026-11_ADDENDUM.md:93`) |
 | Related findings | Q10 (`…_ADDENDUM.md:440-457`). X10 (`:56`, "Admin KPIs fabricated with no label"): the interim label is specified in PRD-X-DEFECTS FR-X10 and is removed by this PRD when it ships. The rz-tracker privacy finding reported by PRD-Q17. New findings N1–N12 in §3.3 |
-| Dependencies | (1) Owner approval: this PRD changes a privacy and auth boundary (`documentation/product-transformation/STATE.md:9-10`, `:52`); decisions D-1 to D-11 in §5.7. (2) Owner actions OA-1 to OA-5 (§22.1): SQL and Edge Function deploys need the owner's Supabase dashboard; credentials never pass through an agent (`STATE.md:47`). (3) PRD-Q11 shares the SQL test harness `tools/lib/pg-harness.mjs` and the config loader `rzLoadConfig()`; whichever PRD ships first creates them. (4) PRD-X-DEFECTS FR-X10 is the interim. (5) PRD-Q07 (`fault_run_start`, its T-15) and PRD-Q17 (path events, its OQ-4) add their event names to the whitelist in their own releases |
+| Dependencies | (1) Owner approval: this PRD changes a privacy and auth boundary (`documentation/product-transformation/STATE.md:9-10`, `:52`); decisions D-Q10-1 to D-Q10-11 in §5.7. (2) Owner actions OA-1 to OA-5 (§22.1): SQL and Edge Function deploys need the owner's Supabase dashboard; credentials never pass through an agent (`STATE.md:47`). (3) PRD-Q11 shares the SQL test harness `tools/lib/pg-harness.mjs` and the config loader `rzLoadConfig()`; whichever PRD ships first creates them. (4) PRD-X-DEFECTS FR-X10 is the interim. (5) PRD-Q07 (`fault_run_start`, its T-15) and PRD-Q17 (path events, its OQ-4) add their event names to the whitelist in their own releases |
 | Related modules | `rz-ops-p7x3k9m.html`; `rz-tracker.js` (62 pages); `js/rz-cookie-consent.js` (246 HTML files); the GA4 loader in 162 HTML files; `privacy.html`; `supabase/schema.sql` (NEW Module 10); NEW `supabase/functions/mayar-proxy/`; `supabase/functions/admin-users/index.ts`; `js/rz-supabase.js`; `setup-supabase.html` (owner action board); `js/rz-toast.js`; `sw.js`; the callers of `window.rzTrack` (`js/rz-command-palette.js`, `js/rz-article-diagram.js`, `js/rz-scrolly.js`) |
 | Target wave | Addendum roadmap "Strategic, week 17 onward" (`…_ADDENDUM.md:558`). The main session sets the implementation wave in `04-implementation-plan/` |
-| Approval status | PRD approved by owner R110/R111 2026-11-10. Implementation is BLOCKED until the owner explicitly approves D-1 to D-11 (privacy and auth boundary, `STATE.md:52`). The approval class in `01-improvement-register/REGISTER.md:23` is "auth/privacy boundary: approval needed" |
+| Approval status | PRD approved by owner R110/R111 2026-11-10. Implementation is BLOCKED until the owner explicitly approves D-Q10-1 to D-Q10-11 (privacy and auth boundary, `STATE.md:52`). The approval class in `01-improvement-register/REGISTER.md:23` is "auth/privacy boundary: approval needed" |
 | Facts verified at | `wt-hub3` commit `9e49bfefd` (2026-11-11, "docs: tracker X2 verified, record P25 SW module contract"). Site version `3.35.10` (`js/rz-version.js:2`). Working tree clean except another agent's untracked `02-prds/PRD-Q09/` |
 
 Change history
@@ -149,7 +149,7 @@ end state the laws in §20.2 assert. Traffic-dependent values are UNKNOWN until 
 | # | Objective | Metric | Today | Target | Method |
 |---|---|---|---|---|---|
 | O1 | No fabricated number in the admin | fabricated generator names + `Math.random` lines + the literal figures of P4 in `rz-ops-p7x3k9m.html` | 3 generator functions (8 lines), 6 `Math.random` lines, 8 literal figures | 0, 0, 0 | L1 |
-| O2 | Every rebuilt panel names its source | `.ops-card` elements in rebuilt sections carrying `data-ops-source` with a known value | 0 | all of them (13 cards, §9.3) | L1, L6 |
+| O2 | Every rebuilt panel names its source | `data-ops-source` attributes with known values on the rebuilt cards and sections | 0 | 16 (13 cards in Dashboard, Usage and Audit log, plus Settings, Mayar and Accounts; §9.3) | L1, L6 |
 | O3 | No analytics request before Accept | requests to `googletagmanager.com`, `google-analytics.com`, `ipapi.co` or `/rest/v1/rpc/record_usage_event` before a choice, after Decline, and under GPC with no choice, on the sampled pages | ≥ 1 (GA after the first scroll on `index.html`; GA at parse time on `changelog.html`; `ipapi.co` on load on a non-local host) | 0 | L2 |
 | O4 | One canonical GA loader everywhere | files carrying the `rz-ga-consent v1` block ÷ files carrying `G-GED7FX8RTV` | 0 / 162 | 162 / 162 | L4 |
 | O5 | The usage payload carries no personal data | keys outside `{p_event,p_page,p_device,p_detail}`; values that look like an e-mail, an IP address, a user agent or typed search text | today's local record holds `ip`, `city`, `ua` and `email` | 0 | L3 |
@@ -178,7 +178,7 @@ end state the laws in §20.2 assert. Traffic-dependent values are UNKNOWN until 
    checkout (`ROOT = Path("/home/baguspermana7/rz-work")`, `:13`) and writes the `'declined'`-only pattern
    (`:16-40`). It is rewritten in place with `--check` and `--apply`.
 5. **`privacy.html`.** Rewrite of the analytics, local-storage, sharing and security statements; a
-   "Your cookie choice" control; a new "Last updated" date. The wording is the owner's to approve (D-10).
+   "Your cookie choice" control; a new "Last updated" date. The wording is the owner's to approve (D-Q10-10).
 6. **`rz-ops-p7x3k9m.html`.** Deletions (§8 FR-8). Rebuilt Dashboard, Usage (replaces User Activity),
    Accounts (the real Supabase panel, renamed from Credentials; the fabricated Users section is deleted),
    Audit log and Settings. Mayar through the proxy. RZToast. Loading, empty, error and not-root states.
@@ -195,7 +195,7 @@ end state the laws in §20.2 assert. Traffic-dependent values are UNKNOWN until 
 ### 5.2 Out of scope (non-goals)
 
 - Tier Manager v2 and the dormant AUTH_V2 path (`auth.js:138-147`, placeholder gateway; `worker-auth/`).
-  Untouched (D-9).
+  Untouched (D-Q10-9).
 - The DC Intelligence, Stock Investment, Finance Terminal and IDR Stocks sections. They read their own
   data files or apps, and none of the `Math.random` lines (P1) is in them. Their badges and visual register
   are untouched.
@@ -207,7 +207,7 @@ end state the laws in §20.2 assert. Traffic-dependent values are UNKNOWN until 
   callers) and the client-side `rz_admin_educators` path in `auth.js:256-292`. That is an auth follow-up.
 - Unique visitors, cohorts, retention curves, geography, referrers and funnels. They are not collected by
   design, so the admin never shows them.
-- Extending the counter to the roughly 190 pages that do not load `rz-tracker.js` (D-8).
+- Extending the counter to the roughly 190 pages that do not load `rz-tracker.js` (D-Q10-8).
 - A full visual re-skin of the 7,115-line admin. Only the rebuilt panels follow §9.8.
 - Legal advice. The privacy text in §9.10 is a draft for the owner.
 
@@ -233,7 +233,7 @@ end state the laws in §20.2 assert. Traffic-dependent values are UNKNOWN until 
 
 | Dependency | Kind | Status |
 |---|---|---|
-| Owner approval of D-1 to D-11 | blocking for implementation | pending |
+| Owner approval of D-Q10-1 to D-Q10-11 | blocking for implementation | pending |
 | OA-1 to OA-5 (owner runs SQL, deploys functions, sets the secret, rotates the Mayar key) | blocking for go-live of the server parts | pending; prepared by T-15 |
 | `tools/lib/pg-harness.mjs` + dev dependency `@electric-sql/pglite` (or Docker `postgres:16` fallback) | shared with PRD-Q11 | NEW, created by T-1 |
 | PRD-X-DEFECTS FR-X10 (interim labels) | interim, superseded here | specified there |
@@ -270,17 +270,17 @@ end state the laws in §20.2 assert. Traffic-dependent values are UNKNOWN until 
 
 | # | Decision | Default | Why it needs the owner |
 |---|---|---|---|
-| D-1 | Allow a new anonymous write path, `record_usage_event`, with the caps of FR-2 | approve | new auth surface (`STATE.md:9`) |
-| D-2 | Retention: `usage_daily` 400 days, `usage_minute` 1 hour | approve | data retention is a privacy choice |
-| D-3 | Global Privacy Control counts as Decline when no choice is stored, and the banner is not shown. An explicit Accept on `privacy.html` overrides it | approve | changes who sees the banner |
-| D-4 | GA4 loads only after Accept on all 162 files. GA numbers will then count consenting visitors only | approve | business-visible drop in GA counts |
-| D-5 | Mayar through `mayar-proxy`, key as secret `MAYAR_API_KEY`; rotate the key after the move | approve | secret handling; new function |
-| D-6 | Delete fabricated panels and figures (FR-8) rather than keep them labelled | approve | feature removal (`STATE.md:9`) |
-| D-7 | Delete the Subscribers panel (P8) | approve | feature removal |
-| D-8 | Keep counting on the current 62 pages only | approve | scope |
-| D-9 | Leave AUTH_V2 and Tier Manager v2 untouched | approve | scope |
-| D-10 | Publish the `privacy.html` text of §9.10 | owner reviews wording | legal copy |
-| D-11 | Revoke `log_event` from PUBLIC and grant it to `authenticated` only | approve | auth boundary |
+| D-Q10-1 | Allow a new anonymous write path, `record_usage_event`, with the caps of FR-2 | approve | new auth surface (`STATE.md:9`) |
+| D-Q10-2 | Retention: `usage_daily` 400 days, `usage_minute` 1 hour | approve | data retention is a privacy choice |
+| D-Q10-3 | Global Privacy Control counts as Decline when no choice is stored, and the banner is not shown. An explicit Accept on `privacy.html` overrides it | approve | changes who sees the banner |
+| D-Q10-4 | GA4 loads only after Accept on all 162 files. GA numbers will then count consenting visitors only | approve | business-visible drop in GA counts |
+| D-Q10-5 | Mayar through `mayar-proxy`, key as secret `MAYAR_API_KEY`; rotate the key after the move | approve | secret handling; new function |
+| D-Q10-6 | Delete fabricated panels and figures (FR-8) rather than keep them labelled | approve | feature removal (`STATE.md:9`) |
+| D-Q10-7 | Delete the Subscribers panel (P8) | approve | feature removal |
+| D-Q10-8 | Keep counting on the current 62 pages only | approve | scope |
+| D-Q10-9 | Leave AUTH_V2 and Tier Manager v2 untouched | approve | scope |
+| D-Q10-10 | Publish the `privacy.html` text of §9.10 | owner reviews wording | legal copy |
+| D-Q10-11 | Revoke `log_event` from PUBLIC and grant it to `authenticated` only | approve | auth boundary |
 
 ## 6. User personas and use cases
 
@@ -333,8 +333,8 @@ invoice (A1); UC10 a non-root opens the admin (A2); UC11 Supabase is unreachable
 2. On `privacy.html`, "Your cookie choice" reads "Declined (your browser sends Global Privacy Control)".
 
 ### J5 Change or withdraw (UC5)
-1. Entry: the banner's "Details" link, or the footer link to `privacy.html`, then the "Your cookie choice"
-   section.
+1. Entry: the banner's "Details" link, or any of the links to `privacy.html` (110 HTML files link it), then
+   the "Your cookie choice" section.
 2. The current state is shown as a word: "Accepted", "Declined", "Declined (your browser sends Global
    Privacy Control)" or "Not chosen yet".
 3. **Turn analytics off** stores `'declined'`, sets the GA disable flag and deletes `_ga` and `_ga_*`
@@ -553,7 +553,7 @@ Each FR is testable. Test ids refer to §20 (L = law, T-x = unit or contract che
 - **Acceptance:** L4; L2 on the sampled pages.
 
 ### FR-7 `privacy.html` states what is collected and lets the visitor change the choice
-- **Description:** replace the statements of P17 with the text of §9.10 (owner approves wording, D-10).
+- **Description:** replace the statements of P17 with the text of §9.10 (owner approves wording, D-Q10-10).
   Add section "4.1 Your cookie choice" with the control of §9.2.8. Set "Last updated" to the release date.
 - **Trigger:** release.
 - **Processing:** the control reads `RZCookieConsent.get()`, `stored()` and `gpc()` on load and renders the
@@ -563,11 +563,15 @@ Each FR is testable. Test ids refer to §20 (L = law, T-x = unit or contract che
 - **Acceptance:** L2 (withdraw case on `privacy.html`), L8 (control at 1440 and 390, both themes).
 
 ### FR-8 Delete every fabricated panel, figure and generator from the admin
-- **Description:** remove, not label (D-6, D-7):
+- **Description:** remove, not label (D-Q10-6, D-Q10-7):
   - code: `FIRST_NAMES`, `LAST_NAMES`, `DOMAINS`, `STATUSES`, `rand`, `randDate`, `generateUsers`,
     `generateActivities`, `renderKPIs`, `renderDashboardCharts`, `renderRevenue`, the fabricated user table
-    (`renderTable` `:2738`, its modal including "Lifetime Value" `:3182`, its exports `:2836-2866`,
-    `promoteEducator`/`demoteEducator` `:2813-2834`), `openReport()` `:2900` and its report builders, the
+    (`renderTable` `:2738`, its modal including "Lifetime Value" `:3182`, its exports `:2836-2865`,
+    `promoteEducator`/`demoteEducator` `:2813-2834`), the `openReport()` branches that read fabricated
+    data (`dashboard` `:2926`, `revenue` `:2957`, `users` `:2980`, `audit` `:3029`, `subscribers` `:3047`,
+    `activity` `:3069`) and their Report buttons. The `benchmarks` (`:3012`) and `mayar` (`:3117`) branches
+    read real data and stay. The `features` branch (`:2995`) reads the dead legacy flat flags and is removed
+    by PRD-Q11. Also removed: the
     legacy `CREDENTIALS` vault `:2547-2552` and its card, `renderAudit`/`filterAudit` over `activities`
     `:4863`, `seedUADemoData` and all `UA_*`/`ua*` activity code (`:5485` to the end of `exportUAEventsCSV()`, which starts at `:6027`), `getSubscribers` `:4912`, the
     dead manual-account helpers that still call `Math.random` (`:3413`; manual accounts are retired,
@@ -627,7 +631,7 @@ Each FR is testable. Test ids refer to §20 (L = law, T-x = unit or contract che
 
 ### FR-12 Audit log on `audit_log`, and audit rows from the Edge Functions
 - **Description:** the Audit log panel reads `audit_log` through `rzSupa.listAuditLog({limit:50, before,
-  action})`. The AUTH_V2 "server" source toggle (`auditSrcServer`) is untouched (D-9). The fabricated
+  action})`. The AUTH_V2 "server" source toggle (`auditSrcServer`) is untouched (D-Q10-9). The fabricated
   "client" source is deleted.
 - **Processing:** newest first. **Load older** passes `before = created_at` of the last row, a keyset with
   no offset. The action select filters on the server (`eq('action', …)`). The target search filters the
@@ -679,7 +683,8 @@ Each FR is testable. Test ids refer to §20 (L = law, T-x = unit or contract che
 - **Acceptance:** L7; L6 (not-deployed state with the stub).
 
 ### FR-15 Panel states, source attribution and notifications
-- **Description:** every rebuilt card is an `.ops-card` with `data-ops-source` (one of `admin_account_summary`,
+- **Description:** every rebuilt card is an `.ops-card` with `data-ops-source` (one or more space-separated
+  values from `admin_account_summary`,
   `admin_usage_summary`, `admin_scenario_summary`, `audit_log`, `profiles`, `mayar-proxy`, `site-constants`,
   `this-browser`) and a visible "Source: …" caption (§9.10). Each card runs the state machine of §12.3:
   `loading`, then `ready`, `empty`, `error`, `signed-out` or `not-root`.
@@ -1027,7 +1032,7 @@ fill gradient, no legend for a single series. The axis titles are the caption.
 - accept: "Accept"
 - decline: "Decline"
 
-**`privacy.html` replacements** (draft; the owner approves wording, D-10)
+**`privacy.html` replacements** (draft; the owner approves wording, D-Q10-10)
 - §1.2 table rows:
   - "Page views and named events (only after you accept analytics cookies) | resistancezero.com page counter
     (Supabase) | Counts per day, page, event and screen-width class. No IP address, no identifier, no
@@ -1088,3 +1093,1105 @@ fill gradient, no legend for a single series. The axis titles are the caption.
 - OA-4 title: "Rotasi API key Mayar setelah OA-3". Why: "Kunci lama pernah tersimpan di localStorage
   browser admin."
 - OA-5 title: "Deploy ulang admin-users (baris audit)".
+
+## 10. Data model
+
+### 10.1 Existing data this PRD reads (unchanged)
+
+| Object | Fields used | Source | Who can read |
+|---|---|---|---|
+| `public.profiles` | `id, email, tier, role, status, created_at` | `supabase/schema.sql:63-88` | own row; root all (`:130-131`) |
+| `auth.users` | `id, last_sign_in_at` | Supabase Auth | only inside `admin_account_summary` (definer) |
+| `public.saved_scenarios` | `calc, user_id, created_at` (never `payload`, never `name`) | `:280-288` | own rows; counts through `admin_scenario_summary` |
+| `public.audit_log` | all columns except `ip`, `ua` (always null for these writers) | `:702-716` | own rows; root all (`:723-724`) |
+| `localStorage['rz_cookie_consent']` | `'accepted' \| 'declined'` | `js/rz-cookie-consent.js:25` | the visitor's browser |
+
+### 10.2 Proposed SQL (NEW Module 10, appended to `supabase/schema.sql` after Module 9)
+
+```sql
+-- ===== Module 10 — usage counts (anonymous, aggregate-only) ==================
+-- A row is a counter for (day, event, page, detail, device). No identifier, no IP address,
+-- no user agent, no account id and no query string is stored or read. record_usage_event()
+-- is the only write path; no client role can read or write these tables directly.
+
+create table if not exists public.usage_daily (
+  day     date    not null,                 -- Asia/Jakarta calendar day
+  event   text    not null,
+  page    text    not null,                 -- pathname only, no query, no hash
+  detail  text    not null default '',      -- only for rz_search_go / rz_command / rz_diagram_scenario
+  device  text    not null,                 -- 'narrow' (<= 767 px) | 'wide'
+  n       integer not null default 0 check (n >= 0),
+  primary key (day, event, page, detail, device)
+);
+alter table public.usage_daily drop constraint if exists usage_daily_event_chk;
+alter table public.usage_daily add  constraint usage_daily_event_chk check (event in (
+  'page_view','visit_start','pro_click','pdf_export','cv_download','ws_download','calc_use',
+  'rz_search_open','rz_search_go','rz_command','rz_diagram_scenario','rz_scrolly_complete',
+  '_limited','_overflow'));
+alter table public.usage_daily drop constraint if exists usage_daily_page_chk;
+alter table public.usage_daily add  constraint usage_daily_page_chk   check (page ~ '^/[A-Za-z0-9/_.-]{0,119}$');
+alter table public.usage_daily drop constraint if exists usage_daily_detail_chk;
+alter table public.usage_daily add  constraint usage_daily_detail_chk check (detail ~ '^[A-Za-z0-9/_.:-]{0,120}$');
+alter table public.usage_daily drop constraint if exists usage_daily_device_chk;
+alter table public.usage_daily add  constraint usage_daily_device_chk check (device in ('narrow','wide'));
+
+create table if not exists public.usage_minute (
+  bucket timestamptz primary key,           -- date_trunc('minute', now())
+  n      integer not null default 0 check (n >= 0)
+);
+
+create table if not exists public.usage_maintenance (
+  id         boolean primary key default true check (id),   -- exactly one row
+  last_purge date not null
+);
+insert into public.usage_maintenance (id, last_purge) values (true, current_date - 1)
+  on conflict (id) do nothing;
+
+alter table public.usage_daily       enable row level security;
+alter table public.usage_minute      enable row level security;
+alter table public.usage_maintenance enable row level security;
+-- No policy on purpose. Belt and braces: no table privilege either.
+revoke all on public.usage_daily, public.usage_minute, public.usage_maintenance from anon, authenticated;
+
+create or replace function public.record_usage_event(
+  p_event  text,
+  p_page   text,
+  p_device text,
+  p_detail text default ''
+)
+returns text
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_day    date        := (now() at time zone 'Asia/Jakarta')::date;
+  v_minute timestamptz := date_trunc('minute', now());
+  v_detail text        := coalesce(p_detail, '');
+  v_n      integer;
+  v_rows   integer;
+begin
+  -- 1. validate; an invalid call writes nothing at all
+  if p_event is null or p_event not in (
+       'page_view','visit_start','pro_click','pdf_export','cv_download','ws_download','calc_use',
+       'rz_search_open','rz_search_go','rz_command','rz_diagram_scenario','rz_scrolly_complete')
+     or p_page is null or p_page !~ '^/[A-Za-z0-9/_.-]{0,119}$'
+     or p_device is null or p_device not in ('narrow','wide')
+     or v_detail !~ '^[A-Za-z0-9/_.:-]{0,120}$'
+     or (v_detail <> '' and p_event not in ('rz_search_go','rz_command','rz_diagram_scenario')) then
+    return 'invalid';
+  end if;
+
+  -- 2. housekeeping, once per Asia/Jakarta day (the row lock serialises racing callers)
+  update public.usage_maintenance set last_purge = v_day where id and last_purge < v_day;
+  if found then
+    delete from public.usage_daily  where day < v_day - 400;
+    delete from public.usage_minute where bucket < now() - interval '1 hour';
+  end if;
+
+  -- 3. global cap: 300 events a minute for the whole site
+  insert into public.usage_minute as m (bucket, n) values (v_minute, 1)
+    on conflict (bucket) do update set n = m.n + 1
+    returning m.n into v_n;
+  if v_n > 300 then
+    if v_n = 301 then                       -- record each capped minute once
+      insert into public.usage_daily as d (day, event, page, detail, device, n)
+        values (v_day, '_limited', '/', '', 'wide', 1)
+        on conflict (day, event, page, detail, device) do update set n = d.n + 1;
+    end if;
+    return 'limited';
+  end if;
+
+  -- 4. an existing key is counted
+  update public.usage_daily set n = n + 1
+   where day = v_day and event = p_event and page = p_page and detail = v_detail and device = p_device;
+  if found then
+    return 'ok';
+  end if;
+
+  -- 5. a new key only under the daily cardinality cap
+  select count(*) into v_rows from public.usage_daily where day = v_day;
+  if v_rows >= 1000 then
+    insert into public.usage_daily as d (day, event, page, detail, device, n)
+      values (v_day, '_overflow', '/', '', 'wide', 1)
+      on conflict (day, event, page, detail, device) do update set n = d.n + 1;
+    return 'limited';
+  end if;
+  insert into public.usage_daily as d (day, event, page, detail, device, n)
+    values (v_day, p_event, p_page, v_detail, p_device, 1)
+    on conflict (day, event, page, detail, device) do update set n = d.n + 1;
+  return 'ok';
+end;
+$$;
+
+create or replace function public.admin_usage_summary(p_days integer default 30)
+returns jsonb
+language plpgsql
+security definer
+stable
+set search_path = public
+as $$
+declare
+  v_to   date := (now() at time zone 'Asia/Jakarta')::date;
+  v_from date;
+begin
+  if not public.is_root() then
+    raise exception 'not authorized: root required';
+  end if;
+  if p_days is null or p_days < 1 or p_days > 400 then
+    raise exception 'invalid days';
+  end if;
+  v_from := v_to - (p_days - 1);
+  return jsonb_build_object(
+    'from', v_from, 'to', v_to, 'days', p_days,
+    'firstDay', (select min(day) from usage_daily where event not in ('_limited','_overflow')),
+    'totals', coalesce((select jsonb_object_agg(event, total) from (
+        select event, sum(n) as total from usage_daily
+         where day between v_from and v_to group by event) t), '{}'::jsonb),
+    'byDay', (select jsonb_agg(jsonb_build_object(
+        'day', g.d::date,
+        'page_view',   coalesce((select sum(n) from usage_daily u where u.day = g.d::date and u.event = 'page_view'), 0),
+        'visit_start', coalesce((select sum(n) from usage_daily u where u.day = g.d::date and u.event = 'visit_start'), 0))
+        order by g.d)
+        from generate_series(v_from::timestamp, v_to::timestamp, interval '1 day') as g(d)),
+    'topPages', coalesce((select jsonb_agg(jsonb_build_object('page', page, 'n', total) order by total desc, page)
+        from (select page, sum(n) as total from usage_daily
+               where day between v_from and v_to and event = 'page_view'
+               group by page order by total desc, page limit 25) t), '[]'::jsonb),
+    'byDevice', coalesce((select jsonb_object_agg(device, total) from (
+        select device, sum(n) as total from usage_daily
+         where day between v_from and v_to and event = 'page_view' group by device) t), '{}'::jsonb),
+    'details', coalesce((select jsonb_object_agg(event, items) from (
+        select event, jsonb_agg(jsonb_build_object('detail', detail, 'n', total) order by total desc, detail) as items
+          from (select event, detail, sum(n) as total,
+                       row_number() over (partition by event order by sum(n) desc, detail) as rk
+                  from usage_daily
+                 where day between v_from and v_to and detail <> ''
+                   and event in ('rz_search_go','rz_command','rz_diagram_scenario')
+                 group by event, detail) r
+         where rk <= 10 group by event) e), '{}'::jsonb),
+    'cappedDays', (select count(distinct day) from usage_daily
+                    where day between v_from and v_to and event in ('_limited','_overflow'))
+  );
+end;
+$$;
+
+create or replace function public.admin_account_summary()
+returns jsonb
+language plpgsql
+security definer
+stable
+set search_path = public
+as $$
+declare
+  v_month timestamp := date_trunc('month', now() at time zone 'Asia/Jakarta');
+begin
+  if not public.is_root() then
+    raise exception 'not authorized: root required';
+  end if;
+  return jsonb_build_object(
+    'asOf', now(),
+    'total', (select count(*) from profiles),
+    'byTier', (select jsonb_build_object(
+        'free', count(*) filter (where tier = 'free'), 'demo', count(*) filter (where tier = 'demo'),
+        'pro',  count(*) filter (where tier = 'pro'),  'root', count(*) filter (where tier = 'root'))
+        from profiles),
+    'byRole', (select jsonb_build_object(
+        'user', count(*) filter (where role = 'user'), 'educator', count(*) filter (where role = 'educator'),
+        'root', count(*) filter (where role = 'root'))
+        from profiles),
+    'suspended', (select count(*) from profiles where status = 'suspended'),
+    'signedIn30d', (select count(*) from auth.users where last_sign_in_at >= now() - interval '30 days'),
+    'neverSignedIn', (select count(*) from auth.users where last_sign_in_at is null),
+    'newThisMonth', (select count(*) from profiles
+                      where date_trunc('month', created_at at time zone 'Asia/Jakarta') = v_month),
+    'signupsByMonth', (select jsonb_agg(jsonb_build_object('month', to_char(g.m, 'YYYY-MM'),
+        'n', (select count(*) from profiles p
+               where date_trunc('month', p.created_at at time zone 'Asia/Jakarta') = g.m)) order by g.m)
+        from generate_series(v_month - interval '11 months', v_month, interval '1 month') as g(m))
+  );
+end;
+$$;
+
+create or replace function public.admin_scenario_summary(p_months integer default 12)
+returns jsonb
+language plpgsql
+security definer
+stable
+set search_path = public
+as $$
+declare
+  v_month timestamp := date_trunc('month', now() at time zone 'Asia/Jakarta');
+begin
+  if not public.is_root() then
+    raise exception 'not authorized: root required';
+  end if;
+  if p_months is null or p_months < 1 or p_months > 36 then
+    raise exception 'invalid months';
+  end if;
+  return jsonb_build_object(
+    'total', (select count(*) from saved_scenarios),
+    'users', (select count(distinct user_id) from saved_scenarios),
+    'byCalc', coalesce((select jsonb_agg(jsonb_build_object('calc', calc, 'n', c) order by c desc, calc)
+        from (select calc, count(*) as c from saved_scenarios group by calc) t), '[]'::jsonb),
+    'byMonth', (select jsonb_agg(jsonb_build_object('month', to_char(g.m, 'YYYY-MM'),
+        'n', (select count(*) from saved_scenarios s
+               where date_trunc('month', s.created_at at time zone 'Asia/Jakarta') = g.m)) order by g.m)
+        from generate_series(v_month - make_interval(months => p_months - 1), v_month, interval '1 month') as g(m))
+  );
+end;
+$$;
+
+-- Grants. PostgreSQL gives EXECUTE on every new function to PUBLIC; revoke it explicitly.
+revoke execute on function public.record_usage_event(text, text, text, text) from public;
+grant  execute on function public.record_usage_event(text, text, text, text) to anon, authenticated;
+revoke execute on function public.admin_usage_summary(integer)    from public, anon;
+revoke execute on function public.admin_account_summary()         from public, anon;
+revoke execute on function public.admin_scenario_summary(integer) from public, anon;
+grant  execute on function public.admin_usage_summary(integer)    to authenticated;
+grant  execute on function public.admin_account_summary()         to authenticated;
+grant  execute on function public.admin_scenario_summary(integer) to authenticated;
+
+-- N6: Module 8 revoked log_event from anon only (:965); PUBLIC's default grant still covered anon.
+revoke execute on function public.log_event(text, text, text, jsonb) from public;
+grant  execute on function public.log_event(text, text, text, jsonb) to authenticated;
+```
+
+Indexes: the primary key `(day, event, page, detail, device)` serves every query here. Each query filters
+on a day range (leading column) or counts one day. No other index is added.
+
+### 10.3 Wire payload (client to `record_usage_event`)
+
+| Field | Type and rule | Example |
+|---|---|---|
+| `p_event` | one of the 12 client events (§10.2 list) | `"page_view"` |
+| `p_page` | `^/[A-Za-z0-9/_.-]{0,119}$`; pathname only; a trailing `/` gets `index.html`; else `/other` | `"/tools.html"` |
+| `p_device` | `"narrow"` when `(max-width: 767px)` matches, else `"wide"` | `"wide"` |
+| `p_detail` | `^[A-Za-z0-9/_.:-]{0,120}$`; non-empty only for `rz_search_go` (destination pathname or `external`), `rz_command` (slug of the command title) and `rz_diagram_scenario` (slug of the scenario id) | `"/pue-calculator.html"` |
+
+**Collected:** the event name, the page pathname, a destination pathname or a site-defined slug for three
+events, the screen-width class and the Asia/Jakarta day (set by the server).
+
+**Not collected:** IP address (the counter's code never reads it; Supabase's infrastructure receives it with
+the request like any web request, §9.10), country, city, timezone, user agent, browser, screen size,
+language, referrer, account id, e-mail, any session or visitor identifier, query string, URL hash, typed
+search text (`q` at `js/rz-command-palette.js:310` is dropped), calculator inputs, time of day.
+
+### 10.4 Browser storage contract
+
+| Key | Store | Owner | Value | Lifetime |
+|---|---|---|---|---|
+| `rz_cookie_consent` | localStorage | `js/rz-cookie-consent.js` (unchanged) | `'accepted' \| 'declined'` | until changed |
+| `rz_ev_visit` | sessionStorage | `rz-tracker.js` (NEW) | `'1'` | tab session |
+| `rz_ev_budget` | sessionStorage | `rz-tracker.js` (NEW) | `{"start":<ms>,"n":<int>}` | tab session |
+| `rz_user_events`, `rz_geo_cache` | local / session | removed by `rz-tracker.js` on every load | — | deleted |
+| `rz_mayar_key`, `rz_newsletter_subscribers` | localStorage | removed by the admin on load | — | deleted |
+
+### 10.5 Retention
+
+| Data | Kept | Mechanism |
+|---|---|---|
+| `usage_daily` | 400 days (D-Q10-2) | purge in the first `record_usage_event` call of each Asia/Jakarta day |
+| `usage_minute` | 1 hour | same purge |
+| `audit_log` | unchanged (no purge exists today) | — |
+| Visitor's legacy tracker history | deleted at the visitor's next page view on any of the 62 pages | FR-4 step 1 |
+| Mayar data | not stored by the site | proxy passes through |
+
+Worst-case size (arithmetic from the caps, not a forecast): 1,000 rows/day × 400 days = 400,000
+`usage_daily` rows. Real volume: UNKNOWN, measured 30 days after release (T-14).
+
+### 10.6 Audit fields
+
+Counters carry no audit fields by design: they record no actor. Admin mutations are audited in `audit_log`
+(FR-12). Existing actions are `tier_change` and `role_change` (trigger, `schema.sql:764-773`). NEW actions:
+`admin_create_user`, `admin_reset_password`, `admin_delete_user`, `admin_migrate_legacy`,
+`mayar_invoice_create`, `mayar_portal_link`. PRD-Q11 adds `feature_override_set` and
+`feature_override_delete`.
+
+### 10.7 Migration and backward compatibility
+
+- Module 10 is additive. Re-running it changes nothing.
+- The `log_event` grant change affects only anonymous callers. `rzSupa.logEvent` (`js/rz-supabase.js:413`)
+  has 0 callers.
+- `window.rzTrack(name, extra)` keeps its signature. The 5 existing call sites need no change.
+- Visitors who accepted before keep `'accepted'`, so their GA continues. Visitors who never chose stop
+  sending GA until they choose (D-Q10-4). Visitors who declined stay declined.
+- The old tracker can stay cached until the service-worker `CACHE_NAME` bump of the release (`sw.js:5`,
+  synced by `tools/sync-sw-version.py`) and the HTTP cache expiry. `NETWORK_FIRST_PATHS` (FR-17) stops it
+  from recurring.
+- The admin's localStorage clean-up (FR-8) runs once on the next admin visit.
+
+### 10.8 Example records (illustrative values, not data)
+
+```
+usage_daily       ('2026-11-12', 'page_view',      '/tools.html', '',                    'wide',   37)
+usage_daily       ('2026-11-12', 'rz_search_go',   '/index.html', '/pue-calculator.html', 'narrow',  2)
+usage_daily       ('2026-11-12', '_limited',       '/',           '',                    'wide',    1)
+usage_minute      ('2026-11-12 03:41:00+00', 12)
+usage_maintenance (true, '2026-11-12')
+audit_log         (…, actor_id=<root uuid>, action='admin_delete_user', target_type='profile',
+                   target_id='3f2a9c1e-…', meta={"tier_before":"free"}, ip=null, ua=null, created_at=…)
+```
+
+## 11. API and integration contracts
+
+### 11.1 Existing contracts used (verified)
+
+| Contract | Method and path | Auth | Source |
+|---|---|---|---|
+| Profiles list | `GET /rest/v1/profiles?select=id,email,tier,display_name,created_at&order=created_at.asc&limit=1000` (gains `role,status`) | user JWT; RLS own/root | `js/rz-supabase.js:264-272`; `schema.sql:130-131` |
+| Set tier | `POST /rest/v1/rpc/admin_set_tier {target, new_tier}` | authenticated; raises unless root; anon revoked | `schema.sql:197-235`, `:274` |
+| Set role | `POST /rest/v1/rpc/admin_set_role {target, new_role}` | same; last-root guard | `:236-272`, `:275` |
+| Audit read | `GET /rest/v1/audit_log?select=id,actor_id,action,target_type,target_id,meta,created_at&order=created_at.desc&limit<=500` | RLS own/root | `js/rz-supabase.js:420-427`; `schema.sql:723-724` |
+| Admin users | `POST /functions/v1/admin-users {action: migrate_legacy\|create_user\|reset_password\|delete_user, …}` | Bearer user JWT; root | `supabase/functions/admin-users/index.ts:83` (handler), cases `:110-178` |
+
+### 11.2 NEW `record_usage_event`
+
+| Item | Contract |
+|---|---|
+| Method, path | `POST {SUPABASE_URL}/rest/v1/rpc/record_usage_event` |
+| Headers | `apikey: <publishable key>`, `Authorization: Bearer <publishable key>` (the pair supabase-js v2 sends when signed out; A4), `Content-Type: application/json` |
+| Body | `{"p_event":"page_view","p_page":"/tools.html","p_device":"wide","p_detail":""}` |
+| 200 response | JSON string `"ok"`, `"limited"` or `"invalid"` |
+| Errors | 404 `PGRST202` (Module 10 not applied); 401 (bad key); 5xx (database). The client ignores all of them |
+| AuthN / AuthZ | anon or authenticated; the function reads no identity |
+| Validation | §10.2 step 1 (server); §10.3 (client, defence in depth only) |
+| Rate limits | server: 300 events/min site-wide; 1,000 rows/day. Client: 30 events per tab per 10 min; 5 s dedupe |
+| Timeout | client aborts after 5 s |
+| Idempotency | none (a counter). Duplicates are prevented only by the client dedupe |
+| Retries | none |
+| Pagination | not applicable |
+
+### 11.3 NEW `admin_usage_summary`
+
+`POST /rest/v1/rpc/admin_usage_summary {"p_days":30}` with `Authorization: Bearer <root user JWT>`.
+
+```json
+{
+  "from": "2026-10-14", "to": "2026-11-12", "days": 30, "firstDay": "2026-11-12",
+  "totals":   {"page_view": 37, "visit_start": 15, "rz_search_go": 2},
+  "byDay":    [{"day": "2026-10-14", "page_view": 0, "visit_start": 0}],
+  "topPages": [{"page": "/tools.html", "n": 37}],
+  "byDevice": {"wide": 30, "narrow": 7},
+  "details":  {"rz_search_go": [{"detail": "/pue-calculator.html", "n": 2}]},
+  "cappedDays": 0
+}
+```
+(illustrative values). Errors: HTTP 400 `not authorized: root required`; HTTP 400 `invalid days`;
+unauthenticated callers get PostgREST's permission-denied response (EXECUTE revoked from anon). Timeout:
+client 15 s. Idempotent read. Retries: the Retry button only.
+
+### 11.4 NEW `admin_account_summary`
+
+`POST /rest/v1/rpc/admin_account_summary {}`. Response keys: `asOf` (timestamptz), `total`, `byTier
+{free,demo,pro,root}`, `byRole {user,educator,root}`, `suspended`, `signedIn30d`, `neverSignedIn`,
+`newThisMonth`, `signupsByMonth [{month:"YYYY-MM", n}]` with 12 entries, zeros included. Errors as §11.3.
+
+### 11.5 NEW `admin_scenario_summary`
+
+`POST /rest/v1/rpc/admin_scenario_summary {"p_months":12}`. Response keys: `total`, `users`, `byCalc
+[{calc, n}]` (all calculators, descending), `byMonth [{month, n}]` with `p_months` entries. Errors: as
+§11.3 plus `invalid months`.
+
+### 11.6 NEW Edge Function `mayar-proxy`
+
+| Item | Contract |
+|---|---|
+| Method, path | `POST {SUPABASE_URL}/functions/v1/mayar-proxy` (OPTIONS answered for CORS) |
+| Headers | `Authorization: Bearer <root user JWT>`, `apikey`, `Content-Type: application/json` (`supabase.functions.invoke` sets them) |
+| CORS | the `admin-users` allowlist (`supabase/functions/admin-users/index.ts:33-40`), same `corsHeaders()` |
+| AuthN / AuthZ | `anon.auth.getUser(token)`, then `profiles.tier === 'root'` through the service client (copied from `:90-101`) |
+| Secret | `Deno.env.get('MAYAR_API_KEY')`; missing gives 500 `config_missing`; never echoed or logged |
+| Body | `{"action": <name>, "params": {…}}` |
+| Upstream | `https://api.mayar.id/hl/v1`, `Authorization: Bearer <secret>`, 10 s timeout |
+| Success | `200 {"ok":true,"data":<Mayar JSON as returned>}` (plus `"audit":"failed"` when FR-12's audit insert failed) |
+
+| Action | Params (validated in `core.ts`) | Upstream |
+|---|---|---|
+| `balance` | none | `GET /balance` |
+| `transactions` | `period?` ∈ {today, week, month, year}; `startDate?`/`endDate?` both or neither, `^\d{4}-\d{2}-\d{2}$`; `productId?`, `customerId?` `^[A-Za-z0-9_-]{1,64}$` | `GET /transactions?<given params>` |
+| `unpaid` | `startDate?`/`endDate?` as above | `GET /unpaid?<given params>` |
+| `customer_search` | `search` 2–80 characters | `GET /customer?search=<encoded>` |
+| `membership` | `productId` required, `tierId?` same pattern | `GET /membership?productId=…&tierId=…` |
+| `invoice_create` | `name` 1–120; `email` `^[^\s@]+@[^\s@]+\.[^\s@]+$` (the pattern of `admin-users/index.ts:78`); `description` 1–200; `quantity` integer 1–1000; `rate` integer 1–1,000,000,000; `expiryDays` integer 1–90; `mobile?` `^\+?[0-9]{8,15}$`; `redirectUrl?` `^https://\S{1,300}$` | `POST /invoice/create` with the body the admin builds today (`rz-ops-p7x3k9m.html:5238-5241`) |
+| `portal_link` | `email` as above | `POST /customer/login/portal {email}` |
+
+The ranges are this site's own validation rules. Mayar's own limits are UNKNOWN, and T-11 reads them from
+Mayar's API documentation and narrows the rules if they are stricter.
+
+Errors (`{"ok":false,"error":<code>,"message":<text>}`): 400 `bad_json`, `invalid_action`,
+`invalid_params`; 401 `no_token`, `invalid_token`; 403 `not_root`; 405 `method_not_allowed`; 429
+`upstream_rate_limited` (Mayar answered 429); 502 `upstream_error` (other upstream 4xx/5xx; the message
+carries the upstream status); 504 `upstream_timeout`; 500 `config_missing`, `db_error`. Rate limit: the
+admin's client guard (18/min, kept), plus Mayar's own limit, which is forwarded. Idempotency: reads are
+idempotent. `invoice_create` is not, and no upstream idempotency key is known (T-11), so the UI
+prevents double submission and the timeout copy says to check the invoice list first. Retries: none
+automatic.
+
+### 11.7 CHANGED `admin-users`
+
+After each successful mutating case (`migrate_legacy`, `create_user`, `reset_password`, `delete_user`,
+`:110-178`), insert one `audit_log` row (FR-12) with the service client. On insert failure, keep the
+success response and add `"audit":"failed"`. The request and response shapes are otherwise unchanged.
+
+### 11.8 JS module contracts
+
+**`rzLoadConfig()`.** Verbatim in `rz-tracker.js` and, per PRD-Q11, `js/rz-feature-flags.js`. A twin check
+in `tools/test-usage-consent.mjs --static` asserts the two function texts are identical.
+
+```js
+function rzLoadConfig() {
+  if (window.RZ_CONFIG && window.RZ_CONFIG.SUPABASE_URL) return Promise.resolve(window.RZ_CONFIG);
+  if (window.__rzConfigP) return window.__rzConfigP;
+  window.__rzConfigP = new Promise(function (resolve) {
+    var s = document.createElement('script');
+    s.src = '/js/rz-config.js';
+    s.async = true;
+    s.onload = function () { resolve(window.RZ_CONFIG && window.RZ_CONFIG.SUPABASE_URL ? window.RZ_CONFIG : null); };
+    s.onerror = function () { resolve(null); };
+    document.head.appendChild(s);
+  });
+  return window.__rzConfigP;
+}
+```
+
+**`window.rzTrack(name, extra)`.** Kept. Unknown names are dropped. `extra` fields other than `to`, `cmd` and
+`scenario` are ignored. **`window.RZUsage`**: `{version:'2.0.0', state: () => 'inert'|'pending'|'active'|'off',
+sent: () => <int>}`.
+
+**`window.RZCookieConsent`** (NEW): `get() → 'accepted'|'declined'|null` (effective, GPC-aware);
+`stored() → 'accepted'|'declined'|null`; `gpc() → boolean`; `set('accepted'|'declined') → void` (throws
+`TypeError` otherwise; dispatches `rz-cookie-consent`; on `'declined'` deletes GA cookies).
+
+**`window.rzSupa`** additions (each returns `{data, error}`, never throws):
+`usageSummary(days)`, `accountSummary()`, `scenarioSummary(months)`, `setRole(userId, role)` (`role` ∈
+`user`, `educator`; else `{error:'invalid role'}`), `listAuditLog({limit=50, before, action})`, and
+`mayar(action, params)` (wraps `client.functions.invoke('mayar-proxy', {body:{action, params}})`; maps a
+404 to `{error:'not_deployed'}`).
+
+**GA canonical block** (`tools/templates/rz-ga-consent-v1.html`, inserted verbatim):
+
+```html
+<!-- rz-ga-consent v1: Google Analytics loads only after the visitor accepts analytics cookies -->
+<script>
+(function () {
+  var ID = 'G-GED7FX8RTV';
+  window.dataLayer = window.dataLayer || [];
+  window.gtag = window.gtag || function () { window.dataLayer.push(arguments); };
+  var loaded = false;
+  function accepted() {
+    try { return localStorage.getItem('rz_cookie_consent') === 'accepted'; } catch (e) { return false; }
+  }
+  function load() {
+    if (loaded || !accepted()) return;
+    loaded = true;
+    gtag('js', new Date());
+    gtag('config', ID);
+    var s = document.createElement('script');
+    s.async = true;
+    s.src = 'https://www.googletagmanager.com/gtag/js?id=' + ID;
+    document.head.appendChild(s);
+  }
+  ['scroll', 'click', 'keydown', 'touchstart'].forEach(function (e) {
+    document.addEventListener(e, load, { once: true, passive: true });
+  });
+  document.addEventListener('rz-cookie-consent', function (ev) {
+    if ((ev.detail || ev.rzDetail) === 'accepted') load();
+  });
+})();
+</script>
+```
+
+On `/id/` pages, the legacy key `cookieConsent` is migrated by `js/rz-cookie-consent.js` at
+DOMContentLoaded (`:42-48`). The block reads the key at interaction time, after the migration, so a
+returning `/id/` visitor who accepted keeps GA.
+
+**Tool CLI:** `python3 tools/gate-gtag-consent.py --check | --apply [paths…]`. Exit 0 means clean, 1 means
+violations listed, 2 means a file with an unknown GA form (`--apply` refuses it).
+
+### 11.9 Client error mapping (admin)
+
+| Source | Condition | State or copy |
+|---|---|---|
+| any RPC | message matches `/not authorized\|root required/` | not-root |
+| `rzSupa` | `not signed in` | signed-out |
+| fetch | `TypeError` (network) | "Could not reach Supabase: {message}." |
+| RPC | `PGRST202` (function missing) | "Could not load {card}: the server function is not installed yet (schema Module 10)." |
+| `mayar` | `not_deployed` | §9.10 Mayar copy |
+| `mayar` | other codes | §9.10 Mayar copy per code |
+| any | other | `friendly()` text (`js/rz-supabase.js:81`) |
+
+## 12. Business rules and state machines
+
+| # | Rule |
+|---|---|
+| R1 | No analytics request (GA or counter) leaves the browser before an explicit Accept. GPC with no stored choice counts as Decline. An explicit choice beats GPC |
+| R2 | The counter never stores or forwards IP address, user agent, account, e-mail, query string, typed text or any identifier |
+| R3 | A count is a lower bound, and every usage panel says so |
+| R4 | Every number on a rebuilt admin panel comes from a server response, or is labelled as a site constant or a this-browser measurement |
+| R5 | No panel shows a derived business ratio (conversion, churn, lifetime value), because none has a source |
+| R6 | Root-only data is enforced in SQL and in the Edge Functions, never only in the page |
+| R7 | Every admin mutation writes an audit row. A failed audit write is shown, not hidden |
+| R8 | The Mayar key exists only as a Supabase secret |
+| R9 | Days and months are Asia/Jakarta calendar units |
+| R10 | Retention per §10.5 |
+| R11 | Caps per §11.2; a capped day is shown as capped |
+| R12 | Adding an event name needs, in the same release, the SQL check list, the RPC whitelist and the tracker whitelist. A parity check in `tools/test-usage-events-sql.mjs` fails when they differ |
+
+Consent, per browser:
+
+```mermaid
+stateDiagram-v2
+  [*] --> NotChosen
+  NotChosen --> Accepted: Accept (banner or privacy.html)
+  NotChosen --> Declined: Decline (banner or privacy.html)
+  NotChosen --> GpcDeclined: page load with GPC on
+  GpcDeclined --> Accepted: Turn analytics on (privacy.html)
+  GpcDeclined --> Declined: Turn analytics off
+  Accepted --> Declined: Turn analytics off, GA cookies deleted
+  Declined --> Accepted: Turn analytics on
+```
+
+Tracker, per page load:
+
+```mermaid
+stateDiagram-v2
+  [*] --> Purged: remove rz_user_events and rz_geo_cache
+  Purged --> Inert: local runtime (file, localhost, 127.x)
+  Purged --> Off: stored declined, or GPC with no stored choice
+  Purged --> Pending: no stored choice
+  Purged --> Active: stored accepted
+  Pending --> Active: rz-cookie-consent accepted
+  Pending --> Off: rz-cookie-consent declined
+  Active --> Active: send (dedupe 5 s, 30 per 10 min per tab)
+  Active --> Off: rz-cookie-consent declined
+```
+
+Admin card:
+
+```mermaid
+stateDiagram-v2
+  [*] --> Loading
+  Loading --> SignedOut: getUser() returns null
+  Loading --> NotRoot: not authorized
+  Loading --> Ready: response with rows
+  Loading --> Empty: response with zero rows
+  Loading --> Error: network or other error
+  Error --> Loading: Retry
+  Ready --> Loading: Refresh or range change
+  Empty --> Loading: Refresh
+```
+
+`record_usage_event` decision:
+
+```mermaid
+stateDiagram-v2
+  [*] --> Validate
+  Validate --> Invalid: field fails whitelist or pattern
+  Validate --> Housekeeping: valid
+  Housekeeping --> MinuteCap: purge if first call of the day
+  MinuteCap --> Limited: more than 300 this minute
+  MinuteCap --> Count: within cap
+  Count --> Ok: key exists, n + 1
+  Count --> RowCap: new key
+  RowCap --> Limited: day already has 1000 rows
+  RowCap --> Ok: insert n = 1
+```
+
+## 13. Cross-module integration
+
+| Module | Change | How it propagates |
+|---|---|---|
+| 62 tracker pages (`rz-tracker.js`) | new file at the same URL | 15 tokened tags refreshed with `node tools/test-asset-cache-tokens.mjs --fix rz-tracker.js`. The 46 bare tags and the `index.html` injection (`:1509-1511`) get the file at the same URL after the HTTP cache and the `CACHE_NAME` bump |
+| `cx-calculator.html` (peer-owned) | none in markup; it loads the bare tag | announce to the peer: the page starts counting after Accept |
+| `js/rz-command-palette.js` (P14 area), `js/rz-article-diagram.js`, `js/rz-scrolly.js` | none | the tracker drops `q` and keeps the names |
+| `js/rz-cookie-consent.js` (246 HTML files) | API, GPC, copy | token refresh on every referencing page (`--fix js/rz-cookie-consent.js`). The cx-handbook pages get it through `python3 tools/build-cx-handbook.py`. `cx-calculator.html`'s tag: coordinate with the peer |
+| GA loader (162 files; 3 generators) | canonical block | sweep plus generator re-runs (`build-cx-handbook.py`, `build-changelog-html.py --apply`) |
+| `privacy.html` | text and control | sitemap `lastmod` if the generator derives it (`python3 tools/build-sitemap.py --check`); IndexNow ping for `privacy.html` after push |
+| `sw.js` | 2 entries in `NETWORK_FIRST_PATHS` | the peer's P25 registers the SW on more pages; coordinate the edit |
+| `setup-supabase.html` | OA entries | owner board lists the actions |
+| Account page (`account.html`) | none | sign-in still sets the Supabase session that the admin reads |
+| Engine, explain-db, incidents, journal, manuals content, search index, llms | none | no copy in them describes the tracker. A static check (§20.4) greps `manual/` and `standarization/` for `ipapi` |
+| PRD-Q11 | shares the harness and `rzLoadConfig()`; owns the Feature Flags panel | whichever ships first creates the shared pieces |
+| PRD-Q07, PRD-Q17 | add `fault_run_start`, `path_start`, `path_complete` later | R12 parity check forces all three lists to change together |
+| PRD-X-DEFECTS FR-X10 | interim labels on the fabricated panels | removed with the panels by FR-8 |
+
+## 14. AI and automation requirements
+
+- No LLM anywhere in the runtime path. Every rule is deterministic SQL or JavaScript.
+- Automation is limited to the tools that run at release time: the GA tool (`--apply` once, `--check` on
+  every ship-gate), the generators, and the daily purge inside `record_usage_event` (no scheduler, no cron
+  extension).
+- Human approval points: D-Q10-1 to D-Q10-11 before implementation; OA-1 to OA-5 (owner-run SQL, deploys, secret,
+  rotation); D-Q10-10 privacy wording before publishing.
+
+## 15. Non-functional requirements
+
+| Area | Requirement | Measurement |
+|---|---|---|
+| Performance, visitor | 0 analytics requests before a choice. After Accept: 2 POSTs on the first page of a tab (`visit_start`, `page_view`), 1 per later page, plus a CORS preflight when the browser's preflight cache misses, plus one `/js/rz-config.js` load on pages that do not already have it | L2 request log |
+| Performance, bytes | `rz-tracker.js` ≤ 7,581 bytes (today's size) | L3 static: `wc -c rz-tracker.js` |
+| Performance, RPC | round trip UNKNOWN | T-14: 10 live samples from V-3, median reported in the CHANGELOG |
+| Performance, admin | page bytes today 551,389; after FR-8 UNKNOWN (expected smaller, no target) | T-14: `wc -c rz-ops-p7x3k9m.html` |
+| Scalability | bounded by the caps; worst case §10.5 | L5 S3, S4 |
+| Availability | static pages on GitHub Pages are unaffected by Supabase downtime. The counter silently drops, and the admin shows error states. Supabase free-plan pausing is prevented by `.github/workflows/supabase-keepalive.yml` | L6 error state |
+| Reliability | no retries, so counts are a lower bound by definition; the purge is idempotent | L5 S7 |
+| Accessibility | axe clean on rebuilt panels and the privacy control, both themes, 1440 and 390, with the planted-line method (inject one known low-contrast line, require axe to flag it, then remove it and require 0); keyboard reachable; status regions | L8 |
+| Security | §16 | L5, L7 |
+| Privacy | data minimisation (§10.3), consent (R1), GPC, retention (§10.5) | L2, L3, L5 S9 |
+| Maintainability | one GA template; one event whitelist checked for parity in three places (R12); a shared config loader with a twin check | L4, L5, §11.8 |
+| Observability | `_limited`/`_overflow` visible in the admin; `RZUsage.state()`/`sent()`; Edge Function errors via `console.error` without bodies | L6, L7 |
+| Data integrity | PK plus CHECK constraints; counters only increase except by purge | L5 |
+| Backup and recovery | usage data is non-critical (losing it loses history only). Accounts and audit rows follow the existing Supabase plan's backups (plan UNKNOWN; OA-1 records it) | — |
+
+## 16. Security and access control
+
+| Role | Can | Cannot |
+|---|---|---|
+| anon (visitor) | `record_usage_event` | read any usage table; call `admin_*`; call `log_event` (after FR-1) |
+| authenticated non-root | `record_usage_event`; `log_event` (unchanged intent); read own profile and audit rows | `admin_*` (raises); read others' rows |
+| root | everything above; `admin_*`; all profiles and audit rows; `admin-users`; `mayar-proxy` | read usage tables directly (no policy; only through `admin_usage_summary`) |
+| service_role (Edge Functions only) | audit inserts; admin user ops | — (never in a browser) |
+
+- **AuthN/AuthZ.** Supabase JWT. `is_root()` inside every `admin_*` function. Edge Functions validate the
+  JWT and the root tier with the service client. The page's `checkAccess()` (`:2405`) stays cosmetic: a
+  forged `rz_premium_session` opens the shell, and every data call is refused.
+- **Input validation.** SQL whitelist and patterns (§10.2); `core.ts` validation (§11.6); client derivation
+  is defence in depth only.
+- **Secrets.** `MAYAR_API_KEY` as a Supabase secret, set by the owner (OA-3). The service role is
+  auto-injected (`admin-users/index.ts:21-23`). The publishable key is public by design. L7 fails if the
+  admin builds a Bearer header from browser storage.
+- **Audit logging.** FR-12 (R7).
+- **Sensitive data.** Mayar customer names, e-mails and phones are shown to root only, never stored, never
+  logged. Audit rows carry ids only.
+- **Abuse prevention.** Caps (R11). No read path for anon. The `_limited` minute counter is one hot row, at
+  most 301 writes a minute.
+- **XSS.** Every server string goes through `rzEsc` or `textContent` (emails, page paths, details, actions,
+  targets). `meta` JSON is rendered with `textContent` inside `<pre>`. L6 plants `<img src=x
+  onerror=…>` in a stub detail and asserts no element is created.
+- **CSV injection.** Cells starting with `=`, `+`, `-` or `@` get a leading `'` in the export.
+- **Open redirect.** `redirectUrl` must be `https://`.
+- **Approval.** D-Q10-1 to D-Q10-11 (STATE.md:9-10, :52).
+
+| Threat | Today | After |
+|---|---|---|
+| Forged admin session | shell plus fabricated data | shell only; every call refused |
+| Count inflation by script | n/a (no counter) | bounded to 300/min, visible as capped days, framed as a lower bound |
+| DB fill | n/a | at most 1,000 rows/day |
+| Personal data smuggled in `detail` | n/a | `@`, spaces and `?` impossible by pattern; text is visible to root only |
+| Audit spam via `log_event` | possible if PUBLIC holds EXECUTE (N6) | revoked |
+| Mayar key theft | readable by any script on the origin | not in the browser; rotated (OA-4) |
+| IP leak to `ipapi.co` | every visitor on 62 pages | none |
+
+## 17. Edge cases and failure scenarios
+
+| # | Case | Behaviour |
+|---|---|---|
+| E1 | Storage blocked (private mode, cookies off) | consent `null` unless GPC; the banner shows every load; nothing is sent; dedupe and budget in memory |
+| E2 | Accept pressed twice quickly | the 5 s dedupe sends one `page_view` |
+| E3 | Accept on page A, tab B already open | tab B starts counting on its next load (the event fires per document) |
+| E4 | GPC on, then Accept on `privacy.html` | stored `'accepted'` wins; counting and GA start |
+| E5 | Decline after GA loaded on this page | `ga-disable` flag stops further hits; GA cookies deleted; the counter stops at once |
+| E6 | `js/rz-config.js` 404 or offline | `rzLoadConfig()` resolves `null`; nothing is sent |
+| E7 | Module 10 not applied | RPC 404 `PGRST202`; tracker ignores it; admin shows "the server function is not installed yet" |
+| E8 | Bot with no JS | nothing counted |
+| E9 | Bot with JS that clicks Accept | counted like a visitor; bounded by the caps; counts remain a lower bound for humans only in the absence of bots, so the caption says "visitors who accepted", not "people" |
+| E10 | 301st event in a minute | `'limited'`; `_limited` +1 once that minute |
+| E11 | 1,001st key in a day | `'limited'`; `_overflow` +1 per refused event |
+| E12 | Two first-of-day calls race | the `usage_maintenance` row lock serialises them; the second sees `last_purge = v_day` and skips |
+| E13 | Midnight Asia/Jakarta during a burst | the day switches; the minute bucket is UTC-based and unaffected |
+| E14 | Admin signed out mid-session | the next call returns `not signed in`; panels switch to signed-out |
+| E15 | Root demoted while the admin is open | the next call raises `not authorized`; panels switch to not-root |
+| E16 | Audit insert fails after `delete_user` | `audit:'failed'` warn toast; the deletion stands |
+| E17 | Delete an account that authored audit rows | `audit_log.actor_id` references `profiles` without `on delete` (`schema.sql:704`), so the cascade fails; the toast shows the error "Delete failed: this account has audit rows." (the trail is kept) |
+| E18 | Mayar function not deployed | `not_deployed` state; no browser fallback |
+| E19 | Mayar timeout on `invoice_create` | 504 copy warns to check the invoice list before retrying |
+| E20 | Service worker serves the old tracker | `NETWORK_FIRST_PATHS` plus `CACHE_NAME` bump; the old tracker would only write to the visitor's own localStorage, which the new one purges on its first run |
+| E21 | Stale `?v=` token | `test-asset-cache-tokens.mjs` (STRICT) fails the ship-gate |
+| E22 | Page path with `%20` or non-ASCII | fails the pattern; sent as `/other` |
+| E23 | Very long command title | slug cut to 40 characters |
+| E24 | `rzTrack` called before consent | dropped (not queued) |
+| E25 | Admin CSV with a target starting with `=` | prefixed with `'` |
+
+## 18. Technical architecture
+
+### 18.1 Components and data flow
+
+```mermaid
+flowchart LR
+  subgraph Browser [Visitor browser, 62 pages]
+    CC[js/rz-cookie-consent.js] -- rz-cookie-consent event --> TR[rz-tracker.js v2]
+    CC -- rz-cookie-consent event --> GA[GA canonical block]
+    TR -- rzLoadConfig --> CFG[js/rz-config.js]
+  end
+  TR -- POST rpc/record_usage_event --> PG[(Supabase Postgres: usage_daily, usage_minute)]
+  GA -- after Accept --> GTM[googletagmanager.com]
+  subgraph Admin [rz-ops-p7x3k9m.html, root]
+    UI[Dashboard / Usage / Accounts / Audit / Settings / Mayar] --> SB[js/rz-supabase.js]
+  end
+  SB -- rpc admin_*_summary --> PG
+  SB -- profiles, audit_log --> PG
+  SB -- functions.invoke --> AU[Edge: admin-users]
+  SB -- functions.invoke --> MP[Edge: mayar-proxy]
+  AU -- service role insert --> PG
+  MP -- Bearer secret --> MAY[api.mayar.id]
+  MP -- audit insert --> PG
+```
+
+### 18.2 Sequence: a visitor accepts and is counted
+
+```mermaid
+sequenceDiagram
+  participant V as Visitor
+  participant C as rz-cookie-consent.js
+  participant T as rz-tracker.js
+  participant G as GA block
+  participant S as Supabase RPC
+  V->>T: page load
+  T->>T: purge legacy keys; state = pending
+  V->>C: press Accept
+  C->>C: store 'accepted'
+  C-->>T: rz-cookie-consent ('accepted')
+  C-->>G: rz-cookie-consent ('accepted')
+  G->>G: load gtag.js
+  T->>T: rzLoadConfig()
+  T->>S: record_usage_event(visit_start, /tools.html, wide, '')
+  S-->>T: "ok"
+  T->>S: record_usage_event(page_view, /tools.html, wide, '')
+  S-->>T: "ok"
+```
+
+### 18.3 Sequence: the owner opens the Dashboard
+
+```mermaid
+sequenceDiagram
+  participant O as Owner
+  participant A as Admin page
+  participant R as rzSupa
+  participant P as Postgres
+  O->>A: open admin
+  A->>R: ready, getUser()
+  R-->>A: root user
+  par
+    A->>R: accountSummary()
+    R->>P: rpc admin_account_summary
+  and
+    A->>R: usageSummary(30)
+    R->>P: rpc admin_usage_summary
+  and
+    A->>R: scenarioSummary(12)
+    R->>P: rpc admin_scenario_summary
+  and
+    A->>R: listAuditLog({limit:10})
+    R->>P: select audit_log
+  end
+  P-->>A: four results (each card renders on its own)
+```
+
+### 18.4 Sequence: an invoice through the proxy
+
+```mermaid
+sequenceDiagram
+  participant O as Owner
+  participant A as Admin page
+  participant F as mayar-proxy
+  participant M as api.mayar.id
+  participant P as audit_log
+  O->>A: Create invoice, confirm
+  A->>F: invoke {action: invoice_create, params}
+  F->>F: JWT, root check, validate
+  F->>M: POST /invoice/create (Bearer secret, 10 s)
+  M-->>F: invoice JSON
+  F->>P: insert mayar_invoice_create (ids, quantity, rate, expiryDays)
+  F-->>A: {ok: true, data}
+  A-->>O: RZToast "Invoice created."
+```
+
+### 18.5 Technology decisions
+
+- Plain `fetch` in the tracker, not supabase-js: the tracker runs on 62 pages, while supabase-js is an ES
+  module loaded from jsDelivr on 10 pages only (`js/rz-supabase.js`).
+- Aggregate counters, not raw events: nothing identifying exists to leak, to retain or to delete on request.
+- Housekeeping on write, not `pg_cron`: no extension to enable, and the first call of each day does it.
+- A separate store, not `log_event`: C1.
+- Edge Function for Mayar: the only place a server-side secret can live in this stack (`admin-users` is the
+  precedent).
+
+### 18.6 Deployment
+
+GitHub Pages serves the static files (pushed by the main session, `git push origin hub-r3:main`).
+Supabase: SQL Module 10 via the SQL Editor (OA-2); Edge Functions `mayar-proxy` (new) and `admin-users`
+(changed) via the Dashboard or `supabase functions deploy` by the owner (OA-3, OA-5). No Cloudflare change.
+
+### 18.7 Alternatives and trade-offs
+
+| Alternative | Why not chosen |
+|---|---|
+| Reuse `log_event` | C1: wrong table, no rate limit, identity column, meant to be authenticated-only |
+| Raw events with a hashed session id | an identifier, more data, more retention duty; counters answer the owner's questions |
+| GA only, no own counter | the admin cannot read GA without an OAuth integration; the addendum acceptance needs "a real event appears in the admin" |
+| A third-party analytics service or a self-hosted one | another processor, or new infrastructure cost (approval class "new infrastructure cost", `STATE.md:9-10`) |
+| `pg_cron` purge | needs an extension enabled by the owner; on-write purge is enough at this volume |
+| Keep the fabricated panels with labels | X10's interim. Labels keep dead weight and still show invented numbers next to real ones |
+
+## 19. Implementation breakdown
+
+| Task | Description | Depends on | Files | Effort | Verification | DoD |
+|---|---|---|---|---|---|---|
+| T-1 | SQL harness spike: `tools/lib/pg-harness.mjs` with PGlite (`npm i -D @electric-sql/pglite`; fallback Docker `postgres:16`), Supabase shims (roles `anon`, `authenticated`, `service_role`; schema `auth` with `users(id, email, last_sign_in_at)` and `auth.uid()` from `request.jwt.claim.sub`), loads Modules 0–9 cleanly. Ask the owner for OA-1 | — | `tools/lib/pg-harness.mjs`, `package.json` | 1.5 d | `node tools/test-usage-events-sql.mjs --harness-only` prints `schema loaded: modules 0-9` | shared with PRD-Q11; documented shims |
+| T-2 | Module 10 SQL (FR-1–FR-3) and `tools/test-usage-events-sql.mjs` (L5), red first | T-1 | `supabase/schema.sql`, `tools/test-usage-events-sql.mjs`, `tools/fixtures/admin-rpc-shapes.json` | 2 d | L5 red on today's schema, then green | fixtures written from real function output |
+| T-3 | `js/rz-supabase.js` additions (FR-16) | T-2 | `js/rz-supabase.js` | 0.5 d | static contract check in L1 gate | token refreshed on 10 pages |
+| T-4 | Tracker v2 (FR-4) | T-2 | `rz-tracker.js` | 1.5 d | L3 static part red, then green | ≤ 7,581 bytes |
+| T-5 | Consent engine (FR-5) | — | `js/rz-cookie-consent.js` | 1 d | unit cases in L2 gate | token refreshed (coordinate `cx-calculator.html`) |
+| T-6 | GA template, `tools/gate-gtag-consent.py` rewrite, generators, `--apply` (FR-6) | T-5 | template, tool, 3 generators, 162 files | 1.5 d | L4 red (0/162), then green (162/162) | generators re-run; freshness green |
+| T-7 | `tools/test-usage-consent.mjs` (L2, L3 browser): host mapping `--host-resolver-rules="MAP rz.test 127.0.0.1:<port>"` so the old tracker's local exemption (`rz-tracker.js:21-23`) cannot hide the `ipapi.co` call; request interception; GPC via `evaluateOnNewDocument`; withdrawal; port the four checks of the unwired `tools/_cookie_e2e.mjs` | T-4, T-5, T-6 | `tools/test-usage-consent.mjs` | 2 d | red on today's tree (GA after first scroll; `ipapi.co` on load) | wired in ship-gate |
+| T-8 | `privacy.html` (FR-7), draft to the owner (D-Q10-10) | T-5 | `privacy.html` | 1 d | L2 withdrawal case; L8 control | owner approved wording |
+| T-9 | Admin deletions (FR-8) and `tools/test-admin-real-data.mjs --static` (L1) | — | `rz-ops-p7x3k9m.html`, gate | 1.5 d | L1 red (names, `Math.random`, literals), then green | Personal Apps and DC Intelligence byte-identical |
+| T-10a | Dashboard and Usage panels (FR-9, FR-10, FR-15) | T-3, T-9 | `rz-ops-p7x3k9m.html` | 2 d | L6 cases D1–D5 | all states reachable |
+| T-10b | Accounts, Audit log, Settings, clock, toasts (FR-11–FR-13, FR-15) | T-3, T-9 | `rz-ops-p7x3k9m.html` | 1.5 d | L6 cases A1–A4 | no `alert()` left |
+| T-11 | `mayar-proxy` (`core.ts`, `index.ts`), admin wiring (FR-14), `tools/test-mayar-proxy.mjs` (L7); read Mayar's API docs for limits, idempotency and currency | T-3 | `supabase/functions/mayar-proxy/*`, admin, gate | 2 d | L7 red, then green | `core.ts` uses erasable TypeScript only, so Node 24 can import it with type stripping |
+| T-12 | `admin-users` audit rows (FR-12) | — | `supabase/functions/admin-users/index.ts` | 0.5 d | L7 static part | `audit:'failed'` path present |
+| T-13 | `tools/test-admin-real-data.mjs --browser --design` (L6, L8) with a stub `js/rz-supabase.js` served by request interception from `tools/fixtures/admin-rpc-shapes.json` | T-10a, T-10b, T-2 | gate | 2 d | L6/L8 red on today's admin, then green | both themes, 1440 and 390 |
+| T-14 | Measurements: tracker bytes, admin bytes, live RPC latency (V-3), DB size (OA-1); 30-day row count | release | CHANGELOG | 0.5 d | numbers quoted with commands | no UNKNOWN left that a command can answer |
+| T-15 | Owner board entries, standards docs (§22.4), CLAUDE.md audit list, ship-gate wiring (FR-17) | all | docs, `tools/ship-gate.sh`, `CLAUDE.md`, `setup-supabase.html`, `sw.js` | 1 d | `node tools/test-gate-wiring.mjs` green | R089 complete |
+| T-16 | Release chain and live validation (§22) | T-15, OA-2 | release files | 1 d | V-1 to V-7 | live evidence in the CHANGELOG |
+
+Total 22.5 days. That is above the addendum's 3-week estimate (`…_ADDENDUM.md:93`). The difference is the
+GA sweep (N1) and the Mayar proxy (N10), which the addendum did not include.
+
+## 20. Test strategy
+
+### 20.1 Layers
+
+- **Unit:** `slug`, page normalisation, detail derivation, dedupe and budget, run by loading `rz-tracker.js`
+  in `node:vm` with a fake `window`, `localStorage` and `sessionStorage` (`test-usage-consent.mjs --unit`).
+  `core.ts` validation and mapping (`test-mayar-proxy.mjs`).
+- **Integration:** SQL behaviour on a real Postgres engine (L5).
+- **Contract:** `test-usage-events-sql.mjs` writes `tools/fixtures/admin-rpc-shapes.json` from the real
+  function output. The admin browser stub serves exactly that file, so a shape change in SQL fails the
+  browser gate until the admin follows.
+- **E2E:** puppeteer against the served tree (`$LTC_BASE`, `tools/ship-gate.sh:317-330`), under rz-lane
+  like the other browser gates.
+- **UI interaction:** every control in §9.4 (L6).
+- **Accessibility:** axe with the planted-line method (L8).
+- **Security:** grants and RLS (L5), secret placement (L7), XSS plant (L6).
+- **Performance:** bytes (L3), request counts (L2).
+- **Regression:** the full `tools/ship-gate.sh`.
+- **Failure recovery:** error and Retry states, missing function, offline config (L6, L2 E6).
+
+### 20.2 LAWS (red first)
+
+| Law | Claim | Command | Red on today's tree (how it fails) |
+|---|---|---|---|
+| L1 | The admin contains no fabricated generator, literal measurement or `Math.random`, and every rebuilt card names its source | `node tools/test-admin-real-data.mjs --static` | finds `generateUsers` (3 lines), `seedUADemoData` (2), `generateActivities` (3), `FIRST_NAMES`, `randDate`; `Math.random` on 6 lines; the 8 literals of P4; 0 `data-ops-source` attributes against 16 required |
+| L2 | No request to `googletagmanager.com`, `google-analytics.com`, `ipapi.co` or `/rest/v1/rpc/record_usage_event` before Accept, after Decline, or under GPC with no choice; after Accept exactly 1 `visit_start` and 1 `page_view` within 3 s and 1 `gtag/js` request; after withdrawal on `privacy.html` 0 further requests and no `_ga*` cookie. Pages: `index.html`, `tools.html`, `glossary.html`, one `manual/` page, one `cx-handbook/` page, `embed/capex-widget.html`, `changelog.html`, `id/index.html`, `privacy.html` | `env RZ_BASE=$LTC_BASE node tools/test-usage-consent.mjs` | `index.html` requests `gtag/js` after the first scroll with no choice (`index.html:26-28`); `changelog.html` and the embed request it at parse time; `ipapi.co` is requested on load on host `rz.test` (`rz-tracker.js:38`); `RZCookieConsent` is undefined, so the withdrawal case cannot run |
+| L3 | Every counter payload has exactly the 4 keys with whitelisted values, and no value looks like an e-mail, an IPv4/IPv6 address, a user agent or the typed search text; legacy keys are purged; the tracker has no `ipapi`, `userAgent`, `rz-auth-change` or `email`, and is ≤ 7,581 bytes | `env RZ_BASE=$LTC_BASE node tools/test-usage-consent.mjs --payload` and `node tools/test-usage-consent.mjs --static` | today's tracker sends no payload at all (the payload assertion fails on "0 requests"); a pre-seeded `rz_user_events` survives the load; `rz-tracker.js:38`, `:79`, `:121`, `:181-186` match |
+| L4 | All 162 GA files carry exactly one canonical block and no other loader, and no generator embeds a loader | `python3 tools/gate-gtag-consent.py --check` | today the tool has no `--check`; with it, 0/162 canonical and 3 generator literals (`build-cx-handbook.py:317`, `build-changelog-html.py:445`, `generate-city-pages.py:119`, `:1009`) |
+| L5 | On a real Postgres engine with Modules 0–10: S1 a valid anon call returns `ok` and counts; S2 each invalid input returns `invalid` and writes nothing; S3 the 301st call in a minute returns `limited` and records `_limited` once; S4 the 1,001st key of a day returns `limited` and records `_overflow`; S5 `anon` and `authenticated` get permission denied on every `usage_*` table; S6 each `admin_*` function denies anon, raises for non-root, and returns the expected JSON for root; S7 rows older than 400 days vanish on the first call of a new day; S8 `has_function_privilege('anon','public.log_event(text,text,text,jsonb)','execute')` is false; S9 no `usage_*` column is named `ip`, `ua`, `user_id`, `email`, `session` or similar; S10 the event whitelists in the SQL check, the RPC and `rz-tracker.js` are identical | `node tools/test-usage-events-sql.mjs` | `record_usage_event` does not exist (S1 fails with "function … does not exist"); S8 returns true because PUBLIC keeps EXECUTE (`schema.sql:965` revokes anon only) |
+| L6 | With a stub `rzSupa` serving the fixture: the Dashboard shows exactly the fixture's numbers and no other digit run outside an allowlist ("30 days", "12 months", dates and times); empty fixture shows each card's empty copy; an error shows the error copy and Retry re-calls once; not-root and signed-out states show their copy and no number; the role select calls `setRole(id, 'educator')`; a planted `<img onerror>` in a detail creates no element; the clock text matches `/^\d{2}:\d{2}:\d{2} WIB$/`; no `alert()` is called | `env RZ_BASE=$LTC_BASE node tools/test-admin-real-data.mjs --browser` | today the Dashboard renders 39 fabricated users, "99.97%" and "234", ignores the stub, calls `alert()` (7 sites), and the clock ends " UTC+7" |
+| L7 | The admin never reads a Mayar key or calls `api.mayar.id`; `mayar-proxy` reads the key only from `Deno.env.get('MAYAR_API_KEY')`; `core.ts` rejects unknown actions and each invalid param, and maps the 7 actions to exactly the 7 upstream requests; every mutating case in `admin-users` and `mayar-proxy` calls `audit(`; no audit `meta` built in either function contains `email`, `name` or `mobile` | `node tools/test-mayar-proxy.mjs` | `rz-ops-p7x3k9m.html:4975` and `:4989` match; `supabase/functions/mayar-proxy/` does not exist; `admin-users` has 0 audit calls |
+| L8 | The rebuilt panels and the privacy control pass axe in light and dark at 1440 and 390 (planted line flagged, then 0 violations); no horizontal overflow at 390; no `.health-stat` or `.kpi-*` tile in rebuilt sections; no `transition: all` and no `:hover` transform in the added CSS; card radius ≤ 4 px; inputs ≥ 16 px at 390 | `env RZ_BASE=$LTC_BASE node tools/test-admin-real-data.mjs --design` | the Dashboard renders `.health-stat` tiles (`rz-ops-p7x3k9m.html:904-922`) and the KPI grid; Settings renders 4 `.health-stat` tiles (`:1966-1990`); `privacy.html` has no `#cookie-choice` section, so the control assertions fail |
+
+### 20.3 Gate files and wiring in `tools/ship-gate.sh`
+
+| Gate file | NEW or changed | Inserted at |
+|---|---|---|
+| `tools/test-admin-real-data.mjs --static` (L1) | NEW | after `:190` (auth surface) |
+| `tools/test-usage-events-sql.mjs` (L5) | NEW (uses `tools/lib/pg-harness.mjs`) | after the L1 line |
+| `tools/test-mayar-proxy.mjs` (L7) | NEW | after the L5 line |
+| `tools/test-usage-consent.mjs --static` (L3 static, twin check) | NEW | after the L7 line |
+| `tools/gate-gtag-consent.py --check` (L4) | CHANGED (rewritten in place) | after `:285` (commercial surface) |
+| `tools/test-usage-consent.mjs` and `--payload` (L2, L3) | NEW | in the served-tree block, after `:329-330` (LTC lab step thread), before `:334` (Cx program tree), with `env RZ_BASE=$LTC_BASE timeout 300` |
+| `tools/test-admin-real-data.mjs --browser --design` (L6, L8) | NEW | same block, after the consent gate, `timeout 300` |
+
+```bash
+gate "admin real data — no fabricated figure, every rebuilt card names its source (Q10 L1)" node tools/test-admin-real-data.mjs --static
+gate "usage SQL — whitelist, caps, retention, root-only reads, log_event not anon (Q10 L5)" node tools/test-usage-events-sql.mjs
+gate "Mayar key server-side — proxy allowlist, audit rows (Q10 L7)" node tools/test-mayar-proxy.mjs
+gate "usage tracker static — no IP or e-mail capture, size budget, config-loader twin (Q10 L3)" node tools/test-usage-consent.mjs --static
+gate "GA consent — gtag loads only after Accept on every GA page, no generator literal (Q10 L4)" python3 tools/gate-gtag-consent.py --check
+gate "usage consent — no analytics request before Accept, PII-free payload (Q10 L2, L3)" \
+  env RZ_BASE=$LTC_BASE timeout 300 node tools/test-usage-consent.mjs --payload
+gate "admin console — real panels and states, axe both themes at 1440 and 390 (Q10 L6, L8)" \
+  env RZ_BASE=$LTC_BASE timeout 300 node tools/test-admin-real-data.mjs --browser --design
+```
+
+The same lines go into the "Audit before push" list (`CLAUDE.md:36`), which `node tools/test-gate-wiring.mjs`
+(`tools/ship-gate.sh:235`) requires to match the ship-gate.
+
+### 20.4 Other checks
+
+- `grep -rn "ipapi" manual/ standarization/ documentation/*.md` lists every doc that describes the old
+  tracker. Each hit is either rewritten or recorded as history (changelog entries stay).
+- The four checks of `tools/_cookie_e2e.mjs` (banner on first visit, spares tour after Accept, no banner for
+  a returning visitor, decline flag) move into `test-usage-consent.mjs`. The scratch file is not wired and
+  points at another checkout (`:3`); it stays untouched.
+
+## 21. Acceptance criteria
+
+| # | Given | When | Then |
+|---|---|---|---|
+| AC-1 | a fresh browser on `/tools.html` | the visitor scrolls, clicks and types without choosing | no request goes to GA, `ipapi.co` or the counter (L2) |
+| AC-2 | the same browser | the visitor presses Accept | 1 `visit_start` and 1 `page_view` POST, and 1 `gtag/js` request (L2) |
+| AC-3 | a browser that declined | any interaction on any page | 0 analytics requests (L2) |
+| AC-4 | GPC on and no stored choice | a page loads | no banner and 0 analytics requests (L2) |
+| AC-5 | an accepted browser | the visitor presses "Turn analytics off" on `privacy.html` | `_ga*` cookies are gone and later interactions send nothing (L2) |
+| AC-6 | any counter request | it is inspected | it has exactly 4 keys and no personal value (L3) |
+| AC-7 | a visitor with old `rz_user_events` | they open any tracker page | the key is gone (L3) |
+| AC-8 | Module 10 on a test database | an anon calls `record_usage_event` with valid input | `"ok"` and `n` increments (L5 S1) |
+| AC-9 | the same | anon selects from `usage_daily` or calls `admin_usage_summary` | permission denied (L5 S5, S6) |
+| AC-10 | the admin with root fixtures | the Dashboard loads | every number equals the fixture and nothing else is shown (L6) |
+| AC-11 | the admin with empty fixtures | the Usage panel loads | "No data yet. Counting starts when …" (L6) |
+| AC-12 | a non-root session | the admin loads | "This account (…) is not a root account. Admin data is not shown." and no number (L6) |
+| AC-13 | the admin source | it is scanned | no `generateUsers`, `seedUADemoData`, `Math.random`, "99.97%" or `rz_mayar_key` (L1, L7) |
+| AC-14 | an invoice created through the admin | the audit log is read | a `mayar_invoice_create` row with ids only (L7 static, L6) |
+| AC-15 | every GA file | `--check` runs | `162/162 canonical, 0 generator literals` (L4) |
+| AC-16 | the rebuilt panels | axe runs in both themes at 1440 and 390 | 0 violations after the planted line is flagged (L8) |
+| AC-17 | the live site after release | V-3 runs | the RPC answers `"ok"` (§22.7) |
+
+| FR | Tests |
+|---|---|
+| FR-1 | L5 S5, S8, S9 |
+| FR-2 | L5 S1–S4, S7, S10 |
+| FR-3 | L5 S6; L6 |
+| FR-4 | L2, L3 |
+| FR-5 | L2 (GPC, withdrawal), unit cases |
+| FR-6 | L4, L2 |
+| FR-7 | L2 (withdrawal), L8 |
+| FR-8 | L1 |
+| FR-9 | L6, L8 |
+| FR-10 | L6, L8 |
+| FR-11 | L6, L8 |
+| FR-12 | L6, L7 |
+| FR-13 | L1, L6 |
+| FR-14 | L7, L6 (`not_deployed`) |
+| FR-15 | L1, L6 |
+| FR-16 | L1 (static contract), L6 |
+| FR-17 | `node tools/test-gate-wiring.mjs`; DoD |
+
+## 22. Rollout and migration
+
+### 22.1 Owner actions (the owner's own access; nothing secret passes through an agent)
+
+- **OA-1 (read-only, before anything):** in the SQL Editor run
+  `select has_function_privilege('anon', 'public.log_event(text,text,text,jsonb)', 'execute');` and
+  `select pg_size_pretty(pg_database_size(current_database()));`. Report the boolean and the size. Also read
+  the plan name from the dashboard. These close N6 and the §15 UNKNOWNs.
+- **OA-2:** paste Module 10 (§10.2) into the SQL Editor and run it. Verify:
+  `select relname, relrowsecurity from pg_class where relname like 'usage_%';` (all true) and
+  `select has_function_privilege('anon','public.admin_usage_summary(integer)','execute');` (false).
+- **OA-3:** deploy `mayar-proxy` (Dashboard → Edge Functions → new function from the repo code, or
+  `supabase functions deploy mayar-proxy`). Set the secret `MAYAR_API_KEY` (Dashboard → Edge Functions →
+  Secrets). The key never enters the repo or a chat.
+- **OA-4:** rotate the Mayar API key in Mayar's dashboard, then update the secret. The admin removes the
+  old browser copy itself (FR-8).
+- **OA-5:** redeploy `admin-users` with the audit rows.
+
+### 22.2 Sequence
+
+1. Owner approves D-Q10-1 to D-Q10-11. Implementation starts.
+2. OA-1 results recorded in the tracker.
+3. T-1 to T-15 on the branch; all laws green locally; full `tools/ship-gate.sh` green.
+4. **OA-2 before the push**, so the new tracker never posts to a missing function.
+5. Push (main session). Then OA-3, OA-5, OA-4.
+6. Live validation (§22.7).
+
+### 22.3 Flags
+
+None. The visitor's consent is the runtime gate. A second switch would only add a state to test.
+
+### 22.4 Standards docs in the same release (rule R089, `standarization/UIUX_AUDIT_LEDGER.md:160`)
+
+- `standarization/LEGAL_COMPLIANCE_STANDARD.md`: `:28` ("GDPR-style opt-in/out" becomes the exact rule:
+  analytics only after Accept, GPC as Decline, withdrawal on `privacy.html`); §7 (`:173-215`): the shared
+  script replaces the inline banner pattern, the GA canonical block, the counter, and the list of what is
+  and is not collected.
+- `standarization/AUTH_STANDARD.md` §Admin Dashboard (`:233`): panels, sources, states, `mayar-proxy`, audit
+  actions.
+- `supabase/SUPABASE_SCHEMA.md`: Module 10 in the ER overview (`:10-60`), migration steps (`:75`) and the
+  verification block (`:89`).
+- `standarization/FINANCE_SUITE_STANDARD.md`: the `.ops-*` classes on `--fs-*` tokens.
+- `CLAUDE.md:36` "Audit before push": the 7 gate lines.
+- `standarization/UIUX_AUDIT_LEDGER.md`: a row for the admin register and the privacy control.
+
+### 22.5 Compatibility and rollback
+
+- Rolling back the static release restores the old tracker. It writes only to the visitor's own storage,
+  so no server data is harmed. Module 10 can stay: it is inert without callers.
+- Rolling back the `log_event` grant is one statement, but should not be needed (0 client callers).
+- The GA change is reversible by reverting the sweep commit.
+
+### 22.6 Monitoring
+
+- Owner-visible: capped days and the `_limited`/`_overflow` rows in the Usage panel; Edge Function logs in
+  the Supabase dashboard.
+- Implementer-run, read-only, weekly for 4 weeks:
+  `RZ_BASE=https://resistancezero.com node tools/test-usage-consent.mjs --live --no-accept`. It asserts 0
+  analytics requests before consent on the live site and writes nothing.
+- T-14 at 30 days: the owner runs `select count(*), count(distinct day) from usage_daily;` and reports the
+  two numbers.
+
+### 22.7 Post-deploy live validation
+
+| # | Check | Command | Pass |
+|---|---|---|---|
+| V-1 | new tracker live | `curl -s https://resistancezero.com/rz-tracker.js \| grep -c ipapi` | `0` |
+| V-2 | no request before consent, live | `RZ_BASE=https://resistancezero.com node tools/test-usage-consent.mjs --live --no-accept` | exit 0 |
+| V-3 | a real visit is counted | `RZ_BASE=https://resistancezero.com node tools/test-usage-consent.mjs --live --accept-once /tools.html` | RPC body `"ok"` (adds 1 `visit_start` and 1 `page_view`, noted in the CHANGELOG); 10 timing samples give the median for §15 |
+| V-4 | anon cannot read counts | the script POSTs `rpc/admin_usage_summary` and GETs `usage_daily` with the publishable key read from `js/rz-config.js` at runtime (never printed) | permission denied on both |
+| V-5 | anon cannot write audit | POST `rpc/log_event` as anon | permission denied. If it succeeds, the fix did not apply; one root-visible row `live_check` is the cost of knowing |
+| V-6 | proxy refuses anonymous calls | `curl -s -X POST "$SUPABASE_URL/functions/v1/mayar-proxy" -H 'Content-Type: application/json' -d '{"action":"balance"}'` | `401` with `no_token` |
+| V-7 | GA canonical live | `curl -s https://resistancezero.com/index.html \| grep -c "rz-ga-consent v1"` | `1` |
+
+### 22.8 Release chain
+
+1. Version in `js/rz-version.js`: the next free version, claimed with the peer.
+2. `CHANGELOG.md` entry (privacy change, admin rebuild, counter, live evidence), then
+   `python3 tools/build-changelog-html.py --apply`.
+3. `python3 tools/sync-sw-version.py` (`sw.js` `CACHE_NAME`).
+4. Tokens: `node tools/test-asset-cache-tokens.mjs --fix rz-tracker.js`, `--fix js/rz-cookie-consent.js`,
+   `--fix js/rz-supabase.js` and `--fix js/rz-toast.js` (newly loaded by the admin).
+5. Generators: `python3 tools/build-cx-handbook.py`; `python3 tools/build-sitemap.py --check` (and apply if
+   `privacy.html`'s `lastmod` changes); `python3 tools/test-generator-freshness.py`.
+6. Standards docs per §22.4.
+7. `bash tools/ship-gate.sh` green, browser gates under rz-lane.
+8. Push by the main session (`git push origin hub-r3:main`); IndexNow for `privacy.html`.
+9. §22.7 V-1 to V-7, with the outputs quoted in the CHANGELOG.
+
+## 23. Risks and dependencies
+
+| # | Risk | Likelihood | Impact | Mitigation |
+|---|---|---|---|---|
+| K1 | GA numbers drop after D-Q10-4 | certain if D-Q10-4 is approved | owner's GA trend breaks | stated in D-Q10-4; the CHANGELOG records the release date as the break point |
+| K2 | Consent rate is low, so the counter shows little | UNKNOWN | the admin looks empty | the copy says "lower bound"; nothing is extrapolated |
+| K3 | PGlite lacks a needed feature (roles, `citext`) | medium | L5 cannot run | T-1 spike; Docker `postgres:16` fallback (Docker is installed) |
+| K4 | The publishable key in `Authorization` is rejected on `/rest/v1/rpc` | low (A4) | nothing is counted | V-3 detects it on day 1; fix: send `apikey` only |
+| K5 | Scripted inflation | low | misleading counts | caps, capped-day note, "visitors who accepted" wording |
+| K6 | The peer edits `sw.js` or `cx-calculator.html` at the same time | medium | merge conflict or a stale token | coordinate before T-15; stage by hunk |
+| K7 | Owner actions delayed | medium | server parts not live | OA-2 gates the push; the static parts wait on the branch |
+| K8 | A gate pins the old GA text (for example in manual tests) | low | ship-gate red | run the full ship-gate after `--apply`; update pinned text in the same release |
+| K9 | Mayar API differences (params, currency, limits) | medium | proxy rejects valid calls | T-11 reads the docs; the proxy forwards Mayar's errors verbatim in `message` |
+| K10 | Deleting an account with audit rows fails (E17) | low | owner confusion | explicit error copy; the trail is deliberately kept |
+| K11 | Legal wording of `privacy.html` | medium | compliance doubt | D-Q10-10 owner review; no legal claim beyond the facts in §10.3 |
+| K12 | Free-plan DB size | low | storage pressure | 400,000-row worst case; OA-1 measures the current size |
+| K13 | Embed widgets lose GA (no banner on third-party sites) | certain | fewer GA embed hits | intended: no consent mechanism there; stated in the CHANGELOG |
+
+## 24. Definition of done
+
+- [ ] Owner approved D-Q10-1 to D-Q10-11 (recorded in `STATE.md`); OA-1 to OA-5 done and recorded.
+- [ ] Module 10 live; OA-2 verification queries returned the expected values.
+- [ ] L1–L8 red on the pre-change tree (outputs saved) and green after; all 7 gate lines wired in
+      `tools/ship-gate.sh` and `CLAUDE.md:36`; `node tools/test-gate-wiring.mjs` green.
+- [ ] No fabricated figure, generator or `Math.random` in the admin; every rebuilt card names its source.
+- [ ] Dashboard, Usage, Accounts, Audit log, Settings and Mayar work end to end for a root account, and
+      show the right state for empty data, errors, non-root and signed-out.
+- [ ] Every admin mutation leaves an audit row, or shows the audit-failed warning.
+- [ ] The Mayar key exists only as a Supabase secret and was rotated.
+- [ ] 162/162 GA files canonical; generators read the template; freshness green.
+- [ ] `privacy.html` text approved by the owner and published; the cookie-choice control works in both
+      themes at 1440 and 390.
+- [ ] Release chain complete (§22.8): version claimed with the peer, CHANGELOG, tokens, SW cache, generators,
+      standards docs.
+- [ ] Live: V-1 to V-7 passed with outputs quoted in the CHANGELOG; T-14 numbers recorded.
+- [ ] Rendering is not done: the counter counts on the live site, the admin reads real rows, and every
+      acceptance test above passes against the live deployment where it can run without credentials.
