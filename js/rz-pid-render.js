@@ -6,7 +6,9 @@
  * with one transform instead of panning sideways. Tags are RZExplain triggers (data-explain="isa-…"), so what a
  * tag MEANS lives in the explanation DB; the line under the drawing shows only the item's own data.
  * Motion: transform / opacity / stroke-dashoffset only, on the --rz-dur-* / --rz-ease-* tokens; reduced motion
- * keeps the lit/dim change and moves the camera instantly. Vanilla ES5, no build.
+ * keeps the lit/dim change and moves the camera instantly. R120: "What if it fails" mode (a toggle; a symbol then shows
+ * RZPid.impact(): the stopped path in the fault token as a STATE, amber stays the selection, the ordered consequences
+ * under the drawing) and live value labels (api.setValues). Vanilla ES5, no build.
  */
 (function (root) {
   'use strict';
@@ -80,7 +82,11 @@
     '.rzpid-svg .pulse{fill:var(--pid-accent);stroke:var(--pid-bg);stroke-width:1.5;opacity:0;pointer-events:none}',
     /* selection: lit vs dim — opacity only, on the motion tokens */
     '.rzpid-svg [data-id],.rzpid-svg [data-edge]{transition:opacity var(--rz-dur-menu,200ms) var(--rz-ease-out,cubic-bezier(.23,1,.32,1))}',
-    '.rzpid-svg.has-sel [data-id]:not(.is-lit),.rzpid-svg.has-sel [data-edge]:not(.is-lit){opacity:.34}',
+    '.rzpid-svg.has-sel [data-id]:not(.is-lit):not(.is-fault):not(.is-ctx),.rzpid-svg.has-sel [data-edge]:not(.is-lit){opacity:.34}',
+    /* R120 fault state: what stopped, in the fault token; written before the selection rules so amber selection wins */
+    '.rzpid-svg .is-fault .pipe{stroke:var(--pid-fault,#FF3030)}.rzpid-svg .is-fault .arrow{fill:var(--pid-fault,#FF3030)}',
+    '.rzpid-svg .is-fault .sym,.rzpid-svg .is-fault .flag{stroke:var(--pid-fault,#FF3030)}.rzpid-svg .is-fault .tag{fill:var(--pid-fault-text,var(--pid-fault))}',
+    '.rzpid-svg .val{font-size:11px;fill:var(--pid-muted,#9aa3ad)}',
     '.rzpid-svg .is-lit .pipe,.rzpid-svg .is-lit.sig-g .sig,.rzpid-svg .is-lit .conn{stroke:var(--pid-accent)}',
     '.rzpid-svg .is-lit .arrow,.rzpid-svg .is-lit .sighead{fill:var(--pid-accent)}',
     '.rzpid-svg .is-lit .sym,.rzpid-svg .is-lit .flag{stroke:var(--pid-accent)}',
@@ -95,7 +101,14 @@
     '@media (max-width:600px){.rzpid-svg .bub,.rzpid-svg .sub{font-size:11px}.rzpid-svg .tag{font-size:12px}.rzpid-item{min-height:0;padding:6px 12px;font-size:12.5px}}',
     '@media (prefers-reduced-motion:reduce){.rzpid-svg .is-flowing .flowdash{animation:none;opacity:0}.rzpid-svg [data-id],.rzpid-svg [data-edge]{transition-duration:1ms}.rzpid-cam,.rzpid-svg text{transition:none}}',
     '.rzpid-item{margin:0;padding:8px 14px;border-top:1px solid var(--pid-line,rgba(255,255,255,.14));font:13px/1.45 "IBM Plex Sans",system-ui,sans-serif;color:var(--pid-muted,#9aa3ad);min-height:2.9em}',
-    '.rzpid-item b{font:500 12.5px "JetBrains Mono",monospace;color:var(--pid-ink)}'
+    '.rzpid-item b{font:500 12.5px "JetBrains Mono",monospace;color:var(--pid-ink)}',
+    '.rzpid-tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;padding:8px 14px;border-top:1px solid var(--pid-line,rgba(255,255,255,.14));font:13px/1.45 "IBM Plex Sans",system-ui,sans-serif;color:var(--pid-muted)}',
+    '.rzpid-whatif-btn{font:500 13px "IBM Plex Sans",system-ui,sans-serif;color:var(--pid-ink);background:transparent;border:1px solid var(--pid-line,rgba(255,255,255,.14));border-radius:3px;min-height:40px;padding:6px 12px;cursor:pointer;transition:border-color var(--rz-dur-press,120ms) var(--rz-ease-out,cubic-bezier(.23,1,.32,1))}',
+    '.rzpid-whatif-btn:hover,.rzpid-whatif-btn[aria-pressed="true"]{border-color:var(--pid-accent)}.rzpid-whatif-btn:focus-visible{outline:1px solid var(--pid-accent);outline-offset:2px}',
+    '.rzpid-whatif-out{padding:4px 14px 12px;border-top:1px solid var(--pid-line,rgba(255,255,255,.14));font:13.5px/1.5 "IBM Plex Sans",system-ui,sans-serif;color:var(--pid-ink)}',
+    '.rzpid-whatif-out[hidden]{display:none}.rzpid-impact{margin:6px 0 0;padding:0 0 0 22px}.rzpid-impact li{padding:3px 0}',
+    '.rzpid-impact li::before{content:attr(data-kind);display:inline-block;min-width:76px;margin-right:6px;font:500 11px "JetBrains Mono",monospace;color:var(--pid-muted)}',
+    '.rzpid-impact li[data-kind="cause"]::before{color:var(--pid-fault-text,var(--pid-fault))}'
   ].join('\n');
   function injectCss() {
     if (document.getElementById('rzpid-css')) return;
@@ -212,6 +225,12 @@
         el('polygon', { points: pts(tri), 'class': 'symline' }, grp);
         tagAt(grp, eq.id, eq.tag, r.cx, r.y1 + 12);
         shapes[id] = { cx: r.cx, cy: r.cy, r: rr };
+      } else if (k === 'generator') {
+        var gr = Math.min(r.w, r.h) / 2;
+        el('circle', { cx: r.cx, cy: r.cy, r: gr, 'class': cls }, grp);
+        txt(grp, r.cx, r.cy + 4, 'G', 'tag');
+        tagAt(grp, eq.id, eq.tag, r.cx, r.y1 + 13);
+        shapes[id] = { cx: r.cx, cy: r.cy, r: gr };
       } else if (k === 'vessel' || k === 'tank' || k === 'pressure_vessel') {
         el('rect', { x: r.x0, y: r.y0, width: r.w, height: r.h, rx: r.w / 2, ry: Math.min(r.w / 2, 10), 'class': cls }, grp);
         el('line', { x1: r.x0 + 3, y1: r.cy + 4, x2: r.x1 - 3, y2: r.cy + 4, 'class': 'symline', 'stroke-dasharray': '3 2' }, grp);
@@ -337,6 +356,15 @@
     /* the item's own data (what it is, where, its value and source); what its tag MEANS is RZExplain's */
     var item = document.createElement('p'); item.className = 'rzpid-item'; item.setAttribute('aria-live', 'polite');
     item.textContent = ITEM_HINT; fig.appendChild(item);
+    var tools = document.createElement('div'); tools.className = 'rzpid-tools';
+    var wiBtn = document.createElement('button'); wiBtn.type = 'button'; wiBtn.className = 'rzpid-whatif-btn'; wiBtn.setAttribute('aria-pressed', 'false');
+    wiBtn.textContent = 'What if it fails';
+    var wiHint = document.createElement('span'); wiHint.textContent = 'Turn on, then pick any symbol: what stops, what reads abnormal, which loop or interlock responds.';
+    tools.appendChild(wiBtn); tools.appendChild(wiHint); fig.appendChild(tools);
+    var wiOut = document.createElement('div'); wiOut.className = 'rzpid-whatif-out'; wiOut.hidden = true; wiOut.setAttribute('aria-live', 'polite');
+    var wiH = document.createElement('p'); wiH.className = 'rzpid-wi-h'; wiH.style.margin = '6px 0 0';
+    var wiList = document.createElement('ol'); wiList.className = 'rzpid-impact';
+    wiOut.appendChild(wiH); wiOut.appendChild(wiList); fig.appendChild(wiOut);
     if (opts.caption) { var fc = document.createElement('figcaption'); fc.className = 'rzpid-cap'; fc.textContent = opts.caption; fig.appendChild(fc); }
     (opts.figureHost || host).appendChild(fig);
 
@@ -392,7 +420,7 @@
     var phoneMq = window.matchMedia ? window.matchMedia('(max-width: 600px)') : null;
     function isPhone() { return !!(phoneMq && phoneMq.matches); }
     function litBox() {
-      var lit = svg.querySelectorAll('.is-lit'), x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      var lit = svg.querySelectorAll('.is-lit,.is-fault'), x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
       for (var k = 0; k < lit.length; k++) {
         var bb = lit[k].getBBox(); if (!bb.width && !bb.height) continue;
         x0 = Math.min(x0, bb.x); y0 = Math.min(y0, bb.y); x1 = Math.max(x1, bb.x + bb.width); y1 = Math.max(y1, bb.y + bb.height);
@@ -408,7 +436,7 @@
         return;
       }
       var cs = getComputedStyle(frame), vw = frame.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-      var vh = Math.round(Math.min(vw * 1.15, window.innerHeight * 0.46)), b = current >= 0 ? litBox() : full, pad = 10;
+      var vh = Math.round(Math.min(vw * 1.15, window.innerHeight * 0.46)), b = current >= 0 || host.hasAttribute('data-whatif') ? litBox() : full, pad = 10;
       svg.setAttribute('viewBox', '0 0 ' + vw.toFixed(1) + ' ' + vh); svg.style.height = vh + 'px';
       var k = Math.min((vw - 2 * pad) / Math.max(b.w, 1), (vh - 2 * pad) / Math.max(b.h, 1), CAM_MAX_SCALE);
       var tx = vw / 2 - k * (b.x + b.w / 2), ty = vh / 2 - k * (b.y + b.h / 2);
@@ -435,7 +463,7 @@
       for (var k = 0; k < els.length; k++) {
         var key = els[k].getAttribute('data-id') || els[k].getAttribute('data-edge');
         var lit = !!set[key];
-        els[k].classList.toggle('is-lit', lit);
+        els[k].classList.toggle('is-lit', lit); els[k].classList.remove('is-fault', 'is-ctx');
         els[k].classList.toggle('is-flowing', lit && !!s.flow && !reduce && els[k].classList.contains('seg'));
       }
       stepBtns.forEach(function (b, j) { b.setAttribute('aria-pressed', j === i ? 'true' : 'false'); b.tabIndex = j === i ? 0 : -1; });
@@ -478,7 +506,48 @@
       var b = document.createElement('b'); b.textContent = n.label + (n.name && n.name !== n.label ? ' — ' + n.name : '');
       item.textContent = ''; item.appendChild(b); item.appendChild(document.createTextNode(' · ' + itemText(id)));
     }
+    /* ------------------------------------------------ R120: what-if mode (content from RZPid.impact, nothing per item) */
+    var wiOn = false, wiTab = [];
+    function whatIf(id) {
+      var r = RZ.impact(g, id); if (!r) return null;
+      var fault = {}, ctx = {};
+      r.fault.forEach(function (x) { fault[x] = 1; });
+      r.readings.forEach(function (x) { ctx[x.id] = 1; });
+      r.responses.forEach(function (x) { (x.finals || []).forEach(function (f) { ctx[f] = 1; }); });
+      r.takeover.forEach(function (x) { ctx[x.by] = 1; });
+      stopPulses(); current = -1; svg.classList.add('has-sel');
+      var els = svg.querySelectorAll('[data-id],[data-edge]');
+      for (var k = 0; k < els.length; k++) {
+        var key = els[k].getAttribute('data-id') || els[k].getAttribute('data-edge');
+        els[k].classList.toggle('is-lit', key === id);
+        els[k].classList.toggle('is-fault', key !== id && !!fault[key]);
+        els[k].classList.toggle('is-ctx', !!ctx[key]);
+        els[k].classList.remove('is-flowing');
+      }
+      stepBtns.forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
+      wiH.textContent = 'If ' + g.byId[id].label + ' ' + r.mode + ':';
+      while (wiList.firstChild) wiList.removeChild(wiList.firstChild);
+      r.chain.forEach(function (c) {
+        var li = document.createElement('li'); li.setAttribute('data-kind', c.kind === 'response' ? 'responds' : c.kind);
+        li.textContent = c.text; wiList.appendChild(li);
+      });
+      wiOut.hidden = false;
+      if (isPhone()) camera(); else revealLit();
+      host.setAttribute('data-whatif', id);
+      return r;
+    }
+    function setWhatIf(on) {
+      wiOn = !!on; wiBtn.setAttribute('aria-pressed', wiOn ? 'true' : 'false'); host.classList.toggle('rzpid-whatif', wiOn);
+      var ns = svg.querySelectorAll('g.node');
+      for (var k = 0; k < ns.length; k++) {
+        if (wiOn) { wiTab[k] = ns[k].getAttribute('tabindex'); ns[k].setAttribute('tabindex', '0'); }
+        else if (wiTab[k] !== undefined) ns[k].setAttribute('tabindex', wiTab[k]);
+      }
+      if (!wiOn) { wiOut.hidden = true; host.removeAttribute('data-whatif'); select(Math.max(0, current), false); }
+    }
+    wiBtn.addEventListener('click', function () { setWhatIf(!wiOn); });
     function pickStep(gEl) {
+      if (wiOn) { whatIf(gEl.getAttribute('data-id')); return; }
       var sid = ex.nodeStep[gEl.getAttribute('data-id')];
       if (!sid) return;
       var j = ex.steps.map(function (s) { return s.id; }).indexOf(sid);
@@ -512,7 +581,20 @@
       }, { threshold: 0.05 }).observe(svg);
     }
 
-    var api = { graph: g, explanation: ex, select: select, svg: svg, steps: stepBtns };
+    /* R120: live value labels. map: { nodeId: text }; placed by layout.values [dx, dy, anchor] from the symbol's centre. */
+    function setValues(map) {
+      Object.keys(map).forEach(function (id) {
+        var sh = shapes[id]; if (!sh) return;
+        var t = svg.querySelector('[data-val-of="' + id + '"]');
+        if (!t) {
+          var o = (L.values || {})[id] || [0, (sh.r || (sh.y1 - sh.cy)) + 13, 'middle'];
+          t = txt(gSym, sh.cx + o[0], sh.cy + o[1], '', 'val', o[2], { 'data-val-of': id });
+        }
+        t.textContent = map[id];
+      });
+      if (isPhone()) camera();
+    }
+    var api = { graph: g, explanation: ex, select: select, svg: svg, steps: stepBtns, whatIf: whatIf, setWhatIf: setWhatIf, setValues: setValues };
     host.__rzpid = api;
     if (opts.initial !== undefined) select(opts.initial, false);
     return api;

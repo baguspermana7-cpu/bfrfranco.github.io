@@ -26,9 +26,12 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(import.meta.url);
-const GRAPH = path.join(ROOT, 'js/rz-pid-graph.js');
-const P = require(fs.existsSync(GRAPH) ? GRAPH : path.join(ROOT, 'js/rz-pid.js'));
+/* RZPID_ROOT=<dir> loads the model modules from there (red runs against a committed copy); data and pages stay in ROOT */
+const CODE = process.env.RZPID_ROOT ? path.resolve(process.env.RZPID_ROOT) : ROOT;
+const GRAPH = path.join(CODE, 'js/rz-pid-graph.js');
+const P = require(fs.existsSync(GRAPH) ? GRAPH : path.join(CODE, 'js/rz-pid.js'));
 const CDU = require(path.join(ROOT, 'js/cdu-engine.js'));
+import { nodeR120, browserR120 } from './test-rz-pid-r120.mjs';
 const NO_BROWSER = process.argv.includes('--no-browser');
 const FIX = path.join(ROOT, 'tools/fixtures/pid-mini-plant');
 
@@ -280,6 +283,9 @@ for (const n of isaItems) {
   if (key && DB[key]) check('explain: ' + key + ' links to isa-5-1-tag', (DB[key].rel || []).includes('isa-5-1-tag'));
 }
 
+/* ---------------------------------------------------------------- R120 (tools/test-rz-pid-r120.mjs) */
+try { nodeR120({ P, CDU, check, ROOT, FIX, readJson, edges, eq, validate }); } catch (e) { check('r120: node laws ran to the end', false, e.stack.split('\n').slice(0, 3).join(' | ')); }
+
 /* ---------------------------------------------------------------- 5. browser */
 if (!NO_BROWSER) await browserChecks();
 
@@ -296,7 +302,7 @@ async function browserChecks() {
   await new Promise((res) => srv.listen(0, '127.0.0.1', res));
   const url = 'http://127.0.0.1:' + srv.address().port + '/rz-pid-mock.html';
   const browser = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox'] });
-  async function open(width, reduce) {
+  async function open(width, reduce, query) {
     const p = await browser.newPage(), errs = [];
     p.on('pageerror', (e) => errs.push(e.message));
     await p.setRequestInterception(true);
@@ -304,7 +310,7 @@ async function browserChecks() {
     await p.evaluateOnNewDocument(() => { try { localStorage.setItem('theme', 'dark'); } catch (e) { /* none */ } });
     if (reduce) await p.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
     await p.setViewport({ width, height: 844, deviceScaleFactor: 1 });
-    await p.goto(url, { waitUntil: 'load' });
+    await p.goto(url + (query || ''), { waitUntil: 'load' });
     await p.waitForFunction(() => document.querySelector('.rzpid') && document.querySelector('.rzpid').__rzpid, { timeout: 15000 });
     return { p, errs };
   }
@@ -380,6 +386,7 @@ async function browserChecks() {
     });
     check('browser 390: camera transition is transform only, 280 ms, on the token ease', !!t && t.prop === 'transform' && t.dur === '0.28s' && /cubic-bezier\(0\.77, 0, 0\.175, 1\)/.test(t.ease), JSON.stringify(t));
     await mv.p.close();
+    await browserR120({ open, check, P });
   } catch (e) {
     check('browser: run completed', false, e.message);
   } finally {

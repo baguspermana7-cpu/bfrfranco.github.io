@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex,nofollow">
-<title>CDU loop P&amp;ID — mock</title>
+<title>Plant P&amp;ID — mock</title>
 <meta name="description" content="R116 mock, not published: an interactive P&amp;ID of a CDU secondary loop with a step-by-step flow, measurement and control-loop explanation.">
 <script>
   (function () {
@@ -28,11 +28,13 @@
     --bg: #F5F7FA; --panel: #FFFFFF; --ink: #15171a; --muted: #5a626c; --line: rgba(0,0,0,.12);
     --pid-bg: #FFFFFF; --pid-panel: #FFFFFF; --pid-ink: #1d2126; --pid-ink2: #6b737c; --pid-muted: #5a626c; --pid-line: rgba(0,0,0,.14);
     --pid-cold: #46698A; --pid-warm: #8C5A49; --pid-accent: #7A4800; --pid-accent-text: #7A4800;
+    --pid-fault: #CC1F1F; --pid-fault-text: #B01A1A;   /* the site's fault token (css/rz-hub.css --rz-accent-alert), a STATE, never an accent */
   }
   [data-theme="dark"] {
     --bg: #0b0c0e; --panel: #121316; --ink: #e8edf5; --muted: #9aa3ad; --line: rgba(255,255,255,.12);
     --pid-bg: #121316; --pid-panel: #191b1f; --pid-ink: #dfe4ea; --pid-ink2: #848c95; --pid-muted: #9aa3ad; --pid-line: rgba(255,255,255,.14);
     --pid-cold: #6E8FAE; --pid-warm: #A87A6A; --pid-accent: #E8B563; --pid-accent-text: #E8B563;
+    --pid-fault: #FF3030; --pid-fault-text: #FF6B6B;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; }
@@ -83,6 +85,20 @@
   .legend svg * { vector-effect: non-scaling-stroke; }
   .facts .disc { padding-bottom: 8px; }
   .facts .disc .calc { display: block; margin-top: 4px; color: var(--muted); }
+  .plants { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 0 0 12px; font-size: 14px; }
+  .plants a { color: var(--muted); text-decoration: none; border-bottom: 1px solid transparent; padding: 10px 0 2px; min-height: 44px; display: inline-flex; align-items: flex-end;
+    transition: border-color var(--rz-dur-press) var(--rz-ease-out); }
+  .plants a:hover { border-bottom-color: var(--line); }
+  .plants a[aria-current="page"] { color: var(--ink); border-bottom-color: var(--pid-accent); }
+  .live { margin-top: 20px; padding: 12px 18px 14px; font-size: 13.5px; }
+  .live[hidden] { display: none; }
+  .live h2 { font-size: 15px; font-weight: 600; margin: 0 0 8px; }
+  .live label { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; color: var(--ink); }
+  .live input[type=range] { flex: 1 1 200px; max-width: 360px; accent-color: var(--pid-accent); min-height: 32px; }
+  .live output { font: 500 12.5px "JetBrains Mono", monospace; color: var(--ink); }
+  .live p { margin: 6px 0 0; color: var(--muted); }
+  .facts .qa-code { font: 12px "JetBrains Mono", monospace; color: var(--muted); }
+  .qa-sum { color: var(--muted); font-size: 13px; margin: 0 0 6px; }
   .attr { font-size: 12.5px; color: var(--muted); margin-top: 24px; max-width: 90ch; }
   .attr a { color: var(--pid-accent-text); }
   @media (max-width: 1023px) {
@@ -104,6 +120,7 @@
     .steps { margin-top: 16px; }
     #figHost { position: sticky; top: 0; z-index: 2; }
     .rzpid-cap { display: none; }
+    #figHost:has(.rzpid-whatif) { position: static; }   /* the consequence list is read, not pinned over the steps */
   }
 </style>
 </head>
@@ -112,8 +129,12 @@
   <div class="bar">
     <div>
       <p class="eyebrow">R116 MOCK · NOT PUBLISHED · FOR THE OWNER'S DECISION</p>
-      <h1>CDU secondary loop <span>— P&amp;ID with the flow explained</span></h1>
-      <p class="lede">The drawing and the steps come from one graph. Pick a step to light its path; click a symbol to jump to its step; hover, focus or tap a tag for its ISA-5.1 meaning. Dashed outlines are items the source page implies but does not draw.</p>
+      <h1><span id="plantName">CDU secondary loop</span> <span>— P&amp;ID with the flow explained</span></h1>
+      <nav class="plants" aria-label="Plant">
+        <a href="rz-pid-mock.html" data-plant="cdu">CDU secondary loop</a>
+        <a href="rz-pid-mock.html?plant=fuel" data-plant="fuel">Diesel day-tank transfer</a>
+      </nav>
+      <p class="lede">The drawing and the steps come from one graph. Pick a step to light its path; click a symbol to jump to its step; hover, focus or tap a tag for its ISA-5.1 meaning. Dashed outlines are items the source page implies but does not draw. “What if it fails” shows, for any symbol, what stops, what reads abnormal and which loop or interlock responds, worked out from the same graph.</p>
     </div>
     <button class="theme" id="themeBtn" type="button" aria-label="Switch colour theme">Theme</button>
   </div>
@@ -122,6 +143,13 @@
     <div class="panel" id="figHost"></div>
     <aside class="panel steps" id="stepsHost" aria-label="Explanation steps"></aside>
   </div>
+  <section class="panel live" id="liveBox" hidden aria-labelledby="liveH">
+    <h2 id="liveH">IT load</h2>
+    <label for="loadCtl">Share of the declared duty <input type="range" id="loadCtl" min="50" max="100" step="5" value="100"> <output id="loadOut" for="loadCtl"></output></label>
+    <p class="mono" id="liveLine"></p>
+    <p class="rz-prov" id="liveProv"></p>
+    <p id="liveDeclared"></p>
+  </section>
   <div class="panel legend-panel">
     <div class="legend" id="legend" aria-label="Legend">
       <span><svg width="26" height="8"><line x1="0" y1="4" x2="26" y2="4" stroke="var(--pid-cold)" stroke-width="2.2"/></svg>supply (cool)</span>
@@ -132,12 +160,14 @@
       <span><svg width="18" height="18"><circle cx="9" cy="9" r="7.5" fill="none" stroke="var(--pid-ink)"/></svg>field instrument</span>
       <span><svg width="18" height="18"><rect x="1" y="1" width="16" height="16" fill="none" stroke="var(--pid-ink)"/><circle cx="9" cy="9" r="7" fill="none" stroke="var(--pid-ink)"/></svg>DCS / shared display</span>
       <span><svg width="18" height="18"><circle cx="9" cy="9" r="7.5" fill="none" stroke="var(--pid-ink)" stroke-dasharray="3 2.5"/></svg>low confidence</span>
+      <span><svg width="26" height="8"><line x1="0" y1="4" x2="26" y2="4" stroke="var(--pid-fault)" stroke-width="2.2"/></svg>stopped (what-if)</span>
     </div>
   </div>
 
   <div class="below">
     <section class="panel" aria-labelledby="lowH">
       <h2 id="lowH">Not drawn on the source page — marked, not guessed</h2>
+      <p class="qa-sum" id="qaSum"></p>
       <ul class="facts" id="lowList"></ul>
     </section>
     <section class="panel" aria-labelledby="graphH">
@@ -146,14 +176,15 @@
     </section>
   </div>
 
-  <p class="attr">Graph model and rules ported from <a href="https://github.com/ScottDuncanAI/PID-to-Knowledge-Graph">PID-to-Knowledge-Graph</a> (MIT, © 2026 The pid-to-kg contributors). Tags, values and bands from <span class="mono">cdu-mini-bms.html</span>; each one names its source line in the data line under the drawing.</p>
+  <p class="attr">Graph model and rules ported from <a href="https://github.com/ScottDuncanAI/PID-to-Knowledge-Graph">PID-to-Knowledge-Graph</a> (MIT, © 2026 The pid-to-kg contributors). Tags, values and bands from <span class="mono" id="srcPage">cdu-mini-bms.html</span>; each one names its source line in the data line under the drawing.</p>
 </main>
 <script src="js/cdu-model.js?v=20261111-r117"></script>
 <script src="js/cdu-engine.js?v=20261111-r117"></script>
-<script src="js/rz-pid-build.js?v=20261111-r117"></script>
-<script src="js/rz-pid-graph.js?v=20261111-r117"></script>
-<script src="js/rz-pid-render.js?v=20261111-r117"></script>
-<script src="js/rz-explain-db.js?v=20261111-r117"></script>
+<script src="js/rz-pid-build.js?v=20261111-r120"></script>
+<script src="js/rz-pid-graph.js?v=20261111-r120"></script>
+<script src="js/rz-pid-render.js?v=20261111-r120"></script>
+<script src="js/rz-provenance.js?v=20261111-r120"></script>
+<script src="js/rz-explain-db.js?v=20261111-r120"></script>
 <script src="js/rz-explain.js?v=20261111-r117"></script>
 <script>
 (function () {
@@ -167,37 +198,78 @@
     label();
   });
 
-  function li(list, html) { var l = document.createElement('li'); l.innerHTML = html; list.appendChild(l); }
-  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function add(list, parts) {   /* parts: [text, className?] pairs; text only, never markup */
+    var l = document.createElement('li');
+    parts.forEach(function (p) { var e = p[1] ? document.createElement(p[2] || 'span') : document.createTextNode(p[0]); if (p[1]) { e.className = p[1]; e.textContent = p[0]; } l.appendChild(e); });
+    list.appendChild(l); return l;
+  }
+  var PLANTS = { cdu: 'data/pid/cdu-secondary-loop.json', fuel: 'data/pid/fuel-day-tank.json' };
+  var plant = /[?&]plant=fuel(&|$)/.test(location.search) ? 'fuel' : 'cdu';
+  [].forEach.call(document.querySelectorAll('.plants a'), function (a) { if (a.getAttribute('data-plant') === plant) a.setAttribute('aria-current', 'page'); });
 
-  fetch('data/pid/cdu-secondary-loop.json').then(function (r) {
+  /* "marked, not guessed": every row is an RZPid.qa() issue (the reference's QA categories + the heat balance) */
+  function qaPanel(g, doc) {
+    var q = RZPid.qa(g, { props: CDU_ENGINE.fluidProps, lowConfidence: RZPid.LOW_CONFIDENCE }), low = document.getElementById('lowList'), byLine = {};
+    document.getElementById('qaSum').textContent = q.counts.error + ' errors, ' + q.counts.warning + ' warnings, ' + q.counts.info +
+      ' info — RZPid.qa(): the reference’s QA checks, items below confidence ' + q.lowConfidence + ', and the heat balance.';
+    q.issues.forEach(function (i) {
+      var n = i.node ? g.byId[i.node] : null;
+      if (i.code === 'low_confidence' && n && n.type === 'PipeSegment' && i.line) {   /* one row per drawn line, not per segment */
+        if (byLine[i.line]) { byLine[i.line].setAttribute('data-qa-n', +byLine[i.line].getAttribute('data-qa-n') + 1); return; }
+        byLine[i.line] = add(low, [[i.code, 'qa-code'], [' line ' + i.line + ' (' + (n.attributes.service || '') + ') — ' + (n.attributes.notes || i.message)]]);
+        byLine[i.line].setAttribute('data-qa-code', i.code); byLine[i.line].setAttribute('data-qa-n', '1');
+        return;
+      }
+      var parts = [[i.code, 'qa-code'], [' ' + (n && i.code !== 'heat_balance_discrepancy' ? '' : (i.node ? i.node + ' ' : '')) + i.message + (i.basis ? ' — ' + i.basis : '')]];
+      if (i.quotes) parts.push([' Quoted: ' + i.quotes.map(function (x) { return '“' + x.text + '” (' + doc.sources[x.src].file + ')'; }).join('; ') + '.']);
+      if (i.calc) parts.push([i.calc, 'calc mono']);
+      var l = add(low, parts); l.setAttribute('data-qa-code', i.code); l.setAttribute('data-qa-n', '1');
+      if (i.calc) l.className = 'disc';
+    });
+  }
+  function graphPanel(g, doc) {
+    var c = g.stats.nodes_by_type, e = g.stats.edges_by_type, gl = document.getElementById('graphList'), m = 'mono';
+    add(gl, [[String(g.stats.nodes), m], [' nodes and '], [String(g.stats.edges), m], [' edges']]);
+    add(gl, [[String(c.Equipment || 0), m], [' equipment, '], [String(c.Component || 0), m], [' valves, '], [String(c.Instrument || 0), m], [' instruments, '], [String(c.PipeSegment || 0), m], [' pipe segments']]);
+    add(gl, [['Loops: ' + g.nodes.filter(function (n) { return n.type === 'ControlLoop'; }).map(function (n) { return n.label + ' ' + n.kind; }).join(', ')]]);
+    add(gl, [[String(e.FEEDS || 0), m], [' equipment-level FEEDS, '], [String(e.MEASURES || 0), m], [' MEASURES, '], [String(e.SIGNAL_TO || 0), m], [' signals, '], [String(e.TRIPS || 0), m], [' TRIPS']]);
+    doc.pages[0].sheet.legend_notes.slice(1, 3).forEach(function (t) { add(gl, [[t]]); });
+  }
+  /* live values: model output through CDU_ENGINE; only a plant that carries a heat balance gets the control */
+  function livePanel(api, g, doc) {
+    var props = CDU_ENGINE.fluidProps, v1 = RZPid.live(g, props, CDU_ENGINE, 1);
+    if (!v1) return;
+    var box = document.getElementById('liveBox'), ctl = document.getElementById('loadCtl'), out = document.getElementById('loadOut');
+    var hx = g.byId[v1.node], ft = g.byId[v1.at.flow], ts = g.byId[v1.at.t_supply], tr = g.byId[v1.at.t_return], src = doc.sources[hx.attributes.src];
+    document.getElementById('liveDeclared').textContent = 'Declared on the source page (' + src.ref + '): ' + hx.attributes.duty_kw + ' kW, ' + ft.attributes.value + ' ' +
+      ft.attributes.unit + ' (' + ft.attributes.total + '), ' + ts.attributes.value + ' °C supply, ' + (tr.attributes.value - ts.attributes.value) + ' °C rise. These stay as declared; the line above is the model.';
+    function update() {
+      var v = RZPid.live(g, props, CDU_ENGINE, (+ctl.value) / 100), map = {};
+      map[v.at.flow] = Math.round(v.flow_lpm) + ' LPM'; map[v.at.t_supply] = v.t_supply.toFixed(1) + ' °C'; map[v.at.t_return] = v.t_return.toFixed(1) + ' °C';
+      api.setValues(map);
+      out.textContent = ctl.value + ' % · ' + v.q_kw.toFixed(0) + ' kW';
+      document.getElementById('liveLine').textContent = RZPid.liveText(v);
+      if (window.RZProvenance) RZProvenance.mark('liveProv', { kind: 'model', basis: 'RZPid.live() through CDU_ENGINE: flow held at the balance flow, supply held at the declared value, rise and return follow the load' });
+    }
+    ctl.addEventListener('input', update);
+    box.hidden = false; update();
+  }
+
+  fetch(PLANTS[plant]).then(function (r) {
     if (!r.ok) throw new Error('HTTP ' + r.status);
     return r.json();
   }).then(function (doc) {
-    var figHost = document.getElementById('figHost');
+    document.getElementById('plantName').textContent = doc.plant.name;
+    if (doc.source_page) document.getElementById('srcPage').textContent = doc.source_page;
+    var sh = doc.pages[0].sheet, figHost = document.getElementById('figHost');
     var holder = document.createElement('div');
     figHost.insertBefore(holder, figHost.firstChild);
     var api = RZPid.render({ doc: doc, host: holder, figureHost: holder, stepsHost: document.getElementById('stepsHost'),
-      caption: doc.pages[0].sheet.title + ' · ' + doc.pages[0].sheet.drawing_number + ' · values for the in-row type', initial: 0,
+      caption: sh.title + ' · ' + sh.drawing_number + (doc.source_page ? ' · read from ' + doc.source_page : ' · values for the in-row type'), initial: 0,
       onSymbol: function (b) { if (b && b.scrollIntoView) b.scrollIntoView({ block: 'nearest' }); } });
-    var g = api.graph, low = document.getElementById('lowList');
-    RZPid.balance(g, CDU_ENGINE.fluidProps).forEach(function (r) {
-      var d = r.discrepancy, l = document.createElement('li'); l.className = 'disc';
-      l.innerHTML = '<code>' + esc(r.node) + '</code> ' + esc(d ? d.what : 'heat balance') + ' — ' + esc(d ? d.note + ' Quoted: ' + d.quotes.map(function (q) { return '“' + q.text + '” (' + doc.sources[q.src].file + ')'; }).join('; ') + '.' : r.finding || 'closes within tolerance.') +
-        '<span class="calc mono">' + esc(RZPid.balanceText(r)) + '</span>';
-      low.appendChild(l);
-    });
-    g.nodes.forEach(function (n) {
-      if (n.confidence < RZPid.LOW_CONFIDENCE && n.type !== 'PipeSegment' && n.type !== 'ControlLoop')
-        li(low, '<code>' + esc(n.label) + '</code> — ' + esc(n.attributes.basis || n.name || ''));
-    });
-    doc.pages[0].lines.forEach(function (l) { if ((l.confidence === undefined ? .85 : l.confidence) < RZPid.LOW_CONFIDENCE) li(low, '<code>' + esc(l.id) + '</code> (' + esc(l.service) + ') — ' + esc(l.notes || '')); });
-    var c = g.stats.nodes_by_type, e = g.stats.edges_by_type, gl = document.getElementById('graphList');
-    li(gl, '<span class="mono">' + g.stats.nodes + '</span> nodes and <span class="mono">' + g.stats.edges + '</span> edges');
-    li(gl, '<span class="mono">' + c.Equipment + '</span> equipment, <span class="mono">' + c.Component + '</span> valves, <span class="mono">' + c.Instrument + '</span> instruments, <span class="mono">' + c.PipeSegment + '</span> pipe segments');
-    li(gl, 'Loops: ' + g.nodes.filter(function (n) { return n.type === 'ControlLoop'; }).map(function (n) { return '<code>' + esc(n.label) + '</code> ' + esc(n.kind); }).join(', '));
-    li(gl, '<span class="mono">' + e.FEEDS + '</span> equipment-level FEEDS, <span class="mono">' + e.MEASURES + '</span> MEASURES, <span class="mono">' + e.SIGNAL_TO + '</span> signals, <span class="mono">' + (e.TRIPS || 0) + '</span> TRIPS');
-    doc.pages[0].sheet.legend_notes.slice(1, 3).forEach(function (t) { li(gl, esc(t)); });
+    qaPanel(api.graph, doc);
+    graphPanel(api.graph, doc);
+    livePanel(api, api.graph, doc);
   }).catch(function (err) {
     document.getElementById('stepsHost').textContent = 'The plant data could not be loaded (' + err.message + ').';
   });

@@ -25,7 +25,9 @@
  * loop's location), SIGNAL_TO, loop grouping by ISA key + signal tracing through relays
  * (ACTUATES, MEMBER_OF roles, CASCADES_TO, interlocks + TRIPS), derived FEEDS, and the
  * three-part reading order (process flow, measurement, control).
- * Not ported: per-sheet tag scoping (tag_scopes), PFD/P&ID view merging, name-conflict QA.
+ * R120 adds the rest of the cross-sheet rules: per-sheet tag scoping (tag_scopes, computed in rz-pid-graph.js and
+ * passed in as opts.scopes, 'TAG@SHEET' ids + tag_reused), name_conflict, off_page_reference_mismatch.
+ * Not ported: PFD/P&ID view merging (no PFD sheets here), OCR/tile coverage QA (needs the PDF work dir).
  *
  * What is RZ (in the other two files): the explanation steps, the heat balance, the drawing, the motion.
  * Vanilla ES5, no build.
@@ -46,14 +48,6 @@
     N: "user's choice", O: 'orifice/restriction', P: 'test point', Q: 'totalize', R: 'record', S: 'switch',
     T: 'transmit', U: 'multifunction', V: 'valve/damper', W: 'well', X: 'unclassified',
     Y: 'relay/compute/convert', Z: 'driver/actuator' };
-  /* Reader-facing words for the decode ("FIC = Flow, Indicating, Controller"). */
-  var FN_WORD = { A: 'Alarm', C: 'Controller', E: 'Element', G: 'Gauge', H: 'High', I: 'Indicating',
-    K: 'Control station', L: 'Low', M: 'Middle', O: 'Orifice', P: 'Test point', Q: 'Totalizing',
-    R: 'Recording', S: 'Switch', T: 'Transmitter', U: 'Multifunction', V: 'Valve', W: 'Well',
-    X: 'Unclassified', Y: 'Relay / converter', Z: 'Driver' };
-  var LOCATION_WORD = { field: 'field mounted', local_panel: 'local panel', main_panel: 'main control panel',
-    behind_panel: 'behind the panel', dcs: 'DCS / shared display', plc: 'PLC', scada: 'SCADA',
-    sis: 'safety system', computer: 'computer function', unknown: 'location not shown' };
   var ACTUATED_COMPONENT_KINDS = { control_valve: 1, on_off_valve: 1, solenoid_valve: 1, motor_operated_valve: 1, three_way_valve: 1 };
   var RELIEF = { PSV: 1, PRV: 1, PSE: 1, TSV: 1, TSE: 1, VRV: 1, PVRV: 1, PVSV: 1 };
   var ISA_VALVE_FUNCTIONS = { V: 1, CV: 1, SV: 1, Y: 1, Z: 1, SE: 1, SO: 1, SC: 1, Q: 1 };
@@ -161,25 +155,12 @@
     var rest = isa.letters.slice(isa.variableCode.length);
     return has(ISA_VALVE_FUNCTIONS, rest) || /CV$/.test(rest);
   }
-  /* "FIC" -> "Flow, Indicating, Controller" */
-  function decodeTag(tag) {
-    var isa = parseIsaTag(tag);
-    if (!isa) return null;
-    var words = [];
-    var v = ISA_MEASURED[isa.letters.charAt(0)];
-    if (isa.modifiers.length) v = isa.modifiers[0] + ' ' + v;
-    words.push(v.charAt(0).toUpperCase() + v.slice(1));
-    if (isa.role === 'relief_device') words.push('Safety', 'Valve');
-    else for (var i = 0; i < isa.fnLetters.length; i++) words.push(FN_WORD[isa.fnLetters.charAt(i)] || isa.fnLetters.charAt(i));
-    return { letters: isa.letters, words: words, text: isa.letters + ' = ' + words.join(', ') };
-  }
-
   /* ------------------------------------------------------------ graph (build.py) */
   function Builder(plantId, plantName) {
     this.plant = { id: plantId, name: plantName, sheets: [] };
     this.nodes = {}; this.order = []; this.edges = []; this.edgeKeys = {}; this.issues = [];
     this.local = {}; this.byTag = {}; this.segments = {}; this.linePaths = {};
-    this.sheetOfPage = {}; this.pageIds = {}; this.drawingOfSheet = {};
+    this.sheetOfPage = {}; this.pageIds = {}; this.drawingOfSheet = {}; this.scopes = {};
   }
   var B = Builder.prototype;
   B.issue = function (severity, code, message, extra) {
@@ -200,6 +181,10 @@
         this.nodes[n.id] = keep; return n.id;
       }
       this.issue('warning', 'type_conflict', "'" + n.id + "' read as " + ex.type + ' and as ' + n.type + '; kept ' + ex.type, { node: n.id });
+    }
+    if (ex.name && n.name && ex.type === n.type && normalizeLabel(ex.name) !== normalizeLabel(n.name) && !similar(ex.name, n.name)) {
+      this.issue('warning', 'name_conflict', "'" + n.id + "' is described as '" + ex.name + "' on " + ex.sheets[0] + " and as '" + n.name + "' on " + n.sheets[0], { node: n.id, sheet: n.sheets[0] });
+      var on = ex.attributes.other_names || (ex.attributes.other_names = []); if (on.indexOf(n.name) < 0) on.push(n.name);
     }
     ex.sheets = mergeList(ex.sheets, n.sheets);
     ex.confidence = Math.max(ex.confidence, n.confidence);
@@ -247,6 +232,7 @@
     if (nt && has(this.nodes, nt)) return nt;
     return null;
   };
+  B.scope = function (page, tag) { return has(this.scopes, page + '|' + tag) ? this.scopes[page + '|' + tag] : null; };
   B.unique = function (page, gid, localId, sheetId) {
     var seen = this.pageIds[page] || (this.pageIds[page] = {});
     var base = gid, n = 1;
@@ -284,13 +270,13 @@
         drawing_type: sheet.drawing_type || 'pid', notes: sheet.legend_notes, tiles_reviewed: ext.tiles_reviewed, unreadable: ext.unreadable }) });
     var P = 'P' + pad2(page) + '.';
     (ext.equipment || []).forEach(function (eq) {
-      var tag = normalizeTag(eq.tag);
-      var gid = self.unique(page, tag || P + eq.id, eq.id, sheetId);
+      var tag = normalizeTag(eq.tag), scope = tag ? self.scope(page, tag) : null;
+      var gid = self.unique(page, scope ? tag + '@' + scope : (tag || P + eq.id), eq.id, sheetId);
       var kind = slug(eq.kind);
       self.upsert({ id: gid, type: 'Equipment', label: tag || eq.name || kind, tag: tag, kind: kind, name: eq.name || null,
         status: eq.status || null, sheets: [sheetId], confidence: conf(eq, 0.9), attributes: clean(copy(eq.attributes)) });
       self.register(page, eq.id, eq.tag, gid);
-      if (tag) self.byTag[tag] = gid;
+      if (tag && !scope) self.byTag[tag] = gid;
     });
     (ext.components || []).forEach(function (c) {
       var tag = normalizeTag(c.tag);
@@ -300,19 +286,20 @@
       attrs.actuator = c.actuator; attrs.fail_position = c.fail_position; attrs.normal_position = c.normal_position;
       attrs.size = c.size; attrs.loop = normalizeTag(c.loop);
       attrs = clean(attrs);
-      var isa = tag ? parseIsaTag(tag) : null;
+      var isa = tag ? parseIsaTag(tag) : null, scope = tag ? self.scope(page, tag) : null;
+      if (scope) gid = self.unique(page, tag + '@' + scope, c.id, sheetId);
       var actuated = has(ACTUATED_COMPONENT_KINDS, kind) || (c.actuator && ['manual', 'none', 'self'].indexOf(c.actuator) < 0);
       if (isa && !isaValveTag(isa)) isa = null;
       if (isa && (actuated || kind === 'relief_valve')) {
         attrs.isa_letters = isa.letters; attrs.variable = isa.variable; attrs.role = isa.role;
-        attrs.loop_key = normalizeTag(c.loop) || isa.loopKey;
+        attrs.loop_key = (normalizeTag(c.loop) || isa.loopKey) + (scope ? '@' + scope : '');
       } else if (c.loop) {
         attrs.loop_key = normalizeTag(c.loop); attrs.role = 'final_element';
       }
       self.upsert({ id: gid, type: 'Component', label: tag || (kind === 'other' && c.name ? c.name : pretty(kind)), tag: tag,
         kind: kind, name: c.name || null, status: c.status || null, sheets: [sheetId], confidence: conf(c, 0.9), attributes: attrs });
       self.register(page, c.id, c.tag, gid);
-      if (tag) self.byTag[tag] = gid;
+      if (tag && !scope) self.byTag[tag] = gid;
     });
     (ext.instruments || []).forEach(function (ins) {
       var o = { location: ins.location || 'unknown', name: ins.name, status: ins.status, confidence: conf(ins, 0.9),
@@ -323,14 +310,14 @@
         self.register(page, ins.id, null, g0);
         return;
       }
-      var ntag = normalizeTag(ins.tag);
-      var gid = self.unique(page, ntag, ins.id, sheetId);
-      var dup = gid.slice(ntag.length);
-      if (dup) {
+      var ntag = normalizeTag(ins.tag), scope = self.scope(page, ntag), base = scope ? ntag + '@' + scope : ntag;
+      var gid = self.unique(page, base, ins.id, sheetId);
+      var dup = gid.slice(base.length);
+      if (scope || dup) {
         var isa = parseIsaTag(ntag), key = normalizeTag(ins.loop) || (isa ? isa.loopKey : null);
-        o.loop = key ? key + dup : null;
+        o.loop = key ? key + (scope ? '@' + scope : '') + dup : null;
       }
-      o.nodeId = gid;
+      o.nodeId = gid; o.scoped = !!scope;
       gid = self.addInstrument(ins.tag, page, sheetId, o);
       self.register(page, ins.id, ins.tag, gid);
     });
@@ -403,7 +390,7 @@
         self.upsert({ id: sid, type: 'PipeSegment', label: n > 1 ? label + ' [' + k + '/' + n + ']' : label,
           tag: normalizeTag(line.line_number), sheets: [sheetId], confidence: lc,
           attributes: clean({ line_id: line.id, line_number: line.line_number, size: line.size, service: line.service,
-            segment: k, segments: n, flow_direction: line.flow_direction || 'shown' }) });
+            segment: k, segments: n, flow_direction: line.flow_direction || 'shown', notes: line.notes }) });
         segs.push(sid);
       }
       self.segments[key] = segs; self.linePaths[key] = pathIds;
@@ -460,6 +447,12 @@
     }
     return words;
   }
+  function similar(a, b) {
+    var ta = tokens(a), tb = tokens(b), ka = Object.keys(ta), kb = Object.keys(tb);
+    if (!ka.length || !kb.length) return false;
+    var sub = function (x, y) { return Object.keys(x).every(function (k) { return y[k]; }); };
+    return sub(ta, tb) || sub(tb, ta) || jaccard(ta, tb) >= 0.5;
+  }
   function jaccard(a, b) {
     var ka = Object.keys(a), kb = Object.keys(b); if (!ka.length || !kb.length) return 0;
     var inter = 0, uni = {}; ka.forEach(function (k) { uni[k] = 1; if (b[k]) inter++; }); kb.forEach(function (k) { uni[k] = 1; });
@@ -490,13 +483,17 @@
     pairs.forEach(function (p) {
       if (p[0] < 3 || used[p[1]] || used[p[2]]) return;
       used[p[1]] = used[p[2]] = true;
-      var o = self.nodes[p[1]], i = self.nodes[p[2]];
+      var o = self.nodes[p[1]], i = self.nodes[p[2]], oDn = self.drawingOfSheet[o.sheets[0]], iDn = self.drawingOfSheet[i.sheets[0]];
+      if ((o.attributes.other_drawing && !sameDrawing(o.attributes.other_drawing, iDn)) || (i.attributes.other_drawing && !sameDrawing(i.attributes.other_drawing, oDn)))
+        self.issue('warning', 'off_page_reference_mismatch', "'" + o.label + "' (" + oDn + ") and '" + i.label + "' (" + iDn + ') were paired by line number ' + o.attributes.line_number +
+          ', but their flags name other drawings (' + o.attributes.other_drawing + ' / ' + i.attributes.other_drawing + ')', { sheet: o.sheets[0], node: o.id });
       self.edge(o.id, i.id, 'FLOWS_TO', { confidence: Math.min(o.confidence, 0.9) }, { off_page: true, match_score: Math.round(p[0] * 100) / 100 });
       o.attributes.linked_to = i.id; i.attributes.linked_from = o.id;
     });
     outs.concat(ins).forEach(function (n) {
       if (used[n.id] || self.linkOpcByItem(n)) return;
-      self.issue('warning', 'unmatched_off_page', "off-page connector '" + n.label + "' has no matching connector or item", { sheet: n.sheets[0], node: n.id });
+      self.issue('warning', 'unmatched_off_page', "off-page connector '" + n.label + "' (" + (n.attributes.direction === 'out' ? 'to' : 'from') + ' ' +
+        n.attributes.other_drawing + ') has no matching connector or item', { sheet: n.sheets[0], node: n.id });
     });
   };
   B.linkOpcByItem = function (opc) {
@@ -771,8 +768,14 @@
     return g;
   };
 
-  function buildGraph(pages, plantId, plantName) {
+  /* opts.scopes: {'page|TAG': sheet suffix} from tagScopes() (rz-pid-graph.js); RZPid.buildGraph always passes it. */
+  function buildGraph(pages, plantId, plantName, opts) {
     var b = new Builder(plantId, plantName || plantId);
+    b.scopes = (opts && opts.scopes) || {};
+    Object.keys(b.scopes).sort().forEach(function (k) {
+      var pg = +k.split('|')[0], t = k.slice(k.indexOf('|') + 1), sc = b.scopes[k];
+      b.issue('info', 'tag_reused', "'" + t + "' identifies different items on different sheets; kept as '" + t + '@' + sc + "'", { page: pg, node: t + '@' + sc });
+    });
     var ps = pages.slice().sort(function (a, c) { return a.page - c.page; });
     ps.slice().sort(function (a, c) {
       var pa = (a.sheet && a.sheet.drawing_type === 'pfd') ? 1 : 0, pc = (c.sheet && c.sheet.drawing_type === 'pfd') ? 1 : 0;
@@ -789,9 +792,8 @@
   /* Public members are re-exported by rz-pid-graph.js as window.RZPid; `_` is shared with the other two
      modules only, so the rules live in one place. */
   root.RZPidBuild = { buildGraph: buildGraph, normalizeTag: normalizeTag, normalizeLabel: normalizeLabel,
-    parseIsaTag: parseIsaTag, decodeTag: decodeTag, loopVariable: loopVariable, LOW_CONFIDENCE: LOW_CONFIDENCE,
-    LOCATION_WORD: LOCATION_WORD,
-    _: { has: has, pad2: pad2, slug: slug, pretty: pretty, conf: conf, nearest: nearest,
+    parseIsaTag: parseIsaTag, loopVariable: loopVariable, LOW_CONFIDENCE: LOW_CONFIDENCE,
+    _: { ISA_MEASURED: ISA_MEASURED, sameDrawing: sameDrawing, tokens: tokens, jaccard: jaccard, has: has, pad2: pad2, slug: slug, pretty: pretty, conf: conf, nearest: nearest,
       TERMINAL_TYPES: TERMINAL_TYPES, ACTUATED_COMPONENT_KINDS: ACTUATED_COMPONENT_KINDS } };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.RZPidBuild;
 })(typeof window !== 'undefined' ? window : globalThis);

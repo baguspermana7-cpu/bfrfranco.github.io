@@ -189,6 +189,8 @@ labels = {
     "TCV-01": [-8, 46, "end"], "HV-01": [0, 0, "middle"], "P-01A": [22, 8, "start"], "P-01B": [22, 8, "start"],
     "HV-03": [0, 0, "middle"], "PSV-01": [-12, 0, "end"], "CK-A": [0, 0, "middle"],
 }
+# R120: where a live value label sits, relative to its bubble centre [dx, dy, anchor]
+values = {"FT-01": [0, -20, "middle"], "TT-01": [0, -20, "middle"], "TT-02": [0, 28, "middle"]}
 flag_tip = {"B-FWS": "right", "B-FWR": "left", "B-RS": "right", "B-RR": "left", "B-MU": "left", "B-REL": "left"}
 
 doc = {
@@ -198,7 +200,7 @@ doc = {
     "plant": {"id": "cdu-secondary-loop", "name": "CDU secondary loop (in-row CDU)"},
     "sources": SRC,
     "pages": [page],
-    "layout": {"viewBox": [W, H], "anchors": anchors, "routes": routes, "signals": signals_l, "labels": labels, "flagTip": flag_tip},
+    "layout": {"viewBox": [W, H], "anchors": anchors, "routes": routes, "signals": signals_l, "labels": labels, "values": values, "flagTip": flag_tip},
 }
 json.dump(doc, open(sys.argv[1], "w"), indent=1, ensure_ascii=False)
 print("ok")
