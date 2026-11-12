@@ -17,7 +17,7 @@
  *  F2 the back arrives in order: shortly after the turn crosses 90°, the back's fact rows are still cascading in (the
  *     last row behind the first); 1.4 s after the click every row is fully shown.
  *  F3 reduced motion: the flip is an opacity swap — no lift, no glare, no cascade.
- *  M5 the light layer drifts with scroll (scroll-driven): .dp-light's translateY differs by >= 8 px between two scroll
+ *  M5 (superseded by R119, 2026-11-12: one page field, no per-section light layer; motion returns with R121) was: the light layer drifts with scroll (scroll-driven): .dp-light's translateY differs by >= 8 px between two scroll
  *     positions; with reduced motion it does not move.
  *  M6 copy feedback: clicking a .copy-btn shows a check icon (opacity > 0.9), hides the copy icon, and colours the
  *     button blue-family (no green).
@@ -71,7 +71,7 @@ try {
       return { cls: e.className.split(' ')[0], ok: !!col && (blue || warm), warm, key: col ? col.slice(0, 3).join(',') : 'none' }; }), GLOWED);
     const cases = g.filter((x) => x.cls === 'case-card');
     check(g.length >= 11 && g.every((x) => x.ok), `G1 ${T} ${g.filter((x) => x.ok).length}/${g.length} panels carry a bottom glow (${[...new Set(g.filter((x) => !x.ok).map((x) => x.cls))].join(',') || 'all'})`);
-    check(new Set(cases.map((x) => x.key)).size >= 2 && cases.some((x) => x.warm), `G1 ${T} case cards rotate the glow colour (${cases.map((x) => x.key).join(' | ')})`);
+    check(cases.length >= 3 && new Set(cases.map((x) => x.key)).size === 1, `G1 ${T} case cards share one light colour (R119: blue as light, no rotation) (${cases.map((x) => x.key).join(' | ')})`);
     // G2
     await scrollTo(p, '#case-studies .case-card');
     const cc = await p.evaluate(() => { const e = document.querySelector('#case-studies .case-card'), r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, bs: getComputedStyle(e).boxShadow }; });
@@ -88,11 +88,10 @@ try {
     const row1 = await p.evaluate(() => { const c = getComputedStyle(document.querySelector('#metrics .res-row:nth-of-type(2)')); return { bg: c.backgroundColor, img: c.backgroundImage, tf: c.transform }; });
     check(row1.bg !== row.bg0 && row1.img === 'none' && row1.tf === 'none', `M8 ${T} result row hover: flat tint ${row.bg0} → ${row1.bg}, no gradient, no movement (${row1.tf})`);
     await p.mouse.move(5, 5);
-    // M5
-    const ty = async (y) => { await p.evaluate((yy) => window.scrollTo(0, yy), y); await sleep(250); return p.evaluate(() => { const m = getComputedStyle(document.querySelector('#case-studies > .dp-light')).transform; return m === 'none' ? 0 : +(m.split(',')[5] || '0').replace(')', ''); }); };
-    const top = await p.evaluate(() => document.getElementById('case-studies').getBoundingClientRect().top + scrollY);
-    const t1 = await ty(top - 700), t2 = await ty(top + 200);
-    check(Math.abs(t1 - t2) >= 8, `M5 ${T} the light drifts with scroll (translateY ${t1.toFixed(1)} → ${t2.toFixed(1)} px)`);
+    // M5 (R119, owner approved 2026-11-12): the per-section light layer gives way to ONE page field; scroll motion
+    // returns with R121 (Lenis + GSAP), not as a per-section drift.
+    const lightShown = await p.evaluate(() => [...document.querySelectorAll('section > .dp-light')].filter((l) => getComputedStyle(l).display !== 'none').length);
+    check(lightShown === 0, `M5 ${T} one page field: no per-section light layer is drawn (R119) — ${lightShown} shown`);
     // F1 + F2 on employer card 2
     await scrollTo(p, '.emp-card:nth-of-type(2)');
     const ec = await p.evaluate(() => { const r = document.querySelector('.emp-card:nth-of-type(2) .emp-front .emp-name').getBoundingClientRect(); return { x: r.left + 10, y: r.top + 5 }; });

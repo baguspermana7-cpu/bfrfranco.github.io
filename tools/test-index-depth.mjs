@@ -5,10 +5,10 @@
  *  D1 tiers: the results and case-study sections sit on a band one step off the page base, operations on the base,
  *     and every panel in them (results panel, operations table, case card) one more step, framed by a 1 px hairline.
  *  D2 figures: every result with a scale carries a measured bar — fill = value, reference tick = its stated reference.
- *  D3 the case-study figures read as results: amber, never struck through or greyed (they were class stat-before).
+ *  D3 (R119, owner approved 2026-11-12, replaces the law below where they differ: one page field, ink figures, blue only as light/bars, accent as the 10 %) the case-study figures read as results: amber, never struck through or greyed (they were class stat-before).
  *  D4 operations: one table panel; no coloured badge, icon tile or tag chips; no hue but amber in the section.
  *  D5 section heads 02–07 (owner "sync"): a numbered mono eyebrow over a left-aligned title in every section after the hero.
- *  D7 60/30/10, R101 (owner 2026-11-09 "aneh birunya kyk nggk nyambung dg theme"; "contoh2 kn sdah saya kasih"): as in the
+ *  D7 (R119, owner approved 2026-11-12, replaces the law below where they differ: one page field, ink figures, blue only as light/bars, accent as the 10 %) 60/30/10, R101 (owner 2026-11-09 "aneh birunya kyk nggk nyambung dg theme"; "contoh2 kn sdah saya kasih"): as in the
  *     owner's echo reference, blue is LIGHT, never a flat band — the results, cases and contact sections sit on the page base
  *     (≤2), a blue radial halo layer sits behind each, every panel there carries a blue rim on its top edge, at least two
  *     result bars and one title word are blue; every text there reaches WCAG AA (4.5:1, 3:1 at 24 px+); the 10 % = --dp-amber.
@@ -17,7 +17,7 @@
  *  D10 every text node in the three band sections, inside panels too, reaches WCAG AA against what it sits on.
  *  D11 motion (owner "animasi"): each bar grows from 0 to its value once, as the results panel enters view (600 ms
  *     strong ease-out, 60 ms row stagger); with reduced motion the bars are full from the start; without JS, full.
- *  D12 rhythm (owner "sync", peer audit): blue / base / blue / base / tier / blue — About sits on the page base (≤2) and FAQ on a
+ *  D12 (R119, owner approved 2026-11-12, replaces the law below where they differ: one page field, ink figures, blue only as light/bars, accent as the 10 %) rhythm (owner "sync", peer audit): blue / base / blue / base / tier / blue — About sits on the page base (≤2) and FAQ on a
  *     real neutral tier (≥8 off the base, no blue cast), in both themes; no painted box inside them is a fake step (1–4 off its parent).
  *  D13 palette: inside the three band sections every saturated colour (text, icon fill/stroke, background) is the blue
  *     family (hue 218–232°) or the accent — no stray cyan/sky link or icon colour (dark contact panel painted 56,189,248).
@@ -27,7 +27,7 @@
  *  D15 contrast stays measurable (R105; axe gives up — "pseudoContent", filed incomplete, never failed — when any ancestor's
  *     ::before/::after covers > 25 % of a text box, and on a gradient behind the text): a planted low-contrast line in every
  *     lit panel (results, each case, contact info, contact form) is a color-contrast VIOLATION in axe, both themes.
- *  D16 the light is a scene (and the first result row keeps the accent figure and bar — a sheen first child once broke :first-child) (owner R105 "Mainkan gradien. Yg sangat cantik"): each band's light layer is a real element
+ *  D16 (R119, owner approved 2026-11-12, replaces the law below where they differ: one page field, ink figures, blue only as light/bars, accent as the 10 %) the light is a scene (and the first result row keeps the accent figure and bar — a sheen first child once broke :first-child) (owner R105 "Mainkan gradien. Yg sangat cantik"): each band's light layer is a real element
  *     (.dp-light, aria-hidden) with >= 3 radial sources — a blue key, a second deep source and a warm orange counter-light —
  *     plus a grain layer; every lit panel catches it on a top-edge sheen (.dp-sheen) that is brightest toward the middle.
  *  D6 phone 390 (both themes): no sideways scroll; every bar inside its panel; no description clipped to an ellipsis. No page errors anywhere.
@@ -145,21 +145,22 @@ try {
     const badBars = o.bars.filter((b) => Math.abs(b.fill - b.v) > 0.01 || (b.ref !== null && (b.at === null || Math.abs(b.at - b.ref) > 0.012 || !b.refLabel)));
     check(o.bars.length === 3 && badBars.length === 0, `D2 ${T} 3 measured bars: fill = value, tick = reference — ${o.bars.map((b) => `${b.v}:${b.fill.toFixed(3)}${b.ref !== null ? `@${b.ref}:${b.at === null ? '-' : b.at.toFixed(3)}` : ''}`).join(' ')}`);
     const amber = o.accent;
-    const badCase = o.cases.filter((c) => c.deco.includes('line-through') || Math.max(...c.color.map((v, i) => Math.abs(v - amber[i]))) > 6);
-    check(o.cases.length === 3 && badCase.length === 0, `D3 ${T} case figures amber, not struck — ${o.cases.map((c) => `${c.t}:${c.deco}:${c.color.join(',')}`).join(' | ')}`);
+    /* R119 (owner approved 2026-11-12): the case figures read in ink; the accent is the 10 %, not every figure. */
+    const badCase = o.cases.filter((c) => c.deco.includes('line-through') || Math.max(...c.color.map((v, i) => Math.abs(v - amber[i]))) <= 6);
+    check(o.cases.length === 3 && badCase.length === 0, `D3 ${T} case figures in ink (R119: not the accent), not struck — ${o.cases.map((c) => `${c.t}:${c.deco}:${c.color.join(',')}`).join(' | ')}`);
     check(o.opsJunk === 0 && o.opsRows === 8, `D4 ${T} operations: 8 rows, no badge/icon tile/tag chip — read rows ${o.opsRows}, junk ${o.opsJunk}`);
     const offHue = [...new Set(o.opsHues)].filter((c) => Math.max(...c.split(',').map((v, i) => Math.abs(+v - amber[i]))) > 6);
     check(offHue.length === 0, `D4 ${T} no hue but amber in operations${offHue.length ? ' — ' + offHue.slice(0, 4).join(' / ') : ''}`);
     for (const h of o.heads) check(/^0\d\b/.test(h.eb) && h.ebMono && h.align !== 'center' && h.dx <= 2, `D5 ${T} #${h.id}: eyebrow "${h.eb}" mono ${h.ebMono}, title ${h.align}, aligned Δ${Math.round(h.dx)}`);
     check(o.bandHue.every((d) => d < 30) && o.halo.every(Boolean), `D7 ${T} blue is light, not a band: section grounds carry no blue (lead ${o.bandHue.join('/')}), a blue halo sits behind each (${o.halo.join('/')})`);
-    check(o.blueBars >= 2 && o.blueWord >= 1, `D7 ${T} blue on the data and one title word: ${o.blueBars} blue bar(s), ${o.blueWord} blue word(s)`);
+    check(o.blueBars >= 2 && o.blueWord === 0, `D7 ${T} blue on the data, never on a title word (R119: blue is light on objects): ${o.blueBars} blue bar(s), ${o.blueWord} blue word(s)`);
     check(o.lowContrast.length === 0, `D7 ${T} text on the bands reaches AA${o.lowContrast.length ? ' — ' + o.lowContrast.map((x) => `${x.t} ${x.r}<${x.need}`).join(' | ') : ''}`);
     check(o.bandText.length === 0, `D10 ${T} every text in the band sections (panels included) reaches AA${o.bandText.length ? ' — ' + o.bandText.length + ': ' + o.bandText.slice(0, 5).map((x) => `${x.t} ${x.r}`).join(' | ') : ''}`);
     const mis = o.align.filter((a) => a.dx > 2);
     check(mis.length === 0, `D9 ${T} every section's content starts on its eyebrow's left edge${mis.length ? ' — ' + mis.map((a) => `#${a.id} Δ${a.dx}`).join(' ') : ''}`);
     check(o.oldAmber.length === 0, `D8 ${T} one accent across the page: no element still paints the old amber${o.oldAmber.length ? ' — ' + o.oldAmber.length + ': ' + o.oldAmber.slice(0, 5).join(' | ') : ''}`);
-    check(o.tier.about.step <= 2 && o.tier.faq.step >= 8 && o.tier.faq.cast <= 8,
-      `D12 ${T} About on the base (≤2, read ${o.tier.about.step}), FAQ on a real neutral tier (≥8, read ${o.tier.faq.step}, blue cast ${o.tier.faq.cast} ≤8)`);
+    check(o.tier.about.step <= 2 && o.tier.faq.step <= 2,
+      `D12 ${T} one page field (R119): About and FAQ paint no ground of their own (≤2, read ${o.tier.about.step} / ${o.tier.faq.step})`);
     check(o.fakeStep.length === 0, `D12 ${T} no fake step (1–4) painted inside operations/About/FAQ${o.fakeStep.length ? ' — ' + o.fakeStep.slice(0, 5).join(' | ') : ''}`);
     check(o.strayHue.length === 0, `D13 ${T} band sections use only the blue family and the accent${o.strayHue.length ? ' — ' + o.strayHue.length + ': ' + o.strayHue.slice(0, 5).join(' | ') : ''}`);
     check(p.errors.length === 0, `D6 ${T} no page errors${p.errors.length ? ' — ' + p.errors[0] : ''}`);
@@ -212,7 +213,7 @@ try {
     const head = await p.evaluate(() => { const r = document.querySelector('#metrics .res-row'), acc = getComputedStyle(document.documentElement).getPropertyValue('--dp-amber').trim();
       const hex = (h) => { const x = h.replace('#', ''); return [0, 2, 4].map((i) => parseInt(x.slice(i, i + 2), 16)).join(', '); };
       return { acc: hex(acc), fig: getComputedStyle(r.querySelector('.metric-value')).color, bar: getComputedStyle(r.querySelector('.res-fill')).backgroundImage }; });
-    check(head.fig.includes(head.acc) && head.bar.includes(head.acc), `D16 ${theme}: the headline result keeps the 10 % accent — figure ${head.fig}, bar ${head.bar.includes(head.acc) ? 'accent' : 'NOT accent'} (accent ${head.acc})`);
+    check(!head.fig.includes(head.acc) && !head.bar.includes(head.acc), `D16 ${theme}: the headline result reads in ink with a blue bar (R119: the accent is the 10 %, not the result) — figure ${head.fig}, bar ${head.bar.includes(head.acc) ? 'accent' : 'not accent'} (accent ${head.acc})`);
     const sc = await p.evaluate((B) => B.map((id) => { const s = document.getElementById(id), L = s.querySelector(':scope > .dp-light');
       if (!L) return { id, src: 0, warm: false, grain: false, sheen: 0, panels: 0 };
       const g = getComputedStyle(L).backgroundImage, src = (g.match(/radial-gradient/g) || []).length;
