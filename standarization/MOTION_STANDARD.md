@@ -215,3 +215,21 @@ blur on the section title only):
 Reduced motion: no section is armed, the flip is a 180 ms opacity swap, bars render full. Without JS nothing is hidden.
 Gates: `tools/test-index-depth.mjs` D11 + D14, `tools/test-index-r079.mjs` L2 (mid-turn 20–170° at 150 ms, keyboard path,
 small icon button, reduced motion = no rotation). Both proven red on v3.35.3 (10 + 6 failures).
+
+## R121 homepage motion — mock (v3.50.0)
+
+Owner request (via peer, 2026-11-11): cinematic motion on the homepage with Lenis 1.3.27 and GSAP 3.15.0
+(ScrollTrigger, SplitText), mock first. Page: `index-motion-mock.html` (noindex), script `js/rz-index-motion.js`, libraries
+pinned to exact versions on jsdelivr.
+
+- Lenis smooth scroll only when `(pointer: fine)` and `(hover: hover)`; phones keep native scroll.
+- Hero name rises word by word; each section's eyebrow, title, lede and items rise once at 85 % of the viewport;
+  employer cards rise as a batch; the portrait drifts 4 % slower than the page (scrubbed). One curve (`expo.out`).
+- `transform` and `opacity` only. Nothing is pinned (the owner rejected the pinned Hub "Stage" on 2026-10-16: "terkunci scroll").
+- While the script runs it disables the CSS `.fade-in` transitions (`html.rzm`), so two systems never move the same
+  element.
+- Reduced motion: no Lenis, 0 tweens. No JS or a failed CDN: everything stays in its final state.
+- When the script runs after the first paint, anything already on screen stays as it is. Without this the name was
+  painted, hidden and then raised again, and the gate counted 26 drops.
+- Gate: `tools/test-index-motion.mjs` T1–T8. Red on index.html (T1–T3), green on the mock. T8 is red when the
+  first-paint check is removed.
