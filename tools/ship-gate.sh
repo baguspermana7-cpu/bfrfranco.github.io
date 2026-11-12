@@ -283,6 +283,7 @@ gate "Cx campus basis — the 3D plant's counts, CDUs, flows and callout text fo
 gate "Cx glb library — Blender export matches a regenerated build byte for byte, footprints, shades" node tools/test-cx-glb.mjs --regen
 gate "Cx records (Tier 3 slice) — PRD v1.0 invariants on the demo record set, overlay on the plan, register import reasons" node tools/test-cx-records.mjs
 gate "DCMOC Cx plan bridge — same plan and status as the site module, store clamps/persists/5 scenarios (needs dcmoc/node_modules)" node tools/test-dcmoc-cx-plan.mjs
+gate "Reliability vs NIST e-Handbook — series, parallel, r-of-n parity (F1-F4 block); N+1/2N defects D1-D3 reported until owner decision O-R120-REL" node tools/test-reliability-reference.mjs
 gate "Cx Analysis — plan editor, schematic, 3D campus with the glb library and callouts, Tier 1.5 calendar, both themes" node tools/test-cx-analysis.mjs
 gate "Cx gradient (K34) — owner gradient surfaces lit, no gradient text, hero text AA over the gradient at 1440/390 both themes" node tools/test-cx-gradient.mjs
 gate "Cx issues — register, gate readiness from the handbook items, overlay on the plan" node tools/test-cx-issues.mjs

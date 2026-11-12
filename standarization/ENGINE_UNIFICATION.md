@@ -177,3 +177,14 @@ Traps catalogued in memory: pue.defaultFor key mismatch (use pueMatrix direct), 
   the key; the back-link lives in `rz-cx-issue-sources` because the Tier 1 schema has no source field.
 - Gates: `tools/test-handoff-contract.mjs`, `tools/test-handoff-cx.mjs`. Not yet: project → spares (spares and tier do
   not load `rz-project.js`).
+
+## Reliability against a public reference (R120, 2026-11-12)
+
+- Reference: NIST/SEMATECH e-Handbook §8.1.8.2–8.1.8.4 (public domain). Gap file:
+  `documentation/product-transformation/gaps/dcmoc-reliability.md`.
+- The engine's series, parallel and `kOutOfN` reproduce the reference exactly (F1–F4); these laws block.
+- Defects found: the headline maps N+1 and 2N to the same 1-of-2 group (`DATA.reliability.redundancyPaths`), which
+  understates N+1 downtime by about 10× at N=4. The what-if row's 2N pools units across both systems (k of 2k)
+  instead of modelling two systems of k. Owner decision O-R120-REL picks the model. Until then D1–D3 are reported,
+  not blocking.
+- Gate: `tools/test-reliability-reference.mjs` (`--strict` makes D1–D3 block once the decision lands).
