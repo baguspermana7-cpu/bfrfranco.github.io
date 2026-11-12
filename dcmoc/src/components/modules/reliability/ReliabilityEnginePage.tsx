@@ -38,7 +38,8 @@ import { explainThresholdMetric, DecisionLever } from '@/lib/decision-explain';
  * shared with the RAM Detail tab so both tabs show the SAME headline */
 import {
     MIN_PER_YEAR, ninesOf, fmtAvail, fmtDowntime,
-    buildSystems as buildSystemsShared, ccOverall as ccOverallShared,
+    buildSystems as buildSystemsShared, ccOverall as ccOverallShared, groupAvail,
+    RED_STEPS, RED_LABEL, toRedKey, unitsForLoad, type RedKey,
     type SystemRow, type RelComponent,
 } from '@/components/modules/reliability/availabilityChain';
 
@@ -70,14 +71,18 @@ export function ReliabilityEnginePage() {
         const comps = d.components as Record<string, RelComponent>;
         const redKey = REDUNDANCY_KEY[inputs.powerRedundancy] ?? 'n1';
         const paths: number = d.redundancyPaths?.[redKey] ?? 2;
+        const red: RedKey = toRedKey(redKey);
+        /* k per class = units the load needs (engine equipScale; R120: N+1 = k of k+1, 2N = two systems of k) */
+        const units = unitsForLoad(eng as never, inputs.itLoad);
 
         /* shared β-adjusted chain (availabilityChain.ts) — same composition the
          * RAM Detail tab uses, parameterized for sensitivity re-runs */
-        const buildSystems = (mttrFactor: number, p: number): SystemRow[] => buildSystemsShared(m, comps, mttrFactor, p);
-        const ccOverall = (mttrFactor: number, p: number): number => ccOverallShared(m, comps, mttrFactor, p);
+        const buildSystems = (mttrFactor: number, r: RedKey): SystemRow[] => buildSystemsShared(m, comps, mttrFactor, r, units);
+        const ccOverall = (mttrFactor: number, r: RedKey): number => ccOverallShared(m, comps, mttrFactor, r, units);
+        const step = (r: RedKey, d: number): RedKey => RED_STEPS[Math.max(0, Math.min(RED_STEPS.length - 1, RED_STEPS.indexOf(r) + d))];
 
-        const systems = buildSystems(1, paths);
-        const overall = ccOverall(1, paths); // headline: common-cause-adjusted
+        const systems = buildSystems(1, red);
+        const overall = ccOverall(1, red); // headline: common-cause-adjusted
         const tierTargetFrac: number = (d.tierAvailability ?? {})[inputs.tierLevel] ?? 0.99982;
         const downtimeMin = (1 - overall) * MIN_PER_YEAR;
 
@@ -116,19 +121,20 @@ export function ReliabilityEnginePage() {
         });
 
         /* sensitivity re-runs vs the common-cause-adjusted base */
-        const sensMttr = ccOverall(1.5, paths);
-        const sensPaths = ccOverall(1, Math.max(1, paths - 1));
+        const sensMttr = ccOverall(1.5, red);
+        const redDown = step(red, -1);
+        const sensPaths = ccOverall(1, redDown);
         const sensitivity = [
             { label: 'All MTTR × 1.5', availability: sensMttr, dAvail: sensMttr - overall, dDowntimeMin: (1 - sensMttr) * MIN_PER_YEAR - downtimeMin },
-            { label: `Redundancy paths − 1 (→ ${Math.max(1, paths - 1)})`, availability: sensPaths, dAvail: sensPaths - overall, dDowntimeMin: (1 - sensPaths) * MIN_PER_YEAR - downtimeMin },
+            { label: `Redundancy one step down (→ ${RED_LABEL[redDown]})`, availability: sensPaths, dAvail: sensPaths - overall, dDowntimeMin: (1 - sensPaths) * MIN_PER_YEAR - downtimeMin },
         ];
 
         const budgetMin = (1 - tierTargetFrac) * MIN_PER_YEAR;
         /* recompute closure for the owner-mandate explain: re-runs the SAME
          * β-adjusted chain at a modified MTTR factor / path count — the lever
          * bisection below never re-implements or fabricates the model. */
-        const recompute = (mods: { mttrFactor?: number; paths?: number }): number =>
-            ccOverall(mods.mttrFactor ?? 1, mods.paths ?? paths);
+        const recompute = (mods: { mttrFactor?: number; red?: RedKey }): number =>
+            ccOverall(mods.mttrFactor ?? 1, mods.red ?? red);
 
         /* ── Workstream H · Redundancy What-If — SURFACES the existing engine
          * kOutOfN (exact Σ C(n,i)aⁱ(1−a)ⁿ⁻ⁱ): UPS + genset availability at
@@ -147,7 +153,8 @@ export function ReliabilityEnginePage() {
                 const catCost = capexResults?.costs?.[costKey];
                 return {
                     cls, label: c.label ?? cls, a, k, kAssumed: fleet == null,
-                    aN: m.kOutOfN(a, k, k), aN1: m.kOutOfN(a, k, k + 1), aN2: m.kOutOfN(a, k, 2 * k),
+                    /* 2N = two independent systems of k (not k of 2k: the systems do not pool units) */
+                    aN: groupAvail(m, a, k, 'n'), aN1: groupAvail(m, a, k, 'n1'), aN2: groupAvail(m, a, k, '2n'),
                     unitCostUsd: catCost != null && fleet ? catCost / fleet : null,
                 };
             };
@@ -176,13 +183,13 @@ export function ReliabilityEnginePage() {
             for (let i = 0; i < 200; i++) {
                 const jit: Record<string, RelComponent> = {};
                 for (const [k, c] of Object.entries(comps)) jit[k] = { ...c, mtbf: c.mtbf * (0.8 + 0.4 * rnd()), mttr: c.mttr * (0.8 + 0.4 * rnd()) };
-                runs.push(ccOverallShared(m, jit, 1, paths));
+                runs.push(ccOverallShared(m, jit, 1, red, units));
             }
             runs.sort((a, b) => a - b);
             mc = { p10: runs[19], p50: runs[99], p90: runs[179] };
         } catch { /* chain jitter failed — band hidden, base model unaffected */ }
 
-        return { systems, overall, tierTargetFrac, downtimeMin, budgetMin, mtbfAll, mttrAvg, spof, score, paths, comps, componentRows, sensitivity, hasFleet: !!eq, recompute, whatIf, chainSpof, mc };
+        return { systems, overall, tierTargetFrac, downtimeMin, budgetMin, mtbfAll, mttrAvg, spof, score, paths, red, units, step, comps, componentRows, sensitivity, hasFleet: !!eq, recompute, whatIf, chainSpof, mc };
     }, [inputs.powerRedundancy, inputs.tierLevel, inputs.itLoad, req.workload.avgRackDensityKw, capexResults]);
 
     /* ── Owner-mandate explain: availability below tier target ───────────────
@@ -216,7 +223,7 @@ export function ReliabilityEnginePage() {
                     }),
                     unreachable: (atHi) => ({
                         label: 'MTTR −90% not enough',
-                        detail: `Even MTTR −90% only gives ${fmtAvail(atHi)} < target ${fmtAvail(model.tierTargetFrac)} — combine with redundancy: +1 path & MTTR −50% gives ${fmtAvail(model.recompute({ paths: model.paths + 1, mttrFactor: 0.5 }))} (computed).`,
+                        detail: `Even MTTR −90% only gives ${fmtAvail(atHi)} < target ${fmtAvail(model.tierTargetFrac)} — combine with redundancy: ${RED_LABEL[model.step(model.red, 1)]} & MTTR −50% gives ${fmtAvail(model.recompute({ red: model.step(model.red, 1), mttrFactor: 0.5 }))} (computed).`,
                     }),
                     targetTab: 'maint',
                 },
@@ -224,13 +231,14 @@ export function ReliabilityEnginePage() {
         });
 
         /* discrete redundancy lever — computed directly on the same chain */
-        const aPlus = model.recompute({ paths: model.paths + 1 });
+        const redUp = model.step(model.red, 1);
+        const aPlus = model.recompute({ red: redUp });
         const dtPlus = (1 - aPlus) * MIN_PER_YEAR;
         const nGain = exactNines(aPlus) - exactNines(model.overall);
         const reaches = aPlus >= model.tierTargetFrac;
         const pathsLever: DecisionLever = {
-            label: `Paths ${model.paths} → ${model.paths + 1}`,
-            detail: `Raise power redundancy from ${inputs.powerRedundancy} (+1 path on the power chain): availability ${fmtAvail(model.overall)} → ${fmtAvail(aPlus)} (+${nGain.toFixed(2)} nines, downtime −${fmtDowntime(Math.max(0, model.downtimeMin - dtPlus))}) ${reaches ? '— MEETS the tier target' : `— still below target ${fmtAvail(model.tierTargetFrac)}`} — computed from the same chain.`,
+            label: `${RED_LABEL[model.red]} → ${RED_LABEL[redUp]}`,
+            detail: `Raise power redundancy from ${RED_LABEL[model.red]} to ${RED_LABEL[redUp]}: availability ${fmtAvail(model.overall)} → ${fmtAvail(aPlus)} (${nGain >= 0 ? '+' : ''}${nGain.toFixed(2)} nines, downtime ${dtPlus <= model.downtimeMin ? '−' : '+'}${fmtDowntime(Math.abs(model.downtimeMin - dtPlus))}) ${reaches ? '— MEETS the tier target' : `— still below target ${fmtAvail(model.tierTargetFrac)}`} — computed from the same chain.`,
             targetTab: 'sim',
             priority: reaches ? 'HIGH' : 'MED',
         };
@@ -248,9 +256,9 @@ export function ReliabilityEnginePage() {
                 targetTab: 'sim',
             };
         }
-        const a2 = model.recompute({ paths: 2 });
+        const a2 = model.recompute({ red: 'n1' });
         return {
-            fix: `Raise redundancy to ≥ N+1 (2 paths): composed availability ${fmtAvail(model.overall)} → ${fmtAvail(a2)} — computed from the same model chain.`,
+            fix: `Raise redundancy to ≥ N+1: composed availability ${fmtAvail(model.overall)} → ${fmtAvail(a2)} — computed from the same model chain.`,
             targetTab: 'sim',
         };
     }, [model]);
@@ -299,7 +307,7 @@ export function ReliabilityEnginePage() {
                 ],
                 config: [
                     ['Redundancy', inputs.powerRedundancy],
-                    ['Paths', `${model.paths}`],
+                    ['Redundancy', `${RED_LABEL[model.red]} (UPS k=${model.units.ups ?? 1}, gen k=${model.units.generator ?? 1})`],
                     ['Tier', `Tier ${inputs.tierLevel}`],
                     ['IT Load', `${inputs.itLoad.toLocaleString()} kW`],
                     ['β common-cause', '5% (assumption)'],
@@ -456,7 +464,7 @@ export function ReliabilityEnginePage() {
 
                     <div className="grid gap-4 xl:grid-cols-2">
                         <div className="rounded border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 p-4">
-                            <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Availability by System <InfoTip content="Per-system availability composed from the IEEE-493 component MTBF/MTTR chains at the current redundancy (path count shown). The 'Chain' column is each system's series/parallel path composition; Status compares its availability against the tier unavailability budget." /><span className="text-[9px] normal-case text-slate-400">documented chains · {inputs.powerRedundancy} = {model.paths} path(s)</span></h2>
+                            <h2 className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Availability by System <InfoTip content="Per-system availability composed from the IEEE-493 component MTBF/MTTR chains at the current redundancy. Each group needs k units (from the engine's equipment counts): N+1 = k of k+1, 2N = two systems of k (NIST e-Handbook 8.1.8.4), with a 5 % common-cause β per redundant group (IEC 61508). Status compares its availability against the tier unavailability budget." /><span className="text-[9px] normal-case text-slate-400">documented chains · {inputs.powerRedundancy} · k per group</span></h2>
                             <table className="w-full text-[11px]">
                                 <thead><tr className="border-b border-slate-200 dark:border-slate-800 text-[9px] uppercase text-slate-400"><th className="py-1 text-left">System</th><th className="text-left">Chain</th><th className="text-right">Availability</th><th className="text-right">Status</th></tr></thead>
                                 <tbody>

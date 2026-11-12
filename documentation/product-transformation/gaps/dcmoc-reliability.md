@@ -61,7 +61,11 @@ unit failures. Its real gains are concurrent maintenance, independent distributi
 cause. Those belong in the β term and in the path model, not in pooled unit counts. The what-if row shows 2N with
 almost zero downtime, which overstates it.
 
-## Owner decision needed (O-R120-REL)
+## Owner decision O-R120-REL — DECIDED 2026-11-12: option (a), fixed in v3.50.0
+
+The D rows below show the state before the fix. After it, `tools/test-reliability-reference.mjs` is green on every law, and it is red (5 failures) on v3.48.
+
+### Options as presented
 
 Which model the headline uses for N+1 and 2N:
 

@@ -14,7 +14,7 @@ import { useEffectiveInputs } from '@/store/useEffectiveInputs';
 import { getPUE } from '@/constants/pue';
 import { calculateFinancials, defaultOccupancyRamp, type FinancialResult } from '@/modules/analytics/FinancialEngine';
 import { rzModels, rzData } from '@/lib/rz-engine';
-import { ccOverall } from '@/components/modules/reliability/availabilityChain';
+import { ccOverall, toRedKey, unitsForLoad } from '@/components/modules/reliability/availabilityChain';
 import { DEFAULT_REVENUE_PER_KW_MONTH } from '@/constants/finance';
 
 const REDUNDANCY_KEY: Record<string, string> = { 'N+1': 'n1', '2N': '2n', '2N+1': '2n1' };
@@ -95,8 +95,7 @@ export function useDashboardData(): DashboardData {
              * Reliability page (availabilityChain.ccOverall); round only at render. */
             const rd = (rzData() as { reliability?: { components?: Record<string, { mtbf: number; mttr: number; label: string }>; redundancyPaths?: Record<string, number> } }).reliability;
             if (m.reliability && rd?.components) {
-                const paths = rd.redundancyPaths?.[redKey] ?? 2;
-                const av = ccOverall(m.reliability as never, rd.components, 1, paths);
+                const av = ccOverall(m.reliability as never, rd.components, 1, toRedKey(redKey), unitsForLoad(m as never, itLoadKw));
                 availabilityPct = +(av * 100).toFixed(5);
                 availabilityTarget = +(m.reliability.tierTarget(inputs.tierLevel) * 100).toFixed(3);
                 downtimeMin = m.reliability.annualDowntimeMinutes(av);

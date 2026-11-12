@@ -12682,16 +12682,29 @@
                 /** System availability for a set of component groups under a redundancy
                  *  config: each group = its item availability in parallel over the config's
                  *  paths, then all groups in series. components = ['ups','crac',...]. */
-                systemAvailability: function (components, redundancy) {
-                    var paths = DATA.reliability.redundancyPaths[redundancy] != null
-                        ? DATA.reliability.redundancyPaths[redundancy] : 1;
+                systemAvailability: function (components, redundancy, units) {
+                    /* v3.49 (R120, NIST e-Handbook 8.1.8.4): each group is redundantGroup(a, k, config),
+                     * k = units the load needs (units[name], default 1). N+1 and 2N differ once k > 1. */
                     var self = RZEngine.models.reliability;
                     var groups = (components || []).map(function (name) {
                         var c = DATA.reliability.components[name];
                         if (!c) return 1;
-                        return self.parallelAvailability(self.availability(c.mtbf, c.mttr), paths);
+                        return self.redundantGroup(self.availability(c.mtbf, c.mttr), (units && units[name]) || 1, redundancy);
                     });
                     return self.seriesAvailability(groups);
+                },
+                /** Availability of a group whose load needs k identical units (each availability a) under a
+                 *  redundancy config: 'n' = k of k; 'n1' = k of k+1; '2n' = two independent systems of k,
+                 *  1 - (1 - a^k)^2; '2n1' = two independent systems of k of k+1. Unknown config = 'n'.
+                 *  2N is NOT k of 2k: the two systems do not pool units (Uptime "System + System"). */
+                redundantGroup: function (a, k, redundancy) {
+                    var self = RZEngine.models.reliability;
+                    k = Math.max(1, Math.round(k || 1));
+                    var nSys = self.kOutOfN(a, k, k), n1Sys = self.kOutOfN(a, k, k + 1);
+                    if (redundancy === 'n1') return n1Sys;
+                    if (redundancy === '2n') return 1 - Math.pow(1 - nSys, 2);
+                    if (redundancy === '2n1') return 1 - Math.pow(1 - n1Sys, 2);
+                    return nSys;
                 },
                 /** k-of-n availability: system up if at least k of n identical units
                  *  (each availability a) are up = Σ_{i=k..n} C(n,i) a^i (1-a)^(n-i).
@@ -15238,23 +15251,25 @@
                     (function () {
                         var Rel = RZEngine.models.reliability;
                         var components = ['ups', 'crac', 'chiller'];
-                        var paths = DATA.reliability.redundancyPaths[red] != null ? DATA.reliability.redundancyPaths[red] : 1;
                         var avail = Rel.systemAvailability(components, red);
                         var downMin = Rel.annualDowntimeMinutes(avail);
+                        var EXPR = { n: function (a) { return r2(a, 6); }, n1: function (a) { return '1 of 2 units at ' + r2(a, 6); },
+                            '2n': function (a) { return '1−(1−' + r2(a, 6) + ')^2 (two systems)'; },
+                            '2n1': function (a) { return '1−(1−[1 of 2 at ' + r2(a, 6) + '])^2'; } };
                         var groupSteps = components.map(function (name) {
                             var c = DATA.reliability.components[name];
                             var a = Rel.availability(c.mtbf, c.mttr);
-                            var pa = Rel.parallelAvailability(a, paths);
-                            return { label: (c.label || name) + ' (×' + paths + ')', expr: '1−(1−' + r2(a, 6) + ')^' + paths, value: r2(pa * 100, 4), unit: '%' };
+                            var pa = Rel.redundantGroup(a, 1, red);
+                            return { label: (c.label || name) + ' (' + red + ', k=1)', expr: (EXPR[red] || EXPR.n)(a), value: r2(pa * 100, 4), unit: '%' };
                         });
                         groupSteps.push({ label: 'Series availability', expr: 'Π group availabilities', value: r2(avail * 100, 5), unit: '%' });
                         calcs.push({
                             id: 'availability', title: 'System Availability (RAM)', discipline: 'Availability / Reliability',
                             standard: 'IEEE 493 (Gold Book) / Uptime Tier', confidence: 'med',
-                            formula: 'A_sys = Π [ 1 − (1 − MTBF/(MTBF+MTTR))^paths ]',
+                            formula: 'A_sys = Π redundantGroup(MTBF/(MTBF+MTTR), k, config): N+1 = k of k+1, 2N = 1 − (1 − a^k)^2',
                             inputs: [
                                 { label: 'Redundancy', value: red.toUpperCase(), unit: '' },
-                                { label: 'Parallel paths', value: paths, unit: '' },
+                                { label: 'Redundancy config', value: red, unit: '' },
                                 { label: 'Model scope', value: 'ups/crac/chiller series (3-group screening; full chain per IEEE 493 RAM study)', unit: '' }
                             ],
                             steps: groupSteps.concat([
@@ -15890,7 +15905,7 @@
                 // `</script>` characters which the print-window's HTML parser
                 // will see (correctly) as a tag closer.
                 return '<script src="auth.js?v=20260324b"><\/script>' +
-                       '<script src="rz-engine.min.js?v=2026-11-11-seeded-rng"><\/script>';
+                       '<script src="rz-engine.min.js?v=2026-11-12-redundancy"><\/script>';
             }
         },
         /* ── A7: lightweight framework-free SVG chart builders. Each returns an SVG string

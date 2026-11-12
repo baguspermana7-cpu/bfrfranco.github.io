@@ -183,8 +183,11 @@ Traps catalogued in memory: pue.defaultFor key mismatch (use pueMatrix direct), 
 - Reference: NIST/SEMATECH e-Handbook §8.1.8.2–8.1.8.4 (public domain). Gap file:
   `documentation/product-transformation/gaps/dcmoc-reliability.md`.
 - The engine's series, parallel and `kOutOfN` reproduce the reference exactly (F1–F4); these laws block.
-- Defects found: the headline maps N+1 and 2N to the same 1-of-2 group (`DATA.reliability.redundancyPaths`), which
-  understates N+1 downtime by about 10× at N=4. The what-if row's 2N pools units across both systems (k of 2k)
-  instead of modelling two systems of k. Owner decision O-R120-REL picks the model. Until then D1–D3 are reported,
-  not blocking.
-- Gate: `tools/test-reliability-reference.mjs` (`--strict` makes D1–D3 block once the decision lands).
+- Defects found and fixed in v3.50.0 (owner chose option (a), 2026-11-12). Before, the headline mapped N+1 and 2N to
+  the same 1-of-2 group, which understated N+1 downtime by about 10× at N=4, and the what-if row pooled 2N units as
+  k of 2k. Now `models.reliability.redundantGroup(a, k, config)` gives N = k of k, N+1 = k of k+1, 2N = two systems of
+  k, and 2N+1 = two systems of k of k+1. `systemAvailability(components, config, units)` and DCMOC
+  `availabilityChain.ts` (`buildSystems`/`ccOverall`, used by the Reliability page, the RAM tab, the dashboard and the
+  value trace) all use it. k comes from `commissioning.equipScale` (`unitsForLoad`). With k = 1 the old 1-of-2 value
+  is kept. The value trace no longer keeps its own copy of the chain.
+- Gate: `tools/test-reliability-reference.mjs`. F1–F4 and D1–D5 all block. Red on v3.48 (5 laws fail), green after.

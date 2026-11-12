@@ -8,7 +8,7 @@
 
 import { useSimulationStore } from '@/store/simulation';
 import { USE_CASE_TO_ENGINE, monthsToCod } from '@/lib/requirementsMappings';
-import { ccOverall } from '@/components/modules/reliability/availabilityChain';
+import { ccOverall, toRedKey, unitsForLoad } from '@/components/modules/reliability/availabilityChain';
 import { useCapexStore } from '@/store/capex';
 import { useRequirementsStore } from '@/store/requirements';
 import { useSitesStore } from '@/store/sites';
@@ -756,14 +756,13 @@ export const TRACE: Record<string, TraceNode> = {
     /* dashboard chains */
     'rel.systemAvailability': {
         label: 'System Availability (β common-cause)', page: 'reliability', unit: '%', provenance: 'engine',
-        formulaTemplate: 'availabilityChain.ccOverall — RBD chain + β=5% common-cause (same as the Reliability page; fake-100% fix 2026-07-20) × 100',
+        formulaTemplate: 'availabilityChain.ccOverall — RBD chain (N+1 = k of k+1, 2N = two systems of k, k from equipScale) + β=5% common-cause (same as the Reliability page; fake-100% fix 2026-07-20) × 100',
         get: () => {
             try {
                 const m = (rzModels() as { reliability?: unknown }).reliability;
                 const rd = (rzData() as { reliability?: { components?: Record<string, { mtbf: number; mttr: number; label: string }>; redundancyPaths?: Record<string, number> } }).reliability;
                 if (!m || !rd?.components) return null;
-                const paths = rd.redundancyPaths?.[redKeyLive()] ?? 2;
-                const av = ccOverall(m as never, rd.components, 1, paths);
+                const av = ccOverall(m as never, rd.components, 1, toRedKey(redKeyLive()), unitsForLoad(rzModels() as never, sim().inputs.itLoad));
                 return +(av * 100).toFixed(5);
             } catch { return null; }
         },
@@ -1943,24 +1942,11 @@ function relPageModel(): { overall: number; downtimeMin: number; mtbfAll: number
         const comps = d.components;
         const redKey = redKeyLive();
         const tier = sim().inputs.tierLevel;
-        const key = [redKey, tier].join('|');
+        const key = [redKey, tier, sim().inputs.itLoad].join('|');
         if (_relCache?.key === key) return _relCache.m;
         const paths: number = d.redundancyPaths?.[redKey] ?? 2;
-        const avail = m.availability;
-        const par = (av: number, n: number) => m.parallelAvailability ? m.parallelAvailability(av, n) : 1 - Math.pow(1 - av, n);
-        const ser = (arr: number[]) => m.seriesAvailability ? m.seriesAvailability(arr) : arr.reduce((s, x) => s * x, 1);
-        const a = (cls: string) => comps[cls] ? avail(comps[cls].mtbf, comps[cls].mttr) : 0.999;
-        /* documented per-system chains — identical to the page's buildSystems(1, paths) */
-        const sys = [
-            par(ser([a('switchgear'), a('pdu')]), paths),
-            par(a('ups'), paths),
-            par(a('generator'), Math.max(2, paths)),
-            par(a('chiller'), 2),
-            par(a('crac'), 2),
-        ];
-        const overallPar = ser(sys);
-        const overallSingle = ser([ser([a('switchgear'), a('pdu')]), a('ups'), a('generator'), a('chiller'), a('crac')]);
-        const overall = overallPar * 0.95 + overallSingle * 0.05;   // β=5% common-cause screening (page CC_BETA)
+        /* the page's own chain (availabilityChain.ccOverall), k per class from the load — no mirror copy */
+        const overall = ccOverall(m as never, comps as Record<string, { mtbf: number; mttr: number; label: string }>, 1, toRedKey(redKey), unitsForLoad(eng as never, sim().inputs.itLoad));
         const tierTarget: number = (d.tierAvailability ?? {})[String(tier)] ?? 0.99982;
         const downtimeMin = (1 - overall) * 525960;                 // page MIN_PER_YEAR
         const vals = Object.values(comps);

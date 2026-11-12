@@ -21,7 +21,7 @@ import {
     drawSectionTitle, drawKpiCard, today, PDF_COLORS,
 } from '@/modules/reporting/PdfUtils';
 import {
-    ccOverall, ninesOf, fmtAvail, fmtDowntime, MIN_PER_YEAR,
+    ccOverall, toRedKey, unitsForLoad, ninesOf, fmtAvail, fmtDowntime, MIN_PER_YEAR,
     type RelComponent,
 } from '@/components/modules/reliability/availabilityChain';
 
@@ -47,7 +47,7 @@ export function ReliabilityDashboard() {
          * parallel-series systemAvailability() saturated (0.99999996 → shown as
          * a fake "100.000% / 0 min" after display rounding). */
         const paths: number = d.redundancyPaths?.[redKey] ?? 2;
-        const sysAv = ccOverall(m, d.components as Record<string, RelComponent>, 1, paths);
+        const sysAv = ccOverall(m, d.components as Record<string, RelComponent>, 1, toRedKey(redKey), unitsForLoad(rzModels() as never, inputs.itLoad));
         const target = m.tierTarget(inputs.tierLevel);
         return {
             comps,
@@ -58,7 +58,7 @@ export function ReliabilityDashboard() {
             targetDowntimeMin: (1 - target) * MIN_PER_YEAR,
             meetsTarget: sysAv >= target,
         };
-    }, [inputs.tierLevel, redKey]);
+    }, [inputs.tierLevel, inputs.itLoad, redKey]);
 
     const handleExport = async () => {
         if (!model) return;
