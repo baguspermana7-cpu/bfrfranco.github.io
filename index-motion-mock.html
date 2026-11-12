@@ -244,7 +244,7 @@
     <link rel="stylesheet" href="styles-index.min.css?v=20261110-72c681ed">
 
     <!-- prefetch removed: 20KB fetch on every page load, low hit rate -->
-    <script src="js/rz-version.js?v=20261112-75e703ac" defer></script>
+    <script src="js/rz-version.js?v=20261112-3a5b9b08" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- R119 colour (approved 2026-11-12): one page field, blue as light on objects, orange as the 10 % -->
@@ -256,6 +256,8 @@
     html.rzm .fade-in { opacity: 1 !important; transform: none !important; transition: none !important; }
     .rzm-word { display: inline-block; }
     </style>
+    <!-- R121: mark the first frame; a frame drawn before the motion script runs means its content is already seen (paint entries can arrive late under load) -->
+    <script>requestAnimationFrame(function () { document.documentElement.setAttribute('data-rzm-frame', '1'); });</script>
 </head>
 <body>
     <!-- Search Overlay & Modal -->
@@ -1780,6 +1782,6 @@ if ('serviceWorker' in navigator) {
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/SplitText.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.27/dist/lenis.min.js" defer></script>
-    <script src="js/rz-index-motion.js?v=20261112-da941406" defer></script>
+    <script src="js/rz-index-motion.js?v=20261112-0755fa5c" defer></script>
 </body>
 </html>

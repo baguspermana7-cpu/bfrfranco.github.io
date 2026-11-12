@@ -12,6 +12,7 @@
  *  T6 no pinning (no .pin-spacer, no position:fixed added by motion).
  *  T7 layout shift during load + scroll stays within 0.01 of the same page without motion (index.html).
  *  T8 nothing the reader already sees is hidden later (sampled every frame for 3 s from navigation, items in the first view).
+ *  T8b T8 under load: paint entries hidden, CDN scripts held 800 ms (the paint entry lags the frame on a busy machine).
  * Headless Chrome reports hover:none; the desktop run sets blink pointer/hover types so (hover: hover) is true.
  */
 import http from 'node:http';
@@ -50,6 +51,13 @@ const scrollAll = async (p) => { const h = await p.evaluate(() => document.docum
 const clsOf = async (p) => p.evaluate(() => window.__cls || 0);
 const CLS_HOOK = () => { window.__cls = 0; new PerformanceObserver((l) => { for (const e of l.getEntries()) if (!e.hadRecentInput) window.__cls += e.value; }).observe({ type: 'layout-shift', buffered: true }); };
 
+/* T8 sampler: records an item that was fully visible (or whose hero host was) and later drops below 0.5 opacity */
+const FLASH = (sel) => { window.__flash = []; const seen = new WeakSet(); const t0 = performance.now();
+    const tick = () => { for (const e of document.querySelectorAll(sel)) { const r = e.getBoundingClientRect(); if (r.top >= innerHeight || r.bottom <= 0) continue;
+      const o = +getComputedStyle(e).opacity; const host = e.classList.contains('rzm-word') ? e.closest('h1, h2') : e;
+      if (o >= 0.99) seen.add(e); else if (o < 0.5 && (seen.has(e) || (host && seen.has(host)))) window.__flash.push([Math.round(performance.now() - t0), e.className.toString().slice(0, 24)]); }
+      if (performance.now() - t0 < 3000) requestAnimationFrame(tick); }; requestAnimationFrame(tick); };
+
 const desktop = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox',
   '--blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4'] });
 const plain = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox'] });
@@ -81,14 +89,19 @@ try {
 
   /* T8 flash: an item visible in the first view must never drop back below opacity 0.5 */
   const f = await desktop.newPage(); await f.setViewport({ width: 1440, height: 900 });
-  await f.evaluateOnNewDocument((sel) => { window.__flash = []; const seen = new WeakSet(); const t0 = performance.now();
-    const tick = () => { for (const e of document.querySelectorAll(sel)) { const r = e.getBoundingClientRect(); if (r.top >= innerHeight || r.bottom <= 0) continue;
-      const o = +getComputedStyle(e).opacity; const host = e.classList.contains('rzm-word') ? e.closest('h1, h2') : e;
-      if (o >= 0.99) seen.add(e); else if (o < 0.5 && (seen.has(e) || (host && seen.has(host)))) window.__flash.push([Math.round(performance.now() - t0), e.className.toString().slice(0, 24)]); }
-      if (performance.now() - t0 < 3000) requestAnimationFrame(tick); }; requestAnimationFrame(tick); }, ITEMS + ', .rzm-word, .sec-head, .emp-card');
+  await f.evaluateOnNewDocument(FLASH, ITEMS + ', .rzm-word, .sec-head, .emp-card');
   await f.goto(BASE + PAGE, { waitUntil: 'load', timeout: 90000 }); await sleep(3200);
   const fl = await f.evaluate(() => window.__flash);
   law('T8', fl.length === 0, `no visible item is hidden again after first paint — ${fl.length} drop(s)${fl.length ? ' e.g. ' + JSON.stringify(fl[0]) : ''}`);
+  /* T8b the same under load: Chrome records the paint entry on presentation feedback, which lags the frame under load
+   * (peer's v3.51 gate: 21 drops on a busy machine). Hide paint entries and hold the CDN scripts 800 ms. */
+  const g = await desktop.newPage(); await g.setViewport({ width: 1440, height: 900 });
+  await g.evaluateOnNewDocument(() => { const get = performance.getEntriesByType.bind(performance); performance.getEntriesByType = (t) => (t === 'paint' ? [] : get(t)); });
+  await g.evaluateOnNewDocument(FLASH, ITEMS + ', .rzm-word, .sec-head, .emp-card');
+  await g.setRequestInterception(true); g.on('request', (rq) => { if (/cdn\.jsdelivr\.net/.test(rq.url())) setTimeout(() => rq.continue(), 800); else rq.continue(); });
+  await g.goto(BASE + PAGE, { waitUntil: 'load', timeout: 90000 }); await sleep(3200);
+  const fl2 = await g.evaluate(() => window.__flash);
+  law('T8b', fl2.length === 0, `same under load (paint entry late, CDN +800 ms) — ${fl2.length} drop(s)${fl2.length ? ' e.g. ' + JSON.stringify(fl2[0]) : ''}`);
 
   /* T2 phone */
   const ph = await plain.newPage();

@@ -27,7 +27,10 @@
     var count = function (t) { state.tweens += 1; return t; };
     /* Arriving late (after the first paint, which the browser records as a 'paint' entry) must not hide what the reader already sees: anything on
      * screen at that moment stays put; only what is still below the fold animates. */
-    var late = !!(window.performance && performance.getEntriesByType && performance.getEntriesByType('paint').length);
+    var late = !!(window.performance && performance.getEntriesByType && performance.getEntriesByType('paint').length) ||
+        /* the page marks its first frame (inline, in <head>): Chrome records the paint entry on presentation feedback,
+         * which under load lags the frame by hundreds of ms, so the entry alone missed text already on screen */
+        document.documentElement.getAttribute('data-rzm-frame') === '1';
     state.late = late;
     var onScreen = function (el) { var r = el.getBoundingClientRect(); return r.top < window.innerHeight && r.bottom > 0; };
 

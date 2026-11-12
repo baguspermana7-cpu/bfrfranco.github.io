@@ -43,7 +43,7 @@
       '<div class="cx-an-actions cx-ex-csv"><label class="tool-btn cx-ex-file">Import plan CSV<input type="file" id="cxExImportPlan" accept=".csv,text/csv" hidden></label>' +
       '<label class="tool-btn cx-ex-file">Import lines CSV<input type="file" id="cxExImportLines" accept=".csv,text/csv" hidden></label>' +
       '<span class="spacer"></span>' +
-      '<button type="button" class="tool-btn" data-export="plan">Plan CSV</button><button type="button" class="tool-btn" data-export="monthly">Monthly CSV</button><button type="button" class="tool-btn" data-export="status">Status CSV</button><button type="button" class="tool-btn" data-export="calendar">Calendar CSV</button><button type="button" class="tool-btn" data-export="lines">Lines CSV</button></div>' +
+      '<button type="button" class="tool-btn" data-export="plan">Plan CSV</button><button type="button" class="tool-btn" data-export="monthly">Monthly CSV</button><button type="button" class="tool-btn" data-export="status">Status CSV</button><button type="button" class="tool-btn" data-export="calendar">Calendar CSV</button><button type="button" class="tool-btn" data-export="lines">Lines CSV</button><button type="button" class="tool-btn" data-export="mspdi" title="MS Project XML (MSPDI, also imported by Primavera P6): levels, systems inside L2–L4, gates as milestones, FS links. One-way: link edits in Project do not come back.">MS Project XML</button><button type="button" class="tool-btn" data-export="ics" title="One all-day event per level gate (RFC 5545)">Calendar (.ics)</button></div>' +
       '<ul class="cx-ex-errors" id="cxExErrors" aria-live="polite"></ul>';
     after.parentNode.insertBefore(panel, after.nextSibling);
     return true;
@@ -54,6 +54,13 @@
     if (doc.activeElement !== anchor) anchor.value = c.anchor || '';
     slot.checked = !!c.slot; slot.disabled = !c.anchor;
     var cp = compute(plan), tb = $('cxExTable').getElementsByTagName('tbody')[0], rel = $('cxExRelease'), i;
+    /* dated exports need dates: disabled with the reason on the button itself (PRD-P12 FR-4) */
+    var dated = $('cxExPanel').querySelectorAll('[data-export="mspdi"], [data-export="ics"]');
+    for (i = 0; i < dated.length; i++) {
+      var b = dated[i]; if (!b.hasAttribute('data-title')) b.setAttribute('data-title', b.title);
+      b.disabled = !cp || !root.RZCxExport;
+      b.title = b.disabled ? 'Set a project start date first — these files carry dates' : b.getAttribute('data-title');
+    }
     tb.innerHTML = '';
     if (!cp) { rel.textContent = !c.anchor ? 'No start date set — months are relative (M0 = project start).' : lastError ? 'calendarPlan failed: ' + lastError : 'Engine without calendarPlan — dates unavailable.'; }
     else {
@@ -84,8 +91,8 @@
 
   function errors(list) { var u = $('cxExErrors'); u.innerHTML = ''; for (var i = 0; i < list.length; i++) { var li = doc.createElement('li'); li.textContent = list[i]; u.appendChild(li); } }
   function dirty() { S.dirty = true; A.render(); }
-  function download(name, text) {
-    var blob = new root.Blob([text], { type: 'text/csv;charset=utf-8' }), url = root.URL.createObjectURL(blob), a = doc.createElement('a');
+  function download(name, text, type) {
+    var blob = new root.Blob([text], { type: type || 'text/csv;charset=utf-8' }), url = root.URL.createObjectURL(blob), a = doc.createElement('a');
     a.href = url; a.download = name; doc.body.appendChild(a); a.click(); doc.body.removeChild(a); root.setTimeout(function () { root.URL.revokeObjectURL(url); }, 1000);
     return text;
   }
@@ -96,6 +103,14 @@
     if (kind === 'status') return download('cx-status-M' + S.month + '.csv', IO.csv.exportStatus(P.statusAt(plan, S.month)));
     if (kind === 'calendar') { var cp = compute(plan); if (!cp) { errors(['Calendar CSV needs a project start date.']); return ''; } return download('cx-calendar.csv', IO.csv.exportCalendar(cp)); }
     if (kind === 'lines') return download('cx-lines.csv', IO.csv.exportLines(lines()));
+    if (kind === 'mspdi' || kind === 'ics') {
+      var X = root.RZCxExport, c2 = compute(plan); if (!X || !c2) { errors(['Set a project start date to export dated files.']); return ''; }
+      var stamp = cal().anchor, text;
+      try { text = kind === 'mspdi' ? X.mspdi(c2, P.SYSTEMS, { name: 'cx-plan-' + stamp + '.xml', basis: c2.basis || 'calendarPlan' }) : X.ics(c2, P.SYSTEMS); }
+      catch (e) { errors([String(e && e.message || e)]); return ''; }
+      if (root.rzScenario && root.rzScenario.track) root.rzScenario.track('pdf_exported', 'calculator', 'cx', { calc: 'cx', format: kind });
+      return kind === 'mspdi' ? download('cx-plan-' + stamp + '.xml', text, 'application/xml;charset=utf-8') : download('cx-plan-' + stamp + '.ics', text, 'text/calendar;charset=utf-8');
+    }
     return '';
   }
   function readFile(input, fn) { var f = input.files && input.files[0]; if (!f) return; var r = new root.FileReader(); r.onload = function () { fn(String(r.result || '')); input.value = ''; }; r.readAsText(f); }

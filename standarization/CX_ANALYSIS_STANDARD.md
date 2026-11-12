@@ -70,6 +70,35 @@ gate's; a pass result is not acceptance; an open blocking issue forces `blocked`
 (`js/rz-cx-records-ui.js`) renders the overlay, the findings and a CSV register import whose rejected rows each carry
 a reason. The shipped set is `data/cx/demo-records.json` and says so on the panel.
 
+**Record workspace (P06 stage 1, v3.51.0).** The panel opens on **Demo** (read-only: write controls hidden, chip
+"read-only", "Start your own set"). **My records** are local sets in `localStorage rz_cx_records_v1`
+(`{v:1, sets:{id:{name, project_id, db, rev, updated_at, invalid}}, active}`) owned by `js/rz-cx-workspace.js`
+(DOM-free, Node-gated). Rules:
+- **One write path.** Every change is `RZCxWorkspace.write(set, change)`: clone the db, apply, `validate`, then refuse
+  if the change ADDS a finding of a refusal law (R1 R2 R3 R4 R5 R6 R7 R11) or commit with `rev + 1` and report any new
+  flag-law finding (R8 R9 R10 R13). Findings already in an imported set never refuse an unrelated write. The UI never
+  writes around it; a refusal is shown inside the dialog as `<law>: <record message> — <law text>`.
+- Gate decisions bind to `RZCxWorkspace.hashOf(db, asset, level)` and write an approval with `self_declared: true`;
+  the signer is a typed name, not an identity. Accepting a gate an open blocking issue holds is refused (R8).
+  Issue saves keep `constraint_state` in sync with open blocking issues, so a clean set carries no R8 finding.
+- Deleting an asset that ports, gates, mappings or issues reference is refused with the references.
+- Export/import is the `rz-cx-records` v1 JSON; import lists findings, never auto-fixes, and marks a set with refusal
+  findings `invalid · n`. A store that does not parse is moved to `rz_cx_records_v1_quarantine` with a notice. Cap
+  2 MB (nothing written above it), warning above 1.5 MB. Undo is one level. A write in another tab reloads this one.
+- Forms are native `<dialog>`s (`.cx-dt.cx-rec-dlg`): labels above fields, ≥ 44 px controls, 16 px fields, centred
+  on a phone (the block-detail sheet goes full-screen; a short form does not). Explanations live in `title`.
+- Not yet: cloud sets (stage 2 SQL in `supabase/migrations/2026-11-product-transformation.sql`, BLOCKED until the
+  owner applies it); RFS intake into a Tier 3 set (amendment C3) — intake still writes the Tier 1 register.
+
+**Schedule export (P12, v3.51.0).** `js/rz-cx-export-schedule.js` writes the DATED plan (the calendar panel's
+`calendarPlan` levels, so it needs a project start date — without one both buttons are disabled and say so) as
+MS Project XML (MSPDI, `xmlns="http://schemas.microsoft.com/project"`) and ICS. Each level is a task (L2–L4 are summary
+tasks holding one subtask per system, split by the 02.4.8 planning-day share with cumulative rounding so they sum to
+the level); each level gate is a milestone. The plan stores no links, so the FS links restate its ordering rule and
+carry the lag in work days that keeps the plan's own dates (the witness slot leaves gaps). One-way: link edits made in
+Project do not come back. Import into MS Project / P6 itself is untested here (no licence); the DOMParser round-trip is
+the proxy. ICS: one all-day event per gate, CRLF, folded at 75 octets on character boundaries, UID `<n>@resistancezero.com`.
+
 ## 3c Workbench (K21, v3.31.0)
 
 `js/rz-cx-workbench.js` makes the plan editor an application, PRD v1.1 §17 / §22 / §23. Every level bar on the
@@ -99,6 +128,9 @@ compares each against the baseline and the editor.
 | `tools/test-cx-campus-basis.mjs` | counts, CDUs, flows, callout text follow the engine basis; light palette; capacity text | v3.29.0 (old module has no `layout()`) |
 | `tools/test-cx-campus-motion.mjs` | K27 motion: eased camera frame by frame (step seam, lands at 450 ms), fades, staggered fan-out, pick lights one callout + 3-level breadcrumb, M7 390 px callouts inside/no overlap, M8 1440 no anchor covered, reduced motion instant | v3.33.0 (HEAD: no `motion()`, M7 8 callouts out; near-only columns: M8 3 covered) |
 | `tools/test-cx-records.mjs` | Tier 3 record layer: PRD v1.0 invariants (R1–R13) on `data/cx/demo-records.json`, overlay on `statusAt`, register import reasons (R14) | v3.29.0 (one mutation per law) |
+| `tools/test-cx-workspace.mjs` | P06 write pipeline: one refused write per refusal law, one flagged write per flag law, referenced delete refused, revisions, round-trip deep-equal, quarantine, cap, 5,000 records < 200 ms | v3.51.0 (R4 dropped from the refusal set: 1 red) |
+| `tools/test-cx-workspace-ui.mjs` | P06 browser: Demo read-only, set from a register, R4/R8 refused in the dialog, issue CRUD, undo, reload, export→import deep-equal, quarantine, two tabs, centred dialog at 390 both themes | v3.51.0 (R4 dropped: 2 red; side-sheet dialog: red) |
+| `tools/test-cx-export-schedule.mjs` | P12: MSPDI (65 tasks on the default plan, L2–L4 summaries, subtasks sum to the level, FS links with lags that restate every date, escaping) and ICS (CRLF, ≤ 75 octets, unique UIDs, gate dates); DOMParser round-trip in the page equals the calendar plan; buttons disabled without a start date | v3.51.0 (lag dropped: 3 red; fold at 76: 2 red; no escaping: 4 red) |
 | `tools/test-dcmoc-cx-plan.mjs` | DCMOC bridge returns the site module's plan and status (deep-equal), store clamps/persists/caps scenarios at 5; needs `dcmoc/node_modules` (symlink in a worktree, git-ignored) | v3.29.0 (site module swapped for a copy with one planning-day changed) |
 | `tools/test-cx-analysis.mjs` | browser: plan editor, schematic, 3D (glb 15/15, ≤ 300 draw calls, ≥ 24 fps, callouts, hulls, K16 probe both themes, K17 LOD, K18 re-layout), Tier 1.5 calendar, workbench W0–W8 (real pointer drag move/stretch, Esc, undo/redo, Ctrl+Z, keyboard, impact reasons, over-cap, Save as/Load/Delete, cap 5), 390 px, no errors | each release; W-laws v3.31.0 (absent on the old tree) |
 | `tools/test-cx-gradient.mjs` | K34: the two owner-gradient fills (hero, Full-analysis call) render a gradient, panels keep flat fills, no gradient text, every hero/tab/Full-analysis text run meets AA against the worst background pixel under it (1440/390, light + dark) — axe skips gradients | v3.35.6 (`--mutate` restores the muted tier: 11 runs below AA) |

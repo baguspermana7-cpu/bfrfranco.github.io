@@ -11,6 +11,58 @@ release sections rather than semver.
 
 ---
 
+## v3.51.0 — 2026-11-12 — Cx records for a real project, and the Cx plan exports to MS Project and calendars
+
+### Added
+- **Cx record workspace (P06 stage 1).** The Records panel on the Cx Analysis tab now has Demo | My records | Import file. Demo stays the default and is read-only. "Start your own set", or a validated asset-register CSV, creates a local record set. It is kept in this browser (`rz_cx_records_v1`), shown as `local · rev n`, and exported or imported as JSON.
+  - New issue, Edit, Close and Gate decision are native dialogs.
+  - Every write goes through one pipeline (`js/rz-cx-workspace.js`): clone, change, `RZCxRecords.validate`, then refuse or commit.
+  - **Refusal laws** R1–R7 and R11 block a write. The dialog shows the law, for example "R4: L2 accepted on A-CRAH-01 without L1 — L(n) accepted implies L(n−1) accepted for the same asset".
+  - **Flag laws** R8–R10 and R13 commit and are reported.
+  - A blocking issue sets its gate's constraint to blocked. Accepting that gate is refused (R8) until the issue closes.
+  - A gate decision is bound to a revision hash. The signer is a typed, self-declared name.
+  - Other safeguards:
+    - Deleting a referenced asset is refused, with the references listed.
+    - One-level Undo.
+    - A write in another tab reloads this one.
+    - A damaged store is set aside to `rz_cx_records_v1_quarantine` with a notice.
+    - Sets are capped at 2 MB, with a warning above 1.5 MB.
+    - An imported set with refusal findings is marked `invalid · n`. It is never auto-fixed.
+- **Cx plan export (P12).** The Cx Analysis CSV row gains **MS Project XML** (MSPDI, also read by Primavera P6) and **Calendar (.ics)**. Both export the dated plan the calendar panel shows.
+  - L0–L6 are tasks, and L2–L4 are summary tasks with one subtask per system, split by the 02.4.8 planning-day share.
+  - Gates are milestones.
+  - FS links carry the lag in work days that keeps every date of the plan, including the witness-slot gaps.
+  - The .ics holds one all-day event per gate (RFC 5545, folded at 75 octets).
+  - Without a project start date both buttons are disabled, and the reason is on the button.
+  - Samples are in `documentation/product-transformation/05-test-evidence/P12/`.
+
+### Fixed
+- **R121 motion mock (LTC).** Under load, hero words that were already drawn were hidden again. Chrome records its paint entry late, so the motion script took words on screen for unpainted ones. The mock now marks its first frame in `<head>`, and `js/rz-index-motion.js` counts that mark as painted. The new law T8b repeats T8 with paint entries hidden and the CDN held 800 ms. The old tree fails T8 (33 drops) and T8b (68).
+- A short form dialog on a phone is centred and fits its content. The first cut inherited the full-height side sheet of the block-detail dialog. The new gate measures an open dialog; the first version of that check measured a closed one and passed.
+
+### Gates
+- `tools/test-cx-workspace.mjs` (32 checks; Node) — 13 law fixtures, plus referenced delete, revisions, round-trip, quarantine and cap. 5,000 records validate in under 200 ms. RED: with R4 dropped from the refusal set, 1 check fails.
+- `tools/test-cx-workspace-ui.mjs` (browser) covers:
+  - Demo read-only, and a set started from a register.
+  - R4 and R8 refused in the dialog.
+  - Issue create, edit and close, plus Undo and reload.
+  - Export → import is deep-equal in a second browser.
+  - An untrusted import renders as text.
+  - Quarantine, two tabs, and a centred dialog at 390 px in both themes.
+  - RED with R4 dropped: 2 checks fail. RED with the side-sheet dialog: the check fails.
+- `tools/test-cx-export-schedule.mjs` (29 checks) covers:
+  - 65 tasks and 61 links whose lags reproduce every successor date.
+  - Escaping, plus folding and UIDs in the .ics.
+  - A DOMParser round-trip in the page whose counts, durations and links equal the plan.
+  - 2,000+ tasks export in under 500 ms.
+  - RED: dropping the lags fails 3 checks, folding at 76 octets fails 2, and dropping escaping fails 4 (the level name "L0 Design & Cx Prep" breaks the XML).
+- `tools/test-cx-analysis.mjs` T20: in Demo, "Start a set with these rows" opens New record set; the demo set is untouched.
+
+### Not in this release
+- **P06 stage 2 (cloud sets) is BLOCKED.** The SQL is delivered in `supabase/migrations/2026-11-product-transformation.sql` (table `cx_record_sets`, own-row RLS, 2 MB cap) for the owner to apply.
+- **Amendment C3.** RFS gaps still go to the Tier 1 issue register even when a record set is active. A Tier 3 issue needs an asset, and an RFS gap names a system.
+- **MS Project / P6 import itself is untested.** There is no licence on this machine; the DOMParser round-trip is the proxy.
+
 ## v3.50.0 — 2026-11-12 — Homepage colour live, reliability counts redundancy correctly, motion mock
 
 Owner requests R119 (approved 2026-11-12), R120 (reliability, option a) and R121 (motion, mock).

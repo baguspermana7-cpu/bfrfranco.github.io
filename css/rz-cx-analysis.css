@@ -331,3 +331,43 @@
 .cx-is-intake-btn { min-height: 44px; padding: 0 12px; background: none; border: 1px solid var(--rzt-line-strong); border-radius: var(--rz-radius); color: var(--rzt-text); font: 400 12px var(--rzt-mono); cursor: pointer; }
 .cx-is-intake-btn:hover { border-color: var(--rzt-accent); }
 .cx-is-intake-btn:focus-visible { outline: 2px solid var(--rzt-accent); outline-offset: 2px; }
+
+/* P06 — record workspace (js/rz-cx-records-ui.js): Demo | My records | Import file, forms in a native <dialog> */
+.cx-rec-ws { display: flex; flex-wrap: wrap; align-items: center; gap: var(--rz-space-2); margin: 0 0 var(--rz-space-2); }
+.cx-rec-seg { display: flex; flex-wrap: wrap; gap: var(--rz-space-2); }
+.cx-rec-ws .tool-btn, .cx-rec-ws select, .cx-rec-rowact .tool-btn { box-sizing: border-box; min-height: 44px; padding: 0 12px; font: 500 13px var(--rzt-mono); color: var(--rzt-text-2); background: transparent; border: 1px solid var(--rzt-line); border-radius: var(--rz-radius); cursor: pointer; display: inline-flex; align-items: center; }
+.cx-rec-ws select { font-size: 16px; color: var(--rzt-text); background: var(--rzt-panel); max-width: 16rem; }
+.cx-rec-ws .tool-btn[aria-pressed="true"] { color: var(--rzt-text); border-color: var(--rzt-line-strong); }
+.cx-rec-ws .tool-btn:hover, .cx-rec-rowact .tool-btn:hover { border-color: var(--rzt-line-strong); color: var(--rzt-text); }
+.cx-rec-ws [hidden] { display: none; }
+.cx-rec-chip { font: 500 12px var(--rzt-mono); color: var(--rzt-muted); border-bottom: 1px dotted var(--rzt-line-strong); }
+.cx-rec-chip[data-tone="fault"], .cx-rec-status[data-tone="fault"], .cx-rec-err { color: var(--rzt-fault); }
+.cx-rec-status { min-height: 1.5em; margin: 0 0 var(--rz-space-2); }
+.cx-rec-status[data-tone="warn"] { color: var(--rzt-text); }
+#cxRecTools[hidden], #cxRecIssueWrap[hidden] { display: none; }
+#cxRecTools .tool-btn { min-height: 44px; }
+.cx-rec-lawcounts { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-bottom: 4px; }
+.cx-rec-rowact { white-space: nowrap; display: flex; gap: 6px; }
+.cx-rec-rowact .tool-btn { min-height: 32px; font-size: 12px; position: relative; }
+.cx-rec-rowact .tool-btn::after { content: ""; position: absolute; inset: -6px -3px; }
+#cxRecIssues tr[data-state="closed"] { color: var(--rzt-muted); }
+#cxRecPanel .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.cx-rec-dlg { width: min(520px, calc(100vw - 32px)); }
+.cx-rec-form { display: grid; gap: var(--rz-space-3); margin-top: var(--rz-space-3); }
+.cx-rec-field { display: grid; gap: 4px; }
+.cx-rec-field label { font: 500 12px var(--rzt-mono); color: var(--rzt-text-2); }
+.cx-rec-field input[type="text"], .cx-rec-field select { box-sizing: border-box; width: 100%; min-height: 44px; padding: 0 10px; font: 16px var(--rzt-sans); color: var(--rzt-text); background: var(--rzt-inset, var(--rzt-panel)); border: 1px solid var(--rzt-line); border-radius: var(--rz-radius); }
+.cx-rec-field input[readonly] { font-family: var(--rzt-mono); color: var(--rzt-text-2); }
+.cx-rec-field input:focus-visible, .cx-rec-field select:focus-visible { outline: 2px solid var(--rzt-accent); outline-offset: 1px; }
+.cx-rec-inline { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.cx-rec-inline input[type="checkbox"] { width: 20px; height: 20px; margin: 0; }
+.cx-rec-inline select { width: auto; }
+.cx-rec-req { color: var(--rzt-fault); }
+.cx-rec-err { margin: 0; min-height: 1.25em; font: 400 13px/1.4 var(--rzt-sans); }
+.cx-rec-dlg .cx-an-actions .tool-btn { min-height: 44px; }
+#cxRecIssueWrap { margin-top: var(--rz-space-4); }
+#cxRecIssueWrap + .cx-an-panel-head { margin-top: var(--rz-space-4); }
+/* a short form is a centred dialog on a phone too (the block-detail sheet goes full-screen; a form does not need to) */
+@media (max-width: 640px) {
+  .cx-dt.cx-rec-dlg { width: calc(100vw - 32px); max-width: calc(100vw - 32px); height: fit-content; max-height: calc(100vh - 32px); margin: auto; border-radius: var(--rz-radius); }
+}

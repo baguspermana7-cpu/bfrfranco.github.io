@@ -282,6 +282,9 @@ gate "Cx assets — every equipment family is a shaped, bounded, deterministic g
 gate "Cx campus basis — the 3D plant's counts, CDUs, flows and callout text follow the engine's site basis; light palette" node tools/test-cx-campus-basis.mjs
 gate "Cx glb library — Blender export matches a regenerated build byte for byte, footprints, shades" node tools/test-cx-glb.mjs --regen
 gate "Cx records (Tier 3 slice) — PRD v1.0 invariants on the demo record set, overlay on the plan, register import reasons" node tools/test-cx-records.mjs
+gate "Cx record workspace (P06) — every write through the laws: R1–R7, R11 refuse, R8–R10, R13 flag (13 fixtures), referenced delete refused, export→import deep-equal, quarantine, 2 MB cap" node tools/test-cx-workspace.mjs
+gate "Cx record workspace UI (P06) — Demo read-only, new set from a register, R4/R8 refused in the dialog, issue CRUD, undo, reload, two tabs, 390 px both themes" node tools/test-cx-workspace-ui.mjs
+gate "Cx schedule export (P12) — MS Project XML + ICS: 65 tasks, links + lags restate the plan dates, escaping, RFC 5545 folding, DOMParser round-trip equals the plan, disabled without a start date" node tools/test-cx-export-schedule.mjs
 gate "DCMOC Cx plan bridge — same plan and status as the site module, store clamps/persists/5 scenarios (needs dcmoc/node_modules)" node tools/test-dcmoc-cx-plan.mjs
 gate "Reliability vs NIST e-Handbook — series, parallel, r-of-n parity; N+1 = k of k+1, 2N = two systems of k (engine + DCMOC chain)" node tools/test-reliability-reference.mjs
 gate "R121 homepage motion mock — Lenis on fine pointer only, reduced motion = 0 tweens, no-JS final state, settled after scroll, nothing pinned, CLS, no flash" node tools/test-index-motion.mjs

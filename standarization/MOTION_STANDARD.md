@@ -231,5 +231,10 @@ pinned to exact versions on jsdelivr.
 - Reduced motion: no Lenis, 0 tweens. No JS or a failed CDN: everything stays in its final state.
 - When the script runs after the first paint, anything already on screen stays as it is. Without this the name was
   painted, hidden and then raised again, and the gate counted 26 drops.
-- Gate: `tools/test-index-motion.mjs` T1–T8. Red on index.html (T1–T3), green on the mock. T8 is red when the
+- Gate: `tools/test-index-motion.mjs` T1–T8b. Red on index.html (T1–T3), green on the mock. T8 is red when the
   first-paint check is removed.
+- "Already seen" is a first frame, not a paint entry. Chrome records the paint entry on presentation feedback, which
+  lags the frame by hundreds of ms on a busy machine: v3.51's gate saw the hero words drawn, then hidden by the split
+  (21 drops). The page sets `data-rzm-frame` on `<html>` from an inline `requestAnimationFrame` in `<head>`, and the
+  motion script counts that mark as painted. T8b runs T8 with paint entries hidden and the CDN scripts held 800 ms:
+  68 drops before the mark, 0 after.
