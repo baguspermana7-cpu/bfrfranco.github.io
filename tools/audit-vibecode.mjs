@@ -611,7 +611,7 @@ const JOURNAL_STRICT = (rel) => /^(articles1?|insights|geopolitics|future-forwar
    EXEMPT set, each with its written reason. Exempt findings are still printed, as their own block,
    so nothing disappears; they are not counted as gating or monitored. */
 const EXEMPT = [
-  [/^(rz-(index-(mockup|mockup-day|polish|redesign)|article-mockup|cockpit-mockup|dark-beforeafter|skin-gallery|style-lab)|planb|plan-[a-z0-9-]+)\.html$|^(manual|prd)\/rz-cockpit-mockup\.html$|^tools\/_rz-diagram-demo\.html$/,
+  [/^(rz-(index-(mockup|mockup-day|polish|redesign)|article-mockup|cockpit-mockup|dark-beforeafter|skin-gallery|style-lab)|index-motion-mock|planb|plan-[a-z0-9-]+)\.html$|^(manual|prd)\/rz-cockpit-mockup\.html$|^tools\/_rz-diagram-demo\.html$/,
     'design artefact (mockup, plan, gallery or demo): the owner decides whether it stays'],
   [/^(index\.html|styles-index\.css)$/,
     'homepage: changes only through an owner-approved mockup'],
