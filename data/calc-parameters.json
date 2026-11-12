@@ -1,0 +1,3153 @@
+{
+ "version": 1,
+ "generatedBy": "tools/build-calc-parameter-registry.mjs",
+ "engineDataVersion": "2.5.1",
+ "scope": "PRD-P10 stage 1: headline results of capex, opex, tco, roi, carbon, pue at page defaults",
+ "parameters": [
+  {
+   "id": "calc.pue.pue",
+   "calc": "pue",
+   "label": "Power Usage Effectiveness",
+   "unit": "ratio",
+   "formula": "PUE = total facility power ÷ IT load; total = IT + cooling + UPS loss + transformer loss + PDU loss + lighting, security and fire loads",
+   "inputs": [
+    {
+     "id": "itLoad",
+     "label": "IT load (kW)"
+    },
+    {
+     "id": "rackDensity",
+     "label": "Rack density (kW)"
+    },
+    {
+     "id": "coolingType",
+     "label": "Cooling type"
+    },
+    {
+     "id": "containment",
+     "label": "Containment"
+    },
+    {
+     "id": "climateZone",
+     "label": "Climate zone"
+    },
+    {
+     "id": "upsType",
+     "label": "UPS type"
+    },
+    {
+     "id": "upsLoadFactor",
+     "label": "UPS load (%)"
+    },
+    {
+     "id": "redundancy",
+     "label": "Redundancy"
+    },
+    {
+     "id": "lighting",
+     "label": "Lighting (W/m²)"
+    },
+    {
+     "id": "security",
+     "label": "Security (kW/rack)"
+    },
+    {
+     "id": "fire",
+     "label": "Fire systems (kW/rack)"
+    }
+   ],
+   "engineFn": "RZEngine.models.pue.pueFromInputs",
+   "pageFn": "calculate() in pue-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "The Green Grid WP#49; ISO/IEC 30134-2:2016",
+    "section": "PUE definition",
+    "method": "Each overhead term is computed on the page from the selected options; the engine divides."
+   },
+   "page": "pue-calculator.html",
+   "kind": "derived",
+   "scope": "pue-calculator.html",
+   "display": "1.46",
+   "value": 1.46,
+   "dependsOnInputs": [
+    "Rack density (kW)",
+    "Cooling type",
+    "Containment",
+    "Climate zone",
+    "UPS type",
+    "Redundancy",
+    "Lighting (W/m²)",
+    "Security (kW/rack)",
+    "Fire systems (kW/rack)"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "pue-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.pue.dcie",
+   "calc": "pue",
+   "label": "DCiE",
+   "unit": "%",
+   "formula": "DCiE = 100 ÷ PUE",
+   "inputs": [
+    {
+     "id": "itLoad",
+     "label": "IT load (kW)"
+    },
+    {
+     "id": "rackDensity",
+     "label": "Rack density (kW)"
+    },
+    {
+     "id": "coolingType",
+     "label": "Cooling type"
+    },
+    {
+     "id": "containment",
+     "label": "Containment"
+    },
+    {
+     "id": "climateZone",
+     "label": "Climate zone"
+    },
+    {
+     "id": "upsType",
+     "label": "UPS type"
+    },
+    {
+     "id": "upsLoadFactor",
+     "label": "UPS load (%)"
+    },
+    {
+     "id": "redundancy",
+     "label": "Redundancy"
+    },
+    {
+     "id": "lighting",
+     "label": "Lighting (W/m²)"
+    },
+    {
+     "id": "security",
+     "label": "Security (kW/rack)"
+    },
+    {
+     "id": "fire",
+     "label": "Fire systems (kW/rack)"
+    }
+   ],
+   "engineFn": "RZEngine.models.pue.dcie",
+   "pageFn": "calculate() in pue-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "The Green Grid WP#49",
+    "section": "DCiE = 1/PUE"
+   },
+   "page": "pue-calculator.html",
+   "kind": "derived",
+   "scope": "pue-calculator.html",
+   "display": "68.3%",
+   "value": 68.3,
+   "dependsOnInputs": [
+    "Rack density (kW)",
+    "Cooling type",
+    "Containment",
+    "Climate zone",
+    "UPS type",
+    "UPS load (%)",
+    "Redundancy",
+    "Security (kW/rack)",
+    "Fire systems (kW/rack)"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "pue-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.pue.total_power",
+   "calc": "pue",
+   "label": "Total facility power",
+   "unit": "kW",
+   "formula": "IT load + cooling + UPS loss + transformer loss + PDU loss + facility loads",
+   "inputs": [
+    {
+     "id": "itLoad",
+     "label": "IT load (kW)"
+    },
+    {
+     "id": "rackDensity",
+     "label": "Rack density (kW)"
+    },
+    {
+     "id": "coolingType",
+     "label": "Cooling type"
+    },
+    {
+     "id": "containment",
+     "label": "Containment"
+    },
+    {
+     "id": "climateZone",
+     "label": "Climate zone"
+    },
+    {
+     "id": "upsType",
+     "label": "UPS type"
+    },
+    {
+     "id": "upsLoadFactor",
+     "label": "UPS load (%)"
+    },
+    {
+     "id": "redundancy",
+     "label": "Redundancy"
+    },
+    {
+     "id": "lighting",
+     "label": "Lighting (W/m²)"
+    },
+    {
+     "id": "security",
+     "label": "Security (kW/rack)"
+    },
+    {
+     "id": "fire",
+     "label": "Fire systems (kW/rack)"
+    }
+   ],
+   "engineFn": null,
+   "pageFn": "calculate() in pue-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "computed on this page"
+   },
+   "page": "pue-calculator.html",
+   "kind": "derived",
+   "scope": "pue-calculator.html",
+   "display": "1,464 kW",
+   "value": 1464,
+   "dependsOnInputs": [
+    "IT load (kW)",
+    "Rack density (kW)",
+    "Cooling type",
+    "Containment",
+    "Climate zone",
+    "UPS type",
+    "UPS load (%)",
+    "Redundancy",
+    "Lighting (W/m²)",
+    "Security (kW/rack)",
+    "Fire systems (kW/rack)"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "pue-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.pue.annual_energy",
+   "calc": "pue",
+   "label": "Annual energy",
+   "unit": "GWh/yr",
+   "formula": "total facility power × 8,760 h",
+   "inputs": [
+    {
+     "id": "itLoad",
+     "label": "IT load (kW)"
+    },
+    {
+     "id": "rackDensity",
+     "label": "Rack density (kW)"
+    },
+    {
+     "id": "coolingType",
+     "label": "Cooling type"
+    },
+    {
+     "id": "containment",
+     "label": "Containment"
+    },
+    {
+     "id": "climateZone",
+     "label": "Climate zone"
+    },
+    {
+     "id": "upsType",
+     "label": "UPS type"
+    },
+    {
+     "id": "upsLoadFactor",
+     "label": "UPS load (%)"
+    },
+    {
+     "id": "redundancy",
+     "label": "Redundancy"
+    },
+    {
+     "id": "lighting",
+     "label": "Lighting (W/m²)"
+    },
+    {
+     "id": "security",
+     "label": "Security (kW/rack)"
+    },
+    {
+     "id": "fire",
+     "label": "Fire systems (kW/rack)"
+    }
+   ],
+   "engineFn": null,
+   "pageFn": "calculate() in pue-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "computed on this page"
+   },
+   "page": "pue-calculator.html",
+   "kind": "derived",
+   "scope": "pue-calculator.html",
+   "display": "12.8 GWh",
+   "value": 12.8,
+   "dependsOnInputs": [
+    "IT load (kW)",
+    "Rack density (kW)",
+    "Cooling type",
+    "Containment",
+    "Climate zone",
+    "UPS type",
+    "Redundancy",
+    "Security (kW/rack)",
+    "Fire systems (kW/rack)"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "pue-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.pue.pue_at_50",
+   "calc": "pue",
+   "label": "PUE at 50 % load",
+   "unit": "ratio",
+   "formula": "partial-load PUE of the design PUE at 50 % IT load",
+   "inputs": [
+    {
+     "id": "itLoad",
+     "label": "IT load (kW)"
+    },
+    {
+     "id": "rackDensity",
+     "label": "Rack density (kW)"
+    },
+    {
+     "id": "coolingType",
+     "label": "Cooling type"
+    },
+    {
+     "id": "containment",
+     "label": "Containment"
+    },
+    {
+     "id": "climateZone",
+     "label": "Climate zone"
+    },
+    {
+     "id": "upsType",
+     "label": "UPS type"
+    },
+    {
+     "id": "upsLoadFactor",
+     "label": "UPS load (%)"
+    },
+    {
+     "id": "redundancy",
+     "label": "Redundancy"
+    },
+    {
+     "id": "lighting",
+     "label": "Lighting (W/m²)"
+    },
+    {
+     "id": "security",
+     "label": "Security (kW/rack)"
+    },
+    {
+     "id": "fire",
+     "label": "Fire systems (kW/rack)"
+    }
+   ],
+   "engineFn": "RZEngine.models.pue.partialLoadPUE",
+   "pageFn": "renderPueCurve() in pue-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "computed on this page",
+    "method": "The engine's partial-load model; fixed losses do not scale down with load."
+   },
+   "page": "pue-calculator.html",
+   "kind": "derived",
+   "scope": "pue-calculator.html",
+   "display": "1.72",
+   "value": 1.72,
+   "dependsOnInputs": [
+    "Rack density (kW)",
+    "Cooling type",
+    "Containment",
+    "Climate zone",
+    "UPS type",
+    "UPS load (%)",
+    "Redundancy",
+    "Security (kW/rack)",
+    "Fire systems (kW/rack)"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "pue-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.capex.total",
+   "calc": "capex",
+   "label": "Total CAPEX",
+   "unit": "USD",
+   "formula": "Σ system costs + soft costs + contingency (+ front-of-meter, renewables in Advanced mode)",
+   "inputs": [
+    {
+     "id": "itLoad",
+     "label": "IT load (kW)"
+    },
+    {
+     "name": "rackType",
+     "label": "Rack density"
+    },
+    {
+     "name": "coolingType",
+     "label": "Cooling"
+    },
+    {
+     "name": "redundancy",
+     "label": "Redundancy"
+    },
+    {
+     "id": "fuelHours",
+     "label": "Fuel autonomy (h)"
+    },
+    {
+     "id": "buildingType",
+     "label": "Building type"
+    },
+    {
+     "id": "seismicZone",
+     "label": "Seismic zone"
+    },
+    {
+     "id": "fireType",
+     "label": "Fire suppression"
+    },
+    {
+     "id": "alarmType",
+     "label": "Fire alarm"
+    },
+    {
+     "id": "upsType",
+     "label": "UPS type"
+    },
+    {
+     "id": "genType",
+     "label": "Generator type"
+    },
+    {
+     "id": "locationFactor",
+     "label": "Region"
+    }
+   ],
+   "engineFn": "RZEngine.models.capex.detailed → total",
+   "pageFn": "calculateCosts() in capex-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "RZEngine.data.capexDetail",
+    "section": "costFactors ($/kW) and option multipliers"
+   },
+   "page": "capex-calculator.html",
+   "kind": "derived",
+   "scope": "capex-calculator.html",
+   "display": "$5.90M",
+   "value": 5900000,
+   "dependsOnInputs": [
+    "IT load (kW)",
+    "Rack density",
+    "Cooling",
+    "Redundancy",
+    "Fuel autonomy (h)",
+    "Building type",
+    "Seismic zone",
+    "Fire suppression",
+    "Fire alarm",
+    "UPS type",
+    "Generator type",
+    "Region"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "capex-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.capex.per_kw",
+   "calc": "capex",
+   "label": "CAPEX per kW",
+   "unit": "USD/kW",
+   "formula": "total CAPEX ÷ IT load",
+   "inputs": [
+    {
+     "id": "itLoad",
+     "label": "IT load (kW)"
+    },
+    {
+     "name": "rackType",
+     "label": "Rack density"
+    },
+    {
+     "name": "coolingType",
+     "label": "Cooling"
+    },
+    {
+     "name": "redundancy",
+     "label": "Redundancy"
+    },
+    {
+     "id": "fuelHours",
+     "label": "Fuel autonomy (h)"
+    },
+    {
+     "id": "buildingType",
+     "label": "Building type"
+    },
+    {
+     "id": "seismicZone",
+     "label": "Seismic zone"
+    },
+    {
+     "id": "fireType",
+     "label": "Fire suppression"
+    },
+    {
+     "id": "alarmType",
+     "label": "Fire alarm"
+    },
+    {
+     "id": "upsType",
+     "label": "UPS type"
+    },
+    {
+     "id": "genType",
+     "label": "Generator type"
+    },
+    {
+     "id": "locationFactor",
+     "label": "Region"
+    }
+   ],
+   "engineFn": "RZEngine.models.capex.detailed → total",
+   "pageFn": "calculateCosts() in capex-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "RZEngine.data.capexDetail",
+    "section": "costFactors ($/kW) and option multipliers"
+   },
+   "page": "capex-calculator.html",
+   "kind": "derived",
+   "scope": "capex-calculator.html",
+   "display": "$6K/kW",
+   "value": 6000,
+   "dependsOnInputs": [
+    "Redundancy",
+    "Region"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "capex-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.capex.energy_cost",
+   "calc": "capex",
+   "label": "Annual energy cost",
+   "unit": "USD/yr",
+   "formula": "IT load × PUE (cooling × rack lookup) × 8,760 h × regional energy rate",
+   "inputs": [
+    {
+     "id": "itLoad",
+     "label": "IT load (kW)"
+    },
+    {
+     "name": "rackType",
+     "label": "Rack density"
+    },
+    {
+     "name": "coolingType",
+     "label": "Cooling"
+    },
+    {
+     "name": "redundancy",
+     "label": "Redundancy"
+    },
+    {
+     "id": "fuelHours",
+     "label": "Fuel autonomy (h)"
+    },
+    {
+     "id": "buildingType",
+     "label": "Building type"
+    },
+    {
+     "id": "seismicZone",
+     "label": "Seismic zone"
+    },
+    {
+     "id": "fireType",
+     "label": "Fire suppression"
+    },
+    {
+     "id": "alarmType",
+     "label": "Fire alarm"
+    },
+    {
+     "id": "upsType",
+     "label": "UPS type"
+    },
+    {
+     "id": "genType",
+     "label": "Generator type"
+    },
+    {
+     "id": "locationFactor",
+     "label": "Region"
+    }
+   ],
+   "engineFn": "RZEngine.models.capex.detailed → annualEnergy",
+   "pageFn": "calculateCosts() in capex-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "RZEngine.data.capexDetail",
+    "section": "pueByCoolingRack, energyRateByLocation"
+   },
+   "page": "capex-calculator.html",
+   "kind": "derived",
+   "scope": "capex-calculator.html",
+   "display": "$1.89M",
+   "value": 1890000,
+   "dependsOnInputs": [
+    "IT load (kW)",
+    "Rack density",
+    "Cooling"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "capex-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.capex.cost.building",
+   "calc": "capex",
+   "label": "Building & civil",
+   "unit": "USD",
+   "formula": "costFactors.building ($/kW) × IT load × location multiplier × building multiplier × rack × floor × site",
+   "inputs": [
+    {
+     "id": "itLoad",
+     "label": "IT load (kW)"
+    },
+    {
+     "name": "rackType",
+     "label": "Rack density"
+    },
+    {
+     "name": "coolingType",
+     "label": "Cooling"
+    },
+    {
+     "name": "redundancy",
+     "label": "Redundancy"
+    },
+    {
+     "id": "fuelHours",
+     "label": "Fuel autonomy (h)"
+    },
+    {
+     "id": "buildingType",
+     "label": "Building type"
+    },
+    {
+     "id": "seismicZone",
+     "label": "Seismic zone"
+    },
+    {
+     "id": "fireType",
+     "label": "Fire suppression"
+    },
+    {
+     "id": "alarmType",
+     "label": "Fire alarm"
+    },
+    {
+     "id": "upsType",
+     "label": "UPS type"
+    },
+    {
+     "id": "genType",
+     "label": "Generator type"
+    },
+    {
+     "id": "locationFactor",
+     "label": "Region"
+    }
+   ],
+   "engineFn": "RZEngine.models.capex.detailed → costs.building",
+   "pageFn": "calculateCosts() in capex-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "RZEngine.data.capexDetail",
+    "section": "costFactors ($/kW) and option multipliers"
+   },
+   "page": "capex-calculator.html",
+   "kind": "derived",
+   "scope": "capex-calculator.html",
+   "display": "$800K",
+   "value": 800000,
+   "dependsOnInputs": [
+    "IT load (kW)",
+    "Rack density",
+    "Building type",
+    "Region"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "capex-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.capex.cost.electrical",
+   "calc": "capex",
+   "label": "Electrical (MV/LV)",
+   "unit": "USD",
+   "formula": "costFactors.electrical ($/kW) × IT load × location multiplier × redundancy × rack × power distribution × transformer",
+   "inputs": [
+    {
+     "id": "itLoad",
+     "label": "IT load (kW)"
+    },
+    {
+     "name": "rackType",
+     "label": "Rack density"
+    },
+    {
+     "name": "coolingType",
+     "label": "Cooling"
+    },
+    {
+     "name": "redundancy",
+     "label": "Redundancy"
+    },
+    {
+     "id": "fuelHours",
+     "label": "Fuel autonomy (h)"
+    },
+    {
+     "id": "buildingType",
+     "label": "Building type"
+    },
+    {
+     "id": "seismicZone",
+     "label": "Seismic zone"
+    },
+    {
+     "id": "fireType",
+     "label": "Fire suppression"
+    },
+    {
+     "id": "alarmType",
+     "label": "Fire alarm"
+    },
+    {
+     "id": "upsType",
+     "label": "UPS type"
+    },
+    {
+     "id": "genType",
+     "label": "Generator type"
+    },
+    {
+     "id": "locationFactor",
+     "label": "Region"
+    }
+   ],
+   "engineFn": "RZEngine.models.capex.detailed → costs.electrical",
+   "pageFn": "calculateCosts() in capex-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "RZEngine.data.capexDetail",
+    "section": "costFactors ($/kW) and option multipliers"
+   },
+   "page": "capex-calculator.html",
+   "kind": "derived",
+   "scope": "capex-calculator.html",
+   "display": "$1.50M",
+   "value": 1500000,
+   "dependsOnInputs": [
+    "IT load (kW)",
+    "Rack density",
+    "Redundancy",
+    "Region"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "capex-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.capex.cost.ups",
+   "calc": "capex",
+   "label": "UPS systems",
+   "unit": "USD",
+   "formula": "costFactors.ups ($/kW) × IT load × location multiplier × redundancy × rack × UPS type",
+   "inputs": [
+    {
+     "id": "itLoad",
+     "label": "IT load (kW)"
+    },
+    {
+     "name": "rackType",
+     "label": "Rack density"
+    },
+    {
+     "name": "coolingType",
+     "label": "Cooling"
+    },
+    {
+     "name": "redundancy",
+     "label": "Redundancy"
+    },
+    {
+     "id": "fuelHours",
+     "label": "Fuel autonomy (h)"
+    },
+    {
+     "id": "buildingType",
+     "label": "Building type"
+    },
+    {
+     "id": "seismicZone",
+     "label": "Seismic zone"
+    },
+    {
+     "id": "fireType",
+     "label": "Fire suppression"
+    },
+    {
+     "id": "alarmType",
+     "label": "Fire alarm"
+    },
+    {
+     "id": "upsType",
+     "label": "UPS type"
+    },
+    {
+     "id": "genType",
+     "label": "Generator type"
+    },
+    {
+     "id": "locationFactor",
+     "label": "Region"
+    }
+   ],
+   "engineFn": "RZEngine.models.capex.detailed → costs.ups",
+   "pageFn": "calculateCosts() in capex-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "RZEngine.data.capexDetail",
+    "section": "costFactors ($/kW) and option multipliers"
+   },
+   "page": "capex-calculator.html",
+   "kind": "derived",
+   "scope": "capex-calculator.html",
+   "display": "$750K",
+   "value": 750000,
+   "dependsOnInputs": [
+    "IT load (kW)",
+    "Rack density",
+    "Redundancy",
+    "UPS type",
+    "Region"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "capex-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.capex.cost.generator",
+   "calc": "capex",
+   "label": "Generator & fuel",
+   "unit": "USD",
+   "formula": "costFactors.generator ($/kW) × IT load × location multiplier × redundancy × fuel autonomy × generator type",
+   "inputs": [
+    {
+     "id": "itLoad",
+     "label": "IT load (kW)"
+    },
+    {
+     "name": "rackType",
+     "label": "Rack density"
+    },
+    {
+     "name": "coolingType",
+     "label": "Cooling"
+    },
+    {
+     "name": "redundancy",
+     "label": "Redundancy"
+    },
+    {
+     "id": "fuelHours",
+     "label": "Fuel autonomy (h)"
+    },
+    {
+     "id": "buildingType",
+     "label": "Building type"
+    },
+    {
+     "id": "seismicZone",
+     "label": "Seismic zone"
+    },
+    {
+     "id": "fireType",
+     "label": "Fire suppression"
+    },
+    {
+     "id": "alarmType",
+     "label": "Fire alarm"
+    },
+    {
+     "id": "upsType",
+     "label": "UPS type"
+    },
+    {
+     "id": "genType",
+     "label": "Generator type"
+    },
+    {
+     "id": "locationFactor",
+     "label": "Region"
+    }
+   ],
+   "engineFn": "RZEngine.models.capex.detailed → costs.generator",
+   "pageFn": "calculateCosts() in capex-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "RZEngine.data.capexDetail",
+    "section": "costFactors ($/kW) and option multipliers"
+   },
+   "page": "capex-calculator.html",
+   "kind": "derived",
+   "scope": "capex-calculator.html",
+   "display": "$596K",
+   "value": 596000,
+   "dependsOnInputs": [
+    "IT load (kW)",
+    "Redundancy",
+    "Fuel autonomy (h)",
+    "Generator type",
+    "Region"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "capex-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.capex.cost.cooling",
+   "calc": "capex",
+   "label": "Cooling systems",
+   "unit": "USD",
+   "formula": "costFactors.cooling ($/kW) × IT load × location multiplier × cooling type × rack (+ refrigerant premium)",
+   "inputs": [
+    {
+     "id": "itLoad",
+     "label": "IT load (kW)"
+    },
+    {
+     "name": "rackType",
+     "label": "Rack density"
+    },
+    {
+     "name": "coolingType",
+     "label": "Cooling"
+    },
+    {
+     "name": "redundancy",
+     "label": "Redundancy"
+    },
+    {
+     "id": "fuelHours",
+     "label": "Fuel autonomy (h)"
+    },
+    {
+     "id": "buildingType",
+     "label": "Building type"
+    },
+    {
+     "id": "seismicZone",
+     "label": "Seismic zone"
+    },
+    {
+     "id": "fireType",
+     "label": "Fire suppression"
+    },
+    {
+     "id": "alarmType",
+     "label": "Fire alarm"
+    },
+    {
+     "id": "upsType",
+     "label": "UPS type"
+    },
+    {
+     "id": "genType",
+     "label": "Generator type"
+    },
+    {
+     "id": "locationFactor",
+     "label": "Region"
+    }
+   ],
+   "engineFn": "RZEngine.models.capex.detailed → costs.cooling",
+   "pageFn": "calculateCosts() in capex-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "RZEngine.data.capexDetail",
+    "section": "costFactors ($/kW) and option multipliers"
+   },
+   "page": "capex-calculator.html",
+   "kind": "derived",
+   "scope": "capex-calculator.html",
+   "display": "$700K",
+   "value": 700000,
+   "dependsOnInputs": [
+    "IT load (kW)",
+    "Rack density",
+    "Cooling",
+    "Region"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "capex-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.capex.cost.network",
+   "calc": "capex",
+   "label": "Network infrastructure",
+   "unit": "USD",
+   "formula": "costFactors.network ($/kW) × IT load × location multiplier × location only (+ cabling and fibre in Advanced mode)",
+   "inputs": [
+    {
+     "id": "itLoad",
+     "label": "IT load (kW)"
+    },
+    {
+     "name": "rackType",
+     "label": "Rack density"
+    },
+    {
+     "name": "coolingType",
+     "label": "Cooling"
+    },
+    {
+     "name": "redundancy",
+     "label": "Redundancy"
+    },
+    {
+     "id": "fuelHours",
+     "label": "Fuel autonomy (h)"
+    },
+    {
+     "id": "buildingType",
+     "label": "Building type"
+    },
+    {
+     "id": "seismicZone",
+     "label": "Seismic zone"
+    },
+    {
+     "id": "fireType",
+     "label": "Fire suppression"
+    },
+    {
+     "id": "alarmType",
+     "label": "Fire alarm"
+    },
+    {
+     "id": "upsType",
+     "label": "UPS type"
+    },
+    {
+     "id": "genType",
+     "label": "Generator type"
+    },
+    {
+     "id": "locationFactor",
+     "label": "Region"
+    }
+   ],
+   "engineFn": "RZEngine.models.capex.detailed → costs.network",
+   "pageFn": "calculateCosts() in capex-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "RZEngine.data.capexDetail",
+    "section": "costFactors ($/kW) and option multipliers"
+   },
+   "page": "capex-calculator.html",
+   "kind": "derived",
+   "scope": "capex-calculator.html",
+   "display": "$250K",
+   "value": 250000,
+   "dependsOnInputs": [
+    "IT load (kW)",
+    "Region"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "capex-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.opex.total",
+   "calc": "opex",
+   "label": "Total annual OPEX",
+   "unit": "USD/yr",
+   "formula": "energy + staffing + maintenance + spare parts + software + utilities + insurance and compliance + training and miscellaneous",
+   "inputs": [
+    {
+     "id": "itLoad",
+     "label": "IT load (kW)"
+    },
+    {
+     "id": "pueSlider",
+     "label": "PUE"
+    },
+    {
+     "id": "countrySelect",
+     "label": "Country"
+    },
+    {
+     "id": "tierLevel",
+     "label": "Tier"
+    },
+    {
+     "id": "facilityAge",
+     "label": "Facility age"
+    },
+    {
+     "id": "utilizationSlider",
+     "label": "Utilization (%)"
+    },
+    {
+     "id": "climateZone",
+     "label": "Climate zone"
+    },
+    {
+     "id": "coolingType",
+     "label": "Cooling type"
+    },
+    {
+     "id": "genConfig",
+     "label": "Generator configuration"
+    }
+   ],
+   "engineFn": null,
+   "pageFn": "calculateOPEX() in opex-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "computed on this page"
+   },
+   "page": "opex-calculator.html",
+   "kind": "derived",
+   "scope": "opex-calculator.html",
+   "display": "$1,703,467",
+   "value": 1703467,
+   "dependsOnInputs": [
+    "IT load (kW)",
+    "PUE",
+    "Country",
+    "Tier",
+    "Facility age",
+    "Utilization (%)",
+    "Climate zone",
+    "Cooling type",
+    "Generator configuration"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "opex-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.opex.monthly",
+   "calc": "opex",
+   "label": "Monthly OPEX",
+   "unit": "USD/mo",
+   "formula": "total annual OPEX ÷ 12",
+   "inputs": [
+    {
+     "id": "itLoad",
+     "label": "IT load (kW)"
+    },
+    {
+     "id": "pueSlider",
+     "label": "PUE"
+    },
+    {
+     "id": "countrySelect",
+     "label": "Country"
+    },
+    {
+     "id": "tierLevel",
+     "label": "Tier"
+    },
+    {
+     "id": "facilityAge",
+     "label": "Facility age"
+    },
+    {
+     "id": "utilizationSlider",
+     "label": "Utilization (%)"
+    },
+    {
+     "id": "climateZone",
+     "label": "Climate zone"
+    },
+    {
+     "id": "coolingType",
+     "label": "Cooling type"
+    },
+    {
+     "id": "genConfig",
+     "label": "Generator configuration"
+    }
+   ],
+   "engineFn": null,
+   "pageFn": "calculateOPEX() in opex-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "computed on this page"
+   },
+   "page": "opex-calculator.html",
+   "kind": "derived",
+   "scope": "opex-calculator.html",
+   "display": "$142.0K",
+   "value": 142000,
+   "dependsOnInputs": [
+    "IT load (kW)",
+    "PUE",
+    "Country",
+    "Tier",
+    "Facility age",
+    "Utilization (%)",
+    "Climate zone",
+    "Cooling type",
+    "Generator configuration"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "opex-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.opex.per_kw",
+   "calc": "opex",
+   "label": "OPEX per kW",
+   "unit": "USD/kW/yr",
+   "formula": "total annual OPEX ÷ IT load",
+   "inputs": [
+    {
+     "id": "itLoad",
+     "label": "IT load (kW)"
+    },
+    {
+     "id": "pueSlider",
+     "label": "PUE"
+    },
+    {
+     "id": "countrySelect",
+     "label": "Country"
+    },
+    {
+     "id": "tierLevel",
+     "label": "Tier"
+    },
+    {
+     "id": "facilityAge",
+     "label": "Facility age"
+    },
+    {
+     "id": "utilizationSlider",
+     "label": "Utilization (%)"
+    },
+    {
+     "id": "climateZone",
+     "label": "Climate zone"
+    },
+    {
+     "id": "coolingType",
+     "label": "Cooling type"
+    },
+    {
+     "id": "genConfig",
+     "label": "Generator configuration"
+    }
+   ],
+   "engineFn": null,
+   "pageFn": "calculateOPEX() in opex-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "computed on this page"
+   },
+   "page": "opex-calculator.html",
+   "kind": "derived",
+   "scope": "opex-calculator.html",
+   "display": "$1,703",
+   "value": 1703,
+   "dependsOnInputs": [
+    "IT load (kW)",
+    "PUE",
+    "Country",
+    "Tier",
+    "Facility age",
+    "Utilization (%)",
+    "Climate zone",
+    "Cooling type",
+    "Generator configuration"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "opex-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.opex.per_kwh",
+   "calc": "opex",
+   "label": "OPEX per kWh",
+   "unit": "USD/kWh",
+   "formula": "total annual OPEX ÷ annual kWh (IT + cooling power × 8,760 h × utilization)",
+   "inputs": [
+    {
+     "id": "itLoad",
+     "label": "IT load (kW)"
+    },
+    {
+     "id": "pueSlider",
+     "label": "PUE"
+    },
+    {
+     "id": "countrySelect",
+     "label": "Country"
+    },
+    {
+     "id": "tierLevel",
+     "label": "Tier"
+    },
+    {
+     "id": "facilityAge",
+     "label": "Facility age"
+    },
+    {
+     "id": "utilizationSlider",
+     "label": "Utilization (%)"
+    },
+    {
+     "id": "climateZone",
+     "label": "Climate zone"
+    },
+    {
+     "id": "coolingType",
+     "label": "Cooling type"
+    },
+    {
+     "id": "genConfig",
+     "label": "Generator configuration"
+    }
+   ],
+   "engineFn": null,
+   "pageFn": "calculateOPEX() in opex-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "computed on this page"
+   },
+   "page": "opex-calculator.html",
+   "kind": "derived",
+   "scope": "opex-calculator.html",
+   "display": "$0.185",
+   "value": 0.185,
+   "dependsOnInputs": [
+    "IT load (kW)",
+    "PUE",
+    "Country",
+    "Tier",
+    "Facility age",
+    "Utilization (%)",
+    "Climate zone",
+    "Cooling type",
+    "Generator configuration"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "opex-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.opex.staffing",
+   "calc": "opex",
+   "label": "Staffing cost",
+   "unit": "USD/yr",
+   "formula": "Σ roles: FTE × salary × country labour multiplier (in-house / contractor split)",
+   "inputs": [
+    {
+     "id": "itLoad",
+     "label": "IT load (kW)"
+    },
+    {
+     "id": "pueSlider",
+     "label": "PUE"
+    },
+    {
+     "id": "countrySelect",
+     "label": "Country"
+    },
+    {
+     "id": "tierLevel",
+     "label": "Tier"
+    },
+    {
+     "id": "facilityAge",
+     "label": "Facility age"
+    },
+    {
+     "id": "utilizationSlider",
+     "label": "Utilization (%)"
+    },
+    {
+     "id": "climateZone",
+     "label": "Climate zone"
+    },
+    {
+     "id": "coolingType",
+     "label": "Cooling type"
+    },
+    {
+     "id": "genConfig",
+     "label": "Generator configuration"
+    }
+   ],
+   "engineFn": null,
+   "pageFn": "calculateStaffingDetail() in opex-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "computed on this page"
+   },
+   "page": "opex-calculator.html",
+   "kind": "derived",
+   "scope": "opex-calculator.html",
+   "display": "$426,851",
+   "value": 426851,
+   "dependsOnInputs": [
+    "IT load (kW)",
+    "Country",
+    "Tier"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "opex-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.opex.maintenance",
+   "calc": "opex",
+   "label": "Maintenance and spare parts",
+   "unit": "USD/yr",
+   "formula": "Σ systems (IT load × base rate × age factor × OEM factor × country maintenance multiplier) + Σ spare parts (IT load × base $/kW × tier × age × contract × country multipliers)",
+   "inputs": [
+    {
+     "id": "itLoad",
+     "label": "IT load (kW)"
+    },
+    {
+     "id": "pueSlider",
+     "label": "PUE"
+    },
+    {
+     "id": "countrySelect",
+     "label": "Country"
+    },
+    {
+     "id": "tierLevel",
+     "label": "Tier"
+    },
+    {
+     "id": "facilityAge",
+     "label": "Facility age"
+    },
+    {
+     "id": "utilizationSlider",
+     "label": "Utilization (%)"
+    },
+    {
+     "id": "climateZone",
+     "label": "Climate zone"
+    },
+    {
+     "id": "coolingType",
+     "label": "Cooling type"
+    },
+    {
+     "id": "genConfig",
+     "label": "Generator configuration"
+    }
+   ],
+   "engineFn": null,
+   "pageFn": "calculateOPEX() → updateMaintenanceTable() in opex-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "computed on this page"
+   },
+   "page": "opex-calculator.html",
+   "kind": "derived",
+   "scope": "opex-calculator.html",
+   "display": "$174,350",
+   "value": 174350,
+   "dependsOnInputs": [
+    "IT load (kW)",
+    "Country",
+    "Tier",
+    "Facility age",
+    "Climate zone",
+    "Cooling type",
+    "Generator configuration"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "opex-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.opex.utilities",
+   "calc": "opex",
+   "label": "Utilities cost",
+   "unit": "USD/yr",
+   "formula": "water + generator test fuel + fuel reserve + telecom + security systems + consumables",
+   "inputs": [
+    {
+     "id": "itLoad",
+     "label": "IT load (kW)"
+    },
+    {
+     "id": "pueSlider",
+     "label": "PUE"
+    },
+    {
+     "id": "countrySelect",
+     "label": "Country"
+    },
+    {
+     "id": "tierLevel",
+     "label": "Tier"
+    },
+    {
+     "id": "facilityAge",
+     "label": "Facility age"
+    },
+    {
+     "id": "utilizationSlider",
+     "label": "Utilization (%)"
+    },
+    {
+     "id": "climateZone",
+     "label": "Climate zone"
+    },
+    {
+     "id": "coolingType",
+     "label": "Cooling type"
+    },
+    {
+     "id": "genConfig",
+     "label": "Generator configuration"
+    }
+   ],
+   "engineFn": null,
+   "pageFn": "calculateOPEX() in opex-calculator.html",
+   "evidenceClass": "ASSUMED",
+   "source": {
+    "ref": "computed on this page",
+    "method": "Several terms are fixed page constants (water $2.50/m³, diesel $0.85–1.20/L, telecom $4,000 + $1,500/MW); not sourced."
+   },
+   "page": "opex-calculator.html",
+   "kind": "derived",
+   "scope": "opex-calculator.html",
+   "display": "$119,413",
+   "value": 119413,
+   "dependsOnInputs": [
+    "IT load (kW)",
+    "Country",
+    "Climate zone",
+    "Cooling type",
+    "Generator configuration"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "opex-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.opex.compliance",
+   "calc": "opex",
+   "label": "Insurance and compliance",
+   "unit": "USD/yr",
+   "formula": "insurance on an estimated CAPEX of $12,000/kW + certification and audit costs",
+   "inputs": [
+    {
+     "id": "itLoad",
+     "label": "IT load (kW)"
+    },
+    {
+     "id": "pueSlider",
+     "label": "PUE"
+    },
+    {
+     "id": "countrySelect",
+     "label": "Country"
+    },
+    {
+     "id": "tierLevel",
+     "label": "Tier"
+    },
+    {
+     "id": "facilityAge",
+     "label": "Facility age"
+    },
+    {
+     "id": "utilizationSlider",
+     "label": "Utilization (%)"
+    },
+    {
+     "id": "climateZone",
+     "label": "Climate zone"
+    },
+    {
+     "id": "coolingType",
+     "label": "Cooling type"
+    },
+    {
+     "id": "genConfig",
+     "label": "Generator configuration"
+    }
+   ],
+   "engineFn": null,
+   "pageFn": "calculateOPEX() in opex-calculator.html",
+   "evidenceClass": "ASSUMED",
+   "source": {
+    "ref": "computed on this page",
+    "method": "The CAPEX base ($12,000/kW) and certification costs are page constants."
+   },
+   "page": "opex-calculator.html",
+   "kind": "derived",
+   "scope": "opex-calculator.html",
+   "display": "$98,500",
+   "value": 98500,
+   "dependsOnInputs": [
+    "IT load (kW)",
+    "Country"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "opex-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.tco.lowest",
+   "calc": "tco",
+   "label": "Lowest TCO",
+   "unit": "USD",
+   "formula": "min(build TCO, colocation TCO, cloud TCO)",
+   "inputs": [
+    {
+     "id": "tcoItLoad",
+     "label": "IT load (MW)"
+    },
+    {
+     "id": "tcoCountry",
+     "label": "Location"
+    },
+    {
+     "id": "tcoPeriod",
+     "label": "Period (years)"
+    },
+    {
+     "id": "tcoTier",
+     "label": "Tier"
+    },
+    {
+     "id": "tcoPue",
+     "label": "PUE"
+    },
+    {
+     "id": "tcoUtil",
+     "label": "Utilization (%)"
+    },
+    {
+     "id": "tcoCooling",
+     "label": "Cooling"
+    },
+    {
+     "id": "tcoGrowth",
+     "label": "Growth (%/yr)"
+    }
+   ],
+   "engineFn": null,
+   "pageFn": "calculate() in tco-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "computed on this page"
+   },
+   "page": "tco-calculator.html",
+   "kind": "derived",
+   "scope": "tco-calculator.html",
+   "display": "$99.0M",
+   "value": 99000000,
+   "dependsOnInputs": [
+    "IT load (MW)",
+    "Location",
+    "Period (years)",
+    "Growth (%/yr)"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "tco-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.tco.build",
+   "calc": "tco",
+   "label": "Build TCO",
+   "unit": "USD",
+   "formula": "CAPEX (IT MW × market build cost × tier multiplier) + Σ years (power + staff + maintenance + insurance + network + 4 % other)",
+   "inputs": [
+    {
+     "id": "tcoItLoad",
+     "label": "IT load (MW)"
+    },
+    {
+     "id": "tcoCountry",
+     "label": "Location"
+    },
+    {
+     "id": "tcoPeriod",
+     "label": "Period (years)"
+    },
+    {
+     "id": "tcoTier",
+     "label": "Tier"
+    },
+    {
+     "id": "tcoPue",
+     "label": "PUE"
+    },
+    {
+     "id": "tcoUtil",
+     "label": "Utilization (%)"
+    },
+    {
+     "id": "tcoCooling",
+     "label": "Cooling"
+    },
+    {
+     "id": "tcoGrowth",
+     "label": "Growth (%/yr)"
+    }
+   ],
+   "engineFn": null,
+   "pageFn": "tcoCore() in tco-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "computed on this page",
+    "method": "Annual power cost is RZEngine.models.opex.powerCostAnnual(MW, PUE, rate, 8,760 × utilization)."
+   },
+   "page": "tco-calculator.html",
+   "kind": "derived",
+   "scope": "tco-calculator.html",
+   "display": "$106.4M",
+   "value": 106400000,
+   "dependsOnInputs": [
+    "IT load (MW)",
+    "Location",
+    "Period (years)",
+    "Tier",
+    "PUE",
+    "Utilization (%)"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "tco-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.tco.colo",
+   "calc": "tco",
+   "label": "Colocation TCO",
+   "unit": "USD",
+   "formula": "setup ($50k/MW) + Σ years (lease kW × $/kW-month × 12 × growth + staff + network + 3 % other)",
+   "inputs": [
+    {
+     "id": "tcoItLoad",
+     "label": "IT load (MW)"
+    },
+    {
+     "id": "tcoCountry",
+     "label": "Location"
+    },
+    {
+     "id": "tcoPeriod",
+     "label": "Period (years)"
+    },
+    {
+     "id": "tcoTier",
+     "label": "Tier"
+    },
+    {
+     "id": "tcoPue",
+     "label": "PUE"
+    },
+    {
+     "id": "tcoUtil",
+     "label": "Utilization (%)"
+    },
+    {
+     "id": "tcoCooling",
+     "label": "Cooling"
+    },
+    {
+     "id": "tcoGrowth",
+     "label": "Growth (%/yr)"
+    }
+   ],
+   "engineFn": null,
+   "pageFn": "tcoCore() in tco-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "computed on this page"
+   },
+   "page": "tco-calculator.html",
+   "kind": "derived",
+   "scope": "tco-calculator.html",
+   "display": "$99.0M",
+   "value": 99000000,
+   "dependsOnInputs": [
+    "IT load (MW)",
+    "Location",
+    "Period (years)",
+    "Growth (%/yr)"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "tco-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.tco.cloud",
+   "calc": "tco",
+   "label": "Cloud TCO",
+   "unit": "USD",
+   "formula": "Σ years (cloud base × kW × 12 × (1 − discount) × price path × growth) × (1 + 15 % egress + 10 % support + 2 % other)",
+   "inputs": [
+    {
+     "id": "tcoItLoad",
+     "label": "IT load (MW)"
+    },
+    {
+     "id": "tcoCountry",
+     "label": "Location"
+    },
+    {
+     "id": "tcoPeriod",
+     "label": "Period (years)"
+    },
+    {
+     "id": "tcoTier",
+     "label": "Tier"
+    },
+    {
+     "id": "tcoPue",
+     "label": "PUE"
+    },
+    {
+     "id": "tcoUtil",
+     "label": "Utilization (%)"
+    },
+    {
+     "id": "tcoCooling",
+     "label": "Cooling"
+    },
+    {
+     "id": "tcoGrowth",
+     "label": "Growth (%/yr)"
+    }
+   ],
+   "engineFn": null,
+   "pageFn": "tcoCore() in tco-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "computed on this page"
+   },
+   "page": "tco-calculator.html",
+   "kind": "derived",
+   "scope": "tco-calculator.html",
+   "display": "$122.0M",
+   "value": 122000000,
+   "dependsOnInputs": [
+    "IT load (MW)",
+    "Period (years)",
+    "Growth (%/yr)"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "tco-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.tco.capex",
+   "calc": "tco",
+   "label": "Build CAPEX",
+   "unit": "USD",
+   "formula": "IT MW × market build cost ($M/MW) × tier multiplier",
+   "inputs": [
+    {
+     "id": "tcoItLoad",
+     "label": "IT load (MW)"
+    },
+    {
+     "id": "tcoCountry",
+     "label": "Location"
+    },
+    {
+     "id": "tcoPeriod",
+     "label": "Period (years)"
+    },
+    {
+     "id": "tcoTier",
+     "label": "Tier"
+    },
+    {
+     "id": "tcoPue",
+     "label": "PUE"
+    },
+    {
+     "id": "tcoUtil",
+     "label": "Utilization (%)"
+    },
+    {
+     "id": "tcoCooling",
+     "label": "Cooling"
+    },
+    {
+     "id": "tcoGrowth",
+     "label": "Growth (%/yr)"
+    }
+   ],
+   "engineFn": null,
+   "pageFn": "tcoCore() in tco-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "computed on this page"
+   },
+   "page": "tco-calculator.html",
+   "kind": "derived",
+   "scope": "tco-calculator.html",
+   "display": "$60.0M",
+   "value": 60000000,
+   "dependsOnInputs": [
+    "IT load (MW)",
+    "Location",
+    "Tier"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "tco-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.tco.cost_per_kw",
+   "calc": "tco",
+   "label": "Cost per kW-year (winning option)",
+   "unit": "USD/kW/yr",
+   "formula": "winning option TCO ÷ (IT kW × years)",
+   "inputs": [
+    {
+     "id": "tcoItLoad",
+     "label": "IT load (MW)"
+    },
+    {
+     "id": "tcoCountry",
+     "label": "Location"
+    },
+    {
+     "id": "tcoPeriod",
+     "label": "Period (years)"
+    },
+    {
+     "id": "tcoTier",
+     "label": "Tier"
+    },
+    {
+     "id": "tcoPue",
+     "label": "PUE"
+    },
+    {
+     "id": "tcoUtil",
+     "label": "Utilization (%)"
+    },
+    {
+     "id": "tcoCooling",
+     "label": "Cooling"
+    },
+    {
+     "id": "tcoGrowth",
+     "label": "Growth (%/yr)"
+    }
+   ],
+   "engineFn": "RZEngine.models.tco.costPerMwYear",
+   "pageFn": "calculate() in tco-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "computed on this page"
+   },
+   "page": "tco-calculator.html",
+   "kind": "derived",
+   "scope": "tco-calculator.html",
+   "display": "$3958/kW/yr",
+   "value": 3958,
+   "dependsOnInputs": [
+    "IT load (MW)",
+    "Location",
+    "Period (years)",
+    "Growth (%/yr)"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "tco-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.roi.npv",
+   "calc": "roi",
+   "label": "Net present value",
+   "unit": "USD",
+   "formula": "NPV of the project cash flows (−CAPEX, then NOI − debt service − tax per year, + terminal value) at the discount rate",
+   "inputs": [
+    {
+     "id": "totalCapex",
+     "label": "Total CAPEX ($)"
+    },
+    {
+     "id": "itCapacity",
+     "label": "IT capacity (MW)"
+    },
+    {
+     "id": "pueValue",
+     "label": "PUE"
+    },
+    {
+     "id": "revenuePerKw",
+     "label": "Revenue ($/kW-month)"
+    },
+    {
+     "id": "occMax",
+     "label": "Stabilised occupancy (%)"
+    },
+    {
+     "id": "electricityRate",
+     "label": "Electricity ($/kWh)"
+    },
+    {
+     "id": "discountRate",
+     "label": "Discount rate (%)"
+    },
+    {
+     "id": "projectLife",
+     "label": "Project life (yrs)"
+    },
+    {
+     "id": "debtRatio",
+     "label": "Debt ratio (%)"
+    },
+    {
+     "id": "interestRate",
+     "label": "Interest (%)"
+    },
+    {
+     "id": "taxRate",
+     "label": "Tax rate (%)"
+    },
+    {
+     "id": "exitCapRate",
+     "label": "Exit cap rate (%)"
+    }
+   ],
+   "engineFn": "RZEngine.models.roi.npv",
+   "pageFn": "calculate() in roi-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "discounted cash flow, standard definition",
+    "section": "this page's cash-flow table"
+   },
+   "page": "roi-calculator.html",
+   "kind": "derived",
+   "scope": "roi-calculator.html",
+   "display": "-$41.4M",
+   "value": -41400000,
+   "dependsOnInputs": [
+    "Total CAPEX ($)",
+    "IT capacity (MW)",
+    "PUE",
+    "Revenue ($/kW-month)",
+    "Stabilised occupancy (%)",
+    "Electricity ($/kWh)",
+    "Discount rate (%)",
+    "Project life (yrs)",
+    "Debt ratio (%)",
+    "Interest (%)",
+    "Tax rate (%)",
+    "Exit cap rate (%)"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "roi-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.roi.irr",
+   "calc": "roi",
+   "label": "Internal rate of return",
+   "unit": "%",
+   "formula": "rate at which NPV of the same cash flows = 0",
+   "inputs": [
+    {
+     "id": "totalCapex",
+     "label": "Total CAPEX ($)"
+    },
+    {
+     "id": "itCapacity",
+     "label": "IT capacity (MW)"
+    },
+    {
+     "id": "pueValue",
+     "label": "PUE"
+    },
+    {
+     "id": "revenuePerKw",
+     "label": "Revenue ($/kW-month)"
+    },
+    {
+     "id": "occMax",
+     "label": "Stabilised occupancy (%)"
+    },
+    {
+     "id": "electricityRate",
+     "label": "Electricity ($/kWh)"
+    },
+    {
+     "id": "discountRate",
+     "label": "Discount rate (%)"
+    },
+    {
+     "id": "projectLife",
+     "label": "Project life (yrs)"
+    },
+    {
+     "id": "debtRatio",
+     "label": "Debt ratio (%)"
+    },
+    {
+     "id": "interestRate",
+     "label": "Interest (%)"
+    },
+    {
+     "id": "taxRate",
+     "label": "Tax rate (%)"
+    },
+    {
+     "id": "exitCapRate",
+     "label": "Exit cap rate (%)"
+    }
+   ],
+   "engineFn": "RZEngine.models.roi.irr",
+   "pageFn": "calculate() in roi-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "discounted cash flow, standard definition",
+    "section": "this page's cash-flow table"
+   },
+   "page": "roi-calculator.html",
+   "kind": "derived",
+   "scope": "roi-calculator.html",
+   "display": "5.8%",
+   "value": 5.8,
+   "dependsOnInputs": [
+    "Total CAPEX ($)",
+    "IT capacity (MW)",
+    "PUE",
+    "Revenue ($/kW-month)",
+    "Stabilised occupancy (%)",
+    "Electricity ($/kWh)",
+    "Project life (yrs)",
+    "Debt ratio (%)",
+    "Interest (%)",
+    "Exit cap rate (%)"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "roi-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.roi.payback",
+   "calc": "roi",
+   "label": "Payback",
+   "unit": "years",
+   "formula": "first year in which cumulative net cash flow ≥ 0",
+   "inputs": [
+    {
+     "id": "totalCapex",
+     "label": "Total CAPEX ($)"
+    },
+    {
+     "id": "itCapacity",
+     "label": "IT capacity (MW)"
+    },
+    {
+     "id": "pueValue",
+     "label": "PUE"
+    },
+    {
+     "id": "revenuePerKw",
+     "label": "Revenue ($/kW-month)"
+    },
+    {
+     "id": "occMax",
+     "label": "Stabilised occupancy (%)"
+    },
+    {
+     "id": "electricityRate",
+     "label": "Electricity ($/kWh)"
+    },
+    {
+     "id": "discountRate",
+     "label": "Discount rate (%)"
+    },
+    {
+     "id": "projectLife",
+     "label": "Project life (yrs)"
+    },
+    {
+     "id": "debtRatio",
+     "label": "Debt ratio (%)"
+    },
+    {
+     "id": "interestRate",
+     "label": "Interest (%)"
+    },
+    {
+     "id": "taxRate",
+     "label": "Tax rate (%)"
+    },
+    {
+     "id": "exitCapRate",
+     "label": "Exit cap rate (%)"
+    }
+   ],
+   "engineFn": null,
+   "pageFn": "calculate() in roi-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "discounted cash flow, standard definition",
+    "section": "this page's cash-flow table"
+   },
+   "page": "roi-calculator.html",
+   "kind": "derived",
+   "scope": "roi-calculator.html",
+   "display": ">20",
+   "value": null,
+   "dependsOnInputs": [
+    "Revenue ($/kW-month)",
+    "Project life (yrs)"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "roi-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.roi.pi",
+   "calc": "roi",
+   "label": "Profitability index",
+   "unit": "ratio",
+   "formula": "(NPV + CAPEX) ÷ CAPEX",
+   "inputs": [
+    {
+     "id": "totalCapex",
+     "label": "Total CAPEX ($)"
+    },
+    {
+     "id": "itCapacity",
+     "label": "IT capacity (MW)"
+    },
+    {
+     "id": "pueValue",
+     "label": "PUE"
+    },
+    {
+     "id": "revenuePerKw",
+     "label": "Revenue ($/kW-month)"
+    },
+    {
+     "id": "occMax",
+     "label": "Stabilised occupancy (%)"
+    },
+    {
+     "id": "electricityRate",
+     "label": "Electricity ($/kWh)"
+    },
+    {
+     "id": "discountRate",
+     "label": "Discount rate (%)"
+    },
+    {
+     "id": "projectLife",
+     "label": "Project life (yrs)"
+    },
+    {
+     "id": "debtRatio",
+     "label": "Debt ratio (%)"
+    },
+    {
+     "id": "interestRate",
+     "label": "Interest (%)"
+    },
+    {
+     "id": "taxRate",
+     "label": "Tax rate (%)"
+    },
+    {
+     "id": "exitCapRate",
+     "label": "Exit cap rate (%)"
+    }
+   ],
+   "engineFn": null,
+   "pageFn": "calculate() in roi-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "discounted cash flow, standard definition",
+    "section": "this page's cash-flow table"
+   },
+   "page": "roi-calculator.html",
+   "kind": "derived",
+   "scope": "roi-calculator.html",
+   "display": "0.59x",
+   "value": 0.59,
+   "dependsOnInputs": [
+    "Total CAPEX ($)",
+    "IT capacity (MW)",
+    "PUE",
+    "Revenue ($/kW-month)",
+    "Stabilised occupancy (%)",
+    "Electricity ($/kWh)",
+    "Discount rate (%)",
+    "Project life (yrs)",
+    "Debt ratio (%)",
+    "Interest (%)",
+    "Tax rate (%)",
+    "Exit cap rate (%)"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "roi-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.roi.roic",
+   "calc": "roi",
+   "label": "Average ROIC",
+   "unit": "%",
+   "formula": "Σ net cash flow ÷ project life ÷ CAPEX × 100",
+   "inputs": [
+    {
+     "id": "totalCapex",
+     "label": "Total CAPEX ($)"
+    },
+    {
+     "id": "itCapacity",
+     "label": "IT capacity (MW)"
+    },
+    {
+     "id": "pueValue",
+     "label": "PUE"
+    },
+    {
+     "id": "revenuePerKw",
+     "label": "Revenue ($/kW-month)"
+    },
+    {
+     "id": "occMax",
+     "label": "Stabilised occupancy (%)"
+    },
+    {
+     "id": "electricityRate",
+     "label": "Electricity ($/kWh)"
+    },
+    {
+     "id": "discountRate",
+     "label": "Discount rate (%)"
+    },
+    {
+     "id": "projectLife",
+     "label": "Project life (yrs)"
+    },
+    {
+     "id": "debtRatio",
+     "label": "Debt ratio (%)"
+    },
+    {
+     "id": "interestRate",
+     "label": "Interest (%)"
+    },
+    {
+     "id": "taxRate",
+     "label": "Tax rate (%)"
+    },
+    {
+     "id": "exitCapRate",
+     "label": "Exit cap rate (%)"
+    }
+   ],
+   "engineFn": null,
+   "pageFn": "calculate() in roi-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "computed on this page"
+   },
+   "page": "roi-calculator.html",
+   "kind": "derived",
+   "scope": "roi-calculator.html",
+   "display": "17.7%",
+   "value": 17.7,
+   "dependsOnInputs": [
+    "Total CAPEX ($)",
+    "IT capacity (MW)",
+    "PUE",
+    "Revenue ($/kW-month)",
+    "Stabilised occupancy (%)",
+    "Electricity ($/kWh)",
+    "Project life (yrs)",
+    "Debt ratio (%)",
+    "Interest (%)",
+    "Tax rate (%)",
+    "Exit cap rate (%)"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "roi-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.roi.peak_noi",
+   "calc": "roi",
+   "label": "Peak NOI",
+   "unit": "USD/yr",
+   "formula": "max over years of (revenue − electricity − fixed and variable OPEX)",
+   "inputs": [
+    {
+     "id": "totalCapex",
+     "label": "Total CAPEX ($)"
+    },
+    {
+     "id": "itCapacity",
+     "label": "IT capacity (MW)"
+    },
+    {
+     "id": "pueValue",
+     "label": "PUE"
+    },
+    {
+     "id": "revenuePerKw",
+     "label": "Revenue ($/kW-month)"
+    },
+    {
+     "id": "occMax",
+     "label": "Stabilised occupancy (%)"
+    },
+    {
+     "id": "electricityRate",
+     "label": "Electricity ($/kWh)"
+    },
+    {
+     "id": "discountRate",
+     "label": "Discount rate (%)"
+    },
+    {
+     "id": "projectLife",
+     "label": "Project life (yrs)"
+    },
+    {
+     "id": "debtRatio",
+     "label": "Debt ratio (%)"
+    },
+    {
+     "id": "interestRate",
+     "label": "Interest (%)"
+    },
+    {
+     "id": "taxRate",
+     "label": "Tax rate (%)"
+    },
+    {
+     "id": "exitCapRate",
+     "label": "Exit cap rate (%)"
+    }
+   ],
+   "engineFn": null,
+   "pageFn": "calculate() in roi-calculator.html",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "computed on this page"
+   },
+   "page": "roi-calculator.html",
+   "kind": "derived",
+   "scope": "roi-calculator.html",
+   "display": "$15.6M",
+   "value": 15600000,
+   "dependsOnInputs": [
+    "IT capacity (MW)",
+    "PUE",
+    "Revenue ($/kW-month)",
+    "Stabilised occupancy (%)",
+    "Electricity ($/kWh)",
+    "Project life (yrs)"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "roi-calculator.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.carbon.total",
+   "calc": "carbon",
+   "label": "Annual carbon emissions",
+   "unit": "tCO2e/yr",
+   "formula": "Scope 1 + Scope 2 + Scope 3",
+   "inputs": [
+    {
+     "id": "itLoad",
+     "label": "IT load (kW)"
+    },
+    {
+     "id": "pueValue",
+     "label": "PUE"
+    },
+    {
+     "id": "countrySelect",
+     "label": "Country"
+    },
+    {
+     "id": "gridIntensity",
+     "label": "Grid intensity (tCO₂/MWh)"
+    },
+    {
+     "id": "renewablePct",
+     "label": "Renewable share (%)"
+    },
+    {
+     "id": "genType",
+     "label": "Generator fuel"
+    },
+    {
+     "id": "genHours",
+     "label": "Generator hours/yr"
+    },
+    {
+     "id": "coolingType",
+     "label": "Cooling type"
+    },
+    {
+     "id": "leakRate",
+     "label": "Refrigerant leak rate (%)"
+    }
+   ],
+   "engineFn": null,
+   "pageFn": "calculate() in carbon-footprint.html (Operational tab)",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "GHG Protocol Corporate Standard (2004) and Scope 2 Guidance (2015)",
+    "section": "scope boundaries"
+   },
+   "page": "carbon-footprint.html",
+   "kind": "derived",
+   "scope": "carbon-footprint.html",
+   "display": "5,668",
+   "value": 5668,
+   "dependsOnInputs": [
+    "IT load (kW)",
+    "PUE",
+    "Country",
+    "Renewable share (%)",
+    "Generator fuel",
+    "Generator hours/yr",
+    "Cooling type",
+    "Refrigerant leak rate (%)"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "carbon-footprint.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.carbon.scope1",
+   "calc": "carbon",
+   "label": "Scope 1",
+   "unit": "tCO2e/yr",
+   "formula": "generator fuel (IT kW × consumption × hours × fuel factor) + refrigerant leak (charge × leak rate × GWP)",
+   "inputs": [
+    {
+     "id": "itLoad",
+     "label": "IT load (kW)"
+    },
+    {
+     "id": "pueValue",
+     "label": "PUE"
+    },
+    {
+     "id": "countrySelect",
+     "label": "Country"
+    },
+    {
+     "id": "gridIntensity",
+     "label": "Grid intensity (tCO₂/MWh)"
+    },
+    {
+     "id": "renewablePct",
+     "label": "Renewable share (%)"
+    },
+    {
+     "id": "genType",
+     "label": "Generator fuel"
+    },
+    {
+     "id": "genHours",
+     "label": "Generator hours/yr"
+    },
+    {
+     "id": "coolingType",
+     "label": "Cooling type"
+    },
+    {
+     "id": "leakRate",
+     "label": "Refrigerant leak rate (%)"
+    }
+   ],
+   "engineFn": null,
+   "pageFn": "calculate() in carbon-footprint.html (Operational tab)",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "GHG Protocol Corporate Standard (2004) and Scope 2 Guidance (2015)",
+    "section": "scope boundaries"
+   },
+   "page": "carbon-footprint.html",
+   "kind": "derived",
+   "scope": "carbon-footprint.html",
+   "display": "192 t",
+   "value": 192,
+   "dependsOnInputs": [
+    "IT load (kW)",
+    "Generator fuel",
+    "Generator hours/yr",
+    "Cooling type",
+    "Refrigerant leak rate (%)"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "carbon-footprint.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.carbon.scope2",
+   "calc": "carbon",
+   "label": "Scope 2 (location-based)",
+   "unit": "tCO2e/yr",
+   "formula": "IT kW × PUE × 8,760 h ÷ 1,000 × grid intensity × (1 − renewable share)",
+   "inputs": [
+    {
+     "id": "itLoad",
+     "label": "IT load (kW)"
+    },
+    {
+     "id": "pueValue",
+     "label": "PUE"
+    },
+    {
+     "id": "countrySelect",
+     "label": "Country"
+    },
+    {
+     "id": "gridIntensity",
+     "label": "Grid intensity (tCO₂/MWh)"
+    },
+    {
+     "id": "renewablePct",
+     "label": "Renewable share (%)"
+    },
+    {
+     "id": "genType",
+     "label": "Generator fuel"
+    },
+    {
+     "id": "genHours",
+     "label": "Generator hours/yr"
+    },
+    {
+     "id": "coolingType",
+     "label": "Cooling type"
+    },
+    {
+     "id": "leakRate",
+     "label": "Refrigerant leak rate (%)"
+    }
+   ],
+   "engineFn": null,
+   "pageFn": "calculate() in carbon-footprint.html (Operational tab)",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "GHG Protocol Corporate Standard (2004) and Scope 2 Guidance (2015)",
+    "section": "scope boundaries"
+   },
+   "page": "carbon-footprint.html",
+   "kind": "derived",
+   "scope": "carbon-footprint.html",
+   "display": "5,326 t",
+   "value": 5326,
+   "dependsOnInputs": [
+    "IT load (kW)",
+    "PUE",
+    "Country",
+    "Renewable share (%)"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "carbon-footprint.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.carbon.scope3",
+   "calc": "carbon",
+   "label": "Scope 3 (upstream, rough)",
+   "unit": "tCO2e/yr",
+   "formula": "IT kW × 0.15 tCO₂e",
+   "inputs": [
+    {
+     "id": "itLoad",
+     "label": "IT load (kW)"
+    },
+    {
+     "id": "pueValue",
+     "label": "PUE"
+    },
+    {
+     "id": "countrySelect",
+     "label": "Country"
+    },
+    {
+     "id": "gridIntensity",
+     "label": "Grid intensity (tCO₂/MWh)"
+    },
+    {
+     "id": "renewablePct",
+     "label": "Renewable share (%)"
+    },
+    {
+     "id": "genType",
+     "label": "Generator fuel"
+    },
+    {
+     "id": "genHours",
+     "label": "Generator hours/yr"
+    },
+    {
+     "id": "coolingType",
+     "label": "Cooling type"
+    },
+    {
+     "id": "leakRate",
+     "label": "Refrigerant leak rate (%)"
+    }
+   ],
+   "engineFn": null,
+   "pageFn": "calculate() in carbon-footprint.html (Operational tab)",
+   "evidenceClass": "ASSUMED",
+   "source": {
+    "ref": "GHG Protocol Corporate Standard (2004) and Scope 2 Guidance (2015)",
+    "section": "scope boundaries",
+    "method": "0.15 tCO₂e per kW IT is a page constant labelled a rough estimate; not sourced."
+   },
+   "page": "carbon-footprint.html",
+   "kind": "derived",
+   "scope": "carbon-footprint.html",
+   "display": "150 t",
+   "value": 150,
+   "dependsOnInputs": [
+    "IT load (kW)"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "carbon-footprint.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.carbon.intensity",
+   "calc": "carbon",
+   "label": "Carbon intensity",
+   "unit": "kgCO2e/kWh IT",
+   "formula": "total emissions × 1,000 ÷ (IT kW × 8,760 h)",
+   "inputs": [
+    {
+     "id": "itLoad",
+     "label": "IT load (kW)"
+    },
+    {
+     "id": "pueValue",
+     "label": "PUE"
+    },
+    {
+     "id": "countrySelect",
+     "label": "Country"
+    },
+    {
+     "id": "gridIntensity",
+     "label": "Grid intensity (tCO₂/MWh)"
+    },
+    {
+     "id": "renewablePct",
+     "label": "Renewable share (%)"
+    },
+    {
+     "id": "genType",
+     "label": "Generator fuel"
+    },
+    {
+     "id": "genHours",
+     "label": "Generator hours/yr"
+    },
+    {
+     "id": "coolingType",
+     "label": "Cooling type"
+    },
+    {
+     "id": "leakRate",
+     "label": "Refrigerant leak rate (%)"
+    }
+   ],
+   "engineFn": null,
+   "pageFn": "calculate() in carbon-footprint.html (Operational tab)",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "computed on this page"
+   },
+   "page": "carbon-footprint.html",
+   "kind": "derived",
+   "scope": "carbon-footprint.html",
+   "display": "0.647",
+   "value": 0.647,
+   "dependsOnInputs": [
+    "PUE",
+    "Country",
+    "Renewable share (%)",
+    "Generator fuel",
+    "Generator hours/yr",
+    "Cooling type"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "carbon-footprint.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  },
+  {
+   "id": "calc.carbon.energy",
+   "calc": "carbon",
+   "label": "Annual energy",
+   "unit": "MWh/yr",
+   "formula": "IT kW × PUE × 8,760 h ÷ 1,000",
+   "inputs": [
+    {
+     "id": "itLoad",
+     "label": "IT load (kW)"
+    },
+    {
+     "id": "pueValue",
+     "label": "PUE"
+    },
+    {
+     "id": "countrySelect",
+     "label": "Country"
+    },
+    {
+     "id": "gridIntensity",
+     "label": "Grid intensity (tCO₂/MWh)"
+    },
+    {
+     "id": "renewablePct",
+     "label": "Renewable share (%)"
+    },
+    {
+     "id": "genType",
+     "label": "Generator fuel"
+    },
+    {
+     "id": "genHours",
+     "label": "Generator hours/yr"
+    },
+    {
+     "id": "coolingType",
+     "label": "Cooling type"
+    },
+    {
+     "id": "leakRate",
+     "label": "Refrigerant leak rate (%)"
+    }
+   ],
+   "engineFn": null,
+   "pageFn": "calculate() in carbon-footprint.html (Operational tab)",
+   "evidenceClass": "DERIVED",
+   "source": {
+    "ref": "computed on this page"
+   },
+   "page": "carbon-footprint.html",
+   "kind": "derived",
+   "scope": "carbon-footprint.html",
+   "display": "13,315",
+   "value": 13315,
+   "dependsOnInputs": [
+    "IT load (kW)",
+    "PUE"
+   ],
+   "notMovable": [],
+   "consumers": [
+    {
+     "page": "carbon-footprint.html"
+    }
+   ],
+   "tests": [
+    "tools/test-calc-parameter-registry.mjs"
+   ]
+  }
+ ]
+}

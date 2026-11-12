@@ -272,6 +272,7 @@ gate "article 30 agent calculators — worked examples, compounding reliability,
 gate "Second Brain graph — every journal page has a node, no dead URL or orphan" python3 "Apps/second brain/sync-graph.py" --strict
 gate "generator freshness — every generated artefact matches a fresh build" python3 tools/test-generator-freshness.py
 gate "RZEngine — worked examples, data invariants, provenance; tracker + manual + PUE pages read the engine" node tools/test-rz-engine.mjs
+gate "RZEngine ESM build — dist/rz-engine.mjs fresh, same surface + data, every worked-example call replays deep-equal (P19)" node tools/test-engine-esm.mjs
 gate "TIA-942 manual — every count and the worked score follow the checklist items" node tools/test-tia942-manual.mjs
 gate "standards claims — no page prints a claim already proven wrong (IEEE 519 row, NFPA 2001 time, ASHRAE RH, Uptime Tier figures, GWP basis)" node tools/test-standard-claims.mjs
 gate "hub tools render — TIA checklist draws, every PLN plant on the map, fire checklist keeps ticks, tracker + PUE read the engine" node tools/test-hub-tools.mjs
@@ -300,6 +301,7 @@ gate "Manual contents (K26) — every long manual has an On-this-page rail (1440
 gate "Saved-scenario Open routes — every calculator id opens its own page; unknown ids never navigate (X2)" node tools/test-scenario-open-routes.mjs
 gate "Calculator inline handlers — every onclick on the 11 calculators calls a function that exists (X3)" node tools/test-calc-onclick-handlers.mjs
 gate "Calculator registry — data/calculators.json pages, fields and result selectors match the 11 rendered calculators (F1)" node tools/test-calculator-registry.mjs
+gate "Calculator basis (P10) — 40 headline results on 6 calculators hooked, registry = fresh render at defaults, inputs measured, drawer by keyboard" node tools/test-calc-parameter-registry.mjs
 gate "Embedded compute — hidden-iframe loop: fixture 2x, queue of one, refusals, timeout, real calculator, ?embed flag (F2)" node tools/test-embed-compute.mjs
 gate "Scenario share links — #rzs= round trip on 11 calculators, schema parity, login-field filter, corrupted link, precedence (P02)" node tools/test-scenario-share-links.mjs
 gate "Register CSS — every page that declares data-rz-register loads a stylesheet carrying that register (P23)" node tools/test-register-css.mjs

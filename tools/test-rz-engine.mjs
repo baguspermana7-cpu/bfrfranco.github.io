@@ -12,7 +12,8 @@
  *
  * This is a SHIP GATE — see CLAUDE.md. Keep it green on every engine change.
  */
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
+import v8 from 'node:v8';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import vm from 'node:vm';
@@ -35,7 +36,37 @@ function loadEngine() {
     const ctx = vm.createContext(win);
     vm.runInContext(src, ctx, { filename: 'rz-engine.js' });
     if (!win.RZEngine) throw new Error('RZEngine did not attach to window');
+    if (process.env.RZ_ENGINE_RECORD) recordCalls(win.RZEngine, process.env.RZ_ENGINE_RECORD);
     return win.RZEngine;
+}
+
+/* ── RZ_ENGINE_RECORD=<file>: record every outermost model call (args + result) so
+ *    tools/test-engine-esm.mjs can replay the same calls on dist/rz-engine.mjs (PRD-P19).
+ *    Calls whose args or result cannot be structured-cloned (functions) are counted, not kept. ── */
+function recordCalls(E, file) {
+    const calls = []; let depth = 0, skipped = 0;
+    const clone = (v) => v8.deserialize(v8.serialize(v));
+    for (const m of Object.keys(E.models)) {
+        const ns = E.models[m];
+        if (!ns || typeof ns !== 'object') continue;
+        for (const f of Object.keys(ns)) {
+            const orig = ns[f];
+            if (typeof orig !== 'function') continue;
+            ns[f] = function () {
+                const args = Array.prototype.slice.call(arguments);
+                if (depth > 0) return orig.apply(this, args);
+                let argCopy = null;
+                try { argCopy = clone(args); } catch (e) { argCopy = null; }
+                depth++;
+                let res;
+                try { res = orig.apply(this, args); } finally { depth--; }
+                try { if (argCopy) calls.push({ m, f, args: argCopy, result: clone(res) }); else skipped++; }
+                catch (e) { skipped++; }
+                return res;
+            };
+        }
+    }
+    process.on('exit', () => writeFileSync(file, v8.serialize({ calls, skipped })));
 }
 
 /* ── Tiny assertion framework ── */

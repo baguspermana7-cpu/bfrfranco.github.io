@@ -191,6 +191,44 @@
             + 'font:inherit;text-decoration:underline dotted">' + esc(label) + '</button>';
     }
 
+    /* v3.52.0 (PRD-P10) — calculator records. A calculator recomputes on every input change, so the registry value
+       is only the value at the page's defaults; the drawer shows the live value from the hooked cell and the live
+       inputs read from the page at open time, and says whether the engine or the page did the arithmetic. */
+    function inputNow(spec) {
+        var el = spec.name ? document.querySelector('input[name="' + spec.name + '"]:checked') : document.getElementById(spec.id);
+        if (!el) return '—';
+        if (el.tagName === 'SELECT') {
+            var o = el.options[el.selectedIndex];
+            return o ? o.textContent.replace(/\s+/g, ' ').trim() : el.value;
+        }
+        if (el.type === 'radio') {
+            var lab = el.id && document.querySelector('label[for="' + el.id + '"]');
+            if (!lab && el.closest) lab = el.closest('label');
+            return lab ? lab.textContent.replace(/\s+/g, ' ').trim() : el.value;
+        }
+        if (el.type === 'checkbox') return el.checked ? 'on' : 'off';
+        return el.value;
+    }
+    function calcRows(p) {
+        var hook = document.querySelector('[data-basis-param="' + p.id + '"]');
+        var now = hook ? hook.textContent.replace(/\s+/g, ' ').trim() : '';
+        var html = row('Value now', '<b style="color:#fff">' + esc(now || '—') + '</b>'
+            + (p.unit ? ' <span style="color:#8fa2b8">' + esc(p.unit) + '</span>' : ''));
+        html += row('At defaults', esc(p.display) + ' <span style="color:#8fa2b8">(the registry value; checked against '
+            + 'the page by tools/test-calc-parameter-registry.mjs)</span>');
+        if (p.inputs && p.inputs.length) {
+            var list = '';
+            for (var i = 0; i < p.inputs.length; i++) {
+                list += '<div>' + esc(p.inputs[i].label) + ': <span style="color:#fff">' + esc(inputNow(p.inputs[i])) + '</span></div>';
+            }
+            html += row('Inputs now', list);
+        }
+        html += row('Computed by', p.engineFn
+            ? esc(p.engineFn) + ' <span style="color:#8fa2b8">(called from ' + esc(p.pageFn || 'the page') + ')</span>'
+            : esc(p.pageFn || 'the page') + ' <span style="color:#d99a2b">(page arithmetic, not in RZEngine)</span>');
+        return html;
+    }
+
     /* v2.1.0 — the record HTML has ONE renderer. The centre modal (HTML value cells) and the
        right-side inspector (SVG diagram marks) both call this; only the chrome differs. */
     function renderRecord(id) {
@@ -200,7 +238,7 @@
             return '<h2 id="rz-basis-drawer-title" style="margin:0 0 8px;font-size:16px">'
                 + 'Basis unavailable</h2><p style="font-size:13px;color:#c9d4e2">No registry entry for '
                 + '<code>' + esc(id) + '</code>. Either the parameter is not registered, or '
-                + '<code>js/conv-parameters.js</code> did not load. Nothing is being guessed here.</p>';
+                + 'the registry (<code>' + esc(REGISTRY_GLOBAL) + '</code>) did not load. Nothing is being guessed here.</p>';
         }
         var evidence = p.evidenceClass || 'UNAVAILABLE';
         var html = '<div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:6px">'
@@ -211,7 +249,8 @@
             + evidenceInfo(evidence).color + '">' + esc(evidence) + '</span></div>'
             + '<div style="font-size:11.5px;color:#8fa2b8;margin-bottom:12px">' + esc(p.id) + '</div>';
 
-        html += row('Value', '<b style="color:#fff">' + esc(fmt(p.value, p.unit)) + '</b>');
+        if (p.calc) html += calcRows(p);
+        else html += row('Value', '<b style="color:#fff">' + esc(fmt(p.value, p.unit)) + '</b>');
         html += row('Kind', esc(p.kind) + (p.kind === 'authored'
             ? ' <span style="color:#8fa2b8">(a constant written into the engine)</span>'
             : ' <span style="color:#8fa2b8">(computed, not stored)</span>'));
@@ -227,13 +266,17 @@
         if (p.dependsOnInputs && p.dependsOnInputs.length) {
             html += row('Measured inputs',
                 '<span style="color:#c9d4e2">' + esc(p.dependsOnInputs.join(', ')) + '</span>'
-                + '<div style="color:#8fa2b8;font-size:11px;margin-top:4px">Obtained by recomputing '
-                + 'the engine once per input with only that input changed. These edges are measured, '
-                + 'not declared.</div>');
+                + '<div style="color:#8fa2b8;font-size:11px;margin-top:4px">' + (p.calc
+                    ? 'Obtained by moving each input by 10 % (a list: the next option) on the page at its defaults '
+                      + 'and re-reading this value. Inputs that did not move it at the displayed precision are not listed.'
+                    : 'Obtained by recomputing the engine once per input with only that input changed.')
+                + ' These edges are measured, not declared.</div>');
         }
 
-        html += row('Evidence', '<span style="color:#c9d4e2">'
-            + esc(evidenceInfo(evidence).note) + '</span>');
+        /* a calculator value computed by the page, not the engine: DERIVED's generic note says "by the engine" */
+        var note = (p.calc && !p.engineFn && evidence === 'DERIVED')
+            ? 'Computed by this page from its inputs; nothing typed.' : evidenceInfo(evidence).note;
+        html += row('Evidence', '<span style="color:#c9d4e2">' + esc(note) + '</span>');
         if (p.source) {
             var src = esc(p.source.ref || '');
             if (p.source.section) src += ' &middot; ' + esc(p.source.section);
@@ -286,7 +329,10 @@
         host.style.display = 'flex';
         host.setAttribute('aria-hidden', 'false');
         var closeBtn = host.querySelector('[data-basis-close]');
-        if (closeBtn && closeBtn.focus) closeBtn.focus();
+        /* preventScroll: a long record must open at its title, not scrolled to the Close button */
+        if (closeBtn && closeBtn.focus) closeBtn.focus({ preventScroll: true });
+        var panel = document.getElementById('rz-basis-drawer-panel');
+        if (panel) panel.scrollTop = 0;
     }
 
     document.addEventListener('click', function (event) {

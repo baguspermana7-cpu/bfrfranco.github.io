@@ -196,6 +196,34 @@ reading, an identity over marked parameters). **A number that is neither hooked 
 for nothing on the AI page. The gate measures with `--settle` so every ticker has fired: a hook whose
 value a die roll overwrites shows up as MISMATCH, which is the live-page form of Rule 2.
 
+**On the calculators (PRD-P10 stage 1, v3.52.0).** The calculators recompute on every input, so their registry
+holds the value **at the page's defaults** and the drawer shows that next to the live cell. The six project
+calculators (capex, opex, tco, roi, carbon, pue) carry 40 headline hooks `calc.<calc>.<key>`:
+
+- `data/calc-parameters.curated.json` is written by hand: label, unit, formula, the declared inputs (DOM ids or a
+  radio group name), the engine function or the page function that does the arithmetic, evidence class, source.
+- `tools/build-calc-parameter-registry.mjs` renders each page at its defaults, reads every hooked cell (`display`,
+  `value`) and moves each declared input on its own (+10 %; a list or radio group to the next option). The inputs
+  that change the cell become `dependsOnInputs`: **measured, never declared**. Output: `data/calc-parameters.json`
+  and the twin `js/calc-parameters.js` (`RZ_CALC_PARAMETERS`).
+- The drawer (`js/rz-basis-drawer.js` with `data-rz-registry="RZ_CALC_PARAMETERS"`) shows *Value now* (the cell),
+  *At defaults* (the registry), *Inputs now* (read from the page when it opens) and *Computed by*: the engine
+  function, or the page function marked "page arithmetic, not in RZEngine". 25 of the 40 values are page
+  arithmetic today; the record names the function so the consolidation is visible, not hidden.
+- `js/rz-calc-basis.js` grants the drawer authority only while the registry's `engineDataVersion` equals the
+  loaded `RZEngine.data.version`, draws the evidence dot, names the focused cell with its value, and makes hooks
+  inert when the registry did not load.
+- A cell whose meaning changes with page state carries a hook only in the state the record describes
+  (carbon-footprint.html: the Operational tab only).
+- A value the page hides from a signed-out visitor (`cost-value-hidden`) is never shown through the drawer: while the
+  class is on, `rz-calc-basis.js` parks the hook in `data-rz-basis-gated` (no mark, no tab stop, no drawer) and
+  restores it when the page reveals the value.
+- Gate `tools/test-calc-parameter-registry.mjs`: schema, twin, engine functions exist and are called, every record
+  has a measured input, a fresh render equals the registry (parity), hooks per page = records (coverage, headline
+  results only), Enter/Esc keyboard path, live inputs, authority and missing-registry fallbacks. RED: a removed
+  hook fails coverage; a changed page default fails parity.
+- Not covered (stage 2, not started): every other numeral on these pages, and the other five calculators.
+
 ## Acceptance tests (CI-gateable)
 
 These are the reviewer's acceptance tests adopted as the validation

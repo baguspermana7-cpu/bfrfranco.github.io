@@ -175,7 +175,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha384-iw3OoTErCYJJB9mCa8LNS2hbsQ7M3C0EpIsO/H5+EGAkPGc6rk+V8i04oW/K5xq0" crossorigin="anonymous">
-    <script src="js/rz-version.js?v=20261112-3a5b9b08" defer></script>
+    <script src="js/rz-version.js?v=20261112-771298f2" defer></script>
     <script src="js/rz-calc-utils.js?v=20260920-ef3425ae" defer></script>
     <script src="js/rz-explain-db.js?v=20261111-a4d62e38" defer></script>
     <script src="js/rz-explain.js?v=20261103-f581e6ac" defer></script>
@@ -815,15 +815,15 @@
                     <div class="res-head"><h2>Results</h2><span class="basis">total = Σ system cost + soft costs + contingency</span></div>
                     <div class="rz-calc-validation tool-valid" id="capexValidation" role="alert" aria-live="polite" hidden></div>
                     <div class="res-group"><h3>Headline</h3><div data-rz-fact-list>
-                        <div class="metric-box is-key"><div class="metric-label">Total CAPEX</div><div class="metric-value total-value" id="totalCost">$12,500,000</div><div class="metric-sub" id="advInfoBadge" style="display:none;"></div></div>
+                        <div class="metric-box is-key"><div class="metric-label">Total CAPEX</div><div class="metric-value total-value" id="totalCost" data-basis-param="calc.capex.total" tabindex="0" role="button" aria-label="Basis for Total CAPEX">$12,500,000</div><div class="metric-sub" id="advInfoBadge" style="display:none;"></div></div>
                     </div></div>
                     <p id="savedIndicator" class="tool-note" style="display:none;">Scenario A saved. Change the inputs to build scenario B; the comparison is under the results.</p>
                     <div class="res-group"><h3>Per kW, tier and energy</h3><div data-rz-fact-list>
-                        <div class="metric-box is-gated" id="perKwSection" onclick="if(!isPremiumUser)handlePremiumTab()"><div class="metric-label">Cost per kW of IT load</div><div class="metric-value per-kw-value" id="perKwCost">$12,500/kW</div><div class="metric-sub"><span id="perKwGateBadge" class="gated-badge" onclick="event.stopPropagation();handlePremiumTab()">Sign in to see</span></div></div>
+                        <div class="metric-box is-gated" id="perKwSection" onclick="if(!isPremiumUser)handlePremiumTab()"><div class="metric-label">Cost per kW of IT load</div><div class="metric-value per-kw-value" id="perKwCost" data-basis-param="calc.capex.per_kw" tabindex="0" role="button" aria-label="Basis for CAPEX per kW">$12,500/kW</div><div class="metric-sub"><span id="perKwGateBadge" class="gated-badge" onclick="event.stopPropagation();handlePremiumTab()">Sign in to see</span></div></div>
                         <div class="metric-box"><div class="metric-label" data-explain="tier">Tier classification</div><div class="metric-value" id="tierClass">Tier III</div></div>
                         <div class="metric-box"><div class="metric-label" data-explain="pue">Estimated PUE</div><div class="metric-value" id="pueValue">1.45</div></div>
                         <div class="metric-box"><div class="metric-label" data-explain="uptime">Legacy tier availability</div><div class="metric-value" id="uptimeValue">99.982%</div></div>
-                        <div class="metric-box is-gated" id="energySection" onclick="if(!isPremiumUser)handlePremiumTab()"><div class="metric-label" data-explain="annual-energy">Annual energy cost</div><div class="metric-value" id="energyCost">$1.2M</div><div class="metric-sub"><span id="energyGateBadge" class="gated-badge" onclick="event.stopPropagation();handlePremiumTab()">Sign in to see</span></div></div>
+                        <div class="metric-box is-gated" id="energySection" onclick="if(!isPremiumUser)handlePremiumTab()"><div class="metric-label" data-explain="annual-energy">Annual energy cost</div><div class="metric-value" id="energyCost" data-basis-param="calc.capex.energy_cost" tabindex="0" role="button" aria-label="Basis for Annual energy cost">$1.2M</div><div class="metric-sub"><span id="energyGateBadge" class="gated-badge" onclick="event.stopPropagation();handlePremiumTab()">Sign in to see</span></div></div>
                     </div></div>
                     <div class="res-group"><h3>Cost by system</h3><div class="cost-breakdown" id="costBreakdown"></div></div>
                     <div class="res-group" id="spacePanel" style="display:none;"><h3>Rack density and white space</h3><div id="spaceGrid" class="kv-list" data-rz-fact-list></div></div>
@@ -923,6 +923,12 @@
         // (rz-engine.js DATA.capexDetail, shared with DCMOC). This page keeps only
         // PRESENTATION metadata; the computation delegates to RZEngine.models.capex.detailed
         // (golden-parity locked: tools/fixtures/capex-golden.json).
+        /* P10: the six largest system blocks carry a basis hook (calc.capex.cost.<key> in data/calc-parameters.json). */
+        const CAPEX_BASIS = { building: 'Building & civil', electrical: 'Electrical (MV/LV)', ups: 'UPS systems',
+            generator: 'Generator & fuel', cooling: 'Cooling systems', network: 'Network infrastructure' };
+        function capexBasisAttr(key) {
+            return CAPEX_BASIS[key] ? ' data-basis-param="calc.capex.cost.' + key + '" tabindex="0" role="button" aria-label="Basis for ' + CAPEX_BASIS[key] + '"' : '';
+        }
         const costMeta = {
             building: { label: 'Building & Civil', icon: 'fa-building', color: '#64748b' },
             seismic: { label: 'Seismic Protection', icon: 'fa-mountain', color: '#78716c' },
@@ -1401,7 +1407,7 @@
                         <div class="cost-bar-container">
                             <div class="cost-bar" style="width: ${barWidth}%;"></div>
                         </div>
-                        <span class="cost-value">${formatCurrency(cost)}</span>
+                        <span class="cost-value"${capexBasisAttr(key)}>${formatCurrency(cost)}</span>
                         <span class="cost-percent">${percent}%</span>
                     </div>`;
             }
@@ -3442,6 +3448,9 @@
 <script src="js/rz-config.js?v=20260920-eed056f9"></script>
 <script src="js/rz-project.js?v=20261111-4db75da3"></script>
 <script src="js/rz-scenario.js?v=20261111-01011425"></script>
+<script src="js/calc-parameters.js?v=20261112-6c42cebc" defer></script>
+<script src="js/rz-basis-drawer.js?v=20261112-b6a9180c" data-rz-registry="RZ_CALC_PARAMETERS" defer></script>
+<script src="js/rz-calc-basis.js?v=20261112-4913dcb7" defer></script>
 <script src="js/rz-manual-links.js?v=20261111-33875d8f" defer></script>
 <script src="js/rz-compare.js?v=20261111-a1ef3c69"></script>
 <script type="module" src="js/rz-supabase.js?v=20261111-3c801534"></script>

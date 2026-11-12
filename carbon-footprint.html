@@ -166,7 +166,7 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'"><noscript><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"></noscript>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha384-iw3OoTErCYJJB9mCa8LNS2hbsQ7M3C0EpIsO/H5+EGAkPGc6rk+V8i04oW/K5xq0" crossorigin="anonymous">
     <script src="js/vendor/chart.umd.min.js?v=20261110-74401d73" defer></script>
-    <script src="js/rz-version.js?v=20261112-3a5b9b08" defer></script>
+    <script src="js/rz-version.js?v=20261112-771298f2" defer></script>
     <script src="js/rz-calc-utils.js?v=20260920-ef3425ae" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
@@ -1233,6 +1233,24 @@
     // ══════════════════════════════════════════════════════════════
     // 12. MAIN CALCULATE FUNCTION
     // ══════════════════════════════════════════════════════════════
+    /* P10: the six headline cells carry a basis hook only on the Operational tab; the other tabs reuse the same cells
+       for different quantities (lifecycle, budget) that are not in the registry yet. */
+    var CF_BASIS = { primaryValue: ['calc.carbon.total', 'Annual carbon emissions'], metScope1: ['calc.carbon.scope1', 'Scope 1'],
+        metScope2: ['calc.carbon.scope2', 'Scope 2 (location-based)'], metScope3: ['calc.carbon.scope3', 'Scope 3 (upstream, rough)'],
+        metIntensity: ['calc.carbon.intensity', 'Carbon intensity'], metEnergy: ['calc.carbon.energy', 'Annual energy'] };
+    function cfBasis(on) {
+        Object.keys(CF_BASIS).forEach(function (k) {
+            var el = document.getElementById(k);
+            if (!el) return;
+            if (on) {
+                el.setAttribute('data-basis-param', CF_BASIS[k][0]); el.setAttribute('tabindex', '0');
+                el.setAttribute('role', 'button'); el.setAttribute('aria-label', 'Basis for ' + CF_BASIS[k][1]);
+            } else {
+                ['data-basis-param', 'tabindex', 'role', 'aria-label'].forEach(function (a) { el.removeAttribute(a); });
+            }
+        });
+    }
+
     function calculate() {
         // Production hardening: non-blocking input feedback (calc is defensive with
         // defaults, so we flag out-of-range inputs rather than gate the result).
@@ -1425,6 +1443,7 @@
         var creditMultiplier = creditStrategy === 'none' ? 0 : creditStrategy === 'voluntary' ? 0.5 : creditStrategy === 'compliance' ? 0.8 : 1.0;
 
         // === UPDATE UI ===
+        cfBasis(currentTab === 'operational');
         if (currentTab === 'operational') {
             document.getElementById('primaryValue').textContent = Math.round(totalEmissions).toLocaleString();
             document.getElementById('primaryUnit').textContent = 'tCO\u2082e/yr';
@@ -2142,6 +2161,9 @@ var _cap = {
 <script src="js/rz-config.js?v=20260920-eed056f9"></script>
 <script src="js/rz-project.js?v=20261111-4db75da3"></script>
 <script src="js/rz-scenario.js?v=20261111-01011425"></script>
+<script src="js/calc-parameters.js?v=20261112-6c42cebc" defer></script>
+<script src="js/rz-basis-drawer.js?v=20261112-b6a9180c" data-rz-registry="RZ_CALC_PARAMETERS" defer></script>
+<script src="js/rz-calc-basis.js?v=20261112-4913dcb7" defer></script>
 <script src="js/rz-manual-links.js?v=20261111-33875d8f" defer></script>
 <script src="js/rz-compare.js?v=20261111-a1ef3c69"></script>
 <script src="js/rz-embed-compute.js?v=20261111-7167e3b8"></script><!-- P07: sensitivity panel (replaces a copied-formula chart) -->
