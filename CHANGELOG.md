@@ -11,6 +11,48 @@ release sections rather than semver.
 
 ---
 
+## v3.50.0 — 2026-11-12 — Homepage colour live, reliability counts redundancy correctly, motion mock
+
+Owner requests R119 (approved 2026-11-12), R120 (reliability, option a) and R121 (motion, mock).
+
+### Changed
+- **Homepage colour (R119), approved from the mock.** One page-wide field replaces the per-section grounds and light
+  layers. Blue appears only as light on objects and as the data bars, and orange is the 10 % accent. Orange's share of
+  rendered pixels fell from 15.5 % to 2.4 % (dark) and from 41.4 % to 9.2 % (light). Case and headline figures read in
+  ink, and the Contact button is ink. `css/rz-index-color.css` is loaded last by index.html, and the mock page is
+  removed.
+- **Reliability: N+1 is no longer 2N.** The engine and DCMOC treated both as "1 of 2". Now
+  `models.reliability.redundantGroup(a, k, config)` uses k, the number of units the load needs (from the engine's
+  equipment counts):
+  - N+1 = k of k+1
+  - 2N = two independent systems of k
+  - 2N+1 = two systems of k of k+1
+
+  This follows NIST e-Handbook 8.1.8.4. Common cause is now the IEC 61508 β-factor per redundant group. The old 5 %
+  blend of a single path through every unit grew to 408 min/yr at 20 MW once k came from the load. Results at N+1:
+  10.44 → 10.48 min/yr at 1 MW, and 24.93 min/yr at 20 MW. The Reliability page, the RAM tab, the dashboard and the
+  value trace all use one chain, and the trace's copy is gone. The what-if row's 2N is now two systems, not k of 2k.
+
+### Added
+- **Homepage motion mock (R121)**, `index-motion-mock.html` (noindex), built with Lenis 1.3.27 and GSAP 3.15.0
+  (ScrollTrigger, SplitText):
+  - the name rises word by word
+  - sections reveal once
+  - the portrait has a slight depth drift
+  - smooth scroll on a mouse only
+  - nothing is pinned, and nothing on screen is hidden again
+  - reduced motion and no-JS show the final state
+- Gap file `documentation/product-transformation/gaps/dcmoc-reliability.md` (reference: NIST/SEMATECH e-Handbook).
+
+### Gates
+- `tools/test-reliability-reference.mjs`: red on 5 laws on v3.48, green 12/12. DCMOC trace parity 214/214.
+- `tools/test-index-motion.mjs` T1–T8: red on index.html, green on the mock. T8 is red when the first-paint check is
+  removed.
+- `test-index-depth` D3/D7/D12/D16 and `test-index-micro` G1/M5 rewritten to R119: red on the old index (9 + 5),
+  green on the new one.
+
+---
+
 ## v3.49.0 — 2026-11-12 — Tier Advisor sizes spares, RFS gaps become Cx issues, and the extra text goes to tooltips
 
 Product transformation, Wave 3: P13 parts A and B (lifecycle hand-offs).
