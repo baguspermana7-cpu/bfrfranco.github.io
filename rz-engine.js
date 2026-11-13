@@ -5986,7 +5986,10 @@
                 apac: { internalRegion: 'sea', multiplier: 0.85 },
                 middle_east: { internalRegion: 'mena', multiplier: 0.90 }
             },
-            cityAnchorPerW: 4.65,   /* locMult = city.perW / cityAnchorPerW */
+            /* R120: the spec a city's all-in $/W describes (ASSUMED: a typical Tier III colocation build in the
+             * Turner & Townsend / Cushman & Wakefield cost guides). At this spec the result equals the city figure. */
+            cityBasisSpec: { rackType: 'medium', redundancy: 'n1', coolingType: 'air', buildingType: 'purpose', seismicZone: 'zone2',
+                fireType: 'novec', alarmType: 'addressable', upsType: 'modular', genType: 'diesel', fuelHours: 48 },
             cityCapexPerW: {
                 silicon_valley: { perW: 13.30, region: 'usa', label: 'Silicon Valley' },
                 new_jersey: { perW: 12.90, region: 'usa', label: 'New Jersey / NYC' },
@@ -11573,12 +11576,27 @@
                     var effectiveRegion = regionDefault.internalRegion;
                     var fuelMult = 1 + (fuelHours - 24) * CD.fuelMultPerHourOver24;
 
-                    var cityLabel = '';
+                    var cityLabel = '', targetPerW, targetBasis;
                     if (inp.city && inp.city !== 'none' && CD.cityCapexPerW[inp.city]) {
                         var city = CD.cityCapexPerW[inp.city];
                         cityLabel = city.label;
                         effectiveRegion = city.region;
-                        locMult = city.perW / CD.cityAnchorPerW;
+                        targetPerW = city.perW; targetBasis = 'city';
+                    } else {
+                        /* no city: the median $/W of the table's cities in this region (derived, no new literal) */
+                        var reg = Object.keys(CD.cityCapexPerW).map(function (k) { return CD.cityCapexPerW[k]; })
+                            .filter(function (c) { return c.region === effectiveRegion; }).map(function (c) { return c.perW; }).sort(function (x, y) { return x - y; });
+                        targetPerW = reg.length ? reg[reg.length >> 1] : null; targetBasis = 'region median';
+                    }
+                    /* R120 (O-R120-CAPEX, option a): a city's $/W is the all-in total of the BASIS spec (CD.cityBasisSpec).
+                     * Calibrate: price the basis spec at this size and place with locMult 1, then scale so it lands on the
+                     * city figure; every other spec moves relative to it. Was locMult = perW / 4.65, which stacked the
+                     * all-in city figure on top of the spec multipliers (+35 % at the basis spec). */
+                    if (inp._locMult != null) locMult = inp._locMult;
+                    else if (targetPerW) {
+                        var basisTotal = RZEngine.models.capex.detailed(Object.assign({}, CD.cityBasisSpec,
+                            { itLoadKw: itLoad, location: location, city: inp.city, _locMult: 1 })).total;
+                        locMult = (targetPerW * 1000 * itLoad) / basisTotal;
                     }
 
                     var yearMult = 1.0, yearLabel = '2025';
@@ -12192,6 +12210,27 @@
                 costPerMwYear: function (totalTco, mw, years) {
                     if (!mw || mw <= 0 || !years || years <= 0) return 0;
                     return Math.round((totalTco || 0) / mw / years);
+                },
+
+                /** Capital recovery factor d(1+d)^L / ((1+d)^L − 1): the share of a capital cost paid each year over L years
+                 *  at real discount rate d (Koomey et al., Uptime TUI3011B Table 1, notes 32–34). d = 0 gives 1/L. (R120) */
+                crf: function (rate, lifeYears) {
+                    var d = +rate || 0, L = +lifeYears || 0;
+                    if (L <= 0) return 0;
+                    if (d === 0) return 1 / L;
+                    var g = Math.pow(1 + d, L);
+                    return d * g / (g - 1);
+                },
+
+                /** Annualized capital: Σ cost_i × CRF(rate, life_i), each asset class over its own life (IT 3 y, facility
+                 *  15 y in TUI3011B). items: [{ cost, lifeYears }]. Returns $/yr. (R120) */
+                annualizedCapital: function (items, rate) {
+                    var d = +rate || 0;
+                    return (items || []).reduce(function (sum, it) {
+                        var L = +it.lifeYears || 0, g = Math.pow(1 + d, L);
+                        var f = L <= 0 ? 0 : (d === 0 ? 1 / L : d * g / (g - 1));
+                        return sum + (+it.cost || 0) * f;
+                    }, 0);
                 },
 
                 /**

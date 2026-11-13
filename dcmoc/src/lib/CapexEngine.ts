@@ -101,6 +101,8 @@ export interface CapexInput {
      * (prime-rated). 'hybrid' = partial grid. Drives genset CAPEX × gensetCapMult
      * and front-of-meter grid infra × gridCapexMult from engine DATA.fuelGen. */
     powerSource?: 'utility-backup' | 'prime' | 'hybrid';
+    /** internal: fixed location multiplier (the basis-spec calibration prices its reference case at 1) */
+    _locMult?: number;
 }
 
 /** Ship-A — analyst interconnect fabric estimates, EXCLUDED from the infra total. */
@@ -195,12 +197,32 @@ export const calculateCapex = (input: CapexInput): CapexResult => {
         locMult = locationMultipliers[location] || 1.0;
     }
 
+    /* R120 (O-R120-CAPEX, option a; same rule as the engine's models.capex.detailed): a city's $/W is the all-in total
+     * of the basis spec (engine DATA.capexDetail.cityBasisSpec) at DCMOC's default soft costs. Price the basis spec here
+     * at locMult 1 and scale so it lands on the city figure; without a city the target is the median US city $/W times
+     * the country/location index (both relative to US = 1.0). Was locMult = perW / 13.0, which left the basis spec at
+     * 66 % of its own city figure while the site calculator showed 135 %. */
+    const relLoc = locMult;
+    let target: number | null = null;
     if (cityMarket !== 'none' && cityData[cityMarket]) {
         const city = cityData[cityMarket];
         effectiveRegion = city.region;
-        // If city data exists, it might override country index or blend? 
-        // For now let's let specific city data override country index if provided
-        locMult = city.perW / 13.0;
+        target = city.perW;
+    } else {
+        const us = Object.values(cityData).filter((c) => c.region === 'usa').map((c) => c.perW).sort((x, y) => x - y);
+        target = us.length ? us[us.length >> 1] * relLoc : null;
+    }
+    if (input._locMult != null) locMult = input._locMult;
+    else if (target) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const spec = (cd as any).cityBasisSpec ?? { rackType: 'medium', redundancy: 'n1', coolingType: 'air', buildingType: 'purpose', seismicZone: 'zone2',
+            fireType: 'novec', alarmType: 'addressable', upsType: 'modular', genType: 'diesel', fuelHours: 48 };
+        const basis = calculateCapex({
+            itLoad, location, country, cityMarket, ...spec, rackForm: 'std42u',
+            projYear: '2025', designFee: 8, pmFee: 5, contingency: 10, includeFOM: false, substationType: input.substationType,
+            transformerLead: 'standard', utilityRate: 9, greenCert: 'none', renewableOption: 'none', powerSource: 'utility-backup', _locMult: 1,
+        }).total;
+        locMult = (target * 1000 * itLoad) / basis;
     }
 
     // Shape-adapted: engine yearEscalation is a plain number, local is {mult,note}
