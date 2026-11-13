@@ -1,7 +1,7 @@
 # R120 gap file — DCMOC and site CAPEX (2026-11-12)
 
 Plan: `documentation/product-transformation/R120_TOOLS_GAP_PLAN.md`, tool 2 of the order (reliability + CAPEX). Gate:
-`tools/test-capex-reference.mjs` (red today on purpose; wired in `tools/ship-gate.sh` in the release that fixes it).
+`tools/test-capex-reference.mjs`, wired in `tools/ship-gate.sh` since v3.54.0.
 
 ## Reference
 
@@ -54,7 +54,12 @@ the site engine gives 6.30 $/W and DCMOC 8.56 $/W for the same US project.
 Who sees it: the CAPEX calculator page (site engine) shows roughly twice what DCMOC shows for one project, and
 DCMOC's CAPEX feeds its TCO, ROI and financial pages.
 
-## Owner decision O-R120-CAPEX (open)
+## Owner decision O-R120-CAPEX — DECIDED 2026-11-13: option (a), live in v3.54.0
+
+The owner chose "Yg terbaik" (option a) and approved the mock ("Live"). After the fix `tools/test-capex-reference.mjs`
+passes F1, F2, D1–D3 (F3 open, stage 2); on v3.53.0 it failed 5 laws. The findings table above shows the state before.
+
+### Options as presented
 
 - **(a) Recommended.** One CAPEX engine. DCMOC calls `capex.detailed` (it already reads the multiplier tables from
   it). The city figure becomes the total at a stated basis spec (Tier III / N+1, air, medium density, purpose-built,

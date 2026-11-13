@@ -498,8 +498,8 @@ window.RZ_CALC_PARAMETERS = {
    "page": "capex-calculator.html",
    "kind": "derived",
    "scope": "capex-calculator.html",
-   "display": "$5.90M",
-   "value": 5900000,
+   "display": "$11.34M",
+   "value": 11340000,
    "dependsOnInputs": [
     "IT load (kW)",
     "Rack density",
@@ -590,11 +590,16 @@ window.RZ_CALC_PARAMETERS = {
    "page": "capex-calculator.html",
    "kind": "derived",
    "scope": "capex-calculator.html",
-   "display": "$6K/kW",
-   "value": 6000,
+   "display": "$11K/kW",
+   "value": 11000,
    "dependsOnInputs": [
+    "Rack density",
+    "Cooling",
     "Redundancy",
-    "Region"
+    "Building type",
+    "Seismic zone",
+    "UPS type",
+    "Generator type"
    ],
    "notMovable": [],
    "consumers": [
@@ -755,8 +760,8 @@ window.RZ_CALC_PARAMETERS = {
    "page": "capex-calculator.html",
    "kind": "derived",
    "scope": "capex-calculator.html",
-   "display": "$800K",
-   "value": 800000,
+   "display": "$1.54M",
+   "value": 1540000,
    "dependsOnInputs": [
     "IT load (kW)",
     "Rack density",
@@ -839,8 +844,8 @@ window.RZ_CALC_PARAMETERS = {
    "page": "capex-calculator.html",
    "kind": "derived",
    "scope": "capex-calculator.html",
-   "display": "$1.50M",
-   "value": 1500000,
+   "display": "$2.88M",
+   "value": 2880000,
    "dependsOnInputs": [
     "IT load (kW)",
     "Rack density",
@@ -923,8 +928,8 @@ window.RZ_CALC_PARAMETERS = {
    "page": "capex-calculator.html",
    "kind": "derived",
    "scope": "capex-calculator.html",
-   "display": "$750K",
-   "value": 750000,
+   "display": "$1.44M",
+   "value": 1440000,
    "dependsOnInputs": [
     "IT load (kW)",
     "Rack density",
@@ -1008,8 +1013,8 @@ window.RZ_CALC_PARAMETERS = {
    "page": "capex-calculator.html",
    "kind": "derived",
    "scope": "capex-calculator.html",
-   "display": "$596K",
-   "value": 596000,
+   "display": "$1.15M",
+   "value": 1150000,
    "dependsOnInputs": [
     "IT load (kW)",
     "Redundancy",
@@ -1093,8 +1098,8 @@ window.RZ_CALC_PARAMETERS = {
    "page": "capex-calculator.html",
    "kind": "derived",
    "scope": "capex-calculator.html",
-   "display": "$700K",
-   "value": 700000,
+   "display": "$1.35M",
+   "value": 1350000,
    "dependsOnInputs": [
     "IT load (kW)",
     "Rack density",
@@ -1177,8 +1182,8 @@ window.RZ_CALC_PARAMETERS = {
    "page": "capex-calculator.html",
    "kind": "derived",
    "scope": "capex-calculator.html",
-   "display": "$250K",
-   "value": 250000,
+   "display": "$480K",
+   "value": 480000,
    "dependsOnInputs": [
     "IT load (kW)",
     "Region"

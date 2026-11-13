@@ -288,6 +288,7 @@ gate "Cx record workspace UI (P06) — Demo read-only, new set from a register, 
 gate "Cx schedule export (P12) — MS Project XML + ICS: 65 tasks, links + lags restate the plan dates, escaping, RFC 5545 folding, DOMParser round-trip equals the plan, disabled without a start date" node tools/test-cx-export-schedule.mjs
 gate "DCMOC Cx plan bridge — same plan and status as the site module, store clamps/persists/5 scenarios (needs dcmoc/node_modules)" node tools/test-dcmoc-cx-plan.mjs
 gate "Reliability vs NIST e-Handbook — series, parallel, r-of-n parity; N+1 = k of k+1, 2N = two systems of k (engine + DCMOC chain)" node tools/test-reliability-reference.mjs
+gate "CAPEX vs Uptime TUI3011B — CRF and annualized capital by asset life; one calibration: the city $/W at the basis spec, site = DCMOC on and off the basis" node tools/test-capex-reference.mjs
 gate "R121 homepage motion — Lenis on fine pointer only, reduced motion = 0 tweens, no-JS final state, settled after scroll, nothing pinned, CLS, no flash" node tools/test-index-motion.mjs
 gate "Cx Analysis — plan editor, schematic, 3D campus with the glb library and callouts, Tier 1.5 calendar, both themes" node tools/test-cx-analysis.mjs
 gate "Cx gradient (K34) — owner gradient surfaces lit, no gradient text, hero text AA over the gradient at 1440/390 both themes" node tools/test-cx-gradient.mjs

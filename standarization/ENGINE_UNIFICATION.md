@@ -191,3 +191,24 @@ Traps catalogued in memory: pue.defaultFor key mismatch (use pueMatrix direct), 
   value trace) all use it. k comes from `commissioning.equipScale` (`unitsForLoad`). With k = 1 the old 1-of-2 value
   is kept. The value trace no longer keeps its own copy of the chain.
 - Gate: `tools/test-reliability-reference.mjs`. F1–F4 and D1–D5 all block. Red on v3.48 (5 laws fail), green after.
+
+## CAPEX against a public reference (R120, v3.54.0)
+
+Reference: Koomey et al., *A Simple Model for Determining True Total Cost of Ownership for Data Centers*, Uptime
+Institute TUI3011B (2007), Table 1 (LBNL-hosted). Gap file: `documentation/product-transformation/gaps/dcmoc-capex.md`.
+Gate: `tools/test-capex-reference.mjs`.
+
+- **One calibration for both CAPEX engines.** A city's `$/W` in `DATA.capexDetail.cityCapexPerW` is the all-in total
+  of the basis spec `DATA.capexDetail.cityBasisSpec` (N+1, air, medium density, purpose-built, seismic zone 2;
+  ASSUMED to be the typical Tier III build the cost guides describe). `models.capex.detailed` and DCMOC
+  `CapexEngine.ts` price the basis spec at the same size and place with location multiplier 1 (`_locMult: 1`), then
+  scale so it lands on the city figure; every other spec moves relative to it. Without a city the target is the
+  region's median city `$/W` (site) or the median US city times the country index (DCMOC). Before v3.54.0 the anchors
+  were 4.65 $/W (site) and 13.0 $/W (DCMOC): Virginia at the basis spec read 18.14 and 8.83 $/W against its own 13.40.
+- The basis spec is priced at each engine's DEFAULT soft costs (site: simple mode; DCMOC: design 8 %, PM 5 %,
+  contingency 10 %), so a user's own fees and contingency still move the result.
+- `models.tco.crf(rate, life)` and `models.tco.annualizedCapital([{cost, lifeYears}], rate)` reproduce Table 1's
+  annualization (19.1 M$/yr).
+- Laws: F1–F2 parity, D1 site = DCMOC, D2 the basis spec equals the city figure, D3 the two engines agree within 2 %
+  off the basis (2N, N, liquid + AI rack, 500 kW–20 MW, warehouse, zone 0). Red on v3.53.0 (5 laws, D3 worst 45 %).
+- Open (stage 2): an area-driven `$/m²` term (F3) needs a current, sourced `$/m²`.
