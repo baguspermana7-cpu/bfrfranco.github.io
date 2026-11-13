@@ -65,9 +65,21 @@ try {
   const ang = (tf) => { if (!/matrix3d/.test(tf)) return 0; const m = tf.slice(tf.indexOf('(') + 1).split(',').map(Number); return Math.round(Math.acos(Math.max(-1, Math.min(1, m[0]))) * 180 / Math.PI); };
   const body = async (n) => { const el = await p.$(`.emp-card:nth-child(${n}) .emp-name`); await el.evaluate((e) => e.scrollIntoView({ block: 'center', behavior: 'instant' })); await sleep(300); const bb = await el.boundingBox(); return { x: bb.x + 10, y: bb.y + bb.height / 2 }; };
   let pt = await body(2);
-  await p.mouse.click(pt.x, pt.y); await sleep(150);
-  const mid = await p.evaluate(() => getComputedStyle(document.querySelectorAll('.emp-card')[1].querySelector('.emp-front')).transform);
-  await sleep(850);
+  await p.mouse.click(pt.x, pt.y);
+  // Sample on the transition's own clock, not the wall clock: under load the first frame lands late and a 150 ms
+  // wall-clock read gave 19° (and an unfinished 176° at 1 s) on a correct page. A swap has no transition -> 0°.
+  const mid = await p.evaluate(async () => {
+    const f = document.querySelectorAll('.emp-card')[1].querySelector('.emp-front');
+    let a = null;
+    for (let i = 0; i < 20 && !a; i++) { a = f.getAnimations().find((x) => x.transitionProperty === 'transform') || null; if (!a) await new Promise((r) => requestAnimationFrame(r)); }
+    if (!a) return getComputedStyle(f).transform;
+    a.pause(); a.currentTime = 150;
+    const tf = getComputedStyle(f).transform;
+    a.play();
+    return tf;
+  });
+  await p.evaluate(() => Promise.all(document.querySelectorAll('.emp-card')[1].getAnimations({ subtree: true }).map((x) => x.finished.catch(() => null))));
+  await sleep(100);
   let s = await st(1);
   const front = await p.evaluate(() => getComputedStyle(document.querySelectorAll('.emp-card')[1].querySelector('.emp-front')).transform);
   check(s.exp === 'true' && !s.inert && ang(s.tf) <= 2 && ang(front) >= 178, `L2 a click on the card body flips card 2 (expanded, back live and square ${ang(s.tf)}°, front turned away ${ang(front)}°)`);
