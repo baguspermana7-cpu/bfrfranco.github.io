@@ -227,28 +227,35 @@ try {
       `D16 ${theme} #${x.id}: light layer ${x.src} radial source(s), warm counter-light ${x.warm}, grain ${x.grain}, sheen on ${x.sheen}/${x.panels} panel(s)`);
     await p.close();
   }
-  // D14 entrance choreography (R103): armed below the fold, hidden before entry, all shown within 1.8 s, title sharpens in.
+  // D14 entrance (R121, GSAP since 2026-11-13; was the R103 IntersectionObserver choreography): each section below the
+  // fold is hidden before the reader reaches it, every item is visible and settled 1.8 s after, the eyebrow rule is drawn;
+  // reduced motion runs 0 tweens and hides nothing. Items = the selectors js/rz-index-motion.js animates.
+  const D14_ITEMS = { metrics: '.res-row', 'case-studies': '.case-card', contact: '.contact-info, .contact-form' };
   for (const reduce of [false, true]) {
     const p = await browser.newPage(); p.errors = []; p.on('pageerror', (e) => p.errors.push(String(e)));
     await p.setViewport({ width: 1440, height: 900 });
     if (reduce) await p.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
     await p.goto(URL.replace('/index.html', '/robots.txt')); await p.evaluate(() => { localStorage.clear(); localStorage.setItem('rz_cookie_consent', 'declined'); });
     await p.goto(URL, { waitUntil: 'networkidle2', timeout: 60000 }); await new Promise((r) => setTimeout(r, 400));
-    const armed = await p.evaluate((S) => S.filter((id) => document.getElementById(id).classList.contains('rv-armed')), SECS);
-    if (reduce) { check(armed.length === 0, `D14 reduced motion: no section is armed (read ${armed.join(',') || 'none'})`); await p.close(); continue; }
-    check(armed.length === SECS.length, `D14 every section below the fold is armed (${armed.length}/${SECS.length})`);
-    for (const id of ['metrics', 'case-studies', 'contact']) {
-      const pre = await p.evaluate((id) => { const items = [...document.getElementById(id).querySelectorAll('.rv')]; return { n: items.length, shown: items.filter((e) => +getComputedStyle(e).opacity > 0.05).length }; }, id);
+    const tw = await p.evaluate(() => (window.RZMotion ? window.RZMotion.tweens : -1));
+    const vis = (id, sel) => p.evaluate((id, sel) => { const items = [...document.getElementById(id).querySelectorAll(sel)];
+      const settled = (e) => { const t = e.style.transform; return !t || t === 'none' || !(t.match(/-?\d*\.?\d+(?=px|%)/g) || []).some((v) => Math.abs(+v) >= 0.5); };
+      return { n: items.length, shown: items.filter((e) => +getComputedStyle(e).opacity > 0.99 && settled(e)).length, hidden: items.filter((e) => +getComputedStyle(e).opacity < 0.05).length }; }, id, sel);
+    if (reduce) {
+      const r = await Promise.all(Object.keys(D14_ITEMS).map((id) => vis(id, D14_ITEMS[id])));
+      check(tw === 0 && r.every((x) => x.shown === x.n), `D14 reduced motion: 0 tweens (${tw}), every item shown at load (${r.map((x) => x.shown + '/' + x.n).join(', ')})`);
+      await p.close(); continue;
+    }
+    check(tw > 0, `D14 the motion script runs (${tw} tweens)`);
+    const PRE = {}; for (const id of Object.keys(D14_ITEMS)) PRE[id] = await vis(id, D14_ITEMS[id]);   // all measured at the top
+    for (const id of Object.keys(D14_ITEMS)) {
+      const pre = PRE[id];
       await p.evaluate((id) => { document.documentElement.style.scrollBehavior = 'auto'; const e = document.getElementById(id); window.scrollTo(0, e.getBoundingClientRect().top + scrollY - 80); }, id);
-      await p.waitForFunction((id) => document.getElementById(id).classList.contains('rv-in'), { timeout: 4000 }, id).catch(() => {});
-      await new Promise((r) => setTimeout(r, 120));
-      const blur = await p.evaluate((id) => { const t = document.querySelector('#' + id + ' .rv-title'); return t ? getComputedStyle(t).filter : 'none'; }, id);
-      await new Promise((r) => setTimeout(r, 1700));
-      const post = await p.evaluate((id) => { const s = document.getElementById(id), items = [...s.querySelectorAll('.rv, .rv-title')];
-        const eb = s.querySelector('.sec-eyebrow'); return { shown: items.filter((e) => +getComputedStyle(e).opacity > 0.99 && getComputedStyle(e).transform === 'none').length, n: items.length,
-          rule: eb ? getComputedStyle(eb, '::after').transform : 'none', light: +getComputedStyle(s.querySelector(':scope > .dp-light') || s, s.querySelector(':scope > .dp-light') ? null : '::before').opacity }; }, id);
-      check(pre.n >= 2 && pre.shown === 0 && /blur\(/.test(blur) && post.shown === post.n && post.rule === 'none' && post.light > 0.99,
-        `D14 #${id}: hidden before entry (${pre.shown}/${pre.n} shown), title mid-sharpen 120 ms in (${blur}), all ${post.shown}/${post.n} shown after, rule drawn (${post.rule}), light on (${post.light})`);
+      await new Promise((r) => setTimeout(r, 1800));
+      const post = await vis(id, D14_ITEMS[id]);
+      const rule = await p.evaluate((id) => { const eb = document.querySelector('#' + id + ' .sec-eyebrow'); return eb ? getComputedStyle(eb, '::after').transform : 'none'; }, id);
+      check(pre.n >= 1 && pre.hidden === pre.n && post.shown === post.n && rule === 'none',
+        `D14 #${id}: hidden before entry (${pre.hidden}/${pre.n}), all ${post.shown}/${post.n} shown and settled 1.8 s after, rule drawn (${rule})`);
     }
     check(p.errors.length === 0, `D14 no page errors${p.errors.length ? ' — ' + p.errors[0] : ''}`);
     await p.close();

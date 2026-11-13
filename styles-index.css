@@ -5702,28 +5702,12 @@ section.dp-band .sec-eyebrow::after { background: linear-gradient(90deg, var(--d
 @media (prefers-reduced-motion: reduce) {
     .emp-face { transition: opacity 180ms ease-out, border-color 160ms ease-out, box-shadow 520ms ease-out; }
 }
-/* R103/R104 (owner "animasi motionnya sangat2 kurang payah. Cari inspirasi"; "bener2 keren effect2 motion"): one
-   entrance choreography per section, after the owner's echo reference and Emil Kowalski's enter recipe — the eyebrow
-   rule draws from the left, the title sharpens out of a 6 px blur, the content follows on a 70 ms stagger, and the blue
-   light behind a band switches on. Runs once per section, only for sections that start below the fold; transform,
-   opacity and the title's filter only; reduced motion shows everything at once. Gate: test-index-depth D14. */
-.rv-armed .sec-eyebrow::after { transform: scaleX(0); transform-origin: left center; }
-#metrics.rv-armed .rv, #operational-excellence.rv-armed .rv, #case-studies.rv-armed .rv, #about.rv-armed .rv, #faq.rv-armed .rv, #contact.rv-armed .rv { opacity: 0; transform: translateY(16px); }
-.rv-armed .rv-title { opacity: 0; transform: translateY(10px); filter: blur(6px); }
-.rv-armed > .dp-light { opacity: 0; }
-.rv-armed.rv-in .sec-eyebrow::after { transform: none; transition: transform 900ms cubic-bezier(0.23, 1, 0.32, 1) 80ms; }
-#metrics.rv-armed.rv-in .rv, #operational-excellence.rv-armed.rv-in .rv, #case-studies.rv-armed.rv-in .rv, #about.rv-armed.rv-in .rv, #faq.rv-armed.rv-in .rv, #contact.rv-armed.rv-in .rv, .rv-armed.rv-in .rv-title {
-    opacity: 1; transform: none; filter: none;
-    transition: opacity 600ms cubic-bezier(0.23, 1, 0.32, 1) var(--rv-d, 0ms), transform 700ms cubic-bezier(0.23, 1, 0.32, 1) var(--rv-d, 0ms), filter 600ms cubic-bezier(0.23, 1, 0.32, 1) var(--rv-d, 0ms);
-}
-.rv-armed.rv-in > .dp-light { opacity: 1; transition: opacity 1400ms cubic-bezier(0.23, 1, 0.32, 1) 150ms; }
-#metrics .fade-in:not(.rv):not(.rv-title), #operational-excellence .fade-in:not(.rv):not(.rv-title), #case-studies .fade-in:not(.rv):not(.rv-title), #about .fade-in:not(.rv):not(.rv-title), #faq .fade-in:not(.rv):not(.rv-title), #contact .fade-in:not(.rv):not(.rv-title) { opacity: 1; transform: none; }
+/* R121 (owner 2026-11-13): the six sections enter through GSAP (js/rz-index-motion.js, gate test-index-motion);
+   the R103 IntersectionObserver choreography (.rv-armed) is retired. The legacy .fade-in stays off in these sections. */
+#metrics .fade-in, #operational-excellence .fade-in, #case-studies .fade-in, #about .fade-in, #faq .fade-in, #contact .fade-in { opacity: 1; transform: none; }
 /* script.js fades every whole section in by 40 px (.section-reveal) — the generic motion the owner called weak, and on top
    of the choreography above it doubled every fade. The six choreographed sections opt out. */
 #metrics.section-reveal, #operational-excellence.section-reveal, #case-studies.section-reveal, #about.section-reveal, #faq.section-reveal, #contact.section-reveal { opacity: 1; transform: none; transition: none; }
-@media (prefers-reduced-motion: reduce) {
-    #metrics.rv-armed .rv, #operational-excellence.rv-armed .rv, #case-studies.rv-armed .rv, #about.rv-armed .rv, #faq.rv-armed .rv, #contact.rv-armed .rv, .rv-armed .rv-title, .rv-armed > .dp-light, .rv-armed .sec-eyebrow::after { opacity: 1; transform: none; filter: none; }
-}
 /* v3.35.5: on the FAQ tier (--dp-raised) the answers' #6c757d read 4.3:1 in light. axe never saw it: the legacy
    section-reveal kept every section below the fold at opacity 0, and axe skips hidden text (audit-a11y now scrolls). */
 #faq .faq-a { color: var(--dp-muted); }

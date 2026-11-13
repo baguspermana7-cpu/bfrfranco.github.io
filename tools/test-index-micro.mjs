@@ -36,6 +36,8 @@ const AXE = readFileSync(resolve(ROOT, 'tools/vendor/axe.min.js'), 'utf8');
 const puppeteer = createRequire(resolve(ROOT, 'package.json'))('puppeteer');
 const GLOWED = '#metrics .res-panel, #case-studies .case-card, #contact .contact-info, #contact .contact-form, .emp-card .emp-front';
 let fail = 0;
+/* no movement = no transform, or an identity matrix (a settled entrance tween leaves translate(0, 0) inline) */
+const still = (tf) => tf === 'none' || /^matrix\(1, 0, 0, 1, 0, 0\)$/.test(tf);
 const check = (ok, msg) => { console.log(`  ${ok ? 'PASS' : 'FAIL'}  ${msg}`); if (!ok) fail++; };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 // headless reports hover:none / pointer:none; a desktop has a fine pointer that hovers — without this every
@@ -86,7 +88,7 @@ try {
     const row = await p.evaluate(() => { const e = document.querySelector('#metrics .res-row:nth-of-type(2)'); const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, bg0: getComputedStyle(e).backgroundColor }; });
     await p.mouse.move(row.x, row.y); await sleep(400);
     const row1 = await p.evaluate(() => { const c = getComputedStyle(document.querySelector('#metrics .res-row:nth-of-type(2)')); return { bg: c.backgroundColor, img: c.backgroundImage, tf: c.transform }; });
-    check(row1.bg !== row.bg0 && row1.img === 'none' && row1.tf === 'none', `M8 ${T} result row hover: flat tint ${row.bg0} → ${row1.bg}, no gradient, no movement (${row1.tf})`);
+    check(row1.bg !== row.bg0 && row1.img === 'none' && still(row1.tf), `M8 ${T} result row hover: flat tint ${row.bg0} → ${row1.bg}, no gradient, no movement (${row1.tf})`);
     await p.mouse.move(5, 5);
     // M5 (R119, owner approved 2026-11-12): the per-section light layer gives way to ONE page field; scroll motion
     // returns with R121 (Lenis + GSAP), not as a per-section drift.

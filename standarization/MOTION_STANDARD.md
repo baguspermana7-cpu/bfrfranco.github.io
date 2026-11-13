@@ -207,7 +207,7 @@ blur on the section title only):
 | Section enters (below the fold only) | eyebrow rule draws from the left; title sharpens out of a 6 px blur; lede, then the content items on a 70 ms stagger; the light layer behind the section (`.dp-light`, a real element since v3.35.7) fades up | 600–900 ms, `cubic-bezier(0.23, 1, 0.32, 1)`; light 1400 ms |
 | Employer card turns (click, Enter) | both faces rotate on the spring `linear()`; the card rises (translateY −6 px, scale 1.035 at 45 %), the turning face casts a shadow and a glare band crosses it (`.emp-glare`, painted only while turning); the back's facts arrive on a 60 ms cascade from 420 ms | 800 ms turn, facts 460 ms `cubic-bezier(0.23, 1, 0.32, 1)`; reduced motion: opacity swap, no lift/glare/cascade |
 | Card hover (homepage) | the bottom glow grows (`--glow-h` 130 → 210 px), border colour; never a transform | 520 ms `cubic-bezier(0.23, 1, 0.32, 1)`, hover-gated |
-| Light layer (`.dp-light`) | hidden since v3.50.0 (R119: one page field replaces the per-section light; `test-index-micro.mjs` M5 asserts none is drawn). Scroll motion returns with R121 | reduced motion: still |
+| Light layer (`.dp-light`) | hidden since v3.50.0 (R119: one page field replaces the per-section light; `test-index-micro.mjs` M5 asserts none is drawn). Scroll motion is R121's (GSAP, `js/rz-index-motion.js`) | reduced motion: still |
 | Copy button | copy icon crossfades to a check, in the light's blue | 160–220 ms |
 | Result bars | grow from 0 to their value | 600 ms, 60 ms row stagger |
 | Employer card click (anywhere on the card) | both faces turn in 3D (front 0→180°, back −180→0°), the card dips to 0.965 and a shade crosses each face mid-turn; the height follows the shown face | 800 ms damped spring as `linear()` (ζ 0.78, ~2 % settle, no bounce); height 500 ms |
@@ -216,22 +216,29 @@ Reduced motion: no section is armed, the flip is a 180 ms opacity swap, bars ren
 Gates: `tools/test-index-depth.mjs` D11 + D14, `tools/test-index-r079.mjs` L2 (mid-turn 20–170° at 150 ms, keyboard path,
 small icon button, reduced motion = no rotation). Both proven red on v3.35.3 (10 + 6 failures).
 
-## R121 homepage motion — mock (v3.50.0)
+## R121 homepage motion (mock v3.50.0, live on index.html since v3.54.0)
 
 Owner request (via peer, 2026-11-11): cinematic motion on the homepage with Lenis 1.3.27 and GSAP 3.15.0
-(ScrollTrigger, SplitText), mock first. Page: `index-motion-mock.html` (noindex), script `js/rz-index-motion.js`, libraries
-pinned to exact versions on jsdelivr.
+(ScrollTrigger, SplitText), mock first. The owner approved the mock on 2026-11-13 ("Put on index"): `index.html` loads
+`js/rz-index-motion.js` and the libraries pinned to exact versions on jsdelivr; the mock page is removed. The R103
+IntersectionObserver choreography (`.rv-armed`, title blur) is retired; `test-index-depth` D14 now asserts the GSAP reveal
+(hidden before entry, every item visible and settled 1.8 s after, reduced motion = 0 tweens and nothing hidden).
 
 - Lenis smooth scroll only when `(pointer: fine)` and `(hover: hover)`; phones keep native scroll.
 - Hero name rises word by word; each section's eyebrow, title, lede and items rise once at 85 % of the viewport;
   employer cards rise as a batch; the portrait drifts 4 % slower than the page (scrubbed). One curve (`expo.out`).
 - `transform` and `opacity` only. Nothing is pinned (the owner rejected the pinned Hub "Stage" on 2026-10-16: "terkunci scroll").
 - While the script runs it disables the CSS `.fade-in` transitions (`html.rzm`), so two systems never move the same
-  element.
+  element. The override sets opacity and transform WITHOUT `!important`, so GSAP's inline values win: with `!important`
+  the case cards (also `.fade-in`) never animated.
+- Every reveal ends with `clearProps: 'transform,opacity,visibility'`. An inline transform left behind beats a class
+  transform: the employer card's flip (rotateY on a class) stopped turning, and `test-index-micro` F2 read its back facts
+  at 0.00 until the props were cleared.
 - Reduced motion: no Lenis, 0 tweens. No JS or a failed CDN: everything stays in its final state.
 - When the script runs after the first paint, anything already on screen stays as it is. Without this the name was
   painted, hidden and then raised again, and the gate counted 26 drops.
-- Gate: `tools/test-index-motion.mjs` T1–T8b. Red on index.html (T1–T3), green on the mock. T8 is red when the
+- Gate: `tools/test-index-motion.mjs` T1–T8b on index.html (T7 compares against the same page with the motion scripts
+  blocked). Red on the pre-R121 index (T1–T3). T8 is red when the
   first-paint check is removed.
 - "Already seen" is a first frame, not a paint entry. Chrome records the paint entry on presentation feedback, which
   lags the frame by hundreds of ms on a busy machine: v3.51's gate saw the hero words drawn, then hidden by the split

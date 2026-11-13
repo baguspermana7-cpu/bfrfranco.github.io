@@ -241,7 +241,7 @@
 </style>
 
     <!-- Index-only stylesheet — 83KB vs 121KB full, sync to prevent CLS -->
-    <link rel="stylesheet" href="styles-index.min.css?v=20261110-72c681ed">
+    <link rel="stylesheet" href="styles-index.min.css?v=20261113-b4a8562d">
 
     <!-- prefetch removed: 20KB fetch on every page load, low hit rate -->
     <script src="js/rz-version.js?v=20261113-4cf7b941" defer></script>
@@ -249,6 +249,15 @@
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- R119 colour (approved 2026-11-12): one page field, blue as light on objects, orange as the 10 % -->
     <link rel="stylesheet" href="css/rz-index-color.css?v=20261112-80391b78">
+    <!-- R121 motion (owner approved 2026-11-13): Lenis + GSAP, exact versions from jsdelivr -->
+    <style>
+    html.lenis, html.lenis body { height: auto; }
+    .lenis.lenis-smooth { scroll-behavior: auto !important; }
+    html.rzm .fade-in { opacity: 1; transform: none; transition: none !important; }   /* GSAP's inline values must win; only the CSS transition is switched off */
+    .rzm-word { display: inline-block; }
+    </style>
+    <!-- R121: mark the first frame; a frame drawn before the motion script runs means its content is already seen (paint entries can arrive late under load) -->
+    <script>requestAnimationFrame(function () { document.documentElement.setAttribute('data-rzm-frame', '1'); });</script>
 </head>
 <body>
     <!-- Search Overlay & Modal -->
@@ -1767,32 +1776,12 @@ if ('serviceWorker' in navigator) {
     <script>
     /* R103/R104 section entrance (see styles-index.css "R103/R104"). Arms only sections that start below the fold,
        so nothing on screen at load ever blinks out; without JS or with reduced motion nothing is hidden. */
-    (function () {
-        if (!('IntersectionObserver' in window)) return;
-        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-        var ITEMS = { metrics: '.res-row', 'operational-excellence': '.oe-card', 'case-studies': '.case-card',
-            about: '.about-text > *:not(.sec-head), .about-image', faq: '.faq-item, .faq-item-simple', contact: '.contact-info, .contact-form' };
-        Object.keys(ITEMS).forEach(function (id) {
-            var sec = document.getElementById(id);
-            if (!sec || sec.getBoundingClientRect().top < window.innerHeight) return;
-            var eb = sec.querySelector('.sec-eyebrow'), h = sec.querySelector('.sec-head .section-title, .sec-head h2');
-            var lede = sec.querySelector('.sec-head .section-subtitle') || sec.querySelector('.sec-head p:not(.sec-eyebrow)');
-            var d = 0;
-            [eb, h, lede].forEach(function (el, i) {
-                if (!el) return;
-                el.classList.add(el === h ? 'rv-title' : 'rv'); el.style.setProperty('--rv-d', (i * 80) + 'ms');
-            });
-            [].slice.call(sec.querySelectorAll(ITEMS[id])).forEach(function (el, i) {
-                el.classList.add('rv'); el.style.setProperty('--rv-d', (220 + Math.min(i, 8) * 70) + 'ms');
-            });
-            sec.classList.add('rv-armed');
-            var io = new IntersectionObserver(function (en) {
-                if (!en[0].isIntersecting) return;
-                sec.classList.add('rv-in'); io.disconnect();
-            }, { rootMargin: '0px 0px -15% 0px' });  /* fires when the top passes 85 % of the viewport — a ratio threshold never fires on a section taller than ~8 screens */
-            io.observe(sec);
-        });
-    })();
+    /* R121: the section reveal is GSAP's (js/rz-index-motion.js); the IntersectionObserver reveal is retired */
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/ScrollTrigger.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/SplitText.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/lenis@1.3.27/dist/lenis.min.js" defer></script>
+    <script src="js/rz-index-motion.js?v=20261113-2679325b" defer></script>
 </body>
 </html>

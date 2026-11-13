@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* R121 motion laws (Lenis 1.3.27 + GSAP 3.15.0 ScrollTrigger + SplitText).
  *
- *   node tools/test-index-motion.mjs [page]     # default index-motion-mock.html; exit 1 on any failed law
+ *   node tools/test-index-motion.mjs [page]     # default index.html; exit 1 on any failed law
  *
  * Serves the repo on a free 127.0.0.1 port (never a fixed one). Laws:
  *  T1 desktop (fine pointer + hover): Lenis runs, GSAP tweens exist, 0 page errors.
@@ -10,7 +10,7 @@
  *  T4 JavaScript off: hero name and every section item fully visible (nothing pre-hidden in the markup).
  *  T5 after scrolling the page, every revealed item ends fully visible with no leftover offset.
  *  T6 no pinning (no .pin-spacer, no position:fixed added by motion).
- *  T7 layout shift during load + scroll stays within 0.01 of the same page without motion (index.html).
+ *  T7 layout shift during load + scroll stays within 0.01 of the same page with the motion scripts blocked.
  *  T8 nothing the reader already sees is hidden later (sampled every frame for 3 s from navigation, items in the first view).
  *  T8b T8 under load: paint entries hidden, CDN scripts held 800 ms (the paint entry lags the frame on a busy machine).
  * Headless Chrome reports hover:none; the desktop run sets blink pointer/hover types so (hover: hover) is true.
@@ -22,7 +22,7 @@ import { fileURLToPath } from 'node:url';
 import puppeteer from '/home/baguspermana7/rz-work/node_modules/puppeteer/lib/esm/puppeteer/puppeteer.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const PAGE = process.argv[2] || 'index-motion-mock.html';
+const PAGE = process.argv[2] || 'index.html';
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml',
   '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.avif': 'image/avif', '.woff2': 'font/woff2' };
 const server = http.createServer((req, res) => {
@@ -83,9 +83,10 @@ try {
   law('T6', pin === 0, `nothing pinned (.pin-spacer ${pin})`);
   const clsMotion = await clsOf(p);
   const q = await desktop.newPage(); await q.setViewport({ width: 1440, height: 900 }); await q.evaluateOnNewDocument(CLS_HOOK);
-  await q.goto(BASE + 'index.html', { waitUntil: 'networkidle2', timeout: 90000 }); await sleep(1500); await scrollAll(q);
+  await q.setRequestInterception(true); q.on('request', (rq) => (/cdn\.jsdelivr\.net\/npm\/(gsap|lenis)|rz-index-motion\.js/.test(rq.url()) ? rq.abort() : rq.continue()));
+  await q.goto(BASE + PAGE, { waitUntil: 'networkidle2', timeout: 90000 }); await sleep(1500); await scrollAll(q);
   const clsBase = await clsOf(q);
-  law('T7', clsMotion <= clsBase + 0.01, `layout shift ${clsMotion.toFixed(4)} vs index.html ${clsBase.toFixed(4)} (≤ +0.01)`);
+  law('T7', clsMotion <= clsBase + 0.01, `layout shift ${clsMotion.toFixed(4)} vs the same page without motion ${clsBase.toFixed(4)} (≤ +0.01)`);
 
   /* T8 flash: an item visible in the first view must never drop back below opacity 0.5 */
   const f = await desktop.newPage(); await f.setViewport({ width: 1440, height: 900 });

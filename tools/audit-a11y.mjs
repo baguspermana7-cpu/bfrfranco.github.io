@@ -97,7 +97,12 @@ for (const f of PAGES) {
       // scroll-behavior: smooth on <html> made a plain scrollTo glide, so the 60 ms steps never arrived and the FAQ stayed
       // hidden — axe then SKIPS opacity-0 text, and a seeded #d4d4d4 answer passed. Instant steps, then a guard below.
       await pg.evaluate(async () => { const h = innerHeight; for (let y = 0; y < document.documentElement.scrollHeight; y += Math.round(h * 0.6)) { window.scrollTo({ top: y, behavior: 'instant' }); await new Promise(r => setTimeout(r, 80)); } window.scrollTo({ top: 0, behavior: 'instant' }); }).catch(() => {});
-      const unrevealed = await pg.evaluate(() => [...document.querySelectorAll('.rv-armed:not(.rv-in)')].map(e => e.id || e.className)).catch(() => []);
+      // R121 (homepage, GSAP): tweens run outside getAnimations(), so wait for every non-scrubbed tween to finish, then
+      // any element GSAP left below full opacity is a reveal that never ran (axe would skip its text).
+      await pg.waitForFunction(() => !window.gsap || !window.gsap.globalTimeline.getChildren(true, true, false)
+        .some((t) => t.isActive() && !(t.scrollTrigger && t.scrollTrigger.vars.scrub)), { timeout: 6000 }).catch(() => {});
+      const unrevealed = await pg.evaluate(() => [...document.querySelectorAll('.rv-armed:not(.rv-in)')].map(e => e.id || e.className)
+        .concat(window.gsap ? [...document.querySelectorAll('[style*="opacity"]')].filter((e) => +e.style.opacity < 0.99 && !e.closest('[aria-hidden="true"]')).map((e) => e.id || String(e.className).slice(0, 30)) : [])).catch(() => []);
       if (unrevealed.length) gating.push({ page: f, theme, rule: 'reveal-never-ran', impact: 'serious', target: unrevealed.join(', '), msg: 'scroll-triggered reveal never ran, axe would skip its hidden text' });
       // settle one-shot entrance animations too: axe blends opacity into the sampled colour, and a staggered
       // fade-in (e.g. the hub's .keys li, 200 ms + i x 70 ms + 400 ms) outlives the 700 ms above — a mid-fade

@@ -1,5 +1,5 @@
 /* R121 homepage motion (owner via peer 2026-11-11: cinematic motion with Lenis 1.3.27 + GSAP 3.15.0 ScrollTrigger +
- * SplitText). MOCK: loaded by index-motion-mock.html only.
+ * SplitText). Loaded by index.html (owner approved the mock 2026-11-13).
  *
  * Laws (tools/test-index-motion.mjs):
  *  - Lenis only on (pointer: fine) and (hover: hover); a phone gets native scroll.
@@ -24,6 +24,9 @@
 
     /* one curve for the page: strong ease-out, close to cubic-bezier(0.23, 1, 0.32, 1) */
     var EASE = 'expo.out';
+    /* a finished reveal hands the element back to its CSS: an inline transform left behind beats class transforms
+     * (the employer card's flip is rotateY on a class, and stopped turning) */
+    var CLEAR = 'transform,opacity,visibility';
     var count = function (t) { state.tweens += 1; return t; };
     /* Arriving late (after the first paint, which the browser records as a 'paint' entry) must not hide what the reader already sees: anything on
      * screen at that moment stays put; only what is still below the fold animates. */
@@ -48,11 +51,11 @@
     var h1 = document.querySelector('.hero h1');
     if (h1 && Split && !(late && onScreen(h1))) {
         var words = new Split(h1, { type: 'words', wordsClass: 'rzm-word' }).words;
-        count(gsap.from(words, { yPercent: 60, autoAlpha: 0, duration: 1.1, ease: EASE, stagger: 0.07, delay: 0.1 }));
+        count(gsap.from(words, { yPercent: 60, autoAlpha: 0, duration: 1.1, ease: EASE, stagger: 0.07, delay: 0.1, clearProps: CLEAR }));
     }
 
     /* sections: eyebrow, title, lede, then the items, each section once as its top reaches 85 % of the viewport.
-     * Same items the inline reveal used; that reveal is not loaded on this page. */
+     * Same items the retired IntersectionObserver reveal used. */
     var ITEMS = { metrics: '.res-row', 'operational-excellence': '.oe-card', 'case-studies': '.case-card',
         about: '.about-text > *:not(.sec-head), .about-image', faq: '.faq-item, .faq-item-simple', contact: '.contact-info, .contact-form' };
     Object.keys(ITEMS).forEach(function (id) {
@@ -63,14 +66,14 @@
         var items = [].slice.call(sec.querySelectorAll(ITEMS[id]));
         if (!head.length && !items.length) return;
         var tl = gsap.timeline({ scrollTrigger: { trigger: sec, start: 'top 85%', once: true } });
-        if (head.length) tl.from(head, { y: 22, autoAlpha: 0, duration: 0.8, ease: EASE, stagger: 0.08 });
-        if (items.length) tl.from(items, { y: 28, autoAlpha: 0, duration: 0.8, ease: EASE, stagger: Math.min(0.07, 0.56 / items.length) }, head.length ? '-=0.55' : 0);
+        if (head.length) tl.from(head, { y: 22, autoAlpha: 0, duration: 0.8, ease: EASE, stagger: 0.08, clearProps: CLEAR });
+        if (items.length) tl.from(items, { y: 28, autoAlpha: 0, duration: 0.8, ease: EASE, stagger: Math.min(0.07, 0.56 / items.length), clearProps: CLEAR }, head.length ? '-=0.55' : 0);
         count(tl);
     });
 
     /* employer cards rise in a batch as the row enters */
     var emp = document.querySelectorAll('.emp-card');
-    if (emp.length && !(late && onScreen(emp[0]))) count(gsap.from(emp, { y: 24, autoAlpha: 0, duration: 0.8, ease: EASE, stagger: 0.06,
+    if (emp.length && !(late && onScreen(emp[0]))) count(gsap.from(emp, { y: 24, autoAlpha: 0, duration: 0.8, ease: EASE, stagger: 0.06, clearProps: CLEAR,
         scrollTrigger: { trigger: emp[0].parentElement, start: 'top 88%', once: true } }));
 
     /* depth: the portrait drifts a little slower than the page while the hero scrolls away (scrubbed, transform only) */
