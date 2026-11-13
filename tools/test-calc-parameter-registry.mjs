@@ -85,6 +85,22 @@ ok('S3 every named engine function exists and its page calls it (' + P.filter((p
 const dead = P.filter((p) => !(p.dependsOnInputs || []).length).map((p) => p.id);
 ok('S4 every record has a measured input', !dead.length, dead.join(', '));
 
+/* S6 — a cell that is another cell divided by a constant or by one input cannot depend on fewer inputs than that cell
+ * (minus the divisor). Rounding hid this: Region moved calc.capex.total ($11.34M) but not "$11K/kW" (LTC, v3.54.0). */
+const QUOTIENTS = [
+  ['calc.capex.per_kw', 'calc.capex.total', 'IT load (kW)'],
+  ['calc.opex.monthly', 'calc.opex.total', null],
+  ['calc.opex.per_kw', 'calc.opex.total', 'IT load (kW)'],
+];
+const s6 = [];
+for (const [cell, of, divisor] of QUOTIENTS) {
+  const c = P.find((p) => p.id === cell), o = P.find((p) => p.id === of);
+  if (!c || !o) { s6.push(cell + ' or ' + of + ' missing'); continue; }
+  const lost = o.dependsOnInputs.filter((l) => l !== divisor && !c.dependsOnInputs.includes(l));
+  if (lost.length) s6.push(cell + ' (' + c.display + ') misses ' + lost.join(', ') + ' that move ' + of);
+}
+ok('S6 a quotient cell depends on every input of the cell it divides (' + QUOTIENTS.length + ' pairs)', !s6.length, s6.join('; '));
+
 /* S5 */
 const s5 = [];
 for (const page of PAGES) {

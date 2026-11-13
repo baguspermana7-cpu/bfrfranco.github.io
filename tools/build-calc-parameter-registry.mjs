@@ -94,55 +94,120 @@ function measureInPage(records, settleMs) {
   }
   function fire(el) { ['input', 'change'].forEach(function (t) { el.dispatchEvent(new Event(t, { bubbles: true })); }); }
   function wait(ms) { return new Promise(function (ok) { setTimeout(ok, ms); }); }
-  function move(spec) {
+  /* Each input is probed several ways so a cell rounded for display cannot hide a dependency (LTC FYI, v3.54.0:
+   * "Region" moved calc.capex.total but not "$11K/kW"): a number goes to x0.5, x1.1 and x2 of its default (inside
+   * min/max, on the range step); a list or radio group goes to up to 6 other options spread across it. */
+  function numVariants(el, b) {
+    var lo = el.min !== '' ? parseFloat(el.min) : -Infinity, hi = el.max !== '' ? parseFloat(el.max) : Infinity;
+    var raw = b === 0 ? [isFinite(hi) ? hi * 0.1 : 1, isFinite(hi) ? hi * 0.5 : 10] : [b * 1.1, b * 0.5, b * 2, b * 0.9];
+    var st = el.type === 'range' && el.step && parseFloat(el.step) > 0 ? parseFloat(el.step) : 0, o = isFinite(lo) ? lo : 0;
+    var out = [];
+    raw.forEach(function (v) {
+      v = Math.min(hi, Math.max(lo, v));
+      if (st) v = o + Math.round((v - o) / st) * st;
+      v = parseFloat(v.toFixed(6));
+      if (v !== b && out.indexOf(v) < 0) out.push(v);
+    });
+    if (!out.length && st) out.push(parseFloat((b + st * (b + st > hi ? -1 : 1)).toFixed(6)));
+    return out;
+  }
+  function spread(n, from) {
+    var all = [];
+    for (var i = 0; i < n; i++) if (i !== from) all.push(i);
+    if (all.length <= 6) return all;
+    var pick = [];
+    for (var k = 0; k < 6; k++) pick.push(all[Math.round(k * (all.length - 1) / 5)]);
+    return pick.filter(function (v, i, a) { return a.indexOf(v) === i; });
+  }
+  function probes(spec) {
     if (spec.name) {
       var rs = [].slice.call(document.querySelectorAll('input[name="' + spec.name + '"]'));
       var i = rs.findIndex(function (r) { return r.checked; });
       if (rs.length < 2 || i < 0 || rs[i].closest('.locked')) return null;
-      var to = rs[(i + 1) % rs.length], from = rs[i];
-      to.checked = true; fire(to);
-      return function () { from.checked = true; fire(from); };
+      var from = rs[i];
+      return spread(rs.length, i).map(function (j) {
+        return { apply: function () { rs[j].checked = true; fire(rs[j]); }, undo: function () { from.checked = true; fire(from); } };
+      });
     }
     var el = document.getElementById(spec.id);
     if (!el || el.closest('.locked') || el.disabled) return null;
     var old = el.value;
+    var undo = function () { el.value = old; fire(el); };
     if (el.tagName === 'SELECT') {
       var opts = [].slice.call(el.options).filter(function (o) { return !o.disabled; });
-      var j = opts.map(function (o) { return o.value; }).indexOf(old);
-      if (opts.length < 2 || j < 0) return null;
-      el.value = (opts[j + 1] || opts[j - 1]).value;
-    } else {
-      var b = parseFloat(old);
-      if (!isFinite(b)) return null;
-      var v = b === 0 ? (el.max !== '' ? parseFloat(el.max) * 0.1 : 1) : b * 1.1;
-      if (el.max !== '' && v > parseFloat(el.max)) v = b * 0.9;
-      if (el.type === 'range' && el.step && parseFloat(el.step) > 0) {
-        var st = parseFloat(el.step), o = el.min !== '' ? parseFloat(el.min) : 0;
-        v = o + Math.round((v - o) / st) * st;
-        if (v === b) v = b + st * (el.max !== '' && b + st > parseFloat(el.max) ? -1 : 1);
-      }
-      el.value = String(parseFloat(v.toFixed(6)));
+      var j0 = opts.map(function (o) { return o.value; }).indexOf(old);
+      if (opts.length < 2 || j0 < 0) return null;
+      return spread(opts.length, j0).map(function (j) { return { apply: function () { el.value = opts[j].value; fire(el); }, undo: undo }; });
     }
-    fire(el);
-    return function () { el.value = old; fire(el); };
+    var b = parseFloat(old);
+    if (!isFinite(b)) return null;
+    var vs = numVariants(el, b);
+    if (!vs.length) return null;
+    return vs.map(function (v) { return { apply: function () { el.value = String(v); fire(el); }, undo: undo }; });
+  }
+  /* A record whose engineFn names a result path ("RZEngine.models.capex.detailed → costs.ups") is also read raw: the
+   * engine function is wrapped so its last return is kept, and the path is compared exactly, not as rounded text. */
+  var rawLast = {};
+  function rawSpec(r) {
+    var m = /^(RZEngine(?:\.[A-Za-z_$][\w$]*)+)\s*→\s*([\w.]+)$/.exec(r.engineFn || '');
+    return m ? { fn: m[1], path: m[2] } : null;
+  }
+  function wrap(fnPath) {
+    if (rawLast.hasOwnProperty(fnPath)) return;
+    var parts = fnPath.split('.'), host = window;
+    for (var i = 0; i < parts.length - 1; i++) { host = host && host[parts[i]]; }
+    var name = parts[parts.length - 1];
+    if (!host || typeof host[name] !== 'function') return;
+    var orig = host[name];
+    rawLast[fnPath] = undefined;
+    try { host[name] = function () { var v = orig.apply(this, arguments); rawLast[fnPath] = v; return v; }; } catch (e) { delete rawLast[fnPath]; }
+  }
+  function raw(r) {
+    var sp = rawSpec(r);
+    if (!sp || !rawLast.hasOwnProperty(sp.fn) || rawLast[sp.fn] == null) return undefined;
+    var v = rawLast[sp.fn];
+    sp.path.split('.').forEach(function (k) { v = v == null ? v : v[k]; });
+    return typeof v === 'number' ? v : undefined;
   }
   return (async function () {
+    records.forEach(function (r) { var sp = rawSpec(r); if (sp) wrap(sp.fn); });
+    var first = records[0] && records[0].inputs[0];
+    var kick = first && probes(first);   /* one recalculation so every wrapped engine has a last return */
+    if (kick && kick.length) { kick[0].apply(); await wait(settleMs); kick[0].undo(); await wait(settleMs); }
     var out = {};
-    records.forEach(function (r) { var t = text(r.id); out[r.id] = { count: t.n, display: t.t, value: num(t.t), moved: [], unmovable: [] }; });
+    records.forEach(function (r) {
+      var t = text(r.id);
+      var v0 = num(t.t), r0 = raw(r);
+      /* the raw path counts only when it IS the shown number (within display rounding): "$11K/kW" reads the
+       * engine total but shows total / kW, so its raw total is not its value */
+      if (r0 !== undefined && !(isFinite(v0) && Math.abs(r0 - v0) <= 0.05 * Math.max(Math.abs(r0), 1e-9))) r0 = undefined;
+      out[r.id] = { count: t.n, display: t.t, value: v0, raw: r0, moved: [], movedRawOnly: [], unmovable: [] };
+    });
     var inputs = {};
     records.forEach(function (r) { r.inputs.forEach(function (s) { inputs[s.id || 'name:' + s.name] = s; }); });
     var keys = Object.keys(inputs);
+    function uses(r, key) { return r.inputs.some(function (s) { return (s.id || 'name:' + s.name) === key; }); }
     for (var k = 0; k < keys.length; k++) {
-      var undo = move(inputs[keys[k]]);
-      if (!undo) { records.forEach(function (r) { if (r.inputs.some(function (s) { return (s.id || 'name:' + s.name) === keys[k]; })) out[r.id].unmovable.push(inputs[keys[k]].label); }); continue; }
-      await wait(settleMs);
+      var ps = probes(inputs[keys[k]]);
+      if (!ps) { records.forEach(function (r) { if (uses(r, keys[k])) out[r.id].unmovable.push(inputs[keys[k]].label); }); continue; }
+      var shown = {}, rawMoved = {};
+      for (var q = 0; q < ps.length; q++) {
+        ps[q].apply();
+        await wait(settleMs);
+        records.forEach(function (r) {
+          if (!uses(r, keys[k])) return;
+          if (text(r.id).t !== out[r.id].display) shown[r.id] = true;
+          var rv = raw(r);
+          if (out[r.id].raw !== undefined && rv !== undefined && rv !== out[r.id].raw) rawMoved[r.id] = true;
+        });
+        ps[q].undo();
+        await wait(settleMs);
+      }
       records.forEach(function (r) {
-        if (!r.inputs.some(function (s) { return (s.id || 'name:' + s.name) === keys[k]; })) return;
-        var t = text(r.id).t;
-        if (t !== out[r.id].display) out[r.id].moved.push(inputs[keys[k]].label);
+        if (!uses(r, keys[k])) return;
+        if (shown[r.id] || rawMoved[r.id]) out[r.id].moved.push(inputs[keys[k]].label);
+        if (rawMoved[r.id] && !shown[r.id]) out[r.id].movedRawOnly.push(inputs[keys[k]].label);
       });
-      undo();
-      await wait(settleMs);
     }
     return out;
   })();

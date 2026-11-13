@@ -209,9 +209,17 @@ calculators (capex, opex, tco, roi, carbon, pue) carry 40 headline hooks `calc.<
 - `data/calc-parameters.curated.json` is written by hand: label, unit, formula, the declared inputs (DOM ids or a
   radio group name), the engine function or the page function that does the arithmetic, evidence class, source.
 - `tools/build-calc-parameter-registry.mjs` renders each page at its defaults, reads every hooked cell (`display`,
-  `value`) and moves each declared input on its own (+10 %; a list or radio group to the next option). The inputs
-  that change the cell become `dependsOnInputs`: **measured, never declared**. Output: `data/calc-parameters.json`
+  `value`) and moves each declared input on its own, several ways (since v3.57.0): a number to x0.5, x0.9, x1.1 and
+  x2 of its default inside min/max and on the range step, a list or radio group to up to 6 other options spread
+  across it. Where the record's engine function names a result path and that raw number IS the shown value (within
+  5 %), the raw engine return is compared too, so display rounding cannot hide a dependency. The inputs that change
+  the cell become `dependsOnInputs`: **measured, never declared**. Output: `data/calc-parameters.json`
   and the twin `js/calc-parameters.js` (`RZ_CALC_PARAMETERS`).
+- A quotient cell depends on every input of the cell it divides, minus the divisor (law S6 in
+  `tools/test-calc-parameter-registry.mjs`; pairs: CAPEX per kW / total, OPEX monthly / total, OPEX per kW / total).
+  It was red on v3.54.0: Region, fuel autonomy and both fire inputs moved the CAPEX total ($11.34M) but not the
+  per-kW cell, shown as "$11K/kW" (found by the LTC session). The cell now shows whole dollars ("$11,343/kW"), as the
+  benchmark label on the same page already did.
 - The drawer (`js/rz-basis-drawer.js` with `data-rz-registry="RZ_CALC_PARAMETERS"`) shows *Value now* (the cell),
   *At defaults* (the registry), *Inputs now* (read from the page when it opens) and *Computed by*: the engine
   function, or the page function marked "page arithmetic, not in RZEngine". 25 of the 40 values are page

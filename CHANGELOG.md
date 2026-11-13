@@ -11,6 +11,32 @@ release sections rather than semver.
 
 ---
 
+## v3.57.0 — 2026-11-14 — Calculator basis: dependencies measured past display rounding
+
+### Fixed
+- **The calculator registry missed inputs that a rounded cell hid** (found by the LTC session). The builder moved each
+  input +10 % and compared the cell's TEXT, so "$11K/kW" did not change when Region, fuel autonomy or the two fire
+  inputs moved the CAPEX total ($11.34M). The basis drawer therefore listed 7 inputs for CAPEX per kW instead of 11.
+  - each input is now probed several ways: a number at x0.5, x0.9, x1.1 and x2 of its default (inside min/max, on the
+    range step), a list or radio group at up to 6 other options
+  - where a record's engine function names a result path and that raw value IS the shown number (within 5 %), the
+    raw engine return is compared as well
+  - 9 records gained inputs, none lost one: CAPEX per kW (+fuel autonomy, fire alarm, Region), PUE (+UPS load),
+    DCiE (+lighting), annual energy (+UPS load), TCO lowest and per kW (+Tier), IRR (+tax rate), payback ">20"
+    (+CAPEX, capacity, PUE, electricity price), carbon intensity (+refrigerant leak rate)
+- **CAPEX per kW shows whole dollars** ("$11,343/kW", as the benchmark label on the same page already did): at
+  thousands the fire-suppression effect could not show at all.
+- **A wide value no longer loses its last letter on phones.** Below 600 px the result rows of every calculator fixed
+  the value column at 7rem, so "$11,343/kW" was clipped to "$11,343/k" at 390 px; the column is now
+  `minmax(7rem, auto)` like the desktop rule (`css/rz-tool.css`, 67 pages).
+
+### Added
+- Law S6 in `tools/test-calc-parameter-registry.mjs`: a quotient cell depends on every input of the cell it divides,
+  minus the divisor (CAPEX per kW / total, OPEX monthly / total, OPEX per kW / total). RED on the v3.56 registry.
+
+Standards: ACCURACY_VALIDATION.md (calculator registry measurement + S6), CALCULATOR_PROMPT_STANDARD.md (value never
+clipped).
+
 ## v3.56.0 — 2026-11-14 — Reproduce an incident in a calculator (PRD-Q03)
 
 Owner decision 2026-11-13 (R123): "Yes, yg terbaik" — build, accept all four entries (D-Q03-1..4).

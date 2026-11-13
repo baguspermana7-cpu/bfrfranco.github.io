@@ -77,6 +77,7 @@ window.RZ_CALC_PARAMETERS = {
     "Containment",
     "Climate zone",
     "UPS type",
+    "UPS load (%)",
     "Redundancy",
     "Lighting (W/m²)",
     "Security (kW/rack)",
@@ -164,6 +165,7 @@ window.RZ_CALC_PARAMETERS = {
     "UPS type",
     "UPS load (%)",
     "Redundancy",
+    "Lighting (W/m²)",
     "Security (kW/rack)",
     "Fire systems (kW/rack)"
    ],
@@ -333,6 +335,7 @@ window.RZ_CALC_PARAMETERS = {
     "Containment",
     "Climate zone",
     "UPS type",
+    "UPS load (%)",
     "Redundancy",
     "Security (kW/rack)",
     "Fire systems (kW/rack)"
@@ -590,16 +593,20 @@ window.RZ_CALC_PARAMETERS = {
    "page": "capex-calculator.html",
    "kind": "derived",
    "scope": "capex-calculator.html",
-   "display": "$11K/kW",
-   "value": 11000,
+   "display": "$11,343/kW",
+   "value": 11343,
    "dependsOnInputs": [
     "Rack density",
     "Cooling",
     "Redundancy",
+    "Fuel autonomy (h)",
     "Building type",
     "Seismic zone",
+    "Fire suppression",
+    "Fire alarm",
     "UPS type",
-    "Generator type"
+    "Generator type",
+    "Region"
    ],
    "notMovable": [],
    "consumers": [
@@ -1844,6 +1851,7 @@ window.RZ_CALC_PARAMETERS = {
     "IT load (MW)",
     "Location",
     "Period (years)",
+    "Tier",
     "Growth (%/yr)"
    ],
    "notMovable": [],
@@ -2180,6 +2188,7 @@ window.RZ_CALC_PARAMETERS = {
     "IT load (MW)",
     "Location",
     "Period (years)",
+    "Tier",
     "Growth (%/yr)"
    ],
    "notMovable": [],
@@ -2362,6 +2371,7 @@ window.RZ_CALC_PARAMETERS = {
     "Project life (yrs)",
     "Debt ratio (%)",
     "Interest (%)",
+    "Tax rate (%)",
     "Exit cap rate (%)"
    ],
    "notMovable": [],
@@ -2443,7 +2453,11 @@ window.RZ_CALC_PARAMETERS = {
    "display": ">20",
    "value": null,
    "dependsOnInputs": [
+    "Total CAPEX ($)",
+    "IT capacity (MW)",
+    "PUE",
     "Revenue ($/kW-month)",
+    "Electricity ($/kWh)",
     "Project life (yrs)"
    ],
    "notMovable": [],
@@ -3075,7 +3089,8 @@ window.RZ_CALC_PARAMETERS = {
     "Renewable share (%)",
     "Generator fuel",
     "Generator hours/yr",
-    "Cooling type"
+    "Cooling type",
+    "Refrigerant leak rate (%)"
    ],
    "notMovable": [],
    "consumers": [
