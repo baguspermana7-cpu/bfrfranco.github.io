@@ -338,7 +338,7 @@
         </header>
 
         <!-- 1. PURPOSE & ENGINEERING BASIS -->
-        <section class="mn-section">
+        <section id="purpose-and-engineering-basis" class="mn-section">
             <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
             <p class="mn-lead">The Data Hall SCADA Console is a <strong>governed-basis cockpit simulator</strong> for a four-hall conventional data centre. It does not accept arbitrary operating inputs. Every KPI derives from the deep-frozen <code class="mn-mono">CONV_CALC v2.0.0</code> snapshot shared by the Conventional BMS suite. Current operation is 30 MW IT across four equal 7.5 MW halls; 4 × 10 MW is the governed design boundary, not a second live operating value.</p>
             <p class="mn-lead">The basis is documented in <code class="mn-mono">Documents/screenshot bms rz/conv/review/09-engineering-basis-and-calculations.md</code> and codified in <code class="mn-mono">js/conv-engine.js</code>. The governing accuracy rules (ACCURACY_VALIDATION 6 rules) are:</p>
@@ -360,7 +360,7 @@
         </section>
 
         <!-- 2. LOCKED BASIS PARAMETERS -->
-        <section class="mn-section">
+        <section id="locked-basis-parameters" class="mn-section">
             <h2><span class="mn-num">02</span> Locked basis parameters</h2>
             <p class="mn-lead">These are the <em>only authored inputs</em> in <code class="mn-mono">CONV_CALC.model</code>. Everything displayed on the cockpit is derived from this table — no other numbers are directly set.</p>
             <div class="mn-tablewrap">
@@ -390,7 +390,7 @@
         </section>
 
         <!-- 3. METHODOLOGY -->
-        <section class="mn-section">
+        <section id="calculation-methodology" class="mn-section">
             <h2><span class="mn-num">03</span> Calculation methodology</h2>
             <p class="mn-lead">Each derivation below maps one-to-one to a named function in <code class="mn-mono">js/conv-engine.js</code>. The function name appears in the source tag; the formula is transcribed exactly from the engine. No constant is hard-coded inside these functions — all literals come from <code class="mn-mono">CONV_MODEL</code>.</p>
 
@@ -456,7 +456,7 @@
         </section>
 
         <!-- 4. CONSTANTS & SOURCES -->
-        <section class="mn-section">
+        <section id="constants-and-data-sources" class="mn-section">
             <h2><span class="mn-num">04</span> Constants &amp; data sources</h2>
             <p class="mn-lead">Every constant in <code class="mn-mono">CONV_MODEL</code> carries a <code>// source:</code> comment referencing a review-doc file and line number. The primary authority document is <code class="mn-mono">conv/review/09-engineering-basis-and-calculations.md</code>. Secondary references for individual values:</p>
             <div class="mn-tablewrap">
@@ -477,7 +477,7 @@
         </section>
 
         <!-- 5. KPI STRIP OUTPUTS -->
-        <section class="mn-section">
+        <section id="kpi-strip-outputs" class="mn-section">
             <h2><span class="mn-num">05</span> KPI strip outputs</h2>
             <p class="mn-lead">The cockpit renders the following nine KPIs from <code class="mn-mono">CONV_CALC.snapshot</code>. Snapshot values are computed once at load and deep-frozen — they never change during a session.</p>
             <div class="mn-tablewrap">
@@ -503,7 +503,7 @@
         </section>
 
         <!-- 6. WORKED EXAMPLE -->
-        <section class="mn-section">
+        <section id="worked-example-current-30-mw-site" class="mn-section">
             <h2><span class="mn-num">06</span> Worked example — current 30 MW site</h2>
             <p class="mn-lead">The exact scenario displayed on the live cockpit. Each number is reproduced from <code class="mn-mono">CONV_CALC.snapshot</code> and must match the live page within ±0.1 (one decimal place rounding).</p>
             <div class="mn-worked">
@@ -528,7 +528,7 @@
         </section>
 
         <!-- 7. REFERENCES -->
-        <section class="mn-section">
+        <section id="references-and-standards" class="mn-section">
             <h2><span class="mn-num">07</span> References &amp; standards</h2>
             <ul class="mn-refs">
                 <li><b>ASHRAE Handbook — Data Centers and Telecommunication Facilities</b> — rack-inlet recommended dry-bulb envelope (18–27 °C for the applicable A classes) and class/dew-point-dependent humidity guidance. The project 25.4 °C target and 48% RH basis remain site decisions.</li>
@@ -545,7 +545,7 @@
         </section>
 
         <!-- 8. ASSUMPTIONS & LIMITS -->
-        <section class="mn-section">
+        <section id="assumptions-and-limitations" class="mn-section">
             <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
             <p class="mn-lead">The cockpit models a <strong>four-hall, steady-state</strong> conventional data centre at the adopted load point. Hall A-D are equal operating views; central plant and site utilities remain site authorities.</p>
             <div class="mn-tablewrap">
@@ -566,7 +566,7 @@
         </section>
 
         <!-- 9. OPERATOR WORKFLOW AND TELEMETRY -->
-        <section class="mn-section" data-explain-scan>
+        <section id="cockpit-workflow-and-telemetry-point-map" class="mn-section" data-explain-scan>
             <h2><span class="mn-num">09</span> Cockpit workflow &amp; telemetry-point map</h2>
             <p class="mn-lead">The console is a deterministic teaching SCADA, not a live BMS endpoint. Read it top-down: alarm strip, engineering roll-up, balance band, selected heat-map layer, equipment inspector, then event log. Every value below maps to a concrete DOM binding or <code class="mn-mono">CONV_CALC.snapshot</code> field.</p>
             <div class="mn-tablewrap">
@@ -591,7 +591,7 @@
         </section>
 
         <!-- 10. DETERMINISTIC SPATIAL AND ALARM LOGIC -->
-        <section class="mn-section">
+        <section id="spatial-model-cooling-balance-and-alarm-logic" class="mn-section">
             <h2><span class="mn-num">10</span> Spatial model, cooling balance &amp; alarm logic</h2>
             <p class="mn-lead">The rack field deliberately separates deterministic basis data from the temporary excursion simulator. Reloading produces the same occupancy, rack loads and normal cold-aisle temperatures; only an explicit excursion may introduce bounded short-lived variation.</p>
             <div class="mn-formula">
@@ -618,7 +618,7 @@
         </section>
 
         <!-- 11. GLOSSARY AND OPERATING LIMITS -->
-        <section class="mn-section" data-explain-scan>
+        <section id="glossary-operating-sequence-and-limitations" class="mn-section" data-explain-scan>
             <h2><span class="mn-num">11</span> Glossary, operating sequence &amp; limitations</h2>
             <p class="mn-lead"><span data-explain="CRAH">CRAH</span>, <span data-explain="PUE">PUE</span>, <span data-explain="WUE">WUE</span>, N+1 and EPMS terms are exposed to RZExplain. These definitions describe the cockpit model and must not be mistaken for site commissioning set-points.</p>
             <div class="mn-tablewrap">
@@ -694,7 +694,7 @@
     })();
     </script>
     <script src="../js/rz-manual-toc.js?v=20261110-9866a7c8" defer></script>
-    <script src="../js/rz-version.js?v=20261112-771298f2" defer></script>
+    <script src="../js/rz-version.js?v=20261113-4cf7b941" defer></script>
     <script src="../js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="../js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <script src="../js/rz-command-palette.js?v=20261111-5028a9f4" defer></script>

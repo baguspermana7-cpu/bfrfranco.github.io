@@ -339,7 +339,7 @@
         </header>
 
         <!-- 1. PURPOSE -->
-        <section class="mn-section">
+        <section id="purpose-and-engineering-basis" class="mn-section">
             <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
             <p class="mn-lead">The OPEX Calculator produces an annual operating-cost estimate for a colocation or owned data center. It decomposes total cost into six independently-modelled lines: <strong>energy</strong> (IT load × PUE × hours × rate), <strong>staffing</strong> (FTE by tier and staffing model), <strong>maintenance</strong> (per-system $/kW rates, age-adjusted, OEM-factored), <strong>spare parts inventory</strong> (risk-weighted by contract model), <strong>software &amp; licensing</strong> (DCIM, BMS, CMMS, cybersecurity), and <strong>insurance &amp; compliance</strong> (jurisdiction-specific). A 4 000-run Monte Carlo seeded around these deterministic core values produces P10/P50/P90 confidence bands.</p>
             <p class="mn-lead">The primary design authorities are <strong>ASHRAE TC 9.9 (2021)</strong> for PUE &amp; thermal envelopes, <strong>Uptime Institute Tier Standard</strong> for staffing benchmarks (4.2 FTE/MW critical-facilities), and <strong>IEC 62040-3</strong> / <strong>ISO/IEC 30134-2</strong> for energy metrics. Country electricity and labor rates come from national utility filings and statistics (as-of 2026, cited per row in <code class="mn-mono">DATA.opsBudget.countries</code>).</p>
@@ -347,7 +347,7 @@
         </section>
 
         <!-- 2. INPUTS -->
-        <section class="mn-section">
+        <section id="inputs" class="mn-section">
             <h2><span class="mn-num">02</span> Inputs</h2>
             <p class="mn-lead">Fourteen inputs across four groups — facility profile, energy model, staffing model, and optional advanced parameters. Core inputs are always active; advanced inputs are unlocked in the expanded panel.</p>
             <div class="mn-tablewrap">
@@ -374,7 +374,7 @@
         </section>
 
         <!-- 3. METHODOLOGY -->
-        <section class="mn-section">
+        <section id="calculation-methodology" class="mn-section">
             <h2><span class="mn-num">03</span> Calculation methodology</h2>
             <p class="mn-lead">Six independently-modelled cost lines, each with its own data path. All function names below map to the page-side calculation in <code class="mn-mono">opex-calculator.html</code>, cross-checked against <code class="mn-mono">RZEngine.models.opsBudget.opex()</code> and <code class="mn-mono">RZEngine.models.opsBudget.staffing()</code>.</p>
 
@@ -438,7 +438,7 @@
         </section>
 
         <!-- 4. CONSTANTS & SOURCES -->
-        <section class="mn-section">
+        <section id="constants-and-data-sources" class="mn-section">
             <h2><span class="mn-num">04</span> Constants &amp; data sources</h2>
             <p class="mn-lead">Every constant lives in <code class="mn-mono">DATA.opsBudget</code> with a corresponding <code>DATA.sources['opsBudget']</code> citation (as-of 2026). Partial listing of the most material constants:</p>
 
@@ -532,7 +532,7 @@
         </section>
 
         <!-- 5. OUTPUTS -->
-        <section class="mn-section">
+        <section id="outputs" class="mn-section">
             <h2><span class="mn-num">05</span> Outputs</h2>
             <div class="mn-tablewrap">
             <table class="mn-table">
@@ -556,7 +556,7 @@
         </section>
 
         <!-- 6. WORKED EXAMPLE -->
-        <section class="mn-section">
+        <section id="worked-example" class="mn-section">
             <h2><span class="mn-num">06</span> Worked example</h2>
             <p class="mn-lead">Inputs: 1 000 kW IT load · PUE 1.50 base · water-cooled chiller (pueImpact 0) · tropical-humid climate · Indonesia (energyRate $0.085/kWh, laborMult 1.0×, maintMult 1.0×) · Tier III · in-house staffing · mid-age facility · 70% utilization. Numbers reproduce the live calculator output.</p>
             <div class="mn-worked">
@@ -588,7 +588,7 @@
         </section>
 
         <!-- 7. REFERENCES -->
-        <section class="mn-section">
+        <section id="references-and-data-sources" class="mn-section">
             <h2><span class="mn-num">07</span> References &amp; data sources</h2>
             <ul class="mn-refs">
                 <li><b>ASHRAE TC 9.9 (2021)</b> — Thermal Guidelines for Data Processing Environments, 5th ed. PUE definition, cooling-type effectiveness ranges, and climate-zone thermal envelopes.</li>
@@ -605,7 +605,7 @@
         </section>
 
         <!-- 8. ASSUMPTIONS & LIMITS -->
-        <section class="mn-section">
+        <section id="assumptions-and-limitations" class="mn-section">
             <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
             <p class="mn-lead">The calculator assumes steady-state annual operation at the stated utilization level. Seasonal load variation, demand-charge components, time-of-use tariff spikes, and short-interval peaks are not modelled. Specific scope and limitations:</p>
             <p class="mn-lead"><strong>Energy:</strong> assumes a flat energy tariff ($/kWh). Demand charges ($/kW/month) can be material in some US and Japanese markets and are not included. Free-cooling hours (captured in climate zone) reduce the effective cooling load in temperate and cold zones but the model does not apply these as a direct reduction — they are reflected through the <code>coolingEnergyMult</code> applied to the cooling-overhead fraction.</p>
@@ -670,7 +670,7 @@
     </script>
     <script src="../js/rz-manual-toc.js?v=20261110-9866a7c8" defer></script>
     <script src="../js/rz-manual-links.js?v=20261111-33875d8f" defer></script>
-    <script src="../js/rz-version.js?v=20261112-771298f2" defer></script>
+    <script src="../js/rz-version.js?v=20261113-4cf7b941" defer></script>
     <script src="../js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="../js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <script src="../js/rz-command-palette.js?v=20261111-5028a9f4" defer></script>

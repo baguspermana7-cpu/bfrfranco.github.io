@@ -339,7 +339,7 @@
         </header>
 
         <!-- 1. PURPOSE -->
-        <section class="mn-section">
+        <section id="purpose-and-engineering-basis" class="mn-section">
             <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
             <p class="mn-lead">The CAPEX calculator produces a parametric, Class 4 (Study / Feasibility) budgetary estimate of data-center construction cost. It answers five pre-design questions: <em>what is the total build cost</em>, <em>how does cost break down across engineering disciplines</em>, <em>what floor area and rack count does the design imply</em>, <em>what construction schedule should the project plan against</em>, and <em>what annual energy cost will the facility carry</em>.</p>
             <p class="mn-lead">The governing cost basis is the <strong>Turner &amp; Townsend Data Center Cost Index (DCCI) 2025</strong>, supplemented by the Cushman &amp; Wakefield Data Center Cost Guide 2025 for city-level $/W anchors and JLL 2026 escalation indices. Category cost factors are calibrated so that the Americas baseline (locMult 1.00) at 4.65 $/W matches the sourced composite anchor. The model is AACE Class 4: project definition maturity 1–15%, typical accuracy −30% / +50%. It is an engineering pre-design screening tool, not a contractor bid.</p>
@@ -347,7 +347,7 @@
         </section>
 
         <!-- 2. INPUTS -->
-        <section class="mn-section">
+        <section id="inputs" class="mn-section">
             <h2><span class="mn-num">02</span> Inputs</h2>
             <p class="mn-lead">Seventeen core inputs across five groups — IT infrastructure, cooling &amp; density, fire/life-safety, power, and location. Eighteen additional advanced parameters unlock in Advanced mode. All defaults below reproduce the page's <code class="mn-mono">value=""</code> / <code class="mn-mono">selected</code> attributes exactly.</p>
             <div class="mn-tablewrap">
@@ -378,7 +378,7 @@
         </section>
 
         <!-- 3. METHODOLOGY -->
-        <section class="mn-section">
+        <section id="calculation-methodology" class="mn-section">
             <h2><span class="mn-num">03</span> Calculation methodology</h2>
             <p class="mn-lead">All arithmetic is in <code class="mn-mono">RZEngine.models.capex.detailed(inp)</code>. The model has five sequential stages: resolve multipliers → compute 14 base cost lines → add advanced per-rack and fiber costs → apply soft costs and contingency → derive PUE, space, and timeline. Function location: <code class="mn-mono">rz-engine.js</code> approximately line 8399.</p>
 
@@ -476,7 +476,7 @@
         </section>
 
         <!-- 4. CONSTANTS -->
-        <section class="mn-section">
+        <section id="constants-and-data-sources" class="mn-section">
             <h2><span class="mn-num">04</span> Constants &amp; data sources</h2>
             <p class="mn-lead">Every constant lives in <code class="mn-mono">DATA.capexDetail</code> (rz-engine.js ~line 5266) with provenance registered in <code class="mn-mono">DATA.sources['capexDetail']</code>. The 14 base cost factors in $/kW IT:</p>
             <div class="mn-tablewrap">
@@ -520,7 +520,7 @@
         </section>
 
         <!-- 5. OUTPUTS -->
-        <section class="mn-section">
+        <section id="outputs" class="mn-section">
             <h2><span class="mn-num">05</span> Outputs</h2>
             <p class="mn-lead">The engine returns a single object <code class="mn-mono">R</code>. The calculator page reads these fields to populate the KPI summary, cost breakdown chart, space program table, and timeline strip.</p>
             <div class="mn-tablewrap">
@@ -547,7 +547,7 @@
         </section>
 
         <!-- 6. WORKED EXAMPLE -->
-        <section class="mn-section">
+        <section id="worked-example" class="mn-section">
             <h2><span class="mn-num">06</span> Worked example</h2>
             <p class="mn-lead">1 000 kW IT, standard rack (6 kW/rack), air cooling, N+1 redundancy, 48 h fuel autonomy, purpose-built building, seismic zone 2 (moderate), Novec 1230 fire suppression, addressable fire alarm, modular UPS, diesel generator, Americas region (locMult 1.00), no city override, simple mode (no advanced options). All numbers below are the literal output of <code class="mn-mono">RZEngine.models.capex.detailed()</code> run against <code class="mn-mono">rz-engine.js</code> via Node.js <code class="mn-mono">vm.runInContext</code> — engine run verified.</p>
             <div class="mn-worked">
@@ -584,7 +584,7 @@
         </section>
 
         <!-- 7. REFERENCES -->
-        <section class="mn-section">
+        <section id="references-and-standards" class="mn-section">
             <h2><span class="mn-num">07</span> References &amp; standards</h2>
             <ul class="mn-refs">
                 <li><b>T&amp;T DCCI 2025</b> — Turner &amp; Townsend Data Center Cost Index 2025: primary source for regional build-cost benchmarks, cost-category composition, and the city $/W anchor table (58 markets).</li>
@@ -599,7 +599,7 @@
         </section>
 
         <!-- 8. ASSUMPTIONS -->
-        <section class="mn-section">
+        <section id="assumptions-and-limitations" class="mn-section">
             <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
             <p class="mn-lead">The model is a <strong>Class 4 parametric estimate</strong> (AACE 18R-97). Its accuracy is inherently −30% / +50% with 1–15% project definition completeness. Specific limitations and assumptions:</p>
             <p class="mn-lead"><strong>Cost basis:</strong> category $/kW factors are anchored to the T&amp;T DCCI 2025 composite benchmark, calibrated so that <code>Americas locMult 1.00 × all-defaults ≈ 4.65 $/W</code>. They represent a market-median build; owner-specific procurement, site conditions, and design choices can shift individual lines by ±50%+.</p>
@@ -664,7 +664,7 @@
     </script>
     <script src="../js/rz-manual-toc.js?v=20261110-9866a7c8" defer></script>
     <script src="../js/rz-manual-links.js?v=20261111-33875d8f" defer></script>
-    <script src="../js/rz-version.js?v=20261112-771298f2" defer></script>
+    <script src="../js/rz-version.js?v=20261113-4cf7b941" defer></script>
     <script src="../js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="../js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <script src="../js/rz-command-palette.js?v=20261111-5028a9f4" defer></script>

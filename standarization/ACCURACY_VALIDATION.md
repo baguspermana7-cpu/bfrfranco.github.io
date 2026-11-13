@@ -224,6 +224,30 @@ calculators (capex, opex, tco, roi, carbon, pue) carry 40 headline hooks `calc.<
   hook fails coverage; a changed page default fails parity.
 - Not covered (stage 2, not started): every other numeral on these pages, and the other five calculators.
 
+**Ask about this page (PRD-P21 stage 1, v3.53.0).** The 15 pages that load the basis drawer (8 Conventional
+cockpits, `datahallAI.html`, the 6 project calculators) carry an **Ask** control (`js/rz-ask.js`, slot
+`[data-rz-ask-slot]`). It answers from records only and uses no AI:
+
+- `tools/build-explain-index.mjs` writes `data/explain/<page>.json` from the page's registry (records the page shows,
+  consumes or documents in its manual) and its manual's `<section id>` blocks, tokenised by `RZAsk.tokens` — the
+  same tokenizer the browser uses. Synonyms (English abbreviations, Indonesian terms) are curated by hand in
+  `data/explain-synonyms.json`. The index is lazy: it loads when the panel opens.
+- Ranking is BM25; the **hit decision is coverage**, not score: the share of the reader's words a document carries in
+  a label, id or heading. A word the page's index has never seen counts double; a word on half the page's documents
+  counts half. Under 0.51 the answer is the honest miss "Not covered by this tool's records" with the manual link.
+- An answer is the template `<label> = <value> <unit>. It is <EVIDENCE>: <note>. Formula: … Source: …`, filled from
+  the live registry record and the evidence table, and rendered with `textContent`. A value the page hides for a
+  signed-out visitor (`[data-rz-basis-gated]`) is withheld; a page without engine authority prints none.
+- Gate `tools/test-explain-ask.mjs`: every cited id resolves in the registry the page's drawer reads and every anchor
+  exists in the manual the page links; 20 fixture questions in the top 3 (floor 18), 10 off-topic misses (10/10), 12
+  held-out questions written after tuning (11/12, floor 10), < 50 ms per answer, every sentence a template; in the
+  browser the card opens the drawer on its record, loading and failed-load states with Retry, gated values withheld,
+  hostile markup in a record shown as text, 390 px, axe, and the control on all 15 pages. RED: coverage threshold 0
+  (3 off-topic questions answered), a renamed manual anchor, `innerHTML` rendering and the gating check removed.
+- The seven manuals without section ids (datahall, capex, carbon, opex, tco, pue, roi) now carry them statically,
+  equal to the ids `js/rz-manual-toc.js` used to assign at run time, so a `manual/x.html#section` link lands.
+- Stage 2 (an LLM layer) is BLOCKED on the owner (model, server key, cost, fabrication risk).
+
 ## Acceptance tests (CI-gateable)
 
 These are the reviewer's acceptance tests adopted as the validation

@@ -339,7 +339,7 @@
         </header>
 
         <!-- 1. PURPOSE -->
-        <section class="mn-section">
+        <section id="purpose-and-engineering-basis" class="mn-section">
             <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
             <p class="mn-lead">The calculator answers one investment question: <em>given a set of assumptions about CAPEX, revenue, operating costs, occupancy ramp, and financing, does this data center project create value above the cost of capital?</em> It does this by projecting a year-by-year cashflow model and applying three complementary lenses:</p>
             <ul style="color:var(--mn-muted);line-height:1.8;padding-left:1.3rem;font-size:1rem;margin:0 0 0.9rem;">
@@ -352,7 +352,7 @@
         </section>
 
         <!-- 2. INPUTS -->
-        <section class="mn-section">
+        <section id="inputs" class="mn-section">
             <h2><span class="mn-num">02</span> Inputs</h2>
             <p class="mn-lead">Twenty-six inputs across six groups. Free-mode inputs drive the deterministic model; Full access-mode adds financing and tax/depreciation parameters. All inputs are validated client-side with out-of-range warnings via <code class="mn-mono">RZCalc.validateNumbers()</code> in <code class="mn-mono">js/rz-calc-utils.js</code>.</p>
 
@@ -438,7 +438,7 @@
         </section>
 
         <!-- 3. METHODOLOGY -->
-        <section class="mn-section">
+        <section id="calculation-methodology" class="mn-section">
             <h2><span class="mn-num">03</span> Calculation methodology</h2>
             <p class="mn-lead">The engine builds a year-by-year cashflow vector then applies five successive calculations: occupancy interpolation, revenue and OPEX construction, NPV, IRR, and payback. All arithmetic runs inline in <code class="mn-mono">roi-calculator.html</code>; IRR falls back to <code class="mn-mono">RZEngine.models.roi.irr()</code> if the shared engine is loaded.</p>
 
@@ -573,7 +573,7 @@
         </section>
 
         <!-- 4. CONSTANTS -->
-        <section class="mn-section">
+        <section id="constants-and-data-sources" class="mn-section">
             <h2><span class="mn-num">04</span> Constants &amp; data sources</h2>
             <p class="mn-lead">Fixed values embedded in the model with their provenance. User-overridable inputs are listed in Section 02; these are not user-adjustable.</p>
             <div class="mn-tablewrap">
@@ -610,7 +610,7 @@
         </section>
 
         <!-- 5. OUTPUTS -->
-        <section class="mn-section">
+        <section id="outputs" class="mn-section">
             <h2><span class="mn-num">05</span> Outputs</h2>
             <div class="mn-tablewrap">
             <table class="mn-table">
@@ -632,7 +632,7 @@
         </section>
 
         <!-- 6. WORKED EXAMPLE -->
-        <section class="mn-section">
+        <section id="worked-example-verified-by-node-e" class="mn-section">
             <h2><span class="mn-num">06</span> Worked example — verified by <code>node -e</code></h2>
             <p class="mn-lead">Default inputs: $100M CAPEX, 10 MW IT, 20-year life, 18-month construction, retail colo at $185/kW/mo, 3% escalation, 15% ancillary, $0.08/kWh electricity, PUE 1.4, $3M staffing, $1.5M maintenance, $0.8M insurance, 2.5% OPEX escalation, moderate occupancy ramp (y1=25, y3=60, y5=85, max=92%), 70/30 debt, 6% interest, 10-year loan, 8% WACC, 25% tax, straight-line depreciation, cap-rate terminal at 5.5%. Results verified by running the inline JavaScript via <code>node -e</code>.</p>
 
@@ -658,7 +658,7 @@
         </section>
 
         <!-- 7. REFERENCES -->
-        <section class="mn-section">
+        <section id="references-and-standards" class="mn-section">
             <h2><span class="mn-num">07</span> References &amp; standards</h2>
             <ul class="mn-refs">
                 <li><b>JLL Data Center Outlook</b> — Annual global market report: vacancy rates, absorption, pricing benchmarks ($100–400/kW/mo), cap rate data. Primary calibration source for revenue defaults and occupancy presets.</li>
@@ -674,7 +674,7 @@
         </section>
 
         <!-- 8. ASSUMPTIONS AND DISCLAIMER -->
-        <section class="mn-section">
+        <section id="assumptions-limitations-and-disclaimer" class="mn-section">
             <h2><span class="mn-num">08</span> Assumptions, limitations &amp; disclaimer</h2>
             <p class="mn-lead"><strong>Model assumptions:</strong> The cashflow model assumes a single-tranche equity-plus-debt capital structure, level-payment amortisation, no refinancing during the hold period, no revenue from power resale or renewable energy credits, and no construction-phase interest capitalisation (CAPEX is deployed as a single Year-0 outflow). Loss carryforward is simplified to zero-floor taxable income (not accumulated). Tax treatment ignores alternative minimum tax, state and local tax overlays, and transfer-pricing considerations. Terminal-value cap-rate method ignores transaction costs and capital gains tax at exit.</p>
             <p class="mn-lead"><strong>Electricity OPEX:</strong> The model assumes electricity cost escalates at a fixed 3.5%/yr regardless of the user's OPEX escalation slider. This approximates a power-pass-through contract structure; fully hedged fixed-rate power would reduce this to near zero escalation.</p>
@@ -740,7 +740,7 @@
     </script>
     <script src="../js/rz-manual-toc.js?v=20261110-9866a7c8" defer></script>
     <script src="../js/rz-manual-links.js?v=20261111-33875d8f" defer></script>
-    <script src="../js/rz-version.js?v=20261112-771298f2" defer></script>
+    <script src="../js/rz-version.js?v=20261113-4cf7b941" defer></script>
     <script src="../js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="../js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <script src="../js/rz-command-palette.js?v=20261111-5028a9f4" defer></script>

@@ -11,6 +11,35 @@ release sections rather than semver.
 
 ---
 
+## v3.53.0 — 2026-11-13 — Ask about this page, answered only from the page's records
+
+### Added
+- **Ask about this page (P21 stage 1).** An **Ask** control on the 15 pages that carry the basis drawer: the 8 Conventional cockpits, the AI data hall and the 6 project calculators. Type a question; up to three answers come back. No AI is involved.
+  - An answer is filled from a registry record: `<label> = <value> <unit>. It is <evidence>: <note>. Formula: … Source: …`, with **Open basis** (the drawer on that record) and a link to the closest manual section. A question about a manual topic returns that section.
+  - A question the page's records do not cover returns "Not covered by this tool's records" and a link to the manual.
+  - Matching is by keyword over the page's own records and manual sections, with a curated synonym list that includes Indonesian ("biaya", "emisi", "kenapa"). The index loads when the panel opens.
+  - A value hidden for signed-out visitors stays hidden in the answer.
+  - Failed index load: "Search of this page's records is unavailable" with Retry.
+- The seven manuals that had no section ids (datahall, capex, carbon, opex, tco, pue, roi) carry them now, equal to the ones the contents rail assigned at run time, so links to a section land on it.
+
+### Fixed
+- The local test server used by the P10 calculator registry builder crashed on a missing file (it sent a 200 head before reading the file). It now returns 404.
+
+### Gates
+- `tools/test-explain-ask.mjs` (22 checks):
+  - Every cited record id resolves in the registry the page's drawer reads; every manual anchor exists in the manual the page links.
+  - 20 fixture questions answered in the top 3 (20/20, floor 18); "why is PUE 1.165" on the AI data hall answers `pue.design_day` first.
+  - 10 off-topic questions return the miss (10/10). 12 held-out questions written after tuning: 11/12 (floor 10); "maintenance cost per year" ranks the OPEX total above the maintenance line.
+  - Slowest answer under 7 ms (limit 50 ms). Every sentence is a template over record fields.
+  - In the browser: the card opens the drawer on its record; Escape closes drawer then panel and returns focus; loading and failed-load states with Retry; a gated CAPEX value withheld; markup in a record renders as text; 390 px; axe 0 serious; the control on all 15 pages at 1366 and 390 px.
+  - RED: coverage threshold 0 (3 off-topic questions answered), a renamed manual anchor (2 checks), `innerHTML` rendering plus the gating check removed (2 checks).
+- `tools/build-explain-index.mjs --check` joins the generator freshness gate.
+
+### Not in this release
+- **P21 stage 2 (an LLM answer layer) is BLOCKED** on the owner: model, a server-held key, cost, and the risk of fabricated answers.
+- The palette action "Ask about this number" (P14 link) is not built.
+- Several AI data hall registry labels are terse ("design day", "pue"); the card shows the record id under the label.
+
 ## v3.52.0 — 2026-11-13 — Click a calculator result to see its basis; the engine as an ES module
 
 ### Added

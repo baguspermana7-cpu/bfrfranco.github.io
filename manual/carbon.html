@@ -340,14 +340,14 @@
         </header>
 
         <!-- 1. PURPOSE -->
-        <section class="mn-section">
+        <section id="purpose-and-engineering-basis" class="mn-section">
             <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
             <p class="mn-lead">The Carbon Footprint Analyzer quantifies greenhouse-gas emissions from a data center across three boundary layers defined by the <strong>GHG Protocol Corporate Standard</strong>: direct emissions you own (Scope 1), electricity you purchase (Scope 2), and supply-chain and construction emissions you induce (Scope 3). It then extends those annual figures across the full cradle-to-grave facility lifetime via a life-cycle assessment aligned to <strong>EN 15978</strong> (Sustainability of construction works, calculation method for environmental performance of buildings, stages A1–D).</p>
             <p class="mn-lead">A third tab allocates the resulting annual emissions against the host country's nationally-determined contribution (NDC) under the <strong>Paris Agreement</strong>, mapping the facility's share of the national carbon budget across sectors (AI training, inference, cloud, enterprise, government) and computing the gap to net-zero by the user's target year. This is a screening-grade planning model, not a certified corporate carbon disclosure.</p>
         </section>
 
         <!-- 2. INPUTS -->
-        <section class="mn-section">
+        <section id="inputs" class="mn-section">
             <h2><span class="mn-num">02</span> Inputs</h2>
             <p class="mn-lead">Inputs span three operational groups (power, location, Scope 1 sources, renewables) plus a lifecycle group for the LCA tab and a budget-allocation group for the Carbon Budget tab.</p>
 
@@ -398,7 +398,7 @@
         </section>
 
         <!-- 3. METHODOLOGY -->
-        <section class="mn-section">
+        <section id="calculation-methodology" class="mn-section">
             <h2><span class="mn-num">03</span> Calculation methodology</h2>
             <p class="mn-lead">All emission calculations follow <strong>GHG Protocol Corporate Standard (2015 edition)</strong> for Scope 1/2/3 boundaries, and <strong>EN 15978:2011 / ISO 14044:2006</strong> for LCA stages. Function names map one-to-one to <code class="mn-mono">RZEngine.models.carbon</code> in <code>rz-engine.js</code>.</p>
 
@@ -497,7 +497,7 @@
         </section>
 
         <!-- 4. CONSTANTS & SOURCES -->
-        <section class="mn-section">
+        <section id="constants-and-data-sources" class="mn-section">
             <h2><span class="mn-num">04</span> Constants &amp; data sources</h2>
             <p class="mn-lead">All grid factors and carbon prices are locked in <code class="mn-mono">DATA.carbon</code> with provenance tags in <code class="mn-mono">DATA.sources['carbon']</code>. Material emission factors live in the inline <code class="mn-mono">LCA</code> constant in <code>carbon-footprint.html</code>, crossreferencing ICE Database v4.1 and RICS/LETI studies.</p>
 
@@ -577,7 +577,7 @@
         </section>
 
         <!-- 5. OUTPUTS -->
-        <section class="mn-section">
+        <section id="outputs" class="mn-section">
             <h2><span class="mn-num">05</span> Outputs</h2>
             <div class="mn-tablewrap">
             <table class="mn-table">
@@ -603,7 +603,7 @@
         </section>
 
         <!-- 6. WORKED EXAMPLE -->
-        <section class="mn-section">
+        <section id="worked-example" class="mn-section">
             <h2><span class="mn-num">06</span> Worked example</h2>
             <p class="mn-lead">Default inputs: 1 000 kW IT, PUE 1.52, United States (grid 0.40 kgCO₂e/kWh), diesel generator 200 h/yr, air_crac cooling (R-410A, GWP 2088, 0.30 kg/kW, 5% leak), no renewables, 1 MW facility, purpose-built, concrete C30, steel world-average, traditional workload, VRLA battery 10 min N+1, 20-year life. All numbers verified by <code>node -e</code> against the engine logic.</p>
             <div class="mn-worked">
@@ -629,7 +629,7 @@
         </section>
 
         <!-- 7. REFERENCES -->
-        <section class="mn-section">
+        <section id="references-and-standards" class="mn-section">
             <h2><span class="mn-num">07</span> References &amp; standards</h2>
             <ul class="mn-refs">
                 <li><b>GHG Protocol (2015)</b> — Corporate Accounting and Reporting Standard (Revised): Scope 1/2/3 boundary definitions, market-based vs location-based Scope 2, REC treatment. <a class="mn-inline" href="https://ghgprotocol.org" target="_blank" rel="noopener noreferrer">ghgprotocol.org</a></li>
@@ -652,7 +652,7 @@
         </section>
 
         <!-- 8. ASSUMPTIONS & LIMITS -->
-        <section class="mn-section">
+        <section id="assumptions-and-limitations" class="mn-section">
             <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
             <p class="mn-lead"><strong>Scope boundaries:</strong> Scope 2 is calculated on the market-based method only (location-based = renewable coverage set to 0%). Scope 3 upstream on the operational tab is a screening factor (0.15 tCO₂e/kW IT); the LCA tab provides a more granular Scope 3 upstream via per-material emission factors and IT-equipment LCAs, but does not include purchased goods and services beyond IT hardware, business travel, waste, or water.</p>
             <p class="mn-lead"><strong>Grid factors:</strong> National average emission factors from IEA/Ember do not represent the marginal emission rate of an additional data-center load on any specific grid or hour. Time-of-use or hourly matching (24/7 CFE methodology) is not modelled. For high-renewable grids (France, Sweden), the national average already reflects near-zero grid intensity.</p>
@@ -717,7 +717,7 @@
     </script>
     <script src="../js/rz-manual-toc.js?v=20261110-9866a7c8" defer></script>
     <script src="../js/rz-manual-links.js?v=20261111-33875d8f" defer></script>
-    <script src="../js/rz-version.js?v=20261112-771298f2" defer></script>
+    <script src="../js/rz-version.js?v=20261113-4cf7b941" defer></script>
     <script src="../js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="../js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <script src="../js/rz-command-palette.js?v=20261111-5028a9f4" defer></script>

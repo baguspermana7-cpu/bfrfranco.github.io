@@ -339,6 +339,7 @@ try {
   await assertKeyboardPath(page, '.epms-back-link', [
     '.epms-prd-link',
     '.epms-manual-link',
+    '.rz-ask-trigger',
     '#rzConvAlarmLaunch',
     '#epmsSidebarToggle',
     '.epms-portfolio-link',
@@ -379,6 +380,7 @@ try {
   assert.equal(contractLayerOrder, true, 'public documentation layer must precede dashboard controls in keyboard order');
   await assertKeyboardPath(page, 'a.rz-prd-contract', [
     'a.rz-manual-contract',
+    '.rz-ask-trigger',
     '#rzConvAlarmLaunch',
     '#genDesignTrigConv',
     '#faqTrigConv',

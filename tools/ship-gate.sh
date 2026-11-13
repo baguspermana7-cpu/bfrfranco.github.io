@@ -302,6 +302,7 @@ gate "Saved-scenario Open routes — every calculator id opens its own page; unk
 gate "Calculator inline handlers — every onclick on the 11 calculators calls a function that exists (X3)" node tools/test-calc-onclick-handlers.mjs
 gate "Calculator registry — data/calculators.json pages, fields and result selectors match the 11 rendered calculators (F1)" node tools/test-calculator-registry.mjs
 gate "Calculator basis (P10) — 40 headline results on 6 calculators hooked, registry = fresh render at defaults, inputs measured, drawer by keyboard" node tools/test-calc-parameter-registry.mjs
+gate "Ask about this page (P21) — answers only from registry records + manual sections, every citation resolves, 20 hits / 10 honest misses / held-out, gated values withheld, text-only render, 15 pages" node tools/test-explain-ask.mjs
 gate "Embedded compute — hidden-iframe loop: fixture 2x, queue of one, refusals, timeout, real calculator, ?embed flag (F2)" node tools/test-embed-compute.mjs
 gate "Scenario share links — #rzs= round trip on 11 calculators, schema parity, login-field filter, corrupted link, precedence (P02)" node tools/test-scenario-share-links.mjs
 gate "Register CSS — every page that declares data-rz-register loads a stylesheet carrying that register (P23)" node tools/test-register-css.mjs

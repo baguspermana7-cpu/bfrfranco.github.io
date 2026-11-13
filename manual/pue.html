@@ -339,7 +339,7 @@
         </header>
 
         <!-- 1. PURPOSE -->
-        <section class="mn-section">
+        <section id="purpose-and-engineering-basis" class="mn-section">
             <h2><span class="mn-num">01</span> Purpose &amp; engineering basis</h2>
             <p class="mn-lead">The calculator quantifies the Power Usage Effectiveness (PUE) of a data center from a bottom-up facility power decomposition. It answers three design questions: <em>what fraction of drawn power reaches IT equipment</em>, <em>how does cooling architecture drive overhead</em>, and <em>what is the annual energy cost and carbon footprint</em>.</p>
             <p class="mn-lead">PUE is defined in <strong>ISO/IEC 30134-2:2016</strong> (adopted by The Green Grid as the industry standard) and measured per ASHRAE TC 9.9 operating envelope guidance. The tool models PUE from first principles rather than from a lookup table, so it can predict the impact of architecture changes before they are built. The global benchmark is <strong>1.52 (Uptime Institute Global Data Center Survey 2026)</strong>; hyperscale leaders achieve 1.10–1.20.</p>
@@ -352,7 +352,7 @@
         </section>
 
         <!-- 2. INPUTS -->
-        <section class="mn-section">
+        <section id="inputs" class="mn-section">
             <h2><span class="mn-num">02</span> Inputs</h2>
             <p class="mn-lead">Fourteen inputs across five groups — IT infrastructure, cooling system, power distribution, facility loads, and FULL advanced parameters. Ranges are enforced client-side; defaults reflect a typical Tier III colocation at 1 MW IT load.</p>
             <div class="mn-tablewrap">
@@ -381,7 +381,7 @@
         </section>
 
         <!-- 3. METHODOLOGY -->
-        <section class="mn-section">
+        <section id="calculation-methodology" class="mn-section">
             <h2><span class="mn-num">03</span> Calculation methodology</h2>
             <p class="mn-lead">The calculator decomposes total facility power into six additive components, then applies PUE = P_total / P_IT. All intermediate values are deterministic given the inputs.</p>
 
@@ -445,7 +445,7 @@
         </section>
 
         <!-- 4. CONSTANTS -->
-        <section class="mn-section">
+        <section id="constants-and-data-sources" class="mn-section">
             <h2><span class="mn-num">04</span> Constants &amp; data sources</h2>
             <p class="mn-lead">Every constant is authored in the calculator JS or in the deep-frozen <code class="mn-mono">DATA</code> block of <code class="mn-mono">rz-engine.js</code> (v2.0), with a <code>DATA.sources</code> citation. Key tables:</p>
 
@@ -520,7 +520,7 @@
         </section>
 
         <!-- 5. OUTPUTS -->
-        <section class="mn-section">
+        <section id="outputs" class="mn-section">
             <h2><span class="mn-num">05</span> Outputs</h2>
             <div class="mn-tablewrap">
             <table class="mn-table">
@@ -544,7 +544,7 @@
         </section>
 
         <!-- 6. WORKED EXAMPLE -->
-        <section class="mn-section">
+        <section id="worked-example" class="mn-section">
             <h2><span class="mn-num">06</span> Worked example</h2>
             <p class="mn-lead">1 000 kW IT load (default preset), CRAH cooling, cold-aisle containment, subtropical climate, double-conversion UPS at 50% load factor, N+1 redundancy, standard lighting (8 W/m²), standard security (0.5 kW/rack), FM-200 fire (0.1 kW/rack). PRO defaults: no economizer, supply temp 20°C, transformer 1.5%, metered PDU, energy cost $0.10/kWh. All values computed from the documented constants — no lookup-only numbers.</p>
             <div class="mn-worked">
@@ -578,7 +578,7 @@
         </section>
 
         <!-- 7. REFERENCES -->
-        <section class="mn-section">
+        <section id="references-and-standards" class="mn-section">
             <h2><span class="mn-num">07</span> References &amp; standards</h2>
             <ul class="mn-refs">
                 <li><b>ISO/IEC 30134-2:2016</b> — Information technology — Data centres key performance indicators — Part 2: Power usage effectiveness (PUE). Definitive normative basis for the PUE formula and measurement boundary.</li>
@@ -593,7 +593,7 @@
         </section>
 
         <!-- 8. ASSUMPTIONS -->
-        <section class="mn-section">
+        <section id="assumptions-and-limitations" class="mn-section">
             <h2><span class="mn-num">08</span> Assumptions &amp; limitations</h2>
             <p class="mn-lead">The calculation assumes a single thermodynamic zone at steady-state load; seasonal variation is modelled only in the PRO monthly chart (not in the base PUE output). Cooling overhead fractions are calibrated to typical-installation COP for each technology type; site-specific COP varies with supply water temperature, ambient wet-bulb, and part-load conditions. The 3 m²/rack floor area used for lighting calculations is a rule-of-thumb; dense hot-aisle configurations may pack more tightly. Redundancy multipliers scale UPS loss proportionally — this is conservative for 2N systems where one UPS string is entirely bypassed at low load.</p>
             <p class="mn-lead">Transformer losses are modelled as load-proportional (a slight overstatement for DOE 2016-compliant units that have low constant core losses). Annual hours of 8 760 is the <code>DATA.hoursPerYear</code> constant; leap-year and planned-downtime corrections are not applied. Energy cost uses a flat $/kWh blended rate; demand charges (typically 20–30% of actual bills) are not included.</p>
@@ -654,7 +654,7 @@
     </script>
     <script src="../js/rz-manual-toc.js?v=20261110-9866a7c8" defer></script>
     <script src="../js/rz-manual-links.js?v=20261111-33875d8f" defer></script>
-    <script src="../js/rz-version.js?v=20261112-771298f2" defer></script>
+    <script src="../js/rz-version.js?v=20261113-4cf7b941" defer></script>
     <script src="../js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="../js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <script src="../js/rz-command-palette.js?v=20261111-5028a9f4" defer></script>
