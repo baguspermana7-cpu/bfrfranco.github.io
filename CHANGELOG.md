@@ -11,6 +11,45 @@ release sections rather than semver.
 
 ---
 
+## v3.54.0 — 2026-11-13 — Homepage motion live; one CAPEX answer for the calculator and DCMOC
+
+Owner decisions 2026-11-13: R121 "Put on index"; CAPEX option (a) "Yg terbaik", mock approved ("Live").
+
+### Changed
+- **Homepage motion (R121), live on index.html.** The motion approved on the mock now runs on the homepage:
+  - smooth scroll (Lenis 1.3.27) only with a mouse or trackpad; phones keep native scroll
+  - the name rises word by word, each section reveals once, employer cards rise as a row, the portrait drifts slightly
+    (GSAP 3.15.0)
+  - reduced motion: nothing moves; no JavaScript: everything is shown
+  - the IntersectionObserver reveal it replaces is removed with its CSS, and the mock page is gone
+- **CAPEX: one answer for one project (R120).** The calculator and DCMOC priced the same project differently: 2.2 MW,
+  N+1, air cooling in Virginia read $18.1/W on the calculator and $8.8/W in DCMOC, against the city table's own $13.4/W.
+  A city's $/W is now the all-in total of a stated basis spec (N+1, air, medium density, purpose-built, seismic zone 2);
+  both engines land on it at that spec and move from it for every other choice. Without a city, the calculator uses the
+  region's median city and DCMOC the median US city times the country index.
+  - Calculator, 1 MW in Virginia: $17.01M → $12.56M. With no city: $5.90M → $11.34M.
+  - DCMOC default (2.5 MW, Indonesia): about $15.2M → $20.3M; the presets rise about 30 %.
+  - The region list no longer shows multipliers the engine stopped using.
+
+### Added
+- `models.tco.crf` and `models.tco.annualizedCapital`: capital annualized by asset life, as in the Uptime Institute
+  TUI3011B worked example (19.1 M$/yr).
+- Gap file `documentation/product-transformation/gaps/dcmoc-capex.md` (reference: Koomey et al., Uptime TUI3011B, 2007).
+
+### Fixed
+- Reveals on the homepage hand the element back to its CSS when they finish. A leftover inline transform stopped the
+  employer card from turning over.
+- The homepage case cards now take part in the reveal; a forced `opacity: 1 !important` had kept them still.
+
+### Gates
+- `tools/test-capex-reference.mjs` (new, wired): F1 F2 D1 D2 D3 pass; 5 failed on v3.53.0 (the two engines differed by up
+  to 45 % off the basis spec; now 0.12 %).
+- `test-index-depth` D14 checks the GSAP reveal; `test-index-micro` M8 counts an identity matrix as no movement (a planted
+  −2 px hover still fails); `test-index-motion` runs on index.html; `audit-a11y` waits for GSAP tweens and fails a reveal
+  that never runs (planted: serious in both themes).
+
+---
+
 ## v3.53.0 — 2026-11-13 — Ask about this page, answered only from the page's records
 
 ### Added
