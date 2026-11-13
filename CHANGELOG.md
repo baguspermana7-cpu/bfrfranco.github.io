@@ -11,6 +11,34 @@ release sections rather than semver.
 
 ---
 
+## v3.56.0 — 2026-11-14 — Reproduce an incident in a calculator (PRD-Q03)
+
+Owner decision 2026-11-13 (R123): "Yes, yg terbaik" — build, accept all four entries (D-Q03-1..4).
+
+### Added
+- **Reproduce on three incident dossiers.** OVHcloud SBG2 (TIA-942 checklist + tier advisor), Equinix LD8 and Delta
+  Atlanta (TIA-942 checklist) gain a "Reproduce" section after the FMEA, with a nav entry and a back-link from the
+  FMEA row it reproduces. Each entry lists the inputs the record states, each with its quoted source, and opens the
+  calculator through the share link with those inputs set.
+  - inputs the record does not state come from a named baseline generated from the calculator's own markup
+    (`data/reproduce-baselines.json`: Tier 3 Enterprise list all ticked, 64 inputs; tier advisor defaults, 22),
+    labelled "Baseline", never as a fact about the site
+  - opened from the dossier: OVH scores 92 % (three fire-suppression gaps on top), Equinix LD8 and Delta 98 %,
+    against 100 % for the baseline; the tier advisor's Physical score drops from 56 to 34
+  - only owner-accepted entries render; seed dossiers never carry one
+- Tools: `tools/build-reproduce-baselines.py` (--apply/--check), `tools/incidents_reproduce.py` (validation rules
+  RV1–RV17, decide/retire/review), `tools/lib/incident_rules.py` (dossier state, PRD-Q09 stage 1).
+- Gates: `tools/test-incidents-reproduce.py` (a planted defect per rule, links decode to baseline + set with origin,
+  placement, review covers every dossier) and `tools/test-incidents-reproduce.mjs` (each link restores every input,
+  the calculator shows the gap, the section is clean at 390/1440 in both themes, axe 0), both in the ship gate;
+  the baselines file in `test-generator-freshness.py`.
+
+### Fixed
+- `tools/test-index-r079.mjs` sampled the employer-card flip on the wall clock and failed a correct page under load
+  (19° at 150 ms, 176° at 1 s). It now seeks the transition to 150 ms and waits for it to finish; a swap still fails.
+
+Standards: DC_INCIDENTS_QA_STANDARD.md §4d, documentation/product-transformation/DECISIONS.md (D-Q03-1..4 decided).
+
 ## v3.55.0 — 2026-11-14 — DC AI cockpit: replay a recorded trend file (PRD-P05 stage 1)
 
 ### Added
