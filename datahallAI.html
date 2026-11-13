@@ -565,6 +565,9 @@ svg text{user-select:none}
 .dh-modal-alarmline .am-stale{color:var(--t3);border-color:var(--bd2)}
 .dh-modal-alarmline .am-scope{color:var(--t3);border-color:var(--bd2);letter-spacing:.06em;font-weight:600}
 [data-theme="light"] .dh-modal-alarmline{background:rgba(0,0,0,.02);border-bottom-color:rgba(0,0,0,.06)}
+/* PRD-P05 finding: on the --bg2 dialog surface the red and slate chips read 4.47:1 and 3.59:1 — lifted to AA in both themes */
+.dh-modal-alarmline .am-crit{color:#f87171}.dh-modal-alarmline .am-maint{color:#94a3b8}
+[data-theme="light"] .dh-modal-alarmline .am-crit{color:#b91c1c}[data-theme="light"] .dh-modal-alarmline .am-maint{color:#475569}
 /* ============================================================================
  * v1.20.2 Stage 6 — alarm-first top strip (doc-00 P1 / doc-22). Added to every
  * in-scope page-panel (NOT #p-dash). Counts are rule-based (DHAlarm model),
@@ -769,7 +772,7 @@ body[data-datahall-authority="unavailable"] #tabs,
 body[data-datahall-authority="unavailable"] .wrap{display:none !important}
 body[data-datahall-authority="unavailable"] .hdr-r>.dot{background:#64748b !important;box-shadow:none !important;animation:none !important}
 body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:none}
-</style>    <script src="js/rz-version.js?v=20261113-aef8304a" defer></script>
+</style>    <script src="js/rz-version.js?v=20261113-638347b2" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <!-- v3.5.0 — hold the 8.5px legibility floor by SCALE, not by font size. Five of this page's
          fifteen diagrams were already clear; the dense ones (cooling P&ID, the four SLDs, the hall
@@ -819,8 +822,8 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
     </script>
     <script src="js/datahall-ai/electrical-topology.js?v=3.9.0"></script>
     <script src="js/datahall-ai/electrical-live.js?v=3.9.0"></script>
-    <script src="js/datahall-ai/sim-telemetry.js?v=20260920-61df5c2d"></script>
-    <script src="js/datahall-ai/hmi-payloads.js?v=20261014-0684c2ca"></script>
+    <script src="js/datahall-ai/sim-telemetry.js?v=20261113-3ca38377"></script>
+    <script src="js/datahall-ai/hmi-payloads.js?v=20261113-e8596474"></script>
     <script src="js/datahall-ai/hmi-points.js?v=20260920-d82032ae"></script>
     <script src="js/datahall-ai/electrical-visual-map.js?v=3.9.0"></script>
     <script src="js/datahall-ai/fire-cause-effect.js?v=20260920-964e57d6"></script>
@@ -844,12 +847,12 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
          before the inspector so RZAlarmState is available when the Alarms tab
          renders. Closes review doc-27 §3.3 P0 + §4.3 P1. -->
     <script src="js/rz-alarm-state.js?v=20260920-a912ad23" defer></script>
-    <script src="js/rz-inspector.js?v=20260920-5efe4744" defer></script>
+    <script src="js/rz-inspector.js?v=20261113-3c562e79" defer></script>
     <!-- v1.43.2 — Data-quality service. Loaded before the inspector script so
          body[data-rz-data-mode] banner renders + RZTelemetryQuality is
          available when the inspector's Live tab renders its chip. Closes
          review doc-27 §3.4 + §5.7. -->
-    <script src="js/rz-telemetry-quality.js?v=20261111-6262452c" defer></script>
+    <script src="js/rz-telemetry-quality.js?v=20261113-8feb0dfd" defer></script>
     <script src="js/rz-provenance.js?v=20261111-6f1cd061" defer></script>
     <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
          Loaded for cross-page consistency; body does NOT carry rz-bms-shell
@@ -865,10 +868,10 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
     <link rel="stylesheet" href="css/rz-cockpit-instrument.css?v=20261105-c3fa9df6">
     <!-- v2.11.0 — the one navigation language shared with the Conventional hub (owner comment 18) -->
     <link rel="stylesheet" href="css/rz-cockpit-nav.css?v=20260920-8e948f05">
-    <link rel="stylesheet" href="css/datahall-ai-operator.css?v=20260920-9fecc127">
+    <link rel="stylesheet" href="css/datahall-ai-operator.css?v=20261113-7e889627">
     <link rel="stylesheet" href="css/rz-design-studio.css?v=20260920-972eff8b">
     <script src="js/datahall-ai/operator-ui.js?v=20261013-6f8ad66d" defer></script>
-    <script src="js/datahall-ai/equipment-inspector.js?v=20260920-bb3a33be" defer></script>
+    <script src="js/datahall-ai/equipment-inspector.js?v=20261113-fb26c5b0" defer></script>
     <script src="js/datahall-ai/hall-interact.js?v=20261013-77877697" defer></script>
     <script src="js/datahall-ai/fire-workstation.js?v=20260927-520eede2" defer></script>
 <style id="rz-skiplink-v1">
@@ -897,8 +900,9 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
 <h1>AI Data Hall Operations<span class="chip" id="datahallAuthorityChip">AUTHORITY UNAVAILABLE</span></h1>
 <div data-rz-telemetry-banner-slot data-rz-telemetry-compact data-rz-telemetry-label="SIMULATED · ENGINE BASIS"></div>
 </div>
-<div class="hdr-r"><span data-rz-ask-slot></span><button class="dh-bod-trig" id="bodTrig" type="button" aria-haspopup="dialog" aria-disabled="true" disabled title="UNAVAILABLE until the current engine authority validates"><span aria-hidden="true">&#9432;</span> Basis of Design</button>&nbsp;<button class="dh-bod-trig" id="genDesignTrig" type="button" aria-haspopup="dialog" aria-disabled="true" disabled title="UNAVAILABLE until the current engine authority validates" style="background:rgba(245,158,11,.10);border-color:rgba(245,158,11,.32);color:#fbbf24"><i class="fas fa-file-lines" aria-hidden="true"></i>Generate Design</button>&nbsp;<button class="dh-bod-trig" id="faqTrig" type="button" aria-haspopup="dialog" aria-disabled="true" disabled title="UNAVAILABLE until the current engine authority validates">FAQ</button>&nbsp;<button class="theme-toggle" id="themeToggle" title="Toggle theme" aria-label="Toggle theme"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button><span class="dot"></span>&nbsp;<span id="clk">--:--:--</span> WIB</div>
+<div class="hdr-r"><span data-rz-ask-slot></span><button class="dh-bod-trig" id="rzReplayTrig" type="button" aria-haspopup="dialog" aria-disabled="true" disabled title="Replay a recorded BMS trend file (CSV or JSON) in place of the simulation. The file stays in this browser; nothing is uploaded." data-core="js/datahall-ai/replay-core.js?v=20261114-8c19b6de" data-ui="js/datahall-ai/replay-ui.js?v=20261114-7381e72e" data-worker="js/datahall-ai/replay-worker.js?v=20261114-be3ddae2">Replay</button>&nbsp;<button class="dh-bod-trig" id="bodTrig" type="button" aria-haspopup="dialog" aria-disabled="true" disabled title="UNAVAILABLE until the current engine authority validates"><span aria-hidden="true">&#9432;</span> Basis of Design</button>&nbsp;<button class="dh-bod-trig" id="genDesignTrig" type="button" aria-haspopup="dialog" aria-disabled="true" disabled title="UNAVAILABLE until the current engine authority validates" style="background:rgba(245,158,11,.10);border-color:rgba(245,158,11,.32);color:#fbbf24"><i class="fas fa-file-lines" aria-hidden="true"></i>Generate Design</button>&nbsp;<button class="dh-bod-trig" id="faqTrig" type="button" aria-haspopup="dialog" aria-disabled="true" disabled title="UNAVAILABLE until the current engine authority validates">FAQ</button>&nbsp;<button class="theme-toggle" id="themeToggle" title="Toggle theme" aria-label="Toggle theme"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button><span class="dot"></span>&nbsp;<span id="clk">--:--:--</span> WIB</div>
 </header>
+<div class="rz-replay-bar" id="rzReplayBar" role="region" aria-label="Replay controls" hidden data-rz-authored-basis="replay controls: the cursor time and sample index of a recorded file the reader loaded into this browser (PRD-P05), never engine quantities"><span class="rz-replay-tag">REPLAY</span><span class="rz-replay-file" id="replayFileName"></span><button class="rz-ops-button rz-ops-button--compact" id="replayPlay" type="button" aria-pressed="false">Play</button><label class="rz-replay-speed"><select id="replaySpeed" aria-label="Replay speed"><option value="1">1&times;</option><option value="10">10&times;</option><option value="60">60&times;</option></select></label><input type="range" id="replayScrub" min="0" max="0" step="1" value="0" aria-label="Replay time"><output id="replayTime" for="replayScrub">&mdash;</output><button class="rz-ops-button rz-ops-button--compact" id="replayExit" type="button" title="Leave replay and return to the seeded simulation">Exit replay</button></div>
 
 <div class="root-gate" id="rootGate">
 <div class="root-card">
@@ -1021,7 +1025,7 @@ Requested model/calculation versions and the complete locked schema must validat
 <details class="legal-disclaimer-wrap" aria-label="Legal Disclaimer" style="margin:0 0 6px;border:1px solid var(--bd,#cbd5e1);border-radius:6px;background:transparent">
 <summary style="cursor:pointer;list-style:none;padding:4px 10px;font-size:11px;line-height:1.4;color:var(--t3,#64748b);user-select:none;display:flex;align-items:center;flex-wrap:wrap;gap:8px">
 <!-- v1.24.4 doc-24 fix #1: compact Data Mode chip in-line with legal notice (full strip → chip-first; legal stays collapsed). -->
-<span aria-label="Data mode" style="display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:999px;font-size:9.5px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;background:rgba(80,200,255,0.10);border:1px solid rgba(80,200,255,0.40);color:#50c8ff;font-family:'JetBrains Mono',monospace;"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;"></span>Data Mode: Simulated</span>
+<span aria-label="Data mode" style="display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:999px;font-size:9.5px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;background:rgba(80,200,255,0.10);border:1px solid rgba(80,200,255,0.40);color:#50c8ff;font-family:'JetBrains Mono',monospace;"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;"></span><span data-rz-mode-label data-rz-mode-replay="Data Mode: Replay">Data Mode: Simulated</span></span>
 <span><span aria-hidden="true">&#9888;</span> Legal &amp; methodology notice &mdash; independent personal research, educational/estimation only, not professional advice. <span style="color:var(--t2,#475569);text-decoration:underline">View details</span></span>
 </summary>
 <div class="calc-disclaimer" style="border:0;margin:0;border-top:1px solid var(--bd,#cbd5e1);border-radius:0">
@@ -1440,6 +1444,9 @@ Requested model/calculation versions and the complete locked schema must validat
 <label class="fire-iso-ack" id="fireIsoAckWrap" hidden><input type="checkbox" id="fireIsoAck" disabled> I acknowledge the consequence above: the zone becomes IMPAIRED, its release is inhibited and a fire watch is required</label>
 <div class="rz-ops-toolbar__group rz-ops-actions"><button class="rz-ops-button rz-ops-button--warn" id="fireIsoSubmit" type="submit" disabled>Isolate</button><button class="rz-ops-button" id="fireIsoCancel" type="button" disabled>Cancel</button></div>
 </form></div>
+<div class="fire-iso replay-dlg" id="replayDialog" aria-labelledby="replayTitle" data-rz-inspector-keep="1">
+<div class="fire-iso-hdr"><h4 id="replayTitle">Replay a trend file</h4><span class="mode" title="The file is read in this browser only. Nothing is uploaded.">LOCAL FILE</span><button class="fire-iso-close" type="button" aria-label="Close">&times;</button></div>
+<div class="fire-iso-body" data-rz-authored-basis="replay mapping: file columns, the first sample of each and the unit factors come from the reader's own file, never from the engine (PRD-P05)"><div class="rz-ops-grid"><div class="rz-ops-field"><label for="replayFile">CSV or JSON, up to 20 MB</label><input type="file" id="replayFile" accept=".csv,.json,text/csv,application/json"></div><div class="rz-ops-field"><label for="replaySearch">Search columns</label><input type="search" id="replaySearch" autocomplete="off"></div></div><p class="replay-status" id="replayStatus" role="status" aria-live="polite"></p><datalist id="replayPoints"></datalist><div class="replay-map-wrap" id="replayMapBody"></div><div class="rz-ops-toolbar__group rz-ops-actions"><button class="rz-ops-button rz-ops-button--warn" id="replayStart" type="button" disabled>Start replay</button><button class="rz-ops-button" id="replayCancel" type="button">Cancel</button><span class="replay-why" id="replayStartWhy">Map at least one point.</span></div></div></div>
 <div class="bat-hmi" id="batHmi">
 <div class="bat-hmi-hdr"><h4 id="batHmiTitle">SCiB ESS 480VDC — System View</h4><span class="mode" id="batHmiMode">Normal</span><button class="bat-hmi-close" onclick="$('batHmi').classList.remove('show')">&times;</button></div>
 <div class="bat-hmi-body"><svg id="batHmiSvg" viewBox="0 0 740 520" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" data-rz-authored-basis="tier-2 HMI mimic: every value comes from the equipment payload (js/datahall-ai/hmi-payloads.js) — engine rows hooked, simulated and state rows declared; per-point provenance in the inspector (Track A §A5)"></svg></div>
@@ -1455,7 +1462,7 @@ var DATAHALL_CURRENT_SPEC_VERSION='gb300-500mw-2026-09-06';  /* = DCAI_MODEL.spe
    engine publishes, with its type. Validating against it means a new engine quantity is
    covered the day it exists and a renamed one fails closed, with nothing to maintain here. */
 var DATAHALL_REGISTRY_MIN_PARAMETERS=150;
-var DATAHALL_AUTHORITY_ACTION_SELECTOR='#bodTrig,#bodDrawerPdf,#genDesignTrig,#faqTrig,'+
+var DATAHALL_AUTHORITY_ACTION_SELECTOR='#rzReplayTrig,#bodTrig,#bodDrawerPdf,#genDesignTrig,#faqTrig,'+
   '#platformProfile,#electricalScenario,#fireScenario,#fireZone,#fireEvaluate,#fireStart,#fireStop,'+
   '#firePointsHall,#firePointsZone,#firePointsType,#firePointsState,#firePointsSearch,#firePointsIsolatedOnly,#firePointsReset,#firePointsClear,'+
   '#fireIsoForm,#fireIsoForm button,#fireIsoForm input,#fireIsoForm select,#fireIsoForm textarea,'+
@@ -1898,8 +1905,14 @@ window.RZDatahallAIHmiOpeners=window.RZDatahallAIHmiOpeners||{};
 function RZ_SIM(site,lo,hi,digits){
   var S=window.RZDatahallAISimTelemetry; if(!S){ return digits===0?Math.round((lo+hi)/2):((lo+hi)/2).toFixed(digits); }
   var p=S.point({id:'page',point:String(site),anchor:(lo+hi)/2,band:Math.abs(hi-lo)/2,digits:digits,min:Math.min(lo,hi),max:Math.max(lo,hi)});
+  if(p.missing)return p.text;   /* PRD-P05: a replay with no sample for this reading prints the dash, never a number */
   return digits===0?p.value:p.text;
 }
+/* PRD-P05 — the replay controls load on first use (core, then UI); the seam itself lives in sim-telemetry.js */
+(function(){var b=document.getElementById('rzReplayTrig');if(!b)return;if(document.body.getAttribute('data-rz-replay')==='off'){b.hidden=true;return;}
+function load(src,cb){var s=document.createElement('script');s.src=src;s.onload=cb;s.onerror=function(){b.title='Replay controls failed to load';};document.head.appendChild(s);}
+b.addEventListener('click',function(){if(window.RZDatahallAIReplayUI){window.RZDatahallAIReplayUI.open();return;}
+load(b.getAttribute('data-core'),function(){load(b.getAttribute('data-ui'),function(){window.RZDatahallAIReplayUI.open();});});});})();
 function RZ_HMI_P(cls,id,hall,renderer){
   var C=window.RZDatahallAIEquipmentInspector,PL=window.RZDatahallAIHmiPayloads;
   if(!PL)return {unavailable:true,v:function(){return '\u2014'},n:function(){return null},state:function(){return null},opt:function(){return {declared:'hmi-payloads.js not loaded (Track A A5)'}},optAll:function(){return {declared:'hmi-payloads.js not loaded (Track A A5)'}}};
@@ -5480,7 +5493,7 @@ return s;
 
 // Idea 30: Voltage deviation summary badge
 function vDevBadge(x,y){
-var dv=RZ_SIM('page23',-1.5,-2.5,1),bus=['LV-A','LV-B','MV-A','MV-B','DC-A'][RZ_SIM('page24',0,4,0)];
+var dv=RZ_SIM('page23',-1.5,-2.5,1),bus=['LV-A','LV-B','MV-A','MV-B','DC-A'][RZ_SIM('page24',0,4,0)]||'\u2014';
 var fc=parseFloat(dv)>-2?'var(--g)':'var(--o)';
 var s='<rect x="'+x+'" y="'+y+'" width="105" height="18" rx="3" fill="rgba(0,0,0,.4)" stroke="'+fc+'" stroke-width=".5"/>';
 s+=tx2(x+52,y+7,'Max \u0394V: '+dv+'%',fc,4,'middle',1,{declared:'cable voltage-drop illustration: a page-authored impedance sketch with randomised drop, not an engine quantity and not a design check'});
@@ -12501,7 +12514,8 @@ var MODALS=[
   {panel:'crahHmi',title:'crahHmiTitle'},
   {panel:'corrHmi',title:'corrHmiTitle'},
   {panel:'batHmi',title:'batHmiTitle'},
-  {panel:'fireIsoDialog',title:'fireIsoTitle'},   /* v2.3.0 §A6 — the isolation dialog, the only modal in the fire workstation */
+  {panel:'fireIsoDialog',title:'fireIsoTitle'},
+  {panel:'replayDialog',title:'replayTitle'},   /* PRD-P05 — replay file + column mapping */   /* v2.3.0 §A6 — the isolation dialog, the only modal in the fire workstation */
   {panel:'sldMimic',title:'sldMimicTitle'},
   {panel:'bodDrawer',title:'bodDrawerTitle'}   /* v1.20.3 Stage 9 — P3 drawer */
 ];
@@ -12613,7 +12627,7 @@ function decorate(panel,titleId){
    which is also correct for height (the openers guess that too). Only panels an
    opener positions inline are touched: the drawer, the full-screen overlay and the
    transform-centred dialog position themselves and are skipped by id. */
-var NO_RECENTRE={bodDrawer:1,sldMimic:1,fireIsoDialog:1};
+var NO_RECENTRE={bodDrawer:1,sldMimic:1,fireIsoDialog:1,replayDialog:1};
 function recentre(panel){
   if(!panel||NO_RECENTRE[panel.id])return;
   if(!panel.style||!panel.style.left)return;

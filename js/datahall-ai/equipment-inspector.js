@@ -144,7 +144,9 @@
     if (elec) { elec.addEventListener('change', function () { if (current) { var p = build(current.ref, current.hall); if (p && !p.unavailable && inspector().isOpen()) { inspector().refreshPayload(p); } } }); }
   }
 
-  var API = { version: '2.3.1', init: init, open: function (ref, hall) { var el = doc.querySelector('[data-rz-equipment="' + ref + '"]'); return el ? openTier1(el) : false; }, context: context, build: build, openTier2: openTier2, stopRefresh: stopRefresh };
+  /* PRD-P05: the replay scrubber moved — repaint the open payload now rather than on the next 4 s tick */
+  function refresh() { if (!current) { return false; } var p = build(current.ref, current.hall); if (p && !p.unavailable && inspector().isOpen()) { inspector().refreshPayload(p); return true; } return false; }
+  var API = { version: '2.3.1', init: init, refresh: refresh, open: function (ref, hall) { var el = doc.querySelector('[data-rz-equipment="' + ref + '"]'); return el ? openTier1(el) : false; }, context: context, build: build, openTier2: openTier2, stopRefresh: stopRefresh };
   win.RZDatahallAIEquipmentInspector = API;
   if (doc.readyState === 'loading') { doc.addEventListener('DOMContentLoaded', init); } else { init(); }
 })(typeof window !== 'undefined' ? window : null, typeof document !== 'undefined' ? document : null);

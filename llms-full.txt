@@ -161427,6 +161427,8 @@ The cockpit deliberately contains three point classes. **Basis/derived** values 
 
  | Global data mode | `body[data-rz-data-mode="simulated"]` | Persistent provenance. | The word **Simulated** must remain visible even when values animate. |
 
+ | Replay (recorded file) | Header **Replay**, `body[data-rz-data-mode="replay"]`, `RZDatahallAISimTelemetry.setProvider` | A CSV or JSON trend file from a BMS, read in the browser only (20 MB limit); sample-and-hold at the scrubber time. | Mapped points show the file value; every other simulated reading shows —; engine values and scenario states are unchanged. The header reads REPLAY with the file name; Exit restores the simulation exactly. |
+
  | Alarm-query records | `RZDataHallAlarmQuery` | Immutable simulated event fixtures. | Date/point/system/severity/lifecycle/quality/value/state/event/action/text filters compose; first-out selects earliest per incident and CSV exports the filtered set. |
 
  | Electrical scenario truth | `RZDatahallAIElectrical.evaluateScenario()` | Pure semantic topology evaluation. | Served + lost = 54; 2N/degraded are mutually interpretable availability classes; CSS animation is a consumer, never the source of truth. |

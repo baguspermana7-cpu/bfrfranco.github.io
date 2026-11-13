@@ -676,7 +676,7 @@
  * TYPE is now declared rather than accidental. There are two, and only two:
  *   PANEL  — a centred equipment read-out. Eleven of them. 820 px, or 960 px where
  *            the mimic inside genuinely needs the extra column (#irCduHmi).
- *   DIALOG — a centred short form the operator must complete. One: #fireIsoDialog.
+ *   DIALOG — a centred short form the operator must complete. Two: #fireIsoDialog, #replayDialog (PRD-P05).
  *            600 px, because a four-field form set 820 px wide reads as a panel
  *            with a hole in it.
  * Both share every other token, so the two widths are the whole difference.
@@ -706,6 +706,7 @@
 }
 #irCduHmi { --dhm-w: 960px; }   /* PANEL, wide: the in-rack mimic needs the column */
 #fireIsoDialog { --dhm-w: 600px; }  /* DIALOG */
+#replayDialog { --dhm-w: 820px; --dhm-accent: var(--o); }  /* DIALOG, wide: the mapping table */
 
 /* system identity — the rail, not the whole box */
 #cduHmi, #chHmi, #ctHmiModal, #crahHmi, #irCduHmi, #eqHmi { --dhm-accent: var(--c); }
@@ -748,13 +749,35 @@
    the DIALOG fades only. */
 @keyframes dhmRise { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 @keyframes dhmFade { from { opacity: 0; } to { opacity: 1; } }
-.dh-modal-host:not(#bodDrawer):not(#sldMimic):not(#fireIsoDialog).show {
+.dh-modal-host:not(#bodDrawer):not(#sldMimic):not(.fire-iso).show {
   animation: dhmRise .16s cubic-bezier(.2, .8, .2, 1) both;
 }
-#fireIsoDialog.show { animation: dhmFade .16s ease-out both; }
+.fire-iso.dh-modal-host.show { animation: dhmFade .16s ease-out both; }   /* every transform-centred DIALOG: #fireIsoDialog, #replayDialog */
 .dh-scrim.show { animation: dhmFade .16s ease-out both; }
 @media (prefers-reduced-motion: reduce) {
-  .dh-modal-host:not(#bodDrawer):not(#sldMimic):not(#fireIsoDialog).show,
-  #fireIsoDialog.show,
+  .dh-modal-host:not(#bodDrawer):not(#sldMimic):not(.fire-iso).show,
+  .fire-iso.dh-modal-host.show,
   .dh-scrim.show { animation: none; }
 }
+
+/* PRD-P05 — replay bar + mapping dialog. One still line under the header; wraps to a second row on phones. */
+.rz-replay-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 6px 12px; border-bottom: 1px solid var(--bd); background: var(--bg2); font: 500 11px/1.4 "JetBrains Mono", monospace; color: var(--t2); position: sticky; top: 44px; z-index: 54; }
+.rz-replay-bar[hidden] { display: none; }
+.rz-replay-tag { font-weight: 700; letter-spacing: .06em; color: var(--o); }
+.rz-replay-file { color: var(--t1); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 32ch; }
+.rz-replay-bar select { min-height: 32px; background: var(--bg); color: var(--t1); border: 1px solid var(--bd); border-radius: 4px; font: inherit; }
+.rz-replay-bar input[type="range"] { flex: 1 1 220px; min-width: 160px; min-height: 32px; accent-color: var(--o); }
+.rz-replay-bar output { min-width: 19ch; color: var(--t1); font-variant-numeric: tabular-nums; }
+.rz-replay-bar .rz-ops-button { min-height: 32px; }
+.replay-status { margin: 0; font: 400 11px/1.4 "JetBrains Mono", monospace; color: var(--t2); min-height: 1.4em; }
+.replay-status[data-tone="error"] { color: var(--r); }
+.replay-status[data-tone="warn"] { color: var(--o); }
+.replay-map-wrap { max-height: 46vh; overflow: auto; }
+.replay-map { width: 100%; border-collapse: collapse; font: 400 11px/1.4 "JetBrains Mono", monospace; }
+.replay-map th, .replay-map td { text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--bd); }
+.replay-map td.num { text-align: right; font-variant-numeric: tabular-nums; }
+.replay-map input { width: 100%; min-height: 32px; box-sizing: border-box; background: var(--bg); color: var(--t1); border: 1px solid var(--bd); border-radius: 4px; font: inherit; padding: 0 6px; }
+.replay-map input.replay-factor { width: 8ch; }
+.replay-map input[aria-invalid="true"] { border-color: var(--r); }
+.replay-why, .replay-more { font: 400 11px/1.4 "JetBrains Mono", monospace; color: var(--t3); }
+@media (max-width: 600px) { .rz-replay-bar { top: 0; } .rz-replay-file { max-width: 100%; flex-basis: 100%; } }

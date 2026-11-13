@@ -34,7 +34,9 @@
     'manual':     { label: 'Manual',      chip: 'MANUAL',     color: '#7dd3fc', bg: 'rgba(56,189,248,0.16)',  bd: 'rgba(56,189,248,0.45)' },
     'comms_lost': { label: 'Comms lost',  chip: 'NO COMMS',   color: '#fca5a5', bg: 'rgba(239,68,68,0.16)',   bd: 'rgba(239,68,68,0.55)' },
     'inhibited':  { label: 'Inhibited',   chip: 'INHIBITED',  color: '#94a3b8', bg: 'rgba(148,163,184,0.16)', bd: 'rgba(148,163,184,0.45)' },
-    'demo':       { label: 'Demo / training', chip: 'DEMO',   color: '#fde047', bg: 'rgba(250,204,21,0.16)',  bd: 'rgba(250,204,21,0.45)' }
+    'demo':       { label: 'Demo / training', chip: 'DEMO',   color: '#fde047', bg: 'rgba(250,204,21,0.16)',  bd: 'rgba(250,204,21,0.45)' },
+    /* PRD-P05: a recorded file replayed in the browser — site history, not live and not simulated */
+    'replay':     { label: 'Replay',      chip: 'REPLAY',     color: '#fbbf24', bg: 'rgba(245,158,11,0.16)',  bd: 'rgba(245,158,11,0.45)' }
   };
 
   function getState(name) {
@@ -145,6 +147,8 @@
       ? 'Governed engineering authority did not validate. Telemetry and controls are unavailable.'
       : effectiveMode === 'simulated'
       ? 'Simulated values from the engine model. They are not measured at a site.'
+      : effectiveMode === 'replay'
+      ? 'Recorded values replayed from a file in this browser. Engine-derived values stay engine values. Nothing is uploaded.'
       : label;
     bannerEl.innerHTML =
       '<span class="rz-tq-banner-label">' + esc(label) + '</span>' +
@@ -218,7 +222,12 @@
       var bodyMode = doc.body.getAttribute('data-rz-data-mode');
       if (bodyMode) { setPageMode(bodyMode); }
       if (root && root.MutationObserver) {
-        var observer = new root.MutationObserver(function () { renderBanner(); });
+        var observer = new root.MutationObserver(function () {
+          /* PRD-P05: a mode written on <body> (simulated <-> replay) is the page mode, not just a repaint */
+          var m = doc.body.getAttribute('data-rz-data-mode');
+          if (m && m !== pageMode && STATES[m]) { pageMode = m; }
+          renderBanner();
+        });
         observer.observe(doc.body, {
           attributes: true,
           attributeFilter: ['data-rz-basis-authority', 'data-datahall-authority', 'data-rz-data-mode']

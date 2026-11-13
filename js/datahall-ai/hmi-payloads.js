@@ -127,7 +127,12 @@
     var offset = finite(o.offset) ? o.offset : 0, scale = finite(o.scale) ? o.scale : 1;
     var p = ctx.sim.point({ id: this.classId + ':' + this.id + ':' + this.hall, point: point, anchor: finite(anchorValue) ? anchorValue * scale + offset : null, band: band, tick: ctx.tick, period: o.period, digits: finite(o.digits) ? o.digits : 1, min: o.min, max: o.max });
     var reason = ctx.sim.declare({ point: point, anchorId: anchorId, anchorText: anchorText || (finite(offset) && offset !== 0 ? 'offset ' + offset : null) || anchorText, band: band, unit: unit });
-    return this.push(tab, { point: point, label: label, value: p.value, text: p.text, unit: unit || '', quality: 'simulated', declared: reason, anchor: anchorId || anchorText, band: band });
+    /* PRD-P05: a replayed reading says so — the recorded file at the scrubber time, or "—" when the file has no sample */
+    if (p.quality === 'replay') {
+      var info = ctx.sim.providerInfo ? ctx.sim.providerInfo() : null;
+      reason = 'replay: ' + point + (p.missing ? ' has no sample in ' : ' read from ') + 'the recorded file ' + ((info && info.source) || '(unnamed)') + ' at the scrubber time, sample-and-hold, never uploaded (PRD-P05)';
+    }
+    return this.push(tab, { point: point, label: label, value: p.value, text: p.text, unit: unit || '', quality: p.quality === 'replay' ? 'replay' : 'simulated', declared: reason, anchor: anchorId || anchorText, band: band });
   };
   /* page-authored constant or an identity over marked parameters */
   Builder.prototype.D = function (tab, point, label, text, reason, value) {

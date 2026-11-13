@@ -435,7 +435,7 @@
       return ' data-basis-param="' + esc(r.basis) + '"' + (r.params ? ' data-basis-params="' + esc([r.basis].concat(r.params).join(' ')) + '"' : '')
         + ' data-evidence="' + esc(evOf(r.basis)) + '" tabindex="0" role="button" style="--rz-ev:' + evColor(evOf(r.basis)) + '" title="' + esc(r.basis + ' · ' + evOf(r.basis)) + '"';
     }
-    var col = r.quality === 'simulated' ? '#b0678f' : r.quality === 'state' ? '#7dd3fc' : '#8fa2b8';
+    var col = r.quality === 'simulated' ? '#b0678f' : r.quality === 'replay' ? '#d49a2a' : r.quality === 'state' ? '#7dd3fc' : '#8fa2b8';
     return ' data-rz-authored-basis="' + esc(r.declared || '') + '" style="--rz-ev:' + col + '" title="' + esc((r.quality || 'declared').toUpperCase() + ' · ' + (r.declared || '')) + '"';
   }
   function payloadRow(r) {

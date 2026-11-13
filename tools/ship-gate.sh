@@ -93,6 +93,8 @@ gate "DC AI basis map — DH_BASIS ids resolve, every bo() field mapped, adapter
 gate "DC AI traceability coverage — every drawn, inspector and modal number hooked or declared (hook-aware, settled)" node tools/test-dcai-coverage.mjs --strict --settle=9000 --modals
 gate "DC AI basis hooks — marks well-formed, a real click per diagram opens the inspector" node tools/test-dcai-basis-hooks.mjs
 gate "DC AI HMI payloads — every class hooked-at-parity or declared, deterministic, scenario states, Rule 2 static scan" node --test tools/test-datahall-ai-hmi-payloads.mjs
+gate "DC AI replay core (P05) — provider seam byte-identical when off, CSV/JSON parsers, sample-and-hold, strict dash, inert source" node --test tools/test-datahall-ai-replay.mjs
+gate "DC AI replay in the browser (P05) — file to mapping to scrubber: file values at 3 positions, unmapped dash, no network, exit deep-equal, axe, 390 px" node tools/test-datahall-ai-replay-runtime.mjs
 gate "DC AI equipment inspector — click=inspector, Open HMI=modal lifecycle, pinned-tick determinism, ladder, Rule 2 counter" node tools/test-datahall-ai-inspector-runtime.mjs --strict-rule2
 gate "conv engine — 26/26 DoD identities"      node tools/test-conv-calc.mjs
 gate "CDU engine — worked examples"            node tools/test-cdu-calc.mjs

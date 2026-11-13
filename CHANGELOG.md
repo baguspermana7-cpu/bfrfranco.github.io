@@ -11,6 +11,32 @@ release sections rather than semver.
 
 ---
 
+## v3.55.0 — 2026-11-14 — DC AI cockpit: replay a recorded trend file (PRD-P05 stage 1)
+
+### Added
+- **Replay on datahallAI.html.** A header button opens a mapping dialog: pick a CSV or JSON trend export from a BMS,
+  the file is parsed in a Web Worker inside this browser (nothing is uploaded, 20 MB cap), its columns are matched to
+  the cockpit's simulated points by name, and Start replaces the simulation with the recorded values.
+  - mapping per column: point, scale factor, sample-and-hold between samples; saved per file signature (sha256 of the
+    header and first timestamp, newest 20 kept)
+  - a replay bar: play at 1x–60x, scrub, step, exit; the header, every in-page mode label and the quality chip read
+    REPLAY with the file name
+  - strict: during a replay every simulated point the file does not map prints "—"; nothing is simulated silently
+  - engine quantities and scenario states are unchanged (Rule 2): only simulated sensor readings are replaced
+  - Exit restores the seeded simulation exactly (deep-equal at the pinned tick)
+  - an unreadable file names its line and leaves the page simulated
+- Gates: `tools/test-datahall-ai-replay.mjs` (R1–R10, parser and provider in Node) and
+  `tools/test-datahall-ai-replay-runtime.mjs` (B1–B10 in the browser, 1366 and 390 px, axe on the dialog,
+  no network during replay), both in the ship gate.
+
+### Fixed
+- The modal alarm line `.dh-modal-alarmline` failed AA contrast in both themes (critical and maintenance colours lifted).
+- The fire-isolation style DIALOG lost its centring transform under the entrance animation at 390 px; the exclusion is
+  now by class (`.fire-iso`), so both dialogs stay on screen.
+
+Standards: DATAHALL_AI_STANDARD.md (Replay a recorded trend file), ACCURACY_VALIDATION.md (v3.55.0 note),
+manual/datahallai.html (Replay row).
+
 ## v3.54.0 — 2026-11-13 — Homepage motion live; one CAPEX answer for the calculator and DCMOC
 
 Owner decisions 2026-11-13: R121 "Put on index"; CAPEX option (a) "Yg terbaik", mock approved ("Live").

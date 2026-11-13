@@ -18,6 +18,7 @@
  * Nothing here decides a STATE (RUN/STBY/TRIP/WET) — states come from the
  * scenario engines. `pick()` exists only for cosmetic rotating text.
  * No random call anywhere in this file (gate: tools/test-datahall-ai-hmi-payloads.mjs).
+ * PRD-P05: setProvider(fn|null) lets a recorded file answer point() first (replay); null = today's output, byte-identical.
  * ES5, zero-build, window.RZDatahallAISimTelemetry + module.exports.
  * ==========================================================================*/
 (function (root) {
@@ -73,6 +74,12 @@
     var tick = finite(s.tick) ? Math.floor(s.tick) : tickNow();
     var period = finite(s.period) && s.period > 0 ? s.period : 15;
     var bucket = Math.floor(tick / period);
+    var digits0 = finite(s.digits) ? s.digits : 1;
+    if (provider) {
+      /* PRD-P05 FR-P05-1: a replay provider answers first. null = not mine, the seeded reading stands. */
+      var r = provider({ id: id, point: name, tick: tick });
+      if (r) { return replayed(r, digits0, s, tick, bucket); }
+    }
     if (!finite(s.anchor) || !finite(s.band)) {
       return deepFreeze({ value: null, text: '—', anchor: s.anchor, band: s.band, tick: tick, bucket: bucket, quality: 'simulated' });
     }
@@ -86,6 +93,32 @@
     if (digits === 0 && Math.abs(v) >= 1000) { text = text.replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
     return deepFreeze({ value: Number(v.toFixed(digits)), text: text, anchor: s.anchor, band: s.band, tick: tick, bucket: bucket, period: period, quality: 'simulated' });
   }
+
+  function fmt(v, digits) {
+    var text = digits === 0 ? String(Math.round(v)) : v.toFixed(digits);
+    if (digits === 0 && Math.abs(v) >= 1000) { text = text.replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+    return text;
+  }
+
+  /* A replayed reading: the file value at the caller's precision, or the dash when the file has no
+     sample for a point the replay knows (FR-P05-6) — never a seeded number standing in for it. */
+  function replayed(r, digits, s, tick, bucket) {
+    if (!finite(r.value)) {
+      return deepFreeze({ value: null, text: '\u2014', anchor: s.anchor, band: s.band, tick: tick, bucket: bucket, quality: 'replay', missing: true });
+    }
+    return deepFreeze({ value: Number(r.value.toFixed(digits)), text: fmt(r.value, digits), anchor: s.anchor, band: s.band, tick: tick, bucket: bucket, quality: 'replay' });
+  }
+
+  /* PRD-P05 FR-P05-1: the one replay seam. fn({id, point, tick}) -> {value, quality:'replay'} | null; null clears. */
+  var provider = null, providerMeta = null;
+  function setProvider(fn, meta) {
+    if (fn !== null && typeof fn !== 'function') { throw new TypeError('setProvider expects a function or null'); }
+    provider = fn;
+    providerMeta = fn && meta ? deepFreeze({ source: String(meta.source || '') }) : null;
+    return !!fn;
+  }
+  function hasProvider() { return !!provider; }
+  function providerInfo() { return providerMeta; }
 
   /** series({...point spec, n}) → values for ticks tick-n+1 .. tick (oldest first) */
   function series(spec) {
@@ -118,7 +151,7 @@
       + ', seeded per equipment id and 4 s tick, never a field reading (Track A §A5)';
   }
 
-  var API = deepFreeze({ version: '2.2.0', TICK_MS: TICK_MS, EPOCH: EPOCH, tickNow: tickNow, seed: seed, rng: rng, point: point, series: series, pick: pick, declare: declare });
+  var API = deepFreeze({ version: '2.2.0', TICK_MS: TICK_MS, EPOCH: EPOCH, tickNow: tickNow, seed: seed, rng: rng, point: point, series: series, pick: pick, declare: declare, setProvider: setProvider, hasProvider: hasProvider, providerInfo: providerInfo });
   if (root) { root.RZDatahallAISimTelemetry = API; }
   if (typeof module !== 'undefined' && module.exports) { module.exports = API; }
 })(typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : this));

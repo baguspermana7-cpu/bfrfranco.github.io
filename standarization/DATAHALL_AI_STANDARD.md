@@ -777,6 +777,35 @@ counter per open modal), `tools/test-dcai-coverage.mjs --strict --settle=9000 --
 and modal rows walk like diagrams). Views without equipment blocks are reported as MONITOR rows,
 never as clean: today `bldgSvg` (floors are navigation, not equipment) and `elecOvSvg` (an aggregate).
 
+## Replay a recorded trend file (PRD-P05 stage 1, v3.55.0)
+
+The header **Replay** button loads `js/datahall-ai/replay-core.js` + `replay-ui.js` on first use. A CSV
+(RFC 4180, `,` or `;`, decimal comma with `;`) or JSON (`[{t, point, value}]` or `[{t, …}]`) file up to
+20 MB is parsed in `replay-worker.js`, its columns are matched to cockpit points by normalised name
+(`#replayDialog`, a DHModal DIALOG), and the mapping is kept in `localStorage.rz_replay_maps` under
+`sha256(header + first timestamp)`, 20 newest.
+
+Rules:
+- **One seam.** Replay enters only through `RZDatahallAISimTelemetry.setProvider(fn, {source})`. With no
+  provider `point()`/`series()` are byte-identical to the module before the seam (3,861 readings compared).
+  Nothing else on the page may read the file.
+- **Strict while replaying.** A mapped point prints the file value (× factor) at the cursor, sample-and-hold,
+  never interpolated. Every other simulated reading — payload rows and `RZ_SIM` drawing readings — prints
+  `—`. A seeded number is never shown next to recorded ones.
+- **Rule 2 holds.** Engine planes, registry-hooked cells and scenario states never pass through the seam;
+  they stay engine values during replay (the gate checks TCS supply).
+- **Labels.** `body[data-rz-data-mode="replay"]`, the header slot reads `REPLAY · <file> · <span>`, every
+  `[data-rz-mode-label]` reads its `data-rz-mode-replay` text, payload rows carry `quality:'replay'` and a
+  declared reason naming the file. Exit restores all of them and the seeded simulation exactly.
+- **Untrusted file.** Cells become numbers or are dropped; text reaches the page through `textContent` only;
+  no request is made from Start to Exit. `body[data-rz-replay="off"]` hides the entry.
+
+Gates: `tools/test-datahall-ai-replay.mjs` (Node, 10 tests: seam identity, parsers, time model, match,
+strict provider, inert source) and `tools/test-datahall-ai-replay-runtime.mjs` (Puppeteer: file → mapping
+→ value equality at 3 scrub positions in payload and inspector, unmapped dash, no network, exit
+deep-equal at tick 4242, axe on the dialog, 390 px). Stage 2 (Conventional cockpits, which do not use
+sim-telemetry) is planned, not built.
+
 ## Zoom & Pan System
 
 SVG containers use CSS classes:

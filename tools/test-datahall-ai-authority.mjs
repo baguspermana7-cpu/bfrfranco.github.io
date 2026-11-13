@@ -14,7 +14,7 @@ const ASSET_VERSION = '1.6.0';
 const SPEC_VERSION = 'gb300-500mw-2026-09-06';
 const EXPECTED_SNAPSHOT = DCAI_ENGINE.snapshot;
 const CORE_ACTION_IDS = Object.freeze([
-  'bodTrig', 'bodDrawerPdf', 'genDesignTrig', 'faqTrig',
+  'rzReplayTrig', 'bodTrig', 'bodDrawerPdf', 'genDesignTrig', 'faqTrig',
   'platformProfile', 'electricalScenario', 'fireScenario', 'fireZone', 'fireEvaluate',
 ]);
 const MIME = Object.freeze({

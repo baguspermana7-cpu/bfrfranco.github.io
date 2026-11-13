@@ -61,6 +61,12 @@ badge, pump running, bypass, dry/wet) is never a die roll: it comes from the ele
 fire scenario engine. The static half of the rule: `tools/test-datahall-ai-hmi-payloads.mjs` fails
 on any `Math.random`, `R(` or `RI(` inside a `@rz-hmi` marker block or in the payload modules.
 
+**v3.55.0 (PRD-P05) — replay is not a third source.** A recorded file reaches the page only through
+`sim-telemetry.setProvider`, so it can replace a *seeded* reading and nothing else: engine values and
+scenario states are untouched. While a file is shown every simulated reading is either the file value or
+`—` (strict provider), and the cell says REPLAY with the file name. With no provider the module's output is
+byte-identical to v2.2.0 — `tools/test-datahall-ai-replay.mjs` R1 proves it.
+
 **v2.3.0 (Track A §A6) — states that are operator acts.** The fire workstation's point states come from
 an isolation REGISTER (owner, reason, expiry — operator input in this browser) and a staged training run,
 evaluated by `js/datahall-ai/fire-points.js` on the sim tick. Zone impairment, release inhibit and fire

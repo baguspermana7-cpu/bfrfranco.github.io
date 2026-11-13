@@ -711,6 +711,7 @@
                     <tr><td>BMS service health</td><td><code>bmsGwOnline</code>, <code>bmsAlmActive</code>, <code>bmsAlmAck</code>, <code>bmsAlmCleared</code></td><td>Static service baseline plus shared rules.</td><td>16/16 gateways is modeled; “cleared” currently reuses the maintenance count and is not a true event lifecycle.</td></tr>
                     <tr><td>Line / breaker quality</td><td><code>data-rz-line</code>, <code>data-rz-breaker</code>, inspector Live tab</td><td>Local rendered state.</td><td>Seven breaker states and data-quality chip must remain distinguishable without color alone.</td></tr>
                     <tr><td>Global data mode</td><td><code>body[data-rz-data-mode="simulated"]</code></td><td>Persistent provenance.</td><td>The word <strong>Simulated</strong> must remain visible even when values animate.</td></tr>
+                    <tr><td>Replay (recorded file)</td><td>Header <strong>Replay</strong>, <code>body[data-rz-data-mode="replay"]</code>, <code>RZDatahallAISimTelemetry.setProvider</code></td><td>A CSV or JSON trend file from a BMS, read in the browser only (20 MB limit); sample-and-hold at the scrubber time.</td><td>Mapped points show the file value; every other simulated reading shows &mdash;; engine values and scenario states are unchanged. The header reads REPLAY with the file name; Exit restores the simulation exactly.</td></tr>
                     <tr><td>Alarm-query records</td><td><code>RZDataHallAlarmQuery</code></td><td>Immutable simulated event fixtures.</td><td>Date/point/system/severity/lifecycle/quality/value/state/event/action/text filters compose; first-out selects earliest per incident and CSV exports the filtered set.</td></tr>
                     <tr><td>Electrical scenario truth</td><td><code>RZDatahallAIElectrical.evaluateScenario()</code></td><td>Pure semantic topology evaluation.</td><td>Served + lost = 54; 2N/degraded are mutually interpretable availability classes; CSS animation is a consumer, never the source of truth.</td></tr>
                     <tr><td>Fire cause/effect</td><td><code>RZDatahallAIFireCauseEffect.evaluateEvent()</code></td><td>Immutable zoned training matrix.</td><td>Rows expose command authority, expected feedback, inhibition and reset authority. FACP controls; BMS/DCIM monitor-only.</td></tr>
@@ -800,7 +801,7 @@
     })();
     </script>
     <script src="../js/rz-manual-toc.js?v=20261110-9866a7c8" defer></script>
-    <script src="../js/rz-version.js?v=20261113-aef8304a" defer></script>
+    <script src="../js/rz-version.js?v=20261113-638347b2" defer></script>
     <script src="../js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="../js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <script src="../js/rz-explain-db.js?v=20261111-a4d62e38" defer></script>
