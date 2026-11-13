@@ -97,16 +97,25 @@ try {
     // F1 + F2 on employer card 2
     await scrollTo(p, '.emp-card:nth-of-type(2)');
     const ec = await p.evaluate(() => { const r = document.querySelector('.emp-card:nth-of-type(2) .emp-front .emp-name').getBoundingClientRect(); return { x: r.left + 10, y: r.top + 5 }; });
-    const t0 = Date.now();
+    // Sample on the animations' own clock (seek every animation of the card to 340 / 560 ms), not the wall clock: under
+    // load a wall-clock read landed before the first frame (scale 1.005, facts all 0.00) on a correct page.
     await p.mouse.click(ec.x, ec.y);
-    await sleep(Math.max(0, 340 - (Date.now() - t0)));
+    const seek = (ms) => p.evaluate(async (ms) => {
+      const card = document.querySelector('.emp-card:nth-of-type(2)');
+      let an = [];
+      for (let i = 0; i < 30 && an.length < 3; i++) { an = card.getAnimations({ subtree: true }); if (an.length < 3) await new Promise((r) => requestAnimationFrame(r)); }
+      an.forEach((a) => { a.pause(); a.currentTime = ms; });
+      return an.length;
+    }, ms);
+    await seek(340);
     const mid = await p.evaluate(() => { const card = document.querySelector('.emp-card:nth-of-type(2)'); const m = getComputedStyle(card).transform; const sc = m === 'none' ? 1 : Math.hypot(...m.replace(/^matrix(3d)?\(|\)$/g, '').split(',').map(Number).slice(0, 2));
       const faces = [...card.querySelectorAll('.emp-face')]; const glare = [...card.querySelectorAll('.emp-glare')].map((e) => getComputedStyle(e).backgroundImage);
       return { sc, shadow: faces.some((f) => window.__sh(getComputedStyle(f).boxShadow).some((s) => !s.inset && s.blur >= 20)), glare: glare.some((b) => /gradient/.test(b)) }; });
     check(mid.sc > 1.01 && mid.shadow && mid.glare, `F1 ${T} mid-turn the card lifts (scale ${mid.sc.toFixed(3)}), the face throws a shadow (${mid.shadow}) and a glare crosses it (${mid.glare})`);
-    await sleep(Math.max(0, 560 - (Date.now() - t0)));
+    await seek(560);
     const cas = await p.evaluate(() => [...document.querySelectorAll('.emp-card:nth-of-type(2) .emp-back .emp-facts > div')].map((e) => +getComputedStyle(e).opacity));
-    await sleep(Math.max(0, 1400 - (Date.now() - t0)));
+    await p.evaluate(() => document.querySelector('.emp-card:nth-of-type(2)').getAnimations({ subtree: true }).forEach((a) => a.play()));
+    await sleep(1400);
     const done = await p.evaluate(() => { const card = document.querySelector('.emp-card:nth-of-type(2)');
       return { rows: [...card.querySelectorAll('.emp-back .emp-facts > div')].map((e) => +getComputedStyle(e).opacity), glare: [...card.querySelectorAll('.emp-glare')].every((e) => getComputedStyle(e).backgroundImage === 'none'),
         shadow: [...card.querySelectorAll('.emp-face')].some((f) => window.__sh(getComputedStyle(f).boxShadow).some((s) => !s.inset && s.blur >= 20)), tf: getComputedStyle(card).transform }; });
@@ -126,7 +135,8 @@ try {
     // M6
     const ctx = browser.defaultBrowserContext(); await ctx.overridePermissions(BASE, ['clipboard-read', 'clipboard-write', 'clipboard-sanitized-write']).catch(() => {});
     await scrollTo(p, '.copy-btn');
-    await p.click('.copy-btn'); await sleep(350);
+    await p.click('.copy-btn'); await sleep(150);
+    await p.evaluate(() => Promise.all(document.querySelector('.copy-btn').getAnimations({ subtree: true }).map((a) => { a.finish(); return a.finished.catch(() => null); })));
     const cp = await p.evaluate(() => { const e = document.querySelector('.copy-btn'), ck = e.querySelector('.ico-check'), co = e.querySelector('.ico-copy'); const col = getComputedStyle(e).color.match(/\d+/g).map(Number);
       return { copied: e.classList.contains('copied'), ck: ck ? +getComputedStyle(ck).opacity : -1, co: co ? +getComputedStyle(co).opacity : -1, col }; });
     const blue = cp.col[2] - Math.max(cp.col[0], cp.col[1]) >= 60, green = cp.col[1] > cp.col[0] + 40 && cp.col[1] > cp.col[2];

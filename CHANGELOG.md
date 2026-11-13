@@ -36,6 +36,10 @@ Owner decision 2026-11-13 (R123): "Yes, yg terbaik" — build, accept all four e
 ### Fixed
 - `tools/test-index-r079.mjs` sampled the employer-card flip on the wall clock and failed a correct page under load
   (19° at 150 ms, 176° at 1 s). It now seeks the transition to 150 ms and waits for it to finish; a swap still fails.
+- `tools/test-index-micro.mjs` F1/F2 read the employer card's lift and fact cascade 340 ms and 560 ms of wall clock
+  after the click and failed a correct page under load (scale 1.005, facts all 0.00); M6 read the copy button mid
+  transition. F1/F2 now pause every animation of the card and seek it to 340 / 560 ms (scale 1.035, facts 0.85 → 0.00
+  in three runs); M6 waits for the button's transitions to finish. With the lift and cascade removed, F1/F2 still fail.
 
 Standards: DC_INCIDENTS_QA_STANDARD.md §4d, documentation/product-transformation/DECISIONS.md (D-Q03-1..4 decided).
 
