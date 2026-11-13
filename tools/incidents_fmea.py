@@ -354,6 +354,14 @@ def _who_acts(inc, m):
     return incidents_response.mode_playbook_html(inc, m)
 
 
+def _rp_back(inc, mode_id):
+    """PRD-Q03 FR-8: 'Reproduce:' links in the FMEA row the entry names (lazy import: incidents_reproduce imports this)."""
+    if not inc.get("reproduce"):
+        return ""
+    import incidents_reproduce
+    return incidents_reproduce.mode_backlink(inc, mode_id)
+
+
 def worksheet_html(inc):
     f = inc["fmea"]
     modes = sorted(f["modes"], key=lambda m: -rpn(m))
@@ -396,7 +404,7 @@ def worksheet_html(inc):
     {rev_line}
     {_who_acts(inc, m)}
     <p class="fm-sub">Evidence</p>
-    <ul class="fm-ev">{ev}</ul>
+    <ul class="fm-ev">{ev}</ul>{_rp_back(inc, m["id"])}
     <button type="button" class="fm-wi-open" data-id="{esc(m["id"])}" hidden>Open in what-if</button>
   </div>
 </details>""")

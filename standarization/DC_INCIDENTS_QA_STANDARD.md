@@ -189,6 +189,25 @@ Rules learned on the first crawl:
 - Unbuilt candidates go to `_master-list.json` with the review URL in `candidateSources`, magnitude marked
   provisional in `verifyNote`.
 
+## 4d · Reproduce in a calculator (PRD-Q03, 2026-11-13, R123)
+
+A dossier may carry `reproduce[]`: entries that open the TIA-942 checklist or the tier advisor in the state the
+record describes. Only owner-accepted entries render (`decidedBy: owner`, `decidedOn`, `request R<nnn>`, recorded by
+`python3 tools/incidents_reproduce.py decide … --by owner --request R<nnn>`); seed dossiers never carry one.
+- **Baselines are generated, never typed.** `tools/build-reproduce-baselines.py --apply` reads them from the
+  calculators' own markup into `data/reproduce-baselines.json` (`tia-t3-ent-all` 64 inputs, `tier-defaults` 22).
+  Inputs the dossier does not state come from the baseline and are labelled "Baseline", never as a fact about the site.
+- **Each set item quotes its evidence** (RV10: the quote must occur in the cited dossier field); a violated item may
+  not rest on a contributing factor alone (RV11). Rules RV1–RV17 live in `validate_reproduce`.
+- **The link is the P2 share link** (`#rzs=` + base64url JSON `{v:1, calc, inputs, origin}`, origin
+  `incident:<slug>:<entry id>`, ≤ 8,000 characters). The section sits after `#fmea`; the FMEA row it reproduces links
+  back to it.
+- **Gates.** `tools/test-incidents-reproduce.py` (static: planted defect per rule, payload decodes to baseline + set,
+  placement, review report covers every dossier) and `tools/test-incidents-reproduce.mjs` (browser: each link restores
+  every input, the calculator shows the gap — TIA score below the 100 % baseline and every "Top gaps" card is a violated
+  item; tier Physical below defaults — and the section is clean at 390/1440 in both themes, axe serious/critical 0).
+  The baselines file is in `test-generator-freshness.py`.
+
 ## 5 · Model + process
 
 Research/QA runs on the **top Opus tier (Opus-5 class)**, multi-agent: crawlers (official · fire-authority/regulator · engineering/technical · facility-forensic) → assembler (this §2 prompt) → adversarial reviewer (this §3 checklist), minimum iterations until the depth floor is met with zero unverified claims. Batched (≤5 incidents/run) to respect session limits; ingest via `tools/_ingest_rca.py`; regenerate; run the §4 visual-QA gate; then the standard gate suite before ship.

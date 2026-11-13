@@ -22,9 +22,11 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import incidents_fmea  # noqa: E402  — retrospective FMEA section + its CSS
 import incidents_response  # noqa: E402  — who did what / who should, by role
+import incidents_reproduce  # noqa: E402  — PRD-Q03: reproduce the record's stated conditions in a calculator
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA_DIR = os.path.join(ROOT, "data", "incidents")
+_RP_BASELINES = incidents_reproduce.load_baselines()
 VER_TAG = "2026-08-01-gloss"
 
 CATEGORY_LABEL = {
@@ -1490,7 +1492,7 @@ def _figure(svg, caption, narrow=None):
             f'<figcaption>{caption}</figcaption></figure>')
 
 
-_SECTIONS = [("summary", "Summary"), ("timeline", "Timeline"), ("response", "Response"), ("fmea", "FMEA"),
+_SECTIONS = [("summary", "Summary"), ("timeline", "Timeline"), ("response", "Response"), ("fmea", "FMEA"), ("reproduce", "Reproduce"),
              ("causes", "Causes"), ("actions", "Actions"), ("sources", "Sources")]
 
 NAV_JS = r"""<script>(function(){
@@ -1561,8 +1563,9 @@ def render_incident(inc, rank):
         for r in inc.get("references", [])
     )
     dur_txt = (_dur(inc.get('durationMin')) + ' — ' if inc.get('durationMin') else '') + (inc.get('durationBasis') or 'Basis not recorded')
+    rp_html = incidents_reproduce.reproduce_section(inc, _RP_BASELINES) if inc.get("reproduce") else ""
     nav = "".join(f'<a href="#{k}">{v}</a>' for k, v in _SECTIONS
-                  if k != "response" or inc.get("response"))
+                  if (k != "response" or inc.get("response")) and (k != "reproduce" or rp_html))
     body = f"""        <div class="reading-col">
         <a class="backlink" href="dc-incidents.html">← All incidents</a>
         <div class="eyebrow">Incident dossier · Rank #{rank} · magnitude {inc['_score']:.1f}</div>
@@ -1602,7 +1605,7 @@ def render_incident(inc, rank):
         </section>
         {incidents_response.response_section(inc)}
         <section class="inc-sec" id="fmea" aria-labelledby="h-fmea">{incidents_fmea.fmea_section(inc)}</section>
-
+{rp_html}
         <section class="inc-sec" id="causes" aria-labelledby="h-causes">
         <h2 id="h-causes">Root cause and contributing factors</h2>
         {_root_cause_html(inc.get('rootCause',''), _used)}
@@ -1634,7 +1637,7 @@ def render_incident(inc, rank):
     if inc.get("fmea"):
         head += (f"<style>{incidents_fmea.CSS}</style>"
                  f'<script src="js/rz-fmea-sim.js?v={_asset_token("js/rz-fmea-sim.js")}" defer></script>')
-    head += f"<style>{incidents_response.CSS}{DOSSIER_CSS}</style>"
+    head += f"<style>{incidents_response.CSS}{DOSSIER_CSS}{incidents_reproduce.CSS if rp_html else ''}</style>"
     body += incidents_response.SCRIPT + NAV_JS
     return page_shell(inc["title"], inc.get("brief", "")[:180], f"incident-{inc['slug']}.html", body, base="",
                       head_extra=head)

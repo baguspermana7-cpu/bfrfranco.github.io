@@ -70,6 +70,7 @@ BUILDERS = [
     ("wash register sweep (no coloured gradient bands)", ["python3", "tools/sweep-wash-register.py", "--check"]),
     ("CTA accent sweep (button/CTA chrome on the one accent)", ["python3", "tools/sweep-cta-accent.py", "--check"]),
     ("cx-handbook/ (Cx field manual pages)", ["python3", "tools/build-cx-handbook.py", "--check"]),
+    ("data/reproduce-baselines.json (Q03 calculator baselines)", ["python3", "tools/build-reproduce-baselines.py", "--check"]),
     ("js/rz-engine-versions.js (P16 engine pins)", ["node", "tools/build-engine-versions.mjs", "--check"]),
     ("dist/rz-engine.mjs (P19 ESM build of rz-engine.js)", ["node", "tools/build-engine-esm.mjs", "--check"]),
     ("data/explain/*.json (P21 Ask-about-this-page index)", ["node", "tools/build-explain-index.mjs", "--check"]),
