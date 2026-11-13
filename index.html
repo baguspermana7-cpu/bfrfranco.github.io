@@ -241,7 +241,7 @@
 </style>
 
     <!-- Index-only stylesheet — 83KB vs 121KB full, sync to prevent CLS -->
-    <link rel="stylesheet" href="styles-index.min.css?v=20261113-b4a8562d">
+    <link rel="stylesheet" href="styles-index.min.css?v=20261113-2b6a2eb6">
 
     <!-- prefetch removed: 20KB fetch on every page load, low hit rate -->
     <script src="js/rz-version.js?v=20261113-43368234" defer></script>
@@ -1722,15 +1722,13 @@ if ('serviceWorker' in navigator) {
   function set(card, open, viaKey) {
     if (card.classList.contains('is-flipped') === open) return;
     var front = card.querySelector('.emp-front'), back = card.querySelector('.emp-back');
-    var h0 = card.getBoundingClientRect().height;
+    if (open) { var fl = back.querySelector('.emp-facts'); if (fl) fl.scrollTop = 0; }
     card.classList.toggle('is-flipped', open);
     card.querySelector('.emp-open').setAttribute('aria-expanded', open ? 'true' : 'false');
     [[front, !open], [back, open]].forEach(function (p) {
       if (p[1]) { p[0].removeAttribute('inert'); p[0].removeAttribute('aria-hidden'); }
       else { p[0].setAttribute('inert', ''); p[0].setAttribute('aria-hidden', 'true'); }
     });
-    var h1 = card.getBoundingClientRect().height;
-    if (card.animate && Math.abs(h1 - h0) > 1) card.animate([{ height: h0 + 'px' }, { height: h1 + 'px' }], { duration: reduce ? 0 : 500, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' });
     if (!reduce && card.animate) {
       card.classList.remove('emp-turning'); void card.offsetWidth; card.classList.add('emp-turning');
       clearTimeout(card._t); card._t = setTimeout(function () { card.classList.remove('emp-turning'); }, 820);

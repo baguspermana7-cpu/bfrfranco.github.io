@@ -5614,8 +5614,12 @@ section.dp-band .sec-eyebrow::after { background: linear-gradient(90deg, var(--d
 .emp-card.is-flipped .emp-front { display: flex; animation: none; transform: rotateY(180deg); }
 .emp-card.is-flipped .emp-back { transform: rotateY(0deg); }
 .emp-card.emp-armed:not(.is-flipped) .emp-front { animation: none; }
-/* the hidden face leaves the flow, so a card is as tall as the face it shows (R079 L3); JS animates the height change */
-.emp-card:not(.is-flipped) .emp-back, .emp-card.is-flipped .emp-front { position: absolute; top: 0; left: 0; right: 0; pointer-events: none; }
+/* R126 (owner 2026-11-14: "kok size card saat flip jadi berubah … dimensinya harus tetap"; chose "setinggi depan +
+   scroll"): the front sets the card's size and never leaves the flow; the back fills the same box and scrolls inside it
+   when its facts are longer. Replaces R079's "a card is as tall as the face it shows". */
+.emp-card:not(.is-flipped) .emp-back, .emp-card.is-flipped .emp-front { pointer-events: none; }
+.emp-back { position: absolute; inset: 0; }
+.emp-back > .emp-facts { flex: 1 1 auto; min-height: 0; margin-bottom: 44px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
 .emp-btn.emp-open, .emp-btn.emp-close {
     position: absolute; right: 12px; bottom: 12px; z-index: 1;
     width: 36px; min-height: 36px; height: 36px; padding: 0; margin: 0;
@@ -5628,7 +5632,7 @@ section.dp-band .sec-eyebrow::after { background: linear-gradient(90deg, var(--d
     .emp-card:hover .emp-btn { color: var(--emp-ink); border-color: var(--emp-ink); }
 }
 .emp-btn:hover { text-decoration: none; }
-.emp-front > .emp-skills, .emp-back > .emp-facts { margin-bottom: 44px; }
+.emp-front > .emp-skills { margin-bottom: 44px; }
 @media (prefers-reduced-motion: reduce) {
     .emp-face { transition: opacity 180ms ease-out, border-color 160ms ease-out; }
     .emp-back, .emp-card.is-flipped .emp-front, .emp-card.is-flipped .emp-back { transform: none; }

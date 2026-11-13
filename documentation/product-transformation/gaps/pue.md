@@ -58,9 +58,12 @@ What the reference does:
   all 12-month cumulative. The select changes no number. Fix with the Measured mode below (the category select
   there shows the meter point), not by relabelling the estimate.
 
-## Not done yet (needs the owner's verdict on a mock)
+## Page (owner R125, 2026-11-14: mock approved "Live")
 
-The page `pue-calculator.html` still only estimates. Proposed: a "Measured" mode beside the estimate — category
-select (with its meter point shown), IT energy, one row per energy type crossing the boundary, the result as PUE₁
-with the weighted breakdown, and the design estimate beside it for comparison. Mock first (owner rule), then the
-page, its browser gate (G2 provenance, G3 a test that fails without the mode, G4 390 px both themes axe 0).
+`pue-calculator.html` gains a Measured tab beside Estimate (a `.tool-tabs` row, so the tool bar keeps its 6 controls):
+category with its IT meter point, IT energy, one row per energy type that crosses the boundary (electricity shown,
+the rest through "Add energy type"), the result as PUE₁/₂/₃ with each weighted line, and the design estimate beside it.
+Starting values are Appendix A Case B (1.708). `js/rz-pue-measured.js` reads and writes only; the arithmetic is
+`models.pue.measured`. A refused input shows the engine's reason and no number. Gate `tools/test-pue-measured.mjs`
+M1–M6, red 11/11 on the page without the mode. Defect D1 is closed by the tab's category select, which names the
+meter point; the old `greenGridLevel` select stays on the Estimate side (it labels the estimate's data quality only).

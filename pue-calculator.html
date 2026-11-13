@@ -290,8 +290,53 @@
         <div class="rz-calc-validation" id="pueValidation" role="alert" aria-live="polite" hidden></div>
         </div>
 
+        <div class="wrap"><div class="tool-tabs pm-tabs" role="tablist" aria-label="Estimate or measured PUE">
+            <button type="button" role="tab" id="btnEstimate" aria-selected="true" aria-controls="pmEstimateBench">Estimate</button>
+            <button type="button" role="tab" id="btnMeasured" aria-selected="false" aria-controls="pmBench">Measured</button>
+        </div></div>
+        <!-- Measured PUE (R125): js/rz-pue-measured.js, arithmetic in RZEngine.models.pue.measured -->
+        <section class="calculator-section wrap" id="pmBench" hidden>
+            <div class="calculator-grid tool-bench">
+                <div class="input-panel tool-inputs">
+                    <div class="input-section">
+                        <h3 class="section-title">Measurement</h3>
+                        <div class="input-group"><label for="pmCat">Category</label>
+                            <select id="pmCat" class="input-field">
+                                <option value="1" selected>1 · UPS output · 12-month kWh</option>
+                                <option value="2">2 · PDU output · 12-month kWh</option>
+                                <option value="3">3 · IT equipment input · 12-month kWh</option>
+                                <option value="0">0 · UPS output · peak kW, all-electric only</option>
+                            </select></div>
+                        <div class="input-group"><label for="pmIt" id="pmItLabel">IT energy at UPS output (kWh, 12 months)</label><input type="number" class="input-field" id="pmIt" min="0" step="1000" value="1000000" inputmode="numeric"></div>
+                    </div>
+                    <div class="input-section">
+                        <h3 class="section-title">Energy at the boundary</h3>
+                        <div class="input-group"><label for="pm-electricity">Electricity <span data-pm-unit>(kWh, 12 months)</span> <span class="pm-f" data-pm-f></span></label><input type="number" class="input-field" id="pm-electricity" min="0" step="1000" value="1305000" inputmode="numeric"></div>
+                        <div class="input-group"><label for="pm-naturalGas">Natural gas <span data-pm-unit>(kWh, 12 months)</span> <span class="pm-f" data-pm-f></span></label><input type="number" class="input-field" id="pm-naturalGas" min="0" step="1000" value="0" inputmode="numeric"></div>
+                        <div class="input-group"><label for="pm-fuelOil">Fuel oil <span data-pm-unit>(kWh, 12 months)</span> <span class="pm-f" data-pm-f></span></label><input type="number" class="input-field" id="pm-fuelOil" min="0" step="1000" value="0" inputmode="numeric"></div>
+                        <div class="input-group"><label for="pm-otherFuels">Other fuels <span data-pm-unit>(kWh, 12 months)</span> <span class="pm-f" data-pm-f></span></label><input type="number" class="input-field" id="pm-otherFuels" min="0" step="1000" value="0" inputmode="numeric"></div>
+                        <div class="input-group"><label for="pm-districtChilledWater">District chilled water <span data-pm-unit>(kWh, 12 months)</span> <span class="pm-f" data-pm-f></span></label><input type="number" class="input-field" id="pm-districtChilledWater" min="0" step="1000" value="1300000" inputmode="numeric"></div>
+                        <div class="input-group"><label for="pm-districtHotWater">District hot water <span data-pm-unit>(kWh, 12 months)</span> <span class="pm-f" data-pm-f></span></label><input type="number" class="input-field" id="pm-districtHotWater" min="0" step="1000" value="0" inputmode="numeric"></div>
+                        <div class="input-group"><label for="pm-districtSteam">District steam <span data-pm-unit>(kWh, 12 months)</span> <span class="pm-f" data-pm-f></span></label><input type="number" class="input-field" id="pm-districtSteam" min="0" step="1000" value="0" inputmode="numeric"></div>
+                        <div class="input-group"><label for="pm-condenserWater">Condenser water <span data-pm-unit>(kWh, 12 months)</span> <span class="pm-f" data-pm-f></span></label><input type="number" class="input-field" id="pm-condenserWater" min="0" step="1000" value="0" inputmode="numeric"></div>
+                        <div class="input-group" id="pmAddWrap"><label for="pmAdd">Add energy type</label><select id="pmAdd" class="input-field"><option value="">Choose…</option></select></div>
+                    </div>
+                </div>
+                <div class="results-panel tool-results">
+                    <div class="results-card">
+                        <div class="res-head"><h2>Measured PUE</h2><span class="basis">source-weighted energy / IT energy</span></div>
+                        <div class="rz-calc-validation" id="pmErr" role="alert" hidden></div>
+                        <div class="res-group"><h3>Headline</h3><div data-rz-fact-list><div class="metric-box is-key"><div class="metric-label" id="pmLabel">PUE<sub>1</sub></div><div class="metric-value" id="pmPue" aria-live="polite">—</div><div class="metric-note" id="pmMeter"></div></div></div></div>
+                        <div class="res-group"><h3>Weighted energy</h3><div data-rz-fact-list id="pmRows"></div></div>
+                        <div class="res-group"><h3>Against the design estimate</h3><div data-rz-fact-list><div class="metric-box"><div class="metric-label">Design estimate (Estimate tab)</div><div class="metric-value" id="pmEst">—</div><div class="metric-note" id="pmDiff"></div></div></div></div>
+                        <p class="res-fine res-pad">Starting values are the reference's worked example (Appendix A, Case B). Method: Data Center Metrics Task Force, Recommendations for Measuring and Reporting Overall Data Center Efficiency v2 (2011), Tables 1–2; weights are source-energy factors normalised to electricity.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Calculator -->
-        <section class="calculator-section wrap">
+        <section class="calculator-section wrap" id="pmEstimateBench">
             <div class="calculator-grid tool-bench">
                 <!-- Input Panel -->
                 <div class="input-panel tool-inputs">
@@ -1807,6 +1852,7 @@
 
 <script src="auth.js?v=20261031-f01cb5a3" defer></script>
 <script src="rz-engine.min.js?v=20261113-fd034bc4" defer></script>
+<script src="js/rz-pue-measured.js?v=20261113-8f984c24" defer></script>
 <!-- Supabase save/reload scenario (additive) -->
 <script src="js/rz-config.js?v=20260920-eed056f9"></script>
 <script src="js/rz-project.js?v=20261111-4db75da3"></script>
