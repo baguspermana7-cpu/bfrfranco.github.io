@@ -5,7 +5,7 @@
 |---|---|
 | PRD id | PRD-P05 |
 | Version | 1.0, 2026-11-10 |
-| Status | Approved (directive) for **stage 1**: the datahallAI page, client-side file replay, no network, no new infrastructure. Stage 2 (Conventional cockpits) is planned and depends on LTC Q7, because those cockpits do not use `sim-telemetry.js`. |
+| Status | **Stage 1 VERIFIED COMPLETE — v3.55.0 live 3a08a7588 (2026-11-14).** Approved (directive) for **stage 1**: the datahallAI page, client-side file replay, no network, no new infrastructure. Stage 2 (Conventional cockpits) is planned and depends on LTC Q7, because those cockpits do not use `sim-telemetry.js`. |
 | Priority | Wave 4 (rank 7, priority 66.0) |
 | Dependencies | Existing `js/datahall-ai/sim-telemetry.js` (the single source of simulated readings, seeded, tick-based) and `js/datahall-ai/hmi-points.js` (point manifest). |
 | Ownership | datahallAI is a shared page. LTC's Q6 (simulation honesty layer) and Q7 (scripted faults) touch the same cockpits. Coordination: this PRD adds a provider seam to sim-telemetry, and Q6/Q7 consume that seam. A message is sent before any edit. |
