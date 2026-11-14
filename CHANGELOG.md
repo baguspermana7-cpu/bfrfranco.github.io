@@ -11,6 +11,31 @@ release sections rather than semver.
 
 ---
 
+## v3.58.4 — 2026-11-14 — Finance Terminal reads real data through the gateway; admin tabs fit on desktop
+
+### Fixed
+- **Finance Terminal showed "$0", "0 coins" and "0.0%" for data it never received.** Every quote went through public
+  CORS proxies (corsproxy.io, allorigins, codetabs) that now fail (401 / network error), and CoinGecko was called
+  straight from the browser, where its 429 arrives without CORS headers. All market data now comes through the
+  first-party gateway (one `GATEWAY_URL` constant); a missing value shows "—", a short reason and Retry on every tab.
+  Crypto prices fall back to Binance's public `data-api.binance.vision` when the gateway's CoinGecko is rate-limited,
+  and the source line says so. A missing price no longer triggers "below" alerts or values a holding at its buy price.
+- Gateway calls are limited to 4 in flight and 90 per minute, identical requests share one call, and a 429/5xx is
+  retried once after Retry-After. A network failure to reach the gateway (some ISPs block `*.workers.dev`) shows one
+  banner, "Market data gateway unreachable from this network", instead of empty tiles.
+- The stock chart threw a page error whenever it had no data; the header now says "Delayed" (amber) instead of a red
+  "Offline"; the fake DXY tile is the real UUP fund.
+- **rz-ops tabs were wider than the screen on desktop**: User Activity 1350–1512 px at 1024–1440 (chart canvases
+  widened their grid tracks), Benchmarks 1331 px (tabs did not wrap), Users 1170 px at 1024. All fit now.
+  The coloured top stripes on the activity category cards are gone (1 px hairline only).
+
+### Removed
+- The public CORS proxies and the localStorage switches that could turn the gateway off or change its URL.
+
+### Gates
+- `tools/test-finance-terminal-data.mjs` D1–D6 (all six failed on v3.58.3); `tools/test-rz-ops-access.mjs` M2
+  (1024/1280/1440 px, failed on v3.58.3). See `standarization/FIN_ENGINE.md` "Data sources".
+
 ## v3.58.3 — 2026-11-14 — Admin suite theme aligned: embedded apps follow the console, light mode from tokens
 
 ### Fixed
