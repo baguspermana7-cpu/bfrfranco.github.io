@@ -415,12 +415,17 @@ export const generateCountryIntelPDF = async (
         if (disaster.mitigationOptions && disaster.mitigationOptions.length > 0) {
             y = ensureSpace(doc, y, 60, pg);
             y = drawSectionTitle(doc, y, 'Mitigation Recommendations', '2.1', branding);
+            /* MitigationOption (DisasterRiskEngine) = { name, cost, riskReduction %, roi × }; it carries
+             * no annual-benefit figure, so the table shows the engine's own fields only. */
             const mitigRows = disaster.mitigationOptions.map((m: any) => [
-                m.name, fmt(m.cost), fmt(m.annualBenefit), `${m.roiPercent}%`
+                m.name,
+                Number.isFinite(m.cost) ? fmt(m.cost) : '—',
+                Number.isFinite(m.riskReduction) ? `${m.riskReduction}%` : '—',
+                Number.isFinite(m.roi) ? `${m.roi}x` : '—',
             ]);
             autoTable(doc, {
                 startY: y,
-                head: [['Measure', 'Cost', 'Annual Benefit', 'ROI']],
+                head: [['Measure', 'Cost', 'Risk Reduction', 'ROI']],
                 body: mitigRows,
                 theme: 'striped',
                 headStyles: { fillColor: PDF_COLORS.slate900 },
