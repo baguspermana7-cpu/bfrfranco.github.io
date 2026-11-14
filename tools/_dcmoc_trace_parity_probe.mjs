@@ -26,7 +26,7 @@ import { join, extname } from 'path';
 
 const ROOT = new URL('..', import.meta.url).pathname;
 const PORT = 8098;
-const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.webp': 'image/webp', '.png': 'image/png', '.svg': 'image/svg+xml', '.woff2': 'font/woff2' };
+const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.webp': 'image/webp', '.png': 'image/png', '.svg': 'image/svg+xml', '.woff2': 'font/woff2' };
 
 const server = http.createServer((req, res) => {
     let p = decodeURIComponent(req.url.split('?')[0]);

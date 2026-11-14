@@ -28,6 +28,16 @@ const SAT_STYLE = {
     layers: [{ id: 'esri', type: 'raster' as const, source: 'esri' }],
 };
 
+/* Popup body built with textContent: site names are user-entered, so no HTML string reaches the map. */
+function popupContent(name: string, place: string): HTMLElement {
+    const box = document.createElement('div');
+    box.style.cssText = 'font:12px system-ui;color:#0f172a';
+    const b = document.createElement('b');
+    b.textContent = name;
+    box.append(b, document.createElement('br'), place);
+    return box;
+}
+
 export function RealMap({ sites, selectedId, onSelect, height = 300, mapStyle = 'map', onStatus }: {
     sites: CandidateSite[];
     selectedId: string | null;
@@ -48,9 +58,12 @@ export function RealMap({ sites, selectedId, onSelect, height = 300, mapStyle = 
         let cancelled = false;
         (async () => {
             try {
-                const maplibre = (await import('maplibre-gl')).default;
+                const maplibre = await import('maplibre-gl');   // v6: ESM, named exports only (no default)
                 await import('maplibre-gl/dist/maplibre-gl.css' as string).catch(() => { /* css side-effect */ });
                 if (cancelled || !ref.current) return;
+                /* v6 derives its worker URL from import.meta.url, which the bundler rewrites to file://.
+                 * Point it at the worker module emitted by webpack (hashed asset under /dcmoc/_next). */
+                maplibre.setWorkerUrl(new URL('maplibre-gl/dist/maplibre-gl-worker.mjs', import.meta.url).href);
                 const map = new maplibre.Map({
                     container: ref.current,
                     style: mapStyle === 'satellite' ? (SAT_STYLE as never) : STYLE_URL,
@@ -77,7 +90,7 @@ export function RealMap({ sites, selectedId, onSelect, height = 300, mapStyle = 
     React.useEffect(() => {
         if (!ready || !mapRef.current) return;
         (async () => {
-            const maplibre = (await import('maplibre-gl')).default;
+            const maplibre = await import('maplibre-gl');
             const map = mapRef.current as InstanceType<typeof maplibre.Map>;
             for (const m of markersRef.current) (m as { remove: () => void }).remove();
             markersRef.current = [];
@@ -93,8 +106,7 @@ export function RealMap({ sites, selectedId, onSelect, height = 300, mapStyle = 
                 el.onclick = () => onSelect?.(s.id);
                 const marker = new maplibre.Marker({ element: el })
                     .setLngLat([lng, lat])
-                    .setPopup(new maplibre.Popup({ offset: 18, closeButton: false }).setHTML(
-                        `<div style="font:12px system-ui;color:#0f172a"><b>${s.name}</b><br/>${s.city || s.countryId}</div>`))
+                    .setPopup(new maplibre.Popup({ offset: 18, closeButton: false }).setDOMContent(popupContent(s.name, s.city || s.countryId)))
                     .addTo(map);
                 markersRef.current.push(marker);
                 bounds.extend([lng, lat]);
