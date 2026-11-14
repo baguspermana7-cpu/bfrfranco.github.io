@@ -36,7 +36,7 @@ Screenshots: taken with a local premium test session (`rz_premium_session` seam 
 | Rack Architecture | `#rackSvg` 960×690 | 1.3× | 1240 × 891 | 91 | 530 | 0 | Rows of text strips ("CT-01 · 4× B300 + 2× Grace" × 18); rail group and network rack are boxes with captions; no rear view, no manifold/busbar/cable cartridge drawing |
 | Data Hall | `#hSvg` 1200×804 | 1.04× | 1252 × 840 | 126 | 388 | 2 grad | **Right direction** (owner R129). 588 tagged items, layers. Remaining: header KPI cards, sentences, 2 gradients |
 
-Equipment modals (tier 2, double-click from Data Hall; `scratchpad/r128/el/t2-*.png`):
+Equipment modals (tier 2, double-click from Data Hall):
 
 - `cdu` → CDU-01 HMI: best of the set (plate HX, pumps 2+1, strainer, valves, sensors) but drawn with gradient fills, glow
   frame, 6 KPI tiles on top, and small 7–8 px labels.
