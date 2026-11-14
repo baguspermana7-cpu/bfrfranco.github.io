@@ -11,6 +11,27 @@ release sections rather than semver.
 
 ---
 
+## v3.57.5 — 2026-11-14 — Finance Terminal: Market Posture tab (breadth, uptrend, exposure coach)
+
+### Added
+- **Posture tab in the Finance Terminal** (admin console → Finance Terminal). The scoring of three
+  tradermonty/claude-trading-skills (MIT) skills — market-breadth-analyzer, uptrend-analyzer, exposure-coach — is
+  ported to `js/rz-market-posture.js` (UMD, no DOM) and runs in the browser on the authors' public CSVs (S&P 500
+  breadth, sector uptrend ratios; fetched directly, CORS open, no proxy, no paid API). It shows the breadth composite
+  and zone with all six components, the uptrend composite with all five, and the exposure coach's posture label,
+  composite and confidence, each component with the input value it came from, data dates, sources and the FIN Engine
+  disclaimer. Loading, retry and partial-data states included.
+- Descriptive only, per the terminal's policy: the skills' action lists and exposure guidance are not ported; the
+  model ceiling is labelled as the framework's mapping of the regime, not an instruction. Six of the coach's eight
+  inputs need paid data (FMP/FINVIZ), so the page says confidence is LOW and why.
+
+### Gate
+- `tools/test-market-posture.mjs`: the 251 calls the skills' own pytest suites make, replayed in JS — 0 mismatches;
+  fixture CSVs end to end equal the original Python (53.4 Neutral / 37.2 Cautious / 16 % Defensive LOW); 180 seeded
+  scenarios over 7 zones — 0 mismatches; a perturbed input moves the score exactly as Python does; the tab renders at
+  390/1440 px in both themes with no page error, no sideways scroll and 0 serious axe findings. The comparator caught
+  one real port bug first (float `+=` vs Python's compensated `sum()`).
+
 ## v3.57.4 — 2026-11-14 — Admin console shows real accounts, never generated numbers
 
 ### Fixed
