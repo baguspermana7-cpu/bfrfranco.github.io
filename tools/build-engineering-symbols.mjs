@@ -97,6 +97,19 @@ ${entries.map((e) => `      ${e.kind}: { label: ${JSON.stringify(e.meta.label)},
     MARKUP: {
 ${entries.map((e) => `      ${e.kind}: ${JSON.stringify(e.body)}`).join(',\n')}
     },
+    /* HMI fields (R128, PRD §4): standard, ports on the 6-unit grid, states, tag prefix. Only kinds that declare them. */
+    STANDARD: {
+${entries.filter((e) => e.meta.standard).map((e) => `      ${e.kind}: ${JSON.stringify(e.meta.standard)}`).join(',\n')}
+    },
+    PORTS: {
+${entries.filter((e) => e.meta.ports).map((e) => `      ${e.kind}: ${JSON.stringify(e.meta.ports)}`).join(',\n')}
+    },
+    STATES: {
+${entries.filter((e) => e.meta.states).map((e) => `      ${e.kind}: ${JSON.stringify(e.meta.states)}`).join(',\n')}
+    },
+    TAG: {
+${entries.filter((e) => e.meta.tagPrefix !== undefined).map((e) => `      ${e.kind}: ${JSON.stringify(e.meta.tagPrefix)}`).join(',\n')}
+    },
     /** A standalone <svg> for one kind, sized in CSS px. */
     svg: function (kind, size, cls) {
       var m = API.MARKUP[kind];
@@ -105,6 +118,35 @@ ${entries.map((e) => `      ${e.kind}: ${JSON.stringify(e.body)}`).join(',\n')}
       return '<svg class="' + (cls || 'rz-sym') + '" viewBox="0 0 ' + API.VIEW + ' ' + API.VIEW +
         '" width="' + sz + '" height="' + sz + '" fill="none" stroke="currentColor" stroke-width="2"' +
         ' stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + m + '</svg>';
+    },
+    /** Kinds, optionally of one category. */
+    list: function (category) {
+      return Object.keys(API.META).filter(function (k) { return !category || API.META[k].category === category; });
+    },
+    /** Named ports of a kind in drawing units: {name: {x, y, medium}} after scale + rotation about the symbol centre. */
+    ports: function (kind, o) {
+      var p = API.PORTS[kind], out = {}, s = (o && o.size || API.VIEW) / API.VIEW, r = ((o && o.rot) || 0) % 360;
+      if (!p) return out;
+      Object.keys(p).forEach(function (n) {
+        var dx = p[n][0] - API.VIEW / 2, dy = p[n][1] - API.VIEW / 2, x = dx, y = dy;
+        if (r === 90) { x = -dy; y = dx; } else if (r === 180) { x = -dx; y = -dy; } else if (r === 270) { x = dy; y = -dx; }
+        out[n] = { x: ((o && o.x) || 0) + x * s, y: ((o && o.y) || 0) + y * s, medium: p[n][2] };
+      });
+      return out;
+    },
+    /** One placed symbol as an SVG group string. o = {x, y (centre), size, rot (0/90/180/270), state, tag, id, label}. */
+    use: function (kind, o) {
+      var m = API.MARKUP[kind];
+      if (!m) return '';
+      o = o || {};
+      var sz = o.size || API.VIEW, s = sz / API.VIEW, h = sz / 2, esc = function (t) {
+        return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; });
+      };
+      return '<g class="rz-hmi-sym" data-sym="' + kind + '"' + (o.id ? ' data-id="' + esc(o.id) + '"' : '') +
+        (o.state ? ' data-state="' + esc(o.state) + '"' : '') +
+        ' transform="translate(' + ((o.x || 0) - h) + ' ' + ((o.y || 0) - h) + ')' + (o.rot ? ' rotate(' + o.rot + ' ' + h + ' ' + h + ')' : '') +
+        (s !== 1 ? ' scale(' + s + ')' : '') + '">' +
+        '<g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + m + '</g></g>';
     }
   };
   root.RZEngSymbols = API;
