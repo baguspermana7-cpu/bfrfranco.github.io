@@ -11,7 +11,7 @@
     <link rel="icon" type="image/png" href="assets/Favicon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha384-iw3OoTErCYJJB9mCa8LNS2hbsQ7M3C0EpIsO/H5+EGAkPGc6rk+V8i04oW/K5xq0" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" integrity="sha384-e6nUZLBkQ86NJ6TVVKAeSaK8jWa3NhkYWZFomE39AvDbQWeie9PlQqM3pmYW5d1g" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
@@ -326,6 +326,16 @@
             .main-content{padding:1rem}
             .cred-row{grid-template-columns:30px 1fr 1fr 0.7fr 80px;font-size:0.72rem}
             .feat-row{grid-template-columns:1.5fr repeat(3,1fr);padding:10px 8px}
+            /* phone width: nothing may push the page sideways (min-width:auto let the topbar widen
+               .main-wrap to 512 px; wide tables scroll inside their own card instead of the page) */
+            .main-wrap,.main-content,.section{min-width:0;max-width:100vw}
+            .topbar-time{display:none}
+            .topbar-link{font-size:0;padding:6px 8px}
+            .topbar-link i{font-size:0.9rem}
+            .section-header{display:flex;flex-wrap:wrap;gap:0.75rem}
+            .card{overflow-x:auto}
+            .section-header>*{flex-shrink:1!important;min-width:0}
+            .health-row{grid-template-columns:repeat(2,1fr)!important}
         }
 
         /* ═══ LOGIN PAGE ═══ */
@@ -710,7 +720,7 @@
         body.light-mode .map-popup-row .val{color:#1e293b}
         body.light-mode #dcGlobalMap{background:#f8fafc}
     </style>
-    <script src="js/rz-version.js?v=20261113-43368234" defer></script>
+    <script src="js/rz-version.js?v=20261114-963d7571" defer></script>
     <script src="js/rz-explain-db.js?v=20261111-a4d62e38" defer></script>
     <script src="js/rz-explain.js?v=20261103-f581e6ac" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
@@ -780,7 +790,7 @@
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
+    <aside class="sidebar" id="sidebar" style="display:none;">
         <div class="sidebar-brand">
             <div class="sidebar-logo">RZ</div>
             <div class="sidebar-brand-text">
@@ -900,7 +910,7 @@
     <div class="kpi-grid" id="kpiGrid"></div>
 
     <!-- Quick Stats Row -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem">
+    <div class="health-row" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem">
         <div class="health-stat">
             <div class="health-stat-label">Total Calculations</div>
             <div class="health-stat-value" style="color:#60a5fa" id="totalCalcs">0</div>
@@ -2379,8 +2389,36 @@ try { document.addEventListener('DOMContentLoaded', applyAuthV2Visibility); } ca
 // ═══════════════════════════════════════════════════════════════
 // ACCESS CONTROL
 // ═══════════════════════════════════════════════════════════════
-const ADMIN_EMAILS = ['bagus@resistancezero.com','admin@resistancezero.com'];
+// Admin access is decided by Supabase, never by localStorage: a signed-in session whose own
+// profiles row (RLS: own row only, no client write path) says tier='root'. rz_premium_session is
+// still written for the rest of the site, but it proves nothing here (anyone can write it).
 let adminEmail = '';
+// js/rz-supabase.js is a module (deferred): it runs AFTER this inline script, so wait for its
+// 'rz-supa-ready' event instead of reading window.rzSupa now (null here = "auth unavailable").
+function _rzSupaReady(){
+    if(window.rzSupa) return window.rzSupa.ready?window.rzSupa.ready:Promise.resolve(window.rzSupa);
+    return new Promise(function(res){
+        var done=false;
+        function fin(v){ if(done) return; done=true; res(v); }
+        window.addEventListener('rz-supa-ready',function(e){
+            var S=(e&&e.detail)||window.rzSupa; fin(S&&S.ready?S.ready:S);
+        },{once:true});
+        setTimeout(function(){ fin(window.rzSupa?(window.rzSupa.ready||window.rzSupa):null); },8000);
+    });
+}
+function verifyRootSession(){
+    return _rzSupaReady().then(function(S){
+        if(!S||!S.configured) return {ok:false,reason:'Auth service unavailable — please retry.'};
+        return S.getUser().then(function(u){
+            if(!u) return {ok:false,reason:''};
+            return S.getProfile().then(function(r){
+                var p=r&&(r.data||r);
+                if(!p||p.tier!=='root') return {ok:false,reason:'Not authorized for admin access.',signedIn:true};
+                return {ok:true,email:(p.email||u.email||'').toLowerCase()};
+            });
+        });
+    }).catch(function(){return {ok:false,reason:'Auth service unavailable — please retry.'}});
+}
 
 function _sidebarRoleLabel(role,tier){
     var r=(role||'').toLowerCase();
@@ -2402,20 +2440,21 @@ function _applySidebarRole(role,tier){
     if(el) el.textContent=_sidebarRoleLabel(role,tier);
 }
 
+function _showConsoleFor(email){
+    adminEmail=email;
+    document.getElementById('loginPage').style.display='none';
+    document.getElementById('sidebar').style.display='flex';
+    document.getElementById('main-content').style.display='block';
+    document.getElementById('sidebarAvatar').textContent=email.charAt(0).toUpperCase();
+    document.getElementById('sidebarName').textContent=email.split('@')[0];
+    _applySidebarRole('root','root');
+}
 function checkAccess(){
-    const s = localStorage.getItem('rz_premium_session');
-    if(!s){showLogin();return false}
-    try{
-        const d=JSON.parse(s);
-        var expMs=typeof d.expires==='string'?new Date(d.expires).getTime():d.expires;
-        var role=d.role||'pro';
-        if(expMs<Date.now()||!ADMIN_EMAILS.includes(d.email)||role!=='root'){showLogin();return false}
-        adminEmail=d.email;
-        document.getElementById('sidebarAvatar').textContent=d.email.charAt(0).toUpperCase();
-        document.getElementById('sidebarName').textContent=d.email.split('@')[0];
-        _applySidebarRole(d.role,d.tier);
+    return verifyRootSession().then(function(v){
+        if(!v.ok){showLogin();return false}
+        _showConsoleFor(v.email);
         return true;
-    }catch(e){showLogin();return false}
+    });
 }
 function showLogin(){
     document.getElementById('loginPage').style.display='flex';
@@ -2458,7 +2497,7 @@ function handleAdminLogin(e){
     btnTxt.innerHTML='<i class="fas fa-spinner fa-spin"></i> Authenticating...';
     errEl.style.display='none';
 
-    // Authenticate against Supabase (real accounts) — admin access requires the ADMIN_EMAILS allowlist.
+    // Authenticate against Supabase; admin access then requires the account's own profile tier = root.
     // No hardcoded password in source; the admin's password lives in Supabase (already migrated).
     var _fail=function(msg){
         errEl.innerHTML='<i class="fas fa-exclamation-circle"></i> '+(msg||'Invalid email or password.');
@@ -2471,26 +2510,29 @@ function handleAdminLogin(e){
         localStorage.setItem('rz_premium_session',JSON.stringify({email:email,tier:'pro',role:'root',expires:new Date(Date.now()+expiry).toISOString()}));
         window.dispatchEvent(new CustomEvent('rz-auth-change',{detail:{email:email,tier:'pro',role:'root',action:'login'}}));
         errEl.style.display='none';
-        document.getElementById('loginPage').style.display='none';
-        document.getElementById('sidebar').style.display='flex';
-        document.getElementById('main-content').style.display='block';
-        adminEmail=email;
-        document.getElementById('sidebarAvatar').textContent=email.charAt(0).toUpperCase();
-        document.getElementById('sidebarName').textContent=email.split('@')[0];
-        _applySidebarRole('root','pro');
-        allUsers=generateUsers();loadManualAccounts();filteredUsers=[...allUsers];activities=generateActivities();
-        applySort();renderKPIs();renderDashboardCharts();renderRevenue();
-        renderTable();renderCredentials();renderFeatures();renderBenchmarks();
-        renderAudit();renderSubscribers();renderSettings();renderMayar();renderActivity();
+        btn.disabled=false; btnTxt.textContent='Sign In';
+        _showConsoleFor(email);
+        initConsole();
     };
-    if(!ADMIN_EMAILS.includes(email)){ setTimeout(function(){_fail('Not authorized for admin access.');},300); return false; }
-    (window.rzSupa&&window.rzSupa.ready?window.rzSupa.ready:Promise.resolve(window.rzSupa||null)).then(function(S){
+    _rzSupaReady().then(function(S){
         if(!S||!S.configured){ _fail('Auth service unavailable — please retry.'); return; }
-        return S.signIn(email,pass).then(function(res){ if(res&&res.error){ _fail('Invalid email or password.'); return; } _success(); });
+        return S.signIn(email,pass).then(function(res){
+            if(res&&res.error){ _fail('Invalid email or password.'); return; }
+            return verifyRootSession().then(function(v){
+                if(v.ok){ _success(); return; }
+                // signed in but not root: end that session so it is not left half-open here
+                return S.signOut().then(function(){ _fail(v.reason||'Not authorized for admin access.'); });
+            });
+        });
     }).catch(function(){ _fail('Auth service unavailable — please retry.'); });
     return false;
 }
-function adminLogout(){if(!confirm('Logout?'))return;localStorage.removeItem('rz_premium_session');location.href='index.html'}
+function adminLogout(){
+    if(!confirm('Logout?'))return;
+    localStorage.removeItem('rz_premium_session');
+    _rzSupaReady().then(function(S){return S&&S.configured?S.signOut():null}).catch(function(){})
+        .then(function(){location.href='index.html'});
+}
 
 // ═══════════════════════════════════════════════════════════════
 // NAVIGATION
@@ -4891,7 +4933,7 @@ function renderSettings(){
         {label:'Environment',value:'Production',icon:'fa-server'},
         {label:'Auth Backend',value:'localStorage (Pre-Supabase)',icon:'fa-database'},
         {label:'Session Duration',value:'24 hours',icon:'fa-clock'},
-        {label:'Admin Emails',value:ADMIN_EMAILS.join(', '),icon:'fa-user-shield'},
+        {label:'Admin Access',value:'Supabase account with tier = root (checked server-side)',icon:'fa-user-shield'},
         {label:'Total Accounts',value:CREDENTIALS.length+' registered',icon:'fa-users'},
         {label:'Feature Flags',value:Object.keys(featureFlags).length+' flags configured',icon:'fa-toggle-on'},
         {label:'Calculators',value:'CAPEX + OPEX',icon:'fa-calculator'},
@@ -5034,7 +5076,7 @@ function showMayarToast(msg,type){
     if(existing)existing.remove();
     var t=document.createElement('div');
     t.className='mayar-toast '+(type||'info');
-    t.innerHTML='<i class="fas fa-'+(type==='error'?'exclamation-triangle':type==='success'?'check-circle':'info-circle')+'"></i> '+msg;
+    t.innerHTML='<i class="fas fa-'+(type==='error'?'exclamation-triangle':type==='success'?'check-circle':'info-circle')+'"></i> '+rzEsc(msg);
     document.body.appendChild(t);
     setTimeout(function(){t.classList.add('show')},50);
     setTimeout(function(){t.classList.remove('show');setTimeout(function(){t.remove()},300)},4000);
@@ -5060,10 +5102,10 @@ function fmtMayarCurrency(amt){
 function mayarStatusBadge(s){
     if(!s)return '<span class="mayar-status pending">Unknown</span>';
     var sl=String(s).toLowerCase();
-    if(sl==='paid'||sl==='active'||sl==='success')return '<span class="mayar-status paid">'+s+'</span>';
-    if(sl==='unpaid'||sl==='pending')return '<span class="mayar-status unpaid">'+s+'</span>';
-    if(sl==='expired'||sl==='cancelled'||sl==='failed')return '<span class="mayar-status expired">'+s+'</span>';
-    return '<span class="mayar-status pending">'+s+'</span>';
+    if(sl==='paid'||sl==='active'||sl==='success')return '<span class="mayar-status paid">'+rzEsc(s)+'</span>';
+    if(sl==='unpaid'||sl==='pending')return '<span class="mayar-status unpaid">'+rzEsc(s)+'</span>';
+    if(sl==='expired'||sl==='cancelled'||sl==='failed')return '<span class="mayar-status expired">'+rzEsc(s)+'</span>';
+    return '<span class="mayar-status pending">'+rzEsc(s)+'</span>';
 }
 
 // ═══ API WRAPPERS ═══
@@ -5163,7 +5205,7 @@ function renderMayarCustomerDetail(c){
     var html='';
     var fields=[['Name',c.name||'—'],['Email',c.email||'—'],['Customer ID',c.id||c.customerId||'—'],['Mobile',c.mobile||c.phone||'—'],['Status',c.status||'Active'],['Created',fmtMayarDate(c.createdAt||c.created_at)]];
     fields.forEach(function(f){
-        html+='<div class="mayar-cust-row"><span>'+f[0]+'</span><span>'+f[1]+'</span></div>';
+        html+='<div class="mayar-cust-row"><span>'+f[0]+'</span><span>'+rzEsc(f[1])+'</span></div>';
     });
     document.getElementById('mayarCustDetail').innerHTML=html;
 }
@@ -5188,7 +5230,7 @@ function loadMayarCustTx(){
         }
         var html='';
         txs.forEach(function(tx){
-            html+='<tr><td>'+fmtMayarDate(tx.createdAt||tx.created_at||tx.date)+'</td><td>'+(tx.description||tx.name||'—')+'</td><td>'+fmtMayarCurrency(tx.amount||tx.total)+'</td><td>'+mayarStatusBadge(tx.status)+'</td></tr>';
+            html+='<tr><td>'+fmtMayarDate(tx.createdAt||tx.created_at||tx.date)+'</td><td>'+rzEsc(tx.description||tx.name||'—')+'</td><td>'+fmtMayarCurrency(tx.amount||tx.total)+'</td><td>'+mayarStatusBadge(tx.status)+'</td></tr>';
         });
         document.getElementById('mayarCustTxBody').innerHTML=html;
     }).catch(function(e){
@@ -5219,7 +5261,7 @@ function renderMayarMembers(members){
     }
     var html='';
     members.forEach(function(m){
-        html+='<tr><td>'+(m.name||'—')+'</td><td>'+(m.email||'—')+'</td><td>'+mayarStatusBadge(m.status||'active')+'</td><td>'+(m.tierName||m.tier||'—')+'</td><td>'+fmtMayarDate(m.createdAt||m.created_at||m.joinedAt)+'</td><td><button class="btn btn-ghost btn-sm" onclick="document.getElementById(\'mayarCustSearch\').value=\''+(m.email||'')+'\';showMayarTab(\'customers\');searchMayarCustomer()"><i class="fas fa-external-link-alt"></i></button></td></tr>';
+        html+='<tr><td>'+rzEsc(m.name||'—')+'</td><td>'+rzEsc(m.email||'—')+'</td><td>'+mayarStatusBadge(m.status||'active')+'</td><td>'+rzEsc(m.tierName||m.tier||'—')+'</td><td>'+fmtMayarDate(m.createdAt||m.created_at||m.joinedAt)+'</td><td><button class="btn btn-ghost btn-sm" onclick="document.getElementById(\'mayarCustSearch\').value=\''+(m.email||'')+'\';showMayarTab(\'customers\');searchMayarCustomer()"><i class="fas fa-external-link-alt"></i></button></td></tr>';
     });
     document.getElementById('mayarMemBody').innerHTML=html;
 }
@@ -5309,9 +5351,9 @@ function renderMayarTxRows(txs,bodyId){
     txs.forEach(function(tx){
         html+='<tr>';
         html+='<td style="white-space:nowrap">'+fmtMayarDate(tx.createdAt||tx.created_at||tx.date)+'</td>';
-        html+='<td>'+(tx.customerName||tx.customer_name||tx.name||'—')+'</td>';
-        if(bodyId!=='mayarRecentBody')html+='<td>'+(tx.customerEmail||tx.customer_email||tx.email||'—')+'</td>';
-        html+='<td>'+(tx.description||tx.productName||tx.product_name||'—')+'</td>';
+        html+='<td>'+rzEsc(tx.customerName||tx.customer_name||tx.name||'—')+'</td>';
+        if(bodyId!=='mayarRecentBody')html+='<td>'+rzEsc(tx.customerEmail||tx.customer_email||tx.email||'—')+'</td>';
+        html+='<td>'+rzEsc(tx.description||tx.productName||tx.product_name||'—')+'</td>';
         html+='<td>'+fmtMayarCurrency(tx.amount||tx.total)+'</td>';
         html+='<td>'+mayarStatusBadge(tx.status)+'</td>';
         html+='</tr>';
@@ -5466,13 +5508,16 @@ function loadRevenuePeriod(period){
     });
 }
 
+// CSV cell: quotes doubled, and a leading = + - @ neutralised so a payer-typed name cannot run as a
+// spreadsheet formula when the export is opened in Excel/Sheets.
+function _csvCell(v){var t=String(v==null?'':v);if(/^[=+\-@\t\r]/.test(t)&&isNaN(Number(t)))t="'"+t;return '"'+t.replace(/"/g,'""')+'"';}
 function exportMayarTxCSV(){
     if(!mayarTxCache.length){showMayarToast('No transactions to export','error');return}
     var csv='Date,Customer,Email,Description,Amount,Status\n';
     mayarTxCache.forEach(function(tx){
-        csv+='"'+fmtMayarDate(tx.createdAt||tx.created_at||tx.date)+'","'+(tx.customerName||tx.customer_name||tx.name||'')+
-            '","'+(tx.customerEmail||tx.customer_email||tx.email||'')+'","'+(tx.description||tx.productName||'')+
-            '","'+(tx.amount||tx.total||0)+'","'+(tx.status||'')+'"\n';
+        csv+=[fmtMayarDate(tx.createdAt||tx.created_at||tx.date),tx.customerName||tx.customer_name||tx.name||'',
+            tx.customerEmail||tx.customer_email||tx.email||'',tx.description||tx.productName||'',
+            tx.amount||tx.total||0,tx.status||''].map(_csvCell).join(',')+'\n';
     });
     var blob=new Blob([csv],{type:'text/csv'});
     var a=document.createElement('a');
@@ -6049,8 +6094,9 @@ function exportUAEventsCSV(){
     }
 })();
 
-if(checkAccess()){
-    document.getElementById('main-content').style.display='block';
+var _consoleInited=false;
+function initConsole(){
+    if(_consoleInited) return; _consoleInited=true;
     allUsers=generateUsers();
     loadManualAccounts();
     filteredUsers=[...allUsers];
@@ -6070,6 +6116,7 @@ if(checkAccess()){
     renderMayar();
     renderActivity();
 }
+checkAccess().then(function(ok){ if(ok) initConsole(); });
 
 // ═══════════════════════════════════════════════════════════════
 // GLOBAL MAP — Leaflet.js Implementation

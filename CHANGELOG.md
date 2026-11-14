@@ -11,6 +11,32 @@ release sections rather than semver.
 
 ---
 
+## v3.57.1 — 2026-11-14 — Admin console: access checked by Supabase, payer text escaped
+
+### Security
+- **A forged browser session opened the admin console.** `rz-ops-p7x3k9m.html` admitted anyone whose
+  localStorage held `rz_premium_session` with `role:"root"` and an allowlisted email; nothing was asked of Supabase.
+  Access now needs a signed-in Supabase session whose OWN `profiles` row says `tier = 'root'` (RLS: own row only, no
+  client write path, so a user cannot raise it). A signed-in non-root account is signed out again with "Not authorized".
+  The hard-coded admin email allowlist is gone from the page. The sidebar stays hidden until the check passes.
+  Account data was already protected server-side (RLS + `admin-users` root check); what leaked was the console itself.
+- **Mayar payer text was written as HTML.** Customer name, email, description, membership tier and status from the
+  Mayar API went into `innerHTML` unescaped, so a payer could plant markup that ran in the admin's tab next to the
+  Supabase session. Every Mayar field and the Mayar toast now go through `rzEsc`; the Mayar CSV export doubles quotes
+  and neutralises a leading `= + - @` (spreadsheet formula injection).
+- The page waits for `js/rz-supabase.js` (a deferred module) through its `rz-supa-ready` event instead of reading
+  `window.rzSupa` before the module has run.
+
+### Fixed
+- At 390 px every console tab scrolled sideways (dashboard 512 px, Users 1,084 px): the topbar widened the main column.
+  Topbar links show icons only on a phone, the health row is two columns, wide tables scroll inside their card.
+- IBM Plex Sans was requested twice in the Google Fonts URL.
+
+### Gate
+- `node tools/test-rz-ops-access.mjs` (new): forged session → login (A1), signed-in non-root → login (A2), root →
+  console (A3), an `<img onerror>` payload in Mayar rows/detail/toast creates nothing and runs nothing (X1), no tab wider
+  than 390 px (M1), no page errors (E1). On v3.57.0 it fails A1, A2, X1 (`pwned:1`) and M1.
+
 ## v3.57.0 — 2026-11-14 — Calculator basis: dependencies measured past display rounding
 
 ### Fixed

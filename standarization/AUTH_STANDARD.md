@@ -412,3 +412,14 @@ The post-login header pill (`#rzDdBadge`) reflects the user's role:
 
 CSS rule (`.rz-dd-badge.educator`) is mirrored in **both** `styles.css`
 **and** `styles-index.css` per the 2-stylesheet architecture rule.
+
+
+## rz-ops admin console access (v3.57.1)
+
+`rz-ops-p7x3k9m.html` does NOT trust `rz_premium_session`. Access = `rzSupa.getUser()` returns a user AND
+`rzSupa.getProfile()` returns that user's own row with `tier === 'root'`. RLS gives the browser no write path to
+`profiles` (tier changes only through `admin_set_tier()`), so the check cannot be satisfied from the client.
+The obscure URL is not a control: the page is linked from the public changelog and the repo is public.
+`js/rz-supabase.js` is a module and runs after inline scripts — wait for the `rz-supa-ready` event.
+Anything a third party typed (Mayar payers, profile names) is written with `rzEsc()` or `textContent`, never raw into
+`innerHTML`. Gate: `node tools/test-rz-ops-access.mjs` (A1-A3 access, X1 escaping, M1 390 px, E1 errors).
