@@ -11,6 +11,8 @@
  * M4 a refused input (category 0 with district chilled water; IT 0) shows the engine's reason and no number
  * M5 "Add energy type" reveals that type's row and only unused types are offered
  * M6 at 390 and 1440, dark and light: no sideways scroll, axe finds no serious or critical violation in the bench
+ * M7 the estimate's "What drives this result" panel (rz-sensitivity, anchor from data/calculators.json) mounts right
+ *    after the Estimate bench, shows on Estimate and hides on Measured (it explains the estimate, not the measurement)
  * Engine parity with the reference: tools/test-pue-reference.mjs.
  */
 import fs from 'fs';
@@ -121,6 +123,18 @@ const add = await pg.evaluate(() => {
 });
 law('M5', add.hiddenBefore && add.shown && add.before.includes('districtSteam') && !add.after.includes('districtSteam') && !add.before.includes('electricity'),
   `Add energy type: steam hidden ${add.hiddenBefore} -> shown ${add.shown}; offered ${add.before.length} -> ${add.after.length}, electricity never offered`);
+
+// M7 the sensitivity panel belongs to the estimate
+const sens = async () => pg.evaluate(() => {
+  const d = document.querySelector('details.rz-sens');
+  return d ? { prev: (d.previousElementSibling || {}).id || '', shown: !!d.offsetParent } : null;
+});
+await click(pg, 'btnEstimate'); await wait(200);
+const e7 = await sens();
+await click(pg, 'btnMeasured'); await wait(200);
+const m7 = await sens();
+law('M7', !!e7 && e7.prev === 'pmEstimateBench' && e7.shown && !!m7 && !m7.shown,
+  `sensitivity panel ${e7 ? 'after #' + (e7.prev || '?') + ', on Estimate shown ' + e7.shown + ', on Measured shown ' + (m7 && m7.shown) : 'not mounted'}`);
 await pg.close();
 
 // ── M6 layout and a11y ───────────────────────────────────────────────────────────────────────────────────────────

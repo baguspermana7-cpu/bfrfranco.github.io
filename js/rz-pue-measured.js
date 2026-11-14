@@ -28,8 +28,9 @@
     if (!bench || !est) return;
     bench.hidden = !on;
     est.hidden = on;
-    var charts = document.querySelector('.charts-section');
-    if (charts) charts.hidden = on;
+    // the charts and the "What drives this result" panel explain the estimate, not the measurement
+    var extra = document.querySelectorAll('.charts-section, details.rz-sens');
+    for (var i = 0; i < extra.length; i++) extra[i].hidden = on;
     [['btnMeasured', on], ['btnEstimate', !on]].forEach(function (p) {
       var b = $(p[0]);
       if (b) b.setAttribute('aria-selected', String(p[1]));

@@ -65,5 +65,8 @@ category with its IT meter point, IT energy, one row per energy type that crosse
 the rest through "Add energy type"), the result as PUE₁/₂/₃ with each weighted line, and the design estimate beside it.
 Starting values are Appendix A Case B (1.708). `js/rz-pue-measured.js` reads and writes only; the arithmetic is
 `models.pue.measured`. A refused input shows the engine's reason and no number. Gate `tools/test-pue-measured.mjs`
-M1–M6, red 11/11 on the page without the mode. Defect D1 is closed by the tab's category select, which names the
+M1–M7, red 11/11 on the page without the mode. M7 (added in the release gate): the estimate's sensitivity panel
+(`data/calculators.json` anchor `#pmEstimateBench`, was `section.calculator-section`, which matched the hidden Measured
+bench first) mounts after the Estimate bench and is hidden on Measured; red before the fix ("after #pmBench, on
+Measured shown true"). Defect D1 is closed by the tab's category select, which names the
 meter point; the old `greenGridLevel` select stays on the Estimate side (it labels the estimate's data quality only).

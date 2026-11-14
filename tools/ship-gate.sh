@@ -294,7 +294,7 @@ gate "DCMOC Cx plan bridge — same plan and status as the site module, store cl
 gate "Reliability vs NIST e-Handbook — series, parallel, r-of-n parity; N+1 = k of k+1, 2N = two systems of k (engine + DCMOC chain)" node tools/test-reliability-reference.mjs
 gate "CAPEX vs Uptime TUI3011B — CRF and annualized capital by asset life; one calibration: the city $/W at the basis spec, site = DCMOC on and off the basis" node tools/test-capex-reference.mjs
 gate "PUE vs Data Center Metrics Task Force v2 — Table 2 source weights, categories 0-3, Appendix A cases A and B, refusals with a reason" node tools/test-pue-reference.mjs
-gate "PUE calculator Measured mode — opens on Estimate, page = engine for typed inputs, reasons for refused inputs, Add energy type, 390/1440 both themes axe 0 (R125)" node tools/test-pue-measured.mjs
+gate "PUE calculator Measured mode — opens on Estimate, page = engine for typed inputs, reasons for refused inputs, Add energy type, sensitivity panel stays with the estimate, 390/1440 both themes axe 0 (R125)" node tools/test-pue-measured.mjs
 gate "R121 homepage motion — Lenis on fine pointer only, reduced motion = 0 tweens, no-JS final state, settled after scroll, nothing pinned, CLS, no flash" node tools/test-index-motion.mjs
 gate "Cx Analysis — plan editor, schematic, 3D campus with the glb library and callouts, Tier 1.5 calendar, both themes" node tools/test-cx-analysis.mjs
 gate "Cx gradient (K34) — owner gradient surfaces lit, no gradient text, hero text AA over the gradient at 1440/390 both themes" node tools/test-cx-gradient.mjs

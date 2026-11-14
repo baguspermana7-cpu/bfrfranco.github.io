@@ -27,9 +27,11 @@ release sections rather than semver.
     1.708)
   - refused inputs show a reason and no number: category 0 with non-electric energy, IT 0, negative energy, total
     below IT
+  - the "What drives this result" panel and the charts stay with the estimate: hidden on Measured (its registry anchor
+    is now `#pmEstimateBench`; the old `section.calculator-section` matched the new Measured bench first)
 - **Engine:** `models.pue.measured(opts)`, `DATA.pueSourceWeights`, `DATA.pueCategories`, with source and refresh
   entries. Gate `tools/test-pue-reference.mjs` (W1, F1–F5, red 6/6 before the change) and browser gate
-  `tools/test-pue-measured.mjs` (M1–M6, red 11/11 on the page without the tab). Gap file
+  `tools/test-pue-measured.mjs` (M1–M7, red 11/11 on the page without the tab). Gap file
   `documentation/product-transformation/gaps/pue.md`; defect D1 (the "Green Grid Level" select changes no number)
   recorded and answered by the category select.
 
