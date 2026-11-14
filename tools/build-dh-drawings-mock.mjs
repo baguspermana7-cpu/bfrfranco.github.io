@@ -18,6 +18,8 @@ const headAt = html.indexOf('</head>');
 const bodyAt = html.lastIndexOf('</body>');
 if (headAt < 0 || bodyAt < headAt) { console.error('build-dh-drawings-mock: </head> or </body> not found'); process.exit(1); }
 const head = `<meta name="robots" content="noindex,nofollow">\n` +
+  // local-only test seam (R142): the mock opens unlocked on 127.0.0.1 / localhost; the premium session is the documented test seam, never a credential
+  `<script>(function(){if(!/^(127\\.0\\.0\\.1|localhost|\\[::1\\])$/.test(location.hostname))return;try{if(!localStorage.getItem('rz_premium_session'))localStorage.setItem('rz_premium_session',JSON.stringify({email:'educator@resistancezero.com',tier:'pro',role:'educator',expires:'2099-12-31T23:59:59.000Z'}));localStorage.setItem('rz_cookie_consent','declined');}catch(e){}document.addEventListener('DOMContentLoaded',function(){document.body.classList.remove('locked');var g=document.getElementById('rootGate');if(g)g.remove();});})();</script>\n` +
   `<link rel="stylesheet" href="css/rz-hmi.css?v=${V}">\n<link rel="stylesheet" href="css/rz-dh-shell.css?v=${V}">\n`;
 const tail = ['js/rz-eng-symbols.js', 'js/rz-hmi-sheet.js', 'js/datahall-ai/hmi-sheets.js', 'js/datahall-ai/hmi-v2.js']
   .map((s) => `<script src="${s}?v=${V}"></script>`).join('\n') + '\n';

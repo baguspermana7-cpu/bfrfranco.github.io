@@ -303,7 +303,75 @@
     return finish(s);
   }
 
-  var BUILDERS = { 'dh-m-103': dhM103, cdu: cduSheet, 'dh-e-101': dhE101, 'dh-r-101': dhR101 };
+  /* ── DH-F-101: detection of one hall — FACP, three addressable loops, 12 zones, aspirating sampling pipes ─────── */
+  function dhF101(snap, o) {
+    var inv = o && o.fire; if (!inv || !inv.zones) throw new Error('hmi-sheets: dh-f-101 needs the fire inventory (RZDatahallAIFirePoints.buildInventory)');
+    var hp = 'DH-01', zones = inv.zones.filter(function (z) { return z.hall === 1; });
+    var W = 1240, H = 880, s = Sheet({ id: 'dh-f-101', no: 'DH-F-101', title: 'Fire detection — ' + hp + ', SLC loops 1–3, aspirating sampling, zoned EPO', size: [W, H], svgId: 'fireSvg', sheet: '1/2',
+      basis: 'NFPA 72 spacing × engine hall geometry (fire-points.js)' });
+    var PX = 90, DX = 130, TX = { L1: 160, L2: 172, L3: 184 }, TEE = { L1: 86, L2: 78, L3: 70 }, FX = 204, ZW = 246, ZG = 10, ZH = 250, RG = 18, Y0 = 56, COLS = 4, BOT = H - 40;
+    var short = function (id) { return id.replace(hp + '-', ''); };
+    // panel column: FACP, NAC 1-2, monitor link, off-sheets
+    var facp = s.n({ id: 'facp', tag: 'FACP-01', sym: 'facp', x: PX, y: 40, size: 40, cls: 'fire-facp', eqId: hp, tagAt: 'right', label: 'Fire alarm control panel, hall ' + hp + ' — addressable, 3 SLC loops class A, 2 NAC' });
+    var bus = [facp + '.loop'];
+    ['L3', 'L2', 'L1'].forEach(function (L) {
+      var tee = s.j('tee-' + L, PX, TEE[L], true), top = s.j('top-' + L, TX[L], TEE[L], false), bot = s.j('bot-' + L, TX[L], BOT, false);
+      bus.push(tee); s.e(tee, top, 'signal', { w: 'signal' }); s.e(top, bot, 'signal', { w: 'signal' });
+      s.notes.push({ x: TX[L] + 3, y: BOT + 10, text: L, role: 'tag', lod: 2 });
+    });
+    [['nac1', 'NAC-1', 'sounder', 130, hp + '-FACP-NAC-1', 'Notification appliance circuit 1 — sounders'],
+     ['nac2', 'NAC-2', 'strobe', 180, hp + '-FACP-NAC-2', 'Notification appliance circuit 2 — visual alarms'],
+     ['comms', 'NET', 'interfaceModule', 230, hp + '-FACP-COMMS', 'Supervising-station and BMS monitor link (monitor only)']].forEach(function (d) {
+      var id = s.n({ id: d[0], tag: d[1], sym: d[2], x: DX, y: d[3], size: 26, rot: 90, cls: 'fire-point', eqId: d[4], tagAt: 'below', label: d[5] });
+      var tee = s.j('tee-' + d[0], PX, d[3], true); bus.push(tee); s.e(tee, id + '.loop', 'signal', { w: 'signal' });
+    });
+    [['os-bms', 'DH-N-101', 280, 'data', 'BMS / EPMS network — sheet DH-N-101'],
+     ['os-rel', 'DH-F-102', 340, 'signal', 'Releasing panel, agent bank, abort and pre-action per zone — sheet DH-F-102']].forEach(function (d) {
+      var id = s.n({ id: d[0], tag: d[1], sym: 'offSheet', x: DX, y: d[2], size: 22, tagAt: 'below', label: d[4] });
+      var tee = s.j('tee-' + d[0], PX, d[2], d[0] !== 'os-rel'); bus.push(tee); s.e(tee, id + '.port', d[3], { w: 'signal' });
+    });
+    s.chain(bus, 'signal', { w: 'signal' });
+    // zones: 3 rows × 4 columns; each loop is a series line through the zone's devices; one sampling pipe per zone
+    var SYM = { smoke_spot: 'smokeDetector', heat_spot: 'heatDetector', beam: 'smokeDetector', lhd: 'heatDetector', mcp: 'manualStation' };
+    var prev = { L1: {}, L2: {}, L3: {} }, unitAt = {};
+    function portsFor(areaM2) { return Math.max(1, Math.ceil(areaM2 / (inv.spacing.vesdaPortM * inv.spacing.vesdaPortM))); }
+    zones.forEach(function (z, k) {
+      var r = Math.floor(k / COLS), c = k % COLS, x0 = FX + c * (ZW + ZG), y0 = Y0 + r * (ZH + RG), zl = z.id.toLowerCase();
+      var yL = { L1: y0 + 54, L2: y0 + 104, L3: y0 + 154 }, yPipe = y0 + 204;
+      s.areas.push({ x: x0, y: y0, w: ZW, h: ZH, kind: 'zone' });
+      s.n({ id: 'zh-' + zl, tag: short(z.id), box: [ZW - 12, 16], x: x0 + ZW / 2, y: y0 + 13, cls: 'fire-zone', eqId: z.id, tagAt: 'none', boxSym: 'zone-head',
+        text: short(z.id) + ' · ' + Math.round(z.areaM2) + ' m²', textRole: 'tag',
+        label: z.name + ' — ' + z.means.length + ' independent detection means, ' + (z.release ? 'clean-agent release zone' : 'detection only') + (z.epo ? ', zoned EPO' : '') });
+      ['L1', 'L2', 'L3'].forEach(function (L) {
+        if (!prev[L][r]) prev[L][r] = s.j('row-' + L + '-' + r, TX[L], yL[L], true);
+        inv.points.filter(function (p) { return p.zoneId === z.id && p.loop === L && SYM[p.type]; }).forEach(function (p, i) {
+          var id = s.n({ id: p.id.toLowerCase(), tag: short(p.id).replace(short(z.id) + '-', ''), sym: SYM[p.type], x: x0 + 28 + i * 34, y: yL[L], size: 20,
+            cls: p.type === 'mcp' ? 'fire-mcp' : 'fire-point', eqId: p.id, tagAt: 'none', label: p.label + ' · ' + p.address });
+          s.e(prev[L][r], id, 'signal', { w: 'signal' }); prev[L][r] = id;
+        });
+      });
+      inv.points.filter(function (p) { return p.zoneId === z.id && p.type === 'epo'; }).forEach(function (p) {
+        s.n({ id: p.id.toLowerCase(), tag: 'EPO', sym: 'epo', x: x0 + ZW - 26, y: yL.L3, size: 22, cls: 'fire-epo', eqId: p.id, tagAt: 'none', label: p.label + ' · ' + p.address });
+      });
+      var unit = inv.points.filter(function (p) { return p.type === 'vesda' && p.zoneIds.indexOf(z.id) >= 0; })[0];
+      if (unit) {
+        var a = s.j('pa-' + zl, x0 + 12, yPipe, false), b = s.j('pb-' + zl, x0 + ZW - 62, yPipe, false), holes = portsFor(z.areaM2);
+        s.e(a, b, 'air', { w: 'branch', line: short(unit.id) + ' · ' + holes + ' ports' });
+        for (var h = 1; h <= holes; h++) s.j('port-' + zl + '-' + h, x0 + 12 + h * ((ZW - 74) / (holes + 1)), yPipe, true);
+        if (!unitAt[unit.id]) {
+          unitAt[unit.id] = s.n({ id: unit.id.toLowerCase(), tag: short(unit.id), sym: 'aspirating', x: x0 + ZW - 34, y: yPipe, size: 26, cls: 'fire-vesda', eqId: unit.id, tagAt: 'below',
+            label: unit.label + ' — ' + unit.ports + ' sampling ports over ' + unit.zoneIds.map(short).join(', ') });
+          s.e(b, unitAt[unit.id], 'air', { w: 'branch' });
+        } else {
+          s.e(b, [x0 + ZW - 14, yPipe], 'air', { w: 'branch' });
+        }
+      }
+    });
+    s.notes.push({ x: FX, y: Y0 - 10, text: 'Loops 1–3 class A · spot ' + inv.spacing.spotSmokeM + ' m · aspirating port ' + inv.spacing.vesdaPortM + ' m', role: 'label', lod: 2 });
+    return finish(s);
+  }
+
+  var BUILDERS = { 'dh-m-103': dhM103, cdu: cduSheet, 'dh-e-101': dhE101, 'dh-r-101': dhR101, 'dh-f-101': dhF101 };
   var API = {
     build: function (id, snap, o) { if (!BUILDERS[id]) throw new Error('hmi-sheets: no sheet ' + id); return BUILDERS[id](snap, o); },
     list: function () { return Object.keys(BUILDERS); },

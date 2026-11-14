@@ -127,7 +127,17 @@
   }
   function find(p, re) { var rs = rows(p); for (var i = 0; i < rs.length; i++) if (re.test(rs[i].label || '') || re.test(rs[i].point || '')) return rs[i]; return null; }
   var CLS_PAYLOAD = { cdu: 'cdu', 'cdu-pump': 'cdu', 'sld-tx': 'sld-tx', 'sld-mv-sub': 'sld-mv-sub', 'sld-msb': 'sld-msb', 'sld-ups-a': 'sld-ups-a', 'sld-ups-b': 'sld-ups-b',
-    'sld-rack-psu': 'sld-rack-psu', 'rack-ct': 'rack-ct', 'rack-ns': 'rack-ns', 'rack-psu': 'rack-psu', 'rack-busbar': 'rack-busbar', 'rack-manifold': 'rack-manifold', 'rack-leak': 'rack-leak' };
+    'sld-rack-psu': 'sld-rack-psu', 'rack-ct': 'rack-ct', 'rack-ns': 'rack-ns', 'rack-psu': 'rack-psu', 'rack-busbar': 'rack-busbar', 'rack-manifold': 'rack-manifold', 'rack-leak': 'rack-leak',
+    'fire-facp': 'fire-facp', 'fire-zone': 'fire-zone', 'fire-vesda': 'fire-vesda', 'fire-mcp': 'fire-mcp', 'fire-epo': 'fire-epo', 'fire-point': 'fire-point' };
+  /* fire points keep their full inventory id (DH-01-Z05-SD1-02); the point state comes from the workstation snapshot through the payload */
+  function fireStateOf(p) {
+    if (!p) return { state: 'unknown' };
+    var r = find(p, /^(state|panel|stage|point|zone)$/i) || find(p, /state|stage|panel/i), t = r ? text(r).toLowerCase() : 'normal';
+    if (/alarm|fire|discharg|released|activated|^active/.test(t) && !/pre-?alarm/.test(t)) return { state: 'fault', alarm: '1' };
+    if (/pre-?alarm|armed|trouble|impaired|fault|watch/.test(t)) return { state: 'normal', alarm: '2' };
+    if (/isolated|expired|disabled|out of service/.test(t)) return { state: 'standby', alarm: '3' };
+    return { state: 'normal' };
+  }
   function stateOf(n, p) {
     if (/^cb|^disconnector/.test(n.sym)) return n.id === 'tie' || /^mb/.test(n.id) ? 'open' : 'closed';
     if (/^valve/.test(n.sym)) return 'open';
@@ -141,9 +151,11 @@
   }
   function read(n) {
     if (n.sym === 'junction') return {};
-    var cls = n.cls && CLS_PAYLOAD[n.cls], id = n.eqId || n.id;
-    var p = cls ? payload(cls, String(id).replace(/^[A-Z]+-?/, '').replace(/-\d+$/, '') || '1') : null;
-    var st = stateOf(n, p), v = {}, tip = [];
+    var cls = n.cls && CLS_PAYLOAD[n.cls], id = n.eqId || n.id, fire = !!cls && cls.indexOf('fire-') === 0;
+    var p = cls ? payload(cls, fire ? String(id) : String(id).replace(/^[A-Z]+-?/, '').replace(/-\d+$/, '') || '1') : null;
+    var tip = [];
+    if (fire) { var fs = fireStateOf(p); rows(p).slice(0, 6).forEach(function (r) { tip.push([r.label, text(r)]); }); return { state: fs.state, alarm: fs.alarm, values: {}, rows: tip }; }
+    var st = stateOf(n, p), v = {};
     if (/p-\d\dc$/i.test(n.tag || '')) st = 'standby';
     (n.values || []).forEach(function (x) {
       var r = null;
@@ -163,7 +175,12 @@
 
   /* ── 4. the sheets on their tabs ────────────────────────────────────────────────────────────────── */
   var sheets = {};
-  function mount(svgId, sheetId, svgNewId) {
+  function fireInventory() {
+    var W = win.RZDatahallAIFireWorkstation, inv = W && W.inventory ? W.inventory() : null;
+    if (!inv && typeof win.fireInv === 'function') inv = win.fireInv();
+    return inv || null;
+  }
+  function mount(svgId, sheetId, svgNewId, o) {
     var old = doc.getElementById(svgId), S = win.RZDatahallAISheets, R = win.RZHmiSheet, snap = win.DCAI_CALC && win.DCAI_CALC.snapshot;
     if (!old || !S || !R || !snap) return;
     var bx = old.closest('.bx'); if (!bx || bx.querySelector('.hmi-host')) return;
@@ -171,13 +188,14 @@
     var h3 = bx.querySelector('h3');
     Array.prototype.slice.call(bx.children).forEach(function (c) { if (c !== h3) c.setAttribute('data-dh2-retired', ''); });
     bx.appendChild(host);
-    var sheet = S.build(sheetId, snap); sheet.svgId = svgNewId;
+    var sheet = S.build(sheetId, snap, o); sheet.svgId = svgNewId;
     sheets[sheetId] = R.render(host, sheet, { read: read, open: open });
   }
   function mountAll() {
     mount('coolSvg', 'dh-m-103', 'hmiCoolSvg');
     mount('elecDH1Svg', 'dh-e-101', 'hmiElecDH1Svg');
     mount('rackSvg', 'dh-r-101', 'hmiRackSvg');
+    var fi = fireInventory(); if (fi) mount('fireSvg', 'dh-f-101', 'hmiFireSvg', { fire: fi });
   }
   setInterval(function () { Object.keys(sheets).forEach(function (k) { if (sheets[k] && sheets[k].svg.getBoundingClientRect().width) sheets[k].update(); }); }, 4000);
 
@@ -261,7 +279,7 @@
     shell(); sidebar(); declutter();
     var tries = 0, t = setInterval(function () {
       tries++;
-      if (win.DCAI_CALC && win.RZDatahallAISheets && doc.getElementById('coolSvg')) { mountAll(); if (Object.keys(sheets).length === 3 || tries > 40) clearInterval(t); }
+      if (win.DCAI_CALC && win.RZDatahallAISheets && doc.getElementById('coolSvg')) { mountAll(); if (Object.keys(sheets).length === 4 || tries > 40) clearInterval(t); }
       if (tries > 40) clearInterval(t);
     }, 250);
   }
