@@ -11,6 +11,32 @@ release sections rather than semver.
 
 ---
 
+## v3.57.7 — 2026-11-14 — Feature overrides and the educator role come from Supabase
+
+### Security
+- **Anyone could grant themselves features, and the admin's switches reached nobody.** The rz-ops Feature Flags panel
+  and Educator promote/demote wrote to the admin's OWN localStorage (`rz_admin_features_by_page`,
+  `rz_admin_educators`), and every page read those keys from the VISITOR's localStorage. Now:
+  - overrides live in Supabase `feature_overrides` (anyone may read, only root may write — RLS); pages read them after
+    first paint (never blocking it), cache them 5 minutes in sessionStorage — a cached entry can only restrict, a grant
+    is always re-fetched — and fall back to the shipped matrix when Supabase is unreachable;
+  - the educator role comes from the server (`educator_allowlist`, `is_educator()`), re-checked at most every 10
+    minutes; a session claiming `educator` without a Supabase sign-in is treated as pro. The client seed list is gone;
+  - the old localStorage keys are deleted on load; rz-ops reads/writes Supabase with saving/saved/error states, offers
+    any overrides left in the admin's browser once (upload or discard), and has an Educators card (list, promote,
+    demote).
+- The live project already has the tables (anon read returned 200) — no migration needed.
+
+### Gate
+- `tools/test-feature-overrides.mjs`: a forged local key stays locked (V1), a server grant unlocks and a server
+  restriction locks a real gated page (V2/V2b), a forged educator list gives no role (V4), Supabase down → defaults
+  with 0 errors (V3), the admin toggle calls `setFeatureOverride` once and leaves localStorage byte-identical (A1),
+  promote/demote call the RPCs (A2). 9 of its laws fail on v3.57.6.
+- `probe-educator-access.mjs` is unchanged at 61/65 — the same 4 stale expectations as before this release.
+
+### Owner action
+- rz-ops → Users → Educators → add `educator@resistancezero.com` if that account should keep educator access.
+
 ## v3.57.6 — 2026-11-14 — DCMOC map/sanitizer upgrades, auth worker hardened before deploy
 
 ### Security
