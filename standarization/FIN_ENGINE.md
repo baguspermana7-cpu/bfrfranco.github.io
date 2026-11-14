@@ -165,7 +165,7 @@ and `exposure-coach` `calculate_exposure.py` (8-input weighted composite, −10 
 participation, confidence).
 
 **Data** — TraderMonty's public CSVs, fetched directly by the browser (all serve `access-control-allow-origin: *`;
-never through the codetabs/corsproxy/allorigins proxies used elsewhere in the terminal):
+never through a public CORS proxy — the terminal has none since 2026-11-14, see **Data sources** below):
 `tradermonty.github.io/market-breadth-analysis/market_breadth_{data,summary}.csv` and
 `raw.githubusercontent.com/tradermonty/uptrend-dashboard/main/data/{uptrend_ratio_timeseries,sector_summary}.csv`
 (~3.6 MB together). The file `Last-Modified` header is shown as the freshness stamp; the as-of date is the CSV's last row.
@@ -205,3 +205,28 @@ warnings, sources with links, `FINEngine.DISCLAIMER`. Loading (skeleton), fetch-
 total is 0.8 in Python but 0.7999999999999999 with a plain `+=` (50 × 0.1/total = 6.250000000000002), which flipped `weighted_contribution` 6.2 → 6.3
 (the gate's first run caught it); `int()` truncates; f-string `:.Nf` is correctly rounded; `str(25.0)` is `"25.0"`;
 `max(d, key=d.get)` keeps the first key on ties. Helpers live in `RZMarketPosture.py`.
+
+## Data sources — Finance Terminal (2026-11-14, gate `tools/test-finance-terminal-data.mjs`)
+
+Every keyless market read goes through the first-party gateway, one constant: `GATEWAY_URL` in
+`Apps/finance-terminal/index.html` (= `https://rz-finance-gateway.resistancezero0us.workers.dev`, `cf-worker/`).
+
+| Panel | Source | When it fails |
+|---|---|---|
+| Quotes: overview indices, world ETFs, commodities, heatmap, movers, watchlist, portfolio, alerts, yield curve | `/q?syms=` (≤60 per call, chunks serial) | "—" + reason; price 0 from `/q` = missing, never a price |
+| Sectors / Futures / Economy | `/sectors` `/futures` `/economy` | "—" + reason + Retry |
+| Charts, crypto history, committee | `/candles?sym=&tf=` | "Price history unavailable" |
+| Crypto prices + global stats | `/crypto` (CoinGecko server-side) | prices from **Binance** `data-api.binance.vision/api/v3/ticker/24hr` (official, keyless, `ACAO: *`, verified 2026-11-14; source line under the table names it); global stats (cap, volume, dominance, coin count) have no fallback → "—" |
+| Forex, converter, cross matrix, econ currencies | `/fx` `/fx-history` | "—" per pair; never a default rate of 0 or 1 |
+| News, earnings/IPO calendars, stock quote/profile/metric/search, analytics | `/news` `/calendar/*` `/quote` `/profile` `/metric` `/search` `/analyze` | message + Retry |
+| Peers, recommendations, insider, targets, dividends, filings, company news, economic calendar, live stream | Finnhub with the **visitor's own key** only | hidden / "needs API key" |
+| Crypto trending, coin genesis date / hashing algorithm | none (no gateway route) | panel says it is unavailable |
+
+Rules: no public CORS proxy (codetabs / corsproxy.io / allorigins were dead and let a third party alter prices);
+no direct browser call to CoinGecko / Yahoo / Frankfurter. The client keeps ≤4 gateway requests in flight
+(90/min), shares identical in-flight GETs, reuses a success for 30 s and a crypto failure for 60 s, and retries a
+429/5xx once after `Retry-After` (≤8 s) or 3 s. A network error (not an HTTP error) shows one banner, "Market data
+gateway unreachable from this network" — some Indonesian ISPs DNS-block `*.workers.dev`; no DNS workaround in code.
+A value that failed to load renders "—" with a short reason (rate-limited / gateway unreachable / source unavailable
+/ needs API key); "0" only when the source returned 0. A missing price never fires a price alert. Known upstream
+limit: the gateway's `r2(x)||0` cannot tell a 0 % change from a missing one (worker change, not deployed here).
