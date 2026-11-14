@@ -152,3 +152,56 @@ bull/top bear) from the already-fetched 3-month candles, keyless; window labeled
 `DATA.portfolioBands` undefined at runtime while the gate (which reads fin-engine.js) stayed green.
 
 Probe: `tools/_portdoctor_probe.mjs` (offline: gateway stub + deterministic yahooCandles override).
+
+## Market Posture (2026-11-14) — port of tradermonty/claude-trading-skills (MIT), NO paid API
+
+**Module** `js/rz-market-posture.js` (UMD, no DOM: `window.RZMarketPosture` / `require`). A faithful JS port of
+three skills from **[tradermonty/claude-trading-skills](https://github.com/tradermonty/claude-trading-skills)**
+(MIT licence, © tradermonty): `market-breadth-analyzer` (csv_client + 6 calculators + scorer: level & trend 25 /
+8MA-vs-200MA 20 / cycle 20 / bearish flag 15 / percentile 10 / S&P divergence 10, weight redistributed when a
+component has no data), `uptrend-analyzer` (data_fetcher + 5 calculators + scorer: breadth 30 / sector participation 25
+/ rotation 15 / momentum 20 / history 10, warning penalties late-cycle −5, high-spread −3, divergence −3, +1 when ≥2),
+and `exposure-coach` `calculate_exposure.py` (8-input weighted composite, −10 per missing critical input, ceiling map,
+participation, confidence).
+
+**Data** — TraderMonty's public CSVs, fetched directly by the browser (all serve `access-control-allow-origin: *`;
+never through the codetabs/corsproxy/allorigins proxies used elsewhere in the terminal):
+`tradermonty.github.io/market-breadth-analysis/market_breadth_{data,summary}.csv` and
+`raw.githubusercontent.com/tradermonty/uptrend-dashboard/main/data/{uptrend_ratio_timeseries,sector_summary}.csv`
+(~3.6 MB together). The file `Last-Modified` header is shown as the freshness stamp; the as-of date is the CSV's last row.
+
+**Surface** — Finance Terminal tab **Posture** (`loadPosture` / `renderPosture`): posture card (posture label, model
+exposure ceiling, coach composite, confidence, which inputs were used and which are missing), breadth and uptrend
+cards (composite + zone, every component with its weight, score, the source signal and the input value it came from),
+warnings, sources with links, `FINEngine.DISCLAIMER`. Loading (skeleton), fetch-error (retry) and partial
+(one analysis missing → posture computed without it) states.
+
+**Policy (non-negotiable)**
+- The source skills also emit prescriptions — zone `actions`, `exposure_guidance`, `guidance`, warning `actions`, the
+  coach's `rationale` ("New positions allowed…", "consider trimming…"). **None of those are ported.** The coach's
+  recommendation code is kept only as `model_state` for parity and rendered as a descriptive label:
+  `CASH_PRIORITY` → **Defensive**, `REDUCE_ONLY` → **Cautious**, `NEW_ENTRY_ALLOWED` → **Constructive**.
+- The "model exposure ceiling" is labelled as the source framework's mapping of the regime, explicitly not a
+  recommendation for any portfolio. No orders, sizes or weights.
+- Only 2 of the coach's 8 inputs exist in a browser without paid data (breadth, uptrend). Regime, top-risk,
+  institutional flow, sector, theme and FTD come from other skills that need FMP/FINVIZ/yfinance — not ported. The
+  coach therefore always runs with a −20 haircut (−30 if breadth fails) and **LOW** confidence; the page says so.
+
+**Parity gate** `node tools/test-market-posture.mjs` — Python truth is the ORIGINAL code, not a re-derivation:
+- **P1** `tools/market-posture-recorder.py` (pytest plugin) recorded every call the skills' own pytest suites make into
+  the scoring functions (251 calls, suites green: 159 + 224 + 169) → `tools/fixtures/market-posture/python-test-calls.jsonl.gz`;
+  the JS replays each and compares every output field (numbers ≤ 1e-9, labels exact; prescriptions omitted by name).
+- **P2/P3** `tools/market-posture-golden.py` runs the skills' own fetch + main() path on the fixture CSVs (trimmed live
+  snapshot, 2026-11-13/14) and 60+60 seeded scenarios (PRNG mirrored in the test). Live `python3 -I -B` when
+  `RZ_TRADING_SKILLS` / `~/.code/claude-trading-skills/skills` exists, else the committed `golden.json.gz`
+  (`--write-golden` refreshes it).
+- **P4** perturbation: latest 8MA −0.30 moves the breadth composite 53.4 → 22.8; the JS must then FAIL against the
+  unperturbed Python answer and match the perturbed one.
+- **B1** the tab in headless Chrome (fixtures intercepted, free port): expected text at 390/1440 dark+light, no page
+  errors, no sideways scroll, axe 0 serious/critical in the panel, error + partial states.
+
+**Python semantics the port must keep (paid for):** `round()` is half-even on the exact binary value (`round(6.25,1)`
+= 6.2); `sum()` of floats is CPython ≥3.12 compensated (Neumaier) summation — the breadth scorer's available-weight
+total is 0.8 in Python but 0.7999999999999999 with a plain `+=` (50 × 0.1/total = 6.250000000000002), which flipped `weighted_contribution` 6.2 → 6.3
+(the gate's first run caught it); `int()` truncates; f-string `:.Nf` is correctly rounded; `str(25.0)` is `"25.0"`;
+`max(d, key=d.get)` keeps the first key on ties. Helpers live in `RZMarketPosture.py`.

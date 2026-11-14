@@ -14,6 +14,8 @@
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.2.3/dist/lightweight-charts.standalone.production.js"></script>
 <!-- FIN Engine — shared finance brain (screener scoring + advisor scorecard). window.FINEngine -->
 <script src="../../fin-engine.min.js?v=2026-07-14-pd"></script>
+<!-- Market Posture — port of tradermonty/claude-trading-skills (MIT): breadth + uptrend + exposure-coach. window.RZMarketPosture -->
+<script src="../../js/rz-market-posture.js?v=20261114-93a07bc2"></script>
 <style>
 :root{--bg0:#0b1120;--bg1:#111827;--bg2:#1e293b;--bg3:#0f172a;--bd:#334155;--bd2:rgba(51,65,85,.4);--t1:#f1f5f9;--t2:#e2e8f0;--t3:#94a3b8;--t4:#64748b;--acc:#64748b;--acc2:#67e8f9;--accbg:rgba(100,116,139,.1);--grn:#34d399;--grnbg:rgba(16,185,129,.15);--red:#f87171;--redbg:rgba(239,68,68,.15);--amb:#fbbf24;--ambbg:rgba(245,158,11,.15);--blu:#60a5fa;--blubg:rgba(96,165,250,.15);--cyn:#22d3ee;--sans:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,sans-serif;--mono:'JetBrains Mono',monospace;--r:14px;--rs:8px;--rx:6px}
 [data-theme="light"]{--bg0:#f8fafc;--bg1:#fff;--bg2:#fff;--bg3:#f1f5f9;--bd:#e2e8f0;--bd2:#f1f5f9;--t1:#1e293b;--t2:#334155;--t3:#64748b;--t4:#94a3b8}
@@ -318,6 +320,32 @@ table.dtbl tr:hover td{background:rgba(34,211,238,.04)}
 /* RESPONSIVE */
 @media(max-width:1200px){.kpi-grid{grid-template-columns:repeat(2,1fr)}#commodityKpis{grid-template-columns:repeat(3,1fr)!important}.g2,.g3,.g23,.g32{grid-template-columns:1fr}.heatmap{grid-template-columns:repeat(3,1fr)}.port-summary{grid-template-columns:1fr}}
 @media(max-width:768px){.hdr{flex-wrap:wrap;row-gap:.4rem}.hdr-right{flex-wrap:wrap;gap:.6rem}.kpi-grid{grid-template-columns:1fr}.heatmap{grid-template-columns:repeat(2,1fr)}.tabs{padding:0 .5rem}.tab{padding:.5rem .8rem;font-size:.72rem}.hdr{padding:.5rem 1rem}.panel{padding:1rem}.stock-hero{flex-direction:column}.stock-meta{flex-direction:column;gap:.5rem}.filters{flex-direction:column}.rz-ap-grid{grid-template-columns:1fr}}
+/* Market Posture tab (js/rz-market-posture.js) — suite tokens only */
+.mp-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:.5rem 1rem;margin-bottom:.75rem}
+.mp-head h2{font:600 1rem/1.3 var(--fs-sans);color:var(--fs-t1);margin:0}
+.mp-meta{font-size:.72rem;color:var(--fs-t3)}
+.mp-big{font:600 2rem/1 var(--fs-mono);font-variant-numeric:tabular-nums;color:var(--fs-t1)}
+.mp-sum{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;margin:.25rem 0 1rem}
+.mp-sum dt{font-size:.68rem;color:var(--fs-t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.25rem}
+.mp-sum dd{margin:0;color:var(--fs-t1)}
+.mp-rows{list-style:none;margin:0;padding:0;border-top:1px solid var(--fs-bd)}
+.mp-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.15rem 1rem;padding:.6rem 0;border-bottom:1px solid var(--fs-bd2)}
+.mp-name{font-size:.8rem;font-weight:600;color:var(--fs-t1)}
+.mp-w{font-size:.7rem;color:var(--fs-t3);font-weight:400;margin-left:.35rem}
+.mp-score{font:600 .95rem var(--fs-mono);font-variant-numeric:tabular-nums;text-align:right}
+.mp-read{grid-column:1/-1;font-size:.74rem;color:var(--fs-t2);overflow-wrap:anywhere}
+.mp-in{grid-column:1/-1;font:.7rem/1.5 var(--fs-mono);color:var(--fs-t3);overflow-wrap:anywhere}
+/* state colours mixed 30% toward --fs-t1 so small text clears 4.5:1 on white (raw --fs-grn is 3.76:1) and stays bright on graphite */
+.mp-ok{color:color-mix(in srgb,var(--fs-grn) 70%,var(--fs-t1))}.mp-mid{color:color-mix(in srgb,var(--fs-amb) 70%,var(--fs-t1))}.mp-low{color:color-mix(in srgb,var(--fs-red) 70%,var(--fs-t1))}.mp-na{color:var(--fs-t3)}
+.mp-note{font-size:.74rem;color:var(--fs-t2);line-height:1.55;margin:.5rem 0 0;padding-left:1.1rem}
+.mp-note li{margin:.2rem 0}
+.mp-src{font-size:.72rem;color:var(--fs-t3);line-height:1.7;overflow-wrap:anywhere}
+.mp-src a{color:var(--fs-acc2);text-decoration:underline;text-underline-offset:2px}
+.mp-disc{font-size:.7rem;color:var(--fs-t3);font-style:italic;margin-top:.75rem}
+.mp-card{margin-bottom:1rem}
+html[data-rz-suite] .fs-card.mp-err{border-color:var(--fs-red)}
+html[data-rz-suite] .fs-chip.mp-ok{color:color-mix(in srgb,var(--fs-grn) 70%,var(--fs-t1))}html[data-rz-suite] .fs-chip.mp-mid{color:color-mix(in srgb,var(--fs-amb) 70%,var(--fs-t1))}html[data-rz-suite] .fs-chip.mp-low{color:color-mix(in srgb,var(--fs-red) 70%,var(--fs-t1))}
+@media(max-width:768px){.mp-sum{grid-template-columns:repeat(2,minmax(0,1fr))}.mp-big{font-size:1.6rem}}
 </style>
 </head>
 <body>
@@ -372,6 +400,7 @@ table.dtbl tr:hover td{background:rgba(34,211,238,.04)}
 <button class="tab" data-tab="watchlist" data-explain="ft-watchlist" onclick="switchTab('watchlist')"><i class="fas fa-star"></i>Watchlist</button>
 <button class="tab" data-tab="news" data-explain="ft-news" onclick="switchTab('news')"><i class="fas fa-newspaper"></i>News</button>
 <button class="tab" data-tab="sectors" data-explain="ft-sectors" onclick="switchTab('sectors')"><i class="fas fa-chart-bar"></i>Sectors</button>
+<button class="tab" data-tab="posture" onclick="switchTab('posture')"><i class="fas fa-compass" aria-hidden="true"></i>Posture</button>
 <button class="tab" data-tab="economy" data-explain="ft-economy" onclick="switchTab('economy')"><i class="fas fa-university"></i>Economy</button>
 <button class="tab" data-tab="futures" data-explain="ft-futures" onclick="switchTab('futures')"><i class="fas fa-rocket"></i>Futures</button>
 <button class="tab" data-tab="alerts" data-explain="ft-alerts" onclick="switchTab('alerts')"><i class="fas fa-bell"></i>Alerts</button>
@@ -603,6 +632,11 @@ table.dtbl tr:hover td{background:rgba(34,211,238,.04)}
 <div class="card"><div class="card-title"><i class="fas fa-table"></i>Sector Details<div class="inp-icon" style="margin-left:auto"><i class="fas fa-search"></i><input class="inp" id="sectorFilter" placeholder="Filter..." style="width:140px;font-weight:400;text-transform:none;letter-spacing:0"></div></div><div class="tbl-wrap"><table class="dtbl" id="sectorTable"><thead><tr><th>Sector</th><th>ETF</th><th class="txt-r">Price</th><th class="txt-r">Day %</th><th class="txt-r">Vol</th></tr></thead><tbody></tbody></table></div></div>
 <div class="card"><div class="card-title"><i class="fas fa-chart-pie"></i>Sector Weights</div><div style="height:300px"><canvas id="sectorPie"></canvas></div></div>
 </div>
+</div>
+
+<!-- TAB: MARKET POSTURE (js/rz-market-posture.js — tradermonty/claude-trading-skills port) -->
+<div class="panel" id="panel-posture" aria-label="Market posture">
+<div id="postureRoot" aria-live="polite" aria-busy="false"></div>
 </div>
 
 <!-- TAB: ECONOMY -->
@@ -1361,9 +1395,124 @@ function switchTab(tab){
   else if(tab==='watchlist')renderWatchlist();
   else if(tab==='news')loadNews();
   else if(tab==='sectors')loadSectors();
+  else if(tab==='posture')loadPosture();
   else if(tab==='economy'){loadEconomy();loadYieldCurve()}
   else if(tab==='futures')loadFutures();
   else if(tab==='alerts')renderAlerts();
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SECTION 7b: MARKET POSTURE — js/rz-market-posture.js (port of tradermonty/claude-trading-skills, MIT:
+   market-breadth-analyzer + uptrend-analyzer + exposure-coach). The page only fetches the public CSVs
+   (CORS *, direct — never through a proxy), calls the module and renders. Descriptive posture for human
+   review: NO trade prescriptions / target weights / position sizing. FINEngine.DISCLAIMER rendered.
+   ═══════════════════════════════════════════════════════════════ */
+const MP={busy:false,data:null};
+function mpFetchText(url){
+  const ctl=typeof AbortController!=='undefined'?new AbortController():null;
+  const timer=ctl?setTimeout(function(){ctl.abort()},30000):null;
+  return fetch(url,ctl?{signal:ctl.signal}:{}).then(function(r){
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const lm=r.headers.get('Last-Modified');
+    return r.text().then(function(t){return {text:t,lastModified:lm}});
+  }).finally(function(){if(timer)clearTimeout(timer)});
+}
+function mpCls(score,avail){if(avail===false)return 'mp-na';return score>=60?'mp-ok':score>=40?'mp-mid':'mp-low'}
+function mpF(x,nd,plus){return (x==null||typeof x!=='number')?'n/a':RZMarketPosture.py.fmt(x,nd,plus)}
+function mpBreadthInput(k,c){
+  if(c.data_available===false&&k!=='cycle_position')return 'No data for this component — its weight is redistributed over the others.';
+  if(k==='breadth_level_trend')return '8MA '+mpF(c.current_8ma,3)+' · 200MA trend '+(c.trend===1?'up':'down')+' · 8MA over 5 sessions '+(c.ma8_direction||'n/a');
+  if(k==='ma_crossover')return '8MA − 200MA gap '+mpF(c.gap,3,true)+' · 8MA '+c.ma8_direction;
+  if(k==='cycle_position')return c.latest_marker_type?('Latest marker '+c.latest_marker_type.toLowerCase()+', '+c.days_since_marker+' sessions ago · 8MA '+c.ma8_trend):'No peak or trough marker in the last 120 sessions — weight redistributed.';
+  if(k==='bearish_signal')return 'Bearish flag '+(c.signal_active?'on':'off')+' · pink zone '+(c.in_pink_zone?'yes, '+c.pink_zone_days+' sessions':'no');
+  if(k==='historical_percentile')return '8MA at the '+mpF(c.percentile_rank,0)+'th percentile of '+c.total_observations+' sessions · avg peak '+mpF(c.avg_peak,3)+' / avg trough '+mpF(c.avg_trough,3);
+  if(k==='divergence')return 'S&P 500 '+mpF(c.sp500_pct_change,2,true)+'% vs 8MA '+mpF(c.breadth_change,4,true)+' over '+c.lookback_days+' sessions · 20-session window scored '+c.window_20d.score;
+  return '';
+}
+function mpUptrendInput(k,c){
+  if(c.data_available===false)return 'No data for this component — scored at the neutral default.';
+  if(k==='market_breadth')return 'Uptrend ratio '+mpF(c.ratio_pct,1)+'% · 10MA '+mpF(c.ma_10_pct,1)+'% · trend '+(c.trend||'n/a')+', slope '+mpF(c.slope,4,true);
+  if(k==='sector_participation')return c.uptrend_count+' of '+c.total_sectors+' sectors in uptrend · spread '+mpF(c.spread_pct,1)+' pp';
+  if(k==='sector_rotation')return 'Cyclical '+mpF(c.cyclical_avg_pct,1)+'% vs defensive '+mpF(c.defensive_avg_pct,1)+'% · commodity '+mpF(c.commodity_avg_pct,1)+'%';
+  if(k==='momentum')return 'EMA(3) slope '+mpF(c.slope_smoothed,4,true)+' · '+String(c.acceleration_label).replace(/_/g,' ')+' · '+c.sector_positive_slope_count+' of '+c.sector_total+' sectors with a rising slope';
+  if(k==='historical_context')return 'Ratio at the '+mpF(c.percentile,1)+'th percentile of '+c.data_points+' sessions ('+c.date_range+') · median '+mpF(c.historical_median_pct,1)+'%';
+  return '';
+}
+function mpRows(comps,weights,labels,inputFn,availOf){
+  return '<ul class="mp-rows">'+Object.keys(weights).map(function(k){
+    const c=comps[k],av=availOf(k,c);
+    return '<li class="mp-row"><span class="mp-name">'+esc(labels[k])+'<span class="mp-w">'+Math.round(weights[k]*100)+'% weight<\/span><\/span>'+
+      '<span class="mp-score fs-num '+mpCls(c.score,av)+'" aria-label="'+esc(labels[k])+' score">'+esc(String(c.score))+'<\/span>'+
+      '<span class="mp-read">'+esc(c.signal)+'<\/span><span class="mp-in">'+esc(inputFn(k,c))+'<\/span><\/li>';
+  }).join('')+'<\/ul>';
+}
+function mpSrc(label,url,lm){return '<li><a href="'+url+'" target="_blank" rel="noopener">'+esc(label)+'<\/a>'+(lm?' · file updated '+esc(lm):'')+'<\/li>'}
+function renderPosture(d){
+  const P=RZMarketPosture,b=d.breadth,u=d.uptrend,x=d.posture,S0=P.SOURCES;
+  const miss=x.inputs_missing.map(function(k){return P.INPUT_LABELS[k]}).join(', ');
+  const used=x.inputs_provided.map(function(k){return P.INPUT_LABELS[k]+' '+x.component_scores[k+'_score']}).join(', ')||'none';
+  const posCls=x.model_state==='NEW_ENTRY_ALLOWED'?'mp-ok':x.model_state==='REDUCE_ONLY'?'mp-mid':'mp-low';
+  let h='<section class="fs-card mp-card" aria-labelledby="mpTitle"><div class="mp-head"><h2 id="mpTitle">Market posture<\/h2>'+
+    '<span class="mp-meta">Breadth data as of '+esc(b?b.as_of:'—')+' · uptrend data as of '+esc(u?u.as_of:'—')+'<\/span>'+
+    '<button class="fs-btn" style="margin-left:auto" onclick="loadPosture(true)" aria-label="Refetch the market posture data"><i class="fas fa-sync-alt" aria-hidden="true"><\/i>Refresh<\/button><\/div>'+
+    '<dl class="mp-sum"><div><dt>Posture<\/dt><dd><span class="fs-chip '+posCls+'">'+esc(x.posture)+'<\/span><\/dd><\/div>'+
+    '<div><dt>Model exposure ceiling<\/dt><dd class="mp-big">'+x.exposure_ceiling_pct+'%<\/dd><\/div>'+
+    '<div><dt>Coach composite<\/dt><dd class="mp-big">'+mpF(x.composite_score,1)+'<\/dd><\/div>'+
+    '<div><dt>Confidence<\/dt><dd><span class="fs-chip'+(x.confidence==='LOW'?' mp-mid':'')+'">'+esc(x.confidence)+'<\/span><\/dd><\/div><\/dl>'+
+    '<ul class="mp-note"><li>Participation reads <strong>'+esc(x.participation.toLowerCase())+'<\/strong> (broad needs both breadth and uptrend at 50 or above).<\/li>'+
+    '<li>Inputs used: '+esc(used)+' (the whole-number part of each composite, as the coach reads it).<\/li>'+
+    (miss?'<li>Not available in the browser: '+esc(miss)+'. The coach re-weights over the inputs it has and subtracts 10 points for each missing critical input (regime, top risk, breadth): −'+x.haircut+' here. That is why confidence is '+esc(x.confidence.toLowerCase())+'.<\/li>':'')+
+    '<li>The ceiling is the source framework’s mapping of this composite to an equity-exposure band. It describes the market regime; it is not a recommendation for any portfolio. Posture labels: Defensive below 30, Cautious below 50 or with two critical inputs missing, otherwise Constructive.<\/li><\/ul><\/section>';
+  if(b){
+    const bc=b.composite;
+    h+='<section class="fs-card mp-card" aria-labelledby="mpBTitle"><div class="mp-head"><h2 id="mpBTitle">Market breadth<\/h2>'+
+      '<span class="mp-big '+mpCls(bc.composite_score)+'">'+mpF(bc.composite_score,1)+'<\/span><span class="fs-chip">'+esc(bc.zone)+'<\/span>'+
+      '<span class="mp-meta">'+esc(bc.data_quality.label)+' · '+b.total_rows+' sessions to '+esc(b.as_of)+'<\/span><\/div>'+
+      mpRows(b.components,P.BREADTH_WEIGHTS,P.BREADTH_LABELS,mpBreadthInput,function(k){return bc.component_scores[k].data_available})+'<\/section>';
+  }else h+='<section class="fs-card mp-card mp-err" role="alert"><h2 class="mp-name">Market breadth unavailable<\/h2><p class="mp-note">'+esc(d.errors.breadth||'No rows')+'. The posture above is computed without it.<\/p><\/section>';
+  if(u){
+    const uc=u.composite;
+    const warn=uc.active_warnings.map(function(w){return '<li><strong>'+esc(w.label)+'<\/strong> — '+esc(w.description)+'<\/li>'}).join('');
+    h+='<section class="fs-card mp-card" aria-labelledby="mpUTitle"><div class="mp-head"><h2 id="mpUTitle">Uptrend participation<\/h2>'+
+      '<span class="mp-big '+mpCls(uc.composite_score)+'">'+mpF(uc.composite_score,1)+'<\/span><span class="fs-chip">'+esc(uc.zone)+' · '+esc(uc.zone_detail)+'<\/span>'+
+      '<span class="mp-meta">'+esc(uc.data_quality.label)+(uc.warning_penalty?' · warning penalty '+uc.warning_penalty+' (raw '+mpF(uc.composite_score_raw,1)+')':'')+' · sectors from '+esc(u.sector_summary_used)+'<\/span><\/div>'+
+      mpRows(u.components,P.UPTREND_WEIGHTS,P.UPTREND_LABELS,mpUptrendInput,function(k,c){return c.data_available})+
+      (warn?'<ul class="mp-note">'+warn+'<\/ul>':'')+'<\/section>';
+  }else h+='<section class="fs-card mp-card mp-err" role="alert"><h2 class="mp-name">Uptrend participation unavailable<\/h2><p class="mp-note">'+esc(d.errors.uptrend||'No rows')+'. The posture above is computed without it.<\/p><\/section>';
+  h+='<section class="fs-card mp-card"><h2 class="mp-name">Sources and method<\/h2><ul class="mp-src" style="padding-left:1.1rem;margin:.5rem 0 0">'+
+    mpSrc('market_breadth_data.csv (TraderMonty)',S0.breadthDetail,d.lm.breadthDetail)+mpSrc('market_breadth_summary.csv',S0.breadthSummary,d.lm.breadthSummary)+
+    mpSrc('uptrend_ratio_timeseries.csv (TraderMonty uptrend dashboard)',S0.uptrendTimeseries,d.lm.uptrendTimeseries)+mpSrc('sector_summary.csv',S0.uptrendSectorSummary,d.lm.uptrendSectorSummary)+
+    mpSrc('Scoring ported from tradermonty/claude-trading-skills (MIT): market-breadth-analyzer, uptrend-analyzer, exposure-coach',S0.skills,null)+'<\/ul>'+
+    '<p class="mp-disc">'+esc((window.FINEngine&&FINEngine.DISCLAIMER)||'Educational analysis — not investment advice.')+' A descriptive market posture for human review — no orders, position sizes or portfolio weights.<\/p><\/section>';
+  return h;
+}
+async function loadPosture(force){
+  const el=$('postureRoot');if(!el||MP.busy)return;
+  if(MP.data&&!force){el.innerHTML=renderPosture(MP.data);return}
+  if(!window.RZMarketPosture){el.innerHTML='<div class="fs-card mp-err" role="alert">Market Posture engine failed to load.<\/div>';return}
+  MP.busy=true;el.setAttribute('aria-busy','true');
+  el.innerHTML='<div class="fs-card mp-card"><p class="mp-meta"><span class="spinner"><\/span>Fetching the breadth and uptrend CSVs (about 3.6 MB)…<\/p><div class="fs-skel" style="height:90px;margin-top:.75rem"><\/div><div class="fs-skel" style="height:220px;margin-top:.75rem"><\/div><\/div>';
+  const P=RZMarketPosture,S0=P.SOURCES,keys=['breadthDetail','breadthSummary','uptrendTimeseries','uptrendSectorSummary'];
+  const res=await Promise.allSettled(keys.map(function(k){return mpFetchText(S0[k])}));
+  const got={},lm={},errs={};
+  keys.forEach(function(k,i){if(res[i].status==='fulfilled'){got[k]=res[i].value.text;lm[k]=res[i].value.lastModified}else errs[k]=(res[i].reason&&res[i].reason.message)||'fetch failed'});
+  let breadth=null,uptrend=null;const errors={};
+  try{
+    if(got.breadthDetail==null)errors.breadth='Could not fetch market_breadth_data.csv ('+errs.breadthDetail+')';
+    else{const pd=P.breadth.parseDetailCsv(got.breadthDetail);if(pd.error)errors.breadth=pd.error;else if(!pd.rows.length)errors.breadth='market_breadth_data.csv has no usable rows';
+      else breadth=P.breadth.analyze(pd.rows,got.breadthSummary!=null?P.breadth.parseSummaryCsv(got.breadthSummary):{})}
+    if(got.uptrendTimeseries==null)errors.uptrend='Could not fetch uptrend_ratio_timeseries.csv ('+errs.uptrendTimeseries+')';
+    else{const pt=P.uptrend.parseTimeseriesCsv(got.uptrendTimeseries);if(pt.error)errors.uptrend=pt.error;
+      else uptrend=P.uptrend.analyze(pt.rows,got.uptrendSectorSummary!=null?P.uptrend.parseSectorSummaryCsv(got.uptrendSectorSummary).rows:[])}
+  }catch(e){if(!breadth)errors.breadth=errors.breadth||('Scoring failed: '+e.message);if(!uptrend)errors.uptrend=errors.uptrend||('Scoring failed: '+e.message)}
+  MP.busy=false;el.setAttribute('aria-busy','false');
+  if(!breadth&&!uptrend){
+    el.innerHTML='<div class="fs-card mp-card mp-err" role="alert"><h2 class="mp-name">Market posture unavailable<\/h2><ul class="mp-note"><li>'+esc(errors.breadth||'')+'<\/li><li>'+esc(errors.uptrend||'')+'<\/li><\/ul>'+
+      '<button class="fs-btn" style="margin-top:.75rem" onclick="loadPosture(true)">Try again<\/button><\/div>';
+    return;
+  }
+  MP.data={breadth:breadth,uptrend:uptrend,posture:P.exposure.compute(breadth,uptrend),errors:errors,lm:lm};
+  el.innerHTML=renderPosture(MP.data);
 }
 
 /* ═══════════════════════════════════════════════════════════════

@@ -85,6 +85,7 @@ node tools/test-dc-corpus.mjs                      # DC corpus gate — provenan
 node tools/test-rz-engine.mjs                      # RZEngine v2.0 — model worked examples + data invariants + reachability + provenance (gate any change to rz-engine.js)
 node tools/test-fin-engine.mjs                     # FIN Engine — ratios/valuation/technical/score worked examples + ta.js PARITY + invariants + provenance + disclaimer (gate any change to fin-engine.js)
 node tools/backtest-fin-screener.mjs               # FIN Engine — walk-forward technical-gauge backtest vs live gateway /candles (accuracy check, needs network; not a strict gate — honest verdict: gauge is descriptive not predictive)
+node tools/test-market-posture.mjs                 # Market Posture (js/rz-market-posture.js, Finance Terminal 'Posture' tab) — PARITY with the ORIGINAL tradermonty/claude-trading-skills Python: replays the 251 calls its own pytest suites make, fixture CSVs end to end, 180 seeded scenarios (live `python3 -I -B` when ~/.code/claude-trading-skills exists, else committed golden), a perturbation that must fail the old answer, and the tab in a browser (390/1440, dark+light, axe, error + partial states). Caught a real bug first run: Python sum() is compensated, so the 0.8 available weight became 0.7999999999999999 with += and weighted_contribution 6.2 flipped to 6.3.
 ```
 
 **RZEngine / FIN Engine build step** (whenever `rz-engine.js` or `fin-engine.js` changes): regenerate the min twin reproducibly, never hand-edit it, then bump the shared `?v=` on the pages that load it:
