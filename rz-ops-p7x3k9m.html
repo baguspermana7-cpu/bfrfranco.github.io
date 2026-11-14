@@ -96,8 +96,7 @@
         .tbl-select{padding:8px 12px;background:var(--fs-bg3);border:1px solid var(--fs-bd);border-radius:8px;color:var(--fs-t2);font-size:0.8rem;font-family:inherit;outline:none;cursor:pointer}
         .tbl-select:focus{border-color:var(--fs-acc)}
         .btn{padding:7px 16px;border-radius:8px;border:none;font-size:0.8rem;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px;transition:all 0.2s}
-        .btn:hover{transform:translateY(-1px)}
-        .btn-purple{background:linear-gradient(135deg,#64748b,var(--fs-acc));color:#fff;box-shadow:0 3px 10px rgba(100, 116, 139,0.25)}
+        .btn-purple{background:#475569;color:#fff;border:1px solid #64748b;border-radius:4px}
         .btn-green{background:linear-gradient(135deg,#059669,#10b981);color:#fff;box-shadow:0 3px 10px rgba(16,185,129,0.25)}
         .btn-amber{background:linear-gradient(135deg,#d97706,#f59e0b);color:#fff;box-shadow:0 3px 10px rgba(245,158,11,0.25)}
         .btn-red{background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;box-shadow:0 3px 10px rgba(239,68,68,0.25)}
@@ -123,12 +122,12 @@
         .supa-status{display:flex;align-items:center;gap:9px;font-size:0.76rem;color:#cbd5e1;background:rgba(18,19,22,0.6);border:1px solid rgba(51,65,85,0.5);border-left:2px solid var(--fs-bd);border-radius:4px;padding:8px 12px;line-height:1.35}
         .supa-status i{flex:0 0 auto;font-size:0.8rem}
         .supa-status a{color:#67e8f9;text-decoration:underline}
-        #supaAccountsList .cred-row select{font-family:'JetBrains Mono',monospace;background:#121316;color:var(--fs-t2);border:1px solid rgba(148,163,184,0.28);border-radius:4px;padding:5px 8px;font-size:0.72rem;cursor:pointer;transition:border-color .15s}
-        #supaAccountsList .cred-row select:hover{border-color:rgba(34,211,238,0.55)}
-        #supaAccountsList .cred-row select:focus{outline:none;border-color:var(--fs-cyn)}
-        #supaAccountsList .cred-row select:disabled{opacity:0.5;cursor:progress}
+        #userTbody select{font-family:'JetBrains Mono',monospace;background:#121316;color:var(--fs-t2);border:1px solid rgba(148,163,184,0.28);border-radius:4px;padding:5px 8px;font-size:0.72rem;cursor:pointer;transition:border-color .15s}
+        #userTbody select:hover{border-color:rgba(34,211,238,0.55)}
+        #userTbody select:focus{outline:none;border-color:var(--fs-cyn)}
+        #userTbody select:disabled{opacity:0.5;cursor:progress}
         body.light-mode .supa-status{background:#f8fafc;border-color:#e2e8f0;color:#475569}
-        body.light-mode #supaAccountsList .cred-row select{background:#fff;color:#1e293b;border-color:#e2e8f0}
+        body.light-mode #userTbody select{background:#fff;color:#1e293b;border-color:#e2e8f0}
         .status-dot{display:inline-flex;align-items:center;gap:6px}
         .status-dot::before{content:'';width:7px;height:7px;border-radius:50%}
         .status-dot.active::before{background:var(--fs-grn)}
@@ -185,15 +184,8 @@
         .matrix-td-center{text-align:center}
         @media(max-width:768px){.features-layout{grid-template-columns:1fr}.features-subnav{flex-direction:row;flex-wrap:wrap;border-right:none;border-bottom:1px solid #1f2937;padding-right:0;padding-bottom:0.5rem;margin-bottom:0.25rem}}
 
-        /* ═══ CREDENTIALS ═══ */
-        .cred-row{display:grid;grid-template-columns:40px 1.2fr 1.5fr 1fr 0.8fr 100px;align-items:center;padding:10px 14px;border-bottom:1px solid rgba(51,65,85,0.4);font-size:0.8rem}
-        .cred-row.header{background:rgba(15,23,42,0.5);border-radius:8px 8px 0 0;border-bottom:2px solid var(--fs-bd);font-size:0.68rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--fs-t4)}
+        /* ═══ AVATAR ═══ */
         .cred-avatar{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:700;color:#fff}
-        .cred-pass{font-family:'JetBrains Mono',monospace;font-size:0.75rem;display:flex;align-items:center;gap:6px}
-        .cred-pass .masked{color:#475569;letter-spacing:2px}
-        .cred-pass .revealed{color:var(--fs-amb)}
-        .cred-reveal{background:none;border:none;color:var(--fs-t4);cursor:pointer;font-size:0.7rem;padding:2px;transition:color 0.2s}
-        .cred-reveal:hover{color:var(--fs-acc2)}
 
         /* ═══ BENCHMARK ═══ */
         .bench-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem}
@@ -287,7 +279,7 @@
         .tl-time{font-size:0.68rem;color:var(--fs-t4);margin-top:2px}
 
         /* ═══ MODAL ═══ */
-        .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);z-index:9999;align-items:center;justify-content:center}
+        .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center}
         .modal-overlay.show{display:flex}
         .modal-box{background:var(--fs-bg2);border:1px solid var(--fs-bd);border-radius:16px;width:92%;max-width:680px;max-height:88vh;overflow-y:auto;padding:2rem;position:relative;animation:mIn 0.25s ease}
         @keyframes mIn{from{opacity:0;transform:scale(0.95) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
@@ -324,7 +316,6 @@
             .bench-filter-group{width:100%}
             .bench-select,.bench-input{width:100%}
             .main-content{padding:1rem}
-            .cred-row{grid-template-columns:30px 1fr 1fr 0.7fr 80px;font-size:0.72rem}
             .feat-row{grid-template-columns:1.5fr repeat(3,1fr);padding:10px 8px}
             /* phone width: nothing may push the page sideways (min-width:auto let the topbar widen
                .main-wrap to 512 px; wide tables scroll inside their own card instead of the page) */
@@ -387,7 +378,6 @@
         .login-submit{width:100%;padding:13px;border:none;border-radius:10px;background:linear-gradient(135deg,#64748b,#64748b);color:#fff;font-size:0.92rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;letter-spacing:0.01em;position:relative;overflow:hidden}
         .login-submit::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.08),transparent);opacity:0;transition:opacity 0.2s}
         .login-submit:hover::before{opacity:1}
-        .login-submit:hover{box-shadow:0 8px 24px rgba(14,116,144,0.35);transform:translateY(-1px)}
         .login-submit:active{transform:translateY(0) scale(0.99);box-shadow:0 2px 8px rgba(14,116,144,0.2)}
         .login-submit:disabled{opacity:0.55;cursor:not-allowed;transform:none!important;box-shadow:none!important}
         .login-submit:disabled::before{display:none}
@@ -535,9 +525,6 @@
         body.light-mode .feat-row.header{background:#f8fafc;border-color:#e2e8f0}
         body.light-mode .feat-row.header span{color:#64748b}
         body.light-mode .feat-name{color:#1e293b}
-        body.light-mode .cred-row{border-color:#f1f5f9}
-        body.light-mode .cred-row.header{background:#f8fafc;border-color:#e2e8f0;color:#64748b}
-        body.light-mode .cred-pass .masked{color:#94a3b8}
         body.light-mode .bench-card{background:linear-gradient(135deg,#f8fafc,#fff);border-color:#e2e8f0}
         body.light-mode .bench-val{color:#1e293b}
         body.light-mode .bench-label{color:#64748b}
@@ -636,7 +623,6 @@
         .ua-period-btn.active{background:linear-gradient(135deg,#64748b,var(--fs-acc));border-color:var(--fs-acc);color:#fff;box-shadow:0 2px 8px rgba(100, 116, 139,0.3)}
         .ua-cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-bottom:1rem}
         .ua-cat-card{background:var(--fs-bg2);border:1px solid var(--fs-bd);border-radius:4px;padding:0.65rem 0.75rem;position:relative;overflow:hidden;transition:transform 0.2s,box-shadow 0.2s;cursor:default}
-        .ua-cat-card:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.25)}
         .ua-cat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
         .ua-cat-card.purple::before{background:linear-gradient(90deg,#64748b,var(--fs-acc2))}
         .ua-cat-card.green::before{background:linear-gradient(90deg,#059669,var(--fs-grn))}
@@ -724,7 +710,6 @@
     <script src="js/rz-explain-db.js?v=20261111-a4d62e38" defer></script>
     <script src="js/rz-explain.js?v=20261103-f581e6ac" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
-    <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
     <!-- Supabase (real accounts) — live "Supabase Accounts" panel, root-gated by RLS -->
     <script src="js/rz-config.js?v=20260920-eed056f9"></script>
@@ -805,7 +790,6 @@
             </a>
             <a class="nav-item" data-section="revenue" onclick="showSection('revenue')">
                 <i class="fas fa-chart-bar"></i> Revenue
-                <span class="badge green">$</span>
             </a>
             <a class="nav-item" data-section="mayar" onclick="showSection('mayar')">
                 <i class="fas fa-credit-card"></i> Mayar Payments
@@ -819,11 +803,7 @@
             <div class="nav-group-label" style="margin-top:0.75rem">Management</div>
             <a class="nav-item" data-section="users" onclick="showSection('users')">
                 <i class="fas fa-users"></i> Users
-                <span class="badge purple" id="navUserCount">50</span>
-            </a>
-            <a class="nav-item" data-section="credentials" onclick="showSection('credentials')">
-                <i class="fas fa-key"></i> Credentials
-                <span class="badge amber">15</span>
+                <span class="badge purple" id="navUserCount">—</span>
             </a>
             <a class="nav-item" data-section="features" onclick="showSection('features')">
                 <i class="fas fa-toggle-on"></i> Feature Flags
@@ -901,84 +881,79 @@
 <!-- ══════════════════════════════════════ DASHBOARD ══════════════════════════════════════ -->
 <div class="section active" id="sec-dashboard">
     <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div><h1>Dashboard Overview</h1><p>Real-time platform metrics and analytics</p></div>
+        <div><h1>Dashboard Overview</h1><p>Accounts from Supabase <code>profiles</code>, events from <code>audit_log</code></p></div>
         <div style="display:flex;gap:0.5rem;flex-shrink:0">
             <button class="btn btn-green btn-sm" onclick="exportDashboardCSV()"><i class="fas fa-download"></i> CSV</button>
             <button class="btn btn-purple btn-sm" onclick="openReport('dashboard')"><i class="fas fa-file-alt"></i> Report</button>
         </div>
     </div>
+    <div id="dashStatus" class="supa-status" style="border-left-color:#334155;margin-bottom:1rem"><i class="fas fa-circle-notch fa-spin" style="color:#64748b"></i><span>Loading profiles and audit log from Supabase…</span></div>
     <div class="kpi-grid" id="kpiGrid"></div>
 
-    <!-- Quick Stats Row -->
+    <!-- Event counts from audit_log (signed-in users only; rz-scenario.js logs them) -->
     <div class="health-row" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem">
         <div class="health-stat">
-            <div class="health-stat-label">Total Calculations</div>
-            <div class="health-stat-value" style="color:#60a5fa" id="totalCalcs">0</div>
-            <div class="health-stat-sub">All users</div>
-        </div>
-        <div class="health-stat">
             <div class="health-stat-label">PDF Exports</div>
-            <div class="health-stat-value" style="color:#94a3b8" id="totalPDFs">234</div>
-            <div class="health-stat-sub">Last 30 days</div>
+            <div class="health-stat-value" style="color:#94a3b8" id="statPdf">—</div>
+            <div class="health-stat-sub">audit_log, last 30 days</div>
         </div>
         <div class="health-stat">
-            <div class="health-stat-label">Active Sessions</div>
-            <div class="health-stat-value" style="color:#34d399" id="activeSessions">0</div>
-            <div class="health-stat-sub">Today</div>
+            <div class="health-stat-label">Scenarios Saved</div>
+            <div class="health-stat-value" style="color:#94a3b8" id="statSaved">—</div>
+            <div class="health-stat-sub">audit_log, last 30 days</div>
         </div>
         <div class="health-stat">
-            <div class="health-stat-label">System Uptime</div>
-            <div class="health-stat-value" style="color:#34d399">99.97%</div>
-            <div class="health-stat-sub">Last 30 days</div>
+            <div class="health-stat-label">Logged Events</div>
+            <div class="health-stat-value" style="color:#94a3b8" id="statEvents">—</div>
+            <div class="health-stat-sub">audit_log, last 30 days</div>
+        </div>
+        <div class="health-stat">
+            <div class="health-stat-label">Active Accounts</div>
+            <div class="health-stat-value" style="color:#94a3b8" id="statActors">—</div>
+            <div class="health-stat-sub">with a logged event, 30 days</div>
         </div>
     </div>
 
     <div class="charts-row">
-        <div class="card"><div class="card-title"><i class="fas fa-chart-line" style="color:#60a5fa"></i> User Growth (6 Months)</div><canvas id="chartGrowth" height="110"></canvas></div>
+        <div class="card"><div class="card-title"><i class="fas fa-chart-line" style="color:#60a5fa"></i> Accounts by Sign-up Month (6 Months)</div><canvas id="chartGrowth" height="110"></canvas></div>
         <div class="card"><div class="card-title"><i class="fas fa-chart-pie" style="color:#94a3b8"></i> Tier Distribution</div><canvas id="chartTier" height="220"></canvas></div>
     </div>
     <div class="charts-row">
-        <div class="card"><div class="card-title"><i class="fas fa-globe-americas" style="color:#22d3ee"></i> Calculator Usage by Hour (Last 7d)</div><canvas id="chartUsageHour" height="90"></canvas></div>
-        <div class="card"><div class="card-title"><i class="fas fa-funnel-dollar" style="color:#fbbf24"></i> Conversion Funnel</div><canvas id="chartFunnel" height="220"></canvas></div>
+        <div class="card"><div class="card-title"><i class="fas fa-clock" style="color:#22d3ee"></i> Logged Events by Hour (local time, 30 days)</div><canvas id="chartUsageHour" height="90"></canvas></div>
+        <div class="card"><div class="card-title"><i class="fas fa-list" style="color:#94a3b8"></i> Logged Events by Action (30 days)</div><canvas id="chartActions" height="220"></canvas></div>
     </div>
 
-    <!-- Geo Distribution Chart -->
     <div class="card" style="margin-bottom:1.5rem">
-        <div class="card-title"><i class="fas fa-map-marker-alt" style="color:#f87171"></i> User Geographic Distribution</div>
-        <canvas id="chartGeo" height="120"></canvas>
+        <div class="card-title"><i class="fas fa-ban" style="color:#64748b"></i> No data source</div>
+        <p style="font-size:0.78rem;color:#94a3b8;line-height:1.6;margin:0">These metrics are not recorded anywhere this console can read, so none is shown:
+        subscription revenue, MRR and churn (payments are in <a href="#" onclick="showSection('mayar');return false" style="color:#67e8f9">Mayar Payments</a>),
+        total calculator runs, active sessions, uptime, and visitor geography (profiles hold no country).</p>
     </div>
 
     <!-- Recent Activity Feed -->
     <div class="card">
-        <div class="card-title"><i class="fas fa-stream" style="color:#94a3b8"></i> Recent Activity</div>
+        <div class="card-title"><i class="fas fa-stream" style="color:#94a3b8"></i> Recent Activity <span style="font-size:0.68rem;color:#64748b;font-weight:400">audit_log</span></div>
         <div id="dashActivity" style="max-height:300px;overflow-y:auto;"></div>
     </div>
 </div>
 
 <!-- ══════════════════════════════════════ REVENUE ══════════════════════════════════════ -->
 <div class="section" id="sec-revenue">
-    <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div><h1>Revenue Analytics</h1><p>Subscription revenue, LTV, churn, and financial metrics</p></div>
-        <div style="display:flex;gap:0.5rem;flex-shrink:0">
-            <button class="btn btn-green btn-sm" onclick="exportRevenueCSV()"><i class="fas fa-download"></i> CSV</button>
-            <button class="btn btn-purple btn-sm" onclick="openReport('revenue')"><i class="fas fa-file-alt"></i> Report</button>
-        </div>
-    </div>
-    <div class="kpi-grid" id="revenueKpis"></div>
-    <div class="charts-row">
-        <div class="card"><div class="card-title"><i class="fas fa-chart-area" style="color:#34d399"></i> Monthly Recurring Revenue (MRR)</div><canvas id="chartMRR" height="110"></canvas></div>
-        <div class="card"><div class="card-title"><i class="fas fa-percentage" style="color:#f87171"></i> Churn Rate</div><canvas id="chartChurn" height="220"></canvas></div>
+    <div class="section-header">
+        <div><h1>Revenue Analytics</h1><p>Subscription revenue, LTV and churn</p></div>
     </div>
     <div class="card">
-        <div class="card-title"><i class="fas fa-money-bill-wave" style="color:#fbbf24"></i> Revenue by Account</div>
-        <div class="tbl-overflow" id="revenueTableWrap"></div>
+        <div class="card-title"><i class="fas fa-ban" style="color:#64748b"></i> No data source</div>
+        <p style="font-size:0.8rem;color:#94a3b8;line-height:1.6;margin:0 0 0.75rem">Supabase stores each account's tier, not what it paid, so MRR, ARR, LTV and churn
+        cannot be computed here. Real payments come from the Mayar gateway.</p>
+        <button class="btn btn-ghost btn-sm" onclick="showSection('mayar')"><i class="fas fa-credit-card"></i> Open Mayar Payments</button>
     </div>
 </div>
 
 <!-- ══════════════════════════════════════ USERS ══════════════════════════════════════ -->
 <div class="section" id="sec-users">
     <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div><h1>User Management</h1><p>Manage accounts, tiers, status, and access</p></div>
+        <div><h1>User Management</h1><p>Supabase accounts (<code>profiles</code>). Passwords are stored hashed and never shown. Tier changes, password resets, new and deleted accounts run server-side (<code>admin_set_tier</code> RPC and the <code>admin-users</code> Edge Function).</p></div>
         <button class="btn btn-purple btn-sm" onclick="openReport('users')"><i class="fas fa-file-alt"></i> Report</button>
     </div>
     <div class="card">
@@ -986,62 +961,14 @@
             <div class="card-title" style="margin:0"><i class="fas fa-user-cog" style="color:#94a3b8"></i> All Users</div>
             <div class="tbl-controls" style="margin:0">
                 <div class="tbl-search"><i class="fas fa-search"></i><input id="userSearch" placeholder="Search email or name..." oninput="filterUsers()" aria-label="Search email or name..."></div>
-                <select class="tbl-select" id="tierFilter" onchange="filterUsers()" aria-label="Tier Filter"><option value="all">All Tiers</option><option value="pro">Full access</option><option value="free">Free</option><option value="demo">Demo</option><option value="educator">Educator</option><option value="root">Root</option></select>
-                <select class="tbl-select" id="statusFilter" onchange="filterUsers()" aria-label="Status Filter"><option value="all">All Status</option><option value="active">Active</option><option value="inactive">Inactive</option><option value="suspended">Suspended</option></select>
+                <select class="tbl-select" id="tierFilter" onchange="filterUsers()" aria-label="Tier Filter"><option value="all">All Tiers</option><option value="free">Free</option><option value="demo">Demo</option><option value="pro">Full access</option><option value="root">Root</option></select>
                 <button class="btn btn-green" onclick="exportCSV()"><i class="fas fa-download"></i> Export CSV</button>
-                <button class="btn btn-purple" onclick="openCreateModal()" style="background:linear-gradient(135deg,rgba(100, 116, 139,0.2),rgba(8,145,178,0.1));border:1px solid rgba(100, 116, 139,0.4);color:#94a3b8;"><i class="fas fa-user-plus"></i> Create Account</button>
-                <button class="btn btn-purple rz-admin-v2-only rz-admin-v2-hidden" id="addUserV2Btn" onclick="openAddUserModalV2()" style="background:linear-gradient(135deg,rgba(34,211,238,0.2),rgba(8,145,178,0.1));border:1px solid rgba(34,211,238,0.4);color:#67e8f9;"><i class="fas fa-user-shield"></i> Add User (server)<span class="rz-admin-v2-badge" style="margin-left:6px">v2</span></button>
+                <button class="btn btn-ghost" onclick="toggleAddAccount()"><i class="fas fa-user-plus"></i> Add account</button>
+                <button class="btn btn-ghost" onclick="migrateLegacyAccounts()"><i class="fas fa-arrows-rotate"></i> Migrate legacy</button>
+                <button class="btn btn-ghost" onclick="loadOpsData()"><i class="fas fa-rotate"></i> Refresh</button>
+                <button class="btn btn-purple rz-admin-v2-only rz-admin-v2-hidden" id="addUserV2Btn" onclick="openAddUserModalV2()"><i class="fas fa-user-shield"></i> Add User (server)<span class="rz-admin-v2-badge" style="margin-left:6px">v2</span></button>
             </div>
         </div>
-        <div class="tbl-overflow">
-            <table class="data-tbl" id="userTable">
-                <thead><tr>
-                    <th onclick="sortTable('name')"  scope="col">Name <i class="fas fa-sort si"></i></th>
-                    <th onclick="sortTable('email')"  scope="col">Email <i class="fas fa-sort si"></i></th>
-                    <th onclick="sortTable('tier')"  scope="col">Tier <i class="fas fa-sort si"></i></th>
-                    <th onclick="sortTable('status')"  scope="col">Status <i class="fas fa-sort si"></i></th>
-                    <th onclick="sortTable('registered')"  scope="col">Registered <i class="fas fa-sort si"></i></th>
-                    <th onclick="sortTable('lastLogin')"  scope="col">Last Login <i class="fas fa-sort si"></i></th>
-                    <th onclick="sortTable('usage')"  scope="col">Calcs <i class="fas fa-sort si"></i></th>
-                    <th onclick="sortTable('lastPayment')"  scope="col">Payment <i class="fas fa-sort si"></i></th>
-                    <th scope="col">Actions</th>
-                </tr></thead>
-                <tbody id="userTbody"></tbody>
-            </table>
-        </div>
-        <div class="pagination"><div class="pagination-info" id="pgInfo"></div><div class="pagination-btns" id="pgBtns"></div></div>
-    </div>
-</div>
-
-<!-- ══════════════════════════════════════ CREDENTIALS ══════════════════════════════════════ -->
-<div class="section" id="sec-credentials">
-    <div class="section-header">
-        <h1>Account Credentials</h1>
-        <p>View and manage all registered account credentials</p>
-    </div>
-    <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
-            <div class="card-title" style="margin:0"><i class="fas fa-key" style="color:#fbbf24"></i> Credential Vault</div>
-            <div style="display:flex;gap:0.5rem;">
-                <button class="btn btn-ghost btn-sm" onclick="toggleAllPasswords()"><i class="fas fa-eye"></i> Toggle All</button>
-                <button class="btn btn-green btn-sm" onclick="exportCredCSV()"><i class="fas fa-download"></i> Export</button>
-            </div>
-        </div>
-        <div class="tbl-overflow" id="credentialsList"></div>
-        <p style="font-size:0.72rem;color:#94a3b8;margin:0.6rem 0 0;">These are the legacy hardcoded accounts (used for the site's Full access-gating). Passwords shown here are placeholders — the real Supabase accounts are below.</p>
-    </div>
-
-    <!-- Supabase Accounts (live, RLS root-only) -->
-    <div class="card" style="margin-top:1rem;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;flex-wrap:wrap;gap:0.5rem;">
-            <div class="card-title" style="margin:0"><i class="fas fa-database" style="color:#22d3ee"></i> Supabase Accounts <span style="font-size:0.62rem;font-weight:700;color:#34d399;background:rgba(16,185,129,0.15);padding:2px 8px;border-radius:999px;">LIVE</span><span id="supaAccountsCount" style="display:none;font-family:'JetBrains Mono',monospace;font-size:0.62rem;font-weight:600;color:#22d3ee;background:rgba(34,211,238,0.1);border:1px solid rgba(34,211,238,0.25);padding:2px 8px;border-radius:4px;"></span></div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;">
-                <button id="supaAddBtn" class="btn btn-ghost btn-sm" onclick="toggleAddAccount()" style="display:none;"><i class="fas fa-user-plus"></i> Add account</button>
-                <button id="supaMigrateBtn" class="btn btn-ghost btn-sm" onclick="migrateLegacyAccounts()" style="display:none;"><i class="fas fa-arrows-rotate"></i> Migrate legacy</button>
-                <button class="btn btn-ghost btn-sm" onclick="loadSupaAccounts()"><i class="fas fa-rotate"></i> Refresh</button>
-            </div>
-        </div>
-        <p style="font-size:0.72rem;color:#94a3b8;margin:0 0 0.75rem;">Real registered users from Supabase. Passwords are <b>never shown</b> (Supabase stores them hashed — that is correct &amp; secure). As a <b>root</b> user you can create accounts, change tiers, reset passwords, and delete users here — the privileged actions run in the <code>admin-users</code> Edge Function (the service key never touches this page). Sign in via <a href="account.html" target="_blank" style="color:#67e8f9;">account.html</a>.</p>
         <!-- Add-account form (root-only, hidden until toggled) -->
         <div id="supaAddForm" style="display:none;background:rgba(15,23,42,0.55);border:1px solid rgba(51,65,85,0.5);border-radius:6px;padding:12px;margin-bottom:0.7rem;">
             <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;">
@@ -1053,8 +980,21 @@
             </div>
             <p style="font-size:0.66rem;color:#64748b;margin:8px 0 0;">Account is created already confirmed (can log in immediately). The password is set by you and shown once here — it is stored hashed in Supabase.</p>
         </div>
-        <div id="supaAccountsStatus" class="supa-status" style="border-left-color:#334155;"><i class="fas fa-circle-notch fa-spin" style="color:#64748b"></i><span>Loading…</span></div>
-        <div class="tbl-overflow" id="supaAccountsList" style="margin-top:0.6rem;"></div>
+        <div id="supaAccountsStatus" class="supa-status" style="border-left-color:#334155;margin-bottom:0.75rem"><i class="fas fa-circle-notch fa-spin" style="color:#64748b"></i><span>Loading…</span></div>
+        <div class="tbl-overflow">
+            <table class="data-tbl" id="userTable">
+                <thead><tr>
+                    <th onclick="sortTable('name')"  scope="col">Name <i class="fas fa-sort si"></i></th>
+                    <th onclick="sortTable('email')"  scope="col">Email <i class="fas fa-sort si"></i></th>
+                    <th onclick="sortTable('tier')"  scope="col">Tier <i class="fas fa-sort si"></i></th>
+                    <th onclick="sortTable('registered')"  scope="col">Registered <i class="fas fa-sort si"></i></th>
+                    <th scope="col">Set tier</th>
+                    <th scope="col">Actions</th>
+                </tr></thead>
+                <tbody id="userTbody"></tbody>
+            </table>
+        </div>
+        <div class="pagination"><div class="pagination-info" id="pgInfo"></div><div class="pagination-btns" id="pgBtns"></div></div>
     </div>
 </div>
 
@@ -1578,7 +1518,7 @@
 <!-- ══════════════════════════════════════ AUDIT ══════════════════════════════════════ -->
 <div class="section" id="sec-audit">
     <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div><h1>Audit Log</h1><p>Complete system event timeline with filters</p></div>
+        <div><h1>Audit Log</h1><p>Supabase <code>audit_log</code>: scenario and PDF events logged for signed-in users (newest 500)</p></div>
         <button class="btn btn-purple btn-sm" onclick="openReport('audit')"><i class="fas fa-file-alt"></i> Report</button>
     </div>
     <div class="card">
@@ -1590,7 +1530,7 @@
                     <button id="auditSrcClient" class="active" onclick="setAuditSource('client')" type="button">Client (legacy)</button>
                 </div>
                 <input type="text" id="auditActorFilter" placeholder="Actor email…" oninput="filterAudit()" aria-label="Filter by actor email" style="padding:0.4rem 0.7rem;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:#e2e8f0;font-size:0.78rem;width:140px;display:none" class="rz-admin-v2-only rz-admin-v2-hidden">
-                <select class="tbl-select" id="auditTypeFilter" onchange="filterAudit()" aria-label="Audit Type Filter"><option value="all">All Types</option><option value="login">Login</option><option value="logout">Logout</option><option value="calculation">Calculation</option><option value="pdf">PDF Export</option><option value="tier_change">Tier Change</option><option value="feature_toggle">Feature Toggle</option></select>
+                <select class="tbl-select" id="auditTypeFilter" onchange="filterAudit()" aria-label="Audit Type Filter"><option value="all">All Actions</option></select>
                 <button class="btn btn-green btn-sm" onclick="exportAuditCSV()"><i class="fas fa-download"></i> Export</button>
             </div>
         </div>
@@ -1601,7 +1541,7 @@
 <!-- ══════════════════════════════════════ SUBSCRIBERS ══════════════════════════════════════ -->
 <div class="section" id="sec-subscribers">
     <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div><h1>Newsletter Subscribers</h1><p>Manage email subscribers from article newsletter forms</p></div>
+        <div><h1>Newsletter Subscribers</h1><p>Rows in the Supabase <code>newsletter_subscribers</code> table (read-only here)</p></div>
         <button class="btn btn-purple btn-sm" onclick="openReport('subscribers')"><i class="fas fa-file-alt"></i> Report</button>
     </div>
     <div class="card">
@@ -1610,19 +1550,18 @@
             <div class="tbl-controls" style="margin:0;display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
                 <input type="text" id="subSearch" placeholder="Search email..." oninput="renderSubscribers()" style="padding:0.4rem 0.75rem;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.05);color:#e2e8f0;font-size:0.8rem;width:180px;" aria-label="Search email...">
                 <select class="tbl-select" id="subSourceFilter" onchange="renderSubscribers()" aria-label="Sub Source Filter"><option value="all">All Sources</option></select>
-                <select class="tbl-select" id="subStatusFilter" onchange="renderSubscribers()" aria-label="Sub Status Filter"><option value="all">All Status</option><option value="active">Active</option><option value="unsubscribed">Unsubscribed</option></select>
+                <select class="tbl-select" id="subStatusFilter" onchange="renderSubscribers()" aria-label="Sub Status Filter"><option value="all">All Status</option><option value="subscribed">Subscribed</option><option value="unsubscribed">Unsubscribed</option></select>
                 <button class="btn btn-green btn-sm" onclick="exportSubscribersCSV()"><i class="fas fa-download"></i> Export CSV</button>
             </div>
         </div>
         <div style="overflow-x:auto;">
             <table class="tbl" id="subscribersTable">
-                <thead><tr><th scope="col">Email</th><th scope="col">Date Subscribed</th><th scope="col">Source</th><th scope="col">Status</th><th scope="col">Actions</th></tr></thead>
+                <thead><tr><th scope="col">Email</th><th scope="col">Date Subscribed</th><th scope="col">Source</th><th scope="col">Status</th></tr></thead>
                 <tbody id="subTableBody"></tbody>
             </table>
         </div>
         <div id="subEmpty" style="display:none;text-align:center;padding:3rem;color:#64748b;">
-            <i class="fas fa-inbox" style="font-size:2rem;margin-bottom:1rem;display:block;opacity:0.5"></i>
-            No subscribers yet. Newsletter signups from articles will appear here.
+            Loading newsletter_subscribers…
         </div>
     </div>
 </div>
@@ -1871,7 +1810,7 @@
 <!-- ══════════════════════════════════════ USER ACTIVITY ══════════════════════════════════════ -->
 <div class="section" id="sec-activity">
     <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div><h1>User Activity</h1><p>Real-time tracking — Full access clicks, demo logins, PDF exports, CV downloads, calculator usage <span id="uaDataSource" style="font-size:0.68rem;color:#475569;margin-left:6px"></span></p></div>
+        <div><h1>User Activity <span class="badge amber" style="font-size:0.62rem;vertical-align:middle">This browser only</span></h1><p>This browser only: <code>rz-tracker.js</code> keeps events in each visitor's own localStorage, so this tab shows only what was recorded in the browser you are using now, not site-wide traffic. <span id="uaDataSource" style="font-size:0.68rem;color:#475569;margin-left:6px"></span></p></div>
         <button class="btn btn-purple btn-sm" onclick="openReport('activity')"><i class="fas fa-file-alt"></i> Report</button>
     </div>
 
@@ -2036,93 +1975,6 @@
         <div class="modal-box"><button class="modal-close" onclick="closeModal()">&times;</button><div id="modalBody"></div></div>
     </div>
 
-    <!-- Create Account Modal -->
-    <div class="modal-overlay" id="createModal">
-        <div class="modal-box" style="max-width:480px">
-            <button class="modal-close" onclick="closeCreateModal()">&times;</button>
-            <div id="createForm">
-                <div style="display:flex;align-items:center;gap:12px;margin-bottom:1.5rem">
-                    <div style="width:42px;height:42px;border-radius:12px;background:#64748b;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1rem"><i class="fas fa-user-plus"></i></div>
-                    <div>
-                        <div style="font-size:1.1rem;font-weight:700;color:#f1f5f9">Create Account</div>
-                        <div style="font-size:0.78rem;color:#64748b">Manually create a new user account</div>
-                    </div>
-                </div>
-                <div id="createError" style="display:none;padding:8px 12px;border-radius:8px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#f87171;font-size:0.8rem;margin-bottom:12px;"></div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-                    <div>
-                        <label style="display:block;font-size:0.72rem;font-weight:600;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Full Name *</label>
-                        <input type="text" id="createName" placeholder="John Doe" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.85rem;font-family:inherit;box-sizing:border-box;" aria-label="John Doe">
-                    </div>
-                    <div>
-                        <label style="display:block;font-size:0.72rem;font-weight:600;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Role</label>
-                        <select id="createRole" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.85rem;font-family:inherit;box-sizing:border-box;" aria-label="Create Role">
-                            <option value="User">User</option>
-                            <option value="Admin">Admin</option>
-                        </select>
-                    </div>
-                </div>
-                <div style="margin-bottom:12px">
-                    <label style="display:block;font-size:0.72rem;font-weight:600;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Email Address *</label>
-                    <input type="email" id="createEmail" placeholder="user@example.com" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.85rem;font-family:inherit;box-sizing:border-box;" aria-label="user@example.com">
-                </div>
-                <div style="margin-bottom:12px">
-                    <label style="display:block;font-size:0.72rem;font-weight:600;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Password *</label>
-                    <div style="position:relative">
-                        <input type="password" id="createPassword" placeholder="Min 6 characters" style="width:100%;padding:10px 14px;padding-right:40px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.85rem;font-family:inherit;box-sizing:border-box;" aria-label="Min 6 characters">
-                        <button onclick="toggleCreatePw()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:none;border:none;color:#64748b;cursor:pointer;font-size:0.85rem;padding:4px"><i class="fas fa-eye" id="createPwIcon"></i></button>
-                    </div>
-                </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-                    <div>
-                        <label style="display:block;font-size:0.72rem;font-weight:600;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Access Tier *</label>
-                        <select id="createTier" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.85rem;font-family:inherit;box-sizing:border-box;" aria-label="Create Tier">
-                            <option value="free" selected>Free</option>
-                            <option value="pro">Full access</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label style="display:block;font-size:0.72rem;font-weight:600;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Company</label>
-                        <input type="text" id="createCompany" placeholder="Optional" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.85rem;font-family:inherit;box-sizing:border-box;" aria-label="Optional">
-                    </div>
-                </div>
-                <div style="margin-bottom:20px">
-                    <label style="display:block;font-size:0.72rem;font-weight:600;color:#94a3b8;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">Country</label>
-                    <select id="createCountry" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:0.85rem;font-family:inherit;box-sizing:border-box;" aria-label="Create Country">
-                        <option value="Indonesia">Indonesia</option>
-                        <option value="Singapore">Singapore</option>
-                        <option value="Malaysia">Malaysia</option>
-                        <option value="Thailand">Thailand</option>
-                        <option value="Philippines">Philippines</option>
-                        <option value="Vietnam">Vietnam</option>
-                        <option value="India">India</option>
-                        <option value="Japan">Japan</option>
-                        <option value="Korea">Korea</option>
-                        <option value="UAE">UAE</option>
-                        <option value="US">US</option>
-                        <option value="UK">UK</option>
-                        <option value="Germany">Germany</option>
-                        <option value="Australia">Australia</option>
-                        <option value="Canada">Canada</option>
-                        <option value="Brazil">Brazil</option>
-                    </select>
-                </div>
-                <div style="display:flex;gap:0.75rem">
-                    <button onclick="submitCreateAccount()" style="flex:1;padding:12px;border:none;border-radius:10px;background:linear-gradient(135deg,#64748b,#64748b);color:#fff;font-size:0.9rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.3s;">
-                        <i class="fas fa-plus"></i> Create Account
-                    </button>
-                    <button onclick="closeCreateModal()" style="padding:12px 20px;border:1px solid rgba(255,255,255,0.15);border-radius:10px;background:transparent;color:#94a3b8;font-size:0.9rem;cursor:pointer;font-family:inherit;transition:all 0.2s;">
-                        Cancel
-                    </button>
-                </div>
-            </div>
-            <div id="createSuccess" style="display:none;text-align:center;padding:20px 0;">
-                <i class="fas fa-check-circle" style="font-size:2.5rem;color:#10b981;margin-bottom:10px;display:block;"></i>
-                <p style="color:#f1f5f9;font-weight:600;margin:4px 0;" id="createSuccessMsg">Account Created!</p>
-                <small style="color:#64748b;font-size:0.8rem;">The account is now active and can log in immediately.</small>
-            </div>
-        </div>
-    </div>
 
     <!-- Add User V2 Modal (R-015 Phase 4) -->
     <div class="modal-overlay" id="addUserModalV2">
@@ -2541,13 +2393,12 @@ function showSection(id){
     document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
     document.getElementById('sec-'+id).classList.add('active');
     document.querySelectorAll('.nav-item').forEach(n=>{n.classList.toggle('active',n.dataset.section===id)});
-    const titles={dashboard:'Dashboard',revenue:'Revenue Analytics',mayar:'Mayar Payments',activity:'User Activity',users:'User Management',credentials:'Account Credentials',features:'Feature Flags',tiers:'Tier Manager',subscribers:'Newsletter Subscribers',benchmarks:'DC Industry Intelligence',audit:'Audit Log',settings:'System Settings','stock-investment':'Stock Investment','finance-terminal':'Finance Terminal','idr-stocks':'IDR Stocks'};
+    const titles={dashboard:'Dashboard',revenue:'Revenue Analytics',mayar:'Mayar Payments',activity:'User Activity',users:'User Management',features:'Feature Flags',tiers:'Tier Manager',subscribers:'Newsletter Subscribers',benchmarks:'DC Industry Intelligence',audit:'Audit Log',settings:'System Settings','stock-investment':'Stock Investment','finance-terminal':'Finance Terminal','idr-stocks':'IDR Stocks'};
     if(id==='tiers' && typeof refreshTiersV2==='function' && typeof AUTH_V2!=='undefined' && AUTH_V2) refreshTiersV2();
     if(id==='audit' && typeof refreshAuditV2State==='function') refreshAuditV2State();
     if(id==='mayar'&&typeof renderMayar==='function')renderMayar();
     if(id==='activity'&&typeof renderActivity==='function')renderActivity();
-    if(id==='stock-investment'){var dcaIf=document.getElementById('dca-iframe');var isL=document.body.classList.contains('light-mode');if(dcaIf&&dcaIf.contentWindow){try{dcaIf.contentWindow.postMessage({type:'theme-sync',theme:isL?'light':'dark'},window.location.origin)}catch(e){}}}
-    if(id==='finance-terminal'){var ftIf=document.getElementById('finance-terminal-iframe');var isL2=document.body.classList.contains('light-mode');if(ftIf&&ftIf.contentWindow){try{ftIf.contentWindow.postMessage({type:'theme-sync',theme:isL2?'light':'dark'},window.location.origin)}catch(e){}}}
+    if(id==='stock-investment'||id==='finance-terminal')syncIframesTheme();
     document.getElementById('topbarTitle').textContent=titles[id]||id;
     if(window.innerWidth<768){document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('show')}
 }
@@ -2572,27 +2423,27 @@ function toggleAdminTheme(){
             else{dcMap.removeLayer(mapLightTiles);mapDarkTiles.addTo(dcMap)}
         }catch(e){}
     }
-    // Sync theme to DCA iframe
-    var dcaIframe=document.getElementById('dca-iframe');
-    if(dcaIframe&&dcaIframe.contentWindow){try{dcaIframe.contentWindow.postMessage({type:'theme-sync',theme:isLight?'light':'dark'},window.location.origin)}catch(e){}}
-    // Sync theme to Finance Terminal iframe
-    var ftIframe=document.getElementById('finance-terminal-iframe');
-    if(ftIframe&&ftIframe.contentWindow){try{ftIframe.contentWindow.postMessage({type:'theme-sync',theme:isLight?'light':'dark'},window.location.origin)}catch(e){}}
+    syncIframesTheme();
+}
+// Post the current theme to the embedded personal apps (DCA + Finance Terminal).
+function syncIframesTheme(){
+    var theme=document.body.classList.contains('light-mode')?'light':'dark';
+    ['dca-iframe','finance-terminal-iframe'].forEach(function(id){
+        var f=document.getElementById(id);
+        if(f&&f.contentWindow){try{f.contentWindow.postMessage({type:'theme-sync',theme:theme},window.location.origin)}catch(e){}}
+    });
 }
 
-// Clock
-setInterval(()=>{document.getElementById('topbarTime').textContent=new Date().toLocaleString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false})+' UTC+7'},1000);
+// Clock — started by initConsole() after a root login, never on the login screen.
+function startClock(){
+    var el=document.getElementById('topbarTime');
+    function tick(){el.textContent=new Date().toLocaleString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false})+' UTC+7'}
+    tick();setInterval(tick,1000);
+}
 
 // ═══════════════════════════════════════════════════════════════
 // DATA
 // ═══════════════════════════════════════════════════════════════
-const CREDENTIALS = [
-    {name:'Bagus Dwi Permana',email:'bagus@resistancezero.com',password:'[redacted]',tier:'pro',role:'Owner',color:'#64748b'},
-    {name:'Admin RZ',email:'admin@resistancezero.com',password:'[redacted]',tier:'pro',role:'Admin',color:'#64748b'},
-    {name:'Demo Pro User',email:'demo@resistancezero.com',password:'[redacted]',tier:'pro',role:'User',color:'#64748b'},
-    {name:'Educator User',email:'educator@resistancezero.com',password:'[redacted]',tier:'pro',role:'Educator',color:'#0891b2'}
-];
-
 // Feature flags state (persisted in localStorage)
 const DEFAULT_FEATURES = {
     advanced_mode:    {label:'Advanced Mode',icon:'fa-cogs',desc:'Extended input parameters',free:false,pro:true},
@@ -2611,298 +2462,244 @@ const DEFAULT_FEATURES = {
 
 let featureFlags = JSON.parse(localStorage.getItem('rz_admin_features')||'null') || JSON.parse(JSON.stringify(DEFAULT_FEATURES));
 
-const FIRST_NAMES=['James','Emma','Liam','Olivia','Noah','Ava','William','Sophia','Mason','Isabella','Lucas','Mia','Ethan','Charlotte','Alexander','Amelia','Daniel','Harper','Michael','Evelyn','David','Abigail','Joseph','Emily','Samuel','Elizabeth','Henry','Sofia','Sebastian','Victoria','Andrew','Grace','Joshua','Chloe','Nathan','Zoey','Ryan','Lily','Benjamin','Hannah','Kevin','Aria','Brandon','Riley','Tyler','Nora','Dylan','Ella','Matthew','Scarlett'];
-const LAST_NAMES=['Chen','Smith','Patel','Williams','Garcia','Johnson','Kim','Brown','Lee','Davis','Miller','Wilson','Tanaka','Rodriguez','Martinez','Anderson','Thomas','Taylor','Moore','Jackson'];
-const DOMAINS=['gmail.com','outlook.com','yahoo.com','protonmail.com','company.io','engineering.co','datacenter.net','techops.com','infra.dev','icloud.com'];
-const STATUSES=['active','active','active','active','inactive','inactive','suspended'];
-
-function rand(min,max){return Math.floor(Math.random()*(max-min+1))+min}
-function randDate(s,e){return new Date(s.getTime()+Math.random()*(e.getTime()-s.getTime()))}
 function fmtDate(d){return d.toISOString().split('T')[0]}
 function fmtDT(d){return d.toISOString().replace('T',' ').substring(0,16)}
 
+// ═══════════════════════════════════════════════════════════════
+// DATA — real rows only. Accounts = Supabase `profiles` (root reads all rows under RLS),
+// events = `audit_log` (written by rz-scenario.js for signed-in users). Nothing is generated.
+// ═══════════════════════════════════════════════════════════════
 let allUsers=[], filteredUsers=[], activities=[];
-let currentPage=1, PAGE_SIZE=10, sortField='lastLogin', sortDir='desc';
-let allPasswordsVisible=false;
+let currentPage=1, PAGE_SIZE=10, sortField='registered', sortDir='desc';
+var opsState={profiles:'loading',profilesError:'',audit:'loading',auditError:''};
+var _charts={};
+var TIER_ORDER=['free','demo','pro','root'];
 
-function generateUsers(){
-    const u=[];
-    // Real accounts
-    u.push({id:'usr_001',name:'Bagus Dwi Permana',email:'bagus@resistancezero.com',password:'[redacted]',tier:'pro',status:'active',registered:'2025-06-15',lastLogin:'2026-02-15 09:30',usage:247,lastPayment:'—',amountPaid:0,role:'Owner',company:'ResistanceZero',country:'Indonesia'});
-    u.push({id:'usr_002',name:'Admin RZ',email:'admin@resistancezero.com',password:'[redacted]',tier:'pro',status:'active',registered:'2025-06-15',lastLogin:'2026-02-14 18:45',usage:182,lastPayment:'—',amountPaid:0,role:'Admin',company:'ResistanceZero',country:'Indonesia'});
-    u.push({id:'usr_003',name:'Demo Pro User',email:'demo@resistancezero.com',password:'[redacted]',tier:'pro',status:'active',registered:'2025-08-20',lastLogin:'2026-02-13 14:20',usage:95,lastPayment:'—',amountPaid:0,role:'User',company:'—',country:'Singapore'});
-    u.push({id:'usr_004',name:'Educator User',email:'educator@resistancezero.com',password:'[redacted]',tier:'pro',status:'active',registered:'2026-05-19',lastLogin:'2026-05-22 03:30',usage:0,lastPayment:'—',amountPaid:0,role:'Educator',company:'—',country:'—'});
-    // Random users
-    for(let i=0;i<35;i++){
-        const fn=FIRST_NAMES[i],ln=LAST_NAMES[i%LAST_NAMES.length];
-        const dm=DOMAINS[rand(0,DOMAINS.length-1)];
-        const em=fn.toLowerCase()+'.'+ln.toLowerCase()+'@'+dm;
-        const tr=Math.random();
-        const tier=tr<0.15?'pro':'free';
-        const st=STATUSES[rand(0,STATUSES.length-1)];
-        const rd=randDate(new Date('2025-07-01'),new Date('2026-02-10'));
-        const ld=randDate(rd,new Date('2026-02-15'));
-        const hp=tier==='pro';
-        const pd=hp?randDate(new Date('2026-01-01'),new Date('2026-02-15')):null;
-        const countries=['US','UK','Germany','Singapore','Japan','India','UAE','Australia','Canada','Brazil','Indonesia','Malaysia'];
-        u.push({id:`usr_${String(i+16).padStart(3,'0')}`,name:fn+' '+ln,email:em,password:tier==='free'?'—':'assigned',tier,status:st,registered:fmtDate(rd),lastLogin:fmtDT(ld),usage:rand(1,150),lastPayment:pd?fmtDate(pd):null,amountPaid:hp?49:0,role:'User',company:['Acme Corp','TechData','CloudFirst','DataVault','NetSys','FreeLance'][rand(0,5)],country:countries[rand(0,countries.length-1)]});
-    }
-    return u;
+function profileToUser(p){
+    var email=String(p.email||'');
+    return {id:String(p.id||''),email:email,name:p.display_name?String(p.display_name):(email.split('@')[0]||'—'),
+        tier:String(p.tier||'free'),created_at:String(p.created_at||''),registered:p.created_at?String(p.created_at).slice(0,10):'—'};
+}
+function auditToActivity(a,byId){
+    var u=byId[a.actor_id];
+    var meta=a.meta&&typeof a.meta==='object'?a.meta:{};
+    var detail=[a.target_type,meta.calc,meta.format].filter(Boolean).join(' · ');
+    var t=a.created_at?new Date(a.created_at):null;
+    return {id:a.id,actorId:a.actor_id||'',email:u?u.email:String(a.actor_id||'(unknown)'),name:u?u.name:'',type:String(a.action||''),
+        ts:t?t.getTime():0,time:t&&!isNaN(t)?fmtDT(t):'—',detail:detail};
+}
+function setStatusLine(id,msg,state){
+    var el=document.getElementById(id);if(!el)return;
+    var st=SUPA_STATE[state]||SUPA_STATE.info;
+    el.style.borderLeftColor=st.c;
+    el.innerHTML='<i class="fas '+st.i+'" style="color:'+st.c+'"></i><span></span>';
+    el.querySelector('span').textContent=msg;
+}
+// UTC month keys (YYYY-MM) for the last n months, oldest first.
+function lastMonths(n){
+    var now=new Date(),out=[];
+    for(var i=n-1;i>=0;i--){out.push(new Date(Date.UTC(now.getUTCFullYear(),now.getUTCMonth()-i,1)).toISOString().slice(0,7))}
+    return out;
+}
+function signupsByMonth(months){
+    return months.map(function(m){return allUsers.filter(function(u){return u.created_at.slice(0,7)===m}).length});
+}
+function recentActivities(days){
+    var from=Date.now()-days*864e5;
+    return activities.filter(function(a){return a.ts>=from});
+}
+function drawChart(id,cfg){
+    if(_charts[id]){try{_charts[id].destroy()}catch(e){}}
+    var el=document.getElementById(id);
+    _charts[id]=el?new Chart(el,cfg):null;
 }
 
-function generateActivities(){
-    const types=['login','logout','calculation','pdf','tier_change','feature_toggle'];
-    const acts=[];
-    const now=new Date('2026-02-15T12:00:00');
-    for(let i=0;i<40;i++){
-        const usr=allUsers[rand(0,allUsers.length-1)];
-        const type=types[rand(0,types.length-1)];
-        const time=new Date(now.getTime()-i*(rand(600000,3600000)));
-        const details={login:'Logged in via web',logout:'Logged out',calculation:'Ran CAPEX calculation ('+rand(1,100)+'MW)',pdf:'Exported PDF report',tier_change:'Tier changed to '+['Pro','Free'][rand(0,1)],feature_toggle:'Toggled feature flag'};
-        acts.push({email:usr.email,name:usr.name,type,time:fmtDT(time),detail:details[type]||''});
+// Load profiles + audit log, then render every view that reads them.
+async function loadOpsData(){
+    var S=window.rzSupa;
+    opsState={profiles:'loading',profilesError:'',audit:'loading',auditError:''};
+    renderDashboard();renderTable();
+    setStatusLine('supaAccountsStatus','Loading accounts from Supabase…','loading');
+    if(!S||!S.configured){
+        opsState.profiles=opsState.audit='error';
+        opsState.profilesError=opsState.auditError='Supabase is not configured on this page.';
+    } else {
+        var res=await Promise.all([
+            S.listAllProfiles().catch(function(e){return {data:[],error:(e&&e.message)||String(e)}}),
+            (S.listAuditLog?S.listAuditLog(500):Promise.resolve({data:[],error:'listAuditLog is not available'})).catch(function(e){return {data:[],error:(e&&e.message)||String(e)}})
+        ]);
+        if(res[0].error){opsState.profiles='error';opsState.profilesError=String(res[0].error);allUsers=[];}
+        else{opsState.profiles='ok';allUsers=(res[0].data||[]).map(profileToUser);}
+        var byId={};allUsers.forEach(function(u){byId[u.id]=u});
+        window.__supaRows={};(res[0].data||[]).forEach(function(p){window.__supaRows[p.id]=p});
+        if(res[1].error){opsState.audit='error';opsState.auditError=String(res[1].error);activities=[];}
+        else{opsState.audit='ok';activities=(res[1].data||[]).map(function(a){return auditToActivity(a,byId)});}
     }
-    return acts;
+    filteredUsers=allUsers.slice();
+    filterUsers();
+    renderDashboard();
+    renderAudit();
+    renderFeatures();
+    renderSettings();
+    if(opsState.profiles==='error')setStatusLine('supaAccountsStatus','Supabase error reading profiles: '+opsState.profilesError,'err');
+    else setStatusLine('supaAccountsStatus',allUsers.length+(allUsers.length===1?' account':' accounts')+' in Supabase. Change a tier in the table; reset or delete with the row buttons.','ok');
 }
 
 // ═══════════════════════════════════════════════════════════════
 // DASHBOARD
 // ═══════════════════════════════════════════════════════════════
+function renderDashboard(){
+    var grid=document.getElementById('kpiGrid');
+    if(opsState.profiles==='loading'){
+        setStatusLine('dashStatus','Loading profiles and audit log from Supabase…','loading');
+        grid.innerHTML=['Total Users','Full access Users','Sign-ups This Month','Root Accounts'].map(function(l){
+            return '<div class="kpi"><div class="kpi-label">'+l+'</div><div class="kpi-val" style="color:#475569">…</div></div>'}).join('');
+        return;
+    }
+    if(opsState.profiles==='error'){
+        setStatusLine('dashStatus','Supabase error reading profiles: '+opsState.profilesError+'. No account numbers are shown.','err');
+        grid.innerHTML='';
+        ['chartGrowth','chartTier'].forEach(function(id){drawChart(id,{type:'bar',data:{labels:[],datasets:[]}})});
+        document.getElementById('navUserCount').textContent='!';
+    } else {
+        var auditMsg=opsState.audit==='error'?' Audit log failed: '+opsState.auditError+'.':' '+activities.length+' audit_log rows read (newest 500 max).';
+        setStatusLine('dashStatus',allUsers.length+' profiles read from Supabase.'+auditMsg,opsState.audit==='error'?'warn':'ok');
+        renderKPIs();
+        renderAccountCharts();
+    }
+    renderEventStats();
+}
 function renderKPIs(){
-    const total=allUsers.length,active=allUsers.filter(u=>u.status==='active').length;
-    const pro=allUsers.filter(u=>u.tier==='pro').length;
-    const revenue=pro*49;
-    const kpis=[
-        {icon:'fa-users',bg:'rgba(96,165,250,0.15)',color:'#60a5fa',label:'Total Users',val:total,sub:`+${((total/42-1)*100).toFixed(0)}% from last month`,cls:'up'},
-        {icon:'fa-user-check',bg:'rgba(52,211,153,0.15)',color:'#34d399',label:'Active Users',val:active,sub:`${((active/total)*100).toFixed(1)}% active rate`,cls:'up'},
-        {icon:'fa-crown',bg:'rgba(148, 163, 184,0.15)',color:'#94a3b8',label:'Pro Users',val:pro,sub:`${(pro/total*100).toFixed(1)}% conversion`,cls:'up'},
-        {icon:'fa-dollar-sign',bg:'rgba(251,191,36,0.15)',color:'#fbbf24',label:'Monthly Revenue',val:'$'+revenue.toLocaleString(),sub:'2.1% churn rate',cls:'down'}
+    var total=allUsers.length;
+    var count=function(t){return allUsers.filter(function(u){return u.tier===t}).length};
+    var months=lastMonths(2), sm=signupsByMonth(months), thisM=sm[1], prevM=sm[0], delta=thisM-prevM;
+    var deltaTxt=(delta>0?'+':delta<0?'−':'±')+Math.abs(delta)+' vs last month ('+prevM+')';
+    var pct=function(n){return total?(n/total*100).toFixed(1)+'% of accounts':'no accounts'};
+    var kpis=[
+        {label:'Total Users',val:total,sub:'profiles rows',cls:'neutral'},
+        {label:'Full access Users',val:count('pro'),sub:pct(count('pro')),cls:'neutral'},
+        {label:'Sign-ups This Month',val:thisM,sub:deltaTxt,cls:delta>0?'up':delta<0?'down':'neutral'},
+        {label:'Root Accounts',val:count('root'),sub:'admin access',cls:'neutral'}
     ];
-    document.getElementById('kpiGrid').innerHTML=kpis.map(k=>`
-        <div class="kpi"><div class="kpi-icon" style="background:${k.bg};color:${k.color}"><i class="fas ${k.icon}"></i></div>
-        <div class="kpi-label">${k.label}</div><div class="kpi-val">${k.val}</div>
-        <span class="kpi-sub ${k.cls}"><i class="fas fa-arrow-${k.cls==='up'?'up':'down'}"></i> ${k.sub}</span></div>`).join('');
+    document.getElementById('kpiGrid').innerHTML=kpis.map(function(k){
+        return '<div class="kpi"><div class="kpi-label">'+rzEsc(k.label)+'</div><div class="kpi-val">'+rzEsc(k.val)+'</div>'+
+        '<span class="kpi-sub '+k.cls+'">'+rzEsc(k.sub)+'</span></div>'}).join('');
     document.getElementById('navUserCount').textContent=total;
 }
-
-function renderDashboardCharts(){
-    const actCount=allUsers.filter(u=>u.status==='active').length;
-    // Quick stats
-    const totalCalcs=allUsers.reduce((sum,u)=>sum+u.usage,0);
-    document.getElementById('totalCalcs').textContent=totalCalcs.toLocaleString();
-    document.getElementById('activeSessions').textContent=rand(3,12);
-    // Growth
-    new Chart(document.getElementById('chartGrowth'),{type:'line',data:{labels:['Sep 25','Oct 25','Nov 25','Dec 25','Jan 26','Feb 26'],datasets:[
-        {label:'Total',data:[12,18,24,31,42,allUsers.length],borderColor:'#64748b',backgroundColor:'rgba(100, 116, 139,0.08)',fill:true,tension:0.4,pointRadius:4,borderWidth:2},
-        {label:'Active',data:[8,14,19,25,35,actCount],borderColor:'#34d399',backgroundColor:'rgba(52,211,153,0.05)',fill:true,tension:0.4,pointRadius:4,borderWidth:2}
-    ]},options:{responsive:true,plugins:{legend:{labels:{color:'#94a3b8',font:{size:10}}}},scales:{x:{ticks:{color:'#475569',font:{size:9}},grid:{color:'rgba(51,65,85,0.2)'}},y:{ticks:{color:'#475569',font:{size:9}},grid:{color:'rgba(51,65,85,0.2)'},beginAtZero:true}}}});
-    // Tier dist
-    const pc=allUsers.filter(u=>u.tier==='pro').length,fc=allUsers.filter(u=>u.tier==='free').length;
-    new Chart(document.getElementById('chartTier'),{type:'doughnut',data:{labels:['Pro','Free'],datasets:[{data:[pc,fc],backgroundColor:['#64748b','#475569'],borderColor:'#1e293b',borderWidth:3}]},options:{responsive:true,cutout:'65%',plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:10},padding:14,usePointStyle:true}}}}});
-    // Usage by hour
-    const hours=Array.from({length:24},(_,i)=>i);
-    const hourData=hours.map(()=>rand(2,45));
-    new Chart(document.getElementById('chartUsageHour'),{type:'bar',data:{labels:hours.map(h=>h+':00'),datasets:[{label:'Calculations',data:hourData,backgroundColor:'rgba(96,165,250,0.4)',borderColor:'#60a5fa',borderWidth:1,borderRadius:3}]},options:{responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#475569',font:{size:8}},grid:{display:false}},y:{ticks:{color:'#475569',font:{size:9}},grid:{color:'rgba(51,65,85,0.2)'},beginAtZero:true}}}});
-    // Funnel
-    new Chart(document.getElementById('chartFunnel'),{type:'bar',data:{labels:['Visitors','Signed Up','Active','Pro'],datasets:[{data:[1200,allUsers.length,actCount,pc],backgroundColor:['#475569','#60a5fa','#34d399','#64748b'],borderRadius:6}]},options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}},scales:{x:{ticks:{color:'#475569',font:{size:9}},grid:{color:'rgba(51,65,85,0.2)'}},y:{ticks:{color:'#e2e8f0',font:{size:10}},grid:{display:false}}}}});
-    // Geo Distribution
-    var countries={};
-    allUsers.forEach(function(u){countries[u.country]=(countries[u.country]||0)+1});
-    var sortedCountries=Object.entries(countries).sort(function(a,b){return b[1]-a[1]});
-    new Chart(document.getElementById('chartGeo'),{type:'bar',data:{
-        labels:sortedCountries.map(function(c){return c[0]}),
-        datasets:[{label:'Users',data:sortedCountries.map(function(c){return c[1]}),
-        backgroundColor:'rgba(100, 116, 139,0.4)',borderColor:'#64748b',borderWidth:1,borderRadius:4}]
-    },options:{indexAxis:'y',responsive:true,plugins:{legend:{display:false}},
-        scales:{x:{ticks:{color:'#475569',font:{size:9}},grid:{color:'rgba(51,65,85,0.2)'}},
-        y:{ticks:{color:'#e2e8f0',font:{size:9}},grid:{display:false}}}}});
-    // Dashboard recent activity
-    var dashAct=document.getElementById('dashActivity');
-    if(dashAct){
-        var icons={login:'fa-sign-in-alt',logout:'fa-sign-out-alt',calculation:'fa-calculator',pdf:'fa-file-pdf',tier_change:'fa-exchange-alt',feature_toggle:'fa-toggle-on'};
-        dashAct.innerHTML=activities.slice(0,8).map(function(a){return '<div class="tl-item '+a.type+'"><div class="tl-icon '+a.type+'"><i class="fas '+(icons[a.type]||'fa-circle')+'"></i></div>'+
-            '<div><div class="tl-text"><strong>'+a.name+'</strong> — '+a.detail+'</div><div class="tl-time">'+a.time+'</div></div></div>'
-        }).join('');
+var CHART_AXES={x:{ticks:{color:'#475569',font:{size:9}},grid:{color:'rgba(51,65,85,0.2)'}},y:{ticks:{color:'#475569',font:{size:9},precision:0},grid:{color:'rgba(51,65,85,0.2)'},beginAtZero:true}};
+function renderAccountCharts(){
+    var months=lastMonths(6);
+    var fresh=signupsByMonth(months);
+    var totals=months.map(function(m){return allUsers.filter(function(u){return u.created_at&&u.created_at.slice(0,7)<=m}).length});
+    var labels=months.map(function(m){var d=new Date(m+'-01T00:00:00Z');return d.toLocaleString('en-US',{month:'short',timeZone:'UTC'})+' '+m.slice(2,4)});
+    drawChart('chartGrowth',{type:'line',data:{labels:labels,datasets:[
+        {label:'Total accounts',data:totals,borderColor:'#64748b',backgroundColor:'rgba(100,116,139,0.08)',fill:true,tension:0,pointRadius:3,borderWidth:1.5},
+        {label:'New sign-ups',data:fresh,borderColor:'#34d399',backgroundColor:'rgba(52,211,153,0.05)',fill:false,tension:0,pointRadius:3,borderWidth:1.5}
+    ]},options:{responsive:true,animation:false,plugins:{legend:{labels:{color:'#94a3b8',font:{size:10}}}},scales:CHART_AXES}});
+    var tiers=TIER_ORDER.filter(function(t){return allUsers.some(function(u){return u.tier===t})});
+    allUsers.forEach(function(u){if(tiers.indexOf(u.tier)<0)tiers.push(u.tier)});
+    drawChart('chartTier',{type:'doughnut',data:{labels:tiers,datasets:[{data:tiers.map(function(t){return allUsers.filter(function(u){return u.tier===t}).length}),
+        backgroundColor:['#475569','#0891b2','#64748b','#f87171','#94a3b8'],borderColor:'#1e293b',borderWidth:2}]},
+        options:{responsive:true,animation:false,cutout:'65%',plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:10},padding:14,usePointStyle:true}}}}});
+}
+function renderEventStats(){
+    var ids=['statPdf','statSaved','statEvents','statActors'];
+    var feed=document.getElementById('dashActivity');
+    if(opsState.audit!=='ok'){
+        var t=opsState.audit==='loading'?'…':'—';
+        ids.forEach(function(id){document.getElementById(id).textContent=t});
+        if(feed){feed.innerHTML='<div style="color:#64748b;font-size:0.78rem;padding:0.75rem"></div>';
+            feed.firstChild.textContent=opsState.audit==='loading'?'Loading audit log…':'Supabase error reading audit_log: '+opsState.auditError;}
+        return;
+    }
+    var rec=recentActivities(30);
+    document.getElementById('statPdf').textContent=rec.filter(function(a){return a.type==='pdf_exported'}).length;
+    document.getElementById('statSaved').textContent=rec.filter(function(a){return a.type==='scenario_saved'}).length;
+    document.getElementById('statEvents').textContent=rec.length;
+    document.getElementById('statActors').textContent=new Set(rec.map(function(a){return a.actorId})).size;
+    var hours=Array.from({length:24},function(_,i){return i});
+    var byHour=hours.map(function(h){return rec.filter(function(a){return new Date(a.ts).getHours()===h}).length});
+    drawChart('chartUsageHour',{type:'bar',data:{labels:hours.map(function(h){return h+':00'}),datasets:[{label:'Events',data:byHour,backgroundColor:'rgba(96,165,250,0.4)',borderColor:'#60a5fa',borderWidth:1,borderRadius:2}]},
+        options:{responsive:true,animation:false,plugins:{legend:{display:false}},scales:CHART_AXES}});
+    var byAction={};rec.forEach(function(a){byAction[a.type]=(byAction[a.type]||0)+1});
+    var acts=Object.keys(byAction).sort(function(a,b){return byAction[b]-byAction[a]});
+    drawChart('chartActions',{type:'bar',data:{labels:acts,datasets:[{data:acts.map(function(k){return byAction[k]}),backgroundColor:'#64748b',borderRadius:2}]},
+        options:{indexAxis:'y',responsive:true,animation:false,plugins:{legend:{display:false}},scales:CHART_AXES}});
+    if(feed){
+        feed.innerHTML=activities.length?activities.slice(0,8).map(activityItemHtml).join(''):
+            '<div style="color:#64748b;font-size:0.78rem;padding:0.75rem">No rows in audit_log yet.</div>';
     }
 }
-
-// ═══════════════════════════════════════════════════════════════
-// REVENUE
-// ═══════════════════════════════════════════════════════════════
-function renderRevenue(){
-    const pro=allUsers.filter(u=>u.tier==='pro').length;
-    const mrr=pro*49, arr=mrr*12, ltv=49*14.2;
-    const kpis=[
-        {icon:'fa-receipt',bg:'rgba(52,211,153,0.15)',color:'#34d399',label:'MRR',val:'$'+mrr.toLocaleString(),sub:'Monthly Recurring Revenue',cls:'up'},
-        {icon:'fa-calendar-alt',bg:'rgba(96,165,250,0.15)',color:'#60a5fa',label:'ARR',val:'$'+(arr).toLocaleString(),sub:'Annual Recurring Revenue',cls:'up'},
-        {icon:'fa-gem',bg:'rgba(148, 163, 184,0.15)',color:'#94a3b8',label:'Avg LTV',val:'$'+ltv.toFixed(0),sub:'Avg 14.2 month retention',cls:'neutral'},
-        {icon:'fa-user-minus',bg:'rgba(248,113,113,0.15)',color:'#f87171',label:'Churn Rate',val:'2.1%',sub:'Last 30 days',cls:'down'}
-    ];
-    document.getElementById('revenueKpis').innerHTML=kpis.map(k=>`
-        <div class="kpi"><div class="kpi-icon" style="background:${k.bg};color:${k.color}"><i class="fas ${k.icon}"></i></div>
-        <div class="kpi-label">${k.label}</div><div class="kpi-val">${k.val}</div>
-        <span class="kpi-sub ${k.cls}"><i class="fas fa-arrow-${k.cls==='up'?'up':k.cls==='down'?'down':'right'}"></i> ${k.sub}</span></div>`).join('');
-    // MRR chart
-    new Chart(document.getElementById('chartMRR'),{type:'line',data:{labels:['Sep 25','Oct 25','Nov 25','Dec 25','Jan 26','Feb 26'],datasets:[{label:'MRR ($)',data:[98,147,196,245,343,mrr],borderColor:'#34d399',backgroundColor:'rgba(52,211,153,0.1)',fill:true,tension:0.4,pointRadius:4,borderWidth:2}]},options:{responsive:true,plugins:{legend:{labels:{color:'#94a3b8',font:{size:10}}}},scales:{x:{ticks:{color:'#475569',font:{size:9}},grid:{color:'rgba(51,65,85,0.2)'}},y:{ticks:{color:'#475569',font:{size:9},callback:v=>'$'+v},grid:{color:'rgba(51,65,85,0.2)'},beginAtZero:true}}}});
-    // Churn chart
-    new Chart(document.getElementById('chartChurn'),{type:'doughnut',data:{labels:['Retained','Churned'],datasets:[{data:[97.9,2.1],backgroundColor:['#34d399','#f87171'],borderColor:'#1e293b',borderWidth:3}]},options:{responsive:true,cutout:'70%',plugins:{legend:{position:'bottom',labels:{color:'#94a3b8',font:{size:10},padding:14,usePointStyle:true}}}}});
-    // Revenue table
-    const payingUsers=allUsers.filter(u=>u.tier==='pro').sort((a,b)=>b.amountPaid-a.amountPaid);
-    document.getElementById('revenueTableWrap').innerHTML=`<table class="data-tbl"><thead><tr><th scope="col">Account</th><th scope="col">Tier</th><th scope="col">Last Payment</th><th scope="col">Amount</th><th scope="col">Est. LTV</th></tr></thead><tbody>${payingUsers.map(u=>`<tr><td style="font-weight:500">${u.name}<br><span style="font-size:0.7rem;color:#64748b">${u.email}</span></td><td><span class="tier-badge pro">FULL</span></td><td>${u.lastPayment||'—'}</td><td style="color:#34d399;font-weight:600">$${u.amountPaid.toFixed(2)}</td><td style="color:#fbbf24">$${(u.amountPaid*rand(6,18)).toFixed(0)}</td></tr>`).join('')}</tbody></table>`;
+function activityItemHtml(a){
+    return '<div class="tl-item"><div class="tl-icon"><i class="fas fa-circle"></i></div>'+
+        '<div><div class="tl-text"><strong>'+rzEsc(a.name||a.email)+'</strong> — '+rzEsc(a.type)+(a.detail?' ('+rzEsc(a.detail)+')':'')+'</div>'+
+        '<div class="tl-time">'+rzEsc(a.time)+' · '+rzEsc(a.email)+'</div></div></div>';
 }
 
 // ═══════════════════════════════════════════════════════════════
-// USERS
+// USERS — the real profiles list; tier/reset/delete call the server paths below.
 // ═══════════════════════════════════════════════════════════════
 function filterUsers(){
-    const q=document.getElementById('userSearch').value.toLowerCase();
-    const tf=document.getElementById('tierFilter').value;
-    const sf=document.getElementById('statusFilter').value;
-    filteredUsers=allUsers.filter(u=>{
-        if(q&&!u.email.toLowerCase().includes(q)&&!u.name.toLowerCase().includes(q))return false;
-        if(tf!=='all'){
-            if(tf==='educator'){
-                if(!(u.role && u.role.toLowerCase()==='educator'))return false;
-            } else if(tf==='root'){
-                if(!(u.role && (u.role.toLowerCase()==='owner'||u.role.toLowerCase()==='admin')))return false;
-            } else if(u.tier!==tf){
-                return false;
-            }
-        }
-        if(sf!=='all'&&u.status!==sf)return false;
+    var q=document.getElementById('userSearch').value.toLowerCase();
+    var tf=document.getElementById('tierFilter').value;
+    filteredUsers=allUsers.filter(function(u){
+        if(q&&u.email.toLowerCase().indexOf(q)<0&&u.name.toLowerCase().indexOf(q)<0)return false;
+        if(tf!=='all'&&u.tier!==tf)return false;
         return true;
     });
     currentPage=1;applySort();renderTable();
 }
 function sortTable(f){if(sortField===f)sortDir=sortDir==='asc'?'desc':'asc';else{sortField=f;sortDir='asc'}applySort();renderTable()}
-function applySort(){filteredUsers.sort((a,b)=>{let va=a[sortField]||'',vb=b[sortField]||'';if(sortField==='usage'){va=+va;vb=+vb}if(va<vb)return sortDir==='asc'?-1:1;if(va>vb)return sortDir==='asc'?1:-1;return 0})}
+function applySort(){filteredUsers.sort((a,b)=>{let va=a[sortField]||'',vb=b[sortField]||'';if(va<vb)return sortDir==='asc'?-1:1;if(va>vb)return sortDir==='asc'?1:-1;return 0})}
 function goPage(p){currentPage=p;renderTable()}
 
 function renderTable(){
+    var tb=document.getElementById('userTbody');
+    var info=document.getElementById('pgInfo'),btnsEl=document.getElementById('pgBtns');
+    if(opsState.profiles!=='ok'){
+        tb.innerHTML='<tr><td colspan="6" style="color:#64748b;padding:1rem"></td></tr>';
+        tb.querySelector('td').textContent=opsState.profiles==='loading'?'Loading accounts from Supabase…':'Supabase error reading profiles: '+opsState.profilesError;
+        info.textContent='';btnsEl.innerHTML='';
+        return;
+    }
     const s=(currentPage-1)*PAGE_SIZE,e=s+PAGE_SIZE,pg=filteredUsers.slice(s,e);
-    document.getElementById('userTbody').innerHTML=pg.map(u=>{
-        var roleLc = (u.role||'').toLowerCase();
-        var badgeCls = (roleLc==='educator') ? 'educator' : u.tier;
-        var badgeTxt = (roleLc==='educator') ? 'EDUCATOR' : (u.tier||'').toUpperCase();
-        /* Educator promote/demote action — hidden for root rows.
-           Promote: any non-educator/non-root → educator.
-           Demote: educator → demo. */
-        var eduBtn = '';
-        if (roleLc === 'root') {
-            eduBtn = '';
-        } else if (roleLc === 'educator') {
-            eduBtn = ' <button class="btn btn-ghost btn-sm" onclick="demoteEducator(\''+u.id+'\')" title="Demote to Demo"><i class="fas fa-graduation-cap" style="color:#f87171"></i></button>';
-        } else {
-            eduBtn = ' <button class="btn btn-ghost btn-sm" onclick="promoteEducator(\''+u.id+'\')" title="Promote to Educator"><i class="fas fa-graduation-cap" style="color:#67e8f9"></i></button>';
-        }
-        return `<tr>
-        <td style="font-weight:500">${u.name}</td>
-        <td><span style="font-size:0.75rem">${u.email}</span></td>
-        <td><span class="tier-badge ${badgeCls}">${badgeTxt}</span></td>
-        <td><span class="status-dot ${u.status}">${u.status.charAt(0).toUpperCase()+u.status.slice(1)}</span></td>
-        <td>${u.registered}</td><td>${u.lastLogin}</td><td>${u.usage}</td>
-        <td>${u.lastPayment||'<span style="color:#475569">—</span>'}</td>
-        <td style="white-space:nowrap"><button class="btn btn-ghost btn-sm" onclick="openUserModal('${u.id}')"><i class="fas fa-eye"></i></button> <button class="btn btn-ghost btn-sm" onclick="changeTier('${u.id}')"><i class="fas fa-exchange-alt"></i></button>${eduBtn}</td>
-    </tr>`;
-    }).join('');
+    tb.innerHTML=pg.length?pg.map(function(u){
+        var id=rzEsc(u.id);
+        var sel='<select aria-label="Change tier for '+rzEsc(u.email)+'" onchange="changeSupaTier(\''+id+'\',this.value,this)">'+
+            SUPA_TIERS.map(function(t){return '<option value="'+t+'"'+(t===u.tier?' selected':'')+'>'+t+'</option>'}).join('')+'</select>';
+        return '<tr>'+
+        '<td style="font-weight:500">'+rzEsc(u.name)+'</td>'+
+        '<td><span style="font-size:0.75rem">'+rzEsc(u.email)+'</span></td>'+
+        '<td><span class="tier-badge '+rzEsc(u.tier)+'">'+rzEsc(u.tier.toUpperCase())+'</span></td>'+
+        '<td>'+rzEsc(u.registered)+'</td><td>'+sel+'</td>'+
+        '<td style="white-space:nowrap"><button class="btn btn-ghost btn-sm" title="Details" onclick="openUserModal(\''+id+'\')"><i class="fas fa-eye"></i></button> '+
+        '<button class="btn btn-ghost btn-sm" title="Reset password" onclick="resetSupaPassword(\''+id+'\')"><i class="fas fa-key"></i></button> '+
+        '<button class="btn btn-ghost btn-sm" title="Delete account" onclick="deleteSupaUser(\''+id+'\')" style="color:#fca5a5"><i class="fas fa-trash"></i></button></td>'+
+        '</tr>';
+    }).join(''):'<tr><td colspan="6" style="color:#64748b;padding:1rem">No accounts match.</td></tr>';
     const tot=filteredUsers.length,tp=Math.ceil(tot/PAGE_SIZE);
-    document.getElementById('pgInfo').textContent=`Showing ${s+1}-${Math.min(e,tot)} of ${tot}`;
+    info.textContent=tot?`Showing ${s+1}-${Math.min(e,tot)} of ${tot}`:'0 accounts';
     let btns='';for(let p=1;p<=tp;p++)btns+=`<button class="pg-btn ${p===currentPage?'active':''}" onclick="goPage(${p})">${p}</button>`;
-    document.getElementById('pgBtns').innerHTML=btns;
+    btnsEl.innerHTML=btns;
 }
 
-function changeTier(id){
-    const u=allUsers.find(x=>x.id===id);if(!u)return;
-    const tiers=['free','pro'];
-    const curr=tiers.indexOf(u.tier);
-    const next=tiers[(curr+1)%2];
-    if(!confirm(`Change ${u.email} tier from ${u.tier.toUpperCase()} to ${next.toUpperCase()}?`))return;
-    u.tier=next;
-    if(next==='pro'){u.amountPaid=49;u.lastPayment=fmtDate(new Date())}
-    /* Persist tier change for manual accounts */
-    if(u.isManual){
-        var manuals=getManualAccounts();
-        var ma=manuals.find(a=>a.email===u.email);
-        if(ma){ma.tier=next;saveManualAccounts(manuals)}
-    }
-    activities.unshift({email:adminEmail,name:'Admin',type:'tier_change',time:fmtDT(new Date()),detail:'Changed '+u.email+' tier to '+next.toUpperCase()});
-    filterUsers();
-    renderKPIs();
-    renderCredentials();
-    renderAudit();
-}
-
-/* Educator allowlist mutators — read/write the localStorage array consumed
-   by auth.js loadEducatorEmails(). Fire 'rz-educators-changed' so the
-   same-tab auth widget refreshes immediately; the 'storage' event covers
-   other tabs. */
-function getEducatorAllowlist(){
-    try{
-        var raw=localStorage.getItem('rz_admin_educators');
-        var arr=raw?JSON.parse(raw):[];
-        return Array.isArray(arr)?arr:[];
-    }catch(e){return []}
-}
-function saveEducatorAllowlist(arr){
-    var dedup={},out=[];
-    for(var i=0;i<arr.length;i++){
-        var s=String(arr[i]||'').toLowerCase().trim();
-        if(!s||dedup[s])continue;
-        dedup[s]=1;out.push(s);
-    }
-    localStorage.setItem('rz_admin_educators',JSON.stringify(out));
-    try{window.dispatchEvent(new CustomEvent('rz-educators-changed'))}catch(e){}
-}
-function promoteEducator(id){
-    var u=allUsers.find(x=>x.id===id);if(!u)return;
-    if((u.role||'').toLowerCase()==='root')return;
-    if(!confirm('Promote '+u.email+' to EDUCATOR?'))return;
-    var list=getEducatorAllowlist();
-    list.push(u.email.toLowerCase());
-    saveEducatorAllowlist(list);
-    u.role='educator';
-    activities.unshift({email:adminEmail,name:'Admin',type:'tier_change',time:fmtDT(new Date()),detail:'Promoted '+u.email+' to EDUCATOR'});
-    filterUsers();renderKPIs();renderCredentials();renderAudit();
-}
-function demoteEducator(id){
-    var u=allUsers.find(x=>x.id===id);if(!u)return;
-    if((u.role||'').toLowerCase()!=='educator')return;
-    if(!confirm('Demote '+u.email+' from EDUCATOR to DEMO?'))return;
-    var list=getEducatorAllowlist().filter(function(e){return e!==u.email.toLowerCase()});
-    saveEducatorAllowlist(list);
-    u.role='demo';
-    u.tier='demo';
-    activities.unshift({email:adminEmail,name:'Admin',type:'tier_change',time:fmtDT(new Date()),detail:'Demoted '+u.email+' from EDUCATOR to DEMO'});
-    filterUsers();renderKPIs();renderCredentials();renderAudit();
-}
-
+function csvCell(v){v=String(v==null?'':v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
 function exportCSV(){
-    const h=['Name','Email','Tier','Status','Registered','Last Login','Usage','Last Payment','Amount','Company','Country'];
-    const r=filteredUsers.map(u=>[u.name,u.email,u.tier,u.status,u.registered,u.lastLogin,u.usage,u.lastPayment||'',u.amountPaid,u.company||'',u.country||''].join(','));
+    const h=['Name','Email','Tier','Registered','User ID'];
+    const r=filteredUsers.map(u=>[u.name,u.email,u.tier,u.registered,u.id].map(csvCell).join(','));
     downloadCSV([h.join(','),...r].join('\n'),'rz_users_'+fmtDate(new Date())+'.csv');
 }
 function downloadCSV(csv,fn){const b=new Blob([csv],{type:'text/csv'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=fn;a.click();URL.revokeObjectURL(u)}
 
 // ═══ SECTION CSV EXPORTS ═══
 function exportDashboardCSV(){
-    var pro=allUsers.filter(u=>u.tier==='pro').length;
-    var free=allUsers.filter(u=>u.tier==='free').length;
-    var active=allUsers.filter(u=>u.status==='active').length;
-    var totalCalcs=allUsers.reduce((s,u)=>s+u.usage,0);
-    var csv='Metric,Value\nTotal Users,'+allUsers.length+'\nPro Users,'+pro+'\nFree Users,'+free+'\nActive Users,'+active+'\nTotal Calculations,'+totalCalcs+'\nPDF Exports,234\nSystem Uptime,99.97%\n';
-    csv+='\nUser,Email,Tier,Status,Country,Calculations\n';
-    allUsers.forEach(u=>{csv+='"'+u.name+'","'+u.email+'",'+u.tier+','+u.status+',"'+(u.country||'')+'",'+u.usage+'\n'});
+    if(opsState.profiles!=='ok'){(window.showToast||alert)('Accounts are not loaded — nothing to export.');return}
+    var csv='Metric,Value\nTotal Users,'+allUsers.length+'\n';
+    TIER_ORDER.forEach(function(t){csv+=t+' accounts,'+allUsers.filter(function(u){return u.tier===t}).length+'\n'});
+    if(opsState.audit==='ok'){var rec=recentActivities(30);csv+='audit_log events (30 days),'+rec.length+'\nPDF exports (30 days),'+rec.filter(function(a){return a.type==='pdf_exported'}).length+'\n'}
+    csv+='\nName,Email,Tier,Registered\n';
+    allUsers.forEach(function(u){csv+=[u.name,u.email,u.tier,u.registered].map(csvCell).join(',')+'\n'});
     downloadCSV(csv,'rz_dashboard_'+fmtDate(new Date())+'.csv');
-}
-
-function exportRevenueCSV(){
-    var pro=allUsers.filter(u=>u.tier==='pro').length;
-    var mrr=pro*49;
-    var csv='Metric,Value\nMRR,$'+mrr+'\nARR,$'+(mrr*12)+'\nAvg LTV,$697\nChurn Rate,2.1%\nPro Users,'+pro+'\n';
-    csv+='\nAccount,Email,Tier,Last Payment,Amount Paid,Est LTV\n';
-    allUsers.filter(u=>u.tier==='pro').sort((a,b)=>b.amountPaid-a.amountPaid).forEach(u=>{
-        csv+='"'+u.name+'","'+u.email+'",'+u.tier+','+(u.lastPayment||'')+','+u.amountPaid.toFixed(2)+','+(u.amountPaid*10).toFixed(0)+'\n';
-    });
-    downloadCSV(csv,'rz_revenue_'+fmtDate(new Date())+'.csv');
 }
 
 function exportFeaturesCSV(){
@@ -2965,73 +2762,17 @@ function openReport(section){
     var title='';
     var subtitle='';
 
-    if(section==='dashboard'){
-        title='Dashboard Overview Report';
-        subtitle='Platform metrics and user analytics';
-        var pro=allUsers.filter(u=>u.tier==='pro').length;
-        var free=allUsers.filter(u=>u.tier==='free').length;
-        var active=allUsers.filter(u=>u.status==='active').length;
-        var totalCalcs=allUsers.reduce((s,u)=>s+u.usage,0);
-        var countries={};allUsers.forEach(u=>{countries[u.country]=(countries[u.country]||0)+1});
+    if(section==='dashboard'||section==='users'){
+        if(opsState.profiles!=='ok'){(window.showToast||alert)('Accounts are not loaded — no report.');return}
+        title=section==='dashboard'?'Dashboard Overview Report':'User Management Report';
+        subtitle='Supabase profiles ('+allUsers.length+' accounts)';
         body+='<div class="kpi-row">';
-        body+='<div class="kpi-box"><div class="label">Total Users</div><div class="value">'+allUsers.length+'</div><div class="sub">All accounts</div></div>';
-        body+='<div class="kpi-box"><div class="label">Full access Users</div><div class="value">'+pro+'</div><div class="sub">'+Math.round(pro/allUsers.length*100)+'% of total</div></div>';
-        body+='<div class="kpi-box"><div class="label">Active</div><div class="value">'+active+'</div><div class="sub">'+Math.round(active/allUsers.length*100)+'% active rate</div></div>';
-        body+='<div class="kpi-box"><div class="label">Calculations</div><div class="value">'+totalCalcs.toLocaleString()+'</div><div class="sub">All time</div></div>';
+        TIER_ORDER.forEach(function(t){var c=allUsers.filter(u=>u.tier===t).length;
+            body+='<div class="kpi-box"><div class="label">'+rzEsc(t)+'</div><div class="value">'+c+'</div><div class="sub">'+(allUsers.length?Math.round(c/allUsers.length*100):0)+'% of accounts</div></div>'});
         body+='</div>';
-        body+='<h2>Tier Distribution</h2><div class="stats-grid"><div class="stat-card"><h3>By Tier</h3>';
-        body+='<div class="bar"><span class="bar-label">Full access</span><div style="flex:1;background:#f1f5f9;border-radius:3px;height:6px"><div class="bar-fill" style="width:'+Math.round(pro/allUsers.length*100)+'%"></div></div><span class="bar-val">'+pro+'</span></div>';
-        body+='<div class="bar"><span class="bar-label">Free</span><div style="flex:1;background:#f1f5f9;border-radius:3px;height:6px"><div class="bar-fill" style="width:'+Math.round(free/allUsers.length*100)+'%;background:#64748b"></div></div><span class="bar-val">'+free+'</span></div>';
-        body+='</div><div class="stat-card"><h3>By Status</h3>';
-        ['active','inactive','suspended'].forEach(function(s){var c=allUsers.filter(u=>u.status===s).length;
-            body+='<div class="bar"><span class="bar-label">'+s.charAt(0).toUpperCase()+s.slice(1)+'</span><div style="flex:1;background:#f1f5f9;border-radius:3px;height:6px"><div class="bar-fill" style="width:'+Math.round(c/allUsers.length*100)+'%;background:'+(s==='active'?'#34d399':s==='inactive'?'#fbbf24':'#f87171')+'"></div></div><span class="bar-val">'+c+'</span></div>';
-        });
-        body+='</div></div>';
-        body+='<h2>Geographic Distribution</h2><div class="stat-card" style="margin-bottom:1.5rem"><h3>Top Countries</h3>';
-        Object.entries(countries).sort((a,b)=>b[1]-a[1]).slice(0,10).forEach(function(c){
-            body+='<div class="bar"><span class="bar-label">'+c[0]+'</span><div style="flex:1;background:#f1f5f9;border-radius:3px;height:6px"><div class="bar-fill" style="width:'+Math.round(c[1]/allUsers.length*100)+'%"></div></div><span class="bar-val">'+c[1]+'</span></div>';
-        });
-        body+='</div>';
-        body+='<h2>User List</h2><table><thead><tr><th scope="col">Name</th><th scope="col">Email</th><th scope="col">Tier</th><th scope="col">Status</th><th scope="col">Country</th><th scope="col">Calcs</th></tr></thead><tbody>';
-        allUsers.slice(0,50).forEach(u=>{body+='<tr><td>'+u.name+'</td><td>'+u.email+'</td><td><span class="badge '+u.tier+'">'+u.tier.toUpperCase()+'</span></td><td><span class="badge '+u.status+'">'+u.status+'</span></td><td>'+(u.country||'—')+'</td><td>'+u.usage+'</td></tr>'});
-        body+='</tbody></table>';
-    }
-    else if(section==='revenue'){
-        title='Revenue Analytics Report';
-        subtitle='Subscription revenue, LTV, and financial metrics';
-        var pro=allUsers.filter(u=>u.tier==='pro').length;
-        var mrr=pro*49,arr=mrr*12;
-        body+='<div class="kpi-row">';
-        body+='<div class="kpi-box"><div class="label">MRR</div><div class="value">$'+mrr.toLocaleString()+'</div><div class="sub">Monthly Recurring</div></div>';
-        body+='<div class="kpi-box"><div class="label">ARR</div><div class="value">$'+arr.toLocaleString()+'</div><div class="sub">Annual Recurring</div></div>';
-        body+='<div class="kpi-box"><div class="label">Avg LTV</div><div class="value">$697</div><div class="sub">14.2 mo retention</div></div>';
-        body+='<div class="kpi-box"><div class="label">Churn</div><div class="value">2.1%</div><div class="sub">Last 30 days</div></div>';
-        body+='</div>';
-        body+='<h2>Revenue by Account</h2><table><thead><tr><th scope="col">Name</th><th scope="col">Email</th><th scope="col">Last Payment</th><th scope="col">Amount</th><th scope="col">Est. LTV</th></tr></thead><tbody>';
-        allUsers.filter(u=>u.tier==='pro').sort((a,b)=>b.amountPaid-a.amountPaid).forEach(u=>{
-            body+='<tr><td>'+u.name+'</td><td>'+u.email+'</td><td>'+(u.lastPayment||'—')+'</td><td style="font-weight:600;color:#059669">$'+u.amountPaid.toFixed(2)+'</td><td>$'+(u.amountPaid*10).toFixed(0)+'</td></tr>';
-        });
-        body+='</tbody></table>';
-        body+='<h2>Revenue Growth</h2><div class="stat-card"><h3>MRR Trend (6 Months)</h3>';
-        ['Sep $98','Oct $147','Nov $196','Dec $245','Jan $343','Feb $'+mrr].forEach(function(m){
-            var val=parseInt(m.split('$')[1]);
-            body+='<div class="bar"><span class="bar-label">'+m.split(' ')[0]+'</span><div style="flex:1;background:#f1f5f9;border-radius:3px;height:6px"><div class="bar-fill" style="width:'+Math.round(val/(mrr||1)*100)+'%;background:#34d399"></div></div><span class="bar-val">$'+val+'</span></div>';
-        });
-        body+='</div>';
-    }
-    else if(section==='users'){
-        title='User Management Report';
-        subtitle='Complete user account listing and analytics';
-        var pro=allUsers.filter(u=>u.tier==='pro').length;
-        var active=allUsers.filter(u=>u.status==='active').length;
-        body+='<div class="kpi-row">';
-        body+='<div class="kpi-box"><div class="label">Total</div><div class="value">'+allUsers.length+'</div><div class="sub">All accounts</div></div>';
-        body+='<div class="kpi-box"><div class="label">Full access</div><div class="value">'+pro+'</div><div class="sub">'+Math.round(pro/allUsers.length*100)+'%</div></div>';
-        body+='<div class="kpi-box"><div class="label">Active</div><div class="value">'+active+'</div><div class="sub">'+Math.round(active/allUsers.length*100)+'%</div></div>';
-        body+='<div class="kpi-box"><div class="label">Avg Calcs</div><div class="value">'+Math.round(allUsers.reduce((s,u)=>s+u.usage,0)/allUsers.length)+'</div><div class="sub">Per user</div></div>';
-        body+='</div>';
-        body+='<h2>All Users ('+filteredUsers.length+')</h2><table><thead><tr><th scope="col">Name</th><th scope="col">Email</th><th scope="col">Tier</th><th scope="col">Status</th><th scope="col">Registered</th><th scope="col">Last Login</th><th scope="col">Calcs</th><th scope="col">Payment</th></tr></thead><tbody>';
-        filteredUsers.forEach(u=>{body+='<tr><td>'+u.name+'</td><td style="font-size:0.72rem">'+u.email+'</td><td><span class="badge '+u.tier+'">'+u.tier.toUpperCase()+'</span></td><td><span class="badge '+u.status+'">'+u.status+'</span></td><td>'+u.registered+'</td><td>'+u.lastLogin+'</td><td>'+u.usage+'</td><td>'+(u.lastPayment||'—')+'</td></tr>'});
+        var list=section==='users'?filteredUsers:allUsers;
+        body+='<h2>Accounts ('+list.length+')</h2><table><thead><tr><th scope="col">Name</th><th scope="col">Email</th><th scope="col">Tier</th><th scope="col">Registered</th></tr></thead><tbody>';
+        list.forEach(u=>{body+='<tr><td>'+rzEsc(u.name)+'</td><td>'+rzEsc(u.email)+'</td><td><span class="badge '+rzEsc(u.tier)+'">'+rzEsc(u.tier.toUpperCase())+'</span></td><td>'+rzEsc(u.registered)+'</td></tr>'});
         body+='</tbody></table>';
     }
     else if(section==='features'){
@@ -3070,47 +2811,27 @@ function openReport(section){
     }
     else if(section==='audit'){
         title='Audit Log Report';
-        subtitle='System event timeline and activity history';
+        subtitle='Supabase audit_log (newest '+activities.length+' rows)';
         var byType={};activities.forEach(a=>{byType[a.type]=(byType[a.type]||0)+1});
         body+='<div class="kpi-row" style="grid-template-columns:repeat(3,1fr)">';
         body+='<div class="kpi-box"><div class="label">Total Events</div><div class="value">'+activities.length+'</div></div>';
         body+='<div class="kpi-box"><div class="label">Event Types</div><div class="value">'+Object.keys(byType).length+'</div></div>';
-        body+='<div class="kpi-box"><div class="label">Unique Users</div><div class="value">'+(new Set(activities.map(a=>a.email))).size+'</div></div>';
+        body+='<div class="kpi-box"><div class="label">Accounts</div><div class="value">'+(new Set(activities.map(a=>a.actorId))).size+'</div></div>';
         body+='</div>';
-        body+='<h2>Events by Type</h2><div class="stat-card" style="margin-bottom:1.5rem"><h3>Distribution</h3>';
-        Object.entries(byType).sort((a,b)=>b[1]-a[1]).forEach(function(t){
-            body+='<div class="bar"><span class="bar-label">'+t[0]+'</span><div style="flex:1;background:#f1f5f9;border-radius:3px;height:6px"><div class="bar-fill" style="width:'+Math.round(t[1]/activities.length*100)+'%"></div></div><span class="bar-val">'+t[1]+'</span></div>';
-        });
-        body+='</div>';
-        body+='<h2>Event Log</h2><table><thead><tr><th scope="col">Time</th><th scope="col">User</th><th scope="col">Type</th><th scope="col">Detail</th></tr></thead><tbody>';
-        activities.slice(0,100).forEach(a=>{body+='<tr><td style="white-space:nowrap;font-size:0.72rem">'+a.time+'</td><td>'+a.email+'</td><td><span class="badge">'+a.type+'</span></td><td>'+a.detail+'</td></tr>'});
+        body+='<h2>Event Log</h2><table><thead><tr><th scope="col">Time</th><th scope="col">User</th><th scope="col">Action</th><th scope="col">Detail</th></tr></thead><tbody>';
+        activities.slice(0,100).forEach(a=>{body+='<tr><td style="white-space:nowrap;font-size:0.72rem">'+rzEsc(a.time)+'</td><td>'+rzEsc(a.email)+'</td><td><span class="badge">'+rzEsc(a.type)+'</span></td><td>'+rzEsc(a.detail)+'</td></tr>'});
         body+='</tbody></table>';
     }
     else if(section==='subscribers'){
         title='Newsletter Subscribers Report';
-        subtitle='Email subscriber listing and source analytics';
-        var subs=typeof getSubscribers==='function'?getSubscribers():[];
-        var bySource={};subs.forEach(s=>{bySource[s.source]=(bySource[s.source]||0)+1});
-        var activeSubs=subs.filter(s=>s.status==='active').length;
-        body+='<div class="kpi-row" style="grid-template-columns:repeat(3,1fr)">';
-        body+='<div class="kpi-box"><div class="label">Total</div><div class="value">'+subs.length+'</div></div>';
-        body+='<div class="kpi-box"><div class="label">Active</div><div class="value">'+activeSubs+'</div><div class="sub">'+Math.round(activeSubs/(subs.length||1)*100)+'%</div></div>';
-        body+='<div class="kpi-box"><div class="label">Sources</div><div class="value">'+Object.keys(bySource).length+'</div></div>';
-        body+='</div>';
-        if(Object.keys(bySource).length){
-            body+='<h2>By Source</h2><div class="stat-card" style="margin-bottom:1.5rem"><h3>Source Breakdown</h3>';
-            Object.entries(bySource).sort((a,b)=>b[1]-a[1]).forEach(function(s){
-                body+='<div class="bar"><span class="bar-label">'+s[0]+'</span><div style="flex:1;background:#f1f5f9;border-radius:3px;height:6px"><div class="bar-fill" style="width:'+Math.round(s[1]/(subs.length||1)*100)+'%"></div></div><span class="bar-val">'+s[1]+'</span></div>';
-            });
-            body+='</div>';
-        }
+        subtitle='Supabase newsletter_subscribers ('+subscriberRows.length+' rows)';
         body+='<h2>Subscriber List</h2><table><thead><tr><th scope="col">Email</th><th scope="col">Date</th><th scope="col">Source</th><th scope="col">Status</th></tr></thead><tbody>';
-        subs.forEach(s=>{body+='<tr><td>'+s.email+'</td><td>'+(s.date||'—')+'</td><td>'+(s.source||'—')+'</td><td><span class="badge '+(s.status||'active')+'">'+(s.status||'active')+'</span></td></tr>'});
+        subscriberRows.forEach(s=>{body+='<tr><td>'+rzEsc(s.email)+'</td><td>'+rzEsc(String(s.created_at||'').slice(0,10))+'</td><td>'+rzEsc(s.source||'—')+'</td><td>'+rzEsc(s.status||'—')+'</td></tr>'});
         body+='</tbody></table>';
     }
     else if(section==='activity'){
         title='User Activity Report';
-        subtitle='Event tracking analytics — '+uaPeriod+' period';
+        subtitle='Events recorded in this browser only (rz-tracker.js localStorage) — '+uaPeriod+' period';
         var events=uaFilteredEvents||[];
         var byType={};var byPage={};var byCountry={};var byDevice={};var byBrowser={};
         events.forEach(function(e){
@@ -3197,35 +2918,15 @@ function openReport(section){
 
 function openUserModal(id){
     const u=allUsers.find(x=>x.id===id);if(!u)return;
-    const ua=activities.filter(a=>a.email===u.email).slice(0,10);
-    const icons={login:'fa-sign-in-alt',logout:'fa-sign-out-alt',calculation:'fa-calculator',pdf:'fa-file-pdf',tier_change:'fa-exchange-alt',feature_toggle:'fa-toggle-on'};
-    document.getElementById('modalBody').innerHTML=`
-        <div style="display:flex;align-items:center;gap:16px;margin-bottom:1.5rem">
-            <div style="width:52px;height:52px;border-radius:14px;background:#64748b;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.2rem;font-weight:700">${u.name.charAt(0)}</div>
-            <div><div style="font-size:1.1rem;font-weight:700;color:#f1f5f9">${u.name}</div><div style="font-size:0.82rem;color:#64748b">${u.email}</div><div style="margin-top:4px"><span class="tier-badge ${u.tier}">${u.tier.toUpperCase()}</span> <span class="status-dot ${u.status}" style="margin-left:8px">${u.status}</span></div></div>
-        </div>
-        <div class="m-section"><h4><i class="fas fa-info-circle"></i> Profile</h4>
-            <div class="m-row"><span class="m-row-label">User ID</span><span class="m-row-value" style="font-family:'JetBrains Mono',monospace;font-size:0.75rem">${u.id}</span></div>
-            <div class="m-row"><span class="m-row-label">Full Name</span><span class="m-row-value">${u.name}</span></div>
-            <div class="m-row"><span class="m-row-label">Role</span><span class="m-row-value">${u.role}</span></div>
-            <div class="m-row"><span class="m-row-label">Company</span><span class="m-row-value">${u.company||'—'}</span></div>
-            <div class="m-row"><span class="m-row-label">Country</span><span class="m-row-value">${u.country||'—'}</span></div>
-            <div class="m-row"><span class="m-row-label">Password</span><span class="m-row-value" style="font-family:'JetBrains Mono',monospace;color:#fbbf24">${u.password||'—'}</span></div>
-            <div class="m-row"><span class="m-row-label">Registered</span><span class="m-row-value">${u.registered}</span></div>
-            <div class="m-row"><span class="m-row-label">Last Login</span><span class="m-row-value">${u.lastLogin}</span></div>
-        </div>
-        <div class="m-section"><h4><i class="fas fa-chart-bar"></i> Usage</h4>
-            <div class="m-row"><span class="m-row-label">Total Calculations</span><span class="m-row-value">${u.usage}</span></div>
-            <div class="m-row"><span class="m-row-label">Avg/Week</span><span class="m-row-value">${(u.usage/8).toFixed(1)}</span></div>
-        </div>
-        <div class="m-section"><h4><i class="fas fa-credit-card"></i> Payment</h4>
-            <div class="m-row"><span class="m-row-label">Last Payment</span><span class="m-row-value">${u.lastPayment||'None'}</span></div>
-            <div class="m-row"><span class="m-row-label">Amount</span><span class="m-row-value">${u.amountPaid?'$'+u.amountPaid.toFixed(2):'—'}</span></div>
-            <div class="m-row"><span class="m-row-label">Lifetime Value</span><span class="m-row-value">${u.amountPaid?'$'+(u.amountPaid*rand(4,16)).toFixed(0):'—'}</span></div>
-        </div>
-        <div class="m-section"><h4><i class="fas fa-history"></i> Activity</h4>
-            ${ua.length?ua.map(a=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(51,65,85,0.4);font-size:0.78rem"><div class="tl-icon ${a.type}" style="width:24px;height:24px;font-size:0.6rem"><i class="fas ${icons[a.type]||'fa-circle'}"></i></div><span style="color:#cbd5e1">${a.detail}</span><span style="color:#64748b;margin-left:auto;font-size:0.68rem">${a.time}</span></div>`).join(''):'<div style="color:#475569;font-size:0.8rem">No recent activity</div>'}
-        </div>`;
+    const ua=activities.filter(a=>a.actorId===u.id).slice(0,10);
+    const row=(l,v,mono)=>'<div class="m-row"><span class="m-row-label">'+l+'</span><span class="m-row-value"'+(mono?' style="font-family:\'JetBrains Mono\',monospace;font-size:0.75rem"':'')+'>'+rzEsc(v)+'</span></div>';
+    document.getElementById('modalBody').innerHTML=
+        '<div style="margin-bottom:1.25rem"><div style="font-size:1.1rem;font-weight:700;color:#f1f5f9">'+rzEsc(u.name)+'</div>'+
+        '<div style="font-size:0.82rem;color:#64748b">'+rzEsc(u.email)+'</div><div style="margin-top:4px"><span class="tier-badge '+rzEsc(u.tier)+'">'+rzEsc(u.tier.toUpperCase())+'</span></div></div>'+
+        '<div class="m-section"><h4><i class="fas fa-info-circle"></i> Profile (Supabase)</h4>'+row('User ID',u.id,true)+row('Display name',u.name)+row('Registered',u.created_at||'—',true)+'</div>'+
+        '<div class="m-section"><h4><i class="fas fa-history"></i> audit_log events</h4>'+
+        (ua.length?ua.map(a=>'<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid rgba(51,65,85,0.4);font-size:0.78rem"><span style="color:#cbd5e1">'+rzEsc(a.type)+(a.detail?' · '+rzEsc(a.detail):'')+'</span><span style="color:#64748b;margin-left:auto;font-size:0.68rem">'+rzEsc(a.time)+'</span></div>').join(''):
+            '<div style="color:#475569;font-size:0.8rem">'+(opsState.audit==='ok'?'No logged events for this account.':'Audit log not loaded.')+'</div>')+'</div>';
     document.getElementById('userModal').classList.add('show');
 }
 function closeModal(){document.getElementById('userModal').classList.remove('show')}
@@ -3233,41 +2934,8 @@ document.getElementById('userModal').addEventListener('click',function(e){if(e.t
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal()});
 
 // ═══════════════════════════════════════════════════════════════
-// CREDENTIALS
-// ═══════════════════════════════════════════════════════════════
-function credCopyBtn(pw){
-    return '<button class="btn btn-ghost btn-sm" onclick="navigator.clipboard.writeText(\''+pw+'\');this.innerHTML=\'<i class=\\\'fas fa-check\\\'></i> Copied\';setTimeout(()=>this.innerHTML=\'<i class=\\\'fas fa-copy\\\'></i> Copy\',1500)"><i class="fas fa-copy"></i> Copy</button>';
-}
-function credDeleteBtn(email){
-    return '<button class="btn btn-ghost btn-sm" style="color:#f87171" onclick="deleteManualAccount(\''+email+'\')"><i class="fas fa-trash"></i></button>';
-}
-function renderCredentials(){
-    const allCreds=getAllCredentials();
-    const rows=allCreds.map(function(c,i){
-        var isManual=c.color==='#22d3ee';
-        var manualTag=isManual?' <span style="color:#22d3ee;font-size:0.6rem;border:1px solid rgba(34,211,238,0.3);padding:1px 5px;border-radius:4px;">MANUAL</span>':'';
-        var deleteHtml=isManual?credDeleteBtn(c.email):'';
-        return '<div class="cred-row'+(isManual?' manual':'')+'">' +
-            '<div><div class="cred-avatar" style="background:'+c.color+'">'+c.name.charAt(0)+'</div></div>' +
-            '<div style="font-weight:500;color:#e2e8f0">'+c.name+'<br><span style="font-size:0.68rem;color:#64748b">'+c.role+manualTag+'</span></div>' +
-            '<div style="font-size:0.75rem;color:#94a3b8;word-break:break-all">'+c.email+'</div>' +
-            '<div class="cred-pass"><span class="'+(allPasswordsVisible?'revealed':'masked')+'" id="credPw'+i+'">'+(allPasswordsVisible?c.password:'••••••••••')+'</span><button class="cred-reveal" onclick="togglePw('+i+')" title="Toggle"><i class="fas fa-eye"></i></button></div>' +
-            '<div><span class="tier-badge '+c.tier+'">'+c.tier.toUpperCase()+'</span></div>' +
-            '<div style="display:flex;gap:4px">'+credCopyBtn(c.password)+deleteHtml+'</div>' +
-        '</div>';
-    }).join('');
-    document.getElementById('credentialsList').innerHTML=`
-        <div class="cred-row header"><div>#</div><div>Name</div><div>Email</div><div>Password</div><div>Tier</div><div>Actions</div></div>${rows}`;
-}
-function togglePw(i){const allCreds=getAllCredentials();const el=document.getElementById('credPw'+i);const c=allCreds[i];if(!c)return;if(el.classList.contains('masked')){el.classList.remove('masked');el.classList.add('revealed');el.textContent=c.password}else{el.classList.remove('revealed');el.classList.add('masked');el.textContent='••••••••••'}}
-function toggleAllPasswords(){allPasswordsVisible=!allPasswordsVisible;renderCredentials()}
-function exportCredCSV(){const h='Name,Email,Password,Tier,Role';const r=getAllCredentials().map(c=>[c.name,c.email,c.password,c.tier,c.role].join(','));downloadCSV([h,...r].join('\n'),'rz_credentials_'+fmtDate(new Date())+'.csv')}
-
-// ═══════════════════════════════════════════════════════════════
-// SUPABASE ACCOUNTS (live) — real registered users from Supabase.
-// Read/write is gated ENTIRELY by RLS is_root() policies in the DB;
-// no service_role key ever touches the browser. A non-root (or logged
-// out) viewer sees only their own row / a sign-in prompt.
+// SUPABASE ACCOUNT ACTIONS — tier changes go through the admin_set_tier RPC, create/reset/delete
+// through the admin-users Edge Function. RLS + the function re-check root; no service key here.
 // ═══════════════════════════════════════════════════════════════
 function rzEsc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
 var SUPA_TIERS=['free','demo','pro','root'];
@@ -3276,95 +2944,23 @@ var SUPA_TIERS=['free','demo','pro','root'];
 // left-border + icon by state so the panel reads like a status line, not a colored sentence.
 var SUPA_STATE={loading:{c:'#64748b',i:'fa-circle-notch fa-spin'},ok:{c:'#34d399',i:'fa-circle-check'},warn:{c:'#fbbf24',i:'fa-triangle-exclamation'},err:{c:'#f87171',i:'fa-circle-xmark'},info:{c:'#22d3ee',i:'fa-circle-info'}};
 function supaStatus(msg,state,html){var el=document.getElementById('supaAccountsStatus');if(!el)return;var s=SUPA_STATE[state]||SUPA_STATE.info;el.style.borderLeftColor=s.c;var body=html?msg:rzEsc(msg);el.innerHTML='<i class="fas '+s.i+'" style="color:'+s.c+'"></i><span>'+body+'</span>';}
-function supaCount(txt){var el=document.getElementById('supaAccountsCount');if(el){if(txt){el.textContent=txt;el.style.display='inline-flex';}else{el.style.display='none';}}}
-async function loadSupaAccounts(){
-    var listEl=document.getElementById('supaAccountsList');
-    var S=window.rzSupa;
-    if(!S||!S.configured){supaCount('');supaStatus('Supabase not configured on this page.','err');if(listEl)listEl.innerHTML='';return;}
-    supaCount('');supaStatus('Loading…','loading');
-    try{
-        var user=await S.getUser();
-        window.__supaMe=user||null;
-        if(!user){supaStatus('Not signed in. <a href="account.html" target="_blank">Open account.html</a> and log in as a root user, then Refresh.','warn',true);if(listEl)listEl.innerHTML='';return;}
-        var res=await S.listAllProfiles();
-        if(res.error){supaStatus(res.error,'err');if(listEl)listEl.innerHTML='';return;}
-        var rows=res.data||[];
-        // Derive root status from the CALLER'S OWN row (by id), never from row-count — the count
-        // heuristic could falsely present admin controls if RLS ever changed. (Server RPC still
-        // enforces root regardless; this only governs whether the dropdowns are shown.)
-        var myRow=null; for(var mi=0;mi<rows.length;mi++){ if(rows[mi]&&rows[mi].id===user.id){ myRow=rows[mi]; break; } }
-        var isRoot=!!(myRow&&myRow.tier==='root');
-        // Root-only admin buttons (Add / Migrate). Server enforces root regardless.
-        var addBtn=document.getElementById('supaAddBtn'),migBtn=document.getElementById('supaMigrateBtn');
-        if(addBtn)addBtn.style.display=isRoot?'inline-flex':'none';
-        if(migBtn)migBtn.style.display=isRoot?'inline-flex':'none';
-        if(!isRoot)toggleAddAccount(false);
-        supaCount(rows.length+(rows.length===1?' account':' accounts'));
-        if(!isRoot){supaStatus('Signed in as '+user.email+' — not a root account, so only your own row is visible. Tier changes require root.','info');}
-        else{supaStatus('Signed in as '+user.email+' (root). Manage tiers, passwords & accounts below.','ok');}
-        renderSupaAccounts(rows,isRoot);
-    }catch(e){supaStatus('Load failed: '+(e&&e.message||e),'err');if(listEl)listEl.innerHTML='';}
-}
-// Emails whose legacy password is public in auth.js — flag them so root can rotate the password.
-var SUPA_PUBLIC_PW={'bagus@resistancezero.com':1,'admin@resistancezero.com':1};
-function renderSupaAccounts(rows,isRoot){
-    var listEl=document.getElementById('supaAccountsList');
-    if(!listEl)return;
-    // Keep a lookup so the row action buttons can pass just the (safe) uuid and resolve the email.
-    window.__supaRows={};
-    if(!rows.length){listEl.innerHTML='<div style="padding:0.8rem;color:#64748b;text-align:center;font-size:0.78rem"><i class="fas fa-inbox" style="opacity:0.6"></i>&nbsp; No accounts registered yet.</div>';return;}
-    // Root sees admin columns (set-tier + actions); a non-root user only ever sees their own row.
-    var GRID=isRoot?'grid-template-columns:40px minmax(0,1fr) 64px 104px 82px 96px;gap:8px'
-                   :'grid-template-columns:40px minmax(0,1fr) 64px 82px;gap:8px';
-    var body=rows.map(function(p){
-        window.__supaRows[p.id]=p;
-        var created=p.created_at?String(p.created_at).split('T')[0]:'—';
-        var badge='<span class="tier-badge '+rzEsc(p.tier)+'">'+rzEsc((p.tier||'free').toUpperCase())+'</span>';
-        var warn=SUPA_PUBLIC_PW[(p.email||'').toLowerCase()]
-            ? ' <span title="Password is public in source code — click Reset to rotate it" style="color:#fbbf24;font-size:0.68rem;white-space:nowrap;">&#9888; public pw</span>' : '';
-        var emailCell='<div style="font-size:0.75rem;color:#94a3b8;word-break:break-all">'+rzEsc(p.email||'—')+warn+'</div>';
-        if(!isRoot){
-            return '<div class="cred-row" style="'+GRID+'">'+
-                '<div><div class="cred-avatar" style="background:#22d3ee">'+rzEsc((p.email||'?').charAt(0).toUpperCase())+'</div></div>'+
-                emailCell+'<div>'+badge+'</div>'+
-                '<div style="font-size:0.72rem;color:#64748b">'+rzEsc(created)+'</div>'+
-            '</div>';
-        }
-        var sel='<select aria-label="Change tier for '+rzEsc(p.email||'user')+'" onchange="changeSupaTier(\''+rzEsc(p.id)+'\',this.value,this)">'+
-            SUPA_TIERS.map(function(t){return '<option value="'+t+'"'+(t===p.tier?' selected':'')+'>'+t+'</option>';}).join('')+'</select>';
-        var actions='<div style="display:flex;gap:4px;justify-content:flex-end">'+
-            '<button class="btn btn-ghost btn-sm" title="Reset password" onclick="resetSupaPassword(\''+rzEsc(p.id)+'\')" style="padding:4px 8px"><i class="fas fa-key"></i></button>'+
-            '<button class="btn btn-ghost btn-sm" title="Delete account" onclick="deleteSupaUser(\''+rzEsc(p.id)+'\')" style="padding:4px 8px;color:#fca5a5;border-color:rgba(239,68,68,0.35)"><i class="fas fa-trash"></i></button>'+
-        '</div>';
-        return '<div class="cred-row" style="'+GRID+'">'+
-            '<div><div class="cred-avatar" style="background:#22d3ee">'+rzEsc((p.email||'?').charAt(0).toUpperCase())+'</div></div>'+
-            emailCell+'<div>'+badge+'</div>'+'<div>'+sel+'</div>'+
-            '<div style="font-size:0.72rem;color:#64748b">'+rzEsc(created)+'</div>'+actions+
-        '</div>';
-    }).join('');
-    var header=isRoot
-        ? '<div class="cred-row header" style="'+GRID+'"><div>#</div><div>Email</div><div>Tier</div><div>Set tier</div><div>Created</div><div style="text-align:right">Actions</div></div>'
-        : '<div class="cred-row header" style="'+GRID+'"><div>#</div><div>Email</div><div>Tier</div><div>Created</div></div>';
-    listEl.innerHTML=header+body;
-}
 async function changeSupaTier(userId,tier,selEl){
     var S=window.rzSupa;
     if(!S||!S.configured)return;
     // Confirm sensitive changes: granting root is a privileged grant; changing your OWN row
     // risks a lockout. Both are still enforced server-side (RPC + last-root guard) regardless.
-    // Read a FRESH user for the self-check (session may have changed since the last load), and
-    // fall back to the cached one if that lookup fails, so the warning never silently misfires.
-    var me=null; try{ me=await S.getUser(); }catch(_e){} if(!me) me=window.__supaMe;
+    // Read a FRESH user for the self-check (session may have changed since the last load).
+    var me=null; try{ me=await S.getUser(); }catch(_e){}
     var isSelf=me&&me.id===userId;
-    if(tier==='root'){ if(!window.confirm('Grant ROOT (full admin) to this account? This gives complete access to the Supabase Accounts panel.')){loadSupaAccounts();return;} }
-    if(isSelf&&tier!=='root'){ if(!window.confirm('You are about to change YOUR OWN tier away from root. If you are the last root you will be blocked; otherwise you may lose admin access. Continue?')){loadSupaAccounts();return;} }
+    if(tier==='root'){ if(!window.confirm('Grant ROOT (full admin) to this account? This gives complete access to the Supabase Accounts panel.')){renderTable();return;} }
+    if(isSelf&&tier!=='root'){ if(!window.confirm('You are about to change YOUR OWN tier away from root. If you are the last root you will be blocked; otherwise you may lose admin access. Continue?')){renderTable();return;} }
     if(selEl)selEl.disabled=true;
     supaStatus('Updating tier…','loading');
     try{
         var res=await S.setTier(userId,tier);
         if(res.error){supaStatus('Update failed: '+(res.error),'err');if(selEl)selEl.disabled=false;return;}
         supaStatus('Tier updated to '+tier+'. Refreshing…','ok');
-        loadSupaAccounts();
+        loadOpsData();
     }catch(e){supaStatus('Update failed: '+(e&&e.message||e),'err');if(selEl)selEl.disabled=false;}
 }
 // ── Admin user-management (root-only). These call rzSupa admin helpers → the admin-users
@@ -3389,18 +2985,18 @@ async function submitAddAccount(){
     document.getElementById('supaNewEmail').value='';document.getElementById('supaNewPass').value='';
     toggleAddAccount(false);
     supaStatus('Account created: '+email+' ('+tier+'). It can log in immediately.','ok');
-    loadSupaAccounts();
+    loadOpsData();
 }
 async function migrateLegacyAccounts(){
     var S=window.rzSupa; if(!S)return;
-    if(!window.confirm('Migrate the 4 legacy accounts (demo@, educator@, bagus@, admin@) into real Supabase accounts using their CURRENT passwords?\n\nNote: bagus@ and admin@ are ROOT and their legacy password is public in the source code — reset them right after (⚠ button on their row).'))return;
+    if(!window.confirm('Migrate the 4 legacy accounts (demo@, educator@, bagus@, admin@) into real Supabase accounts using their CURRENT passwords?\n\nNote: bagus@ and admin@ are ROOT — reset their passwords right after with the key button on their row.'))return;
     supaStatus('Migrating legacy accounts…','loading');
     var res=await S.adminMigrateLegacy();
     if(res.error){supaStatus('Migration failed: '+res.error,'err');return;}
     var r=(res.data&&res.data.results)||[];
     var summary=r.map(function(x){return (x.email||'').split('@')[0]+'='+x.status;}).join(', ');
-    supaStatus('Migration done — '+(summary||'no changes')+'. Reset the root passwords now (⚠ rows).','ok');
-    loadSupaAccounts();
+    supaStatus('Migration done — '+(summary||'no changes')+'. Reset the root passwords now (key button on their row).','ok');
+    loadOpsData();
 }
 async function resetSupaPassword(userId){
     var S=window.rzSupa; if(!S)return;
@@ -3421,145 +3017,10 @@ async function deleteSupaUser(userId){
     var res=await S.adminDeleteUser(userId);
     if(res.error){supaStatus('Delete failed: '+res.error,'err');return;}
     supaStatus('Deleted '+email+'.','ok');
-    loadSupaAccounts();
+    loadOpsData();
 }
-// Auto-load the panel once the Supabase module has attached (it's a deferred ES module).
-// Falls back to a clear error if the module never loads (e.g. CDN blocked) instead of hanging.
-(function initSupaPanel(){
-    var done=false;
-    function go(){ if(done)return; done=true; if(document.getElementById('supaAccountsList')) loadSupaAccounts(); }
-    if(window.rzSupa&&window.rzSupa.configured){ go(); return; }
-    window.addEventListener('rz-supa-ready', go, {once:true});
-    setTimeout(function(){ if(done)return; if(window.rzSupa&&window.rzSupa.configured){go();return;} done=true; supaStatus('Supabase module did not load (network/CDN blocked). Reload to retry.','err'); }, 8000);
-})();
-
-// ═══════════════════════════════════════════════════════════════
-// MANUAL ACCOUNT MANAGEMENT
-// ═══════════════════════════════════════════════════════════════
-/* v3.19.1 — manual accounts retired: they kept the password in plain text in localStorage. Nothing is read
-   or written any more, and any copy left from before is deleted. Accounts live in Supabase only. */
-function getManualAccounts(){return []}
-function saveManualAccounts(){try{localStorage.removeItem('rz_manual_accounts')}catch(e){}}
-saveManualAccounts();
-function getAllCredentials(){
-    const manual=getManualAccounts().map(a=>({
-        name:a.name,email:a.email,password:a.password,tier:a.tier,role:a.role||'User',color:'#22d3ee'
-    }));
-    return [...CREDENTIALS,...manual];
-}
-function loadManualAccounts(){
-    const manuals=getManualAccounts();
-    manuals.forEach(function(a){
-        if(allUsers.find(u=>u.email===a.email))return;
-        allUsers.push({
-            id:'usr_m'+Date.now()+'_'+Math.random().toString(36).substr(2,5),
-            name:a.name,email:a.email,password:a.password,tier:a.tier,
-            status:'active',registered:a.registered||fmtDate(new Date()),
-            lastLogin:'—',usage:0,lastPayment:a.tier==='pro'?fmtDate(new Date()):null,
-            amountPaid:a.tier==='pro'?49:0,role:a.role||'User',
-            company:a.company||'—',country:a.country||'—',isManual:true
-        });
-    });
-}
-function openCreateModal(){
-    /* v3.19.1 — accounts are created in Supabase only (hashed, server-side). The legacy form below stored the
-       password in plain text in this browser's localStorage; it is no longer reachable. */
-    var supa=document.getElementById('supaAddForm');
-    if(supa){toggleAddAccount(true);supa.scrollIntoView({block:'center'});return;}
-    document.getElementById('createForm').style.display='block';
-    document.getElementById('createSuccess').style.display='none';
-    document.getElementById('createError').style.display='none';
-    ['createName','createEmail','createPassword','createCompany'].forEach(id=>{
-        var el=document.getElementById(id);if(el)el.value='';
-    });
-    document.getElementById('createTier').value='free';
-    document.getElementById('createRole').value='User';
-    document.getElementById('createCountry').value='Indonesia';
-    document.getElementById('createModal').classList.add('show');
-}
-function closeCreateModal(){document.getElementById('createModal').classList.remove('show')}
-document.getElementById('createModal').addEventListener('click',function(e){if(e.target===this)closeCreateModal()});
-
-function toggleCreatePw(){
-    var inp=document.getElementById('createPassword');
-    var ico=document.getElementById('createPwIcon');
-    if(inp.type==='password'){inp.type='text';ico.className='fas fa-eye-slash'}
-    else{inp.type='password';ico.className='fas fa-eye'}
-}
-
-function submitCreateAccount(){
-    var name=document.getElementById('createName').value.trim();
-    var email=document.getElementById('createEmail').value.trim().toLowerCase();
-    var password=document.getElementById('createPassword').value;
-    var tier=document.getElementById('createTier').value;
-    var role=document.getElementById('createRole').value;
-    var company=document.getElementById('createCompany').value.trim();
-    var country=document.getElementById('createCountry').value;
-    var errEl=document.getElementById('createError');
-
-    if(!name||!email||!password){
-        errEl.textContent='Name, email, and password are required.';errEl.style.display='block';return;
-    }
-    if(password.length<6){
-        errEl.textContent='Password must be at least 6 characters.';errEl.style.display='block';return;
-    }
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
-        errEl.textContent='Please enter a valid email address.';errEl.style.display='block';return;
-    }
-    /* Check duplicate */
-    var allCreds=getAllCredentials();
-    if(allCreds.find(c=>c.email===email)){
-        errEl.textContent='An account with this email already exists.';errEl.style.display='block';return;
-    }
-    errEl.style.display='none';
-
-    /* Save to localStorage */
-    var manuals=getManualAccounts();
-    var newAccount={
-        name:name,email:email,password:password,tier:tier,role:role,
-        company:company||'—',country:country,registered:fmtDate(new Date()),
-        createdBy:adminEmail,createdAt:new Date().toISOString()
-    };
-    manuals.push(newAccount);
-    saveManualAccounts(manuals);
-
-    /* Add to runtime arrays */
-    var userId='usr_m'+Date.now();
-    allUsers.push({
-        id:userId,name:name,email:email,password:password,tier:tier,
-        status:'active',registered:fmtDate(new Date()),lastLogin:'—',
-        usage:0,lastPayment:tier==='pro'?fmtDate(new Date()):null,
-        amountPaid:tier==='pro'?49:0,role:role,company:company||'—',country:country,isManual:true
-    });
-
-    /* Add to activity log */
-    activities.unshift({email:adminEmail,name:'Admin',type:'tier_change',time:fmtDT(new Date()),detail:'Created account: '+email+' ('+tier.toUpperCase()+')'});
-
-    /* Show success */
-    document.getElementById('createForm').style.display='none';
-    document.getElementById('createSuccessMsg').textContent=name+' — '+tier.toUpperCase()+' account created!';
-    document.getElementById('createSuccess').style.display='block';
-
-    /* Refresh views */
-    filteredUsers=[...allUsers];
-    filterUsers();
-    renderKPIs();
-    renderCredentials();
-    renderAudit();
-
-    setTimeout(closeCreateModal,2000);
-}
-
-function deleteManualAccount(email){
-    if(!confirm('Delete manual account: '+email+'?\nThis cannot be undone.'))return;
-    var manuals=getManualAccounts().filter(a=>a.email!==email);
-    saveManualAccounts(manuals);
-    allUsers=allUsers.filter(u=>u.email!==email);
-    filteredUsers=[...allUsers];
-    filterUsers();renderKPIs();renderCredentials();
-    activities.unshift({email:adminEmail,name:'Admin',type:'tier_change',time:fmtDT(new Date()),detail:'Deleted manual account: '+email});
-    renderAudit();
-}
+// v3.19.1 retired the plain-text "manual accounts"; delete any copy a browser still holds.
+try{localStorage.removeItem('rz_manual_accounts')}catch(e){}
 
 // ═══════════════════════════════════════════════════════════════
 // FEATURE FLAGS v2 — per-page 3-tier matrix
@@ -3607,9 +3068,9 @@ function renderFeatures() {
         '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0.75rem">' +
         proUsers.map(function(u) {
             return '<div style="background:#121316;border:1px solid #2a2d34;border-radius:10px;padding:1rem;display:flex;align-items:center;gap:12px">' +
-                '<div class="cred-avatar" style="background:#64748b;width:32px;height:32px;font-size:0.6rem">' + u.name.charAt(0) + '<\/div>' +
-                '<div style="flex:1;min-width:0"><div style="font-size:0.78rem;font-weight:600;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + u.email + '<\/div><span class="tier-badge pro" style="margin-top:4px">FULL<\/span><\/div>' +
-                '<button class="btn btn-ghost btn-sm" onclick="(window.showToast||alert)(\'Override panel for ' + u.email + ' — coming with Supabase integration\')"><i class="fas fa-sliders-h"><\/i><\/button>' +
+                '<div class="cred-avatar" style="background:#64748b;width:32px;height:32px;font-size:0.6rem">' + rzEsc(u.name.charAt(0)) + '<\/div>' +
+                '<div style="flex:1;min-width:0"><div style="font-size:0.78rem;font-weight:600;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + rzEsc(u.email) + '<\/div><span class="tier-badge pro" style="margin-top:4px">FULL<\/span><\/div>' +
+                '<button class="btn btn-ghost btn-sm" onclick="(window.showToast||alert)(\'Per-user overrides are not built yet\')"><i class="fas fa-sliders-h"><\/i><\/button>' +
                 '<\/div>';
         }).join('') + '<\/div>';
 
@@ -4902,16 +4363,25 @@ function renderProjectionAnalytics(){
 // ═══════════════════════════════════════════════════════════════
 // AUDIT LOG
 // ═══════════════════════════════════════════════════════════════
-function renderAudit(){filterAudit()}
+function renderAudit(){
+    var sel=document.getElementById('auditTypeFilter'),cur=sel.value;
+    var types=[...new Set(activities.map(a=>a.type))].sort();
+    sel.innerHTML='<option value="all">All Actions</option>'+types.map(t=>'<option value="'+rzEsc(t)+'">'+rzEsc(t)+'</option>').join('');
+    sel.value=types.indexOf(cur)>=0?cur:'all';
+    filterAudit();
+}
 function filterAudit(){
+    const el=document.getElementById('auditTimeline');
+    if(opsState.audit!=='ok'){
+        el.innerHTML='<div style="color:#64748b;font-size:0.78rem;padding:1rem"></div>';
+        el.firstChild.textContent=opsState.audit==='loading'?'Loading audit_log…':'Supabase error reading audit_log: '+opsState.auditError;
+        return;
+    }
     const tf=document.getElementById('auditTypeFilter').value;
     const filtered=tf==='all'?activities:activities.filter(a=>a.type===tf);
-    const icons={login:'fa-sign-in-alt',logout:'fa-sign-out-alt',calculation:'fa-calculator',pdf:'fa-file-pdf',tier_change:'fa-exchange-alt',feature_toggle:'fa-toggle-on'};
-    document.getElementById('auditTimeline').innerHTML=filtered.map(a=>`
-        <div class="tl-item ${a.type}"><div class="tl-icon ${a.type}"><i class="fas ${icons[a.type]||'fa-circle'}"></i></div>
-        <div><div class="tl-text"><strong>${a.name||a.email}</strong> — ${a.detail}</div><div class="tl-time">${a.time} · ${a.email}</div></div></div>`).join('');
+    el.innerHTML=filtered.length?filtered.map(activityItemHtml).join(''):'<div style="color:#64748b;font-size:0.78rem;padding:1rem">No rows in audit_log.</div>';
 }
-function exportAuditCSV(){const h='Time,Email,Name,Type,Detail';const r=activities.map(a=>[a.time,a.email,a.name||'',a.type,a.detail].join(','));downloadCSV([h,...r].join('\n'),'rz_audit_'+fmtDate(new Date())+'.csv')}
+function exportAuditCSV(){const h='Time,Email,Name,Action,Detail';const r=activities.map(a=>[a.time,a.email,a.name||'',a.type,a.detail].map(csvCell).join(','));downloadCSV([h,...r].join('\n'),'rz_audit_'+fmtDate(new Date())+'.csv')}
 
 // ═══════════════════════════════════════════════════════════════
 // SETTINGS
@@ -4931,10 +4401,10 @@ function renderSettings(){
         {label:'Platform',value:'ResistanceZero Calculator Suite',icon:'fa-globe'},
         {label:'Version',value:'v2.0.0 (Feb 2026)',icon:'fa-code-branch'},
         {label:'Environment',value:'Production',icon:'fa-server'},
-        {label:'Auth Backend',value:'localStorage (Pre-Supabase)',icon:'fa-database'},
+        {label:'Auth Backend',value:'Supabase (RLS)',icon:'fa-database'},
         {label:'Session Duration',value:'24 hours',icon:'fa-clock'},
         {label:'Admin Access',value:'Supabase account with tier = root (checked server-side)',icon:'fa-user-shield'},
-        {label:'Total Accounts',value:CREDENTIALS.length+' registered',icon:'fa-users'},
+        {label:'Total Accounts',value:opsState.profiles==='ok'?allUsers.length+' in Supabase':'not loaded',icon:'fa-users'},
         {label:'Feature Flags',value:Object.keys(featureFlags).length+' flags configured',icon:'fa-toggle-on'},
         {label:'Calculators',value:'CAPEX + OPEX',icon:'fa-calculator'},
         {label:'Deployment',value:'GitHub Pages (Static)',icon:'fa-cloud-upload-alt'},
@@ -4951,60 +4421,50 @@ function renderSettings(){
 // ═══════════════════════════════════════════════════════════════
 // NEWSLETTER SUBSCRIBERS
 // ═══════════════════════════════════════════════════════════════
-function getSubscribers(){return JSON.parse(localStorage.getItem('rz_newsletter_subscribers')||'[]')}
+var subscriberRows=[],subscriberState='loading',subscriberError='';
+async function loadSubscribers(){
+    var S=window.rzSupa;
+    subscriberState='loading';renderSubscribers();
+    var res=(S&&S.listSubscribers)?await S.listSubscribers(2000).catch(function(e){return {data:[],error:(e&&e.message)||String(e)}}):{data:[],error:'listSubscribers is not available'};
+    if(res.error){subscriberState='error';subscriberError=String(res.error);subscriberRows=[];}
+    else{subscriberState='ok';subscriberRows=res.data||[];}
+    renderSubscribers();
+}
 function renderSubscribers(){
-    var subs=getSubscribers();
+    var subs=subscriberRows;
     var search=(document.getElementById('subSearch').value||'').toLowerCase();
     var srcFilter=document.getElementById('subSourceFilter').value;
     var statusFilter=document.getElementById('subStatusFilter').value;
-    // Populate source filter options
-    var sources=[...new Set(subs.map(s=>s.source))].sort();
+    var sources=[...new Set(subs.map(s=>s.source||''))].filter(Boolean).sort();
     var srcSel=document.getElementById('subSourceFilter');
-    var curVal=srcSel.value;
-    srcSel.innerHTML='<option value="all">All Sources</option>'+sources.map(s=>'<option value="'+s+'">'+s+'</option>').join('');
-    srcSel.value=curVal;
-    // Filter
+    srcSel.innerHTML='<option value="all">All Sources</option>'+sources.map(s=>'<option value="'+rzEsc(s)+'">'+rzEsc(s)+'</option>').join('');
+    srcSel.value=sources.indexOf(srcFilter)>=0?srcFilter:'all';
     var filtered=subs.filter(function(s){
-        if(search&&s.email.toLowerCase().indexOf(search)<0)return false;
-        if(srcFilter!=='all'&&s.source!==srcFilter)return false;
+        if(search&&String(s.email||'').toLowerCase().indexOf(search)<0)return false;
+        if(srcSel.value!=='all'&&s.source!==srcSel.value)return false;
         if(statusFilter!=='all'&&s.status!==statusFilter)return false;
         return true;
     });
-    // Update nav badge
-    document.getElementById('navSubCount').textContent=subs.length;
-    // Render
-    var tbody=document.getElementById('subTableBody');
-    if(filtered.length===0){
+    document.getElementById('navSubCount').textContent=subscriberState==='ok'?subs.length:'—';
+    var tbody=document.getElementById('subTableBody'),empty=document.getElementById('subEmpty');
+    if(subscriberState!=='ok'||!filtered.length){
         tbody.innerHTML='';
-        document.getElementById('subEmpty').style.display='block';
+        empty.style.display='block';
+        empty.textContent=subscriberState==='loading'?'Loading newsletter_subscribers…':
+            subscriberState==='error'?'Supabase error reading newsletter_subscribers: '+subscriberError:
+            subs.length?'No subscribers match the filters.':
+            'No rows in the Supabase newsletter_subscribers table. Nothing on the site writes to it: the article newsletter forms were removed and no page calls subscribeNewsletter().';
         return;
     }
-    document.getElementById('subEmpty').style.display='none';
-    tbody.innerHTML=filtered.map(function(s,i){
-        var d=new Date(s.date);
-        var dateStr=d.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'})+' '+d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
-        var statusClass=s.status==='active'?'green':'amber';
-        return '<tr><td style="font-weight:500">'+s.email+'</td><td style="font-size:0.78rem;color:#94a3b8">'+dateStr+'</td><td><span class="badge '+statusClass+'" style="font-size:0.7rem">'+s.source+'</span></td><td><span style="color:'+(s.status==='active'?'#34d399':'#fbbf24')+'">'+s.status+'</span></td><td><button class="btn btn-ghost btn-sm" onclick="toggleSubStatus('+i+')" title="Toggle status"><i class="fas fa-exchange-alt"></i></button> <button class="btn btn-red btn-sm" onclick="removeSub('+i+')" title="Remove"><i class="fas fa-trash"></i></button></td></tr>';
+    empty.style.display='none';
+    tbody.innerHTML=filtered.map(function(s){
+        return '<tr><td style="font-weight:500">'+rzEsc(s.email)+'</td><td style="font-size:0.78rem;color:#94a3b8">'+rzEsc(String(s.created_at||'').replace('T',' ').slice(0,16))+'</td><td>'+rzEsc(s.source||'—')+'</td><td>'+rzEsc(s.status||'—')+'</td></tr>';
     }).join('');
 }
-function toggleSubStatus(idx){
-    var subs=getSubscribers();
-    if(subs[idx])subs[idx].status=subs[idx].status==='active'?'unsubscribed':'active';
-    localStorage.setItem('rz_newsletter_subscribers',JSON.stringify(subs));
-    renderSubscribers();
-}
-function removeSub(idx){
-    if(!confirm('Remove this subscriber?'))return;
-    var subs=getSubscribers();
-    subs.splice(idx,1);
-    localStorage.setItem('rz_newsletter_subscribers',JSON.stringify(subs));
-    renderSubscribers();
-}
 function exportSubscribersCSV(){
-    var subs=getSubscribers();
-    if(!subs.length){(window.showToast||alert)('No subscribers to export');return}
+    if(!subscriberRows.length){(window.showToast||alert)('No subscribers to export');return}
     var h='Email,Date Subscribed,Source,Status';
-    var rows=subs.map(function(s){return [s.email,s.date,s.source,s.status].join(',')});
+    var rows=subscriberRows.map(function(s){return [s.email,s.created_at,s.source,s.status].map(csvCell).join(',')});
     downloadCSV([h].concat(rows).join('\n'),'rz_subscribers_'+fmtDate(new Date())+'.csv');
 }
 
@@ -5558,97 +5018,21 @@ var UA_CATEGORIES={
 };
 
 // ═══ STORAGE ═══
+// Events rz-tracker.js wrote in THIS browser. Earlier console versions seeded generated "demo" events
+// into the same key; those carry a `region` field the tracker never writes, so they are dropped here.
 function getUAEvents(){
     try{
         var raw=localStorage.getItem(UA_STORAGE_KEY);
         if(!raw)return[];
-        return JSON.parse(raw);
+        var all=JSON.parse(raw);
+        if(!Array.isArray(all))return[];
+        var real=all.filter(function(e){return e&&!Object.prototype.hasOwnProperty.call(e,'region')});
+        if(real.length!==all.length)saveUAEvents(real);
+        return real;
     }catch(e){return[]}
 }
 function saveUAEvents(events){
     try{localStorage.setItem(UA_STORAGE_KEY,JSON.stringify(events))}catch(e){}
-}
-
-// ═══ SEED DEMO DATA ═══
-function seedUADemoData(){
-    var existing=getUAEvents();
-    // Re-seed if old format (no country field) or too few events
-    var hasGeo=existing.length>0&&existing[0].country;
-    if(existing.length>50&&hasGeo)return;
-    if(!hasGeo)existing=[]; // clear old format data
-    var events=existing.slice();
-    var pages=['index.html','article-1.html','article-2.html','article-3.html','article-4.html','article-5.html','article-6.html','article-7.html','article-8.html','article-9.html','article-10.html','article-11.html','article-12.html','article-13.html','article-14.html','article-15.html','article-16.html','article-17.html','capex-calculator.html','opex-calculator.html','geopolitics-1.html','insights.html','datahall.html','articles.html'];
-    var types=Object.keys(UA_CATEGORIES);
-    var ips=['103.28.'+rand(100,255)+'.'+rand(1,254),'202.46.'+rand(100,255)+'.'+rand(1,254),'118.97.'+rand(100,255)+'.'+rand(1,254),'180.244.'+rand(100,255)+'.'+rand(1,254),'36.68.'+rand(100,255)+'.'+rand(1,254),'103.10.'+rand(100,255)+'.'+rand(1,254),'110.137.'+rand(100,255)+'.'+rand(1,254),'114.124.'+rand(100,255)+'.'+rand(1,254)];
-    var agents=['Mozilla/5.0 Chrome/121','Mozilla/5.0 Safari/17','Mozilla/5.0 Firefox/122','Mozilla/5.0 Edge/121','Mozilla/5.0 Mobile Safari','Mozilla/5.0 Chrome Mobile'];
-    var geos=[
-        {country:'Indonesia',cc:'ID',city:'Jakarta',region:'Jakarta'},
-        {country:'Indonesia',cc:'ID',city:'Surabaya',region:'East Java'},
-        {country:'Indonesia',cc:'ID',city:'Bandung',region:'West Java'},
-        {country:'Indonesia',cc:'ID',city:'Medan',region:'North Sumatra'},
-        {country:'Singapore',cc:'SG',city:'Singapore',region:'Central'},
-        {country:'United States',cc:'US',city:'San Francisco',region:'California'},
-        {country:'United States',cc:'US',city:'New York',region:'New York'},
-        {country:'Malaysia',cc:'MY',city:'Kuala Lumpur',region:'Federal Territory'},
-        {country:'Australia',cc:'AU',city:'Sydney',region:'NSW'},
-        {country:'Germany',cc:'DE',city:'Frankfurt',region:'Hessen'},
-        {country:'India',cc:'IN',city:'Mumbai',region:'Maharashtra'},
-        {country:'Japan',cc:'JP',city:'Tokyo',region:'Kanto'}
-    ];
-    var browsers=['Chrome','Safari','Firefox','Edge','Chrome','Chrome'];
-    var devices=['Desktop','Desktop','Desktop','Mobile','Mobile','Tablet'];
-    var screens=['1920x1080','1366x768','2560x1440','390x844','412x915','1024x768'];
-    var langs=['id','en-US','en-GB','ms','ja','de'];
-    var refs=['direct','google.com','linkedin.com','github.com','direct','direct'];
-    var now=Date.now();
-    // Generate events for last 30 days
-    for(var d=0;d<30;d++){
-        var dayTs=now-(d*86400000);
-        var eventsPerDay=d<1?rand(15,35):d<7?rand(8,20):rand(3,12);
-        for(var e=0;e<eventsPerDay;e++){
-            var ts=dayTs-rand(0,86399999);
-            var type=types[rand(0,types.length-1)];
-            // Adjust probabilities: page_view most common
-            var r=Math.random();
-            if(r<0.35)type='page_view';
-            else if(r<0.50)type='pro_click';
-            else if(r<0.62)type='calc_use';
-            else if(r<0.72)type='demo_login';
-            else if(r<0.82)type='pdf_export';
-            else if(r<0.88)type='cv_download';
-            else if(r<0.94)type='ws_download';
-            else type='signup';
-            var page=pages[rand(0,pages.length-1)];
-            // Make some types more page-specific
-            if(type==='calc_use')page=['capex-calculator.html','opex-calculator.html','article-1.html','article-5.html'][rand(0,3)];
-            if(type==='pro_click')page=pages[rand(1,17)]; // articles only
-            if(type==='pdf_export')page=['capex-calculator.html','opex-calculator.html','article-1.html'][rand(0,2)];
-            var geo=geos[rand(0,geos.length-1)];
-            var devIdx=rand(0,devices.length-1);
-            events.push({
-                type:type,
-                page:page,
-                ts:ts,
-                ip:ips[rand(0,ips.length-1)],
-                country:geo.country,
-                cc:geo.cc,
-                city:geo.city,
-                region:geo.region,
-                tz:'Asia/Jakarta',
-                device:devices[devIdx],
-                browser:browsers[rand(0,browsers.length-1)],
-                screen:screens[devIdx],
-                lang:langs[rand(0,langs.length-1)],
-                ref:refs[rand(0,refs.length-1)],
-                ua:agents[rand(0,agents.length-1)],
-                sid:'ses_'+Math.random().toString(36).substring(2,10)
-            });
-        }
-    }
-    // Sort by timestamp descending
-    events.sort(function(a,b){return b.ts-a.ts});
-    saveUAEvents(events);
-    return events;
 }
 
 // ═══ PERIOD FILTER ═══
@@ -5700,7 +5084,6 @@ function filterEventsByPeriod(events){
 // ═══ MAIN RENDER ═══
 function renderActivity(){
     var allEvents=getUAEvents();
-    if(allEvents.length<50)allEvents=seedUADemoData();
 
     // Filter by period
     var periodEvents=filterEventsByPeriod(allEvents);
@@ -5719,7 +5102,7 @@ function renderActivity(){
     var navBadge=document.getElementById('navActivityCount');
     if(navBadge)navBadge.textContent=todayCount;
     var srcEl=document.getElementById('uaDataSource');
-    if(srcEl)srcEl.textContent='('+allEvents.length+' events in localStorage)';
+    if(srcEl)srcEl.textContent='('+allEvents.length+' events stored in this browser)';
 
     renderUAKpis(periodEvents);
     renderUACatGrid(periodEvents);
@@ -6097,24 +5480,14 @@ function exportUAEventsCSV(){
 var _consoleInited=false;
 function initConsole(){
     if(_consoleInited) return; _consoleInited=true;
-    allUsers=generateUsers();
-    loadManualAccounts();
-    filteredUsers=[...allUsers];
-    activities=generateActivities();
-
-    applySort();
-    renderKPIs();
-    renderDashboardCharts();
-    renderRevenue();
-    renderTable();
-    renderCredentials();
+    startClock();
     renderFeatures();
     renderBenchmarks();
-    renderAudit();
-    renderSubscribers();
     renderSettings();
     renderMayar();
     renderActivity();
+    loadOpsData();
+    loadSubscribers();
 }
 checkAccess().then(function(ok){ if(ok) initConsole(); });
 
@@ -6728,7 +6101,7 @@ function confirmDeleteTierV2(name){
 
 function openAddUserModalV2(){
     if (!AUTH_V2){
-        if (typeof openCreateModal === 'function') openCreateModal();
+        toggleAddAccount(true);
         return;
     }
     document.getElementById('addUserV2Email').value = '';

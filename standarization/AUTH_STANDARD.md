@@ -423,3 +423,24 @@ The obscure URL is not a control: the page is linked from the public changelog a
 `js/rz-supabase.js` is a module and runs after inline scripts — wait for the `rz-supa-ready` event.
 Anything a third party typed (Mayar payers, profile names) is written with `rzEsc()` or `textContent`, never raw into
 `innerHTML`. Gate: `node tools/test-rz-ops-access.mjs` (A1-A3 access, X1 escaping, M1 390 px, E1 errors).
+
+### rz-ops data: real or honest, never generated (v3.57.x)
+
+Every number on the console comes from a source the page can read, or the page says there is none:
+
+| View | Source | Rule |
+|---|---|---|
+| Dashboard KPIs, growth chart, tier donut, Users table | `rzSupa.listAllProfiles()` (root reads all `profiles` under RLS) | counts, sign-ups per UTC month and the month-over-month delta are computed from `tier` / `created_at` |
+| PDF exports, scenarios saved, events by hour/action, activity feed, Audit Log | `rzSupa.listAuditLog(500)` (`audit_log`, written by `rz-scenario.js`) | newest 500 rows; 30-day windows |
+| Revenue / MRR / churn, calculator runs, sessions, uptime, visitor geography | none | shown as "No data source"; payments live in Mayar Payments |
+| Subscribers | `rzSupa.listSubscribers()` (`newsletter_subscribers`) | read-only; the empty state says nothing on the site writes the table |
+| User Activity | `rz_user_events` in the admin's own localStorage | labelled "This browser only"; old generated rows (they carry `region`) are purged, nothing is seeded |
+
+Accounts are created, re-tiered, reset and deleted only through the Supabase paths (`admin_set_tier` RPC,
+`admin-users` Edge Function) from the Users tab. There is no Credentials tab and no in-browser create form.
+`Math.random` must not feed any displayed value. A load or Supabase error is shown, never replaced by a number.
+The clock starts after a root login; `rz-cookie-consent.js` is not loaded on the console.
+Gate laws: D1 (numbers equal the stubbed rows), D1b (audit rows), D2 (two loads give identical text), D3 (no invented
+revenue/uptime/session numbers), D4 (Supabase error visible), R1 (credentials/create form gone), S1 (sources named,
+no seeding), X2 (profile names escaped), C1 (no cookie banner, no clock before login), V1 (anti-vibecode CSS).
+`RZ_OPS_SHOTS=<dir>` also writes dashboard/users screenshots at 1440 and 390 px.
