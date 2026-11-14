@@ -9,6 +9,8 @@
  *   A3  a signed-in root profile → console shown
  *   X1  Mayar fields typed by payers render as text: an <img onerror> payload creates no element and runs nothing
  *   M1  at 390 px no section of the console scrolls the page sideways (scrollWidth <= 390 on every tab)
+ *   M2  at 1024 / 1280 / 1440 px no tab is wider than the viewport (FAILED on 0e8a7dcb0 / v3.58.3: User Activity
+ *       1350-1512 px because chart canvases widened their grid tracks, Benchmarks 1331 px because its tabs did not wrap)
  *   E1  no uncaught page errors in any scenario (E1d: every tab opened on the root console)
  *
  * Function laws (each FAILED on 9b2647b30 / v3.57.2 and PASSES after the "make it real or make it honest" pass):
@@ -294,6 +296,22 @@ try {
   const wide = Object.entries(widths).filter(([, w]) => w > 390);
   law('M1', wide.length === 0, `390 px, ${Object.keys(widths).length} sections, wider than viewport: ${JSON.stringify(Object.fromEntries(wide))}`);
   await r.page.close();
+  const wideDesk = [];
+  for (const w of [1024, 1280, 1440]) {
+    r = await open({ user: ROOT_USER, tier: 'root', width: w });
+    const ws = await r.page.evaluate(async () => {
+      const out = {};
+      for (const sec of document.querySelectorAll('.section')) {
+        showSection(sec.id.replace(/^sec-/, ''));
+        await new Promise(res => setTimeout(res, 250));
+        out[sec.id] = document.documentElement.scrollWidth;
+      }
+      return out;
+    });
+    for (const [id, sw] of Object.entries(ws)) if (sw > w) wideDesk.push(`${w}:${id}=${sw}`);
+    await r.page.close();
+  }
+  law('M2', wideDesk.length === 0, `desktop tabs wider than the viewport: ${JSON.stringify(wideDesk)}`);
 } finally {
   await browser.close();
   server.close();
