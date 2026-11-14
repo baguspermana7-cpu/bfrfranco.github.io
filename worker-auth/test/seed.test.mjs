@@ -37,15 +37,15 @@ test('POST /admin/__seed → 403 when token is missing', async () => {
 
 test('POST /admin/__seed → 403 when token is wrong', async () => {
   const env = makeEnv();
-  const { res } = await call(worker, 'POST', '/admin/__seed?token=wrong-token',
-    { env, body: SEED_BODY });
+  const { res } = await call(worker, 'POST', '/admin/__seed',
+    { env, headers: { 'X-Seed-Token': 'wrong-token' }, body: SEED_BODY });
   assert.equal(res.status, 403);
 });
 
 test('POST /admin/__seed happy path writes users + tiers + config/seeded', async () => {
   const env = makeEnv();
-  const { res, body } = await call(worker, 'POST', '/admin/__seed?token=test-bootstrap',
-    { env, body: SEED_BODY });
+  const { res, body } = await call(worker, 'POST', '/admin/__seed',
+    { env, headers: { 'X-Seed-Token': 'test-bootstrap' }, body: SEED_BODY });
   assert.equal(res.status, 200, `expected 200 got ${res.status}: ${JSON.stringify(body)}`);
   assert.equal(body.data.seeded.users, 2);
   assert.equal(body.data.seeded.tiers, 5);
@@ -83,25 +83,25 @@ test('POST /admin/__seed happy path writes users + tiers + config/seeded', async
 
 test('POST /admin/__seed → 403 on second call (config/seeded already set)', async () => {
   const env = makeEnv();
-  const first = await call(worker, 'POST', '/admin/__seed?token=test-bootstrap',
-    { env, body: SEED_BODY });
+  const first = await call(worker, 'POST', '/admin/__seed',
+    { env, headers: { 'X-Seed-Token': 'test-bootstrap' }, body: SEED_BODY });
   assert.equal(first.res.status, 200);
-  const second = await call(worker, 'POST', '/admin/__seed?token=test-bootstrap',
-    { env, body: SEED_BODY });
+  const second = await call(worker, 'POST', '/admin/__seed',
+    { env, headers: { 'X-Seed-Token': 'test-bootstrap' }, body: SEED_BODY });
   assert.equal(second.res.status, 403);
 });
 
 test('POST /admin/__seed → 400 on malformed body', async () => {
   const env = makeEnv();
-  const { res } = await call(worker, 'POST', '/admin/__seed?token=test-bootstrap',
-    { env, body: { users: 'not-an-array' } });
+  const { res } = await call(worker, 'POST', '/admin/__seed',
+    { env, headers: { 'X-Seed-Token': 'test-bootstrap' }, body: { users: 'not-an-array' } });
   assert.equal(res.status, 400);
 });
 
 test('POST /admin/__seed → 403 when BOOTSTRAP_SEED_TOKEN is unset on env', async () => {
   // If the secret is missing, the endpoint must refuse rather than accept any token.
   const env = makeEnv({ BOOTSTRAP_SEED_TOKEN: undefined });
-  const { res } = await call(worker, 'POST', '/admin/__seed?token=anything',
-    { env, body: SEED_BODY });
+  const { res } = await call(worker, 'POST', '/admin/__seed',
+    { env, headers: { 'X-Seed-Token': 'anything' }, body: SEED_BODY });
   assert.equal(res.status, 403);
 });

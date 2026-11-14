@@ -444,3 +444,19 @@ Gate laws: D1 (numbers equal the stubbed rows), D1b (audit rows), D2 (two loads 
 revenue/uptime/session numbers), D4 (Supabase error visible), R1 (credentials/create form gone), S1 (sources named,
 no seeding), X2 (profile names escaped), C1 (no cookie banner, no clock before login), V1 (anti-vibecode CSS).
 `RZ_OPS_SHOTS=<dir>` also writes dashboard/users screenshots at 1440 and 390 px.
+
+## rz-auth-gateway (worker-auth/) hardening — audit S12
+
+The Cloudflare Worker in `worker-auth/` is NOT deployed (its KV id is a placeholder). These rules hold
+before it ever is; `worker-auth/test/hardening-s12.test.mjs` fails if any of them is undone.
+
+| Rule | Where | Why |
+|---|---|---|
+| `POST /auth/login` and `POST /admin/__seed` accept only `Content-Type: application/json` (415 otherwise) and an `Origin` in the worker's CORS allowlist (403 otherwise, missing Origin included). `POST /auth/logout` has no body: Origin rule only. | `refuseUnsafePost()` in `worker-auth/src/index.js` | A `text/plain` POST is a CORS "simple request": a third-party page could otherwise log a visitor into an attacker's account (login CSRF). |
+| The seed token is sent in the `X-Seed-Token` header, never `?token=`, and compared with `constantTimeEqual()` (SHA-256 both sides, fixed 32-byte compare). | `handleSeed()`, `worker-auth/src/lib/crypto.js` | Query strings land in access logs, proxies and shell history; `!==` leaks the first differing position through timing. |
+| The login limiter (5 / 15 min / IP) runs in the `LoginRateLimiter` Durable Object (`LOGIN_LIMITER` binding + migration in `wrangler.toml`), which serialises ticks per IP. | `worker-auth/src/lib/ratelimit.js` | KV has no compare-and-swap: the get → put counter lets a concurrent burst through (measured: 10 parallel attempts, 10 passed). |
+
+**Known limitation:** without the `LOGIN_LIMITER` binding (unit tests, a bare `wrangler dev`) the limiter falls back
+to the non-atomic KV counter and is also only eventually consistent across colos. Never deploy without the binding.
+The Workers native Rate Limiting binding was not used: its period is 10 s or 60 s and its counters are per colo, so it
+cannot express "5 per 15 minutes per IP".

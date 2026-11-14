@@ -8,7 +8,7 @@
  *   - GET  /auth/me               — current session info (auth.js hydrate)
  *   - GET  /auth/tiers/public     — tier list (no feature matrix)
  *   - GET  /auth/features         — resolved tier defaults + per-user overrides
- *   - POST /admin/__seed          — one-time bootstrap migration (token-gated, self-disabling)
+ *   - POST /admin/__seed          — one-time bootstrap migration (X-Seed-Token header, self-disabling)
  *
  * Future admin CRUD endpoints land in Phase 2 (see plan §3 + §5 Task 2).
  *
@@ -31,6 +31,7 @@ import {
   newSalt,
   b64encode,
   PBKDF2_ITERS,
+  constantTimeEqual,
 } from './lib/crypto.js';
 import {
   createSession,
@@ -50,6 +51,9 @@ import {
   COOKIE_NAME,
 } from './middleware.js';
 import { handleAdminRoute } from './handlers/admin.js';
+
+// Durable Object class for the atomic login limiter (wrangler.toml binding LOGIN_LIMITER).
+export { LoginRateLimiter } from './lib/ratelimit.js';
 
 const ALLOWED_ORIGINS = new Set([
   'https://resistancezero.com',
@@ -107,6 +111,30 @@ function withCors(res, origin) {
   const headers = new Headers(res.headers);
   for (const [k, v] of Object.entries(cors)) headers.set(k, v);
   return new Response(res.body, { status: res.status, statusText: res.statusText, headers });
+}
+
+/**
+ * Login-CSRF guard for state-changing POSTs that do not require a session
+ * (audit S12a). A hostile page can send a cross-site `text/plain` or form
+ * POST without a CORS preflight; requiring `application/json` forces a
+ * preflight (which only allowlisted origins pass) and the explicit Origin
+ * check refuses the request even where a browser skips the preflight.
+ * A missing Origin is refused too: browsers always send it on POST, and the
+ * operator curl in SETUP.md sets it explicitly.
+ *
+ * Returns a refusal Response, or null when the request may proceed.
+ */
+function refuseUnsafePost(request, origin, { requireJson = true } = {}) {
+  if (!origin || !ALLOWED_ORIGINS.has(origin)) {
+    return json(null, { status: 403, error: 'forbidden origin', origin });
+  }
+  if (requireJson) {
+    const type = (request.headers.get('Content-Type') || '').split(';')[0].trim().toLowerCase();
+    if (type !== 'application/json') {
+      return json(null, { status: 415, error: 'content-type must be application/json', origin });
+    }
+  }
+  return null;
 }
 
 function handleHealth(origin) {
@@ -319,11 +347,12 @@ async function handleSeed(request, env, origin) {
   const ip = clientIp(request);
   const ua = request.headers.get('user-agent') || null;
 
-  // Gate 1: token must match the secret. Missing secret → reject (NOT permit).
-  const url = new URL(request.url);
-  const queryToken = url.searchParams.get('token');
+  // Gate 1: the X-Seed-Token header must match the secret. Missing secret →
+  // reject (NOT permit). Header, not query string: URLs land in access logs,
+  // proxies and shell history (audit S12b). Compared in constant time.
+  const headerToken = request.headers.get('X-Seed-Token');
   const expected = env.BOOTSTRAP_SEED_TOKEN;
-  if (!expected || !queryToken || queryToken !== expected) {
+  if (!(await constantTimeEqual(headerToken, expected))) {
     await audit(env, { actor: null, action: 'seed.fail.token', target: null, ip, ua });
     return json(null, { status: 403, error: 'forbidden', origin });
   }
@@ -430,10 +459,11 @@ export default {
       if (method === 'GET' && pathname === '/health') return handleHealth(origin);
 
       if (method === 'POST' && pathname === '/auth/login') {
-        return handleLogin(request, env, origin);
+        return refuseUnsafePost(request, origin) || handleLogin(request, env, origin);
       }
       if (method === 'POST' && pathname === '/auth/logout') {
-        return handleLogout(request, env, origin);
+        // No body, so no Content-Type rule — only the Origin rule.
+        return refuseUnsafePost(request, origin, { requireJson: false }) || handleLogout(request, env, origin);
       }
       if (method === 'GET' && pathname === '/auth/me') {
         return handleMe(request, env, origin);
@@ -445,7 +475,7 @@ export default {
         return handleFeatures(request, env, origin);
       }
       if (method === 'POST' && pathname === '/admin/__seed') {
-        return handleSeed(request, env, origin);
+        return refuseUnsafePost(request, origin) || handleSeed(request, env, origin);
       }
 
       // All other /admin/* routes go through the Phase 2 CRUD handler. We

@@ -55,8 +55,9 @@ export async function call(worker, method, pathname, {
   cookie = null,
   ip = '203.0.113.7',
   env = null,
+  headers: extraHeaders = {},
 } = {}) {
-  const headers = { 'Origin': origin };
+  const headers = { 'Origin': origin, ...extraHeaders };
   if (body != null) headers['Content-Type'] = 'application/json';
   if (cookie) headers['Cookie'] = cookie;
   if (ip) headers['cf-connecting-ip'] = ip;

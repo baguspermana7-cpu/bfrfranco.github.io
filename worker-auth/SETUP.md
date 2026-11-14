@@ -50,7 +50,8 @@ committed to the repo and never returned to the browser.
 ## 4. Set the bootstrap seed token (Phase 1 prerequisite)
 
 Used **once** by the Phase 1 `POST /admin/__seed` endpoint as a pre-shared
-secret on the query string. After a successful seed run, the endpoint
+secret in the `X-Seed-Token` request header (never the query string: URLs land in
+access logs and shell history; the worker compares it in constant time). After a successful seed run, the endpoint
 self-disables — it refuses to run when KV already contains the
 `config/seeded` marker (see plan §6).
 
@@ -104,8 +105,9 @@ TOKEN=$(grep BOOTSTRAP_SEED_TOKEN .dev.vars | cut -d= -f2-)   # local dev
 curl -i -X POST \
   -H 'Content-Type: application/json' \
   -H 'Origin: https://resistancezero.com' \
+  -H "X-Seed-Token: $TOKEN" \
   --data @seed-body.json \
-  "https://rz-auth-gateway.<account>.workers.dev/admin/__seed?token=$TOKEN"
+  "https://rz-auth-gateway.<account>.workers.dev/admin/__seed"
 ```
 
 Expected response (200):
@@ -127,7 +129,9 @@ BOOTSTRAP_SEED_TOKEN=dev-token-for-local-only
 ```
 
 Then `npx wrangler dev --port 8788` and the curl above against
-`http://127.0.0.1:8788/admin/__seed?token=dev-token-for-local-only`.
+`http://127.0.0.1:8788/admin/__seed` with `-H 'X-Seed-Token: dev-token-for-local-only'`.
+The seed and login endpoints refuse any `Origin` outside the worker's CORS allowlist and any
+`Content-Type` other than `application/json` (403 / 415).
 
 ## 5. Shell-based admin operations (Phase 2)
 

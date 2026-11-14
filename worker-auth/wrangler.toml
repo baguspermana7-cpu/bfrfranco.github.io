@@ -9,3 +9,15 @@ kv_namespaces = [{ binding = "RZ_AUTH_KV", id = "PLACEHOLDER_REPLACE_VIA_SETUP_M
 #   ADMIN_SESSION_SECRET    — HMAC pepper for session tokens (32+ bytes random)
 #   BOOTSTRAP_ROOT_EMAILS   — comma-separated seed root emails for one-time
 #                             /admin/__seed endpoint (bagus@..., admin@...)
+
+# Atomic per-IP login limiter (audit S12c). One Durable Object per client IP;
+# without this binding the code falls back to a NON-atomic KV counter that a
+# concurrent burst can exceed — never deploy without it. SQLite-backed class,
+# available on the Workers Free plan.
+[[durable_objects.bindings]]
+name = "LOGIN_LIMITER"
+class_name = "LoginRateLimiter"
+
+[[migrations]]
+tag = "v1-login-limiter"
+new_sqlite_classes = ["LoginRateLimiter"]

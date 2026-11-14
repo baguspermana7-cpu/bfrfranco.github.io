@@ -72,6 +72,26 @@ function timingSafeEqualStr(a, b) {
   return diff === 0;
 }
 
+/**
+ * Constant-time equality for secrets of any length (seed token, future API
+ * keys). Both sides are hashed to fixed-length SHA-256 digests first, so the
+ * compare walks 32 bytes whatever the input lengths are and leaks neither
+ * the position of the first difference nor the length of the expected
+ * secret. An empty or non-string value never matches.
+ */
+export async function constantTimeEqual(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string' || !a || !b) return false;
+  const [da, db] = await Promise.all([
+    subtle.digest('SHA-256', enc.encode(a)),
+    subtle.digest('SHA-256', enc.encode(b)),
+  ]);
+  const x = new Uint8Array(da);
+  const y = new Uint8Array(db);
+  let diff = 0;
+  for (let i = 0; i < x.length; i++) diff |= x[i] ^ y[i];
+  return diff === 0;
+}
+
 export async function verifyPassword(password, salt, hash, iters = PBKDF2_ITERS) {
   if (typeof hash !== 'string') return false;
   const saltBytes = salt instanceof Uint8Array ? salt : b64decode(salt);
