@@ -8,10 +8,10 @@ every surface re-skins** (the owner's "auto update ini semua" contract).
 | Surface | Adoption | Notes |
 |---|---|---|
 | `Apps/finance-terminal/index.html` | `<html … data-rz-suite>` + `<link …rz-finance-suite.css>` | Local `--bg0…--cyn` names remapped in §2 of the suite file (canonical vocabulary). |
-| `rz-ops-p7x3k9m.html` | same | Dark-mode style block tokenized to `var(--fs-*)` (443 refs). `body.light-mode` rules keep literal hex (that page's light mode is class-based, vars never flip there). |
+| `rz-ops-p7x3k9m.html` | same | Both themes come from the tokens (w5, 2026-11-14): the toggle sets `<html data-theme>` (and keeps `body.light-mode` as the JS flag for chart colours); the 111 `body.light-mode` hex rules were deleted, and inline `style=` colours in markup and generated HTML read `var(--fs-*)`. The print report (`openReport`) keeps literal hex: it renders in a new window without the tokens. |
 | `account.html` | same | Rebuilt ON the tokens (Account Center, v1.55.0). |
-| `Apps/stock_screener/prototype/*` (StockMap) | `<html … data-rz-suite="stockmap">` | Its local var names (`--bg`, `--accent`, `--font-serif`, …) remapped to dark canonical values — flips the whole app dark; serif display type retired to the sans stack. |
-| `Apps/dca-app` | at BUILD time | `src/ThemeContext.jsx` + `src/index.css` carry the canonical values; changing suite colors requires mirroring there + `npm run build` + redeploying `dist/`. |
+| `Apps/stock_screener/prototype/*` (StockMap) | `<html … data-rz-suite="stockmap">` + `assets/theme.js` in `<head>` | Its local var names (`--bg`, `--accent`, `--font-serif`, …) remapped to the canonical tokens; dark by default, light when `data-theme="light"` (theme-synced from rz-ops). Serif display type retired to the sans stack. |
+| `Apps/dca-app` | at BUILD time | `src/ThemeContext.jsx` + `src/index.css` carry the canonical values; changing suite colors (or the theme-sync listener) requires mirroring there + `npx vite build` + committing `dist/`. No `node_modules` in a worktree: symlink `~/rz-work/Apps/dca-app/node_modules` for the build and remove the link before committing. |
 
 ## The contract
 
@@ -31,9 +31,22 @@ every surface re-skins** (the owner's "auto update ini semua" contract).
    fallback (`getItem(k) || '<literal>'`). The secret gate `node tools/test-no-client-secrets.mjs --law X1.2a`
    (PRD-X-DEFECTS FR-X1.3) fails a new hit; `Apps/finance-terminal/index.html` is baselined until OA-1.
 5. **Cache-bust** the suite `?v=` on every adopting page when the file changes.
-6. **Light theme**: `html[data-rz-suite][data-theme="light"]` flips the `--fs-*` values.
-   Surfaces with a different light mechanism (rz-ops `body.light-mode`) keep their own
-   light literals — only their dark look is suite-governed.
+6. **Light theme**: `html[data-rz-suite][data-theme="light"]` flips the `--fs-*` values. That is the ONLY
+   light mechanism on the suite: a surface switches the attribute, never adds per-selector light hex
+   (rz-ops did until w5 and drifted to 1.4–2.7:1 text). Every token pair holds WCAG AA as text on
+   `--fs-bg0…3` in both themes (w5 raised dark `--fs-t4` to `#808998`, light `--fs-t4` `#5b6577`,
+   `--fs-grn` `#047857`, `--fs-red` `#b91c1c`, `--fs-amb` `#92400e`, `--fs-cyn` `#155e75`).
+7. **Theme sync for embedded apps** (rz-ops hosts DCA, Finance Terminal, StockMap in same-origin iframes):
+   - the console posts `{type:'theme-sync', theme:'light'|'dark'}` with `targetOrigin = location.origin`
+     to EVERY embedded app on each toggle AND on each iframe `load` (they load lazily, after the console
+     theme is set — a toggle-only post leaves a late-loading app on its own default);
+   - each app listens with an origin check (`e.origin === location.origin`), accepts only `light`/`dark`,
+     and applies it to its own mechanism (`<html data-theme>`; DCA through `ThemeContext` state);
+   - on first paint each app reads `localStorage.rz_admin_theme` when framed (`window.parent !== window`),
+     else its own saved key (`rz_ft_theme`, `dca-theme`, `stockmap_theme`);
+   - a new embedded app joins `THEME_IFRAMES` in rz-ops and implements the three points above.
+   Gate: `node tools/test-rz-ops-theme.mjs` (T1 reads each app's `data-theme` AND the luminance it paints,
+   after load and after each toggle, starting from either theme).
 
 ## Accessibility notes
 
@@ -53,7 +66,9 @@ every surface re-skins** (the owner's "auto update ini semua" contract).
 
 ## Gotchas paid for
 
-- rz-ops light mode is `body.light-mode` (class), not `[data-theme]` — blanket
-  hex→var tokenization corrupted its light rules; light-rule literals were restored.
+- rz-ops light mode WAS `body.light-mode` (class) with literal hex — tokenizing the dark rules while the
+  light rules stayed literal corrupted them once. Since w5 the class only flags JS; `<html data-theme>`
+  flips the tokens and the hex light rules are gone. A contrast checker must composite gradients by
+  every stop: the seed audit read a gradient button against its parent colour and called it 1.05:1.
 - The DCA app is a built React bundle: it CANNOT consume the runtime remap; tokens
   are mirrored at build (see table). If suite colors change, rebuild dca-app.

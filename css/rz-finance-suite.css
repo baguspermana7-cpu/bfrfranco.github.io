@@ -28,7 +28,7 @@ html[data-rz-suite] {
   --fs-t1: #f1f5f9;
   --fs-t2: #e2e8f0;
   --fs-t3: #969eaa;
-  --fs-t4: #64748b;
+  --fs-t4: #808998;   /* v3.58 w5 — was #64748b: 3.7:1 on --fs-bg2, under AA for the labels it sets; now 5.0:1 */
 
   /* accent (suite identity — matches terminal + rz-ops today) */
   --fs-acc:   #b45309;
@@ -64,7 +64,7 @@ html[data-rz-suite][data-theme="light"] {
   --fs-t1: #0f172a;
   --fs-t2: #1e293b;
   --fs-t3: #475569;
-  --fs-t4: #64748b;
+  --fs-t4: #5b6577;   /* w5 — #64748b fell to 4.3:1 on --fs-bg3; now 5.4:1 */
   /* light-mode signal + accent variants — the dark 300/400-level hues fall to
      ~1.9-2.5:1 on white; these darkened stops pass AA as text (design.md ramp) */
   /* v3.6.1 — was #6d28d9 / #7c3aed. The ratios that justified violet still hold; the hue does not
@@ -73,11 +73,11 @@ html[data-rz-suite][data-theme="light"] {
      both are already the site's instrument accent (--fs-cyn, --cmp-b on the comparison pages). */
   --fs-acc:  #92400e;
   --fs-acc2: #7A4800;
-  --fs-grn: #059669;  --fs-grnbg: rgba(5, 150, 105, .12);
-  --fs-red: #dc2626;  --fs-redbg: rgba(220, 38, 38, .10);
-  --fs-amb: #b45309;  --fs-ambbg: rgba(180, 83, 7, .12);
+  --fs-grn: #047857;  --fs-grnbg: rgba(5, 150, 105, .12);   /* w5 — #059669 is 3.8:1 on white, not AA as text; emerald-700 5.5:1 */
+  --fs-red: #b91c1c;  --fs-redbg: rgba(220, 38, 38, .10);   /* w5 — red-600/amber-700 fell under 4.5:1 on their own tints */
+  --fs-amb: #92400e;  --fs-ambbg: rgba(180, 83, 7, .12);
   --fs-blu: #2563eb;  --fs-blubg: rgba(37, 99, 235, .10);
-  --fs-cyn: #0e7490;
+  --fs-cyn: #155e75;   /* w5 — cyan-800: 7.3:1 on white, holds AA on a cyan tint */
 }
 
 /* ── §2 Local-name remaps (surface adoption layer) ───────────────────────────
@@ -138,6 +138,13 @@ html[data-rz-suite="stockmap"] {
   --font-sans: var(--fs-sans);
   --font-mono: var(--fs-mono);
   color-scheme: dark;
+}
+/* StockMap light (theme-synced from rz-ops, FINANCE_SUITE_STANDARD.md §Theme sync): the --fs-* values
+   already flip; only the two literal hairlines and the color-scheme are dark-only above. */
+html[data-rz-suite="stockmap"][data-theme="light"] {
+  --border: var(--fs-bd);
+  --border-mid: rgba(71, 85, 105, .35);
+  color-scheme: light;
 }
 html[data-rz-suite="stockmap"] body {
   font-family: var(--fs-sans);

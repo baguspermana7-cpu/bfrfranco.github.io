@@ -91,6 +91,11 @@ const ThemeContext = createContext();
 export function ThemeProvider({ children }) {
   const [mode, setMode] = useState(() => {
     try {
+      // Embedded in the rz-ops console: start on the console's theme (FINANCE_SUITE_STANDARD.md §Theme sync).
+      if (window.parent !== window) {
+        const host = localStorage.getItem("rz_admin_theme");
+        if (host === "light" || host === "dark") return host;
+      }
       const saved = localStorage.getItem("dca-theme");
       if (saved === "light" || saved === "dark") return saved;
     } catch {}
@@ -104,6 +109,7 @@ export function ThemeProvider({ children }) {
   // Listen for theme sync from parent (admin console iframe host)
   useEffect(() => {
     const handler = (e) => {
+      if (e.origin !== window.location.origin) return;
       if (e.data?.type === 'theme-sync') {
         const t = e.data.theme === 'light' ? 'light' : 'dark';
         setMode(t);

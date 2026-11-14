@@ -7,7 +7,7 @@
 <link rel="icon" type="image/png" href="../../assets/Favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="../../css/rz-finance-suite.css?v=20260908-editorial">
+<link rel="stylesheet" href="../../css/rz-finance-suite.css?v=20261114-0a57fe80">
 <script src="../../js/rz-explain-db.js?v=2026-07-24-w" defer></script>
 <script src="../../js/rz-explain.js?v=2026-07-16" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -1375,8 +1375,11 @@ function downloadCSV(csv,name){const b=new Blob([csv],{type:'text/csv'});const u
 /* ═══════════════════════════════════════════════════════════════
    SECTION 6: THEME SYNC
    ═══════════════════════════════════════════════════════════════ */
-window.addEventListener('message',e=>{if(e.origin!==window.location.origin)return;if(e.data&&e.data.type==='theme-sync'){document.documentElement.setAttribute('data-theme',e.data.theme);reRenderCharts()}});
-(function(){const t=localStorage.getItem(CFG.LS.THEME);if(t)document.documentElement.setAttribute('data-theme',t)})();
+/* Embedded in rz-ops: the console posts {type:'theme-sync',theme} on our load and on every toggle
+   (FINANCE_SUITE_STANDARD.md §Theme sync). Same-origin only; only 'light'/'dark' are applied. */
+window.addEventListener('message',e=>{if(e.origin!==window.location.origin)return;if(e.data&&e.data.type==='theme-sync'&&(e.data.theme==='light'||e.data.theme==='dark')){document.documentElement.setAttribute('data-theme',e.data.theme);reRenderCharts()}});
+/* First paint: inside the console take the console's saved theme, standalone our own. */
+(function(){let t=null;try{if(window.parent!==window)t=localStorage.getItem('rz_admin_theme');if(!t)t=localStorage.getItem(CFG.LS.THEME)}catch(e){}if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)})();
 function reRenderCharts(){Object.keys(S.charts).forEach(k=>{try{S.charts[k].options.scales.x.grid.color=chartColors().grid;S.charts[k].options.scales.x.ticks.color=chartColors().text;S.charts[k].options.scales.y.grid.color=chartColors().grid;S.charts[k].options.scales.y.ticks.color=chartColors().text;S.charts[k].update('none')}catch(e){}})}
 
 /* ═══════════════════════════════════════════════════════════════
