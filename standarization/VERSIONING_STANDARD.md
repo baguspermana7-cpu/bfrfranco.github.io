@@ -138,3 +138,23 @@ python3 tools/insert-version-script.py --dry-run
 # Apply changes
 python3 tools/insert-version-script.py --apply
 ```
+
+## Rebase check — a dropped tag hides behind its token (v3.58.1, 2026-11-14)
+
+A release rebased with `-X ours` onto a moved `origin/main` resolves every cache-token conflict in favour of upstream.
+When the release ADDED a `<script>` or `<link>` tag that carries a `?v=` token, the upstream hunk wins and the tag
+disappears. The usual "lost hunks" check filters out lines containing `?v=` to ignore token churn, so it cannot see
+that loss: v3.58.0 shipped `pue-calculator.html` without `js/rz-pue-measured.js` and the live Measured tab did nothing,
+while the R125 gate had passed on the pre-rebase tree.
+
+Rule: after any rebase of a release, before the push, compare the asset tags of every page the release touched with
+their tokens stripped, pre-rebase commit against HEAD:
+
+```bash
+norm(){ git show "$1:$2" | grep -o '<script[^>]*src="[^"]*"\|<link[^>]*href="[^"]*css[^"]*"' | sed 's/?v=[^"]*//' | sort; }
+for f in $(git diff --name-only <merge-base> <pre-rebase> -- '*.html'); do
+  diff <(norm <pre-rebase> "$f") <(norm HEAD "$f") | grep '^<' && echo "DROPPED in $f"; done
+```
+
+Any `<` line that is not an intentional upstream removal is a dropped tag: restore it, then re-run the page's browser
+gate on the rebased tree, not the pre-rebase one.

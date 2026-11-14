@@ -11,6 +11,15 @@ release sections rather than semver.
 
 ---
 
+## v3.58.1 — 2026-11-14 — PUE calculator: the Measured tab works again
+
+### Fixed
+- **pue-calculator.html** loaded no `js/rz-pue-measured.js`: the v3.58.0 rebase onto v3.57.7 resolved the cache-token
+  conflict at the end of the page in favour of the upstream copy and dropped the new script tag with it, so the live
+  Measured tab did nothing (the R125 gate had run on the pre-rebase tree). The tag is back after `rz-engine.min.js`.
+  Rebase check extended: script and link tags are compared with their tokens stripped, not skipped (`tools/ship-gate.sh`
+  unchanged; procedure in `standarization/VERSIONING_STANDARD.md`).
+
 ## v3.58.0 — 2026-11-14 — Measured PUE against a public reference; employer cards keep their size
 
 ### Added
