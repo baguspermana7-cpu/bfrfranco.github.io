@@ -11,6 +11,32 @@ release sections rather than semver.
 
 ---
 
+## v3.57.4 — 2026-11-14 — Admin console shows real accounts, never generated numbers
+
+### Fixed
+- **The admin dashboard was invented.** Total users, active/pro users, revenue, the growth chart, the Users table, the
+  audit log and the activity feed came from `Math.random()` (39 fake people; revenue `pro × 49`; uptime "99.97 %"),
+  under a "Real-time platform metrics" heading, and changed on every reload. They now read Supabase: accounts from
+  `profiles` (totals, tiers, sign-ups this month with a real change against last month, 6-month growth, tier donut,
+  the Users table) and events from `audit_log` (PDF exports, saved scenarios, events, active accounts, events by hour
+  and by action, recent activity). Metrics nothing records — revenue/MRR/churn, calculator runs, sessions, uptime,
+  geography — say "No data source" instead of a number. Loading and Supabase-error states are shown.
+- Subscribers reads `newsletter_subscribers` and says plainly that no page writes to it any more; User Activity is
+  labelled "This browser only" and no longer seeds ~300 random events into localStorage.
+
+### Removed
+- The Credentials tab (rows of "[redacted]"), the in-memory "Create account" form (accounts vanished on reload) and
+  the stale public-password warning. Supabase add / tier / reset / delete live in the Users table.
+
+### Changed
+- Admin console: no cookie banner over the console, no hover lifts, no blurred modal backdrop, flat buttons; one
+  theme-sync helper; the clock starts after sign-in.
+
+### Gate
+- `tools/test-rz-ops-access.mjs` grows to 17 laws with a 7-profile / 4-event stub: D1 numbers equal the stubbed rows,
+  D2 two loads render identical text, D3 no invented revenue/uptime, R1 removed tabs stay gone, S1 honest sources,
+  E1d no page error on any tab. On v3.57.3 it fails 10 of them.
+
 ## v3.57.3 — 2026-11-14 — Glossary links work, hreflang pairs, geolocation only after consent
 
 ### Fixed
