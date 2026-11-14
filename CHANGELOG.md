@@ -11,6 +11,30 @@ release sections rather than semver.
 
 ---
 
+## v3.57.3 — 2026-11-14 — Glossary links work, hreflang pairs, geolocation only after consent
+
+### Fixed
+- **26 glossary links went to 404.** Since 0120a8e48 their href and text were swapped
+  (`<a href="Workforce Strategies">article-27.html#section-4</a>`). Swapped back; rule G5 in `tools/test-glossary.py`
+  fails any href with a space whose text names an `.html` page (26 findings on the old page, 0 now).
+- **hreflang was one-way.** `/id/`, `/id/artikel.html`, `/id/glosarium.html` named their English pages, but
+  `index.html`, `articles.html`, `glossary.html` never named the Indonesian ones, so search engines ignore the pair.
+  Both directions now; the homepage alternate is `https://resistancezero.com/` (its canonical), not `/index.html`.
+- **The author was four different people to search engines.** One Person `@id` (`/#person`) and one job title
+  ("Engineering Operations Manager") on every page that had another (tools, articles, article-9, LTC modelling lab).
+  `tools/test-hreflang-reciprocity.py` checks reciprocity, own-language = canonical, and the author identity.
+
+### Security / privacy
+- **Visitor IP went to ipapi.co on every page view, without consent.** `rz-tracker.js` now looks the country up only
+  after the visitor accepts cookies (`rz_cookie_consent = accepted`, or the `rz-cookie-consent` event); otherwise it
+  uses the fallback. `privacy.html` names ipapi.co, what is sent and why. `tools/test-tracker-consent.mjs`: no request
+  before consent or after decline (the old tracker made one in both), one after accepting.
+- `tools/test-no-client-secrets.mjs` stream-scans text files over 5 MB instead of skipping them (`llms-full.txt`).
+
+### Ledger
+- `SEO_AUDIT_LEDGER.md`: the 14 open rows of the 2026-10-16 audit merged in with today's measurements; these fixes
+  CLOSED with their gates. Still open for the owner: GitHub Pages "Enforce HTTPS" (http answers 200, no HSTS).
+
 ## v3.57.2 — 2026-11-14 — Published secrets removed, signup can no longer create root
 
 ### Security
