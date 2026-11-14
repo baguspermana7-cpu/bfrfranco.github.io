@@ -11,6 +11,36 @@ release sections rather than semver.
 
 ---
 
+## v3.58.3 — 2026-11-14 — Admin suite theme aligned: embedded apps follow the console, light mode from tokens
+
+### Fixed
+- **The apps inside the admin console ignored its theme.** In light mode Finance Terminal, Stock Investment (DCA) and
+  IDR Stocks stayed dark: the console sent the theme only when the toggle was pressed and only to two of them, and DCA
+  and IDR had no listener. It is now sent on every iframe load and every toggle to all three; each app checks the
+  origin and applies it to `<html data-theme>`, and reads `rz_admin_theme` on first paint when embedded.
+- **rz-ops light mode was 111 per-selector hex overrides.** The toggle now switches `<html data-theme>` and light mode
+  comes from the `--fs-*` suite tokens; ~357 inline colours moved to tokens. Text below 4.5:1 (3:1 large) fell from
+  154 (dark) / 166 (light) to 0 on every tab. Shared change: `css/rz-finance-suite.css` darker light-mode
+  t4/grn/red/amb/cyn and dark t4 #808998, so Finance Terminal, account.html and StockMap read better too.
+- **System Health invented numbers** ("99.97 %", "42 ms", "0.02 %") and offered "Reset Mock Data". It now times one
+  real Supabase read (reachable + round-trip) and shows the real localStorage size; the mock buttons are gone.
+  Platform Config states only facts: hosting is GitHub Pages (not Cloudflare), 11 calculators from the registry,
+  sessions governed by Supabase Auth, environment from the host name.
+- The topbar clock is labelled with the viewer's real time zone instead of a fixed "UTC+7".
+- The Finance Terminal status line no longer scrolls off the left edge ("ket data unavailable").
+
+### Changed
+- One accent: violet (`#8b5cf6`, a rejected colour) removed from the DCA app (checked by hue), no modal blur, no glow;
+  "Add account" and "Promote to educator" use the amber outlined button; the login screen follows the console theme,
+  without the orb/grid backdrop, and says "Supabase Auth" instead of an unverified "256-bit encrypted".
+  Tier Manager v2 stays hidden while its worker is not deployed.
+
+### Gate
+- `tools/test-rz-ops-theme.mjs`: T1 every embedded app's theme equals the console's after load and after each toggle,
+  T2/T3 no theme-mismatched surface and no low-contrast text on any tab in either theme (gradient-aware), T4 no
+  invented health numbers, T5 real time zone, T7 no violet hue or blur, T8 login in both themes, T9 Platform Config
+  true, T10 status line on screen. It fails 19 laws on v3.58.1.
+
 ## v3.58.2 — 2026-11-14 — DCMOC: jspdf 4 + next 16.4.6, production audit clean; Country Intelligence PDF works
 
 ### Security
