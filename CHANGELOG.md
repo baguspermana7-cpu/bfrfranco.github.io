@@ -11,6 +11,14 @@ release sections rather than semver.
 
 ---
 
+## v3.58.5 — 2026-11-14 — Finance Terminal names a blocked gateway instead of timing out tile by tile
+
+### Fixed
+- On a network that blocks `*.workers.dev` (checked live on an Indonesian ISP) the gateway request hangs instead of
+  failing, so v3.58.4 showed "timed out" on every tile, no banner, and the ticker stayed on "Loading market data..."
+  for over a minute while queued requests each waited 10 s. Two timeouts in a row now count as unreachable: the
+  banner appears and the remaining requests fail at once until Retry. Gate law D7 (gateway hangs) failed on v3.58.4.
+
 ## v3.58.4 — 2026-11-14 — Finance Terminal reads real data through the gateway; admin tabs fit on desktop
 
 ### Fixed

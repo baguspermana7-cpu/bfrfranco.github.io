@@ -19,6 +19,10 @@
  *   D6  the terminal does not hammer the gateway: never more than 4 gateway requests in flight, and a 429
  *       is retried exactly once (2 /crypto requests per load, not 1 and not a storm).
  *
+ *   D7  gateway HANGS (what an ISP DNS block to a blockpage looks like: no response, no network error): the
+ *       banner shows within 30 s and the ticker tape leaves "Loading market data..." (FAILED on d8e0c26ee / v3.58.4:
+ *       every tile said "timed out", no banner, the queue kept the tape loading for over a minute).
+ *
  * Usage: node tools/test-finance-terminal-data.mjs [--screens <dir>] [--only healthy|ratelimited|down]
  */
 import fs from 'node:fs';
@@ -197,12 +201,34 @@ async function run({ scenario, theme, width = 1440 }) {
 const FAKE = [/\$0(?:\.0+)?(?![\d.,]*[1-9])/, /(?<![\d.])[+-]?0\.0+%/, /(?<![\d.,])0 (?:coins|active)\b/, /(?<![\d.])0\.0000(?!\d)/];
 const fakeIn = (s) => (s == null ? [] : FAKE.map((re) => (s.match(re) || [])[0]).filter(Boolean));
 
-const scen = only ? [only] : ['healthy', 'ratelimited', 'down'];
+const scen = only ? (only === 'hang' ? [] : [only]) : ['healthy', 'ratelimited', 'down'];
 const runs = [];
 for (const s of scen) for (const theme of ['dark', 'light']) {
   const r = await run({ scenario: s, theme });
   runs.push(r);
   console.log(`    ${s}/${theme}: page errors ${r.errors.length}${r.errors.length ? ' [' + r.errors[0] + ']' : ''}, proxy hits ${r.proxyHits.length}, direct market hits ${r.directHits.length}${r.directHits.length ? ' [' + r.directHits[0] + ']' : ''}, max gateway in flight ${r.maxInflight}, /crypto requests ${r.cryptoReqs}, banner ${r.banner ? 'yes' : 'no'}`);
+}
+// D7: the gateway never answers (requests left pending), the fallback is down
+let hang = null;
+if (!only || only === 'hang') {
+  const page = await browser.newPage();
+  await page.setViewport({ width: 1440, height: 900 });
+  await page.setRequestInterception(true);
+  page.on('request', (r) => {
+    const u = r.url();
+    if (u.startsWith(GW)) return; // never answered
+    if (BINANCE.test(u) || PROXY.test(u) || DIRECT_MARKET.test(u)) return r.abort('failed');
+    if (CSV[u]) return r.abort('failed');
+    if (u.startsWith('http://127.0.0.1') || ALLOW.test(u) || u.startsWith('data:') || u.startsWith('blob:')) return r.continue();
+    return r.abort();
+  });
+  const t0 = Date.now();
+  await page.goto(BASE, { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await page.evaluate(() => { const m = document.getElementById('apiModal'); if (m) m.style.display = 'none'; });
+  const ok = await page.waitForFunction(() => { const b = document.getElementById('gwBanner'); const t = document.getElementById('tickerTape');
+    return b && !b.hidden && t && !/Loading market data/.test(t.innerText); }, { timeout: 30000, polling: 250 }).then(() => true).catch(() => false);
+  hang = { ok, secs: ((Date.now() - t0) / 1000).toFixed(1), tape: await page.evaluate(() => (document.getElementById('tickerTape') || {}).innerText || '') };
+  await page.close();
 }
 await browser.close(); server.close();
 
@@ -246,6 +272,8 @@ law('D5', !errs.length, errs.length ? errs.map((r) => `${r.scenario}/${r.theme}:
 const maxIn = Math.max(...runs.map((r) => r.maxInflight));
 const rlCrypto = rl.map((r) => r.cryptoReqs);
 law('D6', maxIn <= 4 && (!rl.length || rlCrypto.every((n) => n === 2)), `max gateway requests in flight ${maxIn} (limit 4); /crypto requests per rate-limited run [${rlCrypto.join(', ')}] (want 2: one call + one retry)`);
+
+if (hang) law('D7', hang.ok, `gateway hangs: banner + tape settled ${hang.ok ? 'after ' + hang.secs + ' s' : 'NOT within 30 s'}; tape "${hang.tape.replace(/\s+/g, ' ').slice(0, 80)}"`);
 
 console.log(failures.length ? `\nFAIL ${failures.join(', ')}` : '\nALL FINANCE-TERMINAL DATA LAWS PASS');
 process.exit(failures.length ? 1 : 0);

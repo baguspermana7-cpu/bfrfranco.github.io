@@ -774,9 +774,11 @@ function fetchWithTimeout(url,ms){
 /* Gateway client. Errors carry .kind: 'net' (no connection — DNS block, offline), 'timeout', 'rate' (429),
    'upstream' (5xx), 'http' (other status). A 429 or 5xx is retried ONCE, after Retry-After (capped 8 s) or 3 s.
    Identical GETs in flight share one request; successful bodies are reused for 30 s. */
-const GW_STATE={unreachable:false,inflight:{},memo:{}};
+const GW_STATE={unreachable:false,timeouts:0,inflight:{},memo:{}};
 function gwError(kind,status,msg){const e=new Error(msg||('GW '+(status||kind)));e.kind=kind;e.status=status||0;return e}
 async function gwOnce(u){
+  /* once the gateway is known unreachable, queued calls fail at once instead of each waiting 10 s */
+  if(GW_STATE.unreachable)throw gwError('net',0,'gateway unreachable');
   let r;
   try{r=await fetchWithTimeout(u,10000)}
   catch(e){throw (e&&e.name==='AbortError')?gwError('timeout',0,'gateway timeout'):gwError('net',0,'gateway unreachable')}
@@ -805,9 +807,14 @@ async function gw(path,params){
         await sleep(e.wait||3000);
         d=await gwLim.add(()=>gwOnce(u));
       }
-      gwReachable(true);GW_STATE.memo[u]={d:d,t:Date.now()};
+      GW_STATE.timeouts=0;gwReachable(true);GW_STATE.memo[u]={d:d,t:Date.now()};
       return d;
-    }catch(e){gwReachable(e.kind!=='net');throw e}
+    }catch(e){
+      /* a blocked ISP often makes the request hang rather than fail: two timeouts in a row count as unreachable */
+      if(e.kind==='timeout'&&++GW_STATE.timeouts>=2){e.kind='net';e.message='gateway unreachable'}
+      if(e.kind==='net')gwReachable(false);
+      throw e;
+    }
   })().finally(()=>{delete GW_STATE.inflight[u]});
   GW_STATE.inflight[u]=p;
   return p;
@@ -826,7 +833,7 @@ function gwReachable(ok){
   }
   b.hidden=false;
 }
-function gwRetryAll(){GW_STATE.memo={};QUOTE_CACHE.clear();CRYPTO_CACHE.d=null;switchTab(S.tab||'overview')}
+function gwRetryAll(){GW_STATE.memo={};GW_STATE.unreachable=false;GW_STATE.timeouts=0;QUOTE_CACHE.clear();CRYPTO_CACHE.d=null;switchTab(S.tab||'overview')}
 /* Why a value is missing, in a few words a reader can act on. */
 function whyMissing(e){
   if(!e)return 'source unavailable';
