@@ -6,7 +6,7 @@
  *   node tools/test-no-client-secrets.mjs --report [--json]
  *   node tools/test-no-client-secrets.mjs --self-test
  *
- * Scans every git-tracked text file (node_modules skipped, > 5 MB skipped, non-UTF-8 skipped; dcmoc/_next IS
+ * Scans every git-tracked text file (node_modules skipped, > 5 MB streamed line by line (binary extension / NUL byte / non-UTF-8 skipped), non-UTF-8 skipped; dcmoc/_next IS
  * scanned: Next.js inlines env values into published chunks). The matched text is NEVER printed, logged or
  * written: output is file, line, pattern name and match length only.
  *   X1.2a  a hit not covered by tools/secret-scan-baseline.json (file + pattern, count = most allowed) fails.
@@ -65,6 +65,39 @@ function readJson(rel, empty) {
   return fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8')) : empty;
 }
 
+const BINARY_EXT = /\.(png|jpe?g|gif|webp|avif|ico|bmp|pdf|zip|gz|tgz|7z|rar|woff2?|ttf|otf|eot|mp[34]|webm|mov|ogg|wav|apk|wasm|bin|glb|gltf|psd|sqlite|db|onnx|npy|pt)$/i;
+
+/* Stream a large text file in 1 MB chunks; same hits as scanText on the whole text. Returns null for binary / non-UTF-8. */
+export function scanTextStream(p) {
+  const hits = [];
+  const dec = new TextDecoder('utf-8', { fatal: true });
+  const fd = fs.openSync(p, 'r');
+  const buf = Buffer.alloc(1024 * 1024);
+  let carry = '';
+  let lineNo = 0;
+  const feed = (line) => {
+    lineNo++;
+    for (const [name, re] of PATTERNS) {
+      re.lastIndex = 0;
+      let m;
+      while ((m = re.exec(line))) hits.push({ line: lineNo, pattern: name, len: m[0].length, lineSha: sha(line) });
+    }
+  };
+  try {
+    let n;
+    let first = true;
+    while ((n = fs.readSync(fd, buf, 0, buf.length, null)) > 0) {
+      if (first && buf.subarray(0, Math.min(n, 8192)).includes(0)) return null;
+      first = false;
+      const parts = (carry + dec.decode(buf.subarray(0, n), { stream: true })).split('\n');
+      carry = parts.pop();
+      parts.forEach(feed);
+    }
+    feed(carry + dec.decode());
+  } catch (e) { return null; } finally { fs.closeSync(fd); }
+  return hits;
+}
+
 export function scanTree(root, files) {
   const hits = [];
   const skips = [];
@@ -75,7 +108,13 @@ export function scanTree(root, files) {
     let st;
     try { st = fs.lstatSync(p); } catch (e) { skips.push([f, 'missing']); continue; }
     if (!st.isFile()) continue;
-    if (st.size > MAX_BYTES) { skips.push([f, 'over 5 MB']); continue; }
+    if (st.size > MAX_BYTES) {
+      if (BINARY_EXT.test(f)) { skips.push([f, 'over 5 MB, binary']); continue; }
+      const big = scanTextStream(p);
+      if (big === null) { skips.push([f, 'over 5 MB, not UTF-8 text']); continue; }
+      for (const h of big) hits.push({ file: f, ...h });
+      continue;
+    }
     let text;
     try { text = dec.decode(fs.readFileSync(p)); } catch (e) { continue; } /* binary / not UTF-8 */
     for (const h of scanText(text)) hits.push({ file: f, ...h });

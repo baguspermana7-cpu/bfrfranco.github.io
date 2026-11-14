@@ -10,6 +10,7 @@ G1  every term sits in the section of its own first letter (a leading digit file
 G2  no coloured left rail on a term card (border-left wider than 1 px)
 G3  no pill (radius >= 12 px) and no radius above 4 px on the term card, its links, the search or the alpha buttons
 G4  no hover transform, no backdrop blur, no radial/linear gradient wash in the page CSS
+G5  no <a href> holding a space whose text is an .html path (href and label swapped; 404, 0120a8e48)
 Pages: glossary.html, id/glosarium.html. Exit 1 on any finding.
 """
 import re
@@ -54,6 +55,8 @@ def check(page):
         out.append('G4 backdrop blur in page CSS')
     if re.search(r'radial-gradient|linear-gradient', css):
         out.append('G4 gradient wash in page CSS')
+    for m in re.finditer(r'<a href="([^"]* [^"]*)"[^>]*>([^<]*\.html[^<]*)</a>', text):
+        out.append('G5 swapped link href="%s" text="%s"' % (m.group(1), m.group(2)))
     return out
 
 

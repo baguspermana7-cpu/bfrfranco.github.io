@@ -21,6 +21,9 @@
     function isLocalRuntime(){
         return location.protocol==='file:'||/^(?:localhost|127(?:\.\d{1,3}){3}|\[::1\])$/.test(location.hostname);
     }
+    function hasConsent(){
+        try{return localStorage.getItem('rz_cookie_consent')==='accepted'}catch(e){return false}
+    }
     function loadGeo(){
         // Local audits and development are an explicit privacy boundary. Discard
         // any production-like cache before it can populate a localhost event.
@@ -29,6 +32,9 @@
             geoInfo=fallbackGeo();
             return Promise.resolve(geoInfo);
         }
+        // Consent gate: the ipapi.co lookup sends the visitor's IP to a third party, so it only runs after the
+        // visitor accepted cookies (rz_cookie_consent, written by js/rz-cookie-consent.js).
+        if(!hasConsent()){geoInfo=fallbackGeo();return Promise.resolve(geoInfo)}
         // Check cache (valid for 30 min)
         try{
             var cached=JSON.parse(sessionStorage.getItem(GEO_KEY)||'null');
@@ -133,6 +139,9 @@
     // ═══ INIT: fetch geo + track page view ═══
     track('page_view');
     loadGeo();
+    document.addEventListener('rz-cookie-consent',function(e){
+        if(e&&e.detail==='accepted')loadGeo();
+    });
 
     // ═══ AUTO-DETECT EVENTS ═══
     document.addEventListener('click',function(e){
