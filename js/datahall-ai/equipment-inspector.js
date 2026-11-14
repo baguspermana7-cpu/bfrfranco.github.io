@@ -96,7 +96,7 @@
     var t = e.target;
     if (!t || !t.closest) { return null; }
     if (t.closest('[data-basis-param]')) { return null; }          /* A3 marks keep basis mode */
-    if (t.closest('.rz-inspector, .dh-modal-host, .sld-mimic-overlay, .eq-hmi, .cdu-hmi, .ch-hmi, .ct-hmi, .ircdu-hmi, .crah-hmi, .corr-hmi, .bat-hmi, .rack-modal')) { return null; }
+    if (t.closest('.rz-inspector, .hmi-host, .hmi-modal-back, .dh-modal-host, .sld-mimic-overlay, .eq-hmi, .cdu-hmi, .ch-hmi, .ct-hmi, .ircdu-hmi, .crah-hmi, .corr-hmi, .bat-hmi, .rack-modal')) { return null; }
     return t.closest('[data-rz-equipment]');
   }
 
@@ -126,7 +126,7 @@
     doc.addEventListener('keydown', function (e) {
       if (e.key !== 'Enter' && e.key !== ' ') { return; }
       var el = e.target && e.target.closest ? e.target.closest('[data-rz-equipment]') : null;
-      if (!el || e.target.closest('[data-basis-param]')) { return; }
+      if (!el || e.target.closest('[data-basis-param]') || e.target.closest('.hmi-host, .hmi-modal-back')) { return; }
       e.stopPropagation(); e.preventDefault();
       if (e.shiftKey) { openTier1(el); return; }
       var kp = build(el.getAttribute('data-rz-equipment'), hallOf(el));

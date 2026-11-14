@@ -1,0 +1,168 @@
+/* rz-hmi.css — HMI drawing register (R128 PRD §3; standarization/HMI_DRAWING_STANDARD.md)
+ * ISA-101 high-performance HMI: grey line work, colour only for abnormal state, alarm hues used for nothing else.
+ * No gradient, filter, shadow or glow anywhere in a drawing or an equipment modal (gate tools/test-dh-drawings.mjs H1).
+ * Page chrome keeps the RZ register; the drawing frame is the ISA process grey in light, RZ graphite in dark. */
+
+:root:not([data-theme="dark"]) {
+  --hmi-bg: #d9dadc; --hmi-bg-2: #cfd0d2; --hmi-frame: #b9bbbe;
+  --hmi-line: #44484e; --hmi-line-2: #74787e; --hmi-fill-run: #9fa3a8; --hmi-fill-run-2: #b4b7bb;
+  --hmi-text: #16181b; --hmi-text-2: #4d5157; --hmi-text-3: #6b6f75;
+  --hmi-alm-1: #c62a2f; --hmi-alm-2: #a35f00; --hmi-alm-3: #7d6e00; --hmi-info: #005f8c;
+  --hmi-feed-a: #2a5cc0; --hmi-feed-b: #1f7a52;
+  --hmi-m-htw: #8a5a24; --hmi-m-tcs-s: #1f6f86; --hmi-m-tcs-r: #8f4335; --hmi-m-chw: #2f5e96; --hmi-m-cw: #5b4a8a;
+  --hmi-m-agent: #6a4f99; --hmi-m-fuel: #6e5a2c; --hmi-m-air: #5a6068; --hmi-m-data: #3d5a73; --hmi-m-dc: #5c4f2e;
+  --hmi-tip-bg: #ffffff; --hmi-tip-line: #9a9da2; --hmi-panel: #e6e7e9;
+}
+[data-theme="dark"] {
+  --hmi-bg: #16181b; --hmi-bg-2: #1c1e22; --hmi-frame: #2c2f34;
+  --hmi-line: #8f949b; --hmi-line-2: #5f646b; --hmi-fill-run: #3b3f45; --hmi-fill-run-2: #2c3035;
+  --hmi-text: #dadcdf; --hmi-text-2: #a0a5ab; --hmi-text-3: #7a7f86;
+  --hmi-alm-1: #ef5a5f; --hmi-alm-2: #f0a43a; --hmi-alm-3: #e3d04d; --hmi-info: #56c2f5;
+  --hmi-feed-a: #6f9cf2; --hmi-feed-b: #4cbf8a;
+  --hmi-m-htw: #c8925a; --hmi-m-tcs-s: #62b5ca; --hmi-m-tcs-r: #cf7a6a; --hmi-m-chw: #78a2d6; --hmi-m-cw: #9b89c9;
+  --hmi-m-agent: #a58bd0; --hmi-m-fuel: #b09a66; --hmi-m-air: #8a9099; --hmi-m-data: #7d9bb5; --hmi-m-dc: #b5a06a;
+  --hmi-tip-bg: #1f2125; --hmi-tip-line: #3a3d42; --hmi-panel: #1b1d21;
+}
+
+/* ── frame ─────────────────────────────────────────────────────────────────────────────────────── */
+.hmi-frame { position: relative; background: var(--hmi-bg); border: 1px solid var(--hmi-frame); border-radius: 2px; color: var(--hmi-line); overflow: hidden; }
+.hmi-frame svg.hmi-svg { display: block; width: 100%; height: auto; touch-action: none; user-select: none; -webkit-user-select: none; }
+.hmi-frame.is-panning svg.hmi-svg { cursor: grabbing; }
+.hmi-bar { display: flex; align-items: center; gap: 4px; padding: 4px 6px; border-bottom: 1px solid var(--hmi-frame); background: var(--hmi-bg-2); font: 500 12px/1 'IBM Plex Sans', system-ui, sans-serif; color: var(--hmi-text-2); flex-wrap: wrap; }
+.hmi-bar .hmi-sheet-no { font: 600 11px/1 'JetBrains Mono', ui-monospace, monospace; color: var(--hmi-text); margin-right: 6px; }
+.hmi-bar .hmi-sp { flex: 1 1 auto; }
+.hmi-btn { min-width: 32px; min-height: 32px; padding: 0 8px; border: 1px solid var(--hmi-frame); border-radius: 2px; background: transparent; color: var(--hmi-text-2); font: 500 12px/1 'IBM Plex Sans', system-ui, sans-serif; cursor: pointer; }
+.hmi-btn:hover { border-color: var(--hmi-line-2); color: var(--hmi-text); }
+.hmi-btn[aria-pressed="true"] { border-color: var(--hmi-info); color: var(--hmi-text); }
+.hmi-btn:focus-visible, .hmi-node:focus-visible { outline: 2px solid var(--hmi-info); outline-offset: 2px; }
+@media (pointer: coarse) { .hmi-btn { min-width: 44px; min-height: 44px; } }
+
+/* ── line work ─────────────────────────────────────────────────────────────────────────────────── */
+.hmi-svg .hmi-edge { fill: none; stroke: var(--hmi-line); stroke-width: 1.4; stroke-linejoin: round; }
+.hmi-svg .hmi-edge.w-main { stroke-width: 2.2; }
+.hmi-svg .hmi-edge.w-signal { stroke-width: .8; stroke-dasharray: 4 2; stroke: var(--hmi-line-2); }
+.hmi-svg .hmi-edge.w-bus { stroke-width: 3.2; }
+.hmi-svg .hmi-edge.w-inst { stroke-width: 1; stroke: var(--hmi-line-2); }
+.hmi-svg .hmi-edge[data-flow="stopped"] { stroke-dasharray: 6 4; }
+.hmi-svg .hmi-edge[data-flow="unavailable"] { stroke-width: .6; stroke-dasharray: none; opacity: .7; }
+.hmi-svg .m-htw { stroke: var(--hmi-m-htw); } .hmi-svg .m-tcs_s { stroke: var(--hmi-m-tcs-s); } .hmi-svg .m-tcs_r { stroke: var(--hmi-m-tcs-r); }
+.hmi-svg .m-chw { stroke: var(--hmi-m-chw); } .hmi-svg .m-cw { stroke: var(--hmi-m-cw); } .hmi-svg .m-agent { stroke: var(--hmi-m-agent); }
+.hmi-svg .m-fuel { stroke: var(--hmi-m-fuel); } .hmi-svg .m-air { stroke: var(--hmi-m-air); } .hmi-svg .m-data { stroke: var(--hmi-m-data); }
+.hmi-svg .m-dc { stroke: var(--hmi-m-dc); } .hmi-svg .m-feed_a { stroke: var(--hmi-feed-a); } .hmi-svg .m-feed_b { stroke: var(--hmi-feed-b); }
+.hmi-svg .m-power[data-flow="unavailable"], .hmi-svg .m-feed_a[data-flow="unavailable"], .hmi-svg .m-feed_b[data-flow="unavailable"] { stroke: var(--hmi-line-2); }
+.hmi-svg .hmi-arrow { fill: currentColor; stroke: none; }
+.hmi-svg .hmi-arrow.m-htw { color: var(--hmi-m-htw); } .hmi-svg .hmi-arrow.m-tcs_s { color: var(--hmi-m-tcs-s); } .hmi-svg .hmi-arrow.m-tcs_r { color: var(--hmi-m-tcs-r); }
+.hmi-svg .hmi-arrow.m-chw { color: var(--hmi-m-chw); } .hmi-svg .hmi-arrow.m-feed_a { color: var(--hmi-feed-a); } .hmi-svg .hmi-arrow.m-feed_b { color: var(--hmi-feed-b); }
+.hmi-svg .hmi-flow { stroke-dasharray: 2 14; stroke-width: 1.4; opacity: .9; }
+@media (prefers-reduced-motion: no-preference) {
+  .hmi-svg .hmi-flow[data-flow="running"] { animation: hmi-march 1.6s linear infinite; }
+}
+@keyframes hmi-march { to { stroke-dashoffset: -16; } }
+.hmi-svg .hmi-junction { fill: var(--hmi-line); stroke: none; }
+.hmi-svg .hmi-zone { fill: none; stroke: var(--hmi-line-2); stroke-width: 1; stroke-dasharray: 8 4; }
+.hmi-svg .hmi-zone-label, .hmi-svg .hmi-area-label { fill: var(--hmi-text-3); font: 500 9.5px 'IBM Plex Sans', system-ui, sans-serif; letter-spacing: .02em; }
+.hmi-svg .hmi-box { fill: none; stroke: var(--hmi-line-2); stroke-width: .8; }
+.hmi-svg .hmi-slot { fill: var(--hmi-bg-2); stroke: var(--hmi-line-2); stroke-width: .6; }
+
+/* ── symbols and states (ISA-101: filled = running, outline = stopped; alarm only by colour + shape) ── */
+.hmi-svg .hmi-node { color: var(--hmi-line); cursor: pointer; }
+.hmi-svg .hmi-node .b { fill: transparent; }
+.hmi-svg .hmi-node[data-state="running"] .b, .hmi-svg .hmi-node[data-state="closed"] .b, .hmi-svg .hmi-node[data-state="open"] .b,
+.hmi-svg .hmi-node[data-state="energized"] .b, .hmi-svg .hmi-node[data-state="on"] .b, .hmi-svg .hmi-node[data-state="up"] .b,
+.hmi-svg .hmi-node[data-state="online"] .b, .hmi-svg .hmi-node[data-state="modulating"] .b, .hmi-svg .hmi-node[data-state="float"] .b,
+.hmi-svg .hmi-node[data-state="connected"] .b, .hmi-svg .hmi-node[data-state="normal"] .b, .hmi-svg .hmi-node[data-state="clean"] .b { fill: var(--hmi-fill-run); }
+.hmi-svg .hmi-node[data-state="open"][data-sym^="cb"] .b, .hmi-svg .hmi-node[data-state="open"][data-sym="disconnector"] .b { fill: transparent; }
+.hmi-svg .hmi-node[data-state="standby"] .b { fill: var(--hmi-fill-run-2); }
+.hmi-svg .hmi-node[data-alarm="1"] { color: var(--hmi-alm-1); }
+.hmi-svg .hmi-node[data-alarm="2"] { color: var(--hmi-alm-2); }
+.hmi-svg .hmi-node[data-alarm="3"] { color: var(--hmi-alm-3); }
+.hmi-svg .hmi-node:hover, .hmi-svg .hmi-node:focus-visible { color: var(--hmi-text); }
+.hmi-svg .hmi-node.is-traced, .hmi-svg .hmi-edge.is-traced { color: var(--hmi-info); stroke: var(--hmi-info); }
+.hmi-svg .hmi-node.is-selected { color: var(--hmi-info); }
+.hmi-svg .hmi-hit { fill: transparent; stroke: none; }
+.hmi-svg .hmi-alm-mark { fill: none; stroke-width: 1.6; }
+.hmi-svg .hmi-alm-mark.p1 { stroke: var(--hmi-alm-1); } .hmi-svg .hmi-alm-mark.p2 { stroke: var(--hmi-alm-2); } .hmi-svg .hmi-alm-mark.p3 { stroke: var(--hmi-alm-3); }
+.hmi-svg .hmi-alm-txt { font: 700 8px 'JetBrains Mono', ui-monospace, monospace; fill: var(--hmi-bg); stroke: none; }
+
+/* ── text roles (typography by role, PRD §3.3) ─────────────────────────────────────────────────── */
+.hmi-svg text { stroke: none; }
+.hmi-svg [data-role="tag"] { fill: var(--hmi-text); font: 600 10px 'JetBrains Mono', ui-monospace, monospace; }
+.hmi-svg [data-role="value"] { fill: var(--hmi-text-2); font: 500 9.5px 'JetBrains Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+.hmi-svg [data-role="value"][data-alarm="1"] { fill: var(--hmi-alm-1); font-weight: 700; }
+.hmi-svg [data-role="value"][data-alarm="2"] { fill: var(--hmi-alm-2); font-weight: 700; }
+.hmi-svg [data-role="line"] { fill: var(--hmi-text-3); font: 400 8.5px 'JetBrains Mono', ui-monospace, monospace; }
+.hmi-svg [data-role="label"] { fill: var(--hmi-text-2); font: 400 9.5px 'IBM Plex Sans', system-ui, sans-serif; }
+.hmi-svg [data-role="inst"] { fill: var(--hmi-text); font: 600 7.5px 'JetBrains Mono', ui-monospace, monospace; text-anchor: middle; }
+.hmi-svg [data-role="titleblock"] rect { fill: var(--hmi-bg-2); stroke: var(--hmi-line-2); stroke-width: .8; }
+.hmi-svg [data-role="titleblock"] line { stroke: var(--hmi-line-2); stroke-width: .6; }
+.hmi-svg [data-role="titleblock"] text { fill: var(--hmi-text-2); font: 400 8px 'JetBrains Mono', ui-monospace, monospace; }
+.hmi-svg [data-role="titleblock"] text.t { fill: var(--hmi-text); font: 600 10.5px 'IBM Plex Sans', system-ui, sans-serif; }
+/* level of detail: secondary labels only once the sheet is zoomed in */
+.hmi-svg.lod-1 [data-lod="2"], .hmi-svg.lod-2 [data-lod="3"] { display: none; }
+
+/* ── tooltip ───────────────────────────────────────────────────────────────────────────────────── */
+.hmi-tip { position: fixed; z-index: 9000; max-width: 300px; padding: 8px 10px; background: var(--hmi-tip-bg); border: 1px solid var(--hmi-tip-line); border-radius: 2px; color: var(--hmi-text); font: 400 12px/1.4 'IBM Plex Sans', system-ui, sans-serif; pointer-events: none; opacity: 0; transition: opacity 120ms var(--rz-ease-out, ease-out); }
+.hmi-tip.is-on { opacity: 1; }
+.hmi-tip .k { font: 600 11px 'JetBrains Mono', ui-monospace, monospace; }
+.hmi-tip .s { color: var(--hmi-text-3); font-size: 11px; }
+.hmi-tip table { border-collapse: collapse; margin-top: 4px; width: 100%; }
+.hmi-tip td { padding: 1px 0; font: 400 11px 'JetBrains Mono', ui-monospace, monospace; color: var(--hmi-text-2); }
+.hmi-tip td + td { text-align: right; color: var(--hmi-text); }
+.hmi-tip .hint { margin-top: 4px; color: var(--hmi-text-3); font-size: 11px; }
+
+/* ── minimap ───────────────────────────────────────────────────────────────────────────────────── */
+.hmi-mini { position: absolute; left: 8px; bottom: 8px; width: 140px; border: 1px solid var(--hmi-frame); background: var(--hmi-bg-2); }
+.hmi-mini svg { display: block; width: 100%; height: auto; }
+.hmi-mini .vp { fill: none; stroke: var(--hmi-info); stroke-width: 6; }
+.hmi-frame:not(.is-zoomed) .hmi-mini { display: none; }
+
+/* ── equipment modal (ISA-101 L3) ──────────────────────────────────────────────────────────────── */
+.hmi-modal-back { position: fixed; inset: 0; z-index: 8000; background: rgba(8, 9, 11, .55); display: flex; align-items: center; justify-content: center; padding: 16px; }
+.hmi-modal-back[hidden] { display: none; }
+.hmi-modal { width: min(1180px, 100%); max-height: calc(100vh - 32px); overflow: auto; background: var(--hmi-panel); border: 1px solid var(--hmi-frame); border-radius: 2px; color: var(--hmi-text); display: grid; grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; }
+.hmi-modal > header { grid-column: 1 / -1; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--hmi-frame); }
+.hmi-modal > header .tag { font: 600 14px 'JetBrains Mono', ui-monospace, monospace; }
+.hmi-modal > header .cls { color: var(--hmi-text-2); font: 400 13px 'IBM Plex Sans', system-ui, sans-serif; }
+.hmi-modal > header .state { font: 500 12px 'IBM Plex Sans', system-ui, sans-serif; color: var(--hmi-text-2); padding-left: 10px; border-left: 1px solid var(--hmi-frame); }
+.hmi-modal > header .sp { flex: 1; }
+.hmi-modal .hmi-m-draw .hmi-svg { max-height: calc(100vh - 250px); }
+.hmi-modal .hmi-m-draw { padding: 10px; border-right: 1px solid var(--hmi-frame); min-width: 0; }
+.hmi-modal .hmi-m-pts { padding: 6px 10px 10px; overflow: auto; }
+.hmi-modal .hmi-m-foot { grid-column: 1 / -1; border-top: 1px solid var(--hmi-frame); padding: 8px 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.hmi-pt { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; align-items: baseline; padding: 5px 0; border-bottom: 1px solid var(--hmi-frame); }
+.hmi-pt .pt-tag { font: 600 10.5px 'JetBrains Mono', ui-monospace, monospace; color: var(--hmi-text); }
+.hmi-pt .pt-label { font: 400 12px 'IBM Plex Sans', system-ui, sans-serif; color: var(--hmi-text-2); min-width: 0; }
+.hmi-pt .pt-val { font: 500 12.5px 'JetBrains Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; text-align: right; }
+.hmi-pt .pt-band { grid-column: 1 / -1; height: 6px; position: relative; }
+.hmi-pt .pt-band i { position: absolute; top: 2px; left: 0; right: 0; height: 2px; background: var(--hmi-line-2); opacity: .35; }
+.hmi-pt .pt-band b { position: absolute; top: 2px; height: 2px; background: var(--hmi-line-2); }
+.hmi-pt .pt-band u { position: absolute; top: 0; width: 2px; height: 6px; background: var(--hmi-text); }
+.hmi-pt[data-alarm="1"] .pt-val { color: var(--hmi-alm-1); } .hmi-pt[data-alarm="2"] .pt-val { color: var(--hmi-alm-2); }
+.hmi-m-sec { font: 600 11px 'IBM Plex Sans', system-ui, sans-serif; color: var(--hmi-text-3); margin: 8px 0 2px; }
+.hmi-trend svg { width: 100%; height: 64px; display: block; }
+.hmi-trend-ax { display: flex; justify-content: space-between; font: 400 10.5px 'JetBrains Mono', ui-monospace, monospace; color: var(--hmi-text-3); }
+.hmi-trend path { fill: none; stroke: var(--hmi-line); stroke-width: 1.2; }
+.hmi-trend .lim { stroke: var(--hmi-line-2); stroke-dasharray: 3 3; stroke-width: .8; }
+.hmi-evt { font: 400 11.5px 'JetBrains Mono', ui-monospace, monospace; color: var(--hmi-text-2); margin: 0; padding: 0; list-style: none; }
+.hmi-evt li { padding: 2px 0; border-bottom: 1px solid var(--hmi-frame); }
+@media (max-width: 860px) {
+  .hmi-modal { grid-template-columns: minmax(0, 1fr); }
+  .hmi-modal .hmi-m-draw { border-right: 0; border-bottom: 1px solid var(--hmi-frame); }
+  .hmi-modal .hmi-m-foot { grid-template-columns: 1fr; }
+}
+
+/* ── phones (<= 760 px): one-column modal, one-line drawing bar ────────────────────────────────── */
+@media (max-width: 760px) {
+  .hmi-bar { flex-wrap: nowrap; }
+  .hmi-bar .hmi-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hmi-bar .hmi-btn { min-height: 36px; min-width: 36px; height: 36px; flex: none; }
+  .hmi-modal-back { padding: 0; align-items: stretch; }
+  .hmi-modal { max-height: 100vh; height: 100%; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto auto auto; }
+  .hmi-modal > header { flex-wrap: wrap; gap: 6px 8px; }
+  .hmi-modal > header .cls { display: none; }
+  .hmi-modal > header .sp { flex-basis: 100%; height: 0; }
+  .hmi-modal .hmi-m-draw { border-right: 0; border-bottom: 1px solid var(--hmi-frame); padding: 6px; }
+  .hmi-modal .hmi-m-draw .hmi-svg { max-height: 56vh; }
+  .hmi-modal .hmi-m-pts { overflow: visible; }
+  .hmi-modal .hmi-m-foot { grid-template-columns: minmax(0, 1fr); }
+}

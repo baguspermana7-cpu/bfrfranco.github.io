@@ -121,7 +121,8 @@
       netServer: { label: "Server / compute node", category: "network" },
       netCarrier: { label: "Carrier / external network", category: "network" },
       netOdf: { label: "Fibre distribution (ODF / patch)", category: "network" },
-      bmsController: { label: "BMS controller (DDC / PLC)", category: "network" }
+      bmsController: { label: "BMS controller (DDC / PLC)", category: "network" },
+      transformer2w: { label: "Two-winding transformer", category: "electrical" }
     },
     MARKUP: {
       utility: "<path d=\"M24 4 L11 44 M24 4 L37 44\" /><path d=\"M16 26 L32 38 M32 26 L16 38\" stroke-width=\"1.3\" /><path d=\"M7 16 H41 M10 30 H38\" /><path d=\"M9 16 v4 M39 16 v4 M14 30 v4 M34 30 v4\" stroke-width=\"1.4\" /><path d=\"M24 8 v4\" stroke-width=\"1.4\" />",
@@ -237,7 +238,8 @@
       netServer: "<path d=\"M24 0 V6\"/><rect class=\"b\" x=\"8\" y=\"6\" width=\"32\" height=\"38\" rx=\"1\"/><path d=\"M8 18 H40 M8 30 H40\"/><circle cx=\"34\" cy=\"12\" r=\"1.5\" fill=\"currentColor\"/><circle cx=\"34\" cy=\"24\" r=\"1.5\" fill=\"currentColor\"/><circle cx=\"34\" cy=\"36\" r=\"1.5\" fill=\"currentColor\"/>",
       netCarrier: "<path d=\"M24 36 V48\"/><path class=\"b\" d=\"M12 36 A8 8 0 0 1 12 20 A10 10 0 0 1 30 14 A9 9 0 0 1 38 36 Z\"/>",
       netOdf: "<path d=\"M24 0 V12 M24 36 V48\"/><rect class=\"b\" x=\"4\" y=\"12\" width=\"40\" height=\"24\" rx=\"1\"/><circle cx=\"12\" cy=\"24\" r=\"2\"/><circle cx=\"20\" cy=\"24\" r=\"2\"/><circle cx=\"28\" cy=\"24\" r=\"2\"/><circle cx=\"36\" cy=\"24\" r=\"2\"/>",
-      bmsController: "<path d=\"M24 0 V8 M12 40 V48 M36 40 V48\"/><rect class=\"b\" x=\"6\" y=\"8\" width=\"36\" height=\"32\" rx=\"1\"/><path d=\"M12 16 H36 M12 22 H28\"/><path d=\"M12 32 H16 M20 32 H24 M28 32 H32\"/>"
+      bmsController: "<path d=\"M24 0 V8 M12 40 V48 M36 40 V48\"/><rect class=\"b\" x=\"6\" y=\"8\" width=\"36\" height=\"32\" rx=\"1\"/><path d=\"M12 16 H36 M12 22 H28\"/><path d=\"M12 32 H16 M20 32 H24 M28 32 H32\"/>",
+      transformer2w: "<path d=\"M24 0 V6 M24 42 V48\"/><circle class=\"b\" cx=\"24\" cy=\"17\" r=\"11\"/><circle cx=\"24\" cy=\"31\" r=\"11\"/><path d=\"M20 15 L24 11 L28 15 Z M20 30 L24 34 L28 30 M24 34 V28\" stroke-width=\"1.2\"/>"
     },
     /* HMI fields (R128, PRD §4): standard, ports on the 6-unit grid, states, tag prefix. Only kinds that declare them. */
     STANDARD: {
@@ -318,7 +320,8 @@
       netServer: "— (neutral)",
       netCarrier: "— (neutral)",
       netOdf: "— (neutral)",
-      bmsController: "— (neutral)"
+      bmsController: "— (neutral)",
+      transformer2w: "IEC 60617-6"
     },
     PORTS: {
       pumpCentrifugal: {"suction":[0,24,"liquid"],"discharge":[48,24,"liquid"]},
@@ -398,7 +401,8 @@
       netServer: {"nic":[24,0,"data"]},
       netCarrier: {"handoff":[24,48,"data"]},
       netOdf: {"a":[24,0,"data"],"b":[24,48,"data"]},
-      bmsController: {"net":[24,0,"data"],"io1":[12,48,"signal"],"io2":[36,48,"signal"]}
+      bmsController: {"net":[24,0,"data"],"io1":[12,48,"signal"],"io2":[36,48,"signal"]},
+      transformer2w: {"hv":[24,0,"power"],"lv":[24,48,"power"]}
     },
     STATES: {
       pumpCentrifugal: ["running","stopped","standby","fault","manual"],
@@ -478,7 +482,8 @@
       netServer: ["up","degraded","down"],
       netCarrier: ["up","degraded","down"],
       netOdf: ["normal"],
-      bmsController: ["online","offline","fault"]
+      bmsController: ["online","offline","fault"],
+      transformer2w: ["energized","de-energized","fault"]
     },
     TAG: {
       pumpCentrifugal: "P",
@@ -558,7 +563,8 @@
       netServer: "SRV",
       netCarrier: "ISP",
       netOdf: "ODF",
-      bmsController: "DDC"
+      bmsController: "DDC",
+      transformer2w: "TX"
     },
     /** A standalone <svg> for one kind, sized in CSS px. */
     svg: function (kind, size, cls) {

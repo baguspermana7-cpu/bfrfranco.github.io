@@ -1,0 +1,67 @@
+/* rz-dh-shell.css — datahallAI shell for the HMI redraw (R131, PRD §9). One nav row in the RZ register:
+   graphite surface, 1 px hairline, IBM Plex Sans title, one amber accent, radius <= 4 px, no gradient. */
+.hdr[data-dh2] { height: auto; padding: 0; display: block; }
+.dh2-nav { display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 14px; font: 500 13px/1 'IBM Plex Sans', system-ui, sans-serif; color: var(--t1); }
+.dh2-back { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid var(--bd); border-radius: 3px; color: var(--t2); text-decoration: none; font-size: 15px; }
+.dh2-back:hover { border-color: var(--bd2); color: var(--t1); }
+.dh2-title { font-weight: 600; font-size: 15px; letter-spacing: 0; white-space: nowrap; }
+.dh2-nav #datahallAuthorityChip { font-size: 11px; }
+.dh2-sim { font: 600 10px/1 'JetBrains Mono', ui-monospace, monospace; padding: 4px 6px; border: 1px solid var(--bd2); border-radius: 2px; color: var(--t2); cursor: help; }
+.dh2-sim:focus-visible { outline: 2px solid #E8B563; outline-offset: 2px; }
+.dh2-sp { flex: 1 1 auto; }
+.dh2-nav > button, .dh2-docs > summary { height: 32px; padding: 0 10px; border: 1px solid var(--bd); border-radius: 3px; background: transparent; color: var(--t2); font: 500 12px/30px 'IBM Plex Sans', system-ui, sans-serif; cursor: pointer; }
+.dh2-nav > button:hover, .dh2-docs > summary:hover { border-color: var(--bd2); color: var(--t1); }
+.dh2-docs { position: relative; }
+.dh2-docs > summary { list-style: none; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; line-height: 1; }
+.dh2-docs > summary::-webkit-details-marker { display: none; }
+.dh2-docs > summary::after { content: ' \25BE'; font-size: 10px; }
+.dh2-menu { position: absolute; right: 0; top: 36px; z-index: 70; min-width: 210px; padding: 4px; background: var(--bg1); border: 1px solid var(--bd2); border-radius: 3px; display: flex; flex-direction: column; }
+.dh2-menu .dh2-mi { display: block; width: 100%; text-align: left; padding: 8px 10px; border: 0; border-radius: 2px; background: transparent; color: var(--t1); font: 400 13px/1.2 'IBM Plex Sans', system-ui, sans-serif; text-decoration: none; text-transform: none; letter-spacing: 0; height: auto; cursor: pointer; }
+.dh2-menu .dh2-mi:hover, .dh2-menu .dh2-mi:focus-visible { background: var(--bg3); }
+.dh2-nav #clk { font: 400 11px 'JetBrains Mono', ui-monospace, monospace; color: var(--t3); }
+.dh2-nav #themeToggle { width: 32px; padding: 0; }
+
+/* sidebar: pinned / auto-hide / hidden (PRD §9.2). The legacy collapse class is neutralised. */
+.dh2-sidemodes { display: flex; width: max-content; margin: 0 8px 6px; border: 1px solid var(--bd); border-radius: 3px; }
+.dh2-sm { width: 26px; height: 22px; padding: 0; border: 0; background: transparent; color: var(--t3); font-size: 9px; cursor: pointer; }
+.dh2-sm + .dh2-sm { border-left: 1px solid var(--bd); }
+.dh2-sm[aria-pressed="true"] { color: #E8B563; background: var(--bg3); }
+/* phones and tablets keep the page's own collapse (the sidebar stacks under the drawing there) */
+@media (max-width: 1024px) { .dh2-sidemodes { display: none; } }
+@media (min-width: 1025px) {
+.dh2-legacy-tog { display: none !important; }
+body[data-side] .wrap.side-collapsed .side { width: 180px; min-width: 180px; padding: 6px; border-right: 1px solid var(--bd); overflow-y: auto; opacity: 1; }
+body[data-side] .dh-sidereopen { display: none; }
+body[data-side="hidden"] .wrap .side { display: none; }
+}
+@media (min-width: 1025px) { body[data-side="hidden"] .dh-sidereopen { display: flex; position: absolute; left: 0; top: 50%; transform: translateY(-50%); z-index: 6; width: 16px; height: 54px; align-items: center; justify-content: center; border: 1px solid var(--bd2); border-left: 0; border-radius: 0 3px 3px 0; background: var(--bg3); color: var(--t2); cursor: pointer; } }
+@media (min-width: 1025px) {
+  body[data-side="auto"] .wrap { position: relative; }
+  body[data-side="auto"] .mn { margin-left: 10px; }
+  body[data-side="auto"] .wrap .side, body[data-side="auto"] .wrap.side-collapsed .side { position: absolute; left: 0; top: 0; bottom: 0; z-index: 30; width: 10px; min-width: 10px; padding: 0; overflow: hidden; border-right: 1px solid var(--bd2); transition: width 180ms var(--rz-ease-out, ease-out); }
+  body[data-side="auto"] .wrap .side > * { opacity: 0; transition: opacity 120ms var(--rz-ease-out, ease-out); }
+  body[data-side="auto"] .wrap .side:hover, body[data-side="auto"] .wrap .side:focus-within { width: 200px; padding: 6px; overflow-y: auto; }
+  body[data-side="auto"] .wrap .side:hover > *, body[data-side="auto"] .wrap .side:focus-within > * { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) { body[data-side="auto"] .wrap .side { transition: none; } }
+
+/* the redraw replaces these; the retired nodes stay in the DOM for scripts that still write to them */
+[data-dh2-retired] { display: none !important; }
+.bx > .hmi-host { margin-top: 6px; }
+
+@media (max-width: 860px) {
+  .dh2-nav { gap: 6px; padding: 0 10px; }
+  .dh2-nav #clk, .dh2-nav #rzReplayTrig, .dh2-nav .dh2-sim { display: none; }
+  .dh2-nav #datahallAuthorityChip { max-width: 22vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dh2-title { font-size: 14px; }
+  .dh2-user [class*="btn"], .dh2-user button { min-width: 32px; height: 32px; padding: 0 6px; }
+}
+@media (max-width: 480px) { .dh2-nav #datahallAuthorityChip { display: none; } }
+.hdr[data-dh2] > .hdr-main[hidden], .hdr[data-dh2] > .hdr-r[hidden] { display: none; }
+.dh2-user { display: inline-flex; align-items: center; gap: 6px; }
+.dh2-user:empty { display: none; }
+.dh2-menu .rz-public-contract-link { min-width: 0 !important; }
+.dh2-slot, .dh2-slot-link { display: inline-flex; align-items: center; height: 32px; min-height: 32px !important; padding: 0 10px; border: 1px solid var(--bd); border-radius: 3px; font: 500 12px/1 'IBM Plex Sans', system-ui, sans-serif; color: var(--t2); background: var(--bg1); text-decoration: none; box-sizing: border-box; }
+.dh2-slot[hidden] { display: none; }
+.mn .rz-ops-caption[hidden], .mn .dh-primary-q[hidden], .mn .rz-ops-eyebrow[hidden] { display: none !important; }
+.dh2-has-tip { cursor: help; text-decoration: underline dotted var(--bd2); text-underline-offset: 3px; }
