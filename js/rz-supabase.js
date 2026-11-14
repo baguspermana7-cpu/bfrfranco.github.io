@@ -462,6 +462,34 @@ const api = {
       .select('page_key, feature_key, tier, enabled').single();
     return { data, error: friendly(error) };
   },
+  /** Bulk upsert (presets, uploads). rows: [{page_key, feature_key, tier, enabled}]. Root-only under RLS. */
+  async setFeatureOverrides(rows) {
+    if (!client) return { error: initError };
+    const user = await this.getUser();
+    if (!user) return { error: 'not signed in' };
+    const clean = (rows || []).map(function (r) {
+      return { page_key: r.page_key, feature_key: r.feature_key, tier: r.tier, enabled: !!r.enabled, updated_by: user.id };
+    });
+    if (!clean.length) return { data: [], error: null };
+    const { data, error } = await client.from('feature_overrides')
+      .upsert(clean, { onConflict: 'page_key,feature_key,tier' })
+      .select('page_key, feature_key, tier, enabled');
+    return { data: data || [], error: friendly(error) };
+  },
+  /** Delete every override row of one page ("reset to defaults"). Root-only under RLS. */
+  async deleteFeatureOverrides(pageKey) {
+    if (!client) return { error: initError };
+    if (!(await this.getUser())) return { error: 'not signed in' };
+    const { error } = await client.from('feature_overrides').delete().eq('page_key', pageKey);
+    return { error: friendly(error) };
+  },
+  /** Server answer to "is the signed-in user an educator?" (profiles.role or educator_allowlist). */
+  async isEducator() {
+    if (!client) return { data: false, error: initError };
+    if (!(await this.getUser())) return { data: false, error: 'not signed in' };
+    const { data, error } = await client.rpc('is_educator');
+    return { data: data === true, error: friendly(error) };
+  },
   async listEducators() { // root-only (RLS)
     if (!client) return { data: [], error: initError };
     if (!(await this.getUser())) return { data: [], error: 'not signed in' };
@@ -473,13 +501,13 @@ const api = {
     const user = await this.getUser();
     if (!user) return { error: 'not signed in' };
     const { data, error } = await client.from('educator_allowlist')
-      .upsert({ email: email, added_by: user.id }, { onConflict: 'email' }).select('email').single();
+      .upsert({ email: String(email || '').toLowerCase().trim(), added_by: user.id }, { onConflict: 'email' }).select('email').single();
     return { data, error: friendly(error) };
   },
   async removeEducator(email) {
     if (!client) return { error: initError };
     if (!(await this.getUser())) return { error: 'not signed in' };
-    const { error } = await client.from('educator_allowlist').delete().eq('email', email);
+    const { error } = await client.from('educator_allowlist').delete().eq('email', String(email || '').toLowerCase().trim());
     return { error: friendly(error) };
   }
 };

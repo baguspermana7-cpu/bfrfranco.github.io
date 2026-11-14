@@ -25,9 +25,19 @@
  *   window._rzFeatures.listFeatures(pageKey)    → string[]
  *   window._rzFeatures.listPages()              → string[]
  *
- * Admin override storage key: rz_admin_features_by_page (JSON object)
- * Structure: { [pageKey]: { [featureKey]: { free, demo, pro, root } } }
- * Dispatches CustomEvent 'rz-features-changed' when overrides change.
+ *   window._rzFeatures.refresh()                → Promise (re-read server overrides)
+ *   window._rzFeatures.source()                 → 'server' | 'cache' | 'defaults'
+ *
+ * Admin overrides live in Supabase `feature_overrides` (anon read, root-only
+ * write under RLS), written by the rz-ops Feature Flags panel. They are read
+ * after first paint through the lazy rzSupa loader (_rzAuth.ensureSupabase),
+ * never block render, and fall back to the static matrix below when Supabase
+ * is unavailable. A sessionStorage copy (rz_flag_overrides_v1, 5 min TTL) is
+ * used to skip the network, but it can only RESTRICT: a cached row that would
+ * grant access is never applied from the cache and forces a fresh fetch, so a
+ * visitor cannot grant themselves anything by editing browser storage.
+ * The legacy localStorage key rz_admin_features_by_page is IGNORED and deleted.
+ * Dispatches CustomEvent 'rz-features-changed' when the applied overrides change.
  */
 
 /* ── Canonical schema ───────────────────────────────────────────────────── */
@@ -428,6 +438,104 @@ window.RZ_FEATURE_FLAGS = {
 window._rzFeatures = (function () {
   'use strict';
 
+  /* ── Server overrides (Supabase feature_overrides) ───────────────────── */
+  var CACHE_KEY = 'rz_flag_overrides_v1';
+  var CACHE_TTL_MS = 5 * 60 * 1000;
+  var FETCH_TIMEOUT_MS = 6000;
+  var TIERS = { free: 1, demo: 1, pro: 1, root: 1 };
+  var serverMap = null;   /* fetched this page load: trusted, applied as-is */
+  var cacheMap = null;    /* from sessionStorage: applied restrict-only */
+  var inflight = null;
+
+  /* The old client-side override key let any visitor unlock pages from devtools. It is no longer
+     read anywhere; delete it so stale local grants vanish. */
+  try { localStorage.removeItem('rz_admin_features_by_page'); } catch (e) { /* storage blocked */ }
+
+  function toMap(rows) {
+    var map = {};
+    var n = 0;
+    (rows || []).forEach(function (r) {
+      if (!r || typeof r.page_key !== 'string' || typeof r.feature_key !== 'string') return;
+      if (!TIERS[r.tier] || typeof r.enabled !== 'boolean') return;
+      map[r.page_key] = map[r.page_key] || {};
+      map[r.page_key][r.feature_key] = map[r.page_key][r.feature_key] || {};
+      map[r.page_key][r.feature_key][r.tier] = r.enabled;
+      n++;
+    });
+    return { map: map, n: n };
+  }
+
+  function readCache() {
+    try {
+      var c = JSON.parse(sessionStorage.getItem(CACHE_KEY) || 'null');
+      if (!c || typeof c.t !== 'number' || !Array.isArray(c.rows)) return null;
+      var age = Date.now() - c.t;
+      if (age < -60000) return null;   /* a future timestamp is forged or clock-skewed: ignore */
+      var m = toMap(c.rows);
+      m.fresh = age < CACHE_TTL_MS;
+      m.hasGrant = c.rows.some(function (r) { return r && r.enabled === true; });
+      return m;
+    } catch (e) { return null; }
+  }
+
+  function writeCache(rows) {
+    try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ t: Date.now(), rows: rows })); } catch (e) {}
+  }
+
+  function lookupOverride(pageKey, featureKey, tier) {
+    var m = serverMap || cacheMap;
+    var v = m && m[pageKey] && m[pageKey][featureKey] && m[pageKey][featureKey][tier];
+    if (typeof v !== 'boolean') return undefined;
+    if (!serverMap && v === true) return undefined;   /* cache may only restrict */
+    return v;
+  }
+
+  function changed() {
+    try { window.dispatchEvent(new CustomEvent('rz-features-changed')); } catch (e) {}
+  }
+
+  function loadSupa() {
+    if (window.rzSupa && window.rzSupa.ready) return window.rzSupa.ready;
+    if (window._rzAuth && typeof window._rzAuth.ensureSupabase === 'function') return window._rzAuth.ensureSupabase();
+    return Promise.resolve(null);
+  }
+
+  /** Fetch the override rows. Resolves (never rejects); on any failure the current state is kept. */
+  function refresh() {
+    if (inflight) return inflight;
+    inflight = new Promise(function (resolve) {
+      var done = false;
+      function fin(v) { if (!done) { done = true; inflight = null; resolve(v); } }
+      setTimeout(function () { fin(false); }, FETCH_TIMEOUT_MS);
+      Promise.resolve().then(loadSupa).then(function (supa) {
+        if (!supa || !supa.configured || typeof supa.getFeatureOverrides !== 'function') return fin(false);
+        return Promise.resolve(supa.getFeatureOverrides()).then(function (res) {
+          if (done) return;
+          if (!res || res.error || !Array.isArray(res.data)) return fin(false);
+          var before = JSON.stringify(serverMap || cacheMap || {});
+          serverMap = toMap(res.data).map;
+          writeCache(res.data.map(function (r) {
+            return { page_key: r.page_key, feature_key: r.feature_key, tier: r.tier, enabled: r.enabled };
+          }));
+          if (JSON.stringify(serverMap) !== before) changed();
+          fin(true);
+        });
+      }).catch(function () { fin(false); });
+    });
+    return inflight;
+  }
+
+  function source() { return serverMap ? 'server' : (cacheMap ? 'cache' : 'defaults'); }
+
+  (function boot() {
+    var c = readCache();
+    if (c && c.n) cacheMap = c.map;
+    if (c && c.fresh && !c.hasGrant) return;            /* fresh restrict-only cache: no network */
+    function go() { setTimeout(refresh, 0); }            /* after first paint, never blocking it */
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go);
+    else go();
+  }());
+
   /**
    * Resolve the current user tier: 'free' | 'demo' | 'pro' | 'root'.
    *
@@ -496,7 +604,7 @@ window._rzFeatures = (function () {
 
   /**
    * Check whether a feature is available for the current tier.
-   * Respects per-page admin overrides stored in rz_admin_features_by_page.
+   * Respects per-page admin overrides from Supabase feature_overrides.
    *
    * 4-tier resolution: free | demo | pro | root.
    * Back-compat: when a page-feature record lacks a `root` field (legacy
@@ -524,20 +632,9 @@ window._rzFeatures = (function () {
        admit educators (role=educator) explicitly here. */
     if (featureKey === 'page-access' && EDUCATOR_ACCESS_PAGES[pageKey] && getRole() === 'educator') return true;
 
-    /* Check admin overrides first */
-    try {
-      var overrides = JSON.parse(
-        localStorage.getItem('rz_admin_features_by_page') || '{}'
-      );
-      if (overrides[pageKey] && overrides[pageKey][featureKey]) {
-        var ov = overrides[pageKey][featureKey];
-        if (typeof ov[tier] === 'boolean') {
-          return ov[tier];
-        }
-        /* Back-compat: override missing root column but tier is root → allow. */
-        if (tier === 'root') return true;
-      }
-    } catch (e) { /* ignore malformed overrides */ }
+    /* Server overrides (Supabase feature_overrides) win over the matrix. */
+    var ov = lookupOverride(pageKey, featureKey, tier);
+    if (typeof ov === 'boolean') return ov;
 
     /* Fall back to canonical schema */
     var pageDef = window.RZ_FEATURE_FLAGS && window.RZ_FEATURE_FLAGS[pageKey];
@@ -584,7 +681,9 @@ window._rzFeatures = (function () {
     has: has,
     canAccess: canAccess,
     listFeatures: listFeatures,
-    listPages: listPages
+    listPages: listPages,
+    refresh: refresh,
+    source: source
   };
 }());
 
@@ -596,11 +695,3 @@ if (window.RZ_FEATURE_FLAGS && !window.RZ_FEATURE_FLAGS.canAccess) {
   };
 }
 
-/* ── Admin override hot-reload ─────────────────────────────────────────── */
-window.addEventListener('storage', function (e) {
-  if (e.key === 'rz_admin_features_by_page') {
-    try {
-      window.dispatchEvent(new CustomEvent('rz-features-changed'));
-    } catch (_) { /* IE11 guard — no-op */ }
-  }
-});

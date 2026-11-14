@@ -241,46 +241,48 @@ window.addEventListener('rz-features-changed', function () {
 
 ---
 
-## 6. Admin Console Integration
+## 6. Admin Console Integration (server overrides, v3.57.x — audit F2)
 
-The admin console (`rz-ops-p7x3k9m.html`) can override any feature flag
-for any page at runtime without code deployment.
+The admin console (`rz-ops-p7x3k9m.html`, Feature Flags panel) overrides any
+cell of the matrix for **every visitor** without a code deployment. Overrides
+are rows in Supabase `feature_overrides`
+(`page_key, feature_key, tier, enabled, updated_by, updated_at`, unique on
+`(page_key, feature_key, tier)`; RLS: anyone reads, only `is_root()` writes —
+`supabase/schema.sql` Module 3).
 
-### Storage key
+### Write path (admin)
 
-`rz_admin_features_by_page` (JSON string in localStorage)
+- Toggle → `rzSupa.setFeatureOverride(page, feature, tier, enabled)`; preset →
+  `rzSupa.setFeatureOverrides(rows)`; Reset → `rzSupa.deleteFeatureOverrides(page)`.
+- The panel shows loading / saving / saved / error in `#featureFlagsStatus`; a
+  failed write reverts the checkbox and prints the Supabase error. Toggles are
+  disabled while the overrides are not loaded.
+- The panel writes **nothing** to localStorage. Overrides an older panel left in
+  the admin's browser under `rz_admin_features_by_page` are offered once
+  ("Upload to Supabase" / "Discard") from a parse-time snapshot.
 
-### Override structure
+### Read path (every page that loads `js/rz-feature-flags.js`)
 
-```json
-{
-  "pue-calculator": {
-    "pdf-export": { "free": true, "demo": true, "pro": true }
-  },
-  "tco-calculator": {
-    "multi-scenario": { "free": false, "demo": true, "pro": true }
-  }
-}
-```
+1. First paint uses the shipped matrix; nothing waits for the network.
+2. After `DOMContentLoaded` the module loads rzSupa lazily
+   (`_rzAuth.ensureSupabase()`), calls `getFeatureOverrides()` (6 s timeout) and
+   applies the rows. When they change the effective map it dispatches
+   `rz-features-changed`; `auth.js` re-runs `enforceTierFeatureAccess()` for the
+   page's gate when the verdict changed.
+3. The rows are cached in `sessionStorage.rz_flag_overrides_v1` for 5 minutes.
+   A cached row can only **restrict**: a cached `enabled: true` is never applied
+   from the cache and its presence forces a fresh fetch. A fresh restrict-only
+   cache skips the network entirely (a reload makes no Supabase request).
+4. Supabase unreachable, unconfigured or the table missing → the shipped matrix
+   applies, with no page error.
+5. `_rzFeatures.source()` → `'server' | 'cache' | 'defaults'`; `_rzFeatures.refresh()`
+   re-reads the server.
 
-When an override entry exists for a given `pageKey` + `featureKey`, it takes
-precedence over the canonical schema for the matching tier. Tiers not covered
-by the override fall back to the canonical schema — the override object is
-merged at the feature level, not replaced wholesale.
+`rz_admin_features_by_page` is **never read** and is deleted on load (by this
+module and by `auth.js`), so a visitor cannot grant themselves a feature from
+devtools. The client gate is still a UX gate: a locked page's HTML is public.
 
-### Broadcasting changes
-
-When the admin console writes to `rz_admin_features_by_page`, open tabs on
-other pages receive a `storage` event. `rz-feature-flags.js` listens for
-this and fires `rz-features-changed` on `window` so pages can re-apply gating
-without a full reload.
-
-### Clearing overrides
-
-```js
-localStorage.removeItem('rz_admin_features_by_page');
-window.dispatchEvent(new CustomEvent('rz-features-changed'));
-```
+Gate: `node tools/test-feature-overrides.mjs` (V1–V4, P1, A1–A2, E1).
 
 ---
 
@@ -677,17 +679,9 @@ getTier: function (session) {
 
 ### 12.5 Back-compat for missing `root` column
 
-If a cached page-feature record (e.g. an admin override stored in
-`rz_admin_features_by_page` before v1.22.x) lacks the `root` field, the
-runtime treats root as **allowed**:
-
-```js
-/* Back-compat: override missing root column but tier is root → allow. */
-if (tier === 'root') return true;
-```
-
-Admin console UI (rz-ops) should write all four columns for every new
-override to keep this fallback unused.
+When no override row exists for the `root` tier, root falls back to the
+matrix, where a missing `root` field means **allowed**. Root `page-access` is
+always true regardless of any override row (root lock-out guard in `has()`).
 
 ---
 

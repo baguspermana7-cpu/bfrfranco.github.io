@@ -245,59 +245,14 @@
 
     var ROOT_EMAILS = ['admin@resistancezero.com', 'bagus@resistancezero.com'];
     var DEMO_EMAILS = ['demo@resistancezero.com'];
-    var EDUCATOR_SEED_EMAILS = ['educator@resistancezero.com'];
-    /**
-     * Load the educator allowlist: seed entries merged with any extras stored
-     * by the admin panel under localStorage key 'rz_admin_educators' (JSON
-     * array of email strings). Tolerant of corrupt/missing JSON: returns the
-     * seed list on any parse error.
-     * @returns {string[]} deduped, lowercased, trimmed emails
-     */
-    function loadEducatorEmails() {
-        var out = [];
-        var seen = {};
-        function push(raw) {
-            if (raw == null) return;
-            var s = String(raw).toLowerCase().trim();
-            if (!s || seen[s]) return;
-            seen[s] = 1;
-            out.push(s);
-        }
-        for (var i = 0; i < EDUCATOR_SEED_EMAILS.length; i++) {
-            push(EDUCATOR_SEED_EMAILS[i]);
-        }
-        try {
-            if (typeof localStorage !== 'undefined') {
-                var raw = localStorage.getItem('rz_admin_educators');
-                if (raw) {
-                    var extras = JSON.parse(raw);
-                    if (extras && extras.length) {
-                        for (var j = 0; j < extras.length; j++) push(extras[j]);
-                    }
-                }
-            }
-        } catch (e) { /* corrupt JSON or storage unavailable — ignore */ }
-        return out;
-    }
-    var EDUCATOR_EMAILS = loadEducatorEmails();
-    if (typeof window !== 'undefined' && window.addEventListener) {
-        /* Cross-tab sync: only rebuild when the educator allowlist key
-           specifically changes. A full localStorage.clear() (e.key === null)
-           is handled by page reload elsewhere — no need to rebuild here. */
-        window.addEventListener('storage', function (e) {
-            if (e && e.key === 'rz_admin_educators') {
-                EDUCATOR_EMAILS = loadEducatorEmails();
-            }
-        });
-        window.addEventListener('rz-educators-changed', function () {
-            EDUCATOR_EMAILS = loadEducatorEmails();
-        });
-    }
+    /* Educator status comes from the SERVER (public.is_educator(): profiles.role = 'educator' or an
+       educator_allowlist row, managed in rz-ops), never from a client list. The old localStorage list
+       rz_admin_educators let any visitor make themselves an educator; it is ignored and deleted. */
+    try { localStorage.removeItem('rz_admin_educators'); localStorage.removeItem('rz_admin_features_by_page'); } catch (e) { /* storage blocked */ }
     function detectRole(email) {
         var e = String(email || '').toLowerCase().trim();
         if (ROOT_EMAILS.indexOf(e) !== -1) return 'root';
         if (DEMO_EMAILS.indexOf(e) !== -1) return 'demo';
-        if (EDUCATOR_EMAILS.indexOf(e) !== -1) return 'educator';
         return 'pro';
     }
     function isRootEmail(email) {
@@ -429,6 +384,7 @@
 
     /* Lazy-load the shared Supabase client (config + module) on demand, so the ONE shared login modal is
        Supabase-aware on EVERY page without adding the module to 105 pages. Resolves to window.rzSupa or null. */
+    var lastGate = null;   /* {key, allowed} of the last enforceTierFeatureAccess() call on this page */
     function ensureSupabase() {
         if (window.rzSupa && window.rzSupa.ready) return window.rzSupa.ready;
         if (window.__rzSupaLoading) return window.__rzSupaLoading;
@@ -436,7 +392,7 @@
             function loadModule() {
                 var m = document.createElement('script');
                 m.type = 'module';
-                m.src = '/js/rz-supabase.js?v=2026-08-26-h1h2';
+                m.src = '/js/rz-supabase.js?v=20261114-4d629a29';
                 m.onload = function () {
                     var r = (window.rzSupa && window.rzSupa.ready) ? window.rzSupa.ready : Promise.resolve(window.rzSupa || null);
                     r.then(resolve).catch(function () { resolve(window.rzSupa || null); });
@@ -452,6 +408,25 @@
             document.head.appendChild(c);
         });
         return window.__rzSupaLoading;
+    }
+
+    /* Server role for a Supabase account: root/demo come from the email (detectRole); every other
+       account is 'educator' only when public.is_educator() says so, else 'pro'. Never throws. */
+    function resolveServerRole(supa, email) {
+        var base = detectRole(email);
+        if (base !== 'pro' || !supa || typeof supa.isEducator !== 'function') return Promise.resolve(base);
+        return Promise.resolve(supa.isEducator())
+            .then(function (r) { return (r && r.data === true) ? 'educator' : base; })
+            .catch(function () { return base; });
+    }
+    function hasSupabaseToken() {
+        try {
+            for (var i = 0; i < localStorage.length; i++) {
+                var k = localStorage.key(i);
+                if (k && k.indexOf('sb-') === 0 && k.indexOf('auth-token') !== -1) return true;
+            }
+        } catch (e) {}
+        return false;
     }
 
     /* demo/manual offline fallback only (real accounts go through Supabase). */
@@ -946,7 +921,9 @@
                         }
                         return supa.getProfile().then(function (pr) {
                             var tier = (pr && pr.data && pr.data.tier) || 'pro';
-                            _finish({ email: emailNorm, tier: tier, role: detectRole(emailNorm) });
+                            return resolveServerRole(supa, emailNorm).then(function (role) {
+                                _finish({ email: emailNorm, tier: tier, role: role });
+                            });
                         }).catch(function () {
                             _finish({ email: emailNorm, tier: 'pro', role: detectRole(emailNorm) });
                         });
@@ -1037,7 +1014,6 @@
             var email = String(session.email).toLowerCase();
             if (ROOT_EMAILS.indexOf(email) !== -1) return 'pro';
             if (DEMO_EMAILS.indexOf(email) !== -1) return 'demo';
-            if (EDUCATOR_EMAILS.indexOf(email) !== -1) return 'pro';
             return 'pro';
         },
 
@@ -1059,9 +1035,12 @@
          * @param {string} pageKey — rz-feature-flags page key (e.g. 'datahall-ai')
          * @returns {boolean} true when access is allowed; false when denied
          */
+        ensureSupabase: ensureSupabase,
+
         enforceTierFeatureAccess: function (pageKey) {
             var session = getSession();
             var role = getRoleFromSession(session);
+            lastGate = { key: pageKey, allowed: role === 'root' || featureAllows(pageKey) };
             if (role === 'root') {
                 /* v1.127.x fix: root is authorized — actually UNLOCK the page. Previously this returned
                    true without removing 'locked', so a root user who logged in via the modal stayed behind
@@ -1070,16 +1049,7 @@
                 return true;
             }
 
-            var allowed = false;
-            try {
-                if (window._rzFeatures && typeof window._rzFeatures.canAccess === 'function') {
-                    allowed = !!window._rzFeatures.canAccess(pageKey, 'page-access');
-                } else if (window.RZ_FEATURE_FLAGS && typeof window.RZ_FEATURE_FLAGS.canAccess === 'function') {
-                    allowed = !!window.RZ_FEATURE_FLAGS.canAccess(pageKey, 'page-access');
-                } else if (window._rzFeatures && typeof window._rzFeatures.has === 'function') {
-                    allowed = !!window._rzFeatures.has(pageKey, 'page-access');
-                }
-            } catch (e) { allowed = false; }
+            var allowed = lastGate.allowed;
 
             if (allowed) {
                 if (typeof document !== 'undefined' && document.body) {
@@ -1110,6 +1080,29 @@
         }
     };
 
+    /* page-access resolution through the rz-feature-flags.js matrix (+ server overrides). */
+    function featureAllows(pageKey) {
+        try {
+            if (window._rzFeatures && typeof window._rzFeatures.canAccess === 'function') {
+                return !!window._rzFeatures.canAccess(pageKey, 'page-access');
+            } else if (window.RZ_FEATURE_FLAGS && typeof window.RZ_FEATURE_FLAGS.canAccess === 'function') {
+                return !!window.RZ_FEATURE_FLAGS.canAccess(pageKey, 'page-access');
+            } else if (window._rzFeatures && typeof window._rzFeatures.has === 'function') {
+                return !!window._rzFeatures.has(pageKey, 'page-access');
+            }
+        } catch (e) {}
+        return false;
+    }
+    /* Server overrides arrive after first paint: when they change this page's verdict, re-run the gate. */
+    window.addEventListener('rz-features-changed', function () {
+        if (!lastGate) return;
+        var role = getRoleFromSession(getSession());
+        var now = role === 'root' || featureAllows(lastGate.key);
+        if (now === lastGate.allowed) return;
+        if (now && typeof window._rzAuth.hideModal === 'function') window._rzAuth.hideModal();
+        window._rzAuth.enforceTierFeatureAccess(lastGate.key);
+    });
+
     /* Close dropdown on outside click */
     document.addEventListener('click', function (e) {
         var dropdown = document.getElementById('rzUserDropdown');
@@ -1136,12 +1129,7 @@
     function rehydrateFromSupabase() {
         try {
             if (getSession()) return;                          // mirror healthy
-            var hasSbToken = false;
-            for (var i = 0; i < localStorage.length; i++) {
-                var k = localStorage.key(i);
-                if (k && k.indexOf('sb-') === 0 && k.indexOf('auth-token') !== -1) { hasSbToken = true; break; }
-            }
-            if (!hasSbToken) return;                           // not Supabase-logged-in
+            if (!hasSupabaseToken()) return;                   // not Supabase-logged-in
             ensureSupabase().then(function () {
                 var supa = window.rzSupa;
                 if (!supa || typeof supa.getSession !== 'function') return;
@@ -1151,10 +1139,12 @@
                     email = String(email).toLowerCase().trim();
                     var role = detectRole(email);
                     var finish = function (tier) {
-                        setSession(email, tier || (role === 'demo' ? 'demo' : 'pro'), role);
-                        updateAuthUI();
-                        updateRootOnlyLinksUI();
-                        try { window.dispatchEvent(new Event('rz-auth-change')); } catch (e) {}
+                        resolveServerRole(supa, email).then(function (r) {
+                            setSession(email, tier || (role === 'demo' ? 'demo' : 'pro'), r);
+                            updateAuthUI();
+                            updateRootOnlyLinksUI();
+                            try { window.dispatchEvent(new Event('rz-auth-change')); } catch (e) {}
+                        });
                     };
                     if (typeof supa.getProfile === 'function') {
                         Promise.resolve(supa.getProfile())
@@ -1162,6 +1152,40 @@
                             .catch(function () { finish(null); });
                     } else finish(null);
                 }).catch(function () {});
+            }).catch(function () {});
+        } catch (e) {}
+    }
+
+    /* Re-check the educator role of an existing session against the server (at most every 10 min per
+       tab, after first paint). A session that says 'educator' without a Supabase login is downgraded:
+       that role could only have come from the retired client-side list. */
+    function syncServerRole() {
+        try {
+            var s = getSession();
+            if (!s || s.v2 || (s.role !== 'pro' && s.role !== 'educator')) return;
+            if (detectRole(s.email) !== 'pro') return;
+            var apply = function (role) {
+                var cur = getSession();
+                if (!cur || cur.email !== s.email || cur.role === role) return;
+                cur.role = role;
+                try { localStorage.setItem('rz_premium_session', JSON.stringify(cur)); } catch (e) { return; }
+                updateAuthUI();
+                try { window.dispatchEvent(new Event('rz-auth-change')); } catch (e) {}
+            };
+            if (!hasSupabaseToken()) { if (s.role === 'educator') apply('pro'); return; }
+            var last = 0;
+            try { last = Number(sessionStorage.getItem('rz_role_checked_v1')) || 0; } catch (e) {}
+            if (Date.now() - last < 600000 && Date.now() >= last) return;
+            ensureSupabase().then(function (supa) {
+                if (!supa || !supa.configured) return;
+                return Promise.resolve(supa.getSession()).then(function (sess) {
+                    var em = sess && sess.user && String(sess.user.email || '').toLowerCase().trim();
+                    if (!em || em !== String(s.email).toLowerCase().trim()) return;
+                    return resolveServerRole(supa, em).then(function (role) {
+                        try { sessionStorage.setItem('rz_role_checked_v1', String(Date.now())); } catch (e) {}
+                        apply(role);
+                    });
+                });
             }).catch(function () {});
         } catch (e) {}
     }
@@ -1175,6 +1199,7 @@
         updateAuthUI();
         updateRootOnlyLinksUI();
         rehydrateFromSupabase();
+        setTimeout(syncServerRole, 0);
         /* Phase 3: when flag is on, refresh the local mirror from the
            Worker once per page-load. hydrateSessionFromWorker() resolves
            with null on failure and clears the mirror — we re-render after

@@ -774,18 +774,12 @@ rz-ops admin panel (same as plain pro).
 
 ### 14.2 Educator role detection
 
-`auth.js` resolves the role via `detectRole(email)`:
-
-```js
-if (ROOT_EMAILS.indexOf(e)     !== -1) return 'root';
-if (DEMO_EMAILS.indexOf(e)     !== -1) return 'demo';
-if (EDUCATOR_EMAILS.indexOf(e) !== -1) return 'educator';
-return 'pro';
-```
-
-`EDUCATOR_EMAILS` is built from the hardcoded seed
-(`educator@resistancezero.com`) unioned with the admin-managed
-`localStorage.rz_admin_educators` JSON list.
+`auth.js` resolves root/demo from the email (`detectRole`); every other
+Supabase account is `educator` only when the server says so
+(`rzSupa.isEducator()` → `public.is_educator()`: `profiles.role` or an
+`educator_allowlist` row), else `pro`. See `AUTH_STANDARD.md` §Educator
+allowlist storage. The client-side list (`EDUCATOR_SEED_EMAILS`,
+`localStorage.rz_admin_educators`) is retired and deleted on load.
 
 ### 14.3 EDUCATOR badge (header dropdown)
 

@@ -69,6 +69,7 @@ python3 tools/audit-published-datasets.py --strict  # every downloadable CSV par
 node   tools/test-journal.mjs                      # JOURNAL family gate (v3.23.0): data/journal.json = every article's meta and every generated grid; the per-page CSS sweep is a no-op; structure (no fixed decorative canvas, blur >= 20px, transition:all, hover lift, ticker, serif face, navy literal, per-page accent — RED on a seeded navy + ticker); the topic/series/search filter in a real browser at 390 + 1440 (counts equal the JSON, URL state restored, Clear, empty state, aria-pressed); computed fonts/backgrounds, composited layers <= 20, fact lists render as rows. The blank-on-scroll hub had 48 layers.
 python3 tools/audit-post-drafts.py --strict         # every journal page (article-N, FF-N, geopolitics-N) carries its five social drafts (x, linkedin, mastodon, medium, facebook; any prefix/extension) with UTM-tagged resistancezero links and a Medium import/canonical line (v3.24.1 — the v1 audit expected file names nobody used and never passed). Other pages monitored. `--fix-utm` tags older drafts.
 node   tools/test-rz-ops-access.mjs              # rz-ops admin console (v3.57.1): a forged localStorage session or a signed-in non-root account sees the LOGIN, only a Supabase profile with tier=root sees the console; Mayar payer text cannot inject markup (X1); no tab scrolls sideways at 390 px. Function laws: dashboard/users/tier/growth numbers equal the stubbed profiles + audit_log rows (D1), identical across two loads (D2), no invented revenue/uptime/session numbers (D3), Supabase errors visible (D4), Credentials tab + in-memory create form gone (R1), Subscribers/User Activity name their source and nothing is seeded (S1), no cookie banner or pre-login clock (C1), no lift/blur/glow CSS (V1). js/rz-supabase.js is stubbed in-browser. Fails A1/A2/X1/M1 on v3.57.0 and C1b/D1/D1b/D3/R1/S1/V1/C1/D2/D4 on v3.57.2.
+node   tools/test-feature-overrides.mjs           # feature overrides + educator role come from Supabase, never the visitor's localStorage (audit F2): a forged rz_admin_features_by_page / sessionStorage cache / rz_admin_educators grants nothing (V1, V1c, V4); a server override is applied on the real gated page both ways (V2); Supabase down → shipped defaults, 0 errors (V3); a reload in the TTL makes no Supabase request (P1); rz-ops toggles call setFeatureOverride and write no localStorage, failed writes revert (A1); educator promote/demote call addEducator/removeEducator, emails escaped (A2). js/rz-supabase.js stubbed in-browser. Fails V1/V2/V2b/V4/P1/A1/A1b/A2/A2x on v3.57.6.
 node   tools/test-no-client-secrets.mjs --law X1.2a   # SECRET gate (PRD-X-DEFECTS FR-X1.3): every git-tracked text file, incl. published dcmoc/_next, against 11 key/token/password patterns; prints file:line + pattern + length, NEVER the value. A hit outside tools/secret-scan-baseline.json fails. --law X1.2b fails until the baseline is empty (owner actions OA-1..3, D-XDEF-11). --self-test plants a run-time fake key.
 python3 tools/test-article-series.py               # series navigation current on every article (counts, Prev/Next, the previous article's tail) — after adding an article run the sync tool in the same folder with --apply (sync-article-series) first.
 node   tools/test-llm-calc.mjs                      # article 29's five LLM calculators (js/rz-llm-calc.js): every worked example in Article/Article_29/CALCULATORS.md (396 assertions incl. the number format a reader sees), invalid inputs, monotonicity, a source on every constant, formula strings match the spec.
@@ -212,10 +213,14 @@ NOT purple. Tokens: `background: rgba(8,145,178,0.18); color: #67e8f9;`.
 CSS rule is mirrored in BOTH `styles.css` AND `styles-index.css` per the
 2-stylesheet architecture rule above.
 
-**Educator allowlist** seed is hardcoded in `auth.js`
-(`EDUCATOR_SEED_EMAILS`); admin overrides live in
-`localStorage.rz_admin_educators` and fire a `rz-educators-changed` event
-when written by the rz-ops admin panel.
+**Educator role and feature overrides are SERVER state** (audit F2): educator =
+`public.is_educator()` (`educator_allowlist` row or `profiles.role`), resolved by
+`auth.js` at login and re-checked per tab; overrides = Supabase
+`feature_overrides`, read by `js/rz-feature-flags.js` after first paint (5 min
+restrict-only sessionStorage cache, shipped matrix when Supabase is down) and
+written only by root from rz-ops. The old client keys `rz_admin_features_by_page`
+/ `rz_admin_educators` are never read and are deleted on load — never bring a
+client-side grant back.
 
 Full spec: `standarization/AUTH_STANDARD.md` (§Auth tiers),
 `standarization/PRO_MODE_STANDARDIZATION.md` (§14),

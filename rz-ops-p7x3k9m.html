@@ -710,10 +710,10 @@
     <script src="js/rz-explain-db.js?v=20261111-a4d62e38" defer></script>
     <script src="js/rz-explain.js?v=20261103-f581e6ac" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
-    <script src="js/rz-feature-flags.js?v=20260920-3857d43d" defer></script>
+    <script src="js/rz-feature-flags.js?v=20261114-73e75695" defer></script>
     <!-- Supabase (real accounts) — live "Supabase Accounts" panel, root-gated by RLS -->
     <script src="js/rz-config.js?v=20260920-eed056f9"></script>
-    <script type="module" src="js/rz-supabase.js?v=20261111-3c801534"></script>
+    <script type="module" src="js/rz-supabase.js?v=20261114-4d629a29"></script>
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -996,12 +996,22 @@
         </div>
         <div class="pagination"><div class="pagination-info" id="pgInfo"></div><div class="pagination-btns" id="pgBtns"></div></div>
     </div>
+    <div class="card" id="educatorCard" style="margin-top:1.5rem">
+        <div class="card-title"><i class="fas fa-graduation-cap" style="color:#67e8f9"></i> Educators</div>
+        <p style="font-size:0.78rem;color:#64748b;margin-bottom:0.75rem;">Emails in Supabase <code style="font-size:0.7rem;color:#94a3b8">educator_allowlist</code> sign in with the Educator role (Full-access column plus DC AI/HPC and DC Conventional). Only root can read or change this list.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:0.75rem">
+            <label style="font-size:0.66rem;color:#94a3b8;display:flex;flex-direction:column;gap:3px;flex:1 1 220px;">EMAIL<input id="eduEmail" type="email" autocomplete="off" placeholder="teacher@example.com" style="background:#121316;color:#e2e8f0;border:1px solid rgba(148,163,184,0.28);border-radius:4px;padding:6px 8px;font-size:0.78rem;"></label>
+            <button class="btn btn-sm" id="eduAddBtn" onclick="promoteEducator()" style="background:#22d3ee;color:#06202a;font-weight:700;"><i class="fas fa-user-graduate"></i> Promote to educator</button>
+        </div>
+        <div id="eduStatus" class="supa-status" style="border-left-color:#334155;margin-bottom:0.75rem"><i class="fas fa-circle-notch fa-spin" style="color:#64748b"></i><span>Loading…</span></div>
+        <div class="tbl-overflow"><table class="data-tbl"><thead><tr><th scope="col">Email</th><th scope="col">Added</th><th scope="col">Action</th></tr></thead><tbody id="eduTbody"></tbody></table></div>
+    </div>
 </div>
 
 <!-- ══════════════════════════════════════ FEATURES ══════════════════════════════════════ -->
 <div class="section" id="sec-features">
     <div class="section-header" style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div><h1>Feature Flags</h1><p>Per-page 4-tier feature matrix — FREE | DEMO | FULL | ROOT. Changes persist immediately.</p></div>
+        <div><h1>Feature Flags</h1><p>Per-page 4-tier feature matrix — FREE | DEMO | FULL | ROOT. Each toggle is saved to Supabase and reaches every visitor within 5 minutes.</p></div>
         <div style="display:flex;gap:0.5rem;flex-shrink:0">
             <button class="btn btn-green btn-sm" onclick="exportFeaturesCSV()"><i class="fas fa-download"></i> CSV</button>
             <button class="btn btn-purple btn-sm" onclick="openReport('features')"><i class="fas fa-file-alt"></i> Report</button>
@@ -1010,7 +1020,9 @@
     <!-- Per-page 3-tier matrix (v1.18.0) -->
     <div class="card">
         <div class="card-title"><i class="fas fa-sliders-h" style="color:#22d3ee"></i> Per-Page Tier-Level Feature Matrix</div>
-        <p style="font-size:0.78rem;color:#64748b;margin-bottom:1.25rem;">Select a page from the left panel. Toggle features per tier. Overrides saved to <code style="font-size:0.7rem;color:#94a3b8">rz_admin_features_by_page</code>. Open calc tabs receive an <code style="font-size:0.7rem;color:#94a3b8">rz-features-changed</code> event.</p>
+        <p style="font-size:0.78rem;color:#64748b;margin-bottom:0.75rem;">Select a page from the left panel. Toggle features per tier. Overrides are rows in Supabase <code style="font-size:0.7rem;color:#94a3b8">feature_overrides</code> (anyone may read, only root may write). Visitors' pages read them after first paint and fall back to the shipped matrix when Supabase is unreachable.</p>
+        <div id="featureFlagsStatus" class="supa-status" style="border-left-color:#334155;margin-bottom:1rem"><i class="fas fa-circle-notch fa-spin" style="color:#64748b"></i><span>Loading overrides from Supabase…</span></div>
+        <div id="legacyFlagCard" style="display:none;margin-bottom:1rem"></div>
         <div class="features-layout">
             <div class="features-subnav" id="featurePagesSubnav">
                 <span style="font-size:0.65rem;color:#475569;padding:4px 2px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em">Loading pages...</span>
@@ -2540,6 +2552,8 @@ async function loadOpsData(){
     renderDashboard();
     renderAudit();
     renderFeatures();
+    loadFeatureOverrides();
+    loadEducators();
     renderSettings();
     if(opsState.profiles==='error')setStatusLine('supaAccountsStatus','Supabase error reading profiles: '+opsState.profilesError,'err');
     else setStatusLine('supaAccountsStatus',allUsers.length+(allUsers.length===1?' account':' accounts')+' in Supabase. Change a tier in the table; reset or delete with the row buttons.','ok');
@@ -2705,8 +2719,8 @@ function exportDashboardCSV(){
 function exportFeaturesCSV(){
     /* 4-tier per-page matrix export with overrides resolved */
     var schema = (typeof _getFeatureSchema === 'function') ? _getFeatureSchema() : (window.RZ_FEATURE_FLAGS || {});
-    var overrides = {};
-    try { overrides = JSON.parse(localStorage.getItem('rz_admin_features_by_page') || '{}'); } catch(_) {}
+    if (ffState.status !== 'ok') { (window.showToast||alert)('Overrides are not loaded from Supabase — nothing to export.'); return; }
+    var overrides = ffState.map;
     var csv='Page,Feature,Label,Free,Demo,Pro,Root,Overridden\n';
     Object.keys(schema).forEach(function(pageKey){
         var spec=schema[pageKey]; if(!spec) return;
@@ -3045,6 +3059,9 @@ var RZ_FEATURE_FLAGS_FALLBACK = {
 };
 
 window._selectedFeaturePage = '';
+var ffState = {status:'loading', error:'', map:{}};
+/* Snapshot of the retired local-only key, taken while parsing (before js/rz-feature-flags.js deletes it). */
+var LEGACY_FLAG_OVERRIDES = (function(){ try { return JSON.parse(localStorage.getItem('rz_admin_features_by_page') || 'null'); } catch(_) { return null; } })();
 
 function _getFeatureSchema() {
     return (window.RZ_FEATURE_FLAGS && Object.keys(window.RZ_FEATURE_FLAGS).length > 0)
@@ -3104,9 +3121,8 @@ window.selectFeaturePage = function(pageKey) {
 
     document.getElementById('featureMatrixTitle').textContent = pageKey;
 
-    var overrides = {};
-    try { overrides = JSON.parse(localStorage.getItem('rz_admin_features_by_page') || '{}'); } catch(_) {}
-    var pageOverrides = overrides[pageKey] || {};
+    var pageOverrides = (ffState.map && ffState.map[pageKey]) || {};
+    var canEdit = ffState.status === 'ok';
 
     var rows = Object.keys(spec).map(function(fk) {
         var defs = spec[fk];
@@ -3115,11 +3131,12 @@ window.selectFeaturePage = function(pageKey) {
             /* ROOT defaults to true unless schema explicitly says otherwise — keeps Super Admin always-on semantics */
             var schemaVal = (tier === 'root' && typeof defs.root !== 'boolean') ? true : defs[tier];
             var current = (typeof ov[tier] === 'boolean') ? ov[tier] : schemaVal;
-            return '<label class="toggle-switch"><input type="checkbox" ' + (current ? 'checked' : '') +
-                   ' onchange="toggleFeatureFlag(\'' + pageKey + '\',\'' + fk + '\',\'' + tier + '\',this.checked)"><span class="toggle-slider"><\/span><\/label>';
+            return '<label class="toggle-switch"><input type="checkbox" ' + (current ? 'checked' : '') + (canEdit ? '' : ' disabled') +
+                   ' aria-label="' + rzEsc(pageKey + ' ' + fk + ' ' + tier) + '" data-page="' + rzEsc(pageKey) + '" data-feat="' + rzEsc(fk) + '" data-tier="' + tier + '"' +
+                   ' onchange="toggleFeatureFlagEl(this)"><span class="toggle-slider"><\/span><\/label>';
         }
         var hasOverride = (typeof ov.free === 'boolean' || typeof ov.demo === 'boolean' || typeof ov.pro === 'boolean' || typeof ov.root === 'boolean');
-        var label = (defs.label || fk) + (hasOverride ? ' <span style="color:#fbbf24;font-size:0.6rem">*<\/span>' : '');
+        var label = rzEsc(defs.label || fk) + (hasOverride ? ' <span style="color:#fbbf24;font-size:0.6rem" title="Overridden in Supabase">*<\/span>' : '');
         var defRoot = (typeof defs.root === 'boolean') ? defs.root : true;
         return '<tr>' +
             '<td>' + label + '<\/td>' +
@@ -3137,49 +3154,177 @@ window.selectFeaturePage = function(pageKey) {
     if (sel) sel.value = '';
 };
 
-window.toggleFeatureFlag = function(pageKey, featureKey, tier, value) {
-    var overrides = {};
-    try { overrides = JSON.parse(localStorage.getItem('rz_admin_features_by_page') || '{}'); } catch(_) {}
-    overrides[pageKey] = overrides[pageKey] || {};
-    overrides[pageKey][featureKey] = overrides[pageKey][featureKey] || {};
-    overrides[pageKey][featureKey][tier] = !!value;
-    localStorage.setItem('rz_admin_features_by_page', JSON.stringify(overrides));
-    try { window.dispatchEvent(new CustomEvent('rz-features-changed')); } catch(_) {}
-};
-
-window.resetFeaturePage = function(pageKey) {
-    if (!pageKey) return;
-    if (!confirm('Reset ' + pageKey + ' to defaults?')) return;
-    var overrides = {};
-    try { overrides = JSON.parse(localStorage.getItem('rz_admin_features_by_page') || '{}'); } catch(_) {}
-    delete overrides[pageKey];
-    localStorage.setItem('rz_admin_features_by_page', JSON.stringify(overrides));
-    selectFeaturePage(pageKey);
-    try { window.dispatchEvent(new CustomEvent('rz-features-changed')); } catch(_) {}
-};
-
-window.applyFeaturePreset = function(preset) {
-    var pageKey = window._selectedFeaturePage;
-    if (!pageKey || !preset) return;
-    var schema = _getFeatureSchema();
-    var spec = schema[pageKey];
-    if (!spec) return;
-    var overrides = {};
-    try { overrides = JSON.parse(localStorage.getItem('rz_admin_features_by_page') || '{}'); } catch(_) {}
-    overrides[pageKey] = overrides[pageKey] || {};
-    Object.keys(spec).forEach(function(fk) {
-        overrides[pageKey][fk] = overrides[pageKey][fk] || {};
-        if (preset === 'all_free')      { overrides[pageKey][fk].free = true;  overrides[pageKey][fk].demo = true;  overrides[pageKey][fk].pro = true;  overrides[pageKey][fk].root = true;  }
-        if (preset === 'all_demo+')     { overrides[pageKey][fk].free = false; overrides[pageKey][fk].demo = true;  overrides[pageKey][fk].pro = true;  overrides[pageKey][fk].root = true;  }
-        if (preset === 'all_pro+')      { overrides[pageKey][fk].free = false; overrides[pageKey][fk].demo = false; overrides[pageKey][fk].pro = true;  overrides[pageKey][fk].root = true;  }
-        if (preset === 'all_root_only') { overrides[pageKey][fk].free = false; overrides[pageKey][fk].demo = false; overrides[pageKey][fk].pro = false; overrides[pageKey][fk].root = true;  }
-        if (preset === 'pro_only')      { overrides[pageKey][fk].free = false; overrides[pageKey][fk].demo = false; overrides[pageKey][fk].pro = true;  overrides[pageKey][fk].root = true;  }
-        if (preset === 'demo_up')       { overrides[pageKey][fk].free = false; overrides[pageKey][fk].demo = true;  overrides[pageKey][fk].pro = true;  overrides[pageKey][fk].root = true;  }
-        if (preset === 'all_off')       { overrides[pageKey][fk].free = false; overrides[pageKey][fk].demo = false; overrides[pageKey][fk].pro = false; overrides[pageKey][fk].root = false; }
+/* Overrides live in Supabase feature_overrides (anon read, root-only write under RLS). This panel
+   reads them once per load, writes each change through rzSupa, and never touches localStorage. */
+var TIER_KEYS = ['free','demo','pro','root'];
+function _ffRowsToMap(rows){
+    var map={};
+    (rows||[]).forEach(function(r){
+        if(!r||TIER_KEYS.indexOf(r.tier)===-1||typeof r.enabled!=='boolean')return;
+        map[r.page_key]=map[r.page_key]||{};
+        map[r.page_key][r.feature_key]=map[r.page_key][r.feature_key]||{};
+        map[r.page_key][r.feature_key][r.tier]=r.enabled;
     });
-    localStorage.setItem('rz_admin_features_by_page', JSON.stringify(overrides));
+    return map;
+}
+function _ffAfterWrite(){
+    /* this tab's own gate copy: drop the cache and re-read so the admin sees what visitors will see */
+    try{sessionStorage.removeItem('rz_flag_overrides_v1')}catch(_){}
+    if(window._rzFeatures&&typeof window._rzFeatures.refresh==='function')window._rzFeatures.refresh();
+}
+async function loadFeatureOverrides(){
+    var S=window.rzSupa;
+    ffState={status:'loading',error:'',map:{}};
+    setStatusLine('featureFlagsStatus','Loading overrides from Supabase…','loading');
+    if(!S||!S.configured||typeof S.getFeatureOverrides!=='function'){
+        ffState={status:'error',error:'Supabase is not configured on this page.',map:{}};
+    } else {
+        var r=await S.getFeatureOverrides().catch(function(e){return {data:[],error:(e&&e.message)||String(e)}});
+        if(r.error) ffState={status:'error',error:String(r.error),map:{}};
+        else ffState={status:'ok',error:'',map:_ffRowsToMap(r.data),count:(r.data||[]).length};
+    }
+    if(ffState.status==='ok')setStatusLine('featureFlagsStatus',ffState.count+(ffState.count===1?' override':' overrides')+' in Supabase. Untouched cells use the shipped default.','ok');
+    else setStatusLine('featureFlagsStatus','Supabase error reading feature_overrides: '+ffState.error+'. Toggles are disabled; pages use the shipped defaults.','err');
+    if(window._selectedFeaturePage)selectFeaturePage(window._selectedFeaturePage);
+    renderLegacyFlagCard();
+}
+
+window.toggleFeatureFlagEl = function(el){
+    toggleFeatureFlag(el.getAttribute('data-page'),el.getAttribute('data-feat'),el.getAttribute('data-tier'),el.checked,el);
+};
+window.toggleFeatureFlag = async function(pageKey, featureKey, tier, value, el) {
+    var S=window.rzSupa;
+    var label=pageKey+' / '+featureKey+' / '+tier+' → '+(value?'on':'off');
+    if(!S||typeof S.setFeatureOverride!=='function'||ffState.status!=='ok'){
+        if(el)el.checked=!value;
+        setStatusLine('featureFlagsStatus','Not saved ('+label+'): overrides are not loaded from Supabase.','err');
+        return;
+    }
+    if(el)el.disabled=true;
+    setStatusLine('featureFlagsStatus','Saving '+label+'…','loading');
+    var r=await S.setFeatureOverride(pageKey,featureKey,tier,!!value).catch(function(e){return {error:(e&&e.message)||String(e)}});
+    if(el)el.disabled=false;
+    if(r&&r.error){
+        if(el)el.checked=!value;
+        setStatusLine('featureFlagsStatus','Not saved ('+label+'): '+r.error,'err');
+        return;
+    }
+    ffState.map[pageKey]=ffState.map[pageKey]||{};
+    ffState.map[pageKey][featureKey]=ffState.map[pageKey][featureKey]||{};
+    ffState.map[pageKey][featureKey][tier]=!!value;
+    setStatusLine('featureFlagsStatus','Saved '+label+'. Visitors pick it up within 5 minutes.','ok');
+    if(window._selectedFeaturePage===pageKey)selectFeaturePage(pageKey);
+    _ffAfterWrite();
+};
+
+window.resetFeaturePage = async function(pageKey) {
+    if (!pageKey) return;
+    var S=window.rzSupa;
+    if(!S||typeof S.deleteFeatureOverrides!=='function'||ffState.status!=='ok'){setStatusLine('featureFlagsStatus','Not reset: overrides are not loaded from Supabase.','err');return;}
+    if (!confirm('Reset ' + pageKey + ' to defaults for every visitor?')) return;
+    setStatusLine('featureFlagsStatus','Resetting '+pageKey+'…','loading');
+    var r=await S.deleteFeatureOverrides(pageKey).catch(function(e){return {error:(e&&e.message)||String(e)}});
+    if(r&&r.error){setStatusLine('featureFlagsStatus','Not reset ('+pageKey+'): '+r.error,'err');return;}
+    delete ffState.map[pageKey];
+    setStatusLine('featureFlagsStatus','Reset '+pageKey+' to the shipped defaults.','ok');
     selectFeaturePage(pageKey);
-    try { window.dispatchEvent(new CustomEvent('rz-features-changed')); } catch(_) {}
+    _ffAfterWrite();
+};
+
+var FEATURE_PRESETS = {
+    'all_free':      {free:true, demo:true, pro:true, root:true},
+    'all_demo+':     {free:false,demo:true, pro:true, root:true},
+    'all_pro+':      {free:false,demo:false,pro:true, root:true},
+    'all_root_only': {free:false,demo:false,pro:false,root:true},
+    'pro_only':      {free:false,demo:false,pro:true, root:true},
+    'demo_up':       {free:false,demo:true, pro:true, root:true},
+    'all_off':       {free:false,demo:false,pro:false,root:false}
+};
+window.applyFeaturePreset = async function(preset) {
+    var pageKey = window._selectedFeaturePage;
+    var vals = FEATURE_PRESETS[preset];
+    if (!pageKey || !vals) return;
+    var spec = _getFeatureSchema()[pageKey];
+    if (!spec) return;
+    var S=window.rzSupa;
+    if(!S||typeof S.setFeatureOverrides!=='function'||ffState.status!=='ok'){setStatusLine('featureFlagsStatus','Preset not applied: overrides are not loaded from Supabase.','err');return;}
+    var rows=[];
+    Object.keys(spec).forEach(function(fk){TIER_KEYS.forEach(function(t){rows.push({page_key:pageKey,feature_key:fk,tier:t,enabled:vals[t]})})});
+    setStatusLine('featureFlagsStatus','Applying preset to '+pageKey+' ('+rows.length+' cells)…','loading');
+    var r=await S.setFeatureOverrides(rows).catch(function(e){return {error:(e&&e.message)||String(e)}});
+    if(r&&r.error){setStatusLine('featureFlagsStatus','Preset not applied ('+pageKey+'): '+r.error,'err');selectFeaturePage(pageKey);return;}
+    rows.forEach(function(x){ffState.map[x.page_key]=ffState.map[x.page_key]||{};ffState.map[x.page_key][x.feature_key]=ffState.map[x.page_key][x.feature_key]||{};ffState.map[x.page_key][x.feature_key][x.tier]=x.enabled;});
+    setStatusLine('featureFlagsStatus','Preset applied to '+pageKey+' ('+rows.length+' cells).','ok');
+    selectFeaturePage(pageKey);
+    _ffAfterWrite();
+};
+
+/* Overrides that earlier versions of this panel kept ONLY in this browser (they never reached any
+   visitor). The flag module deletes that key on load, so offer to upload the snapshot taken at parse. */
+function renderLegacyFlagCard(){
+    var box=document.getElementById('legacyFlagCard');if(!box)return;
+    var rows=[];
+    var lg=LEGACY_FLAG_OVERRIDES;
+    if(lg&&typeof lg==='object')Object.keys(lg).forEach(function(pk){var f=lg[pk];if(!f||typeof f!=='object')return;Object.keys(f).forEach(function(fk){var t=f[fk]||{};TIER_KEYS.forEach(function(tr){if(typeof t[tr]==='boolean')rows.push({page_key:pk,feature_key:fk,tier:tr,enabled:t[tr]})})})});
+    if(!rows.length||ffState.status!=='ok'){box.style.display='none';box.innerHTML='';return;}
+    box.style.display='';
+    box.innerHTML='<div class="supa-status" style="border-left-color:#fbbf24;flex-wrap:wrap"><i class="fas fa-triangle-exclamation" style="color:#fbbf24"></i><span></span>'+
+        '<button class="btn btn-ghost btn-sm" onclick="uploadLegacyFlags()">Upload to Supabase</button><button class="btn btn-ghost btn-sm" onclick="discardLegacyFlags()">Discard</button></div>';
+    box.querySelector('span').textContent=rows.length+' override'+(rows.length===1?' was':'s were')+' saved only in this browser by an older admin panel and never reached any visitor.';
+    box._rows=rows;
+}
+window.uploadLegacyFlags=async function(){
+    var box=document.getElementById('legacyFlagCard');var rows=(box&&box._rows)||[];
+    if(!rows.length)return;
+    var r=await window.rzSupa.setFeatureOverrides(rows).catch(function(e){return {error:(e&&e.message)||String(e)}});
+    if(r&&r.error){setStatusLine('featureFlagsStatus','Upload failed: '+r.error,'err');return;}
+    LEGACY_FLAG_OVERRIDES=null;
+    _ffAfterWrite();
+    loadFeatureOverrides();
+};
+window.discardLegacyFlags=function(){LEGACY_FLAG_OVERRIDES=null;renderLegacyFlagCard();};
+
+// ═══════════════════════════════════════════════════════════════
+// EDUCATORS — Supabase educator_allowlist (root-only read/write under RLS)
+// ═══════════════════════════════════════════════════════════════
+async function loadEducators(){
+    var S=window.rzSupa,tb=document.getElementById('eduTbody');
+    if(!tb)return;
+    if(!S||!S.configured||typeof S.listEducators!=='function'){setStatusLine('eduStatus','Supabase is not configured on this page.','err');tb.innerHTML='';return;}
+    setStatusLine('eduStatus','Loading educator_allowlist…','loading');
+    var r=await S.listEducators().catch(function(e){return {data:[],error:(e&&e.message)||String(e)}});
+    if(r.error){setStatusLine('eduStatus','Supabase error reading educator_allowlist: '+r.error,'err');tb.innerHTML='';return;}
+    var list=r.data||[];
+    tb.innerHTML=list.length?list.map(function(x){
+        var em=rzEsc(x.email);
+        return '<tr><td><span style="font-size:0.75rem">'+em+'</span></td><td>'+rzEsc(x.added_at?fmtDate(new Date(x.added_at)):'—')+'</td>'+
+            '<td><button class="btn btn-ghost btn-sm" data-email="'+em+'" onclick="demoteEducator(this.getAttribute(\'data-email\'))" title="Remove educator role" style="color:#fca5a5"><i class="fas fa-user-minus"></i> Demote</button></td></tr>';
+    }).join(''):'<tr><td colspan="3" style="color:#64748b;padding:1rem">No educators in the allowlist.</td></tr>';
+    setStatusLine('eduStatus',list.length+(list.length===1?' educator':' educators')+' in Supabase.','ok');
+}
+window.promoteEducator=async function(email){
+    var inp=document.getElementById('eduEmail');
+    email=String(email||(inp&&inp.value)||'').toLowerCase().trim();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){setStatusLine('eduStatus','Enter a valid email address.','warn');return;}
+    var S=window.rzSupa;
+    if(!S||typeof S.addEducator!=='function'){setStatusLine('eduStatus','Supabase is not configured on this page.','err');return;}
+    setStatusLine('eduStatus','Saving '+email+'…','loading');
+    var r=await S.addEducator(email).catch(function(e){return {error:(e&&e.message)||String(e)}});
+    if(r&&r.error){setStatusLine('eduStatus','Not saved ('+email+'): '+r.error,'err');return;}
+    if(inp)inp.value='';
+    await loadEducators();
+    setStatusLine('eduStatus','Saved: '+email+' is an educator from their next sign-in (or within 10 minutes).','ok');
+};
+window.demoteEducator=async function(email){
+    email=String(email||'').toLowerCase().trim();if(!email)return;
+    if(!confirm('Remove the educator role from '+email+'?'))return;
+    var S=window.rzSupa;
+    if(!S||typeof S.removeEducator!=='function'){setStatusLine('eduStatus','Supabase is not configured on this page.','err');return;}
+    setStatusLine('eduStatus','Removing '+email+'…','loading');
+    var r=await S.removeEducator(email).catch(function(e){return {error:(e&&e.message)||String(e)}});
+    if(r&&r.error){setStatusLine('eduStatus','Not removed ('+email+'): '+r.error,'err');return;}
+    await loadEducators();
+    setStatusLine('eduStatus','Removed: '+email+' is no longer an educator.','ok');
 };
 
 // Legacy flat-flag helpers (kept for backward compat — rz_admin_features key unchanged)
@@ -6441,9 +6586,9 @@ function renderAuditV2(){
 })();
 
 /* Hook into existing renderTable() — when AUTH_V2 is on we re-render the
-   user table from server data instead of the local generated array. The
-   localStorage Educator promote/demote actions remain intact in flag-off
-   mode (see existing renderTable / promoteEducator path). */
+   user table from server data instead of the local generated array.
+   Educator promote/demote is the Supabase educator_allowlist card in
+   the Users section (promoteEducator / demoteEducator). */
 (function _v2OverrideRenderTable(){
     if (typeof window.renderTable !== 'function') return;
     var legacy = window.renderTable;

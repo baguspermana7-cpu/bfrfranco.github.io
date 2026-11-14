@@ -55,7 +55,7 @@
 |-------|----------|------|------|--------|
 | `bagus@resistancezero.com` | `[redacted — rotated]` | pro | root | Hardcoded in auth.js + all pages |
 | `admin@resistancezero.com` | `[redacted — rotated]` | pro | root | Hardcoded in auth.js + all pages |
-| `educator@resistancezero.com` | `[redacted]` | pro | educator | Hardcoded in auth.js + `rz_admin_educators` (admin-managed allowlist) |
+| `educator@resistancezero.com` | `[redacted]` | pro | educator | Supabase account; educator role from the server (`educator_allowlist` row or `profiles.role`) — add it in rz-ops → Users → Educators |
 | `demo@resistancezero.com` | `demo2026` | demo | demo | Hardcoded in auth.js + all pages |
 | *(manual accounts)* | *(varies)* | *(varies)* | pro | `rz_manual_accounts` localStorage |
 
@@ -378,27 +378,27 @@ LTC labs.
 },
 ```
 
-### Educator allowlist storage
+### Educator allowlist storage (server, v3.57.x — audit F2)
 
-The set of educator emails has two sources:
+Educator status comes **only from the server**: `public.is_educator()` is true
+when the caller's `profiles.role = 'educator'` or their email is in
+`public.educator_allowlist` (root-only read/write under RLS).
 
-1. **Seed list** — hardcoded in `auth.js` (`EDUCATOR_SEED_EMAILS`,
-   currently `['educator@resistancezero.com']`).
-2. **Admin overrides** — `localStorage.rz_admin_educators`, a JSON array of
-   email strings managed by the rz-ops admin panel.
+- **Login / rehydrate** (`auth.js`): after Supabase sign-in,
+  `resolveServerRole()` sets the session role — root/demo from the email,
+  otherwise `'educator'` when `rzSupa.isEducator()` returns true, else `'pro'`.
+- **Existing sessions**: `syncServerRole()` re-checks after first paint (at most
+  every 10 min per tab, `sessionStorage.rz_role_checked_v1`) and corrects the
+  session both ways. A session that says `educator` with no Supabase login is
+  downgraded to `pro` (that role could only have come from the retired list).
+- **Admin**: rz-ops → Users → Educators card: `rzSupa.listEducators()`,
+  `addEducator(email)` ("Promote to educator"), `removeEducator(email)`
+  ("Demote"). Emails are lowercased and rendered escaped.
+- **Retired**: `EDUCATOR_SEED_EMAILS`, `localStorage.rz_admin_educators` and the
+  `rz-educators-changed` event. The key is deleted on load; any visitor could
+  write it and become an educator.
 
-Both lists are unioned by `loadEducatorEmails()`. The rz-ops admin panel
-dispatches a `rz-educators-changed` CustomEvent + emits a `storage` event
-after writing the override; `auth.js` re-reads the allowlist on either.
-
-```js
-// rz-ops adds an educator
-var raw = localStorage.getItem('rz_admin_educators');
-var list = raw ? JSON.parse(raw) : [];
-list.push('partner-edu@university.edu');
-localStorage.setItem('rz_admin_educators', JSON.stringify(list));
-window.dispatchEvent(new CustomEvent('rz-educators-changed'));
-```
+Gate: `node tools/test-feature-overrides.mjs` (V4 forged list, A2 promote/demote).
 
 ### Badge convention (header dropdown)
 
