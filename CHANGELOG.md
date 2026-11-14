@@ -11,6 +11,26 @@ release sections rather than semver.
 
 ---
 
+## v3.58.2 — 2026-11-14 — DCMOC: jspdf 4 + next 16.4.6, production audit clean; Country Intelligence PDF works
+
+### Security
+- **DCMOC shipped jspdf 2.5.1 (critical PDF-injection advisories) and next 16.2.6 (critical).** Now jspdf 4.2.1,
+  jspdf-autotable 5.0.9, next/eslint-config-next 16.4.6, and a non-forced `npm audit fix` for postcss, sharp, nanoid,
+  source-map-js, fflate and baseline-browser-mapping. `npm audit --omit=dev` in `dcmoc/`: 9 findings (2 critical,
+  5 high) → 0. No source change was needed: every builder already goes through `initDoc()` and calls
+  `autoTable(doc, opts)` as a function. Rebuilt with `next build --webpack`, one build id.
+
+### Fixed
+- **Results → Full Report → Country Intelligence PDF never generated** ("Error generating PDF"): its mitigation table
+  read `annualBenefit` / `roiPercent`, fields the disaster-risk engine does not have. It now shows the engine's own
+  Cost, Risk Reduction % and ROI; anything that is not a number prints "—".
+
+### Checked
+- All 27 PDF reports DCMOC offers download as valid PDFs (jsPDF 4.2.1) with the previous page counts and 0 page
+  errors; with exchange rates held fixed, report text equals the previous build's line for line (the only drift is
+  the live FX rate, which the old build showed between runs too). Trace parity 214/214, enum coverage clean, value
+  bindings green, Site Intelligence map renders.
+
 ## v3.58.1 — 2026-11-14 — PUE calculator: the Measured tab works again
 
 ### Fixed
