@@ -11,6 +11,21 @@ release sections rather than semver.
 
 ---
 
+## v3.57.2 — 2026-11-14 — Published secrets removed, signup can no longer create root
+
+### Security
+- **Signup could create a root account.** With sign-up open and email auto-confirm on, `handle_new_user()` gave
+  tier/role `root` to any NEW account whose email matched an owner address. If one of those addresses had no account,
+  anyone could register it. `supabase/schema.sql` now starts every account as free/user (signup trigger and backfill);
+  `supabase/migrations/2026-11-14-signup-never-root.sql` applies it to the live project (owner runs it in the SQL
+  editor and turns on "Confirm email"). Root comes only from `admin_set_tier()` / `admin_set_role()`.
+- **Published secrets removed from the tree** (revocation/rotation is with the owner): the Finance Terminal's built-in
+  Finnhub key fallback (the key modal already handles "no key"), the old Supabase anon/service-role keys, DB password
+  and direct connection string in `standarization/SUPABASE_FIREBASE_SETUP.md`, the full NemoClaw Gemini key in
+  `tools/Auto Update All/engine/validate-security.py` (now matched by prefix), and the retired admin and educator
+  passwords quoted in seven docs. `tools/secret-scan-baseline.json` drops the three closed entries, so any of these
+  literals coming back fails `test-no-client-secrets.mjs --law X1.2a`.
+
 ## v3.57.1 — 2026-11-14 — Admin console: access checked by Supabase, payer text escaped
 
 ### Security

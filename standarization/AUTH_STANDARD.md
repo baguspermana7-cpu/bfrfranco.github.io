@@ -53,9 +53,9 @@
 
 | Email | Password | Tier | Role | Source |
 |-------|----------|------|------|--------|
-| `bagus@resistancezero.com` | `RZ@Premium2026!` | pro | root | Hardcoded in auth.js + all pages |
-| `admin@resistancezero.com` | `RZ@Premium2026!` | pro | root | Hardcoded in auth.js + all pages |
-| `educator@resistancezero.com` | `educator2026` | pro | educator | Hardcoded in auth.js + `rz_admin_educators` (admin-managed allowlist) |
+| `bagus@resistancezero.com` | `[redacted — rotated]` | pro | root | Hardcoded in auth.js + all pages |
+| `admin@resistancezero.com` | `[redacted — rotated]` | pro | root | Hardcoded in auth.js + all pages |
+| `educator@resistancezero.com` | `[redacted]` | pro | educator | Hardcoded in auth.js + `rz_admin_educators` (admin-managed allowlist) |
 | `demo@resistancezero.com` | `demo2026` | demo | demo | Hardcoded in auth.js + all pages |
 | *(manual accounts)* | *(varies)* | *(varies)* | pro | `rz_manual_accounts` localStorage |
 
@@ -136,8 +136,8 @@ function handleLogin() {
   /* ── MUST match Valid Credentials table exactly ── */
   var VALID = [
     { email: 'demo@resistancezero.com',  password: 'demo2026' },
-    { email: 'bagus@resistancezero.com',  password: 'RZ@Premium2026!' },
-    { email: 'admin@resistancezero.com',  password: 'RZ@Premium2026!' }
+    { email: 'bagus@resistancezero.com',  password: '[redacted — rotated]' },
+    { email: 'admin@resistancezero.com',  password: '[redacted — rotated]' }
   ];
   var found = VALID.some(function(u) {
     return u.email.toLowerCase() === email.toLowerCase() && u.password === pass;

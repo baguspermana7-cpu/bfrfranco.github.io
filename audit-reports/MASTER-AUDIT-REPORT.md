@@ -15,7 +15,7 @@
 | **C — Performance** | **124** | Lighthouse 0.59 / LCP 5.0s · 208 imgs without width/height (CLS) · 911 KB ltc-system-modelling-lab.html · auth.js+rz-engine.js loaded twice on calc pages |
 | **D — SEO + AI search** | **111** | 67 pages missing ai-content-declaration · glossary.html broken JSON-LD · 4 orphan pages · llms-full.txt incorrectly listed as Sitemap |
 | **E — Mobile/Consistency/Security** | **155** | GA before GDPR consent on 98 pages · 113 `target=_blank` without noopener · `new Function()` w/ user input · no CSP · malformed `target="<em>blank"` in changelog |
-| **F — Code quality / tech debt** | **93** | localhost:8200 link in geopolitics · plaintext `RZ@Premium2026!` password in 10+ pages · Firebase API key committed · zero unit tests |
+| **F — Code quality / tech debt** | **93** | localhost:8200 link in geopolitics · plaintext `[redacted — rotated]` password in 10+ pages · Firebase API key committed · zero unit tests |
 | **TOTAL** | **759** | — |
 
 ---
@@ -28,7 +28,7 @@ Severity HIGH + medium-effort or low-effort. Prioritized by impact × ease.
 
 1. **A4-XSS-01** — `geopolitics.html:776` hardcoded `http://localhost:8200` link in production. **Fix**: remove or replace with proper URL.
 2. **F7-04** — Firebase API key committed in `firebase-config.js` (public GitHub repo). **Fix**: rotate key + move to env var pattern (note: GitHub Pages has no env vars; consider deleting if unused).
-3. **F7-05** — Plaintext password `RZ@Premium2026!` in 10+ HTML files + `auth.js` + `firebase-auth.js`. **Fix**: client-side passwords are inherently insecure; document this is demo-only OR move to server-side validation.
+3. **F7-05** — Plaintext password `[redacted — rotated]` in 10+ HTML files + `auth.js` + `firebase-auth.js`. **Fix**: client-side passwords are inherently insecure; document this is demo-only OR move to server-side validation.
 4. **E3-2** — 113 `target="_blank"` without `rel="noopener noreferrer"`. **Fix**: regex sweep adds `rel="noopener noreferrer"` everywhere.
 5. **E3-3** — `new Function()` with user-controlled input in `ltc-system-modelling-lab.html:7294`. **Fix**: replace with safe parser (Math.js or whitelist allowed operations).
 6. **E10-1** — Google Analytics fires before GDPR consent on 98 pages. **Fix**: gate `gtag()` calls behind cookie-banner consent check.

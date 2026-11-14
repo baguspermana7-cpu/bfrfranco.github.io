@@ -255,8 +255,8 @@ Follow `AUTH_STANDARD.md` exactly.
 | Email | Password | Tier |
 |-------|----------|------|
 | `demo@resistancezero.com` | `demo2026` | pro |
-| `bagus@resistancezero.com` | `RZ@Premium2026!` | pro |
-| `admin@resistancezero.com` | `RZ@Premium2026!` | pro |
+| `bagus@resistancezero.com` | `[redacted — rotated]` | pro |
+| `admin@resistancezero.com` | `[redacted — rotated]` | pro |
 
 ### 6.2 Session Format
 
@@ -281,8 +281,8 @@ function handleLogin() {
 
   var VALID = [
     { email: 'demo@resistancezero.com',  password: 'demo2026' },
-    { email: 'bagus@resistancezero.com',  password: 'RZ@Premium2026!' },
-    { email: 'admin@resistancezero.com', password: 'RZ@Premium2026!' }
+    { email: 'bagus@resistancezero.com',  password: '[redacted — rotated]' },
+    { email: 'admin@resistancezero.com', password: '[redacted — rotated]' }
   ];
   var found = VALID.some(function(u) {
     return u.email.toLowerCase() === email.toLowerCase() && u.password === pass;

@@ -103,7 +103,7 @@
 | F7-02 | `firebase-config.js:22` | `// const API_BASE = 'http://localhost:8080'; // Local dev` — commented-out localhost URL committed to the repo. Not dangerous but clutters the public file. | L | S |
 | F7-03 | `rz-chat.js:9` + `firebase-config.js:21` + `firebase-auth.js` | `https://bfrfranco-github-io-586770625232.us-central1.run.app` hardcoded as `API_BASE` in three separate files. Changing the Cloud Run URL requires touching three files. | M | S |
 | F7-04 | `firebase-config.js:8` | Firebase Web API key `AIzaSyCXlJbZyWHr74vkJOJaUsjVdv6iAa0kt6A` committed in plain text to a public GitHub repository. While Firebase public keys are intended to be client-visible, combined with the project ID it enables enumeration and abuse if Firebase security rules are misconfigured. | H | M |
-| F7-05 | `auth.js:123-125`, `firebase-auth.js:58`, `article-24.html`, `article-25.html`, `article-26.html`, `article-11.html`, `article-8.html`, `article-3.html`, `capex-calculator.html`, `FF-2.html`, `tco-calculator.html` | Password `RZ@Premium2026!` and `demo2026` hardcoded in 10+ HTML/JS files visible to any visitor opening DevTools. This is the most critical security finding. | H | M |
+| F7-05 | `auth.js:123-125`, `firebase-auth.js:58`, `article-24.html`, `article-25.html`, `article-26.html`, `article-11.html`, `article-8.html`, `article-3.html`, `capex-calculator.html`, `FF-2.html`, `tco-calculator.html` | Password `[redacted — rotated]` and `demo2026` hardcoded in 10+ HTML/JS files visible to any visitor opening DevTools. This is the most critical security finding. | H | M |
 
 ---
 
@@ -251,7 +251,7 @@
 
 | # | File(s) | Finding | Sev | Effort |
 |---|---------|---------|-----|--------|
-| F20-01 | `auth.js:123,125` + 10 HTML pages | Password `RZ@Premium2026!` contains a hardcoded year. When 2026 ends, the credential will feel stale and require an update across 10+ files. (Related to F7-05 — should be moved server-side entirely.) | H | M |
+| F20-01 | `auth.js:123,125` + 10 HTML pages | Password `[redacted — rotated]` contains a hardcoded year. When 2026 ends, the credential will feel stale and require an update across 10+ files. (Related to F7-05 — should be moved server-side entirely.) | H | M |
 | F20-02 | 103 HTML pages | `&copy; 2026 Bagus Dwi Permana` hardcoded in every footer (40+ pages found by grep). When the year rolls to 2027, all 103 pages need a manual update. JavaScript `new Date().getFullYear()` would eliminate this forever. | M | M |
 | F20-03 | `index.html` JSON-LD | `"dateModified":"2026-03-16"` hardcoded in the `ProfilePage` schema. No automation updates this — it drifts immediately after any page change. | L | S |
 | F20-04 | `rz-tracker.js` | `fetch('https://ipapi.co/json/')` — third-party geolocation API. `ipapi.co` free tier has rate limits (1000 req/day). No fallback if the API changes pricing or goes offline. | M | M |

@@ -62,7 +62,7 @@ Each task = its own commit on a worktree branch `educator-tier`. Pattern matches
 ### Task 1 — `auth.js` role/tier extensions (TDD)
 - Add `EDUCATOR_EMAILS` allowlist + `localStorage.rz_admin_educators` merge on init.
 - Extend `detectRole`, `getRoleFromSession`, `getTier` for `educator`.
-- Add seed user `educator@resistancezero.com / educator2026 / tier:'educator' role:'educator'` to the mock `USERS` array.
+- Add seed user `educator@resistancezero.com / [redacted] / tier:'educator' role:'educator'` to the mock `USERS` array.
 - **Do NOT** touch `ROOT_ONLY_PATHS` yet (that lands in Task 3 atomically with the matrix gating).
 - Smoke: in DevTools, `__rzAuth.getTier({email:'educator@resistancezero.com'}) === 'educator'`.
 - Commit: `feat(auth): introduce educator role + tier (no behavior change yet)`.

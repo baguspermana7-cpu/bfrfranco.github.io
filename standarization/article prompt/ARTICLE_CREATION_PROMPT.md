@@ -897,8 +897,8 @@ Follow AUTH_STANDARD.md. **3 valid credentials (NEVER deviate):**
 | Email | Password | Tier |
 |-------|----------|------|
 | `demo@resistancezero.com` | `demo2026` | pro |
-| `bagus@resistancezero.com` | `RZ@Premium2026!` | pro |
-| `admin@resistancezero.com` | `RZ@Premium2026!` | pro |
+| `bagus@resistancezero.com` | `[redacted — rotated]` | pro |
+| `admin@resistancezero.com` | `[redacted — rotated]` | pro |
 
 **Required auth behavior:**
 - Store session in `rz_premium_session` (localStorage), expires 30 days

@@ -27,14 +27,13 @@ SECRET_PATTERNS = [
 
 # Known false positive patterns (these are OK to have in the codebase)
 FALSE_POSITIVES = [
-    'AIzaSyDS0dm8JbiW9SqTvmiATwoXVZKN5tx4FWI',  # NemoClaw Gemini key (not in site files)
+    'AIzaSyDS0d',  # prefix of the retired NemoClaw Gemini key (full literal removed 2026-11-14; key to be revoked)
     'AIzaSyCXlJbZyWHr74vkJOJaUsjVdv',           # firebase-config.js — Firebase public client key (by design)
     'example-api-key',
     'YOUR_API_KEY',
     'REPLACE_WITH',
     # Intentional public demo credentials used in VALID_USERS arrays across calculators
     "demo2026",
-    "RZ@Premium2026!",
 ]
 
 # XSS risk patterns

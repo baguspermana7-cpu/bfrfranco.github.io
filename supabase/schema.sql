@@ -140,8 +140,9 @@ create trigger trg_profiles_updated_at
   for each row execute function public.set_updated_at();
 
 -- ---------- auto-create a profile on each new signup ----------
--- Owner emails get tier='root'; everyone else ALWAYS starts 'free'. The trigger constructs the
--- row itself, so a client cannot influence the tier at creation time.
+-- Every new account starts free/user (2026-11-14, migrations/2026-11-14-signup-never-root.sql).
+-- Root is NEVER derived from an email string: with sign-up open and auto-confirm on, anyone could
+-- register an unused owner address. Root comes only from admin_set_tier()/admin_set_role().
 create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
@@ -149,20 +150,7 @@ security definer set search_path = public
 as $$
 begin
   insert into public.profiles (id, email, tier, role)
-  values (
-    new.id,
-    new.email,
-    case when lower(new.email) in (
-      'bagusdpermana7@gmail.com',
-      'bagus@resistancezero.com',
-      'admin@resistancezero.com'
-    ) then 'root' else 'free' end,
-    case when lower(new.email) in (
-      'bagusdpermana7@gmail.com',
-      'bagus@resistancezero.com',
-      'admin@resistancezero.com'
-    ) then 'root' else 'user' end
-  )
+  values (new.id, new.email, 'free', 'user')
   on conflict (id) do nothing;
   return new;
 end;
@@ -173,19 +161,9 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
 
--- Backfill profiles for users who signed up BEFORE this ran.
+-- Backfill profiles for users who signed up BEFORE this ran (free/user; root only via admin_set_tier).
 insert into public.profiles (id, email, tier, role)
-select u.id, u.email,
-       case when lower(u.email) in (
-         'bagusdpermana7@gmail.com',
-         'bagus@resistancezero.com',
-         'admin@resistancezero.com'
-       ) then 'root' else 'free' end,
-       case when lower(u.email) in (
-         'bagusdpermana7@gmail.com',
-         'bagus@resistancezero.com',
-         'admin@resistancezero.com'
-       ) then 'root' else 'user' end
+select u.id, u.email, 'free', 'user'
 from auth.users u
 on conflict (id) do nothing;
 

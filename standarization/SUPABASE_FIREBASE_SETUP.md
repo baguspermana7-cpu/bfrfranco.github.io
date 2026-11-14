@@ -117,10 +117,10 @@ const API_BASE = 'https://bfrfranco-github-io-586770625232.us-central1.run.app';
 | Project Ref | `bizrikfjfyxtxykuipvv` |
 | Region | Singapore (ap-southeast-1) |
 | URL | `https://bizrikfjfyxtxykuipvv.supabase.co` |
-| Anon Key | `eyJhbGciOiJIUzI1NiIs...otukd5M1_FfxBVlklleMW7Gt_D_MPGWzcmwIFsVX9mY` |
-| Service Role Key | `eyJhbGciOiJIUzI1NiIs...Gf70sx3HjtK8k1qgP_nM7owJUDjw18tJcIWqH8gHe2w` |
-| DB Password | `Umum_Mirage7` |
-| Direct Connection | `postgresql://postgres:Umum_Mirage7@db.bizrikfjfyxtxykuipvv.supabase.co:5432/postgres` |
+| Anon Key | `[redacted 2026-11-14 — was published; rotate]` |
+| Service Role Key | `[redacted 2026-11-14 — was published; rotate]` |
+| DB Password | `[redacted 2026-11-14 — was published; rotate]` |
+| Direct Connection | `[redacted 2026-11-14 — was published; rotate]` |
 
 ### 2.2 Supabase Console Setup Steps
 
