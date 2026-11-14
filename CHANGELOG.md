@@ -11,6 +11,25 @@ release sections rather than semver.
 
 ---
 
+## v3.57.6 — 2026-11-14 — DCMOC map/sanitizer upgrades, auth worker hardened before deploy
+
+### Security
+- **DCMOC shipped two libraries with published XSS advisories:** maplibre-gl 5.24.0 (critical, sanitizer bypass) and
+  dompurify 2.5.8 (high). Now maplibre-gl 6.18.0 and dompurify 3.4.17 (forced under jspdf with an npm override); the
+  Site Intelligence map popup builds its content with `textContent` instead of HTML, since site names are typed by
+  users. maplibre 6 loads its worker from `/dcmoc/_next/static/media/maplibre-gl-worker.*.mjs`. Rebuilt with
+  `next build --webpack`, one build id shipped. Trace parity 214/214, enum coverage clean, value bindings green, map
+  and PDF report checked headless with 0 errors.
+- **worker-auth (not deployed) hardened first:** login and seed accept only `application/json` from an allowlisted
+  Origin (login-CSRF with a text/plain body is closed); the seed token moved from `?token=` to an `X-Seed-Token` header
+  compared in constant time; login attempts are counted in a per-IP Durable Object instead of a non-atomic KV
+  read-modify-write (KV stays as a documented fallback). `worker-auth/test/hardening-s12.test.mjs`: 10 of its laws fail
+  on the old worker; the suite is 106/106.
+
+### Still open
+- DCMOC `npm audit`: jspdf ≤4.2.0 (PDF injection; the fix is a breaking major) and others, tracked in the security
+  ledger. next ≤16.4.0 advisories concern the server and do not apply to the static export.
+
 ## v3.57.5 — 2026-11-14 — Finance Terminal: Market Posture tab (breadth, uptrend, exposure coach)
 
 ### Added
