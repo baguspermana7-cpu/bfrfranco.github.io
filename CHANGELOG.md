@@ -11,6 +11,36 @@ release sections rather than semver.
 
 ---
 
+## v3.58.0 — 2026-11-14 — Measured PUE against a public reference; employer cards keep their size
+
+### Added
+- **PUE calculator: a Measured tab** beside Estimate (owner R125). PUE from 12 months of metered energy (peak kW for
+  category 0) per the Data Center Metrics Task Force *Recommendations for Measuring and Reporting Overall Data Center
+  Efficiency* v2 (2011, hosted by ENERGY STAR):
+  - category select names where IT energy is metered (0/1 UPS output, 2 PDU output, 3 IT equipment input); the result
+    carries the subscript (PUE<sub>1</sub>)
+  - every energy type crossing the boundary, weighted by the reference's source factors (electricity 1.0, natural gas
+    0.31, fuel oil 0.30, other fuels 0.30, district chilled water 0.31, hot water 0.40, steam 0.43, condenser water
+    0.03); electricity shown, the rest through "Add energy type"
+  - each weighted line printed, the design estimate shown beside the measured value
+  - starts on Appendix A Case B: 1.708 (the paper prints 1.70 for both worked cases; the exact quotients are 1.705 and
+    1.708)
+  - refused inputs show a reason and no number: category 0 with non-electric energy, IT 0, negative energy, total
+    below IT
+  - the "What drives this result" panel and the charts stay with the estimate: hidden on Measured (its registry anchor
+    is now `#pmEstimateBench`; the old `section.calculator-section` matched the new Measured bench first)
+- **Engine:** `models.pue.measured(opts)`, `DATA.pueSourceWeights`, `DATA.pueCategories`, with source and refresh
+  entries. Gate `tools/test-pue-reference.mjs` (W1, F1–F5, red 6/6 before the change) and browser gate
+  `tools/test-pue-measured.mjs` (M1–M7, red 11/11 on the page without the tab). Gap file
+  `documentation/product-transformation/gaps/pue.md`; defect D1 (the "Green Grid Level" select changes no number)
+  recorded and answered by the category select.
+
+### Fixed
+- **Homepage employer cards no longer change size when flipped** (owner R126). The back used to leave the flow and the
+  card grew from 305 to 603 px at 390 (397 to 770 px at 1440). The back now fills the front's box and only its fact list
+  scrolls; the Back button sits below the list and never covers a fact. `tools/test-index-r079.mjs` L3: width and
+  height change ≤ 0.5 px for all five cards at 390/1024/1440 in both themes; the last fact is reachable by scrolling.
+
 ## v3.57.7 — 2026-11-14 — Feature overrides and the educator role come from Supabase
 
 ### Security

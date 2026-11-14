@@ -26,7 +26,7 @@ prove each closed gap red → green. A reference we cannot read is not a referen
 | P&ID (`js/rz-pid-*`) | ScottDuncanAI/PID-to-Knowledge-Graph (MIT) | off-page pairing + QA report on its fixture (R120 agent, in progress) |
 | DCMOC CAPEX/OPEX/TCO | NREL Annual Technology Baseline method; LBNL/ENERGY STAR data-center calculators; Schneider Electric TradeOff Tools published method notes (WP 52/WP 6) | reproduce a published worked example per module |
 | DCMOC reliability / Monte Carlo | IEEE 493 (Gold Book) availability method; open RBD libraries (e.g. `reliability` Python package, MIT) | series/parallel/k-of-n availability on the package's examples |
-| PUE calculator | The Green Grid PUE/pPUE method (WP 49), ISO/IEC 30134-2 | category-1/2/3 measurement-point examples |
+| PUE calculator | Data Center Metrics Task Force v2 (2011, ENERGY STAR-hosted; WP 49 sign-in only, ISO/IEC 30134-2 paywalled) | ENGINE DONE 2026-11-14: Table 2 weights, categories 0-3, Appendix A cases (`gaps/pue.md`); page Measured mode waits for a mock |
 | CDU calculator | ASHRAE TC 9.9 liquid-cooling guidance; OCP ACS cold-plate requirements | flow/ΔT/approach examples (balance already gated in R117) |
 | Fire calculator | NFPA 2001 Annex / ISO 14520 design-concentration equations | agent quantity examples from the standard's annex |
 | Spares readiness | MIL-HDBK-338B / Poisson spares formula | spares-to-target-fill-rate examples |

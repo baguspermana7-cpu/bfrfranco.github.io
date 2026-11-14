@@ -83,6 +83,27 @@
         // source: the pages carried 1.58 (Uptime 2024) while dcValue used 1.56 (v3.24.24).
         pueBenchmark: { industryAvg: 1.52, year: 2026 },
 
+        // Measured PUE (R120 step 3a): source-energy weighting factors normalised to electricity, Data Center Metrics
+        // Task Force "Recommendations for Measuring and Reporting Overall Data Center Efficiency" v2 (2011), Table 2.
+        pueSourceWeights: {
+            electricity:          { factor: 1.0,  label: 'Electricity' },
+            naturalGas:           { factor: 0.31, label: 'Natural gas' },
+            fuelOil:              { factor: 0.30, label: 'Fuel oil' },
+            otherFuels:           { factor: 0.30, label: 'Other fuels' },
+            districtChilledWater: { factor: 0.31, label: 'District chilled water' },
+            districtHotWater:     { factor: 0.40, label: 'District hot water' },
+            districtSteam:        { factor: 0.43, label: 'District steam' },
+            condenserWater:       { factor: 0.03, label: 'Condenser water' }
+        },
+        // Same document, Table 1: where the IT meter sits per measurement category; 0 is peak demand (kW), 1-3 are
+        // 12-month energy (kWh). Category 0 is for all-electric sites only.
+        pueCategories: {
+            0: { itMeter: 'UPS output', basis: 'peak demand (kW)', allElectricOnly: true },
+            1: { itMeter: 'UPS output', basis: '12-month energy (kWh)' },
+            2: { itMeter: 'PDU output', basis: '12-month energy (kWh)' },
+            3: { itMeter: 'IT equipment input', basis: '12-month energy (kWh)' }
+        },
+
         // PUE defaults by cooling architecture, refreshed 2026 (Uptime Global PUE Survey 2026).
         // Legacy *Tier3 keys retained for backward-compat; full per-tier matrix in `pueMatrix` (A3).
         pueDefaults: {
@@ -9358,6 +9379,8 @@
             'pueDefaults':            { source: 'Uptime Global PUE Survey 2026 by cooling architecture', asOf: '2026', unit: 'ratio' },
             'pueBenchmark':           { source: 'Uptime Institute Global Data Center Survey 2026, Figure 2: "2026 industry average PUE is 1.52" (annual average, operator respondents)', asOf: '2026', unit: 'dimensionless', method: 'survey annual average; dcValue.industryAvgPUE (article-12 model, 1.56) is that article\'s own basis and is not this benchmark' },
             'pueMatrix':              { source: 'Uptime Global PUE Survey 2026 (tier x cooling)', asOf: '2026', unit: 'ratio' },
+            'pueSourceWeights':       { source: 'Data Center Metrics Task Force (7x24 Exchange, ASHRAE, The Green Grid, SVLG, US DOE, US EPA ENERGY STAR, USGBC, Uptime Institute), Recommendations for Measuring and Reporting Overall Data Center Efficiency, Version 2 (2011-05-17), Table 2 (EPA national-average source factors normalised to electricity) and Appendix A', asOf: '2011-05', unit: 'ratio to electricity', method: 'weighted energy = annual energy x factor; PUE = sum of weighted energy / IT energy' },
+            'pueCategories':          { source: 'Data Center Metrics Task Force (7x24 Exchange, ASHRAE, The Green Grid, SVLG, US DOE, US EPA ENERGY STAR, USGBC, Uptime Institute), Recommendations for Measuring and Reporting Overall Data Center Efficiency, Version 2 (2011-05-17), section 3.2 Table 1 (PUE categories 0-3)', asOf: '2011-05', unit: 'meter location', method: 'category 0 peak kW, all-electric only; 1-3 12-month kWh at UPS output / PDU output / IT equipment input' },
             'capexPerMw':             { source: '451 Research 2026 + JLL DC Cost 2026 + Cushman & Wakefield 2026', asOf: '2026', unit: 'USD/MW raw build' },
             'land':                   { source: 'JLL / CBRE industrial land + shell 2026', asOf: '2026', unit: 'USD/MW' },
             'laborRates':             { source: 'RSMeans + regional construction wage surveys 2026', asOf: '2026', unit: 'USD/hr' },
@@ -9492,6 +9515,8 @@
             'pueMatrix':          { months: 12, reason: 'industry PUE survey is yearly' },
             'pueDefaults':        { months: 12, reason: 'industry PUE survey is yearly' },
             'pueBenchmark':       { months: 12, reason: 'industry PUE survey is yearly' },
+            'pueSourceWeights':   { months: 240, reason: 'a measurement-method constant fixed by the published recommendation, not market data' },
+            'pueCategories':      { months: 240, reason: 'a measurement-method definition fixed by the published recommendation' },
             'aiDensity':          { months: 12, reason: 'rack-density guidance moves with each GPU generation' },
             'benchmarksCorpus':   { months: 12, reason: 'operator sustainability reports are yearly' },
             'calibrationSpec':    { months: 12, reason: 'calibration bands follow the yearly benchmark corpus' },
@@ -12260,6 +12285,31 @@
             },
 
             pue: {
+                /**
+                 * Measured PUE (R120 step 3a, Data Center Metrics Task Force v2): every energy type crossing the data
+                 * center boundary weighted by DATA.pueSourceWeights, divided by IT energy at the category's meter.
+                 * opts = { category: 0..3, itKwh (1-3) | itKw (0), energy: { electricity, naturalGas, ... } }.
+                 * Returns { ok:true, pue, label 'PUE<n>', itMeter, basis, weighted, total } or { ok:false, reason }.
+                 */
+                measured: function (opts) {
+                    var o = opts || {}, n = Number(o.category), cat = (o.category !== '' && o.category != null) ? DATA.pueCategories[n] : null;
+                    if (!cat || n !== Math.floor(n)) return { ok: false, reason: 'category must be 0, 1, 2 or 3' };
+                    var it = Number(n === 0 ? o.itKw : o.itKwh);
+                    if (!(it > 0) || !isFinite(it)) return { ok: false, reason: 'IT ' + (n === 0 ? 'demand' : 'energy') + ' must be above zero' };
+                    var energy = o.energy || {}, weighted = {}, total = 0, keys = Object.keys(energy);
+                    if (!keys.length) return { ok: false, reason: 'no energy entered at the data center boundary' };
+                    for (var i = 0; i < keys.length; i++) {
+                        var k = keys[i], w = DATA.pueSourceWeights[k], v = Number(energy[k]);
+                        if (!w) return { ok: false, reason: 'unknown energy type: ' + k };
+                        if (!(v >= 0) || !isFinite(v)) return { ok: false, reason: w.label + ' must be zero or more' };
+                        if (cat.allElectricOnly && k !== 'electricity' && v > 0) return { ok: false, reason: 'category 0 is for all-electric data centers only; use category 1-3 for ' + w.label.toLowerCase() };
+                        weighted[k] = v * w.factor;
+                        total += weighted[k];
+                    }
+                    if (total < it) return { ok: false, reason: 'total energy is below IT energy; check the meters' };
+                    return { ok: true, pue: total / it, label: 'PUE' + n, itMeter: cat.itMeter, basis: cat.basis, weighted: weighted, total: total };
+                },
+
                 /** Compute PUE from total facility load and IT load. */
                 pueFromInputs: function (itLoad, totalLoad) {
                     if (!itLoad || itLoad <= 0) return 0;
@@ -15944,7 +15994,7 @@
                 // `</script>` characters which the print-window's HTML parser
                 // will see (correctly) as a tag closer.
                 return '<script src="auth.js?v=20260324b"><\/script>' +
-                       '<script src="rz-engine.min.js?v=2026-11-13-capex-basis"><\/script>';
+                       '<script src="rz-engine.min.js?v=2026-11-14-pue-measured"><\/script>';
             }
         },
         /* ── A7: lightweight framework-free SVG chart builders. Each returns an SVG string

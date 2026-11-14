@@ -7,7 +7,8 @@
  *     the reader, front turned away); 150 ms in, the front is mid-turn (20°–170°, a real 3D turn, not a swap); the turn
  *     button shows no text and is ≤ 40 px; keyboard Enter on it flips and moves focus to Back, Esc flips home and returns
  *     focus; opening card B closes card A; the shown face sets the height; reduced motion fades, no rotation.
- *  L3 phone 390: no horizontal scroll, cards one column, each card as tall as its shown face; every logo 28 px tall and a vector.
+ *  L3 every card keeps its width and height when it turns (R126, replaces "as tall as its shown face"); phone 390: no
+ *     horizontal scroll, cards one column; every logo 28 px tall and a vector.
  *  L4 nav: no backdrop-filter, no box-shadow, 64 +/- 2 px at 1440; the Contact pill once in the nav, the
  *     pill CTA once in the hero and once in the contact section, each reaching #contact or mailto.
  *     No clock row (owner 2026-11-08).
@@ -142,11 +143,39 @@ try {
       return { sw: document.documentElement.scrollWidth, cols, gap, logos, mark: m.getBoundingClientRect().width, box: f.clientWidth - parseFloat(fs.paddingLeft) - parseFloat(fs.paddingRight),
         links: [...document.querySelectorAll('.rz-foot a')].map((a) => a.getAttribute('href')), text, html: document.documentElement.outerHTML.includes('ALL OPERATIONAL DATASETS') || document.documentElement.outerHTML.includes('BUILT FOR MISSION CRITICAL') };
     }, w);
-    check(r.gap <= (w === 390 ? 40 : 80), `L3 ${theme} ${w}: no empty band above Details on the fronts beyond row alignment (largest ${r.gap} px, limit ${w === 390 ? 40 : 80})`);
+    // R126 (owner 2026-11-14: "kok size card saat flip jadi berubah … dimensinya harus tetap"): a card keeps its
+    // width and height when it turns. This replaces R079's "a card is as tall as the face it shows".
+    const turn = await p.evaluate(async () => {
+      const out = [], backs = [];
+      const done = (c) => Promise.all(c.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => null)));
+      for (const c of document.querySelectorAll('.emp-card')) {
+        c.scrollIntoView({ block: 'center', behavior: 'instant' });
+        const r0 = c.getBoundingClientRect();
+        c.querySelector('.emp-open').click(); await new Promise((r) => requestAnimationFrame(r)); await done(c);
+        const r1 = c.getBoundingClientRect();
+        // the back fills the card's box; a long back scrolls inside it to its last fact; Back stays inside the box
+        // the back fills the card's box; its fact list scrolls inside it to the last fact; Back never covers a fact
+        const bk = c.querySelector('.emp-back'), fl = bk.querySelector('.emp-facts'), btn = bk.querySelector('.emp-close'), last = fl.querySelector(':scope > div:last-child');
+        const within = (e, box) => { const a = e.getBoundingClientRect(), b = box.getBoundingClientRect(); return a.top >= b.top - 1 && a.bottom <= b.bottom + 1; }; // scrollTop is whole pixels
+        const clear = () => { const a = btn.getBoundingClientRect(), f = fl.getBoundingClientRect(); return a.top >= f.bottom - 0.5; };
+        const bb = bk.getBoundingClientRect(), btnTop = within(btn, bk) && clear();
+        fl.scrollTop = fl.scrollHeight; await new Promise((r) => requestAnimationFrame(r));
+        const fit = Math.abs(bb.height - r1.height) <= 0.5 && Math.abs(bb.width - r1.width) <= 0.5;
+        backs.push({ fit, btnTop, btnEnd: within(btn, bk) && clear(), lastSeen: within(last, fl), scrolls: fl.scrollHeight > fl.clientHeight + 1, ov: getComputedStyle(fl).overflowY });
+        c.querySelector('.emp-close').click(); await new Promise((r) => requestAnimationFrame(r)); await done(c);
+        const r2 = c.getBoundingClientRect();
+        out.push({ dw: Math.max(Math.abs(r1.width - r0.width), Math.abs(r2.width - r0.width)), dh: Math.max(Math.abs(r1.height - r0.height), Math.abs(r2.height - r0.height)), h0: Math.round(r0.height), h1: Math.round(r1.height) });
+      }
+      return { out, backs };
+    });
+    const sizes = turn.out, backs = turn.backs;
+    const worst = sizes.reduce((m, x) => Math.max(m, x.dw, x.dh), 0);
+    check(sizes.length === 5 && worst <= 0.5, `L3 ${theme} ${w}: every card keeps its size when it turns (largest change ${worst.toFixed(1)} px; heights front/back ${sizes.map((x) => x.h0 + '/' + x.h1).join(' ')})`);
+    const badBack = backs.map((b, i) => (b.fit && b.btnTop && b.btnEnd && b.lastSeen && (!b.scrolls || b.ov === 'auto') ? null : `card ${i + 1} ${JSON.stringify(b)}`)).filter(Boolean);
+    check(backs.length === 5 && !badBack.length, `L3 ${theme} ${w}: each back fills the card's box, fact list scrolls inside it to the last fact (${backs.filter((b) => b.scrolls).length} of 5 scroll), Back never covers a fact${badBack.length ? ' — ' + badBack[0] : ''}`);
     if (w === 390) {
       check(r.sw <= 390, `L3 ${theme} 390: no horizontal scroll (scrollWidth ${r.sw})`);
       check(r.cols === 1, `L3 ${theme} 390: cards in one column (${r.cols} column x-positions)`);
-      check(r.gap <= 40, `L3 ${theme} 390: a card is as tall as its shown face (largest empty band above the Details button ${r.gap} px)`);
     }
     check(r.logos.length === 5 && r.logos.every((l) => l.h === 28 && /\.svg(\?|$)/.test(l.src)), `L3 ${theme} ${w}: 5 logos shown, one height (28 px), each a vector — ${r.logos.map((l) => l.h).join(',')}`);
     check(Math.abs(r.mark - r.box) <= 2, `L5 ${w}: wordmark ${r.mark.toFixed(0)} px = footer box ${r.box.toFixed(0)} px`);

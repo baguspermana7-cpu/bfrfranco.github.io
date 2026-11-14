@@ -212,3 +212,18 @@ Gate: `tools/test-capex-reference.mjs`.
 - Laws: F1–F2 parity, D1 site = DCMOC, D2 the basis spec equals the city figure, D3 the two engines agree within 2 %
   off the basis (2N, N, liquid + AI rack, 500 kW–20 MW, warehouse, zone 0). Red on v3.53.0 (5 laws, D3 worst 45 %).
 - Open (stage 2): an area-driven `$/m²` term (F3) needs a current, sourced `$/m²`.
+
+## Measured PUE against a public reference (R120 step 3a)
+
+Reference: Data Center Metrics Task Force, *Recommendations for Measuring and Reporting Overall Data Center
+Efficiency* v2 (2011), Table 1, Table 2, Appendix A (ENERGY STAR-hosted). Gap file:
+`documentation/product-transformation/gaps/pue.md`. Gate: `tools/test-pue-reference.mjs`.
+
+- `models.pue.measured({category, itKwh | itKw, energy})` is the one measured-PUE formula: every energy type that
+  crosses the boundary times its `DATA.pueSourceWeights` factor, over IT energy at the category's meter
+  (`DATA.pueCategories`: 0 peak kW, UPS output, all-electric only; 1 UPS output, 2 PDU output, 3 IT input, 12-month
+  kWh). It returns `{ok:false, reason}` instead of a number for anything the reference does not allow.
+- The design estimate on `pue-calculator.html` (`estimatePue`) is a different quantity and stays; a measured value
+  is labelled with its subscript (PUE1) and never mixed into the estimate.
+- Laws W1, F1–F5; red 6/6 before the engine change. The paper prints 1.70 for both Appendix A cases; the gate
+  checks the exact 1.705 and 1.708.
