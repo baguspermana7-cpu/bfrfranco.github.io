@@ -60,6 +60,8 @@ input,select{font-family:inherit}
 .tape{background:var(--bg1);border-bottom:1px solid var(--bd);overflow:hidden;height:32px;position:relative}
 .tape-inner{display:flex;gap:2rem;align-items:center;height:100%;white-space:nowrap;animation:scroll 60s linear infinite;padding:0 1rem}
 .tape:hover .tape-inner{animation-play-state:paused}
+/* a one-line status (loading / unavailable) is not a marquee: scrolling it by -50% clipped it off the left edge */
+.tape-inner.static{animation:none}
 .tape-item{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-family:var(--mono)}
 .tape-sym{color:var(--t3);font-weight:600}
 .tape-price{color:var(--t1);font-weight:600}
@@ -387,7 +389,7 @@ html[data-rz-suite] .fs-chip.mp-ok{color:color-mix(in srgb,var(--fs-grn) 70%,var
 </header>
 
 <!-- TICKER TAPE -->
-<div class="tape"><div class="tape-inner" id="tickerTape"><span class="tape-item"><span class="tape-sym">Loading market data...</span></span></div></div>
+<div class="tape"><div class="tape-inner static" id="tickerTape"><span class="tape-item"><span class="tape-sym">Loading market data...</span></span></div></div>
 
 <!-- TABS -->
 <nav class="tabs" id="tabNav">
@@ -1568,16 +1570,16 @@ async function loadTickerTape(batchQ){
       Object.entries(fx.rates||{}).forEach(([cur,rate])=>quotes.push({sym:'USD/'+cur,name:'USD/'+cur,c:rate,dp:0}));
     }catch(e){}
 
-    if(quotes.length===0){tape.innerHTML='<span class="tape-item"><span class="tape-sym">Market data unavailable</span></span>';return}
+    if(quotes.length===0){tape.classList.add('static');tape.innerHTML='<span class="tape-item"><span class="tape-sym">Market data unavailable</span></span>';return}
 
     let html='';
     quotes.forEach(q=>{
       const cls=chgClass(q.dp||q.d||0);
       html+=`<span class="tape-item"><span class="tape-sym">${esc(q.name||q.sym)}</span><span class="tape-price">${fmtP(q.c,q.c>100?2:4)}</span><span class="tape-chg ${cls}">${q.dp!=null?(q.dp>0?'+':'')+fmtP(q.dp,2)+'%':''}</span></span>`;
     });
-    tape.innerHTML=html+html;
+    tape.classList.remove('static');tape.innerHTML=html+html;
     S.indices=quotes.reduce((a,q)=>{a[q.sym]=q;return a},{});
-  }catch(e){tape.innerHTML='<span class="tape-item"><span class="tape-sym">Error loading data</span></span>'}
+  }catch(e){tape.classList.add('static');tape.innerHTML='<span class="tape-item"><span class="tape-sym">Error loading data</span></span>'}
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1662,7 +1664,7 @@ function loadTickerTapeV2(bySym){
     const cls=chgClass(q.dp||q.d||0);
     html+='<span class="tape-item"><span class="tape-sym">'+esc(q.name||q.sym)+'</span><span class="tape-price">'+fmtP(q.c,q.c>100?2:4)+'</span><span class="tape-chg '+cls+'">'+(q.dp!=null?(q.dp>0?'+':'')+fmtP(q.dp,2)+'%':'')+'</span></span>';
   });
-  tape.innerHTML=html+html;
+  tape.classList.remove('static');tape.innerHTML=html+html;
   S.indices=quotes.reduce(function(a,q){a[q.sym]=q;return a},{});
 }
 

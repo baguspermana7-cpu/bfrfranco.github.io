@@ -334,59 +334,49 @@
         .skip-link:focus{top:0}
 
         /* ═══ LOGIN PAGE ═══ */
-        .login-page{position:fixed;top:0;left:0;right:0;bottom:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:#0e0f12;background-image:radial-gradient(ellipse 80% 60% at 50% 120%,rgba(14,116,144,0.15),transparent),radial-gradient(ellipse 60% 50% at 80% 0%,rgba(59,130,246,0.07),transparent),radial-gradient(ellipse 50% 40% at 10% 20%,rgba(100, 116, 139,0.06),transparent)}
-        .login-page .login-bg{position:absolute;inset:0;overflow:hidden;pointer-events:none}
-        .login-page .login-bg::before{content:'';position:absolute;top:-15%;right:-5%;width:700px;height:700px;background:radial-gradient(circle,rgba(14,116,144,0.10) 0%,rgba(14,116,144,0.03) 40%,transparent 65%);animation:loginOrb1 12s ease-in-out infinite alternate}
-        .login-page .login-bg::after{content:'';position:absolute;bottom:-10%;left:-5%;width:600px;height:600px;background:radial-gradient(circle,rgba(59,130,246,0.08) 0%,rgba(59,130,246,0.02) 40%,transparent 65%);animation:loginOrb2 15s ease-in-out infinite alternate}
-        .login-bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(148,163,184,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(148,163,184,0.03) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 70% 60% at 50% 50%,black 20%,transparent 70%);-webkit-mask-image:radial-gradient(ellipse 70% 60% at 50% 50%,black 20%,transparent 70%)}
-        .login-bg-accent{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:800px;height:800px;background:conic-gradient(from 180deg at 50% 50%,transparent 0deg,rgba(14,116,144,0.04) 60deg,transparent 120deg,rgba(59,130,246,0.03) 200deg,transparent 260deg,rgba(100, 116, 139,0.04) 320deg,transparent 360deg);animation:loginSpin 40s linear infinite}
-        @keyframes loginOrb1{0%{opacity:0.5;transform:translate(0,0) scale(1)}50%{opacity:0.8;transform:translate(-30px,20px) scale(1.1)}100%{opacity:0.6;transform:translate(20px,-10px) scale(1.05)}}
-        @keyframes loginOrb2{0%{opacity:0.4;transform:translate(0,0) scale(1)}50%{opacity:0.7;transform:translate(25px,-15px) scale(1.08)}100%{opacity:0.5;transform:translate(-15px,20px) scale(1.03)}}
-        @keyframes loginSpin{from{transform:translate(-50%,-50%) rotate(0deg)}to{transform:translate(-50%,-50%) rotate(360deg)}}
+        .login-page{position:fixed;top:0;left:0;right:0;bottom:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:var(--fs-bg0);overflow-y:auto}
+        .login-page .login-bg{display:none}   /* the orb/grid/conic backdrop was aurora (rejected) */
         .login-container{width:100%;max-width:420px;margin:0 20px;position:relative;z-index:1}
-        .login-card{padding:2.5rem 2.25rem 2rem;background:rgba(15,23,42,0.75);border:1px solid rgba(51,65,85,0.4);border-radius:4px;box-shadow:0 24px 64px rgba(0,0,0,0.5),0 0 0 1px rgba(255,255,255,0.03) inset}
+        .login-card{padding:2.5rem 2.25rem 2rem;background:var(--fs-bg2);border:1px solid var(--fs-bd);border-radius:4px;box-shadow:none}
         .login-brand{text-align:center;margin-bottom:1.75rem}
-        .login-brand-logo{width:60px;height:60px;margin:0 auto 1rem;border-radius:16px;box-shadow:0 8px 24px rgba(14,116,144,0.25);overflow:hidden}
+        .login-brand-logo{width:60px;height:60px;margin:0 auto 1rem;border-radius:4px;box-shadow:none;overflow:hidden}
         .login-brand-logo img{width:100%;height:100%;object-fit:cover;display:block}
         .login-brand h1{font-size:1.4rem;font-weight:800;color:var(--fs-t1);margin:0 0 0.15rem;letter-spacing:-0.02em}
         .login-brand p{font-size:0.8rem;color:var(--fs-t4);margin:0;font-weight:400}
-        .login-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(100, 116, 139,0.25),transparent);margin:0 0 1.75rem}
+        .login-divider{height:1px;background:var(--fs-bd);margin:0 0 1.75rem}
         .login-field{margin-bottom:1.125rem}
         .login-field label{display:flex;align-items:center;justify-content:space-between;font-size:0.75rem;font-weight:600;color:var(--fs-t3);margin-bottom:0.4rem;letter-spacing:0.02em}
         .login-field label a{color:var(--fs-acc2);text-decoration:none;font-size:0.72rem;font-weight:500}
-        .login-field label a:hover{color:#67e8f9;text-decoration:underline}
+        .login-field label a:hover{color:var(--fs-acc2);text-decoration:underline}
         .login-field-wrap{position:relative}
-        .login-field-wrap .login-field-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#475569;font-size:0.82rem;pointer-events:none;transition:color 0.2s}
-        .login-field-wrap input{width:100%;padding:12px 14px 12px 42px;border-radius:10px;border:1px solid rgba(51,65,85,0.6);background:rgba(18,19,22,0.6);color:var(--fs-t1);font-size:0.9rem;font-family:inherit;outline:none;transition:border-color 0.2s,box-shadow 0.2s,background 0.2s;box-sizing:border-box}
-        .login-field-wrap input:focus{border-color:#64748b;box-shadow:0 0 0 3px rgba(14,116,144,0.15);background:rgba(15,23,42,0.9)}
+        .login-field-wrap .login-field-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--fs-t4);font-size:0.82rem;pointer-events:none;transition:color 0.2s}
+        .login-field-wrap input{width:100%;padding:12px 14px 12px 42px;border-radius:4px;border:1px solid var(--fs-bd);background:var(--fs-bg3);color:var(--fs-t1);font-size:0.9rem;font-family:inherit;outline:none;transition:border-color 0.2s,box-shadow 0.2s,background 0.2s;box-sizing:border-box}
+        .login-field-wrap input:focus{border-color:var(--fs-acc);box-shadow:none;background:var(--fs-bg2)}
         .login-field-wrap input:focus ~ .login-field-icon{color:var(--fs-acc2)}
-        .login-field-wrap input::placeholder{color:#4b5563;font-size:0.84rem}
-        .login-toggle-pw{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:#475569;font-size:0.88rem;cursor:pointer;padding:4px 2px;transition:color 0.2s;line-height:1}
+        .login-field-wrap input::placeholder{color:var(--fs-t4);font-size:0.84rem}
+        .login-toggle-pw{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--fs-t4);font-size:0.88rem;cursor:pointer;padding:4px 2px;transition:color 0.2s;line-height:1}
         .login-toggle-pw:hover{color:var(--fs-acc2)}
         .login-options{display:flex;align-items:center;justify-content:space-between;margin:0.25rem 0 1.25rem}
         .login-remember{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.78rem;color:var(--fs-t3);user-select:none}
-        .login-remember input[type="checkbox"]{appearance:none;-webkit-appearance:none;width:16px;height:16px;border:1.5px solid #475569;border-radius:4px;background:transparent;cursor:pointer;position:relative;transition:all 0.15s;flex-shrink:0}
-        .login-remember input[type="checkbox"]:checked{background:#64748b;border-color:#64748b}
+        .login-remember input[type="checkbox"]{appearance:none;-webkit-appearance:none;width:16px;height:16px;border:1px solid var(--fs-t4);border-radius:4px;background:transparent;cursor:pointer;position:relative;transition:all 0.15s;flex-shrink:0}
+        .login-remember input[type="checkbox"]:checked{background:var(--fs-acc);border-color:var(--fs-acc)}
         .login-remember input[type="checkbox"]:checked::after{content:'\2713';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-size:0.65rem;font-weight:700}
-        .login-remember input[type="checkbox"]:focus{box-shadow:0 0 0 2px rgba(14,116,144,0.2)}
+        .login-remember input[type="checkbox"]:focus{box-shadow:none}
         .login-forgot{font-size:0.78rem;color:var(--fs-acc2);text-decoration:none;transition:color 0.15s}
-        .login-forgot:hover{color:#67e8f9;text-decoration:underline}
-        .login-error{padding:10px 14px;border-radius:10px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:var(--fs-red);font-size:0.8rem;margin-bottom:1rem;display:none;line-height:1.4;animation:loginShake 0.35s ease}
+        .login-forgot:hover{color:var(--fs-acc2);text-decoration:underline}
+        .login-error{padding:10px 14px;border-radius:4px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);color:var(--fs-red);font-size:0.8rem;margin-bottom:1rem;display:none;line-height:1.4;animation:loginShake 0.35s ease}
         .login-error i{margin-right:6px}
         @keyframes loginShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
-        .login-submit{width:100%;padding:13px;border:none;border-radius:10px;background:linear-gradient(135deg,#64748b,#64748b);color:#fff;font-size:0.92rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;letter-spacing:0.01em;position:relative;overflow:hidden}
-        .login-submit::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.08),transparent);opacity:0;transition:opacity 0.2s}
-        .login-submit:hover::before{opacity:1}
-        .login-submit:active{transform:translateY(0) scale(0.99);box-shadow:0 2px 8px rgba(14,116,144,0.2)}
-        .login-submit:disabled{opacity:0.55;cursor:not-allowed;transform:none!important;box-shadow:none!important}
-        .login-submit:disabled::before{display:none}
-        .login-card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid rgba(51,65,85,0.3)}
+        .login-submit{width:100%;padding:13px;border:none;border-radius:4px;background:var(--fs-acc);color:#fff;font-size:0.92rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s;letter-spacing:0.01em;position:relative;overflow:hidden}
+        .login-submit:hover{background:var(--fs-acc2);color:var(--fs-bg0)}
+        .login-submit:disabled{opacity:0.55;cursor:not-allowed;transform:none!important;box-shadow:none}
+        .login-card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--fs-bd)}
         .login-card-footer a{color:var(--fs-t4);text-decoration:none;font-size:0.78rem;transition:color 0.2s;display:inline-flex;align-items:center;gap:6px}
         .login-card-footer a:hover{color:var(--fs-acc2)}
-        .login-secure{display:flex;align-items:center;gap:5px;font-size:0.68rem;color:#475569}
-        .login-secure i{font-size:0.58rem;color:#22c55e}
-        .login-ext-footer{text-align:center;margin-top:1.5rem;font-size:0.7rem;color:var(--fs-bd)}
-        .login-ext-footer a{color:#475569;text-decoration:none;transition:color 0.15s}
+        .login-secure{display:flex;align-items:center;gap:5px;font-size:0.68rem;color:var(--fs-t4)}
+        .login-secure i{font-size:0.58rem;color:var(--fs-grn)}
+        .login-ext-footer{text-align:center;margin-top:1.5rem;font-size:0.7rem;color:var(--fs-t4)}
+        .login-ext-footer a{color:var(--fs-t4);text-decoration:none;transition:color 0.15s}
         .login-ext-footer a:hover{color:var(--fs-t4)}
 
         /* ═══ THEME TOGGLE ═══ */
@@ -654,7 +644,7 @@
                         <a href="index.html"><i class="fas fa-arrow-left"></i> Back to Website</a>
                         <div class="login-secure"><i class="fas fa-shield-alt"></i> Authorized only</div>
                     </div>
-                    <p style="text-align:center;font-size:0.68rem;color:#475569;margin-top:12px;line-height:1.5;">By signing in, you agree to our <a href="terms.html" target="_blank" style="color:#64748b;text-decoration:underline;" rel="noopener noreferrer">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:#64748b;text-decoration:underline;" rel="noopener noreferrer">Privacy Policy</a>.</p>
+                    <p style="text-align:center;font-size:0.68rem;color:var(--fs-t4);margin-top:12px;line-height:1.5;">By signing in, you agree to our <a href="terms.html" target="_blank" style="color:var(--fs-t3);text-decoration:underline;" rel="noopener noreferrer">Terms</a> &amp; <a href="privacy.html" target="_blank" style="color:var(--fs-t3);text-decoration:underline;" rel="noopener noreferrer">Privacy Policy</a>.</p>
                 </form>
             </div>
             <div class="login-ext-footer">&copy; 2026 ResistanceZero. All rights reserved.</div>
@@ -865,7 +855,7 @@
                 <label style="font-size:0.66rem;color:var(--fs-t3);display:flex;flex-direction:column;gap:3px;flex:1 1 200px;">EMAIL<input id="supaNewEmail" type="email" autocomplete="off" placeholder="user@example.com" style="background:var(--fs-bg3);color:var(--fs-t2);border:1px solid rgba(148,163,184,0.28);border-radius:4px;padding:6px 8px;font-size:0.78rem;"></label>
                 <label style="font-size:0.66rem;color:var(--fs-t3);display:flex;flex-direction:column;gap:3px;flex:1 1 160px;">PASSWORD (min 8)<input id="supaNewPass" type="text" autocomplete="off" placeholder="min 8 characters" style="background:var(--fs-bg3);color:var(--fs-t2);border:1px solid rgba(148,163,184,0.28);border-radius:4px;padding:6px 8px;font-size:0.78rem;font-family:'JetBrains Mono',monospace;"></label>
                 <label style="font-size:0.66rem;color:var(--fs-t3);display:flex;flex-direction:column;gap:3px;">TIER<select id="supaNewTier" style="background:var(--fs-bg3);color:var(--fs-t2);border:1px solid rgba(148,163,184,0.28);border-radius:4px;padding:6px 8px;font-size:0.78rem;font-family:'JetBrains Mono',monospace;"><option value="free">free</option><option value="demo">demo</option><option value="pro">pro</option><option value="root">root</option></select></label>
-                <button class="btn btn-sm" onclick="submitAddAccount()" style="background:#22d3ee;color:#06202a;font-weight:700;"><i class="fas fa-check"></i> Create</button>
+                <button class="btn btn-sm btn-amber" onclick="submitAddAccount()"><i class="fas fa-check"></i> Create</button>
                 <button class="btn btn-ghost btn-sm" onclick="toggleAddAccount(false)">Cancel</button>
             </div>
             <p style="font-size:0.66rem;color:var(--fs-t4);margin:8px 0 0;">Account is created already confirmed (can log in immediately). The password is set by you and shown once here — it is stored hashed in Supabase.</p>
@@ -891,7 +881,7 @@
         <p style="font-size:0.78rem;color:var(--fs-t4);margin-bottom:0.75rem;">Emails in Supabase <code style="font-size:0.7rem;color:var(--fs-t3)">educator_allowlist</code> sign in with the Educator role (Full-access column plus DC AI/HPC and DC Conventional). Only root can read or change this list.</p>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:0.75rem">
             <label style="font-size:0.66rem;color:var(--fs-t3);display:flex;flex-direction:column;gap:3px;flex:1 1 220px;">EMAIL<input id="eduEmail" type="email" autocomplete="off" placeholder="teacher@example.com" style="background:var(--fs-bg3);color:var(--fs-t2);border:1px solid rgba(148,163,184,0.28);border-radius:4px;padding:6px 8px;font-size:0.78rem;"></label>
-            <button class="btn btn-sm" id="eduAddBtn" onclick="promoteEducator()" style="background:#22d3ee;color:#06202a;font-weight:700;"><i class="fas fa-user-graduate"></i> Promote to educator</button>
+            <button class="btn btn-sm btn-amber" id="eduAddBtn" onclick="promoteEducator()"><i class="fas fa-user-graduate"></i> Promote to educator</button>
         </div>
         <div id="eduStatus" class="supa-status" style="border-left-color:var(--fs-bd);margin-bottom:0.75rem"><i class="fas fa-circle-notch fa-spin" style="color:var(--fs-t4)"></i><span>Loading…</span></div>
         <div class="tbl-overflow"><table class="data-tbl"><thead><tr><th scope="col">Email</th><th scope="col">Added</th><th scope="col">Action</th></tr></thead><tbody id="eduTbody"></tbody></table></div>
@@ -1849,12 +1839,12 @@
 
 <!-- ══════════════════════════════════════ STOCK INVESTMENT ══════════════════════════════════════ -->
 <div class="section" id="sec-stock-investment">
-    <iframe id="dca-iframe" src="Apps/dca-app/dist/index.html?v=20261114-6567f526" style="width:100%;height:calc(100vh - 80px);border:none;background:transparent;" loading="lazy" title="DCA Portfolio Intelligence"></iframe>
+    <iframe id="dca-iframe" src="Apps/dca-app/dist/index.html?v=20261114-058bc430" style="width:100%;height:calc(100vh - 80px);border:none;background:transparent;" loading="lazy" title="DCA Portfolio Intelligence"></iframe>
 </div>
 
 <!-- ══════════════════════════════════════ FINANCE TERMINAL ══════════════════════════════════════ -->
 <div class="section" id="sec-finance-terminal">
-    <iframe id="finance-terminal-iframe" src="Apps/finance-terminal/index.html?v=20261114-7c3557c1" style="width:100%;height:calc(100vh - 80px);border:none;background:var(--fs-bg0);" loading="lazy" title="Finance Terminal"></iframe>
+    <iframe id="finance-terminal-iframe" src="Apps/finance-terminal/index.html?v=20261114-95800616" style="width:100%;height:calc(100vh - 80px);border:none;background:var(--fs-bg0);" loading="lazy" title="Finance Terminal"></iframe>
 </div>
 
 <!-- ══════════════════════════════════════ IDR STOCKS ══════════════════════════════════════ -->
@@ -4440,22 +4430,26 @@ function renderSettings(){
     const settings=[
         {label:'Platform',value:'ResistanceZero Calculator Suite',icon:'fa-globe'},
         {label:'Version',value:window.RZ_VERSION?'v'+window.RZ_VERSION+(window.RZ_VERSION_DATE?' ('+window.RZ_VERSION_DATE+')':''):'unknown (js/rz-version.js not loaded)',icon:'fa-code-branch'},
-        {label:'Environment',value:'Production',icon:'fa-server'},
+        // Every row is a fact this page can check (audit 2026-11-14: "CDN: Cloudflare" was false — the
+        // site is GitHub Pages served directly, server: GitHub.com, no cf-ray; the calculator row was stale).
+        {label:'Environment',value:location.hostname==='resistancezero.com'?'Production (resistancezero.com)':'Not production ('+rzEsc(location.host||'file')+')',icon:'fa-server'},
         {label:'Auth Backend',value:'Supabase (RLS)',icon:'fa-database'},
-        {label:'Session Duration',value:'24 hours',icon:'fa-clock'},
+        {label:'Session',value:'Supabase Auth session (refresh token; lifetime set in the Supabase project)',icon:'fa-clock'},
         {label:'Admin Access',value:'Supabase account with tier = root (checked server-side)',icon:'fa-user-shield'},
         {label:'Total Accounts',value:opsState.profiles==='ok'?allUsers.length+' in Supabase':'not loaded',icon:'fa-users'},
         {label:'Feature Flags',value:Object.keys(featureFlags).length+' flags configured',icon:'fa-toggle-on'},
-        {label:'Calculators',value:'CAPEX + OPEX',icon:'fa-calculator'},
-        {label:'Deployment',value:'GitHub Pages (Static)',icon:'fa-cloud-upload-alt'},
-        {label:'CDN',value:'Cloudflare',icon:'fa-shield-alt'},
-        {label:'Analytics',value:'Google Analytics (G-GED7FX8RTV)',icon:'fa-chart-line'}
+        {label:'Calculators',value:'<span id="settingsCalcCount">reading data/calculators.json</span>',icon:'fa-calculator'},
+        {label:'Hosting',value:'GitHub Pages, static (served by GitHub\'s own edge)',icon:'fa-cloud-upload-alt'},
+        {label:'Analytics',value:'Google Analytics G-GED7FX8RTV on the public pages (not on this console)',icon:'fa-chart-line'}
     ];
     document.getElementById('settingsGrid').innerHTML=settings.map(s=>`
         <div style="display:flex;align-items:center;gap:12px;padding:0.75rem;background:var(--fs-bg3);border:1px solid var(--fs-bd);border-radius:8px">
             <i class="fas ${s.icon}" style="color:var(--fs-t4);width:16px;text-align:center"></i>
             <div><div style="font-size:0.68rem;color:var(--fs-t4);text-transform:uppercase;letter-spacing:0.3px">${s.label}</div><div style="font-size:0.82rem;color:var(--fs-t2);font-weight:500">${s.value}</div></div>
         </div>`).join('');
+    fetch('data/calculators.json',{cache:'no-cache'}).then(function(r){if(!r.ok)throw new Error('HTTP '+r.status);return r.json()})
+        .then(function(d){var n=(d&&d.calculators||[]).length;var el=document.getElementById('settingsCalcCount');if(el)el.textContent=n+' in the registry (data/calculators.json)';})
+        .catch(function(e){var el=document.getElementById('settingsCalcCount');if(el)el.textContent='registry not readable: '+((e&&e.message)||e);});
 }
 
 // System Health: one real Supabase read (the signed-in root's own profile row), timed in this browser.

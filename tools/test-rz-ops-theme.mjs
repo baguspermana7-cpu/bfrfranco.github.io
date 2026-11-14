@@ -18,6 +18,12 @@
  *       "Mock" button or toast; its round-trip tile is a measured "<n> ms" and its Supabase tile says reachable.
  *   T5  the topbar clock names the viewer's real zone (Intl short timeZoneName), never a fixed "UTC+7".
  *   T6  AUTH_V2 off (production): no V2-only control or the Tier Manager nav item is visible.
+ *   T7  no violet-family colour (hue 238°-310°, by HUE not by hex) painted by any visible element of the console or
+ *       the DCA app (text, background, border, outline, SVG fill/stroke, gradient stops); no blur filter (T7b).
+ *   T8  the login screen follows rz_admin_theme: its background matches the theme and its text clears AA, both themes.
+ *   T9  Settings → Platform Config: no "Cloudflare" (GitHub Pages direct), no stale "CAPEX + OPEX" / "24 hours" /
+ *       "v2.0.0", and the calculator count equals data/calculators.json.
+ *   T10 the Finance Terminal's ticker tape never scrolls a one-line status off its left edge.
  *   E1  no uncaught page errors.
  *
  * js/rz-supabase.js is stubbed in-browser (request interception), like tools/test-rz-ops-access.mjs.
@@ -61,9 +67,9 @@ const PROFILES = [
 const AUDIT = [
   { id: 1, actor_id: 'p1', action: 'pdf_exported', target_type: 'calc', target_id: null, meta: { calc: 'capex' }, created_at: new Date(Date.now() - 864e5).toISOString() },
 ];
-const STUB = `const u={id:'u2',email:'bagus@resistancezero.com'};const P=${JSON.stringify(PROFILES)};const A=${JSON.stringify(AUDIT)};
-  const api={configured:true,getUser:async()=>u,getSession:async()=>({user:u}),
-  getProfile:async()=>({data:{id:'u2',email:u.email,tier:'root'},error:null}),
+const stub = signedIn => `const u=${signedIn ? "{id:'u2',email:'bagus@resistancezero.com'}" : 'null'};const P=${JSON.stringify(PROFILES)};const A=${JSON.stringify(AUDIT)};
+  const api={configured:true,getUser:async()=>u,getSession:async()=>u?{user:u}:null,
+  getProfile:async()=>u?{data:{id:'u2',email:u.email,tier:'root'},error:null}:{data:null,error:'not signed in'},
   signIn:async()=>({error:'stub'}),signOut:async()=>({}),listProfiles:async()=>({data:[]}),
   listAllProfiles:async()=>({data:P.map(r=>Object.assign({},r)),error:null}),
   listAuditLog:async()=>({data:A.map(r=>Object.assign({},r)),error:null}),
@@ -79,7 +85,7 @@ const failures = [];
 const law = (id, ok, detail) => { console.log(`${ok ? 'PASS' : 'FAIL'} ${id} ${detail}`); if (!ok) failures.push(id); };
 const pageErrors = [];
 
-async function open(theme, { width = 1440, tz = null } = {}) {
+async function open(theme, { width = 1440, tz = null, signedIn = true } = {}) {
   const page = await browser.newPage();
   await page.setViewport({ width, height: 900 });
   if (tz) await page.emulateTimezone(tz);
@@ -87,14 +93,14 @@ async function open(theme, { width = 1440, tz = null } = {}) {
   await page.setRequestInterception(true);
   page.on('request', r => {
     const u = r.url();
-    if (u.includes('/js/rz-supabase.js')) return r.respond({ status: 200, contentType: 'text/javascript', body: STUB });
+    if (u.includes('/js/rz-supabase.js')) return r.respond({ status: 200, contentType: 'text/javascript', body: stub(signedIn) });
     if (!u.startsWith(BASE) && !/jsdelivr|cdnjs|googleapis|gstatic|unpkg/.test(u)) return r.respond({ status: 204, body: '' });
     r.continue();
   });
   // The console's saved choice, set in the top frame only (the embedded apps must take it from the console).
   await page.evaluateOnNewDocument(t => { if (window.top === window) localStorage.setItem('rz_admin_theme', t); }, theme);
   await page.goto(BASE + FILE, { waitUntil: 'load', timeout: 60000 });
-  await page.waitForFunction(() => document.querySelector('.main-wrap') && getComputedStyle(document.querySelector('.main-wrap')).display !== 'none', { timeout: 15000 }).catch(() => {});
+  if (signedIn) await page.waitForFunction(() => document.querySelector('.main-wrap') && getComputedStyle(document.querySelector('.main-wrap')).display !== 'none', { timeout: 15000 }).catch(() => {});
   await sleep(1500);
   return page;
 }
@@ -158,6 +164,40 @@ function auditSection(sel, theme) {
   return out;
 }
 
+// T7 — every painted colour (text, fill, border, SVG fill/stroke) of every visible element, by HUE: the violet
+// family [238°, 310°] is banned (CLAUDE.md rejected #3). A hex grep missed same-hue literals once
+// (feedback_colour_ban_by_hue_not_string); so does a hex list. Also reports any backdrop blur.
+function purpleScan() {
+  const hue = c => { const m = c && c.match(/rgba?\(([^)]+)\)/); if (!m) return null; const p = m[1].split(/[\s,/]+/).filter(Boolean).map(Number);
+    if (p.length > 3 && p[3] < 0.05) return null; const [r, g, b] = p.slice(0, 3).map(v => v / 255); const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn;
+    const l = (mx + mn) / 2, sat = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1)); if (sat < 0.15 || d < 0.04) return null;
+    let h = mx === r ? ((g - b) / d) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h *= 60; if (h < 0) h += 360; return h; };
+  const out = [], blur = [];
+  let seen = 0;
+  for (const e of document.querySelectorAll('body *')) {
+    if (!e.getClientRects().length) continue;
+    const cs = getComputedStyle(e); if (cs.visibility !== 'visible' || cs.display === 'none') continue;
+    seen++;
+    for (const prop of ['color', 'backgroundColor', 'borderTopColor', 'borderLeftColor', 'fill', 'stroke', 'outlineColor']) {
+      if (prop === 'color' && !/[A-Za-z0-9]/.test([...e.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent).join(''))) continue;
+      if (prop.startsWith('border') && parseFloat(cs[prop.replace('Color', 'Width')]) === 0) continue;
+      if (prop === 'outlineColor' && cs.outlineStyle === 'none') continue;
+      if ((prop === 'fill' || prop === 'stroke') && !(e instanceof SVGElement)) continue;
+      const h = hue(cs[prop]); if (h !== null && h >= 238 && h <= 310) out.push(`${e.tagName.toLowerCase()}.${[...e.classList].slice(0, 1).join('')} ${prop}=${cs[prop]}`);
+    }
+    for (const img of (cs.backgroundImage.match(/rgba?\([^)]+\)/g) || [])) { const h = hue(img); if (h !== null && h >= 238 && h <= 310) out.push(`${e.tagName.toLowerCase()} gradient ${img}`); }
+    if (/blur/.test(cs.backdropFilter || '') || /blur/.test(cs.filter || '')) blur.push(`${e.tagName.toLowerCase()}.${[...e.classList].slice(0, 1).join('')} ${cs.backdropFilter || cs.filter}`);
+  }
+  return { purple: [...new Set(out)], blur, seen };
+}
+// T10 — the Terminal's ticker tape: a one-line status must sit inside the tape, not scroll off its left edge.
+function tapeCheck() {
+  const tape = document.querySelector('.tape'), first = document.querySelector('#tickerTape .tape-item');
+  if (!tape || !first) return { ok: false, why: 'no tape' };
+  const t = tape.getBoundingClientRect(), f = first.getBoundingClientRect();
+  return { ok: f.left >= t.left - 0.5, why: `items=${document.querySelectorAll('#tickerTape .tape-item').length} first="${first.textContent.trim().slice(0, 30)}" left=${(f.left - t.left).toFixed(0)}px` };
+}
+
 // Theme an embedded app actually shows: its <html data-theme> + the luminance it paints.
 async function iframeTheme(page, id) {
   const fh = await page.$('#' + id); if (!fh) return { attr: 'missing' };
@@ -191,7 +231,7 @@ async function shot(page, name) {
 }
 
 // ── T1: embedded app theme, both starting themes, after load and after each toggle ──
-for (const start of run('T1') ? ['dark', 'light'] : []) {
+for (const start of run('T1') || run('T7') || run('T10') ? ['dark', 'light'] : []) {
   const page = await open(start);
   await loadIframes(page);
   let want = start;
@@ -202,6 +242,19 @@ for (const start of run('T1') ? ['dark', 'light'] : []) {
     steps.push([`toggle${n}`, await allIframes(page), want]);
   }
   steps[0].push(start);
+  // T7 purple / blur on the console + the DCA app, T10 the Terminal's tape (after the apps have loaded)
+  const dcaFrame = await (await page.$('#dca-iframe')).contentFrame();
+  const ftFrame = await (await page.$('#finance-terminal-iframe')).contentFrame();
+  // a display:none section hides its iframe too: show each app before reading what it paints
+  const con = await page.evaluate(purpleScan);
+  await page.evaluate(() => showSection('stock-investment')); await sleep(800);
+  const dca = await dcaFrame.evaluate(purpleScan);
+  law(`T7a-${start}`, con.purple.length === 0 && dca.purple.length === 0 && dca.seen > 50, `${con.seen}+${dca.seen} visible elements; violet-hue colours: console ${con.purple.length} ${JSON.stringify(con.purple.slice(0, 4))}, DCA app ${dca.purple.length} ${JSON.stringify(dca.purple.slice(0, 4))}`);
+  law(`T7b-${start}`, con.blur.length === 0 && dca.blur.length === 0, `blur: console ${JSON.stringify(con.blur)}, DCA app ${JSON.stringify(dca.blur.slice(0, 3))}`);
+  await page.evaluate(() => showSection('finance-terminal'));
+  await sleep(4000);                                        // the old marquee moved a status ~38 px left in 4 s
+  const tp = await ftFrame.evaluate(tapeCheck);
+  law(`T10-${start}`, tp.ok, `Terminal tape ${tp.why}`);
   for (const [step, res, w] of steps) {
     const bad = Object.entries(res).filter(([, t]) => !shows(t, w));
     law(`T1-${start}-${step}`, bad.length === 0, `console=${w} ` + Object.entries(res).map(([k, t]) => `${k}:${t.attr}/${t.lum}`).join(' '));
@@ -246,6 +299,33 @@ for (const theme of run('T2') || run('T3') || run('T4') ? ['dark', 'light'] : []
     const v2 = await page.evaluate(() => [...document.querySelectorAll('.rz-admin-v2-only, #navTiers, #addUserV2Btn, #auditSourceToggle')].filter(e => e.getClientRects().length && getComputedStyle(e).visibility === 'visible').map(e => e.id || e.className));
     law('T6', v2.length === 0, `visible V2 controls with AUTH_V2 off: ${JSON.stringify(v2)}`);
   }
+  await page.close();
+}
+
+// ── T8: the login screen follows rz_admin_theme and its text clears AA in both themes ──
+for (const theme of run('T8') ? ['dark', 'light'] : []) {
+  const page = await open(theme, { signedIn: false });
+  await page.waitForFunction(() => getComputedStyle(document.getElementById('loginPage')).display !== 'none', { timeout: 15000 }).catch(() => {});
+  await sleep(600);
+  const r = await page.evaluate(auditSection, '#loginPage', theme);
+  const bg = await page.evaluate(() => { const m = getComputedStyle(document.getElementById('loginPage')).backgroundColor.match(/[\d.]+/g).map(Number);
+    const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f(m[0]) + 0.7152 * f(m[1]) + 0.0722 * f(m[2]); });
+  const themed = theme === 'dark' ? bg < 0.05 : bg > 0.5;
+  law(`T8-${theme}`, themed && r.low.length === 0 && r.mismatch.length === 0, `login background lum ${bg.toFixed(3)} (${themed ? 'matches' : 'WRONG for'} ${theme}); ${r.low.length} low-contrast ${JSON.stringify(r.low.slice(0, 6))}; ${r.mismatch.length} mismatched ${JSON.stringify(r.mismatch.slice(0, 3))}`);
+  await shot(page, `login-${theme}-1440`);
+  await page.close();
+}
+
+// ── T9: Settings → Platform Config states only checkable facts ──
+if (run('T9')) {
+  const page = await open('dark');
+  await page.evaluate(() => showSection('settings')); await sleep(1200);
+  const txt = await page.evaluate(() => document.getElementById('settingsGrid').innerText);
+  const nCalc = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/calculators.json'), 'utf8')).calculators.length;
+  const bad = [/Cloudflare/i.test(txt) && 'Cloudflare (the site is GitHub Pages direct)', /CAPEX \+ OPEX/.test(txt) && 'stale "CAPEX + OPEX"',
+    /24 hours/.test(txt) && 'hardcoded "24 hours" session', !txt.includes(`${nCalc} in the registry`) && `calculator count != ${nCalc} from data/calculators.json`,
+    /v2\.0\.0/.test(txt) && 'stale v2.0.0'].filter(Boolean);
+  law('T9', bad.length === 0, `Platform Config: ${bad.length ? JSON.stringify(bad) : 'no false or stale row'}; registry has ${nCalc}`);
   await page.close();
 }
 

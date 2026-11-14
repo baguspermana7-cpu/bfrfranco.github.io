@@ -6,84 +6,71 @@ import { createContext, useContext, useState, useEffect, useMemo } from "react";
    and visual harmony in both modes
    ══════════════════════════════════════════════ */
 
+// Values MIRROR css/rz-finance-suite.css (--fs-*): this is a built bundle and cannot read the runtime tokens.
+// Graphite surfaces, 1px hairlines, ONE amber accent (--fs-amb). No violet anywhere (CLAUDE.md rejected #3;
+// tools/test-rz-ops-theme.mjs T7 checks every painted colour by HUE). "pur" is the app's second-series
+// key: it is blue now, the name stays so 23 call sites do not churn. "amb" is the warning orange so it
+// stays distinct from the amber accent in the Bear/Consv/Base/Bull/Opti scenario sets.
 const darkColors = {
-  // Backgrounds — RZ finance-suite canonical tokens (css/rz-finance-suite.css)
-  bg:   "#0b1120",   // page (--fs-bg0)
-  sf:   "#1e293b",   // card / surface (--fs-bg2)
-  sf2:  "#0f172a",   // inset / well (--fs-bg3)
-  sf3:  "#334155",   // raised
-  // Borders
-  bd:   "#334155",   // 1px hairline (--fs-bd)
-  bd2:  "#475569",
-  // Accent & semantic
-  acc:  "#8b5cf6",
-  accH: "#a78bfa",
+  bg:   "#0e0f12",   // --fs-bg0
+  sf:   "#16181d",   // --fs-bg2
+  sf2:  "#121316",   // --fs-bg3
+  sf3:  "#1c1f25",
+  bd:   "#2a2d34",   // --fs-bd
+  bd2:  "#3a3e47",
+  acc:  "#fbbf24",   // --fs-amb (dark)
+  accH: "#fcd34d",
   grn:  "#34d399",
   grnH: "#6ee7b7",
   red:  "#f87171",
   redH: "#fca5a5",
-  amb:  "#fbbf24",
-  ambH: "#fcd34d",
-  pur:  "#8b5cf6",
-  purH: "#a78bfa",
+  amb:  "#fb923c",
+  ambH: "#fdba74",
+  pur:  "#60a5fa",   // second series (--fs-blu)
+  purH: "#93c5fd",
   cyn:  "#22d3ee",
   cynH: "#67e8f9",
   pnk:  "#f472b6",
-  // Text
-  t1:   "#f1f5f9",   // bright (--fs-t1)
-  t2:   "#94a3b8",   // muted (--fs-t3)
-  t3:   "#64748b",   // dim (--fs-t4)
-  // Input
-  inp:  "#0f172a",
-  // Overlay
-  ov:   "rgba(0,0,0,0.5)",
-  // Shadow
-  sh:   "0 2px 8px rgba(0,0,0,0.3)",
-  sh2:  "0 8px 24px rgba(0,0,0,0.25)",
-  // Chart tooltip
-  ttBg: "#1e293b",
-  // Gradient overlay for cards
-  grd:  "linear-gradient(135deg, rgba(139,92,246,0.06) 0%, transparent 50%)",
+  t1:   "#f1f5f9",   // --fs-t1
+  t2:   "#969eaa",   // --fs-t3
+  t3:   "#808998",   // --fs-t4
+  inp:  "#121316",
+  ov:   "rgba(0,0,0,0.6)",
+  sh:   "none",
+  sh2:  "none",
+  ttBg: "#16181d",
+  grd:  "none",
 };
 
 const lightColors = {
-  // Backgrounds — RZ finance-suite canonical light tokens
-  bg:   "#f8fafc",   // page (--fs-bg0)
-  sf:   "#ffffff",   // card / surface
-  sf2:  "#f1f5f9",   // inset / well (--fs-bg3)
+  bg:   "#f8f9fa",   // --fs-bg0 (light)
+  sf:   "#ffffff",
+  sf2:  "#f1f5f9",
   sf3:  "#e2e8f0",
-  // Borders
-  bd:   "#e2e8f0",   // hairline (--fs-bd)
+  bd:   "#e2e8f0",
   bd2:  "#cbd5e1",
-  // Accent & semantic — canonical accents; darker hover for contrast on white
-  acc:  "#8b5cf6",
-  accH: "#7c3aed",
-  grn:  "#34d399",
-  grnH: "#10b981",
-  red:  "#f87171",
-  redH: "#ef4444",
-  amb:  "#fbbf24",
-  ambH: "#f59e0b",
-  pur:  "#8b5cf6",
-  purH: "#7c3aed",
-  cyn:  "#22d3ee",
-  cynH: "#06b6d4",
-  pnk:  "#ec4899",
-  // Text — dark text on light backgrounds
-  t1:   "#0f172a",   // bright (--fs-t1 light)
-  t2:   "#475569",   // muted (--fs-t3 light)
-  t3:   "#64748b",   // dim (--fs-t4 light)
-  // Input
+  acc:  "#92400e",   // --fs-amb (light): AA as text on white
+  accH: "#78350f",
+  grn:  "#047857",
+  grnH: "#065f46",
+  red:  "#b91c1c",
+  redH: "#991b1b",
+  amb:  "#c2410c",
+  ambH: "#9a3412",
+  pur:  "#1d4ed8",
+  purH: "#1e40af",
+  cyn:  "#155e75",
+  cynH: "#164e63",
+  pnk:  "#be185d",
+  t1:   "#0f172a",
+  t2:   "#475569",
+  t3:   "#5b6577",
   inp:  "#f1f5f9",
-  // Overlay
-  ov:   "rgba(0,0,0,0.15)",
-  // Shadow
-  sh:   "0 1px 3px rgba(0,0,0,0.08)",
-  sh2:  "0 4px 12px rgba(0,0,0,0.06)",
-  // Chart tooltip
+  ov:   "rgba(15,23,42,0.35)",
+  sh:   "none",
+  sh2:  "none",
   ttBg: "#ffffff",
-  // Gradient overlay for cards
-  grd:  "linear-gradient(135deg, rgba(139,92,246,0.03) 0%, transparent 50%)",
+  grd:  "none",
 };
 
 const ThemeContext = createContext();
@@ -125,7 +112,7 @@ export function ThemeProvider({ children }) {
     // Set meta theme-color for mobile browser chrome
     const meta = document.querySelector('meta[name="theme-color"]') || document.createElement("meta");
     meta.name = "theme-color";
-    meta.content = mode === "dark" ? "#0b1120" : "#f8fafc";
+    meta.content = mode === "dark" ? "#0e0f12" : "#f8f9fa";
     if (!meta.parentNode) document.head.appendChild(meta);
   }, [mode]);
 

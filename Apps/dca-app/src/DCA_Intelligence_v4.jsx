@@ -9,7 +9,7 @@ import { useResponsive } from "./useResponsive";
 const DB = {
   VOO:  { nm:"Vanguard S&P 500",         cat:"Large Blend",   r:14.86, d:1.3, er:.03, b:1.00, dd:-24.5, c:"#60a5fa",
     hist:{2015:1.31,2016:12.17,2017:21.77,2018:-4.50,2019:31.35,2020:18.29,2021:28.78,2022:-18.19,2023:26.32,2024:24.98,2025:17.82} },
-  QQQ:  { nm:"Invesco Nasdaq-100",       cat:"Large Growth",  r:18.30, d:0.6, er:.20, b:1.15, dd:-33.0, c:"#8b5cf6",
+  QQQ:  { nm:"Invesco Nasdaq-100",       cat:"Large Growth",  r:18.30, d:0.6, er:.20, b:1.15, dd:-33.0, c:"#2dd4bf",
     hist:{2015:9.45,2016:7.10,2017:32.66,2018:-0.12,2019:38.98,2020:48.40,2021:27.42,2022:-32.58,2023:54.85,2024:25.58,2025:24.80} },
   SCHD: { nm:"Schwab Dividend Equity",   cat:"Dividend Value", r:11.00, d:3.5, er:.06, b:.80, dd:-16.0, c:"#34d399",
     hist:{2015:-1.42,2016:16.43,2017:15.47,2018:-5.56,2019:27.18,2020:2.40,2021:29.87,2022:-3.23,2023:3.67,2024:12.09,2025:9.80} },
@@ -17,7 +17,7 @@ const DB = {
     hist:{2015:0.40,2016:12.68,2017:21.19,2018:-5.13,2019:30.80,2020:20.95,2021:25.72,2022:-19.53,2023:26.07,2024:23.87,2025:17.00} },
   VIG:  { nm:"Vanguard Div Appreciation",cat:"Div Growth",    r:12.00, d:1.8, er:.06, b:.85, dd:-18.0, c:"#f472b6",
     hist:{2015:-0.83,2016:10.98,2017:20.94,2018:-2.01,2019:29.58,2020:15.48,2021:23.68,2022:-9.84,2023:14.52,2024:17.75,2025:13.50} },
-  SPY:  { nm:"SPDR S&P 500 Trust",       cat:"Large Blend",   r:14.77, d:1.2, er:.09, b:1.00, dd:-24.5, c:"#a78bfa",
+  SPY:  { nm:"SPDR S&P 500 Trust",       cat:"Large Blend",   r:14.77, d:1.2, er:.09, b:1.00, dd:-24.5, c:"#a3e635",
     hist:{2015:1.25,2016:12.00,2017:21.70,2018:-4.56,2019:31.22,2020:18.37,2021:28.75,2022:-18.17,2023:26.19,2024:24.89,2025:17.70} },
   VGT:  { nm:"Vanguard Info Tech",       cat:"Sector Tech",   r:19.00, d:0.6, er:.10, b:1.20, dd:-34.0, c:"#22d3ee",
     hist:{2015:5.90,2016:13.70,2017:38.78,2018:-0.30,2019:48.00,2020:46.00,2021:30.30,2022:-33.70,2023:50.10,2024:24.20,2025:22.00} },
@@ -187,7 +187,7 @@ function rd(s,{type:t,p}) {
    ══════════════════════════════════════════════ */
 /* cs is now provided by ThemeContext — see useTheme() hook below */
 
-const Box=({children,style,ac,onClick,cs,glow})=><div onClick={onClick} style={{background:cs.sf,border:`1px solid ${cs.bd}`,borderRadius:12,borderLeft:ac?`3px solid ${ac}`:undefined,cursor:onClick?"pointer":undefined,boxShadow:glow?`${cs.sh2}, 0 0 0 1px ${glow}15`:cs.sh,backgroundImage:cs.grd,transition:"all .25s",...style}}>{children}</div>;
+const Box=({children,style,ac,onClick,cs,glow})=><div onClick={onClick} style={{background:cs.sf,border:`1px solid ${cs.bd}`,borderRadius:4,cursor:onClick?"pointer":undefined,transition:"border-color .15s",...style}}>{children}</div>;
 const Num=({l,v,c,s,cs})=><div><div style={{fontSize:16,fontWeight:700,color:c||cs.t1,fontFamily:cs.m}}>{v}</div><div style={{fontSize:11,color:cs.t3,marginTop:2}}>{l}</div>{s&&<div style={{fontSize:10,color:cs.t3}}>{s}</div>}</div>;
 
 const Tip=({title,text,formula,cs,children})=>{
@@ -256,10 +256,10 @@ const Inp=({l,v,onChange,pre,suf,w,step,ph,type="number",cs,tip,fmt})=>{
 
 const Pill=({active,onClick,children,color,cs})=><button onClick={onClick} style={{
   padding:"7px 16px",borderRadius:8,border:`1px solid ${active?color||cs.acc:cs.bd}`,
-  background:active?`linear-gradient(135deg,${(color||cs.acc)}18,${(color||cs.acc)}08)`:"transparent",
+  background:active?`${(color||cs.acc)}14`:"transparent",
   color:active?color||cs.acc:cs.t3,
   fontSize:13,fontWeight:active?700:500,cursor:"pointer",fontFamily:cs.f,transition:"all .2s",
-  boxShadow:active?`0 2px 8px ${(color||cs.acc)}20`:"none",
+  boxShadow:"none",
 }}>{children}</button>;
 
 /* ══════════════════════════════════════════════
@@ -611,8 +611,8 @@ export default function App(){
 
     {/* ═══ FINNHUB API KEY MODAL ═══ */}
     {showKeyModal&&(
-      <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.6)",zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",backdropFilter:"blur(4px)"}}>
-        <div style={{background:cs.sf,border:`1px solid ${cs.bd}`,borderRadius:16,padding:24,width:380,maxWidth:"90vw",boxShadow:"0 20px 60px rgba(0,0,0,0.4)"}}>
+      <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.6)",zIndex:9999,display:"flex",alignItems:"center",justifyContent:"center",backdropFilter:"none"}}>
+        <div style={{background:cs.sf,border:`1px solid ${cs.bd}`,borderRadius:4,padding:24,width:380,maxWidth:"90vw",boxShadow:"0 20px 60px rgba(0,0,0,0.4)"}}>
           <div style={{fontSize:16,fontWeight:700,marginBottom:4}}>🔑 Finnhub API Key</div>
           <div style={{fontSize:12,color:cs.t3,marginBottom:12,lineHeight:1.5}}>
             Enter your free Finnhub API key to enable live ETF prices and real-time P&L updates.
@@ -623,7 +623,7 @@ export default function App(){
           <div style={{display:"flex",gap:8,justifyContent:"flex-end"}}>
             {fhKey&&<button onClick={()=>setShowKeyModal(false)} style={{padding:"8px 16px",borderRadius:8,border:`1px solid ${cs.bd}`,background:"transparent",color:cs.t3,fontSize:12,cursor:"pointer"}}>Cancel</button>}
             <button onClick={()=>{if(!fhKeyInput.trim())return;setFinnhubKey(fhKeyInput.trim());setFhKey(fhKeyInput.trim());setShowKeyModal(false);}}
-              style={{padding:"8px 20px",borderRadius:8,border:"none",background:"#6d28d9",color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer"}}>Save & Connect</button>
+              style={{padding:"8px 20px",borderRadius:8,border:"none",background:cs.acc,color:cs.isDark?"#0e0f12":"#fff",fontSize:12,fontWeight:700,cursor:"pointer"}}>Save & Connect</button>
           </div>
           <div style={{fontSize:10,color:cs.t4||cs.t3,marginTop:10,opacity:0.6}}>Free tier: 60 calls/min, ~15 min delayed quotes. No credit card required.</div>
         </div>
@@ -637,10 +637,10 @@ export default function App(){
           {[{m:"sim",l:"Simulation",ic:"📊"},{m:"record",l:"Record",ic:"📒"}].map(x=>
             <button key={x.m} onClick={()=>D("CFG",{appMode:x.m})} style={{
               padding:"8px 16px",borderRadius:8,border:"none",
-              background:appMode===x.m?`linear-gradient(135deg,${cs.acc}20,${cs.acc}08)`:  "transparent",
+              background:appMode===x.m?`${cs.acc}14`:  "transparent",
               color:appMode===x.m?cs.acc:cs.t3,fontSize:13,fontWeight:appMode===x.m?700:500,
               cursor:"pointer",fontFamily:cs.f,transition:"all .2s",
-              boxShadow:appMode===x.m?`0 2px 8px ${cs.acc}20`:"none",
+              boxShadow:"none",
             }}>{x.ic} {x.l}</button>
           )}
         </div>
@@ -677,7 +677,7 @@ export default function App(){
 
       {/* Config — Simulation mode only */}
       {showCfg&&appMode==="sim"&&(
-        <div style={{padding:isMobile?12:16,background:cs.sf,borderRadius:12,border:`1px solid ${cs.bd}`,marginBottom:8,boxShadow:cs.sh,backgroundImage:cs.grd,transition:"all .25s"}}>
+        <div style={{padding:isMobile?12:16,background:cs.sf,borderRadius:4,border:`1px solid ${cs.bd}`,marginBottom:8,boxShadow:cs.sh,backgroundImage:cs.grd,transition:"all .25s"}}>
           <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":`repeat(4,1fr)`,gap:8,marginBottom:10}}>
             <Inp cs={cs} l="Investment" v={invest} onChange={v=>D("CFG",{invest:v})} pre="$" fmt tip={{t:"Investment (USD)",d:"Investment amount per period in USD. Start with any amount that fits your budget.",f:"Benchmark: $50-300/mo"}}/>
             <Inp cs={cs} l="Fee" v={fee} onChange={v=>D("CFG",{fee:v})} suf="%" step={.1} tip={{t:"Broker Fee",d:"Trading fee per order. Gotrade ~0.3%, Interactive Brokers ~$1 flat.",f:"Benchmark: <0.5% cost-efficient"}}/>
@@ -705,7 +705,7 @@ export default function App(){
             </div>
           </div>
 
-          <div style={{display:"flex",justifyContent:"space-between",padding:"10px 14px",background:`linear-gradient(135deg,${cs.grn}08,transparent)`,borderRadius:8,alignItems:"center",flexWrap:"wrap",gap:4,border:`1px solid ${cs.grn}20`}}>
+          <div style={{display:"flex",justifyContent:"space-between",padding:"10px 14px",background:`${cs.grn}0d`,borderRadius:8,alignItems:"center",flexWrap:"wrap",gap:4,border:`1px solid ${cs.grn}20`}}>
             <span style={{fontSize:12,color:cs.t3}}>Net per {intv.nm.toLowerCase()}</span>
             <span style={{fontSize:18,fontWeight:700,color:cs.grn,fontFamily:cs.m}}>{$(grossPer,2)}<span style={{fontSize:11,color:cs.t3,fontWeight:400,marginLeft:6}}>({$(invest,0)} × {intv.factor.toFixed(2)})</span></span>
           </div>
@@ -768,9 +768,9 @@ export default function App(){
       {[{id:"main",l:"Dashboard",ic:"📊"},...(appMode==="record"?[{id:"txn",l:"Record",ic:"📒"}]:[]),{id:"proj",l:"Projection",ic:"📈"},{id:"anal",l:"Analysis",ic:"🧠"},...(appMode==="sim"&&savedSims.length>=2?[{id:"compare",l:"Compare",ic:"⚖️"}]:[])].map(n=>
         <button key={n.id} onClick={()=>D("SET",{view:n.id})} style={{
           flex:1,padding:"10px 0",border:"none",fontSize:13,fontWeight:700,cursor:"pointer",fontFamily:cs.f,
-          background:view===n.id?`linear-gradient(135deg,${cs.acc}18,${cs.acc}08)`:"transparent",
+          background:view===n.id?`${cs.acc}14`:"transparent",
           color:view===n.id?cs.acc:cs.t3,borderRadius:8,margin:"0 3px",
-          boxShadow:view===n.id?`0 2px 8px ${cs.acc}15`:"none",transition:"all .2s",
+          boxShadow:"none",transition:"all .2s",
         }}>{n.ic} {n.l}</button>
       )}
     </div>
@@ -814,7 +814,7 @@ export default function App(){
         </div>}
 
         {allocMode==="pct"&&<div style={{display:"flex",height:6,borderRadius:4,overflow:"hidden",marginBottom:8,background:cs.bd}}>
-          {sd.map((x,i)=><div key={i} style={{width:`${x.al}%`,background:`linear-gradient(90deg,${x.etf.c},${x.etf.c}cc)`,transition:"width .3s",boxShadow:`0 0 4px ${x.etf.c}40`}}/>)}
+          {sd.map((x,i)=><div key={i} style={{width:`${x.al}%`,background:`linear-gradient(90deg,${x.etf.c},${x.etf.c}cc)`,transition:"width .3s",}}/>)}
         </div>}
 
         <div style={{display:"flex",gap:8}}>
@@ -826,7 +826,7 @@ export default function App(){
                 background:editIdx===i?`${x.etf.c}10`:"transparent",
                 transition:"all .2s",
               }}>
-                <div style={{width:8,height:8,borderRadius:"50%",background:x.etf.c,flexShrink:0,boxShadow:`0 0 6px ${x.etf.c}60`}}/>
+                <div style={{width:8,height:8,borderRadius:"50%",background:x.etf.c,flexShrink:0,}}/>
                 <span style={{fontSize:13,fontWeight:800,color:x.etf.c,fontFamily:cs.m,width:40}}>{x.tk}</span>
                 <div style={{flex:1,minWidth:0}}>
                   <div style={{fontSize:11,color:cs.t2,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{x.etf.nm}</div>
@@ -950,7 +950,7 @@ export default function App(){
           {l:`Passive Income (yr ${yrs})`,v:`${$(fin.divMo)}/mo`,idr:`${IDR(fin.divMo*idrEnd.rate)}/mo`,c:cs.cyn},
         ];
         return(
-        <Box cs={cs} glow={cs.acc} style={{padding:16,marginTop:10,borderLeft:`3px solid ${cs.acc}`}}>
+        <Box cs={cs} glow={cs.acc} style={{padding:16,marginTop:10,}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
             <span style={{fontSize:14,fontWeight:800,color:cs.acc}}>Final Summary</span>
             <div style={{display:"flex",alignItems:"center",gap:8}}>
@@ -967,7 +967,7 @@ export default function App(){
           <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"1fr 1fr 1fr",gap:8}}>
             {metrics.map((x,i)=>(
               <div key={i} style={{padding:"10px 12px",background:cs.sf2,borderRadius:8,border:`1px solid ${cs.bd}`,
-                backgroundImage:`linear-gradient(135deg,${x.c}08,transparent 60%)`}}>
+                }}>
                 <div style={{fontSize:18,fontWeight:700,color:x.c,fontFamily:cs.m}}>{x.v}</div>
                 {x.idr&&<div style={{fontSize:12,color:cs.amb,fontFamily:cs.m,marginTop:2,opacity:0.85}}>{x.idr}</div>}
                 <div style={{fontSize:11,color:cs.t3,marginTop:3}}>{x.l}{x.rateNote&&<span style={{fontSize:9,color:cs.t3,marginLeft:4}}>@{x.rateNote}</span>}</div>
@@ -979,7 +979,7 @@ export default function App(){
 
       {/* FIRE Independence Tracker */}
       {fin&&(
-        <Box cs={cs} glow={cs.amb} style={{padding:16,marginTop:10,borderLeft:`3px solid ${cs.amb}`}}>
+        <Box cs={cs} glow={cs.amb} style={{padding:16,marginTop:10,}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8,flexWrap:"wrap",gap:6}}>
             <span style={{fontSize:14,fontWeight:800,color:cs.amb}}>FIRE Independence</span>
             <div style={{display:"flex",alignItems:"center",gap:4}}>
@@ -994,7 +994,7 @@ export default function App(){
           </div>
           {fireData&&<>
             <div style={{height:8,background:`${cs.amb}15`,borderRadius:4,overflow:"hidden",marginBottom:8}}>
-              <div style={{height:"100%",width:`${fireData.covPct}%`,background:`linear-gradient(90deg,${cs.amb},${fireData.covPct>=100?cs.grn:cs.amb}cc)`,borderRadius:4,transition:"width .5s",boxShadow:`0 0 8px ${cs.amb}40`}}/>
+              <div style={{height:"100%",width:`${fireData.covPct}%`,background:`linear-gradient(90deg,${cs.amb},${fireData.covPct>=100?cs.grn:cs.amb}cc)`,borderRadius:4,transition:"width .5s",}}/>
             </div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,fontSize:12}}>
               <div><div style={{fontSize:10,color:cs.t3,textTransform:"uppercase",fontWeight:600}}>Coverage</div>
@@ -1058,7 +1058,7 @@ export default function App(){
           </Box>
 
           {/* Bulk generator */}
-          <Box cs={cs} glow={cs.pur} style={{padding:14,marginBottom:8,borderColor:`${cs.pur}30`,backgroundImage:`linear-gradient(135deg,${cs.pur}08,transparent 60%)`}}>
+          <Box cs={cs} glow={cs.pur} style={{padding:14,marginBottom:8,borderColor:`${cs.pur}30`,}}>
             <div style={{fontSize:12,fontWeight:700,color:cs.pur,marginBottom:4}}>⚡ Quick Generate ({intv.nm})</div>
             <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"1fr 1fr 1fr 80px",gap:6}}>
               <Inp cs={cs} l={`# of ${intv.nm.toLowerCase()}`} v={bkN} onChange={setBkN}/>
@@ -1066,7 +1066,7 @@ export default function App(){
               <Inp cs={cs} l="Amount" v={bkAm} onChange={setBkAm} pre="$" ph={x.perUSD>0?x.perUSD.toFixed(0):"0"}/>
               <div style={{display:"flex",alignItems:"flex-end"}}><button onClick={()=>{
                 if(+bkPr>0)D("TX_BULK",{i:editIdx,n:bkN||12,pr:+bkPr,am:+(bkAm||x.perUSD.toFixed(0))});
-              }} style={{padding:"0 10px",height:36,borderRadius:4,border:"none",background:cs.pur,color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",width:"100%"}}>Go</button></div>
+              }} style={{padding:"0 10px",height:36,borderRadius:4,border:"none",background:cs.pur,color:cs.isDark?"#0e0f12":"#fff",fontSize:12,fontWeight:700,cursor:"pointer",width:"100%"}}>Go</button></div>
             </div>
             <div style={{fontSize:11,color:cs.t3,marginTop:4}}>Generate {bkN} entries × {$(+(bkAm||x.perUSD.toFixed(0)))} every {intv.nm.toLowerCase()}</div>
           </Box>
@@ -1140,10 +1140,10 @@ export default function App(){
             <div style={{display:"flex",gap:2,background:cs.sf2,borderRadius:8,padding:2,border:`1px solid ${cs.bd}`}}>
               {[1,3,5,7,10,15,20].map(y=><button key={y} onClick={()=>D("CFG",{yrs:y})} style={{
                 padding:"4px 10px",borderRadius:6,border:"none",
-                background:yrs===y?`linear-gradient(135deg,${cs.acc}20,${cs.acc}08)`:"transparent",
+                background:yrs===y?`${cs.acc}14`:"transparent",
                 color:yrs===y?cs.acc:cs.t3,fontSize:11,fontWeight:yrs===y?700:500,
                 cursor:"pointer",fontFamily:cs.m,transition:"all .2s",minWidth:30,textAlign:"center",
-                boxShadow:yrs===y?`0 1px 4px ${cs.acc}20`:"none",
+                boxShadow:"none",
               }}>{y}y</button>)}
             </div>
             <Inp cs={cs} v={adj} onChange={v=>D("CFG",{adj:v})} pre="±" suf="%" w={80} step={.5}/>
@@ -1243,7 +1243,7 @@ export default function App(){
 
       {/* Cost of Waiting */}
       {costOfWait.length>0&&(
-        <Box cs={cs} glow={cs.red} style={{padding:14,marginBottom:10,borderLeft:`3px solid ${cs.red}`}}>
+        <Box cs={cs} glow={cs.red} style={{padding:14,marginBottom:10,}}>
           <div style={{fontSize:14,fontWeight:700,color:cs.red,marginBottom:4}}>Cost of Waiting</div>
           <div style={{fontSize:11,color:cs.t2,marginBottom:8}}>Potential loss by delaying your DCA start (same {yrs}yr horizon)</div>
           <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"repeat(4,1fr)",gap:6}}>
@@ -1319,7 +1319,7 @@ export default function App(){
       </Box>
 
       {/* Portfolio Health Score */}
-      <Box cs={cs} glow={healthScore.c} style={{padding:16,marginBottom:10,borderLeft:`3px solid ${healthScore.c}`}}>
+      <Box cs={cs} glow={healthScore.c} style={{padding:16,marginBottom:10,}}>
         <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:10}}>
           <div style={{width:60,height:60,borderRadius:"50%",background:`${healthScore.c}15`,border:`3px solid ${healthScore.c}`,display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",flexShrink:0}}>
             <div style={{fontSize:20,fontWeight:800,fontFamily:cs.m,color:healthScore.c,lineHeight:1}}>{healthScore.score}</div>
