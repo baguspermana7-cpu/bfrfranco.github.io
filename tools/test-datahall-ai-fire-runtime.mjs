@@ -137,7 +137,7 @@ try {
     await activateTab(tab, set, entry('points'));
 
     /* R4 — impair Z12 (the strip already carries the page's standing criticals, e.g. UPS loading; only the deltas are ours) */
-    await activateTab(tab, set, set.diagrams.find((d) => d.selector === '#coolSvg')); await sleep(4600);
+    await activateTab(tab, set, set.diagrams.find((d) => d.selector === '#hmiCoolSvg')); await sleep(4600);
     const st0 = await strip(tab, 'p-cool');
     await activateTab(tab, set, entry('points'));
     const impair = await tab.evaluate(() => {
@@ -150,9 +150,9 @@ try {
     const sm4 = await summary(tab);
     note(sm4.impairedZones.join() === 'DH-01-Z12' && sm4.fireWatch && sm4.releaseInhibitedZones.join() === 'DH-01-Z12', `R4 summary impaired: ${JSON.stringify({ impaired: sm4.impairedZones, fw: sm4.fireWatch, disabled: sm4.disabled })}`);
     await activateTab(tab, set, entry('zones'));
-    const tile = await tab.evaluate(() => { const t = document.querySelector('[data-rz-equipment="fire-zone:DH-01-Z12"]'); return { state: t.getAttribute('data-state'), text: t.textContent }; });
+    const tile = await tab.evaluate(() => { const t = document.querySelector('.rz-fire-tile[data-rz-equipment="fire-zone:DH-01-Z12"]'); return { state: t.getAttribute('data-state'), text: t.textContent }; });
     note(tile.state === 'impaired' && /IMPAIRED/.test(tile.text) && /RELEASE INHIBITED/.test(tile.text), `R4 zone tile reads impaired (${JSON.stringify(tile)})`);
-    await activateTab(tab, set, set.diagrams.find((d) => d.selector === '#coolSvg'));
+    await activateTab(tab, set, set.diagrams.find((d) => d.selector === '#hmiCoolSvg'));
     const banner = await tab.evaluate(() => { const b = document.getElementById('fireImpairmentBanner'); const r = b.getBoundingClientRect(); return { hidden: b.hidden, tone: b.getAttribute('data-tone'), text: b.textContent.replace(/\s+/g, ' '), visible: r.height > 0 }; });
     note(!banner.hidden && banner.visible && /FIRE WATCH/.test(banner.text) && /impaired/.test(banner.text) && banner.tone === 'warn', `R4 page-wide banner on the cooling tab: ${JSON.stringify(banner)}`);
     await sleep(4600);                                            /* the strip repaints every 4 s */

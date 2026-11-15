@@ -115,6 +115,7 @@ gate "DC AI electrical — four-second live parity" node tools/test-datahall-ai-
 gate "DC AI fire — FACP cause and effect" node tools/test-datahall-ai-fire-cause-effect.mjs
 gate "DC AI fire workstation — inventory formula, isolation refusals, two-means rule, records, expiry, purity" node --test tools/test-datahall-ai-fire-points.mjs
 gate "DC AI fire workstation — runtime: scoped sub-tabs, isolate via inspector, impairment banner + strip, C&E block, persistence" node tools/test-datahall-ai-fire-runtime.mjs
+gate "DC AI HMI drawings — H0 ratchet, H1 paint, H2 library, H4 names, H5 text budget, H6 fit 1440/390, H13 first open, F1-F9 fire sheet (R128-R134, R143)" node tools/test-dh-drawings.mjs
 gate "DC AI operator UI — markup contract" node tools/test-datahall-ai-operator-ui.mjs
 gate "DC AI operator UI — runtime contract" node tools/test-datahall-ai-operator-runtime.mjs
 gate "EPMS — ATS-to-rack source colour" node tools/test-epms-ats-rack-color.mjs
@@ -168,6 +169,12 @@ gate "Conventional alarms — common historian workspace" node --test tools/test
 gate "Conventional alarms — modal runtime and accessibility" node tools/test-conv-alarm-runtime.mjs
 gate "Conventional cooling/water — operator UI" node --test tools/test-conv-cooling-water-ui.mjs
 gate "Conventional fire/fuel — operator consequences" node --test tools/test-conv-fire-fuel-operator.mjs
+# audit F2 / rz-ops hardening (v3.57.1, v3.57.7) and the Finance Terminal gateway (v3.58.4): CLAUDE.md lists these as
+# mandatory and gate [107] failed on origin/main because none was wired (same lines as the pending v3.59 branch)
+gate "rz-ops access — forged session / non-root sees the login, only tier=root sees the console, no injected markup, 390 px" node tools/test-rz-ops-access.mjs
+gate "rz-ops theme — embedded apps follow the console theme, AA contrast both themes, measured health, no violet (w5)" node tools/test-rz-ops-theme.mjs
+gate "Feature overrides + educator role from Supabase, never the visitor's localStorage (audit F2)" node tools/test-feature-overrides.mjs
+gate "Finance Terminal — market data only through the gateway, no CORS proxy, no fake zero (v3.58.4)" node tools/test-finance-terminal-data.mjs
 gate "Conventional dashboard — complete authority and Design Studio" node tools/test-conv-dashboard-authority.mjs
 gate "Conventional Design Studio — document selection, scope, and export" node tools/test-conv-design-studio-browser.mjs
 gate "Conventional ICT and EPMS — complete authority fail-close" node tools/test-conv-secondary-authority.mjs

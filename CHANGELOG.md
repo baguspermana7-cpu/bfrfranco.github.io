@@ -11,6 +11,66 @@ release sections rather than semver.
 
 ---
 
+## v3.60.0 — 2026-11-15 — datahallAI drawings redrawn as HMI sheets (R128–R147)
+
+### Added
+- **datahallAI: an HMI drawing layer** replaces four drawings in place (owner R128 "ganti total gambar", shipped
+  straight from the mock on R143): Cooling & Piping → sheet DH-M-103 (the CDU line of DH-01, every CDU from the
+  engine's installed count, duty + standby pumps, plate HX, TCS out/in) with a CDU-nn sheet as the L3 modal;
+  DH-01 Electrical SLD → DH-E-101 (feeds A and B, MV incomers, transformers, MSB, UPS, busway, rack PSU);
+  Rack Architecture → DH-R-101 (GB300 NVL72 front and rear elevation, 48 U, busbar, manifold); Fire → Mimic →
+  DH-F-101 (FACP-01 with NAC-1 / NAC-2 / NET, SLC loops L1–L3 with a loop isolator at each entry and an end cap on
+  every branch, every addressable device of DH-01 — 133 devices = `fire-points.js` inventory —, 12 zones, VESDA
+  VD-1..4 with one sampling pipe per zone and 50 sampling ports = inventory, zoned EPO, the clean-agent release row
+  (abort, release, pre-action solenoid, agent pressure) and cylinder PS-1).
+  Every count is a formula over the engine snapshot or the fire inventory; the previous drawing in each box is
+  retired (`data-dh2-retired`), not deleted.
+- **Six more sheets (owner R139 "finish all"):** Electrical → Overview → DH-E-001 (site single-line: HV intake,
+  main transformers, MV boards with their feeders, tie, the genset pool — every count from `distribution.*` and
+  `equipment.gensets_*`); Network → Compute fabric → DH-N-101 (cores, spines, leaves and the rack NICs from
+  `network.*`, mesh drawn as routes); Room Layout → DH-A-101 (the DH-01 plan at 1 : 100 from `geometry.*`: fan-wall
+  galleries with every CRAH module, 20 rows × 22 racks, cross aisle, CDU gallery with 55 CDUs, fire zones Z01–Z08,
+  support rooms Z09–Z12, doors, egress, scale bar, north arrow — mounted in keep mode beside the building isometric
+  and per-level plans, which stay); BMS → DH-B-101 (field buses → controllers → gateways → ring A/B → servers and
+  applications from the page's `BMS_MODEL` with engine device counts)); Network → Corporate & DC internet → DH-N-102 (carriers, scrubbing,
+  border routers, NGFW pair, campus core); Network → Security network → DH-N-104 (IEC 62443 zones Z-EXT … Z0, conduits
+  C1–C7 with their enforcement points).
+- **Deep shading (owner R139/R140 "detail deep shader", default on):** the renderer owns one `<defs>` block
+  (`hmi-g-run / run2 / off / panel / zone / canvas` gradients, `hmi-f-soft / lift / glow` filters); symbol bodies
+  take a soft fill by state, pipes and cables read as tubes (shadow under, crest on top, width by line class), the
+  canvas and title block gain depth, alarm states glow. A **Shade** button on every sheet switches to the flat
+  ISA-101 register and the choice persists (`localStorage rz_hmi_shade`); `prefers-reduced-motion` drops the
+  filters. Plan-view zones and rooms stay outline-only so the equipment reads.
+- **PME / BMS screens, no prose (owner R144):** every sheet carries tags, values and line ids only — descriptive
+  notes, band names, basis strings and the title block are gone; titles are short upper-case (`DH-01 CDU LINE`).
+- **One drawing toolchain (owner R147):** edges without hand-set via points are routed by the RZ diagram engine
+  (`RZDiagramLayout.route`) around symbol bodies; symbols come from one pipeline (`tools/hmi-symbol-defs.py` →
+  `assets/engineering/*.svg` → `js/rz-eng-symbols.js`).
+- **Cooling:** DH-M-103 draws the chiller plant that closes the HTW loop (CH-01 … CH-nn from the engine); a click on a
+  CDU opens the page's CDU modal (focus trap, inert background) with the CDU-nn sheet inside.
+- **Shared pieces:** `js/rz-eng-symbols.js` (+78 HMI symbols with ports, states, standards — ISO 10628 / ISA-5.1 /
+  IEC 60617 / NFPA 170), `js/rz-hmi-sheet.js` (sheet renderer: fit / zoom / pan, LOD text, flow arrows and dash
+  march on running lines only, trace, tooltips from the live payload, keyboard focus on every item),
+  `css/rz-hmi.css` (ISA-101 register: grey line work, colour only for abnormal state, alarm hues used for nothing
+  else), `css/rz-dh-shell.css` (one-row shell, sidebar pinned / auto-hide / hidden), `js/datahall-ai/hmi-sheets.js`,
+  `js/datahall-ai/hmi-v2.js` (mount + payload binding; fire points keep their full inventory id and take their
+  state from the workstation snapshot).
+- Gate `tools/test-dh-drawings.mjs` in the ship gate: H0 ratchet (≥ 10 HMI sheets, may only grow), H1 paint only
+  from the renderer's own `<defs>` (no foreign gradient / filter / shadow), H15 the Shade toggle (deep by default,
+  flat after one click, flat after reload), H16 edges through a symbol body (reported), H17 shading filters per
+  layer, never per symbol (≤ 12 filtered elements per sheet — 599 per-node shadows made a tab take 25–36 s), H2 library-only, H4 title + focus, H5 ≤ 8 words per sheet, H6 fit-to-width at 1440
+  and 390, H13 first open, F1–F9 on the fire sheet (mounted, 12 zones, devices = inventory, no `unknown` state, no
+  overlapping symbols, no page overflow, no console error). H3 (own L3 modal per class) and H11/H12 (shell) are
+  reported and block only with `--strict-all` until their phases land.
+- Standard `standarization/HMI_DRAWING_STANDARD.md` (sheet object v1, live binding, laws, local mock seam).
+
+### Changed
+- `tools/build-dh-drawings-mock.mjs`: the local mock opens unlocked on 127.0.0.1 / localhost through the documented
+  premium test seam (owner R142); inert on any other host.
+
+### Not in this release (next)
+- The remaining cooling (101/102/104/105), electrical (DH-02…08, 002/003) and fire (102–104) sheets; the Room Layout building isometric and per-level plans as sheets; L3 schematics for every class
+  (H3 ratchet); R135 commissioning scenarios on these drawings.
 ## v3.58.5 — 2026-11-14 — Finance Terminal names a blocked gateway instead of timing out tile by tile
 
 ### Fixed

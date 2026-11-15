@@ -142,9 +142,16 @@ try {
                 }
                 await tab.click('.rz-inspector-tab[data-tab="live"]');
                 await sleep(100);
-                const cell = await tab.$('.rz-inspector .rz-inspector-v[data-basis-param]');
+                /* query + click in one page turn: the inspector repaints its live rows on every sim tick, so a handle
+                   taken in one round trip can be detached by the next ("Node is detached from document") */
+                const cell = await tab.evaluate(() => {
+                    const c = document.querySelector('.rz-inspector .rz-inspector-v[data-basis-param]');
+                    if (!c) return false;
+                    c.scrollIntoView({ block: 'center' });
+                    c.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
+                    return true;
+                });
                 if (cell) {
-                    await cell.click();
                     await sleep(250);
                     const b = await inspectorState(tab);
                     note(b.open && b.basis && !b.modalOpen && /Value/.test(b.body), `${row.view}: hooked cell enters basis mode (${JSON.stringify(b.body.slice(0, 80))})`);

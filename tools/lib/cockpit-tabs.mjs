@@ -61,10 +61,10 @@ export const TAB_SETS = Object.freeze({
             { tab: 'over', selector: '#floorSvg', label: 'floor plan — roof',
               reveal: { click: '#bldgSvg [data-floor="roof"]', expect: '#floorDetail' } },
             { tab: 'hall', selector: '#hSvg', label: 'data hall' },
-            { tab: 'rack', selector: '#rackSvg', label: 'rack architecture' },
-            { tab: 'cool', selector: '#coolSvg', label: 'cooling P&ID' },
-            { tab: 'elec', sub: 'overview', selector: '#elecOvSvg', label: 'electrical overview' },
-            { tab: 'elec', sub: 'dh01', selector: '#elecDH1Svg', label: 'DH-01 SLD' },
+            { tab: 'rack', selector: '#hmiRackSvg', label: 'rack architecture' },
+            { tab: 'cool', selector: '#hmiCoolSvg', label: 'cooling P&ID' },
+            { tab: 'elec', sub: 'overview', selector: '#hmiElecOvSvg', label: 'electrical overview' },
+            { tab: 'elec', sub: 'dh01', selector: '#hmiElecDH1Svg', label: 'DH-01 SLD' },
             { tab: 'elec', sub: 'dh02', selector: '#elecDH2Svg', label: 'DH-02 SLD' },
             { tab: 'elec', sub: 'dh03', selector: '#elecDH3Svg', label: 'DH-03 SLD' },
             { tab: 'elec', sub: 'dh04', selector: '#elecDH4Svg', label: 'DH-04 SLD' },
@@ -75,16 +75,16 @@ export const TAB_SETS = Object.freeze({
             { tab: 'elec', sub: 'dh08', selector: '#elecDH8Svg', label: 'DH-08 SLD' },
             /* v2.13.0 §A7 — the Network tab is three views behind one scoped sub-bar (#netTabs,
                data-np, np-*), the same entry-level override the fire workstation uses. */
-            { tab: 'net', sub: 'fabric', selector: '#netSvg', label: 'network compute fabric', subBar: '#netTabs', subAttr: 'data-np', subPanelPrefix: 'np-' },
-            { tab: 'net', sub: 'wan', selector: '#wanSvg', label: 'corporate and DC internet', subBar: '#netTabs', subAttr: 'data-np', subPanelPrefix: 'np-' },
-            { tab: 'net', sub: 'sec', selector: '#secSvg', label: 'security zones and conduits', subBar: '#netTabs', subAttr: 'data-np', subPanelPrefix: 'np-' },
+            { tab: 'net', sub: 'fabric', selector: '#hmiNetSvg', label: 'network compute fabric', subBar: '#netTabs', subAttr: 'data-np', subPanelPrefix: 'np-' },
+            { tab: 'net', sub: 'wan', selector: '#hmiWanSvg', label: 'corporate and DC internet', subBar: '#netTabs', subAttr: 'data-np', subPanelPrefix: 'np-' },
+            { tab: 'net', sub: 'sec', selector: '#hmiSecSvg', label: 'security zones and conduits', subBar: '#netTabs', subAttr: 'data-np', subPanelPrefix: 'np-' },
             /* v2.3.0 §A6 — the fire workstation: three HTML views and the mimic behind one scoped sub-bar.
                Points is listed FIRST so the panel's HTML is measured with its default view visible. */
             { tab: 'fire', sub: 'points', kind: 'html', selector: '#fp-points', label: 'fire point list', subBar: '#fireTabs', subAttr: 'data-fp', subPanelPrefix: 'fp-' },
             { tab: 'fire', sub: 'zones', kind: 'html', selector: '#fp-zones', label: 'fire zones', subBar: '#fireTabs', subAttr: 'data-fp', subPanelPrefix: 'fp-' },
             { tab: 'fire', sub: 'cause-effect', kind: 'html', selector: '#fp-cause-effect', label: 'fire cause & effect', subBar: '#fireTabs', subAttr: 'data-fp', subPanelPrefix: 'fp-' },
-            { tab: 'fire', sub: 'mimic', selector: '#fireSvg', label: 'fire mimic', subBar: '#fireTabs', subAttr: 'data-fp', subPanelPrefix: 'fp-' },
-            { tab: 'bms', selector: '#bmsSvg', label: 'BMS architecture' },
+            { tab: 'fire', sub: 'mimic', selector: '#hmiFireSvg', label: 'fire mimic', subBar: '#fireTabs', subAttr: 'data-fp', subPanelPrefix: 'fp-' },
+            { tab: 'bms', selector: '#hmiBmsSvg', label: 'BMS architecture' },
         ]),
     }),
 });
@@ -181,9 +181,11 @@ export async function activateTab(page, set, entry) {
         const el = document.querySelector(selector);
         if (!el) return false;
         if (kind === 'html') { const b = el.getBoundingClientRect(); return b.width > 2 && b.height > 2; }
-        const text = el.querySelector('text');
-        if (!text) return true;                     // a diagram with no labels is legitimately ready
-        return text.getBoundingClientRect().height > 0;
+        const texts = [...el.querySelectorAll('text')];
+        if (!texts.length) return true;             // a diagram with no labels is legitimately ready
+        /* an HMI sheet hides its level-of-detail text (data-lod) below the LOD floor, so the first <text> may be
+           legitimately 0 x 0 — ready means ANY label has a box (v3.60.0: the fire mimic's first text is an LOD-2 note) */
+        return texts.some((t) => t.getBoundingClientRect().height > 0);
     }, { timeout: READINESS_MS }, entry.selector, entry.kind || 'svg');
 
     /* Rule 3 — two frames, so any level-of-detail pass triggered by the tab change has applied. */
