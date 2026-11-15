@@ -119,6 +119,7 @@ gate "DC AI fire — FACP cause and effect" node tools/test-datahall-ai-fire-cau
 gate "DC AI fire workstation — inventory formula, isolation refusals, two-means rule, records, expiry, purity" node --test tools/test-datahall-ai-fire-points.mjs
 gate "DC AI fire workstation — runtime: scoped sub-tabs, isolate via inspector, impairment banner + strip, C&E block, persistence" node tools/test-datahall-ai-fire-runtime.mjs
 gate "DC AI HMI drawings — H0 ratchet, H1 paint, H2 library, H4 names, H5 text budget, H6 fit 1440/390, H13 first open, F1-F9 fire sheet (R128-R134, R143)" node tools/test-dh-drawings.mjs
+gate "DC AI operator truth — one state model, no state without evidence, flow only with evidence, quality on values, alarm badge without colour, reduced motion (O1-O5, O8; BMS master prompt)" node tools/test-dh-operator.mjs
 gate "DC AI operator UI — markup contract" node tools/test-datahall-ai-operator-ui.mjs
 gate "DC AI operator UI — runtime contract" node tools/test-datahall-ai-operator-runtime.mjs
 gate "EPMS — ATS-to-rack source colour" node tools/test-epms-ats-rack-color.mjs

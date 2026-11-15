@@ -230,6 +230,7 @@ async function verifyControl(page, control) {
     assert.equal(await page.$eval('#simPlay', (node) => node.getAttribute('aria-pressed')), 'false');
     assert.equal(await page.$eval('#simStep', (node) => node.disabled), false);
   } else if (control === 'datahallai') {
+    await page.evaluate(() => { const d = document.getElementById('faqTrig')?.closest('details'); if (d) d.open = true; });   // v3.60 shell: FAQ sits in the Docs menu
     await page.click('#faqTrig');
     assert.ok(await page.$('#rzFaqDialog'));
   } else if (control === 'conventional') {

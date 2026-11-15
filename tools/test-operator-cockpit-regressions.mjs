@@ -480,7 +480,7 @@ try {
       const beforeStyle = getComputedStyle(document.body, '::before');
       const afterStyle = getComputedStyle(document.body, '::after');
       return {
-        chip: document.querySelector('.hdr h1 .chip')?.textContent?.trim(),
+        chip: document.querySelector('.hdr h1 .chip, .hdr .dh2-nav .chip, #datahallAuthorityChip')?.textContent?.trim() || '',   // v3.60 shell: the chip lives in the nav row
         provenance: document.querySelector('.rz-tq-banner-label')?.textContent?.trim(),
         slotInHeader: Boolean(slot && slot.closest('.hdr')),
         header: rect(header),
@@ -510,7 +510,7 @@ try {
           afterContent: afterStyle.content,
           afterImage: afterStyle.backgroundImage,
         },
-        headerDotAnimation: getComputedStyle(document.querySelector('.hdr-r > .dot')).animationName,
+        headerDotAnimation: (() => { const d = document.querySelector('.hdr-r > .dot, .hdr .dh2-nav .dot'); return d ? getComputedStyle(d).animationName : 'missing'; })(),   // v3.60 one-row shell moves the status dot into the nav row
         horizontalOverflow: document.documentElement.scrollWidth - window.innerWidth,
       };
     });
@@ -588,6 +588,7 @@ try {
         `AI mobile telemetry spine did not expose its detail (${expandedSidebar.height}px)`);
       assert.match(expandedSidebar.label, /collapse/i,
         'expanded mobile telemetry spine must advertise the inverse action');
+      await page.evaluate(() => { const d = document.getElementById('bodTrig')?.closest('details'); if (d) d.open = true; });   // v3.60 shell: Basis of Design sits in the Docs menu
       await page.click('#bodTrig');
       await page.waitForSelector('#bodDrawer.show', { timeout: 5_000 });
       const drawerLayout = await page.evaluate(() => {

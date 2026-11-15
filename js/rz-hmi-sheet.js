@@ -176,7 +176,7 @@
           ? '<text data-role="line" data-lod="2" x="' + r1(lx) + '" y="' + r1(ly - 4) + '" text-anchor="middle">' + esc(e.line) + '</text>'
           : '<text data-role="line" data-lod="2" transform="translate(' + r1(lx - 4) + ' ' + r1(ly) + ') rotate(-90)" text-anchor="middle">' + esc(e.line) + '</text>';
       }
-      graph.push({ id: id, a: endNode(e.from), b: endNode(e.to), flowOf: e.flowOf });
+      graph.push({ id: id, a: endNode(e.from), b: endNode(e.to), flowOf: e.flowOf, m: e.medium || 'line', w: e.w || 'branch' });
     });
     sheet.nodes.forEach(function (n) {
       if (n.sym === 'junction') { nodeSvg += '<circle class="hmi-junction" data-junction="' + esc(n.id) + '" cx="' + r1(n.x) + '" cy="' + r1(n.y) + '" r="' + (n.dot === false ? 0 : 2.2) + '"/>'; return; }
@@ -199,6 +199,12 @@
           textSvg += '<text data-role="tag" data-tag-of="' + esc(n.id) + '"' + (n.lod ? ' data-lod="' + n.lod + '"' : '') + ' text-anchor="end" transform="translate(' + r1(n.x + 3) + ' ' + r1(n.y + h + 4) + ') rotate(-90)">' + esc(n.tag) + '</text>';
         } else {
           textSvg += '<text data-role="tag" data-tag-of="' + esc(n.id) + '"' + (n.lod ? ' data-lod="' + n.lod + '"' : '') + ' x="' + r1(tx) + '" y="' + r1(ty) + '" text-anchor="' + anchor + '">' + esc(n.tag) + '</text>';
+          /* R149: the equipment name (short, upper case) and its rating sit under the tag — a reader finds the CRAH, the
+             chiller, the CDU by name, not by guessing from a symbol */
+          var step = at === 'above' ? -12 : 12, ly = ty;   // 12: a 10 px tag over a 9 px name must not share a pixel row (geometry gate G1)
+          if (n.name) { ly += step; textSvg += '<text data-role="name" data-name-of="' + esc(n.id) + '"' + (n.lod ? ' data-lod="' + n.lod + '"' : '') + ' x="' + r1(tx) + '" y="' + r1(ly) + '" text-anchor="' + anchor + '">' + esc(n.name) + '</text>'; }
+          if (n.rating) { ly += step; textSvg += '<text data-role="value" data-rating-of="' + esc(n.id) + '" x="' + r1(tx) + '" y="' + r1(ly) + '" text-anchor="' + anchor + '">' + esc(n.rating) + '</text>'; }
+          if (n.values && n.values.length && (n.name || n.rating)) ty = ly;
         }
         (n.values || []).forEach(function (v, j) {
           var vx = v.dx != null ? n.x + v.dx : tx, vy = v.dy != null ? n.y + v.dy : ty + 10 * (j + 1);
@@ -209,33 +215,68 @@
     (sheet.notes || []).forEach(function (t) {
       textSvg += '<text data-role="' + (t.role || 'label') + '" x="' + t.x + '" y="' + t.y + '"' + (t.anchor ? ' text-anchor="' + t.anchor + '"' : '') + (t.lod ? ' data-lod="' + t.lod + '"' : '') + '>' + esc(t.text) + '</text>';
     });
-    var tb = sheet.titleblock === true ? titleBlock(sheet, W, H) : '';   // R144: PME/BMS screens carry no title block; the bar holds no + title
+    // R149 loop legend: one stroke sample per medium with its loop name (FWS vs TCS vs CHW ...), top-right of the sheet
+    var lg = '';
+    (sheet.legend || []).forEach(function (it, i) {
+      var at = sheet.legendAt || [W - 200, 16], cols = sheet.legendCols || 1, per = Math.ceil(sheet.legend.length / cols);
+      var lx = at[0] + Math.floor(i / per) * 210, ly = at[1] + (i % per) * 14;
+      lg += '<path class="hmi-edge m-' + esc(it[0]) + ' w-main" d="M' + lx + ' ' + ly + ' L' + (lx + 26) + ' ' + ly + '"/>' +
+        '<text data-role="legend" x="' + (lx + 32) + '" y="' + (ly + 3) + '">' + esc(it[1]) + '</text>';
+    });
+    if (lg) lg = '<g class="hmi-legend">' + lg + '</g>';
+    var tb = (sheet.titleblock === true ? titleBlock(sheet, W, H) : '') + lg;   // R144: PME/BMS screens carry no title block; the bar holds no + title
 
     host.innerHTML = '';
     var frame = doc.createElement('div');
     frame.className = 'hmi-frame';
     frame.setAttribute('data-sheet-frame', sheet.id);
     frame.setAttribute('data-shade', shadeMode());
+    /* equipment finder (owner brief O9): every item with a payload by tag and name — on a phone the fitted sheet is too
+       small to tap, so choosing an item zooms to it, marks it selected and moves focus there */
+    var findable = sheet.nodes.filter(function (n) { return n.cls && n.tag && n.sym !== 'junction'; });
+    var findOpts = findable.map(function (n) { return '<option value="' + esc(n.id) + '">' + esc(n.tag + (n.name ? ' · ' + n.name : '')) + '</option>'; }).join('');
     frame.innerHTML = '<div class="hmi-bar"><span class="hmi-sheet-no">' + esc(sheet.no) + '</span><span class="hmi-title">' + esc(sheet.title) + '</span><span class="hmi-sp"></span>' +
+      (findable.length ? '<select class="hmi-find" data-find aria-label="Find equipment on ' + esc(sheet.no) + '"><option value="">Find…</option>' + findOpts + '</select>' : '') +
       '<button type="button" class="hmi-btn" data-z="out" aria-label="Zoom out" title="Zoom out">−</button>' +
       '<button type="button" class="hmi-btn" data-z="fit" aria-label="Fit to width" title="Fit to width">Fit</button>' +
       '<button type="button" class="hmi-btn" data-z="in" aria-label="Zoom in" title="Zoom in">+</button>' +
       '<button type="button" class="hmi-btn hmi-btn-shade" data-shade-btn aria-pressed="' + (shadeMode() === 'deep' ? 'true' : 'false') + '" aria-label="Shaded drawing (off = flat ISA-101 line work)" title="Shaded drawing (off = flat ISA-101 line work)">Shade</button></div>' +
-      '<svg class="hmi-svg lod-1" xmlns="' + NS + '" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(sheet.no + ' ' + sheet.title) + '" id="' + esc(sheet.svgId || ('hmi-' + sheet.id)) + '">' +
+      '<div class="hmi-vp" style="--hmi-min-w:' + Math.round(W * (sheet.minScale || 0.9)) + 'px">' +
+      '<svg class="hmi-svg lod-1" xmlns="' + NS + '" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(sheet.no + ' ' + sheet.title) + '" id="' + esc(sheet.svgId || ('hmi-' + sheet.id)) + '"' +
+        ' data-rz-authored-basis="' + esc('HMI sheet ' + sheet.no + ': counts, ratings and design temperatures come from the DC AI engine snapshot (' + (sheet.basis || 'engine') + ') through js/datahall-ai/hmi-sheets.js; live values and states from the equipment payload (hmi-payloads.js)') + '">' +
       '<rect class="hmi-canvas" x="0" y="0" width="' + W + '" height="' + H + '"/><g class="hmi-areas">' + areaSvg + '</g><g class="hmi-edges"><g class="hmi-edge-shadows">' + shadowSvg + '</g>' + edgesSvg + '<g class="hmi-edge-his">' + hiSvg + '</g>' + flowSvg + arrowSvg + '</g><g class="hmi-lines">' + lineSvg + '</g>' +
-      '<g class="hmi-nodes">' + nodeSvg + '</g><g class="hmi-text">' + textSvg + '</g>' + tb + '</svg>' +
+      '<g class="hmi-nodes">' + nodeSvg + '</g><g class="hmi-text">' + textSvg + '</g>' + tb + '</svg>' + '</div>' +
       '<div class="hmi-mini" aria-hidden="true"><svg viewBox="0 0 ' + W + ' ' + H + '"><rect x="0" y="0" width="' + W + '" height="' + H + '" fill="none" stroke="currentColor" stroke-width="4"/><rect class="vp" x="0" y="0" width="' + W + '" height="' + H + '"/></svg></div>';
     host.appendChild(frame);
     var svg = frame.querySelector('svg.hmi-svg'), vpRect = frame.querySelector('.hmi-mini .vp');
 
     /* ── zoom / pan through the viewBox (fit-to-width at 1×) ───────────────────────────────── */
     var view = { x: 0, y: 0, w: W, h: H, z: 1 };
-    function apply() {
+    /* while the view moves, the shading layers (filters, tube shadows / crests) are dropped and come back 180 ms after it
+       stops: a zoom or pan re-rasterises the sheet every frame, and shadows are the first cost to shed (owner brief) */
+    /* during a gesture the drawn sheet is moved by a GPU transform (no re-raster per frame, like a map viewer); the real
+       viewBox — and sharp text, LOD and shading — is committed when the view settles. Without a laid-out SVG (hidden tab)
+       the viewBox is committed at once. */
+    var movingT = null, applied = 0, committed = { x: 0, y: 0, w: W, h: H };
+    function commit() {
+      clearTimeout(movingT); movingT = null;
+      svg.style.transform = ''; svg.style.transformOrigin = '';
       svg.setAttribute('viewBox', r1(view.x) + ' ' + r1(view.y) + ' ' + r1(view.w) + ' ' + r1(view.h));
+      committed = { x: view.x, y: view.y, w: view.w, h: view.h };
       svg.classList.toggle('lod-1', view.z < 1.6);
       svg.classList.toggle('lod-2', view.z < 3);
+      frame.removeAttribute('data-moving');
+    }
+    function apply() {
       frame.classList.toggle('is-zoomed', view.z > 1.01);
       vpRect.setAttribute('x', view.x); vpRect.setAttribute('y', view.y); vpRect.setAttribute('width', view.w); vpRect.setAttribute('height', view.h);
+      var px = svg.clientWidth;
+      if (!applied++ || !px) { commit(); return; }
+      var sc = committed.w / view.w, k = px / committed.w;
+      svg.style.transformOrigin = '0 0';
+      svg.style.transform = 'translate(' + r1(-sc * k * (view.x - committed.x)) + 'px,' + r1(-sc * k * (view.y - committed.y)) + 'px) scale(' + sc.toFixed(4) + ')';
+      frame.setAttribute('data-moving', '');
+      clearTimeout(movingT); movingT = setTimeout(commit, 180);
     }
     function zoomAt(f, cx, cy) {
       var z = Math.max(1, Math.min(6, view.z * f));
@@ -256,6 +297,7 @@
       var b = ev.target.closest('[data-z]'); if (!b) return;
       var z = b.getAttribute('data-z');
       if (z === 'fit') fit(); else zoomAt(z === 'in' ? 1.5 : 1 / 1.5);
+      commit();   // a button is one discrete step, not a gesture: its viewBox holds at once (conv B5 reads it right after the click)
     });
     svg.addEventListener('wheel', function (ev) {
       if (!ev.ctrlKey && view.z === 1 && !ev.altKey) return;      // a plain wheel scrolls the page at 1×
@@ -316,27 +358,54 @@
     });
 
     /* ── live values + states ─────────────────────────────────────────────────────────────── */
+    /* element lookups cached once (a repaint of ~600 nodes did ~600 attribute-selector scans); attributes written only
+       when they change, so an unchanged repaint triggers no style recalculation */
+    var elCache = null;
+    function els() {
+      if (elCache) return elCache;
+      elCache = { node: {}, val: {}, edge: {}, arrows: {} };
+      svg.querySelectorAll('.hmi-node[data-node]').forEach(function (g) { elCache.node[g.getAttribute('data-node')] = g; });
+      svg.querySelectorAll('[data-val]').forEach(function (t) { elCache.val[t.getAttribute('data-val')] = t; });
+      svg.querySelectorAll('[data-edge], [data-edge-flow]').forEach(function (p) { var k = p.getAttribute('data-edge') || p.getAttribute('data-edge-flow'); (elCache.edge[k] = elCache.edge[k] || []).push(p); });
+      svg.querySelectorAll('[data-edge-arrows]').forEach(function (a) { elCache.arrows[a.getAttribute('data-edge-arrows')] = a; });
+      return elCache;
+    }
+    function setA(el, k, v) { if (v == null || v === false) { if (el.hasAttribute(k)) el.removeAttribute(k); } else if (el.getAttribute(k) !== String(v)) el.setAttribute(k, v); }
     function update() {
       if (!opts.read) return;
+      var E = els();
       sheet.nodes.forEach(function (n) {
-        var d = opts.read(n) || {}, g = svg.querySelector('.hmi-node[data-node="' + n.id + '"]');
+        var d = opts.read(n) || {}, g = E.node[n.id];
         if (!g) return;
-        var sym = g.querySelector('[data-sym]');
-        if (d.state) { g.setAttribute('data-state', d.state); if (sym) sym.setAttribute('data-state', d.state); }
-        if (d.alarm) g.setAttribute('data-alarm', d.alarm); else g.removeAttribute('data-alarm');
+        var sym = g.__sym || (g.__sym = g.querySelector('[data-sym]'));
+        if (d.state) { setA(g, 'data-state', d.state); if (sym) setA(sym, 'data-state', d.state); }
+        setA(g, 'data-quality', d.quality || null);
+        setA(g, 'data-alarm', d.alarm || null);
+        /* alarm without colour (owner brief O5): a priority badge — diamond with the ISA priority digit — top-right of the
+           symbol; hollow once acknowledged; it stays while the source is active */
+        var bd = g.querySelector('.hmi-alarm-badge');
+        if (d.alarm) {
+          if (!bd) {
+            var sz = n.box ? Math.max(n.box[0], n.box[1]) : (n.size || 32), bx = n.box ? n.x + n.box[0] / 2 : n.x + sz / 2, by = n.box ? n.y - n.box[1] / 2 : n.y - sz / 2;
+            bd = document.createElementNS(NS, 'g'); bd.setAttribute('class', 'hmi-alarm-badge'); bd.setAttribute('transform', 'translate(' + r1(bx) + ' ' + r1(by) + ')');
+            bd.innerHTML = '<path d="M0 -8 L8 0 L0 8 L-8 0 Z"/><text x="0" y="3.2" text-anchor="middle"></text>';
+            g.appendChild(bd);
+          }
+          bd.setAttribute('data-prio', d.alarm); bd.setAttribute('data-ack', d.ack ? '1' : '0'); bd.querySelector('text').textContent = d.alarm;
+        } else if (bd) bd.remove();
         (n.values || []).forEach(function (v) {
-          var t = svg.querySelector('[data-val="' + n.id + ':' + v.k + '"]'), dv = d.values && d.values[v.k];
+          var t = E.val[n.id + ':' + v.k], dv = d.values && d.values[v.k];
           if (!t) return;
-          t.textContent = dv ? dv.text : '—';
-          if (dv && dv.alarm) t.setAttribute('data-alarm', dv.alarm); else t.removeAttribute('data-alarm');
+          var tx = dv ? dv.text : '—'; if (t.textContent !== tx) t.textContent = tx;
+          setA(t, 'data-alarm', dv && dv.alarm ? dv.alarm : null);
         });
       });
       graph.forEach(function (e) {
         if (!e.flowOf && !opts.flow) return;
-        var f = opts.flow ? opts.flow(e) : null;
+        var f = opts.flow ? opts.flow(e, graph) : null;
         if (!f) return;
-        svg.querySelectorAll('[data-edge="' + e.id + '"], [data-edge-flow="' + e.id + '"]').forEach(function (p) { p.setAttribute('data-flow', f); });
-        var ar = svg.querySelector('[data-edge-arrows="' + e.id + '"]'); if (ar) ar.style.display = f === 'running' ? '' : 'none';
+        (E.edge[e.id] || []).forEach(function (p) { setA(p, 'data-flow', f); });
+        var ar = E.arrows[e.id], disp = f === 'running' ? '' : 'none'; if (ar && ar.style.display !== disp) ar.style.display = disp;
       });
     }
 
@@ -365,10 +434,22 @@
       var n = nodes[id]; if (!n) return;
       if (view.z < 2) zoomAt(2.5 / view.z, n.x, n.y);
       var w = view.w, h = view.h;
-      view.x = Math.max(0, Math.min(W - w, n.x - w / 2)); view.y = Math.max(0, Math.min(H - h, n.y - h / 2)); apply();
+      view.x = Math.max(0, Math.min(W - w, n.x - w / 2)); view.y = Math.max(0, Math.min(H - h, n.y - h / 2)); apply(); commit();
+      // on a narrow frame the sheet scrolls inside its viewport: bring the item's column into view there too
+      var vp = svg.parentElement, px = svg.clientWidth;
+      if (vp && px && vp.scrollWidth > vp.clientWidth + 1) vp.scrollLeft = Math.max(0, (n.x - view.x) / view.w * px - vp.clientWidth / 2);
     }
 
+    var fsel = frame.querySelector('[data-find]');
+    if (fsel) fsel.addEventListener('change', function () {
+      var id = fsel.value; if (!id) return;
+      svg.querySelectorAll('.hmi-node[data-selected]').forEach(function (g) { g.removeAttribute('data-selected'); });
+      focusNode(id);
+      var g = svg.querySelector('.hmi-node[data-node="' + id.replace(/"/g, '') + '"]');
+      if (g) { g.setAttribute('data-selected', ''); g.focus({ preventScroll: true }); }
+    });
     var api = { sheet: sheet, svg: svg, frame: frame, update: update, trace: trace, clearTrace: clearTrace, fit: fit, zoom: zoomAt, focus: focusNode,
+      view: function () { return { x: view.x, y: view.y, w: view.w, h: view.h, z: view.z }; },
       node: function (id) { return nodes[id]; }, graph: graph, destroy: function () { host.innerHTML = ''; hideTip(); } };
     apply();
     update();

@@ -10,15 +10,18 @@ A **sheet**: one SVG drawn by `js/rz-hmi-sheet.js` (`RZHmiSheet.render(host, she
 object built in code (`js/datahall-ai/hmi-sheets.js`, `RZDatahallAISheets.build(id, snapshot, opts)`), using only the
 shared symbol library `js/rz-eng-symbols.js`. The page mounts a sheet into the `.bx` of the tab it replaces
 (`js/datahall-ai/hmi-v2.js mountAll`); the previous drawing in that box is retired (`data-dh2-retired`, hidden by
-`css/rz-dh-shell.css`), never deleted in the same release. `mount(..., {keep: true})` instead inserts the sheet right
+`css/rz-dh-shell.css`), never deleted in the same release. A sheet with no legacy drawing gets its own box after an anchor drawing (`mountNew`). A builder that throws
+leaves the old drawing in place — never a blank box. A sheet is drawn only once its tab panel (`.pn`) is shown — on the tab click or key, never into a hidden panel at boot (gate `test-dcai-deferred-panels.mjs` D6: 6,127 attribute writes in hidden panels during 9 s before v3.62.1). `mount(..., {keep: true})` instead inserts the sheet right
 after the drawing it complements and retires nothing — used where another contract still reads the old drawing
 (Room Layout: `#floorSvg` reveal, `hall-interact`).
 
 | Sheet | Builder | Tab | Data |
 |---|---|---|---|
+| DH-M-102 heat rejection (dry-cooler field, HTW and CW loops, chillers) | `dhM102` | Cooling (own box, `mountNew`) | `equipment.dry_coolers_*`, `chillers_*`, `design.planes.*` |
+| DH-M-104 TCS to the rack rows, DH-01 | `dhM104` | Cooling (own box) | `geometry.rack_rows`, `racks_per_row`, `design.flows.tcs_rack_lpm`, planes |
 | DH-M-103 CDU line, DH-01 | `dhM103` | Cooling | `DCAI_CALC.snapshot.equipment.cdu_*`, design planes |
 | CDU-nn in full (L3 modal) | `cduSheet` | Cooling → click a CDU | same + `cdu` payload |
-| DH-E-101 single-line, DH-01 | `dhE101` | Electrical → DH-01 | `distribution.*`, `equipment.ups_*`, `transformer_*` |
+| DH-E-101 … DH-E-108 single-line, DH-01 … DH-08 | `dhE101` (`o.hall`) | Electrical → DH-01 … DH-08 (hall sheets mount when their sub-tab draws) | `distribution.*`, `equipment.ups_*`, `transformer_*`; hall count = `equipment.cdu_installed_facility / cdu_installed_per_hall` |
 | DH-R-101 GB300 NVL72 rack | `dhR101` | Rack | `compute.*`, `power.*` |
 | DH-F-101 fire detection, DH-01 | `dhF101` | Fire → Mimic | `RZDatahallAIFirePoints.buildInventory` (133 drawn devices, 12 zones per hall) |
 | DH-E-001 site single-line | `dhE001` | Electrical → Overview | `distribution.*`, `equipment.gensets_*`, `site.fuel_autonomy_h` |
@@ -87,9 +90,23 @@ repaints every 4 s (`sheet.update()`), only while visible.
 
 Click → `open(node)` → the L3 modal (`cdu` class draws its own sheet; other classes keep the current HMI modal).
 
+## 4b. Operator truth (owner brief "BMS_UIUX_Master_Prompt", 2026-11-15; PRD `PRD_BMS_OPERATOR_HMI.md`)
+
+- **One state model.** `hmi-v2.js stateOf()` takes a node's state only from its payload: a pump's own `pump_state_n`
+  row, the unit's status chip, a scenario state row. **No payload = `data-state="na"`** (not instrumented, drawn
+  neutral) — never a guessed running / open / closed / energized.
+- **Flow only with evidence.** `flowMap()` joins edges into branches through passive items; a branch flows when its
+  mover runs, else when the equipment it joins runs; a plain header inherits from a running neighbour. Missing samples
+  → `unknown` (dimmed, no motion); a stopped / tripped mover → `stopped`. Signal lines never flow.
+- **Quality on every node** (`data-quality`): `simulated`, `replay`, `design` (engine values only), `partial`,
+  `nosample` (dashed outline); a missing value prints the dash, a valid zero prints `0`.
+- **Alarm without colour.** A diamond badge with the ISA priority digit sits top-right of an alarmed symbol, hollow
+  once acknowledged, kept while the source is active. Gate `tools/test-dh-operator.mjs` (O1–O5, O8), proven red 9/12 on
+  8fdf0a429.
+
 ## 5. Laws (gates)
 
-`tools/test-dh-drawings.mjs` (wired into `tools/ship-gate.sh` in v3.60.0): H0 ratchet (≥ 10 HMI sheets), H1 paint (renderer shading only), H2 library-only, H3 own L3
+`tools/test-dh-drawings.mjs` (wired into `tools/ship-gate.sh` in v3.60.0): H0 ratchet (≥ 14 HMI sheets), H1 paint (renderer shading only), H2 library-only, H3 own L3
 schematic per class (ratchet), H4 title + focus, H5 text budget, H6 fit-to-width 1440 and 390, H11 shell,
 H12 sidebar persistence, H13 Room Layout / Rack non-zero, H15 shading mode. H3, H11, H12, H13 and H1 on the legacy
 modals are *reported* until their phases land (`--strict-all` makes them block). Fire sheet: F1 mounted, F2 12 zones, F3 devices drawn =

@@ -43,10 +43,13 @@ const RACK = DIAGRAM('rack architecture');
 const COOL = DIAGRAM('cooling P&ID');
 const SLD1 = DIAGRAM('DH-01 SLD');
 const MIME = Object.freeze({ '.css': 'text/css', '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.woff2': 'font/woff2' });
+const missing = new Set();   // paths the page asked for that do not exist (reported at the end)
 const server = createServer(async (req, res) => {
     const full = resolve(ROOT, decodeURIComponent(new URL(req.url, 'http://localhost').pathname.slice(1)));
     if (full !== ROOT && !full.startsWith(ROOT + sep)) { res.writeHead(403).end(); return; }
-    try { res.writeHead(200, { 'content-type': MIME[extname(full)] || 'application/octet-stream' }).end(await readFile(full)); } catch { res.writeHead(404).end(); }
+    /* read first, then write: writeHead(200) before an awaited read threw ERR_HTTP_HEADERS_SENT on the first missing file */
+    let body; try { body = await readFile(full); } catch { missing.add(req.url.split('?')[0]); res.writeHead(404).end(); return; }
+    res.writeHead(200, { 'content-type': MIME[extname(full)] || 'application/octet-stream' }).end(body);
 });
 await new Promise((accept) => server.listen(0, '127.0.0.1', accept));
 const base = `http://127.0.0.1:${server.address().port}`;
@@ -271,6 +274,7 @@ try {
 console.log(`DCAI EQUIPMENT INSPECTOR — ${PAGE}`);
 for (const r of report) console.log(`  ${r.view.padEnd(14)} blocks ${String(r.blocks).padStart(4)}  ${r.status}${r.ref ? ' (' + r.ref + ')' : ''}`);
 console.log(`  classes clicked: ${[...seenClasses].join(', ')}`);
+if (missing.size) console.log(`  404 requested by the page: ${[...missing].slice(0, 8).join(', ')}`);
 for (const r of rule2) console.log(`  Rule 2 ${r.modal.padEnd(12)} Math.random calls while open: ${r.randomCalls}${r.randomCalls ? '  (RED until WP4/WP5)' : '  CLEAN'}`);
 if (STRICT_RULE2) for (const r of rule2) note(r.randomCalls === 0, `Rule 2: ${r.modal} still rolls ${r.randomCalls} dice while open`);
 const monitor = report.filter((r) => r.status === 'MONITOR').map((r) => r.view);

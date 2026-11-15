@@ -83,22 +83,24 @@
 .hmi-svg .hmi-hit { fill: transparent; stroke: none; }
 .hmi-svg .hmi-alm-mark { fill: none; stroke-width: 1.6; }
 .hmi-svg .hmi-alm-mark.p1 { stroke: var(--hmi-alm-1); } .hmi-svg .hmi-alm-mark.p2 { stroke: var(--hmi-alm-2); } .hmi-svg .hmi-alm-mark.p3 { stroke: var(--hmi-alm-3); }
-.hmi-svg .hmi-alm-txt { font: 700 8px 'JetBrains Mono', ui-monospace, monospace; fill: var(--hmi-bg); stroke: none; }
+.hmi-svg .hmi-alm-txt { font: 700 9px 'JetBrains Mono', ui-monospace, monospace; fill: var(--hmi-bg); stroke: none; }
 
 /* ── text roles (typography by role, PRD §3.3) ─────────────────────────────────────────────────── */
 .hmi-svg text { stroke: none; }
+.hmi-svg [data-role="name"] { fill: var(--hmi-text-2, var(--hmi-text)); font: 500 9px 'IBM Plex Sans', system-ui, sans-serif; letter-spacing: .04em; text-transform: uppercase; opacity: .82; }
+.hmi-svg [data-role="legend"] { fill: var(--hmi-text); font: 500 9px 'JetBrains Mono', ui-monospace, monospace; }
 .hmi-svg [data-role="tag"] { fill: var(--hmi-text); font: 600 10px 'JetBrains Mono', ui-monospace, monospace; }
 /* tags and values sit on a halo of the canvas colour, so a line passing behind a tag never strikes through it (PME practice) */
-.hmi-svg [data-role="tag"], .hmi-svg [data-role="value"], .hmi-svg [data-role="line"] { paint-order: stroke; stroke: var(--hmi-bg); stroke-width: 3px; stroke-linejoin: round; }
+.hmi-svg [data-role="tag"], .hmi-svg [data-role="value"], .hmi-svg [data-role="line"], .hmi-svg [data-role="name"], .hmi-svg [data-role="legend"] { paint-order: stroke; stroke: var(--hmi-bg); stroke-width: 3px; stroke-linejoin: round; }
 .hmi-svg [data-role="value"] { fill: var(--hmi-text-2); font: 500 9.5px 'JetBrains Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
 .hmi-svg [data-role="value"][data-alarm="1"] { fill: var(--hmi-alm-1); font-weight: 700; }
 .hmi-svg [data-role="value"][data-alarm="2"] { fill: var(--hmi-alm-2); font-weight: 700; }
-.hmi-svg [data-role="line"] { fill: var(--hmi-text-3); font: 400 8.5px 'JetBrains Mono', ui-monospace, monospace; }
+.hmi-svg [data-role="line"] { fill: var(--hmi-text-3); font: 400 9px 'JetBrains Mono', ui-monospace, monospace; }
 .hmi-svg [data-role="label"] { fill: var(--hmi-text-2); font: 400 9.5px 'IBM Plex Sans', system-ui, sans-serif; }
-.hmi-svg [data-role="inst"] { fill: var(--hmi-text); font: 600 7.5px 'JetBrains Mono', ui-monospace, monospace; text-anchor: middle; }
+.hmi-svg [data-role="inst"] { fill: var(--hmi-text); font: 600 8.5px 'JetBrains Mono', ui-monospace, monospace; text-anchor: middle; }
 .hmi-svg [data-role="titleblock"] rect { fill: var(--hmi-bg-2); stroke: var(--hmi-line-2); stroke-width: .8; }
 .hmi-svg [data-role="titleblock"] line { stroke: var(--hmi-line-2); stroke-width: .6; }
-.hmi-svg [data-role="titleblock"] text { fill: var(--hmi-text-2); font: 400 8px 'JetBrains Mono', ui-monospace, monospace; }
+.hmi-svg [data-role="titleblock"] text { fill: var(--hmi-text-2); font: 400 9px 'JetBrains Mono', ui-monospace, monospace; }
 .hmi-svg [data-role="titleblock"] text.t { fill: var(--hmi-text); font: 600 10.5px 'IBM Plex Sans', system-ui, sans-serif; }
 /* level of detail: secondary labels only once the sheet is zoomed in */
 .hmi-svg.lod-1 [data-lod="2"], .hmi-svg.lod-2 [data-lod="3"] { display: none; }
@@ -239,3 +241,42 @@
 .hmi-svg .hmi-node[data-sym="fire-zone"]:hover .b, .hmi-svg .hmi-node[data-sym="fire-zone"].is-selected .b { stroke: var(--hmi-info); }
 .hmi-frame[data-shade="deep"] .hmi-svg .hmi-node[data-sym="fire-zone"] > [data-sym], .hmi-frame[data-shade="deep"] .hmi-svg .hmi-node[data-sym="room"] > [data-sym] { filter: none; }
 .hmi-svg .hmi-node[data-sym="rack-plan"] .b { stroke-width: .6; }
+
+/* ── operator truth (owner brief "BMS_UIUX_Master_Prompt", PRD_BMS_OPERATOR_HMI O2–O5) ─────────────────────────── */
+/* flow only with evidence: the dash march and arrows exist only on running lines; a line without evidence is dimmed */
+.hmi-svg .hmi-flow:not([data-flow="running"]) { display: none; }
+.hmi-svg .hmi-edge[data-flow="unknown"] { opacity: .5; }
+.hmi-svg .hmi-edge[data-flow="stopped"] { opacity: .75; }
+/* not instrumented: neutral outline, no fill, no state colour */
+.hmi-svg .hmi-node[data-state="na"] .b { fill: transparent !important; }
+.hmi-svg .hmi-node[data-state="na"] { color: var(--hmi-line-2); }
+/* data quality: no sample = dashed outline around the symbol; partial = dotted */
+.hmi-svg .hmi-node[data-quality="nosample"] .hmi-hit { stroke: var(--hmi-text-3); stroke-width: 1; stroke-dasharray: 3 2; fill: none; }
+.hmi-svg .hmi-node[data-quality="partial"] .hmi-hit { stroke: var(--hmi-text-3); stroke-width: 1; stroke-dasharray: 1 2; fill: none; }
+/* alarm badge: a diamond with the ISA priority digit — readable without colour; hollow once acknowledged */
+.hmi-svg .hmi-alarm-badge path { stroke: var(--hmi-bg); stroke-width: 1.2; }
+.hmi-svg .hmi-alarm-badge[data-prio="1"] path { fill: var(--hmi-alm-1); }
+.hmi-svg .hmi-alarm-badge[data-prio="2"] path { fill: var(--hmi-alm-2); }
+.hmi-svg .hmi-alarm-badge[data-prio="3"] path { fill: var(--hmi-alm-3); }
+.hmi-svg .hmi-alarm-badge text { fill: #000; font: 700 9px 'JetBrains Mono', ui-monospace, monospace; }
+.hmi-svg .hmi-alarm-badge[data-ack="1"] path { fill: var(--hmi-bg); stroke: var(--hmi-text); stroke-width: 1.4; }
+.hmi-svg .hmi-alarm-badge[data-ack="1"] text { fill: var(--hmi-text); }
+
+/* equipment finder in the sheet bar (O9) and the selected item */
+.hmi-bar .hmi-find { max-width: 220px; min-width: 0; height: 26px; font: 500 11px 'JetBrains Mono', ui-monospace, monospace; color: var(--hmi-text); background: var(--hmi-bg); border: 1px solid var(--hmi-frame); border-radius: 2px; padding: 0 4px; }
+@media (max-width: 600px) { .hmi-bar .hmi-find { max-width: 132px; height: 32px; font-size: 16px; } .hmi-bar .hmi-title { display: none; } }
+.hmi-svg .hmi-node[data-selected] .hmi-hit { stroke: var(--hmi-info, var(--hmi-text)); stroke-width: 1.6; fill: none; }
+
+/* moving view: shed the shading cost until the view settles (180 ms) — text, lines, states and alarm badges stay */
+.hmi-frame[data-moving] .hmi-svg .hmi-nodes, .hmi-frame[data-moving] .hmi-svg .hmi-node > [data-sym], .hmi-frame[data-moving] .hmi-svg .hmi-box { filter: none !important; }
+.hmi-frame[data-moving] .hmi-svg .hmi-edge-shadows, .hmi-frame[data-moving] .hmi-svg .hmi-edge-his, .hmi-frame[data-moving] .hmi-svg .hmi-flow { display: none; }
+.hmi-frame[data-moving] .hmi-svg { shape-rendering: optimizeSpeed; text-rendering: optimizeSpeed; }
+.hmi-frame[data-moving] .hmi-svg { will-change: transform; }
+/* SLD mimic modal with its feed one-line: the legacy zoom buttons drove the retired drawing — the sheet bar has its own */
+#sldMimic:has(.hmi-host[data-hmi-sheet="sld-l3"]) #sldZoomIn, #sldMimic:has(.hmi-host[data-hmi-sheet="sld-l3"]) #sldZoomOut, #sldMimic:has(.hmi-host[data-hmi-sheet="sld-l3"]) #sldZoomFit { display: none; }
+
+/* legibility floor (geometry gate G5: a label under 8.5 px on screen is texture, not data): a sheet never renders below
+   the scale its smallest label needs; a narrower frame scrolls the sheet sideways inside the frame instead of
+   shrinking it, as the legacy drawings did. The minimum width is set per sheet by the renderer (--hmi-min-w). */
+.hmi-frame .hmi-vp { overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
+.pn .bx .hmi-frame .hmi-vp > svg.hmi-svg, .ep .bx .hmi-frame .hmi-vp > svg.hmi-svg, .hmi-frame .hmi-vp > svg.hmi-svg { min-width: var(--hmi-min-w, 0) !important; }

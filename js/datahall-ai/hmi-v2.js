@@ -37,6 +37,10 @@
     var clk = $('#clk'), theme = $('#themeToggle');
     var sp = el('span', { class: 'dh2-sp' });
     var user = el('span', { class: 'dh2-user' });
+    /* the provenance banner (SIMULATED · ENGINE BASIS, with its 44 px dismiss) stays the page's own component: its slot moves
+       into the nav row in place of the SIM chip — the hidden .hdr-main had made it 0 x 0 (gates conv-alarm-runtime, cockpit
+       regressions) */
+    var slot = $('[data-rz-telemetry-banner-slot]'); if (slot) sim = slot;
     [back, title, chip, sim, sp, ask, replay, docs, clk, user, theme].forEach(function (n) { if (n) nav.appendChild(n); });
     hdr.insertBefore(nav, hdr.firstChild);
     var main = $('.hdr-main', hdr), right = $('.hdr-r', hdr);
@@ -106,10 +110,20 @@
 
   /* ── 3. values from the engine payloads ─────────────────────────────────────────────────────────── */
   var P = win.RZDatahallAIHmiPayloads, cache = {}, tickSeen = null;
-  function ctx() { return P && P.buildContext ? P.buildContext(win, { hall: 1 }) : null; }
+  /* the payload context is built once per (tick, cooling scenario, electrical scenario, replay) — it evaluates the whole
+     electrical topology, and a repaint reads ~600 nodes: rebuilding it per node cost 2-3 s per repaint (O11 profile) */
+  var ctxKey = null, ctxVal = null;
+  function ctx() {
+    if (!P || !P.buildContext) return null;
+    var sim = win.RZDatahallAISimTelemetry, cs = doc.getElementById('coolingScenario'), es = doc.getElementById('electricalScenario');
+    var k = (sim && sim.tickNow ? sim.tickNow() : '') + '|' + (cs ? cs.value : '') + '|' + (es ? es.value : '') + '|' + (sim && sim.hasProvider && sim.hasProvider() ? 'r' : 's');
+    if (k !== ctxKey || !ctxVal) { ctxVal = P.buildContext(win, { hall: 1 }); ctxKey = ctxVal ? k : null; }
+    return ctxVal;
+  }
   function payload(cls, id) {
     var c = ctx(); if (!c || !P) return null;
-    if (c.tick !== tickSeen) { cache = {}; tickSeen = c.tick; }
+    var key = c.tick + '|' + (c.cooling && c.cooling.scenarioId || '') + '|' + (c.scenario && c.scenario.scenarioId || '') + '|' + (c.sim && c.sim.hasProvider && c.sim.hasProvider() ? 'replay' : 'sim');
+    if (key !== tickSeen) { cache = {}; tickSeen = key; }
     var k = cls + ':' + id;
     if (!cache[k]) { try { cache[k] = P.safePayload(cls, id, c); } catch (e) { cache[k] = null; } }
     return cache[k];
@@ -126,7 +140,7 @@
     return r.unit && t !== '—' && t.indexOf(r.unit) < 0 ? t + ' ' + r.unit : t;
   }
   function find(p, re) { var rs = rows(p); for (var i = 0; i < rs.length; i++) if (re.test(rs[i].label || '') || re.test(rs[i].point || '')) return rs[i]; return null; }
-  var CLS_PAYLOAD = { cdu: 'cdu', 'cdu-pump': 'cdu', chiller: 'chiller', 'net-wan': 'net-wan', 'net-zone': 'net-zone', 'sld-tx': 'sld-tx', 'sld-mv-sub': 'sld-mv-sub', 'sld-msb': 'sld-msb', 'sld-ups-a': 'sld-ups-a', 'sld-ups-b': 'sld-ups-b',
+  var CLS_PAYLOAD = { cdu: 'cdu', 'cdu-pump': 'cdu', chiller: 'chiller', stp: 'stp', ahu: 'ahu', 'battery-a': 'battery-a', 'battery-b': 'battery-b', 'dry-cooler': 'dry-cooler', 'fws-pump-station': 'fws-pump-station', 'cw-pump-station': 'cw-pump-station', chem: 'chem', 'tcs-manifold': 'tcs-manifold', 'net-wan': 'net-wan', 'net-zone': 'net-zone', 'sld-tx': 'sld-tx', 'sld-mv-sub': 'sld-mv-sub', 'sld-msb': 'sld-msb', 'sld-ups-a': 'sld-ups-a', 'sld-ups-b': 'sld-ups-b',
     'sld-rack-psu': 'sld-rack-psu', 'rack-ct': 'rack-ct', 'rack-ns': 'rack-ns', 'rack-psu': 'rack-psu', 'rack-busbar': 'rack-busbar', 'rack-manifold': 'rack-manifold', 'rack-leak': 'rack-leak',
     'fire-facp': 'fire-facp', 'fire-zone': 'fire-zone', 'fire-vesda': 'fire-vesda', 'fire-mcp': 'fire-mcp', 'fire-epo': 'fire-epo', 'fire-point': 'fire-point',
     'sld-main-tx': 'sld-main-tx', 'site-genset-yard': 'site-genset-yard', 'net-core': 'net-core', 'net-spine': 'net-spine', 'net-leaf': 'net-leaf', 'rack-unit': 'rack-unit', crah: 'crah', 'bms-server': 'bms-server', 'bms-controller': 'bms-controller', 'bms-network': 'bms-network', 'bms-gateway': 'bms-gateway', 'bms-field': 'bms-field', 'bms-ldc': 'bms-ldc', 'bms-app': 'bms-app' };
@@ -139,26 +153,81 @@
     if (/isolated|expired|disabled|out of service/.test(t)) return { state: 'standby', alarm: '3' };
     return { state: 'normal' };
   }
+  /* ONE state model (owner brief O1/O2): a node's state comes only from its payload — the pump's own state row, the
+     unit's status chip, a scenario state row. A node with no payload is "na" (not instrumented): drawn neutral, never
+     guessed as running / open / closed / energized. */
+  var STATE_WORD = { run: 'running', running: 'running', online: 'running', energized: 'running', normal: 'running', closed: 'closed',
+    open: 'open', fault: 'fault', trip: 'fault', critical: 'fault', alarm: 'fault', stby: 'standby', standby: 'standby', bypass: 'standby',
+    off: 'stopped', stopped: 'stopped', isolated: 'standby', warning: 'running', 'float': 'running', discharge: 'fault' };
+  function liveRows(p) { return p && p.tabs && Array.isArray(p.tabs.live) ? p.tabs.live : []; }
   function stateOf(n, p) {
-    if (/^cb|^disconnector/.test(n.sym)) return n.id === 'tie' || /^mb/.test(n.id) ? 'open' : 'closed';
-    if (/^valve/.test(n.sym)) return 'open';
-    if (/^transformer/.test(n.sym)) return 'energized';
+    if (!p) return 'na';
+    var live = liveRows(p), r;
+    if (n.pump) { r = live.filter(function (x) { return x.point === 'pump_state_' + n.pump; })[0]; if (r) return STATE_WORD[r.state] || 'na'; }   // a CDU pump: its own state row
+    if (n.pumpState) { r = live.filter(function (x) { return x.point === n.pumpState; })[0]; if (r) return STATE_WORD[r.state] || 'na'; }   // a named mover state row (STP blowers)
     if (n.standby) return 'standby';
-    var s = p && find(p, /status|state|mode/i);
-    var t = s ? text(s) : '';
-    if (/fault|trip|alarm/i.test(t)) return 'fault';
-    if (/standby|stby/i.test(t)) return 'standby';
-    return 'running';
+    if (p.statusChip && STATE_WORD[String(p.statusChip.state).toLowerCase()]) return STATE_WORD[String(p.statusChip.state).toLowerCase()];
+    r = live.filter(function (x) { return x.quality === 'state' && STATE_WORD[x.state]; })[0];
+    return r ? STATE_WORD[r.state] : 'na';
   }
-  function read(n) {
+  /* electrical evidence (owner brief O7): SLD devices take their state from the electrical scenario engine
+     (RZDatahallAIElectrical.evaluateScenario on the page's scenario) — breaker position from its controller, a
+     transformer energized only when the edge into it is, ATS / UPS from their own state. Not a device the engine models
+     → no claim (na). */
+  var BRK = { closed: 'closed', open: 'open', tripped: 'fault', maintenance: 'open', racked_out: 'open', test: 'open', disabled: 'open' };
+  var UPSW = { online: 'running', bypass: 'standby', fault: 'fault', maintenance: 'standby' }, ATSW = { normal: 'running', transfer_failed: 'fault', maintenance: 'standby' };
+  function elecState(n, sheet) {
+    var c = ctx(), ev = c && c.scenario; if (!ev || !ev.state || !/^dh-e-/.test(sheet || '')) return null;
+    var S = ev.state, m = /^([a-z-]+?)([AB])(01)?$/.exec(n.id), L, k, edgeTo = function (to) { var e = ev.edges.filter(function (x) { return x.to === to; })[0]; return e ? (e.semanticState === 'energized' ? 'running' : e.semanticState === 'fault' ? 'fault' : 'stopped') : null; };
+    if (!m) { if (n.id === 'mv-tie' || n.id === 'tie') return 'open'; if (/^gen\d$/.test(n.id)) { var g = S.sources && S.sources['SRC-GENSET-POOL']; return g ? (g.state === 'running' ? 'running' : g.state === 'failed' ? 'fault' : 'standby') : null; } return null; }
+    k = m[1]; L = m[2];
+    var br = function (id) { var v = S.breakers && S.breakers[id + '-' + L]; return v ? BRK[v] || 'na' : null; };
+    if (sheet === 'dh-e-001') {
+      if (k === 'cb-mv') return br('BR-MV-INCOMER'); if (k === 'cb-tx') return br('BR-HV-TX'); if (k === 'tx-main') return edgeTo('MAIN-TX-' + L);
+      return null;
+    }
+    switch (k) {
+      case 'cb-mv': return br('BR-TX');
+      case 'tx': return edgeTo('TX-' + L);
+      case 'cb-lv': return br('BR-MSB');
+      case 'ats': var a = S.ats && S.ats['ATS-' + L]; return a ? ATSW[a.state] || 'na' : null;
+      case 'qi': return br('BR-UPS');
+      case 'rec': case 'inv': var u = S.ups && S.ups['UPS-' + L]; return u ? UPSW[u] || UPSW[u.state] || 'na' : null;
+      case 'ss': var u2 = S.ups && S.ups['UPS-' + L], us = u2 && (u2.state || u2); return us ? (us === 'bypass' ? 'closed' : 'open') : null;
+      case 'mb': var u3 = S.ups && S.ups['UPS-' + L], ms = u3 && (u3.state || u3); return ms ? (ms === 'maintenance' ? 'closed' : 'open') : null;
+      case 'qbw': return br('BR-BUSWAY');
+      default: return null;
+    }
+  }
+
+  /* data quality of a node (owner brief O4): over the telemetry rows it shows — every row missing = nosample, some = partial */
+  function qualityOf(p) {
+    if (!p) return 'none';
+    var tel = liveRows(p).filter(function (r) { return r.quality === 'simulated' || r.quality === 'replay'; });
+    if (!tel.length) return 'design';
+    var miss = tel.filter(function (r) { return r.missing || r.value == null; }).length;
+    if (miss === tel.length) return 'nosample';
+    if (miss) return 'partial';
+    return tel.some(function (r) { return r.quality === 'replay'; }) ? 'replay' : 'simulated';
+  }
+  /* alarm of a node (owner brief O5): the payload's own alarm list, ISA priority 1 / 2 / 3, acknowledged kept apart */
+  var PRIO = { critical: '1', high: '1', medium: '2', low: '3', info: '3' };
+  function alarmOf(p) {
+    var al = p && p.tabs && p.tabs.alarms ? p.tabs.alarms.filter(function (a) { return a.lifecycle !== 'returned' && a.lifecycle !== 'returned_ack'; }) : [];
+    if (!al.length) return null;
+    var best = al.map(function (a) { return PRIO[a.severity] || '2'; }).sort()[0];
+    return { prio: best, ack: al.every(function (a) { return /ack/.test(String(a.lifecycle || '')) && !/unack/.test(String(a.lifecycle || '')); }) };
+  }
+  function read(n, sheet) {
     if (n.sym === 'junction') return {};
     var cls = n.cls && CLS_PAYLOAD[n.cls], id = n.eqId || n.id, fire = !!cls && cls.indexOf('fire-') === 0;
     var fullId = fire || cls === 'net-zone';   // fire points and security zones keep their full id (DH-01-Z05-SD1-02, Z-EXT)
     var p = cls ? payload(cls, fullId ? String(id) : String(id).replace(/^[A-Z]+-?/, '').replace(/-\d+$/, '') || '1') : null;
     var tip = [];
     if (fire) { var fs = fireStateOf(p); rows(p).slice(0, 6).forEach(function (r) { tip.push([r.label, text(r)]); }); return { state: fs.state, alarm: fs.alarm, values: {}, rows: tip }; }
-    var st = stateOf(n, p), v = {};
-    if (/p-\d\dc$/i.test(n.tag || '')) st = 'standby';
+    var es = elecState(n, sheet), st = (n.sym === 'offSheet') ? undefined : (es || stateOf(n, p)), v = {}, al = alarmOf(p);
+    // a pump carries only its own alarm (point PUMP-n); the unit-level alarm belongs to the unit's main symbol
+    if (n.pump) al = alarmOf(p && { tabs: { alarms: (p.tabs.alarms || []).filter(function (a) { return a.point === 'PUMP-' + n.pump; }) } });
     (n.values || []).forEach(function (x) {
       var r = null;
       if (x.k === 'duty') r = find(p, /duty|heat/i);
@@ -166,7 +235,7 @@
       else if (x.k === 'tcsS') r = find(p, /supply.*t|tcs.*supply|supply temp/i);
       else if (x.k === 'tcsR') r = find(p, /return.*t|tcs.*return|return temp/i);
       else if (x.k === 'pos') r = find(p, /valve|position/i);
-      else if (/^p\d$/.test(x.k)) r = x.k === 'p3' ? { text: 'standby' } : find(p, /pump.*speed|speed/i);
+      else if (/^p\d$/.test(x.k)) r = st === 'running' ? find(p, /pump.*speed|speed/i) : { text: String(st || '').toUpperCase() };   // a pump that is not running shows its state, not a speed
       else if (x.k === 'load' || x.k === 'ups') r = find(p, /load/i);
       else if (x.k === 'rack') r = find(p, /current|feed/i);
       else if (x.k === 'util') r = find(p, /utilis|util/i);
@@ -174,7 +243,68 @@
       v[x.k] = { text: text(r) };
     });
     rows(p).slice(0, 6).forEach(function (r) { tip.push([r.label, text(r)]); });
-    return { state: st, values: v, rows: tip };
+    return { state: st, quality: n.sym === 'offSheet' ? undefined : qualityOf(p), alarm: al ? al.prio : null, ack: al ? al.ack : false, values: v, rows: tip };
+  }
+
+  /* ── flow only with evidence (owner brief O3) ─────────────────────────────────────────────────────────────
+     Edges are joined into branches through passive items (junction bends, valves, strainers — no payload, degree ≤ 2).
+     A branch flows when its mover (pump / fan) runs; without a mover, when the equipment it joins runs; a plain header
+     between tees inherits "running" from a running neighbour branch. Missing samples make a branch "unknown" (no
+     motion); a stopped / tripped mover makes it "stopped". Signal and instrument lines never flow. */
+  var EQUIP = { running: 1, stopped: 1, fault: 1, standby: 1, open: 1 };   // an open breaker / closed-off device is evidence: it blocks its branch
+  function isMover(n) { return n && /^pump|^fan/.test(n.sym || ''); }
+  function flowMap(graph, st) {
+    var deg = {}, out = {}, proc = graph.filter(function (e) { return !/^(signal|inst)$/.test(e.w) && !/^(line|signal)$/.test(e.m); });
+    graph.forEach(function (e) { if (proc.indexOf(e) < 0) out[e.id] = 'na'; });
+    proc.forEach(function (e) { [e.a, e.b].forEach(function (k) { if (k) deg[k] = (deg[k] || 0) + 1; }); });
+    var par = {}; proc.forEach(function (e) { par[e.id] = e.id; });
+    var find = function (x) { while (par[x] !== x) { par[x] = par[par[x]]; x = par[x]; } return x; };
+    var passive = function (k) { var n = st[k]; return !n || !EQUIP[n.state]; };
+    var byNode = {};
+    proc.forEach(function (e) { [e.a, e.b].forEach(function (k) { if (k) (byNode[k] = byNode[k] || []).push(e); }); });
+    Object.keys(byNode).forEach(function (k) {   // join edges of one medium through a passive item with no branching
+      if (!passive(k) || deg[k] > 2) return;
+      var es = byNode[k]; for (var i = 1; i < es.length; i++) if (es[i].m === es[0].m) par[find(es[i].id)] = find(es[0].id);
+    });
+    var br = {};
+    proc.forEach(function (e) {
+      var b = find(e.id), B = br[b] = br[b] || { edges: [], ev: [], tees: [], movers: [] };
+      B.edges.push(e);
+      [e.a, e.b].forEach(function (k) {
+        if (!k) return;
+        var n = st[k];
+        if (n && EQUIP[n.state]) { (isMover(n) ? B.movers : B.ev).push(n); }
+        else if (deg[k] > 2) B.tees.push(k);
+      });
+      if (e.flowOf && st[e.flowOf]) B.movers.push(st[e.flowOf]);
+    });
+    var res = {};
+    Object.keys(br).forEach(function (b) {
+      var B = br[b], all = B.movers.concat(B.ev), r;
+      if (all.some(function (n) { return n.quality === 'nosample'; })) r = 'unknown';
+      else if (B.movers.length) r = B.movers.some(function (n) { return n.state === 'running'; }) ? 'running' : 'stopped';
+      else if (B.ev.length) r = B.ev.some(function (n) { return n.state === 'running' || n.state === 'fault'; }) ? 'running' : 'stopped';   // a fault on a heat exchanger / chiller does not prove zero flow; only a mover's stop does
+      res[b] = r || null;
+    });
+    for (var pass = 0; pass < 4; pass++) {   // headers between tees take "running" from a running neighbour branch
+      Object.keys(br).forEach(function (b) {
+        if (res[b]) return;
+        var on = br[b].tees.some(function (t) { return (byNode[t] || []).some(function (e) { return res[find(e.id)] === 'running'; }); });
+        if (on) res[b] = 'running';
+      });
+    }
+    proc.forEach(function (e) { out[e.id] = res[find(e.id)] || 'unknown'; });
+    return out;
+  }
+  /* the options every sheet render gets: read() records each node's state for the flow pass of the same repaint */
+  function sheetOpts(extra) {
+    var st = {}, dirty = true, map = null;
+    var o = {
+      read: function (n) { var d = read(n, extra && extra.sheet); st[n.id] = { state: d.state, quality: d.quality, sym: n.sym, cls: n.cls }; dirty = true; return d; },
+      flow: function (e, graph) { if (dirty) { map = flowMap(graph, st); dirty = false; } return map[e.id]; }
+    };
+    for (var k in extra || {}) if (k !== 'sheet') o[k] = extra[k];
+    return o;
   }
 
   /* ── 4. the sheets on their tabs ────────────────────────────────────────────────────────────────── */
@@ -184,9 +314,12 @@
     if (!inv && typeof win.fireInv === 'function') inv = win.fireInv();
     return inv || null;
   }
+  /* a sheet is drawn only once its tab panel is shown: the cockpit builds no panel a visitor never opens (v3.11.7,
+     gate test-dcai-deferred-panels D6), and 14 sheets drawn into hidden panels at boot also landed inside that window */
+  function panelHidden(node) { var pn = node.closest && node.closest('.pn'); return !!pn && !pn.getClientRects().length; }
   function mount(svgId, sheetId, svgNewId, o) {
     var old = doc.getElementById(svgId), S = win.RZDatahallAISheets, R = win.RZHmiSheet, snap = win.DCAI_CALC && win.DCAI_CALC.snapshot;
-    if (!old || !S || !R || !snap) return;
+    if (!old || !S || !R || !snap || panelHidden(old)) return;
     var bx = old.closest('.bx'); if (!bx || bx.querySelector('.hmi-host[data-hmi-sheet="' + sheetId + '"]')) return;
     var host = el('div', { class: 'hmi-host', 'data-hmi-sheet': sheetId });
     var h3 = bx.querySelector('h3');
@@ -197,17 +330,40 @@
       Array.prototype.slice.call(bx.children).forEach(function (c) { if (c !== h3) c.setAttribute('data-dh2-retired', ''); });
       bx.appendChild(host);
     }
-    var sheet = S.build(sheetId, snap, o); sheet.svgId = svgNewId;
-    sheets[sheetId] = R.render(host, sheet, { read: read, open: open });
+    var sheet;
+    try { sheet = S.build(sheetId, snap, o); }
+    catch (e) {   // a builder that cannot draw (missing engine path) must never leave a blank box: restore the old drawing
+      host.remove(); Array.prototype.slice.call(bx.querySelectorAll('[data-dh2-retired]')).forEach(function (c) { c.removeAttribute('data-dh2-retired'); });
+      if (win.console) console.warn('hmi-v2: ' + sheetId + ' not drawn — ' + e.message); return;
+    }
+    sheet.svgId = svgNewId;
+    sheets[sheetId] = R.render(host, sheet, sheetOpts({ open: open, sheet: sheetId }));
+  }
+  /* a sheet with no legacy drawing to replace: its own box, inserted right after the box of an anchor drawing */
+  function mountNew(anchorSvgId, sheetId, svgNewId, o) {
+    var a = doc.getElementById(anchorSvgId), S = win.RZDatahallAISheets, R = win.RZHmiSheet, snap = win.DCAI_CALC && win.DCAI_CALC.snapshot;
+    if (!a || !S || !R || !snap || panelHidden(a) || sheets[sheetId] || doc.querySelector('.bx[data-hmi-box="' + sheetId + '"]')) return;
+    var ab = a.closest('.bx'); if (!ab) return;
+    var sheet; try { sheet = S.build(sheetId, snap, o); } catch (e) { if (win.console) console.warn('hmi-v2: ' + sheetId + ' not drawn — ' + e.message); return; }
+    var bx = el('div', { class: 'bx', 'data-hmi-box': sheetId }), host = el('div', { class: 'hmi-host', 'data-hmi-sheet': sheetId });
+    bx.appendChild(host);
+    if (o && o.before) ab.insertAdjacentElement('beforebegin', bx); else (o && o.after ? doc.querySelector(o.after) || ab : ab).insertAdjacentElement('afterend', bx);
+    sheet.svgId = svgNewId;
+    sheets[sheetId] = R.render(host, sheet, sheetOpts({ open: open, sheet: sheetId }));
   }
   function mountAll() {
     mount('coolSvg', 'dh-m-103', 'hmiCoolSvg');
+    mountNew('coolSvg', 'dh-m-101', 'hmiCoolOverSvg', { before: true });                         // overview first: where every item sits
+    mountNew('coolSvg', 'dh-m-102', 'hmiCoolPlantSvg');                                          // heat rejection, after the CDU line
+    mountNew('coolSvg', 'dh-m-104', 'hmiCoolRowsSvg', { after: '.bx[data-hmi-box="dh-m-102"]' });   // TCS to the rack rows, after it
     mount('elecDH1Svg', 'dh-e-101', 'hmiElecDH1Svg');
+    for (var h = 2; h <= 16; h++) if (doc.getElementById('elecDH' + h + 'Svg')) mount('elecDH' + h + 'Svg', 'dh-e-1' + (h < 10 ? '0' : '') + h, 'hmiElecDH' + h + 'Svg', { hall: h });   // drawn lazily per hall sub-tab
     mount('rackSvg', 'dh-r-101', 'hmiRackSvg');
     mount('elecOvSvg', 'dh-e-001', 'hmiElecOvSvg');
     mount('netSvg', 'dh-n-101', 'hmiNetSvg');
     var fi = fireInventory();
     if (fi) mount('fireSvg', 'dh-f-101', 'hmiFireSvg', { fire: fi });
+    if (fi) mountNew('fireSvg', 'dh-f-102', 'hmiFireRelSvg', { fire: fi });   // clean-agent release, under the detection sheet
     if (fi) mount('floorSvg', 'dh-a-101', 'hmiFloorPlanSvg', { fire: fi, keep: true });   // Room Layout: the to-scale hall plan joins the building isometric and the per-level plans (kept — their reveal gates stay)
     if (win.BMS_MODEL) mount('bmsSvg', 'dh-b-101', 'hmiBmsSvg', { bms: win.BMS_MODEL });
     if (win.WAN_NODES) mount('wanSvg', 'dh-n-102', 'hmiWanSvg', { wan: win.WAN_NODES });
@@ -215,7 +371,31 @@
     /* the CDU tier-2 opener stays the PAGE's (openCduHmi: the dh-modal contract — focus trap, inert background,
        aria-modal, timers cleared on close); the CDU-nn L3 sheet is drawn inside that modal's body and the legacy
        720 x 440 mimic in it is retired, not deleted. Only without the page opener does the bare sheet modal open. */
-    if (sheets['dh-m-103']) {
+    wrapOpener('chiller', function (id) { drawInPageModal('chHmi', 'chHmiSvg', 'chiller-l3', 'chiller', { id: id }); });
+    wrapOpener('crah', function (id) { drawInPageModal('crahHmi', 'crahHmiSvg', 'crah-l3', 'crah', { id: id }); });
+    wrapOpener('eq', function (type) {
+      var t = String(type || ''), map = { 'CW Pump Station': ['pump-station', { loop: 'cw' }], 'FWS Pump Station': ['pump-station', { loop: 'fws' }], 'TCS Manifold': ['tcs-manifold', {}], 'Chemical Dosing': ['chem-dosing', {}] };
+      if (map[t]) drawInPageModal('eqHmi', 'eqHmiSvg', 'eq-l3', map[t][0], map[t][1]);
+    });
+    wrapOpener('net', function (kind, id) { if (/^(core|spine|leaf)$/.test(String(kind))) drawAtBodyTop('netModalBody', 'net-l3', 'switch', { kind: kind, id: id }); });
+    wrapOpener('bms', function (kind, id) { if (kind === 'controller' && win.BMS_MODEL) drawAtBodyTop('bmsModalBody', 'bms-l3', 'bms-controller', { bms: win.BMS_MODEL, id: id }); });
+    wrapOpener('rack', function (type) {
+      if (/psu|power|shelf/.test(String(type))) { drawRackPower('rack-power'); return; }
+      if (String(type) === 'ct') { drawRackPower('tray', { id: arguments[1] }); return; }
+      if (String(type) === 'ns') { drawRackPower('nvswitch-tray', { id: arguments[1] }); return; }
+      // compute / switch tray block diagrams still draw in the legacy svg: bring it back, drop the shelf sheet
+      var svg0 = doc.getElementById('rackModalSvg'), h = svg0 && svg0.parentNode.querySelector('.hmi-host[data-hmi-sheet="rack-l3"]');
+      if (svg0) svg0.removeAttribute('data-dh2-retired'); if (h) h.remove(); if (pageSheets['rack-l3']) { pageSheets['rack-l3'].destroy(); pageSheets['rack-l3'] = null; }
+    });
+    wrapOpener('mimic', function (type, dh) { drawMimic(type, dh); });
+    wrapOpener('stp', function () { drawInPageModal('eqHmi', 'eqHmiSvg', 'eq-l3', 'stp', {}); });
+    wrapOpener('ahu', function () { drawInPageModal('eqHmi', 'eqHmiSvg', 'eq-l3', 'ahu', {}); });
+    wrapOpener('dryCooler', function (id) { drawInPageModal('ctHmiModal', 'ctHmiSvg', 'dc-l3', 'dry-cooler', { id: id }); });
+    wrapOpener('bat', function () {   // the modal title is a nameplate (SCiB 480 VDC string), not an engine number: declare it
+      var t = doc.getElementById('batHmiTitle'); if (t && !t.hasAttribute('data-rz-authored-basis')) t.setAttribute('data-rz-authored-basis', 'battery system nameplate label (lithium-titanate SCiB string, 480 VDC) authored with the page UPS battery design; the engine publishes energy, not the string voltage');
+    });
+    wrapOpener('bat', function (feed) { drawInPageModal('batHmi', 'batHmiSvg', 'bat-l3', 'battery', { side: String(feed || 'A').toUpperCase().charAt(0), unit: 1 }); });
+    {   // the CDU opener does not need the cooling sheet (openCdu builds a stand-in node), so it is wired on every tab
       var O = win.RZDatahallAIHmiOpeners = win.RZDatahallAIHmiOpeners || {}, prev = O.cdu;
       if (prev && !prev.__hmiL3) {
         var wrapped = function (num) { prev(num); drawCduInPageModal(num); };
@@ -223,13 +403,77 @@
       } else if (!prev) O.cdu = function (num) { openCdu(num); };
     }
   }
-  setInterval(function () {
+  function repaintNow() {
     Object.keys(sheets).forEach(function (k) { if (sheets[k] && sheets[k].svg.getBoundingClientRect().width) sheets[k].update(); });
-    if (pageCduSheet && pageCduSheet.svg.getBoundingClientRect().width) pageCduSheet.update();   // CDU-nn inside the page modal, only while shown
-  }, 4000);
+    if (pageCduSheet && pageCduSheet.svg.getBoundingClientRect().width) pageCduSheet.update();
+    Object.keys(pageSheets).forEach(function (k) { var p = pageSheets[k]; if (p && p.svg.getBoundingClientRect().width) p.update(); });   // L3 sheets inside page modals, only while shown
+  }
+  setInterval(repaintNow, 4000);   // telemetry tick
+  /* an alarm reaches the sheet when its source changes, not on the next 4 s poll (owner brief: alarm status follows the
+     source event as the UI receives it) — a scenario change or an alarm-workspace event repaints at once */
+  doc.addEventListener('change', function (ev) { if (ev.target && /^(coolingScenario|electricalScenario)$/.test(ev.target.id)) repaintNow(); }, true);
+  ['rz-replay-change', 'rz-alarm-ack', 'rz-alarms-changed'].forEach(function (t) { doc.addEventListener(t, repaintNow); });
 
   /* ── 5. equipment modal (L3) ─────────────────────────────────────────────────────────────────────── */
   var back = null, lastFocus = null, modalSheet = null, pageCduSheet = null;
+  /* chiller / CRAH / battery: same pattern as the CDU — the page's modal keeps its contract, the L3 sheet replaces the
+     legacy mimic in its body (retired, not deleted); a builder that throws leaves the legacy mimic showing */
+  var pageSheets = {};
+  function drawInPageModal(modalId, legacyId, key, sheetId, o) {
+    var body = doc.querySelector('#' + modalId + ' [class$="-hmi-body"]'), snap = win.DCAI_CALC && win.DCAI_CALC.snapshot;
+    if (!body || !snap || !win.RZHmiSheet || !win.RZDatahallAISheets) return;
+    var legacy = doc.getElementById(legacyId), sheet;
+    try { sheet = win.RZDatahallAISheets.build(sheetId, snap, o); } catch (e) { if (win.console) console.warn('hmi-v2: ' + sheetId + ' — ' + e.message); return; }
+    if (legacy) legacy.setAttribute('data-dh2-retired', '');
+    var host = body.querySelector('.hmi-host[data-hmi-sheet="' + key + '"]');
+    if (!host) { host = el('div', { class: 'hmi-host', 'data-hmi-sheet': key }); body.appendChild(host); }
+    if (pageSheets[key]) { pageSheets[key].destroy(); pageSheets[key] = null; }
+    host.innerHTML = '';
+    pageSheets[key] = win.RZHmiSheet.render(host, sheet, sheetOpts());
+  }
+  /* a text modal keeps its detail; the L3 sheet goes on top of its body */
+  function drawAtBodyTop(bodyId, key, sheetId, o) {
+    var body = doc.getElementById(bodyId), snap = win.DCAI_CALC && win.DCAI_CALC.snapshot;
+    if (!body || !snap || !win.RZHmiSheet || !win.RZDatahallAISheets) return;
+    var sheet; try { sheet = win.RZDatahallAISheets.build(sheetId, snap, o); } catch (e) { if (win.console) console.warn('hmi-v2: ' + sheetId + ' — ' + e.message); return; }
+    var host = body.querySelector('.hmi-host[data-hmi-sheet="' + key + '"]');
+    if (!host) { host = el('div', { class: 'hmi-host', 'data-hmi-sheet': key }); body.insertBefore(host, body.firstChild); }
+    if (pageSheets[key]) { pageSheets[key].destroy(); pageSheets[key] = null; }
+    host.innerHTML = '';
+    pageSheets[key] = win.RZHmiSheet.render(host, sheet, sheetOpts());
+  }
+  /* SLD mimic: the feed one-line replaces the legacy four-panel mimic in its body (retired, not deleted); states from the
+     scenario engine (sheet id dh-e-*), zoomed to and selecting the device that was opened; the results panel stays */
+  function drawRackPower(which, o) {   // rack modal: the shelf one-line replaces the text-card mimic (retired, not deleted)
+    var svg0 = doc.getElementById('rackModalSvg'), snap = win.DCAI_CALC && win.DCAI_CALC.snapshot; if (!svg0 || !snap) return;
+    var sheet; try { sheet = win.RZDatahallAISheets.build(which || 'rack-power', snap, o || {}); } catch (e) { if (win.console) console.warn('hmi-v2: ' + (which || 'rack-power') + ' — ' + e.message); return; }
+    var par = svg0.parentNode, host = par.querySelector('.hmi-host[data-hmi-sheet="rack-l3"]');
+    if (!host) { host = el('div', { class: 'hmi-host', 'data-hmi-sheet': 'rack-l3' }); par.insertBefore(host, svg0); }
+    svg0.setAttribute('data-dh2-retired', '');
+    if (pageSheets['rack-l3']) { pageSheets['rack-l3'].destroy(); pageSheets['rack-l3'] = null; }
+    host.innerHTML = ''; pageSheets['rack-l3'] = win.RZHmiSheet.render(host, sheet, sheetOpts());
+  }
+  function drawMimic(type, dh) {
+    var body = doc.querySelector('#sldMimic .sld-mimic-body'), snap = win.DCAI_CALC && win.DCAI_CALC.snapshot;
+    if (!body || !snap || !win.RZHmiSheet || !win.RZDatahallAISheets) return;
+    var sheet; try { sheet = win.RZDatahallAISheets.build('sld-mimic', snap, { type: String(type || 'msb'), hall: Number(dh) || 1 }); } catch (e) { if (win.console) console.warn('hmi-v2: sld-mimic — ' + e.message); return; }
+    var legacy = doc.getElementById('sldMimicSvg'); if (legacy) legacy.setAttribute('data-dh2-retired', '');
+    var host = body.querySelector('.hmi-host[data-hmi-sheet="sld-l3"]');
+    if (!host) { host = el('div', { class: 'hmi-host', 'data-hmi-sheet': 'sld-l3' }); body.insertBefore(host, body.firstChild); }
+    if (pageSheets['sld-l3']) { pageSheets['sld-l3'].destroy(); pageSheets['sld-l3'] = null; }
+    host.innerHTML = '';
+    var api = pageSheets['sld-l3'] = win.RZHmiSheet.render(host, sheet, sheetOpts({ sheet: 'dh-e-101' }));
+    if (sheet.focusId) setTimeout(function () {
+      var g = api.svg.querySelector('.hmi-node[data-node="' + sheet.focusId + '"]');   // the feed sheet is legible at fit: select, do not zoom
+      if (g) { g.setAttribute('data-selected', ''); if (g.scrollIntoView) g.scrollIntoView({ block: 'center', inline: 'nearest' }); }
+    }, 60);
+  }
+  function wrapOpener(name, after) {
+    var O = win.RZDatahallAIHmiOpeners = win.RZDatahallAIHmiOpeners || {}, prev = O[name];
+    if (!prev || prev.__hmiL3) return;
+    var w = function () { prev.apply(this, arguments); after.apply(this, arguments); };
+    w.__hmiL3 = true; O[name] = w;
+  }
   function drawCduInPageModal(num) {
     var body = doc.querySelector('#cduHmi .cdu-hmi-body'), snap = win.DCAI_CALC && win.DCAI_CALC.snapshot;
     if (!body || !snap || !win.RZHmiSheet || !win.RZDatahallAISheets) return;
@@ -239,7 +483,7 @@
     if (!host) { host = el('div', { class: 'hmi-host', 'data-hmi-sheet': 'cdu-l3' }); body.appendChild(host); }
     if (pageCduSheet) { pageCduSheet.destroy(); pageCduSheet = null; }
     host.innerHTML = '';
-    try { pageCduSheet = win.RZHmiSheet.render(host, win.RZDatahallAISheets.build('cdu', snap, { id: id }), { read: read }); }
+    try { pageCduSheet = win.RZHmiSheet.render(host, win.RZDatahallAISheets.build('cdu', snap, { id: id }), sheetOpts()); }
     catch (e) { if (legacy) legacy.removeAttribute('data-dh2-retired'); if (win.console) console.warn('hmi-v2: CDU sheet', e.message); }
   }
   function close() { if (!back) return; back.hidden = true; if (modalSheet) modalSheet.destroy(); modalSheet = null; if (lastFocus) lastFocus.focus(); }
@@ -279,7 +523,7 @@
       '<div class="hmi-m-foot"><div><div class="hmi-m-sec">Trend, last 24 h (simulated)</div><div class="hmi-trend">' + trend(id) + '</div></div>' +
       '<div><div class="hmi-m-sec">Alarms</div><ul class="hmi-evt">' + (rs.filter(function (r) { return r.alarm; }).map(function (r) { return '<li>' + r.label + ' · ' + text(r) + '</li>'; }).join('') || '<li>None active</li>') + '</ul></div></div></div>';
     back.hidden = false;
-    modalSheet = win.RZHmiSheet.render(back.querySelector('.hmi-m-draw'), win.RZDatahallAISheets.build('cdu', win.DCAI_CALC.snapshot, { id: id }), { read: read });
+    modalSheet = win.RZHmiSheet.render(back.querySelector('.hmi-m-draw'), win.RZDatahallAISheets.build('cdu', win.DCAI_CALC.snapshot, { id: id }), sheetOpts());
     back.querySelector('[data-close]').addEventListener('click', close);
     $$('[data-trace]', back).forEach(function (b) {
       b.addEventListener('click', function () {
@@ -328,12 +572,16 @@
     /* the fire sheets need the workstation inventory, which exists only once the engine authority has validated
        and the fire workstation has booted (often after the Fire tab is first opened) — so mounting keeps retrying:
        fast for 10 s, then every 1.5 s for 5 min, and on every tab click, until all 8 sheets are up */
-    var tries = 0, done = function () { return Object.keys(sheets).length >= 10; };
+    var tries = 0, done = function () { return Object.keys(sheets).length >= 14; };
     function tick() { if (win.DCAI_CALC && win.RZDatahallAISheets && doc.getElementById('coolSvg')) mountAll(); }
     var t = setInterval(function () { tries++; tick(); if (done() || tries > 40) { clearInterval(t); if (!done()) slow(); } }, 250);
     function slow() { var n = 0, t2 = setInterval(function () { n++; tick(); if (done() || n > 200) clearInterval(t2); }, 1500); }
-    doc.addEventListener('click', function (ev) { if (!done() && ev.target.closest && ev.target.closest('#tabs, #fireTabs, #netTabs, .elec-tabs')) setTimeout(tick, 600); }, true);
+    function onTab(ev) {   // a panel's sheets are drawn when it is shown: right after the page's own tab handler, and again once its builder has run
+      if (ev.type === 'keydown' && !/^(Enter| |Arrow(Left|Right|Up|Down)|Home|End)$/.test(ev.key)) return;
+      if (ev.target.closest && ev.target.closest('#tabs, #fireTabs, #netTabs, .elec-tabs')) { setTimeout(tick, 60); setTimeout(tick, 600); }
+    }
+    doc.addEventListener('click', onTab, true); doc.addEventListener('keydown', onTab, true);   // hall SLDs are drawn lazily per sub-tab: mount after every tab click (mount() skips a sheet already up)
   }
   if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', boot); else boot();
-  win.RZDhHmiV2 = { setSide: setSide, sheets: sheets, open: open };
+  win.RZDhHmiV2 = { setSide: setSide, sheets: sheets, open: open, repaint: repaintNow };
 })(typeof window !== 'undefined' ? window : null, typeof document !== 'undefined' ? document : null);

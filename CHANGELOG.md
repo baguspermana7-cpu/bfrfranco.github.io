@@ -11,6 +11,66 @@ release sections rather than semver.
 
 ---
 
+## v3.62.1 — 2026-11-15 — datahallAI as an operator BMS: flow only with evidence, alarm badges, equipment finder, cooling overview and named equipment, SLDs without icon grids, schematic modals, 6 ms repaint
+
+- **Gates that read the clock.** `audit-editorial-render.mjs` pins the page clock to local noon: achievements.html unlocks "Night Owl" between 22:00 and 05:00, which added 4 off-scale values, so the unchanged v3.61.0 tree failed at 00:40 (487 → 491) and passed at 20:00. A zoom button now commits its viewBox at once (only wheel and pinch gestures defer it); the Conventional truth gate B5 read the viewBox right after the click and saw the old one.
+
+- **Deferred panels kept deferred (gate D6).** hmi-v2 drew all 14 sheets into hidden tab panels at boot, so 6,127 attribute writes landed in panels nobody could see (p-over 1,797, p-elec 1,378, p-fire 957 …). A sheet is now drawn when its panel is shown (tab click or key), the CDU opener no longer waits for the cooling sheet. `tools/test-dcai-deferred-panels.mjs`: 7 failures on db5284edf, clean after.
+
+### Added
+- **Electrical → DH-02 … DH-08 are HMI sheets** (DH-E-102 … DH-E-108), drawn by the DH-01 builder for each hall; the
+  engine sizes every hall the same, so the sheets differ only in name. A hall sheet mounts when its sub-tab draws.
+- **Cooling → DH-M-102 heat rejection** (the dry-cooler field with every installed unit, HTW loop to the CDU line, CW loop
+  from the chiller condensers, chillers making CHW for the air path; temperatures from the engine's design planes) and
+  **DH-M-104 TCS to the rack rows** (supply / return headers, one manifold per rack row, flow per rack). The off-sheet
+  links on DH-M-103 now lead somewhere.
+- **Chiller, CRAH and battery modals draw their L3 sheet** like the CDU modal: chiller (evaporator, condenser, compressor,
+  expansion valve, CHW / CW transmitters with design temperatures, TE / TC), fan wall (filter, CHW coil and valve, four
+  EC fans, supply / return air), battery (DC bus, four strings with breaker and fuse, kWh per frame). The page modal
+  keeps its focus / inert / aria contract; the old mimic is retired, not deleted.
+
+- **The sheets tell the operator only what the data supports** (owner brief "BMS UI/UX master prompt"): a line animates
+  only when the pump, fan or equipment driving it runs with good data — stopped pumps stop their lines, missing samples
+  stop all motion; items with no data (isolation valves, strainers) are drawn neutral instead of looking healthy; every
+  node carries its data quality; an alarm shows a priority badge readable without colour, hollow once acknowledged; each
+  CDU pump shows its own state (pump 3 was hard-coded standby). Gate `tools/test-dh-operator.mjs` (12 laws, 9 red
+  before the change). Plan: `documentation/prd/datahall-ai/PRD_BMS_OPERATOR_HMI.md`. Electrical sheets take breaker, transformer, ATS and UPS states
+  from the page's electrical scenario engine (a tripped busway stops its lines; a lost utility de-energises its
+  transformer; UPS bypass closes the static switch); the bus tie reads open, as designed.
+- **Find equipment on every sheet:** a finder in the sheet bar lists every item by tag and name; choosing one zooms to it,
+  selects it and focuses it — on a phone the fitted sheet is too small to tap. Sheets fit without overflow at 360, 768,
+  1440 and 1920 px and at 200 % browser zoom; opening and closing an equipment modal keeps the sheet's zoom and selection.
+- **BMS controller modals draw the controller** dual-homed on the supervisory ring, its field I/O and the servers (from
+  the page's BMS model), above their detail.
+- **Network modals draw the switch** (uplinks, downlinks, OOB, dual power, per-switch counts from the engine's hall link
+  totals) above their detail. Fixed: the network sheets printed 400G ports while the engine's published port class is
+  800G — every port speed now comes from the engine.
+- **More modals draw a schematic instead of text cards:** SLD mimic (the full feed one-line, states from the scenario engine,
+  opened device selected — the old four tiny panels showed a `null%` gauge), rack power shelves, GB300 compute tray (the
+  old block named the GPU B200, the GB200 part; counts now from the engine), NVLink switch tray, STP, AHU.
+- **Fire → Mimic → DH-F-102 clean-agent release:** cylinder bank (release state from the workstation), manifold, one
+  selector valve and nozzle set per release zone of the fire inventory.
+- **Legibility:** no sheet renders below the scale its smallest label needs (≥ 8.5 px on screen); narrow screens scroll the
+  sheet inside its frame instead of shrinking it; stacked tag / name / rating lines 12 px apart. The geometry gate counted
+  515 label overlaps and 964 illegible labels on the v3.61.1 candidate; 0 and 0 after (4,816 labels, 96 views).
+- **Fixed regressions from v3.60.0:** the SIMULATED · ENGINE BASIS provenance banner was invisible (its slot sat in the hidden
+  header row) — it is back in the nav row with its 44 px dismiss; CDU pumps and the SLD battery opened no inspector.
+- **Faster sheets:** a repaint of the Room Layout sheet took 2.2–3.2 s (the whole electrical topology was re-evaluated
+  for every item) and now takes 6 ms; zoom and pan move the drawn sheet on the GPU and re-render it sharp when it settles
+  (60 fps median); an alarm reaches the sheet when its source changes (174 ms) instead of on the next 4 s poll. The
+  20 ms p95 frame target is not met yet (50 ms on this laptop's GPU) — measured and recorded in the PRD.
+
+### Fixed
+- **DH-E-001 listed DH-02 … DH-04 instead of DH-02 … DH-08** (shipped in v3.60.0): it took `site.hall_levels` (4 levels)
+  as the hall count. The count now comes from the engine — installed CDUs on the campus ÷ installed CDUs per hall
+  (440 ÷ 55 = 8) — in the site sheet, the UPS split per hall and the hall builder; the hard-coded `halls = 8` is gone.
+- **The drawings gate and the local mock had stopped unlocking the cockpit** (since v3.57.7 a session forged in
+  localStorage no longer unlocks it, and the page re-locks): both now clear the auth blockers with the shared audit helper's
+  observer, as every other cockpit browser gate does. A sheet builder that throws now leaves the old drawing in place.
+- Gate `tools/test-datahall-ai-inspector-runtime.mjs`: its file server wrote headers before reading the file, so the
+  first missing file crashed the run (ERR_HTTP_HEADERS_SENT); it now reads first and lists any 404 the page requested.
+- Gate `tools/test-dh-drawings.mjs`: H0 ratchet 10 → 14 (DH-02, DH-08, DH-M-102, DH-M-104); `tools/lib/cockpit-tabs.mjs` hall
+  SLD selectors point at the sheets (labels unchanged).
 ## v3.62.0 — 2026-11-15 — Conventional cockpits redrawn as HMI sheets that tell the truth about flow, state and data quality
 
 ### Added

@@ -101,6 +101,15 @@ export async function measurePage(browser, url, scale = SCALE) {
     await tab.setViewport({ width: SCALE.viewport, height: 900 });
     await tab.setRequestInterception(true);
     tab.on('request', (rq) => (rq.url().startsWith('file:') || rq.url().startsWith('data:') ? rq.continue() : rq.abort()));
+    /* the clock is pinned to local noon of today: achievements.html unlocks "Night Owl" between 22:00 and 05:00 and
+       its unlocked card adds 4 off-scale values, so the same tree passed at 20:00 and failed at 00:40 (v3.62.1) */
+    await tab.evaluateOnNewDocument(() => {
+      const D = Date, noon = new D(); noon.setHours(12, 0, 0, 0); const t0 = noon.getTime(), w0 = D.now();
+      const now = () => t0 + (D.now() - w0);
+      function P(...a) { return new.target ? (a.length ? new D(...a) : new D(now())) : new D(now()).toString(); }
+      P.prototype = D.prototype; P.now = now; P.parse = D.parse; P.UTC = D.UTC;
+      window.Date = P;
+    });
     await tab.goto(url, { waitUntil: 'domcontentloaded', timeout: 30000 });
     /* settle: the DOM a page builds in script must be there before it is counted (a fixed 300 ms let 3 of 278
      * pages differ between two runs) — wait until the element count holds for two 250 ms polls, at most 4 s */

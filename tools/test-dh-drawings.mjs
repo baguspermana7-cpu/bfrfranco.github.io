@@ -32,6 +32,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import puppeteer from 'puppeteer';
 import { isSupabaseModule, signedInStorage, signedInSupabaseBody } from './lib/signed-in-supabase.mjs';
+import { enterAuthorizedAuditState } from './lib/cockpit-audit-state.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const arg = (k) => (process.argv.find((a) => a.startsWith(`--${k}=`)) || '').split('=')[1];
@@ -46,11 +47,11 @@ const law = (id, ok, msg) => {
   console.log(`${ok ? 'PASS' : 'FAIL'} ${id} ${msg}`);
 };
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-const SHEETS = [['hall', null, 'hSvg'], ['over', null, 'floorSvg', 'hmiFloorPlanSvg'], ['rack', null, 'rackSvg', 'hmiRackSvg'], ['cool', null, 'coolSvg', 'hmiCoolSvg'],
-  ['elec', 'Overview', 'elecOvSvg', 'hmiElecOvSvg'], ['elec', 'DH-01', 'elecDH1Svg', 'hmiElecDH1Svg'], ['net', 'Compute fabric', 'netSvg', 'hmiNetSvg'],
+const SHEETS = [['hall', null, 'hSvg'], ['over', null, 'floorSvg', 'hmiFloorPlanSvg'], ['rack', null, 'rackSvg', 'hmiRackSvg'], ['cool', null, 'coolSvg', 'hmiCoolSvg'], ['cool', null, 'coolSvg', 'hmiCoolPlantSvg'], ['cool', null, 'coolSvg', 'hmiCoolRowsSvg'],
+  ['elec', 'Overview', 'elecOvSvg', 'hmiElecOvSvg'], ['elec', 'DH-01', 'elecDH1Svg', 'hmiElecDH1Svg'], ['elec', 'DH-02', 'elecDH2Svg', 'hmiElecDH2Svg'], ['elec', 'DH-08', 'elecDH8Svg', 'hmiElecDH8Svg'], ['net', 'Compute fabric', 'netSvg', 'hmiNetSvg'],
   ['net', 'Corporate & DC internet', 'wanSvg', 'hmiWanSvg'], ['net', 'Security network', 'secSvg', 'hmiSecSvg'], ['fire', 'Mimic', 'fireSvg', 'hmiFireSvg'], ['bms', null, 'bmsSvg', 'hmiBmsSvg']];
 const STRICT_ALL = process.argv.includes('--strict-all');
-const HMI_MIN = 10;   // ratchet: sheets already redrawn (room layout plan, rack, cool, elec overview + DH-01, fabric, WAN, security, fire, BMS) — a lower count fails
+const HMI_MIN = 14;   // ratchet: sheets already redrawn (heat rejection, TCS rows, room layout plan, rack, cool, elec overview + DH-01, fabric, WAN, security, fire, BMS, hall SLDs DH-02 and DH-08 sampled) — a lower count fails
 
 const srv = http.createServer((req, res) => {
   const p = path.join(ROOT, decodeURIComponent(req.url.split(/[?#]/)[0]));
@@ -65,8 +66,8 @@ await new Promise((r) => srv.listen(0, '127.0.0.1', r));
 const ORIGIN = `http://127.0.0.1:${srv.address().port}/`;
 const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
 
-async function open(vp, theme) {
-  const pg = await browser.newPage();
+async function open(vp, theme, ctx) {
+  const pg = await (ctx || browser).newPage();
   pg.errors = [];
   pg.on('pageerror', (e) => pg.errors.push(e.message));
   await pg.setRequestInterception(true);
@@ -85,7 +86,13 @@ async function open(vp, theme) {
     } catch (x) { /* no storage */ }
   }, theme, signedInStorage({ email: 'educator@resistancezero.com', tier: 'pro', role: 'educator' }));
   await pg.goto(ORIGIN + PAGE, { waitUntil: 'networkidle2', timeout: 60000 });
+  /* the signed-in stub makes auth.js sync the server role once, and that reloads the page; under ship-gate load the
+     reload arrived mid-test ('Promise was collected' after H15) — wait it out here (no reload within 8 s = none) */
+  await pg.waitForNavigation({ waitUntil: 'networkidle2', timeout: 8000 }).catch(() => {});
   await wait(800);
+  /* since v3.57.7 a session forged in localStorage no longer unlocks the cockpit (the page re-locks); the shared audit
+     helper keeps the auth blockers off with an observer, as every other cockpit browser gate does */
+  await enterAuthorizedAuditState(pg, 'dc-ai');
   return pg;
 }
 async function showSheet(pg, tab, sub) {
@@ -128,7 +135,7 @@ for (const [tab, sub, legacyId, hmiId] of SHEETS) {
     const id = v.id, hmi = v.classList.contains('hmi-svg');
     const box = v.getBoundingClientRect();
     const frame = (v.closest('[data-sheet-frame]') || v.parentElement).getBoundingClientRect();
-    const SKIP = '[data-role="tag"],[data-role="value"],[data-role="line"],[data-role="titleblock"],[data-role="titleblock"] *';
+    const SKIP = '[data-role="tag"],[data-role="value"],[data-role="line"],[data-role="name"],[data-role="legend"],[data-role="titleblock"],[data-role="titleblock"] *';
     const words = [...v.querySelectorAll('text')].filter((t) => !t.closest(SKIP))
       .map((t) => t.textContent.trim()).join(' ').split(/\s+/).filter((w) => /[A-Za-z]{2,}/.test(w)).length;
     const items = [...v.querySelectorAll('[data-rz-equipment]')];
@@ -146,7 +153,7 @@ for (const [tab, sub, legacyId, hmiId] of SHEETS) {
     });
     const routed = v.querySelectorAll('path.hmi-edge[data-routed]').length;
     const filtered = [...v.querySelectorAll('*')].filter((e) => { const f = getComputedStyle(e).filter; return f && f !== 'none'; }).length;   // H17
-    return { id, hmi, w: Math.round(box.width), h: Math.round(box.height), frameW: Math.round(frame.width), words, paint: paint(v), cross, crossIds: crossIds.slice(0, 6), routed, filtered,
+    return { id, hmi, w: Math.round(box.width), h: Math.round(box.height), frameW: Math.round(frame.width), scrollsInFrame: !!(v.parentElement && v.parentElement.classList.contains('hmi-vp') && getComputedStyle(v.parentElement).overflowX === 'auto'), words, paint: paint(v), cross, crossIds: crossIds.slice(0, 6), routed, filtered,
       items: items.length, sym: items.filter((e) => META[e.getAttribute('data-sym')] || e.querySelector('[data-sym]')).length,
       named: items.filter((e) => (e.getAttribute('aria-label') || e.querySelector(':scope > title')) && e.getAttribute('tabindex') !== null).length };
   }, legacyId, hmiId, PROBE.paint.toString());
@@ -162,7 +169,7 @@ law('H17', shown.every((r) => r.filtered <= 12), 'elements carrying an SVG filte
 law(STRICT_ALL ? 'H16' : 'H16 (reported)', !STRICT_ALL || shown.every((r) => r.cross === 0), 'edges through a symbol body they do not end on (R147 routing): ' + shown.map((r) => `${r.id} ${r.cross}${r.crossIds.length ? ' [' + r.crossIds.join(' ') + ']' : ''} routed ${r.routed}`).join(', '));
 law('H4', allItems > 0 && allNamed === allItems, `items with a name and keyboard focus: ${allNamed} / ${allItems}`);
 law('H5', shown.every((r) => r.words <= 8), 'words per sheet outside tags/values (<= 8, R144): ' + shown.map((r) => `${r.id} ${r.words}`).join(', '));
-law('H6', shown.every((r) => r.w <= r.frameW + 1), '1440 sheet width vs frame: ' + shown.map((r) => `${r.id} ${r.w}/${r.frameW}`).join(', '));
+law('H6', shown.every((r) => r.w <= r.frameW + 1 || r.scrollsInFrame), '1440 sheet fits its frame or scrolls inside it: ' + shown.map((r) => `${r.id} ${r.w}/${r.frameW}`).join(', '));
 const flr = sheetRows.find((r) => r.id === 'floorSvg'), rk = sheetRows.find((r) => r.id === 'rackSvg' || r.id === 'hmiRackSvg');
 law(STRICT_ALL ? 'H13' : 'H13 (reported)', !STRICT_ALL || (!!flr && !flr.missing && flr.w > 0 && flr.h > 0 && !!rk && !rk.missing && rk.w > 0 && rk.h > 0),
   `first open: Room Layout ${flr && !flr.missing ? flr.w + '×' + flr.h : 'missing'}, Rack ${rk && !rk.missing ? rk.w + '×' + rk.h : 'missing'}`);
@@ -181,7 +188,7 @@ const fire = await pg.evaluate(() => {
   const unknown = dev.filter((g) => { const s = g.getAttribute('data-state'); return !s || s === 'unknown'; }).length;
   const rects = dev.filter((g) => g.querySelector('[data-sym]')).map((g) => g.querySelector('[data-sym]').getBoundingClientRect());
   let ov = 0; for (let i = 0; i < rects.length; i++) for (let j = i + 1; j < rects.length; j++) { const a = rects[i], c = rects[j]; if (a.left < c.right - 1 && c.left < a.right - 1 && a.top < c.bottom - 1 && c.top < a.bottom - 1) ov++; }
-  const SKIP = '[data-role="tag"],[data-role="value"],[data-role="line"],[data-role="titleblock"],[data-role="titleblock"] *';
+  const SKIP = '[data-role="tag"],[data-role="value"],[data-role="line"],[data-role="name"],[data-role="legend"],[data-role="titleblock"],[data-role="titleblock"] *';
   const words = [...svg.querySelectorAll('text')].filter((t) => !t.closest(SKIP)).map((t) => t.textContent.trim()).join(' ').split(/\s+/).filter((x) => /[A-Za-z]{2,}/.test(x)).length;
   const paint = svg.querySelectorAll('linearGradient,radialGradient,filter').length;
   return { host: true, hostW: Math.round(hb.width), svgW: Math.round(sb.width), expected, dev: dev.length, zones: zones.length, nodes: nodes.length, named, unknown, ov, words, paint };
@@ -203,9 +210,14 @@ const sh0 = await pg.evaluate(() => { const f = [...document.querySelectorAll('.
 await pg.evaluate(() => { const f = [...document.querySelectorAll('.hmi-frame')].find((x) => x.getBoundingClientRect().width); f && f.querySelector('[data-shade-btn]').click(); });
 await wait(200);
 const sh1 = await pg.evaluate(() => { const f = [...document.querySelectorAll('.hmi-frame')].find((x) => x.getBoundingClientRect().width); const b = f.querySelector('.hmi-node .b'); return { mode: f.dataset.shade, fill: getComputedStyle(b).fill, tube: getComputedStyle(f.querySelector('.hmi-edge-shadow') || f).display }; });
-const pg2 = await open({ width: 1440, height: 1000 }, 'dark'); await showSheet(pg2, 'fire', 'Mimic'); await wait(3000);   // persistence read on a fresh page of the same origin
+/* persistence: in its OWN browser context (a second tab of the same context writes the signed-in Supabase keys, and the
+   first tab's auth sync reloaded it mid-run — 'Promise was collected'): turn Shade off there, reload, read it back */
+const iso = await browser.createBrowserContext();
+const pg2 = await open({ width: 1440, height: 1000 }, 'dark', iso); await showSheet(pg2, 'fire', 'Mimic'); await wait(2500);
+await pg2.evaluate(() => { const f = [...document.querySelectorAll('.hmi-frame')].find((x) => x.getBoundingClientRect().width); f && f.querySelector('[data-shade-btn]').click(); });
+await wait(200); await pg2.reload({ waitUntil: 'networkidle2' }); await wait(800); await enterAuthorizedAuditState(pg2, 'dc-ai'); await showSheet(pg2, 'fire', 'Mimic'); await wait(2500);
 const sh2 = await pg2.evaluate(() => { const f = [...document.querySelectorAll('.hmi-frame')].find((x) => x.getBoundingClientRect().width); return f ? f.dataset.shade : null; });
-await pg2.evaluate(() => { try { localStorage.removeItem('rz_hmi_shade'); } catch (e) { /* none */ } }); await pg2.close();
+await iso.close();
 await pg.evaluate(() => { try { localStorage.removeItem('rz_hmi_shade'); } catch (e) { /* none */ } });
 law('H15', !!sh0 && sh0.mode === 'deep' && sh0.defs && /url\(/.test(sh0.fill) && sh0.btn && sh1.mode === 'flat' && !/url\(/.test(sh1.fill) && sh1.tube === 'none' && sh2 === 'flat',
   `shade default ${sh0 && sh0.mode} (body fill ${sh0 && sh0.fill.slice(0, 18)}), after Shade off: ${sh1.mode} fill ${sh1.fill.slice(0, 18)} tubes ${sh1.tube}, after reload ${sh2}`);
@@ -264,7 +276,7 @@ let persisted = false;
 if (['pinned', 'auto', 'hidden'].every((m) => modes.includes(m))) {
   await pg.evaluate(() => document.querySelector('[data-side-mode="auto"]').click());
   await pg.reload({ waitUntil: 'networkidle2' });
-  await wait(600);
+  await wait(600); await enterAuthorizedAuditState(pg, 'dc-ai');
   persisted = await pg.evaluate(() => document.body.getAttribute('data-side') === 'auto');
 }
 law(STRICT_ALL ? 'H12' : 'H12 (reported)', !STRICT_ALL || persisted, `sidebar modes offered [${modes.join(', ') || 'none'}], auto-hide survives reload ${persisted}`);
@@ -281,12 +293,14 @@ for (const [tab, sub, legacyId, hmiId] of SHEETS) {
     const v = document.getElementById(hmiId) || document.getElementById(legacyId), id = v ? v.id : legacyId;
     const sw = document.documentElement.scrollWidth, cw = document.documentElement.clientWidth;
     if (!v || !v.classList.contains('hmi-svg')) return { id, ok: false, why: 'not an HMI sheet' };
-    const w = v.getBoundingClientRect().width, f = (v.closest('[data-sheet-frame]') || v.parentElement).getBoundingClientRect().width;
-    return { id, ok: w <= f + 1 && sw <= cw, why: `${Math.round(w)}/${Math.round(f)} page ${sw}/${cw}` };
+    // fits, or (v3.61.1 legibility floor) scrolls inside its own viewport — never widens the page
+    const vp = v.parentElement, fr = v.closest('.hmi-frame').getBoundingClientRect(), w = v.getBoundingClientRect().width, f = vp.getBoundingClientRect().width;
+    const ok = sw <= cw && fr.right <= cw + 1 && (w <= f + 1 || getComputedStyle(vp).overflowX === 'auto');
+    return { id, ok, why: `${Math.round(w)}/${Math.round(f)}${w > f + 1 ? ' scrolls in frame' : ''} page ${sw}/${cw}` };
   }, legacyId, hmiId));
 }
 law('H6', narrow.every((r) => r.ok), '390 light: ' + narrow.map((r) => `${r.id} ${r.why}`).join(', '));
-law('F8', narrow.some((r) => r.id === 'hmiFireSvg' && r.ok), '390 fire sheet fits its frame, no page overflow');
+law('F8', narrow.some((r) => r.id === 'hmiFireSvg' && r.ok), '390 fire sheet fits or scrolls inside its frame, no page overflow');
 await ph.close();
 
 await browser.close();
