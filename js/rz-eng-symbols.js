@@ -122,7 +122,15 @@
       netCarrier: { label: "Carrier / external network", category: "network" },
       netOdf: { label: "Fibre distribution (ODF / patch)", category: "network" },
       bmsController: { label: "BMS controller (DDC / PLC)", category: "network" },
-      transformer2w: { label: "Two-winding transformer", category: "electrical" }
+      transformer2w: { label: "Two-winding transformer", category: "electrical" },
+      tankStorage: { label: "Atmospheric storage tank (fire-water reserve)", category: "fire" },
+      preActionValve: { label: "Pre-action valve with solenoid release trim", category: "fire" },
+      alarmValve: { label: "Wet-pipe alarm check valve", category: "fire" },
+      sprinklerHead: { label: "Sprinkler head (pendent)", category: "fire" },
+      compressor: { label: "Compressor / nitrogen generator", category: "process" },
+      coolingTowerCell: { label: "Cooling tower cell (induced draft, with basin)", category: "process" },
+      uvSteriliser: { label: "UV steriliser", category: "process" },
+      gensetDiesel: { label: "Diesel generating set (engine + alternator)", category: "process" }
     },
     MARKUP: {
       utility: "<path d=\"M24 4 L11 44 M24 4 L37 44\" /><path d=\"M16 26 L32 38 M32 26 L16 38\" stroke-width=\"1.3\" /><path d=\"M7 16 H41 M10 30 H38\" /><path d=\"M9 16 v4 M39 16 v4 M14 30 v4 M34 30 v4\" stroke-width=\"1.4\" /><path d=\"M24 8 v4\" stroke-width=\"1.4\" />",
@@ -239,7 +247,15 @@
       netCarrier: "<path d=\"M24 36 V48\"/><path class=\"b\" d=\"M12 36 A8 8 0 0 1 12 20 A10 10 0 0 1 30 14 A9 9 0 0 1 38 36 Z\"/>",
       netOdf: "<path d=\"M24 0 V12 M24 36 V48\"/><rect class=\"b\" x=\"4\" y=\"12\" width=\"40\" height=\"24\" rx=\"1\"/><circle cx=\"12\" cy=\"24\" r=\"2\"/><circle cx=\"20\" cy=\"24\" r=\"2\"/><circle cx=\"28\" cy=\"24\" r=\"2\"/><circle cx=\"36\" cy=\"24\" r=\"2\"/>",
       bmsController: "<path d=\"M24 0 V8 M12 40 V48 M36 40 V48\"/><rect class=\"b\" x=\"6\" y=\"8\" width=\"36\" height=\"32\" rx=\"1\"/><path d=\"M12 16 H36 M12 22 H28\"/><path d=\"M12 32 H16 M20 32 H24 M28 32 H32\"/>",
-      transformer2w: "<path d=\"M24 0 V6 M24 42 V48\"/><circle class=\"b\" cx=\"24\" cy=\"17\" r=\"11\"/><circle cx=\"24\" cy=\"31\" r=\"11\"/><path d=\"M20 15 L24 11 L28 15 Z M20 30 L24 34 L28 30 M24 34 V28\" stroke-width=\"1.2\"/>"
+      transformer2w: "<path d=\"M24 0 V6 M24 42 V48\"/><circle class=\"b\" cx=\"24\" cy=\"17\" r=\"11\"/><circle cx=\"24\" cy=\"31\" r=\"11\"/><path d=\"M20 15 L24 11 L28 15 Z M20 30 L24 34 L28 30 M24 34 V28\" stroke-width=\"1.2\"/>",
+      tankStorage: "<path d=\"M24 0 V6 M38 42 H48\"/><path class=\"b\" d=\"M10 12 Q24 2 38 12 V46 H10 Z\"/><path d=\"M10 22 H38\" stroke-dasharray=\"3 2\"/>",
+      preActionValve: "<path d=\"M0 24 H6 M42 24 H48 M24 24 V14\"/><path class=\"b\" d=\"M6 14 L24 24 L6 34 Z M42 14 L24 24 L42 34 Z\"/><rect x=\"16\" y=\"2\" width=\"16\" height=\"12\" rx=\"1\"/><path d=\"M19 11 L24 5 L29 11\"/>",
+      alarmValve: "<path d=\"M0 24 H6 M42 24 H48 M24 24 V12\"/><path class=\"b\" d=\"M6 14 L24 24 L6 34 Z M42 14 L24 24 L42 34 Z\"/><path d=\"M16 12 Q24 2 32 12 Z\"/>",
+      sprinklerHead: "<path d=\"M24 0 V16\"/><path class=\"b\" d=\"M18 16 H30 L27 24 H21 Z\"/><path d=\"M16 30 H32 M18 34 L14 40 M24 34 V42 M30 34 L34 40\"/>",
+      compressor: "<path d=\"M0 24 H10 M38 24 H48\"/><circle class=\"b\" cx=\"24\" cy=\"24\" r=\"14\"/><path d=\"M14 14 L36 19 M14 34 L36 29\"/>",
+      coolingTowerCell: "<path d=\"M0 36 H9 M48 12 H38 M48 42 H40 M24 44 V48\"/><path class=\"b\" d=\"M8 44 L12 6 H36 L40 44 Z\"/><path d=\"M9 34 H39\" stroke-dasharray=\"3 2\"/><path d=\"M16 2 H32 M24 2 V6\"/><path d=\"M17 18 L31 18 M16 24 L32 24\"/>",
+      uvSteriliser: "<path d=\"M0 24 H6 M42 24 H48\"/><rect class=\"b\" x=\"6\" y=\"14\" width=\"36\" height=\"20\" rx=\"10\"/><path d=\"M14 24 H34\" stroke-width=\"2.2\"/><path d=\"M16 8 L18 12 M24 6 V11 M32 8 L30 12 M16 40 L18 36 M24 42 V37 M32 40 L30 36\"/>",
+      gensetDiesel: "<path d=\"M0 30 H6 M0 42 H6 M42 24 H48\"/><rect class=\"b\" x=\"6\" y=\"12\" width=\"20\" height=\"34\" rx=\"1\"/><path d=\"M10 20 H22 M10 26 H22 M10 32 H22\"/><path d=\"M26 24 H28\"/><circle class=\"b\" cx=\"35\" cy=\"24\" r=\"7\"/><path d=\"M31 24 C32.5 21 34 21 35 24 C36 27 37.5 27 39 24\"/>"
     },
     /* HMI fields (R128, PRD §4): standard, ports on the 6-unit grid, states, tag prefix. Only kinds that declare them. */
     STANDARD: {
@@ -321,7 +337,15 @@
       netCarrier: "— (neutral)",
       netOdf: "— (neutral)",
       bmsController: "— (neutral)",
-      transformer2w: "IEC 60617-6"
+      transformer2w: "IEC 60617-6",
+      tankStorage: "ISO 10628-2",
+      preActionValve: "NFPA 170 / NFPA 13",
+      alarmValve: "NFPA 170 / NFPA 13",
+      sprinklerHead: "NFPA 170",
+      compressor: "ISO 10628-2",
+      coolingTowerCell: "ISO 10628-2",
+      uvSteriliser: "ISO 10628-2",
+      gensetDiesel: "ISO 10628-2 / IEC 60617-6"
     },
     PORTS: {
       pumpCentrifugal: {"suction":[0,24,"liquid"],"discharge":[48,24,"liquid"]},
@@ -402,7 +426,15 @@
       netCarrier: {"handoff":[24,48,"data"]},
       netOdf: {"a":[24,0,"data"],"b":[24,48,"data"]},
       bmsController: {"net":[24,0,"data"],"io1":[12,48,"signal"],"io2":[36,48,"signal"]},
-      transformer2w: {"hv":[24,0,"power"],"lv":[24,48,"power"]}
+      transformer2w: {"hv":[24,0,"power"],"lv":[24,48,"power"]},
+      tankStorage: {"inlet":[24,0,"liquid"],"outlet":[48,42,"liquid"]},
+      preActionValve: {"a":[0,24,"liquid"],"b":[48,24,"liquid"],"signal":[24,0,"signal"]},
+      alarmValve: {"inlet":[0,24,"liquid"],"outlet":[48,24,"liquid"]},
+      sprinklerHead: {"inlet":[24,0,"liquid"]},
+      compressor: {"suction":[0,24,"gas"],"discharge":[48,24,"gas"]},
+      coolingTowerCell: {"makeup":[0,36,"liquid"],"hotIn":[48,12,"liquid"],"basinOut":[48,42,"liquid"],"blowdown":[24,48,"liquid"]},
+      uvSteriliser: {"inlet":[0,24,"liquid"],"outlet":[48,24,"liquid"]},
+      gensetDiesel: {"fuelIn":[0,30,"liquid"],"fuelRet":[0,42,"liquid"],"out":[48,24,"power"]}
     },
     STATES: {
       pumpCentrifugal: ["running","stopped","standby","fault","manual"],
@@ -483,7 +515,15 @@
       netCarrier: ["up","degraded","down"],
       netOdf: ["normal"],
       bmsController: ["online","offline","fault"],
-      transformer2w: ["energized","de-energized","fault"]
+      transformer2w: ["energized","de-energized","fault"],
+      tankStorage: ["normal","low","lowlow"],
+      preActionValve: ["closed","open","fault"],
+      alarmValve: ["closed","open","fault"],
+      sprinklerHead: ["normal","operated"],
+      compressor: ["running","stopped","standby","fault"],
+      coolingTowerCell: ["running","stopped","fault"],
+      uvSteriliser: ["running","stopped","fault"],
+      gensetDiesel: ["running","stopped","standby","fault"]
     },
     TAG: {
       pumpCentrifugal: "P",
@@ -564,7 +604,15 @@
       netCarrier: "ISP",
       netOdf: "ODF",
       bmsController: "DDC",
-      transformer2w: "TX"
+      transformer2w: "TX",
+      tankStorage: "TK",
+      preActionValve: "PAV",
+      alarmValve: "AV",
+      sprinklerHead: "SP",
+      compressor: "C",
+      coolingTowerCell: "CT",
+      uvSteriliser: "UV",
+      gensetDiesel: "G"
     },
     /** A standalone <svg> for one kind, sized in CSS px. */
     svg: function (kind, size, cls) {

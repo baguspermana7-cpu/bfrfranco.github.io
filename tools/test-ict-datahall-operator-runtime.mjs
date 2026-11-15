@@ -46,7 +46,7 @@ try {
   ict.on('pageerror', (error) => ictPageErrors.push(error.message));
   await ict.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
   await ict.goto(`${origin}/ict.html`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
-  await ict.waitForSelector('.network-topology .topology-layer');
+  await ict.waitForSelector('svg.ict-arch .node .n-sym [data-sym]');
   await ict.click('#alarm-filter-toggle');
   await ict.select('#alarm-filter-segment', 'wan');
   await ict.select('#alarm-filter-state', 'ack');

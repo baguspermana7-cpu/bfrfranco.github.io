@@ -264,6 +264,57 @@ Before release:
     inspector rails and phone columns must remain bounded, internally reachable and unclipped.
 22. Simulated process evolution is reproducible for a given scenario. Healthy duty/standby selection
     never changes by chance; automatic changeover requires an explicit modeled threshold or fault.
+23. **Text budget (PRD-CONV-REDRAW, `tools/test-conv-text-budget.mjs`, ship gate).** Measured at
+    1440 px, dark theme, authorized audit state, outside drawings/dialogs/tooltips/inspector:
+    T1 no element whose own text is >= 10 words (a sentence on the page); T2 <= 400 words per
+    cockpit; T3 the main drawing is not wider than the box that shows it at rest (scrolling does
+    not count as fitting); T4 no `<text>` of >= 6 words inside a visible drawing. Explanations go
+    to `conv-<page>-*` RZExplain entries, never back onto the page. Units are written once (field
+    attribute, legend chip, column key), not on every cell. Chiller T4 was a ratchet at 28 until
+    the W2 redraw (CH-M-101) took it to 0; the ratchet table is now empty. Proven red on v3.59.0 (6 of 6 fail).
+24. **One reading, one place (W3 polish).** A KPI tile carries a number and at most a short qualifier; the
+    explanation goes to its tooltip or basis drawer. A tile that repeats another tile's number is removed or
+    replaced by a figure the operator does not already have: the fuel "N+1 scenario" tile printed the same
+    autonomy as the autonomy tile (N+1 load sharing leaves the burn unchanged) and now shows the margin over
+    the 24 h SLA. A strip that redraws what the P&ID already shows (fuel icon flow path, ICT box-list topology)
+    is deleted, not restyled. The data-hall field fits 25 rows at 1440 px without side scroll: the row footer
+    prints min, max and avg as three bare numbers whose order is written once in the legend key. Simulated
+    timers run at their labelled rate: the fire suppression ABORT window is 30 real seconds (it ran 5 s per
+    tick).
+25. **Depth on the HMI sheets (W3, v3.62.0, `js/conv/hmi-depth.js` + `css/conv-hmi-depth.css`).** Opt-in per host with
+    the class `hmi-depth` (water WT-M-101, fuel FU-M-101). `RZHmiDepth.apply(svg, {levels})` adds, from the sheet's own
+    geometry: a body gradient and one clipped specular per equipment symbol, a dark casing under each pipe plus a
+    sheen line (a tube, not a stroke), liquid level fills that deepen toward the bottom of a tank with a surface band,
+    and ONE contact shadow filter on the whole node layer — never a filter per symbol (headless and phones stall on
+    hundreds of filters). Colours are tokens (`--hd-s1..s3`, `--hd-case`, `--hd-shadow`, `--hd-surf`) per theme.
+    Depth never moves geometry: tags, values and hit targets are the renderer's.
+    Materials (v3.63): insulated chilled water is drawn as aluminium cladding (wider jacket, seam ring every 22 units),
+    bare painted steel (fire water, fuel, condenser water) as a dark tube wall, and welded storage tanks show two
+    shell-course seams clipped to the body.
+26. **Sheet text is never struck (v3.62.0, `tools/test-conv-sheet-text-clear.mjs`, ship gate).** At 1440 px on fire,
+    chiller, water and fuel: C1 no pipe/cable runs through a text box, C2 no zone/box border crosses one, C3 no foreign
+    equipment body covers one. The text-vs-text geometry gate could not see these; W3 found them on screenshots.
+    Proven red on the pre-fix tree (UST-01 tag × fill pipe, PT-101 value × divider, fire PAV-02..05 × release
+    lines, FH / HR RISER × zone border) and by mutation (TK-402 values × divider). Limit, written down: C3 measures the
+    filled body (`.b`), not a symbol's outline strokes. C4: the sheet page never scrolls sideways at 1280 / 1440 px (a grid item
+    holding a sheet needs `min-width: 0`).
+
+
+27. **The sheet tells the truth about flow, state and quality (W4, PRD-CONV-BMS-UIUX, `js/conv/sheet-truth.js`,
+    gates `tools/test-conv-bms-truth.mjs` + `tools/test-conv-sheet-perf.mjs`).** On fire, chiller, water and fuel:
+    every drawn flow is a point with a quality; an edge moves only when its point is good and > 0, a good 0 is
+    `stopped` and prints `0 <unit>`, stale/bad/no-data are `unavailable` with the word on the value (`STALE (last)`,
+    `BAD`, `NO DATA`) and never a number or motion (B1); pumps print `CMD ON|OFF` and `RUN|STOP` as two values, a
+    mismatch marks the symbol (`data-mismatch`) and stills its branch (B2); one stale point changes only its own
+    edges and an active alarm stays (B3); alarm = filled triangle `!`, acknowledged = hollow triangle `ACK`, selected =
+    dashed body outline — readable in greyscale (B4); every symbol opens its detail beside the sheet and closing
+    returns focus, selection, pan and zoom (B5); reduced motion animates nothing and keeps static arrows on running
+    edges only (B6); an alarm reaches its mark in <= 250 ms and a sheet off screen runs no animation (B7). A chiller
+    branch at a valid zero is not a disconnect. The test seam `window.RZConvSim` exists only in simulated data mode
+    and never writes to equipment. **Not verified:** the brief's frame budgets (p95 <= 20 ms desktop, <= 34 ms
+    phone) — headless Chrome rasterises SVG in software (one sheet repaint ~30 ms against a 16.7 ms blank-page
+    control); the gate prints the numbers and leaves the budget for target hardware. Signed reverse flow and
+    breaker/energised scenarios do not apply to these four mechanical sheets (no reversible path, no breaker feedback).
 
 ## 10. Change and lesson ledger
 

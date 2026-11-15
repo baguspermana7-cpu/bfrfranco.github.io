@@ -281,13 +281,15 @@ try {
   await fuel.$eval('#rzConvAlarmClose', (button) => button.click());
 
   await fuel.click('#btn-pump');
-  await fuel.waitForFunction(() => document.getElementById('fp-pump')?.textContent === 'RUN');
+  /* FU-M-101: the pump state and the live transfer path are read off the sheet, which replaced the icon strip */
+  await fuel.waitForFunction(() => /RUN/.test(document.querySelector('#fuel-svg [data-val="p101:st"]')?.textContent || ''));
   const preservedFlow = await fuel.evaluate(() => ({
-    pump: document.getElementById('fp-pump')?.textContent,
+    pump: /RUN/.test(document.querySelector('#fuel-svg [data-val="p101:st"]')?.textContent || ''),
     polish: document.getElementById('polish-status')?.textContent,
-    arrows: Array.from(document.querySelectorAll('.fp-arrow')).every((arrow) => arrow.classList.contains('active')),
+    transfer: ['fs-suction', 'fs-transfer-header', 'fs-h3'].every((id) =>
+      document.querySelector('#fuel-svg path[data-edge="' + id + '"]')?.getAttribute('data-flow') === 'running'),
   }));
-  assert.deepEqual(preservedFlow, { pump: 'RUN', polish: 'RUNNING', arrows: true });
+  assert.deepEqual(preservedFlow, { pump: true, polish: 'RUNNING', transfer: true });
 
   await fuel.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 });
   await new Promise((accept) => setTimeout(accept, 150));

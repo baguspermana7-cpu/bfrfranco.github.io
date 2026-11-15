@@ -226,10 +226,11 @@ try {
   'localhost tracker events must never reuse cached production-like geolocation');
   const hall = await page.evaluate(() => {
     const occupied = Array.from(document.querySelectorAll('#zone-field .rack'))
-      .find((node) => /\d+\.\d+°C/.test(node.querySelector('.rk-val')?.textContent || ''));
+      .find((node) => /^\d+\.\d+$/.test(node.querySelector('.rk-val')?.textContent || ''));
     return {
       activeMode: document.querySelector('.mode-btn.active')?.getAttribute('data-mode'),
       rackValue: occupied?.querySelector('.rk-val')?.textContent || '',
+      rackUnit: document.getElementById('zone-field')?.getAttribute('data-unit') || '',
       rackFill: occupied ? getComputedStyle(occupied).backgroundColor : '',
       balanceLabel: document.querySelector('#bb-balance')?.previousElementSibling?.textContent?.trim(),
       balance: document.getElementById('bb-balance')?.textContent?.trim(),
@@ -239,6 +240,7 @@ try {
   });
   assert.equal(hall.activeMode, 'temp', 'rack-inlet temperature must be the default operator heatmap');
   assert.match(hall.rackValue, /^25\./, 'default rack field must expose the current 25.x C inlet plane');
+  assert.equal(hall.rackUnit, '°C', 'the temperature field must name its unit once, on the rack field');
   /* v2.10.0 — the cabinet field paints a CONTINUOUS severity ramp (owner comment 12), so a 25.x C
      inlet is no longer one fixed green: it sits between the 25.4 C target stop and the 27 C warning
      stop. The invariant this pinned is semantic — inside the recommended envelope must read on the
@@ -252,16 +254,18 @@ try {
   assert.match(hall.balanceBasis, /site EPMS 30\.000 MW ÷ 4 halls = 7\.500 MW/i);
   assert.doesNotMatch(hall.bodyText, /(?:NaN|null|undefined)/);
 
-  await page.click('#dh-mode-toolbar button[data-layer="power"]');
+  await page.click('.mode-btn[data-mode="power"]');
   const powerMode = await page.evaluate(() => ({
     activeMode: document.querySelector('.mode-btn.active')?.getAttribute('data-mode'),
-    pressed: document.querySelector('#dh-mode-toolbar button[data-layer="power"]')?.getAttribute('aria-pressed'),
+    pressed: document.querySelector('.mode-btn[data-mode="power"]')?.getAttribute('aria-pressed'),
     rackValue: Array.from(document.querySelectorAll('#zone-field .rack .rk-val'))
-      .map((node) => node.textContent || '').find((value) => /kW$/.test(value)) || '',
+      .map((node) => node.textContent || '').find((value) => /^\d+\.\d+$/.test(value)) || '',
+    unit: document.getElementById('zone-field')?.getAttribute('data-unit') || '',
   }));
-  assert.equal(powerMode.activeMode, 'power', 'shared toolbar Power must drive the rack heatmap');
-  assert.equal(powerMode.pressed, 'true', 'shared toolbar Power must expose its active state');
-  assert.match(powerMode.rackValue, /kW$/, 'Power mode must render rack load values');
+  assert.equal(powerMode.activeMode, 'power', 'the mode selector Power must drive the rack heatmap');
+  assert.equal(powerMode.pressed, 'true', 'the mode selector Power must expose its active state');
+  assert.match(powerMode.rackValue, /^\d+\.\d+$/, 'Power mode must render rack load values');
+  assert.equal(powerMode.unit, 'kW', 'Power mode must name its unit once, on the rack field');
 
   await page.goto(`${origin}/chiller-plant.html`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
   await page.waitForSelector('#asLevel', { timeout: 10_000 });

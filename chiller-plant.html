@@ -98,7 +98,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
 .sup-panel .sp-card.wide{grid-column:1/-1}
 .sup-panel h5{margin:0 0 8px;font:700 10.5px/1.2 'JetBrains Mono',monospace;letter-spacing:.09em;
   text-transform:uppercase;color:#7f93ab;display:flex;justify-content:space-between;gap:8px}
-.sup-panel .sp-row{display:flex;justify-content:space-between;gap:12px;padding:3px 0;font-size:12px;
+.sup-panel .sp-row{display:flex;justify-content:space-between;gap:12px;padding:4px 0;font-size:12px;
   border-bottom:1px solid rgba(255,255,255,.04)}
 .sup-panel .sp-row:last-child{border-bottom:0}
 .sup-panel .sp-row .k{color:#8fa2b8}
@@ -106,9 +106,9 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
 .sup-panel table.sp-tbl{width:100%;border-collapse:collapse;font-size:11.5px;
   font-variant-numeric:tabular-nums}
 .sup-panel table.sp-tbl th{text-align:right;font:700 10px/1.2 'JetBrains Mono',monospace;letter-spacing:.06em;
-  text-transform:uppercase;color:#7f93ab;padding:4px 6px;border-bottom:1px solid var(--line)}
+  text-transform:uppercase;color:#7f93ab;padding:4px 8px;border-bottom:1px solid var(--line)}
 .sup-panel table.sp-tbl th:first-child,.sup-panel table.sp-tbl td:first-child{text-align:left}
-.sup-panel table.sp-tbl td{padding:4px 6px;border-bottom:1px solid rgba(255,255,255,.04);
+.sup-panel table.sp-tbl td{padding:4px 8px;border-bottom:1px solid rgba(255,255,255,.04);
   text-align:right;font-family:'JetBrains Mono',monospace;color:#c9d4e2}
 .sup-panel table.sp-tbl tr:last-child td{border-bottom:0}
 .sup-panel .sp-state{font-weight:700}
@@ -203,7 +203,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
 .legend .run{border-color:rgba(56,181,109,.6);color:#9de0ba}
 .legend .warn{border-color:rgba(182,141,73,.65);color:#e3c88f}
 .legend .alarm{border-color:rgba(187,93,93,.7);color:#ecb7b7}
-#pidSvg{width:100%;height:auto;display:block;border:1px solid #425266;border-radius:8px;background:#191b1f}
+.chw-sheet-host{display:block}
 /* v1.25.4 — pro-BMS responsive SVG. Diagram keeps design width on mobile so blocks
    don't overlap; user pans horizontally instead of squishing.
    v1.29.3 — Plant Capacity / Loop Summary / Drawing Info panels live at x=1520–2280 (viewBox 2300).
@@ -212,10 +212,10 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
   .pid-panel{overflow-x:auto;-webkit-overflow-scrolling:touch}
   /* v1.134.18 — was 2300px, the retired canvas width. 1:1 with the trimmed viewBox keeps
      every label at its authored size and lets the panel scroll instead of shrinking. */
-  #pidSvg{min-width:1460px}
+  .chw-sheet-host{min-width:1120px}
+  .chw-sheet-host svg.hmi-svg{touch-action:pan-x pan-y}
 }
 @media (max-width:1024px){
-  #pidSvg{min-width:1460px}
   /* Status strip is rendered DOM, not SVG — keep it inside the pid-panel scroll
      so the chips don't wrap into the SVG and force a second horizontal scrollbar. */
   .status-strip{flex-wrap:wrap;align-items:flex-start;min-width:0}
@@ -224,7 +224,6 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
   .s-msg{white-space:normal;max-width:100%}
 }
 @media (max-width:760px){
-  #pidSvg{min-width:1460px}  /* 1:1 with the viewBox — scroll, never shrink below legible */
 }
 /* v1.25.4 owner-feedback: ISA pump triangle no longer spins.
    Green fill is the ON indicator — rotation looked like a UI bug. */
@@ -554,7 +553,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
         ]
     }
     </script>
-    <script src="js/rz-version.js?v=20261115-39e50add" defer></script>
+    <script src="js/rz-version.js?v=20261115-04f828e4" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- Conventional BMS single scenario engine — single source of truth for the
@@ -567,12 +566,12 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
     <script src="js/rz-engine-versions.js?v=20261110-a5518a77"></script>
     <script src="js/conv-engine.js?v=2.2.0"></script>
     <!-- v1.134.2 — generated parameter registry + the shared basis drawer. -->
-    <script src="js/conv-parameters.js?v=20261111-a5970a49"></script>
+    <script src="js/conv-parameters.js?v=20261115-5f46ff93"></script>
     <!-- v1.134.25 — RZExplain, the site glossary engine. The cockpits were the only
          substantial pages carrying none of it, so terms an operator has to read
          (approach temperature, cycles of concentration, N+1, WUE) had nowhere to go.
          Loaded BEFORE the basis drawer, which wires the keys from the registry. -->
-    <script src="js/rz-explain-db.js?v=20261111-a4d62e38" defer></script>
+    <script src="js/rz-explain-db.js?v=20261115-9c8be43f" defer></script>
     <script src="js/rz-explain.js?v=20261103-f581e6ac" defer></script>
     <script src="js/rz-basis-drawer.js?v=20261112-b6a9180c"></script>
 <script src="js/rz-ask.js?v=20261113-42137266" data-rz-ask-index="data/explain/chiller-plant.json" defer></script>
@@ -582,6 +581,13 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
          existing rendering preserved when RZL/RZB are absent. -->
     <script src="js/rz-line-model.js?v=20260920-c4511df5"></script>
     <script src="js/rz-breaker-symbols.js?v=20260920-d428580e"></script>
+    <link rel="stylesheet" href="css/rz-hmi.css?v=20261115-e1e76a7a">
+    <link rel="stylesheet" href="css/conv-hmi-depth.css?v=20261115-09997c8c">
+    <script src="js/conv/hmi-depth.js?v=20261115-d3e4a5ed"></script>
+    <script src="js/rz-eng-symbols.js?v=20261115-b780482c"></script>
+    <script src="js/rz-hmi-sheet.js?v=20261115-71c0fbf5"></script>
+    <script src="js/conv/chiller-sheet.js?v=20261115-d7f3f3c6"></script>
+    <script src="js/conv/sheet-truth.js?v=20261115-438fc2a7"></script>
     <!-- v1.43.1 — Right-side inspector extended to chiller-plant. Click any
          tagged pipe to see Live/Capacity/Deps/Alarms/Trend/Maint tabs without
          occluding topology. Closes review doc-27 §3.2 P0 cross-page parity. -->
@@ -632,7 +638,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
   <header class="bar">
     <div class="bar-left">
       <h1 class="title">CHILLER PLANT SCADA HMI</h1>
-      <div class="sub">ISA-style industrial P&amp;ID • primary CHW header engine-bound • click CH module for diagnostics</div>
+      <div class="sub" data-explain="conv-chw-pid">ISA-5.1 P&amp;ID · CHW primary header</div>
     </div>
     <div class="bar-right" data-rz-alarm-launch-slot><span data-rz-ask-slot></span>
       <a class="btn" href="dc-conventional.html">Back</a>
@@ -698,11 +704,12 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
            per-machine share: cooling.flow_lps / cooling.chillers_running. The coverage gate
            verifies that every drawn loop sits at the share before excluding these readouts from
            its denominator — the exclusion is bought with a check, not asserted. -->
-      <svg id="pidSvg" viewBox="0 0 1460 1930" aria-label="Chiller P&ID mimic"
+      <div id="chw-sheet-host" class="chw-sheet-host hmi-depth" data-theme="dark"
            data-rz-distribution="cooling.flow_lps"
            data-rz-distribution-mode="per-item"
            data-rz-distribution-divisor="cooling.chillers_running"
-           data-rz-distribution-selector="[data-rz-loop-flow] text"></svg>
+           data-rz-distribution-selector="text[data-rz-loop-flow]"
+           data-rz-authored-basis="CH-M-101: tags are equipment identifiers; compressor count, pump duty and speed, loop supply and return temperatures and the secondary pump duty are simulated operating state (conv-engine.js publishes no per-machine quantity); header temperatures, condenser water, CRAH counts and air planes are conv-engine.js cooling values; hall IT is the hall snapshot."></div>
       <!-- v1.134.17 — supervisory telemetry, in HTML. Same content the SVG column carried,
            rendered at native resolution instead of 55 % scale. -->
       <div id="supPanel" class="sup-panel" aria-label="Supervisory metrics and plant status"></div>
@@ -773,7 +780,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
           <div class="kv" title="Reference flow using the IT sensible load only"><div class="k">IT sensible reference</div><div class="v" id="kFlowIt">&mdash;</div></div>
           <div class="kv" title="Current plant-duty flow using IT plus UPS loss"><div class="k">Plant-duty reference</div><div class="v" id="kFlowHr">&mdash;</div></div>
           <div class="kv" title="Plant-duty uplift above the IT-only reference"><div class="k">Δ (plant − IT ref)</div><div class="v" id="kFlowGap">&mdash;</div></div>
-          <div class="meta">943.0 L/s is the engine's IT sensible-load reference. Current evaporator duty requires 982.3 L/s at the same ΔT; measured header flow remains unavailable.</div>
+          <div class="meta" data-explain="conv-chw-flow-ref"><b>943.0 L/s</b> IT ref · <b>982.3 L/s</b> evap duty · header flow UNAVAILABLE</div>
         </div>
 
         <div class="card" data-bms-mode-hide="overview">
@@ -1115,10 +1122,9 @@ function paintChillerBasisCard(){
     el.textContent = 'Site plant authority UNAVAILABLE · selected demand context withheld';
     return;
   }
-  el.textContent = 'Site plant · ' + (s.site.it_load_kw / 1000).toFixed(3) + ' MW IT · ' +
-    (s.cooling.heat_rejection_kw / 1000).toFixed(3) + ' MW evaporator duty · selected Hall ' +
-    selected + ' · ' + (hall.it_load_kw / 1000).toFixed(3) + ' MW IT / ' + hall.racks +
-    ' racks · deterministic simulated telemetry';
+  el.textContent = (s.site.it_load_kw / 1000).toFixed(3) + ' MW IT · ' +
+    (s.cooling.heat_rejection_kw / 1000).toFixed(3) + ' MW evap · Hall ' +
+    selected + ' · ' + (hall.it_load_kw / 1000).toFixed(3) + ' MW IT / ' + hall.racks + ' racks';
 }
 
 if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', paintChillerBasisCard);
@@ -1164,14 +1170,26 @@ st.loops = rescaleLoopsToEngine(st.loops);
 function evalLoop(loop){
   const dpAvg = (loop.dp1+loop.dp2)/2;
   const forced = ui.forced.has(loop.id);
-  const disconnected = forced || loop.flow < 1.5 || ((Math.round(loop.spdA)+Math.round(loop.spdB))===0);
-  if(disconnected){
-    return { level:"ALARM", msg:forced?"forced disconnect":"no flow / disconnected", disconnected:true, dpAvg };
+  if(forced) return { level:"ALARM", msg:"forced disconnect", disconnected:true, dpAvg };
+  /* W4 B1: the branch flow is a point with a quality. Only the forced fault or a bad / no-data point is a
+     disconnect; a good 0 is a stopped train (no alarm); a stale point keeps its last value. */
+  const rec = (typeof chwLoopRec === 'function') ? chwLoopRec(loop) : null;
+  let flow = loop.flow;
+  if(rec){
+    if(rec.quality === 'bad' || rec.quality === 'nodata')
+      return { level:"ALARM", msg: rec.quality === 'bad' ? "flow point BAD" : "flow point NO DATA", disconnected:true, dpAvg };
+    if(rec.quality === 'good' && rec.value === 0) return { level:"NORMAL", msg:"stopped · 0 flow", disconnected:false, stopped:true, dpAvg };
+    if(rec.value != null) flow = rec.value;
+  } else if(loop.flow < 1.5){
+    return { level:"ALARM", msg:"no flow / disconnected", disconnected:true, dpAvg };
   }
-  if(loop.flow < LOOP_FLOW_ALARM_MIN || dpAvg > 135 || loop.t2 > LOOP_T2_ALARM_MAX){
+  if((Math.round(loop.spdA)+Math.round(loop.spdB))===0){
+    return { level:"ALARM", msg:"no duty pump", disconnected:true, dpAvg };
+  }
+  if(flow < LOOP_FLOW_ALARM_MIN || dpAvg > 135 || loop.t2 > LOOP_T2_ALARM_MAX){
     return { level:"ALARM", msg:"envelope breach", disconnected:false, dpAvg };
   }
-  if(loop.flow < LOOP_FLOW_WARNING_MIN || dpAvg > 120 || loop.t2 > LOOP_T2_WARNING_MAX){
+  if(flow < LOOP_FLOW_WARNING_MIN || dpAvg > 120 || loop.t2 > LOOP_T2_WARNING_MAX){
     return { level:"WARNING", msg:"approaching limit", disconnected:false, dpAvg };
   }
   return { level:"NORMAL", msg:"stable", disconnected:false, dpAvg };
@@ -1219,29 +1237,6 @@ function alarmStep(){
 
 function text(x,y,cls,t,anchor){ return `<text x="${x}" y="${y}" class="${cls}"${anchor?` text-anchor="${anchor}"`:""}>${t}</text>`; }
 
-function flowArrow(x,y,dir,cls){
-  const s=5;
-  if(dir==="right") return `<polygon points="${x-s},${y-s} ${x+s},${y} ${x-s},${y+s}" class="flow-arrow ${cls}" />`;
-  if(dir==="left") return `<polygon points="${x+s},${y-s} ${x-s},${y} ${x+s},${y+s}" class="flow-arrow ${cls}" />`;
-  if(dir==="down") return `<polygon points="${x-s},${y-s} ${x},${y+s} ${x+s},${y-s}" class="flow-arrow ${cls}" />`;
-  return `<polygon points="${x-s},${y+s} ${x},${y-s} ${x+s},${y+s}" class="flow-arrow ${cls}" />`;
-}
-
-/* An ISA instrument balloon is ONE label drawn on two lines — function letters over loop
-   number, separated by the balloon's own rule. Their boxes touch by design, so the geometry
-   gate must not read that as a collision. It is declared as a group rather than excused by a
-   tolerance: `data-rz-text-group` tells the gate these texts are one label, and any text
-   OUTSIDE the group still collides normally. Widening the tolerance instead would have hidden
-   the real 30 px overlap this same page had. */
-function isaBubble(x,y,tag,num){
-  return `<g data-rz-text-group="isa-bubble">
-    <circle cx="${x}" cy="${y}" r="13" class="isa-bubble" />
-    <line x1="${x-13}" y1="${y}" x2="${x+13}" y2="${y}" stroke="#7a92ad" stroke-width=".8" />
-    <text x="${x}" y="${y-3}" class="isa-bubble-txt">${tag}</text>
-    <text x="${x}" y="${y+7}" class="isa-bubble-txt" style="font-size:8px">${num}</text>
-  </g>`;
-}
-
 function sparkline(x,y,w,h,data,color){
   if(!data||data.length<2) return '';
   const mn=Math.min(...data), mx=Math.max(...data);
@@ -1280,22 +1275,11 @@ function strainerSym(x,y){
     <polygon points="${x-6},${y-4} ${x+6},${y-4} ${x},${y+6}" fill="none" stroke="#7a92ad" stroke-width="1.2" />`;
 }
 
-function valveSym(x,y,size,orient){
-  const s=size||8;
-  if(orient==="h"){
-    return `<polygon points="${x-s},${y-s} ${x},${y} ${x-s},${y+s}" class="valve-body" />
-      <polygon points="${x+s},${y-s} ${x},${y} ${x+s},${y+s}" class="valve-body" />`;
-  }
-  return `<polygon points="${x-s},${y-s} ${x},${y} ${x+s},${y-s}" class="valve-body" />
-    <polygon points="${x-s},${y+s} ${x},${y} ${x+s},${y+s}" class="valve-body" />`;
-}
-
 /* v1.134.23 — the SAME declared reason now covers all three simulated-state blocks on
    the P&ID. It was written once for the refrigerant cycle; the suction/discharge/
    superheat panel and the pump mechanicals sat outside the declaring group, so 20-odd
    readings that this text already explains were being counted as untraced work. A
    constant rather than three copies, because three copies drift. */
-const AUTHORED_IDENTITY_BASIS = "Condenser-water flow per machine is an identity over marked parameters (cooling.tower_rejection_kw_th over 4.186 x cooling.cdw_range_k over cooling.chillers_running), printed for the operator; the evaporator differential pressure is simulated equipment state — conv-engine.js publishes no pressure";
 const AUTHORED_MECHANICAL_BASIS = "The refrigeration cycle, the secondary loop and the pump mechanicals are simulated operating state: conv-engine.js models the primary chilled-water side (CHWS, CHWR, delta-T, flow, heat rejection, chiller count) and publishes no compressor, refrigerant, secondary-loop or pump-vibration quantity, so these readings have no engine parameter to trace to. The primary-side values on this drawing are engine-derived and remain in the denominator.";
 
 function loopMetrics(loop){
@@ -1363,508 +1347,247 @@ function exvPositionPct(loop){
   return Math.round(clamp(40 + refrigerantLoadIndex*2.5, 20, 95));
 }
 
-function loopSvg(loop, pos){
-  const x = pos.x, y = pos.y, w = pos.w;
-  const e = evalLoop(loop);
-  const m = loopMetrics(loop);
-  const panelCls = e.level === "ALARM" ? "panel-alarm" : (e.level === "WARNING" ? "panel-warn" : "panel-normal");
-  const dis = e.disconnected;
-  const fClsS = dis ? "flow chws broken" : "flow chws";
-  const fClsR = dis ? "flow chwr broken" : "flow chwr";
-
-  const flowTxt = `${conv.f(loop.flow,ui.unit)} ${conv.fu(ui.unit)}`;
-  const t1Txt = `${conv.t(loop.t1,ui.unit)}${conv.tu(ui.unit)}`;
-  const t2Txt = `${conv.t(loop.t2,ui.unit)}${conv.tu(ui.unit)}`;
-  const dp1Txt = `${conv.p(loop.dp1,ui.unit)} ${conv.pu(ui.unit)}`;
-  const dp2Txt = `${conv.p(loop.dp2,ui.unit)} ${conv.pu(ui.unit)}`;
-  const sucTxt = `${conv.p(m.suction,ui.unit)} ${conv.pu(ui.unit)}`;
-  const disTxt = `${conv.p(m.discharge,ui.unit)} ${conv.pu(ui.unit)}`;
-  const shTxt = `${ui.unit==="ip"?r1(m.superheat*9/5):m.superheat} ${ui.unit==="ip"?"F":"C"}`;
-  const scTxt = `${ui.unit==="ip"?r1(m.subcool*9/5):m.subcool} ${ui.unit==="ip"?"F":"C"}`;
-  const cSatTxt = `${conv.t(m.condSat,ui.unit)}${conv.tu(ui.unit)}`;
-  const eSatTxt = `${conv.t(m.evapSat,ui.unit)}${conv.tu(ui.unit)}`;
-  const headAU = `${ui.unit==="ip"?r1(m.headA*3.28084):m.headA} ${ui.unit==="ip"?"ft":"m"}`;
-  const headBU = `${ui.unit==="ip"?r1(m.headB*3.28084):m.headB} ${ui.unit==="ip"?"ft":"m"}`;
-
-  const supY = y + 82;
-  const retY = y + 142;
-  const portX = x + w - 18;
-  /* v2.5.0 — condenser-water flow per machine is an identity over marked parameters:
-     cooling.tower_rejection_kw_th ÷ (4.186 × cooling.cdw_range_k) ÷ cooling.chillers_running */
-  const cdwFlowLps = (PLANT.towerKw != null && PLANT.cdwRange != null && PLANT.cdwRange > 0 && ENGINE_CHILLERS_RUNNING) ? PLANT.towerKw / (4.186 * PLANT.cdwRange) / ENGINE_CHILLERS_RUNNING : null;
-  const cdwFlowTxt = cdwFlowLps == null ? '\u2014' : `${conv.f(cdwFlowLps,ui.unit)} ${conv.fu(ui.unit)}`;
-
-  let lvlBg = "#2b3d55";
-  let lvlBd = "#6f849f";
-  if(e.level === "WARNING"){ lvlBg = "rgba(192,143,70,.2)"; lvlBd = "rgba(192,143,70,.75)"; }
-  if(e.level === "ALARM"){ lvlBg = "rgba(194,90,90,.22)"; lvlBd = "rgba(194,90,90,.75)"; }
-
-  const acc = { x: x+16, w: 230 };
-  const ref = { x: x+254, w: 236 };
-  const pmp = { x: x+498, w: 210 };
-  const ins = { x: x+716, w: 200 };
-  const flowDur = dis ? 1.3 : Math.max(3, 8 - (loop.flow/24)*5);
-  /* v1.134.23 — this read `r1(loop.t1 - (loop.t1 - 2.8))`, which cancels to the literal
-     2.8 for every loop at every load. It LOOKED derived, which is exactly the dead-binding
-     shape the parameter programme exists to remove: a plausible constant dressed as
-     arithmetic, so a reader checking the page believes a temperature is following
-     something. conv-engine.js publishes no refrigerant-side plane, so the evaporator
-     approach IS an authored bounded value here — written as one, and declared with the
-     rest of the simulated machine state rather than disguised. */
-  const EVAP_APPROACH_K = 2.8;
-  const approachT = dis ? 0 : EVAP_APPROACH_K;
-  const approachTxt = `${ui.unit==="ip"?r1(approachT*9/5):approachT}${conv.tu(ui.unit)}`;
-  const appColor = approachT < 3 ? "var(--run)" : (approachT < 5 ? "var(--warn)" : "var(--alarm)");
-
-  return `
-  <g data-loop-id="${loop.id}" style="cursor:pointer">
-    <rect x="${x}" y="${y}" width="${w}" height="240" rx="12" class="panel ${panelCls}" filter="url(#fShadow)" />
-
-    <rect x="${x+14}" y="${y+12}" width="${w-160}" height="28" rx="7" class="field-box" />
-    ${text(x+28,y+31,"section-title",`CH-${String(loop.id).padStart(2,"0")}  \u2022  WCC-${String(loop.id).padStart(2,"0")}  \u2022  CHWP-${String(loop.id).padStart(2,"0")}A/B  \u2022  DPS  \u2022  FLOW-REF`)}
-    <rect x="${x+w-130}" y="${y+12}" width="112" height="28" rx="7" fill="${lvlBg}" stroke="${lvlBd}" />
-    ${text(x+w-74,y+31,"value",e.level,"middle")}
-
-    <rect x="${acc.x}" y="${y+56}" width="${acc.w}" height="156" rx="10" class="equip-shell"><title>WCC-${String(loop.id).padStart(2,"0")} Water-Cooled Centrifugal Chiller • ${loop.comps.reduce((a,b)=>a+b,0)}/3 comp • ${PLANT.inputPerMachineKw != null ? PLANT.inputPerMachineKw + " kW electrical" : "—"}</title></rect>
-    <!-- v1.134.17 — ACC is an AIR-cooled chiller tag. The owner adopted the study's
-         water-cooled basis in v1.134.8 and the module header was renamed to WCC then;
-         this inner label was missed and kept contradicting it four times per screen. -->
-    ${text(acc.x+14,y+80,"value",`WCC / CH-${String(loop.id).padStart(2,"0")}`)}
-    <text x="${acc.x+14}" y="${y+104}" class="label" data-rz-authored-basis="${AUTHORED_MECHANICAL_BASIS}">App: <tspan fill="${appColor}">${approachTxt}</tspan>  \u2022  Oil: ${m.oil}\u00b0C</text>
-    ${text(acc.x+14,y+128,"label","Comp")}
-    <circle cx="${acc.x+62}" cy="${y+128}" r="9" class="${loop.comps[0]?"comp-on":"comp-off"}" />
-    <text x="${acc.x+62}" y="${y+131}" class="isa-bubble-txt">C1</text>
-    <circle cx="${acc.x+86}" cy="${y+128}" r="9" class="${loop.comps[1]?"comp-on":"comp-off"}" />
-    <text x="${acc.x+86}" y="${y+131}" class="isa-bubble-txt">C2</text>
-    <circle cx="${acc.x+110}" cy="${y+128}" r="9" class="${loop.comps[2]?"comp-on":"comp-off"}" />
-    <text x="${acc.x+110}" y="${y+131}" class="isa-bubble-txt">C3</text>
-    ${text(acc.x+134,y+132,"unit",`${loop.comps.reduce((a,b)=>a+b,0)}/3`)}
-    <!-- v1.134.8 — this was "Fans n/6", the condenser fans of an AIR-COOLED machine. The owner
-         adopted the study's basis (evaporative cooling tower = water-cooled), so the machine
-         rejects to a condenser-water circuit, not to ambient air. Engine-published CDWS/CDWR. -->
-    <text x="${acc.x+14}" y="${y+158}" class="label">CDW ${PLANT.cdws != null ? PLANT.cdws.toFixed(1) : "\u2014"}/${PLANT.cdwr != null ? PLANT.cdwr.toFixed(1) : "\u2014"}&#176;C <tspan fill="${dis?"var(--muted)":"var(--run)"}">\u25CF</tspan></text>
-    ${text(acc.x+14,y+180,"unit",PLANT.inputPerMachineKw != null ? `${PLANT.inputPerMachineKw} kW` : "\u2014 kW")}
-    <g data-rz-authored-basis="${AUTHORED_IDENTITY_BASIS}">${text(acc.x+14,y+200,"unit",`CDW ${cdwFlowTxt}  \u2022  EVAP DP ${conv.p(loop.dp2,ui.unit)} ${conv.pu(ui.unit)}`)}</g>
-
-    <line x1="${acc.x+acc.w}" y1="${supY}" x2="${portX}" y2="${supY}" class="pipe" stroke="rgba(6,182,212,.25)" />
-    <line x1="${acc.x+acc.w}" y1="${supY}" x2="${portX}" y2="${supY}" class="${fClsS}" style="animation-duration:${flowDur}s" />
-    <line x1="${portX}" y1="${retY}" x2="${acc.x+acc.w}" y2="${retY}" class="pipe" stroke="rgba(245,158,11,.25)" />
-    <line x1="${portX}" y1="${retY}" x2="${acc.x+acc.w}" y2="${retY}" class="${fClsR}" style="animation-duration:${flowDur*1.05}s" />
-
-    <rect x="${ref.x}" y="${y+56}" width="${ref.w}" height="156" rx="10" class="equip-shell" />
-    <g data-rz-authored-basis="${AUTHORED_MECHANICAL_BASIS}">${text(ref.x+14,y+68,"unit","REFRIGERANT CYCLE  R-1234ze(E)")}  <!-- v1.134.6: was y+76, colliding with COND -->
-    <circle cx="${ref.x+46}" cy="${y+114}" r="18" class="${dis?"comp-off":"comp-on"}" />
-    <polygon points="${ref.x+38},${y+104} ${ref.x+58},${y+114} ${ref.x+38},${y+124}" class="${dis?"comp-off":"comp-on"}" />
-    ${text(ref.x+46,y+141,"unit","COMP","middle")}
-    <rect x="${ref.x+96}" y="${y+68}" width="130" height="26" rx="5" class="field-box" />
-    ${text(ref.x+104,y+86,"label",`COND ${cSatTxt}`)}
-    <rect x="${ref.x+96}" y="${y+136}" width="130" height="26" rx="5" class="field-box" />
-    ${text(ref.x+104,y+154,"label",`EVAP ${eSatTxt}`)}</g>
-    ${valveSym(ref.x+216, y+114, 7, "h")}
-    <g data-rz-text-group="stacked-label" data-rz-authored-basis="${AUTHORED_MECHANICAL_BASIS}">
-    ${text(ref.x+228,y+112,"unit","EXV")}
-    ${text(ref.x+228,y+124,"unit",`${exvPositionPct(loop)}%`)}
-    </g>
-    <path d="M${ref.x+64},${y+104} L${ref.x+96},${y+80} L${ref.x+210},${y+80} L${ref.x+216},${y+114} L${ref.x+210},${y+148} L${ref.x+96},${y+148} L${ref.x+64},${y+124}" class="ref-cycle ${dis?"off":""}" />
-    <g data-rz-authored-basis="${AUTHORED_MECHANICAL_BASIS}">
-    <rect x="${ref.x+4}" y="${y+168}" width="112" height="34" rx="5" class="field-box" />
-    ${text(ref.x+10,y+182,"unit",`SUCT ${sucTxt}`)}
-    ${text(ref.x+10,y+196,"unit",`DISC ${disTxt}`)}
-    <rect x="${ref.x+120}" y="${y+168}" width="112" height="34" rx="5" class="field-box" />
-    ${text(ref.x+126,y+182,"unit",`SH ${shTxt}`)}
-    ${text(ref.x+126,y+196,"unit",`SC ${scTxt}`)}
-    </g>
-
-    <rect x="${pmp.x}" y="${y+56}" width="${pmp.w}" height="156" rx="10" class="equip-shell"><title>CHWP-${String(loop.id).padStart(2,"0")}A/B • ${m.runA?"A DUTY":"B DUTY"} • SPD ${m.runA?Math.round(loop.spdA):Math.round(loop.spdB)}% • Q ${flowTxt} (branch ref) • VIB A ${m.vibA} / B ${m.vibB} mm/s</title></rect>
-    <g data-rz-loop-flow="1">${text(pmp.x+12,y+68,"unit",`PRIMARY PUMPS  \u2022  Q ${flowTxt}`)}</g>  <!-- v1.134.6: was y+76, colliding with DUTY/SPD -->
-    <circle cx="${pmp.x+52}" cy="${supY}" r="18" class="pump ${m.runA?"pump-run":"pump-off"}" />
-    <polygon points="${pmp.x+44},${supY-10} ${pmp.x+64},${supY} ${pmp.x+44},${supY+10}" class="${m.runA?"pump-run":"pump-off"}" />
-    <circle cx="${pmp.x+52}" cy="${supY}" r="5" class="${m.runA?"status-run":"status-stdby"}" />
-    <text x="${pmp.x+20}" y="${supY+4}" class="unit" fill="${m.runA?"var(--run)":"var(--muted)"}" style="font-weight:700">${m.runA?"DUTY":"STBY"}</text>
-    <circle cx="${pmp.x+52}" cy="${retY}" r="18" class="pump ${m.runB?"pump-run":"pump-off"}" />
-    <polygon points="${pmp.x+44},${retY-10} ${pmp.x+64},${retY} ${pmp.x+44},${retY+10}" class="${m.runB?"pump-run":"pump-off"}" />
-    <circle cx="${pmp.x+52}" cy="${retY}" r="5" class="${m.runB?"status-run":"status-stdby"}" />
-    <text x="${pmp.x+20}" y="${retY+4}" class="unit" fill="${m.runB?"var(--run)":"var(--muted)"}" style="font-weight:700">${m.runB?"DUTY":"STBY"}</text>
-    <g data-rz-authored-basis="${AUTHORED_MECHANICAL_BASIS}">
-    <rect x="${pmp.x+80}" y="${y+68}" width="124" height="22" rx="5" class="field-box" />
-    ${text(pmp.x+86,y+83,"unit",`SPD ${Math.round(loop.spdA)}%  AMP ${m.ampA} A`)}
-    <rect x="${pmp.x+80}" y="${y+92}" width="124" height="22" rx="5" class="field-box" />
-    ${text(pmp.x+86,y+107,"unit",`H ${headAU}  DP ${conv.p(loop.dp1,ui.unit)} ${conv.pu(ui.unit)}`)}
-    <rect x="${pmp.x+80}" y="${y+128}" width="124" height="22" rx="5" class="field-box" />
-    ${text(pmp.x+86,y+143,"unit",`SPD ${Math.round(loop.spdB)}%  AMP ${m.ampB} A`)}
-    <rect x="${pmp.x+80}" y="${y+152}" width="124" height="22" rx="5" class="field-box" />
-    ${text(pmp.x+86,y+167,"unit",`H ${headBU}  DP ${m.runB ? conv.p(loop.dp1,ui.unit) : 0} ${conv.pu(ui.unit)}`)}
-    </g>
-
-    <rect x="${ins.x}" y="${y+56}" width="${ins.w}" height="156" rx="10" class="equip-shell"><title>Simulated loop state CH-${loop.id} • calculated branch reference: ${flowTxt} • T1: ${t1Txt} • T2: ${t2Txt}</title></rect>
-    ${text(ins.x+12,y+72,"unit","SIMULATED LOOP STATE")}
-    <rect x="${ins.x+8}" y="${y+82}" width="${ins.w-16}" height="24" rx="6" class="field-box" />
-    <g data-rz-loop-flow="1">${text(ins.x+16,y+98,"label",`CALC BRANCH REF  ${flowTxt}`)}</g>
-    <rect x="${ins.x+4}" y="${y+112}" width="94" height="30" rx="6" class="field-box" />
-    <g data-rz-authored-basis="${AUTHORED_MECHANICAL_BASIS}">${text(ins.x+10,y+131,"unit","DPS1")}
-    ${text(ins.x+66,y+131,"value",dp1Txt,"middle")}
-    <rect x="${ins.x+102}" y="${y+112}" width="94" height="30" rx="6" class="field-box" />
-    ${text(ins.x+108,y+131,"unit","DPS2")}
-    ${text(ins.x+164,y+131,"value",dp2Txt,"middle")}</g>
-    <rect x="${ins.x+8}" y="${y+146}" width="92" height="24" rx="6" class="field-box" />
-    <g data-rz-loop-t1="1" data-rz-authored-basis="${AUTHORED_MECHANICAL_BASIS}">${text(ins.x+14,y+162,"label",`T1 ${t1Txt}`)}</g>
-    <rect x="${ins.x+106}" y="${y+146}" width="92" height="24" rx="6" class="field-box" />
-    <!-- v1.134.17 — two layout faults here, both invisible while the COMP line read "—".
-         T2 sat at y+148, the TOP EDGE of its own y+146 box, while T1 beside it sat correctly
-         at y+162. And the COMP strip was drawn at y+160, straight over the y+146..170 T-row
-         boxes. Once the water-cooled adoption gave COMP a real value ("736 kW • OIL 69 C")
-         the overlap became visible text-on-text and the strict geometry gate caught it. -->
-    <g data-rz-loop-t2="1" data-rz-authored-basis="${AUTHORED_MECHANICAL_BASIS}">${text(ins.x+112,y+162,"label",`T2 ${t2Txt}`)}</g>
-    <rect x="${ins.x+8}" y="${y+176}" width="${ins.w-16}" height="22" rx="6" class="field-box" />
-    ${text(ins.x+14,y+191,"unit",`COMP ${m.compKw != null ? m.compKw + " kW" : "\u2014"} \u2022`)}<g data-rz-authored-basis="${AUTHORED_MECHANICAL_BASIS}">${text(ins.x+112,y+191,"unit",`OIL ${m.oil} C`)}</g>
-
-    <rect x="${x+w-118}" y="${supY-12}" width="96" height="20" rx="6" class="field-box" />
-    ${text(x+w-108,supY+3,"unit","SEC OUT")}
-    <rect x="${x+w-118}" y="${retY-12}" width="96" height="20" rx="6" class="field-box" />
-    ${text(x+w-108,retY+3,"unit","SEC IN")}
-    <circle cx="${portX}" cy="${supY}" r="7" class="tee" />
-    <circle cx="${portX}" cy="${retY}" r="7" class="tee" />
-
-    <!-- ISA instrument bubbles -->
-    ${isaBubble(ins.x+28, y+220, "FT", `${loop.id}01`)}
-    ${isaBubble(ins.x+72, y+220, "DPS", `${loop.id}01`)}
-    ${isaBubble(ins.x+116, y+220, "TT", `${loop.id}01`)}
-    ${isaBubble(ins.x+160, y+220, "TT", `${loop.id}02`)}
-
-    <!-- Isolation valves on supply/return -->
-    ${valveSym(acc.x+acc.w+18, supY, 8, "h")}
-    ${valveSym(acc.x+acc.w+18, retY, 8, "h")}
-
-    <!-- Flow direction arrows -->
-    ${flowArrow(pmp.x+pmp.w+16, supY, "right", "supply")}
-    ${flowArrow(pmp.x+pmp.w+16, retY, "left", "return")}
-
-    <!-- Flow direction check (simplified arrow — items 13,14) -->
-    ${flowArrow(portX-30, retY, "left", "return")}
-  </g>`;
+/* ============================================================================
+ * W2 (2026-11-14) — CH-M-101. The P&ID is one HMI sheet drawn by js/rz-hmi-sheet.js from
+ * js/conv/chiller-sheet.js: ISO 10628-2 / ISA-5.1 symbols, orthogonal pipes, flow states
+ * (running = solid + marching dashes, stopped = dashed, unavailable = hairline). The page
+ * supplies only numbers and states, through chwRead() / chwFlow(). The tabular telemetry
+ * stays in #supPanel; refrigerant-side detail stays in the loop modal (click a train).
+ * ==========================================================================*/
+let chwSheet = null, chwSheetMode = null;
+const CHW_UNAV = 'UNAVAILABLE';
+function chwLoopOf(id){
+  const m = /^(?:ch|cd[rs]|pa|pb|tts|ttr)(\d)$/.exec(id || '');
+  return m ? st.loops[Number(m[1]) - 1] : null;
 }
-
-
-function drawUnavailablePid(){
-  const svg = $("pidSvg");
-  svg.setAttribute("aria-label", "Chiller plant authority unavailable");
-  svg.innerHTML = `
-    <g class="grid">
-      ${Array.from({length:37}).map((_,i)=>`<line x1="${i*40}" y1="0" x2="${i*40}" y2="1400" />`).join("")}
-      ${Array.from({length:35}).map((_,i)=>`<line x1="0" y1="${i*40}" x2="1460" y2="${i*40}" />`).join("")}
-    </g>
-    <rect x="90" y="120" width="1280" height="1160" rx="8" class="frame" />
-    ${text(150,220,"section-title","CHILLER PLANT AUTHORITY UNAVAILABLE")}
-    ${text(150,270,"label","The requested conv-engine revision did not establish a current governed snapshot.")}
-    ${text(150,310,"label","All plant values, commands, alarms, redundancy and flow animation are suppressed.")}
-    <rect x="220" y="430" width="520" height="250" rx="6" class="sup-card" />
-    ${text(260,490,"sup-title","ENGINE AUTHORITY")}
-    ${text(260,565,"sup-val","UNAVAILABLE")}
-    ${text(260,620,"sup-unit-sm","Reload the governed revision before operation")}
-    <rect x="890" y="430" width="520" height="250" rx="6" class="sup-card" />
-    ${text(930,490,"sup-title","PRIMARY CHW HEADER")}
-    ${text(930,565,"sup-val","UNAVAILABLE")}
-    ${text(930,620,"sup-unit-sm","No zero-value substitution")}
-    <rect x="1560" y="430" width="520" height="250" rx="6" class="sup-card" />
-    ${text(1600,490,"sup-title","PLANT STATUS")}
-    ${text(1600,565,"sup-val","UNAVAILABLE")}
-    ${text(1600,620,"sup-unit-sm","Commands disabled; escalation required")}
-    <line x1="420" y1="860" x2="1880" y2="860" class="pipe"
-      data-rz-line="chw-header-supply" data-from="CHILLER-PLANT" data-to="BUILDING-AHU"
-      data-state="unavailable" data-current="UNAVAILABLE" />
-    <line x1="1880" y1="980" x2="420" y2="980" class="pipe"
-      data-rz-line="chw-header-return" data-from="BUILDING-AHU" data-to="CHILLER-PLANT"
-      data-state="unavailable" data-current="UNAVAILABLE" />
-    ${text(420,835,"hdr-pipe-label supply","PRIMARY CHWS — UNAVAILABLE")}
-    ${text(420,955,"hdr-pipe-label return","PRIMARY CHWR — UNAVAILABLE")}
-  `;
+function chwVal(text, alarm){ return { text: text, alarm: alarm || null }; }
+function chwHall(code){
+  return (window.CONV_CALC && typeof window.CONV_CALC.getHallSnapshot === 'function') ? window.CONV_CALC.getHallSnapshot(code) : null;
 }
-
-function drawPid(){
-  if(!CHW_AUTHORITY_AVAILABLE){
-    drawUnavailablePid();
-    return;
+function chwRead(n){
+  const out = { values: {}, rows: [] };
+  const ok = CHW_AUTHORITY_AVAILABLE;
+  const T = (v) => (v == null || !isFinite(v)) ? '—' : `${conv.t(v,ui.unit)} °${conv.tu(ui.unit)}`;
+  const lp = chwLoopOf(n.id);
+  if(lp){
+    const e = evalLoop(lp), m = loopMetrics(lp), dis = e.disconnected;
+    const al = e.level === 'ALARM' ? '1' : (e.level === 'WARNING' ? '2' : null);
+    const flowTxt = `${conv.f(lp.flow,ui.unit)} ${conv.fu(ui.unit)}`;
+    if(/^ch/.test(n.id)){
+      const comps = lp.comps.reduce((a,b)=>a+b,0);
+      out.state = !ok ? null : (dis ? 'fault' : (e.stopped || !comps ? 'stopped' : 'running'));
+      out.alarm = ok ? al : null;
+      out.values = !ok ? { st: chwVal(CHW_UNAV), kw: chwVal('—'), q: chwVal('—') } : {
+        st: chwVal(`${e.level} · ${comps}/3 COMP`, al),
+        kw: chwVal(m.compKw != null ? `${m.compKw} kW` : '—'),
+        q: chwVal(`CALC BRANCH REF ${chwPointText('ch'+lp.id+':q')}`) };
+      out.rows = ok ? [['Status', e.level + (dis || e.stopped ? ' · ' + e.msg : '')], ['Branch flow (calc ref)', chwPointText('ch' + lp.id + ':q')], ['Compressors', comps + ' / 3'], ['Electrical', m.compKw != null ? m.compKw + ' kW' : '—']] : [['Status', CHW_UNAV]];
+    } else if(/^cdr/.test(n.id)){
+      out.values = { t: chwVal(ok && PLANT.cdwr != null ? T(PLANT.cdwr) : CHW_UNAV) };
+    } else if(/^cds/.test(n.id)){
+      out.values = { t: chwVal(ok && PLANT.cdws != null ? T(PLANT.cdws) : CHW_UNAV) };
+    } else if(/^tts/.test(n.id)){
+      out.values = { t: chwVal(ok ? T(lp.t1) : CHW_UNAV) };
+    } else if(/^ttr/.test(n.id)){
+      out.values = { t: chwVal(ok ? T(lp.t2) : CHW_UNAV, ok && lp.t2 > LOOP_T2_WARNING_MAX ? '2' : null) };
+    } else {
+      const isA = /^pa/.test(n.id), run = isA ? m.runA : m.runB, spd = isA ? lp.spdA : lp.spdB;
+      /* W4 B2: command and feedback are two values; a mismatch marks the symbol (data-alarm + data-mismatch) */
+      const pc = chwPumpCmd(n.id), pf = chwPumpFb(n.id), mm = chwPumpMismatch(n.id);
+      out.state = !ok ? null : (pf === 'on' ? 'running' : 'standby');
+      out.alarm = ok && mm ? '2' : null;
+      out.values = !ok ? { cmd: chwVal('—'), st: chwVal(CHW_UNAV) } : {
+        cmd: chwVal(pc === 'on' ? 'CMD ON' : 'CMD OFF', mm ? '2' : null),
+        st: chwVal(pf === 'on' ? 'RUN' : 'STOP', mm ? '2' : null) };
+      out.rows = ok ? [['Mode', run ? 'Duty' : 'Standby'], ['Speed', Math.round(spd) + ' %'], ['Head', (isA ? m.headA : m.headB) + ' m'], ['Current', (isA ? m.ampA : m.ampB) + ' A']] : [['Mode', CHW_UNAV]];
+    }
+    return out;
   }
-  $("pidSvg").setAttribute("aria-label", "Chiller P&ID mimic");
-  $("pidSvg").setAttribute("viewBox", "0 0 1460 1930");   /* v2.5.0 — the canvas grew downward for the air-side band; VH below must match */
-  // v1.42.4 — bind line-model for cross-page semantic adoption (review docs 27/28 + 17/18).
-  const RZL = window.RZLineModel;
-  const VW = 1460, VH = 1930;   // v2.5.0: the distribution & air-side band lives below the trains (y 1340..1900)
-  const PZ_X = 36, PZ_Y = 100, PZ_W = 1280;
-  const LOOP_X = 50, LOOP_W = 1060, LOOP_H = 240, LOOP_GAP = 40;
-  const HDR_CHWS_Y = 148, HDR_CHWR_Y = 256;
-  const HDR_X1 = 1096;
-  // Reserved label lane = HDR_X1 .. LABEL_LANE_END contains NO branch tees.
-  // 154px wide — fits a short 2-line tag with ≥8px clearance from first tee.
-  const LABEL_LANE_END = 1250;
-  const BRANCH_START = 1276, BRANCH_SPACING = 30;
-  const HDR_X2 = 1276 + 3*30 + 30;            // 1396 — clears the last branch tee
-  const SUP_X = 1520, SUP_W = 760;            // ends at 2280 (viewBox 2300)
-  const CX = SUP_X + 16, CW = SUP_W - 32;
-
-  const pos = st.loops.map((_,i)=>({ x:LOOP_X, y:170+i*(LOOP_H+LOOP_GAP), w:LOOP_W }));
-  const branchX = st.loops.map((_,i)=> BRANCH_START + i*BRANCH_SPACING);
-
-  const branches = st.loops.map((lp,i)=>{
-    const p = pos[i];
-    const bxS = branchX[i];
-    const bxR = branchX[i] + 12;
-    const supY = p.y + 82;
-    const retY = p.y + 142;
-    const portX = p.x + p.w - 18;
-    const e = evalLoop(lp);
-    const fs = e.disconnected?"flow chws broken":"flow chws";
-    const fr = e.disconnected?"flow chwr broken":"flow chwr";
-    const sC = e.level==="ALARM"?"var(--alarm)":(e.level==="WARNING"?"var(--warn)":"var(--run)");
-    const loopId = lp.id || ('LOOP-'+(i+1));
-    const loopState = !CHW_AUTHORITY_AVAILABLE ? 'unavailable'
-      : (e.disconnected ? 'fault' : (e.level === 'ALARM' ? 'fault' : 'energized'));
-    // v1.42.4 — semantic line-model port (review doc-17 §3.2 + §5.3 line metadata).
-    // Pipe lines tagged with from/to/medium/state; animation overlay (`flow` class) unchanged.
-    const supDrop = RZL ? RZL.line({id:'chw-sup-drop-'+loopId,from:'CHWS-HEADER',to:loopId+'-SUP-TEE',medium:'chws',direction:'forward',state:loopState,capacity:'DN100',current:CHW_AUTHORITY_AVAILABLE ? `${lineTemperatureFlow(st.header.chws)} plant` : 'UNAVAILABLE',redundancy:'duty',sensor:'TT-CHWS-'+(i+1),geometry:{x1:bxS,y1:HDR_CHWS_Y,x2:bxS,y2:supY},style:{stroke:'currentColor',strokeWidth:1.5,cssClass:'pipe'}}) : `<line x1="${bxS}" y1="${HDR_CHWS_Y}" x2="${bxS}" y2="${supY}" class="pipe" />`;
-    const supLeg = RZL ? RZL.line({id:'chw-sup-leg-'+loopId,from:loopId+'-SUP-TEE',to:loopId+'-EVAP',medium:'chws',direction:'forward',state:loopState,capacity:'DN100',current:lineTemperature(st.header.chws),redundancy:'duty',geometry:{x1:portX,y1:supY,x2:bxS,y2:supY},style:{stroke:'currentColor',strokeWidth:1.5,cssClass:'pipe'}}) : `<line x1="${portX}" y1="${supY}" x2="${bxS}" y2="${supY}" class="pipe" />`;
-    const retDrop = RZL ? RZL.line({id:'chw-ret-drop-'+loopId,from:'CHWR-HEADER',to:loopId+'-RET-TEE',medium:'chwr',direction:'reverse',state:loopState,capacity:'DN100',current:CHW_AUTHORITY_AVAILABLE ? `${lineTemperatureFlow(st.header.chwr)} plant` : 'UNAVAILABLE',redundancy:'duty',sensor:'TT-CHWR-'+(i+1),geometry:{x1:bxR,y1:HDR_CHWR_Y,x2:bxR,y2:retY},style:{stroke:'currentColor',strokeWidth:1.5,cssClass:'pipe'}}) : `<line x1="${bxR}" y1="${HDR_CHWR_Y}" x2="${bxR}" y2="${retY}" class="pipe" />`;
-    const retLeg = RZL ? RZL.line({id:'chw-ret-leg-'+loopId,from:loopId+'-EVAP',to:loopId+'-RET-TEE',medium:'chwr',direction:'reverse',state:loopState,capacity:'DN100',current:lineTemperature(st.header.chwr),redundancy:'duty',geometry:{x1:portX,y1:retY,x2:bxR,y2:retY},style:{stroke:'currentColor',strokeWidth:1.5,cssClass:'pipe'}}) : `<line x1="${portX}" y1="${retY}" x2="${bxR}" y2="${retY}" class="pipe" />`;
-    return `
-      ${supDrop}
-      <line x1="${bxS}" y1="${HDR_CHWS_Y}" x2="${bxS}" y2="${supY}" class="${fs}" />
-      ${supLeg}
-      <line x1="${portX}" y1="${supY}" x2="${bxS}" y2="${supY}" class="${fs}" />
-      <circle cx="${bxS}" cy="${HDR_CHWS_Y}" r="7" class="tee" />
-      <circle cx="${bxS}" cy="${supY}" r="7" class="tee" />
-      ${flowArrow(bxS, HDR_CHWS_Y+18, "down", "supply")}
-      ${i===0?`<text x="${bxS+16}" y="${HDR_CHWS_Y+30}" class="pipe-label" text-anchor="start">DN100</text>`:''}
-
-      ${retDrop}
-      <line x1="${bxR}" y1="${HDR_CHWR_Y}" x2="${bxR}" y2="${retY}" class="${fr}" />
-      ${retLeg}
-      <line x1="${portX}" y1="${retY}" x2="${bxR}" y2="${retY}" class="${fr}" />
-      <circle cx="${bxR}" cy="${HDR_CHWR_Y}" r="7" class="tee" />
-      <circle cx="${bxR}" cy="${retY}" r="7" class="tee" />
-      ${flowArrow(bxR, retY-20, "up", "return")}
-    `;
-  }).join("");
-
-  /* ============================================================================
-   * v2.5.0 (Track B §B3, owner comment 13) — THE OUTLET NO LONGER STOPS.
-   * The two primary headers the branch drops always pointed at are drawn; they
-   * continue down the right margin as risers into a DISTRIBUTION & AIR-SIDE band
-   * where the chilled water reaches the four hall CRAH banks — with the performance
-   * conv-engine.js already publishes for them (crah_* counts, unit sensible duty,
-   * available / N+1 capacity, supply-return air planes, air-side ΔT, coil approach,
-   * CHW coil ΔT) and per-hall IT load from getHallSnapshot(). Hall CHW flow is the
-   * IT-reference flow shared over the halls (an identity, declared); the coil valve
-   * position and the unit run state are simulated and declared as such.
-   * ========================================================================== */
-  const ES = engineSnap();
-  const CR = ES ? ES.cooling : null;
-  const HALLS = ['A','B','C','D'];
-  const hallSnap = (code) => (window.CONV_CALC && typeof window.CONV_CALC.getHallSnapshot === 'function') ? window.CONV_CALC.getHallSnapshot(code) : null;
-  const num1 = (v, d) => (v == null || !isFinite(v)) ? '—' : Number(v).toFixed(d == null ? 1 : d);
-  const numG = (v) => (v == null || !isFinite(v)) ? '—' : Math.round(v).toLocaleString('en-US');
-  const AIR_SIDE_BASIS = 'Air-side block: CRAH counts, unit sensible duty, available and N+1 capacity, supply and return air, hot-aisle, air-side delta-T, coil approach and CHW delta-T are conv-engine.js cooling.* values (the engine sizes CRAH from the campus-average hall load, so the counts are per-hall averages, not a per-hall allocation); hall IT load and racks are the hall snapshot; hall CHW flow = cooling.flow_lps shared over the halls (an identity over marked parameters); coil valve position and unit run state are simulated equipment state — conv-engine.js publishes no per-CRAH quantity';
-  const SEC_PUMP_BASIS = 'Secondary pump station and its speed, head and differential pressure are simulated equipment state: conv-engine.js publishes no pump quantity; the flow on the header is the IT-reference flow (cooling.flow_lps), calculated, not metered';
-  const DIST_Y = VH - 590;                 // distribution band top
-  const SUP_HDR_Y = DIST_Y + 60, RET_HDR_Y = VH - 80;
-  const RISER_S_X = HDR_X2 + 16, RISER_R_X = HDR_X2 + 36;
-  const HALL_W = 316, HALL_GAP = 24, HALL_X0 = 60, HALL_Y = DIST_Y + 100, HALL_H = RET_HDR_Y - 50 - HALL_Y;
-  const hdrState = CHW_AUTHORITY_AVAILABLE ? 'energized' : 'unavailable';
-  const hdrTxt = (t) => `${conv.t(t,ui.unit)}${conv.tu(ui.unit)}`;
-  const flowShare = CR ? CR.flow_lps / HALLS.length : null;
-  const lineSpec = (id, from, to, medium, dir, cap, cur, x1, y1, x2, y2, tag) => RZL ? RZL.line({id, from, to, medium, direction:dir, state:hdrState, capacity:cap, current:cur, redundancy:'duty', tag, geometry:{x1,y1,x2,y2}, style:{stroke:'currentColor', strokeWidth:1.5, cssClass:'pipe'}}) : '';
-  const headers = `
-    <!-- primary collection headers (the branch drops above always pointed at these coordinates) -->
-    ${lineSpec('chw-header-supply','CHILLER-PLANT','SECONDARY-DISTRIBUTION','chws','forward','DN300', CHW_AUTHORITY_AVAILABLE ? `${lineTemperatureFlow(st.header.chws)} plant` : 'UNAVAILABLE', HDR_X1, HDR_CHWS_Y, RISER_S_X, HDR_CHWS_Y, 'primary header')}
-    <line x1="${HDR_X1}" y1="${HDR_CHWS_Y}" x2="${RISER_S_X}" y2="${HDR_CHWS_Y}" class="flow chws" />
-    ${lineSpec('chw-header-return','SECONDARY-DISTRIBUTION','CHILLER-PLANT','chwr','reverse','DN300', CHW_AUTHORITY_AVAILABLE ? `${lineTemperatureFlow(st.header.chwr)} plant` : 'UNAVAILABLE', RISER_R_X, HDR_CHWR_Y, HDR_X1, HDR_CHWR_Y, 'primary header')}
-    <line x1="${RISER_R_X}" y1="${HDR_CHWR_Y}" x2="${HDR_X1}" y2="${HDR_CHWR_Y}" class="flow chwr" />
-    ${text(HDR_X1+6, HDR_CHWS_Y-14, "hdr-pipe-label supply", `CHWS HEADER ${hdrTxt(st.header.chws)}`)}
-    ${text(HDR_X1+6, HDR_CHWR_Y+24, "hdr-pipe-label return", `CHWR HEADER ${hdrTxt(st.header.chwr)}`)}
-    <!-- risers: the headers leave the train zone down the right margin into the distribution band -->
-    ${lineSpec('chw-riser-supply','CHWS-HEADER','DIST-SUPPLY-HEADER','chws','forward','DN300', hdrTxt(st.header.chws), RISER_S_X, HDR_CHWS_Y, RISER_S_X, SUP_HDR_Y, 'riser')}
-    <line x1="${RISER_S_X}" y1="${HDR_CHWS_Y}" x2="${RISER_S_X}" y2="${SUP_HDR_Y}" class="flow chws" />
-    ${lineSpec('chw-riser-return','DIST-RETURN-HEADER','CHWR-HEADER','chwr','reverse','DN300', hdrTxt(st.header.chwr), RISER_R_X, RET_HDR_Y, RISER_R_X, HDR_CHWR_Y, 'riser')}
-    <line x1="${RISER_R_X}" y1="${RET_HDR_Y}" x2="${RISER_R_X}" y2="${HDR_CHWR_Y}" class="flow chwr" />
-    <circle cx="${RISER_S_X}" cy="${HDR_CHWS_Y}" r="7" class="tee" /><circle cx="${RISER_R_X}" cy="${HDR_CHWR_Y}" r="7" class="tee" />
-  `;
-  const halls = HALLS.map((code, i) => {
-    const hx = HALL_X0 + i*(HALL_W+HALL_GAP), hy = HALL_Y, h = hallSnap(code);
-    const crahN = CR ? CR.crah_running : null, crahI = CR ? CR.crah_installed : null;
-    const unitKw = CR ? CR.crah_unit_sensible_kw : null;
-    const util = h && h.it_design_kw ? h.it_load_kw / h.it_design_kw : null;
-    const valvePct = util == null ? null : Math.round(45 + util * 40);          // simulated coil valve position, declared
-    const inX = hx - 6, outX = hx + HALL_W + 6;                                    // branch risers run in the gaps, never through text
-    const coilY = hy + 113, coilL = hx + 30, coilR = hx + HALL_W - 30;
-    const rowY = (k) => hy + 152 + k*24;
-    let zig = `M${coilL},${coilY}`;
-    for (let k = 0; k < 10; k++) { const x0 = coilL + k*((coilR-coilL)/10); zig += ` L${x0 + (coilR-coilL)/20},${coilY - 13} L${x0 + (coilR-coilL)/10},${coilY + (k===9 ? 0 : 13)}`; }
-    return `
-    <g data-hall-block="${code}" data-rz-authored-basis="${AIR_SIDE_BASIS}">
-      <rect x="${hx}" y="${hy}" width="${HALL_W}" height="${HALL_H}" rx="12" class="panel panel-normal" filter="url(#fShadow)" />
-      <rect x="${hx+12}" y="${hy+12}" width="${HALL_W-24}" height="28" rx="7" class="field-box" />
-      ${text(hx+24, hy+31, "section-title", `HALL ${code}  •  CRAH BANK  •  CRAH-${code}01..${code}${String(crahI == null ? '—' : crahI).padStart(2,'0')}`)}
-      <!-- supply: header tee → down the left gap → into the coil; return: coil → right gap → down to the return header -->
-      ${lineSpec('chw-hall-supply-'+code,'DIST-SUPPLY-HEADER','CRAH-BANK-'+code,'chws','forward','DN150', flowShare == null ? '—' : `${conv.f(flowShare,ui.unit)} ${conv.fu(ui.unit)} ref`, inX, SUP_HDR_Y, inX, coilY, 'hall '+code)}
-      <line x1="${inX}" y1="${SUP_HDR_Y}" x2="${inX}" y2="${coilY}" class="flow chws" />
-      <line x1="${inX}" y1="${coilY}" x2="${coilL}" y2="${coilY}" class="flow chws" />
-      ${valveSym(inX, SUP_HDR_Y+24, 7, "v")}
-      <circle cx="${inX}" cy="${SUP_HDR_Y}" r="7" class="tee" />
-      <path d="${zig}" class="coil" />
-      <line x1="${coilR}" y1="${coilY}" x2="${outX}" y2="${coilY}" class="flow chwr" />
-      ${lineSpec('chw-hall-return-'+code,'CRAH-BANK-'+code,'DIST-RETURN-HEADER','chwr','reverse','DN150', hdrTxt(st.header.chwr), outX, coilY, outX, RET_HDR_Y, 'hall '+code)}
-      <line x1="${outX}" y1="${coilY}" x2="${outX}" y2="${RET_HDR_Y}" class="flow chwr" />
-      ${valveSym(outX, hy+HALL_H+22, 7, "v")}
-      ${text(hx+HALL_W-4, hy+HALL_H+26, "unit", `CV ${valvePct == null ? '—' : valvePct + '%'}`, "end")}
-      <circle cx="${outX}" cy="${RET_HDR_Y}" r="7" class="tee" />
-      <circle cx="${hx+HALL_W/2}" cy="${hy+78}" r="12" class="fan" /><path d="M${hx+HALL_W/2-7},${hy+73} q7,-6 14,0 q-7,6 -14,0 M${hx+HALL_W/2},${hy+71} q6,7 0,14 q-6,-7 0,-14" class="fan-blade" />
-      ${text(hx+HALL_W/2, hy+58, "unit", `EC FAN WALL  •  ${crahN == null ? '—' : crahN} RUN / ${crahI == null ? '—' : crahI} INST`, "middle")}
-      ${text(hx+16, rowY(0), "metric-row", `Unit sensible  <tspan class="metric-val-inline">${numG(unitKw)} kW</tspan>  •  ${crahN == null ? '—' : crahN} duty`)}
-      ${text(hx+16, rowY(1), "metric-row", `Avail  <tspan class="metric-val-inline">${numG(CR ? CR.crah_available_kw : null)} kW</tspan>  •  N+1  <tspan class="metric-val-inline">${numG(CR ? CR.crah_n1_available_kw : null)} kW</tspan>`)}
-      ${text(hx+16, rowY(2), "metric-row", `Hall IT  <tspan class="metric-val-inline">${numG(h ? h.it_load_kw : null)} kW</tspan>  •  ${numG(h ? h.racks : null)} racks`)}
-      ${text(hx+16, rowY(3), "metric-row", `Supply air  <tspan class="metric-val-inline">${num1(CR ? CR.crah_supply_air_c : null)}°C</tspan>  •  Return  <tspan class="metric-val-inline">${num1(CR ? CR.crah_return_air_c : null)}°C</tspan>`)}
-      ${text(hx+16, rowY(4), "metric-row", `Air ΔT  <tspan class="metric-val-inline">${num1(CR ? CR.airside_delta_t_k : null)} K</tspan>  •  Hot aisle  <tspan class="metric-val-inline">${num1(CR ? CR.hot_aisle_c : null)}°C</tspan>`)}
-      ${text(hx+16, rowY(5), "metric-row", `CHW coil ΔT  <tspan class="metric-val-inline">${num1(CR ? CR.chw_delta_t : null)} K</tspan>  •  Approach  <tspan class="metric-val-inline">${num1(CR ? CR.chw_coil_approach_k : null)} K</tspan>`)}
-      ${text(hx+16, rowY(6), "metric-row", `Hall CHW  <tspan class="metric-val-inline">${flowShare == null ? '—' : conv.f(flowShare,ui.unit) + ' ' + conv.fu(ui.unit)}</tspan>  (IT-ref ÷ ${HALLS.length})`)}
-      ${text(hx+16, rowY(7), "metric-row", `CHWS in  <tspan class="metric-val-inline">${hdrTxt(st.header.chws)}</tspan>  •  CHWR out  <tspan class="metric-val-inline">${hdrTxt(st.header.chwr)}</tspan>`)}
-    </g>`;
-  }).join('');
-  const secPumpX = RISER_S_X - 40;   // secondary pump station on the supply header, beside the riser
-  const airSide = `
-    <rect x="${PZ_X}" y="${DIST_Y}" width="${RISER_R_X + 24 - PZ_X}" height="${VH - DIST_Y - 36}" rx="10" class="frame" />
-    ${text(PZ_X+16, DIST_Y+24, "zone-label", `DISTRIBUTION & AIR SIDE  —  CHW TO ${HALLS.length} HALL CRAH BANKS  —  ${CR ? CR.crah_running : '—'} OF ${CR ? CR.crah_installed : '—'} CRAH RUNNING PER HALL (ENGINE, CAMPUS-AVERAGE)`)}
-    ${lineSpec('chw-dist-supply','DIST-SUPPLY-HEADER','CRAH-BANKS','chws','forward','DN300', CHW_AUTHORITY_AVAILABLE ? `${lineTemperatureFlow(st.header.chws)} ref` : 'UNAVAILABLE', RISER_S_X, SUP_HDR_Y, HALL_X0, SUP_HDR_Y, 'distribution header')}
-    <line x1="${RISER_S_X}" y1="${SUP_HDR_Y}" x2="${HALL_X0}" y2="${SUP_HDR_Y}" class="flow chws" />
-    ${lineSpec('chw-dist-return','CRAH-BANKS','DIST-RETURN-HEADER','chwr','reverse','DN300', hdrTxt(st.header.chwr), HALL_X0, RET_HDR_Y, RISER_R_X, RET_HDR_Y, 'distribution header')}
-    <line x1="${HALL_X0}" y1="${RET_HDR_Y}" x2="${RISER_R_X}" y2="${RET_HDR_Y}" class="flow chwr" />
-    ${text(HALL_X0+8, SUP_HDR_Y-14, "hdr-pipe-label supply", `SECONDARY CHWS DISTRIBUTION HEADER  ${hdrTxt(st.header.chws)}  •  IT-REFERENCE FLOW ${conv.f(st.header.flow,ui.unit)} ${conv.fu(ui.unit)}  •  CALCULATED • NOT METERED`)}
-    ${text(HALL_X0+8, RET_HDR_Y+24, "hdr-pipe-label return", `SECONDARY CHWR RETURN HEADER  ${hdrTxt(st.header.chwr)}`)}
-    <g data-rz-authored-basis="${SEC_PUMP_BASIS}">
-      <circle cx="${secPumpX}" cy="${SUP_HDR_Y}" r="16" class="pump pump-run" /><polygon points="${secPumpX-8},${SUP_HDR_Y-9} ${secPumpX+10},${SUP_HDR_Y} ${secPumpX-8},${SUP_HDR_Y+9}" class="pump-run" />
-      <circle cx="${secPumpX-44}" cy="${SUP_HDR_Y}" r="16" class="pump pump-off" /><polygon points="${secPumpX-52},${SUP_HDR_Y-9} ${secPumpX-34},${SUP_HDR_Y} ${secPumpX-52},${SUP_HDR_Y+9}" class="pump-off" />
-      ${text(RISER_S_X-14, SUP_HDR_Y-26, "unit", "CHWP-S1 DUTY  •  S2 STBY", "end")}
-      ${text(RISER_S_X-14, SUP_HDR_Y-42, "unit", `SPD 82%  •  H 28.4 m  •  DP 145 kPa`, "end")}
-    </g>
-    ${halls}
-  `;
-
-  const loops = st.loops.map((lp,i)=>loopSvg(lp,pos[i])).join("");
-  const itRefFlow = `${conv.f(st.header.flow,ui.unit)} ${conv.fu(ui.unit)}`;
-  const hDp = `${conv.p(st.header.dp,ui.unit)} ${conv.pu(ui.unit)}`;
-  const hChws = `${conv.t(st.header.chws,ui.unit)}${conv.tu(ui.unit)}`;
-  const hChwr = `${conv.t(st.header.chwr,ui.unit)}${conv.tu(ui.unit)}`;
-  const deltaT = ui.unit==="ip"?r1((st.header.chwr-st.header.chws)*9/5):r1(st.header.chwr-st.header.chws);
-  const deltaTU = ui.unit==="ip"?"F":"C";
-  const compRun = st.loops.reduce((n,lp)=>n+lp.comps.reduce((a,b)=>a+b,0),0);
-  const forced = ui.forced.size;
-  const ackTxt = st.alarm.issues.length ? (st.alarm.ack ? "ACKED" : "REQUIRED") : "N/A";
-  const firstOut = st.alarm.firstOut || "None";
-
-  /* Plant electrical input has no source in this basis — see loopMetrics(). Null propagates
-     to an em-dash rather than summing four nulls into a confident 0. */
-  /* v1.134.8 — the plant's electrical input is an ENGINE quantity now (duty x specific power
-     for the adopted machine type), not the sum of four drawn machines: this mimic draws 4 of 7
-     running, so summing what is drawn would under-report the plant by 3/7. */
-  const totalKw = PLANT.inputKw;
-  const totalTons = PLANT.dutyRt;
-  /* COP and kW/RT come straight from the engine's adopted specific power. They were reported
-     UNAVAILABLE while the heat-rejection technology was unresolved; the owner adopted the
-     study's basis (evaporative cooling tower = water-cooled centrifugal), so they are derived
-     and traceable. */
-  const plantCop = PLANT.cop;
-  const kwPerRt = PLANT.kwPerRt;
-  const loopsOnline = st.loops.filter(lp=>!evalLoop(lp).disconnected).length;
-  // Plant capacity context — use only validated engine fields. The previous P&ID
-  // invented a 5.25 MW unit rating from an authored 85% loading assumption, which
-  // contradicted the governed 5 MW/unit schedule and overstated N+1 margin.
-  const _es = engineSnap();
-  const chRun = _es ? _es.cooling.chillers_running : 2;
-  const chTot = _es ? _es.cooling.chillers_total : 3;
-  const coolDemandKw = st.header.coolingKw;
-  const runningCapacityKw = PLANT.capacityKw;
-  const postOneFailureCapacityKw = PLANT.n1CapacityKw;
-  const nPlus1MarginKw = postOneFailureCapacityKw - coolDemandKw;
-  const redundancy = postOneFailureCapacityKw >= coolDemandKw
-    ? "N+1" : (runningCapacityKw >= coolDemandKw ? "N" : "DEGRADED");
-  const redColor = redundancy==="N+1"?"var(--run)":(redundancy==="N"?"var(--warn)":"var(--alarm)");
-
-  const alarmBg = st.alarm.level==="ALARM"?"rgba(194,90,90,.15)":(st.alarm.level==="WARNING"?"rgba(192,143,70,.12)":"rgba(56,181,109,.08)");
-  const alarmBd = st.alarm.level==="ALARM"?"rgba(194,90,90,.6)":(st.alarm.level==="WARNING"?"rgba(192,143,70,.5)":"rgba(56,181,109,.3)");
-  const alarmCol = st.alarm.level==="ALARM"?"#ecb7b7":(st.alarm.level==="WARNING"?"#e3c78d":"#9de0ba");
-
-  const C3W = Math.floor((CW - 20) / 3);
-  const C2W = Math.floor((CW - 10) / 2);
-  const R1Y = PZ_Y + 36;   // v1.134.6: was +16, so "HEADER FLOW" ran into the zone title
-  const R2Y = R1Y + 104 + 14;
-  const R3Y = R2Y + 104 + 14;
-  const R4Y = R3Y + 86 + 14;
-  const R5Y = R4Y + 152 + 14;
-  const R6Y = R5Y + 86 + 14;
-
-  $("pidSvg").innerHTML = `
-    <defs>
-      <linearGradient id="gShell" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#243448" />
-        <stop offset="100%" stop-color="#182636" />
-      </linearGradient>
-      <linearGradient id="gPanel" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#1e2e42" />
-        <stop offset="100%" stop-color="#141f2e" />
-      </linearGradient>
-      <linearGradient id="gSupCard" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="#1e3348" />
-        <stop offset="100%" stop-color="#152638" />
-      </linearGradient>
-      <filter id="fGlow">
-        <feGaussianBlur stdDeviation="2" result="blur" />
-        <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-      </filter>
-      <filter id="fShadow" x="-2%" y="-2%" width="104%" height="108%">
-        <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="rgba(0,0,0,.35)" />
-      </filter>
-    </defs>
-    <g class="grid">
-      <!-- v1.134.17 — the column count was the literal 116 (x20 = 2320), sized for the old
-           2300 viewBox. After the trim it drew 43 columns past the drawing's right edge, and
-           the strict geometry gate caught every one. Derive both counts from VW/VH so the grid
-           can never outrun its own canvas again. -->
-      ${Array.from({length:Math.floor(VW/20)+1}).map((_,i)=>`<line x1="${i*20}" y1="0" x2="${i*20}" y2="${VH}" />`).join("")}
-      ${Array.from({length:Math.floor(VH/20)+1}).map((_,i)=>`<line x1="0" y1="${i*20}" x2="${VW}" y2="${i*20}" />`).join("")}
-    </g>
-
-    <rect x="20" y="36" width="${VW-40}" height="${VH-72}" rx="14" class="panel" />
-    ${text(44,68,"section-title","CHILLER PLANT / WATER SIDE")}
-    ${text(44,87,"label","ISA-5.1 P&ID  \u2022  Continuous pipe routing  \u2022  Click loop module for diagnostics")}
-
-    <rect x="${PZ_X}" y="${PZ_Y}" width="${PZ_W}" height="${VH-136}" rx="10" class="frame" />
-    <!-- v1.134.7 — this said "4x AIR-COOLED CHILLER LOOPS" as though it were the whole plant.
-         Two things were wrong with that. The engine runs 7 of 10 machines, so four loops are a
-         SUBSET and the mimic must say so rather than let an operator read four as the total.
-         And "air-cooled" contradicts the governed study, which specifies evaporative
-         cooling-tower heat rejection — i.e. water-cooled machines. That conflict is stated on
-         the drawing instead of being resolved by whichever page was edited last; it is a Basis
-         of Design decision, and the ~2x difference in specific power is why this page reports
-         plant COP and kW/RT as UNAVAILABLE. -->
-    ${text(PZ_X+16,PZ_Y+24,"zone-label",`PROCESS TRAINS  \u2014  WATER-COOLED CENTRIFUGAL  \u2014  4 OF ${ENGINE_CHILLERS_RUNNING != null ? ENGINE_CHILLERS_RUNNING : "\u2014"} RUNNING (${ENGINE_CHILLERS_TOTAL != null ? ENGINE_CHILLERS_TOTAL : "\u2014"} INSTALLED)`)}
-    <!-- v1.134.17 — THE SUPERVISORY COLUMN LEFT THIS DRAWING.
-         It occupied x 1520-2280 of a 2300-wide viewBox: a THIRD of the drawing, spent on
-         tabular telemetry. The panel renders ~1274 px wide, so everything was drawn at 55 %
-         scale and the process trains — the reason this page exists — were the least legible
-         thing on the screen. Worse, its top three cards (CHWS, CHWR, delta-T, flow, DP)
-         repeated values the right-hand inspector already showed, so the same four numbers
-         appeared three times per screen.
-         Tabular telemetry does not belong in a scaled SVG. It is HTML now (see #supPanel),
-         where it renders at native resolution, wraps responsively and can carry basis hooks.
-         The viewBox drops to the drawing's real extent (content ends at HDR_X2 = 1396), which
-         takes the process trains from 0.55 to ~0.87 scale — a 1.6x gain in legibility with
-         nothing removed. -->
-
-    ${branches}
-    ${headers}
-    ${loops}
-    ${airSide}
-  `;
+  if(n.id === 'tths') out.values = { t: chwVal(ok ? T(st.header.chws) : CHW_UNAV) };
+  else if(n.id === 'tthr') out.values = { t: chwVal(ok ? T(st.header.chwr) : CHW_UNAV) };
+  else if(n.id === 'ps1' || n.id === 'ps2'){
+    const duty = n.id === 'ps1';
+    out.state = !ok ? null : (duty ? 'running' : 'standby');
+    out.values = { st: chwVal(!ok ? CHW_UNAV : (duty ? 'DUTY' : 'STBY')) };
+  } else if(n.id === 'sref'){
+    out.values = { q: chwVal(ok ? `IT-REFERENCE FLOW ${chwPointText('sref:q')}` : CHW_UNAV) };
+  } else if(/^crah[A-D]$/.test(n.id)){
+    const code = n.id.slice(4), h = ok ? chwHall(code) : null, ES = ok ? engineSnap() : null, CR = ES ? ES.cooling : null;
+    const n1 = (v) => (v == null || !isFinite(v)) ? '—' : Number(v).toFixed(1);
+    out.state = ok ? 'running' : 'stopped';
+    out.values = !ok ? { it: chwVal(CHW_UNAV), n: chwVal('—'), air: chwVal('—') } : {
+      it: chwVal(`${h ? Math.round(h.it_load_kw).toLocaleString('en-US') : '—'} kW IT`),
+      n: chwVal(`${CR ? CR.crah_running : '—'} / ${CR ? CR.crah_installed : '—'} RUN`),
+      air: chwVal(`${n1(CR && CR.crah_supply_air_c)} / ${n1(CR && CR.crah_return_air_c)} °C`) };
+    if(CR) out.rows = [['Unit sensible', Math.round(CR.crah_unit_sensible_kw) + ' kW'], ['Available / N+1', Math.round(CR.crah_available_kw) + ' / ' + Math.round(CR.crah_n1_available_kw) + ' kW'], ['Air ΔT', n1(CR.airside_delta_t_k) + ' K'], ['CHW coil ΔT', n1(CR.chw_delta_t) + ' K']];
+  }
+  return out;
+}
+function chwFlow(e){
+  if(!e.flowOf) return null;
+  if(!CHW_AUTHORITY_AVAILABLE || !chwPoints) return 'unavailable';
+  /* B2: a pump's own branch follows its cmd/fb, not the header point */
+  if(CHW_EDGE_PUMP[e.id]) return chwBranchFlow(CHW_EDGE_PUMP[e.id]);
+  /* B1: an edge takes its flow from the measured point it evidences (good>0=running,
+     good 0=stopped, else unavailable). An edge shared by two points runs when either
+     runs, and is unavailable when neither runs and one is not good. */
+  var ps = CHW_EDGE_POINTS[e.id];
+  if(ps) {
+    var fs = ps.map(chwPointFlow);
+    if(fs.indexOf('running') >= 0) return 'running';
+    return fs.indexOf('unavailable') >= 0 ? 'unavailable' : 'stopped';
+  }
+  /* no point evidences it: dead legs (vents, expansion, header ends) and the decoupler at the design point
+     carry no flow (stopped, as before); anything else, the condenser-water stubs included, is unavailable */
+  var k = e.flowOf;
+  if(k === 'still' || k === 'dec' || k === 's2') return 'stopped';
+  return 'unavailable';
+}
+/* Line-model adoption on the sheet: every process pipe carries data-rz-line + data-current,
+   so the inspector and the fail-closed gates read the same metadata the hand-drawn mimic carried. */
+function chwTagLines(){
+  const svg = $('pidSvg');
+  if(!svg) return;
+  const cur = CHW_AUTHORITY_AVAILABLE ? null : CHW_UNAV;
+  svg.querySelectorAll('path.hmi-edge[data-edge]').forEach((p) => {
+    if(/w-(inst|signal)/.test(p.getAttribute('class') || '')) return;
+    const id = p.getAttribute('data-edge');
+    p.setAttribute('data-rz-line', id);
+    p.setAttribute('data-state', CHW_AUTHORITY_AVAILABLE ? (p.getAttribute('data-flow') || 'energized') : 'unavailable');
+    p.setAttribute('data-current', cur || (/^e-(s|hs)/.test(id) ? lineTemperature(st.header.chws) : (/^e-cd/.test(id) ? 'condenser water' : lineTemperature(st.header.chwr))));
+  });
+  svg.querySelectorAll('[data-val$=":q"]').forEach((t) => {
+    if(/^ch\d:q$/.test(t.getAttribute('data-val'))) t.setAttribute('data-rz-loop-flow', '1');
+  });
+  /* B2: a command / feedback mismatch is marked on the pump symbol, not by colour alone */
+  Object.keys(chwPumpForce).forEach(function (id) {
+    var g = svg.querySelector('.hmi-node[data-node="' + id + '"]'); if (!g) return;
+    if (CHW_AUTHORITY_AVAILABLE && chwPumpMismatch(id)) g.setAttribute('data-mismatch', '1'); else g.removeAttribute('data-mismatch');
+  });
+  svg.querySelectorAll('.hmi-node[data-node^="ch"]').forEach((g) => {
+    const m = /^ch(\d)$/.exec(g.getAttribute('data-node'));
+    if(m) g.setAttribute('data-loop-id', String(st.loops[Number(m[1]) - 1].id));
+  });
 }
 
+/* ============================================================================
+ * W4 (2026-11-15) — per-point CHW flow evidence + CHWP command / feedback
+ * (PRD-CONV-BMS-UIUX laws B1, B2, B3, B6). Every drawn flow is a point with a
+ * quality (js/conv/sheet-truth.js); an edge animates only when its point is good
+ * and > 0, a good 0 renders stopped (not disconnected), anything else unavailable.
+ * Points are re-seeded each scan from values this page already computes; nothing
+ * is invented. A forced-disconnect fault (ui.forced, the #faultBtn path) still
+ * raises an ALARM — a valid zero does not. CHWP-01A shows CMD ON|OFF and RUN|STOP
+ * as two values; a mismatch marks the symbol and stills its branch. RZConvSim
+ * (setPoint, setPump, trip, clearTrip, ack, tick, snapshot) installs only in
+ * simulated data mode and is never a write path to equipment.
+ * ==========================================================================*/
+var T4 = window.RZConvTruth || null;
+/* Points (seeds, all already computed by this page):
+     ch1:q..ch4:q  loop.flow of each primary train, the figure printed as CALC BRANCH REF (chwRead, ch node 'q')
+     sref:q        st.header.flow, the IT-REFERENCE FLOW printed at CHWS · SECONDARY (chwRead, sref node)
+     hallA:q..D:q  st.header.flow shared over the four halls the sheet draws (the same reference, no new number)
+   A train under the forced-disconnect fault (ui.forced, #faultBtn) seeds its point as quality bad. */
+var CHW_HALLS = ['A', 'B', 'C', 'D'];
+var CHW_POINTS = {}, CHW_POINT_EDGES = {}, CHW_SHARED_EDGES = {}, CHW_PUMP_EDGES = {};
+(function () {
+  var n, i;
+  for (n = 1; n <= 4; n++) {
+    CHW_POINTS['ch' + n + ':q'] = { unit: 'L/s', digits: 1, label: 'CH-0' + n + ' branch flow (loop.flow, calc ref)' };
+    CHW_POINT_EDGES['ch' + n + ':q'] = ['e-s' + n + 'a', 'e-s' + n + 'b', 'e-s' + n, 'e-r' + n, 'e-r' + n + 'a', 'e-r' + n + 'b', 'e-ev' + n];
+    CHW_PUMP_EDGES['pa' + n] = ['e-pa' + n + 's', 'e-pa' + n + 'd', 'e-pa' + n + 'c'];
+    CHW_PUMP_EDGES['pb' + n] = ['e-pb' + n + 's', 'e-pb' + n + 'd', 'e-pb' + n + 'c'];
+    /* primary headers carry the trains that have joined them: e-hs1/e-hr1 train 1, e-hs4/e-hr4 trains 1-4 */
+    var up = []; for (i = 1; i <= n; i++) up.push('ch' + i + ':q');
+    CHW_SHARED_EDGES['e-hs' + n] = up; CHW_SHARED_EDGES['e-hr' + n] = up;
+  }
+  CHW_POINTS['sref:q'] = { unit: 'L/s', digits: 1, label: 'Secondary IT-reference flow (st.header.flow)' };
+  CHW_POINT_EDGES['sref:q'] = ['e-sec0', 'e-sec0b', 'e-s1s', 'e-s1d', 'e-hr5', 'e-hr6'];
+  CHW_HALLS.forEach(function (h, k) {
+    CHW_POINTS['hall' + h + ':q'] = { unit: 'L/s', digits: 1, label: 'Hall ' + h + ' CRAH supply (IT-reference share)' };
+    CHW_POINT_EDGES['hall' + h + ':q'] = ['e-c' + h + 's', 'e-c' + h + 'r'];
+    /* hall supply header: e-hsA feeds A-D, e-hsD feeds D; hall return: e-hrB carries A, e-hrD2 carries A-D */
+    CHW_SHARED_EDGES['e-hs' + h] = CHW_HALLS.slice(k).map(function (x) { return 'hall' + x + ':q'; });
+    if (k > 0) CHW_SHARED_EDGES['e-hr' + h] = CHW_HALLS.slice(0, k).map(function (x) { return 'hall' + x + ':q'; });
+  });
+  CHW_SHARED_EDGES['e-hrD2'] = CHW_HALLS.map(function (x) { return 'hall' + x + ':q'; });
+})();
+var CHW_EDGE_POINTS = {}, CHW_EDGE_PUMP = {};
+Object.keys(CHW_POINT_EDGES).forEach(function (p) { CHW_POINT_EDGES[p].forEach(function (e) { (CHW_EDGE_POINTS[e] = CHW_EDGE_POINTS[e] || []).push(p); }); });
+Object.keys(CHW_SHARED_EDGES).forEach(function (e) { CHW_EDGE_POINTS[e] = CHW_SHARED_EDGES[e].slice(); });
+Object.keys(CHW_PUMP_EDGES).forEach(function (p) { CHW_PUMP_EDGES[p].forEach(function (e) { CHW_EDGE_PUMP[e] = p; }); });
+var chwPoints = T4 ? T4.createStore(CHW_POINTS) : null;
+var chwForcedPoint = {}, chwPumpForce = {}, chwPumpFbSim = {};
+Object.keys(CHW_PUMP_EDGES).forEach(function (id) { chwPumpForce[id] = {}; chwPumpFbSim[id] = 'off'; });
+
+/* Command = the page's duty selection (loop.pumpA and a drive speed > 0); feedback = the simulated pump's
+   answer, taken once per scan (chwPumpScan), unless the seam forces one. */
+function chwPumpCmd(id) {
+  var f = chwPumpForce[id] && chwPumpForce[id].cmd;
+  if (f) return f;
+  var m = /^p([ab])(\d)$/.exec(id); if (!m) return 'off';
+  var lp = st.loops[Number(m[2]) - 1]; if (!lp) return 'off';
+  if (m[1] === 'a') return (lp.pumpA && lp.spdA > 0) ? 'on' : 'off';
+  return (!lp.pumpA && lp.spdB > 0) ? 'on' : 'off';
+}
+function chwPumpFb(id) { return (chwPumpForce[id] && chwPumpForce[id].fb) || chwPumpFbSim[id] || 'off'; }
+function chwPumpMismatch(id) { return chwPumpCmd(id) !== chwPumpFb(id); }
+function chwPumpScan() { Object.keys(chwPumpFbSim).forEach(function (id) { chwPumpFbSim[id] = chwPumpCmd(id); }); }
+function chwSeedPoint(id, v) {
+  if (!chwPoints || chwForcedPoint[id]) return;
+  chwPoints.set(id, (typeof v === 'number' && isFinite(v)) ? { value: v, quality: 'good' } : { quality: 'nodata' });
+}
+function chwSeedPoints() {
+  if (!chwPoints || !CHW_AUTHORITY_AVAILABLE) return;
+  st.loops.forEach(function (lp) {
+    var id = 'ch' + lp.id + ':q';
+    if (ui.forced.has(lp.id)) { if (!chwForcedPoint[id]) chwPoints.set(id, { quality: 'bad' }); }
+    else chwSeedPoint(id, lp.flow);
+  });
+  chwSeedPoint('sref:q', st.header.flow);
+  CHW_HALLS.forEach(function (h) { chwSeedPoint('hall' + h + ':q', st.header.flow != null ? st.header.flow / CHW_HALLS.length : null); });
+}
+function chwLoopRec(lp) { return chwPoints ? chwPoints.get('ch' + lp.id + ':q') : null; }
+function chwPointText(id) {
+  if (!CHW_AUTHORITY_AVAILABLE || !chwPoints) return CHW_UNAV;
+  var r = chwPoints.get(id), q = function (v) { return conv.f(v, ui.unit) + ' ' + conv.fu(ui.unit); };
+  if (r && r.quality === 'good' && r.value != null) return q(r.value);
+  if (r && r.quality === 'stale' && r.value != null) return 'STALE (' + q(r.value) + ')';
+  return T4.text(r, CHW_POINTS[id]);
+}
+function chwPointFlow(id) { return CHW_AUTHORITY_AVAILABLE && chwPoints ? T4.flowState(chwPoints.get(id)) : 'unavailable'; }
+/* a pump's own branch moves only while that pump runs and agrees with its command */
+function chwBranchFlow(pump) {
+  if (chwPumpMismatch(pump)) return 'unavailable';
+  if (chwPumpFb(pump) !== 'on') return 'stopped';
+  return chwPointFlow('ch' + pump.slice(2) + ':q');
+}
+
+function chwOpen(n){
+  const lp = chwLoopOf(n.id);
+  if(!lp || !CHW_AUTHORITY_AVAILABLE) return;
+  openModal(lp.id);
+  if(window.RZBMSShell && typeof updateLoopInspector === 'function') updateLoopInspector(lp.id);
+}
+function mountChwSheet(mode){
+  const host = $('chw-sheet-host');
+  if(!host || !window.RZHmiSheet || !window.RZChillerSheets) return;
+  if(chwSheet && chwSheetMode === mode){ chwSheet.update(); chwTagLines(); if(window.RZHmiDepth) window.RZHmiDepth.apply(host.querySelector('svg.hmi-svg'), { levels: {} }); return; }
+  if(chwSheet && chwSheet.destroy) chwSheet.destroy();
+  const sheet = mode === 'unavailable' ? window.RZChillerSheets.unavailable : window.RZChillerSheets.pid;
+  chwSheet = window.RZHmiSheet.render(host, sheet, { read: chwRead, flow: chwFlow, open: chwOpen });
+  chwSheetMode = mode;
+  chwSheet.update();
+  const svg = $('pidSvg');
+  if(svg) svg.setAttribute('aria-label', mode === 'unavailable' ? 'Chiller plant authority unavailable' : 'Chiller P&ID mimic');
+  chwTagLines();
+  if(window.RZHmiDepth) window.RZHmiDepth.apply(host.querySelector('svg.hmi-svg'), { levels: {} });   /* W3 depth */
+}
+function drawUnavailablePid(){ mountChwSheet('unavailable'); }
+function drawPid(){
+  if(!CHW_AUTHORITY_AVAILABLE){ drawUnavailablePid(); return; }
+  mountChwSheet('pid');
+}
 
 /* ============================================================================
  * v1.134.17 — SUPERVISORY TELEMETRY, IN HTML
@@ -2269,6 +1992,7 @@ function closeModal(){
 
 function stepProcess(){
   if(!ui.sim || !CHW_AUTHORITY_AVAILABLE) return;
+  chwPumpScan();   /* W4 B2: feedback answers the command of the previous scan */
 
   st.loops.forEach(lp=>{
     if(ui.forced.has(lp.id)){
@@ -2355,6 +2079,7 @@ function renderAll(){
     drawUnavailablePid();
     return;
   }
+  chwSeedPoints();
   alarmStep();
   renderKpi();
   renderAlarmStrip();
@@ -2433,16 +2158,6 @@ function bind(){
   $("faultBtn").addEventListener("click", ()=>{ ui.forced.add(Number($("faultSel").value)); renderAll(); });
   $("clearBtn").addEventListener("click", ()=>{ ui.forced.clear(); renderAll(); });
 
-  $("pidSvg").addEventListener("click", e=>{
-    const g = e.target.closest("[data-loop-id]");
-    if(!g) return;
-    const id = Number(g.getAttribute("data-loop-id"));
-    openModal(id);
-    // v1.23.1 BMS Shell adoption — also feed the right-side inspector with
-    // a quick-summary payload (modal remains the deep-detail view).
-    if(window.RZBMSShell && typeof updateLoopInspector === "function") updateLoopInspector(id);
-  });
-
   $("mClose").addEventListener("click", closeModal);
   $("modalScrim").addEventListener("click", closeModal);
   document.addEventListener("click", e=>{
@@ -2477,27 +2192,6 @@ function bind(){
     }
   });
 
-  // SVG zoom via mouse wheel
-  let svgScale = 1;
-  $("pidSvg").addEventListener("wheel", e=>{
-    e.preventDefault();
-    svgScale = clamp(svgScale + (e.deltaY > 0 ? -0.1 : 0.1), 0.5, 3);
-    $("pidSvg").style.transform = `scale(${svgScale})`;
-    $("pidSvg").style.transformOrigin = "top left";
-  }, {passive:false});
-
-  // Hover = cyan SELECTION outline (doc-10 color semantics: selection is a
-  // cyan outline, not a glow — glow is reserved for critical only).
-  $("pidSvg").addEventListener("mouseover", e=>{
-    const g = e.target.closest("[data-loop-id]");
-    const p = g && g.querySelector(".panel");
-    if(p){ p.style.stroke = "#4fb6c9"; p.style.strokeWidth = "2.4"; }
-  });
-  $("pidSvg").addEventListener("mouseout", e=>{
-    const g = e.target.closest("[data-loop-id]");
-    const p = g && g.querySelector(".panel");
-    if(p){ p.style.stroke = ""; p.style.strokeWidth = ""; }
-  });
 }
 
 /* ============================================================================
@@ -2599,8 +2293,55 @@ function initBmsShellShim(){
   }
 }
 
+/* ---- W4 simulation / test seam (simulated data mode only; never a write path) -------------------------
+   trip(chN) applies the page's own forced-disconnect fault to train N (the #faultBtn path); tick(n) runs n of
+   the page's 1.2 s scans; setPump forces a CHW pump's cmd and/or fb ('on' | 'off', 'auto' releases); setPoint
+   holds a point until clearTrip / a reload. */
+function installChwSeam(){
+  if(!T4 || !chwPoints) return;
+  const trainOf = (n) => { const m = /^ch([1-4])$/.exec(n || ''); return m ? Number(m[1]) : null; };
+  T4.seam({
+    points: () => chwPoints.ids(),
+    edgesOf: (id) => {
+      const es = (CHW_POINT_EDGES[id] || []).slice();
+      /* a train point also evidences the branch of the pump that runs on it */
+      const m = /^ch(\d):q$/.exec(id);
+      if(m) ['pa', 'pb'].forEach((p) => { const pid = p + m[1]; if(chwPumpFb(pid) === 'on' && !chwPumpMismatch(pid)) CHW_PUMP_EDGES[pid].forEach((e) => es.push(e)); });
+      return es;
+    },
+    setPoint: (id, rec) => { const r = chwPoints.set(id, rec); chwForcedPoint[id] = true; return r; },
+    setPump: (id, f) => {
+      if(!chwPumpForce[id]) return false;
+      const next = { cmd: chwPumpForce[id].cmd, fb: chwPumpForce[id].fb };
+      ['cmd', 'fb'].forEach((k) => {
+        if(!f || !(k in f)) return;
+        if(f[k] === 'on' || f[k] === 'off') next[k] = f[k];
+        else if(f[k] === 'auto' || f[k] == null) delete next[k];
+        else throw new Error('RZConvSim.setPump: ' + k + ' must be on | off | auto');
+      });
+      chwPumpForce[id] = next;
+      return true;
+    },
+    tick: (n) => { const k = Math.max(1, Math.min(600, Math.floor(n) || 1)); for(let i = 0; i < k; i++) stepProcess(); return k; },
+    trip: (n) => { const t = trainOf(n); if(!t) return false; ui.forced.add(t); return true; },
+    clearTrip: (n) => { const t = trainOf(n); if(!t) return false; ui.forced.delete(t); delete chwForcedPoint['ch' + t + ':q']; return true; },
+    ack: () => { if(!st.alarm.issues.length) return false; st.alarm.ack = true; st.alarm.ackTs = Date.now(); return true; },
+    snapshot: () => {
+      const pts = {}, pumps = {};
+      chwPoints.ids().forEach((id) => { const r = chwPoints.get(id);
+        pts[id] = { value: r.value, quality: r.quality, unit: CHW_POINTS[id].unit, text: chwPointText(id), flow: chwPointFlow(id),
+          edges: (CHW_POINT_EDGES[id] || []).slice(), held: !!chwForcedPoint[id] }; });
+      Object.keys(CHW_PUMP_EDGES).forEach((id) => { pumps[id] = { cmd: chwPumpCmd(id), fb: chwPumpFb(id), mismatch: chwPumpMismatch(id), edges: CHW_PUMP_EDGES[id].slice() }; });
+      return { sheet: 'CH-M-101', available: CHW_AUTHORITY_AVAILABLE, points: pts, pumps: pumps,
+        forced: Array.from(ui.forced), alarm: st.alarm.level, acked: !!st.alarm.ack };
+    }
+  }, renderAll);
+}
+
 function init(){
   syncToggles();
+  chwPumpScan();
+  installChwSeam();
   renderAll();
   bind();
   /* Wait for the deferred BMS Shell script to finish loading before init. */

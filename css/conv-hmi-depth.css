@@ -1,0 +1,58 @@
+/* conv-hmi-depth.css — shading for hosts opted into js/conv/hmi-depth.js (class "hmi-depth").
+   Stop colours are tokens so light and dark themes each get their own metal and liquid. */
+.hmi-depth { --hd-b0: #4a5262; --hd-b1: #3a414e; --hd-b2: #262b34; --hd-b3: #1a1e25;
+  --hd-r0: #3f5a52; --hd-r1: #2f4842; --hd-r2: #1f322e; --hd-r3: #162420; --hd-sheen: rgba(255,255,255,.26); --hd-men: rgba(255,255,255,.55);
+  --hd-s1: rgba(255,255,255,.16); --hd-s2: rgba(255,255,255,.34); --hd-s3: rgba(0,0,0,.34); --hd-case: #07080a; --hd-shadow: rgba(0,0,0,.55); --hd-surf: rgba(255,255,255,.2);
+  --hd-p0: #5a606b; --hd-p1: #3b4049; --hd-p2: #22262c; --hd-flange: #9aa3b0;
+  --hd-clad: #aab2bd; --hd-clad-seam: #6c7480; --hd-course: rgba(0,0,0,.28); }
+:root[data-theme="light"] .hmi-depth:not([data-theme="dark"]) { --hd-b0: #ffffff; --hd-b1: #eef1f5; --hd-b2: #d6dbe3; --hd-b3: #c3c9d3;
+  --hd-r0: #f2fbf6; --hd-r1: #ddf2e6; --hd-r2: #c4e3d1; --hd-r3: #b0d6c0; --hd-sheen: rgba(255,255,255,.75); --hd-men: rgba(0,0,0,.35);
+  --hd-s1: rgba(255,255,255,.55); --hd-s2: rgba(255,255,255,.9); --hd-s3: rgba(30,40,60,.16); --hd-case: #5b6472; --hd-shadow: rgba(20,30,45,.2); --hd-surf: rgba(255,255,255,.45);
+  --hd-p0: #e9ecf0; --hd-p1: #c9ced6; --hd-p2: #a7aeb9; --hd-flange: #5b6472;
+  --hd-clad: #b9c0c9; --hd-clad-seam: #7c8490; --hd-course: rgba(20,30,45,.22); }
+.hmi-depth .hd-b0 { stop-color: var(--hd-b0); } .hmi-depth .hd-b1 { stop-color: var(--hd-b1); }
+.hmi-depth .hd-b2 { stop-color: var(--hd-b2); } .hmi-depth .hd-b3 { stop-color: var(--hd-b3); }
+.hmi-depth .hd-r0 { stop-color: var(--hd-r0); } .hmi-depth .hd-r1 { stop-color: var(--hd-r1); }
+.hmi-depth .hd-r2 { stop-color: var(--hd-r2); } .hmi-depth .hd-r3 { stop-color: var(--hd-r3); }
+.hmi-depth .hd-l0 { stop-opacity: .5; } .hmi-depth .hd-l1 { stop-opacity: .42; } .hmi-depth .hd-l2 { stop-opacity: .72; }
+.hmi-depth .hd-s0 { stop-color: #fff; stop-opacity: 0; } .hmi-depth .hd-s1 { stop-color: var(--hd-s1); }
+.hmi-depth .hd-s2 { stop-color: var(--hd-s2); } .hmi-depth .hd-s3 { stop-color: var(--hd-s3); }
+.hmi-depth .hd-shadow { flood-color: var(--hd-shadow); }
+.hmi-depth .hd-spec { pointer-events: none; }
+.hmi-depth .hd-surface { fill: var(--hd-surf); }
+.hmi-depth .hd-m-pw { stop-color: var(--hmi-m-pw); } .hmi-depth .hd-m-fuel { stop-color: var(--hmi-m-fuel); }
+.hmi-depth .hd-m-fw { stop-color: var(--hmi-m-fw); } .hmi-depth .hd-m-cw { stop-color: var(--hmi-m-cw); }
+.hmi-depth .hd-m-chw { stop-color: var(--hmi-m-chw); } .hmi-depth .hd-m-htw { stop-color: var(--hmi-m-htw); }
+.hmi-depth .hd-m-dr { stop-color: var(--hmi-m-dr); }
+.hmi-depth .hd-meniscus { stroke: var(--hd-men); stroke-width: 1; }
+/* process pipes read as tubes: the medium stroke is widened and a sheen runs down its middle */
+.hmi-depth .hmi-edge[data-edge]:not(.w-inst):not(.w-signal) { stroke-width: 3; stroke-linecap: round; }
+.hmi-depth .hmi-edge[data-edge][data-flow="unavailable"] { stroke-width: 1.2; }
+.hmi-depth .hd-casing-line { fill: none; stroke: var(--hd-case); stroke-width: 5.4; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+.hmi-depth .hd-casing-line[data-flow="unavailable"] { display: none; }
+.hmi-depth .hd-sheen-line { fill: none; stroke: var(--hd-sheen); stroke-width: .8; stroke-linejoin: round; stroke-linecap: round; pointer-events: none; }
+.hmi-depth .hd-sheen-line[data-flow="stopped"], .hmi-depth .hd-sheen-line[data-flow="unavailable"] { display: none; }
+.hmi-depth .hmi-flow { stroke-width: 2.2; }
+/* W4 B7: the meniscus no longer sloshes — the motion carried no process meaning and every frame of it repainted the
+   whole sheet (measured: 33 ms median frame on the water sheet in headless software rendering, 16.7 ms paused) */
+/* W4 B7 (brief §6): a sheet scrolled out of view stops all of its motion; the geometry and values stay as drawn */
+.hmi-depth.is-offscreen .hmi-flow, .hmi-depth.is-offscreen * { animation-play-state: paused !important; }
+.hmi-depth .hd-p0 { stop-color: var(--hd-p0); } .hmi-depth .hd-p1 { stop-color: var(--hd-p1); } .hmi-depth .hd-p2 { stop-color: var(--hd-p2); }
+.hmi-depth .hd-plinth { pointer-events: none; }
+.hmi-depth .hd-flange { stroke: var(--hd-flange); stroke-width: 1.1; stroke-linecap: butt; pointer-events: none; }
+/* B4 (W4): alarm / acknowledged / selected without colour — shape, fill and text, never hue alone */
+.hmi-depth .cv-marks { pointer-events: none; }
+.hmi-depth .cv-mark-tri { fill: var(--hmi-alm-1); stroke: var(--hd-case); stroke-width: .8; stroke-linejoin: round; }
+.hmi-depth .cv-mark.is-acked .cv-mark-tri { fill: none; stroke: var(--hmi-alm-1); stroke-width: 1.4; }
+.hmi-depth .cv-mark[data-sev="2"] .cv-mark-tri { fill: var(--hmi-alm-2); }
+.hmi-depth .cv-mark.is-acked[data-sev="2"] .cv-mark-tri { fill: none; stroke: var(--hmi-alm-2); }
+.hmi-depth .cv-mark-txt { font: 700 7px/1 'JetBrains Mono', monospace; fill: #fff; }
+.hmi-depth .cv-mark.is-acked .cv-mark-txt { fill: var(--hmi-text); font: 700 9px/1 'JetBrains Mono', monospace;
+  paint-order: stroke; stroke: var(--hmi-bg); stroke-width: 3px; stroke-linejoin: round; }
+.hmi-depth .hmi-node.is-selected .b { stroke-dasharray: 3 2; stroke-width: 2; }
+/* materials (brief §3): insulated chilled water reads as aluminium cladding with seam rings, bare painted steel
+   (fire water, fuel, condenser water) keeps the dark tube wall; welded tanks show their shell courses */
+.hmi-depth .hd-insul { fill: none; stroke: var(--hd-clad); stroke-width: 7.2; stroke-linecap: butt; stroke-linejoin: round; pointer-events: none; }
+.hmi-depth .hd-insul-seam { fill: none; stroke: var(--hd-clad-seam); stroke-width: 7.2; stroke-dasharray: 0.9 22; stroke-linecap: butt; pointer-events: none; }
+.hmi-depth .hd-insul[data-flow="unavailable"], .hmi-depth .hd-insul-seam[data-flow="unavailable"] { display: none; }
+.hmi-depth .hd-course { stroke: var(--hd-course); stroke-width: .7; pointer-events: none; }

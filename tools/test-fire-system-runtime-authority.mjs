@@ -158,16 +158,29 @@ async function readFireState(page) {
     const byId = (id) => document.getElementById(id)?.textContent.trim() || '';
     const ids = [
       'basis-tag', 'fire-current-basis-value', 'fire-duration-shortfall',
-      'tank-cap-tag', 'tank-level-txt', 'tank-vol-txt', 'tank-dur-txt',
       'm-it-basis', 'm-tank-pct', 'm-tank-vol', 'm-pump-demand', 'm-duration',
       'm-hall-vol', 'm-zones', 'm-static', 'as-banner', 'as-facp', 'as-vesda', 'as-crit',
-      'as-sup', 'as-trbl', 'as-tank', 'as-press', 'as-quality', 'flow-val',
+      'as-sup', 'as-trbl', 'as-tank', 'as-press', 'as-quality',
       'as-scenario', 'as-updated',
-      'fire-authority', 'pump-cards', 'log-view', 'label-m1-state', 'label-j-state',
-      'label-m2-state', 'label-n2-state',
+      'fire-authority', 'pump-cards', 'log-view',
     ];
+    /* FS-M-101 (js/conv/fire-sheet.js) — values, node states and pipe flow states read from the drawing */
+    const svg = document.getElementById('fire-svg');
+    const val = (node, k) => svg?.querySelector(`[data-val="${node}:${k}"]`)?.textContent.trim() || '';
+    const nodeState = (node) => svg?.querySelector(`.hmi-node[data-node="${node}"]`)?.getAttribute('data-state') || '';
+    const flow = (edge) => svg?.querySelector(`path.hmi-edge[data-edge="${edge}"]`)?.getAttribute('data-flow') || '';
+    const sheet = {
+      tankLvl: val('tank', 'lvl'), tankVol: val('tank', 'vol'), tankDur: val('tank', 'dur'),
+      pt: val('pt', 'p'), fe: val('fe', 'q'), fp1: val('fp1', 'st'), jp1: val('jp1', 'st'), fp2: val('fp2', 'st'), cmd: [val('fp1', 'cmd'), val('jp1', 'cmd'), val('fp2', 'cmd')], n2: val('n2', 'p'),
+      facp: val('facp', 'st'), zone1: val('zd1', 'st'), zone2: val('zd2', 'st'),
+      states: Object.fromEntries(['fp1', 'jp1', 'fp2', 'n2', 'pav1', 'pav2', 'sp1', 'tank'].map((n) => [n, nodeState(n)])),
+      pumpSymbols: svg ? svg.querySelectorAll('.hmi-node[data-sym="pumpCentrifugal"]').length : 0,
+      flows: Object.fromEntries(['e-suc', 'e-d1', 'e-h0', 'e-h1', 'e-h2', 'e-hdr', 'e-w1', 'e-z1', 'e-zs1', 'e-z2', 'e-n2', 'e-n2h', 'e-n2z1', 'e-n2z2']
+        .map((e) => [e, flow(e)])),
+    };
     return {
       ...Object.fromEntries(ids.map((id) => [id, byId(id)])),
+      sheet,
       stripClass: document.getElementById('alarm-strip')?.className || '',
       bannerColor: getComputedStyle(document.getElementById('as-banner')).color,
       reserveFindingClass: document.getElementById('fire-reserve-finding')?.className || '',
@@ -178,25 +191,12 @@ async function readFireState(page) {
       armDisabled: document.getElementById('btn-arm')?.disabled === true,
       interlockRows: Array.from(document.querySelectorAll('#fire-interlock-list [data-interlock]'))
         .map((row) => row.textContent.trim()),
-      pumpLedFills: ['led-j', 'led-m1', 'led-m2']
-        .map((id) => document.getElementById(id)?.getAttribute('fill') || ''),
-      gaugePinOpacity: document.getElementById('gauge-pin')?.style.opacity || '',
-      semanticLineStates: [
-        'path-suction', 'path-discharge', 'path-j-discharge', 'path-m2-discharge',
-        'path-to-wet', 'path-to-pre', 'path-n2', 'path-n2-header', 'path-n2-pv1',
-        'path-n2-pv2', 'path-n2-pv3', 'path-n2-pv4', 'path-n2-pv5',
-      ]
-        .map((id) => ({
-          id,
-          state: document.getElementById(id)?.getAttribute('data-state') || '',
-          current: document.getElementById(id)?.getAttribute('data-current') || '',
-        })),
     };
   });
 }
 
 function assertNoInvalidNumerics(values, context) {
-  const rendered = Object.values(values).join(' | ');
+  const rendered = JSON.stringify(values);
   assert.doesNotMatch(rendered, /(?:null|NaN|Infinity|undefined)/i, `${context} rendered an invalid numeric token`);
 }
 
@@ -210,17 +210,14 @@ assert.match(source, new RegExp('js/conv-engine\\.js\\?v='
   + ENGINE_PUBLISHED_VERSION.replace(/\./g, '\\.')),
   'fire page must load the current conventional engine cache token');
 assert.match(source, /id="fire-current-basis-value">UNAVAILABLE</, 'first-paint current basis must fail closed');
-assert.match(source, /id="tank-vol-txt"[^>]*>UNAVAILABLE</, 'first-paint reserve volume must fail closed');
-assert.match(source, /id="tank-dur-txt"[^>]*>Duration · UNAVAILABLE</, 'first-paint duration must fail closed');
+assert.match(source, /id="fire-sheet-host"/, 'the fire P&ID is the FS-M-101 sheet');
+assert.match(source, /js\/conv\/fire-sheet\.js\?v=/, 'the sheet geometry loads from js/conv/fire-sheet.js');
+assert.match(source, /js\/rz-hmi-sheet\.js\?v=/, 'the sheet is drawn by the shared HMI sheet renderer');
+assert.doesNotMatch(source, /<svg id="fire-svg"/, 'the hand-drawn fire SVG is retired');
 assert.match(source, /id="as-banner"[^>]*>FIRE AUTHORITY UNAVAILABLE</, 'first-paint banner must fail closed');
 assert.match(source, /id="as-facp">UNAVAILABLE</, 'first-paint FACP state must fail closed');
 assert.match(source, /id="as-scenario">UNAVAILABLE</, 'first-paint scenario provenance must fail closed');
 assert.match(source, /id="as-updated">UNAVAILABLE</, 'first-paint update time must fail closed');
-assert.equal((source.match(/data-pid-symbol="centrifugal-pump"/g) || []).length, 3,
-  'FP-01, JP-01, and FP-02 must use recognizable centrifugal-pump P&ID symbols');
-assert.doesNotMatch(source,
-  /id="spin-(?:m1|j|m2)"[^>]*>\s*<line[^>]*>\s*<line/i,
-  'fire pumps must not use the generic plus-in-circle placeholder');
 assert.match(source, /id="log-view"[\s\S]*?Fire authority UNAVAILABLE/i, 'first-paint log must not claim healthy state');
 assert.doesNotMatch(source, /Live mimic|live tank/i,
   'simulated Fire current-state copy must not claim live telemetry/equipment');
@@ -230,15 +227,6 @@ assert.doesNotMatch(source, /Protected hall volume/,
   'site-wide rack-footprint context must not masquerade as protected enclosure volume');
 assert.doesNotMatch(source, /pressure maintain @ 7\.5 bar/,
   'jockey-pump semantic line must not publish the retired unsupported pressure');
-for (const pathId of [
-  'path-suction', 'path-discharge', 'path-j-discharge', 'path-m2-discharge',
-  'path-to-wet', 'path-to-pre', 'path-n2', 'path-n2-header', 'path-n2-pv1',
-  'path-n2-pv2', 'path-n2-pv3', 'path-n2-pv4', 'path-n2-pv5',
-]) {
-  const pathTag = source.match(new RegExp(`<path[^>]+id="${pathId}"[^>]*>`))?.[0] || '';
-  assert.match(pathTag, /data-state="unavailable"/, `${pathId} first-paint state must fail closed`);
-  assert.match(pathTag, /data-current="UNAVAILABLE"/, `${pathId} first-paint current must fail closed`);
-}
 
 const { server, origin } = await startServer();
 const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
@@ -253,11 +241,18 @@ try {
   assertNoInvalidNumerics(current, 'current engine');
   assert.match(current['basis-tag'], /30\.00 MW.*2,000 racks/i);
   assert.match(current['fire-current-basis-value'], /30\.00 MW IT.*114 m³ fire reserve.*5 pre-action zones/i);
-  assert.equal(current['tank-vol-txt'], '105 m³ / 114 m³');
-  assert.equal(current['tank-dur-txt'], 'Duration ≈ 42 min');
+  assert.equal(current.sheet.tankLvl, '92 %');
+  assert.equal(current.sheet.tankVol, '105 / 114 m³');
+  assert.equal(current.sheet.tankDur, '≈ 42 min');
+  assert.equal(current.sheet.pumpSymbols, 3, 'FP-01, JP-01 and FP-02 are ISO 10628 centrifugal-pump symbols');
+  /* W4 B2: the sheet prints the pump's feedback (RUN|STOP) and its command (CMD ON|OFF) as two values; the
+     AUTO / STBY mode stays on the pump card */
+  assert.deepEqual([current.sheet.fp1, current.sheet.jp1, current.sheet.fp2], ['STOP', 'STOP', 'STOP']);
+  assert.deepEqual(current.sheet.cmd, ['CMD OFF', 'CMD OFF', 'CMD OFF']);
+  assert.deepEqual([current.sheet.states.fp1, current.sheet.states.jp1, current.sheet.states.fp2], ['stopped', 'stopped', 'standby']);
   assert.equal(current['m-duration'], '42 min');
   assert.equal(current['m-hall-vol'], '7,200 m³ proxy');
-  assert.match(current['fire-duration-shortfall'], /36 m³ short.*60 min requirement/i);
+  assert.match(current['fire-duration-shortfall'], /^36 m³ short of 60 min · 45\.6 min full · 42 min at 92 %$/);
   assert.equal(current['as-quality'], 'GOOD');
   assert.equal(current['as-scenario'], 'Simulated');
   assert.match(current['as-updated'], /^\d{2}:\d{2}:\d{2}$/);
@@ -279,13 +274,29 @@ try {
   assert.equal(current.normalCauseEffectActive, true);
   assert.equal(current.activeStageChips, 1);
   assert.equal(current.armDisabled, false);
-  assert.ok(current.semanticLineStates.every((line) => line.state !== 'unavailable' && line.current !== 'UNAVAILABLE'),
-    'current authority must restore every fire-water and N2 semantic line');
-  assert.equal(
-    current.semanticLineStates.find((line) => line.id === 'path-j-discharge')?.current,
-    'pressure maintained @ 12.5 bar (simulated static)',
-    'jockey-pump semantic line must bind to the governed simulated header pressure',
-  );
+  assert.deepEqual(Object.entries(current.sheet.flows).filter(([, f]) => f !== 'stopped'), [],
+    'at stage 0 every fire-water and N2 pipe is charged and still (dashed), none unavailable, none flowing');
+  assert.equal(current.sheet.pt, '12.5 bar', 'PT-01 binds to the governed simulated static header pressure');
+  assert.equal(current.sheet.fe, '0.0 m³/h');
+
+  /* stage 5 in zone 1: pumps on the pressure rule, PAV-01 open, its heads operate; zone 2 stays dry */
+  assert.equal(await fresh.evaluate(() => window.RZFireOperator.stageForTest(5)), true);
+  const released = await readFireState(fresh);
+  assert.equal(released.sheet.states.fp1, 'running');
+  assert.equal(released.sheet.states.pav1, 'open');
+  assert.equal(released.sheet.states.pav2, 'closed');
+  assert.equal(released.sheet.states.sp1, 'operated');
+  assert.equal(released.sheet.zone1, 'RELEASE');
+  assert.equal(released.sheet.zone2, 'NORMAL');
+  assert.deepEqual(['e-suc', 'e-h0', 'e-hdr', 'e-z1', 'e-zs1'].map((e) => released.sheet.flows[e]),
+    ['running', 'running', 'running', 'running', 'running'], 'the zone-1 discharge path flows end to end');
+  assert.equal(released.sheet.flows['e-z2'], 'stopped', 'zone 2 does not flow');
+  assert.equal(released.sheet.fe, '227.0 m³/h');
+  await fresh.evaluate(() => window.RZFireOperator.stageForTest(0));
+  /* v3.61 (PRD-CONV-REDRAW): the inspector rail sits beside the P&ID from 1800 px; below that it moves
+     under the drawing so the drawing is shown whole at rest (test-conv-text-budget T3). */
+  await fresh.setViewport({ width: 1920, height: 900, deviceScaleFactor: 1 });
+  await new Promise((accept) => setTimeout(accept, 120));
   const desktopColumns = await fresh.$eval('.fire-scope-strip', (node) => getComputedStyle(node).gridTemplateColumns);
   assert.equal(desktopColumns.trim().split(/\s+/).length, 3, 'scope strip must use three balanced desktop columns');
   const desktopLayout = await fresh.evaluate(() => {
@@ -333,22 +344,32 @@ try {
     `desktop Fire inspector escaped its 720px viewport bound: ${desktopLayout.inspector.height}px`);
   assert.ok(desktopLayout.inspector.scrollHeight > desktopLayout.inspector.clientHeight,
     'long Fire inspector content must remain reachable inside the bounded rail');
-  const pumpLabelGeometry = await fresh.evaluate(() => {
-    const svg = document.getElementById('fire-svg');
-    return ['label-m1-state', 'label-j-state', 'label-m2-state'].map((id) => {
-      const label = document.getElementById(id);
-      const group = label?.closest('g[role="button"]');
-      const point = svg.createSVGPoint();
-      point.x = 0;
-      point.y = 0;
-      const center = point.matrixTransform(group.getScreenCTM());
-      const rect = label.getBoundingClientRect();
-      return { id, labelBottom: rect.bottom, pipeCenterY: center.y };
-    });
+  await fresh.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
+  await new Promise((accept) => setTimeout(accept, 120));
+  const laptopLayout = await fresh.evaluate(() => {
+    const layout = document.querySelector('.layout-grid');
+    const mimic = layout?.firstElementChild?.getBoundingClientRect();
+    const grid = document.querySelector('.fire-inspector-grid');
+    const rail = grid?.getBoundingClientRect();
+    return {
+      columns: layout ? getComputedStyle(layout).gridTemplateColumns : '',
+      railColumns: grid ? getComputedStyle(grid).gridTemplateColumns : '',
+      mimicBottom: mimic?.bottom, mimicWidth: mimic?.width, railTop: rail?.top, railWidth: rail?.width,
+    };
   });
+  assert.equal(laptopLayout.columns.trim().split(/\s+/).length, 1, 'at 1440 px the P&ID takes the full width');
+  assert.ok(laptopLayout.railTop >= laptopLayout.mimicBottom - 2, 'at 1440 px the inspector sits under the P&ID');
+  assert.equal(laptopLayout.railColumns.trim().split(/\s+/).length, 3, 'at 1440 px the inspector spreads over three columns');
+  assert.ok(laptopLayout.railWidth >= laptopLayout.mimicWidth - 2, 'at 1440 px the inspector spans the drawing width');
+  const pumpLabelGeometry = await fresh.evaluate(() => ['fp1', 'jp1', 'fp2'].map((id) => {
+    const svg = document.getElementById('fire-svg');
+    const tag = svg.querySelector(`[data-tag-of="${id}"]`)?.getBoundingClientRect();
+    const body = svg.querySelector(`.hmi-node[data-node="${id}"] [data-sym]`)?.getBoundingClientRect();
+    return { id, tagBottom: tag?.bottom, symbolTop: body?.top };
+  }));
   for (const label of pumpLabelGeometry) {
-    assert.ok(label.labelBottom <= label.pipeCenterY - 2,
-      `${label.id} overlaps its pump pipe centerline: bottom ${label.labelBottom}, center ${label.pipeCenterY}`);
+    assert.ok(label.tagBottom <= label.symbolTop + 1,
+      `${label.id} tag overlaps its pump symbol: tag bottom ${label.tagBottom}, symbol top ${label.symbolTop}`);
   }
 
   for (const [width, height] of [[1180, 900], [768, 900], [390, 844]]) {
@@ -401,13 +422,13 @@ try {
   assert.equal(incomplete['as-press'], 'UNAVAILABLE');
   assert.equal(incomplete['as-scenario'], 'UNAVAILABLE');
   assert.equal(incomplete['as-updated'], 'UNAVAILABLE');
-  assert.equal(incomplete.gaugePinOpacity, '0.35');
+  assert.equal(incomplete.sheet.pt, 'UNAVAILABLE', 'partial authority must not draw a header pressure');
   assert.match(incomplete['pump-cards'], /UNAVAILABLE/);
   assert.doesNotMatch(incomplete['pump-cards'], /healthy|phase OK|battery|fuel 88%|standby|idle/i);
-  assert.equal(incomplete['flow-val'], 'UNAVAILABLE');
+  assert.equal(incomplete.sheet.fe, 'UNAVAILABLE');
   assert.equal(incomplete.activeStageChips, 0);
-  assert.ok(incomplete.pumpLedFills.every((fill) => !/(?:34d399|st-normal)/i.test(fill)),
-    'incomplete Fire authority must not leave standby pump LEDs green');
+  assert.ok(['fp1', 'jp1', 'fp2'].every((n) => !['running', 'standby', 'stopped'].includes(incomplete.sheet.states[n])),
+    'incomplete Fire authority must not draw a pump state it cannot know');
   assert.deepEqual(incompleteFireErrors, [],
     `incomplete Fire authority page errors: ${incompleteFireErrors.join(' | ')}`);
   await incompleteFire.close();
@@ -441,10 +462,9 @@ try {
   assert.equal(unavailable['basis-tag'], 'Basis: UNAVAILABLE');
   assert.match(unavailable['fire-current-basis-value'], /^UNAVAILABLE/);
   assert.match(unavailable['fire-duration-shortfall'], /^UNAVAILABLE/);
-  assert.equal(unavailable['tank-cap-tag'], 'UNAVAILABLE');
-  assert.equal(unavailable['tank-level-txt'], 'UNAVAILABLE');
-  assert.equal(unavailable['tank-vol-txt'], 'UNAVAILABLE');
-  assert.equal(unavailable['tank-dur-txt'], 'Duration · UNAVAILABLE');
+  assert.equal(unavailable.sheet.tankLvl, 'UNAVAILABLE');
+  assert.equal(unavailable.sheet.tankVol, '—');
+  assert.equal(unavailable.sheet.tankDur, '—');
   assert.equal(unavailable['m-tank-vol'], 'UNAVAILABLE');
   assert.equal(unavailable['m-duration'], 'UNAVAILABLE');
   assert.equal(unavailable['as-tank'], 'UNAVAILABLE');
@@ -466,27 +486,23 @@ try {
   assert.match(unavailable['log-view'], /UNAVAILABLE/);
   assert.match(unavailable['pump-cards'], /UNAVAILABLE/);
   assert.doesNotMatch(unavailable['pump-cards'], /healthy|phase OK|battery|fuel 88%|standby|idle/i);
-  assert.equal(unavailable['flow-val'], 'UNAVAILABLE');
+  assert.equal(unavailable.sheet.fe, 'UNAVAILABLE');
   assert.equal(unavailable.normalCauseEffectActive, false);
   assert.equal(unavailable.activeStageChips, 0);
   assert.equal(unavailable.armDisabled, true);
   assert.ok(unavailable.interlockRows.every((row) => /UNAVAILABLE/.test(row)), 'all rendered interlock states must fail closed');
-  assert.ok(unavailable.pumpLedFills.every((fill) => !/(?:34d399|st-normal)/i.test(fill)), 'unknown pump LEDs must not remain green');
-  assert.deepEqual(
-    unavailable.semanticLineStates.filter((line) => line.state !== 'unavailable' || line.current !== 'UNAVAILABLE'),
-    [],
-    'unknown fire-water and N2 paths must not advertise energized/standby/charged state',
-  );
-  for (const id of ['label-m1-state', 'label-j-state', 'label-m2-state', 'label-n2-state']) {
-    assert.match(unavailable[id], /UNAVAILABLE/, `${id} must fail closed`);
-  }
+  assert.ok(['fp1', 'jp1', 'fp2'].every((n) => !['running', 'standby', 'stopped'].includes(unavailable.sheet.states[n])),
+    'unknown pumps must not be drawn running, stopped or standby');
+  assert.deepEqual(Object.entries(unavailable.sheet.flows).filter(([, f]) => f !== 'unavailable'), [],
+    'unknown fire-water and N2 pipes must be drawn unavailable (hairline), never charged or flowing');
+  for (const k of ['fp1', 'jp1', 'fp2', 'pt']) assert.equal(unavailable.sheet[k], 'UNAVAILABLE', `${k} must fail closed`);
 
-  await legacy.$eval('#grp-main1', (node) => node.dispatchEvent(new Event('focus')));
-  const pumpTooltip = await legacy.$eval('#tooltip-content', (node) => node.textContent);
+  await legacy.$eval('#fire-svg .hmi-node[data-node="fp1"]', (node) => node.focus());
+  const pumpTooltip = await legacy.$eval('#hmiTip', (node) => node.textContent);
   assert.match(pumpTooltip, /UNAVAILABLE/);
   assert.doesNotMatch(pumpTooltip, /Healthy|phase OK|AUTO|STANDBY/i);
-  await legacy.$eval('#grp-n2', (node) => node.dispatchEvent(new Event('focus')));
-  const n2Tooltip = await legacy.$eval('#tooltip-content', (node) => node.textContent);
+  await legacy.$eval('#fire-svg .hmi-node[data-node="n2"]', (node) => node.focus());
+  const n2Tooltip = await legacy.$eval('#hmiTip', (node) => node.textContent);
   assert.match(n2Tooltip, /UNAVAILABLE/);
   assert.doesNotMatch(n2Tooltip, /Healthy|Live|STANDBY/i);
   assert.deepEqual(legacyErrors, [], `legacy authority page errors: ${legacyErrors.join(' | ')}`);

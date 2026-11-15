@@ -62116,7 +62116,8 @@ Technical manual and methodologyCDU toolkitCDU calculatorCDU checklistCDU deep c
 
 > Operator-grade SCADA mimic of a chiller plant: ISA-style P&ID, primary/secondary loop drilldown, lead-lag sequencing and setpoint annotations.
 
-Skip to main content
+**
+ Skip to main content
 
 
 
@@ -62124,7 +62125,7 @@ Skip to main content
 
 # CHILLER PLANT SCADA HMI
 
- ISA-style industrial P&ID • primary CHW header engine-bound • click CH module for diagnostics
+ ISA-5.1 P&ID · CHW primary header
 
 
  Back
@@ -62239,7 +62240,7 @@ Skip to main content
  IT sensible reference —
  Plant-duty reference —
  Δ (plant − IT ref) —
- 943.0 L/s is the engine's IT sensible-load reference. Current evaporator duty requires 982.3 L/s at the same ΔT; measured header flow remains unavailable.
+ 943.0 L/s** IT ref · **982.3 L/s** evap duty · header flow UNAVAILABLE
 
 
 
@@ -154308,11 +154309,10 @@ Bagus Dwi Permana (2026). "02 The commissioning process: phases, levels L0 to L5
  PUE **UNAVAILABLE**
  Power Density **UNAVAILABLE** kW/rack
 
- Click any KPI for basis · Mode toggles below
 
 
 
- **Data Hall A** · one locked reference scenario per selected hall; changing scope updates tags and inspection context without altering the deterministic engine input.
+ **Data Hall A**
 
  Hall A
  Hall B
@@ -154320,10 +154320,6 @@ Bagus Dwi Permana (2026). "02 The commissioning process: phases, levels L0 to L5
  Hall D
 
 
-
-
-
- View Mode:
 
 
 
@@ -154440,7 +154436,6 @@ Bagus Dwi Permana (2026). "02 The commissioning process: phases, levels L0 to L5
  Row load min / max UNAVAILABLE
  Rack-inlet min / avg / max UNAVAILABLE
  Hottest Rack-Inlet UNAVAILABLE
- Rack-inlet design 25.4°C · recommended envelope 18–27°C · humidity interpreted with dew point / non-condensing constraints · CRAH return assumes contained hot-aisle path (0 K mixing adjustment).
 
 
  Rack Density Basis
@@ -154450,7 +154445,7 @@ Bagus Dwi Permana (2026). "02 The commissioning process: phases, levels L0 to L5
 
  Selected cabinet peak UNAVAILABLE
 
- Current telemetry is not the same as the installed design study; both remain visible and separately labelled.
+
 
 
  Selected
@@ -155014,36 +155009,20 @@ Reference limits only. STANDARD rows quote a published code, TYPICAL rows are co
 
 
 
- **Fire-water reserve vs stated duration**
+ **Fire-water reserve**
  UNAVAILABLE — awaiting current fire-water basis.
 
 
- CURRENT · ENGINE BOUND
- **UNAVAILABLE** Simulated mimic and staged scenario use this locked Conventional DC basis.
+ CURRENT
+ **UNAVAILABLE**
 
 
- STUDY ONLY
- **4 × 10 MW halls · separate hydraulic design required** Expansion does not resize the current-scenario tank, pumps, zoning or cause/effect model.
-
-
-
+ STUDY
+ **4 × 10 MW halls**
 
 
 
 
- Fire Water & Inert Gas Process Mimic
-
- ZOOM
- **75%
- 100%
- 120%
- ** FIT
-
-
-
-
-
- Equipment
 
 
 
@@ -155053,9 +155032,8 @@ Reference limits only. STANDARD rows quote a published code, TYPICAL rows are co
 
 
  SIMULATION MODE: OFF
- Demo / training only — not connected to a real FACP. Arm first, then run a staged fire scenario.
 
- ARM SIMULATION
+ **ARM SIMULATION
  ** SIMULATE FIRE EVENT
  ** RESET R
 
@@ -155100,16 +155078,13 @@ Reference limits only. STANDARD rows quote a published code, TYPICAL rows are co
  Site rack-footprint proxy (non-sizing) UNAVAILABLE
  Pre-action zones UNAVAILABLE
 
-Duration = available litres ÷ fire-pump demand. Suppression release quantities are **preliminary** pending hydraulic calc.
-
-
 
 
 
  ** Alarm & Event Log
 
 
-Fire authority UNAVAILABLE · no current FACP, pressure, pump or reserve state can be asserted.
+Fire authority UNAVAILABLE
 
 
 
@@ -155127,22 +155102,10 @@ Fire authority UNAVAILABLE · no current FACP, pressure, pump or reserve state c
 
 > Enterprise SCADA dashboard for fuel system monitoring. Track diesel tank levels, generator fuel consumption, and transfer pump status in real-time.
 
-Fuel Process — bulk storage → transfer → conditioning → day tanks → gensets **
+Fuel process — FU-M-101 **
 
 
 
-
- ****UST-01** UNAVAILABLE
- **
- ****P-101** UNAVAILABLE
- **
- ****FPU-01** UNAVAILABLE
- **
- ****Day Tks** —
- **
- ****Gensets** UNAVAILABLE
-
- Transfer Direction UNAVAILABLE
 
 
 
@@ -155165,7 +155128,7 @@ Fuel Process — bulk storage → transfer → conditioning → day tanks → ge
 
 
 
- **Inventory basis:** — Usable reserve is what backs the autonomy figure (conv/review/09-engineering-basis lines 133–147).
+ **Inventory basis** —
 
 
 
@@ -155238,9 +155201,6 @@ Fuel Process — bulk storage → transfer → conditioning → day tanks → ge
 
 
  Day Tanks & Gensets **
-
-
- **Day-tank logic:** P-101 lifts UST → the running genset's day tank. Low-low (<25%) raises a critical interlock alarm and forces lead pump to RUN. DT serves a single genset; failover to N+1 standby genset on engine fault.
 
 
 
@@ -183486,10 +183446,6 @@ All tools are provided for educational and decision-support use. Results are mod
 
 
 
- ZOOM
- 75%
- 100%
- 125%
  Fullscreen
  Export PDF — choose sections
 
@@ -183597,7 +183553,7 @@ All tools are provided for educational and decision-support use. Results are mod
  Domestic/process · site · WUE excluded **UNAVAILABLE**
  Downstream hall allocation **UNAVAILABLE**
 
- Municipal treatment is one site-wide plant. Hall allocation remains UNAVAILABLE until validated downstream submeter data is published.
+ one site plant · hall split needs submeter
 
 
 
@@ -183606,7 +183562,6 @@ All tools are provided for educational and decision-support use. Results are mod
  **Simulation Mode: OFF
  Simulate Backwash Cycle
  Reset View
- Engineering values are deterministic (engine basis) — sim animates trend only.
 
 
 
@@ -183619,10 +183574,7 @@ All tools are provided for educational and decision-support use. Results are mod
  WUE-incl water · site (1 h) UNAVAILABLE
  Instant WUE · site UNAVAILABLE
  24 h WUE · historian UNAVAILABLE
-
- Site WUE = site WUE-included water volume ÷ site IT energy
- (computed from conv-engine**, not a per-hall allocation).
-
+ WUE = water ÷ IT energy · site
 
 
 
@@ -183645,18 +183597,17 @@ All tools are provided for educational and decision-support use. Results are mod
  UNAVAILABLE
 
 
- **Total treatment**
+ Total treatment**
  UNAVAILABLE
 
 
 
- Total site treatment **—** L/min − site domestic/process
- **—** L/min = site WUE-included makeup
- **—** L/min. WUE
+ **—** − **—**
+ = **—** L/min · WUE
  **—**
- vs all-treated-flow equivalent **—** L/kWh.
+ / all-treated **—** L/kWh.
 
- UNAVAILABLE — current site-water balance requires the conv-engine snapshot.
+ UNAVAILABLE · no engine snapshot
 
 
 

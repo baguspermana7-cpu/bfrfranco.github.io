@@ -37,10 +37,15 @@ const set = TAB_SETS[PAGE];
 const FIRE = set.diagrams.filter((d) => d.tab === 'fire');
 const entry = (sub) => FIRE.find((d) => d.sub === sub);
 const MIME = Object.freeze({ '.css': 'text/css', '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.png': 'image/png', '.svg': 'image/svg+xml', '.webp': 'image/webp', '.woff2': 'font/woff2' });
+const missing = new Set();
 const server = createServer(async (req, res) => {
     const full = resolve(ROOT, decodeURIComponent(new URL(req.url, 'http://localhost').pathname.slice(1)));
     if (full !== ROOT && !full.startsWith(ROOT + sep)) { res.writeHead(403).end(); return; }
-    try { res.writeHead(200, { 'content-type': MIME[extname(full)] || 'application/octet-stream' }).end(await readFile(full)); } catch { res.writeHead(404).end(); }
+    /* read before writing headers: writeHead(200) ahead of an awaited readFile threw ERR_HTTP_HEADERS_SENT on the
+       first missing file and killed the run instead of reporting it */
+    let body;
+    try { body = await readFile(full); } catch { missing.add(req.url.split('?')[0]); res.writeHead(404).end(); return; }
+    res.writeHead(200, { 'content-type': MIME[extname(full)] || 'application/octet-stream' }).end(body);
 });
 await new Promise((accept) => server.listen(0, '127.0.0.1', accept));
 const base = `http://127.0.0.1:${server.address().port}`;
@@ -243,5 +248,6 @@ try {
 } finally { await browser.close(); server.close(); }
 
 console.log(`DCAI FIRE WORKSTATION — ${PAGE}`);
+if (missing.size) console.log('  404 (page asked for files that do not exist): ' + [...missing].join(', '));
 if (failures.length) { console.error('\nFAIL\n  ' + failures.join('\n  ')); process.exit(1); }
 console.log('PASS — point list home, scoped sub-tabs, isolation with consequence, two-means impairment, page-wide banner, strip + sidebar parity, C&E block, staged run, persistence, determinism, walker clean');

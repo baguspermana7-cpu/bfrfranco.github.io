@@ -237,7 +237,7 @@ try {
   assert.equal(healthy.rackLoad, '7.50');
   assert.equal(healthy.margin, '0.5', 'Hall cooling margin must be (7,540-7,500)/7,540');
   assert.equal(healthy.cooling, '7.500 / 7.540 MW');
-  assert.match(healthy.coolingSub, /Hall operating headroom 40 kW.*0\.53% of available/i);
+  assert.match(healthy.coolingSub, /^headroom 40 kW · 0\.53% · 58 × 130 kW$/);
   assert.doesNotMatch(healthy.coolingSub, /31,250|heat-rej/i,
     'Hall cooling band must not inject campus heat rejection');
   assert.equal(healthy.controlsEnabled, true);

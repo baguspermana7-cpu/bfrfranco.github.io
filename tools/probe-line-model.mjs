@@ -36,11 +36,11 @@ const BASE = (process.env.RZ_BASE === 'file')
 const ADOPTION_TARGETS = {
   'datahallAI.html': 171,
   'dc-conventional.html': 0,
-  'chiller-plant.html': 18,
-  'water-system.html': 12,   /* v2.8.0 + cdw supply/return */
-  'fire-system.html': 14,
+  'chiller-plant.html': 99,  /* CH-M-101 HMI sheet: every process pipe carries data-rz-line + data-current (chwTagLines) */
+  'water-system.html': 27,   /* WT-M-101 HMI sheet: every process edge tagged (tagWaterSheet) */
+  'fire-system.html': 0,    /* FS-M-101 HMI sheet: pipes are data-edge (rz-hmi-sheet), gated by test-fire-system-runtime-authority */
   'ict.html': 19,          /* v2.9.0 architecture canvas, default IT segment: 19 tagged edges */
-  'fuel-system.html': 14   /* v2.7.0 fuel P&ID: fill/suction/2 discharge/header/3 DT feed/3 gen supply/polish side+return/DT return */
+  'fuel-system.html': 27   /* FU-M-101 HMI sheet: every process edge tagged (tagFuelSheet) */
 };
 
 /* Breaker symbol library — verify pilot ports tagged. */

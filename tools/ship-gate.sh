@@ -163,6 +163,10 @@ gate "Conventional formulas — declared arithmetic actually holds" node tools/t
 # x 2 themes. The flip condition documented here has been met, so the gate is armed — a new
 # label that lands on another one, or an element drawn outside its viewBox, now fails the ship.
 gate "Conventional geometry — collisions, clipping, arrangement" node tools/test-conv-geometry.mjs
+gate "Conventional text budget — no prose at rest, words within budget, drawings reachable" node tools/test-conv-text-budget.mjs
+gate "Conventional HMI sheets — no text struck by a pipe, a zone border or a foreign body (W3, C1-C3)" node tools/test-conv-sheet-text-clear.mjs
+gate "Conventional HMI sheets — flow, values and states follow evidence and quality; cmd/fb apart; marks without colour; every asset opens (W4 B1-B6)" node tools/test-conv-bms-truth.mjs
+gate "Conventional HMI sheets — alarm reaches its mark <= 250 ms, motion stops off screen; frame budgets reported (W4 B7)" node tools/test-conv-sheet-perf.mjs
 # v3.21.9 — the reveal gate existed but was never wired, so it went stale for five releases (it
 # still expected four floor views after the building became six levels). Every building level must
 # open its own floor plan.

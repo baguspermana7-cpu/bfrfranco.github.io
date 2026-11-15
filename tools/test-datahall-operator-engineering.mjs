@@ -59,7 +59,14 @@ includes('Sensible heat equivalence', 'rack electrical load to heat-load assumpt
    authored constant on a page is exactly what the parameter programme removes. */
 includes('var RETURN_PATH_MIXING_ADJUSTMENT_C = S.cooling.return_path_mixing_k',
   'CRAH return path must use a named mixing assumption read from the engine');
-includes('contained hot-aisle return with 0 K mixing adjustment', 'CRAH return assumption must be visible to operators');
+/* v3.62 text pass: the assumption is a visible engine-bound row ("Return-path mixing", #th-retmix on
+   cooling.return_path_mixing_k) and its wording moved to the RZExplain entry the row opens — not page prose */
+includes('data-basis-param="cooling.return_path_mixing_k"', 'CRAH return assumption must be visible to operators');
+includes('id="th-retmix"', 'CRAH return-path mixing value must be printed on the page');
+{
+  const extra = await readFile(new URL('./explain-extra.json', import.meta.url), 'utf8');
+  assert.ok(/contained hot aisle with a 0 K mixing adjustment/.test(extra), 'CRAH return assumption wording must stay in its explain entry');
+}
 assert.equal(html.includes('hotAisleC - 0.8'), false, 'CRAH return must not use an unexplained 0.8C offset');
 assert.equal(html.includes('Cooling efficiency index'), false, 'allocated-duty utilization must not be mislabeled as plant efficiency');
 includes('window.__fireDatahallExcursion = fireExcursion', 'thermal excursion must expose a deterministic runtime verification hook');

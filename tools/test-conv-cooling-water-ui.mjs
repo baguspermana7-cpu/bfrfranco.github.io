@@ -38,8 +38,10 @@ assert.doesNotMatch(WATER_SOURCE, /id="kDp">0\.40|id="kTds">140|id="status-tank"
   'water first paint must not publish plausible process telemetry before authority');
 assert.match(WATER_SOURCE, /id="alarmList">\s*<li><span class="sev unavailable">UNAVAILABLE<\/span>/,
   'water first-paint alarm state must be unavailable');
-assert.match(WATER_SOURCE, /data-id="ws-mains-in"[^>]+data-state="unavailable"[^>]+data-current="UNAVAILABLE"/,
-  'water first-paint process line must fail closed');
+/* WT-M-101: the sheet is drawn by script, so first paint carries no process line at all (nothing to
+   read as healthy); the runtime cases below assert every tagged line fails closed without authority. */
+assert.match(WATER_SOURCE, /id="water-sheet-host"/, 'water page must host the WT-M-101 sheet');
+assert.doesNotMatch(WATER_SOURCE, /<path[^>]+data-rz-line/, 'water first paint must not ship static process lines');
 
 const ROOT = process.cwd();
 const MIME = Object.freeze({
@@ -312,8 +314,8 @@ try {
     pumpLed: document.getElementById('led-pump')?.className,
     tankStatus: document.getElementById('status-tank')?.textContent.trim(),
     pumpStatus: document.getElementById('status-pump')?.textContent.trim(),
-    pumpAState: document.getElementById('m-pump-st')?.textContent.trim(),
-    pumpBState: document.getElementById('m-pump-b-st')?.textContent.trim(),
+    pumpAState: document.querySelector('#water-svg [data-val="pump-duty:st"]')?.textContent.trim(),
+    pumpBState: document.querySelector('#water-svg [data-val="pump-standby:st"]')?.textContent.trim(),
     alarmText: document.getElementById('alarmList')?.innerText.replace(/\s+/g, ' ').trim(),
     processStates: Array.from(document.querySelectorAll('#water-svg [data-rz-line]'))
       .map((node) => node.getAttribute('data-state')),
@@ -339,6 +341,7 @@ try {
   assert.match(unavailable.pumpBState, /UNAVAILABLE/i);
   assert.match(unavailable.alarmText, /UNAVAILABLE/i);
   assert.doesNotMatch(unavailable.alarmText, /\bOK\b|healthy|feedback OK/i);
+  assert.ok(unavailable.processStates.length > 10, 'WT-M-101 must tag its process lines');
   assert.ok(unavailable.processStates.every((state) => state === 'unavailable'),
     `water process lines must fail closed: ${unavailable.processStates.join(', ')}`);
   assert.equal(unavailable.chartCount, 0, 'unavailable process authority must not instantiate a plausible DP chart');

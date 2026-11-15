@@ -34,6 +34,11 @@ mentioned INSIDE a tooltip body (e.g. "DSCR") are themselves hoverable (nested t
 5. **Legacy tooltip families are DEPRECATED** (45+ per-page CSS families:
    `.tooltip-trigger`, `.tco-tooltip-*`, `.calc-tooltip`, …). No new instances.
    Migration status: `standarization/EXPLAIN_ROLLOUT.md`.
+5b. **Markup rendered after load must be re-attached.** `RZExplain` wires `[data-explain]` once at
+   DOMContentLoaded; a renderer that writes `innerHTML` later calls
+   `RZExplain.attachExplicit(container)` after each write (ict canvas and calc note, datahall
+   legend). `tools/test-conv-explain-wiring.mjs` fails on any `[data-explain]` that never became a
+   trigger.
 6. A11y (the old capex pattern failed all of these): triggers focusable (`tabindex=0`),
    `aria-describedby` while open, `role=tooltip` panel, Escape closes, hover-intent
    150 ms, reduced-motion honoured. axe 0/0 both themes required on adopting pages.

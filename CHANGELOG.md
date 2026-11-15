@@ -11,6 +11,64 @@ release sections rather than semver.
 
 ---
 
+## v3.62.0 — 2026-11-15 — Conventional cockpits redrawn as HMI sheets that tell the truth about flow, state and data quality
+
+### Added
+- **The sheets tell the operator the truth (W4, owner BMS brief, PRD-CONV-BMS-UIUX).** On fire, chiller, water and
+  fuel every drawn flow is a point with a quality (`js/conv/sheet-truth.js`): a pipe moves only on good evidence > 0,
+  a valid zero is stopped and prints `0 L/min`, stale / bad / no-data print `STALE (last)`, `BAD`, `NO DATA` and never
+  move. Pumps print command and feedback apart (`CMD ON` / `STOP`), a mismatch marks the symbol and stills its branch,
+  and fuel's `P-101 FAIL` ("no flow within 10 s") can now actually happen. A chiller branch at a valid zero is no
+  longer reported as a disconnect. The fuel polishing loop (no meter) moves on the FPU-01 run feedback, the same
+  evidence rule as the water condenser loop. Alarm, acknowledged and selected are readable in greyscale (filled `!` triangle,
+  hollow `ACK` triangle, dashed outline). Every fire and fuel symbol now opens its detail beside the sheet; closing
+  returns focus, selection, pan and zoom. Off-screen sheets stop their motion; the decorative meniscus slosh is gone.
+- **`tools/test-conv-bms-truth.mjs`** (laws B1-B6 on all four sheets) and **`tools/test-conv-sheet-perf.mjs`** (alarm to
+  mark <= 250 ms, motion stops off screen) in the ship gate, through a simulation-only seam `window.RZConvSim`. The
+  brief's frame budgets (p95 <= 20 / 34 ms) are reported, not claimed: headless Chrome rasterises SVG in software.
+- **Four Conventional P&IDs on the shared HMI sheet renderer and symbol library** (the library v3.60.0 brought to
+  datahallAI): fire FS-M-101 (`js/conv/fire-sheet.js`), chilled water CH-M-101 (`js/conv/chiller-sheet.js`), water
+  WT-M-101 (`js/conv/water-sheet.js`) and fuel FU-M-101 (`js/conv/fuel-sheet.js`). Nine symbols added to
+  `js/rz-eng-symbols.js` (storage tank, pre-action valve, alarm valve, sprinkler head, compressor, cooling-tower cell,
+  UV steriliser, diesel genset, two-winding transformer) with ports, states and standard references; three media
+  (fire water, potable, drain). ICT gains network symbols on its architecture drawing.
+- **Depth on all four sheets** (`js/conv/hmi-depth.js` + `css/conv-hmi-depth.css`, opt-in by the host class
+  `hmi-depth`; fire, chiller, water, fuel): a body gradient and one clipped specular per equipment symbol, pipes drawn as tubes (dark casing plus
+  sheen), flange collars where a pipe meets an equipment port, a plinth under floor-mounted equipment, tank liquid
+  that deepens toward the bottom with a surface band (the fire-water reserve shows the level the panel prints), and
+  one contact shadow on the node layer — never a filter per symbol. Geometry is untouched.
+- **Materials on the sheets.** Insulated chilled water reads as aluminium cladding with seam rings; fire water, fuel
+  and condenser water stay painted steel tubes; welded storage tanks show their shell-course seams.
+- **`tools/test-conv-sheet-text-clear.mjs`** (ship gate): on all four sheets at 1440 px no text is struck by a pipe
+  (C1), crossed by a zone border (C2) or covered by a foreign equipment body (C3). Red on the pre-fix tree.
+- **`tools/test-conv-text-budget.mjs`** wired into the ship gate (T1-T4: no sentence at rest, <= 400 words per
+  cockpit, the main drawing fits its box, no long text inside a drawing).
+
+### Changed
+- **Text pass on fire, datahall, fuel, water, ict and chiller**: explanations move to RZExplain entries
+  (`conv-<page>-*`), units are written once, the datahall field has one mode selector and prints min/max/avg as bare
+  numbers keyed once in the legend; fire and ICT drawings take the full width.
+- Fuel: the "N+1 scenario" tile repeated the autonomy number and now shows the margin over the 24 h SLA.
+- Fire: the suppression ABORT window counts 30 real seconds at 1 Hz (it ran 5 s per tick); the inspector rail sits
+  beside the P&ID from 1800 px and under it at 1440.
+
+### Fixed
+- Water: the WT-M-101 panel no longer widens the page (368 px of sideways scroll at 1280 px); the sheet scrolls inside
+  its panel. `test-conv-sheet-text-clear` C4 now fails any sheet page that scrolls sideways at 1280 or 1440 px.
+- Data hall: the IT-load sub-line leads with the kW again (`7,412 kW · 463 active racks`); the text pass had made
+  the rack count its first number, so the basis drawer for `hall.it_load_kw` no longer described what it showed.
+- Gates kept in step with the text pass: the CRAH return-path assumption is checked as its engine-bound row plus
+  its RZExplain wording, the Conventional parameter registry is regenerated (consumers moved), and the DC AI fire
+  runtime gate's test server reads a file before writing headers (a missing file crashed the run).
+- Chiller: with the plant authority missing, the fail-closed sheet again says CHILLER PLANT AUTHORITY UNAVAILABLE
+  inside the drawing (the shared renderer stopped drawing a title block in R144, so the words had vanished and
+  `test-operator-cockpit-regressions` went red).
+- Labels struck by lines, found on screenshots and now gated: UST-01 tag × its fill pipe, PT-101 value × the zone
+  divider, TK-402 values × the divider, the domestic tank covering the DOMESTIC tag, fire PAV-02..05 tags × the
+  release lines, FH / HR RISER × the zone border.
+
+---
+
 ## v3.61.0 — 2026-11-15 — Render scale gate, calculators in articles, project prefill for spares, Cx intake follows the tier
 
 ### Added

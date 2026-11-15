@@ -4114,6 +4114,174 @@
       "rel": [
         "isa-5-1-tag"
       ]
+    },
+    "conv-fire-current-basis": {
+      "t": "Current basis (engine bound)",
+      "d": "The mimic and the staged fire scenario both run on the locked Conventional DC basis from conv-engine.js: IT load, fire-water reserve and the number of pre-action zones come from the engine, not from this page."
+    },
+    "conv-fire-study-basis": {
+      "t": "Study only: 4 × 10 MW halls",
+      "d": "A capacity study, not the running scenario. Expanding to four 10 MW halls needs its own hydraulic design; it does not resize the tank, the pumps, the zoning or the cause and effect model shown here."
+    },
+    "conv-fire-reserve-finding": {
+      "t": "Fire-water reserve vs required duration",
+      "d": "The installed reserve tank cannot meet the duration this drawing requires. Required capacity = pump demand × required minutes; the shortfall is required minus installed. Duration at full = installed litres ÷ pump demand. Open the tank value for the derivation."
+    },
+    "conv-fire-sim-mode": {
+      "t": "Simulation mode",
+      "d": "Demo and training only: the page is not connected to a real fire alarm control panel. Arm the simulation first, then run a staged fire scenario; Reset returns every device to normal."
+    },
+    "conv-fire-duration": {
+      "t": "Available duration",
+      "d": "Available litres ÷ fire-pump demand. Suppression release quantities are preliminary until a hydraulic calculation is made for the installation."
+    },
+    "conv-fire-pacv": {
+      "t": "Pre-action zone valve (double interlock)",
+      "d": "Each pre-action valve has a release solenoid (SOL), a supervisory pressure switch on the nitrogen-filled pipe (PS) and a flow switch (FS). Double interlock: the valve opens only when detection confirms a fire AND the pipe loses pressure from an open sprinkler."
+    },
+    "conv-fire-stage-0": {
+      "t": "Stage 0: Normal",
+      "d": "All quiescent. The jockey pump holds 12.5 bar; the FACP and VESDA are supervised."
+    },
+    "conv-fire-stage-1": {
+      "t": "Stage 1: VESDA alert",
+      "d": "Aspirating smoke alert. Warning only: the operator investigates, nothing is switched."
+    },
+    "conv-fire-stage-2": {
+      "t": "Stage 2: VESDA action / smoke",
+      "d": "Smoke detector alarm. First-stage sounder; pre-alarm to the BMS."
+    },
+    "conv-fire-stage-3": {
+      "t": "Stage 3: Confirmed fire (2 zones)",
+      "d": "Cross-zone confirmed. The FACP issues HVAC stop, damper close, lift recall and egress-release requests. Field proof of each action is not modelled."
+    },
+    "conv-fire-stage-4": {
+      "t": "Stage 4: Suppression armed",
+      "d": "Release circuit armed, countdown running, manual ABORT station live. Fire pumps go to automatic run on pressure drop."
+    },
+    "conv-fire-stage-5": {
+      "t": "Stage 5: Discharge / lockout",
+      "d": "Inert gas or pre-action discharge, hold time, then lockout until a manual reset."
+    },
+    "conv-dh-hall-scope": {
+      "t": "Hall scope",
+      "d": "One locked reference scenario per selected hall. Changing the hall changes tags and the inspection context; it never changes the deterministic engine input."
+    },
+    "conv-dh-reconciliation": {
+      "t": "Hall IT reconciliation",
+      "d": "There is no governed hall EPMS submeter, so the hall IT load cannot be reconciled against a meter and reads UNAVAILABLE. The line below is a planning reference only: site EPMS IT load divided equally across the halls."
+    },
+    "conv-dh-cooling-demand": {
+      "t": "Cooling demand / available",
+      "d": "Demand is the hall IT load (rack electrical kW is taken as sensible kWth). Available is running CRAH units × unit sensible capacity. Headroom = available − demand; margin = headroom ÷ available."
+    },
+    "conv-dh-crah-air": {
+      "t": "CRAH leaving air → return air (LA→RA)",
+      "d": "Leaving air is what the CRAH supplies; return air is what comes back to it. The return path assumes a contained hot aisle with a 0 K mixing adjustment. The rack-inlet setpoint is a separate value."
+    },
+    "conv-dh-alarm-rule": {
+      "t": "Rack alarm rule",
+      "d": "A rack raises a warning above 85 % of its rating or when its inlet leaves the recommended envelope (18–27 °C, ASHRAE A1 recommended)."
+    },
+    "conv-dh-env": {
+      "t": "Hall environment basis",
+      "d": "Rack-inlet design 25.4 °C, recommended envelope 18–27 °C. Humidity is read with dew point and non-condensing limits. CRAH return assumes a contained hot-aisle path (0 K mixing adjustment)."
+    },
+    "conv-dh-density": {
+      "t": "Current vs installed density",
+      "d": "Current telemetry is the simulated operating field; the installed study is positions × cabinet design rating. They are different numbers on purpose and are labelled separately."
+    },
+    "conv-fuel-current-basis": {
+      "t": "Current basis (engine bound)",
+      "d": "Autonomy, consumption and transfer state come from the conv-engine.js bulk fuel model. They stay suppressed until the complete current Conventional snapshot is available."
+    },
+    "conv-fuel-study-basis": {
+      "t": "Study only: 4 × 10 MW IT halls",
+      "d": "Fuel storage is not sized for the study here. That needs its own load profile, runtime target, delivery risk and civil-containment study, and it cannot change this simulation."
+    },
+    "conv-fuel-pid-legend": {
+      "t": "Fuel P&ID line states",
+      "d": "Medium: diesel. A solid line is flowing, dim dashes are stopped, a hairline is unavailable (no state source)."
+    },
+    "conv-fuel-inventory": {
+      "t": "Inventory basis",
+      "d": "Usable reserve = tank volume × usable fraction × level. The usable reserve, not the gross volume, is what backs the autonomy figure (conv/review/09-engineering-basis lines 133–147)."
+    },
+    "conv-fuel-day-tank": {
+      "t": "Day-tank logic",
+      "d": "P-101 lifts fuel from the UST to the running genset’s day tank. Low-low (< 25 %) raises a critical interlock alarm and forces the lead pump to RUN. Each day tank serves one genset; an engine fault fails over to the N+1 standby genset."
+    },
+    "conv-water-pid-legend": {
+      "t": "Water P&ID line states",
+      "d": "Site treatment train. A solid line is flowing, dim dashes are stopped, a hairline is unavailable (no state source)."
+    },
+    "conv-water-hall-alloc": {
+      "t": "Hall allocation",
+      "d": "Municipal treatment is one site-wide plant. The per-hall split stays UNAVAILABLE until validated downstream submeter data is published."
+    },
+    "conv-water-sim": {
+      "t": "Simulation mode",
+      "d": "Engineering values are deterministic from the engine basis; simulation only animates the trend lines."
+    },
+    "conv-water-wue-basis": {
+      "t": "WUE basis",
+      "d": "Site WUE = site WUE-included water volume ÷ site IT energy, computed from conv-engine. It is not a per-hall allocation."
+    },
+    "conv-water-recon": {
+      "t": "Scope reconciliation",
+      "d": "Total site treatment L/min − domestic/process L/min = WUE-included makeup L/min. WUE is shown against the all-treated-flow equivalent in L/kWh."
+    },
+    "conv-ict-seg-it": {
+      "t": "IT network",
+      "d": "Customer and compute fabric. Inventory capacity and traffic telemetry use separate authored bases."
+    },
+    "conv-ict-seg-bms": {
+      "t": "OT / BMS network",
+      "d": "Segmented facility control network — physically separate switching from IT, reaching it only through a firewalled OT gateway. Carries EPMS/cooling/fire/fuel/water gateways."
+    },
+    "conv-ict-seg-sec": {
+      "t": "Security network",
+      "d": "CCTV, access control, intrusion, gas-leak, fence-line — isolated from IT and OT."
+    },
+    "conv-ict-seg-mgmt": {
+      "t": "Management network",
+      "d": "OOB / iLO / console-server plane for infrastructure administration."
+    },
+    "conv-ict-seg-wan": {
+      "t": "WAN / DCI",
+      "d": "Inter-DC and internet transit. Primary UP, backup STANDBY."
+    },
+    "conv-ict-seg-mon": {
+      "t": "Monitoring",
+      "d": "Infrastructure monitoring server health — sensors, probes, scan freshness."
+    },
+    "conv-ict-arch": {
+      "t": "Campus schematic",
+      "d": "Click a node for its fault domain, an edge for its link. Line state follows the authored scenario."
+    },
+    "conv-ict-capacity": {
+      "t": "Capacity states",
+      "d": "Installed 80 Gbps physical; usable 40 Gbps under the protected policy; N+1 survivable 40 Gbps after one edge-path loss. Access-switch loss is a local rack failure domain."
+    },
+    "conv-ict-stale": {
+      "t": "Stale-sensor rule",
+      "d": "Sensor states are authored monitoring states, never random. The stale-sensor count feeds the top alarm strip Stale Points counter; warn when telemetry is older than 60 s."
+    },
+    "conv-ict-bases": {
+      "t": "Independent engineering bases",
+      "d": "Power context comes from conv-engine.js (IT load, facility load, PUE, rack-equivalents at 8 kW — not physical inventory). Network inventory and the traffic scenario are authored on this page and independent of IT power. All values are deterministic and identical on reload."
+    },
+    "conv-chw-pid": {
+      "t": "Chiller plant P&ID",
+      "d": "ISA-5.1 tags. The primary CHW header is bound to conv-engine; click a chiller module for its diagnostics."
+    },
+    "conv-chw-flow-ref": {
+      "t": "Header flow references",
+      "d": "943.0 L/s is the engine's IT sensible-load reference. Current evaporator duty needs 982.3 L/s at the same ΔT. Measured header flow stays unavailable until a flow meter is published."
+    },
+    "conv-dh-row-foot": {
+      "t": "Row foot",
+      "d": "Under each rack row, top to bottom: row heat in kW (sums to the hall IT load), rack inlet °C and hot-aisle °C on the engine planes, then the row min–max and avg of the active mode."
     }
   }
 }

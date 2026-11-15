@@ -17,7 +17,8 @@ includes('var NETWORK_CAPACITY_BASIS', 'ICT must define an explicit authored net
 for (const token of ['installedGbps', 'usableGbps', 'survivableGbps']) {
   includes(token, `ICT capacity basis is missing ${token}`);
 }
-includes('class="network-topology"', 'ICT must expose an operator topology workspace');
+includes('class="ict-arch"', 'ICT must expose an operator topology workspace (the layered architecture canvas)');
+includes("archGlyph(nd", 'ICT architecture nodes must carry a network symbol, not a bare dot');
 for (const layer of ['External / DCI', 'Edge / Core', 'Fabric / Access', 'Racks / Services']) {
   includes(layer, `ICT topology is missing the ${layer} layer`);
 }
