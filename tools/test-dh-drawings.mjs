@@ -31,6 +31,7 @@ import http from 'http';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import puppeteer from 'puppeteer';
+import { isSupabaseModule, signedInStorage, signedInSupabaseBody } from './lib/signed-in-supabase.mjs';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const arg = (k) => (process.argv.find((a) => a.startsWith(`--${k}=`)) || '').split('=')[1];
@@ -69,15 +70,20 @@ async function open(vp, theme) {
   pg.errors = [];
   pg.on('pageerror', (e) => pg.errors.push(e.message));
   await pg.setRequestInterception(true);
-  pg.on('request', (r) => (r.url().startsWith(ORIGIN) || r.url().startsWith('data:') ? r.continue() : r.abort()));
+  pg.on('request', (r) => {
+    /* v3.61: a signed-in visitor via the Supabase module; a forged localStorage session is ignored since v3.57.7
+       and the page re-locked mid-run (F1 'svg 0px', then a TypeError at H15). */
+    if (isSupabaseModule(r.url())) return r.respond({ status: 200, contentType: 'text/javascript', body: signedInSupabaseBody({ email: 'educator@resistancezero.com', tier: 'pro', educator: true }) });
+    return r.url().startsWith(ORIGIN) || r.url().startsWith('data:') ? r.continue() : r.abort();
+  });
   await pg.setViewport(vp);
-  await pg.evaluateOnNewDocument((t) => {
+  await pg.evaluateOnNewDocument((t, entries) => {
     try {
       localStorage.setItem('theme', t);
       localStorage.setItem('rz_cookie_consent', 'declined');
-      localStorage.setItem('rz_premium_session', JSON.stringify({ email: 'educator@resistancezero.com', tier: 'pro', role: 'educator', expires: '2099-12-31T23:59:59.000Z' }));
+      entries.forEach(([k, v]) => localStorage.setItem(k, v));
     } catch (x) { /* no storage */ }
-  }, theme);
+  }, theme, signedInStorage({ email: 'educator@resistancezero.com', tier: 'pro', role: 'educator' }));
   await pg.goto(ORIGIN + PAGE, { waitUntil: 'networkidle2', timeout: 60000 });
   await wait(800);
   return pg;

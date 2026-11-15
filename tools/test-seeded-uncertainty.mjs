@@ -5,6 +5,8 @@
 //      sim / commissioning paths
 //   S2 the page-local LCGs (tier, tia, spares, cx) use the engine's constants and default seed, and tier's
 //      mcScoreBand equals the same band drawn with RZEngine.models.sim.rng
+//   X1 tier's band text names the assumed spread with its percentage; X2 with rz-engine blocked, roi shows no band
+//      numerals and the unavailable sentence (both added after the 0b review found them unchecked)
 //   R  rendered: each band read twice from two fresh loads is identical, shows a number, and its basis line names a seed
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
@@ -93,6 +95,27 @@ try {
     const [a, b] = reads;
     check(`R ${page}`, !/^ERROR/.test(a) && a === b && /\d/.test(a.split('|')[0]) && /seed \d+/.test(a),
       a === b ? `"${a.slice(0, 160)}"` : `two loads differ: "${a.slice(0, 90)}" vs "${b.slice(0, 90)}"`);
+  }
+  /* X (0b gaps, PRD-P08 AC 2 and 3) */
+  {
+    const c = await browser.createBrowserContext(); const tab = await c.newPage();
+    await tab.setRequestInterception(true);
+    tab.on('request', (r) => (ALLOW.some((a) => r.url().startsWith(a)) ? r.continue() : r.abort()));
+    await tab.goto(base + 'tier-advisor.html', { waitUntil: 'load', timeout: 60000 });
+    const t = await tab.evaluate(() => mcBasisText());
+    check('X1 tier band names its assumed spread with a percentage', /assumed score spread/.test(t) && /±\d+(\.\d+)? %/.test(t), t);
+    await c.close();
+  }
+  {
+    const c = await browser.createBrowserContext(); const tab = await c.newPage();
+    await tab.setRequestInterception(true);
+    tab.on('request', (r) => (/rz-engine(\.min)?\.js/.test(r.url()) ? r.abort() : ALLOW.some((a) => r.url().startsWith(a)) ? r.continue() : r.abort()));
+    await tab.goto(base + 'roi-calculator.html', { waitUntil: 'load', timeout: 60000 });
+    await new Promise((ok) => setTimeout(ok, 800));
+    const r = await tab.evaluate(() => { try { runMonteCarlo([-120e6, 18e6, 19e6, 20e6, 21e6, 22e6, 23e6, 24e6, 25e6, 26e6, 27e6]); } catch (e) { return { err: String(e.message) }; }
+      return { band: ['mcP5', 'mcP50', 'mcP95'].map((id) => (document.getElementById(id) || {}).textContent), basis: (document.getElementById('roiMcBasis') || {}).textContent, engine: typeof window.RZEngine }; });
+    check('X2 engine missing: roi shows no band numerals and says why', !r.err && r.engine === 'undefined' && r.band.every((v) => !/\d/.test(v || '')) && /unavailable/.test(r.basis || ''), JSON.stringify(r));
+    await c.close();
   }
 } finally { await browser.close(); server.close(); }
 if (fails.length) { console.log(`FAIL test-seeded-uncertainty — ${fails.length} of ${fails.length + passes}`); fails.forEach((f) => console.log('  ' + f)); process.exit(1); }

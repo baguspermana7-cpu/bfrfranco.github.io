@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { extname, resolve, sep } from 'node:path';
 import puppeteer from 'puppeteer';
+import { isSupabaseModule, signedInStorage, signedInSupabaseBody } from './lib/signed-in-supabase.mjs';
 import DCAI_ENGINE from '../js/dcai-engine.js';
 
 const ROOT = process.cwd();
@@ -88,6 +89,11 @@ async function preparePage(browser, origin, fixture, javaScriptEnabled = true) {
   await page.setRequestInterception(true);
   page.on('request', (request) => {
     const url = request.url();
+    /* v3.61: a signed-in visitor via the Supabase module, not a forged localStorage session (ignored since v3.57.7) */
+    if (isSupabaseModule(url)) {
+      request.respond({ status: 200, contentType: 'text/javascript', body: signedInSupabaseBody({ email: 'educator@resistancezero.com', tier: 'pro', educator: true }) });
+      return;
+    }
     if (request.isNavigationRequest() && url.startsWith(`${origin}/datahallAI.html`)) {
       /* the pinned token, not a literal: a literal stopped matching on the next version bump and
          turned this fixture into a copy of the healthy page */
@@ -124,14 +130,8 @@ async function preparePage(browser, origin, fixture, javaScriptEnabled = true) {
     request.respond({ status: 204, contentType: 'text/plain', body: '' });
   });
   if (javaScriptEnabled) {
-    await page.evaluateOnNewDocument(() => {
-      localStorage.setItem('rz_premium_session', JSON.stringify({
-        email: 'educator@resistancezero.com',
-        tier: 'pro',
-        role: 'educator',
-        expires: '2099-12-31T23:59:59.000Z',
-      }));
-    });
+    await page.evaluateOnNewDocument((entries) => entries.forEach(([k, v]) => localStorage.setItem(k, v)),
+      signedInStorage({ email: 'educator@resistancezero.com', tier: 'pro', role: 'educator' }));
   }
   await page.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
   await page.goto(`${origin}/datahallAI.html?authority=${fixture}`, {

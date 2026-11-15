@@ -9,6 +9,7 @@
  *      - listAuditLog was called with {own:true}
  *      - Open / Copy link / Delete each log exactly one event with the right action
  *      - an empty log shows the empty sentence; a failing log shows the error + Retry, and Retry reloads
+ *  A5  a failing log write (rejected, thrown, {error}) during a save: the save still reads "Saved", nothing unhandled
  *  A3  browser, two calculators: the real PDF builders are wrapped (__rzTracked); a wrapped builder that returns
  *      logs pdf_exported with {calc, format:'pdf'}; a throwing builder logs nothing; signed out logs nothing;
  *      an unknown action and an unknown meta key never reach logEvent
@@ -180,6 +181,26 @@ try {
     await tab.waitForFunction(() => window.rzScenario && window.rzScenario.track, { timeout: 15000 });
     const n = await tab.evaluate(async () => { await window.rzScenario.track('scenario_saved', 'scenario', 'z', { calc: 'pue' }); return window.__rzEvents.length; });
     ok(n === 0, `A3 signed out must log nothing, logged ${n}`);
+    await tab.close();
+  }
+  /* A5 (0b gap, PRD-P15 AC 3): the log write failing never fails the save — rejected promise, sync throw, {error} */
+  for (const how of ['reject', 'throw', 'error']) {
+    const { tab, errs } = await open('capex-calculator.html?stub=rows');
+    await tab.waitForFunction(() => window.rzScenario && window.rzScenario.saveToAccount, { timeout: 15000 });
+    const unhandled = [];
+    await tab.exposeFunction('__rzUnhandled', (m) => unhandled.push(m)).catch(() => {});
+    const r = await tab.evaluate(async (how) => {
+      window.addEventListener('unhandledrejection', (e) => window.__rzUnhandled(String(e.reason && e.reason.message || e.reason)));
+      window.rzSupa.saveScenario = async () => ({ data: { id: 's-9' }, error: null });
+      window.rzSupa.logEvent = how === 'reject' ? () => Promise.reject(new Error('rpc down'))
+        : how === 'throw' ? () => { throw new Error('rpc down'); } : async () => ({ error: 'rpc down' });
+      const m = document.createElement('div'); m.id = '__a5msg'; document.body.appendChild(m);
+      await window.rzScenario.saveToAccount('capex', { msgEl: '__a5msg', name: 'A5 case' });
+      await new Promise((res) => setTimeout(res, 300));
+      return m.textContent;
+    }, how);
+    ok(/^Saved/.test(r.trim()), `A5 log ${how}: save message should read "Saved…", got "${r}"`);
+    ok(unhandled.length === 0 && errs.length === 0, `A5 log ${how}: unhandled ${JSON.stringify(unhandled)} errors ${JSON.stringify(errs)}`);
     await tab.close();
   }
 } finally {

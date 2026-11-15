@@ -11,6 +11,46 @@ release sections rather than semver.
 
 ---
 
+## v3.61.0 — 2026-11-15 — Render scale gate, calculators in articles, project prefill for spares, Cx intake follows the tier
+
+### Added
+- **Render scale gate (PRD-P22).** `tools/audit-editorial-render.mjs` measures the RENDERED font-size, spacing and
+  border-radius of every visible element on 278 pages at 1440 px against `data/design-scale.json` (generated from
+  `documentation/design.md`). Enforced as a per-page ratchet (`tools/editorial-render-ratchet.json`): a page may only
+  fall. `changelog.html` is compared by distinct off-scale kinds because it grows every release. Laws E1–E7 in
+  `tools/test-audit-editorial-render.mjs` (planted fixture = exactly 3, on-scale twin = 0, +1 element = +1, kinds mode
+  passes a repeated rule and fails a new one; mutation-proven).
+- **Calculators inside articles (PRD-P20 part A).** `?embed=article` turns a calculator into a compact box an article
+  on this site can frame (`js/rz-embed-article.js`): only the declared input group or result row is shown, height is
+  posted to the same-origin parent, a frame from another origin gets only a link out, and "Open full calculator" opens
+  the full page with the same inputs. Used in article-7, article-19 and article-23.
+- **Spares readiness takes the active project (FR-P13-5).** With a project open, tier, country and IT load prefill
+  spares through the same hand-off contract the links use (`RZHandoff.fromProject`); values already on a link win, and
+  the banner names what came from the project.
+- **Cx issue intake follows the active record set (P06 C3).** "Add" from the RFS gap queue writes to the Tier 3
+  register when a Tier 3 set is active, to the Tier 1 workspace otherwise, and refuses Demo records. While a Tier 3 set
+  is active the Tier 1 register is read-only and says so.
+- **Groundwork for per-tab loading of the DC AI page (PRD-P09, no page change).** `tools/report-datahall-globals.mjs`
+  maps every implicit global in the page scripts; `js/datahall-ai/tab-loader.js` loads a tab's modules once, in
+  order, and reports a failure without caching it.
+- **Review gates:** reader journey across project, capex, roi, compare, pack, share link and offline reopen
+  (`tools/test-journey-w6.mjs`); console sweep over every page that loads a P-series module (157 pages, 0 page
+  errors); responsive sweep (38 pages × 2 themes × 5 widths); TIA theme; activity-log failure path; seeded-uncertainty
+  band text and engine-missing state; six-calculator pack.
+
+### Fixed
+- **Tool tab buttons sit on the 4 px grid.** `.tool-tabs > button` side padding 14 px → 16 px (`css/rz-tool.css`);
+  carbon, cx and rfs fall on the render-scale ratchet and the PUE tab row added in v3.58.0 no longer raises it.
+- Gate fixtures under `tools/fixtures/` are skipped by the version-stamp audit, like `embed/`.
+- **Ship gates signed in the way the site now authenticates.** Since v3.57.7 a forged localStorage `rz_premium_session`
+  grants nothing, so gates that test something other than auth were measuring the login wall: datahall-ai authority,
+  Design Studio browser and (from v3.60.0) `test-dh-drawings` — the page re-locked mid-run, F1 read the fire sheet at
+  0 px and H15 threw. `tools/lib/signed-in-supabase.mjs` answers `js/rz-supabase.js` with one signed-in profile.
+  `rz-svg-legible` uses a throttle instead of a debounce (cockpit tickers starved the fit), the reveal gate waits for
+  the fit, the rz-ops theme gate is wired, and `RZ_GATE_FROM=N` resumes a sharded run.
+
+---
+
 ## v3.60.0 — 2026-11-15 — datahallAI drawings redrawn as HMI sheets (R128–R147)
 
 ### Added
@@ -71,6 +111,8 @@ release sections rather than semver.
 ### Not in this release (next)
 - The remaining cooling (101/102/104/105), electrical (DH-02…08, 002/003) and fire (102–104) sheets; the Room Layout building isometric and per-level plans as sheets; L3 schematics for every class
   (H3 ratchet); R135 commissioning scenarios on these drawings.
+
+---
 ## v3.58.5 — 2026-11-14 — Finance Terminal names a blocked gateway instead of timing out tile by tile
 
 ### Fixed
@@ -103,6 +145,8 @@ release sections rather than semver.
 ### Gates
 - `tools/test-finance-terminal-data.mjs` D1–D6 (all six failed on v3.58.3); `tools/test-rz-ops-access.mjs` M2
   (1024/1280/1440 px, failed on v3.58.3). See `standarization/FIN_ENGINE.md` "Data sources".
+
+---
 
 ## v3.58.3 — 2026-11-14 — Admin suite theme aligned: embedded apps follow the console, light mode from tokens
 

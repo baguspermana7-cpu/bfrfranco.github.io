@@ -6,6 +6,7 @@
 | PRD id | PRD-P20 |
 | Version | 1.1, 2026-11-10 (review revision: UI states, acceptance) |
 | Status | **Part A** (embeds on the site's own article pages, same origin) approved under the directive. **Part B** (third-party sites embedding the calculators) needs owner approval: it changes the framing policy, a security boundary, and makes the site a public widget host. BLOCKED. |
+| Delivery | **Part A SHIPPED v3.61.0** — `js/rz-embed.js` (article side) + `js/rz-embed-article.js` (calculator side, `?embed=article`); adopted on article-7 (Tier advisor), article-19 (TCO), article-23 (CAPEX). 9 calculators declare `embed.keep` in data/calculators.json; tia-942-checklist and rfs-readiness are EXCLUDED with a stated reason (checklists: no input moves one headline value). Guard: opened top-level, the embed view redirects to the full page; framed by another origin it renders a link only (Chrome blocks cross-origin top navigation). Laws A0–A10 in `tools/test-embed-article.mjs`. Part B unchanged (owner) |
 | Priority | Wave 4 |
 | Dependencies | P03 embed flag pattern (`?embed=`) |
 

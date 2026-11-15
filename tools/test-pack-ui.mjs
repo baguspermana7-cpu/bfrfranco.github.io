@@ -13,6 +13,8 @@
  *  U6 a calculator never run for the project is computed and the section says it had not been run
  *  U7 the hidden copies write nothing: the stored projects are byte-identical before and after
  *  U8 a calculator that cannot load gets a "Section not available" section; the others still print; the status line counts it
+ *  U12 all six calculators: six sections that carry numbers, cover, register and appendix (numeral equality per page
+ *      is asserted for CAPEX in U3; the other five sections are checked for presence and numbers)
  *  U9 a blocked new tab says how to allow it and points at Print
  *  U10 Cancel during a build offers nothing to print
  *  U11 390 px: the pack view fits (no horizontal scroll), the note field is >= 16 px (no iOS zoom)
@@ -192,6 +194,19 @@ try {
   await tab.waitForFunction(() => /Cancelled/.test(document.querySelector('.rz-pack-progress').textContent), { timeout: 60000 });
   ok(!(await tab.$('[data-pack="print"]')), 'U10 a cancelled build still offers Print');
   route = () => 'continue';
+
+  /* U12 (0b gap, PRD-P04 AC 1): all six calculators in one pack — cover, register, six sections with numbers, appendix */
+  await tab.$$eval('.rz-pack-form input[name="calc"]', (xs) => xs.forEach((x) => { x.checked = true; }));
+  const html12 = await build(tab);
+  const s12 = await tab.$eval('.rz-pack-progress', (x) => x.textContent);
+  const p12 = html12 ? await tab.evaluate((html) => {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const secs = [...doc.querySelectorAll('section.rzp-section[id^="calc-"]')].map((x) => ({ id: x.id, digits: (x.textContent.match(/\d/g) || []).length, na: /Section not available/.test(x.textContent) }));
+    return { secs, reg: doc.querySelectorAll('#assumptions tbody tr').length, basis: !!doc.querySelector('#basis'), cover: doc.querySelectorAll('.rzp-meta tr').length };
+  }, html12) : null;
+  ok(!!p12 && p12.secs.length === 6 && p12.secs.every((x) => x.digits > 10 && !x.na), 'U12 six sections with numbers: ' + JSON.stringify(p12 && p12.secs));
+  ok(!!p12 && p12.reg > 0 && p12.basis && p12.cover > 0, 'U12 cover, register and appendix: ' + JSON.stringify(p12 && { reg: p12.reg, basis: p12.basis, cover: p12.cover }));
+  ok(/^Pack ready · 6 calculators/.test(s12.trim()), 'U12 status "' + s12 + '"');
   await tab.close();
 
   /* U11 */

@@ -131,7 +131,7 @@ create table public.cx_record_sets (
 | P01 | `project_id` link |
 | 3D campus / heatmap | Read through overlay |
 
-**Phase 3 amendment C3:** new issues go to the active Cx tier. With no Tier 3 record set active, intake writes Tier 1 `RZCxIssues`. With a Tier 3 set active, intake writes Tier 3 `issues`, and the Tier 1 register is read-only. Conversion between tiers is explicit (`RZCxRecords.issueFromTier1`); nothing is mirrored silently.
+**Phase 3 amendment C3:** new issues go to the active Cx tier. With no Tier 3 record set active, intake writes Tier 1 `RZCxIssues`. With a Tier 3 set active, intake writes Tier 3 `issues`, and the Tier 1 register is read-only. Conversion between tiers is explicit (`RZCxRecords.issueFromTier1`); nothing is mirrored silently. **SHIPPED v3.61.0 (intake + read-only):** `RZHandoffCx.target()` picks tier1 / tier3 / demo; with a set active the RFS intake writes through `RZCxWorkspace.write` (A/B/C → critical/major/minor, blocking the queued gate on the first asset of the queued system, `NO_ASSET` keeps the gap queued), the Tier 1 form and row actions are disabled with the reason shown; with sets present but Demo shown the intake is refused and nothing is written. Gate `tools/test-handoff-cx.mjs` U5–U6, E4–E6.
 **Phase 3 amendment C7:** the SQL is delivered in the single owner-applied bundle `supabase/migrations/2026-11-product-transformation.sql`.
 
 ## 14. AI and automation

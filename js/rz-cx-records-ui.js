@@ -60,6 +60,7 @@
 
   /* ── workspace chrome ── */
   function renderWs() {
+    if (root.RZCxIssuesUI && root.RZCxIssuesUI.lock) root.RZCxIssuesUI.lock();   /* P06 C3: Tier 1 read-only follows the active set */
     var sel = $('cxRecSet'), ids = WS ? Object.keys(WS.sets) : [], i;
     sel.innerHTML = '';
     sel.appendChild(el('option', { value: '' }, ids.length ? 'My records…' : 'My records'));
@@ -325,7 +326,7 @@
     });
     S.hooks.push(function (plan) { if (!LOADED) load(); render(plan); });
     root.RZCxRecordsUi = { render: render, db: function () { return db(); }, mode: function () { return MODE; }, workspace: function () { return WS; },
-      setDb: function (d) { DEMO = d; LOADED = true; render(S.plan); }, importText: importText, version: '3.50.0' };
+      setDb: function (d) { DEMO = d; LOADED = true; render(S.plan); }, importText: importText, write: function (change) { return commit(change, 'Readiness gap added'); }, version: '3.50.0' };
     renderWs();
     if (ST.quarantined) say('A damaged local record store was set aside (rz_cx_records_v1_quarantine). Started empty.', 'fault');
     if (S.plan) { load(); render(S.plan); }

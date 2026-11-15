@@ -43,6 +43,7 @@ EXCLUDED_DIRS = {
     'Automation',
     '__pycache__',
     'dc-corpus',
+    'fixtures',    # gate fixtures (tools/fixtures/**) — test inputs, not site pages
 }
 
 

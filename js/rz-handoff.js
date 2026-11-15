@@ -41,7 +41,9 @@
       { param: 'installedBase', type: 'int', min: 1, max: 1000, targets: ['c1_installed', 's_installed_base', 'h_sites'] },
       { param: 'leadTime', type: 'float', min: 1, max: 260, unit: 'weeks', targets: ['r_lt_weeks', 's_lt_weeks', 'h_oem_lt', 'mc_lt_base'] },
       { param: 'unitCost', type: 'float', min: 1, max: 100000000, unit: 'USD', targets: ['s_unit_cost', 'h_unit_cost', 'ltb_unit_cost'] }
-    ]
+    ],
+    // FR-P13-5: P01 project input -> contract param. The project's values go through the same parse as a link.
+    project: { tier: 'tier', country: 'country', it_load_kw: 'itLoad' }
   };
 
   var INT = /^[+-]?\d+$/, FLOAT = /^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$/;
@@ -100,6 +102,17 @@
     return contract.page + (parts.length ? '?' + parts.join('&') : '');
   }
 
+  // Query string from a P01 project's inputs, for parse(); params in `skip` (already on the link) are left out.
+  function fromProject(contract, inputs, skip) {
+    var parts = [], map = contract.project || {}, no = skip || [];
+    Object.keys(map).forEach(function (k) {
+      var param = map[k];
+      if (!inputs || inputs[k] == null || no.indexOf(param) >= 0) return;
+      parts.push(encodeURIComponent(param) + '=' + encodeURIComponent(String(inputs[k])));
+    });
+    return parts.join('&');
+  }
+
   var UNIT = { years: 'yr', hours: 'h', weeks: 'wk', 'USD/h': 'USD/h', kW: 'kW', USD: 'USD' };
   function label(contract, param, value) {
     var spec = null;
@@ -111,5 +124,5 @@
     return param + ' ' + value + (spec.unit ? ' ' + (UNIT[spec.unit] || spec.unit) : '');
   }
 
-  return { CONTRACTS: { spares: SPARES }, parse: parse, url: url, label: label };
+  return { CONTRACTS: { spares: SPARES }, parse: parse, url: url, label: label, fromProject: fromProject };
 });

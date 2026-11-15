@@ -601,3 +601,27 @@ cries wolf gets muted and then protects nothing.
   quotes `#8b5cf6` while DESCRIBING its purge is not committing it). `changelog.html` (generated archive
   that quotes historical CSS as before/after illustration) is excluded from scope entirely — the ban is
   enforced on live-design surfaces, not the historical log.
+
+### Rendered scale ratchet — P22 (v3.61.0, 2026-11-14)
+
+The scale tables in `documentation/design.md` are now measured on the RENDER, not grepped from source.
+`tools/build-design-scale.mjs` generates `data/design-scale.json` from design.md (spacing grid 4 px with
+hairlines ≤ 2 px exempt; font steps 11/13/14/16/20/22/28/32/44/64 at 1440; radii 3 and 10 plus a 4 px
+ceiling; tolerance 0.5 px) — a scale edited in design.md and not regenerated fails gate E3.
+`tools/audit-editorial-render.mjs` walks every published page and counts computed values off that scale.
+It skips what is not authored layout: SVG internals, iframes, icon fonts, hidden or zero-size boxes, `gap`
+on a box that is not flex/grid, vertical margin on an inline box; a font is checked only on an element
+that owns a text node; it waits for the DOM to settle (element count stable for two 250 ms polls, max 4 s).
+
+Enforcement is a RATCHET, not a zero target: `tools/editorial-render-ratchet.json` holds the measured
+count for each of 278 pages and a page may only fall. A page that rises fails; `--tighten` lowers the
+baseline after a sweep; a NEW published page must be added with `--add-new` (gate E5 fails on a page
+missing from the ratchet). Laws E1–E5 in `tools/test-audit-editorial-render.mjs`: a planted fixture
+reports exactly its 3 defects (font 17.3 px, column-gap 7 px, one corner radius 11 px), an on-scale
+fixture reports 0, and adding one off-scale element to a real page raises it by exactly 1.
+One page is compared differently: `changelog.html` is a log that gains an entry every release, so its
+ratchet entry carries `"mode": "kinds"` and compares the number of distinct off-scale kinds
+(`tag.class prop:value`, no id) instead of the total. A release that repeats a known rule passes; a new
+off-scale rule still fails (laws E6–E7, mutation-proven). A baseline must be measured on the tree it
+ships on: the first one was taken before the rebase onto v3.57.0 and four pages read low, so they were
+re-based with the cause written in the ratchet's `about`.

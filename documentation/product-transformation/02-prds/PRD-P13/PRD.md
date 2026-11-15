@@ -82,7 +82,7 @@ This PRD wires the senders. It also lets an RFS readiness gap become a Cx issue 
 | FR-P13-2 | The receiver reads the contract, validates ranges, applies, and records applied and ignored params | unit + E2E |
 | FR-P13-3 | tier-advisor sender: maps `coolRedundancy` {n→n, n1→n1, 2n→2n, 2n1→2n} and the computed tier 1–4 | E2E |
 | FR-P13-4 | Provenance line + field tags on spares | E2E |
-| FR-P13-5 | The P01 adapter for spares (country, tier) reuses the contract transforms | field-map gate |
+| FR-P13-5 | The P01 adapter for spares (country, tier) reuses the contract transforms | field-map gate — **SHIPPED v3.61.0**: `spares.handoff.project` + `RZHandoff.fromProject()`, link wins per param; `test-handoff-contract.mjs` C4, H6–H8 (12 red before) |
 | FR-P13-6 | rfs Send to Cx: queue entry schema {gap_id, title ≤120, system (a `RZCxPlan.SYSTEMS` id chosen by the user in the send dialog, pre-selected by an rfs-system → Cx-system map in the contract file), gate L1–L5 (user-chosen, default L3), severity A/B/C (rfs high→A, medium→B, low→C), evidence_ids[], source_url}, max 100 | unit |
 | FR-P13-7 | Cx intake banner, Add / Dismiss; Add calls `RZCxIssues.store(localStorage).add()` per item; a refused item (code TITLE/SEVERITY/SYSTEM/GATE) is listed with its code and kept in the queue; the issue title carries the suffix "(RFS)", and the gap url is kept in a side map `rz-cx-issue-sources` {issueId: url}, because the Tier 1 issue schema has no source field | E2E |
 | FR-P13-8 | Duplicate guard by gap_id across the queue and existing issues | unit |

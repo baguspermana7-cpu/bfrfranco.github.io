@@ -99,9 +99,25 @@
   }
 
   function rerender() { A.render(); }
+  /* P06 C3: while a Tier 3 record set is active, issues live in that set; this Tier 1 register is read-only. */
+  var LOCK_MSG = 'A Tier 3 record set is active · this register is read-only';
+  function locked() {
+    var RU = root.RZCxRecordsUi, ws = RU && RU.workspace ? RU.workspace() : null;
+    return !!(RU && root.RZHandoffCx && root.RZHandoffCx.target({ mode: RU.mode(), sets: ws && ws.sets ? Object.keys(ws.sets).length : 0 }) === 'tier3');
+  }
+  function applyLock() {
+    var f = $('cxIsForm'), on = locked(); if (!f) return;
+    var els = f.querySelectorAll('input,select,button');
+    for (var i = 0; i < els.length; i++) els[i].disabled = on;
+    f.title = on ? LOCK_MSG : '';
+    var m = $('cxIsMsg'); if (m && (on || m.textContent === LOCK_MSG) && (!m.textContent || m.textContent === LOCK_MSG)) m.textContent = on ? LOCK_MSG : '';
+    var acts = $('cxIsList') ? $('cxIsList').querySelectorAll('[data-is-toggle],[data-is-del],[data-is-waive]') : [];
+    for (i = 0; i < acts.length; i++) acts[i].disabled = on;
+  }
   function bind() {
     $('cxIsForm').addEventListener('submit', function (e) {
       e.preventDefault();
+      if (locked()) { say(LOCK_MSG); return; }
       var due = parseFloat($('cxIsDue').value);
       var r = R.add({ title: $('cxIsTitle').value, severity: $('cxIsSev').value, system: $('cxIsSys').value, gate: $('cxIsGate').value, owner: $('cxIsOwner').value, due: isNaN(due) ? null : due });
       if (!r.ok) { say(r.code === 'TITLE' ? 'Give the issue a title (1–120 characters)' : 'Pick a category, system and gate'); return; }
@@ -113,11 +129,13 @@
       var t = e.target; if (!t || !t.getAttribute) return;
       var k = t.getAttribute('data-is-check'), w = t.getAttribute('data-is-waive');
       if (k) { var p = k.split(':'); R.check(p[0], p[1], p[2], t.checked); rerender(); restoreFocus('[data-is-check="' + k + '"]'); }
+      else if (w && locked()) { t.checked = !t.checked; say(LOCK_MSG); }
       else if (w) { R.setWaiver(w, t.checked); rerender(); restoreFocus('[data-is-waive="' + w + '"]'); }
     });
     $('cxIsList').addEventListener('click', function (e) {
       var t = e.target; if (!t || !t.getAttribute) return;
       var tg = t.getAttribute('data-is-toggle'), d = t.getAttribute('data-is-del');
+      if ((tg || d) && locked()) { say(LOCK_MSG); return; }
       if (tg) { var it = R.load().items.filter(function (x) { return x.id === tg; })[0]; if (it) { R.setStatus(tg, it.status === 'open' ? 'closed' : 'open'); say(tg + (it.status === 'open' ? ' closed' : ' reopened')); rerender(); } }
       else if (d) { R.remove(d); say(d + ' deleted'); rerender(); }
     });
@@ -138,7 +156,13 @@
     if (!root.RZHandoffCx || !st) return;
     Q = root.RZHandoffCx.queue(st); SRC = root.RZHandoffCx.sources(st);
     $('cxIsIntakeAdd').addEventListener('click', function () {
-      var r = root.RZHandoffCx.intake(Q, R, SRC);
+      // P06 C3: a Tier 3 set active → its issues table (through the workspace write); Demo shown → refused.
+      var RU = root.RZCxRecordsUi, ws = RU && RU.workspace ? RU.workspace() : null;
+      var tgt = root.RZHandoffCx.target(RU ? { mode: RU.mode(), sets: ws && ws.sets ? Object.keys(ws.sets).length : 0 } : null);
+      if (tgt === 'demo') { say('Demo records are read-only · choose your record set, then Add'); return; }
+      var r = tgt === 'tier3'
+        ? root.RZHandoffCx.intake(Q, root.RZHandoffCx.workspaceRegister(RU.db, RU.write, root.RZCxWorkspace.ops, function () { return new Date().toISOString(); }), { put: function () {} })
+        : root.RZHandoffCx.intake(Q, R, SRC);
       say(r.added.length + ' added' + (r.added.length ? ' (' + r.added.map(function (x) { return x.id; }).join(', ') + ')' : '') +
           (r.refused.length ? ' · ' + r.refused.length + ' refused: ' + r.refused.map(function (x) { return x.gap_id + ' ' + x.code; }).join(', ') : ''));
       rerender(); renderIntake();
@@ -147,7 +171,7 @@
     renderIntake();
   }
   function restoreFocus(sel) { var q = doc.querySelector(sel); if (q) q.focus(); }
-  function hook(plan) { renderList(); decorate(plan); readinessBlock(plan); }
+  function hook(plan) { renderList(); decorate(plan); readinessBlock(plan); applyLock(); }
   function init() {
     A = root.RZCxAnalysis; P = root.RZCxPlan; I = root.RZCxIssues;
     if (!A || !P || !I || !A.state || !A.state.hooks) return;
@@ -155,6 +179,6 @@
     R = I.store(st); if (!build()) return;
     bind(); bindIntake(); S.hooks.push(hook); A.render();
   }
-  root.RZCxIssuesUI = { version: '3.33.0' };
+  root.RZCxIssuesUI = { version: '3.60.0', lock: function () { applyLock(); } };
   if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', init); else init();
 })(typeof window !== 'undefined' ? window : this, typeof document !== 'undefined' ? document : null);

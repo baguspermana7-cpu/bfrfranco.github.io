@@ -207,9 +207,13 @@
 
   function report() { return apply(); }
 
+  /* v3.61: a throttle, not a debounce. Cockpits with live tickers flip a class somewhere in the body
+     every few hundred ms or faster; a debounce that restarts on each flip never fired, so a freshly
+     opened drill-down was never fitted (test-cockpit-reveal red under load). The first change in a
+     quiet period schedules ONE apply 120 ms later; changes inside that window ride along. */
   var pending = null;
   function schedule() {
-    if (pending) { root.clearTimeout(pending); }
+    if (pending) { return; }
     pending = root.setTimeout(function () { pending = null; apply(); }, 120);
   }
 

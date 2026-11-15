@@ -10,6 +10,14 @@
 // E2 Cx (?tab=analysis): banner "1 readiness gap waiting"; Add → one more issue, title "(RFS)", title links to the gap;
 //    banner hidden. Dismiss empties the queue without adding.
 // E3 both themes at 390 px: the send form and the banner fit, no horizontal overflow; no page errors.
+// U5 P06 C3 target(): no Tier 3 set → tier1; a Tier 3 set active → tier3; sets exist but Demo is shown → demo.
+// U6 workspaceRegister(): Add writes a Tier 3 issue through RZCxWorkspace.write (severity A→critical, blocking the
+//    queued gate on the first asset of the queued system, title "(RFS)"); a system with no asset in the set → NO_ASSET,
+//    the item stays queued; nothing goes to the Tier 1 register.
+// E4 Cx with a Tier 3 set active: Add → the set gains one issue (rev +1), the Tier 1 register is unchanged.
+// E6 with a Tier 3 set active the Tier 1 register is read-only: its Add button is disabled and a forced submit adds nothing;
+//    switching the workspace to Demo unlocks it immediately.
+// E5 Cx with a Tier 3 set but Demo shown: Add is refused with a reason, nothing written, the gap stays queued.
 // Run: node tools/test-handoff-cx.mjs [--base=http://127.0.0.1:PORT]
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
@@ -60,6 +68,28 @@ const fakeReg = { add: (o) => (o.system === 'fire' ? { ok: false, code: 'SYSTEM'
 q.send(item(7, { system: 'fire' }));
 r = X.intake(q, fakeReg, src);
 ok('U3 refused items stay queued with their code', r.refused.length === 2 && r.refused.every((x) => x.code === 'SYSTEM') && q.load().items.length === 2, r);
+
+// ---- P06 C3: intake follows the active Cx tier ----
+global.self = global; require(join(ROOT, 'js/rz-cx-records.js')); require(join(ROOT, 'js/rz-cx-workspace.js'));
+const Wk = global.RZCxWorkspace;
+const DEMO_ASSETS = JSON.parse(readFileSync(join(ROOT, 'data/cx/demo-records.json'), 'utf8')).assets.slice(0, 3);
+ok('U5 target: no sets → tier1', typeof X.target === 'function' && X.target({ mode: 'demo', sets: 0 }) === 'tier1' && X.target(null) === 'tier1');
+ok('U5 target: a set active → tier3', typeof X.target === 'function' && X.target({ mode: 'set-1', sets: 1 }) === 'tier3');
+ok('U5 target: sets exist, Demo shown → demo', typeof X.target === 'function' && X.target({ mode: 'demo', sets: 2 }) === 'demo');
+if (typeof X.workspaceRegister === 'function') {
+  let set = Wk.createSet(Wk.emptyWorkspace(), { name: 'Hall 1', assets: DEMO_ASSETS }).ws;
+  set = set.sets[Object.keys(set.sets)[0]];
+  const w3 = (change) => { const r = Wk.write(set, change); if (r.ok) set = r.set; return r; };
+  const reg3 = X.workspaceRegister(() => set.db, w3, Wk.ops, () => '2026-11-14T00:00:00Z');
+  st = mem(); q = X.queue(st, now); const tier1 = I.store(st);
+  q.send(item(40, { system: 'crah', severity: 'A', gate: 'L4' })); q.send(item(41, { system: 'fire' }));
+  r = X.intake(q, reg3, { put() {} });
+  const iss = set.db.issues;
+  ok('U6 one Tier 3 issue written through the workspace', r.added.length === 1 && iss.length === 1 && set.rev === 2, { r, n: iss.length, rev: set.rev });
+  ok('U6 critical, "(RFS)", on the first crah asset, blocking L4', !!iss[0] && iss[0].severity === 'critical' && / \(RFS\)$/.test(iss[0].title) && iss[0].assets[0] === 'A-CRAH-01' && iss[0].blocking_gate_ids[0] === 'G-A-CRAH-01-L4', iss[0]);
+  ok('U6 system with no asset in the set → NO_ASSET, kept queued', r.refused.length === 1 && r.refused[0].code === 'NO_ASSET' && q.load().items.length === 1, r);
+  ok('U6 Tier 1 register untouched', tier1.load().items.length === 0);
+} else ok('U6 workspaceRegister exists', false);
 
 // ---- headless ----
 const puppeteer = require('puppeteer');
@@ -131,6 +161,41 @@ try {
   await cx.click('#cxIsIntakeDismiss').catch(() => {}); await wait(200);
   ok('E2 Dismiss empties the queue, adds nothing', (await cx.evaluate(() => RZHandoffCx.queue(localStorage).load().items.length)) === 0 && (await cx.evaluate(() => RZCxIssues.store(localStorage).load().items.length)) === n0);
   await ctx.close();
+
+  // E4/E5 — P06 C3, Tier 3 workspace seeded in a fresh context
+  for (const [label, activeSet] of [['E4', true], ['E5', false]]) {
+    const c3 = await browser.createBrowserContext();
+    const xp = await c3.newPage();
+    await xp.setViewport({ width: 1440, height: 900 });
+    xp.on('pageerror', (e) => errors.push('cx ' + label + ': ' + e.message));
+    await xp.evaluateOnNewDocument((assets, act) => {
+      if (sessionStorage.getItem('seeded')) return; sessionStorage.setItem('seeded', '1');
+      const db = { meta: { project_id: null }, assets, ports: [], connections: [], mappings: [], gates: [], packs: [], attempts: [], steps: [], issues: [], approvals: [], cost_lines: [], allocations: [], observations: [], scenarios: [] };
+      localStorage.setItem('rz_cx_records_v1', JSON.stringify({ v: 1, active: act ? 'set-1' : null, sets: { 'set-1': { name: 'Hall 1', project_id: null, db, rev: 1, updated_at: '2026-11-14T00:00:00Z', invalid: 0 } } }));
+      localStorage.setItem('rz_handoff_cx', JSON.stringify({ v: 1, items: [{ gap_id: 'u:c3', title: 'CRAH filter missing', system: 'crah', gate: 'L3', severity: 'B', evidence_ids: [], source_url: 'rfs-readiness-workbench.html#gap-u:c3', at: Date.now() }] }));
+    }, DEMO_ASSETS, activeSet);
+    await xp.goto(base + '/cx-calculator.html?tab=analysis', { waitUntil: 'networkidle2', timeout: 60000 });
+    await xp.waitForSelector('#cxIsIntake', { timeout: 20000 }).catch(() => null); await wait(400);
+    const t1 = await xp.evaluate(() => RZCxIssues.store(localStorage).load().items.length);
+    await xp.click('#cxIsIntakeAdd').catch(() => {}); await wait(400);
+    const res = await xp.evaluate(() => { const w = JSON.parse(localStorage.getItem('rz_cx_records_v1')); const s = w.sets['set-1'];
+      return { n3: s.db.issues.length, rev: s.rev, title: (s.db.issues[0] || {}).title, t1: RZCxIssues.store(localStorage).load().items.length, q: RZHandoffCx.queue(localStorage).load().items.length,
+        msg: (document.getElementById('cxIsMsg') || document.querySelector('[id^="cxIs"][role="status"]') || {}).textContent || '' }; });
+    if (activeSet) {
+      ok('E4 Tier 3 set gains one issue "(RFS)", rev 2', res.n3 === 1 && res.rev === 2 && / \(RFS\)$/.test(res.title || ''), res);
+      ok('E4 Tier 1 register unchanged, queue empty', res.t1 === t1 && res.q === 0, res);
+      const ro = await xp.evaluate(() => { const b = document.getElementById('cxIsAdd'); const n0 = RZCxIssues.store(localStorage).load().items.length;
+        document.getElementById('cxIsTitle').value = 'Forced'; document.getElementById('cxIsForm').dispatchEvent(new Event('submit', { cancelable: true }));
+        return { disabled: !!(b && b.disabled), added: RZCxIssues.store(localStorage).load().items.length - n0, msg: document.getElementById('cxIsMsg').textContent }; });
+      ok('E6 Tier 1 register read-only while a Tier 3 set is active', ro.disabled && ro.added === 0 && /read-only/i.test(ro.msg), ro);
+      await xp.click('#cxRecDemo').catch(() => {}); await wait(200);
+      ok('E6 switching to Demo unlocks the Tier 1 form at once', (await xp.$eval('#cxIsAdd', (b) => b.disabled).catch(() => true)) === false);
+    } else {
+      ok('E5 Demo shown: nothing written, gap stays queued', res.n3 === 0 && res.rev === 1 && res.t1 === t1 && res.q === 1, res);
+      ok('E5 the refusal says why', /read-only/i.test(res.msg), res.msg);
+    }
+    await c3.close();
+  }
 
   for (const theme of ['dark', 'light']) {
     ({ ctx, p } = await rfsWithGaps(theme, 390));

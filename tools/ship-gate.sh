@@ -23,6 +23,8 @@ runs=0
 # Sharding: RZ_GATE_SHARD=i/n runs every n-th gate starting at i, so two shards can run at once on two browser lanes
 #   rz-lane -l 1 -- env RZ_GATE_SHARD=1/2 bash tools/ship-gate.sh --probe
 #   rz-lane -l 2 -- env RZ_GATE_SHARD=2/2 bash tools/ship-gate.sh --probe
+# Resume: RZ_GATE_FROM=N skips gates numbered below N (a run killed by its timeout continues where it stopped;
+#   the ship evidence is then the first log for gates < N plus this one).
 # Gate numbers stay global. Shard 1 also runs the non-gate checks and the probe. A tree ships only when EVERY shard passed.
 shard="${RZ_GATE_SHARD:-}"
 shard_i=1; shard_n=1
@@ -38,6 +40,7 @@ gate() {
   local name="$1"; shift
   runs=$((runs+1))
   if [ $(( (runs - 1) % shard_n )) -ne $(( shard_i - 1 )) ]; then skipped=$((skipped+1)); return 0; fi
+  if [ -n "${RZ_GATE_FROM:-}" ] && [ "$runs" -lt "$RZ_GATE_FROM" ]; then skipped=$((skipped+1)); return 0; fi   # resume after a killed run; the earlier gates' PASS lives in that run's log
   if [ -n "${RZ_GATE_LIST:-}" ]; then echo "GATE [$runs] $name"; return 0; fi   # list mode: name only, nothing runs
   echo
   echo "── [$runs] $name ──"
@@ -211,6 +214,11 @@ gate "anti-vibecode — hard-banned design tokens" node tools/audit-vibecode.mjs
 # (seeded 8px against a `> 8` ceiling) and nobody saw, the fourth instance of "a gate that exists but
 # is not wired". §A27–34 (the tells the owner found on the hub) are proven RED→GREEN here.
 gate "anti-vibecode fixtures — every detector RED on its seed, GREEN on the register" node --test tools/test-audit-vibecode.mjs
+# PRD-P22: the RENDERED scale. Computed font-size / spacing / radius at 1440 px against data/design-scale.json (generated
+# from design.md); a ratchet per page (tools/editorial-render-ratchet.json) that may only fall. A NEW page fails until it is
+# recorded: node tools/audit-editorial-render.mjs --add-new --page=<page>.
+gate "Render scale (P22) — fixture: 3 planted = 3 reported, on-scale twin 0, skip rules, +1 element = +1 on a real page, every page in the ratchet" node tools/test-audit-editorial-render.mjs
+gate "Render scale (P22) — no page rises above its ratchet of off-scale computed values (278 pages, 1440 px)" node tools/audit-editorial-render.mjs
 # auth.js injects its own stylesheet from a JS array, which audit-vibecode cannot read (static CSS only).
 # This reads the same array the browser gets, hover states included, and keeps the plaintext
 # manual-account path retired (v3.19.1).
@@ -318,6 +326,13 @@ gate "Calculator registry — data/calculators.json pages, fields and result sel
 gate "Calculator basis (P10) — 40 headline results on 6 calculators hooked, registry = fresh render at defaults, inputs measured, drawer by keyboard" node tools/test-calc-parameter-registry.mjs
 gate "Ask about this page (P21) — answers only from registry records + manual sections, every citation resolves, 20 hits / 10 honest misses / held-out, gated values withheld, text-only render, 15 pages" node tools/test-explain-ask.mjs
 gate "Embedded compute — hidden-iframe loop: fixture 2x, queue of one, refusals, timeout, real calculator, ?embed flag (F2)" node tools/test-embed-compute.mjs
+gate "Article embeds (P20A) — 9 calculators compact, every shown input moves its result, auto-height no inner scroll, P02 open link, cross-origin parent refused, 8 s fallback, 3 articles CLS <= 0.02 both themes" node tools/test-embed-article.mjs
+gate "datahallAI global map analyser (P09 FR-P09-1) — program/hoisted/implicit/window globals proven on known code; cross-block uses listed" node tools/test-report-datahall-globals.mjs
+gate "datahallAI tab loader (P09 FR-P09-2) — ordered load, single flight, cached success, retried failure, rz:tab-ready / rz:tab-error in a real browser" node tools/test-datahall-tab-loader.mjs
+gate "Reader journey (W6-1) — project, capex, roi, compare, pack, share link and offline reopen in one browser session" node tools/test-journey-w6.mjs
+gate "Console sweep (W6-3) — every page that loads a P-series module (list derived from script tags) opens with 0 page errors" node tools/test-console-sweep-p.mjs
+gate "Responsive sweep (W6-2) — every page that loads a P-series module, 360–1440 px, both themes: no sideways scroll, P surfaces inside the viewport" node tools/test-responsive-sweep-p.mjs
+gate "TIA theme toggle (PX X2, 0b gap) — toggle stores and applies; dark set before first paint" node tools/test-tia-theme.mjs
 gate "Scenario share links — #rzs= round trip on 11 calculators, schema parity, login-field filter, corrupted link, precedence (P02)" node tools/test-scenario-share-links.mjs
 gate "Register CSS — every page that declares data-rz-register loads a stylesheet carrying that register (P23)" node tools/test-register-css.mjs
 gate "Seeded uncertainty — no unseeded draws on the 11 calculators, page LCGs = engine sim.rng, 7 bands identical across fresh loads with their seed printed (P08)" node tools/test-seeded-uncertainty.mjs

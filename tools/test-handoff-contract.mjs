@@ -11,6 +11,11 @@
 // H4 tier-advisor "Size spares for this design" href = RZHandoff.url(tier, redundancy); follows the inputs;
 //    clicking it opens spares with that redundancy.
 // H5 both themes, 390 px: no horizontal overflow, the line and button fit; no page errors.
+// C4 FR-P13-5: data/calculators.json spares.handoff.project = RZHandoff.CONTRACTS.spares.project (project input -> contract param);
+//    fromProject() builds the query from the active project's inputs, skips params the link already carries.
+// H6 an active P01 project (Tier 4, SG) opens spares with 2N and the SG carrying rate, line "From project “…” · Tier 4 · SG".
+// H7 a project value the contract refuses (country NZ) is listed as ignored with its reason; the rest applies.
+// H8 the link wins: ?tier=2 with a Tier 4 project gives N+1; the project still supplies what the link lacks.
 // Run: node tools/test-handoff-contract.mjs [--base=http://127.0.0.1:PORT]
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
@@ -52,6 +57,11 @@ ok('C3 ten valid values applied', r.applied.length === 10 && r.ignored.length ==
 ok('C3 repeated param: first wins, second listed', (() => { const x = P('tier=3&tier=4'); return x.applied[0].value === 3 && x.ignored[0].reason.startsWith('repeated'); })());
 ok('C3 url() builds the contract URL', H.url(C, { from: 'tier', tier: 3, redundancy: 'n1' }) === 'spares-readiness-calculator.html?from=tier&tier=3&redundancy=n1');
 ok('C3 url() refuses tier=7', (() => { try { H.url(C, { tier: 7 }); return false; } catch (e) { return /tier=7/.test(e.message); } })());
+ok('C4 registry spares.handoff.project = RZHandoff.CONTRACTS.spares.project', !!C.project && JSON.stringify(reg && reg.handoff && reg.handoff.project) === JSON.stringify(C.project), [reg && reg.handoff && reg.handoff.project, C.project]);
+ok('C4 every project map target is a contract param', !!C.project && Object.values(C.project).every((v) => !!spec(v)));
+ok('C4 fromProject builds the contract query', typeof H.fromProject === 'function' && H.fromProject(C, { tier: 3, country: 'ID', it_load_kw: 1200, pue_design: 1.4 }) === 'tier=3&country=ID&itLoad=1200');
+ok('C4 fromProject skips params the link carries', typeof H.fromProject === 'function' && H.fromProject(C, { tier: 3, country: 'ID' }, ['tier']) === 'country=ID');
+ok('C4 a refused project value is ignored by the same parse', typeof H.fromProject === 'function' && (() => { const x = P(H.fromProject(C, { tier: 3, country: 'NZ' })); return x.applied.length === 1 && x.ignored[0].param === 'country' && /not one of/.test(x.ignored[0].reason); })());
 
 // ---- headless ----
 const puppeteer = require('puppeteer');
@@ -65,8 +75,10 @@ if (!base) {
   if (served !== readFileSync(join(ROOT, 'js/rz-version.js'), 'utf8')) { console.error('FAIL — ' + base + ' does not serve this tree'); if (server) server.kill(); process.exit(1); } }
 const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-dev-shm-usage', '--disable-audio-output'], protocolTimeout: 90000 });
 const errors = [];
-async function open(path, theme = 'dark', width = 1440) {
+async function open(path, theme = 'dark', width = 1440, project = null) {
   const p = await browser.newPage();
+  if (project) await p.evaluateOnNewDocument((pr) => { try { localStorage.setItem('rz_projects_v1', JSON.stringify({ v: 1, active: 'p1',
+    projects: { p1: { id: 'p1', name: pr.name, rev: 1, created_at: '2026-11-14T00:00:00Z', updated_at: '2026-11-14T00:00:00Z', inputs: pr.inputs, results: {}, overrides: {} } } })); } catch (e) {} }, project);
   await p.setViewport({ width, height: 900 });
   p.on('pageerror', (e) => errors.push(path + ': ' + e.message));
   await p.evaluateOnNewDocument((t) => { try { localStorage.setItem('theme', t); } catch (e) {} }, theme);
@@ -98,6 +110,26 @@ try {
   ok('H3 Clear removes tags', (await p.$$('[data-rz-handoff]')).length === 0);
   ok('H3 Clear keeps values', (await val(p, 's_carry_rate')) === carry && (await val(p, 'c1_redundancy')) === 'n1');
   ok('H3 line hidden after Clear', (await line(p)) === '');
+  await p.close();
+
+  p = await open(C.page, 'dark', 1440, { name: 'Batam DC1', inputs: { tier: 4, country: 'SG', it_load_kw: 1200 } });
+  let pl = await line(p);
+  ok('H6 project fills redundancy 2n', (await val(p, 'c1_redundancy')) === '2n', await val(p, 'c1_redundancy'));
+  ok('H6 project fills the SG carrying rate', (await val(p, 's_carry_rate')) === '22', await val(p, 's_carry_rate'));
+  ok('H6 line names the project and its values', pl === 'From project “Batam DC1” · Tier 4 · SG · itLoad 1200 kW Clear', pl);
+  ok('H6 project fields tagged', (await p.$$eval('[data-rz-handoff]', (els) => els.map((e) => e.id))).includes('c1_redundancy'));
+  await p.close();
+  p = await open(C.page, 'dark', 1440, { name: 'Wellington', inputs: { tier: 3, country: 'NZ' } });
+  const ig7 = await p.$eval('#carrierIgnored', (e) => ({ t: e.textContent, title: e.title, hidden: e.hidden })).catch(() => null);
+  ok('H7 refused project country listed with its reason', !!ig7 && !ig7.hidden && ig7.t === '1 ignored' && /^country=NZ: not one of/.test(ig7.title), ig7);
+  ok('H7 the valid project tier still applies (n1)', (await val(p, 'c1_redundancy')) === 'n1');
+  ok('H7 carrying rate untouched by the refused country', (await val(p, 's_carry_rate')) === (await p.evaluate(() => document.getElementById('s_carry_rate').defaultValue)));
+  await p.close();
+  p = await open(C.page + '?tier=2', 'dark', 1440, { name: 'Batam DC1', inputs: { tier: 4, country: 'SG' } });
+  ok('H8 the link tier wins over the project (n1, not 2n)', (await val(p, 'c1_redundancy')) === 'n1', await val(p, 'c1_redundancy'));
+  ok('H8 the project supplies what the link lacks (SG rate)', (await val(p, 's_carry_rate')) === '22');
+  pl = await line(p);
+  ok('H8 line names both sources', pl === 'From link · Tier 2 · project “Batam DC1” · SG Clear', pl);
   await p.close();
 
   p = await open('tier-advisor.html');

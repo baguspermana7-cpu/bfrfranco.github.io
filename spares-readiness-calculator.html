@@ -62,7 +62,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha384-iw3OoTErCYJJB9mCa8LNS2hbsQ7M3C0EpIsO/H5+EGAkPGc6rk+V8i04oW/K5xq0" crossorigin="anonymous">
 <!-- Chart.js loaded blocking (non-deferred) per site convention to avoid sync init issues -->
 <script src="js/vendor/chart.umd.min.js?v=20261110-74401d73"></script>
-<script src="js/rz-version.js?v=20261115-ceb424e4" defer></script>
+<script src="js/rz-version.js?v=20261115-39e50add" defer></script>
 <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
 <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
 <script src="js/spares-parts-catalog.js?v=20260920-1487b6d8" defer></script>    <meta property="og:image:alt" content="Critical Spares Engine | DC M&amp;E Spares Readiness Calculator">
@@ -87,9 +87,9 @@
 }
 </style>
     <link rel="stylesheet" href="css/rz-hub.css?v=20261015-f49c6a25">
-    <link rel="stylesheet" href="css/rz-tool.css?v=20261113-f5d687e4">
+    <link rel="stylesheet" href="css/rz-tool.css?v=20261114-55710c32">
 </head>
-<body class="hub tool" data-rz-calc="spares" data-rz-account-pill="off">
+<body class="hub tool" data-rz-calc="spares" data-rz-account-pill="off" data-rz-embed-keep-ids="presetSelect sum_readiness">
 <script>
 (function(){
   var t = localStorage.getItem('theme');
@@ -3540,7 +3540,8 @@
 <!-- Scripts -->
 <script src="auth.js?v=20261114-33c53edf" defer></script>
 <script src="rz-engine.min.js?v=20261114-fd034bc4" defer></script>
-<script src="js/rz-handoff.js?v=20261111-7561617b"></script>
+<script src="js/rz-handoff.js?v=20261115-b2ca3ff6"></script>
+<script src="js/rz-project.js?v=20261111-4db75da3"></script>
 <script src="script.min.js?v=20261101-0e062c54" defer></script>
 
 <script>
@@ -5137,6 +5138,16 @@ window.addEventListener('scroll', function() {
   var H = window.RZHandoff, contract = H && H.CONTRACTS.spares;
   var result = H ? H.parse(contract, window.location.search) : { applied: [], ignored: [] };
   var carrierParams = [], from = null, tagged = {};
+  // FR-P13-5: the active P01 project fills what the link does not carry, through the same contract parse.
+  var project = null, fromProj = { applied: [], ignored: [] };
+  try { if (H && window.RZProject) project = window.RZProject.createStore(window.localStorage).active(); } catch (e) { project = null; }
+  if (project && project.inputs) {
+    var onLink = result.applied.concat(result.ignored).map(function (x) { return x.param; });
+    fromProj = H.parse(contract, H.fromProject(contract, project.inputs, onLink));
+    result = { applied: result.applied.concat(fromProj.applied), ignored: result.ignored.concat(fromProj.ignored) };
+  }
+  var projParam = {};
+  fromProj.applied.forEach(function (a) { projParam[a.param] = true; });
 
   // Country → lead-time multiplier + carrying cost adjustment
   var countryLT = { US:1.0, GB:1.0, DE:1.05, FR:1.05, AU:1.15, IN:1.25, SG:1.10, ID:1.30, JP:1.10, BR:1.40, CN:0.90, MY:1.20 };
@@ -5174,7 +5185,11 @@ window.addEventListener('scroll', function() {
   if ('installedBase' in v) { setField('c1_installed', v.installedBase); setField('s_installed_base', v.installedBase); setField('h_sites', Math.min(v.installedBase, 50)); }
   if ('leadTime' in v) { ['r_lt_weeks', 's_lt_weeks', 'h_oem_lt', 'mc_lt_base'].forEach(function (id) { setField(id, v.leadTime); }); }
   if ('unitCost' in v) { ['s_unit_cost', 'h_unit_cost', 'ltb_unit_cost'].forEach(function (id) { setField(id, v.unitCost); }); }
-  order.forEach(function (k) { if (k in v) carrierParams.push(H.label(contract, k, v[k])); });
+  var projLabels = [];
+  order.forEach(function (k) { if (k in v) (projParam[k] ? projLabels : carrierParams).push(H.label(contract, k, v[k])); });
+  var linkCount = carrierParams.length;
+  if (projLabels.length) carrierParams.push('project \u201c' + project.name + '\u201d');
+  carrierParams = carrierParams.concat(projLabels);
 
   // Hash-based scenario restore (from shareScenario)
   var hash = window.location.hash;
@@ -5183,7 +5198,7 @@ window.addEventListener('scroll', function() {
       var snapStr = decodeURIComponent(hash.slice(3));
       var snap = JSON.parse(snapStr);
       applySnapshot(snap);
-      carrierParams.push('scenario restored from URL');
+      carrierParams.splice(linkCount, 0, 'scenario restored from URL'); linkCount++;
     } catch(e) { /* ignore malformed hash */ }
   }
 
@@ -5192,7 +5207,7 @@ window.addEventListener('scroll', function() {
   if ((carrierParams.length || result.ignored.length) && banner && bannerText) {
     // Short line; the explanation and the reasons live in the tooltips (owner 2026-11-12: less text).
     var src = from ? H.label(contract, 'from', from) : 'link';
-    bannerText.textContent = carrierParams.length ? 'From ' + src + ' · ' + carrierParams.join(' · ') : '';
+    bannerText.textContent = !carrierParams.length ? '' : linkCount ? 'From ' + src + ' · ' + carrierParams.join(' · ') : 'From ' + carrierParams.join(' · ');
     banner.title = 'Prefilled from a link. Edit any field to override; Clear removes the markers and keeps the values.';
     var ign = document.getElementById('carrierIgnored');
     if (ign && result.ignored.length) {
@@ -10266,6 +10281,7 @@ if(window.MutationObserver)new MutationObserver(m).observe(document.documentElem
 })();
 </script>
 <script src="js/rz-scenario.js?v=20261111-01011425"></script>
+<script src="js/rz-embed-article.js?v=20261113-ead525a4"></script>
 <script src="js/rz-manual-links.js?v=20261111-33875d8f" defer></script>
 <script src="js/rz-compare.js?v=20261111-a1ef3c69"></script><!-- P02: save/open/share links (rz-scenario) -->
 <script src="js/rz-sw-register.js?v=20261110-ce520462" defer></script>

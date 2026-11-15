@@ -65,8 +65,8 @@ This PRD moves each tab's builder code into a separate module that loads when th
 ## 8. Functional requirements
 | ID | Description | Acceptance |
 |---|---|---|
-| FR-P09-1 | Cross-block global map (which function and variable each block defines and uses) | report; no move before it |
-| FR-P09-2 | `tab-loader.js`: `ensureTab(id) → Promise`, single flight, retry | unit |
+| FR-P09-1 | Cross-block global map (which function and variable each block defines and uses) | report; no move before it  **DONE v3.61.0**: `tools/report-datahall-globals.mjs` → `05-test-evidence/P09-global-map.{json,md}` (7 inline blocks; B3 916 KB defines 70 names; cross-block reads B3←B5 `DHModal`, B5←B3, B6←B3, B7←B3; one implicit global `s` at line 9103 in the `#dashC` panel, which returns early because `#dashC` no longer exists — dead code, removed with its tab in stage 2). Analyser laws G1–G5 in the ship gate; G6 `--fresh` is run before each move stage |
+| FR-P09-2 | `tab-loader.js`: `ensureTab(id) → Promise`, single flight, retry | unit  **DONE v3.61.0**: `js/datahall-ai/tab-loader.js` (`RZDatahallTabLoader.create(registry)`), not yet loaded by the page — stage 1 wires it. `tools/test-datahall-tab-loader.mjs` T1–T6 + browser B1–B2 |
 | FR-P09-3 | Stage 1: move the 3 heaviest tab builders | gates green; bytes measured |
 | FR-P09-4 | Stage 2: the remaining tabs + modals (modals load with their tab) | gates green |
 | FR-P09-5 | Skeleton and error states | E2E |

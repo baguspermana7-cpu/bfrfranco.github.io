@@ -85,6 +85,10 @@ try {
 
   /* GREEN — the declared reveal opens the drill-down, and what it opens is legible. */
   await activateTab(page, set, floor);
+  /* RZSvgLegible fits on a 120 ms throttle after the drill-down's class change; under load the first frame
+     can come before it. Wait for the fit (bounded) — a reveal that is never registered still fails below. */
+  await page.waitForFunction(() => Number((document.getElementById('floorSvg') || {}).getAttribute?.('data-rz-legible-scale')) > 1,
+    { timeout: 5000 }).catch(() => {});
   const shown = await page.evaluate(() => {
     const svg = document.getElementById('floorSvg');
     let min = Infinity, under = 0, total = 0;
@@ -132,6 +136,8 @@ try {
     await small.goto(`${base}/datahallAI.html`, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await enterAuthorizedAuditState(small, set.cockpit);
     await activateTab(small, set, set.diagrams.find((d) => d.selector === '#hSvg'));
+    await small.waitForFunction(() => Number((document.querySelector('#hSvg') || {}).getAttribute?.('data-rz-legible-scale')) > 1,
+      { timeout: 5000 }).catch(() => {});   /* RZSvgLegible fits on a 120 ms throttle — wait for it, the asserts below still judge */
     const m = await small.evaluate(() => {
       const svg = document.querySelector('#hSvg');
       const pane = svg.parentElement;

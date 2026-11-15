@@ -10,6 +10,10 @@
  *   RZHandoffCx.sources(storage)        -> { get(issueId), all(), put(issueId, rec) }   key rz-cx-issue-sources
  *   RZHandoffCx.safeUrl(url)            -> url when it is a same-origin RFS anchor, else null
  * The Tier 1 issue schema has no source field, so the RFS link lives in the side map (FR-P13-7).
+ *   RZHandoffCx.target({mode, sets})   -> 'tier1' (no Tier 3 set) | 'tier3' (a set is active) | 'demo' (sets exist, Demo shown)
+ *   RZHandoffCx.workspaceRegister(getDb, write, ops, now) -> a register for intake() that writes a Tier 3 issue through
+ *                                          RZCxWorkspace.write (P06 C3): severity A/B/C → critical/major/minor, blocking the
+ *                                          queued gate on the first asset of the queued system; no such asset → NO_ASSET.
  * Duplicate guard (FR-P13-8): a gap_id already in the queue or already intaken is refused with code DUP.
  */
 (function (root, factory) {
@@ -112,6 +116,27 @@
     return { added: added, refused: refused };
   }
 
-  return { KEY: KEY, SRC_KEY: SRC_KEY, MAX: MAX, TTL_MS: TTL_MS, SYSTEM_MAP: SYSTEM_MAP, SEVERITY_MAP: SEVERITY_MAP,
+  /* P06 C3: the intake follows the active Cx tier */
+  var SEV3 = { A: 'critical', B: 'major', C: 'minor' };
+  function target(info) {
+    if (!info || !info.sets) return 'tier1';
+    return info.mode && info.mode !== 'demo' ? 'tier3' : 'demo';
+  }
+  function workspaceRegister(getDb, write, ops, now) {
+    return {
+      add: function (f) {
+        var db = getDb(), asset = null, i;
+        if (!db || !db.assets) return { ok: false, code: 'NO_SET' };
+        for (i = 0; i < db.assets.length; i++) if (db.assets[i].system_id === f.system) { asset = db.assets[i]; break; }
+        if (!asset) return { ok: false, code: 'NO_ASSET' };
+        var r = write(ops.addIssue({ title: f.title, severity: SEV3[f.severity] || 'minor', asset_id: asset.id, blocking: true, level: f.gate, source: 'rfs' }, now ? now() : null));
+        if (!r || !r.ok) return { ok: false, code: r && r.refused && r.refused[0] ? r.refused[0].law : 'ERROR' };
+        var iss = r.set.db.issues;
+        return { ok: true, issue: { id: iss[iss.length - 1].id } };
+      }
+    };
+  }
+
+  return { target: target, workspaceRegister: workspaceRegister, KEY: KEY, SRC_KEY: SRC_KEY, MAX: MAX, TTL_MS: TTL_MS, SYSTEM_MAP: SYSTEM_MAP, SEVERITY_MAP: SEVERITY_MAP,
            fromGap: fromGap, queue: queue, intake: intake, sources: sources, safeUrl: safeUrl };
 });

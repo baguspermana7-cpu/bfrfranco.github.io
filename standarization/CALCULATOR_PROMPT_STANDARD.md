@@ -714,3 +714,17 @@ Before declaring a calculator complete, verify every item:
 
 *Cross-reference: PRO_MODE_STANDARDIZATION.md | PDF_EXPORT_STANDARD.md | AUTH_STANDARD.md | TOOLTIP_STANDARD.md*
 *For active article registry, see PRO_MODE_STANDARDIZATION.md §2.*
+
+## Article embeds (`?embed=article`, PRD-P20 Part A, v3.61.0)
+
+A calculator that may be embedded in an article declares it twice, and the two must agree:
+`data/calculators.json` → `"embed": {"keep": [ids]}` and `<body data-rz-embed-keep-ids="…">` on the page,
+plus `js/rz-embed-article.js` loaded after `js/rz-scenario.js`. `keep` lists the inputs the reader may
+change and the ONE headline result; each kept input must move that result (law A9 — an input that does
+not move the headline is not a demo). A page where no input moves one headline value (a checklist) is
+not embedded: `"keep": [], "excluded": "<reason>"`. The embed view hides every other unit, adds
+"Try it: <title>" and an "Open the full calculator" link carrying the scenario, and posts its height.
+Opened top-level it redirects to the full page; framed by another origin it shows a link only.
+The article side (`js/rz-embed.js`) reserves height from the input count before load, loads on approach
+(1600 px), accepts size messages only from its own frame and origin, and replaces the frame with a
+sentence and a plain link if no size message arrives in 8 s. Laws A0–A10: `tools/test-embed-article.mjs`.

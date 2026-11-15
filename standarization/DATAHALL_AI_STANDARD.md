@@ -847,3 +847,14 @@ below 1,200 px; no decorative animation on a monitoring diagram. Every block car
 tier-2 modal (`#bmsModal`): identity, protocol and transport with port, points and poll interval, what it
 serves, failure domain, alarm-priority mapping, and an AUTHORITY section on every panel stating that the
 cockpit is monitor-only. Specification cards state the monitoring contract, never a list of vendor names.
+
+## Per-tab loading — groundwork (PRD-P09 FR-P09-1/2, v3.61.0)
+
+No inline block moves into a tab module until the cross-block global map is regenerated for the page as it is now:
+`node tools/report-datahall-globals.mjs` writes `documentation/product-transformation/05-test-evidence/P09-global-map.{json,md}`
+(per block: names defined at program level, hoisted `var`, implicit globals with their line, `window.X` writes; free
+reads; which other block each read comes from). `node tools/test-report-datahall-globals.mjs --fresh` must pass before
+a move stage. A move keeps every cross-block name reachable from where it is read.
+Tab modules load through `js/datahall-ai/tab-loader.js`: `RZDatahallTabLoader.create({tab: [urls]}).ensureTab(id)` loads
+in order, once (single flight), announces `rz:tab-ready` {id} on `document`, and on failure announces `rz:tab-error`
+{id, url} without caching the failure, so the next activation retries. Gates wait for `rz:tab-ready`, never a timer.

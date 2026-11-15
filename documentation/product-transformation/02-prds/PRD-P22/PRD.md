@@ -5,7 +5,7 @@
 |---|---|
 | PRD id | PRD-P22 |
 | Version | 1.0, 2026-11-10 |
-| Status | Approved (directive) |
+| Status | **SHIPPED v3.61.0** — `tools/audit-editorial-render.mjs` + `data/design-scale.json` (generated from design.md) + ratchet `tools/editorial-render-ratchet.json` (278 pages, may only fall); laws E1–E5 in `tools/test-audit-editorial-render.mjs` |
 | Priority | Wave 5 (hardening) |
 | Modules | new `tools/audit-editorial-render.mjs`; `documentation/design.md` scale tables; `ship-gate.sh` |
 
@@ -97,7 +97,7 @@ Puppeteer walker → counts → ratchet compare.
 - Run on 5 representative pages and review the false positives by hand (memory: render-audit false positives) before trusting the baseline.
 
 ## 21. Acceptance criteria
-- **Given** a fixture with a 13.37 px font, **then** it is reported.
+- **Given** a fixture with a 17.3 px font, **then** it is reported. (Revised at build: the original 13.37 px example sits 0.37 px from the 13 px step, inside the 0.5 px tolerance, so a correct gate must NOT report it.)
 - **Given** the current tree, **then** the gate passes, and adding one off-scale element to any page fails it.
 
 ## 22. Rollout

@@ -168,6 +168,12 @@ Traps catalogued in memory: pue.defaultFor key mismatch (use pueMatrix direct), 
 - The spares contract lives once in `data/calculators.json` → `spares.handoff` and is mirrored in the module; the gate
   asserts they are equal, that every target field exists, and that the enums equal the page's own option lists.
   Breaking the URL contract needs a version param (`hv=2`). LTC's incident links use the same contract (`from=incident`).
+- The active P01 project prefills the spares page too (FR-P13-5, v3.61.0), and only through the same contract:
+  `spares.handoff.project` maps project inputs to contract params (`tier`, `country`, `it_load_kw` → `itLoad`),
+  `RZHandoff.fromProject()` turns them into a query, and that query goes through `parse()` like any link — a project
+  value the contract refuses (a country outside the list) is listed as ignored with its reason. A param already on the
+  link wins; the project supplies only what the link lacks. The line names both sources ("From link · Tier 2 ·
+  project “Batam DC1” · SG"). Gate: `tools/test-handoff-contract.mjs` C4, H6–H8.
 - `mtbf` is in years (the spares field is an annual failure rate); `tier` 1–4 maps to redundancy n / n1 / n1 / 2n and an
   explicit `redundancy` wins.
 - Visible text is short ("From Tier Advisor · Tier 3 · N+1 · ID", "1 ignored"); the reasons and the how-to are tooltips.
@@ -175,6 +181,10 @@ Traps catalogued in memory: pue.defaultFor key mismatch (use pueMatrix direct), 
   (`js/rz-handoff-cx.js`: max 100, 7-day expiry, duplicate guard by `unitId:reqId` across the queue and the intaken
   issues). Cx adds it through `RZCxIssues.store().add()` with the UI's own store instance (its cache), never by writing
   the key; the back-link lives in `rz-cx-issue-sources` because the Tier 1 schema has no source field.
+- The intake follows the active Cx tier (PRD-P06 C3, v3.61.0): no Tier 3 record set → the Tier 1 register
+  (`RZCxIssues`); a set active → that set's `issues`, through `RZCxWorkspace.write` so the refusal laws apply, and the
+  Tier 1 register is read-only (form and row actions disabled, the reason on screen); sets exist but Demo is shown →
+  refused, nothing written, the gap stays queued. Gate: `tools/test-handoff-cx.mjs` U5–U6, E4–E6.
 - Gates: `tools/test-handoff-contract.mjs`, `tools/test-handoff-cx.mjs`. Not yet: project → spares (spares and tier do
   not load `rz-project.js`).
 

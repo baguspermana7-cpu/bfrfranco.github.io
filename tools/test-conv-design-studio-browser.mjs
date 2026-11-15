@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { extname, resolve, sep } from 'node:path';
 import puppeteer from 'puppeteer';
+import { isSupabaseModule, signedInStorage, signedInSupabaseBody } from './lib/signed-in-supabase.mjs';
 import { createRequire as __rzRequire } from 'node:module';
 const ENGINE_PUBLISHED_VERSION = (() => {
   const m = __rzRequire(import.meta.url)(process.cwd() + '/js/conv-engine.js');
@@ -91,6 +92,11 @@ async function openCockpit(browser, origin) {
   await page.setRequestInterception(true);
   page.on('request', (request) => {
     const url = request.url();
+    /* v3.61: a signed-in educator via the Supabase module (a forged localStorage role is ignored since v3.57.7) */
+    if (isSupabaseModule(url)) {
+      request.respond({ status: 200, contentType: 'text/javascript', body: signedInSupabaseBody({ email: 'educator@resistancezero.com', tier: 'pro', educator: true }) });
+      return;
+    }
     if (url.startsWith(origin) || url.startsWith('data:')) {
       request.continue();
       return;
@@ -113,13 +119,9 @@ async function openCockpit(browser, origin) {
       }
       return browserFetch(input, init);
     };
-    localStorage.setItem('rz_premium_session', JSON.stringify({
-      email: 'educator@resistancezero.com',
-      tier: 'pro',
-      role: 'educator',
-      expires: '2099-12-31T23:59:59.000Z',
-    }));
   });
+  await page.evaluateOnNewDocument((entries) => entries.forEach(([k, v]) => localStorage.setItem(k, v)),
+    signedInStorage({ email: 'educator@resistancezero.com', tier: 'pro', role: 'educator' }));
   await page.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
   await page.goto(`${origin}/dc-conventional.html`, {
     waitUntil: 'domcontentloaded',

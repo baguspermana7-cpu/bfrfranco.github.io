@@ -39,6 +39,7 @@ EXCLUDED_DIRS = {
     'Automation',
     '__pycache__',
     'dc-corpus',   # crawl raw artifacts (tools/dc-corpus/raw/*.html) — not site pages
+    'fixtures',    # gate fixtures (tools/fixtures/**) — test inputs, not site pages
 }
 
 
