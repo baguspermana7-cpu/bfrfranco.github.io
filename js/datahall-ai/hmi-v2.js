@@ -435,6 +435,8 @@
       if (/psu|power|shelf/.test(String(type))) { drawRackPower('rack-power'); return; }
       if (String(type) === 'ct') { drawRackPower('tray', { id: arguments[1] }); return; }
       if (String(type) === 'ns') { drawRackPower('nvswitch-tray', { id: arguments[1] }); return; }
+      var RCLS = { manifold: 'rack-manifold', busbar: 'rack-busbar', leak: 'rack-leak', backplane: 'rack-busbar' };
+      if (RCLS[String(type)]) { drawRackPower('dh-r-101', { focusCls: RCLS[String(type)] }); return; }   // the rack elevation with the opened item selected (was text cards)
       // compute / switch tray block diagrams still draw in the legacy svg: bring it back, drop the shelf sheet
       var svg0 = doc.getElementById('rackModalSvg'), h = svg0 && svg0.parentNode.querySelector('.hmi-host[data-hmi-sheet="rack-l3"]');
       if (svg0) svg0.removeAttribute('data-dh2-retired'); if (h) h.remove(); if (pageSheets['rack-l3']) { pageSheets['rack-l3'].destroy(); pageSheets['rack-l3'] = null; }
@@ -505,7 +507,12 @@
     if (!host) { host = el('div', { class: 'hmi-host', 'data-hmi-sheet': 'rack-l3' }); par.insertBefore(host, svg0); }
     svg0.setAttribute('data-dh2-retired', '');
     if (pageSheets['rack-l3']) { pageSheets['rack-l3'].destroy(); pageSheets['rack-l3'] = null; }
-    host.innerHTML = ''; pageSheets['rack-l3'] = win.RZHmiSheet.render(host, sheet, sheetOpts());
+    if (which === 'dh-r-101') sheet.svgId = 'rackL3Svg';   // the Rack tab draws the same sheet as hmiRackSvg: no duplicate id
+    host.innerHTML = ''; var api = pageSheets['rack-l3'] = win.RZHmiSheet.render(host, sheet, sheetOpts());
+    if (o && o.focusCls) setTimeout(function () {
+      var g = api.svg.querySelector('.hmi-node[data-rz-equipment^="' + o.focusCls + ':"]');
+      if (g) { g.setAttribute('data-selected', ''); if (g.scrollIntoView) g.scrollIntoView({ block: 'center', inline: 'nearest' }); }
+    }, 60);
   }
   function drawMimic(type, dh) {
     var body = doc.querySelector('#sldMimic .sld-mimic-body'), snap = win.DCAI_CALC && win.DCAI_CALC.snapshot;

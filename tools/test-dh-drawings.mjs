@@ -23,6 +23,7 @@
  * F10-F14 interlocks sheet DH-F-103 (Cause & effect view): one control module per system the C&E matrix commands,
  *     nothing marked at rest, a running training event marks exactly the systems the C&E engine has due / pending /
  *     blocked for that event and zone, Stop returns every module to normal
+ * S1  returning to the DC Dashboard tab raises no page error
  * M1  every BMS block kind (server, ring switch, gateway, LDC, controller) opens with its own L3 schematic
  * M2  a fire zone click opens its detection schematic with every device of the zone; Shift+click keeps the inspector
  * M3  the battery modal draws its L3 sheet
@@ -301,6 +302,13 @@ await pg.evaluate(() => { try { localStorage.removeItem('rz_hmi_shade'); } catch
 law('H15', !!sh0 && sh0.mode === 'deep' && sh0.defs && /url\(/.test(sh0.fill) && sh0.btn && sh1.mode === 'flat' && !/url\(/.test(sh1.fill) && sh1.tube === 'none' && sh2 === 'flat',
   `shade default ${sh0 && sh0.mode} (body fill ${sh0 && sh0.fill.slice(0, 18)}), after Shade off: ${sh1.mode} fill ${sh1.fill.slice(0, 18)} tubes ${sh1.tube}, after reload ${sh2}`);
 
+// ── S1 back to the dashboard: the tab handler repaints the DC Dashboard on the way in without a page error (it called
+// updateDashKPI, defined inside its panel IIFE: ReferenceError on every return since v3.11.8) ─────────────────────
+const e0 = pg.errors.length;
+await showSheet(pg, 'cool', null); await showSheet(pg, 'dash', null); await wait(600);
+const dashErr = pg.errors.slice(e0);
+law('S1', dashErr.length === 0, `return to DC Dashboard: page errors ${dashErr.length}${dashErr.length ? ' — ' + dashErr[0].slice(0, 120) : ''}`);
+
 // ── M1 BMS modals: every block kind of DH-B-101 opens with its own L3 schematic above the specification tables
 // (owner "modalnya cuma tulisan"; until v3.63.0 only the controller drew one) ─────────────────────────────────────────
 await showSheet(pg, 'bms', null); await wait(1500);
@@ -368,11 +376,11 @@ for (const [cls, [tab, sub]] of classes) {
     await new Promise((res) => setTimeout(res, 900));
     const m = [...document.querySelectorAll('[data-rz-modal-class], dialog[open], [role=dialog], .hmi-modal-back:not([hidden]), [aria-modal="true"]')]
       .filter((d) => d.getBoundingClientRect().width > 0 && getComputedStyle(d).visibility !== 'hidden');
-    const mine = m.find((d) => d.getAttribute('data-rz-modal-class') === cls || d.querySelector('.hmi-host svg.hmi-svg'));
+    const mine = m.find((d) => d.getAttribute('data-rz-modal-class') === cls || d.querySelector('.hmi-host svg.hmi-svg, .hmi-m-draw svg.hmi-svg'));
     const p = m.reduce((a, d) => a + paint(d), 0);
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     m.forEach((d) => { const x = d.querySelector('[aria-label*="Close" i], .close, [data-close]'); if (x) x.click(); });
-    return { cls, own: !!mine, sym: mine ? mine.querySelectorAll('.hmi-host .hmi-node [data-sym]').length : 0, paint: p };
+    return { cls, own: !!mine, sym: mine ? mine.querySelectorAll('svg.hmi-svg .hmi-node [data-sym]').length : 0, paint: p };
   }, cls, PROBE.paint.toString());
   await wait(250);
   modalPaint += r.paint || 0;

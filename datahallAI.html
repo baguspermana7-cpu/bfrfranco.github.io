@@ -1934,7 +1934,7 @@ if(el)el.classList.add('on');
 if(window.RZDefer)RZDefer.ensure(t);
 /* A panel whose body is a live tick is as old as the moment the reader left it — repaint on the way in. */
 if(t==='elec'&&window.__rzTickElec)window.__rzTickElec();
-if(t==='dash')updateDashKPI();
+if(t==='dash'&&typeof window.updateDashKPI==='function')window.updateDashKPI();   /* defined inside its panel IIFE: called bare it threw a ReferenceError on every return to the dashboard (since v3.11.8) */
 const FW=window.RZDatahallAIFireWorkstation;if(t==='fire'&&FW&&FW.render)FW.render();});
 /* v2.13.0 §A7 — network sub-tabs: own bar, own class names, own handler (never .et/.ep). */
 (function(){var bar=$('netTabs');if(!bar)return;
@@ -8934,6 +8934,7 @@ callEl.innerHTML=ch;
 // AI-ACC-01/02/03/07: basis KPIs (PUE/WUE/CUE/IT) MUST be deterministic and engine-derived.
 // Sensor-class jitter (TCS sensors, people count, outdoor weather, alarm count) stays
 // random per reviewer's explicit allowance (doc-26 §AI-ACC-07 "Allowed behavior").
+window.updateDashKPI=function(){return updateDashKPI();};   /* the tab handler repaints the dashboard on the way in */
 function updateDashKPI(){
 /* v3.11.7 — every id below is inside #p-dash or drawn by its own builder; none is page-wide, so
    this whole function is skipped while the reader is on another tab. It is called again on
