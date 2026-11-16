@@ -425,7 +425,11 @@
       if (map[t]) drawInPageModal('eqHmi', 'eqHmiSvg', 'eq-l3', map[t][0], map[t][1]);
     });
     wrapOpener('net', function (kind, id) { if (/^(core|spine|leaf)$/.test(String(kind))) drawAtBodyTop('netModalBody', 'net-l3', 'switch', { kind: kind, id: id }); });
-    wrapOpener('bms', function (kind, id) { if (kind === 'controller' && win.BMS_MODEL) drawAtBodyTop('bmsModalBody', 'bms-l3', 'bms-controller', { bms: win.BMS_MODEL, id: id }); });
+    wrapOpener('bms', function (kind, id) {
+      if (!win.BMS_MODEL) return;
+      if (kind === 'controller') drawAtBodyTop('bmsModalBody', 'bms-l3', 'bms-controller', { bms: win.BMS_MODEL, id: id });
+      else if (/^(server|network|gateway|ldc)$/.test(String(kind || 'server'))) drawAtBodyTop('bmsModalBody', 'bms-l3', 'bms-node', { bms: win.BMS_MODEL, kind: String(kind || 'server'), id: id });   // the spec tables stay below the schematic
+    });
     wrapOpener('rack', function (type) {
       if (/psu|power|shelf/.test(String(type))) { drawRackPower('rack-power'); return; }
       if (String(type) === 'ct') { drawRackPower('tray', { id: arguments[1] }); return; }

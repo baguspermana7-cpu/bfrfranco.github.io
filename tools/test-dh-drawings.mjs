@@ -22,6 +22,7 @@
  * F10-F14 interlocks sheet DH-F-103 (Cause & effect view): one control module per system the C&E matrix commands,
  *     nothing marked at rest, a running training event marks exactly the systems the C&E engine has due / pending /
  *     blocked for that event and zone, Stop returns every module to normal
+ * M1  every BMS block kind (server, ring switch, gateway, LDC, controller) opens with its own L3 schematic
  * F15-F18 zone map DH-F-104 (Zones view): every zone of the hall once, means available / total = the isolation
  *     register, a zone isolated below two means shows its alarm (and only it), Clear restores
  * H7-H10, H14 (geometry, engine binding, trace, colour, a11y) land with the phases that build them.
@@ -296,6 +297,23 @@ await iso.close();
 await pg.evaluate(() => { try { localStorage.removeItem('rz_hmi_shade'); } catch (e) { /* none */ } });
 law('H15', !!sh0 && sh0.mode === 'deep' && sh0.defs && /url\(/.test(sh0.fill) && sh0.btn && sh1.mode === 'flat' && !/url\(/.test(sh1.fill) && sh1.tube === 'none' && sh2 === 'flat',
   `shade default ${sh0 && sh0.mode} (body fill ${sh0 && sh0.fill.slice(0, 18)}), after Shade off: ${sh1.mode} fill ${sh1.fill.slice(0, 18)} tubes ${sh1.tube}, after reload ${sh2}`);
+
+// ── M1 BMS modals: every block kind of DH-B-101 opens with its own L3 schematic above the specification tables
+// (owner "modalnya cuma tulisan"; until v3.63.0 only the controller drew one) ─────────────────────────────────────────
+await showSheet(pg, 'bms', null); await wait(1500);
+const bmsM = await pg.evaluate(async () => {
+  const out = [], M = window.BMS_MODEL, O = window.RZDatahallAIHmiOpeners; if (!M || !O || !O.bms) return [{ kind: 'opener', ok: false }];
+  const pick = { server: M.server[0].id, network: M.ring[2].id, gateway: M.gateway[2].id, ldc: M.ldc[1].id, controller: M.plc[0].id };
+  for (const k of Object.keys(pick)) {
+    O.bms(k, pick[k]); await new Promise((r) => setTimeout(r, 400));
+    const sv = document.querySelector('#bmsModalBody .hmi-host[data-hmi-sheet="bms-l3"] svg');
+    const syms = sv ? [...sv.querySelectorAll('.hmi-node [data-sym]')].length : 0, mine = sv ? !!sv.querySelector(`[data-rz-equipment$=":${pick[k]}"]`) : false;
+    out.push({ kind: k, ok: !!sv && syms >= 3 && mine && sv.getBoundingClientRect().width > 0, syms, mine });
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await new Promise((r) => setTimeout(r, 200));
+  }
+  return out;
+});
+law('M1', bmsM.every((x) => x.ok), 'BMS modal kinds with an L3 schematic holding the opened block: ' + bmsM.map((x) => `${x.kind} ${x.ok ? 'ok' : 'NO'} (${x.syms || 0} symbols${x.mine ? '' : ', opened block not drawn'})`).join(', '));
 
 // ── H3 + H1 modals: every equipment class opens its own modal ───────────────────────────────────────────────────
 const classes = new Map();

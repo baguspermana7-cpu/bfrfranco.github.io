@@ -999,6 +999,67 @@
     return finish(s);
   }
 
+  /* ── L3 for the other BMS blocks of DH-B-101 (owner: "modalnya cuma tulisan"): the opened block drawn with what it
+     connects to, from the page BMS model (an authored architecture, like DH-B-101 itself) — server pair on the core,
+     the supervisory ring with the opened switch, a protocol gateway between its field bus and the IP network, a
+     local display controller on its ring switch. ────────────────────────────────────────────────────────────────── */
+  function bmsNodeL3(snap, o) {
+    var M = o && o.bms, kind = o && o.kind, id = String((o && o.id) || ''), R = (M && M.ring) || [];
+    if (!M || !R.length) throw new Error('hmi-sheets: BMS sheet needs the page BMS model');
+    var core = R.filter(function (r) { return r.id === 'CORE'; })[0] || R[0];
+    var at = function (place) { var p = String(place || '').toLowerCase(); return R.filter(function (r) { var q = String(r.at).toLowerCase(); return q.indexOf(p) >= 0 || p.indexOf(q) >= 0; })[0] || null; };
+    var s, up = function (from, x, y) { var u = s.n({ id: 'up', tag: 'DH-B-101', name: 'SUPERVISORY RING', sym: 'offSheet', x: x, y: y, size: 22, rot: 180, tagAt: 'below', label: 'The BMS supervisory ring and its other blocks (sheet DH-B-101)' }); s.e(from, u + '.port', 'data', { w: 'branch' }); };
+    if (kind === 'server') {
+      var sv = M.server || [];
+      s = Sheet({ id: 'bms-server', no: 'BMS-SRV', title: 'BMS SERVERS', size: [900, 380], svgId: 'bmsL3Svg' });
+      s.legend = [['data', 'BMS NETWORK']]; s.legendAt = [700, 14];
+      var c0 = s.n({ id: 'core', tag: core.id, name: String(core.at).toUpperCase(), sym: 'netSwitch', x: 450, y: 90, size: 34, cls: 'bms-network', eqId: core.id, tagAt: 'right' });
+      sv.forEach(function (v, i) {
+        var x = 300 + i * 300, n = s.n({ id: 'sv' + i, tag: v.id, name: String(v.role).toUpperCase() + ' · ' + String(v.at).toUpperCase(), sym: 'netServer', x: x, y: 260, size: v.id === id ? 56 : 44, cls: 'bms-server', eqId: v.id, tagAt: 'below' });
+        s.e(c0, n, 'data', { w: 'main', via: [[450, 170], [x, 170]] });
+      });
+      if (sv.length > 1) s.e('sv0', 'sv1', 'data', { w: 'signal', line: 'HEARTBEAT / REPLICATION' });
+      up(c0, 120, 90);
+      return finish(s);
+    }
+    if (kind === 'network') {
+      var k = Math.max(0, R.map(function (r) { return r.id; }).indexOf(id)), Rn = R.length, cx = 450, cy = 250, rx = 330, ry = 150;
+      s = Sheet({ id: 'bms-ring', no: 'BMS-NET', title: 'SUPERVISORY RING', size: [900, 480], svgId: 'bmsL3Svg' });
+      s.legend = [['data', 'RING (FIBRE)']]; s.legendAt = [700, 14];
+      R.forEach(function (r, i) {
+        var a = -Math.PI / 2 + i * 2 * Math.PI / Rn, x = Math.round(cx + rx * Math.cos(a)), y = Math.round(cy + ry * Math.sin(a));
+        s.n({ id: 'sw' + i, tag: r.id, name: String(r.at).toUpperCase(), sym: r.id === 'CORE' ? 'netRouter' : 'netSwitch', x: x, y: y, size: i === k ? 40 : 30, cls: 'bms-network', eqId: r.id, tagAt: x < cx - 10 ? 'left' : x > cx + 10 ? 'right' : (y < cy ? 'above' : 'below') });
+      });
+      for (var i2 = 0; i2 < Rn; i2++) s.e('sw' + i2, 'sw' + ((i2 + 1) % Rn), 'data', { w: 'bus' });
+      s.focusId = 'sw' + k;
+      return finish(s);
+    }
+    if (kind === 'gateway') {
+      var gw = (M.gateway || []).filter(function (g) { return g.id === id; })[0] || (M.gateway || [])[0]; if (!gw) throw new Error('hmi-sheets: no gateway in the BMS model');
+      s = Sheet({ id: 'bms-gw', no: gw.tag, title: 'GATEWAY ' + String(gw.id).toUpperCase(), size: [900, 340], svgId: 'bmsL3Svg' });
+      s.legend = [['data', 'IP NETWORK'], ['signal', 'FIELD BUS']]; s.legendAt = [700, 14];
+      var fld = s.n({ id: 'fld', tag: 'FIELD', name: String(gw.from).toUpperCase(), sym: 'bmsController', x: 130, y: 200, size: 44, tagAt: 'below', label: 'Field devices speaking ' + gw.from });
+      var g = s.n({ id: 'gw', tag: gw.tag, name: String(gw.id).toUpperCase() + ' → ' + String(gw.to).toUpperCase(), rating: gw.port + ' · POLL ' + String(gw.poll).toUpperCase(), sym: 'netRouter', x: 430, y: 200, size: 44, cls: 'bms-gateway', eqId: gw.id, tagAt: 'below' });
+      var sw = s.n({ id: 'sw', tag: core.id, name: String(core.at).toUpperCase(), sym: 'netSwitch', x: 720, y: 200, size: 34, cls: 'bms-network', eqId: core.id, tagAt: 'below' });
+      s.e(fld, g, gw.tag === 'native' || gw.tag === 'network' ? 'data' : 'signal', { w: gw.tag === 'native' || gw.tag === 'network' ? 'branch' : 'signal', line: String(gw.from).toUpperCase() });
+      s.e(g, sw, 'data', { w: 'main', line: String(gw.to).toUpperCase() });
+      up(sw, 720, 70);
+      return finish(s);
+    }
+    if (kind === 'ldc') {
+      var l = (M.ldc || []).filter(function (x) { return x.id === id; })[0] || (M.ldc || [])[0]; if (!l) throw new Error('hmi-sheets: no LDC in the BMS model');
+      var ls = at(l.at) || core;
+      s = Sheet({ id: 'bms-ldc', no: l.id, title: 'LOCAL DISPLAY ' + l.id, size: [900, 340], svgId: 'bmsL3Svg' });
+      s.legend = [['data', 'BMS NETWORK']]; s.legendAt = [700, 14];
+      var p = s.n({ id: 'ldc', tag: l.id, name: String(l.panel).toUpperCase(), rating: String(l.at).toUpperCase(), sym: 'instPanel', x: 250, y: 200, size: 48, cls: 'bms-ldc', eqId: l.id, tagAt: 'below' });
+      var lsw = s.n({ id: 'sw', tag: ls.id, name: String(ls.at).toUpperCase(), sym: ls.id === 'CORE' ? 'netRouter' : 'netSwitch', x: 600, y: 200, size: 34, cls: 'bms-network', eqId: ls.id, tagAt: 'below' });
+      s.e(p, lsw, 'data', { w: 'main' });
+      up(lsw, 600, 70);
+      return finish(s);
+    }
+    throw new Error('hmi-sheets: no BMS sheet for kind ' + kind);
+  }
+
   /* ── SLD mimic modal: the one feed (A or B) of the opened device, drawn by the DH-E-101 feed builder at full size —
      states from the electrical scenario engine like the hall sheet; the modal zooms to the device that was opened. ── */
   var MIMIC_FOCUS = { 'mv-sub': 'cb-mv', rmu: 'cb-mv', tx: 'tx', msb: 'cb-lv', 'ups-a': 'inv', 'ups-b': 'inv', busway: 'qbw', 'rack-psu': 'tap', cooling: 'cb-lv' };
@@ -1250,7 +1311,7 @@
     return finish(s);
   }
 
-  var BUILDERS = { 'dh-m-103': dhM103, cdu: cduSheet, 'dh-e-101': dhE101, 'dh-r-101': dhR101, 'dh-f-101': dhF101, 'dh-e-001': dhE001, 'dh-n-101': dhN101, 'dh-a-101': dhA101, 'dh-b-101': dhB101, 'dh-n-102': dhN102, 'dh-n-104': dhN104, 'dh-m-102': dhM102, 'dh-m-104': dhM104, 'dh-m-101': dhM101, chiller: chillerL3, crah: crahL3, battery: batteryL3, 'pump-station': pumpStationL3, 'tcs-manifold': tcsManifoldL3, 'chem-dosing': chemDosingL3, 'dry-cooler': dryCoolerL3, switch: switchL3, 'bms-controller': bmsCtlL3, 'sld-mimic': sldMimicL3, 'rack-power': rackPowerL3, stp: stpL3, ahu: ahuL3, tray: trayL3, 'nvswitch-tray': nvswitchTrayL3, 'dh-f-102': dhF102, 'dh-f-103': dhF103, 'dh-f-104': dhF104 };
+  var BUILDERS = { 'dh-m-103': dhM103, cdu: cduSheet, 'dh-e-101': dhE101, 'dh-r-101': dhR101, 'dh-f-101': dhF101, 'dh-e-001': dhE001, 'dh-n-101': dhN101, 'dh-a-101': dhA101, 'dh-b-101': dhB101, 'dh-n-102': dhN102, 'dh-n-104': dhN104, 'dh-m-102': dhM102, 'dh-m-104': dhM104, 'dh-m-101': dhM101, chiller: chillerL3, crah: crahL3, battery: batteryL3, 'pump-station': pumpStationL3, 'tcs-manifold': tcsManifoldL3, 'chem-dosing': chemDosingL3, 'dry-cooler': dryCoolerL3, switch: switchL3, 'bms-controller': bmsCtlL3, 'sld-mimic': sldMimicL3, 'rack-power': rackPowerL3, stp: stpL3, ahu: ahuL3, tray: trayL3, 'nvswitch-tray': nvswitchTrayL3, 'dh-f-102': dhF102, 'dh-f-103': dhF103, 'dh-f-104': dhF104, 'bms-node': bmsNodeL3 };
   for (var hb = 2; hb <= 9; hb++) BUILDERS['dh-e-10' + hb] = dhE101;   // DH-E-102 ... : same builder, o.hall picks the hall (the builder refuses a hall the engine does not have)
   var API = {
     build: function (id, snap, o) { if (!BUILDERS[id]) throw new Error('hmi-sheets: no sheet ' + id); return BUILDERS[id](snap, o); },

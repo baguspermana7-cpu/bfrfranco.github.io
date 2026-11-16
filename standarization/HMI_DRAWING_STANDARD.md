@@ -27,6 +27,7 @@ after the drawing it complements and retires nothing — used where another cont
 | DH-F-102 clean-agent release, DH-01 | `dhF102` | Fire → Mimic (own box, under DH-F-101) | fire inventory release zones |
 | DH-F-103 fire interlocks, DH-01 | `dhF103` | Fire → Cause & effect (above the matrix) | the systems `RZDatahallAIFireCauseEffect.BASE_ROWS` command (15 control modules) |
 | DH-F-104 fire zone map, DH-01 | `dhF104` | Fire → Zones (above the zone tiles) | `geometry.*` bands of DH-A-101 + the fire inventory zones (Z09–Z12 square to their stated area) |
+| BMS block L3 (server pair, supervisory ring, protocol gateway, LDC) | `bmsNodeL3` (`o.kind`) | BMS → click a block (above the specification tables; controller keeps `bmsCtlL3`) | page `BMS_MODEL` (authored architecture) |
 | DH-E-001 site single-line | `dhE001` | Electrical → Overview | `distribution.*`, `equipment.gensets_*`, `site.fuel_autonomy_h` |
 | DH-N-101 compute fabric | `dhN101` | Network → Compute fabric | `network.*` (cores, spines, leaves, link counts) |
 | DH-A-101 room layout, DH-01 (1 : 100 at fit) | `dhA101` | Room Layout (keep mode — joins the building isometric and per-level plans) | `geometry.*`, `equipment.cdu_installed_per_hall`, `crah_installed_per_hall`, fire zones |
@@ -142,6 +143,9 @@ Interlocks DH-F-103: F10 one control module per C&E system (15), F11 nothing mar
 the text budget, F13 a running `vesda_fire_2` in Z05 marks exactly the systems the C&E engine has due / pending /
 blocked, F14 Stop clears. Zone map DH-F-104: F15 every zone of the hall once, F16 means = the register, F17 a zone
 isolated below two means is P1 and no zone without an isolated point is marked, F18 Clear restores.
+M1: every BMS block kind (server, ring switch, gateway, LDC, controller) opens with its own L3 schematic holding the
+opened block (fails on v3.62.1: only the controller drew one). H3 reads `data-rz-modal-class`, which no renderer
+sets, so it reports 0 / 45 on every tree — a stale measure kept as *reported* until it reads the drawn modal.
 
 Red proofs on record: the fire block fails F1 on a tree without the `fireSvg` mount; H5 read 1,056 / 1,639 / 1,592
 words on the pre-redraw sheets; H13 read `floorSvg 0×0`. v3.63.0: F10 and F15 fail on v3.62.1 (not drawn); F17
