@@ -11,6 +11,60 @@ release sections rather than semver.
 
 ---
 
+## v3.63.0 — 2026-11-16 — datahallAI: fire interlocks and zone map drawn, fire zones and BMS blocks open schematics, repaint only what changed
+
+### Added
+- **Fire → Cause & effect: DH-F-103 fire interlocks.** The FACP's signalling line circuit to one control module per
+  system the cause-and-effect matrix commands (15: sounders and strobes, CCTV, BMS, AHU / CRAH, smoke dampers, lift,
+  egress doors, voice evacuation, fire brigade link, NOC on-call, generator, pre-action valve, clean-agent release to
+  DH-F-102, zoned EPO, leak isolation), each wired to the equipment it drives with tag and name. A module shows its
+  system's command in the C&E evaluation of the running training event: blocked P1, due P2, pending (engineered delay)
+  P3; at rest the panel commands nothing and every module is normal. A module opens its own inspector (the matrix
+  actions and the current command). The BMS gets a monitor-only data line.
+- **Fire → Zones: DH-F-104 fire zone map.** The hall floor to the engine's scale (fan-wall galleries, rack field, cross
+  aisle, CDU gallery) with each zone where its contents stand, and the ancillary rooms Z09–Z12 drawn square to their
+  stated area. Every zone prints its detection means available / total from the isolation register; a zone below two
+  means is P1. The zone tiles stay below it with the per-zone detail.
+- **A fire zone opens its detection schematic** (tiles, DH-F-101 and DH-F-104 zone heads): the loops entering through
+  their isolators, every device of the zone with its tag, the aspirating unit on its sampling pipe, the zone EPO and the
+  abort - release - pre-action line to DH-F-102, with the zone's points beside it. Points still open the inspector (the
+  isolation workflow); Shift+click a zone for its inspector.
+- **BMS server, ring switch, gateway and LDC modals draw their schematic** above the specification tables (the server
+  pair on the core with the heartbeat link, the supervisory ring with the opened switch, a gateway between its field bus
+  and the IP network with port and poll, a local display on its ring switch). Until now only the controller did.
+- **Rack manifold, 48 V bus bar, leak sensor and backplane** open the GB300 rack elevation with the opened item selected
+  (were text cards).
+- Box nodes in the shared renderer (`js/rz-hmi-sheet.js`) can carry a name and live values inside the box.
+
+### Changed
+- **Repaint only what changed.** A node's reading is kept while the payload context (tick, scenarios, replay, fire
+  register) holds and the renderer skips a node whose reading is unchanged; the flow pass re-runs only on a state change;
+  sheet reads build no trend series; the fire inventory indexes its points per zone once. At 390 px, DPR 3, CPU 4x,
+  software raster, zooming Room Layout with a repaint every second: p95 frame 50.1 → 33.4 ms (budget 34); desktop 16.8 ms.
+
+### Fixed
+- **Returning to the DC Dashboard threw** `updateDashKPI is not defined` (since v3.11.8): the function sat inside its
+  panel's closure, so the dashboard was never repainted on the way back.
+- **The battery modal kept its legacy mimic** since v3.61.1: hmi-v2 wrapped the battery opener twice and the second
+  wrapper (the L3 draw) was skipped. One wrapper now does both.
+- **Rack-row fire zones named forty rows.** Z05–Z08 were "Rack rows 1-10 … 31-40" on a hall the engine draws with 20
+  rows; they are named from `geometry.rack_rows` with the rack payload's own rule (Rack rows 1-5 … 16-20).
+- **Drawings one isolation behind.** The payload cache was keyed on the tick only, so an isolation or a restore reached
+  the sheets a tick late (never while the tick is pinned); `clearRegister` rendered without evaluating, so the tiles kept
+  cleared isolations.
+- **An impaired fire zone read P2**: fire items ignored their payload's own alarm list. The highest priority wins now.
+- **At 390 px** the sheet number wrapped to 2–3 lines in the bar (13 sheets) and Room Layout was 227 of 362 px wide (the
+  page's floated zoom buttons squeezed the frame). A long point value ran over its label in the modals.
+
+### Gates
+- `tools/test-dh-drawings.mjs`: F10–F14 interlocks, F15–F18 zone map, M1 BMS modals, M2 fire zone schematic, M3 battery
+  modal, S1 dashboard return, H6 sheet number on one line and frame as wide as its host — each fails on v3.62.1. H3 now
+  counts the modals that really draw a sheet (21 / 45; it read an attribute no renderer sets and reported 0 / 45).
+- `tools/test-dh-operator.mjs` O11 opens its page signed in: unsigned, the page re-locked and the audit observer fought
+  the lock on every mutation, so O11 timed the harness. With the fixed harness v3.62.1 fails O11 mobile (50.1 ms).
+- `tools/test-datahall-ai-fire-points.mjs` F1b; `tools/test-dcai-coverage.mjs` measures hmi-v2's own modal.
+- Standard: `standarization/HMI_DRAWING_STANDARD.md` §1, §3, §4, §4c, §5.
+
 ## v3.62.2 — 2026-11-16 — Conventional sheets: a tag struck by a foreign symbol's outline now fails the gate
 
 ### Added
