@@ -94,7 +94,7 @@
     var ce = CE(); if (!S.snap || !ce) { return null; }
     var rows = null;
     try { rows = ce.applyRuntime(ce.BASE_ROWS, S.snap.runtimeUpdates); } catch (e) { rows = null; }
-    return { elapsedSeconds: S.snap.elapsedSeconds, runtimeRows: rows, interlocks: S.snap.interlocks, running: !!S.run, stage: S.snap.stage };
+    return { elapsedSeconds: S.snap.elapsedSeconds, runtimeRows: rows, interlocks: S.snap.interlocks, running: !!S.run, eventId: S.run ? S.run.eventId : null, zoneId: S.run ? S.run.zoneId : null, stage: S.snap.stage };
   }
 
   /* ------------------------------------------------------------------ sub-tabs (scoped: never .et / .ep) */

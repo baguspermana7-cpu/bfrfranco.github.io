@@ -59,6 +59,22 @@ test('F1 inventory is a formula of geometry, deterministic, four halls', () => {
   assert.ok(inv.points.every((p) => /^\d{4}-\d{2}-\d{2}$/.test(p.lastTestAt)));
 });
 
+test('F1b rack-row zones Z05-Z08 name the engine rows they cover: contiguous 1..rackRows, the rack payload rule', () => {
+  // the template once named 1-10 … 31-40 (forty rows) on a hall the engine draws with 20; the rack → zone dependency of
+  // hmi-payloads.js puts row r in Z0(5 + floor((r - 1) / ceil(rows / 4))) — each zone name must list exactly those rows
+  for (const rows of [10, 20, 22]) {
+    const z = FP.buildInventory({ ...GEO, rackRows: rows }).zones.filter((x) => x.hall === 1 && x.n >= 5 && x.n <= 8);
+    const per = Math.ceil(rows / 4), covered = [];
+    z.forEach((x) => {
+      const m = /^Rack rows (\d+)(?:-(\d+))?$/.exec(x.name); assert.ok(m, `${x.id} names its rows: ${x.name}`);
+      const a = +m[1], b = +(m[2] || m[1]);
+      for (let r = a; r <= b; r++) { covered.push(r); assert.equal(5 + Math.floor((r - 1) / per), x.n, `${rows} rows: row ${r} belongs to Z0${x.n} by the payload rule`); }
+    });
+    assert.deepEqual(covered, Array.from({ length: rows }, (_, i) => i + 1), `${rows} rows: Z05-Z08 cover rows 1-${rows} once each`);
+  }
+  assert.match(FP.buildInventory({ halls: 1, hallLengthM: 62, hallWidthM: 31 }).zones[4].name, /^Rack field Q1$/, 'no engine row count → no invented row numbers');
+});
+
 test('F2 everything the module returns is deeply frozen', () => {
   assert.ok(isDeepFrozen(inv)); assert.ok(isDeepFrozen(FP.createRegister()));
   const r = FP.isolate(inv, FP.createRegister(), REQ('DH-01-Z05-SD1-01'), {});

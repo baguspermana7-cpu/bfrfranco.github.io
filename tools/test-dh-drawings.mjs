@@ -19,6 +19,9 @@
  * H13 Room Layout and Rack Architecture draw on first open (non-zero box)
  * F1-F9 fire sheet DH-F-101: mounted, 12 zones, devices drawn = inventory, title + focus, no unknown state,
  *     no overlapping symbols, text budget + paint, no page overflow at 390, no console error
+ * F10-F14 interlocks sheet DH-F-103 (Cause & effect view): one control module per system the C&E matrix commands,
+ *     nothing marked at rest, a running training event marks exactly the systems the C&E engine has due / pending /
+ *     blocked for that event and zone, Stop returns every module to normal
  * H7-H10, H14 (geometry, engine binding, trace, colour, a11y) land with the phases that build them.
  * Scope (v3.60.0, R143 — the redraw ships sheet by sheet): H1/H2/H4/H5/H6 measure the HMI sheets (`svg.hmi-svg`,
  * ids hmi*Svg); a tab not yet redrawn is reported as legacy and not judged. H3 (own L3 modal per class) and H11/H12
@@ -202,7 +205,42 @@ if (fire.host) {
   law('F6', fire.ov === 0, `fire overlapping symbols: ${fire.ov}`);
   law('F7', fire.words <= 8 && fire.paint === 0, `fire words ${fire.words} (<= 8), gradients/filters ${fire.paint}`);
 }
-law('F9', pg.errors.length === 0, `page errors so far: ${pg.errors.length}${pg.errors.length ? ' — ' + pg.errors[0].slice(0, 160) : ''}`);
+// ── F10-F14 interlocks sheet DH-F-103 (Cause & effect view): one control module per system the C&E matrix commands;
+// at rest the panel commands nothing (every module normal, no alarm mark); a running training event marks exactly the
+// systems the C&E engine has due / pending / blocked for that event and zone, and nothing else ──────────────────────
+await showSheet(pg, 'fire', 'Cause & effect'); await wait(1500);
+const ilkProbe = () => {
+  const host = document.querySelector('.hmi-host[data-hmi-sheet="dh-f-103"]'); if (!host) return { host: false };
+  const svg = host.querySelector('svg'), mods = [...svg.querySelectorAll('.hmi-node')].filter((g) => /^cm\d/.test(g.dataset.node));
+  const CE = window.RZDatahallAIFireCauseEffect, sys = []; CE.BASE_ROWS.forEach((r) => r.outputs.forEach((x) => { if (!sys.includes(x.system)) sys.push(x.system); }));
+  const named = mods.filter((g) => g.getAttribute('tabindex') === '0' && (g.querySelector('title') || {}).textContent).length;
+  const marked = mods.filter((g) => g.getAttribute('data-alarm')).map((g) => g.getAttribute('data-rz-equipment') || g.dataset.node);
+  const SKIP = '[data-role="tag"],[data-role="value"],[data-role="line"],[data-role="name"],[data-role="legend"],[data-role="titleblock"],[data-role="titleblock"] *';
+  const words = [...svg.querySelectorAll('text')].filter((t) => !t.closest(SKIP)).map((t) => t.textContent.trim()).join(' ').split(/\s+/).filter((x) => /[A-Za-z]{2,}/.test(x)).length;
+  return { host: true, w: Math.round(svg.getBoundingClientRect().width), mods: mods.length, sys: sys.length, named, marked, words, states: mods.map((g) => g.getAttribute('data-state')) };
+};
+const ilk0 = await pg.evaluate(ilkProbe);
+law('F10', ilk0.host && ilk0.w > 0 && ilk0.mods === ilk0.sys && ilk0.sys > 0, `interlocks sheet dh-f-103 in the Cause & effect view: ${ilk0.host ? ilk0.w + ' px, ' + ilk0.mods + ' control modules / ' + ilk0.sys + ' C&E systems' : 'not drawn'}`);
+if (ilk0.host) {
+  law('F11', ilk0.marked.length === 0 && ilk0.states.every((s) => s === 'normal'), `at rest no module commanded: marked ${ilk0.marked.length}, states ${[...new Set(ilk0.states)].join('/')}`);
+  law('F12', ilk0.named === ilk0.mods && ilk0.words <= 8, `modules with title + focus ${ilk0.named}/${ilk0.mods}; words ${ilk0.words} (<= 8)`);
+  await pg.evaluate(() => window.RZDatahallAIFireWorkstation.startRun('vesda_fire_2', 'DH-01-Z05')); await wait(4800);
+  const ilk1 = await pg.evaluate(() => {
+    const CE = window.RZDatahallAIFireCauseEffect, W = window.RZDatahallAIFireWorkstation, ci = W.causeEffectInput();
+    const r = CE.evaluateEvent({ eventId: ci.eventId, zoneId: ci.zoneId, elapsedSeconds: ci.elapsedSeconds, runtimeRows: ci.runtimeRows, interlocks: ci.interlocks });
+    const rowSys = {}; CE.BASE_ROWS.forEach((x) => { rowSys[x.id] = x.outputs.map((o) => o.system); });
+    const want = new Set([...r.commands, ...r.pending].map((c) => c.system).concat(...r.blocked.map((b) => rowSys[b.rowId] || [])));
+    const svg = document.querySelector('.hmi-host[data-hmi-sheet="dh-f-103"] svg');
+    const got = new Set([...svg.querySelectorAll('.hmi-node')].filter((g) => /^cm\d/.test(g.dataset.node) && g.getAttribute('data-alarm')).map((g) => (g.getAttribute('data-rz-equipment') || '').split(':').pop()));
+    return { want: [...want].sort(), got: [...got].sort(), blocked: r.blocked.length };
+  });
+  law('F13', ilk1.want.length > 0 && ilk1.want.join() === ilk1.got.join(), `running vesda_fire_2 in Z05: marked [${ilk1.got.join(', ')}] = C&E due/pending/blocked [${ilk1.want.join(', ')}]${ilk1.blocked ? ' (+' + ilk1.blocked + ' blocked rows)' : ''}`);
+  await pg.evaluate(() => window.RZDatahallAIFireWorkstation.stopRun()); await wait(4800);
+  const ilk2 = await pg.evaluate(ilkProbe);
+  law('F14', ilk2.marked.length === 0, `after Stop every module back to normal: marked ${ilk2.marked.length}`);
+}
+await showSheet(pg, 'fire', 'Mimic'); await wait(1500);   // H15 below measures the first visible frame: the process sheet it always measured
+law('F9', pg.errors.length === 0, `page errors so far:${pg.errors.length}${pg.errors.length ? ' — ' + pg.errors[0].slice(0, 160) : ''}`);
 
 // ── H15 shading mode ─────────────────────────────────────────────────────────────────────────────────────────────
 const sh0 = await pg.evaluate(() => { const f = [...document.querySelectorAll('.hmi-frame')].find((x) => x.getBoundingClientRect().width); if (!f) return null;

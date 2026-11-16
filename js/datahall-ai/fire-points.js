@@ -66,16 +66,17 @@
   /* 12 zones per hall. Z01–Z08 share the hall floor (areaShare sums to 1.0); Z09–Z12 are the
      ancillary rooms with a stated floor area. `means` are the independent detection means the
      double-interlock release counts; `release` marks clean-agent zones; `epo` follows Tech Spec §6.9
-     (NFPA 75 §9.4 — electrical rooms only). */
+     (NFPA 75 §9.4 — electrical rooms only). Z05–Z08 split the engine's rack rows in four (geometry.rack_rows, 20 on the
+     GB300 basis): their names count those rows — the template once said 1-10 … 31-40, forty rows the hall does not have. */
   var ZONE_TEMPLATE = deepFreeze([
     { n: 1, name: 'CDU line 1', areaShare: 0.08, means: ['vesda', 'smoke_l1', 'smoke_l2'], release: true, epo: false },
     { n: 2, name: 'CDU line 2', areaShare: 0.08, means: ['vesda', 'smoke_l1', 'smoke_l2'], release: true, epo: false },
     { n: 3, name: 'CDU line 3', areaShare: 0.08, means: ['vesda', 'smoke_l1', 'smoke_l2'], release: true, epo: false },
     { n: 4, name: 'CDU line 4', areaShare: 0.08, means: ['vesda', 'smoke_l1', 'smoke_l2'], release: true, epo: false },
-    { n: 5, name: 'Rack rows 1-10', areaShare: 0.17, means: ['vesda', 'smoke_l1', 'smoke_l2', 'heat', 'lhd'], release: true, epo: false },
-    { n: 6, name: 'Rack rows 11-20', areaShare: 0.17, means: ['vesda', 'smoke_l1', 'smoke_l2', 'heat', 'lhd'], release: true, epo: false },
-    { n: 7, name: 'Rack rows 21-30', areaShare: 0.17, means: ['vesda', 'smoke_l1', 'smoke_l2', 'heat', 'lhd'], release: true, epo: false },
-    { n: 8, name: 'Rack rows 31-40', areaShare: 0.17, means: ['vesda', 'smoke_l1', 'smoke_l2', 'heat', 'lhd'], release: true, epo: false },
+    { n: 5, name: 'Rack rows', rowQuarter: 1, areaShare: 0.17, means: ['vesda', 'smoke_l1', 'smoke_l2', 'heat', 'lhd'], release: true, epo: false },
+    { n: 6, name: 'Rack rows', rowQuarter: 2, areaShare: 0.17, means: ['vesda', 'smoke_l1', 'smoke_l2', 'heat', 'lhd'], release: true, epo: false },
+    { n: 7, name: 'Rack rows', rowQuarter: 3, areaShare: 0.17, means: ['vesda', 'smoke_l1', 'smoke_l2', 'heat', 'lhd'], release: true, epo: false },
+    { n: 8, name: 'Rack rows', rowQuarter: 4, areaShare: 0.17, means: ['vesda', 'smoke_l1', 'smoke_l2', 'heat', 'lhd'], release: true, epo: false },
     { n: 9, name: 'Elec room A', areaM2: 200, means: ['vesda', 'beam', 'smoke_l1', 'smoke_l2'], release: true, epo: true },
     { n: 10, name: 'Elec room B', areaM2: 200, means: ['vesda', 'beam', 'smoke_l1', 'smoke_l2'], release: true, epo: true },
     { n: 11, name: 'UPS + battery', areaM2: 150, means: ['vesda', 'heat', 'smoke_l1', 'smoke_l2'], release: true, epo: true },
@@ -158,6 +159,13 @@
     var halls = finite(g.halls) && g.halls > 0 ? Math.floor(g.halls) : null;
     var L = finite(g.hallLengthM) && g.hallLengthM > 0 ? g.hallLengthM : null;
     var W = finite(g.hallWidthM) && g.hallWidthM > 0 ? g.hallWidthM : null;
+    var rackRows = finite(g.rackRows) && g.rackRows > 0 ? Math.floor(g.rackRows) : null;
+    function zoneName(t) {   // a rack-row zone names the rows it covers, from the engine row count; without it, which quarter
+      if (!t.rowQuarter) { return t.name; }
+      if (!rackRows) { return 'Rack field Q' + t.rowQuarter; }
+      var per = Math.ceil(rackRows / 4), a = (t.rowQuarter - 1) * per + 1, b = Math.min(rackRows, t.rowQuarter * per);
+      return a > b ? 'Rack field Q' + t.rowQuarter : 'Rack rows ' + a + (b > a ? '-' + b : '');
+    }
     var leakZones = finite(g.leakZonesPerHall) && g.leakZonesPerHall > 0 ? Math.floor(g.leakZonesPerHall) : 24;
     if (!halls || !L || !W) { throw new Error('fire-points: inventory needs halls, hallLengthM and hallWidthM'); }
     var hallArea = L * W, zones = [], points = [], h, z, i, k, u;
@@ -179,7 +187,7 @@
       for (z = 0; z < ZONE_TEMPLATE.length; z++) {
         var t = ZONE_TEMPLATE[z];
         var area = finite(t.areaM2) ? t.areaM2 : Math.round(hallArea * t.areaShare * 10) / 10;
-        var zone = { id: hallId + '-Z' + pad2(t.n), hall: h, n: t.n, name: t.name, areaM2: area, means: t.means.slice(), release: t.release, epo: t.epo, counts: {} };
+        var zone = { id: hallId + '-Z' + pad2(t.n), hall: h, n: t.n, name: zoneName(t), areaM2: area, means: t.means.slice(), release: t.release, epo: t.epo, counts: {} };
         hallZones.push(zone); zones.push(zone);
         var loops = [1, 2], spots = spotsFor(area);
         for (i = 0; i < loops.length; i++) {
@@ -187,21 +195,21 @@
           zone.counts[m] = spots;
           for (k = 1; k <= spots; k++) {
             add({ id: zone.id + '-SD' + loops[i] + '-' + pad2(k), hall: h, zoneIds: [zone.id], type: 'smoke_spot', means: m, loop: 'L' + loops[i],
-              address: 'L' + loops[i] + ':' + pad2(t.n) + pad2(k), label: 'Photo smoke loop ' + loops[i] + ' #' + k, room: t.name });
+              address: 'L' + loops[i] + ':' + pad2(t.n) + pad2(k), label: 'Photo smoke loop ' + loops[i] + ' #' + k, room: zone.name });
           }
         }
         if (t.means.indexOf('heat') >= 0) {
           var heats = heatsFor(area); zone.counts.heat = heats;
-          for (k = 1; k <= heats; k++) { add({ id: zone.id + '-HD-' + pad2(k), hall: h, zoneIds: [zone.id], type: 'heat_spot', means: 'heat', loop: 'L3', address: 'L3:' + pad2(t.n) + pad2(k), label: 'Rate-of-rise / fixed 57 °C heat #' + k, room: t.name }); }
+          for (k = 1; k <= heats; k++) { add({ id: zone.id + '-HD-' + pad2(k), hall: h, zoneIds: [zone.id], type: 'heat_spot', means: 'heat', loop: 'L3', address: 'L3:' + pad2(t.n) + pad2(k), label: 'Rate-of-rise / fixed 57 °C heat #' + k, room: zone.name }); }
         }
-        if (t.means.indexOf('beam') >= 0) { zone.counts.beam = 1; add({ id: zone.id + '-BD-1', hall: h, zoneIds: [zone.id], type: 'beam', means: 'beam', loop: 'L3', address: 'L3:' + pad2(t.n) + '90', label: 'Reflective beam detector', room: t.name }); }
-        if (t.means.indexOf('lhd') >= 0) { zone.counts.lhd = 1; add({ id: zone.id + '-LHD-1', hall: h, zoneIds: [zone.id], type: 'lhd', means: 'lhd', loop: 'L3', address: 'L3:' + pad2(t.n) + '91', label: 'Linear heat cable loop (busway / tray)', room: t.name }); }
+        if (t.means.indexOf('beam') >= 0) { zone.counts.beam = 1; add({ id: zone.id + '-BD-1', hall: h, zoneIds: [zone.id], type: 'beam', means: 'beam', loop: 'L3', address: 'L3:' + pad2(t.n) + '90', label: 'Reflective beam detector', room: zone.name }); }
+        if (t.means.indexOf('lhd') >= 0) { zone.counts.lhd = 1; add({ id: zone.id + '-LHD-1', hall: h, zoneIds: [zone.id], type: 'lhd', means: 'lhd', loop: 'L3', address: 'L3:' + pad2(t.n) + '91', label: 'Linear heat cable loop (busway / tray)', room: zone.name }); }
         if (t.release) {
-          add({ id: zone.id + '-REL', hall: h, zoneIds: [zone.id], type: 'release', releaseRole: 'release', loop: 'REL', address: 'REL:' + pad2(t.n), label: 'Clean-agent release circuit (solenoid)', room: t.name });
-          add({ id: zone.id + '-ABORT', hall: h, zoneIds: [zone.id], type: 'abort', releaseRole: 'abort', loop: 'REL', address: 'ABT:' + pad2(t.n), label: 'Abort station at the zone exit', room: t.name });
-          add({ id: zone.id + '-PAV', hall: h, zoneIds: [zone.id], type: 'preaction_solenoid', releaseRole: 'preaction', loop: 'REL', address: 'PAV:' + pad2(t.n), label: 'Pre-action valve solenoid (double interlock)', room: t.name });
+          add({ id: zone.id + '-REL', hall: h, zoneIds: [zone.id], type: 'release', releaseRole: 'release', loop: 'REL', address: 'REL:' + pad2(t.n), label: 'Clean-agent release circuit (solenoid)', room: zone.name });
+          add({ id: zone.id + '-ABORT', hall: h, zoneIds: [zone.id], type: 'abort', releaseRole: 'abort', loop: 'REL', address: 'ABT:' + pad2(t.n), label: 'Abort station at the zone exit', room: zone.name });
+          add({ id: zone.id + '-PAV', hall: h, zoneIds: [zone.id], type: 'preaction_solenoid', releaseRole: 'preaction', loop: 'REL', address: 'PAV:' + pad2(t.n), label: 'Pre-action valve solenoid (double interlock)', room: zone.name });
         }
-        if (t.epo) { add({ id: zone.id + '-EPO', hall: h, zoneIds: [zone.id], type: 'epo', loop: 'EPO', address: 'EPO:' + pad2(t.n), label: 'Zoned EPO station (dual-confirm)', room: t.name }); }
+        if (t.epo) { add({ id: zone.id + '-EPO', hall: h, zoneIds: [zone.id], type: 'epo', loop: 'EPO', address: 'EPO:' + pad2(t.n), label: 'Zoned EPO station (dual-confirm)', room: zone.name }); }
       }
       /* one aspirating unit per three zones — a VESDA unit is ONE point that serves three zones */
       for (u = 1; u <= Math.ceil(hallZones.length / 3); u++) {

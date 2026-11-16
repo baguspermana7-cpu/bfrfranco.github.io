@@ -1165,7 +1165,59 @@
     return finish(s);
   }
 
-  var BUILDERS = { 'dh-m-103': dhM103, cdu: cduSheet, 'dh-e-101': dhE101, 'dh-r-101': dhR101, 'dh-f-101': dhF101, 'dh-e-001': dhE001, 'dh-n-101': dhN101, 'dh-a-101': dhA101, 'dh-b-101': dhB101, 'dh-n-102': dhN102, 'dh-n-104': dhN104, 'dh-m-102': dhM102, 'dh-m-104': dhM104, 'dh-m-101': dhM101, chiller: chillerL3, crah: crahL3, battery: batteryL3, 'pump-station': pumpStationL3, 'tcs-manifold': tcsManifoldL3, 'chem-dosing': chemDosingL3, 'dry-cooler': dryCoolerL3, switch: switchL3, 'bms-controller': bmsCtlL3, 'sld-mimic': sldMimicL3, 'rack-power': rackPowerL3, stp: stpL3, ahu: ahuL3, tray: trayL3, 'nvswitch-tray': nvswitchTrayL3, 'dh-f-102': dhF102 };
+  /* ── DH-F-103 fire interlocks, DH-01: the FACP's signalling line circuit to one control module per interlocked system
+     of the cause-and-effect matrix (o.systems = the systems its rows command, in matrix order), each module wired to
+     the equipment it drives. Every module is a fire-output item: its state is that system's command in the C&E
+     evaluation of the running training event (due / pending / blocked), normal when no event runs. The BMS gets a
+     monitor-only data line, never a control line. ─────────────────────────────────────────────────────────────── */
+  var F103_EQ = {
+    ahu_crah: ['crah', 'AHU / CRAH', 'Air handlers and CRAH units in the zone: engineered shutdown / smoke sequence', 'ENGINEERED SHUTDOWN'],
+    smoke_control: ['damperFire', 'FSD', 'Fire / smoke dampers and enclosure isolation for the agent zone', 'SMOKE DAMPERS'],
+    access_control: ['doorRelease', 'DOORS', 'Egress doors released and hold-open devices dropped', 'EGRESS RELEASE'],
+    elevator: ['instPlc', 'LIFT', 'Lift controller: recall to the designated landing', 'RECALL'],
+    zoned_epo: ['epo', 'EPO', 'Zoned emergency power off of the affected zone', 'ZONE POWER OFF'],
+    leak_control: ['valveSolenoid', 'LIV', 'Leak isolation valve on the affected cooling branch', 'LEAK ISOLATION'],
+    generator: ['gensetDiesel', 'GEN', 'Generator group: project-approved fire sequence', 'FIRE SEQUENCE'],
+    preaction: ['preActionValve', 'PAV', 'Pre-action valve: monitor valve position and water flow', 'PRE-ACTION VALVE'],
+    notification: ['sounder', 'NAC', 'Sounders and strobes: pre-alarm, alarm, pre-discharge and evacuation', 'SOUNDERS / STROBES'],
+    public_address: ['sounder', 'PA', 'Public address: voice evacuation message', 'VOICE EVACUATION'],
+    fire_brigade: ['instPanel', 'FBI', 'Fire brigade interface: confirmed fire transmitted', 'FIRE BRIGADE LINK'],
+    noc_sms: ['instPanel', 'NOC', 'NOC on-call: escalation message', 'ON-CALL ESCALATION'],
+    cctv: ['netServer', 'CCTV', 'CCTV: camera focus and event bookmark', 'CAMERA BOOKMARK'],
+    bms_event: ['bmsController', 'BMS', 'BMS / DCIM: event published, monitor-only (no control authority)', 'MONITOR ONLY']
+  };
+  function dhF103(snap, o) {
+    var sys = o && o.systems; if (!sys || !sys.length) throw new Error('hmi-sheets: dh-f-103 needs the cause-and-effect systems');
+    var list = sys.filter(function (k) { return k === 'clean_agent' || F103_EQ[k]; });
+    var per = Math.ceil(list.length / 2), RH = 64, W = 1240, H = 150 + per * RH;
+    var s = Sheet({ id: 'dh-f-103', no: 'DH-F-103', title: 'DH-01 FIRE INTERLOCKS', size: [W, H], svgId: 'fireIlkSvg', sheet: '3/4' });
+    s.legend = [['signal', 'CONTROL (FACP)'], ['data', 'MONITOR ONLY']]; s.legendAt = [1000, 14];
+    var facp = s.n({ id: 'facp', tag: 'FACP-01', name: 'FIRE ALARM PANEL', sym: 'facp', x: 90, y: 110 + (per - 1) * RH / 2, size: 40, cls: 'fire-facp', eqId: 'DH-01-FACP', tagAt: 'below', label: 'Fire alarm control panel, the controlling authority of every interlock (sheet DH-F-101)' });
+    var xs = [260, 760], yTop = 110;
+    s.e(facp, [180, 110 + (per - 1) * RH / 2], 'signal', { w: 'signal' });
+    s.notes.push({ x: 188, y: 96, text: 'SLC 4', role: 'tag' });
+    list.forEach(function (k, i) {
+      var col = i < per ? 0 : 1, r = i % per, x = xs[col], y = yTop + r * RH, n = pad(i + 1);
+      var mod = s.n({ id: 'cm' + n, tag: 'CM-' + n, sym: 'interfaceModule', x: x, y: y, size: 22, cls: 'fire-output', eqId: k, tagAt: 'left', label: 'Control module ' + n + ' — ' + (F103_EQ[k] ? F103_EQ[k][2] : 'clean-agent release') });
+      var bus = col === 0 ? 180 : 700;
+      if (col === 1 && r === 0) s.e([180, yTop], [700, yTop], 'signal', { w: 'signal', via: [[180, 70], [700, 70]] });
+      s.e([bus, y], mod, 'signal', { w: 'signal' });
+      if (k === 'clean_agent') {
+        var os = s.n({ id: 'os-rel', tag: 'F-102', sym: 'offSheet', x: x + 170, y: y, size: 18, tagAt: 'right', label: 'Releasing panel, agent bank and selector valves — sheet DH-F-102' });
+        s.e(mod, os, 'signal', { w: 'signal' });
+        return;
+      }
+      var q = F103_EQ[k], eq = s.n({ id: 'eq-' + k, tag: q[1], name: q[3], sym: q[0], x: x + 190, y: y, size: 30, tagAt: 'right', label: q[2] });
+      s.e(mod, eq, k === 'bms_event' ? 'data' : 'signal', { w: 'signal' });
+    });
+    for (var c = 0; c < 2; c++) {
+      var nIn = c === 0 ? per : list.length - per; if (nIn < 1) continue;
+      s.e([c === 0 ? 180 : 700, yTop], [c === 0 ? 180 : 700, yTop + (nIn - 1) * RH], 'signal', { w: 'signal' });
+    }
+    return finish(s);
+  }
+
+  var BUILDERS = { 'dh-m-103': dhM103, cdu: cduSheet, 'dh-e-101': dhE101, 'dh-r-101': dhR101, 'dh-f-101': dhF101, 'dh-e-001': dhE001, 'dh-n-101': dhN101, 'dh-a-101': dhA101, 'dh-b-101': dhB101, 'dh-n-102': dhN102, 'dh-n-104': dhN104, 'dh-m-102': dhM102, 'dh-m-104': dhM104, 'dh-m-101': dhM101, chiller: chillerL3, crah: crahL3, battery: batteryL3, 'pump-station': pumpStationL3, 'tcs-manifold': tcsManifoldL3, 'chem-dosing': chemDosingL3, 'dry-cooler': dryCoolerL3, switch: switchL3, 'bms-controller': bmsCtlL3, 'sld-mimic': sldMimicL3, 'rack-power': rackPowerL3, stp: stpL3, ahu: ahuL3, tray: trayL3, 'nvswitch-tray': nvswitchTrayL3, 'dh-f-102': dhF102, 'dh-f-103': dhF103 };
   for (var hb = 2; hb <= 9; hb++) BUILDERS['dh-e-10' + hb] = dhE101;   // DH-E-102 ... : same builder, o.hall picks the hall (the builder refuses a hall the engine does not have)
   var API = {
     build: function (id, snap, o) { if (!BUILDERS[id]) throw new Error('hmi-sheets: no sheet ' + id); return BUILDERS[id](snap, o); },

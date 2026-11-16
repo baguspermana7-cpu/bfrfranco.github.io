@@ -218,8 +218,43 @@
     var best = al.map(function (a) { return PRIO[a.severity] || '2'; }).sort()[0];
     return { prio: best, ack: al.every(function (a) { return /ack/.test(String(a.lifecycle || '')) && !/unack/.test(String(a.lifecycle || '')); }) };
   }
+  /* the systems the cause-and-effect matrix commands, in matrix order (one control module each on DH-F-103) */
+  function ceSystems(CE) {
+    var seen = {}, out = [];
+    CE.BASE_ROWS.forEach(function (r) { r.outputs.forEach(function (x) { if (!seen[x.system]) { seen[x.system] = 1; out.push(x.system); } }); });
+    return out;
+  }
+  /* an interlock's state (DH-F-103): its system's commands in the C&E evaluation of the RUNNING training event — the
+     run's own event and zone, its elapsed seconds, runtime rows and release interlocks from
+     the fire workstation. No event running = every output normal: the panel commands nothing at rest. */
+  var ceMemo = { k: null, v: null };
+  function ceEval() {
+    var CE = win.RZDatahallAIFireCauseEffect, W = win.RZDatahallAIFireWorkstation, ci = W && W.causeEffectInput ? W.causeEffectInput() : null;
+    if (!CE || !ci || !ci.running || !ci.eventId || !ci.zoneId) return null;
+    var k = ci.eventId + '|' + ci.zoneId + '|' + ci.elapsedSeconds + '|' + ci.stage;
+    if (ceMemo.k === k) return ceMemo.v;
+    var ev = { eventId: ci.eventId, zoneId: ci.zoneId, elapsedSeconds: isFinite(ci.elapsedSeconds) ? ci.elapsedSeconds : 0 };
+    if (ci.runtimeRows) ev.runtimeRows = ci.runtimeRows; if (ci.interlocks) ev.interlocks = ci.interlocks;
+    var r = null; try { r = CE.evaluateEvent(ev); } catch (e) { r = null; }
+    ceMemo = { k: k, v: r }; return r;
+  }
+  function interlockOf(system) {
+    var r = ceEval(), rowsOf = function (list) { return (list || []).filter(function (c) { return c.system === system; }); };
+    if (!r) return { state: 'normal', values: {}, rows: [['Command', 'none — no fire event running']] };
+    var CE = win.RZDatahallAIFireCauseEffect, sysOfRow = {};
+    CE.BASE_ROWS.forEach(function (row) { row.outputs.forEach(function (x) { (sysOfRow[row.id] = sysOfRow[row.id] || []).push(x.system); }); });
+    var due = rowsOf(r.commands), pend = rowsOf(r.pending), blk = (r.blocked || []).filter(function (b) { return (sysOfRow[b.rowId] || []).indexOf(system) >= 0; });
+    var tip = due.map(function (c) { return ['Due', c.action.replace(/_/g, ' ').toLowerCase() + ' · ' + (c.resolvedScope || c.scope)]; })
+      .concat(pend.map(function (c) { return ['Pending', c.action.replace(/_/g, ' ').toLowerCase() + ' · T-' + Math.max(0, c.delaySeconds - (r.elapsedSeconds || 0)) + ' s']; }))
+      .concat(blk.map(function (b) { return ['Blocked', b.reason]; }));
+    if (blk.length) return { state: 'fault', alarm: '1', values: {}, rows: tip };
+    if (due.length) return { state: 'running', alarm: '2', values: {}, rows: tip };
+    if (pend.length) return { state: 'standby', alarm: '3', values: {}, rows: tip };
+    return { state: 'normal', values: {}, rows: [['Command', 'none for this event']] };
+  }
   function read(n, sheet) {
     if (n.sym === 'junction') return {};
+    if (n.cls === 'fire-output') return interlockOf(n.eqId);
     var cls = n.cls && CLS_PAYLOAD[n.cls], id = n.eqId || n.id, fire = !!cls && cls.indexOf('fire-') === 0;
     var fullId = fire || cls === 'net-zone';   // fire points and security zones keep their full id (DH-01-Z05-SD1-02, Z-EXT)
     var p = cls ? payload(cls, fullId ? String(id) : String(id).replace(/^[A-Z]+-?/, '').replace(/-\d+$/, '') || '1') : null;
@@ -343,7 +378,7 @@
   function mountNew(anchorSvgId, sheetId, svgNewId, o) {
     var a = doc.getElementById(anchorSvgId), S = win.RZDatahallAISheets, R = win.RZHmiSheet, snap = win.DCAI_CALC && win.DCAI_CALC.snapshot;
     if (!a || !S || !R || !snap || panelHidden(a) || sheets[sheetId] || doc.querySelector('.bx[data-hmi-box="' + sheetId + '"]')) return;
-    var ab = a.closest('.bx'); if (!ab) return;
+    var ab = a.closest('.bx') || (o && o.loose && a.getClientRects().length ? a : null); if (!ab) return;   // loose: the anchor is a plain block (no drawing box), drawn only once that block shows
     var sheet; try { sheet = S.build(sheetId, snap, o); } catch (e) { if (win.console) console.warn('hmi-v2: ' + sheetId + ' not drawn — ' + e.message); return; }
     var bx = el('div', { class: 'bx', 'data-hmi-box': sheetId }), host = el('div', { class: 'hmi-host', 'data-hmi-sheet': sheetId });
     bx.appendChild(host);
@@ -364,6 +399,8 @@
     var fi = fireInventory();
     if (fi) mount('fireSvg', 'dh-f-101', 'hmiFireSvg', { fire: fi });
     if (fi) mountNew('fireSvg', 'dh-f-102', 'hmiFireRelSvg', { fire: fi });   // clean-agent release, under the detection sheet
+    var CE = win.RZDatahallAIFireCauseEffect;
+    if (fi && CE && CE.BASE_ROWS) mountNew('fireCauseEffectSummary', 'dh-f-103', 'hmiFireIlkSvg', { fire: fi, loose: true, before: true, systems: ceSystems(CE) });   // interlocks, above the C&E matrix they draw
     if (fi) mount('floorSvg', 'dh-a-101', 'hmiFloorPlanSvg', { fire: fi, keep: true });   // Room Layout: the to-scale hall plan joins the building isometric and the per-level plans (kept — their reveal gates stay)
     if (win.BMS_MODEL) mount('bmsSvg', 'dh-b-101', 'hmiBmsSvg', { bms: win.BMS_MODEL });
     if (win.WAN_NODES) mount('wanSvg', 'dh-n-102', 'hmiWanSvg', { wan: win.WAN_NODES });
