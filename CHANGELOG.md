@@ -11,6 +11,23 @@ release sections rather than semver.
 
 ---
 
+## v3.63.1 — 2026-11-16 — audit of v3.63.0: one modal slot no longer shows the previous item's reading
+
+### Fixed
+- **A modal showed the previous item's state** (code review, HIGH): hmi-v2 kept a node's reading per sheet name and node
+  id, but one modal slot draws several items in turn with the same node ids — fire zone Z12 opened after Z11 showed Z11's
+  alarm (P3 instead of P1), and the same held for battery A/B and BMS gateways inside one 4 s tick, indefinitely with a
+  pinned tick. The key now includes the item's class and equipment id. Gate M4 (red on v3.63.0).
+- **A zone click could do nothing**: the inspector ignored an opener's result, so a schematic that could not be drawn
+  opened neither it nor the inspector. An opener that returns false now falls back to the inspector. Gate M5.
+- **Modal markup escaped**: the fire zone and CDU modals inserted payload strings without escaping. No operator text
+  reaches them today (security review: no exploitable path), but a payload that ever carries one cannot become markup.
+- An impaired fire zone now shows on its outline (P1 red, P2 amber), not only on its badge.
+
+### Gates
+- `tools/test-dh-drawings.mjs` M4, M5; M2 checks the inspector by its open state (the previous check matched any
+  inspector element in the DOM).
+
 ## v3.63.0 — 2026-11-16 — datahallAI: fire interlocks and zone map drawn, fire zones and BMS blocks open schematics, repaint only what changed
 
 ### Added

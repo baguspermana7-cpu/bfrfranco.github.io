@@ -150,6 +150,9 @@ no page modal is on the DHModal stack.
 M3: the battery modal draws its L3 sheet — a second `wrapOpener('bat')` (the title-basis declaration came first) was
 skipped because `wrapOpener` never wraps an opener twice, so since v3.61.1 the battery modal kept its legacy mimic.
 One wrapper per opener.
+M4 (v3.63.1, audit): a reading is memoised per sheet, node id, class and equipment id — one modal slot draws Z11 then
+Z12 with the same node ids, and a key of sheet + node id showed Z12 with Z11's alarm (red on v3.63.0). M5: an opener
+that cannot draw returns false and the inspector opens instead. Modal markup built from payload strings is escaped.
 H6 at 390 also requires the sheet number on one line (it wrapped to 2-3 lines on 13 sheets) and the frame as wide as
 its host (`.hmi-host { clear: both }` — the page's floated svg zoom buttons squeezed Room Layout to 227 of 362 px).
 M1: every BMS block kind (server, ring switch, gateway, LDC, controller) opens with its own L3 schematic holding the

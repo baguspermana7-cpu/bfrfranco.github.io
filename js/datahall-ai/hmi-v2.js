@@ -247,7 +247,7 @@
   var readMemo = {}, readKey = null;
   function read(n, sheet) {
     ctx(); if (ctxKey !== readKey) { readMemo = {}; readKey = ctxKey; }
-    var mk = (sheet || '') + '|' + n.id;
+    var mk = (sheet || '') + '|' + n.id + '|' + (n.cls || '') + '|' + (n.eqId || '');   // node ids repeat across the items one modal slot draws in turn (zone Z11 then Z12): the item is part of the key (gate M4)
     if (readKey != null && readMemo[mk]) return readMemo[mk];
     var d = readNow(n, sheet); if (readKey != null) readMemo[mk] = d;
     return d;
@@ -572,17 +572,17 @@
     }
     var p = payload('cdu', id), rs = rows(p), st = stateOf(n, p);
     var pts = rs.slice(0, 16).map(function (r) {
-      return '<div class="hmi-pt"' + (r.alarm ? ' data-alarm="' + r.alarm + '"' : '') + (r.point ? ' title="Point ' + String(r.point) + '"' : '') + '>' +
-        '<span class="pt-label">' + (r.label || '') + '</span><span class="pt-val">' + text(r) + '</span>' + bandHtml(r) + '</div>';
+      return '<div class="hmi-pt"' + (r.alarm ? ' data-alarm="' + esc(r.alarm) + '"' : '') + (r.point ? ' title="Point ' + esc(r.point) + '"' : '') + '>' +
+        '<span class="pt-label">' + esc(r.label || '') + '</span><span class="pt-val">' + esc(text(r)) + '</span>' + bandHtml(r) + '</div>';
     }).join('');
     back.innerHTML = '<div class="hmi-modal" role="dialog" aria-modal="true" aria-labelledby="hmiModalTag" data-rz-modal-class="cdu">' +
-      '<header><span class="tag" id="hmiModalTag">CDU-' + id + '</span><span class="cls">Coolant distribution unit</span><span class="state">' + st + '</span><span class="sp"></span>' +
+      '<header><span class="tag" id="hmiModalTag">CDU-' + esc(id) + '</span><span class="cls">Coolant distribution unit</span><span class="state">' + esc(st) + '</span><span class="sp"></span>' +
       '<button type="button" class="hmi-btn" data-trace="up" title="Show what feeds this CDU on the CDU line">Trace upstream</button>' +
       '<button type="button" class="hmi-btn" data-trace="down" title="Show what this CDU feeds on the CDU line">Trace downstream</button>' +
       '<button type="button" class="hmi-btn" data-close aria-label="Close">&#215;</button></header>' +
       '<div class="hmi-m-draw"></div><div class="hmi-m-pts"><div class="hmi-m-sec">Points</div>' + (pts || '<p>—</p>') + '</div>' +
       '<div class="hmi-m-foot"><div><div class="hmi-m-sec">Trend, last 24 h (simulated)</div><div class="hmi-trend">' + trend(id) + '</div></div>' +
-      '<div><div class="hmi-m-sec">Alarms</div><ul class="hmi-evt">' + (rs.filter(function (r) { return r.alarm; }).map(function (r) { return '<li>' + r.label + ' · ' + text(r) + '</li>'; }).join('') || '<li>None active</li>') + '</ul></div></div></div>';
+      '<div><div class="hmi-m-sec">Alarms</div><ul class="hmi-evt">' + (rs.filter(function (r) { return r.alarm; }).map(function (r) { return '<li>' + esc(r.label) + ' · ' + esc(text(r)) + '</li>'; }).join('') || '<li>None active</li>') + '</ul></div></div></div>';
     back.hidden = false;
     modalSheet = win.RZHmiSheet.render(back.querySelector('.hmi-m-draw'), win.RZDatahallAISheets.build('cdu', win.DCAI_CALC.snapshot, { id: id }), sheetOpts());
     back.querySelector('[data-close]').addEventListener('click', close);
@@ -597,6 +597,7 @@
   }
   /* a fire zone's detection schematic (opener 'fire', the zone payload's tier-2): the fire-zone-l3 sheet with the zone's
      points beside it; the same modal shell as the CDU (focus moved in, Escape and the backdrop close, focus returned) */
+  function esc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }   // modal markup from payload strings: escaped, so a payload that ever carries operator text cannot become markup
   function openFireZone(zid, pointId) {
     var fi = fireInventory(), snap = win.DCAI_CALC && win.DCAI_CALC.snapshot; if (!fi || !snap || !win.RZHmiSheet || !win.RZDatahallAISheets) return false;
     var sheet; try { sheet = win.RZDatahallAISheets.build('fire-zone-l3', snap, { fire: fi, zone: String(zid), point: pointId }); } catch (e) { if (win.console) console.warn('hmi-v2: fire zone — ' + e.message); return false; }
@@ -609,14 +610,14 @@
     }
     var p = payload('fire-zone', String(zid)), rs = rows(p), z = fi.zoneById[String(zid)];
     var pts = rs.slice(0, 16).map(function (r) {
-      return '<div class="hmi-pt"' + (r.alarm ? ' data-alarm="' + r.alarm + '"' : '') + (r.point ? ' title="Point ' + String(r.point) + '"' : '') + '><span class="pt-label">' + (r.label || '') + '</span><span class="pt-val">' + text(r) + '</span></div>';
+      return '<div class="hmi-pt"' + (r.alarm ? ' data-alarm="' + esc(r.alarm) + '"' : '') + (r.point ? ' title="Point ' + esc(r.point) + '"' : '') + '><span class="pt-label">' + esc(r.label || '') + '</span><span class="pt-val">' + esc(text(r)) + '</span></div>';
     }).join('');
     var al = p && p.tabs && p.tabs.alarms ? p.tabs.alarms : [];
     back.innerHTML = '<div class="hmi-modal" role="dialog" aria-modal="true" aria-labelledby="hmiModalTag" data-rz-modal-class="fire-zone">' +
-      '<header><span class="tag" id="hmiModalTag">' + String(zid).replace(/^DH-\d\d-/, '') + '</span><span class="cls">Fire zone · ' + (z ? z.name : '') + '</span><span class="state">' + text(find(p, /^state$/i)) + '</span><span class="sp"></span>' +
+      '<header><span class="tag" id="hmiModalTag">' + esc(String(zid).replace(/^DH-\d\d-/, '')) + '</span><span class="cls">Fire zone · ' + esc(z ? z.name : '') + '</span><span class="state">' + esc(text(find(p, /^state$/i))) + '</span><span class="sp"></span>' +
       '<button type="button" class="hmi-btn" data-close aria-label="Close">&#215;</button></header>' +
       '<div class="hmi-m-draw"></div><div class="hmi-m-pts" data-rz-authored-basis="fire-zone payload rows (js/datahall-ai/hmi-payloads.js): means and isolations from the training isolation register, area from the engine hall geometry, ceiling temperature simulated on design plane p11 (Track A §A6)"><div class="hmi-m-sec">Points</div>' + (pts || '<p>—</p>') + '</div>' +
-      '<div class="hmi-m-foot"><div><div class="hmi-m-sec">Alarms</div><ul class="hmi-evt">' + (al.map(function (a) { return '<li>' + (a.text || a.point || '') + '</li>'; }).join('') || '<li>None active</li>') + '</ul></div></div></div>';
+      '<div class="hmi-m-foot"><div><div class="hmi-m-sec">Alarms</div><ul class="hmi-evt">' + (al.map(function (a) { return '<li>' + esc(a.text || a.point || '') + '</li>'; }).join('') || '<li>None active</li>') + '</ul></div></div></div>';
     back.hidden = false;
     modalSheet = win.RZHmiSheet.render(back.querySelector('.hmi-m-draw'), sheet, sheetOpts({ sheet: 'fire-zone-l3' }));
     back.querySelector('[data-close]').addEventListener('click', close);

@@ -89,8 +89,7 @@
     var fn = openers()[a.opener];
     if (typeof fn !== 'function') { if (win.console) { win.console.warn('[equipment-inspector] no opener ' + a.opener); } return false; }
     win.__rzLastEquipmentTrigger = trigger || null;
-    fn.apply(null, a.args || []);
-    return true;
+    return fn.apply(null, a.args || []) !== false;   // an opener that could not draw (returns false) falls back to the inspector
   }
   function equipmentTarget(e) {
     var t = e.target;

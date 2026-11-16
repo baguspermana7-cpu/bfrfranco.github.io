@@ -27,6 +27,8 @@
  * M1  every BMS block kind (server, ring switch, gateway, LDC, controller) opens with its own L3 schematic
  * M2  a fire zone click opens its detection schematic with every device of the zone; Shift+click keeps the inspector
  * M3  the battery modal draws its L3 sheet
+ * M5  an opener that cannot draw falls back to the inspector
+ * M4  two items drawn in turn in one modal slot each show their own reading (memo keyed on the item, not the node id)
  * F15-F18 zone map DH-F-104 (Zones view): every zone of the hall once, means available / total = the isolation
  *     register, a zone isolated below two means shows its alarm (and only it), Clear restores
  * H7-H10, H14 (geometry, engine binding, trace, colour, a11y) land with the phases that build them.
@@ -339,7 +341,7 @@ const fz = await pg.evaluate(async () => {
   const head = sv ? !!sv.querySelector(`[data-rz-equipment="fire-zone:${Z}"]`) : false;
   document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await new Promise((r) => setTimeout(r, 300));
   t.dispatchEvent(new MouseEvent('click', { bubbles: true, shiftKey: true })); await new Promise((r) => setTimeout(r, 800));
-  const insp = [...document.querySelectorAll('.rz-inspector')].some((x) => !x.hidden && x.getBoundingClientRect().width > 0), modal2 = !!document.querySelector('.hmi-modal-back:not([hidden])');
+  const insp = !!document.querySelector('aside.rz-inspector.open'), modal2 = !!document.querySelector('.hmi-modal-back:not([hidden])');
   document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
   return { tile: true, modal: !!sv, head, want: want.length, got: got.length, missing: want.filter((x) => !got.includes(x)).slice(0, 4), insp, modal2 };
 });
@@ -351,6 +353,36 @@ const bat = await pg.evaluate(async () => { const O = window.RZDatahallAIHmiOpen
   const sv = document.querySelector('#batHmi .hmi-host svg.hmi-svg'), n = sv ? sv.querySelectorAll('.hmi-node [data-sym]').length : 0;
   const bh = document.getElementById('batHmi'); if (bh) bh.classList.remove('show'); return { opener: true, sheet: !!sv, n }; });
 law('M3', bat.opener && bat.sheet && bat.n >= 8, `battery modal L3 sheet: ${bat.sheet ? bat.n + ' symbols' : 'not drawn'}`);
+
+// ── M4 one modal slot, two items: with the tick pinned, open zone Z11 then the impaired Z12 in the same modal; Z12's
+// zone head must carry Z12's alarm, not Z11's memoised reading (code review v3.63.0: memo key was sheet + node id) ─────
+const m4 = await pg.evaluate(async () => {
+  const W = window.RZDatahallAIFireWorkstation, inv = W.inventory(), O = window.RZDatahallAIHmiOpeners, Z = 'DH-01-Z12', wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  W.clearRegister();
+  inv.points.filter((p) => p.zoneIds.includes(Z) && (p.type === 'vesda' || p.means === 'smoke_l1')).forEach((p) => W.isolate({ pointId: p.id, owner: 'shift-a', reason: 'drawing gate M4: Z12 below two means', expiryId: '8h', acknowledged: true }));
+  window.__rzSimTick = 9300000;
+  O.fire('DH-01-Z11'); await wait(400);
+  const a = document.querySelector('.hmi-modal-back:not([hidden]) [data-rz-equipment="fire-zone:DH-01-Z11"]');
+  const z11 = a ? a.getAttribute('data-alarm') : 'none';
+  O.fire(Z); await wait(400);
+  const b = document.querySelector('.hmi-modal-back:not([hidden]) [data-rz-equipment="fire-zone:DH-01-Z12"]');
+  const z12 = b ? b.getAttribute('data-alarm') : 'none';
+  document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+  delete window.__rzSimTick; W.clearRegister();
+  return { z11, z12 };
+});
+law('M4', m4.z12 === '1' && m4.z11 !== '1', `same modal, Z11 then impaired Z12 (tick pinned): Z11 alarm ${m4.z11}, Z12 alarm ${m4.z12} (want 1)`);
+
+// ── M5 an opener that cannot draw falls back to the inspector (a zone click did nothing when openFireZone returned false)
+await showSheet(pg, 'fire', 'Zones'); await wait(800);
+const m5 = await pg.evaluate(async () => {
+  const O = window.RZDatahallAIHmiOpeners, keep = O.fire; O.fire = function () { return false; };
+  const t = document.querySelector('.rz-fire-tile[data-rz-equipment="fire-zone:DH-01-Z05"]'); t.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+  await new Promise((r) => setTimeout(r, 700)); O.fire = keep;
+  const insp = !!document.querySelector('aside.rz-inspector.open');
+  document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); return insp;
+});
+law('M5', m5, `zone click with a failing opener: inspector ${m5 ? 'opened' : 'NOT opened (nothing happened)'}`);
 
 // ── H3 + H1 modals: every equipment class opens its own modal ───────────────────────────────────────────────────
 const classes = new Map();

@@ -1,4 +1,4 @@
 /* Single source of truth for site version. Bump on every release per VERSIONING_STANDARD.md. */
-window.RZ_VERSION = '3.63.0';
+window.RZ_VERSION = '3.63.1';
 window.RZ_VERSION_DATE = '2026-11-16';
 window.RZ_VERSION_CODENAME = 'Graphite';
