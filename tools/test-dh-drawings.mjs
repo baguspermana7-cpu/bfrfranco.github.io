@@ -22,6 +22,8 @@
  * F10-F14 interlocks sheet DH-F-103 (Cause & effect view): one control module per system the C&E matrix commands,
  *     nothing marked at rest, a running training event marks exactly the systems the C&E engine has due / pending /
  *     blocked for that event and zone, Stop returns every module to normal
+ * F15-F18 zone map DH-F-104 (Zones view): every zone of the hall once, means available / total = the isolation
+ *     register, a zone isolated below two means shows its alarm (and only it), Clear restores
  * H7-H10, H14 (geometry, engine binding, trace, colour, a11y) land with the phases that build them.
  * Scope (v3.60.0, R143 — the redraw ships sheet by sheet): H1/H2/H4/H5/H6 measure the HMI sheets (`svg.hmi-svg`,
  * ids hmi*Svg); a tab not yet redrawn is reported as legacy and not judged. H3 (own L3 modal per class) and H11/H12
@@ -238,6 +240,41 @@ if (ilk0.host) {
   await pg.evaluate(() => window.RZDatahallAIFireWorkstation.stopRun()); await wait(4800);
   const ilk2 = await pg.evaluate(ilkProbe);
   law('F14', ilk2.marked.length === 0, `after Stop every module back to normal: marked ${ilk2.marked.length}`);
+}
+// ── F15-F17 zone map DH-F-104 (Zones view): every zone of the hall drawn once with its detection means available /
+// total from the isolation register; a zone driven below two means by isolations shows its alarm, Clear restores ─────
+await showSheet(pg, 'fire', 'Zones'); await wait(1500);
+const zoneProbe = () => {
+  const host = document.querySelector('.hmi-host[data-hmi-sheet="dh-f-104"]'); if (!host) return { host: false };
+  const svg = host.querySelector('svg'), W = window.RZDatahallAIFireWorkstation, snap = W.snapshot(), inv = W.inventory();
+  const want = inv.zones.filter((z) => z.hall === 1).map((z) => z.id);
+  const boxes = [...svg.querySelectorAll('.hmi-node[data-rz-equipment^="fire-zone:"]')], got = boxes.map((g) => g.getAttribute('data-rz-equipment').slice(10));
+  const bad = boxes.map((g) => {
+    const id = g.getAttribute('data-rz-equipment').slice(10), z = snap.zones.find((x) => x.id === id), t = svg.querySelector(`[data-val="${g.dataset.node}:means"]`);
+    const exp = z ? z.meansAvailable + '/' + z.meansTotal + ' MEANS' : '?';
+    return t && t.textContent === exp ? null : `${id} ${t ? t.textContent : 'no value'} != ${exp}`;
+  }).filter(Boolean);
+  const isoZones = new Set(Object.keys(W.register().entries).flatMap((pid) => (inv.byId[pid] || { zoneIds: [] }).zoneIds));
+  const alarmed = boxes.filter((g) => g.getAttribute('data-alarm')), stray = alarmed.filter((g) => !isoZones.has(g.getAttribute('data-rz-equipment').slice(10))).map((g) => g.dataset.node);
+  const z12 = boxes.find((g) => g.dataset.node === 'z12');
+  return { host: true, w: Math.round(svg.getBoundingClientRect().width), want, got, bad, alarmed: alarmed.map((g) => g.dataset.node), stray, z12: z12 ? z12.getAttribute('data-alarm') : null };
+};
+const zm0 = await pg.evaluate(zoneProbe);
+law('F15', zm0.host && zm0.w > 0 && zm0.got.slice().sort().join() === zm0.want.slice().sort().join(), `zone map dh-f-104 in the Zones view: ${zm0.host ? zm0.got.length + ' zones drawn / ' + zm0.want.length + ' in the inventory' : 'not drawn'}`);
+if (zm0.host) {
+  law('F16', zm0.bad.length === 0 && zm0.alarmed.length === 0, `means available / total = the isolation register on every zone${zm0.bad.length ? ': ' + zm0.bad.slice(0, 3).join('; ') : ''}; alarmed at rest ${zm0.alarmed.length}`);
+  const iso = await pg.evaluate(() => {
+    const W = window.RZDatahallAIFireWorkstation, inv = W.inventory(), Z = 'DH-01-Z12', base = { owner: 'shift-a', reason: 'drawing gate: drive Z12 below two means', expiryId: '8h', acknowledged: true };
+    W.clearRegister();
+    const ids = inv.points.filter((p) => p.zoneIds.includes(Z) && (p.type === 'vesda' || p.means === 'smoke_l1')).map((p) => p.id);
+    return ids.map((id) => W.isolate({ ...base, pointId: id }).ok).filter((x) => !x).length;
+  });
+  await wait(4800);
+  const zm1 = await pg.evaluate(zoneProbe);
+  law('F17', iso === 0 && zm1.bad.length === 0 && zm1.z12 === '1' && zm1.stray.length === 0, `Z12 below two means: refusals ${iso}, Z12 priority ${zm1.z12}, marked [${zm1.alarmed.join(', ')}] (zones without an isolated point marked: ${zm1.stray.length}), values ${zm1.bad.length ? zm1.bad.slice(0, 2).join('; ') : 'match the register'}`);
+  await pg.evaluate(() => window.RZDatahallAIFireWorkstation.clearRegister()); await wait(4800);
+  const zm2 = await pg.evaluate(zoneProbe);
+  law('F18', zm2.alarmed.length === 0 && zm2.bad.length === 0, `after Clear: alarmed ${zm2.alarmed.length}, values ${zm2.bad.length ? 'differ' : 'match'}`);
 }
 await showSheet(pg, 'fire', 'Mimic'); await wait(1500);   // H15 below measures the first visible frame: the process sheet it always measured
 law('F9', pg.errors.length === 0, `page errors so far:${pg.errors.length}${pg.errors.length ? ' — ' + pg.errors[0].slice(0, 160) : ''}`);

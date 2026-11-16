@@ -54,7 +54,7 @@ function ctxFor(overrides = {}) {
         tick: overrides.tick ?? 4242, hall: overrides.hall || 1, sim: Sim, fire: overrides.fire || null,
     };
 }
-const SAMPLE_ID = { cdu: '4', chiller: '3', 'dry-cooler': '2', crah: '7', 'fire-zone': '1', 'fire-vesda': '2', 'net-spine': '0', 'net-leaf': '1', 'net-domain': '3', room: 'ups-a', 'fire-mcp': '1', 'bms-controller': '2' };
+const SAMPLE_ID = { 'fire-output': 'ahu_crah', cdu: '4', chiller: '3', 'dry-cooler': '2', crah: '7', 'fire-zone': '1', 'fire-vesda': '2', 'net-spine': '0', 'net-leaf': '1', 'net-domain': '3', room: 'ups-a', 'fire-mcp': '1', 'bms-controller': '2' };
 const idFor = (classId) => SAMPLE_ID[classId] || 'dh01';
 const TABS = ['live', 'capacity', 'deps', 'alarms', 'trend', 'maint'];
 const rowsOf = (p) => TABS.filter((t) => Array.isArray(p.tabs[t])).flatMap((t) => p.tabs[t]);

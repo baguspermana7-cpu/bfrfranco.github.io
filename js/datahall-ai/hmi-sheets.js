@@ -1217,7 +1217,40 @@
     return finish(s);
   }
 
-  var BUILDERS = { 'dh-m-103': dhM103, cdu: cduSheet, 'dh-e-101': dhE101, 'dh-r-101': dhR101, 'dh-f-101': dhF101, 'dh-e-001': dhE001, 'dh-n-101': dhN101, 'dh-a-101': dhA101, 'dh-b-101': dhB101, 'dh-n-102': dhN102, 'dh-n-104': dhN104, 'dh-m-102': dhM102, 'dh-m-104': dhM104, 'dh-m-101': dhM101, chiller: chillerL3, crah: crahL3, battery: batteryL3, 'pump-station': pumpStationL3, 'tcs-manifold': tcsManifoldL3, 'chem-dosing': chemDosingL3, 'dry-cooler': dryCoolerL3, switch: switchL3, 'bms-controller': bmsCtlL3, 'sld-mimic': sldMimicL3, 'rack-power': rackPowerL3, stp: stpL3, ahu: ahuL3, tray: trayL3, 'nvswitch-tray': nvswitchTrayL3, 'dh-f-102': dhF102, 'dh-f-103': dhF103 };
+  /* ── DH-F-104 fire zone map, DH-01: the hall floor to the engine's scale (the bands of DH-A-101: fan-wall galleries,
+     rack field, cross aisle, CDU gallery) with the fire inventory's zones where their contents stand — Z05-Z08 the rack
+     row quarters, Z01-Z04 the CDU line quarters — and the ancillary rooms Z09-Z12 drawn square to their stated area.
+     Each zone is a fire-zone item: outline state from the zone payload, detection means available / total inside. ── */
+  function dhF104(snap, o) {
+    var inv = o && o.fire; if (!inv) throw new Error('hmi-sheets: dh-f-104 needs the fire inventory');
+    var Lm = need(snap, 'geometry.hall_length_m'), Wm = need(snap, 'geometry.hall_width_m'), rowLen = need(snap, 'geometry.row_length_m');
+    var cross = need(snap, 'geometry.cross_aisle_m'), cduDepth = need(snap, 'geometry.cdu_line_depth_m'), galleries = need(snap, 'geometry.fan_wall_galleries');
+    var zones = inv.zones.filter(function (z) { return z.hall === 1; }), anc = zones.filter(function (z) { return z.n > 8; });
+    var SC = 700 / Lm, M = 40, X = function (m) { return M + m * SC; }, Y = function (m) { return 70 + m * SC; };
+    var side = function (z) { return Math.sqrt(z.areaM2) * SC; }, colW = Math.max.apply(null, anc.map(side)), rx = X(Lm) + 60;
+    var W = Math.round(rx + 2 * colW + 20 + M), H = Math.round(Math.max(Y(Wm), 70 + 2 * colW + 30) + 50);
+    var s = Sheet({ id: 'dh-f-104', no: 'DH-F-104', title: 'DH-01 FIRE ZONES', size: [W, H], svgId: 'fireZoneSvg', sheet: '4/4', basis: 'engine hall geometry + fire inventory' });
+    var fw = (Wm - rowLen - cross - cduDepth) / galleries, bands = [['FAN WALL A', fw], ['', rowLen], ['CROSS AISLE', cross], ['', cduDepth], ['FAN WALL B', fw]], yb = 0;
+    s.areas.push({ x: X(0) - 5, y: Y(0) - 5, w: Lm * SC + 10, h: Wm * SC + 10, kind: 'box' });
+    bands.forEach(function (b) { b.y = yb; if (b[0]) s.notes.push({ x: X(0) + 6, y: Y(yb + b[1] / 2) + 3, text: b[0], role: 'tag' }); yb += b[1]; });
+    var bx = function (z, x, y, w, h) {
+      s.n({ id: 'z' + pad(z.n), tag: 'Z' + pad(z.n), text: 'Z' + pad(z.n), textRole: 'tag', textAt: 'top', name: z.name.toUpperCase(), box: [w, h], x: x + w / 2, y: y + h / 2,
+        cls: 'fire-zone', eqId: z.id, boxSym: 'fire-zone', values: [{ k: 'means' }], label: 'Fire zone ' + z.id.slice(-3) + ' ' + z.name + ', ' + z.areaM2 + ' m²' + (z.release ? ', clean-agent release' : '') + (z.epo ? ', zoned EPO' : '') });
+    };
+    zones.forEach(function (z) {
+      if (z.n > 8) return;
+      var q = (z.n - 1) % 4, rack = z.n >= 5, band = rack ? bands[1] : bands[3];
+      bx(z, X(q * Lm / 4) + 3, Y(band.y) + 3, Lm / 4 * SC - 6, band[1] * SC - 6);
+    });
+    anc.forEach(function (z, i) {
+      var sd = side(z), cx = rx + (i % 2) * (colW + 20), cy = 70 + Math.floor(i / 2) * (colW + 20);
+      bx(z, cx, cy, sd, sd);
+    });
+    s.notes.push({ x: rx, y: 60, text: 'ANCILLARY ROOMS', role: 'tag' });
+    return finish(s);
+  }
+
+  var BUILDERS = { 'dh-m-103': dhM103, cdu: cduSheet, 'dh-e-101': dhE101, 'dh-r-101': dhR101, 'dh-f-101': dhF101, 'dh-e-001': dhE001, 'dh-n-101': dhN101, 'dh-a-101': dhA101, 'dh-b-101': dhB101, 'dh-n-102': dhN102, 'dh-n-104': dhN104, 'dh-m-102': dhM102, 'dh-m-104': dhM104, 'dh-m-101': dhM101, chiller: chillerL3, crah: crahL3, battery: batteryL3, 'pump-station': pumpStationL3, 'tcs-manifold': tcsManifoldL3, 'chem-dosing': chemDosingL3, 'dry-cooler': dryCoolerL3, switch: switchL3, 'bms-controller': bmsCtlL3, 'sld-mimic': sldMimicL3, 'rack-power': rackPowerL3, stp: stpL3, ahu: ahuL3, tray: trayL3, 'nvswitch-tray': nvswitchTrayL3, 'dh-f-102': dhF102, 'dh-f-103': dhF103, 'dh-f-104': dhF104 };
   for (var hb = 2; hb <= 9; hb++) BUILDERS['dh-e-10' + hb] = dhE101;   // DH-E-102 ... : same builder, o.hall picks the hall (the builder refuses a hall the engine does not have)
   var API = {
     build: function (id, snap, o) { if (!BUILDERS[id]) throw new Error('hmi-sheets: no sheet ' + id); return BUILDERS[id](snap, o); },

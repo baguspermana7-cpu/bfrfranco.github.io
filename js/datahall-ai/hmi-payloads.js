@@ -1051,6 +1051,48 @@
     b.S('live', 'temp_c', 'Zone ceiling temperature', { plane: 'p11_air_return_c' }, 1, '°C');
     b.trend('temp_c', 'Ceiling temperature', '°C', { plane: 'p11_air_return_c' }, 1);
   });
+  /* a fire interlock (DH-F-103 control module), id = the C&E output system: what the matrix makes it do, and its
+     command in the C&E evaluation of the running training event — the run's own event and zone, elapsed seconds,
+     runtime rows and release interlocks from the fire workstation. No event running = no command. */
+  var ILK_NAME = { ahu_crah: 'AHU / CRAH engineered shutdown', smoke_control: 'Smoke dampers and enclosure isolation', access_control: 'Egress door release',
+    elevator: 'Lift recall', zoned_epo: 'Zoned emergency power off', leak_control: 'Leak isolation valve', generator: 'Generator fire sequence', preaction: 'Pre-action valve',
+    notification: 'Sounders and strobes', public_address: 'Voice evacuation', fire_brigade: 'Fire brigade link', noc_sms: 'NOC on-call escalation', cctv: 'CCTV bookmark',
+    bms_event: 'BMS / DCIM event (monitor only)', clean_agent: 'Clean-agent release' };
+  var ILK_REASON = 'command of this output in the cause-and-effect evaluation (RZDatahallAIFireCauseEffect.evaluateEvent) of the running training event; none when no event runs (Track A §A6)';
+  var ILK_SPEC = 'cause-and-effect matrix rows (js/datahall-ai/fire-cause-effect.js BASE_ROWS): the immutable training matrix, not measurements (Track A §A6)';
+  function interlockCommand(sys) {
+    var CE = root && root.RZDatahallAIFireCauseEffect, W = root && root.RZDatahallAIFireWorkstation, ci = W && W.causeEffectInput ? W.causeEffectInput() : null;
+    if (!CE || !ci || !ci.running || !ci.eventId || !ci.zoneId) { return null; }
+    var ev = { eventId: ci.eventId, zoneId: ci.zoneId, elapsedSeconds: isFinite(ci.elapsedSeconds) ? ci.elapsedSeconds : 0 }, r;
+    if (ci.runtimeRows) { ev.runtimeRows = ci.runtimeRows; } if (ci.interlocks) { ev.interlocks = ci.interlocks; }
+    try { r = CE.evaluateEvent(ev); } catch (e) { return null; }
+    var mine = function (c) { return c.system === sys; }, rowSys = {};
+    CE.BASE_ROWS.forEach(function (row) { rowSys[row.id] = row.outputs.map(function (o) { return o.system; }); });
+    return { eventId: ci.eventId, zoneId: ci.zoneId, elapsed: ev.elapsedSeconds, due: r.commands.filter(mine), pending: r.pending.filter(mine),
+      blocked: r.blocked.filter(function (x) { return (rowSys[x.rowId] || []).indexOf(sys) >= 0; }) };
+  }
+  def('fire-output', { kind: 'scenario', label: 'Fire interlock', system: 'fire', tier2: null }, function (b, ctx, id) {
+    var sys = String(id), CE = root && root.RZDatahallAIFireCauseEffect, hp = hallPrefix(ctx, id);
+    b.title = 'Fire interlock — ' + (ILK_NAME[sys] || sys);
+    var c = interlockCommand(sys), word = !c ? 'none' : c.blocked.length ? 'blocked' : c.due.length ? 'due' : c.pending.length ? 'pending' : 'none';
+    b.ST('live', 'command', 'Command', word, ILK_REASON);
+    b.L('live', 'event', 'Event', c ? c.eventId.replace(/_/g, ' ') + ' · ' + c.zoneId : 'none running');
+    if (c) {
+      c.due.forEach(function (x, i) { b.L('live', 'due_' + i, 'Due', x.action.replace(/_/g, ' ').toLowerCase() + ' · ' + (x.resolvedScope || x.scope)); });
+      c.pending.forEach(function (x, i) { b.D('live', 'pending_' + i, 'Pending ' + x.action.replace(/_/g, ' ').toLowerCase(), 'T-' + Math.max(0, x.delaySeconds - c.elapsed) + ' s', 'engineered delay of the matrix row minus the elapsed training time (Track A §A6)', Math.max(0, x.delaySeconds - c.elapsed)); });
+      c.blocked.forEach(function (x, i) { b.L('live', 'blocked_' + i, 'Blocked', x.reason); });
+      if (c.blocked.length) { b.alarm({ severity: 'critical', point: 'command', text: 'Interlock command blocked — ' + c.blocked[0].reason, state: 'active' }); b.chip('BLOCKED', 'critical'); }
+      else if (c.due.length) { b.chip('COMMANDED', 'warning'); }
+    }
+    if (CE && CE.BASE_ROWS) {
+      var outs = []; CE.BASE_ROWS.forEach(function (row) { row.outputs.forEach(function (o) { if (o.system === sys) { outs.push({ row: row, o: o }); } }); });
+      b.D('capacity', 'matrix_rows', 'Matrix rows driving it', String(outs.length), ILK_SPEC, outs.length);
+      var acts = outs.map(function (x) { return x.o.action.replace(/_/g, ' ').toLowerCase(); }).filter(function (v, i, a) { return a.indexOf(v) === i; });
+      b.L('capacity', 'actions', 'Actions', acts.join(' · '));
+      if (outs.length) { b.L('capacity', 'authority', 'Authority', outs[0].o.authority + ' · ' + outs[0].o.commandType); }
+    }
+    b.dep('upstream', 'fire-facp:' + hp, 'FACP');
+  });
   def('fire-cylinder-bank', { kind: 'scenario', label: 'Agent cylinders', system: 'fire', tier2: null }, function (b, ctx, id) {
     var hp = hallPrefix(ctx, id), fs = ctx.fire && ctx.fire.summary ? ctx.fire.summary : null;
     b.title = 'Cylinder bank ' + hp + ' — ' + agentLabel();

@@ -24,6 +24,9 @@ after the drawing it complements and retires nothing — used where another cont
 | DH-E-101 … DH-E-108 single-line, DH-01 … DH-08 | `dhE101` (`o.hall`) | Electrical → DH-01 … DH-08 (hall sheets mount when their sub-tab draws) | `distribution.*`, `equipment.ups_*`, `transformer_*`; hall count = `equipment.cdu_installed_facility / cdu_installed_per_hall` |
 | DH-R-101 GB300 NVL72 rack | `dhR101` | Rack | `compute.*`, `power.*` |
 | DH-F-101 fire detection, DH-01 | `dhF101` | Fire → Mimic | `RZDatahallAIFirePoints.buildInventory` (133 drawn devices, 12 zones per hall) |
+| DH-F-102 clean-agent release, DH-01 | `dhF102` | Fire → Mimic (own box, under DH-F-101) | fire inventory release zones |
+| DH-F-103 fire interlocks, DH-01 | `dhF103` | Fire → Cause & effect (above the matrix) | the systems `RZDatahallAIFireCauseEffect.BASE_ROWS` command (15 control modules) |
+| DH-F-104 fire zone map, DH-01 | `dhF104` | Fire → Zones (above the zone tiles) | `geometry.*` bands of DH-A-101 + the fire inventory zones (Z09–Z12 square to their stated area) |
 | DH-E-001 site single-line | `dhE001` | Electrical → Overview | `distribution.*`, `equipment.gensets_*`, `site.fuel_autonomy_h` |
 | DH-N-101 compute fabric | `dhN101` | Network → Compute fabric | `network.*` (cores, spines, leaves, link counts) |
 | DH-A-101 room layout, DH-01 (1 : 100 at fit) | `dhA101` | Room Layout (keep mode — joins the building isometric and per-level plans) | `geometry.*`, `equipment.cdu_installed_per_hall`, `crah_installed_per_hall`, fire zones |
@@ -72,7 +75,9 @@ Every count on a sheet is a formula over the engine snapshot or the fire invento
 ```
 sheet { id, no, title, rev, sheet:'n/m', basis, size:[w,h], svgId, nodes:[…], edges:[…], areas:[…], notes:[…] }
 node  { id, tag, sym, x, y, size?, rot?, cls?, eqId?, label, tagAt:'below'|'right'|'left'|'none', values?, lod?, standby? }
-      box node: { box:[w,h], boxSym, text, textRole, marks } (rack slots, busbar, zone heads)
+      box node: { box:[w,h], boxSym, text, textRole, textAt, name?, values?, marks } (rack slots, busbar, zones; a box
+                with `name` / `values` prints them inside, top-left, 12 px apart — a shallow box puts its one value
+                right-aligned on the name line)
       junction: s.j(id, x, y, dot) — a point an edge may start or end on
 edge  { from:'node.port'|'id'|[x,y], to, via:[[x,y]…], medium, w:'main'|'branch'|'signal'|'bus', line? }
 area  { x, y, w, h, kind:'zone'|'box', label? }     note { x, y, text, role, anchor?, lod? }
@@ -85,8 +90,15 @@ to its centre (symbols without ports: detectors, call points, EPO). An unresolve
 `hmi-v2.js read(node)` returns `{state, alarm?, values, rows}` from the HMI payload of `node.cls` (`CLS_PAYLOAD`):
 equipment classes strip the prefix of `eqId` (`CDU-07` → `07`); **fire classes pass the full inventory id**
 (`DH-01-Z05-SD1-02`) and map the workstation point state — alarm/active/discharged → `fault` + P1, pre-alarm /
-trouble / impaired → P2, isolated / expired → `standby` + P3, no payload → `unknown` (gate F5 fails on any). The sheet
-repaints every 4 s (`sheet.update()`), only while visible.
+trouble / impaired → P2, isolated / expired → `standby` + P3, no payload → `unknown` (gate F5 fails on any); the
+payload's own alarm list counts too (O5) — the highest priority wins, so an impaired zone (a `high` alarm) is P1. A
+fire zone with `values: [{k:'means'}]` prints its detection means available / total from the isolation register
+(`n/m MEANS`, P1 below two). **Interlocks (DH-F-103, class `fire-output`, `eqId` = C&E system):** state from the C&E
+evaluation of the *running* training event (the run's own event and zone, elapsed seconds, runtime rows, release
+interlocks): a blocked command → `fault` + P1, due → P2, pending (engineered delay) → P3; no event running → `normal`
+on every module — the panel commands nothing at rest. The payload context key carries the fire workstation snapshot's
+identity, so an isolation, a restore or a run repaints at once, not at the next tick (gate F17). The sheet repaints
+every 4 s (`sheet.update()`), only while visible.
 
 Click → `open(node)` → the L3 modal (`cdu` class draws its own sheet; other classes keep the current HMI modal).
 
@@ -114,9 +126,15 @@ inventory (133 for DH-01), F4 title + focus on every node, F5 no `unknown` state
 F7 words ≤ 25 and 0 gradient/filter, F8 no page overflow at 390, F9 0 console errors — in
 `tools/test-dh-drawings.mjs` as the `fire` block (browser) and the Node geometry check (133/133 devices, 50/50
 sampling ports, 0 overlaps, 0 nodes outside the sheet).
+Interlocks DH-F-103: F10 one control module per C&E system (15), F11 nothing marked at rest, F12 title + focus and
+the text budget, F13 a running `vesda_fire_2` in Z05 marks exactly the systems the C&E engine has due / pending /
+blocked, F14 Stop clears. Zone map DH-F-104: F15 every zone of the hall once, F16 means = the register, F17 a zone
+isolated below two means is P1 and no zone without an isolated point is marked, F18 Clear restores.
 
 Red proofs on record: the fire block fails F1 on a tree without the `fireSvg` mount; H5 read 1,056 / 1,639 / 1,592
-words on the pre-redraw sheets; H13 read `floorSvg 0×0`.
+words on the pre-redraw sheets; H13 read `floorSvg 0×0`. v3.63.0: F10 and F15 fail on v3.62.1 (not drawn); F17
+read the drawing one register behind (cache keyed on the tick only) and the impaired zone at P2, F18 read the cleared
+register stale (`clearRegister` rendered without evaluating) — all three fixed in the same release.
 
 ## 6. Local mock
 
@@ -126,5 +144,5 @@ educator role, no credential) — the seam is inert on any other host (R142).
 
 ## 7. Open items (owner R139/R140, after v3.60.0)
 
-Network DH-N-101, Room Layout DH-A-101, BMS DH-B-101, cooling sheets 101/102/104/105, electrical 002/003, fire 102–104;
+Network DH-N-101, Room Layout DH-A-101, BMS DH-B-101, cooling sheets 101/102/104/105, electrical 002/003 (fire 102–104 shipped v3.61.1 / v3.63.0);
 loop isolators and pipe end caps on DH-F-101; L3 schematics for the remaining classes (H3 ratchet); more detail per sheet (instrument bubbles, line numbers, valves on every branch).

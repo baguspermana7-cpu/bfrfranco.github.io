@@ -256,7 +256,7 @@
     var F = FP(), t = tick(), n = Object.keys(S.reg.entries).length;
     var rec = { id: 'FIRE-CLR-' + t, timestamp: F.isoFromTick(t), sequence: t * 100 + 99, tag: 'REGISTER', point: 'REGISTER', location: 'facility', system: 'fire', severity: 'info', lifecycle: 'returned_ack', kind: 'discrete',
       previousState: n + ' isolated', currentState: 'cleared', quality: 'simulated', event: 'register-cleared', action: 'clear', scenario: 'training', operator: by || 'operator', message: 'Training isolation register cleared by the operator — ' + n + ' isolation(s) removed from this browser', incidentId: 'CLR-' + t, asset: 'fire-register', source: 'fire-points', runId: 'tick-' + t, trigger: 'operator', reset: 'none' };
-    S.reg = F.createRegister(); saveRegister(); emit([rec]); render(); refreshInspector();
+    S.reg = F.createRegister(); saveRegister(); emit([rec]); evaluate(); render(); refreshInspector();   // evaluate first: the zones read the new register now, not at the next tick (DH-F-104 gate F18)
   }
 
   /* ------------------------------------------------------------------ zones view */

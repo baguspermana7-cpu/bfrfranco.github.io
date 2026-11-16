@@ -113,16 +113,24 @@
   /* the payload context is built once per (tick, cooling scenario, electrical scenario, replay) — it evaluates the whole
      electrical topology, and a repaint reads ~600 nodes: rebuilding it per node cost 2-3 s per repaint (O11 profile) */
   var ctxKey = null, ctxVal = null;
+  /* the fire workstation's snapshot changes on an isolation, a restore or a training run without a tick passing: its
+     identity is part of the context key, so a zone driven below two means repaints at once (DH-F-104 gate F17) */
+  var fireSnapRef = null, fireRev = 0;
+  function fireRevision() {
+    var W = win.RZDatahallAIFireWorkstation, sn = W && W.snapshot ? W.snapshot() : null;
+    if (sn !== fireSnapRef) { fireSnapRef = sn; fireRev++; }
+    return fireRev;
+  }
   function ctx() {
     if (!P || !P.buildContext) return null;
     var sim = win.RZDatahallAISimTelemetry, cs = doc.getElementById('coolingScenario'), es = doc.getElementById('electricalScenario');
-    var k = (sim && sim.tickNow ? sim.tickNow() : '') + '|' + (cs ? cs.value : '') + '|' + (es ? es.value : '') + '|' + (sim && sim.hasProvider && sim.hasProvider() ? 'r' : 's');
+    var k = (sim && sim.tickNow ? sim.tickNow() : '') + '|' + (cs ? cs.value : '') + '|' + (es ? es.value : '') + '|' + (sim && sim.hasProvider && sim.hasProvider() ? 'r' : 's') + '|f' + fireRevision();
     if (k !== ctxKey || !ctxVal) { ctxVal = P.buildContext(win, { hall: 1 }); ctxKey = ctxVal ? k : null; }
     return ctxVal;
   }
   function payload(cls, id) {
     var c = ctx(); if (!c || !P) return null;
-    var key = c.tick + '|' + (c.cooling && c.cooling.scenarioId || '') + '|' + (c.scenario && c.scenario.scenarioId || '') + '|' + (c.sim && c.sim.hasProvider && c.sim.hasProvider() ? 'replay' : 'sim');
+    var key = ctxKey;   // the context key already holds tick, both scenarios, replay and the fire revision
     if (key !== tickSeen) { cache = {}; tickSeen = key; }
     var k = cls + ':' + id;
     if (!cache[k]) { try { cache[k] = P.safePayload(cls, id, c); } catch (e) { cache[k] = null; } }
@@ -224,42 +232,32 @@
     CE.BASE_ROWS.forEach(function (r) { r.outputs.forEach(function (x) { if (!seen[x.system]) { seen[x.system] = 1; out.push(x.system); } }); });
     return out;
   }
-  /* an interlock's state (DH-F-103): its system's commands in the C&E evaluation of the RUNNING training event — the
-     run's own event and zone, its elapsed seconds, runtime rows and release interlocks from
-     the fire workstation. No event running = every output normal: the panel commands nothing at rest. */
-  var ceMemo = { k: null, v: null };
-  function ceEval() {
-    var CE = win.RZDatahallAIFireCauseEffect, W = win.RZDatahallAIFireWorkstation, ci = W && W.causeEffectInput ? W.causeEffectInput() : null;
-    if (!CE || !ci || !ci.running || !ci.eventId || !ci.zoneId) return null;
-    var k = ci.eventId + '|' + ci.zoneId + '|' + ci.elapsedSeconds + '|' + ci.stage;
-    if (ceMemo.k === k) return ceMemo.v;
-    var ev = { eventId: ci.eventId, zoneId: ci.zoneId, elapsedSeconds: isFinite(ci.elapsedSeconds) ? ci.elapsedSeconds : 0 };
-    if (ci.runtimeRows) ev.runtimeRows = ci.runtimeRows; if (ci.interlocks) ev.interlocks = ci.interlocks;
-    var r = null; try { r = CE.evaluateEvent(ev); } catch (e) { r = null; }
-    ceMemo = { k: k, v: r }; return r;
-  }
-  function interlockOf(system) {
-    var r = ceEval(), rowsOf = function (list) { return (list || []).filter(function (c) { return c.system === system; }); };
-    if (!r) return { state: 'normal', values: {}, rows: [['Command', 'none — no fire event running']] };
-    var CE = win.RZDatahallAIFireCauseEffect, sysOfRow = {};
-    CE.BASE_ROWS.forEach(function (row) { row.outputs.forEach(function (x) { (sysOfRow[row.id] = sysOfRow[row.id] || []).push(x.system); }); });
-    var due = rowsOf(r.commands), pend = rowsOf(r.pending), blk = (r.blocked || []).filter(function (b) { return (sysOfRow[b.rowId] || []).indexOf(system) >= 0; });
-    var tip = due.map(function (c) { return ['Due', c.action.replace(/_/g, ' ').toLowerCase() + ' · ' + (c.resolvedScope || c.scope)]; })
-      .concat(pend.map(function (c) { return ['Pending', c.action.replace(/_/g, ' ').toLowerCase() + ' · T-' + Math.max(0, c.delaySeconds - (r.elapsedSeconds || 0)) + ' s']; }))
-      .concat(blk.map(function (b) { return ['Blocked', b.reason]; }));
-    if (blk.length) return { state: 'fault', alarm: '1', values: {}, rows: tip };
-    if (due.length) return { state: 'running', alarm: '2', values: {}, rows: tip };
-    if (pend.length) return { state: 'standby', alarm: '3', values: {}, rows: tip };
-    return { state: 'normal', values: {}, rows: [['Command', 'none for this event']] };
+  /* an interlock's state (DH-F-103): the `command` row of its fire-output payload (hmi-payloads.js evaluates the C&E
+     matrix for the running training event) — blocked P1, due P2, pending P3, none = normal: the panel commands
+     nothing at rest */
+  var ILK = { blocked: ['fault', '1'], due: ['running', '2'], pending: ['standby', '3'] };
+  function interlockOf(n) {
+    var p = payload('fire-output', String(n.eqId)), r = find(p, /^command$/i), m = r && ILK[r.state], tip = [];
+    rows(p).slice(0, 6).forEach(function (x) { tip.push([x.label, text(x)]); });
+    return { state: m ? m[0] : 'normal', alarm: m ? m[1] : null, values: {}, rows: tip };
   }
   function read(n, sheet) {
     if (n.sym === 'junction') return {};
-    if (n.cls === 'fire-output') return interlockOf(n.eqId);
+    if (n.cls === 'fire-output') return interlockOf(n);
     var cls = n.cls && CLS_PAYLOAD[n.cls], id = n.eqId || n.id, fire = !!cls && cls.indexOf('fire-') === 0;
     var fullId = fire || cls === 'net-zone';   // fire points and security zones keep their full id (DH-01-Z05-SD1-02, Z-EXT)
     var p = cls ? payload(cls, fullId ? String(id) : String(id).replace(/^[A-Z]+-?/, '').replace(/-\d+$/, '') || '1') : null;
     var tip = [];
-    if (fire) { var fs = fireStateOf(p); rows(p).slice(0, 6).forEach(function (r) { tip.push([r.label, text(r)]); }); return { state: fs.state, alarm: fs.alarm, values: {}, rows: tip }; }
+    if (fire) {
+      var fs = fireStateOf(p), fv = {};
+      rows(p).slice(0, 6).forEach(function (r) { tip.push([r.label, text(r)]); });
+      (n.values || []).forEach(function (x) {   // a zone's detection means available of total (DH-F-104), from the isolation register
+        if (x.k !== 'means') return; var r = find(p, /^means available$/i), m = r && /^(\d+) of (\d+)$/.exec(text(r));
+        fv.means = { text: m ? m[1] + '/' + m[2] + ' MEANS' : '—', alarm: m && +m[1] < 2 ? '1' : null };
+      });
+      var fal = alarmOf(p), prio = [fs.alarm, fal && fal.prio].filter(Boolean).sort()[0] || null;   // O5: the payload's own alarm list counts too (an impaired zone is a high alarm)
+      return { state: fs.state, alarm: prio, ack: fal ? fal.ack : false, values: fv, rows: tip };
+    }
     var es = elecState(n, sheet), st = (n.sym === 'offSheet') ? undefined : (es || stateOf(n, p)), v = {}, al = alarmOf(p);
     // a pump carries only its own alarm (point PUMP-n); the unit-level alarm belongs to the unit's main symbol
     if (n.pump) al = alarmOf(p && { tabs: { alarms: (p.tabs.alarms || []).filter(function (a) { return a.point === 'PUMP-' + n.pump; }) } });
@@ -400,6 +398,7 @@
     if (fi) mount('fireSvg', 'dh-f-101', 'hmiFireSvg', { fire: fi });
     if (fi) mountNew('fireSvg', 'dh-f-102', 'hmiFireRelSvg', { fire: fi });   // clean-agent release, under the detection sheet
     var CE = win.RZDatahallAIFireCauseEffect;
+    if (fi) mountNew('fireZonesGrid', 'dh-f-104', 'hmiFireZoneSvg', { fire: fi, loose: true, before: true });   // zone map above the zone tiles (the tiles keep the per-zone detail)
     if (fi && CE && CE.BASE_ROWS) mountNew('fireCauseEffectSummary', 'dh-f-103', 'hmiFireIlkSvg', { fire: fi, loose: true, before: true, systems: ceSystems(CE) });   // interlocks, above the C&E matrix they draw
     if (fi) mount('floorSvg', 'dh-a-101', 'hmiFloorPlanSvg', { fire: fi, keep: true });   // Room Layout: the to-scale hall plan joins the building isometric and the per-level plans (kept — their reveal gates stay)
     if (win.BMS_MODEL) mount('bmsSvg', 'dh-b-101', 'hmiBmsSvg', { bms: win.BMS_MODEL });

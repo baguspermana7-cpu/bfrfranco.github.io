@@ -278,8 +278,8 @@ tripped breaker frame in alarm colour; scenario select (existing "Normal 2N", "L
 |---|---|
 | DH-F-101 Detection | Addressable loops from FACP with every device (smoke, heat, MCP, sounder/strobe, interface modules), loop isolators; VESDA units VD-1..4 with the **sampling pipe drawn along the rack rows**, hole spacing, pipe end cap, transport time; zones as boundaries |
 | DH-F-102 Suppression | Clean-agent bank: pilot + agent cylinders, manifold, check valves, selector valves per zone, discharge pressure switches, nozzles in each zone, abort/hold stations, releasing panel logic (cross-zoned: two detection means → release) |
-| DH-F-103 Interlocks | HVAC shutdown, fire/smoke dampers, door release, EPO zones, leak detection rope + panel, gas-detection (Li-ion off-gas) if engine has it |
-| DH-F-104 Zone map | The hall floor (same geometry as Room Layout) with the 12 zones as hatched areas and live state; replaces the 12 text cards |
+| DH-F-103 Interlocks (shipped v3.63.0: the 15 systems the C&E matrix commands, state from the running event) | HVAC shutdown, fire/smoke dampers, door release, EPO zones, leak detection rope + panel, gas-detection (Li-ion off-gas) if engine has it |
+| DH-F-104 Zone map (shipped v3.63.0, above the tiles — the tiles keep the per-zone detail) | The hall floor (same geometry as Room Layout) with the 12 zones as hatched areas and live state; replaces the 12 text cards |
 | Cause & effect | Stays a table (it is a table in practice); cells link to the device on the sheets |
 
 ### 6.5 Room Layout — architectural plan to scale (R129)

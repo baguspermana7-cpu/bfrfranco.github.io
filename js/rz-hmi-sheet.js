@@ -468,7 +468,18 @@
       '<title>' + esc(label) + '</title><g data-sym="' + esc(n.boxSym || 'box') + '"><rect class="b" x="' + r1(x) + '" y="' + r1(y) + '" width="' + w + '" height="' + h +
       '" fill="none" stroke="currentColor" stroke-width="1"/>' + marks + '</g>' +
       (n.text ? '<text data-role="' + (n.textRole || 'label') + '" x="' + r1(x + 4) + '" y="' + r1(n.textAt === 'top' ? y + 12 : y + h / 2 + 3.2) + '">' + esc(n.text) + '</text>' : '') +
-      '</g>';
+      '</g>' + boxLines(n, x, y);
+  }
+  /* a room-sized box (a fire zone on DH-F-104) carries its name and live values inside, top-left under its text, 12 px
+     apart like a symbol's tag / name / rating stack; outside the node group so they are text, not the hit target */
+  function boxLines(n, x, y) {
+    var out = '', ly = y + 12 + (n.text ? 12 : 0), vs = n.values || [];
+    var flat = n.name && vs.length === 1 && ly + 12 + 4 > y + n.box[1];   // a shallow box: the value goes right-aligned on the name's line
+    if (n.name) { out += '<text data-role="name" data-name-of="' + esc(n.id) + '" x="' + r1(x + 4) + '" y="' + r1(ly) + '">' + esc(n.name) + '</text>'; if (!flat) ly += 12; }
+    vs.forEach(function (v) {
+      out += '<text data-role="value" data-lod="' + (v.lod || 1) + '" data-val="' + esc(n.id) + ':' + esc(v.k) + '" x="' + r1(flat ? x + n.box[0] - 4 : x + 4) + '" y="' + r1(ly) + '"' + (flat ? ' text-anchor="end"' : '') + '>—</text>'; ly += 12;
+    });
+    return out;
   }
 
   function titleBlock(s, W, H) {
