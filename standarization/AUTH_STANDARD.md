@@ -378,6 +378,18 @@ LTC labs.
 },
 ```
 
+**Fail closed until `_rzAuth` decides (v3.63.2).** A page's inline gate starts with `body.locked` and calls
+`_rzAuth.enforceTierFeatureAccess(pageKey)` once auth.js has loaded. Until then — or when auth.js never loads — it keeps
+the lock. It never reads `rz_premium_session` (or any other client-written record) to unlock: anyone can write that key
+from the console. datahallAI.html: gate `tools/test-dh-operator.mjs` A1 (auth.js blocked + a forged root session stays
+locked; failed on v3.63.1) and A2 (a signed-in Pro session still opens). dc-conventional.html still carries the old
+`readSessionDirect()` fallback (owner of that page to align).
+
+Scope of this rule: it covers the inline gate only. `_rzAuth` itself still takes the role from the stored session record
+(`auth.js` `getSession`, `enforceTierFeatureAccess`), which is also client-written — a hand-written `role: "root"` passes
+once auth.js has loaded. That is open as S1 in `documentation/prd/datahall-ai/PLAN_AUDIT_2026_11_16.md` (v3.64.0: role
+only from a verified Supabase session).
+
 ### Educator allowlist storage (server, v3.57.x — audit F2)
 
 Educator status comes **only from the server**: `public.is_educator()` is true

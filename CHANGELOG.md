@@ -11,6 +11,24 @@ release sections rather than semver.
 
 ---
 
+## v3.63.2 — 2026-11-16 — datahallAI: the access gate fails closed without auth.js
+
+### Security
+- **With auth.js not loaded, a stored session no longer opens datahallAI.** When `_rzAuth` was not (yet) loaded, the
+  page's inline gate read `rz_premium_session` from localStorage and unlocked for any record with an email (role `root`
+  or a listed address gave root). Anyone could write that key from the console; with auth.js blocked the page stayed
+  open. The gate now keeps the lock until `_rzAuth.enforceTierFeatureAccess('datahall-ai')` decides; the direct reader
+  and its email lists are removed. Found by the v3.63.0 audit (LOW, pre-existing).
+- **Still open (not fixed here):** with auth.js loaded, `_rzAuth` itself trusts the role in the same client-written
+  record (`auth.js` `getSession` / `enforceTierFeatureAccess`), so a hand-written `role: "root"` still unlocks this and
+  every other gated page. Read from the code, not yet reproduced in a browser. Planned for v3.64.0
+  (`documentation/prd/datahall-ai/PLAN_AUDIT_2026_11_16.md`, S1 / wave W2).
+
+### Gates
+- `tools/test-dh-operator.mjs` A1: auth.js blocked + a forged root session → page locked (FAIL on v3.63.1, PASS now);
+  A2: a signed-in Pro session (Supabase stub) still opens (FAIL under a mutation that always locks).
+- Standard: `standarization/AUTH_STANDARD.md` page-access convention, "Fail closed until `_rzAuth` decides".
+
 ## v3.63.1 — 2026-11-16 — audit of v3.63.0: one modal slot no longer shows the previous item's reading
 
 ### Fixed

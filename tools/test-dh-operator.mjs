@@ -21,6 +21,9 @@
  *      ≤ 20 ms at 1440 and ≤ 34 ms at 390 with 4x CPU throttle (headless Chrome, software compositing); alarm source
  *      change -> badge on the sheet < 500 ms
  *   O8 reduced motion: with prefers-reduced-motion: reduce no flow path animates
+ *   A1 fail closed: with auth.js blocked and a forged root session in localStorage the page stays locked (the gate
+ *      never unlocks from a client-written record; only _rzAuth decides)
+ *   A2 a signed-in Pro session (Supabase module stub, no audit helper) still opens the page
  *
  *   node tools/test-dh-operator.mjs            # exit 1 on any failed law (run under rz-lane)
  */
@@ -236,6 +239,32 @@ await repaint(pr);
 const r = await probe(pr);
 law('O8', r.anim === 0, `prefers-reduced-motion: ${r.anim} flow paths animate (want 0)`);
 await pr.close();
+
+// ── fail closed without auth.js (A1) ────────────────────────────────────────────────────────────────────────
+{
+  const pa = await browser.newPage();
+  await pa.setRequestInterception(true);
+  pa.on('request', (r) => (r.url().startsWith(ORIGIN) && !/\/auth(\.min)?\.js/.test(r.url()) ? r.continue() : r.abort()));
+  await pa.evaluateOnNewDocument(() => { try { localStorage.setItem('rz_premium_session', JSON.stringify({ email: 'forged@example.com', role: 'root', expires: '2099-01-01T00:00:00Z' })); } catch (e) { /* none */ } });
+  await pa.goto(ORIGIN + 'datahallAI.html', { waitUntil: 'networkidle2', timeout: 60000 });
+  await wait(2200);
+  const a1 = await pa.evaluate(() => ({ locked: document.body.classList.contains('locked'), auth: !!window._rzAuth }));
+  law('A1', a1.locked && !a1.auth, `auth.js blocked + forged root session: page locked ${a1.locked} (want true), _rzAuth present ${a1.auth}`);
+  await pa.close();
+  const ps = await browser.newPage();
+  await ps.setRequestInterception(true);
+  ps.on('request', (r) => {
+    if (isSupabaseModule(r.url())) return r.respond({ status: 200, contentType: 'text/javascript', body: signedInSupabaseBody({ email: 'educator@resistancezero.com', tier: 'pro', educator: true }) });
+    return r.url().startsWith(ORIGIN) || r.url().startsWith('data:') ? r.continue() : r.abort();
+  });
+  await ps.evaluateOnNewDocument((entries) => { try { entries.forEach(([k, v]) => localStorage.setItem(k, v)); } catch (e) { /* none */ } },
+    signedInStorage({ email: 'educator@resistancezero.com', tier: 'pro', role: 'educator' }));
+  await ps.goto(ORIGIN + 'datahallAI.html', { waitUntil: 'networkidle2', timeout: 60000 });
+  await wait(2200);
+  const a2 = await ps.evaluate(() => ({ locked: document.body.classList.contains('locked'), auth: !!window._rzAuth }));
+  law('A2', !a2.locked && a2.auth, `signed-in Pro session: page locked ${a2.locked} (want false), _rzAuth present ${a2.auth}`);
+  await ps.close();
+}
 
 await browser.close(); srv.close();
 const failed = results.filter((x) => !x.ok);

@@ -772,7 +772,7 @@ body[data-datahall-authority="unavailable"] #tabs,
 body[data-datahall-authority="unavailable"] .wrap{display:none !important}
 body[data-datahall-authority="unavailable"] .hdr-r>.dot{background:#64748b !important;box-shadow:none !important;animation:none !important}
 body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:none}
-</style>    <script src="js/rz-version.js?v=20261116-881083df" defer></script>
+</style>    <script src="js/rz-version.js?v=20261116-ca9e8869" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <!-- v3.5.0 — hold the 8.5px legibility floor by SCALE, not by font size. Five of this page's
          fifteen diagrams were already clear; the dense ones (cooling P&ID, the four SLDs, the hall
@@ -12381,42 +12381,14 @@ inner.addEventListener('touchend',function(){lastDist=0},{passive:true});
 <script src="rz-engine.min.js?v=20261114-fd034bc4" defer></script>
 <script>
 (function(){
-    /* Tier-feature gate. Replaces the legacy ROOT_ONLY hard block with the
-       4-tier matrix in rz-feature-flags.js (`datahall-ai` page-access).
-       Pro + Educator + Root pass; Demo + Free see the upgrade modal.
-       Robust against auth.js / feature-flags-js load order: falls back to a
-       direct localStorage read when the helpers are not yet available. */
-    var ROOT_EMAILS = ['admin@resistancezero.com', 'bagus@resistancezero.com'];
-    var DEMO_EMAILS = ['demo@resistancezero.com'];
-    function readSessionDirect(){
-        try {
-            var raw = localStorage.getItem('rz_premium_session');
-            if (!raw) return null;
-            var s = JSON.parse(raw);
-            if (!s || !s.email) return null;
-            if (s.expires && new Date(s.expires) < new Date()) return null;
-            return s;
-        } catch(e){ return null; }
-    }
-    function tierDirect(){
-        var s = readSessionDirect();
-        if (!s) return 'free';
-        var email = String(s.email).toLowerCase();
-        if (s.role === 'root' || ROOT_EMAILS.indexOf(email) !== -1) return 'root';
-        if (DEMO_EMAILS.indexOf(email) !== -1) return 'demo';
-        return 'pro';
-    }
-    function allowedDirect(){
-        var t = tierDirect();
-        return t === 'root' || t === 'pro';
-    }
+    /* Tier-feature gate (`datahall-ai` page-access in rz-feature-flags.js): Pro + Educator + Root pass; Demo + Free
+       see the upgrade modal. Only _rzAuth (auth.js) decides. Until it has loaded, or if it never loads, the page stays
+       locked: a session record in localStorage is client-written and never unlocks it (gate A1, v3.63.2). */
     function applyGate(){
-        var ok;
         if (window._rzAuth && typeof window._rzAuth.enforceTierFeatureAccess === 'function') {
-            ok = window._rzAuth.enforceTierFeatureAccess('datahall-ai');
+            window._rzAuth.enforceTierFeatureAccess('datahall-ai');
         } else {
-            ok = allowedDirect();
-            document.body.classList.toggle('locked', !ok);
+            document.body.classList.add('locked');
         }
     }
     var b = document.getElementById('rootLoginBtn');
