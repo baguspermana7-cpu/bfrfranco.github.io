@@ -396,6 +396,7 @@
     sheets[sheetId] = R.render(host, sheet, sheetOpts({ open: open, sheet: sheetId }));
   }
   function mountAll() {
+    var OP = win.RZDatahallAIHmiOpeners = win.RZDatahallAIHmiOpeners || {}; if (!OP.fire) OP.fire = openFireZone;   // tier-2 of the fire-zone payload
     mount('coolSvg', 'dh-m-103', 'hmiCoolSvg');
     mountNew('coolSvg', 'dh-m-101', 'hmiCoolOverSvg', { before: true });                         // overview first: where every item sits
     mountNew('coolSvg', 'dh-m-102', 'hmiCoolPlantSvg');                                          // heat rejection, after the CDU line
@@ -582,6 +583,34 @@
         if (api) { api.trace(n.id, dir); api.focus(n.id); }
       });
     });
+    back.querySelector('[data-close]').focus();
+    return true;
+  }
+  /* a fire zone's detection schematic (opener 'fire', the zone payload's tier-2): the fire-zone-l3 sheet with the zone's
+     points beside it; the same modal shell as the CDU (focus moved in, Escape and the backdrop close, focus returned) */
+  function openFireZone(zid, pointId) {
+    var fi = fireInventory(), snap = win.DCAI_CALC && win.DCAI_CALC.snapshot; if (!fi || !snap || !win.RZHmiSheet || !win.RZDatahallAISheets) return false;
+    var sheet; try { sheet = win.RZDatahallAISheets.build('fire-zone-l3', snap, { fire: fi, zone: String(zid), point: pointId }); } catch (e) { if (win.console) console.warn('hmi-v2: fire zone — ' + e.message); return false; }
+    lastFocus = doc.activeElement;
+    if (!back) {
+      back = el('div', { class: 'hmi-modal-back', hidden: '' });
+      back.addEventListener('click', function (e) { if (e.target === back) close(); });
+      doc.addEventListener('keydown', function (e) { if (e.key === 'Escape' && back && !back.hidden) close(); });
+      doc.body.appendChild(back);
+    }
+    var p = payload('fire-zone', String(zid)), rs = rows(p), z = fi.zoneById[String(zid)];
+    var pts = rs.slice(0, 16).map(function (r) {
+      return '<div class="hmi-pt"' + (r.alarm ? ' data-alarm="' + r.alarm + '"' : '') + (r.point ? ' title="Point ' + String(r.point) + '"' : '') + '><span class="pt-label">' + (r.label || '') + '</span><span class="pt-val">' + text(r) + '</span></div>';
+    }).join('');
+    var al = p && p.tabs && p.tabs.alarms ? p.tabs.alarms : [];
+    back.innerHTML = '<div class="hmi-modal" role="dialog" aria-modal="true" aria-labelledby="hmiModalTag" data-rz-modal-class="fire-zone">' +
+      '<header><span class="tag" id="hmiModalTag">' + String(zid).replace(/^DH-\d\d-/, '') + '</span><span class="cls">Fire zone · ' + (z ? z.name : '') + '</span><span class="state">' + text(find(p, /^state$/i)) + '</span><span class="sp"></span>' +
+      '<button type="button" class="hmi-btn" data-close aria-label="Close">&#215;</button></header>' +
+      '<div class="hmi-m-draw"></div><div class="hmi-m-pts" data-rz-authored-basis="fire-zone payload rows (js/datahall-ai/hmi-payloads.js): means and isolations from the training isolation register, area from the engine hall geometry, ceiling temperature simulated on design plane p11 (Track A §A6)"><div class="hmi-m-sec">Points</div>' + (pts || '<p>—</p>') + '</div>' +
+      '<div class="hmi-m-foot"><div><div class="hmi-m-sec">Alarms</div><ul class="hmi-evt">' + (al.map(function (a) { return '<li>' + (a.text || a.point || '') + '</li>'; }).join('') || '<li>None active</li>') + '</ul></div></div></div>';
+    back.hidden = false;
+    modalSheet = win.RZHmiSheet.render(back.querySelector('.hmi-m-draw'), sheet, sheetOpts({ sheet: 'fire-zone-l3' }));
+    back.querySelector('[data-close]').addEventListener('click', close);
     back.querySelector('[data-close]').focus();
     return true;
   }

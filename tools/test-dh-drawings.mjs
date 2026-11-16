@@ -24,6 +24,7 @@
  *     nothing marked at rest, a running training event marks exactly the systems the C&E engine has due / pending /
  *     blocked for that event and zone, Stop returns every module to normal
  * M1  every BMS block kind (server, ring switch, gateway, LDC, controller) opens with its own L3 schematic
+ * M2  a fire zone click opens its detection schematic with every device of the zone; Shift+click keeps the inspector
  * F15-F18 zone map DH-F-104 (Zones view): every zone of the hall once, means available / total = the isolation
  *     register, a zone isolated below two means shows its alarm (and only it), Clear restores
  * H7-H10, H14 (geometry, engine binding, trace, colour, a11y) land with the phases that build them.
@@ -315,6 +316,25 @@ const bmsM = await pg.evaluate(async () => {
   return out;
 });
 law('M1', bmsM.every((x) => x.ok), 'BMS modal kinds with an L3 schematic holding the opened block: ' + bmsM.map((x) => `${x.kind} ${x.ok ? 'ok' : 'NO'} (${x.syms || 0} symbols${x.mine ? '' : ', opened block not drawn'})`).join(', '));
+
+// ── M2 fire zone: a click on a zone opens its detection schematic with every device of the zone drawn (loops, aspirating
+// unit, EPO, release line); Shift+click keeps the inspector (the isolation workflow) ───────────────────────────────────
+await showSheet(pg, 'fire', 'Zones'); await wait(1500);
+const fz = await pg.evaluate(async () => {
+  const inv = window.RZDatahallAIFireWorkstation.inventory(), Z = 'DH-01-Z11';
+  const want = inv.points.filter((p) => (p.zoneId === Z && /^(smoke_spot|heat_spot|beam|lhd|mcp|epo|abort|release|preaction_solenoid)$/.test(p.type)) || (p.type === 'vesda' && p.zoneIds.includes(Z))).map((p) => p.id).sort();
+  const t = document.querySelector(`.rz-fire-tile[data-rz-equipment="fire-zone:${Z}"]`); if (!t) return { tile: false };
+  t.dispatchEvent(new MouseEvent('click', { bubbles: true })); await new Promise((r) => setTimeout(r, 1000));
+  const m = document.querySelector('.hmi-modal-back:not([hidden]) .hmi-modal'), sv = m && m.querySelector('svg.hmi-svg');
+  const got = sv ? [...sv.querySelectorAll('.hmi-node[data-rz-equipment^="fire-"]')].map((g) => g.getAttribute('data-rz-equipment').split(':').slice(1).join(':')).filter((id) => want.includes(id)).sort() : [];
+  const head = sv ? !!sv.querySelector(`[data-rz-equipment="fire-zone:${Z}"]`) : false;
+  document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await new Promise((r) => setTimeout(r, 300));
+  t.dispatchEvent(new MouseEvent('click', { bubbles: true, shiftKey: true })); await new Promise((r) => setTimeout(r, 800));
+  const insp = [...document.querySelectorAll('.rz-inspector')].some((x) => !x.hidden && x.getBoundingClientRect().width > 0), modal2 = !!document.querySelector('.hmi-modal-back:not([hidden])');
+  document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+  return { tile: true, modal: !!sv, head, want: want.length, got: got.length, missing: want.filter((x) => !got.includes(x)).slice(0, 4), insp, modal2 };
+});
+law('M2', fz.tile && fz.modal && fz.head && fz.want > 0 && fz.got === fz.want && fz.insp && !fz.modal2, `fire zone Z11 click: schematic ${fz.modal ? 'drawn' : 'NOT drawn'}, devices ${fz.got}/${fz.want}${fz.missing && fz.missing.length ? ' missing ' + fz.missing.join(' ') : ''}; Shift+click inspector ${fz.insp ? 'open' : 'NOT open'}${fz.modal2 ? ' (modal opened too)' : ''}`);
 
 // ── H3 + H1 modals: every equipment class opens its own modal ───────────────────────────────────────────────────
 const classes = new Map();

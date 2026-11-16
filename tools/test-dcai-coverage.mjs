@@ -123,7 +123,8 @@ try {
                 seenModals.add(cls);
                 await btn.click();
                 await sleep(1500);                                   /* first 4 s ticker pass is not needed: tick is pinned */
-                const top = await tab.evaluate(() => { const t = window.DHModal && window.DHModal.top ? window.DHModal.top() : null; return t ? '#' + t.id : ''; });
+                /* a page modal (DHModal stack) or hmi-v2's own sheet modal (.hmi-modal-back — the fire zone schematic, v3.63.0) */
+                const top = await tab.evaluate(() => { const t = window.DHModal && window.DHModal.top ? window.DHModal.top() : null; return t ? '#' + t.id : (document.querySelector('.hmi-modal-back:not([hidden]) .hmi-modal') ? '.hmi-modal-back:not([hidden]) .hmi-modal' : ''); });
                 if (!top) { rows.push(unmeasured(`modal:${cls}`, `panel via ${ref}`, 'panel did not open')); }
                 else {
                     const r = await run(top, {});

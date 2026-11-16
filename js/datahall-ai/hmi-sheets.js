@@ -409,6 +409,59 @@
     return finish(s);
   }
 
+  /* ── L3 of one fire zone (modal from a zone on DH-F-101 / DH-F-104 / the zone tiles): the FACP's loops entering the
+     zone through their short-circuit isolators, every device of the zone on its loop with its tag, the aspirating unit
+     on its sampling pipe, the zone's EPO, and for a clean-agent zone the abort - release - pre-action line to DH-F-102.
+     All items are fire-point / fire-zone items: their states come from the workstation snapshot. ────────────── */
+  function fireZoneL3(snap, o) {
+    var inv = o && o.fire, zid = String((o && o.zone) || ''); if (!inv || !inv.zoneById || !inv.zoneById[zid]) throw new Error('hmi-sheets: fire zone sheet needs the fire inventory and a zone id');
+    var z = inv.zoneById[zid], hp = zid.slice(0, 5), short = function (id) { return id.replace(zid + '-', '').replace(hp + '-', ''); };
+    var SYM = { smoke_spot: 'smokeDetector', heat_spot: 'heatDetector', beam: 'smokeDetector', lhd: 'heatDetector', mcp: 'manualStation' };
+    var pts = inv.points.filter(function (p) { return p.zoneId === zid; }), loops = ['L1', 'L2', 'L3'].filter(function (L) { return pts.some(function (p) { return p.loop === L && SYM[p.type]; }); });
+    var perLoop = Math.max.apply(null, [1].concat(loops.map(function (L) { return pts.filter(function (p) { return p.loop === L && SYM[p.type]; }).length; })));
+    var DX = 64, W = Math.max(900, 260 + perLoop * DX + 120), yL = {}, H = 140 + loops.length * 80 + 200;
+    var s = Sheet({ id: 'fire-zone-l3', no: short(zid), title: hp + ' ' + short(zid) + ' ' + z.name.toUpperCase(), size: [W, H], svgId: 'fireZoneL3Svg', basis: 'NFPA 72 × hall geometry' });
+    s.legend = [['signal', 'SLC LOOP'], ['air', 'SAMPLING PIPE'], ['agent', 'RELEASE LINE']]; s.legendAt = [W - 220, 14];
+    var facp = s.n({ id: 'facp', tag: 'FACP-01', name: 'FIRE ALARM PANEL', sym: 'facp', x: 70, y: 90, size: 40, cls: 'fire-facp', eqId: hp, tagAt: 'below', label: 'Fire alarm control panel ' + hp + ' (sheet DH-F-101)' });
+    s.areas.push({ x: 190, y: 50, w: W - 220, h: H - 80, kind: 'zone' });
+    var hd = s.n({ id: 'zh', tag: short(zid), box: [W - 240, 18], x: 190 + (W - 220) / 2, y: 64, cls: 'fire-zone', eqId: zid, tagAt: 'none', boxSym: 'zone-head',
+      text: short(zid) + ' · ' + Math.round(z.areaM2) + ' m² · ' + z.means.length + ' MEANS', textRole: 'tag', label: z.name + ' — ' + z.means.join(', ') });
+    loops.forEach(function (L, i) {
+      var y = 130 + i * 80; yL[L] = y;
+      var tee = s.j('t-' + L, 140, y, false); s.e(facp + '.loop', tee, 'signal', { w: 'signal', via: [[70, y]] });
+      var iso = s.n({ id: 'iso-' + L, tag: 'ISO-' + L, sym: 'interfaceModule', x: 210, y: y, size: 20, tagAt: 'below', label: 'Loop ' + L + ' short-circuit isolator at the zone boundary' });
+      s.e(tee, iso, 'signal', { w: 'signal', line: L }); var prev = iso;
+      pts.filter(function (p) { return p.loop === L && SYM[p.type]; }).forEach(function (p, k) {
+        var id = s.n({ id: p.id.toLowerCase(), tag: short(p.id), sym: SYM[p.type], x: 280 + k * DX, y: y, size: 28, cls: p.type === 'mcp' ? 'fire-mcp' : 'fire-point', eqId: p.id, tagAt: 'below', label: p.label + ' · ' + p.address });
+        s.e(prev, id, 'signal', { w: 'signal' }); prev = id;
+      });
+    });
+    var yP = 130 + loops.length * 80 + 10, unit = inv.points.filter(function (p) { return p.type === 'vesda' && p.zoneIds.indexOf(zid) >= 0; })[0];
+    if (unit) {
+      var holes = Math.max(1, Math.ceil(z.areaM2 / (inv.spacing.vesdaPortM * inv.spacing.vesdaPortM))), xe = W - 140;
+      s.n({ id: 'cap', tag: 'CAP', box: [3, 12], x: 220, y: yP, tagAt: 'none', boxSym: 'endcap', label: 'Sampling pipe end cap (capped, with end sampling hole)' });
+      s.e([220, yP], [xe - 20, yP], 'air', { w: 'branch', line: holes + ' SAMPLING PORTS' });
+      for (var h = 1; h <= holes; h++) s.j('port' + h, 220 + h * ((xe - 260) / (holes + 1)), yP, true);
+      var vu = s.n({ id: unit.id.toLowerCase(), tag: short(unit.id), name: 'ASPIRATING UNIT', sym: 'aspirating', x: xe, y: yP, size: 34, cls: 'fire-vesda', eqId: unit.id, tagAt: 'below', label: unit.label + ' — sampling ' + unit.zoneIds.map(short).join(', ') });
+      s.e([xe - 20, yP], vu, 'air', { w: 'branch' });
+    }
+    var yR = yP + 80, rel = pts.filter(function (p) { return /^(abort|release|preaction_solenoid)$/.test(p.type); });
+    if (rel.length) {
+      var RS = { abort: 'abortSwitch', release: 'valveSolenoid', preaction_solenoid: 'valveSolenoid' }, RT = { abort: 'ABORT', release: 'RELEASE', preaction_solenoid: 'PRE-ACTION' }, last = s.j('r0', 220, yR, false);
+      rel.sort(function (p, q) { return ['abort', 'release', 'preaction_solenoid'].indexOf(p.type) - ['abort', 'release', 'preaction_solenoid'].indexOf(q.type); }).forEach(function (p, i) {
+        var id = s.n({ id: p.id.toLowerCase(), tag: short(p.id), name: RT[p.type], sym: RS[p.type], x: 300 + i * 150, y: yR, size: 30, cls: 'fire-point', eqId: p.id, tagAt: 'below', label: p.label + ' · ' + p.address });
+        s.e(last, p.type === 'abort' ? id : id + '.a', 'agent', { w: 'branch' }); last = p.type === 'abort' ? id : id + '.b';
+      });
+      var os = s.n({ id: 'os-rel', tag: 'DH-F-102', name: 'AGENT BANK', sym: 'offSheet', x: W - 80, y: yR, size: 20, tagAt: 'below', label: 'Agent bank and selector valve for ' + short(zid) + ' — sheet DH-F-102' });
+      s.e(last, os + '.port', 'agent', { w: 'branch' });
+    }
+    pts.filter(function (p) { return p.type === 'epo'; }).forEach(function (p, i) {
+      s.n({ id: p.id.toLowerCase(), tag: short(p.id), name: 'ZONE EPO', sym: 'epo', x: 120, y: yR + i * 60, size: 30, cls: 'fire-epo', eqId: p.id, tagAt: 'below', label: p.label + ' · ' + p.address });
+    });
+    if (o.point) s.focusId = String(o.point).toLowerCase();
+    return finish(s);
+  }
+
   /* ── DH-E-001: facility single-line — 150 kV intake, main transformers, 20 kV boards per hall and feed, generator plant ── */
   function dhE001(snap) {
     var W = 1240, H = 900, s = Sheet({ id: 'dh-e-001', no: 'DH-E-001', title: 'SITE SLD', size: [W, H], svgId: 'elecOvSvg', sheet: '1/8' });
@@ -1311,7 +1364,7 @@
     return finish(s);
   }
 
-  var BUILDERS = { 'dh-m-103': dhM103, cdu: cduSheet, 'dh-e-101': dhE101, 'dh-r-101': dhR101, 'dh-f-101': dhF101, 'dh-e-001': dhE001, 'dh-n-101': dhN101, 'dh-a-101': dhA101, 'dh-b-101': dhB101, 'dh-n-102': dhN102, 'dh-n-104': dhN104, 'dh-m-102': dhM102, 'dh-m-104': dhM104, 'dh-m-101': dhM101, chiller: chillerL3, crah: crahL3, battery: batteryL3, 'pump-station': pumpStationL3, 'tcs-manifold': tcsManifoldL3, 'chem-dosing': chemDosingL3, 'dry-cooler': dryCoolerL3, switch: switchL3, 'bms-controller': bmsCtlL3, 'sld-mimic': sldMimicL3, 'rack-power': rackPowerL3, stp: stpL3, ahu: ahuL3, tray: trayL3, 'nvswitch-tray': nvswitchTrayL3, 'dh-f-102': dhF102, 'dh-f-103': dhF103, 'dh-f-104': dhF104, 'bms-node': bmsNodeL3 };
+  var BUILDERS = { 'dh-m-103': dhM103, cdu: cduSheet, 'dh-e-101': dhE101, 'dh-r-101': dhR101, 'dh-f-101': dhF101, 'dh-e-001': dhE001, 'dh-n-101': dhN101, 'dh-a-101': dhA101, 'dh-b-101': dhB101, 'dh-n-102': dhN102, 'dh-n-104': dhN104, 'dh-m-102': dhM102, 'dh-m-104': dhM104, 'dh-m-101': dhM101, chiller: chillerL3, crah: crahL3, battery: batteryL3, 'pump-station': pumpStationL3, 'tcs-manifold': tcsManifoldL3, 'chem-dosing': chemDosingL3, 'dry-cooler': dryCoolerL3, switch: switchL3, 'bms-controller': bmsCtlL3, 'sld-mimic': sldMimicL3, 'rack-power': rackPowerL3, stp: stpL3, ahu: ahuL3, tray: trayL3, 'nvswitch-tray': nvswitchTrayL3, 'dh-f-102': dhF102, 'dh-f-103': dhF103, 'dh-f-104': dhF104, 'bms-node': bmsNodeL3, 'fire-zone-l3': fireZoneL3 };
   for (var hb = 2; hb <= 9; hb++) BUILDERS['dh-e-10' + hb] = dhE101;   // DH-E-102 ... : same builder, o.hall picks the hall (the builder refuses a hall the engine does not have)
   var API = {
     build: function (id, snap, o) { if (!BUILDERS[id]) throw new Error('hmi-sheets: no sheet ' + id); return BUILDERS[id](snap, o); },

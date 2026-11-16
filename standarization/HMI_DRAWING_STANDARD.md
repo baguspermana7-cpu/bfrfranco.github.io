@@ -27,6 +27,7 @@ after the drawing it complements and retires nothing — used where another cont
 | DH-F-102 clean-agent release, DH-01 | `dhF102` | Fire → Mimic (own box, under DH-F-101) | fire inventory release zones |
 | DH-F-103 fire interlocks, DH-01 | `dhF103` | Fire → Cause & effect (above the matrix) | the systems `RZDatahallAIFireCauseEffect.BASE_ROWS` command (15 control modules) |
 | DH-F-104 fire zone map, DH-01 | `dhF104` | Fire → Zones (above the zone tiles) | `geometry.*` bands of DH-A-101 + the fire inventory zones (Z09–Z12 square to their stated area) |
+| Fire zone L3 (loops through isolators, every device, aspirating unit on its pipe, EPO, abort - release - pre-action to DH-F-102) | `fireZoneL3` | a fire zone click (tiles, DH-F-101 / DH-F-104 zone heads) — hmi-v2 modal via opener `fire`, the fire-zone payload's tier-2; points still open the inspector (isolation workflow), Shift+click a zone for its inspector | fire inventory |
 | BMS block L3 (server pair, supervisory ring, protocol gateway, LDC) | `bmsNodeL3` (`o.kind`) | BMS → click a block (above the specification tables; controller keeps `bmsCtlL3`) | page `BMS_MODEL` (authored architecture) |
 | DH-E-001 site single-line | `dhE001` | Electrical → Overview | `distribution.*`, `equipment.gensets_*`, `site.fuel_autonomy_h` |
 | DH-N-101 compute fabric | `dhN101` | Network → Compute fabric | `network.*` (cores, spines, leaves, link counts) |
@@ -143,6 +144,9 @@ Interlocks DH-F-103: F10 one control module per C&E system (15), F11 nothing mar
 the text budget, F13 a running `vesda_fire_2` in Z05 marks exactly the systems the C&E engine has due / pending /
 blocked, F14 Stop clears. Zone map DH-F-104: F15 every zone of the hall once, F16 means = the register, F17 a zone
 isolated below two means is P1 and no zone without an isolated point is marked, F18 Clear restores.
+M2: a fire zone click opens its schematic with every device of the zone (10 / 10 on Z11) and Shift+click still opens
+the inspector (fails on v3.62.1: no schematic). `test-dcai-coverage --modals` measures hmi-v2's own sheet modal when
+no page modal is on the DHModal stack.
 H6 at 390 also requires the sheet number on one line (it wrapped to 2-3 lines on 13 sheets) and the frame as wide as
 its host (`.hmi-host { clear: both }` — the page's floated svg zoom buttons squeezed Room Layout to 227 of 362 px).
 M1: every BMS block kind (server, ring switch, gateway, LDC, controller) opens with its own L3 schematic holding the

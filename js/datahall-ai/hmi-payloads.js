@@ -1030,7 +1030,7 @@
     b.dep('upstream', 'fire-facp:' + hp, 'FACP');
     b.trend('obscuration', 'Obscuration', '%/m', { value: 0.001 }, 0.0008, { digits: 4 });
   });
-  def('fire-zone', { kind: 'scenario', label: 'Fire zone', system: 'fire', tier2: null }, function (b, ctx, id) {
+  def('fire-zone', { kind: 'scenario', label: 'Fire zone', system: 'fire', tier2: 'fire' }, function (b, ctx, id) {
     var inv = fireInventory(ctx), hp = hallPrefix(ctx, id);
     var zid = /^DH-\d\d-Z\d\d$/.test(String(id)) ? String(id) : hp + '-Z' + (String(id).length < 2 ? '0' : '') + String(id).replace(/^Z/i, '');
     var zone = inv ? inv.zoneById[zid] : null, zs = ctx.fire && ctx.fire.zones ? ctx.fire.zones[zid] : null;
@@ -1048,6 +1048,7 @@
         else if (zs.isolatedCount) { b.chip(zs.isolatedCount + ' ISOLATED', 'warning'); }
       }
       b.related = inv.points.filter(function (p) { return p.zoneIds.indexOf(zid) >= 0; }).slice(0, 40).map(function (p) { return 'fire-point:' + p.id; });
+      b.tier2('fire', [zid]);   // plain click: the zone's detection schematic (hmi-v2 opener 'fire'); Shift+click keeps the inspector
     } else {
       b.D('capacity', 'detection', 'Detection', 'photo + heat + aspirating, double-interlock release', FIRE_SPEC);
     }
