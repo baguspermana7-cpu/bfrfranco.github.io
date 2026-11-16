@@ -30,6 +30,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import puppeteer from 'puppeteer';
 import { enterAuthorizedAuditState } from './lib/cockpit-audit-state.mjs';
+import { isSupabaseModule, signedInStorage, signedInSupabaseBody } from './lib/signed-in-supabase.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.webp': 'image/webp', '.woff2': 'font/woff2' };
@@ -186,10 +187,19 @@ for (const [w, dpr, tag] of [[360, 3, '360'], [768, 2, '768'], [1440, 1, '1440']
 async function perf(tag, w, throttle, budget) {
   const pp = await browser.newPage();
   await pp.setRequestInterception(true);
-  pp.on('request', (r) => (r.url().startsWith(ORIGIN) || r.url().startsWith('data:') ? r.continue() : r.abort()));
+  /* signed in through the Supabase module stub, as tools/test-dh-drawings.mjs: without a real session the page re-locks
+     (v3.57.7) and the audit observer below removes the lock on every mutation — that fight ran during the measurement
+     (median 50 ms per frame on the old and the new renderer alike) and timed the harness, not the cockpit */
+  pp.on('request', (r) => {
+    if (isSupabaseModule(r.url())) return r.respond({ status: 200, contentType: 'text/javascript', body: signedInSupabaseBody({ email: 'educator@resistancezero.com', tier: 'pro', educator: true }) });
+    return r.url().startsWith(ORIGIN) || r.url().startsWith('data:') ? r.continue() : r.abort();
+  });
   await pp.setViewport({ width: w, height: w < 800 ? 820 : 1000, deviceScaleFactor: w < 800 ? 3 : 1, isMobile: w < 800, hasTouch: w < 800 });
-  await pp.evaluateOnNewDocument(() => { try { localStorage.setItem('rz_cookie_consent', 'declined'); } catch (e) { /* none */ } });
-  await pp.goto(ORIGIN + 'datahallAI.html', { waitUntil: 'networkidle2', timeout: 60000 }); await wait(800);
+  await pp.evaluateOnNewDocument((entries) => { try { localStorage.setItem('rz_cookie_consent', 'declined'); entries.forEach(([k, v]) => localStorage.setItem(k, v)); } catch (e) { /* none */ } },
+    signedInStorage({ email: 'educator@resistancezero.com', tier: 'pro', role: 'educator' }));
+  await pp.goto(ORIGIN + 'datahallAI.html', { waitUntil: 'networkidle2', timeout: 60000 });
+  await pp.waitForNavigation({ waitUntil: 'networkidle2', timeout: 8000 }).catch(() => {});   // the stub's role sync reloads once
+  await wait(800);
   await enterAuthorizedAuditState(pp, 'dc-ai');
   await pp.evaluate(() => document.querySelector('#tabs [data-t="over"]').click());
   await pp.waitForFunction(() => { const s = document.getElementById('hmiFloorPlanSvg'); return s && s.getBoundingClientRect().width > 0; }, { timeout: 30000 }); await wait(800);

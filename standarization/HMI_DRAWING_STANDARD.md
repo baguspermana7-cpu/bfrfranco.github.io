@@ -116,6 +116,18 @@ Click → `open(node)` → the L3 modal (`cdu` class draws its own sheet; other 
   once acknowledged, kept while the source is active. Gate `tools/test-dh-operator.mjs` (O1–O5, O8), proven red 9/12 on
   8fdf0a429.
 
+## 4c. Repaint cost (v3.63.0, O11)
+
+A repaint is a function of the payload context key (tick, both scenarios, replay, fire workstation snapshot): `hmi-v2
+read()` returns the same reading object while that key holds and the renderer skips a node whose reading object is
+unchanged (`g.__d`); the flow pass re-runs only when a node state changed; alarm badges are cached per node. Sheet reads
+build no trend series (`buildContext({noTrend: true})` — the inspector's own context builds them), and the fire
+inventory indexes its points per zone once (`pointsByZone`, WeakMap). Measured at 390 px, DPR 3, CPU 4x, software
+raster, DH-A-101 zoomed continuously with a repaint every second: p95 frame 50.1 ms → 33.4 ms (budget 34), a repaint
+with nothing new 24.8 → ~5 ms, a new-tick repaint 310–430 → 116–248 ms; desktop 1440 p95 16.8 ms (budget 20).
+The O11 page is signed in through the Supabase stub: an unsigned page re-locks and the audit observer fought the lock
+on every mutation (median 50 ms per frame on any renderer — the harness, not the cockpit).
+
 ## 5. Laws (gates)
 
 `tools/test-dh-drawings.mjs` (wired into `tools/ship-gate.sh` in v3.60.0): H0 ratchet (≥ 14 HMI sheets), H1 paint (renderer shading only), H2 library-only, H3 own L3

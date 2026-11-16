@@ -125,7 +125,7 @@
     if (!P || !P.buildContext) return null;
     var sim = win.RZDatahallAISimTelemetry, cs = doc.getElementById('coolingScenario'), es = doc.getElementById('electricalScenario');
     var k = (sim && sim.tickNow ? sim.tickNow() : '') + '|' + (cs ? cs.value : '') + '|' + (es ? es.value : '') + '|' + (sim && sim.hasProvider && sim.hasProvider() ? 'r' : 's') + '|f' + fireRevision();
-    if (k !== ctxKey || !ctxVal) { ctxVal = P.buildContext(win, { hall: 1 }); ctxKey = ctxVal ? k : null; }
+    if (k !== ctxKey || !ctxVal) { ctxVal = P.buildContext(win, { hall: 1, noTrend: true }); ctxKey = ctxVal ? k : null; }
     return ctxVal;
   }
   function payload(cls, id) {
@@ -241,7 +241,18 @@
     rows(p).slice(0, 6).forEach(function (x) { tip.push([x.label, text(x)]); });
     return { state: m ? m[0] : 'normal', alarm: m ? m[1] : null, values: {}, rows: tip };
   }
+  /* a node's reading is a function of the payload context (tick, both scenarios, replay, fire revision) and the node:
+     while that key holds, a repaint returns the same object and the renderer skips the node — a repaint with nothing new
+     cost 25 ms of script at 4x CPU throttle on DH-A-101 (O11 mobile p95 66 ms during a zoom) */
+  var readMemo = {}, readKey = null;
   function read(n, sheet) {
+    ctx(); if (ctxKey !== readKey) { readMemo = {}; readKey = ctxKey; }
+    var mk = (sheet || '') + '|' + n.id;
+    if (readKey != null && readMemo[mk]) return readMemo[mk];
+    var d = readNow(n, sheet); if (readKey != null) readMemo[mk] = d;
+    return d;
+  }
+  function readNow(n, sheet) {
     if (n.sym === 'junction') return {};
     if (n.cls === 'fire-output') return interlockOf(n);
     var cls = n.cls && CLS_PAYLOAD[n.cls], id = n.eqId || n.id, fire = !!cls && cls.indexOf('fire-') === 0;
@@ -333,7 +344,7 @@
   function sheetOpts(extra) {
     var st = {}, dirty = true, map = null;
     var o = {
-      read: function (n) { var d = read(n, extra && extra.sheet); st[n.id] = { state: d.state, quality: d.quality, sym: n.sym, cls: n.cls }; dirty = true; return d; },
+      read: function (n) { var d = read(n, extra && extra.sheet), o = st[n.id]; if (!o || o.state !== d.state || o.quality !== d.quality) { st[n.id] = { state: d.state, quality: d.quality, sym: n.sym, cls: n.cls }; dirty = true; } return d; },   // the flow pass re-runs only when a state changed
       flow: function (e, graph) { if (dirty) { map = flowMap(graph, st); dirty = false; } return map[e.id]; }
     };
     for (var k in extra || {}) if (k !== 'sheet') o[k] = extra[k];

@@ -257,12 +257,22 @@
   function facpInAlarm(fire, tick) { return !!FACP_ALARM_STAGES[stageOf(fire, tick)]; }
   function isolatedSet(reg) { return reg && reg.entries ? reg.entries : {}; }
   /** independent detection means still available in a zone under a register (a VESDA unit counts for every zone it serves) */
+  /* points per zone, built once per inventory (the inventory is frozen): evaluate() runs every 4 s tick over every
+     zone and means, and scanning all points for each (zones x means x points) cost ~100 ms a tick on a phone-class CPU */
+  var ZONE_INDEX = typeof WeakMap === 'function' ? new WeakMap() : null;
+  function pointsByZone(inv) {
+    var ix = ZONE_INDEX && ZONE_INDEX.get(inv); if (ix) { return ix; }
+    ix = {};
+    inv.points.forEach(function (p) { p.zoneIds.forEach(function (z) { (ix[z] = ix[z] || []).push(p); }); });
+    if (ZONE_INDEX) { ZONE_INDEX.set(inv, ix); }
+    return ix;
+  }
   function meansOf(inv, reg, zoneId) {
     var zone = inv.zoneById[zoneId]; if (!zone) { return null; }
-    var iso = isolatedSet(reg), available = [], lost = [], i, m, pts;
+    var iso = isolatedSet(reg), available = [], lost = [], i, m, pts, inZone = pointsByZone(inv)[zoneId] || [];
     for (i = 0; i < zone.means.length; i++) {
       m = zone.means[i];
-      pts = inv.points.filter(function (p) { return p.means === m && p.zoneIds.indexOf(zoneId) >= 0; });
+      pts = inZone.filter(function (p) { return p.means === m; });
       if (pts.some(function (p) { return !iso[p.id]; })) { available.push(m); } else { lost.push(m); }
     }
     return { zoneId: zoneId, total: zone.means.length, available: available, lost: lost, count: available.length };
@@ -401,7 +411,7 @@
     var elapsed = fire && finite(fire.startedAtTick) ? Math.max(0, (tick - fire.startedAtTick) * (TICK_MS / 1000)) : 0;
     var zones = inv.zones.map(function (z) {
       var means = meansOf(inv, reg, z.id);
-      var isolated = inv.points.filter(function (p) { return iso[p.id] && p.zoneIds.indexOf(z.id) >= 0; });
+      var isolated = (pointsByZone(inv)[z.id] || []).filter(function (p) { return iso[p.id]; });
       var expired = isolated.filter(function (p) { return tick >= iso[p.id].expiresAtTick; });
       var impaired = z.release && means.count < 2;
       var since = isolated.length ? Math.max.apply(null, isolated.map(function (p) { return iso[p.id].isolatedAtTick; })) : null;

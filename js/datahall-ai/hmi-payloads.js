@@ -157,6 +157,10 @@
   };
   Builder.prototype.trend = function (point, label, unit, anchor, band, o) {
     o = o || {};
+    if (this.ctx.noTrend) {   // a drawing read (hmi-v2 sheets): 30 simulated samples x 440 racks per tick were a third of a repaint; the inspector's own context builds the trend
+      this.tabs.trend = deepFreeze({ point: point, label: label, unit: unit || '', series: [], anchor: null, band: band, declared: 'trend not built for a drawing read; the equipment inspector builds it' });
+      return this;
+    }
     var ctx = this.ctx, anchorValue = anchor && anchor.field ? ctx.adapter[anchor.field] : anchor && anchor.plane ? ctx.snapshot.design.planes[anchor.plane] : anchor && anchor.value;
     var anchorId = anchor && anchor.field ? ctx.basisMap[anchor.field] : anchor && anchor.plane ? 'design.planes.' + anchor.plane : null;
     var series = ctx.sim.series({ id: this.classId + ':' + this.id + ':' + this.hall, point: point, anchor: finite(anchorValue) ? anchorValue : null, band: band, tick: ctx.tick, n: o.n || 30, digits: finite(o.digits) ? o.digits : 1 });
@@ -1259,7 +1263,7 @@
     return {
       snapshot: auth.snapshot, adapter: win.DHE, basisMap: win.DH_BASIS, registryIndex: idx, registryVersion: reg ? reg.engineVersion : null,
       scenario: scenario, live: null, fire: opts.fire || (win.RZDatahallAIFireWorkstation && win.RZDatahallAIFireWorkstation.fireContext ? win.RZDatahallAIFireWorkstation.fireContext() : null), cooling: { scenarioId: cool && cool.value ? cool.value : 'normal' },
-      tick: finite(opts.tick) ? opts.tick : undefined, hall: finite(opts.hall) ? opts.hall : 1, sim: win.RZDatahallAISimTelemetry
+      tick: finite(opts.tick) ? opts.tick : undefined, hall: finite(opts.hall) ? opts.hall : 1, sim: win.RZDatahallAISimTelemetry, noTrend: !!opts.noTrend
     };
   }
 

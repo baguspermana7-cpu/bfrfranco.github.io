@@ -376,23 +376,24 @@
       var E = els();
       sheet.nodes.forEach(function (n) {
         var d = opts.read(n) || {}, g = E.node[n.id];
-        if (!g) return;
+        if (!g || g.__d === d) return;   // the same reading object as the last repaint: nothing on this node can have changed
+        g.__d = d;
         var sym = g.__sym || (g.__sym = g.querySelector('[data-sym]'));
         if (d.state) { setA(g, 'data-state', d.state); if (sym) setA(sym, 'data-state', d.state); }
         setA(g, 'data-quality', d.quality || null);
         setA(g, 'data-alarm', d.alarm || null);
         /* alarm without colour (owner brief O5): a priority badge — diamond with the ISA priority digit — top-right of the
            symbol; hollow once acknowledged; it stays while the source is active */
-        var bd = g.querySelector('.hmi-alarm-badge');
+        var bd = g.__bd && g.__bd.parentNode === g ? g.__bd : null;
         if (d.alarm) {
           if (!bd) {
             var sz = n.box ? Math.max(n.box[0], n.box[1]) : (n.size || 32), bx = n.box ? n.x + n.box[0] / 2 : n.x + sz / 2, by = n.box ? n.y - n.box[1] / 2 : n.y - sz / 2;
             bd = document.createElementNS(NS, 'g'); bd.setAttribute('class', 'hmi-alarm-badge'); bd.setAttribute('transform', 'translate(' + r1(bx) + ' ' + r1(by) + ')');
             bd.innerHTML = '<path d="M0 -8 L8 0 L0 8 L-8 0 Z"/><text x="0" y="3.2" text-anchor="middle"></text>';
-            g.appendChild(bd);
+            g.appendChild(bd); g.__bd = bd;
           }
           bd.setAttribute('data-prio', d.alarm); bd.setAttribute('data-ack', d.ack ? '1' : '0'); bd.querySelector('text').textContent = d.alarm;
-        } else if (bd) bd.remove();
+        } else if (bd) { bd.remove(); g.__bd = null; }
         (n.values || []).forEach(function (v) {
           var t = E.val[n.id + ':' + v.k], dv = d.values && d.values[v.k];
           if (!t) return;
