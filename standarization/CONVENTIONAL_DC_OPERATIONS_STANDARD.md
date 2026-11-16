@@ -295,8 +295,10 @@ Before release:
     chiller, water and fuel: C1 no pipe/cable runs through a text box, C2 no zone/box border crosses one, C3 no foreign
     equipment body covers one. The text-vs-text geometry gate could not see these; W3 found them on screenshots.
     Proven red on the pre-fix tree (UST-01 tag × fill pipe, PT-101 value × divider, fire PAV-02..05 × release
-    lines, FH / HR RISER × zone border) and by mutation (TK-402 values × divider). Limit, written down: C3 measures the
-    filled body (`.b`), not a symbol's outline strokes. C4: the sheet page never scrolls sideways at 1280 / 1440 px (a grid item
+    lines, FH / HR RISER × zone border) and by mutation (TK-402 values × divider). C3 measures the filled body
+    (`.b`) box; C5 (v3.62.2) closes its blind spot: no stroked outline of a foreign symbol (tank shell, pump casing,
+    instrument bubble, any path/line/circle/rect in another `.hmi-node`) passes through a text box, sampled every 1 user
+    unit. Proven red with `RZ_TEXT_CLEAR_PLANT=1` (fire: FACP-01 tag on the VESDA pipe outline fails C5 while C3 passes). C4: the sheet page never scrolls sideways at 1280 / 1440 px (a grid item
     holding a sheet needs `min-width: 0`).
 
 

@@ -10,13 +10,16 @@
  *   C1  no visible sheet text has a pipe/cable (path.hmi-edge, not the flow overlay) running through its box
  *   C2  no visible sheet text is crossed by a zone or box border (rect.hmi-zone / rect.hmi-box)
  *   C3  no visible sheet text is covered by the body (.b) of an equipment symbol it does not belong to
+ *   C5  no visible sheet text is struck by the drawn outline of an equipment symbol it does not belong to: every
+ *       stroked shape inside a foreign .hmi-node (tank shells, pump casings, valve bodies, instrument bubbles) is sampled
+ *       every 1 user unit along its outline. C3 measures the filled body box only, so a tank outline over a tag escaped it.
  *   C4  the page itself never scrolls sideways at 1280 or 1440 px: the sheet's own floor width scrolls inside its panel
  *       (v3.62: the water P&ID panel, a grid item without min-width 0, widened the page by 368 px at 1280)
  *
  * Text = every <text> in the sheet's text layer plus area labels; the title block is excluded (it is its own frame).
  * A text box is its screen rectangle inset by 0.75 px; a line "runs through" it when a point sampled every 1 user
  * unit along the line lies inside. Proven red on b1b885089 (the W3 tree before the fixes): C1 UST-01 tag, C2 TK-402 and
- * PT-101 values, C3 DOMESTIC tag. Usage: node tools/test-conv-sheet-text-clear.mjs [--page=water-system.html]
+ * PT-101 values, C3 DOMESTIC tag. C5 proven red by RZ_TEXT_CLEAR_PLANT=1 (moves one tag onto a foreign symbol outline). Usage: node tools/test-conv-sheet-text-clear.mjs [--page=water-system.html]
  */
 import puppeteer from 'puppeteer';
 import http from 'node:http';
@@ -77,7 +80,26 @@ function probe(hostSel) {
       const w = Math.min(r.right, b.x1) - Math.max(r.left, b.x0), h = Math.min(r.bottom, b.y1) - Math.max(r.top, b.y0);
       if (w > 1.5 && h > 1.5) c3.push(label(b.t) + ' under body of ' + id); }
   }
-  return { texts: texts.length, edges: edges.length, c1, c2, c3 };
+  // C5 foreign symbol outlines
+  const c5 = [];
+  for (const n of [...svg.querySelectorAll('g.hmi-nodes .hmi-node')]) {
+    const id = n.getAttribute('data-node');
+    const foreign = texts.filter((b) => !(b.owner && b.owner === id) && !n.contains(b.t));
+    if (!foreign.length) continue;
+    const nr = n.getBoundingClientRect();
+    const near = foreign.filter((b) => b.x1 > nr.left && b.x0 < nr.right && b.y1 > nr.top && b.y0 < nr.bottom);
+    if (!near.length) continue;
+    for (const g of n.querySelectorAll('path, line, circle, ellipse, rect, polygon, polyline')) {
+      if (g.closest('text') || !vis(g) || typeof g.getTotalLength !== 'function') continue;
+      const cs = getComputedStyle(g); if (cs.stroke === 'none' || !(parseFloat(cs.strokeWidth) > 0) || +cs.strokeOpacity === 0) continue;
+      const m = g.getScreenCTM(); if (!m) continue; let L; try { L = g.getTotalLength(); } catch (e) { continue; }
+      const hitBy = new Set();
+      for (let s = 0; s <= L; s += 1) { const p = g.getPointAtLength(s); const x = m.a * p.x + m.c * p.y + m.e, y = m.b * p.x + m.d * p.y + m.f;
+        for (const b of near) if (!hitBy.has(b) && inside(b, x, y)) hitBy.add(b); }
+      for (const b of hitBy) c5.push(label(b.t) + ' struck by ' + g.tagName + (g.getAttribute('class') ? '.' + g.getAttribute('class').split(' ')[0] : '') + ' of ' + id);
+    }
+  }
+  return { texts: texts.length, edges: edges.length, c1, c2, c3, c5 };
 }
 
 let fail = 0;
@@ -89,10 +111,19 @@ for (const [page, hostSel] of PAGES) {
   await enterAuthorizedAuditState(pg, page.replace('.html', ''));
   await pg.waitForFunction((h) => { const s = document.querySelector(h + ' svg'); return s && s.getBoundingClientRect().width > 0; }, { timeout: 20000 }, hostSel).catch(() => {});
   await new Promise((r) => setTimeout(r, 1500));
+  if (process.env.RZ_TEXT_CLEAR_PLANT === '1') await pg.evaluate((h) => {
+    /* self-test: move one tag onto the outline of a symbol it does not belong to (C5 must go red) */
+    const svg = document.querySelector(h + ' svg'); const t = svg.querySelector('g.hmi-text text[data-tag-of]');
+    const owner = t.getAttribute('data-tag-of');
+    const n = [...svg.querySelectorAll('g.hmi-nodes .hmi-node')].find((g) => g.getAttribute('data-node') !== owner && g.querySelector('path:not(.b), circle:not(.b), line'));
+    const g = n.querySelector('path:not(.b), circle:not(.b), line'); const p = g.getPointAtLength(g.getTotalLength() / 2);
+    const q = new DOMPoint(p.x, p.y).matrixTransform(g.getScreenCTM()).matrixTransform(t.parentNode.getScreenCTM().inverse());
+    t.setAttribute('x', q.x); t.setAttribute('y', q.y + 3); t.setAttribute('text-anchor', 'middle'); t.removeAttribute('transform');
+  }, hostSel);
   const r = await pg.evaluate(probe, hostSel);
   if (r.missing) { console.log(`FAIL ${page}: sheet ${hostSel} not drawn`); fail++; await pg.close(); continue; }
   if (r.texts < 5 || r.edges < 3) { console.log(`FAIL ${page}: measured ${r.texts} texts / ${r.edges} edges — the probe saw no sheet`); fail++; }
-  for (const [k, list] of [['C1', r.c1], ['C2', r.c2], ['C3', r.c3]]) {
+  for (const [k, list] of [['C1', r.c1], ['C2', r.c2], ['C3', r.c3], ['C5', [...new Set(r.c5)]]]) {
     const ok = list.length === 0; if (!ok) fail++;
     console.log(`${ok ? 'PASS' : 'FAIL'} ${k} ${page}: ${list.length}${list.length ? ' — ' + list.slice(0, 6).join('; ') : ''}`);
   }

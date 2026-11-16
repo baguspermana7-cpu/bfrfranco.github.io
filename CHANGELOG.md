@@ -11,6 +11,16 @@ release sections rather than semver.
 
 ---
 
+## v3.62.2 — 2026-11-16 — Conventional sheets: a tag struck by a foreign symbol's outline now fails the gate
+
+### Added
+- **C5 in `tools/test-conv-sheet-text-clear.mjs`.** C3 measured only the filled body box (`.b`) of a symbol, so an
+  outline stroke of another asset (a tank shell, a pipe stub inside a symbol, an instrument bubble) could run through a
+  tag and still pass, the limit v3.62.0 wrote down. C5 samples every stroked shape inside each foreign `.hmi-node` every
+  1 user unit and fails when a point lands inside a visible text box. Fire, chiller, water and fuel sheets are clean.
+  Proven red with `RZ_TEXT_CLEAR_PLANT=1`, which moves one tag onto a foreign outline: fire FACP-01 on the VESDA symbol
+  fails C5 while C3 still passes (the blind spot), and the other three sheets fail both. Standard: CONVENTIONAL_DC_OPERATIONS_STANDARD item 26.
+
 ## v3.62.1 — 2026-11-15 — datahallAI as an operator BMS: flow only with evidence, alarm badges, equipment finder, cooling overview and named equipment, SLDs without icon grids, schematic modals, 6 ms repaint
 
 - **Gates that read the clock.** `audit-editorial-render.mjs` pins the page clock to local noon: achievements.html unlocks "Night Owl" between 22:00 and 05:00, which added 4 off-scale values, so the unchanged v3.61.0 tree failed at 00:40 (487 → 491) and passed at 20:00. A zoom button now commits its viewBox at once (only wheel and pinch gestures defer it); the Conventional truth gate B5 read the viewBox right after the click and saw the old one.
