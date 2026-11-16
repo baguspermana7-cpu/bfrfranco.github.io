@@ -443,10 +443,12 @@
     wrapOpener('stp', function () { drawInPageModal('eqHmi', 'eqHmiSvg', 'eq-l3', 'stp', {}); });
     wrapOpener('ahu', function () { drawInPageModal('eqHmi', 'eqHmiSvg', 'eq-l3', 'ahu', {}); });
     wrapOpener('dryCooler', function (id) { drawInPageModal('ctHmiModal', 'ctHmiSvg', 'dc-l3', 'dry-cooler', { id: id }); });
-    wrapOpener('bat', function () {   // the modal title is a nameplate (SCiB 480 VDC string), not an engine number: declare it
+    /* ONE wrapper per opener: wrapOpener skips an opener it already wrapped, so a second wrapOpener('bat') — the L3 draw —
+       was never installed and the battery modal kept its legacy mimic (found by the honest H3 count, v3.63.0) */
+    wrapOpener('bat', function (feed) {
       var t = doc.getElementById('batHmiTitle'); if (t && !t.hasAttribute('data-rz-authored-basis')) t.setAttribute('data-rz-authored-basis', 'battery system nameplate label (lithium-titanate SCiB string, 480 VDC) authored with the page UPS battery design; the engine publishes energy, not the string voltage');
+      drawInPageModal('batHmi', 'batHmiSvg', 'bat-l3', 'battery', { side: String(feed || 'A').toUpperCase().charAt(0), unit: 1 });
     });
-    wrapOpener('bat', function (feed) { drawInPageModal('batHmi', 'batHmiSvg', 'bat-l3', 'battery', { side: String(feed || 'A').toUpperCase().charAt(0), unit: 1 }); });
     {   // the CDU opener does not need the cooling sheet (openCdu builds a stand-in node), so it is wired on every tab
       var O = win.RZDatahallAIHmiOpeners = win.RZDatahallAIHmiOpeners || {}, prev = O.cdu;
       if (prev && !prev.__hmiL3) {

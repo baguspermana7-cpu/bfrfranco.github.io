@@ -25,6 +25,7 @@
  *     blocked for that event and zone, Stop returns every module to normal
  * M1  every BMS block kind (server, ring switch, gateway, LDC, controller) opens with its own L3 schematic
  * M2  a fire zone click opens its detection schematic with every device of the zone; Shift+click keeps the inspector
+ * M3  the battery modal draws its L3 sheet
  * F15-F18 zone map DH-F-104 (Zones view): every zone of the hall once, means available / total = the isolation
  *     register, a zone isolated below two means shows its alarm (and only it), Clear restores
  * H7-H10, H14 (geometry, engine binding, trace, colour, a11y) land with the phases that build them.
@@ -335,6 +336,13 @@ const fz = await pg.evaluate(async () => {
   return { tile: true, modal: !!sv, head, want: want.length, got: got.length, missing: want.filter((x) => !got.includes(x)).slice(0, 4), insp, modal2 };
 });
 law('M2', fz.tile && fz.modal && fz.head && fz.want > 0 && fz.got === fz.want && fz.insp && !fz.modal2, `fire zone Z11 click: schematic ${fz.modal ? 'drawn' : 'NOT drawn'}, devices ${fz.got}/${fz.want}${fz.missing && fz.missing.length ? ' missing ' + fz.missing.join(' ') : ''}; Shift+click inspector ${fz.insp ? 'open' : 'NOT open'}${fz.modal2 ? ' (modal opened too)' : ''}`);
+
+// ── M3 battery: the battery modal draws its L3 sheet (a second wrapOpener('bat') was skipped since v3.61.1) ─────────
+const bat = await pg.evaluate(async () => { const O = window.RZDatahallAIHmiOpeners; if (!O || !O.bat) return { opener: false };
+  O.bat('A', 1); await new Promise((r) => setTimeout(r, 600));
+  const sv = document.querySelector('#batHmi .hmi-host svg.hmi-svg'), n = sv ? sv.querySelectorAll('.hmi-node [data-sym]').length : 0;
+  const bh = document.getElementById('batHmi'); if (bh) bh.classList.remove('show'); return { opener: true, sheet: !!sv, n }; });
+law('M3', bat.opener && bat.sheet && bat.n >= 8, `battery modal L3 sheet: ${bat.sheet ? bat.n + ' symbols' : 'not drawn'}`);
 
 // ── H3 + H1 modals: every equipment class opens its own modal ───────────────────────────────────────────────────
 const classes = new Map();
