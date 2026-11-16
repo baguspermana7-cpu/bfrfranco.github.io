@@ -324,7 +324,7 @@ for (const [tab, sub] of SHEETS) {
     .filter((e) => e.getBoundingClientRect().width > 0).map((e) => e.getAttribute('data-rz-equipment').split(':')[0]));
   for (const c of found) if (!classes.has(c)) classes.set(c, [tab, sub]);
 }
-const own = [], generic = [];
+const own = [], generic = [], partial = [];
 let modalPaint = 0;
 for (const [cls, [tab, sub]] of classes) {
   await showSheet(pg, tab, sub);
@@ -333,22 +333,26 @@ for (const [cls, [tab, sub]] of classes) {
     const el = [...document.querySelectorAll(`[data-rz-equipment^="${cls}:"]`)].find((e) => e.getBoundingClientRect().width > 0);
     if (!el) return { cls, none: true };
     el.scrollIntoView({ block: 'center' });
-    el.dispatchEvent(new MouseEvent('dblclick', { bubbles: true }));
-    await new Promise((res) => setTimeout(res, 700));
-    const m = [...document.querySelectorAll('[data-rz-modal-class], dialog[open], [role=dialog]')]
+    /* v3.63.0: the click contract (plain click → the class's tier-2 opener) and the drawn modal — a visible dialog that
+       holds an HMI sheet. It read a data-rz-modal-class attribute no renderer sets and the dblclick no opener listens
+       to, so it reported 0 / 45 on every tree, the CDU L3 included. */
+    el.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    await new Promise((res) => setTimeout(res, 900));
+    const m = [...document.querySelectorAll('[data-rz-modal-class], dialog[open], [role=dialog], .hmi-modal-back:not([hidden]), [aria-modal="true"]')]
       .filter((d) => d.getBoundingClientRect().width > 0 && getComputedStyle(d).visibility !== 'hidden');
-    const mine = m.find((d) => d.getAttribute('data-rz-modal-class') === cls);
+    const mine = m.find((d) => d.getAttribute('data-rz-modal-class') === cls || d.querySelector('.hmi-host svg.hmi-svg'));
     const p = m.reduce((a, d) => a + paint(d), 0);
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     m.forEach((d) => { const x = d.querySelector('[aria-label*="Close" i], .close, [data-close]'); if (x) x.click(); });
-    return { cls, own: !!mine, sym: mine ? mine.querySelectorAll('[data-sym]').length : 0, paint: p };
+    return { cls, own: !!mine, sym: mine ? mine.querySelectorAll('.hmi-host .hmi-node [data-sym]').length : 0, paint: p };
   }, cls, PROBE.paint.toString());
   await wait(250);
   modalPaint += r.paint || 0;
   (r.own && r.sym >= 8 ? own : generic).push(r.cls);
+  if (r.own && r.sym > 0 && r.sym < 8) partial.push(r.cls + ' ' + r.sym);
 }
 law(STRICT_ALL ? 'H3' : 'H3 (reported)', !STRICT_ALL || (classes.size > 0 && generic.length === 0), `classes with their own L3 schematic: ${own.length} / ${classes.size}` +
-  (generic.length ? ` — missing: ${generic.slice(0, 12).join(', ')}${generic.length > 12 ? ' …' : ''}` : ''));
+  (partial.length ? ` — drawn with < 8 symbols: ${partial.join(', ')}` : '') + (generic.length ? ` — missing: ${generic.filter((c) => !partial.some((x) => x.startsWith(c + ' '))).join(', ')}` : ''));
 law(STRICT_ALL ? 'H1' : 'H1 modals (reported)', !STRICT_ALL || modalPaint === 0, `no gradient/filter/shadow in equipment modals: ${modalPaint} painted element(s) (legacy modals retire with H3)`);
 
 // ── H11 shell ────────────────────────────────────────────────────────────────────────────────────────────────────

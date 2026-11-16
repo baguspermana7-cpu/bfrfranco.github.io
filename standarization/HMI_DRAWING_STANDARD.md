@@ -146,8 +146,10 @@ isolated below two means is P1 and no zone without an isolated point is marked, 
 H6 at 390 also requires the sheet number on one line (it wrapped to 2-3 lines on 13 sheets) and the frame as wide as
 its host (`.hmi-host { clear: both }` — the page's floated svg zoom buttons squeezed Room Layout to 227 of 362 px).
 M1: every BMS block kind (server, ring switch, gateway, LDC, controller) opens with its own L3 schematic holding the
-opened block (fails on v3.62.1: only the controller drew one). H3 reads `data-rz-modal-class`, which no renderer
-sets, so it reports 0 / 45 on every tree — a stale measure kept as *reported* until it reads the drawn modal.
+opened block (fails on v3.62.1: only the controller drew one). H3 (reported) read `data-rz-modal-class`, which no
+renderer sets, after a double-click no opener listens to — 0 / 45 on every tree. Since v3.63.0 it clicks and counts a
+visible dialog that holds an HMI sheet: 15 / 45 classes with >= 8 symbols, 9 drawn with fewer, 21 still text — the
+worklist it prints.
 
 Red proofs on record: the fire block fails F1 on a tree without the `fireSvg` mount; H5 read 1,056 / 1,639 / 1,592
 words on the pre-redraw sheets; H13 read `floorSvg 0×0`. v3.63.0: F10 and F15 fail on v3.62.1 (not drawn); F17
