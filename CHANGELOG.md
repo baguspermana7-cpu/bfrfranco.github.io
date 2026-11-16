@@ -11,6 +11,41 @@ release sections rather than semver.
 
 ---
 
+## v3.63.3 — 2026-11-17 — datahallAI: closed drawings are released, hall SLD items read their own hall, fire register and tray fixes
+
+### Fixed
+- **Every opened modal stayed in memory.** Each drawing added two pointer listeners on the window and never removed
+  them, so a closed modal kept its whole drawing alive (66 listeners after one open, 106 after twenty more). They are
+  removed when the drawing is destroyed, with its timers; a tooltip can no longer appear after its modal closed.
+- **Items on the SLD of hall 2 and above read and opened as hall 1.** The MSB on DH-03 opened "MSB-1A/B — DH-01". A
+  hall SLD now reads a context built for its own hall and the inspector resolves the hall from the sheet (halls with
+  two digits included).
+- **An isolation after "Clear register" never reached Alarms.** The record sequence restarted, the next record reused
+  an id the Alarms workspace had already seen and was dropped. The sequence now survives a clear.
+- **A very long isolation reason was lost.** Past the alarm schema's text limit the record was refused and still marked
+  as delivered. The reason is capped at 500 characters (input and engine), so its record always fits. A record offered
+  while the Alarms workspace is not ready is kept and offered again on the next pass.
+- **The fire point table kept the previous zone's rows** when a different point set had the same size (training run on
+  Z05, then Z06, state filter "alarm").
+- **Every compute and NVSwitch tray opened tray 1.** A tray now opens as itself (CT-18 opens CT-18).
+- Hall labels past hall 9 (`DH-012` → `DH-12`); a replay file with a column named `__proto__` or `constructor` parses;
+  the CDU trend in the stand-alone CDU modal read one instant for all 48 points (that modal is not used on this page,
+  so this one is fixed by reading, not by a browser check).
+- The per-hall L3 mimic was rendered as hall 1's sheet and an opener called over an open modal left the replaced
+  drawing alive (both found by the review of this release; fixed by reading, the mimic's values carry no hall label
+  a gate could read).
+
+### Security
+- Drawing tooltips render `data-tip` as text. They were parsed as HTML; only page-written text reached them, but a
+  value such as "< 5 µS/cm" was also mis-parsed.
+
+### Gates
+- `tools/test-dh-drawings.mjs` L1, L2, L3, L4, L5, L7, L9 — each fails on v3.63.2 and passes now.
+- Node: `test-datahall-ai-hmi-payloads` H7, `test-datahall-ai-replay` R11, `test-datahall-ai-fire-points` F13 — each
+  fails on the v3.63.2 sources.
+- Standard: `standarization/HMI_DRAWING_STANDARD.md` §5, lifecycle and identity laws.
+- Not fixed here: the role taken from the stored session record (S1, v3.64.0).
+
 ## v3.63.2 — 2026-11-16 — datahallAI: the access gate fails closed without auth.js
 
 ### Security

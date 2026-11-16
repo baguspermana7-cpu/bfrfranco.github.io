@@ -309,13 +309,17 @@
       if (view.z <= 1.001 || ev.button !== 0) return;
       drag = { x: ev.clientX, y: ev.clientY, vx: view.x, vy: view.y, moved: false };
     });
-    root.addEventListener('pointermove', function (ev) {
+    function onPanMove(ev) {
       if (!drag) return;
       var r = svg.getBoundingClientRect(), dx = (ev.clientX - drag.x) / r.width * view.w, dy = (ev.clientY - drag.y) / r.height * view.h;
       if (Math.abs(ev.clientX - drag.x) + Math.abs(ev.clientY - drag.y) > 4) { drag.moved = true; frame.classList.add('is-panning'); }
       view.x = Math.max(0, Math.min(W - view.w, drag.vx - dx)); view.y = Math.max(0, Math.min(H - view.h, drag.vy - dy)); apply();
-    });
-    root.addEventListener('pointerup', function () { if (drag) { frame.classList.remove('is-panning'); setTimeout(function () { drag = null; }, 0); } });
+    }
+    function onPanEnd() { if (drag) { frame.classList.remove('is-panning'); setTimeout(function () { drag = null; }, 0); } }
+    /* On window so a pan survives the pointer leaving the sheet; destroy() removes both (a closed modal kept its
+       whole drawing alive through them, v3.63.3). */
+    root.addEventListener('pointermove', onPanMove);
+    root.addEventListener('pointerup', onPanEnd);
 
     /* ── tooltip + open ───────────────────────────────────────────────────────────────────── */
     function nodeOf(el) { var g = el && el.closest && el.closest('.hmi-node'); return g ? nodes[g.getAttribute('data-node')] : null; }
@@ -332,7 +336,7 @@
     svg.addEventListener('pointerover', function (ev) {
       var n = nodeOf(ev.target); if (!n) return;
       clearTimeout(tipTimer);
-      tipTimer = setTimeout(function () { showTip(tipHtml(n), ev.clientX, ev.clientY); }, 250);
+      tipTimer = setTimeout(function () { if (svg.isConnected) showTip(tipHtml(n), ev.clientX, ev.clientY); }, 250);
     });
     svg.addEventListener('pointerout', function (ev) { if (nodeOf(ev.target)) { clearTimeout(tipTimer); hideTip(); } });
     svg.addEventListener('focusin', function (ev) {
@@ -451,7 +455,10 @@
     });
     var api = { sheet: sheet, svg: svg, frame: frame, update: update, trace: trace, clearTrace: clearTrace, fit: fit, zoom: zoomAt, focus: focusNode,
       view: function () { return { x: view.x, y: view.y, w: view.w, h: view.h, z: view.z }; },
-      node: function (id) { return nodes[id]; }, graph: graph, destroy: function () { host.innerHTML = ''; hideTip(); } };
+      node: function (id) { return nodes[id]; }, graph: graph, destroy: function () {
+        root.removeEventListener('pointermove', onPanMove); root.removeEventListener('pointerup', onPanEnd);
+        clearTimeout(tipTimer); clearTimeout(movingT); host.innerHTML = ''; hideTip();
+      } };
     apply();
     update();
     return api;

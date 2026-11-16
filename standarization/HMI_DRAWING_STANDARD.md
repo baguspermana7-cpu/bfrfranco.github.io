@@ -166,6 +166,24 @@ words on the pre-redraw sheets; H13 read `floorSvg 0×0`. v3.63.0: F10 and F15 f
 read the drawing one register behind (cache keyed on the tick only) and the impaired zone at P2, F18 read the cleared
 register stale (`clearRegister` rendered without evaluating) — all three fixed in the same release.
 
+**Lifecycle and identity laws (v3.63.3, audit 2026-11-16).** `tools/test-dh-drawings.mjs`:
+- **L1** a destroyed sheet leaves nothing behind: 20 modal open / close cycles keep the number of `pointermove` /
+  `pointerup` listeners on `window` constant (read through CDP `DOMDebugger.getEventListeners`), and no tooltip appears
+  after the modal closed. Rule: every listener a renderer adds outside its own SVG is a named function removed in
+  `destroy()`; every timer is cleared there.
+- **L2** a record id is never reused in a page session: the isolation sequence survives "Clear register"
+  (`createRegister(seq)`). **L7** an isolation reason is capped (`REASON_MAX`, 500) so its record always passes the
+  alarm schema; a record offered while the Alarms workspace is not ready stays unseen and is offered again, a batch the
+  schema refuses is dropped (kept, it would block every later record).
+- **L3** an item belongs to its sheet's hall: a hall SLD (`dh-e-1NN`) reads a context built for hall NN and its host
+  carries `data-rz-hall`, which the inspector resolves (two-digit halls included).
+- **L4** a table's row cache is keyed on the ids it shows, never on their count.
+- **L5** an item's id carries its own number (`rack-ct:R07-CT-18` opens CT-18).
+- **L9** a `data-tip` is text (`textContent`), never parsed as HTML.
+Each failed on v3.63.2: listeners 66 → 106; `FIRE-ISO-1001` twice with 0 records in Alarms; "MSB-1A/B — DH-01" on the
+DH-03 sheet; Z05 rows under a Z06 run; CT-01 for CT-18; 5,016 characters stored and no record; markup rendered on 9
+drawings with `onerror` fired. Node: `test-datahall-ai-hmi-payloads` H7, `-replay` R11, `-fire-points` F13.
+
 ## 6. Local mock
 
 `node tools/build-dh-drawings-mock.mjs` writes `dh-drawings-mock.html` (noindex, never linked, not committed). On

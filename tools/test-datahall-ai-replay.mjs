@@ -168,3 +168,12 @@ test('R10 replay core is inert: no network, eval, HTML sink, clock or die roll',
     assert.doesNotMatch(src, re);
   }
 });
+
+test('R11 a column named __proto__ or constructor is a column like any other (audit 2026-11-16 S3)', () => {
+    const r = Replay.parse('time,__proto__,constructor\n2026-01-01T00:00:00Z,1,2\n2026-01-01T00:00:10Z,3,4\n');
+    assert.equal(r.ok, true, 'the file parses');
+    assert.deepEqual([...r.columns], ['__proto__', 'constructor']);
+    assert.deepEqual([...r.series['__proto__'].values], [1, 3]);
+    assert.deepEqual([...r.series['constructor'].values], [2, 4]);
+    assert.equal(({}).polluted, undefined, 'Object.prototype untouched');
+});

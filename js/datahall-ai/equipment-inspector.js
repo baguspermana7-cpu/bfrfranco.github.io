@@ -30,13 +30,13 @@
     while (t && t !== doc.body) {
       if (t.getAttribute) {
         var h = t.getAttribute('data-rz-hall') || t.getAttribute('data-dh') || t.getAttribute('data-hall');
-        if (h && /^\d$/.test(String(h).replace(/^dh0?/i, ''))) { return Number(String(h).replace(/^dh0?/i, '')); }
-        if (t.id && /^elecDH(\d)Svg$/.test(t.id)) { return Number(RegExp.$1); }
+        if (h && /^\d{1,2}$/.test(String(h).replace(/^dh0?/i, ''))) { return Number(String(h).replace(/^dh0?/i, '')); }
+        if (t.id && /^(?:hmi)?[eE]lecDH(\d{1,2})Svg$/.test(t.id)) { return Number(RegExp.$1); }
       }
       t = t.parentNode;
     }
     var btn = doc.querySelector('.dh-nav .dh-btn.active[data-dh], .dh-btn.active[data-dh]');
-    if (btn) { var v = String(btn.getAttribute('data-dh')).replace(/^dh0?/i, ''); if (/^\d$/.test(v)) { return Number(v); } }
+    if (btn) { var v = String(btn.getAttribute('data-dh')).replace(/^dh0?/i, ''); if (/^\d{1,2}$/.test(v)) { return Number(v); } }
     return 1;
   }
   function context(opts) {

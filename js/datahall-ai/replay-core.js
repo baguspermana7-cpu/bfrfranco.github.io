@@ -101,7 +101,7 @@
 
   /* collect (time, column, value) triples into sorted per-column series; duplicate time keeps the last */
   function build(triples, columns) {
-    var by = {}, out = {}, start = Infinity, end = -Infinity;
+    var by = Object.create(null), out = Object.create(null), start = Infinity, end = -Infinity;
     triples.forEach(function (tr, k) {
       (by[tr[1]] = by[tr[1]] || []).push([tr[0], tr[2], k]);
     });
@@ -164,7 +164,7 @@
     if (!tk) { for (var i = 0; i < keys.length; i++) { if (TIME_NAMES.indexOf(normalise(keys[i])) >= 0) { tk = keys[i]; break; } } }
     if (!tk) { return { ok: false, code: 'NO_TIME', candidates: keys, message: 'No timestamp field found — pick one.' }; }
     var long = keys.indexOf('point') >= 0 && keys.indexOf('value') >= 0;
-    var triples = [], cols = [], seen = {}, zoned = null, k, rec, t;
+    var triples = [], cols = [], seen = Object.create(null), zoned = null, k, rec, t;
     for (k = 0; k < data.length; k++) {
       rec = data[k];
       if (!rec || typeof rec !== 'object') { continue; }
@@ -219,7 +219,7 @@
         if (cands.some(function (c) { return c != null && (normalise(c) === nc || tokens(c) === tc); })) { hit = p.key; return true; }
         return false;
       });
-      if (hit) { used[hit] = 1; mapping[col] = { point: hit, factor: 1 }; } else { unmatched.push(col); }
+      if (hit) { used[hit] = 1; Object.defineProperty(mapping, col, { value: { point: hit, factor: 1 }, enumerable: true, writable: true, configurable: true }); } else { unmatched.push(col); }
     });
     return { mapping: mapping, unmatched: unmatched };
   }

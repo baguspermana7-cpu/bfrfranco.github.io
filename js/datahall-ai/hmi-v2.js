@@ -121,18 +121,25 @@
     if (sn !== fireSnapRef) { fireSnapRef = sn; fireRev++; }
     return fireRev;
   }
-  function ctx() {
+  /* one context per hall: a hall SLD (dh-e-1NN) reads its own hall, every other sheet hall 1 (v3.63.3 — DH-03's MSB
+     read and opened as DH-01) */
+  var ctxHalls = {};
+  function hallOfSheet(sheet) { var m = /^dh-e-1(\d\d)$/.exec(sheet || ''); return m ? Number(m[1]) : 1; }
+  function ctx(hall) {
+    hall = hall || 1;
     if (!P || !P.buildContext) return null;
     var sim = win.RZDatahallAISimTelemetry, cs = doc.getElementById('coolingScenario'), es = doc.getElementById('electricalScenario');
     var k = (sim && sim.tickNow ? sim.tickNow() : '') + '|' + (cs ? cs.value : '') + '|' + (es ? es.value : '') + '|' + (sim && sim.hasProvider && sim.hasProvider() ? 'r' : 's') + '|f' + fireRevision();
-    if (k !== ctxKey || !ctxVal) { ctxVal = P.buildContext(win, { hall: 1, noTrend: true }); ctxKey = ctxVal ? k : null; }
-    return ctxVal;
+    if (k !== ctxKey || !ctxVal) { ctxVal = P.buildContext(win, { hall: 1, noTrend: true }); ctxKey = ctxVal ? k : null; ctxHalls = {}; }
+    if (hall === 1 || !ctxVal) return ctxVal;
+    if (!ctxHalls[hall]) ctxHalls[hall] = P.buildContext(win, { hall: hall, noTrend: true });
+    return ctxHalls[hall];
   }
-  function payload(cls, id) {
-    var c = ctx(); if (!c || !P) return null;
+  function payload(cls, id, hall) {
+    var c = ctx(hall); if (!c || !P) return null;
     var key = ctxKey;   // the context key already holds tick, both scenarios, replay and the fire revision
     if (key !== tickSeen) { cache = {}; tickSeen = key; }
-    var k = cls + ':' + id;
+    var k = (hall || 1) + '|' + cls + ':' + id;
     if (!cache[k]) { try { cache[k] = P.safePayload(cls, id, c); } catch (e) { cache[k] = null; } }
     return cache[k];
   }
@@ -257,7 +264,7 @@
     if (n.cls === 'fire-output') return interlockOf(n);
     var cls = n.cls && CLS_PAYLOAD[n.cls], id = n.eqId || n.id, fire = !!cls && cls.indexOf('fire-') === 0;
     var fullId = fire || cls === 'net-zone';   // fire points and security zones keep their full id (DH-01-Z05-SD1-02, Z-EXT)
-    var p = cls ? payload(cls, fullId ? String(id) : String(id).replace(/^[A-Z]+-?/, '').replace(/-\d+$/, '') || '1') : null;
+    var p = cls ? payload(cls, fullId ? String(id) : String(id).replace(/^[A-Z]+-?/, '').replace(/-\d+$/, '') || '1', hallOfSheet(sheet)) : null;
     var tip = [];
     if (fire) {
       var fs = fireStateOf(p), fv = {};
@@ -366,6 +373,7 @@
     if (!old || !S || !R || !snap || panelHidden(old)) return;
     var bx = old.closest('.bx'); if (!bx || bx.querySelector('.hmi-host[data-hmi-sheet="' + sheetId + '"]')) return;
     var host = el('div', { class: 'hmi-host', 'data-hmi-sheet': sheetId });
+    if (/^dh-e-1\d\d$/.test(sheetId)) host.setAttribute('data-rz-hall', String(hallOfSheet(sheetId)));   // the inspector resolves an item's hall from here
     var h3 = bx.querySelector('h3');
     if (o && o.keep) {   // keep mode: the sheet joins the box right after the drawing it complements; nothing is retired
       var sib = old; while (sib.parentElement && sib.parentElement !== bx) sib = sib.parentElement;
@@ -523,7 +531,7 @@
     if (!host) { host = el('div', { class: 'hmi-host', 'data-hmi-sheet': 'sld-l3' }); body.insertBefore(host, body.firstChild); }
     if (pageSheets['sld-l3']) { pageSheets['sld-l3'].destroy(); pageSheets['sld-l3'] = null; }
     host.innerHTML = '';
-    var api = pageSheets['sld-l3'] = win.RZHmiSheet.render(host, sheet, sheetOpts({ sheet: 'dh-e-101' }));
+    var api = pageSheets['sld-l3'] = win.RZHmiSheet.render(host, sheet, sheetOpts({ sheet: 'dh-e-1' + ((Number(dh) || 1) < 10 ? '0' : '') + (Number(dh) || 1) }));   // the mimic reads its own hall
     if (sheet.focusId) setTimeout(function () {
       var g = api.svg.querySelector('.hmi-node[data-node="' + sheet.focusId + '"]');   // the feed sheet is legible at fit: select, do not zoom
       if (g) { g.setAttribute('data-selected', ''); if (g.scrollIntoView) g.scrollIntoView({ block: 'center', inline: 'nearest' }); }
@@ -584,6 +592,7 @@
       '<div class="hmi-m-foot"><div><div class="hmi-m-sec">Trend, last 24 h (simulated)</div><div class="hmi-trend">' + trend(id) + '</div></div>' +
       '<div><div class="hmi-m-sec">Alarms</div><ul class="hmi-evt">' + (rs.filter(function (r) { return r.alarm; }).map(function (r) { return '<li>' + esc(r.label) + ' · ' + esc(text(r)) + '</li>'; }).join('') || '<li>None active</li>') + '</ul></div></div></div>';
     back.hidden = false;
+    if (modalSheet) modalSheet.destroy();   // an opener called over an open modal: release the sheet it replaces
     modalSheet = win.RZHmiSheet.render(back.querySelector('.hmi-m-draw'), win.RZDatahallAISheets.build('cdu', win.DCAI_CALC.snapshot, { id: id }), sheetOpts());
     back.querySelector('[data-close]').addEventListener('click', close);
     $$('[data-trace]', back).forEach(function (b) {
@@ -619,6 +628,7 @@
       '<div class="hmi-m-draw"></div><div class="hmi-m-pts" data-rz-authored-basis="fire-zone payload rows (js/datahall-ai/hmi-payloads.js): means and isolations from the training isolation register, area from the engine hall geometry, ceiling temperature simulated on design plane p11 (Track A §A6)"><div class="hmi-m-sec">Points</div>' + (pts || '<p>—</p>') + '</div>' +
       '<div class="hmi-m-foot"><div><div class="hmi-m-sec">Alarms</div><ul class="hmi-evt">' + (al.map(function (a) { return '<li>' + esc(a.text || a.point || '') + '</li>'; }).join('') || '<li>None active</li>') + '</ul></div></div></div>';
     back.hidden = false;
+    if (modalSheet) modalSheet.destroy();
     modalSheet = win.RZHmiSheet.render(back.querySelector('.hmi-m-draw'), sheet, sheetOpts({ sheet: 'fire-zone-l3' }));
     back.querySelector('[data-close]').addEventListener('click', close);
     back.querySelector('[data-close]').focus();
@@ -627,8 +637,11 @@
   function trend(id) {
     var c = ctx(); if (!c || !P) return '';
     var pts = [], lo = Infinity, hi = -Infinity;
+    /* the shared context carries no tick (it follows the live clock): without this base every point read the same
+       instant and the 24 h trend was one flat line (v3.63.3) */
+    var sim = win.RZDatahallAISimTelemetry, t0 = typeof c.tick === 'number' && isFinite(c.tick) ? c.tick : (sim && sim.tickNow ? sim.tickNow() : 0);
     for (var k = 47; k >= 0; k--) {
-      var cc = {}; for (var x in c) cc[x] = c[x]; cc.tick = c.tick - k * 450;
+      var cc = {}; for (var x in c) cc[x] = c[x]; cc.tick = t0 - k * 450;
       var r = null; try { r = find(P.safePayload('cdu', id, cc), /differential pressure/i); } catch (e) { r = null; }
       var v = r && typeof r.value === 'number' ? r.value : null; pts.push(v);
       if (v != null) { lo = Math.min(lo, v); hi = Math.max(hi, v); }

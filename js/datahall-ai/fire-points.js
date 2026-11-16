@@ -105,7 +105,7 @@
     { id: '24h', label: '24 hours', ticks: 21600 }, { id: '72h', label: '72 hours', ticks: 64800 }
   ]);
   var OWNERS = deepFreeze(['shift-a', 'shift-b', 'fire-watch', 'contractor']);
-  var MAX_EXTENSIONS = 2, MIN_REASON = 10;
+  var MAX_EXTENSIONS = 2, MIN_REASON = 10, REASON_MAX = 500;
   var REFUSALS = deepFreeze({
     UNKNOWN_POINT: 'the point id is not in the inventory',
     LIFE_SAFETY_POINT: 'manual call points, EPO stations, release and abort circuits are life-safety points and are never isolable',
@@ -244,7 +244,8 @@
   /* ------------------------------------------------------------------------
    * 2. Register + state machine
    * ---------------------------------------------------------------------- */
-  function createRegister() { return deepFreeze({ version: 1, sequence: 1000, entries: {} }); }
+  /* seq (optional) carries a counter over so a fresh register never re-issues a record id; absent or below 1000 -> 1000 */
+  function createRegister(seq) { return deepFreeze({ version: 1, sequence: finite(seq) && seq >= 1000 ? Math.floor(seq) : 1000, entries: {} }); }
   function expiryOf(id) { for (var i = 0; i < EXPIRY_OPTIONS.length; i++) { if (EXPIRY_OPTIONS[i].id === id) { return EXPIRY_OPTIONS[i]; } } return null; }
   function stageOf(fire, tick) {
     if (!fire || !fire.eventId || !STAGE_OF_EVENT[fire.eventId]) { return 'normal'; }
@@ -336,11 +337,11 @@
     var r = nextRecord(reg, tick, {
       code: 'ISO', tag: p.id, location: locationOf(inv, p), severity: 'medium', lifecycle: 'inhibited', previousState: 'normal', currentState: 'isolated',
       event: 'point-isolated', action: 'isolate', operator: req.owner,
-      message: p.label + ' isolated by ' + req.owner + ' — reason: ' + String(req.reason).trim() + ' — expires ' + exp.label + ' (tick ' + (tick + exp.ticks) + ')' + (pre.consequence.zoneImpaired ? ' — consequence acknowledged: ' + pre.consequence.text : ''),
+      message: p.label + ' isolated by ' + req.owner + ' — reason: ' + String(req.reason).trim().slice(0, REASON_MAX) + ' — expires ' + exp.label + ' (tick ' + (tick + exp.ticks) + ')' + (pre.consequence.zoneImpaired ? ' — consequence acknowledged: ' + pre.consequence.text : ''),
       incidentId: 'ISO-' + p.id + '-' + tick, asset: 'fire-point:' + p.id
     });
     var next = clone(reg); next.sequence = r.sequence;
-    next.entries[p.id] = { pointId: p.id, owner: req.owner, reason: String(req.reason).trim(), isolatedAtTick: tick, expiryId: exp.id, expiresAtTick: tick + exp.ticks, extensions: 0, acknowledgedConsequence: !!pre.consequence.zoneImpaired };
+    next.entries[p.id] = { pointId: p.id, owner: req.owner, reason: String(req.reason).trim().slice(0, REASON_MAX), isolatedAtTick: tick, expiryId: exp.id, expiresAtTick: tick + exp.ticks, extensions: 0, acknowledgedConsequence: !!pre.consequence.zoneImpaired };
     return deepFreeze({ ok: true, code: null, message: null, register: deepFreeze(next), records: [r.record], consequence: pre.consequence });
   }
   function restore(inv, reg, req) {
@@ -371,7 +372,7 @@
     var r = nextRecord(reg, tick, {
       code: 'EXT', tag: p.id, location: locationOf(inv, p), severity: 'medium', lifecycle: 'inhibited', previousState: 'isolated', currentState: 'isolated',
       event: 'isolation-extended', action: 'extend', operator: req.owner,
-      message: p.label + ' isolation extended by ' + req.owner + ' to ' + exp.label + ' from now (tick ' + (tick + exp.ticks) + '), extension ' + (entry.extensions + 1) + ' of ' + MAX_EXTENSIONS + (req.reason ? ' — ' + String(req.reason).trim() : ''),
+      message: p.label + ' isolation extended by ' + req.owner + ' to ' + exp.label + ' from now (tick ' + (tick + exp.ticks) + '), extension ' + (entry.extensions + 1) + ' of ' + MAX_EXTENSIONS + (req.reason ? ' — ' + String(req.reason).trim().slice(0, REASON_MAX) : ''),
       incidentId: 'ISO-' + p.id + '-' + entry.isolatedAtTick, asset: 'fire-point:' + p.id
     });
     var next = clone(reg); next.sequence = r.sequence;
@@ -519,7 +520,7 @@
 
   var API = deepFreeze({
     version: VERSION, TICK_MS: TICK_MS, EPOCH: EPOCH, SPACING: SPACING, MEANS: MEANS, ZONE_TEMPLATE: ZONE_TEMPLATE, TYPES: TYPES, STATES: STATES, STAGES: STAGES,
-    EXPIRY_OPTIONS: EXPIRY_OPTIONS, OWNERS: OWNERS, REFUSALS: REFUSALS, AGENT_LABEL: AGENT_LABEL, STAGE_OF_EVENT: STAGE_OF_EVENT, MAX_EXTENSIONS: MAX_EXTENSIONS, MIN_REASON: MIN_REASON,
+    EXPIRY_OPTIONS: EXPIRY_OPTIONS, OWNERS: OWNERS, REFUSALS: REFUSALS, AGENT_LABEL: AGENT_LABEL, STAGE_OF_EVENT: STAGE_OF_EVENT, MAX_EXTENSIONS: MAX_EXTENSIONS, MIN_REASON: MIN_REASON, REASON_MAX: REASON_MAX,
     buildInventory: buildInventory, createRegister: createRegister, previewIsolate: previewIsolate, isolate: isolate, restore: restore, extend: extend,
     evaluate: evaluate, meansOf: meansOf, stageOf: stageOf, facpInAlarm: facpInAlarm, isoFromTick: isoFromTick, serialize: serialize, deserialize: deserialize, declare: declare
   });

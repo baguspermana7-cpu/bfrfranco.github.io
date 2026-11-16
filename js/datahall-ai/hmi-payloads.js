@@ -44,6 +44,11 @@
     return (Math.abs(v) >= 1000 ? grp(Number(parts[0])) : parts[0]) + '.' + parts[1];
   }
   function pad2(n) { return String(n).padStart ? String(n).padStart(2, '0') : ('0' + n).slice(-2); }
+  /* 'DH-' + two digits: 'DH-0' + hall printed DH-010 from hall 10 */
+  function hallTag(n) { return 'DH-' + pad2(n); }
+  /* a tray ref ('14', 'CT-14', 'NS-3') → its number; anything without a positive integer → 1 */
+  /* the tray number of an id: 'CT-14' and 'R07-CT-14' give 14 (the number after the tray kind, else the last one) */
+  function trayNo(id) { var t = String(id), m = /(?:CT|NS)[- ]?(\d+)/i.exec(t) || /(\d+)\D*$/.exec(t), n = m ? Number(m[1]) : 1; return n >= 1 ? n : 1; }
 
   var TOL = 1e-6;
   function parity(value, rec) {
@@ -149,7 +154,7 @@
   Builder.prototype.alarm = function (a) {
     var ctx = this.ctx;
     this.tabs.alarms.push(deepFreeze({
-      tag: a.tag, point: a.point, location: a.location || ('DH-0' + this.hall), system: a.system || this.meta.system || 'cooling',
+      tag: a.tag, point: a.point, location: a.location || hallTag(this.hall), system: a.system || this.meta.system || 'cooling',
       severity: a.severity || 'high', lifecycle: a.lifecycle || 'active_unack', kind: 'discrete', quality: 'simulated',
       event: a.event || 'alarm', action: a.action || 'acknowledge', scenario: a.scenario || ctx.scenarioId || 'normal',
       operator: 'DC AI operator', message: a.message, previousState: a.previousState || 'normal', currentState: a.currentState || 'alarm'
@@ -256,7 +261,7 @@
   function num(id) { var n = parseInt(String(id).replace(/\D/g, ''), 10); return isFinite(n) ? n : 1; }
   def('cdu', { kind: 'engine', label: 'CDU', system: 'cooling', tier2: 'cdu' }, function (b, ctx, id) {
     var n = num(id), cs = coolingScenario(ctx), A = ctx.adapter;
-    b.title = 'CDU-' + pad2(n) + ' — DH-0' + b.hall;
+    b.title = 'CDU-' + pad2(n) + ' — ' + hallTag(b.hall);
     b.P('live', 'htw_supply_c', 'HTW supply', 'p05_htw_supply_c');
     b.P('live', 'htw_return_c', 'HTW return', 'p06_htw_return_c');
     b.P('live', 'tcs_supply_c', 'TCS supply', 'p07_tcs_supply_c');
@@ -286,7 +291,7 @@
     b.E('capacity', 'installed_per_hall', 'Installed per hall', 'cduInstalled', '', { digits: 0 });
     b.E('capacity', 'liquid_hall_kwth', 'Hall liquid heat', 'liquidHeat', 'kWth', { digits: 0 });
     b.D('capacity', 'approach_k', 'CDU approach', fmt(A.cduApproachK, 1) + ' K', 'CDU approach is the PUBLISHED CoolIT CHx1000 approach (model leaf thermal.cduApproachK), printed as authored (Track A §A5)', A.cduApproachK);
-    b.dep('upstream', 'fws-pump-station:dh0' + b.hall, 'HTW pump station'); b.dep('downstream', 'tcs-manifold:dh0' + b.hall, 'TCS manifold');
+    b.dep('upstream', 'fws-pump-station:dh' + pad2(b.hall), 'HTW pump station'); b.dep('downstream', 'tcs-manifold:dh' + pad2(b.hall), 'TCS manifold');
     if (p1 === 'fault') { b.alarm({ tag: 'CDU-' + pad2(n), point: 'PUMP-1', severity: 'high', message: 'CDU pump 1 fault — standby pump 3 running', system: 'cooling' }); }
     b.trend('dp_bar', 'Differential pressure', 'bar', { value: 1.8 }, 0.25, { digits: 2 });
     b.S('maint', 'strainer_dp', 'Strainer ΔP', { value: 0.2, text: '0.2 bar clean strainer' }, 0.08, 'bar', { digits: 2, min: 0 });
@@ -364,7 +369,7 @@
   });
 
   def('fws-pump-station', { kind: 'engine', label: 'HTW pump station', system: 'cooling', tier2: 'eq' }, function (b, ctx) {
-    b.title = 'HTW (facility water) pump station — DH-0' + b.hall;
+    b.title = 'HTW (facility water) pump station — ' + hallTag(b.hall);
     b.E('live', 'htw_flow', 'HTW flow per hall', 'htwFlowM3h', 'm³/h', { digits: 0 });
     b.P('live', 'htw_supply_c', 'Supply', 'p05_htw_supply_c'); b.P('live', 'htw_return_c', 'Return', 'p06_htw_return_c');
     b.S('live', 'head_bar', 'Discharge head', { value: 3.8, text: '3.8 bar design head' }, 0.3, 'bar', { digits: 2 });
@@ -377,7 +382,7 @@
   });
 
   def('tcs-manifold', { kind: 'engine', label: 'TCS manifold', system: 'cooling', tier2: 'eq' }, function (b, ctx) {
-    b.title = 'TCS manifold — DH-0' + b.hall;
+    b.title = 'TCS manifold — ' + hallTag(b.hall);
     b.P('live', 'tcs_supply_c', 'TCS supply', 'p07_tcs_supply_c'); b.P('live', 'tcs_return_c', 'TCS return', 'p08_tcs_return_c');
     b.E('live', 'tcs_flow_hall', 'Hall TCS flow', 'tcsFlowTotal', 'L/min', { digits: 0 });
     b.E('live', 'tcs_flow_rack', 'Per rack', 'tcsFlowRackLpm', 'L/min', { digits: 0 });
@@ -410,7 +415,7 @@
 
   def('crah', { kind: 'engine', label: 'CRAH', system: 'cooling', tier2: 'crah' }, function (b, ctx, id) {
     var n = num(id), A = ctx.adapter;
-    b.title = 'CRAH-' + String(id) + ' — DH-0' + b.hall;
+    b.title = 'CRAH-' + String(id) + ' — ' + hallTag(b.hall);
     b.P('live', 'chw_supply_c', 'CHW in', 'p12_chw_supply_c'); b.P('live', 'chw_return_c', 'CHW out', 'p13_chw_return_c');
     b.P('live', 'air_supply_c', 'Supply air', 'p09_air_supply_c'); b.P('live', 'air_return_c', 'Return air', 'p11_air_return_c');
     var running = A.crahActive, st = finite(running) && n > running ? 'stby' : 'run';
@@ -431,27 +436,27 @@
     b.E('capacity', 'air_hall_kwth', 'Hall air heat', 'airHeat', 'kWth', { digits: 0 });
     var airPer = ctx.snapshot.design && ctx.snapshot.design.flows && finite(ctx.snapshot.design.flows.crah_air_m3s) && finite(A.crahInstalled) && finite(A.halls) && A.crahInstalled > 0 ? ctx.snapshot.design.flows.crah_air_m3s / (A.crahInstalled * A.halls) * 3600 : null;
     b.D('capacity', 'unit_air_m3h', 'Airflow per unit', airPer == null ? '—' : fmt(airPer, 0) + ' m³/h', IDENT('design.flows.crah_air_m3s over equipment.crah_installed_facility'), airPer);
-    b.dep('upstream', 'chiller:1', 'Chiller plant (CHW)'); b.dep('downstream', 'room:dh0' + b.hall, 'Hall air path');
+    b.dep('upstream', 'chiller:1', 'Chiller plant (CHW)'); b.dep('downstream', 'room:dh' + pad2(b.hall), 'Hall air path');
     b.trend('fan_pct', 'Fan speed', '%', { value: 75 }, 8, { digits: 0 });
     b.S('maint', 'filter_dp', 'Filter ΔP', { value: 120, text: '120 Pa clean filter' }, 25, 'Pa', { digits: 0, min: 0 });
     b.tier2('crah', [String(id)]);
   });
 
   def('fws-piping', { kind: 'engine', label: 'HTW piping', system: 'cooling', tier2: 'corr' }, function (b, ctx) {
-    b.title = 'HTW piping — DH-0' + b.hall;
+    b.title = 'HTW piping — ' + hallTag(b.hall);
     b.E('live', 'htw_flow', 'Hall flow', 'htwFlowM3h', 'm³/h', { digits: 0 });
     b.P('live', 'htw_supply_c', 'Supply', 'p05_htw_supply_c'); b.P('live', 'htw_return_c', 'Return', 'p06_htw_return_c');
     b.S('live', 'pressure_bar', 'Header pressure', { value: 2.1, text: '2.1 bar header design' }, 0.2, 'bar', { digits: 2 });
     b.ST('live', 'isolation_valves', 'Isolation valves', 'open', COOL_REASON);
     b.D('capacity', 'pipe', 'Header', 'DN250 CS A106 Sch40, 50 mm PIR insulation', SPEC('piping material, size and insulation'));
-    b.dep('upstream', 'fws-pump-station:dh0' + b.hall, 'HTW pump station'); b.dep('downstream', 'cdu:1', 'Row CDUs');
+    b.dep('upstream', 'fws-pump-station:dh' + pad2(b.hall), 'HTW pump station'); b.dep('downstream', 'cdu:1', 'Row CDUs');
     b.trend('pressure_bar', 'Header pressure', 'bar', { value: 2.1 }, 0.2, { digits: 2 });
     b.tier2('corr', ['fws']);
   });
 
   def('leak', { kind: 'scenario', label: 'Leak detection', system: 'cooling', tier2: 'corr' }, function (b, ctx) {
     var cs = coolingScenario(ctx), wet = cs.leakWetZones;
-    b.title = 'Leak detection — DH-0' + b.hall;
+    b.title = 'Leak detection — ' + hallTag(b.hall);
     var i;
     for (i = 1; i <= 24; i++) { b.ST('live', 'zone_' + i, 'Zone ' + pad2(i), wet.indexOf(i) >= 0 ? 'wet' : 'dry', COOL_REASON); }
     b.chip(wet.length ? 'LEAK' : 'DRY', wet.length ? 'fault' : 'normal');
@@ -459,13 +464,13 @@
     b.D('capacity', 'points', 'Point sensors', '180 probes at QD connections', SPEC('point-sensor count'));
     b.S('maint', 'loop_kohm', 'Loop resistance', { value: 1.2, text: '1.2 kΩ healthy loop' }, 0.3, 'kΩ', { digits: 2, min: 0 });
     for (i = 0; i < wet.length; i++) { b.alarm({ tag: 'LEAK-Z' + pad2(wet[i]), point: 'ROPE', severity: 'critical', message: 'Rope wet in zone ' + wet[i] + ' — isolate branch, CDU auto-shutoff armed', system: 'cooling', currentState: 'wet', previousState: 'dry' }); }
-    b.dep('upstream', 'fws-piping:dh0' + b.hall, 'HTW piping'); b.dep('downstream', 'cdu:1', 'Row CDUs (auto shut-off)');
+    b.dep('upstream', 'fws-piping:dh' + pad2(b.hall), 'HTW piping'); b.dep('downstream', 'cdu:1', 'Row CDUs (auto shut-off)');
     b.trend('loop_kohm', 'Loop resistance', 'kΩ', { value: 1.2 }, 0.3, { digits: 2 });
     b.tier2('corr', ['leak']);
   });
 
   def('cable-tray', { kind: 'authored', label: 'Cable tray', system: 'electrical', tier2: 'corr' }, function (b) {
-    b.title = 'Overhead cable trays — DH-0' + b.hall;
+    b.title = 'Overhead cable trays — ' + hallTag(b.hall);
     b.D('capacity', 'fill_power', 'Power tray fill', '65 % of NEC 392 limit', SPEC('design tray fill (page-authored, not simulated)'), 65);
     b.D('capacity', 'fill_fiber', 'Fibre tray fill', '40 %', SPEC('design tray fill'), 40);
     b.D('capacity', 'fill_cu', 'Copper tray fill', '52 %', SPEC('design tray fill'), 52);
@@ -495,12 +500,12 @@
     b.S('live', 'psu_out_w', 'Shelf output', { field: 'shelfKw' }, 1.5, 'kW', { digits: 1, offset: -6 });
     b.S('live', 'vdc', 'DC bus', { value: 48, text: '48 VDC published shelf output' }, 0.6, 'V', { digits: 1 });
     rackCommon(b, ctx);
-    b.dep('upstream', 'sld-busway:dh0' + b.hall, 'Busway / RPP group'); b.dep('downstream', 'rack-busbar:1', '48 VDC bus bar');
+    b.dep('upstream', 'sld-busway:dh' + pad2(b.hall), 'Busway / RPP group'); b.dep('downstream', 'rack-busbar:1', '48 VDC bus bar');
     b.trend('vdc', 'DC bus', 'V', { value: 48 }, 0.6);
     b.S('maint', 'psu_c', 'PSU inlet temperature', { plane: 'p10_rack_inlet_c' }, 2, '°C');
     b.tier2('rack', ['psu']);
   });
-  def('rack-ct', { kind: 'engine', label: 'Compute tray', system: 'compute', tier2: 'rack' }, function (b, ctx) {
+  def('rack-ct', { kind: 'engine', label: 'Compute tray', system: 'compute', tier2: 'rack' }, function (b, ctx, id) {
     b.title = 'Compute trays — GB300 NVL72 rack';
     b.D('live', 'trays', 'Compute trays', String(ctx.adapter.computeTrays) + ' × 2U', 'compute trays per rack is the PUBLISHED GB300 NVL72 figure (model leaf gb300.computeTrays), a label not a derived quantity (Track A §A5)', ctx.adapter.computeTrays);
     b.E('live', 'gpu_per_rack', 'GPUs per rack', 'gpuPerRack', '', { digits: 0 });
@@ -511,9 +516,9 @@
     rackCommon(b, ctx);
     b.dep('upstream', 'rack-manifold:1', 'Rack manifold'); b.dep('downstream', 'rack-ns:1', 'NVSwitch trays');
     b.trend('gpu_c', 'GPU junction', '°C', { value: 62 }, 4);
-    b.tier2('rack', ['ct']);
+    b.tier2('rack', ['ct', trayNo(id)]);
   });
-  def('rack-ns', { kind: 'engine', label: 'NVSwitch tray', system: 'compute', tier2: 'rack' }, function (b, ctx) {
+  def('rack-ns', { kind: 'engine', label: 'NVSwitch tray', system: 'compute', tier2: 'rack' }, function (b, ctx, id) {
     b.title = 'NVSwitch trays — GB300 NVL72 rack';
     b.E('live', 'nvswitch_per_rack', 'NVSwitch chips per rack', 'nvswitchPerRack', '', { digits: 0 });
     b.E('live', 'domain_tbs', 'NVLink domain bandwidth', 'nvlinkDomainTBs', 'TB/s', { digits: 0 });
@@ -522,14 +527,14 @@
     rackCommon(b, ctx);
     b.dep('upstream', 'rack-ct:1', 'Compute trays'); b.dep('downstream', 'net-leaf:1', 'Leaf switches');
     b.trend('util_pct', 'NVLink utilisation', '%', { value: 80 }, 8, { digits: 0 });
-    b.tier2('rack', ['ns']);
+    b.tier2('rack', ['ns', trayNo(id)]);
   });
   /* one rack of the hall plan (v2.4.0): R<row>-<position>, a row = one RPP group */
   def('rack-unit', { kind: 'engine', label: 'Rack', system: 'compute', tier2: 'rack' }, function (b, ctx, id) {
     var A = ctx.adapter, m = /^R(\d\d)-(\d\d)$/.exec(String(id)) || (String(id) === '1' || /^dh/i.test(String(id)) ? ['', '01', '01'] : null);
     if (!m) { throw new Error('hmi-payloads: rack-unit id must be R<row>-<pos>: ' + id); }
     var row = Number(m[1]), pos = Number(m[2]);
-    var hp = 'DH-0' + b.hall;
+    var hp = hallTag(b.hall);
     b.title = 'Rack R' + m[1] + '-' + m[2] + ' — RG-' + m[1] + ' — ' + hp;
     b.E('live', 'it_kw', 'Design IT load', 'kwPerRack', 'kW', { digits: 0 });
     b.E('live', 'gpus', 'GPUs', 'gpuPerRack', '', { digits: 0 });
@@ -549,7 +554,7 @@
     var pairsN = finite(A.rackRows) ? A.rackRows / 2 : null, pIdx = Math.floor((row - 1) / 2);
     var cduFirst = (finite(A.cduInstalled) && pairsN) ? pIdx * Math.floor(A.cduInstalled / pairsN) + Math.min(pIdx, A.cduInstalled % pairsN) + 1 : 1;
     b.dep('upstream', 'cdu:' + cduFirst, 'CDU line at the end of this row pair (TCS header)');
-    b.dep('upstream', 'sld-busway:dh0' + b.hall, 'Busway / RPP group RG-' + m[1]);
+    b.dep('upstream', 'sld-busway:dh' + pad2(b.hall), 'Busway / RPP group RG-' + m[1]);
     var zPer = finite(A.rackRows) ? Math.ceil(A.rackRows / 4) : 5;   /* four rack-row fire zones Z05-Z08 across the rows */
     b.dep('upstream', 'fire-zone:' + hp + '-Z0' + Math.min(8, 5 + Math.floor((row - 1) / zPer)), 'Fire zone');
     b.dep('downstream', 'rack-manifold:1', 'Rack liquid manifold');
@@ -564,7 +569,7 @@
     b.ST('live', 'qd_state', 'Quick disconnects', 'coupled', COOL_REASON);
     b.ST('live', 'fill_pump', 'Fill / degas pump', coolingScenario(ctx).leakWetZones.length ? 'stby' : 'run', COOL_REASON);
     rackCommon(b, ctx);
-    b.dep('upstream', 'tcs-manifold:dh0' + b.hall, 'TCS manifold'); b.dep('downstream', 'rack-ct:1', 'Compute trays');
+    b.dep('upstream', 'tcs-manifold:dh' + pad2(b.hall), 'TCS manifold'); b.dep('downstream', 'rack-ct:1', 'Compute trays');
     b.trend('dp_bar', 'Manifold ΔP', 'bar', { value: 0.6 }, 0.08, { digits: 2 });
     b.tier2('rack', ['manifold']);
   });
@@ -583,7 +588,7 @@
     b.ST('live', 'rope', 'Rack rope', cs.leakWetZones.length ? 'wet' : 'dry', COOL_REASON);
     b.ST('live', 'qd_probe', 'QD point probe', 'dry', COOL_REASON);
     rackCommon(b, ctx);
-    b.dep('upstream', 'leak:dh0' + b.hall, 'Hall leak controller');
+    b.dep('upstream', 'leak:dh' + pad2(b.hall), 'Hall leak controller');
     b.S('maint', 'loop_kohm', 'Loop resistance', { value: 1.2, text: '1.2 kΩ healthy loop' }, 0.3, 'kΩ', { digits: 2, min: 0 });
     b.trend('loop_kohm', 'Loop resistance', 'kΩ', { value: 1.2 }, 0.3, { digits: 2 });
     b.tier2('rack', ['leak']);
@@ -602,7 +607,7 @@
   /* electrical SLD blocks (per hall, feed A/B where relevant) */
   function feedOf(id) { return String(id).toUpperCase().indexOf('B') >= 0 ? 'B' : 'A'; }
   def('sld-mv-sub', { kind: 'engine', label: 'MV substation', system: 'electrical', tier2: 'mimic' }, function (b, ctx) {
-    b.title = 'MV customer substation — DH-0' + b.hall;
+    b.title = 'MV customer substation — ' + hallTag(b.hall);
     var sa = electricalState(ctx, 'SRC-UTILITY-A', 'online'), sb = electricalState(ctx, 'SRC-UTILITY-B', 'online'), sg = electricalState(ctx, 'SRC-GENSET-POOL', 'standby');
     b.ST('live', 'utility_a', 'Utility A', sa, SCEN_REASON); b.ST('live', 'utility_b', 'Utility B', sb, SCEN_REASON); b.ST('live', 'genset_pool', 'Generator pool', sg, SCEN_REASON);
     b.D('live', 'mv_kv', 'MV bus', '20 kV', SPEC('MV distribution voltage (20 kV)'), 20);
@@ -615,7 +620,7 @@
     b.chip(sa === 'online' && sb === 'online' ? 'NORMAL' : 'DEGRADED', sa === 'online' && sb === 'online' ? 'normal' : 'standby');
     if (sa !== 'online') { b.alarm({ tag: 'MV-SUB', point: 'UTILITY-A', severity: 'critical', message: 'Utility A unavailable — ' + (sg === 'running' ? 'generator pool running' : 'generator pool ' + sg), system: 'electrical', currentState: sa }); }
     if (sb !== 'online') { b.alarm({ tag: 'MV-SUB', point: 'UTILITY-B', severity: 'critical', message: 'Utility B unavailable', system: 'electrical', currentState: sb }); }
-    b.dep('upstream', 'sld-mv-sub:grid', 'PLN 150 kV grid'); b.dep('downstream', 'sld-rmu:dh0' + b.hall, 'RMU-' + b.hall);
+    b.dep('upstream', 'sld-mv-sub:grid', 'PLN 150 kV grid'); b.dep('downstream', 'sld-rmu:dh' + pad2(b.hall), 'RMU-' + b.hall);
     b.trend('bus_kv', 'Bus voltage', 'kV', { value: 20 }, 0.2, { digits: 2 });
     b.S('maint', 'sf6_bar', 'SF6 pressure', { value: 1.5, text: '1.5 bar rated fill' }, 0.05, 'bar', { digits: 2 });
     b.tier2('mimic', ['mv-sub', b.hall]);
@@ -626,7 +631,7 @@
      utility loss darkens the intake, the bus, the transformer and the board in that order. */
   def('sld-main-tx', { kind: 'engine', label: 'Main transformer', system: 'electrical' }, function (b, ctx) {
     var feed = String(b.id || '').slice(-1).toUpperCase() === 'B' ? 'B' : 'A';
-    b.title = 'MAIN-TX-' + b.hall + feed + ' — 150/20 kV — DH-0' + b.hall;
+    b.title = 'MAIN-TX-' + b.hall + feed + ' — 150/20 kV — ' + hallTag(b.hall);
     var state = feedEdgeState(ctx, feed, 'MAIN-TX');
     b.ST('live', 'feed', 'Feed ' + feed, state, SCEN_REASON);
     b.E('live', 'loading_normal_pct', 'Loading, both feeds', 'mainTxNormalPct', '%', { digits: 1 });
@@ -645,8 +650,8 @@
     b.S('maint', 'tap', 'OLTC tap position', { value: 0, text: 'tap 0 (±9 × 1.25 % on-load)' }, 0.6, '', { digits: 0 });
     b.chip(state === 'energized' ? 'ENERGIZED' : state === 'fault' ? 'FAULT' : 'DE-ENERGIZED', state === 'energized' ? 'normal' : state === 'fault' ? 'fault' : 'standby');
     if (state === 'fault') { b.alarm({ tag: 'MAIN-TX-' + b.hall + feed, point: 'PROT', severity: 'critical', message: 'Main transformer protection trip — the 20 kV section it feeds is dead', system: 'electrical', currentState: 'fault' }); }
-    b.dep('upstream', 'sld-mv-sub:dh0' + b.hall, '150 kV intake');
-    b.dep('downstream', 'sld-rmu:dh0' + b.hall, 'RMU-' + b.hall);
+    b.dep('upstream', 'sld-mv-sub:dh' + pad2(b.hall), '150 kV intake');
+    b.dep('downstream', 'sld-rmu:dh' + pad2(b.hall), 'RMU-' + b.hall);
     b.trend('winding_c', 'Winding temperature', '°C', { value: 78 }, 7);
   });
   /* v3.21.10 — the campus blocks on the site plan. The GIS hall, the genset yard and the fuel farm
@@ -703,20 +708,20 @@
     b.trend('level_pct', 'Tank level', '%', { value: 95 }, 1, { digits: 1 });
   });
   def('sld-rmu', { kind: 'engine', label: 'Ring main unit', system: 'electrical', tier2: 'mimic' }, function (b, ctx) {
-    b.title = 'RMU-' + b.hall + ' — DH-0' + b.hall;
+    b.title = 'RMU-' + b.hall + ' — ' + hallTag(b.hall);
     var ea = feedEdgeState(ctx, 'A', 'RMU'), eb = feedEdgeState(ctx, 'B', 'RMU');
     b.ST('live', 'feed_a', 'Feed A', ea, SCEN_REASON); b.ST('live', 'feed_b', 'Feed B', eb, SCEN_REASON); b.ST('live', 'tie', 'Bus tie', 'open', SCEN_REASON);
     b.E('live', 'group_kw', 'RPP group load', 'groupKw', 'kW', { digits: 0 });
     b.S('live', 'bus_kv', 'Bus voltage', { value: 20, text: '20 kV MV distribution' }, 0.2, 'kV', { digits: 2 });
     b.D('capacity', 'gear', 'Panel', 'RM6 24 kV, 3-panel, 630 A / 25 kA', SPEC('ring-main-unit ratings'));
     b.chip(ea === 'energized' && eb === 'energized' ? 'NORMAL' : 'DEGRADED', ea === 'energized' && eb === 'energized' ? 'normal' : 'standby');
-    b.dep('upstream', 'sld-mv-sub:dh0' + b.hall, 'MV substation'); b.dep('downstream', 'sld-tx:dh0' + b.hall, 'TX-' + b.hall + 'A/B');
+    b.dep('upstream', 'sld-mv-sub:dh' + pad2(b.hall), 'MV substation'); b.dep('downstream', 'sld-tx:dh' + pad2(b.hall), 'TX-' + b.hall + 'A/B');
     b.trend('bus_kv', 'Bus voltage', 'kV', { value: 20 }, 0.2, { digits: 2 });
     b.S('maint', 'sf6_bar', 'SF6 pressure', { value: 1.5, text: '1.5 bar rated fill' }, 0.05, 'bar', { digits: 2 });
     b.tier2('mimic', ['rmu', b.hall]);
   });
   def('sld-tx', { kind: 'engine', label: 'Transformers', system: 'electrical', tier2: 'mimic' }, function (b, ctx) {
-    b.title = 'TX-' + b.hall + 'A/B — DH-0' + b.hall;
+    b.title = 'TX-' + b.hall + 'A/B — ' + hallTag(b.hall);
     var ea = feedEdgeState(ctx, 'A', 'TX'), eb = feedEdgeState(ctx, 'B', 'TX');
     b.ST('live', 'tx_a', 'TX-' + b.hall + 'A', ea, SCEN_REASON); b.ST('live', 'tx_b', 'TX-' + b.hall + 'B', eb, SCEN_REASON);
     b.E('live', 'loading_pct', 'Loading', 'txLoadPct', '%', { digits: 1 });
@@ -730,13 +735,13 @@
     b.chip(ea === 'energized' && eb === 'energized' ? 'NORMAL' : 'DEGRADED', ea === 'energized' && eb === 'energized' ? 'normal' : ea === 'fault' || eb === 'fault' ? 'fault' : 'standby');
     if (ea === 'fault') { b.alarm({ tag: 'TX-' + b.hall + 'A', point: 'PROT', severity: 'critical', message: 'Transformer A protection trip', system: 'electrical', currentState: 'fault' }); }
     if (eb === 'fault') { b.alarm({ tag: 'TX-' + b.hall + 'B', point: 'PROT', severity: 'critical', message: 'Transformer B protection trip', system: 'electrical', currentState: 'fault' }); }
-    b.dep('upstream', 'sld-rmu:dh0' + b.hall, 'RMU-' + b.hall); b.dep('downstream', 'sld-msb:dh0' + b.hall, 'MSB-' + b.hall + 'A/B');
+    b.dep('upstream', 'sld-rmu:dh' + pad2(b.hall), 'RMU-' + b.hall); b.dep('downstream', 'sld-msb:dh' + pad2(b.hall), 'MSB-' + b.hall + 'A/B');
     b.trend('winding_c', 'Winding temperature', '°C', { value: 95 }, 6);
     b.S('maint', 'tap', 'Tap position', { value: 0, text: 'tap 0 (±2.5 % × 2 OCTC)' }, 0.4, '', { digits: 0 });
     b.tier2('mimic', ['tx', b.hall]);
   });
   def('sld-msb', { kind: 'engine', label: 'Main switchboard', system: 'electrical', tier2: 'mimic' }, function (b, ctx) {
-    b.title = 'MSB-' + b.hall + 'A/B — DH-0' + b.hall;
+    b.title = 'MSB-' + b.hall + 'A/B — ' + hallTag(b.hall);
     var ea = feedEdgeState(ctx, 'A', 'MSB'), eb = feedEdgeState(ctx, 'B', 'MSB');
     var ata = electricalState(ctx, 'ATS-A', 'normal'), atb = electricalState(ctx, 'ATS-B', 'normal');
     b.ST('live', 'msb_a', 'MSB-' + b.hall + 'A', ea, SCEN_REASON); b.ST('live', 'msb_b', 'MSB-' + b.hall + 'B', eb, SCEN_REASON);
@@ -750,7 +755,7 @@
     b.E('capacity', 'busway_a', 'Busway trunk', 'buswayA', 'A', { digits: 0 });
     b.D('capacity', 'form', 'Board', 'Form 4b, LV tie normally open', SPEC('switchboard form and tie configuration'));
     b.chip(ea === 'energized' && eb === 'energized' ? 'NORMAL' : 'DEGRADED', ea === 'energized' && eb === 'energized' ? 'normal' : 'standby');
-    b.dep('upstream', 'sld-tx:dh0' + b.hall, 'Transformers'); b.dep('downstream', 'sld-ups-a:dh0' + b.hall, 'UPS-' + b.hall + 'A');
+    b.dep('upstream', 'sld-tx:dh' + pad2(b.hall), 'Transformers'); b.dep('downstream', 'sld-ups-a:dh' + pad2(b.hall), 'UPS-' + b.hall + 'A');
     b.trend('v_l1', 'L1 voltage', 'V', { field: 'voltageLL' }, 3, { digits: 0 });
     b.S('maint', 'thd_pct', 'Voltage THD', { value: 1.8, text: '1.8 % THDv class' }, 0.3, '%', { digits: 2, min: 0 });
     b.tier2('mimic', ['msb', b.hall]);
@@ -758,7 +763,7 @@
   function upsClass(feed) {
     return function (b, ctx) {
       var key = 'UPS-' + feed, st = electricalState(ctx, key, 'online');
-      b.title = 'UPS-' + b.hall + feed + ' — DH-0' + b.hall;
+      b.title = 'UPS-' + b.hall + feed + ' — ' + hallTag(b.hall);
       var mode = st === 'online' ? 'online' : st === 'bypass' ? 'bypass' : st === 'maintenance' ? 'maintenance' : 'fault';
       b.ST('live', 'mode', 'Mode', mode, SCEN_REASON);
       b.E('live', 'load_pct', 'Loading (failover)', 'upsLoadPct', '%', { digits: 1 });
@@ -773,8 +778,8 @@
       b.E('capacity', 'battery_kwh', 'Battery energy per hall', 'batteryPerHall', 'kWh', { digits: 0 });
       b.chip(mode.toUpperCase(), mode === 'online' ? 'normal' : mode === 'bypass' ? 'standby' : 'fault');
       if (mode !== 'online') { b.alarm({ tag: key, point: 'MODE', severity: mode === 'bypass' ? 'high' : 'critical', message: 'UPS ' + feed + ' on ' + mode, system: 'electrical', currentState: mode, previousState: 'online' }); }
-      b.dep('upstream', 'sld-msb:dh0' + b.hall, 'MSB-' + b.hall + feed); b.dep('downstream', 'sld-busway:dh0' + b.hall, 'Busway ' + feed);
-      b.related.push('battery-' + feed.toLowerCase() + ':dh0' + b.hall);
+      b.dep('upstream', 'sld-msb:dh' + pad2(b.hall), 'MSB-' + b.hall + feed); b.dep('downstream', 'sld-busway:dh' + pad2(b.hall), 'Busway ' + feed);
+      b.related.push('battery-' + feed.toLowerCase() + ':dh' + pad2(b.hall));
       b.trend('out_v', 'Output voltage', 'V', { field: 'voltageLL' }, 1, { digits: 0 });
       b.S('maint', 'fan_hours', 'Fan run hours', { value: 12000, text: '12,000 h class' }, 300, 'h', { digits: 0, period: 400 });
       b.tier2('mimic', ['ups-' + feed.toLowerCase(), b.hall]);
@@ -785,7 +790,7 @@
   function batteryClass(feed) {
     return function (b, ctx) {
       var st = electricalState(ctx, 'UPS-' + feed, 'online'), mode = st === 'online' ? 'float' : st === 'bypass' ? 'float' : 'discharge';
-      b.title = 'BAT-' + b.hall + feed + ' — DH-0' + b.hall;
+      b.title = 'BAT-' + b.hall + feed + ' — ' + hallTag(b.hall);
       b.ST('live', 'mode', 'Battery mode', mode, SCEN_REASON);
       b.E('live', 'energy_kwh', 'Energy per hall', 'batteryPerHall', 'kWh', { digits: 0 });
       b.S('live', 'soc_pct', 'State of charge', { value: 98, text: '98 % float' }, 1.5, '%', { digits: 0, max: 100 });
@@ -794,7 +799,7 @@
       b.E('capacity', 'frame_kw', 'Supported frame', 'upsRatingKW', 'kW', { digits: 0 });
       b.D('capacity', 'autonomy', 'Autonomy', '10 min at rated load', SPEC('battery autonomy'));
       b.chip(mode.toUpperCase(), mode === 'float' ? 'normal' : 'fault');
-      b.dep('upstream', 'sld-ups-' + feed.toLowerCase() + ':dh0' + b.hall, 'UPS-' + b.hall + feed);
+      b.dep('upstream', 'sld-ups-' + feed.toLowerCase() + ':dh' + pad2(b.hall), 'UPS-' + b.hall + feed);
       b.trend('soc_pct', 'State of charge', '%', { value: 98 }, 1.5, { digits: 0 });
       b.S('maint', 'cycles', 'Cycles', { value: 120, text: '120 cycles class' }, 4, '', { digits: 0, period: 400 });
       b.tier2('bat', [feed, b.hall]);
@@ -803,7 +808,7 @@
   def('battery-a', { kind: 'engine', label: 'Battery A', system: 'electrical', tier2: 'bat' }, batteryClass('A'));
   def('battery-b', { kind: 'engine', label: 'Battery B', system: 'electrical', tier2: 'bat' }, batteryClass('B'));
   def('sld-busway', { kind: 'engine', label: 'Busway + RPP groups', system: 'electrical', tier2: 'mimic' }, function (b, ctx) {
-    b.title = 'BW-' + b.hall + 'A/B — DH-0' + b.hall;
+    b.title = 'BW-' + b.hall + 'A/B — ' + hallTag(b.hall);
     var ba = electricalState(ctx, 'BUSWAY-A', 'normal'), bb = electricalState(ctx, 'BUSWAY-B', 'normal');
     var ea = feedEdgeState(ctx, 'A', 'BUSWAY'), eb = feedEdgeState(ctx, 'B', 'BUSWAY');
     b.ST('live', 'bw_a', 'Busway A', ea, SCEN_REASON); b.ST('live', 'bw_b', 'Busway B', eb, SCEN_REASON);
@@ -818,25 +823,25 @@
     b.E('capacity', 'rpp_per_hall', 'RPP per hall', 'rppPerHall', '', { digits: 0 });
     b.chip(ea === 'energized' && eb === 'energized' ? 'NORMAL' : 'DEGRADED', ea === 'energized' && eb === 'energized' ? 'normal' : ea === 'fault' || eb === 'fault' ? 'fault' : 'standby');
     if (ea === 'fault' || ba === 'tripped') { b.alarm({ tag: 'BW-' + b.hall + 'A', point: 'FEEDER', severity: 'critical', message: 'Busway A feeder trip — racks on feed B only', system: 'electrical', currentState: 'fault' }); }
-    b.dep('upstream', 'sld-ups-a:dh0' + b.hall, 'UPS-' + b.hall + 'A/B'); b.dep('downstream', 'rack-psu:1', 'Rack power shelves');
+    b.dep('upstream', 'sld-ups-a:dh' + pad2(b.hall), 'UPS-' + b.hall + 'A/B'); b.dep('downstream', 'rack-psu:1', 'Rack power shelves');
     b.trend('i_a', 'Feed A current', 'A', { field: 'reqCurrentA' }, 40, { digits: 0 });
     b.S('maint', 'joint_c', 'Joint IR scan (max)', { value: 48, text: '48 °C class' }, 3, '°C');
     b.tier2('mimic', ['busway', b.hall]);
   });
   def('sld-rack-psu', { kind: 'engine', label: 'Rack power', system: 'electrical', tier2: 'mimic' }, function (b, ctx) {
-    b.title = 'Rack power — DH-0' + b.hall;
+    b.title = 'Rack power — ' + hallTag(b.hall);
     b.E('live', 'racks', 'Racks', 'racksPerHall', '', { digits: 0 });
     b.E('live', 'rack_kw', 'Rack IT', 'kwPerRack', 'kW', { digits: 0 });
     b.E('live', 'feed_a', 'Rack feed current', 'rackFeedA', 'A', { digits: 0 });
     b.E('live', 'rack_it_hall', 'Rack IT per hall', 'rackItHallKw', 'kW', { digits: 0 });
     b.S('live', 'psu_c', 'PSU inlet', { plane: 'p10_rack_inlet_c' }, 2, '°C');
     rackCommon(b, ctx);
-    b.dep('upstream', 'sld-busway:dh0' + b.hall, 'Busway / RPP'); b.dep('downstream', 'rack-psu:1', 'Power shelves');
+    b.dep('upstream', 'sld-busway:dh' + pad2(b.hall), 'Busway / RPP'); b.dep('downstream', 'rack-psu:1', 'Power shelves');
     b.trend('psu_c', 'PSU inlet', '°C', { plane: 'p10_rack_inlet_c' }, 2);
     b.tier2('mimic', ['rack-psu', b.hall]);
   });
   def('sld-cooling', { kind: 'engine', label: 'Cooling loads', system: 'electrical', tier2: 'mimic' }, function (b, ctx) {
-    b.title = 'Cooling electrical loads — DH-0' + b.hall;
+    b.title = 'Cooling electrical loads — ' + hallTag(b.hall);
     b.E('live', 'cooling_kwe', 'Cooling kWe per hall', 'pb_cooling', 'kWe', { digits: 0 });
     b.E('live', 'chiller_kwe', 'Chillers', 'pb_chiller', 'kWe', { digits: 0 });
     b.E('live', 'pumps_kwe', 'Pumps', 'pb_pumps', 'kWe', { digits: 0 });
@@ -845,7 +850,7 @@
     b.E('capacity', 'cdu_installed', 'CDUs per hall', 'cduInstalled', '', { digits: 0 });
     b.E('capacity', 'crah_installed', 'CRAHs per hall', 'crahInstalled', '', { digits: 0 });
     b.ST('live', 'feed', 'ATS-backed feed', 'energized', SCEN_REASON);
-    b.dep('upstream', 'sld-msb:dh0' + b.hall, 'MSB (ATS-backed section)'); b.dep('downstream', 'cdu:1', 'CDU pumps (UPS-fed)');
+    b.dep('upstream', 'sld-msb:dh' + pad2(b.hall), 'MSB (ATS-backed section)'); b.dep('downstream', 'cdu:1', 'CDU pumps (UPS-fed)');
     b.trend('cooling_kwe', 'Cooling kWe', 'kWe', { field: 'pb_cooling' }, 0, { digits: 0 });
     b.tier2('mimic', ['cooling', b.hall]);
   });

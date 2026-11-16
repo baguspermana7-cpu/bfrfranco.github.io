@@ -140,3 +140,16 @@ test('H6 fail-closed', () => {
     assert.equal(safe.unavailable, true);
     assert.throws(() => Payloads.payload('no-such-class', '1', ctxFor()), /unknown equipment class/);
 });
+
+test('H7 hall 12 is DH-12, never DH-012; a tray id keeps its tray number (audit 2026-11-16 C9, C5)', () => {
+    const p = Payloads.safePayload('sld-msb', '1', ctxFor({ hall: 12 }));
+    const text = JSON.stringify(p);
+    assert.match(text, /DH-12/, 'the hall-12 payload names DH-12');
+    assert.doesNotMatch(text, /DH-012|dh012/, 'no zero-prefixed two-digit hall');
+    const one = JSON.stringify(Payloads.safePayload('sld-msb', '1', ctxFor({ hall: 1 })));
+    assert.match(one, /DH-01/, 'hall 1 still reads DH-01');
+    for (const [cls, id, want] of [['rack-ct', 'R07-CT-14', 14], ['rack-ct', '14', 14], ['rack-ns', 'R07-NS-3', 3], ['rack-ct', 'x', 1]]) {
+        const t2 = JSON.stringify(Payloads.safePayload(cls, id, ctxFor()));
+        assert.ok(t2.includes(`"${cls === 'rack-ct' ? 'ct' : 'ns'}",${want}]`), `${cls}:${id} opens tray ${want}`);
+    }
+});

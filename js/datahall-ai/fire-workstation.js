@@ -54,16 +54,35 @@
       return reg;
     } catch (e) { return F.createRegister(); }
   }
+  function copyOwn(target, src) { var k; for (k in src) { if (Object.prototype.hasOwnProperty.call(src, k)) { target[k] = src[k]; } } return target; }
   function saveRegister() { try { root.localStorage.setItem(STORAGE_KEY, FP().serialize(S.reg)); } catch (e) { /* storage may be unavailable; the session register still works */ } }
 
   /* ------------------------------------------------------------------ records → Alarms workspace */
   function emit(records) {
-    var fresh = [], i;
-    for (i = 0; i < (records || []).length; i++) { if (!S.seen[records[i].id]) { S.seen[records[i].id] = true; fresh.push(records[i]); } }
+    var fresh = [], batch = {}, i, j, logged, id;
+    for (i = 0; i < (records || []).length; i++) {
+      id = records[i].id;
+      if (!S.seen[id] && !batch[id]) { batch[id] = true; fresh.push(records[i]); }
+    }
     if (!fresh.length) { return; }
-    S.log = S.log.concat(fresh).slice(-LOG_MAX);
-    var W = root.RZDatahallAIAlarmWorkspace;
-    if (W && W.appendEvents) { try { W.appendEvents(fresh); } catch (e) { if (root.console) { root.console.warn('[fire-workstation] ' + e.message); } } }
+    /* a record offered again (the workspace was not there yet) is logged once */
+    for (i = 0; i < fresh.length; i++) {
+      logged = false;
+      for (j = 0; j < S.log.length; j++) { if (S.log[j].id === fresh[i].id) { logged = true; break; } }
+      if (!logged) { S.log = S.log.concat([fresh[i]]).slice(-LOG_MAX); }
+    }
+    var W = root.RZDatahallAIAlarmWorkspace, retry = false;
+    if (W && W.appendEvents) {
+      try { W.appendEvents(fresh); }
+      catch (e) {
+        /* workspace not ready: keep the batch unseen and offer it again next pass (one warning). A batch the schema
+           refuses is dropped: offered again it would block every later record behind it. */
+        retry = /unavailable/.test(e.message);
+        if (root.console && (!retry || !S.warnedUnavailable)) { root.console.warn('[fire-workstation] ' + e.message); }
+        if (retry) { S.warnedUnavailable = true; }
+      }
+    } else { retry = true; }
+    if (!retry) { for (i = 0; i < fresh.length; i++) { S.seen[fresh[i].id] = true; } }
   }
   function zoneTransitions(prev, next) {
     /* pure evaluate cannot know yesterday: the workstation diffs snapshots to log a zone RESTORED */
@@ -180,7 +199,9 @@
   }
   function renderPoints() {
     var body = $('firePointsBody'); if (!body || !S.snap) { return; }
-    var list = filtered(), key = S.hall + '|' + JSON.stringify(S.filters) + '|' + list.length, i;
+    var list = filtered(), ids = [], i;
+    for (i = 0; i < list.length; i++) { ids.push(list[i].id); }
+    var key = S.hall + '|' + JSON.stringify(S.filters) + '|' + ids.join(',');
     if (S.rowsKey !== key) {
       S.rowsKey = key; S.rows = {};
       var frag = doc.createDocumentFragment();
@@ -256,7 +277,7 @@
     var F = FP(), t = tick(), n = Object.keys(S.reg.entries).length;
     var rec = { id: 'FIRE-CLR-' + t, timestamp: F.isoFromTick(t), sequence: t * 100 + 99, tag: 'REGISTER', point: 'REGISTER', location: 'facility', system: 'fire', severity: 'info', lifecycle: 'returned_ack', kind: 'discrete',
       previousState: n + ' isolated', currentState: 'cleared', quality: 'simulated', event: 'register-cleared', action: 'clear', scenario: 'training', operator: by || 'operator', message: 'Training isolation register cleared by the operator — ' + n + ' isolation(s) removed from this browser', incidentId: 'CLR-' + t, asset: 'fire-register', source: 'fire-points', runId: 'tick-' + t, trigger: 'operator', reset: 'none' };
-    S.reg = F.createRegister(); saveRegister(); emit([rec]); evaluate(); render(); refreshInspector();   // evaluate first: the zones read the new register now, not at the next tick (DH-F-104 gate F18)
+    S.reg = F.createRegister(S.reg.sequence); saveRegister(); emit([rec]); evaluate(); render(); refreshInspector();   // evaluate first: the zones read the new register now, not at the next tick (DH-F-104 gate F18)
   }
 
   /* ------------------------------------------------------------------ zones view */
@@ -504,9 +525,9 @@
     render: function () { if (!S.unavailable) { evaluate(); render(); refreshInspector(); } return !S.unavailable; },
     snapshot: function () { return S.snap; }, summary: summary, fireContext: fireContext, causeEffectInput: causeEffectInput,
     startRun: startRun, stopRun: stopRun,
-    isolate: function (req) { var res = FP().isolate(S.inv, S.reg, Object.assign({ tick: tick() }, req), { fire: S.run }); S.reg = res.register; saveRegister(); emit(res.records); evaluate(); render(); refreshInspector(); return res; },
-    restore: function (req) { var res = FP().restore(S.inv, S.reg, Object.assign({ tick: tick() }, req)); S.reg = res.register; saveRegister(); emit(res.records); evaluate(); render(); refreshInspector(); return res; },
-    extend: function (req) { var res = FP().extend(S.inv, S.reg, Object.assign({ tick: tick() }, req)); S.reg = res.register; saveRegister(); emit(res.records); evaluate(); render(); refreshInspector(); return res; },
+    isolate: function (req) { var res = FP().isolate(S.inv, S.reg, copyOwn({ tick: tick() }, req), { fire: S.run }); S.reg = res.register; saveRegister(); emit(res.records); evaluate(); render(); refreshInspector(); return res; },
+    restore: function (req) { var res = FP().restore(S.inv, S.reg, copyOwn({ tick: tick() }, req)); S.reg = res.register; saveRegister(); emit(res.records); evaluate(); render(); refreshInspector(); return res; },
+    extend: function (req) { var res = FP().extend(S.inv, S.reg, copyOwn({ tick: tick() }, req)); S.reg = res.register; saveRegister(); emit(res.records); evaluate(); render(); refreshInspector(); return res; },
     register: function () { return S.reg; }, clearRegister: function () { clearRegister('api'); }, inventory: function () { return S.inv; },
     setHall: setHall, showView: function (k) { showView(k, false); }, openDialog: openDialog, log: function () { return S.log.slice(); }, unavailable: function () { return S.unavailable; }
   };

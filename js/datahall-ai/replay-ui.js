@@ -12,7 +12,7 @@
   'use strict';
   var Core = win.RZDatahallAIReplay, Sim = win.RZDatahallAISimTelemetry;
   var STORE = 'rz_replay_maps', KEEP = 20, ROWS = 200, SPEEDS = [1, 10, 60];
-  var st = { phase: 'simulated', name: null, parsed: null, mapping: {}, catalogue: [], byLabel: {}, times: [], idx: 0, speed: 1, timer: null, sig: null, prevLabel: null };
+  var st = { phase: 'simulated', name: null, parsed: null, mapping: Object.create(null), catalogue: [], byLabel: Object.create(null), times: [], idx: 0, speed: 1, timer: null, sig: null, prevLabel: null };
 
   function $(id) { return doc.getElementById(id); }
   function el(tag, attrs, text) {
@@ -140,10 +140,10 @@
   /* ---- step 2: mapping ---------------------------------------------------- */
   function onParsed(r, text) {
     st.parsed = r; st.phase = 'mapping';
-    st.catalogue = catalogue(); st.byLabel = {};
+    st.catalogue = catalogue(); st.byLabel = Object.create(null);
     st.catalogue.forEach(function (p) { st.byLabel[p.label] = p.key; });
     var auto = Core.autoMatch(r.columns, st.catalogue);
-    st.mapping = auto.mapping;
+    st.mapping = Object.create(null); Object.keys(auto.mapping).forEach(function (c) { st.mapping[c] = auto.mapping[c]; });
     var firstTime = r.start == null ? '' : String(r.start);
     signature(String(r.header) + '|' + firstTime).then(function (sig) {
       st.sig = sig;
@@ -235,7 +235,7 @@
   }
   function start() {
     if (!mappedCount()) { return; }
-    var mapping = {};
+    var mapping = Object.create(null);
     Object.keys(st.mapping).forEach(function (c) { if (st.mapping[c].point) { mapping[c] = { point: st.mapping[c].point, factor: st.mapping[c].factor || 1 }; } });
     if (st.sig) { writeStore(st.sig, mapping); }
     st.times = unionTimes(); st.idx = 0;

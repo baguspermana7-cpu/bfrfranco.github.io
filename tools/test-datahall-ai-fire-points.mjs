@@ -237,3 +237,22 @@ test('F12 serialize / deserialize: round trip, foreign versions and malformed st
   assert.equal(FP.deserialize('{"version":1,"sequence":1000,"entries":{"ghost":{"pointId":"ghost","owner":"shift-a","reason":"x","isolatedAtTick":1,"expiryId":"2h","expiresAtTick":2}}}', inv), null, 'a point not in the inventory fails closed');
   assert.equal(FP.deserialize('{"version":1,"sequence":1000,"entries":{"DH-01-Z05-SD1-01":{"pointId":"DH-01-Z05-SD1-01","owner":"nobody","reason":"x","isolatedAtTick":1,"expiryId":"2h","expiresAtTick":2}}}', inv), null, 'an unknown owner fails closed');
 });
+
+test('F13 the record sequence survives a cleared register; a reason is capped; ES5 modules use no Object.assign (audit 2026-11-16 C2, C8, C10)', () => {
+    const pts = inv.points.filter((p) => p.hall === 1 && (p.type === 'vesda' || p.means === 'smoke_l1'));
+    const req = (p, reason) => ({ pointId: p.id, owner: FP.OWNERS[0], reason, expiryId: FP.EXPIRY_OPTIONS[0].id, tick: T, acknowledged: true });
+    const r1 = FP.isolate(inv, FP.createRegister(), req(pts[0], 'first isolation of the session'), {});
+    assert.equal(r1.ok, true);
+    const r2 = FP.isolate(inv, FP.createRegister(r1.register.sequence), req(pts[1], 'isolation after a cleared register'), {});
+    assert.equal(r2.ok, true);
+    assert.notEqual(r2.records[0].id, r1.records[0].id, 'a cleared register that carries the sequence never repeats a record id');
+    assert.equal(FP.createRegister().sequence, 1000); assert.equal(FP.createRegister('x').sequence, 1000); assert.equal(FP.createRegister(5).sequence, 1000);
+    const long = FP.isolate(inv, FP.createRegister(), req(pts[0], 'y'.repeat(5000)), {});
+    assert.equal(long.ok, true);
+    assert.equal(long.register.entries[pts[0].id].reason.length, FP.REASON_MAX);
+    assert.equal(AQ.validateEvents(long.records).valid, true, 'the capped record passes the alarm schema');
+    const dir = join(ROOT, 'js/datahall-ai');
+    for (const f of ['fire-points.js', 'fire-workstation.js', 'fire-cause-effect.js', 'hmi-payloads.js', 'hmi-v2.js', 'hmi-sheets.js', 'equipment-inspector.js', 'replay-core.js', 'replay-ui.js']) {
+        assert.doesNotMatch(readFileSync(join(dir, f), 'utf8'), /Object\.assign\(/, `${f} uses no Object.assign`);
+    }
+});

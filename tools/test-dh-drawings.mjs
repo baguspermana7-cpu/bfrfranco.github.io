@@ -28,6 +28,11 @@
  * M2  a fire zone click opens its detection schematic with every device of the zone; Shift+click keeps the inspector
  * M3  the battery modal draws its L3 sheet
  * M5  an opener that cannot draw falls back to the inspector
+ * L1  a closed sheet leaves no window listener and no late tooltip behind
+ * L3  an item on a hall SLD opens and reads as that hall
+ * L2  an isolation after Clear register gets a new record id and reaches Alarms · L4 the point table follows the
+ *     point set · L7 a very long reason is capped and still recorded
+ * L5  a compute tray opens as itself · L9 a data-tip is rendered as text
  * M4  two items drawn in turn in one modal slot each show their own reading (memo keyed on the item, not the node id)
  * F15-F18 zone map DH-F-104 (Zones view): every zone of the hall once, means available / total = the isolation
  *     register, a zone isolated below two means shows its alarm (and only it), Clear restores
@@ -383,6 +388,107 @@ const m5 = await pg.evaluate(async () => {
   document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); return insp;
 });
 law('M5', m5, `zone click with a failing opener: inspector ${m5 ? 'opened' : 'NOT opened (nothing happened)'}`);
+
+// ── L1 a closed sheet leaves nothing behind (audit 2026-11-16 C1, C7): every render added pointermove + pointerup on
+// window and destroy() removed neither, so each modal open kept a whole drawing alive; a pending tooltip timer fired
+// after the modal had closed ────────────────────────────────────────────────────────────────────────────────────────
+const cdp = await pg.target().createCDPSession();
+const winListeners = async () => { const { result } = await cdp.send('Runtime.evaluate', { expression: 'window' });
+  const { listeners } = await cdp.send('DOMDebugger.getEventListeners', { objectId: result.objectId });
+  return listeners.filter((l) => l.type === 'pointermove' || l.type === 'pointerup').length; };
+const openClose = (n) => pg.evaluate(async (n) => { const O = window.RZDatahallAIHmiOpeners;
+  for (let i = 0; i < n; i++) { O.fire('DH-01-Z11'); await new Promise((r) => setTimeout(r, 120));
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await new Promise((r) => setTimeout(r, 60)); } }, n);
+await openClose(1); const l0 = await winListeners(); await openClose(20); const l1 = await winListeners();
+const lateTip = await pg.evaluate(async () => { const O = window.RZDatahallAIHmiOpeners; O.fire('DH-01-Z11'); await new Promise((r) => setTimeout(r, 400));
+  const g = document.querySelector('.hmi-modal-back:not([hidden]) .hmi-node'); if (!g) return 'no node';
+  g.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, clientX: 300, clientY: 300 }));
+  document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await new Promise((r) => setTimeout(r, 450));
+  const t = document.querySelector('.hmi-tip'); return t && t.classList.contains('is-on') ? 'shown' : 'none'; });
+law('L1', l1 === l0 && lateTip === 'none', `20 modal open/close: window pointer listeners ${l0} → ${l1} (want equal); tooltip 450 ms after Escape: ${lateTip}`);
+await cdp.detach();
+
+// ── L3 an item on a hall SLD belongs to that hall (audit 2026-11-16 C3): the inspector matched `elecDH<n>Svg` while the
+// sheet is `hmiElecDH<n>Svg`, and every sheet read one hall-1 context, so DH-03's MSB opened and read as DH-01 ───────
+await showSheet(pg, 'elec', 'DH-03'); await wait(2500);
+const l3 = await pg.evaluate(async () => { const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  const sv = document.getElementById('hmiElecDH3Svg'); if (!sv) return { why: 'no DH-03 sheet' };
+  const g = sv.querySelector('[data-rz-equipment^="sld-msb:"]'); if (!g) return { why: 'no MSB node' };
+  g.dispatchEvent(new MouseEvent('click', { bubbles: true, shiftKey: true })); await wait(800);
+  const a = document.querySelector('aside.rz-inspector.open'), insp = a ? a.textContent.replace(/\s+/g, ' ').slice(0, 400) : '';
+  document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await wait(300);
+  g.dispatchEvent(new MouseEvent('click', { bubbles: true })); await wait(800);
+  const m = document.querySelector('.hmi-modal-back:not([hidden]), .dh-modal.show, .modal.show'), modal = m ? m.textContent.replace(/\s+/g, ' ').slice(0, 400) : '';
+  document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await wait(300);
+  // the L3 mimic of the same hall: its nodes must read hall 3 as well (review of v3.63.3: it was rendered as dh-e-101)
+  const O = window.RZDatahallAIHmiOpeners; let mim = 'no mimic opener';
+  if (O && O.mimic) { O.mimic('msb', 3); await wait(900);
+    const h = document.querySelector('.hmi-host[data-hmi-sheet="sld-l3"] svg.hmi-svg'), n = h && h.querySelector('.hmi-node[data-rz-equipment]');
+    if (n) { n.dispatchEvent(new FocusEvent('focusin', { bubbles: true })); await wait(200); const t = document.querySelector('.hmi-tip.is-on'); mim = (h.closest('.hmi-frame').textContent.replace(/\s+/g, ' ').slice(0, 80)) + ' || tip: ' + (t ? t.textContent.replace(/\s+/g, ' ').slice(0, 160) : 'none'); n.dispatchEvent(new FocusEvent('focusout', { bubbles: true })); }
+    else mim = 'mimic not drawn';
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await wait(200); }
+  return { ref: g.getAttribute('data-rz-equipment'), insp, modal, mim }; });
+law('L3', /DH-03/.test(l3.insp || '') && !/DH-01/.test(l3.insp || '') && !/DH-01/.test(l3.modal || ''), `MSB on the DH-03 SLD (${l3.ref || l3.why}): inspector "${(l3.insp || '').slice(0, 90)}" modal "${(l3.modal || '').slice(0, 90)}"; mimic "${l3.mim}"`);
+
+// ── L5 a tray opens as itself (audit C5): every compute / NVSwitch tray carried id 1 and opened tray 1 ────────────────
+await showSheet(pg, 'rack', null); await wait(2500);
+const l5 = await pg.evaluate(async () => { const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  const sv = document.getElementById('hmiRackSvg'); if (!sv) return { why: 'no rack sheet' };
+  const all = [...sv.querySelectorAll('[data-rz-equipment^="rack-ct:"]')], g = all[all.length - 1]; if (!g) return { why: 'no tray node' };
+  const ref = g.getAttribute('data-rz-equipment'), want = (/CT-?(\d+)/.exec(ref) || [])[1];
+  g.dispatchEvent(new MouseEvent('click', { bubbles: true })); await wait(900);
+  const svs = [...document.querySelectorAll('svg.hmi-svg')].filter((x) => x !== sv && x.getClientRects().length && /tray/i.test(x.getAttribute('aria-label') || x.closest('.hmi-frame')?.textContent || ''));
+  const txt = svs.map((x) => (x.closest('.hmi-frame') || x).textContent.replace(/\s+/g, ' ').slice(0, 160)).join(' | ');
+  document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await wait(200);
+  return { ref, want, txt }; });
+law('L5', !!l5.want && Number(l5.want) > 1 && new RegExp('CT-?0?' + Number(l5.want) + '\\b').test(l5.txt || ''), `tray click (${l5.ref || l5.why}): opened "${(l5.txt || '').slice(0, 110)}" (want CT-${l5.want})`);
+
+// ── L9 a tooltip is text (audit S4): data-tip went through innerHTML ─────────────────────────────────────────────────
+await showSheet(pg, 'over', null); await wait(800);
+const l9 = await pg.evaluate(async () => { window.__l9 = 0; const out = [];
+  for (const id of ['bldgSvg', 'floorSvg', 'rackSvg', 'coolSvg', 'netSvg', 'fireSvg', 'bmsSvg', 'elecOvSvg', 'elecDH1Svg']) { const sv = document.getElementById(id); if (!sv) continue;
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g'); g.setAttribute('data-tip', 'L9 <img src=x onerror="window.__l9++"> <b id="l9b">bold</b>'); sv.appendChild(g);
+    g.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 200, clientY: 200 })); await new Promise((r) => setTimeout(r, 150));
+    out.push(id + (document.getElementById('l9b') ? ':markup' : ':text')); g.remove(); }
+  await new Promise((r) => setTimeout(r, 300)); return { out, fired: window.__l9 }; });
+law('L9', l9.fired === 0 && l9.out.length >= 2 && l9.out.every((x) => /:text$/.test(x)), `data-tip with markup on ${l9.out.length} drawings: ${l9.out.filter((x) => /:markup$/.test(x)).join(' ') || 'all rendered as text'}; onerror fired ${l9.fired}`);
+
+// ── L2 / L4 / L7 fire register and point table (audit C2, C4, C8) ────────────────────────────────────────────────────
+// L2: "Clear register" restarted the record sequence, so the next isolation reused an id the Alarms workspace had seen
+// and dropped it. L7: a reason past the alarm schema's text limit never reached Alarms and was still marked seen.
+// L4: the table key was hall | filters | row count, so another point set of the same size kept the old rows.
+await showSheet(pg, 'fire', 'Points'); await wait(900);
+const lf = await pg.evaluate(async () => { const W = window.RZDatahallAIFireWorkstation, A = window.RZDatahallAIAlarmWorkspace, inv = W.inventory(), wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  const pts = inv.points.filter((p) => p.hall === 1 && (p.type === 'vesda' || p.means === 'smoke_l1')).slice(0, 3);
+  const req = (p, reason) => ({ pointId: p.id, owner: 'shift-a', reason, expiryId: '8h', acknowledged: true });
+  const isoIds = () => A.events().filter((e) => /^FIRE-ISO-/.test(e.id)).map((e) => e.id);
+  W.clearRegister(); const before = new Set(isoIds());
+  const r1 = W.isolate(req(pts[0], 'drawing gate L2: first isolation')); W.clearRegister();
+  const r2 = W.isolate(req(pts[1], 'drawing gate L2: second isolation after a clear'));
+  const fresh = isoIds().filter((id) => !before.has(id));
+  const r3 = W.isolate(req(pts[2], 'drawing gate L7 ' + 'x'.repeat(5000)));
+  const fresh7 = isoIds().filter((id) => !before.has(id) && !fresh.includes(id));
+  const stored = (W.register().entries[pts[2].id] || {}).reason || '';
+  W.clearRegister();
+  // L4: two training runs on neighbouring zones, state filter on the state the run drives
+  const evs = [...(document.getElementById('fireScenario') || { options: [] }).options].map((o) => o.value).filter(Boolean), sel = document.getElementById('firePointsState');
+  const rowIds = () => [...document.querySelectorAll('#firePointsBody tr[data-rz-equipment]')].map((t) => t.getAttribute('data-rz-equipment').replace('fire-point:', '')).sort().join(',');
+  const want = (st) => W.snapshot().points.filter((p) => p.hall === 1 && p.state === st).map((p) => p.id).sort().join(',');
+  const T0 = 9400000, run = (z) => { window.__rzSimTick = T0; W.startRun(ev, z); window.__rzSimTick = T0 + 60; W.render(); };   // 60 ticks on: the event is past its first stage
+  const sets = (z) => { run(z); const o = {}; W.snapshot().points.forEach((p) => { if (p.hall === 1 && p.state !== 'normal') (o[p.state] = o[p.state] || []).push(p.id); }); Object.keys(o).forEach((k) => { o[k] = o[k].sort().join(','); }); return o; };
+  let ev = null, st = null, s5 = {}, s6 = {};
+  for (const e of evs) { ev = e; s5 = sets('DH-01-Z05'); s6 = sets('DH-01-Z06');
+  // the state whose points differ between the two runs but count the same: the case the old key could not see
+    st = Object.keys(s5).filter((k) => s6[k] && s6[k] !== s5[k] && s6[k].split(',').length === s5[k].split(',').length)[0]; if (st) break; }
+  let l4 = { why: 'no state with equal-size, different point sets: Z05 ' + JSON.stringify(Object.keys(s5)) + ' Z06 ' + JSON.stringify(Object.keys(s6)) };
+  if (st && sel) { run('DH-01-Z05'); await wait(200); sel.value = st; sel.dispatchEvent(new Event('change', { bubbles: true })); await wait(200);
+    const a = rowIds(), wa = want(st); run('DH-01-Z06'); await wait(300); const b = rowIds(), wb = want(st);
+    l4 = { st, ev, okA: a === wa, okB: b === wb, differ: wa !== wb, n: wb.split(',').length, got: b.slice(0, 60), wantB: wb.slice(0, 60) }; }
+  W.stopRun(); delete window.__rzSimTick; if (sel) { sel.value = ''; sel.dispatchEvent(new Event('change', { bubbles: true })); }
+  return { ok: [r1.ok, r2.ok, r3.ok], ids: [r1.records && r1.records[0] && r1.records[0].id, r2.records && r2.records[0] && r2.records[0].id], fresh, fresh7, storedLen: stored.length, l4 }; });
+law('L2', lf.ok[0] && lf.ok[1] && lf.ids[0] !== lf.ids[1] && lf.fresh.length === 2, `isolate, clear register, isolate: record ids ${lf.ids.join(' and ')}; new in Alarms ${lf.fresh.length} (want 2 distinct)`);
+law('L7', lf.ok[2] && lf.fresh7.length === 1 && lf.storedLen <= 500, `5,000-character reason: stored ${lf.storedLen} characters (cap 500), Alarms records ${lf.fresh7.length} (want 1)`);
+law('L4', !!lf.l4.st && lf.l4.okA && lf.l4.okB && lf.l4.differ, `point table, state "${lf.l4.st || '—'}", event ${lf.l4.ev || '—'}, run Z05 then Z06: ${lf.l4.why || (lf.l4.okB ? lf.l4.n + ' rows are the Z06 points' : 'rows ' + lf.l4.got + ' want ' + lf.l4.wantB) + (lf.l4.differ ? '' : ' (the two sets are equal: law measures nothing)')}`);
 
 // ── H3 + H1 modals: every equipment class opens its own modal ───────────────────────────────────────────────────
 const classes = new Map();
