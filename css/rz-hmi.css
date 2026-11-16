@@ -26,11 +26,14 @@
 
 /* ── frame ─────────────────────────────────────────────────────────────────────────────────────── */
 .hmi-frame { position: relative; background: var(--hmi-bg); border: 1px solid var(--hmi-frame); border-radius: 2px; color: var(--hmi-line); overflow: hidden; }
+/* a sheet host clears the legacy floats of its box: the page's svg zoom buttons (.svg-zb, float right, 131 px) sat beside
+   the frame, and the frame (overflow hidden, a block formatting context) narrowed to 227 of 362 px at 390 (Room Layout) */
+.hmi-host { clear: both; }
 .hmi-frame svg.hmi-svg { display: block; width: 100%; height: auto; touch-action: none; user-select: none; -webkit-user-select: none; }
 .pn .bx .hmi-frame svg.hmi-svg, .ep .bx .hmi-frame svg.hmi-svg { min-width: 0 !important; }   /* the legacy page rules `.pn:not(#p-dash) .bx svg, .ep .bx svg { min-width:640px }` (max-width 600) forced every sheet to 640 px at 390 (R143 proof: svg 640 / host 362) */
 .hmi-frame.is-panning svg.hmi-svg { cursor: grabbing; }
 .hmi-bar { display: flex; align-items: center; gap: 4px; padding: 4px 6px; border-bottom: 1px solid var(--hmi-frame); background: var(--hmi-bg-2); font: 500 12px/1 'IBM Plex Sans', system-ui, sans-serif; color: var(--hmi-text-2); flex-wrap: wrap; }
-.hmi-bar .hmi-sheet-no { font: 600 11px/1 'JetBrains Mono', ui-monospace, monospace; color: var(--hmi-text); margin-right: 6px; }
+.hmi-bar .hmi-sheet-no { font: 600 11px/1 'JetBrains Mono', ui-monospace, monospace; color: var(--hmi-text); margin-right: 6px; white-space: nowrap; flex: none; }   /* the sheet number never wraps (it broke into DH- / F- / 103 at 390 px); the Find list gives way instead */
 .hmi-bar .hmi-sp { flex: 1 1 auto; }
 .hmi-btn { min-width: 32px; min-height: 32px; padding: 0 8px; border: 1px solid var(--hmi-frame); border-radius: 2px; background: transparent; color: var(--hmi-text-2); font: 500 12px/1 'IBM Plex Sans', system-ui, sans-serif; cursor: pointer; }
 .hmi-btn:hover { border-color: var(--hmi-line-2); color: var(--hmi-text); }

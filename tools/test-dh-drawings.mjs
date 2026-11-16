@@ -13,7 +13,8 @@
  * H3  every equipment class opens its OWN L3 modal (data-rz-modal-class = class) holding >= 8 library symbols
  * H4  every tagged item has an accessible name (aria-label or <title>) and is keyboard-focusable
  * H5  <= 8 words per sheet outside tags, values and line numbers (R144: PME/BMS screens carry no descriptive text)
- * H6  every sheet opens fit-to-width: no drawing wider than its frame, no sideways page scroll (1440 and 390)
+ * H6  every sheet opens fit-to-width: no drawing wider than its frame, no sideways page scroll (1440 and 390); at 390 the
+ *     sheet number in the bar stays on one line
  * H11 shell: no header control outside the nav bar, <= 6 visible actions in it, no "SIMULATED · ENGINE BASIS" text
  * H12 sidebar has pinned / auto-hide / hidden modes that survive a reload
  * H13 Room Layout and Rack Architecture draw on first open (non-zero box)
@@ -388,8 +389,10 @@ for (const [tab, sub, legacyId, hmiId] of SHEETS) {
     if (!v || !v.classList.contains('hmi-svg')) return { id, ok: false, why: 'not an HMI sheet' };
     // fits, or (v3.61.1 legibility floor) scrolls inside its own viewport — never widens the page
     const vp = v.parentElement, fr = v.closest('.hmi-frame').getBoundingClientRect(), w = v.getBoundingClientRect().width, f = vp.getBoundingClientRect().width;
-    const ok = sw <= cw && fr.right <= cw + 1 && (w <= f + 1 || getComputedStyle(vp).overflowX === 'auto');
-    return { id, ok, why: `${Math.round(w)}/${Math.round(f)}${w > f + 1 ? ' scrolls in frame' : ''} page ${sw}/${cw}` };
+    const no = v.closest('.hmi-frame').querySelector('.hmi-sheet-no'), lines = no ? Math.round(no.getBoundingClientRect().height / parseFloat(getComputedStyle(no).fontSize)) : 0;
+    const hw = v.closest('.hmi-host').getBoundingClientRect().width, narrowed = fr.width < hw - 2;   // a legacy float beside the frame squeezed it (Room Layout 227 of 362 px)
+    const ok = sw <= cw && fr.right <= cw + 1 && (w <= f + 1 || getComputedStyle(vp).overflowX === 'auto') && lines <= 1 && !narrowed;
+    return { id, ok, why: `${Math.round(w)}/${Math.round(f)}${w > f + 1 ? ' scrolls in frame' : ''} page ${sw}/${cw}${lines > 1 ? ' sheet number on ' + lines + ' lines' : ''}${narrowed ? ' frame ' + Math.round(fr.width) + ' of host ' + Math.round(hw) : ''}` };
   }, legacyId, hmiId));
 }
 law('H6', narrow.every((r) => r.ok), '390 light: ' + narrow.map((r) => `${r.id} ${r.why}`).join(', '));

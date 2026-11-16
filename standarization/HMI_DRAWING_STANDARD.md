@@ -143,6 +143,8 @@ Interlocks DH-F-103: F10 one control module per C&E system (15), F11 nothing mar
 the text budget, F13 a running `vesda_fire_2` in Z05 marks exactly the systems the C&E engine has due / pending /
 blocked, F14 Stop clears. Zone map DH-F-104: F15 every zone of the hall once, F16 means = the register, F17 a zone
 isolated below two means is P1 and no zone without an isolated point is marked, F18 Clear restores.
+H6 at 390 also requires the sheet number on one line (it wrapped to 2-3 lines on 13 sheets) and the frame as wide as
+its host (`.hmi-host { clear: both }` — the page's floated svg zoom buttons squeezed Room Layout to 227 of 362 px).
 M1: every BMS block kind (server, ring switch, gateway, LDC, controller) opens with its own L3 schematic holding the
 opened block (fails on v3.62.1: only the controller drew one). H3 reads `data-rz-modal-class`, which no renderer
 sets, so it reports 0 / 45 on every tree — a stale measure kept as *reported* until it reads the drawn modal.
