@@ -11,6 +11,20 @@ release sections rather than semver.
 
 ---
 
+## v3.64.1 — 2026-11-17 — datahallAI: every drawing has an accessible name, no width animation, no 100vw drawer
+
+### Fixed
+- **28 of the page's 50 drawings had no accessible name.** A screen reader announced them as an unnamed graphic. Each
+  drawing now carries a name (the tab drawings a fixed one, the equipment modals the title of their own modal).
+- The SLD results panel no longer animates its width (layout work on every frame); it opens and closes at once.
+- The basis-of-design drawer on a phone is 100 % wide, not `100vw` (wider than the page when a scrollbar is shown).
+
+### Gates
+- `tools/test-dh-drawings.mjs` U1: every `<svg>` with an id has `aria-label`, a resolvable `aria-labelledby` or
+  `aria-hidden` — 28 failed on v3.64.0. sloplint (app scope): rule 33 17 → 0, rules 10a and 34 each 2 → 1 (the
+  remaining one is the sidebar's width transition, not in this release).
+- Not done (owner decision D1): the eyebrow labels above eight headings. Not done: the spacing-scale sweep (U5).
+
 ## v3.64.0 — 2026-11-17 — sign-in: root and educator need a Supabase proof, a hand-written session record grants neither
 
 ### Security

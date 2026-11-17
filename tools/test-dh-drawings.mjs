@@ -32,6 +32,7 @@
  * L3  an item on a hall SLD opens and reads as that hall
  * L2  an isolation after Clear register gets a new record id and reaches Alarms · L4 the point table follows the
  *     point set · L7 a very long reason is capped and still recorded
+ * U1  every drawing (svg with an id) has an accessible name
  * L5  a compute tray opens as itself · L9 a data-tip is rendered as text
  * M4  two items drawn in turn in one modal slot each show their own reading (memo keyed on the item, not the node id)
  * F15-F18 zone map DH-F-104 (Zones view): every zone of the hall once, means available / total = the isolation
@@ -575,6 +576,13 @@ for (const [tab, sub, legacyId, hmiId] of SHEETS) {
 }
 law('H6', narrow.every((r) => r.ok), '390 light: ' + narrow.map((r) => `${r.id} ${r.why}`).join(', '));
 law('F8', narrow.some((r) => r.id === 'hmiFireSvg' && r.ok), '390 fire sheet fits or scrolls inside its frame, no page overflow');
+// ── U1 every drawing has an accessible name (audit 2026-11-16: 28 of 50 had none) ────────────────────────────────────
+const u1 = await ph.evaluate(() => {
+  const named = (v) => v.hasAttribute('aria-hidden') || (v.getAttribute('aria-label') || '').trim() || (v.getAttribute('aria-labelledby') || '').split(/\s+/).some((id) => id && document.getElementById(id));
+  const bad = [...document.querySelectorAll('svg[id]')].filter((v) => !named(v)).map((v) => v.id);
+  return { n: document.querySelectorAll('svg[id]').length, bad };
+});
+law('U1', u1.n > 10 && u1.bad.length === 0, `${u1.n} drawings with an id: ${u1.bad.length} without an accessible name${u1.bad.length ? ' — ' + u1.bad.slice(0, 8).join(', ') : ''}`);
 await ph.close();
 
 await browser.close();

@@ -166,6 +166,11 @@ words on the pre-redraw sheets; H13 read `floorSvg 0×0`. v3.63.0: F10 and F15 f
 read the drawing one register behind (cache keyed on the tick only) and the impaired zone at P2, F18 read the cleared
 register stale (`clearRegister` rendered without evaluating) — all three fixed in the same release.
 
+**U1 (v3.64.1).** Every drawing — an `<svg>` with an id, legacy or HMI — has an accessible name: `aria-label`, an
+`aria-labelledby` that resolves (a modal drawing points at its modal title), or `aria-hidden` for decoration. An
+interactive drawing takes `role="group"`, never `role="img"` (that would hide its focusable items). 28 of 50 failed
+on v3.64.0.
+
 **Lifecycle and identity laws (v3.63.3, audit 2026-11-16).** `tools/test-dh-drawings.mjs`:
 - **L1** a destroyed sheet leaves nothing behind: 20 modal open / close cycles keep the number of `pointermove` /
   `pointerup` listeners on `window` constant (read through CDP `DOMDebugger.getEventListeners`), and no tooltip appears
