@@ -28,6 +28,7 @@
  * M2  a fire zone click opens its detection schematic with every device of the zone; Shift+click keeps the inspector
  * M3  the battery modal draws its L3 sheet
  * M5  an opener that cannot draw falls back to the inspector
+ * M8  the main transformer and the generator yard draw their own L3; the transformer follows the electrical scenario
  * M7  leak detection (24 zones, the scenario's wet zone in fault) and HTW piping (branches to the engine's CDU count) draw
  *     their own L3
  * M6  a WAN node, security zone, BMS application and field group open their architecture sheet with the item selected
@@ -428,6 +429,27 @@ const m7 = await pg.evaluate(async () => { const O = window.RZDatahallAIHmiOpene
 law('M7', m7.zones === 24 && m7.faultDry === 0 && m7.wet.join(',') === 'ldp,z7' && m7.badges.join(',') === 'ldp,z7' && m7.fsym >= 8 && m7.tags.includes('cdu:' + m7.n) && m7.retired,
   `leak L3: ${m7.zones} zones (want 24), in fault with no leak ${m7.faultDry}, with "leak zone 7" in fault ${m7.wet.join(',') || 'none'}, alarm badge on ${m7.badges.length > 4 ? m7.badges.length + ' nodes' : m7.badges.join(',') || 'none'} (want the panel and z7 only); HTW L3: ${m7.fsym} symbols, branches ${m7.tags.join(' ')} (last = engine ${m7.n})`);
 
+// ── M8 the main transformer and the generator yard draw their own schematic (v3.65.1; both opened the inspector only).
+// The transformer bay's breaker follows the electrical scenario: with "utility A lost" the feed-A bay is not energized.
+await showSheet(pg, 'elec', 'Overview'); await wait(1500);
+const m8 = await pg.evaluate(async () => { const wait = (ms) => new Promise((r) => setTimeout(r, ms)), out = {};
+  const es = document.getElementById('electricalScenario'), keep = es ? es.value : '';
+  const click = async (sel) => { const g = document.querySelector(sel); if (!g) return null; g.dispatchEvent(new MouseEvent('click', { bubbles: true })); await wait(900);
+    const m = document.querySelector('.hmi-modal-back:not([hidden])'), sv = m && m.querySelector('.hmi-m-draw svg.hmi-svg');
+    const r = { cls: m ? m.querySelector('.hmi-modal').getAttribute('data-rz-modal-class') : null, n: sv ? sv.querySelectorAll('.hmi-node [data-sym]').length : 0, pts: m ? m.querySelectorAll('.hmi-pt').length : 0,
+      tx: sv && sv.querySelector('[data-node^="tx-main"]') ? sv.querySelector('[data-node^="tx-main"]').getAttribute('data-state') : null, gens: sv ? sv.querySelectorAll('[data-node^="gen"]').length : 0,
+      last: sv ? [...sv.querySelectorAll('[data-rz-equipment^="site-genset-yard:"]')].map((g) => g.getAttribute('data-rz-equipment')).pop() : null };
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await wait(250); return r; };
+  out.tx = await click('#hmiElecOvSvg [data-rz-equipment="sld-main-tx:A01"]');
+  out.gen = await click('#hmiElecOvSvg [data-rz-equipment^="site-genset-yard:"]');
+  if (es) { const opt = [...es.options].find((o) => /utility.*(a|feed a).*(loss|lost|fail)|loss.*utility a|utility a/i.test(o.textContent) && !/b\b.*lost/i.test(o.textContent)); out.scenario = opt ? opt.textContent.trim().slice(0, 50) : 'none found';
+    if (opt) { es.value = opt.value; es.dispatchEvent(new Event('change', { bubbles: true })); await wait(700); out.txLost = await click('#hmiElecOvSvg [data-rz-equipment="sld-main-tx:A01"]'); }
+    es.value = keep; es.dispatchEvent(new Event('change', { bubbles: true })); await wait(400); }
+  out.duty = window.DCAI_CALC.snapshot.equipment.gensets_duty; return out; });
+law('M8', !!m8.tx && m8.tx.cls === 'sld-main-tx' && m8.tx.n >= 8 && m8.tx.pts > 0 && m8.tx.tx === 'running' && !!m8.gen && m8.gen.cls === 'site-genset-yard' && m8.gen.n >= 8 && m8.gen.gens === 4 && m8.gen.last === 'site-genset-yard:G' + (m8.duty + 1)
+  && (!m8.txLost || m8.txLost.tx !== 'running'),
+  `main transformer: ${m8.tx ? m8.tx.n + ' symbols, ' + m8.tx.pts + ' points, state ' + m8.tx.tx : 'NOT opened'}; under "${m8.scenario}" state ${m8.txLost ? m8.txLost.tx : 'not run'} (want not running); generator yard: ${m8.gen ? m8.gen.n + ' symbols, ' + m8.gen.gens + ' sets, standby group from ' + m8.gen.last : 'NOT opened'} (engine duty ${m8.duty})`);
+
 // ── L1 a closed sheet leaves nothing behind (audit 2026-11-16 C1, C7): every render added pointermove + pointerup on
 // window and destroy() removed neither, so each modal open kept a whole drawing alive; a pending tooltip timer fired
 // after the modal had closed ────────────────────────────────────────────────────────────────────────────────────────
@@ -555,13 +577,17 @@ for (const [cls, [tab, sub]] of classes) {
       .filter((d) => d.getBoundingClientRect().width > 0 && getComputedStyle(d).visibility !== 'hidden');
     const mine = m.find((d) => d.getAttribute('data-rz-modal-class') === cls || d.querySelector('.hmi-host svg.hmi-svg, .hmi-m-draw svg.hmi-svg'));
     const p = m.reduce((a, d) => a + paint(d), 0);
+    /* counted BEFORE the modal closes: the sheet modal empties its drawing on close, so the count after it read 0 and
+       three drawn classes (fire zone, main transformer, generator yard) were reported as missing (v3.65.1) */
+    const sym = mine ? mine.querySelectorAll('svg.hmi-svg .hmi-node [data-sym]').length : 0;
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     m.forEach((d) => { const x = d.querySelector('[aria-label*="Close" i], .close, [data-close]'); if (x) x.click(); });
-    return { cls, own: !!mine, sym: mine ? mine.querySelectorAll('svg.hmi-svg .hmi-node [data-sym]').length : 0, paint: p };
+    return { cls, own: !!mine, sym, paint: p, dbg: el.getAttribute('data-rz-equipment') + ' in ' + ((el.closest('svg') || {}).id || el.tagName) + ' → ' + m.length + ' dialog(s)' + (document.querySelector('aside.rz-inspector.open') ? ' + inspector' : '') };
   }, cls, PROBE.paint.toString());
   await wait(250);
   modalPaint += r.paint || 0;
   (r.own && r.sym >= 8 ? own : generic).push(r.cls);
+  if (process.env.RZ_H3_TRACE && !(r.own && r.sym >= 8)) console.error(`[H3] ${r.cls}: own ${r.own} sym ${r.sym} · ${r.dbg}`);
   if (r.own && r.sym > 0 && r.sym < 8) partial.push(r.cls + ' ' + r.sym);
 }
 law(STRICT_ALL ? 'H3' : 'H3 (reported)', !STRICT_ALL || (classes.size > 0 && generic.length === 0), `classes with their own L3 schematic: ${own.length} / ${classes.size}` +

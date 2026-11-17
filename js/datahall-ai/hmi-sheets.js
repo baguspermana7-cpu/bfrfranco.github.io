@@ -1425,7 +1425,63 @@
     return finish(s);
   }
 
-  var BUILDERS = { 'dh-m-103': dhM103, cdu: cduSheet, 'dh-e-101': dhE101, 'dh-r-101': dhR101, 'dh-f-101': dhF101, 'dh-e-001': dhE001, 'dh-n-101': dhN101, 'dh-a-101': dhA101, 'dh-b-101': dhB101, 'dh-n-102': dhN102, 'dh-n-104': dhN104, 'dh-m-102': dhM102, 'dh-m-104': dhM104, 'dh-m-101': dhM101, chiller: chillerL3, crah: crahL3, battery: batteryL3, 'pump-station': pumpStationL3, 'tcs-manifold': tcsManifoldL3, 'chem-dosing': chemDosingL3, 'dry-cooler': dryCoolerL3, switch: switchL3, 'bms-controller': bmsCtlL3, 'sld-mimic': sldMimicL3, 'rack-power': rackPowerL3, stp: stpL3, ahu: ahuL3, tray: trayL3, 'nvswitch-tray': nvswitchTrayL3, 'dh-f-102': dhF102, 'dh-f-103': dhF103, 'dh-f-104': dhF104, 'bms-node': bmsNodeL3, 'fire-zone-l3': fireZoneL3, 'leak-l3': leakL3, 'fws-l3': fwsPipingL3 };
+  /* ── L3 main transformer bay (v3.65.1): what the site SLD (DH-E-001) and the transformer payload state for one feed —
+     HV breaker, the two-winding main transformer (YNyn0, buried delta tertiary: no terminals to draw), its earthed HV
+     star point, winding temperature, the incomer with its relay, the 20 kV board and the normally-open tie to the other
+     board. Node ids are the site SLD's, so breaker and transformer states come from the electrical scenario. ─────── */
+  function mainTxL3(snap, o) {
+    var L = String((o && o.feed) || 'A').toUpperCase() === 'B' ? 'B' : 'A', other = L === 'A' ? 'B' : 'A', med = L === 'A' ? 'feed_a' : 'feed_b';
+    var hvKv = need(snap, 'distribution.hv_intake_kv'), mvKv = need(snap, 'distribution.mv_kv'), txMva = need(snap, 'distribution.main_tx_mva'), kaRated = need(snap, 'distribution.mv_board_ka_rating');
+    var W = 900, H = 470, X = 420, s = Sheet({ id: 'main-tx-l3', no: 'TX-M' + L + '01', title: 'MAIN TRANSFORMER TX-M' + L + '01', size: [W, H], svgId: 'mainTxL3Svg', basis: 'engine distribution; transformer payload' });
+    s.legend = [['power', hvKv + ' kV'], [med, mvKv + ' kV FEED ' + L]]; s.legendAt = [660, 14];
+    var os = s.n({ id: 'os-hv', tag: 'DH-E-001', name: hvKv + ' kV BUS', sym: 'offSheet', x: X, y: 44, size: 22, rot: 90, tagAt: 'right', label: hvKv + ' kV double busbar (sheet DH-E-001)' });
+    var cb1 = s.n({ id: 'cb-tx' + L, tag: 'CB-T' + L, name: 'HV BREAKER', sym: 'cbIec', x: X, y: 110, size: 28, tagAt: 'right', label: 'Transformer HV breaker ' + L });
+    var tx = s.n({ id: 'tx-main' + L, tag: 'TX-M' + L + '01', name: 'MAIN TRANSFORMER', rating: txMva + ' MVA · ' + hvKv + ' / ' + mvKv + ' kV', sym: 'transformer2w', x: X, y: 200, size: 56, cls: 'sld-main-tx', eqId: L + '01', tagAt: 'right',
+      label: 'Main transformer ' + L + '01, ' + txMva + ' MVA, ' + hvKv + ' / ' + mvKv + ' kV, YNyn0 with a buried delta tertiary', values: [{ k: 'load', dx: 38, dy: 30, anchor: 'start' }] });
+    var en = s.n({ id: 'earth-n', tag: 'N', name: 'HV STAR POINT', sym: 'earth', x: X - 130, y: 214, size: 22, tagAt: 'below', label: 'HV star point earthed: the ' + hvKv + ' kV network is effectively earthed' });
+    s.e([X - 28, 186], en, 'power', { w: 'branch', via: [[X - 130, 186]] });
+    var tt = s.n({ id: 'tt-w', tag: 'TT', sym: 'instField', x: X - 130, y: 130, size: 26, tagAt: 'none', inst: 'TT', cls: 'sld-main-tx', eqId: L + '01', label: 'Winding temperature (top oil)' });
+    s.e(tt + '.process', [X - 20, 172], 'line', { w: 'inst' });
+    var cb2 = s.n({ id: 'cb-mv' + L, tag: 'Q-IN' + L, name: 'INCOMER', sym: 'cbDrawout', x: X, y: 300, size: 30, cls: 'sld-mv-sub', eqId: L + '00', tagAt: 'left', label: mvKv + ' kV incomer breaker, board ' + L });
+    s.n({ id: 'pr-' + L, tag: '50/51', sym: 'protectionRelay', x: X + 56, y: 300, size: 20, tagAt: 'right', inst: '51', label: 'Incomer protection relay 50/51/87T, board ' + L });
+    s.e(os + '.port', cb1 + '.line', 'power', { w: 'main' }); s.e(cb1 + '.load', tx + '.hv', 'power', { w: 'main' }); s.e(tx + '.lv', cb2 + '.line', med, { w: 'main', line: mvKv + ' kV' });
+    var BY = 372, bl = s.j('mv-l', X - 180, BY, false), br = s.j('mv-r', X + 150, BY, false);
+    s.e(bl, br, med, { w: 'bus', line: 'MVB-' + L + '01 · ' + kaRated + ' kA' }); s.e(cb2 + '.load', [X, BY], med, { w: 'main' }); s.j('mv-t', X, BY, true);
+    var tie = s.n({ id: 'mv-tie', tag: 'Q-TIE', name: 'NORMALLY OPEN', sym: 'cbDrawout', x: X + 230, y: BY, size: 26, rot: 90, tagAt: 'above', label: mvKv + ' kV bus tie to board ' + other + ' (normally open)' });
+    var ob = s.n({ id: 'os-other', tag: 'MVB-' + other + '01', sym: 'offSheet', x: X + 360, y: BY, size: 20, tagAt: 'below', label: mvKv + ' kV board ' + other + ' (sheet DH-E-001)' });
+    s.e(br, tie + '.line', 'power', { w: 'main' }); s.e(tie + '.load', ob + '.port', 'power', { w: 'main' });
+    var of = s.n({ id: 'os-e101', tag: 'DH-E-101 ' + L, name: 'UNIT SUBSTATIONS', sym: 'offSheet', x: X - 100, y: BY + 60, size: 20, rot: 90, tagAt: 'right', label: 'Feeders to the unit substations and UPS, feed ' + L + ' (sheet DH-E-101)' });
+    s.e([X - 100, BY], of + '.port', med, { w: 'branch' }); s.j('mv-f', X - 100, BY, true);
+    return finish(s);
+  }
+
+  /* ── L3 generator yard (v3.65.1): the 20 kV paralleling bus of the site SLD with the yard's sets — the first two duty
+     sets, the last duty set and the standby group (counts, unit rating and redundancy from the engine), each on its 52G
+     breaker, the two bus incomers to the 20 kV boards, the fuel farm. State: the generator pool of the scenario. ──── */
+  function gensetYardL3(snap) {
+    var mvKv = need(snap, 'distribution.mv_kv'), gens = need(snap, 'equipment.gensets_installed'), duty = need(snap, 'equipment.gensets_duty'), kw = need(snap, 'equipment.generator_unit_kw');
+    var W = 860, H = 420, BY = 170, s = Sheet({ id: 'genset-l3', no: 'GEN YARD', title: 'GENERATOR YARD ' + mvKv + ' kV', size: [W, H], svgId: 'gensetL3Svg', basis: 'engine: gensets installed / duty, unit rating' });
+    s.legend = [['power', mvKv + ' kV GENERATOR BUS']]; s.legendAt = [620, 14];
+    var bl = s.j('gb-l', 60, BY, false), br = s.j('gb-r', 800, BY, false);
+    s.e(bl, br, 'power', { w: 'bus', line: 'GEN BUS ' + mvKv + ' kV · ' + duty + ' duty of ' + gens });
+    var sets = [[1, 'G-01', false], [2, 'G-02', false], [duty, 'G-' + pad(duty), false], [duty + 1, 'G-' + pad(duty + 1) + ' … G-' + pad(gens), true]];
+    sets.forEach(function (g, i) {
+      var x = 130 + i * 170, gen = s.n({ id: 'gen' + (i + 1), tag: g[1], name: g[2] ? 'STANDBY ×' + (gens - duty) : 'DUTY', rating: kw / 1000 + ' MW · ' + mvKv + ' kV', standby: g[2], sym: 'generatorIec', x: x, y: 320, size: 40,
+        cls: 'site-genset-yard', eqId: 'G' + pad(g[0]), tagAt: 'below', label: 'Diesel generator ' + g[1] + ', ' + kw / 1000 + ' MW, ' + mvKv + ' kV (' + need(snap, 'equipment.generator_redundancy') + ')' });
+      var cb = s.n({ id: 'cb-g' + (i + 1), tag: '52G', sym: 'cbIec', x: x, y: 240, size: 24, tagAt: 'right', label: 'Generator breaker 52G with synchronising check (25)' });
+      s.e(gen + '.out', cb + '.load', 'power', { w: 'main', vfirst: true }); s.e(cb + '.line', [x, BY], 'power', { w: 'main' }); s.j('gt' + i, x, BY, true);
+    });
+    s.notes.push({ x: 385, y: 324, text: '… ' + duty + ' DUTY', role: 'value', anchor: 'middle' });
+    ['A', 'B'].forEach(function (L, i) {
+      var x = 260 + i * 260, c = s.n({ id: 'cb-gen' + L, tag: '52GB-' + L, sym: 'cbDrawout', x: x, y: 100, size: 24, tagAt: 'right', label: 'Generator bus incomer to board ' + L + ' (closed on utility loss, ATS logic on DH-E-101)' });
+      var o = s.n({ id: 'os-b' + L, tag: 'MVB-' + L + '01', sym: 'offSheet', x: x, y: 40, size: 20, rot: 270, tagAt: 'right', label: mvKv + ' kV board ' + L + ' (sheet DH-E-001)' });
+      s.e([x, BY], c + '.load', 'power', { w: 'main' }); s.e(c + '.line', o + '.port', 'power', { w: 'main' }); s.j('gbt' + L, x, BY, true);
+    });
+    s.n({ id: 'os-fuel', tag: 'DH-U-101', name: 'FUEL FARM', sym: 'offSheet', x: 770, y: 250, size: 20, tagAt: 'below', label: 'Fuel farm, ' + need(snap, 'site.fuel_autonomy_h') + ' h autonomy (sheet DH-U-101)' });
+    return finish(s);
+  }
+
+  var BUILDERS = { 'dh-m-103': dhM103, cdu: cduSheet, 'dh-e-101': dhE101, 'dh-r-101': dhR101, 'dh-f-101': dhF101, 'dh-e-001': dhE001, 'dh-n-101': dhN101, 'dh-a-101': dhA101, 'dh-b-101': dhB101, 'dh-n-102': dhN102, 'dh-n-104': dhN104, 'dh-m-102': dhM102, 'dh-m-104': dhM104, 'dh-m-101': dhM101, chiller: chillerL3, crah: crahL3, battery: batteryL3, 'pump-station': pumpStationL3, 'tcs-manifold': tcsManifoldL3, 'chem-dosing': chemDosingL3, 'dry-cooler': dryCoolerL3, switch: switchL3, 'bms-controller': bmsCtlL3, 'sld-mimic': sldMimicL3, 'rack-power': rackPowerL3, stp: stpL3, ahu: ahuL3, tray: trayL3, 'nvswitch-tray': nvswitchTrayL3, 'dh-f-102': dhF102, 'dh-f-103': dhF103, 'dh-f-104': dhF104, 'bms-node': bmsNodeL3, 'fire-zone-l3': fireZoneL3, 'leak-l3': leakL3, 'fws-l3': fwsPipingL3, 'main-tx-l3': mainTxL3, 'genset-l3': gensetYardL3 };
   for (var hb = 2; hb <= 9; hb++) BUILDERS['dh-e-10' + hb] = dhE101;   // DH-E-102 ... : same builder, o.hall picks the hall (the builder refuses a hall the engine does not have)
   var API = {
     build: function (id, snap, o) { if (!BUILDERS[id]) throw new Error('hmi-sheets: no sheet ' + id); return BUILDERS[id](snap, o); },

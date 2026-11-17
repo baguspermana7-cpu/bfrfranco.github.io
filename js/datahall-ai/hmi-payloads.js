@@ -629,7 +629,7 @@
      piece of plant the drawing named without drawing: the SLD went from a 150 kV source box
      straight into 20 kV gear. Its state follows the HV edge the topology now carries, so a
      utility loss darkens the intake, the bus, the transformer and the board in that order. */
-  def('sld-main-tx', { kind: 'engine', label: 'Main transformer', system: 'electrical' }, function (b, ctx) {
+  def('sld-main-tx', { kind: 'engine', label: 'Main transformer', system: 'electrical', tier2: 'maintx' }, function (b, ctx) {
     var feed = String(b.id || '').slice(-1).toUpperCase() === 'B' ? 'B' : 'A';
     b.title = 'MAIN-TX-' + b.hall + feed + ' — 150/20 kV — ' + hallTag(b.hall);
     var state = feedEdgeState(ctx, feed, 'MAIN-TX');
@@ -653,6 +653,7 @@
     b.dep('upstream', 'sld-mv-sub:dh' + pad2(b.hall), '150 kV intake');
     b.dep('downstream', 'sld-rmu:dh' + pad2(b.hall), 'RMU-' + b.hall);
     b.trend('winding_c', 'Winding temperature', '°C', { value: 78 }, 7);
+    b.tier2('maintx', [feed]);
   });
   /* v3.21.10 — the campus blocks on the site plan. The GIS hall, the genset yard and the fuel farm
      are plant the engine sizes (site branch) but had no inspector of their own: the GIS hall and
@@ -678,7 +679,7 @@
     b.dep('downstream', 'sld-main-tx:dh01a', 'Main transformers');
     b.trend('sf6_bar', 'SF6 density', 'bar', { value: 6 }, 0.08, { digits: 2 });
   });
-  def('site-genset-yard', { kind: 'engine', label: 'Genset yard', system: 'electrical' }, function (b, ctx) {
+  def('site-genset-yard', { kind: 'engine', label: 'Genset yard', system: 'electrical', tier2: 'genset' }, function (b, ctx) {
     b.title = 'Genset yard — 20 kV standby generation';
     var sg = electricalState(ctx, 'SRC-GENSET-POOL', 'standby');
     b.ST('live', 'pool', 'Generator pool', sg, SCEN_REASON);
@@ -694,6 +695,7 @@
     b.dep('upstream', 'site-fuel-farm:1', 'Fuel farm');
     b.dep('downstream', 'sld-mv-sub:dh01', '20 kV switchroom boards');
     b.trend('jacket_c', 'Jacket water', '°C', { value: 40 }, 1.5, { digits: 1 });
+    b.tier2('genset', []);
   });
   def('site-fuel-farm', { kind: 'engine', label: 'Fuel farm', system: 'electrical' }, function (b, ctx) {
     b.title = 'Fuel farm — diesel bulk storage';

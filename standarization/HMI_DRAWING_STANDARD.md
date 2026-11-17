@@ -173,6 +173,12 @@ its own data draws its own sheet: `leak-l3` (24 zones, one loop; a node with `pu
 when its own row is in fault), `fws-l3` (branches from the engine's CDU count). Nothing is drawn that the payload or
 the engine does not state. Laws M6, M7 (`tools/test-dh-drawings.mjs`), both red on v3.64.1.
 
+**Sheet modal (v3.65.1).** A class with its own L3 and no legacy modal opens through `openSheetModal({ cls, id, tag,
+name, sheet, o, read })` in `hmi-v2.js`: the sheet, the payload's points and alarms, the CDU / fire-zone shell. `read`
+names the sheet whose scenario mapping the nodes use (`dh-e-001` for `main-tx-l3` and `genset-l3`, whose node ids are
+the site SLD's). The payload names the opener (`tier2('maintx', [feed])`, `tier2('genset', [])`). Law M8. H3 counts a
+schematic's symbols before the modal closes (the sheet modal empties its drawing on close).
+
 **U1 (v3.64.1).** Every drawing — an `<svg>` with an id, legacy or HMI — has an accessible name: `aria-label`, an
 `aria-labelledby` that resolves (a modal drawing points at its modal title), or `aria-hidden` for decoration. An
 interactive drawing takes `role="group"`, never `role="img"` (that would hide its focusable items). 28 of 50 failed

@@ -406,6 +406,9 @@
   }
   function mountAll() {
     var OP = win.RZDatahallAIHmiOpeners = win.RZDatahallAIHmiOpeners || {}; if (!OP.fire) OP.fire = openFireZone;   // tier-2 of the fire-zone payload
+    /* tier-2 of the main transformer and the generator yard (v3.65.1): their own L3 sheet, states from the site SLD's scenario mapping */
+    if (!OP.maintx) OP.maintx = function (feed) { var L = String(feed || 'A').toUpperCase() === 'B' ? 'B' : 'A'; return openSheetModal({ cls: 'sld-main-tx', id: L + '01', tag: 'TX-M' + L + '01', name: 'Main transformer', sheet: 'main-tx-l3', o: { feed: L }, read: 'dh-e-001' }); };
+    if (!OP.genset) OP.genset = function () { return openSheetModal({ cls: 'site-genset-yard', id: 'G01', tag: 'GEN YARD', name: 'Generator yard', sheet: 'genset-l3', read: 'dh-e-001' }); };
     mount('coolSvg', 'dh-m-103', 'hmiCoolSvg');
     mountNew('coolSvg', 'dh-m-101', 'hmiCoolOverSvg', { before: true });                         // overview first: where every item sits
     mountNew('coolSvg', 'dh-m-102', 'hmiCoolPlantSvg');                                          // heat rejection, after the CDU line
@@ -648,6 +651,37 @@
     back.hidden = false;
     if (modalSheet) modalSheet.destroy();
     modalSheet = win.RZHmiSheet.render(back.querySelector('.hmi-m-draw'), sheet, sheetOpts({ sheet: 'fire-zone-l3' }));
+    back.querySelector('[data-close]').addEventListener('click', close);
+    back.querySelector('[data-close]').focus();
+    return true;
+  }
+  /* a class with its own L3 sheet and no legacy modal (main transformer, generator yard): the sheet with the payload's
+     points beside it, in the same shell as the CDU and the fire zone. cfg: { cls, id, tag, name, sheet, o, read } */
+  function openSheetModal(cfg) {
+    var snap = win.DCAI_CALC && win.DCAI_CALC.snapshot; if (!snap || !win.RZHmiSheet || !win.RZDatahallAISheets) return false;
+    var sheet; try { sheet = win.RZDatahallAISheets.build(cfg.sheet, snap, cfg.o || {}); } catch (e) { if (win.console) console.warn('hmi-v2: ' + cfg.sheet + ' — ' + e.message); return false; }
+    lastFocus = doc.activeElement;
+    if (!back) {
+      back = el('div', { class: 'hmi-modal-back', hidden: '' });
+      back.addEventListener('click', function (e) { if (e.target === back) close(); });
+      doc.addEventListener('keydown', function (e) { if (e.key === 'Escape' && back && !back.hidden) close(); });
+      doc.body.appendChild(back);
+    }
+    var p = payload(cfg.cls, String(cfg.id)), rs = rows(p), al = p && p.tabs && p.tabs.alarms ? p.tabs.alarms : [];
+    /* every value keeps its origin, as in the inspector: a registry-backed row is hooked to its parameter, any other row
+       carries the payload's declared reason (traceability gate, tools/test-dcai-coverage.mjs) */
+    var hook = function (r) { return r.basis ? ' data-basis-param="' + esc(r.basis) + '" tabindex="0" role="button"' : ' data-rz-authored-basis="' + esc(r.declared || '') + '"'; };
+    var pts = rs.slice(0, 16).map(function (r) {
+      return '<div class="hmi-pt"' + (r.alarm ? ' data-alarm="' + esc(r.alarm) + '"' : '') + (r.point ? ' title="Point ' + esc(r.point) + '"' : '') + '><span class="pt-label">' + esc(r.label || '') + '</span><span class="pt-val"' + hook(r) + '>' + esc(text(r)) + '</span>' + bandHtml(r) + '</div>';
+    }).join('');
+    back.innerHTML = '<div class="hmi-modal" role="dialog" aria-modal="true" aria-labelledby="hmiModalTag" data-rz-modal-class="' + esc(cfg.cls) + '">' +
+      '<header><span class="tag" id="hmiModalTag">' + esc(cfg.tag) + '</span><span class="cls">' + esc(cfg.name) + '</span><span class="state">' + esc(p && p.statusChip ? p.statusChip.text || p.statusChip.state || '' : '') + '</span><span class="sp"></span>' +
+      '<button type="button" class="hmi-btn" data-close aria-label="Close">&#215;</button></header>' +
+      '<div class="hmi-m-draw"></div><div class="hmi-m-pts"><div class="hmi-m-sec">Points</div>' + (pts || '<p>—</p>') + '</div>' +
+      '<div class="hmi-m-foot"><div><div class="hmi-m-sec">Alarms</div><ul class="hmi-evt">' + (al.map(function (a) { return '<li>' + esc(a.text || a.message || a.point || '') + '</li>'; }).join('') || '<li>None active</li>') + '</ul></div></div></div>';
+    back.hidden = false;
+    if (modalSheet) modalSheet.destroy();
+    modalSheet = win.RZHmiSheet.render(back.querySelector('.hmi-m-draw'), sheet, sheetOpts({ sheet: cfg.read || cfg.sheet }));
     back.querySelector('[data-close]').addEventListener('click', close);
     back.querySelector('[data-close]').focus();
     return true;

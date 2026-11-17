@@ -11,6 +11,31 @@ release sections rather than semver.
 
 ---
 
+## v3.65.1 — 2026-11-17 — datahallAI: the main transformer and the generator yard open their own schematic
+
+### Added
+- **Main transformer bay** (Electrical → Overview → a main transformer or a 150 kV line): HV breaker, the transformer
+  (rating and voltages from the engine; YNyn0 with a buried delta tertiary), its earthed HV star point, winding
+  temperature, the incomer with its relay, the 20 kV board, the normally-open tie and the feeders. The breaker and the
+  transformer follow the training scenario: under "Utility A fail" the feed-A bay reads stopped.
+- **Generator yard**: the 20 kV generator bus with the first two duty sets, the last duty set and the standby group
+  (171 installed, 169 on duty, 4 MW each — the engine's numbers), each on its 52G breaker, the two bus incomers to the
+  20 kV boards, the fuel farm. Both opened the inspector only.
+
+### Fixed
+- The count of classes with their own schematic (gate H3, reported) read 0 symbols for every schematic drawn in the
+  shared sheet modal: it counted after the modal had closed and emptied its drawing. The fire zone schematic (v3.63.0)
+  was reported as missing for that reason.
+
+### Gates
+- `tools/test-dh-drawings.mjs` M8: the transformer bay (≥ 8 symbols, its points, state running; not running under
+  "Utility A fail") and the generator yard (4 sets drawn, the standby group starts at the engine's duty count + 1).
+  The points beside both schematics are hooked to their registry parameter or carry the payload's declared reason
+  (`tools/test-dcai-coverage.mjs --strict --modals`: 0 untraced; the first build of this release had 14 and the
+  gate stopped it).
+  H3 (reported): 30 of 45 (27 before). Still without one: fire panel, fire point, aspirating detector, manual call
+  point, EPO, cylinder bank; nine are drawn with fewer than 8 symbols.
+
 ## v3.65.0 — 2026-11-17 — datahallAI: leak detection and HTW piping drawn, WAN nodes, security zones and BMS blocks open on their architecture
 
 ### Added
