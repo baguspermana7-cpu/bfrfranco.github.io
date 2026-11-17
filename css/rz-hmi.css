@@ -270,6 +270,8 @@
 .hmi-bar .hmi-find { max-width: 220px; min-width: 0; height: 26px; font: 500 11px 'JetBrains Mono', ui-monospace, monospace; color: var(--hmi-text); background: var(--hmi-bg); border: 1px solid var(--hmi-frame); border-radius: 2px; padding: 0 4px; }
 @media (max-width: 600px) { .hmi-bar .hmi-find { max-width: 132px; height: 32px; font-size: 16px; } .hmi-bar .hmi-title { display: none; } }
 .hmi-svg .hmi-node[data-selected] .hmi-hit { stroke: var(--hmi-info, var(--hmi-text)); stroke-width: 1.6; fill: none; }
+/* a box node (zone, application, field group, tray) has no hit rect: its own outline carries the selection */
+.hmi-svg .hmi-node[data-box][data-selected] rect.b { stroke: var(--hmi-info, var(--hmi-text)); stroke-width: 1.6; }
 
 /* moving view: shed the shading cost until the view settles (180 ms) — text, lines, states and alarm badges stay */
 .hmi-frame[data-moving] .hmi-svg .hmi-nodes, .hmi-frame[data-moving] .hmi-svg .hmi-node > [data-sym], .hmi-frame[data-moving] .hmi-svg .hmi-box { filter: none !important; }

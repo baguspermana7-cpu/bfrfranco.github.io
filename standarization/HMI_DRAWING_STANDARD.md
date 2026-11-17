@@ -166,6 +166,13 @@ words on the pre-redraw sheets; H13 read `floorSvg 0×0`. v3.63.0: F10 and F15 f
 read the drawing one register behind (cache keyed on the tick only) and the impaired zone at P2, F18 read the cleared
 register stale (`clearRegister` rendered without evaluating) — all three fixed in the same release.
 
+**L3 by architecture (v3.65.0).** A class whose authored model describes an architecture and not the inside of one
+item (a WAN node, a security zone, a BMS application, a field group) opens that architecture's sheet inside its modal
+with the item selected (`drawAtBodyTop(..., { svgId, focus })` — a second `svgId`, never a duplicate id). A class with
+its own data draws its own sheet: `leak-l3` (24 zones, one loop; a node with `pumpState` carries the payload alarm only
+when its own row is in fault), `fws-l3` (branches from the engine's CDU count). Nothing is drawn that the payload or
+the engine does not state. Laws M6, M7 (`tools/test-dh-drawings.mjs`), both red on v3.64.1.
+
 **U1 (v3.64.1).** Every drawing — an `<svg>` with an id, legacy or HMI — has an accessible name: `aria-label`, an
 `aria-labelledby` that resolves (a modal drawing points at its modal title), or `aria-hidden` for decoration. An
 interactive drawing takes `role="group"`, never `role="img"` (that would hide its focusable items). 28 of 50 failed

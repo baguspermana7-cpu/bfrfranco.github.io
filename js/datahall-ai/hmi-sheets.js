@@ -1364,7 +1364,68 @@
     return finish(s);
   }
 
-  var BUILDERS = { 'dh-m-103': dhM103, cdu: cduSheet, 'dh-e-101': dhE101, 'dh-r-101': dhR101, 'dh-f-101': dhF101, 'dh-e-001': dhE001, 'dh-n-101': dhN101, 'dh-a-101': dhA101, 'dh-b-101': dhB101, 'dh-n-102': dhN102, 'dh-n-104': dhN104, 'dh-m-102': dhM102, 'dh-m-104': dhM104, 'dh-m-101': dhM101, chiller: chillerL3, crah: crahL3, battery: batteryL3, 'pump-station': pumpStationL3, 'tcs-manifold': tcsManifoldL3, 'chem-dosing': chemDosingL3, 'dry-cooler': dryCoolerL3, switch: switchL3, 'bms-controller': bmsCtlL3, 'sld-mimic': sldMimicL3, 'rack-power': rackPowerL3, stp: stpL3, ahu: ahuL3, tray: trayL3, 'nvswitch-tray': nvswitchTrayL3, 'dh-f-102': dhF102, 'dh-f-103': dhF103, 'dh-f-104': dhF104, 'bms-node': bmsNodeL3, 'fire-zone-l3': fireZoneL3 };
+  /* ── L3 leak detection of one hall (v3.65.0): the 24 sensing-rope zones of the leak payload on one supervised loop out
+     of the leak panel and back, the panel's alarm to the BMS and its shut-off request to the row CDUs. A zone's state
+     (dry / wet) is that zone's own payload row. Counts and wording are the payload's; nothing is added. ─────────────── */
+  function leakL3(snap, o) {
+    var hall = (o && o.hall) || 1, hp = 'DH-' + pad(hall), eq = 'dh' + pad(hall), N = 24, per = 12, W = 940, H = 400;
+    var s = Sheet({ id: 'leak-l3', no: hp + '-LD', title: hp + ' LEAK DETECTION', size: [W, H], svgId: 'leakL3Svg', basis: 'leak payload: 24 rope zones' });
+    s.legend = [['line', 'SENSING ROPE LOOP'], ['data', 'ALARM / SHUT-OFF REQUEST']]; s.legendAt = [640, 14];
+    var pnl = s.n({ id: 'ldp', tag: 'LDP-' + pad(hall), name: 'LEAK PANEL', sym: 'interfaceModule', x: 90, y: 200, size: 40, cls: 'leak', eqId: eq, tagAt: 'below',
+      label: 'Leak detection panel ' + hp + ': supervises the sensing-rope loop, 24 zones' });
+    var prev = pnl, i;
+    for (i = 1; i <= N; i++) {
+      var back = i > per, col = back ? (N - i) : (i - 1);   // out along the top row, back along the bottom row: one loop
+      var z = s.n({ id: 'z' + i, tag: 'Z' + pad(i), sym: 'leakSensor', x: 200 + col * 60, y: back ? 280 : 120, size: 24, cls: 'leak', eqId: eq, pumpState: 'zone_' + i,
+        tagAt: back ? 'below' : 'above', label: 'Leak zone ' + pad(i) + ': sensing-rope section' });
+      s.e(prev, z, 'line', { w: 'signal' });
+      prev = z;
+    }
+    s.e(prev, pnl, 'line', { w: 'signal' });
+    var ob = s.n({ id: 'os-bms', tag: 'DH-B-101', name: 'ALARM', sym: 'offSheet', x: 90, y: 60, size: 22, rot: 270, tagAt: 'right', label: 'Leak alarm to the BMS (sheet DH-B-101)' });
+    s.e(pnl, ob + '.port', 'data', { w: 'signal' });
+    var oc = s.n({ id: 'os-cdu', tag: 'DH-M-103', name: 'CDU SHUT-OFF', sym: 'offSheet', x: 90, y: 340, size: 22, rot: 90, tagAt: 'right', label: 'Shut-off request to the row CDUs (sheet DH-M-103)' });
+    s.e(pnl, oc + '.port', 'data', { w: 'signal' });
+    return finish(s);
+  }
+
+  /* ── L3 HTW (facility water) piping of one hall (v3.65.0): supply header from the HTW pump station, isolation, flow and
+     pressure / temperature instruments, a branch to each row CDU (first, second and last drawn; the count is the
+     engine's CDUs per hall), return header back to the pumps. Header size and material are the payload's capacity row. */
+  function fwsPipingL3(snap, o) {
+    var hall = (o && o.hall) || 1, hp = 'DH-' + pad(hall), eq = 'dh' + pad(hall), n = need(snap, 'equipment.cdu_installed_per_hall');
+    var W = 940, H = 420, YS = 110, YR = 320, YC = 215;
+    var s = Sheet({ id: 'fws-l3', no: hp + '-HTW', title: hp + ' HTW PIPING', size: [W, H], svgId: 'fwsL3Svg', basis: 'engine: CDUs per hall; HTW piping payload' });
+    s.legend = [['htw', 'HTW SUPPLY / RETURN'], ['line', 'INSTRUMENT']]; s.legendAt = [640, 14];
+    var os = s.n({ id: 'os-s', tag: 'P-HTW', name: 'FROM HTW PUMPS', sym: 'offSheet', x: 60, y: YS, size: 22, tagAt: 'below', cls: 'fws-piping', eqId: eq, label: 'Supply from the HTW pump station' });
+    var vs = s.n({ id: 'vs', tag: 'V-HTW-S', name: 'ISOLATION', sym: 'valveBall', x: 170, y: YS, size: 26, tagAt: 'below', cls: 'fws-piping', eqId: eq, label: 'Supply header isolation valve' });
+    var fe = s.n({ id: 'fe', tag: 'FE-HTW', name: 'HALL FLOW', sym: 'flowMeter', x: 270, y: YS, size: 26, tagAt: 'below', cls: 'fws-piping', eqId: eq, label: 'HTW hall flow' });
+    s.e(os + '.port', vs + '.a', 'htw', { w: 'main' }); s.e(vs + '.b', fe + '.a', 'htw', { w: 'main', line: 'DN250' });
+    var pt = s.n({ id: 'pt', tag: 'PT', sym: 'instField', x: 330, y: YS - 46, size: 26, tagAt: 'none', inst: 'PT', cls: 'fws-piping', eqId: eq, label: 'Supply header pressure' });
+    s.e(pt + '.process', [330, YS], 'line', { w: 'inst' });
+    var tts = s.n({ id: 'tts', tag: 'TT', sym: 'instField', x: 390, y: YS - 46, size: 26, tagAt: 'none', inst: 'TT', cls: 'fws-piping', eqId: eq, label: 'HTW supply temperature' });
+    s.e(tts + '.process', [390, YS], 'line', { w: 'inst' });
+    var cols = [[470, 1], [600, 2], [800, n]], sj = [], rj = [];
+    cols.forEach(function (c, i) {
+      var id = pad(c[1]), a = s.j('sj' + i, c[0], YS), b = s.j('rj' + i, c[0], YR);
+      var u = s.n({ id: 'cdu' + id, tag: 'CDU-' + id, sym: 'cdu', x: c[0], y: YC, size: 40, cls: 'cdu', eqId: String(c[1]), tagAt: 'right', label: 'Row CDU ' + id + ' primary side (sheet DH-M-103)' });
+      s.e(a, u, 'htw', { w: 'branch' }); s.e(u, b, 'htw', { w: 'branch' });
+      sj.push(a); rj.push(b);
+    });
+    s.e(fe + '.b', sj[0], 'htw', { w: 'main' }); s.chain(sj, 'htw', { w: 'main' });
+    s.notes.push({ x: 700, y: YC + 4, text: '… ' + n + ' CDUs', role: 'value', anchor: 'middle' });
+    var av = s.n({ id: 'av', tag: 'AV-HTW', name: 'AIR VENT', sym: 'airVent', x: 860, y: YS - 30, size: 22, tagAt: 'left', label: 'Automatic air vent at the supply header end' });
+    s.e(av, [860, YS], 'htw', { w: 'branch' }); s.e(sj[sj.length - 1], [860, YS], 'htw', { w: 'main' });
+    var vr = s.n({ id: 'vr', tag: 'V-HTW-R', name: 'ISOLATION', sym: 'valveBall', x: 170, y: YR, size: 26, tagAt: 'below', cls: 'fws-piping', eqId: eq, label: 'Return header isolation valve' });
+    var or = s.n({ id: 'os-r', tag: 'P-HTW', name: 'TO HTW PUMPS', sym: 'offSheet', x: 60, y: YR, size: 22, rot: 180, tagAt: 'below', cls: 'fws-piping', eqId: eq, label: 'Return to the HTW pump station' });
+    var ttr = s.n({ id: 'ttr', tag: 'TT', sym: 'instField', x: 330, y: YR - 46, size: 26, tagAt: 'none', inst: 'TT', cls: 'fws-piping', eqId: eq, label: 'HTW return temperature' });
+    s.e(ttr + '.process', [330, YR], 'line', { w: 'inst' });
+    var rev = rj.slice().reverse(); s.chain(rev, 'htw', { w: 'main' });
+    s.e(rev[rev.length - 1], vr + '.b', 'htw', { w: 'main', line: 'DN250' }); s.e(vr + '.a', or + '.port', 'htw', { w: 'main' });
+    return finish(s);
+  }
+
+  var BUILDERS = { 'dh-m-103': dhM103, cdu: cduSheet, 'dh-e-101': dhE101, 'dh-r-101': dhR101, 'dh-f-101': dhF101, 'dh-e-001': dhE001, 'dh-n-101': dhN101, 'dh-a-101': dhA101, 'dh-b-101': dhB101, 'dh-n-102': dhN102, 'dh-n-104': dhN104, 'dh-m-102': dhM102, 'dh-m-104': dhM104, 'dh-m-101': dhM101, chiller: chillerL3, crah: crahL3, battery: batteryL3, 'pump-station': pumpStationL3, 'tcs-manifold': tcsManifoldL3, 'chem-dosing': chemDosingL3, 'dry-cooler': dryCoolerL3, switch: switchL3, 'bms-controller': bmsCtlL3, 'sld-mimic': sldMimicL3, 'rack-power': rackPowerL3, stp: stpL3, ahu: ahuL3, tray: trayL3, 'nvswitch-tray': nvswitchTrayL3, 'dh-f-102': dhF102, 'dh-f-103': dhF103, 'dh-f-104': dhF104, 'bms-node': bmsNodeL3, 'fire-zone-l3': fireZoneL3, 'leak-l3': leakL3, 'fws-l3': fwsPipingL3 };
   for (var hb = 2; hb <= 9; hb++) BUILDERS['dh-e-10' + hb] = dhE101;   // DH-E-102 ... : same builder, o.hall picks the hall (the builder refuses a hall the engine does not have)
   var API = {
     build: function (id, snap, o) { if (!BUILDERS[id]) throw new Error('hmi-sheets: no sheet ' + id); return BUILDERS[id](snap, o); },

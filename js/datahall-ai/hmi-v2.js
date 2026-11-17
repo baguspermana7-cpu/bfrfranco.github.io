@@ -155,7 +155,7 @@
     return r.unit && t !== '—' && t.indexOf(r.unit) < 0 ? t + ' ' + r.unit : t;
   }
   function find(p, re) { var rs = rows(p); for (var i = 0; i < rs.length; i++) if (re.test(rs[i].label || '') || re.test(rs[i].point || '')) return rs[i]; return null; }
-  var CLS_PAYLOAD = { cdu: 'cdu', 'cdu-pump': 'cdu', chiller: 'chiller', stp: 'stp', ahu: 'ahu', 'battery-a': 'battery-a', 'battery-b': 'battery-b', 'dry-cooler': 'dry-cooler', 'fws-pump-station': 'fws-pump-station', 'cw-pump-station': 'cw-pump-station', chem: 'chem', 'tcs-manifold': 'tcs-manifold', 'net-wan': 'net-wan', 'net-zone': 'net-zone', 'sld-tx': 'sld-tx', 'sld-mv-sub': 'sld-mv-sub', 'sld-msb': 'sld-msb', 'sld-ups-a': 'sld-ups-a', 'sld-ups-b': 'sld-ups-b',
+  var CLS_PAYLOAD = { cdu: 'cdu', 'cdu-pump': 'cdu', chiller: 'chiller', stp: 'stp', ahu: 'ahu', 'battery-a': 'battery-a', 'battery-b': 'battery-b', 'dry-cooler': 'dry-cooler', 'fws-pump-station': 'fws-pump-station', 'cw-pump-station': 'cw-pump-station', chem: 'chem', 'tcs-manifold': 'tcs-manifold', leak: 'leak', 'fws-piping': 'fws-piping', 'net-wan': 'net-wan', 'net-zone': 'net-zone', 'sld-tx': 'sld-tx', 'sld-mv-sub': 'sld-mv-sub', 'sld-msb': 'sld-msb', 'sld-ups-a': 'sld-ups-a', 'sld-ups-b': 'sld-ups-b',
     'sld-rack-psu': 'sld-rack-psu', 'rack-ct': 'rack-ct', 'rack-ns': 'rack-ns', 'rack-psu': 'rack-psu', 'rack-busbar': 'rack-busbar', 'rack-manifold': 'rack-manifold', 'rack-leak': 'rack-leak',
     'fire-facp': 'fire-facp', 'fire-zone': 'fire-zone', 'fire-vesda': 'fire-vesda', 'fire-mcp': 'fire-mcp', 'fire-epo': 'fire-epo', 'fire-point': 'fire-point',
     'sld-main-tx': 'sld-main-tx', 'site-genset-yard': 'site-genset-yard', 'net-core': 'net-core', 'net-spine': 'net-spine', 'net-leaf': 'net-leaf', 'rack-unit': 'rack-unit', crah: 'crah', 'bms-server': 'bms-server', 'bms-controller': 'bms-controller', 'bms-network': 'bms-network', 'bms-gateway': 'bms-gateway', 'bms-field': 'bms-field', 'bms-ldc': 'bms-ldc', 'bms-app': 'bms-app' };
@@ -173,7 +173,7 @@
      guessed as running / open / closed / energized. */
   var STATE_WORD = { run: 'running', running: 'running', online: 'running', energized: 'running', normal: 'running', closed: 'closed',
     open: 'open', fault: 'fault', trip: 'fault', critical: 'fault', alarm: 'fault', stby: 'standby', standby: 'standby', bypass: 'standby',
-    off: 'stopped', stopped: 'stopped', isolated: 'standby', warning: 'running', 'float': 'running', discharge: 'fault' };
+    off: 'stopped', stopped: 'stopped', isolated: 'standby', warning: 'running', 'float': 'running', discharge: 'fault', dry: 'running', wet: 'fault' };   // dry / wet: a leak zone's own state row
   function liveRows(p) { return p && p.tabs && Array.isArray(p.tabs.live) ? p.tabs.live : []; }
   function stateOf(n, p) {
     if (!p) return 'na';
@@ -279,6 +279,7 @@
     var es = elecState(n, sheet), st = (n.sym === 'offSheet') ? undefined : (es || stateOf(n, p)), v = {}, al = alarmOf(p);
     // a pump carries only its own alarm (point PUMP-n); the unit-level alarm belongs to the unit's main symbol
     if (n.pump) al = alarmOf(p && { tabs: { alarms: (p.tabs.alarms || []).filter(function (a) { return a.point === 'PUMP-' + n.pump; }) } });
+    if (n.cls === 'leak' && n.pumpState && st !== 'fault') al = null;   // a leak zone carries the alarm only when its own rope section is wet (24 zones share one payload)
     (n.values || []).forEach(function (x) {
       var r = null;
       if (x.k === 'duty') r = find(p, /duty|heat/i);
@@ -433,11 +434,18 @@
       var t = String(type || ''), map = { 'CW Pump Station': ['pump-station', { loop: 'cw' }], 'FWS Pump Station': ['pump-station', { loop: 'fws' }], 'TCS Manifold': ['tcs-manifold', {}], 'Chemical Dosing': ['chem-dosing', {}] };
       if (map[t]) drawInPageModal('eqHmi', 'eqHmiSvg', 'eq-l3', map[t][0], map[t][1]);
     });
-    wrapOpener('net', function (kind, id) { if (/^(core|spine|leaf)$/.test(String(kind))) drawAtBodyTop('netModalBody', 'net-l3', 'switch', { kind: kind, id: id }); });
+    wrapOpener('net', function (kind, id) {
+      if (/^(core|spine|leaf)$/.test(String(kind))) drawAtBodyTop('netModalBody', 'net-l3', 'switch', { kind: kind, id: id });
+      /* a WAN node or a security zone opens the architecture it is part of with itself selected (as the rack manifold
+         opens the rack elevation): one node alone has no schematic of its own in the page's authored model */
+      else if (String(kind) === 'wan' && win.WAN_NODES) drawAtBodyTop('netModalBody', 'net-l3', 'dh-n-102', { wan: win.WAN_NODES, svgId: 'wanL3Svg', focus: 'net-wan:' + id });
+      else if (String(kind) === 'zone' && win.ZONES) drawAtBodyTop('netModalBody', 'net-l3', 'dh-n-104', { zones: win.ZONES, svgId: 'secL3Svg', focus: 'net-zone:' + id });
+    });
     wrapOpener('bms', function (kind, id) {
       if (!win.BMS_MODEL) return;
       if (kind === 'controller') drawAtBodyTop('bmsModalBody', 'bms-l3', 'bms-controller', { bms: win.BMS_MODEL, id: id });
       else if (/^(server|network|gateway|ldc)$/.test(String(kind || 'server'))) drawAtBodyTop('bmsModalBody', 'bms-l3', 'bms-node', { bms: win.BMS_MODEL, kind: String(kind || 'server'), id: id });   // the spec tables stay below the schematic
+      else if (/^(app|field)$/.test(String(kind))) drawAtBodyTop('bmsModalBody', 'bms-l3', 'dh-b-101', { bms: win.BMS_MODEL, svgId: 'bmsL3Svg', focus: 'bms-' + kind + ':' + id });   // an application or a field group: the BMS architecture with it selected
     });
     wrapOpener('rack', function (type) {
       if (/psu|power|shelf/.test(String(type))) { drawRackPower('rack-power'); return; }
@@ -450,6 +458,10 @@
       if (svg0) svg0.removeAttribute('data-dh2-retired'); if (h) h.remove(); if (pageSheets['rack-l3']) { pageSheets['rack-l3'].destroy(); pageSheets['rack-l3'] = null; }
     });
     wrapOpener('mimic', function (type, dh) { drawMimic(type, dh); });
+    wrapOpener('corr', function (type) {   // corridor services: leak detection and HTW piping draw their L3 (the legacy mimic is retired, not deleted)
+      if (String(type) === 'leak') drawInPageModal('corrHmi', 'corrHmiSvg', 'corr-l3', 'leak-l3', { hall: 1 });
+      else if (String(type) === 'fws') drawInPageModal('corrHmi', 'corrHmiSvg', 'corr-l3', 'fws-l3', { hall: 1 });
+    });
     wrapOpener('stp', function () { drawInPageModal('eqHmi', 'eqHmiSvg', 'eq-l3', 'stp', {}); });
     wrapOpener('ahu', function () { drawInPageModal('eqHmi', 'eqHmiSvg', 'eq-l3', 'ahu', {}); });
     wrapOpener('dryCooler', function (id) { drawInPageModal('ctHmiModal', 'ctHmiSvg', 'dc-l3', 'dry-cooler', { id: id }); });
@@ -504,7 +516,13 @@
     if (!host) { host = el('div', { class: 'hmi-host', 'data-hmi-sheet': key }); body.insertBefore(host, body.firstChild); }
     if (pageSheets[key]) { pageSheets[key].destroy(); pageSheets[key] = null; }
     host.innerHTML = '';
-    pageSheets[key] = win.RZHmiSheet.render(host, sheet, sheetOpts());
+    if (o && o.svgId) sheet.svgId = o.svgId;   // a tab sheet drawn again inside a modal: no duplicate id
+    var api = pageSheets[key] = win.RZHmiSheet.render(host, sheet, sheetOpts());
+    if (o && o.focus) setTimeout(function () {   // the opened item, selected and brought into view on the drawing it belongs to
+      var gs = api.svg.querySelectorAll('.hmi-node[data-rz-equipment="' + o.focus + '"]');
+      for (var i = 0; i < gs.length; i++) gs[i].setAttribute('data-selected', '');
+      if (gs[0] && gs[0].scrollIntoView) gs[0].scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    }, 60);
   }
   /* SLD mimic: the feed one-line replaces the legacy four-panel mimic in its body (retired, not deleted); states from the
      scenario engine (sheet id dh-e-*), zoomed to and selecting the device that was opened; the results panel stays */

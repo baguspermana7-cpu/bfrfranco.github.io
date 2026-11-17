@@ -28,6 +28,9 @@
  * M2  a fire zone click opens its detection schematic with every device of the zone; Shift+click keeps the inspector
  * M3  the battery modal draws its L3 sheet
  * M5  an opener that cannot draw falls back to the inspector
+ * M7  leak detection (24 zones, the scenario's wet zone in fault) and HTW piping (branches to the engine's CDU count) draw
+ *     their own L3
+ * M6  a WAN node, security zone, BMS application and field group open their architecture sheet with the item selected
  * L1  a closed sheet leaves no window listener and no late tooltip behind
  * L3  an item on a hall SLD opens and reads as that hall
  * L2  an isolation after Clear register gets a new record id and reaches Alarms · L4 the point table follows the
@@ -389,6 +392,41 @@ const m5 = await pg.evaluate(async () => {
   document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); return insp;
 });
 law('M5', m5, `zone click with a failing opener: inspector ${m5 ? 'opened' : 'NOT opened (nothing happened)'}`);
+
+// ── M6 a WAN node, a security zone, a BMS application and a field group open the architecture they belong to with
+// themselves selected (v3.65.0; each opened a text-only modal) ────────────────────────────────────────────────────────
+const m6 = await pg.evaluate(async () => { const O = window.RZDatahallAIHmiOpeners, wait = (ms) => new Promise((r) => setTimeout(r, ms)), out = [];
+  const B = window.BMS_MODEL || {}, app = (B.apps || B.app || [])[0], fld = (B.field || B.fields || [])[0];
+  const cases = [['net', 'wan', '4', 'net-wan:4', '#netModalBody'], ['net', 'zone', 'Z2', 'net-zone:Z2', '#netModalBody'],
+    ['bms', 'app', app && app.id, app && 'bms-app:' + app.id, '#bmsModalBody'], ['bms', 'field', fld && fld.id, fld && 'bms-field:' + fld.id, '#bmsModalBody']];
+  for (const [op, kind, id, ref, body] of cases) { if (!id) { out.push(kind + ': no id in the page model'); continue; }
+    O[op](kind, id); await wait(700);
+    const sv = document.querySelector(body + ' .hmi-host svg.hmi-svg'), sel = sv ? [...sv.querySelectorAll('.hmi-node[data-selected]')].map((g) => g.getAttribute('data-rz-equipment')) : [];
+    const n = sv ? sv.querySelectorAll('.hmi-node [data-sym]').length : 0, dup = sv ? document.querySelectorAll('#' + CSS.escape(sv.id)).length : 0;
+    out.push(`${kind} ${id}: ${sv ? n + ' symbols' : 'NOT drawn'}, selected ${sel.length && sel.every((x) => x === ref) ? 'ok' : 'WRONG ' + sel.slice(0, 2).join(',')}${dup > 1 ? ', DUPLICATE id ' + sv.id : ''}`);
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); [...document.querySelectorAll('.modal.show .close, .dh-modal.show .close, [aria-label="Close"]')].forEach((x) => { try { x.click(); } catch (e) {} }); await wait(250); }
+  return out; });
+law('M6', m6.length === 4 && m6.every((x) => /symbols, selected ok$/.test(x) && Number(/: (\d+) symbols/.exec(x)[1]) >= 8), `opened on their architecture, item selected: ${m6.join('; ')}`);
+
+// ── M7 leak detection and HTW piping draw their own schematic (v3.65.0): 24 zones on one loop, the wet zone of the
+// cooling scenario is the one in fault; the HTW sheet branches to the engine's CDU count ─────────────────────────────
+const m7 = await pg.evaluate(async () => { const O = window.RZDatahallAIHmiOpeners, wait = (ms) => new Promise((r) => setTimeout(r, ms));
+  const cs = document.getElementById('coolingScenario'), keep = cs ? cs.value : '';
+  const setCs = async (v) => { if (!cs) return; cs.value = v; cs.dispatchEvent(new Event('change', { bubbles: true })); await wait(500); };
+  const close = async () => { const h = document.getElementById('corrHmi'); if (h) h.classList.remove('show'); await wait(150); };
+  await setCs('normal'); O.corr('leak'); await wait(800);
+  let sv = document.querySelector('#corrHmi .hmi-host svg.hmi-svg');
+  const zones = sv ? sv.querySelectorAll('.hmi-node [data-sym="leakSensor"]').length : 0, faultDry = sv ? sv.querySelectorAll('.hmi-node[data-state="fault"]').length : -1; await close();
+  await setCs('leak-z07'); O.corr('leak'); await wait(900);
+  sv = document.querySelector('#corrHmi .hmi-host svg.hmi-svg');
+  const wet = sv ? [...sv.querySelectorAll('.hmi-node[data-state="fault"]')].map((g) => g.getAttribute('data-node')).sort() : [];
+  const badges = sv ? [...sv.querySelectorAll('.hmi-node[data-alarm]')].map((g) => g.getAttribute('data-node')).sort() : []; await close(); await setCs(keep || 'normal');
+  O.corr('fws'); await wait(800); sv = document.querySelector('#corrHmi .hmi-host svg.hmi-svg');
+  const n = window.DCAI_CALC.snapshot.equipment.cdu_installed_per_hall, tags = sv ? [...sv.querySelectorAll('.hmi-node[data-rz-equipment^="cdu:"]')].map((g) => g.getAttribute('data-rz-equipment')) : [];
+  const fsym = sv ? sv.querySelectorAll('.hmi-node [data-sym]').length : 0, legacy = document.getElementById('corrHmiSvg'); await close();
+  return { zones, faultDry, wet, badges, n, tags, fsym, retired: !!legacy && legacy.hasAttribute('data-dh2-retired') }; });
+law('M7', m7.zones === 24 && m7.faultDry === 0 && m7.wet.join(',') === 'ldp,z7' && m7.badges.join(',') === 'ldp,z7' && m7.fsym >= 8 && m7.tags.includes('cdu:' + m7.n) && m7.retired,
+  `leak L3: ${m7.zones} zones (want 24), in fault with no leak ${m7.faultDry}, with "leak zone 7" in fault ${m7.wet.join(',') || 'none'}, alarm badge on ${m7.badges.length > 4 ? m7.badges.length + ' nodes' : m7.badges.join(',') || 'none'} (want the panel and z7 only); HTW L3: ${m7.fsym} symbols, branches ${m7.tags.join(' ')} (last = engine ${m7.n})`);
 
 // ── L1 a closed sheet leaves nothing behind (audit 2026-11-16 C1, C7): every render added pointermove + pointerup on
 // window and destroy() removed neither, so each modal open kept a whole drawing alive; a pending tooltip timer fired

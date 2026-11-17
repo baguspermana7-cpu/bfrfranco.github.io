@@ -11,6 +11,32 @@ release sections rather than semver.
 
 ---
 
+## v3.65.0 — 2026-11-17 — datahallAI: leak detection and HTW piping drawn, WAN nodes, security zones and BMS blocks open on their architecture
+
+### Added
+- **Leak detection schematic** (Data Hall → leak detection): the leak panel, the 24 sensing-rope zones on one supervised
+  loop out and back, the alarm to the BMS and the shut-off request to the row CDUs. A zone is in fault only when its own
+  rope section is wet in the cooling scenario; the alarm badge sits on that zone and the panel, not on all 24.
+- **HTW piping schematic** (Data Hall → HTW piping): supply header from the HTW pumps, isolation, flow, pressure and
+  temperature instruments, the branch to each row CDU (first, second and last drawn; the count is the engine's CDUs per
+  hall), return header. A CDU on it opens its own schematic.
+- **A WAN node, a security zone, a BMS application and a field device group** open the architecture they belong to
+  (WAN edge, IEC 62443 zones, BMS architecture) with themselves selected, above the specification tables. Each opened
+  a text-only modal. Their authored models describe the architecture, not the inside of one node, so the drawing is
+  the architecture.
+
+### Fixed
+- A selected box item (zone, application, field group) showed no selection outline.
+
+### Gates
+- `tools/test-dh-drawings.mjs` M6 (the four open on their sheet, the opened item selected, no duplicate id) and M7 (24
+  zones, zone 7 and the panel in fault under "leak zone 7", HTW branches end at the engine's CDU count) — both fail on
+  v3.64.1. H3 (reported): 27 of 45 classes with their own schematic (21 before).
+- `tools/test-conv-geometry.mjs` now finishes on this page (was stopped by hand for four releases): 11 minutes for the
+  whole gate.
+- Still without a schematic (9): the main transformer, the generator yard, the fire panel, a fire point, the
+  aspirating detector, the manual call point, the EPO, the cylinder bank; the fire zone has one that H3 does not count.
+
 ## v3.64.1 — 2026-11-17 — datahallAI: every drawing has an accessible name, no width animation, no 100vw drawer
 
 ### Fixed
