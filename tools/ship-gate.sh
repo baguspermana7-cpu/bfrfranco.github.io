@@ -383,6 +383,10 @@ gate "commercial surface — no newsletter capture, no paid tier, no e-mail coll
 gate "page metadata — every published page is visible to a search or answer engine" node tools/test-page-metadata.mjs
 gate "meta description fit — every published description finishes inside the display cut" node tools/test-meta-description-fit.mjs
 gate "mobile nav — one hamburger per navbar, and it opens the menu" node tools/test-mobile-nav.mjs
+# Site chrome (PRD_SITE_CHROME, owner 2026-11-17 "navbar position, theme button nggak konsisten"): every root page
+# rendered at 1440 and 390 — bar sticky at its kind's height, one theme button in its slot, the stored theme at first
+# paint. A RATCHET until the last family is refitted: tools/site-chrome-baseline.json may fall, a rise fails.
+gate "site chrome — one bar position and one theme button on every page (ratchet, CH1-CH9)" node tools/test-site-chrome.mjs
 gate "nav tap targets — no navigation link under 24px at 390px (WCAG 2.5.8)" node tools/test-tap-targets.mjs
 gate "mobile form controls — 16px text fields, or iOS zooms the viewport" node tools/test-mobile-forms.mjs
 # CACHE-KEY DRIFT is the min-twin bug's sibling: one shared asset requested under two `?v=`
