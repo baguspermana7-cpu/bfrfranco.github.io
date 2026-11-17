@@ -121,3 +121,58 @@ Chart.js carries SRI; no `postMessage`; every `localStorage` `JSON.parse` sits i
 | render / UI | — | 2 | 3 | — | 3 |
 | gates | — | 1 | 1 | — | — |
 | **all** | **2** | **9** | **24** | **14** | **3** |
+
+## 7. Depth: modal, inspector, traceability, tooltip (added after owner review)
+
+Owner, 2026-11-16: *"Gak mungkin gak ada hasilnya, masih jelek. Modal, traceability, tooltip banyak yang
+belum."* Correct, and the first pass could not have seen it. `test-conv-coverage.mjs` traces a number
+by **value-string membership** in the registry, so a number with no hook and no visible mark passes;
+no gate clicked equipment; no gate counted tooltips. `tools/test-conv-depth.mjs` (MONITOR) now
+measures all three in the authorised audit state at 1440 px, dark theme.
+
+Probe soundness: it clicks the `.hmi-node` symbol body (a click on the separate text layer counted 0
+on chiller, a false negative found and fixed); CH-01…04 open the loop modal and are counted, so a
+real open is detected.
+
+### Baseline (2026-11-16, v3.63.1)
+
+| page | numerals | hooked + visible mark | declared only (no mark) | bare | tooltip on labels | tagged equipment → opens | inspector LIVE ≤ 2 rows | tabs with content (of 6) |
+|---|---|---|---|---|---|---|---|---|
+| dc-conventional | 41 | 32 (78 %) | 0 | 9 | 29/58 (50 %) | no equipment drawing | — | — |
+| datahall | 362 | 23 (6 %) | 318 | 21 | 6/85 (7 %) | 500 racks → in-page panel only, no modal | — | — |
+| chiller-plant | 137 | 8 (6 %) | 94 | 35 | 2/60 (3 %) | 29 → **4** (CH-01…04 loop modal; pumps, TT, ET dead) | inspector never opens | — |
+| water-system | 88 | 17 (19 %) | 43 | 28 | 2/26 (8 %) | 17 → 11 | 1 of 11 | 1.9 |
+| fire-system | 79 | 4 (5 %) | 40 | 35 | 6/58 (10 %) | 24 → 24 | **23 of 24** | **0.2** |
+| fuel-system | 76 | 6 (8 %) | 34 | 36 | 5/96 (5 %) | 16 → 16 | **15 of 16** | **0.4** |
+| ict | 92 | 1 (1 %) | 78 | 13 | 1/43 (2 %) | 17 nodes → in-page detail only | — | — |
+| EPMS_Telemetry | 43 | 7 (16 %) | 2 | 34 | 5/74 (7 %) | 29 SLD devices → **0** | — | — |
+| cdu-mini-bms | 86 | **0** | 0 | **86** | **0/32** | 13 → **0** | — | — |
+
+### Findings
+
+| ID | sev | V | finding | evidence | WP |
+|---|---|---|---|---|---|
+| D1 | CRITICAL | Y | The shared payload builder ships empty tabs: `capacity: []`, `trend: null`, `maint: []`, `openHmi: null`, `engineVersion` "—", `counts.derived 0`. Every fire/fuel inspector opens to a title and one state row; the hover tooltip carries more than the inspector | `js/conv/sheet-truth.js:134-138`; fire 23/24 and fuel 15/16 LIVE ≤ 2 rows; screenshot `conv-2026-11-16/fire-modal.webp` | D-1 |
+| D2 | HIGH | Y | Chiller: 25 of 29 tagged items show a pointer cursor and do nothing on click (pumps CHWP-*, TT-*, ET-01, headers). Only chillers open, and only the loop modal | `chwOpen()` returns unless the node belongs to a loop, `chiller-plant.html:1566-1571` | D-2 |
+| D3 | HIGH | Y | EPMS SLD: 29 devices (MV, RMU, Tx, LVSB, GEN, ATS, UPS …) — no click, no inspector, no modal, no tooltip on the device | probe; `EPMS_Telemetry.html` DEVICES | D-3 |
+| D4 | HIGH | Y | cdu-mini-bms: 86 numerals with no hook, no declaration, no mark; 0 tooltips; 13 tagged items inert | probe | D-3 |
+| D5 | HIGH | Y | Datahall (500 racks) and ICT (17 nodes) have an in-page detail panel only: no six-tab inspector, no deep modal, no traceability inside the panel | `datahall.html:1970` `selectRack`; `ict.html:1585` `showNodeDetail` | D-3 |
+| D6 | HIGH | Y | Traceability is invisible on 8 of 9 pages: 1–19 % of numerals carry a hook and a mark; 629 numerals carry only a `data-rz-authored-basis` the operator cannot see or click; 297 are bare | baseline table | D-4 |
+| D7 | HIGH | Y | `test-conv-coverage.mjs` passes these pages because it counts a number as traced when its string appears in the registry — the same blind spot `test-dcai-coverage` closed for datahallAI in A3 | `tools/test-conv-coverage.mjs:47-72,357` | D-4 |
+| D8 | HIGH | Y | Tooltips cover 2–10 % of labels on 7 pages; `rz-explain-db.js` has 42 `conv-*` entries for ~600 labels, tags and abbreviations | probe; `grep -o '"conv-' js/rz-explain-db.js` | D-5 |
+| D9 | MEDIUM | Y | Chiller loop modal: values without units' degree sign (`8.3 C`), simulated pump amps/vibration not marked SIMULATED, no traceability marks, no trend; secondary supply 18.9 °C below primary CHWS 19.4 °C (secondary cannot be colder than primary without a source) | screenshot `conv-2026-11-16/chiller-modal.webp` | D-2 |
+| D10 | MEDIUM | Y | The inspector opens over the page header and covers the `FULL` / toolbar controls at 1440 (no docking on cockpit pages) | screenshot `conv-2026-11-16/fire-modal.webp` | D-1 |
+
+### Flip condition for `test-conv-depth.mjs`
+
+MONITOR until D-1…D-5 land; then STRICT per page when its row reaches: hooked + marked ≥ 95 % of
+engine numerals and every simulated numeral visibly marked SIM; bare = 0; tooltip on labels ≥ 95 %;
+every tagged item opens; LIVE ≥ 4 rows on every opened item; ≥ 5 of 6 tabs with content.
+
+### Totals with §7
+
+| | CRITICAL | HIGH | MEDIUM | LOW | INFO |
+|---|---|---|---|---|---|
+| §2–§5 | 2 | 9 | 24 | 14 | 3 |
+| §7 depth | 1 | 7 | 2 | — | — |
+| **all** | **3** | **16** | **26** | **14** | **3** |

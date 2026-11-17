@@ -1,316 +1,325 @@
-# DC Conventional family — execution plan (2026-11-16)
+# DC Conventional family — execution plan (rev 2, 2026-11-17)
 
-Closes every row of `CONV_TOTAL_AUDIT_2026-11-16.md`. Written to be executed by **Opus** (main
-session or Opus subagent) or **Ark** (BytePlus `glm-5.2` subagent via claude-hybrid). Each work
-package (WP) is self-contained: an executor reads the "Executor protocol", then its WP, and nothing
-else is required.
+Closes every row of `CONV_TOTAL_AUDIT_2026-11-16.md` (§2–§5 and the §7 depth rows). Written for two
+executors: **Opus** (main session or Opus subagent) and **Ark** (BytePlus `glm-5.2` subagent through
+claude-hybrid). An executor reads §1 (protocol), then its own work package (WP). Nothing else is
+needed.
 
-## 0. Routing — who executes what
+Rev 2 puts **depth first**. The owner's complaint was modal, traceability and tooltip, and the
+measurement agrees. Fire and fuel open an inspector on every symbol, but 38 of 40 open to a title
+and one row. Chiller ignores 25 of 29 clicks. EPMS and cdu-mini-bms open nothing. Seven of nine pages
+show a traceability mark on fewer than one number in five, and seven pages have tooltips on fewer
+than one label in ten. The engine corrections (old W2) still ship, but after the depth layer, because
+the payload builder is what carries their numbers to the operator.
 
-| class of work | executor | why |
+---
+
+## 0. The target — what the operator gets on every conventional cockpit
+
+| layer | contract | measured by |
 |---|---|---|
-| Bounded edits with a mechanical law (contrast tokens, null checks, provenance strings, literal → engine read, listener cleanup) | **Ark** | cheap, parallel; the law and the gate decide correctness, not judgement |
-| Engine arithmetic, sizing rules, new model leaves, anything that changes a published number | **Opus** | needs engineering judgement and ripple tracing across 8 cockpits, registry, PDFs, manuals |
-| Shared test tooling (`tools/lib/*`, gates walked by LTC) | **Opus** | a mistake blinds another session's gate |
-| Review of every Ark diff, ship gate, version bump, push | **Opus main session** | Ark subagents cannot push; the ark-approver hook judges risky calls; one integrator owns the release |
+| **Click** | Every tagged item on every drawing (P&ID symbol, SLD device, ICT node, rack, CDU part) opens the right-side inspector. No pointer cursor without an action. | `test-conv-depth.mjs` M: opened = tagged |
+| **Inspector** | Six tabs, all populated. LIVE: state, role, command/feedback, the item's process values with quality, timestamp and source (≥ 4 rows). CAPACITY: rating, load, % and redundancy margin from the engine. DEPS: upstream/downstream items, clickable. ALARMS: events for this asset with ISA lifecycle. TREND: 60-point series (engine plane as a reference line; simulated series declared). MAINT: declared test/inspection interval and last-test record, with the standard it comes from. | depth I: LIVE ≥ 4, ≥ 5/6 tabs |
+| **Deep modal** | "Open HMI" in the inspector, or a double-click, opens the equipment modal: a mini-mimic of the item, every reading with a traceability mark, a trend, the operator guidance, and the design basis. One modal shell for all classes. | depth M + `test-conv-equipment-modal.mjs` (new) |
+| **Traceability** | Every engine number carries `data-basis-param` and a visible evidence mark, and a click opens the basis drawer. Every simulated number carries a visible `SIM` mark. No bare numbers. This applies on the page, in the inspector and in the modal. | depth T + hook-aware `test-conv-coverage.mjs --strict` |
+| **Tooltip** | Every KPI label, column header, equipment tag class, unit and abbreviation has an `rz-explain` entry. SVG symbols carry a `<title>`. Labels ≥ 95 %. | depth H |
 
-Hard rule: an Ark result is a claim from another model family. Opus re-runs the WP's `verify:` lines
-and looks at the screenshots before accepting it.
+---
 
 ## 1. Executor protocol (every WP, every executor)
 
-1. **Worktree.** Own worktree from fresh `origin/main` (`git worktree add ~/.cache/rz-wN origin/main`
-   or reuse `~/.cache/rz-w5` after `git fetch && git checkout -B <wp-branch> origin/main`). Never edit
-   `~/rz-work` or another session's worktree. Never `git add -A` on a shared tree.
-2. **Scope fence.** Do not touch `datahallAI.html`, `js/datahall-ai/*`, `prd/datahallai.html`,
-   `manual/datahallai.html` (LTC session) beyond mechanical `?v=` tokens.
-3. **Browser jobs.** `export TMPDIR=$HOME/.cache/qa-tmp`; run every Puppeteer job as
-   `timeout N rz-lane -l 1|2 -t N -- $(command -v node) tools/<gate>.mjs` (lane 3 belongs to LTC).
-   Never `pkill -f`; never kill a chrome or server you did not start. A local server binds a free
-   port (`python3 -c 'import socket;s=socket.socket();s.bind(("127.0.0.1",0));print(s.getsockname()[1])'`),
-   never 8166/8081.
-4. **Laws → proof.** Before editing, run the WP's RED check and keep its output. After editing, the
-   same check is GREEN. A new gate must fail on the old tree first. Quote the decisive output line.
-5. **Engine changes** (`js/conv-engine.js`): bump `version` and `js/rz-engine-versions.js` `conv`
-   together, then `node tools/test-conv-engine-version-pins.mjs` — a pin mismatch blanks all 8
-   cockpits with no console error (memory: engine-version-pin trap). Regenerate the registry only via
-   `node tools/build-conv-parameter-registry.mjs`; never hand-edit `data/conv-parameters.json`.
-6. **Scripted HTML edits**: Python with lambda replacement in `re.sub` (a `\00b7` replacement became a
-   NUL byte once); afterwards `grep -caP "\x00" <file>` must print 0, and
-   `python3 tools/audit-js-syntax.py --strict` must be CLEAN.
-7. **Docs in the same release**: `standarization/CONVENTIONAL_DC_OPERATIONS_STANDARD.md` (rule + gate
-   number), the subsystem `manual/<slug>.html` when a formula or number changes, `CHANGELOG.md`, this
-   plan's status column, and the audit ledger row → CLOSED with version + gate.
-8. **Release** (Opus main session only): `js/rz-version.js` + `sw.js` + `changelog.html` regen +
-   cache tokens, `bash tools/ship-gate.sh` (resume with `RZ_GATE_FROM=N`), push with plain
-   `git push origin HEAD:main` (SSH deploy key; never a token), check the Pages deploy and the live
-   `js/rz-version.js`. Commit trailer per session rules.
-9. **Report**: per law, the command and its decisive output line; screenshots looked at; anything not
-   proven said first.
+1. **Worktree**: create your own from fresh `origin/main` with `git worktree add ~/.cache/rz-<wp> origin/main`. Name the branch `wp/<id>`. Never edit `~/rz-work` or another session's tree. Never `git add -A` on a shared tree; stage by path.
+2. **Scope fence**: do not edit `datahallAI.html`, `js/datahall-ai/*`, `prd/datahallai.html` or `manual/datahallai.html` (LTC session), except for mechanical `?v=` tokens. `js/rz-inspector.js`, `js/rz-hmi-sheet.js` and `js/rz-svg-basis.js` are shared with datahallAI. Change them additively only, and run LTC's `test-datahall-ai-inspector-runtime.mjs` before you hand back.
+3. **Browser jobs**: `export TMPDIR=$HOME/.cache/qa-tmp`. Run every Puppeteer job as `timeout N rz-lane -l 1|2 -t N -- $(command -v node) tools/<gate>.mjs`. Lane 3 belongs to LTC. Never `pkill -f`, and never kill a chrome or server you did not start. A local server binds a free port, never 8166 or 8081.
+4. **Laws → proof**: run the WP's RED command first and keep the decisive line. After the change, run the same command GREEN. A new gate must fail on the old tree, or on a planted defect, before you trust it.
+5. **Engine**: if you touch `js/conv-engine.js`, bump `version` and `js/rz-engine-versions.js` `conv` together, then run `node tools/test-conv-engine-version-pins.mjs`. A pin mismatch blanks all 8 cockpits silently. Regenerate the registry only with `node tools/build-conv-parameter-registry.mjs`.
+6. **Explain DB**: never edit `js/rz-explain-db.js` (it is generated). Add entries to `tools/explain-conv.json` (new), register that file in `tools/build-explain-db.py`, then run `python3 tools/build-explain-db.py`.
+7. **Scripted edits**: Python `re.sub` with a lambda replacement. Afterwards `grep -caP "\x00" <file>` must print 0 and `python3 tools/audit-js-syntax.py --strict` must say CLEAN.
+8. **Look**: for every visual change, capture a screenshot at 390 and 1440 in both themes and look at it. A gate number is not enough.
+9. **Hand-back (Ark)**: return the diff stat, each law with its RED line and GREEN line, and the paths of the screenshots you looked at. Do not commit to `main` and do not push.
+10. **Release (Opus main session only)**: in one commit, update `js/rz-version.js`, `sw.js`, regenerate `changelog.html`, refresh cache tokens and update `CHANGELOG.md`. Run `bash tools/ship-gate.sh` (resume with `RZ_GATE_FROM=N`). Push with `git push origin HEAD:main` over the SSH deploy key, never with a token. Then verify the Pages deploy and the live `js/rz-version.js`. Standards docs change in the same release as the code.
 
-## 2. Waves and releases
+---
 
-| wave | WPs | executor | release | depends on |
+## 2. Routing and order
+
+| wave | WP | executor | output | release |
 |---|---|---|---|---|
-| W0 | G1 gate repair | Opus | v3.64.0 (with W1) | — |
-| W1 | A2, A3, A4, U1, U2 | Ark ×2 in parallel (A2+A3 / A4+U1+U2), Opus review | v3.64.0 | W0 (so the geometry gate can see U2) |
-| W2 | E1, E2, E3, E4, E5 | Opus (E1+E3 one agent, E2+E4 one agent, E5 Ark after E3 lands) | v3.65.0 MINOR — published counts change | W1 merged (same files) |
-| W3 | R1, S1, G2 | Ark (R1), Opus (S1, G2) | v3.65.x | W2 |
+| W0 | G1 geometry gate fails instead of hanging | Opus | gate | v3.64.0 |
+| W0 | GD depth + coverage gates made hook-aware | Opus | gates (MONITOR) | v3.64.0 |
+| **W1** | **D-1 payload builder + inspector shell** | **Opus** | `js/conv/payloads.js`, Node test | v3.64.0 |
+| **W1** | **D-2 chiller reference page** | **Opus** | the pattern every other page copies | v3.64.0 |
+| **W2** | **D-3 replicate to fire, fuel, water, ICT, EPMS, datahall, cdu-mini, dc-conventional** | **Ark ×2 parallel, one page per brief** (§9 briefs) | per-page wiring | v3.65.0 |
+| **W2** | **D-4 traceability sweep** (hook + mark every number) | Ark per page, Opus review | | v3.65.0 |
+| **W2** | **D-5 tooltip corpus** (`tools/explain-conv.json`) | Ark drafts the entries, Opus checks the engineering | | v3.65.0 |
+| W3 | F-1…F-5 page fixes (old W1: shared defects, state honesty, labels, contrast, readable drawings) | Ark | | v3.66.0 |
+| W4 | E-1…E-5 engine truth (gensets, transformers, WUE, CRAH, PUE, fire hydraulics, ICT) | Opus | engine 2.3.0 | v3.67.0 MINOR |
+| W5 | H-1…H-3 hardening (split builders, gate coherence, pixel contrast) | Ark / Opus | | v3.67.x |
 
-Max two executors in flight at once (token budget rule); thermal limit: at most two browser lanes.
+Order rationale:
+- D before E: payloads read the engine, so the corrected engine numbers reach every inspector and modal with no second pass.
+- F after D: D rewrites the same click and label code, so fixing those pages first would mean editing them twice.
 
----
-
-## W0 — gate health
-
-### W0-G1 · `test-conv-geometry.mjs` must fail, never hang (audit G1) — Opus
-
-- Laws:
-  1. A page whose tab activation stalls ends that page's run within 90 s with `HUNG <page> <tab>` and
-     exit 1 for a strict page / a MONITOR line for a monitor page; the run continues to the next page.
-  2. The full run on today's tree finishes in < 25 min (it currently never finishes).
-  3. Conv pages (`chiller-plant`, `fire-system`, `water-system`, `fuel-system`, `ict`, `index`) still
-     report their existing PASS/FAIL unchanged.
-- RED: `timeout 1500 rz-lane -l 2 -t 1500 -- node tools/test-conv-geometry.mjs` → killed by timeout
-  with no summary line (record the last page printed).
-- Fix: wrap each page (and each `activateTab` call) in a `Promise.race` against a per-page deadline;
-  on deadline close that page's browser context, print `HUNG`, continue. Change only
-  `tools/test-conv-geometry.mjs`; `tools/lib/cockpit-tabs.mjs` is shared with LTC — read it, do not
-  edit it. Do not remove `datahallAI.html` from the run (it is LTC's monitor row); a hang there becomes
-  a reported row, not a silent stall.
-- Verify: rerun RED command → summary line printed, `HUNG datahallAI.html …` present, conv pages
-  unchanged. Add a seam `RZ_GEOMETRY_PLANT_HANG=1` that makes one conv page's activation never resolve,
-  proving law 1 RED→GREEN on demand.
-- Docs: standard §9 (gate list) note "per-page deadline"; ledger G1 → CLOSED.
+At most two executors run at once (token budget), and at most two browser lanes (thermal limit).
 
 ---
 
-## W1 — truth, wiring and readability (bounded; Ark executes, Opus reviews)
+## 3. Architecture decisions (D-1 builds them; everyone else uses them)
 
-### W1-A2 · shared module defects (C-A8, C-A9, C-A10, C-A11) — Ark
-
-- Laws:
-  1. `grep -n "DC AI engine\|datahall-ai/hmi-sheets" js/rz-hmi-sheet.js` → 0 lines in the conv path;
-     the sheet basis string names `js/conv-engine.js` (pass the engine name in via the sheet spec, so
-     the shared module stays engine-agnostic; datahallAI keeps its own string through its own spec).
-  2. EPMS PDF export with `window.open` returning `null` shows an in-page message and throws nothing
-     (`pageerror` count 0).
-  3. Opening and closing the basis drawer 10× on `dc-conventional` and `datahall` leaves the document
-     keydown listener count unchanged; both pages use the shared `js/rz-basis-drawer.js` and the inline
-     copies (`dc-conventional.html:2806-2842`, `datahall.html:2338-2371`) are deleted.
-  4. `RZHmiSheet.destroy()` removes every listener it added (count via a CDP
-     `DOMDebugger.getEventListeners` probe before render / after destroy).
-- RED: (1) the grep prints line 246; (2) a probe that stubs `window.open = () => null` and clicks the
-  export → `TypeError`; (3)/(4) listener counts grow per cycle.
-- Gates to stay green: `test-conv-basis-drawer.mjs`, `test-conv-sheet-text-clear.mjs`,
-  `test-conv-sheet-perf.mjs`, `test-conv-coverage.mjs`, and LTC's
-  `test-datahall-ai-inspector-runtime.mjs` (shared `rz-hmi-sheet.js` — run it, do not edit LTC files).
-- New gate: extend `tools/test-conv-bms-truth.mjs` with the provenance-string check (law 1) and the
-  listener-count check (laws 3–4).
-
-### W1-A3 · page state honesty (C-A1…A6, C-A12) — Ark
-
-- Laws:
-  1. No displayed state on a conv cockpit is driven by `Math.random`: a static scan of the 8 pages for
-     `Math.random` returns only lines inside a declared `simulated` jitter helper that the page's
-     `data-rz-authored-basis` names; `datahall.html` no longer starts excursions on a timer — an
-     excursion starts only from an explicit operator "Run scenario" control and is labelled SIMULATED.
-  2. Fuel alarm thresholds read `snapshot.fuel.level_low_pct / level_low_low_pct /
-     level_overfill_pct`; `grep -nE "< 30|< 60|> 95" fuel-system.html` in the alarm block → 0.
-  3. The fuel UST trend axis spans the series' real range (0–100 %), so a value outside 80–90 % is
-     drawn inside the plot (probe: set level 40 %, the last point's y is inside the plot box).
-  4. FP-02 status text carries no authored live value (`fuel 88%`, `battery OK`) unless it is declared
-     SIMULATED in the same element.
-  5. Switching hall during an excursion clears the excursion banner and state.
-  6. Fuel "updated Ns ago" increases monotonically between ticks (one owner of `lastUpdate`).
-- RED: each law's grep/probe on the current tree. Pin the sim tick (`window.__rzSimTick`) in probes.
-- Gates: `test-conv-fire-fuel-operator.mjs`, `test-conv-cooling-water-ui.mjs`,
-  `test-conv-alarm-runtime.mjs`, `test-conv-snapshot-binding.mjs`, `test-conv-hall-scope.mjs`.
-- Docs: standard §6 Fuel/Water/Data hall lines that describe the simulated parts.
-
-### W1-A4 · labels that say the wrong thing (E-H4, E-H6, C-A13) — Ark
-
-- Laws:
-  1. The 22.4 °C value is captioned as what it is (`avg_temp_c`, room average) and never sits under a
-     "setpoint" or "cold aisle" caption; the rack-inlet target shown anywhere = `cooling.rack_inlet_target_c`
-     (25.4).
-  2. Tech Spec "UPS module count" prints `electrical.ups_module_count` (64) as
-     `2 systems × 32 modules`, and per-system output = `ups_system_kw`; no "2 (A + B feed)" string.
-  3. No page labels 20–80 % RH as "recommended"; ASHRAE A1 recommended band is stated as a dew-point
-     range (−9 °C to 15 °C dew point, with the RH ceiling of the cited edition) or the RH line is
-     labelled "allowable".
-- RED: `grep -n "UPS module count','2" dc-conventional.html`; grep for "recommended" next to "20-80".
-- Gates: `test-conv-document-parity.mjs`, `test-conv-coverage.mjs --strict`, `test-conv-explain-wiring.mjs`.
-
-### W1-U1 · contrast and the light theme (U1, U2, U3) — Ark
-
-- Laws:
-  1. `dc-conventional.html` light theme: the page background, the sign-in modal and the PRD/Manual
-     buttons all follow the theme; axe `color-contrast` violations = 0 at 390/768/1440 in both themes.
-  2. `ict.html` and every `rz-bms-shell` adopter: axe `color-contrast` violations = 0, both themes, 3 widths.
-  3. Fix by token, not by literal: replace `#64748b` / `#66758a` secondary text on near-black with the
-     existing secondary-text token that measures ≥ 4.5:1 on `#0a0b0d…#181a1e` (check
-     `documentation/design.md` tokens); no new hex.
-- RED: the render audit states 00421–00423, 00499–00504, 00319–00324 (FAIL). Re-run:
-  `node tools/audit-site-render.mjs --base http://127.0.0.1:<port>/ --include '^(dc-conventional|ict|chiller-plant)\.html$' --axe --capture-all --out <new dir>`.
-- Gates: `audit-a11y.mjs --strict`, `audit-dark-coverage.mjs`, `audit-legibility.mjs --strict`;
-  look at the six screenshots per page.
-- Note: the sign-in modal comes from `auth.js` — fix the token scoping in the auth modal CSS so it
-  inherits the active theme; check `index.html` and one calculator still render it correctly.
-
-### W1-U2 · drawings readable at every width (U4, U5) — Ark, Opus review
-
-- Laws:
-  1. `EPMS_Telemetry.html` at 390 and 768: every SLD equipment box shows its tag (MV-A, Tx-A, LVSB-A, …)
-     at ≥ 8.5 rendered px, or the sheet opens in a fit/scroll viewport with tags legible after one
-     "zoom to fit" — standard §4 ("labels cannot overlap… at 390, 768"); the bottom KPI strip shows
-     every cell without truncation (wrap or 2-row grid).
-  2. `chiller-plant.html` "Shade" (light) sheet: tag text halo stroke uses the sheet background colour,
-     so text edges are clean; `test-conv-sheet-text-clear.mjs` C1–C5 stay green; screenshots in both
-     sheet shades looked at.
-- RED: render audit states 00439–00443 (`large-blank-gap`, `bodyTextLength` 738 at 390 vs 1,646 at
-  1440); screenshot 00324 crop.
-- Gates: `test-conv-geometry.mjs --page=EPMS_Telemetry.html` (needs W0), `audit-legibility.mjs --page=…`,
-  `audit-responsive-layout.mjs --strict`.
-
-**W1 release v3.64.0** — Opus integrates both Ark branches (merge-base squash, never
-`reset --soft origin/main`), runs the full ship gate, pushes, verifies live.
+- **AD1. One payload builder.** `js/conv/payloads.js` is a DOM-free dual-target IIFE (same idiom as `js/conv/sheet-truth.js`), and Node can test it. Its API is `payload(classId, id, ctx)`, where `ctx = {snapshot, truth, alarms, basis, tick, page, hall}`.
+  - It replaces the `build()` in `sheet-truth.js:100-140` (which keeps a thin shim so callers do not break) and the inline builder in `water-system.html:900-930`.
+  - It never returns an empty tab. A tab with nothing real states why: `{ unavailable: 'no governed meter — header flow UNAVAILABLE' }`.
+- **AD2. A class table, not per-page code.** `CLASSES` maps a symbol class to its tab recipes. The symbol classes in the sheets today are: `chillerWater`, `pumpCentrifugal`, `instField`, `tankStorage`, `tankExpansion`, `valve*`, `coolingCoil`, `coolingTowerCell`, `hxShellTube`, `filterCartridge`, `uvSteriliser`, `dosingPot`, `facp`, `aspirating`, `releasePanel`, `manualStation`, `abortSwitch`, `preActionValve`, `alarmValve`, `sprinklerHead`, `smokeDetector`, `compressor`, `gensetDiesel`, `leakSensor`, `flowMeter`, `offSheet`.
+  - D-3 adds the classes for SLD devices (`mvSwitchgear`, `rmu`, `transformer`, `lvBoard`, `ats`, `ups`, `pdu`), ICT nodes (`coreSwitch`, `distSwitch`, `accessSwitch`, `otGateway`, `firewall`), `rack`, and the CDU parts (`cdu`, `cduPump`, `plateHx`, `cduSensor`).
+- **AD3. Every row is traced.** A payload row is `{label, value, text, unit, quality, basis? | declared?, sim?}`, with `basis` = registry id. The module enforces it: a row with `basis` must resolve in `data/conv-parameters.json` and must equal the engine value at the printed precision; any other row must carry `declared` (≥ 40 chars) or `sim: true`. No `NaN`; null prints "—".
+- **AD4. Inspector rendering.** Use `RZInspector.openPayload` (payload mode already exists, 1.45.0+). Value cells get `data-basis-param` plus the evidence dot, or the `SIM` mark (`rz-evidence` vocabulary).
+  - Docking: a page opts in with `<body data-rz-inspector-dock="1">`, so the inspector stops covering the header (D10).
+  - Fix this additively in `rz-inspector.js` CSS for conv pages only.
+- **AD5. One modal shell.** `js/conv/equipment-modal.js` (new) renders the deep modal from the same payload plus a class mini-mimic (`js/rz-eng-symbols.js` glyph at large scale with its live tags).
+  - Modal sections: identity, readings (traced), trend, guidance (from the class table), design basis.
+  - Lifecycle: focus trap, `Esc` closes, focus returns to the trigger, timers cleared on close, background inert.
+  - Chiller's loop modal becomes the `chillerWater` instance of this shell. Its 18 rows move into the class recipe.
+- **AD6. Trend.** Use a seeded deterministic series (`tick`, period, phase from the point id), anchored on the engine plane, with no `Math.random`. It is declared SIMULATED and drawn as an inline SVG sparkline with the engine plane as a dashed reference line.
+- **AD7. Maintenance.** Each class carries a declared interval and the standard it comes from: NFPA 25 weekly churn for fire pumps; NFPA 110 monthly load test for gensets; ASHRAE 180 for chillers and towers; NFPA 72 annual for detectors; IEEE 450 for UPS batteries. A "last test" is a deterministic declared fixture. It is labelled TRAINING RECORD, never presented as live.
+- **AD8. Tooltip corpus.** `tools/explain-conv.json` holds one entry per conv label, tag class, unit and abbreviation.
+  - Each entry: short definition, formula or setpoint if any, standard reference, and why it matters to the operator.
+  - Bind with `data-explain="conv-<key>"`. In the SVG tag layer, add `<title>` to the node. The text layer stays pointer-events none.
 
 ---
 
-## W2 — engineering truth (Opus)
+## 4. Gates (W0 — Opus)
 
-Engine changes publish new numbers: bump `conv-engine` 2.2.0 → 2.3.0 with the pin (protocol §5).
-Every new quantity is an engine leaf with a `// source:` comment and an evidence class
-(ADOPTED / ASSUMED / DERIVED), then rendered or declared internal (registry R7/R8 strict).
+### G1 · `test-conv-geometry.mjs` must fail, never hang (audit G1)
 
-### W2-E1 · electrical and fuel fleet (E-C1, E-C2, E-M4, E-M5, E-L3, E-L4, E-L5) — Opus
+- **Laws**
+  1. When a page stalls in `activateTab`, the gate prints `HUNG <page> <tab>` within 90 s and continues to the next page. The page counts as FAIL if it is strict, or as a MONITOR line otherwise.
+  2. The full run on today's tree finishes in under 25 min.
+  3. Conv page verdicts do not change.
+- **RED**: `timeout 1500 rz-lane -l 2 -t 1500 -- node tools/test-conv-geometry.mjs` → exit 124 with no summary line. Measured: exit 124 at 603 s.
+- **Fix**
+  - Add a per-page `Promise.race` deadline. On deadline, close that page's browser context and go on to the next page.
+  - Edit only `tools/test-conv-geometry.mjs`. Do not edit `tools/lib/cockpit-tabs.mjs` (LTC uses it).
+  - Add a seam `RZ_GEOMETRY_PLANT_HANG=1` that makes one conv page's activation hang, for the RED→GREEN proof.
 
-- Model (proposed defaults — the executor checks them against vendor-class data and records them ADOPTED):
-  - `electrical.genset_unit_kw = 3000` (standby, 20-cyl high-speed diesel class), `genset_max_loading = 0.8`,
-    `genset_redundancy = 'N+1 per hall block'`.
-  - `gensets_per_hall = ceil(hall_design_kw × PUE_design / (unit × max_loading)) + 1`
-    → hall 10,000 kW × 1.45 = 14,500 kW → ceil(14,500 / 2,400) = 7 → **8 per hall, 32 total**.
-  - `transformer_unit_kva = 3150`, `pf = 0.95`; per hall per stream must carry the whole hall on
-    contingency: `ceil(14,500 / 0.95 / 3,150) = 5` → 5 × 3,150 kVA per stream per hall (normal ≤ 50 %).
-    LV board per transformer `I = 3,150 / (√3 × 0.4) = 4,547 A` → 5,000 A ACB / busbar.
-  - Fuel: specific consumption from a declared load-dependent curve (≈ 0.27 L/kWh at 100 %,
-    ≈ 0.30 at 50 %) instead of the flat 0.356; tank and autonomy recomputed at design AND adopted load;
-    transfer pump capacity ≥ 1.25 × full-fleet burn (L/min).
-  - UPS efficiency from a declared part-load curve (IEC 62040-3 class), not flat 96 %.
-- Pages: EPMS SLD shows banks (`5 × 3,150 kVA / stream / hall`, `8 × 3.0 MW / hall`) bound to the
-  engine; the A/B (+ C) topology matches the engine's 2N UPS with mechanical load NOT on UPS (or the
-  engine adopts the catcher topology — pick one, write why, make the page and engine agree). Fuel page
-  shows the running set count and per-set load (`facility_kw / running_sets`). Day-tank capacity one
-  value everywhere.
-- Laws (each a new identity in `tools/test-conv-calc.mjs` or a new `tools/test-conv-electrical-fleet.mjs`):
-  1. `gensets_running × unit_kw × max_loading ≥ facility_kw` at design and adopted load, with one set lost.
-  2. Every transformer's contingency loading ≤ 100 %; normal ≤ 50 %.
-  3. No rendered current > the drawn board rating; `grep -n "3150KVA\|'2.5 MW'" EPMS_Telemetry.html` → 0 literals.
-  4. Transfer pump L/min ≥ 1.25 × fleet burn L/min.
-  5. Autonomy hours printed = usable litres / burn at the stated load, at both loads.
-- RED: run the new identities against 2.2.0 — they fail with the C1/C2 numbers.
-- Docs: standard §6 Fuel + new electrical fleet paragraph; `manual/epms-telemetry.html`,
-  `manual/fuel-system.html` formulas and worked example; registry regen.
+### GD · instruments that can see depth (audit D7)
 
-### W2-E2 · cooling and water thermodynamics (E-H1, E-M2, E-M3, E-M9, E-M10, E-L2) — Opus
-
-- WUE becomes DERIVED: `evap_kg_s = tower_rejection_kw / h_fg` (h_fg 2,430 kJ/kg at ~30 °C),
-  `blowdown = evap / (CoC − 1)` (CoC ADOPTED, e.g. 4), `drift = 0.0005 % × circulation` (CTI ATC-140
-  class), `makeup = evap + blowdown + drift`, `WUE = makeup_L_per_h / IT_kW`. Expected ≈ 2.0–2.4 L/kWh.
-  The old 1.20 input is retired (record it in the standard's lesson ledger).
-- Per-chiller evaporator flow uses evaporator duty (982.3 L/s basis), not IT-only flow, so the printed
-  ΔT equals the computed ΔT (7.6 K).
-- "Plant COP / kW/RT" either includes pumps + tower fans or is relabelled "compressor COP"; both if room.
-- Refrigerant pressures from R-1234ze(E) saturation at the printed evaporating/condensing temperatures
-  (table from a named source, ADOPTED).
-- Grid factor: adopt the published Java-Bali grid emission factor (MEMR/KESDM, cite year) — LABEL the
-  old 0.42 as retired.
-- Laws: energy balance `tower_rejection = evap_duty + compressor_input (± 2 %)`; latent of makeup
-  evaporation = tower rejection (± 5 %); printed ΔT = Q / (ṁ c_p) (± 0.05 K); refrigerant P within
-  ± 3 % of the saturation table. Each RED on 2.2.0.
-- Docs: standard §5 + §6 Water/Chiller; `manual/water-system.html`, `manual/chiller-plant.html`.
-
-### W2-E3 · air side, PUE and the heat balance (E-H2, E-H3, E-M1) — Opus
-
-- `crah_installed` fixed by the design load (`ceil(hall_design_kw / crah_unit_sensible_kw) + 1` → 78 per
-  hall at 10 MW), `crah_running` follows load; N+1 margin printed at both loads.
-- PUE: a bottom-up stack (IT, UPS loss, distribution loss, chiller, pumps, tower fans, CRAH fans,
-  lighting/aux) at design load; at part load either computed from the same terms or shown UNAVAILABLE
-  (per `conv-design-basis.js`) — never the design value reused. The residual line "Cooling overhead"
-  disappears because the stack closes.
-- Laws: Σ non-IT terms = facility − IT (± 0.5 %); `crah_installed` constant across the 4 scenario loads;
-  part-load PUE either derived or literally UNAVAILABLE on every page (`test-conv-design-basis.mjs`).
-
-### W2-E4 · fire hydraulics (E-H5, E-M6, E-M7, E-M8, C-A7) — Opus
-
-- Pumps sized from duty: `P_hyd = ρ g Q H`; motor ≥ P_hyd at 150 % flow / 65 % head point ÷ η_pump
-  (NFPA 20 curve points) → main pump class ~110 kW at 227 m³/h, ~120 m; jockey ≥ 7.5 kW.
-- Storage sized from the pump rated flow × duration (NFPA 13/20 duration ADOPTED), or the pump rating
-  reduced to the 2,500 L/min demand — one basis.
-- Static/working pressure ≤ 12.1 bar (175 psi) or components declared 300 psi class.
-- One suppression agent statement everywhere; N₂ generator described as pre-action supervisory gas.
-- Pressure setpoints (jockey/main start/stop) derived from the static pressure leaf.
-- Laws: motor kW ≥ hydraulic kW / 0.75 at the rated point; storage L ≥ rated L/min × duration; a grep
-  for the four agent wordings returns one.
-
-### W2-E5 · ICT sizing and rack-equivalents (E-H7, E-L1) — Ark after E3, Opus review
-
-- Access switches from rack count and ports per rack with an explicit oversubscription policy
-  (standard §6 ICT); rack-equivalents never exceed physical positions (cap, or relabel as kW-equivalent).
-- Laws: `access_switches × ports_per_switch ≥ racks × ports_per_rack`; no rack-equivalent > 2,000.
-
-**W2 release v3.65.0 (MINOR)** — published counts change; full ship gate + probe; engine pins.
+- **`tools/test-conv-depth.mjs`**: already committed as a MONITOR (baseline in audit §7).
+  - Add per-page thresholds read from `tools/conv-depth-thresholds.json`.
+  - A page with no entry stays MONITOR. A page with an entry fails below its numbers.
+  - D-2…D-5 raise the entries as pages land, as a ratchet that never lowers.
+- **`tools/test-conv-coverage.mjs`**: add a hook-aware numerator, the same rule `test-dcai-coverage` uses.
+  - A visible number counts as traced only when it has a `[data-basis-param]` ancestor whose id resolves and whose value matches at the printed precision, or a `[data-rz-authored-basis]` ancestor that is **visibly marked** (an evidence/SIM mark inside the same group).
+  - Value-string membership alone no longer counts.
+  - Enters as MONITOR with the per-page table. The flip condition is written into the standard.
+  - **RED**: today the hook-aware table must report ≥ 600 untraced numbers across the 8 cockpits.
+- **New `tools/test-conv-payloads.mjs`** (`node --test`). It must prove:
+  - every class returns a frozen payload with 6 non-empty tabs;
+  - every `basis` resolves and matches the engine;
+  - every other row is declared or SIM;
+  - same tick gives a `deepEqual` payload;
+  - tick + 1 changes only SIM rows;
+  - the module sources contain no `Math.random`.
+- **New `tools/test-conv-equipment-modal.mjs`** (Puppeteer). On each sheet page, one item per class goes through: inspector → Open HMI → the modal opens.
+  - Focus moves inside the modal and Tab wraps.
+  - Background is inert.
+  - `Esc` closes it, focus returns to the trigger, and the active timer count is 0.
+  - Run at 390 and 1440 with no horizontal overflow.
 
 ---
 
-## W3 — hardening
+## 5. W1 — the depth layer and the reference page (Opus)
 
-### W3-R1 · split oversized builders (C-A14, C-A15) — Ark
+### D-1 · payload builder, inspector shell, modal shell (D1, D10)
 
-- `buildTechSpecHtml` (768 lines, `dc-conventional.html:1846`) → `js/conv/tech-spec.js` sections ≤ 80
-  lines each; the PDF output byte-identical before/after for a pinned snapshot (hash the HTML string).
-- One engine-pin parse helper in `js/rz-engine-versions.js`, pages call it.
-- Law: `sha256(buildTechSpecHtml(snapshot))` unchanged; `test-conv-document-parity.mjs` green.
+- **Files**
+  - New: `js/conv/payloads.js`, `js/conv/equipment-modal.js`, `tools/test-conv-payloads.mjs`.
+  - Changed: `js/conv/sheet-truth.js` (shim to `payloads.js`); additive changes to `js/rz-inspector.js`; `css/` inspector dock for conv pages.
+- **Laws**
+  1. `node --test tools/test-conv-payloads.mjs` passes for every class listed in AD2.
+  2. On the fire page, opening FACP-01, VESDA-01, FP-01, TK-FW-01 and PAV-01 shows LIVE ≥ 4 rows and ≥ 5 of 6 tabs with content.
+  3. The provenance footer shows the real engine version (2.2.0), not "—".
+  4. At 1440 the inspector does not cover the page header or the toolbar.
+- **RED**: `test-conv-depth.mjs --page=fire-system.html` → `LIVE <= 2 rows on 23`, `avg tabs 0.2/6`.
+- **GREEN**: the same command → `LIVE <= 2 rows on 0`, `avg tabs ≥ 5.0/6`, `traceable cells > 0`.
 
-### W3-S1 · gate coherence (C-B1, C-B2, C-B3) — Opus
+### D-2 · chiller-plant as the reference page (D2, D9, and the chiller rows of D6/D8)
 
-- The pages are public static content, so this is consistency, not secrecy: one gate list in
-  `js/rz-feature-flags.js` covering all 8 sub-cockpits (or a written decision that they are public),
-  inline root/demo lists removed in favour of `auth.js`. State plainly in the standard that the client
-  gate is not a security boundary.
-
-### W3-G1 · render coverage the generic audit cannot reach (U6, U7, G2) — Opus
-
-- Extend the conv render gate with the authorised audit state (`tools/lib/cockpit-audit-state.mjs`) and
-  a pixel-sampled contrast probe for SVG text (the axe `incomplete` class), so the 9–114 undecided
-  nodes per page get a verdict. RED: plant one `#66758a` label on a sheet.
+- **Wiring**
+  - Every `.hmi-node` on `#pidSvg` opens the inspector through `payloads.js`. Remove the `chwLoopOf` early return in `chwOpen()`.
+  - A double-click, or "Open HMI", opens the modal shell. CH-0n opens the chiller instance; CHWP opens the pump class (command/feedback, speed, amps, head, vibration, duty/standby, permissive, trip); TT opens the transmitter class (PV, range, quality, calibration due); ET-01 opens the expansion tank class (pre-charge, level).
+- **Modal content (D9)**
+  - Units use `°C`.
+  - Simulated pump amps and vibration carry `SIM`.
+  - Engine values carry their basis marks.
+  - Secondary supply ≥ primary CHWS, through a decoupler/blend identity (`T_sec_sup = T_prim_sup + mixing_k`, mixing_k ≥ 0 declared). The 18.9 < 19.4 defect becomes impossible.
+- **Traceability**: every number on the page is hooked with a mark, or declared with a visible SIM mark.
+  - Target: 137 numerals → bare 0, hooked + marked ≥ 95 % of the engine-sourced ones.
+- **Tooltips**: every label and tag class on the page. Target: 60 labels → ≥ 57 with a tooltip.
+- **Laws**: the chiller row of `test-conv-depth.mjs` meets the §7 flip condition. Then enter it in `conv-depth-thresholds.json` and flip the chiller page to STRICT.
+- **Look**: screenshots of the inspector on CH-01, CHWP-01A, TT-101 and the CHWP modal at 390 and 1440, both themes.
+- **Docs**
+  - `standarization/CONVENTIONAL_DC_OPERATIONS_STANDARD.md`: a new §3a "Equipment inspection contract" (the §0 table of this plan), gate numbers, and the flip condition.
+  - `manual/chiller-plant.html`: the modal and its basis.
+  - Release **v3.64.0** = G1 + GD + D-1 + D-2.
 
 ---
 
-## 3. Owner decisions (defaults chosen; the owner may override before W2 starts)
+## 6. W2 — replicate (Ark, one page per brief; Opus reviews and ships)
 
-1. Genset unit class 3.0 MW standby, N+1 per hall block → 32 sets (E1).
-2. Transformer 3,150 kVA, 5 per stream per hall, 2N (E1).
-3. WUE becomes derived (~2.0–2.4 L/kWh); the dashboard's 1.20 retires (E2).
-4. Grid factor moves to the published Java-Bali factor (E2).
-5. EPMS topology: align the page to the engine's 2N with mechanical not on UPS (E1).
+Each page copies the D-2 pattern. The table lists what each page needs beyond the shared builder.
 
-## 4. Status
+| page | items to wire | inspector / modal classes to add or fill | numerals (bare / declared-only) | labels without tooltip | special |
+|---|---|---|---|---|---|
+| fire-system | 24 tagged + 25 junction/aux | fill all fire classes (FACP, VESDA, RCP, MCP, ABT, PAV, alarm valve, FP, JP, tank, sprinkler, N₂ compressor) | 35 / 40 | 52 | MAINT per NFPA 25/72; cause-and-effect rows link from the FACP inspector |
+| fuel-system | 16 + 6 | UST, day tank, transfer pump, filter train, leak sensor, genset | 36 / 34 | 91 | genset CAPACITY reads the W4 fleet leaves when they land (until then states "fleet sizing under review — audit E-C1") |
+| water-system | 17 (6 dead today) | tank, booster pump, filter, UV, dosing, HX, tower cell | 28 / 43 | 24 | tower CAPACITY shows the evaporation/blowdown balance |
+| ict | 17 nodes | core / dist / access / OT gateway / firewall | 13 / 78 | 42 | keep `showNodeDetail` fault-domain logic, but render it as the DEPS tab |
+| EPMS_Telemetry | 29 SLD devices | MV, RMU, Tx, LVSB, GEN, ATS, UPS, PDU | 34 / 2 | 69 | SLD labels at 390/768 (old U4) ride in this WP |
+| datahall | 500 racks + CRAH + row PDUs | rack, CRAH, row | 21 / 318 | 79 | `selectRack` panel becomes the inspector; 318 declared-only cells get a visible SIM/derived mark via the `data-rz-distribution` group mark |
+| cdu-mini-bms | 13 parts | CDU, pump, plate HX, sensors | **86 / 0** | 32 | page is a monitor page: hook to the CDU calculator engine or declare SIM per group |
+| dc-conventional | subsystem tiles | none (tiles navigate) | 9 / 0 | 29 | finish tooltips and the 9 bare numbers only |
 
-| WP | rows | executor | status |
+- **Per-page laws**: the page's row in `test-conv-depth.mjs` meets the §7 flip condition. Then enter the row in `conv-depth-thresholds.json`.
+  - `test-conv-equipment-modal.mjs` passes for that page.
+  - The hook-aware coverage row for the page shows 0 untraced.
+  - All existing conv gates stay green.
+- **D-4 (traceability) and D-5 (tooltips)** run inside each page brief, not as separate sweeps, so a page is finished once.
+- **D-5 content rule**: Ark drafts each `explain-conv.json` entry. Opus checks every formula, unit and standard citation before merge. A tooltip that states a wrong standard is worse than none.
+- **Release v3.65.0**: the 8 pages, 2 per review batch. The release does not ship until every page is STRICT in `test-conv-depth.mjs`.
+
+---
+
+## 7. W3 — page fixes (Ark), audit §3–§4 rows
+
+| WP | rows | laws (each with a RED grep or probe on today's tree) |
+|---|---|---|
+| F-1 shared modules | C-A8, A9, A10, A11 | conv sheets no longer say "DC AI engine"; EPMS PDF with a blocked pop-up shows a message and throws nothing; basis drawer open/close ×10 leaves the keydown listener count unchanged (inline copies deleted); `RZHmiSheet.destroy()` removes its listeners |
+| F-2 state honesty | C-A1…A6, A12 | no displayed state from `Math.random` outside a declared SIM helper; datahall excursions start only from a labelled "Run scenario" control; fuel alarm thresholds read the engine; fuel trend axis 0–100 %; FP-02 has no authored live values; hall switch clears the excursion; one `lastUpdate` owner |
+| F-3 labels | E-H4, E-H6, C-A13 | 22.4 °C captioned as room average, never as a setpoint; UPS "2 systems × 32 modules = 64"; RH 20–80 % never "recommended" |
+| F-4 contrast + light theme | U1, U2, U3 | axe `color-contrast` = 0 on dc-conventional, ict and every `rz-bms-shell` adopter, 3 widths × 2 themes; the sign-in modal follows the theme; token fix, no new hex |
+| F-5 readable drawings | U5 (U4 moved to the EPMS brief) | chiller "Shade" sheet halo uses the sheet background colour; `test-conv-sheet-text-clear.mjs` C1–C5 green; screenshots in both shades |
+
+Release v3.66.0.
+
+---
+
+## 8. W4 — engine truth (Opus), audit §2 rows
+
+Engine 2.2.0 → 2.3.0, with the pin, the registry regenerated and the manuals updated. Payloads carry the new numbers to every inspector automatically, and the Node payload test catches any row that loses its basis.
+
+### E-1 · electrical and fuel fleet (E-C1, C2, M4, M5, L3, L4, L5)
+
+Proposed defaults below. The executor checks them against vendor-class data and records them as ADOPTED.
+
+- **Gensets**: `genset_unit_kw 3000`, `genset_max_loading 0.8`, N+1 per hall block. Per hall: `ceil(10,000 × 1.45 / 2,400) + 1` = **8 per hall, 32 total**.
+- **Transformers**: `transformer_unit_kva 3150`, PF 0.95. On contingency each stream carries the whole hall: `ceil(14,500 / 0.95 / 3,150)` = **5 per stream per hall**, normal loading ≤ 50 %. LV current per transformer is 4,547 A, so use 5,000 A boards.
+- **Fuel**: load-dependent specific consumption (≈ 0.27 L/kWh at 100 % load, ≈ 0.30 at 50 %) replaces the flat 0.356. The transfer pump must deliver ≥ 1.25 × the fleet burn in L/min.
+- **UPS efficiency**: a declared part-load curve.
+- **Topology**: one day-tank value everywhere. The EPMS topology matches the engine: 2N, with mechanical load not on UPS.
+- **Laws**
+  - Fleet with one set lost ≥ facility kW, at design and at adopted load.
+  - Transformer contingency loading ≤ 100 %.
+  - No literal `3150KVA` or `'2.5 MW'` remains in the page.
+  - Pump ≥ 1.25 × burn.
+  - Autonomy = usable litres ÷ burn, at both loads.
+
+### E-2 · cooling and water (E-H1, M2, M3, M9, M10, L2)
+
+- **WUE becomes derived**:
+  - evaporation = tower rejection / h_fg (2,430 kJ/kg);
+  - blowdown = E / (CoC − 1);
+  - drift = 0.0005 % of circulation;
+  - WUE = make-up / IT, expected ≈ 2.0–2.4 L/kWh.
+- **Chiller**: per-chiller flow on evaporator duty. COP is labelled compressor-only, or made plant-level.
+- **Other**: R-1234ze(E) saturation table. Java-Bali grid factor (KESDM, cite the year).
+- **Laws**
+  - Tower = evaporator + compressor input (± 2 %).
+  - Latent heat of the make-up = tower rejection (± 5 %).
+  - Printed ΔT = Q / (ṁ c_p) (± 0.05 K).
+
+### E-3 · air side and PUE (E-H2, H3, M1)
+
+- `crah_installed` fixed by design load (78 per hall), while `crah_running` follows load.
+- Bottom-up PUE stack. Part-load PUE is either derived or printed as UNAVAILABLE.
+- **Laws**
+  - Σ non-IT terms = facility − IT (± 0.5 %).
+  - `crah_installed` is the same at all 4 scenario loads.
+
+### E-4 · fire hydraulics (E-H5, M6, M7, M8, C-A7)
+
+- Motor ≥ P_hyd at the NFPA 20 150 % point ÷ η. Main pump ≈ 110 kW class; jockey ≥ 7.5 kW.
+- Storage = rated flow × duration.
+- Pressure ≤ 12.1 bar, or the components are declared 300 psi class.
+- One suppression-agent wording. Pump setpoints derived from the static pressure.
+
+### E-5 · ICT sizing (E-H7, L1)
+
+- Ark executes after E-3; Opus reviews.
+- **Law 1**: access ports ≥ racks × ports per rack under a declared oversubscription.
+- **Law 2**: rack-equivalents ≤ 2,000.
+
+Release v3.67.0 (MINOR: published counts change).
+
+---
+
+## 9. Ready-to-paste Ark brief (one per page; fill the brackets)
+
+```
+You are executing WP D-3/<page> of standarization/Audit result/CONV_EXECUTION_PLAN_2026-11-16.md.
+Read §1 (protocol), §0 (target), §3 (architecture) and the <page> row of §6 of that file first.
+Reference implementation: chiller-plant.html after v3.64.0 + js/conv/payloads.js + js/conv/equipment-modal.js.
+Work in your own worktree: git worktree add ~/.cache/rz-d3-<page> origin/main ; branch wp/d3-<page>.
+Do NOT edit datahallAI.html or js/datahall-ai/*. Do NOT commit to main or push.
+
+1. RED: run
+   TMPDIR=$HOME/.cache/qa-tmp timeout 900 rz-lane -l <1|2> -t 900 -- node tools/test-conv-depth.mjs --page=<page>
+   and copy its T/H/M/I lines.
+2. Add the classes this page needs to CLASSES in js/conv/payloads.js (tab recipes from §0; every row
+   basis= a registry id that resolves, or declared>=40 chars, or sim:true). Extend
+   tools/test-conv-payloads.mjs for each new class; run node --test tools/test-conv-payloads.mjs.
+3. Wire every tagged item on the page to the inspector (single click) and the modal shell (Open HMI /
+   double-click). No pointer cursor without an action.
+4. Hook and mark every number (data-basis-param + evidence mark, or a visible SIM mark). Bare = 0.
+5. Add tools/explain-conv.json entries for every label, tag class, unit and abbreviation on the page,
+   bind them with data-explain, add <title> to SVG nodes; python3 tools/build-explain-db.py.
+6. GREEN: the same depth command must meet: bare 0; hooked+marked >= 95 % of engine numerals; tooltip on
+   labels >= 95 %; every tagged item opens; LIVE >= 4 rows on every opened item; >= 5/6 tabs with content.
+   Also green: node tools/test-conv-equipment-modal.mjs --page=<page>, node tools/test-conv-coverage.mjs,
+   node tools/test-conv-bms-truth.mjs, python3 tools/audit-js-syntax.py --strict.
+7. Screenshots 390 and 1440, dark and light: page, inspector on 3 items, one modal. Look at each.
+8. Hand back: diff stat, RED and GREEN lines per law, screenshot paths, and every explain entry you were
+   unsure of (Opus checks the engineering before merge).
+```
+
+---
+
+## 10. Owner decisions (defaults stand unless the owner overrides)
+
+1. **Modal shape**: inspector on click and deep modal on "Open HMI" / double-click, the same two-tier model datahallAI uses. The alternative is a modal on every click.
+2. **Last test records**: shown as a TRAINING RECORD with the standard interval, not left blank.
+3. **Engine defaults (W4)**: gensets 3.0 MW, N+1 per hall (32 sets); transformers 3,150 kVA, 5 per stream per hall; WUE derived (~2.0–2.4 L/kWh); Java-Bali grid factor; EPMS aligned to 2N with mechanical load not on UPS.
+
+---
+
+## 11. Status
+
+| WP | audit rows | executor | status |
 |---|---|---|---|
-| W0-G1 | G1 | Opus | OPEN |
-| W1-A2 | C-A8, A9, A10, A11 | Ark | OPEN |
-| W1-A3 | C-A1…A6, A12 | Ark | OPEN |
-| W1-A4 | E-H4, E-H6, C-A13 | Ark | OPEN |
-| W1-U1 | U1, U2, U3 | Ark | OPEN |
-| W1-U2 | U4, U5 | Ark | OPEN |
-| W2-E1 | E-C1, C2, M4, M5, L3, L4, L5 | Opus | OPEN |
-| W2-E2 | E-H1, M2, M3, M9, M10, L2 | Opus | OPEN |
-| W2-E3 | E-H2, H3, M1 | Opus | OPEN |
-| W2-E4 | E-H5, M6, M7, M8, C-A7 | Opus | OPEN |
-| W2-E5 | E-H7, L1 | Ark | OPEN |
-| W3-R1 | C-A14, A15 | Ark | OPEN |
-| W3-S1 | C-B1, B2, B3 | Opus | OPEN |
-| W3-G1 | U6, U7, G2 | Opus | OPEN |
+| G1 | G1 | Opus | OPEN |
+| GD | D7 | Opus | OPEN (`test-conv-depth.mjs` MONITOR committed) |
+| D-1 | D1, D10 | Opus | OPEN |
+| D-2 | D2, D9, chiller part of D6/D8 | Opus | OPEN |
+| D-3 fire / fuel / water / ict / EPMS / datahall / cdu-mini / dc-conv | D3, D4, D5, D6, D8, U4 | Ark | OPEN |
+| F-1 | C-A8, A9, A10, A11 | Ark | OPEN |
+| F-2 | C-A1…A6, A12 | Ark | OPEN |
+| F-3 | E-H4, E-H6, C-A13 | Ark | OPEN |
+| F-4 | U1, U2, U3 | Ark | OPEN |
+| F-5 | U5 | Ark | OPEN |
+| E-1 | E-C1, C2, M4, M5, L3, L4, L5 | Opus | OPEN |
+| E-2 | E-H1, M2, M3, M9, M10, L2 | Opus | OPEN |
+| E-3 | E-H2, H3, M1 | Opus | OPEN |
+| E-4 | E-H5, M6, M7, M8, C-A7 | Opus | OPEN |
+| E-5 | E-H7, L1 | Ark | OPEN |
+| H-1 | C-A14, A15 | Ark | OPEN |
+| H-2 | C-B1, B2, B3 | Opus | OPEN |
+| H-3 | U6, U7, G2 | Opus | OPEN |
