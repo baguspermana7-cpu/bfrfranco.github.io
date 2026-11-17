@@ -135,6 +135,33 @@ Order: W0 → W1 → W2 → W3 → W4 → W5 → W6. A HIGH found mid-wave preem
 | W5 | v3.66.0 | E1–E3 | W4 (moves the code W4 edits) | 1 design + ~6 cards |
 | W6 | v3.67–3.70 | R135 phases C0–C5 | W4 sheets accepted (owner rule) | per PRD |
 
+### Status 2026-11-17 (after eight releases)
+
+| Wave | Shipped | Result |
+|---|---|---|
+| W0 | v3.63.2 | inline gate fails closed without auth.js (A1, A2) |
+| W1 | v3.63.3 | C1–C10, S3, S4; laws L1 L2 L3 L4 L5 L7 L9 + Node H7 R11 F13. C6 and the hall mimic fixed by reading only |
+| W2 | v3.64.0 | S1 for root and educator: role only from the Supabase server (`getUser`), laws Z1–Z4. The first build trusted `getSession` (a local token); the independent review forged root with it before the push |
+| W3 | v3.64.1 | U1 (28 of 50 drawings unnamed → 0), U2, U3 |
+| W4 | v3.65.0 – v3.65.2 | leak detection, HTW piping, main transformer bay, generator yard and fire panel drawn; WAN node, security zone, BMS application / field group and cylinder bank open on their architecture. Laws M6–M9, U7. H3 21 → 32 of 45 |
+| gate | 88988ca47 | ship-gate step [63] finishes on this page (a 20 s wait per load, not a hang) |
+
+Open, each waiting on something named:
+- **Owner check:** a real root sign-in on the live site (no credentials in the build session).
+- **Owner decisions:** D1 (U4 eyebrows), D2 (S5 demo account), D3 (Pro tier is still taken from the client record).
+- **Permission:** S2 needs the Supabase client vendored into the repo (a download from the CDN).
+- **Other work stream:** the inline gates of `dc-conventional.html` and `ltc-system-modelling-lab.html` still unlock from
+  the client record before auth.js decides.
+- **W4 remainder, not planned:** four isolable fire points keep the inspector on a click by design. Nine classes are
+  drawn with fewer than 8 symbols (a switch with its uplinks, downlinks, management port and two supplies is 5–6): the
+  page models hold nothing more to draw, so they are not padded to reach the count.
+- **U5** (spacing-scale sweep): not started; cosmetic, changes pixels on every tab.
+- **W5** (1.19 MB inline script, two blocks of 917 KB and 239 KB): 64 tools reference this page and 29 of them parse
+  its inline source (engine adapter, basis map, drawing code). Moving the blocks needs one shared reader
+  (`page source = html + its same-origin scripts`) adopted by all 29, several owned by the Conventional work stream.
+  Design first, with that stream; not a single-session change.
+- **W6** (R135 commissioning scenarios): waits for the owner's acceptance of the drawings (owner rule in the PRD).
+
 ### W1 — task cards
 
 Laws go into `tools/test-dh-drawings.mjs` (browser) or a Node test; Opus writes each, proves it red on v3.63.2, then
