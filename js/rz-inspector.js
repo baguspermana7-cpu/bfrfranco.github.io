@@ -91,6 +91,12 @@
       'font-family:IBM Plex Sans,sans-serif;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;border-radius:4px;cursor:pointer}' +
     '.rz-inspector-action--warn{border-color:rgba(245,158,11,.55);color:#fbbf24}.rz-inspector-action[aria-disabled="true"]{opacity:.45;cursor:not-allowed}' +
     '.rz-inspector-action:hover,.rz-inspector-action:focus-visible{background:rgba(56,189,248,0.18);outline:2px solid #38bdf8;outline-offset:1px}' +
+    /* a closing panel is still on screen while it slides out: it must not swallow the click on the next symbol */
+    '.rz-inspector:not(.open){pointer-events:none}' +
+    /* conv payloads (js/conv/payloads.js): a seeded training value carries a visible SIM mark, not only a dot */
+    '.rz-inspector-v[data-rz-sim]::before{content:"SIM";display:inline-block;margin-right:5px;padding:0 3px;border:1px solid rgba(176,103,143,.7);border-radius:2px;font:600 8.5px/1.4 JetBrains Mono,monospace;letter-spacing:.04em;color:#e3a6c6;vertical-align:1px}' +
+    '.rz-inspector-sec{margin:10px 0 2px;font:600 10px/1.3 IBM Plex Sans,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:#94a3b8}' +
+    '.rz-inspector-spark .ref{stroke:#94a3b8;stroke-dasharray:3 3}' +
     '.rz-inspector-v[data-basis-param]{cursor:pointer;text-decoration:underline dotted rgba(255,255,255,0.3)}' +
     '.rz-inspector-v[data-basis-param]::after,.rz-inspector-v[data-rz-authored-basis]::after{content:"";display:inline-block;width:5px;height:5px;border-radius:50%;margin-left:5px;vertical-align:middle;background:var(--rz-ev,#8fa2b8)}' +
     '.rz-inspector-v.state-run,.rz-inspector-v.state-online,.rz-inspector-v.state-up,.rz-inspector-v.state-dry,.rz-inspector-v.state-normal,.rz-inspector-v.state-float,.rz-inspector-v.state-coupled,.rz-inspector-v.state-armed,.rz-inspector-v.state-ok{color:#86efac}' +
@@ -436,7 +442,7 @@
         + ' data-evidence="' + esc(evOf(r.basis)) + '" tabindex="0" role="button" style="--rz-ev:' + evColor(evOf(r.basis)) + '" title="' + esc(r.basis + ' · ' + evOf(r.basis)) + '"';
     }
     var col = r.quality === 'simulated' ? '#b0678f' : r.quality === 'replay' ? '#d49a2a' : r.quality === 'state' ? '#7dd3fc' : '#8fa2b8';
-    return ' data-rz-authored-basis="' + esc(r.declared || '') + '" style="--rz-ev:' + col + '" title="' + esc((r.quality || 'declared').toUpperCase() + ' · ' + (r.declared || '')) + '"';
+    return ' data-rz-authored-basis="' + esc(r.declared || '') + '"' + (r.sim ? ' data-rz-sim="1"' : '') + ' style="--rz-ev:' + col + '" title="' + esc((r.quality || 'declared').toUpperCase() + ' · ' + (r.declared || '')) + '"';
   }
   function payloadRow(r) {
     var cls = 'rz-inspector-v' + (r.state ? ' state-' + esc(r.state) : '');
@@ -452,7 +458,9 @@
     var vals = s.filter(function (x) { return typeof x === 'number'; });
     var min = Math.min.apply(null, vals), max = Math.max.apply(null, vals), span = (max - min) || 1;
     var pts = s.map(function (v, i) { return (i / (n - 1) * 100).toFixed(2) + ',' + (v == null ? 32 : (32 - (v - min) / span * 28 + 2)).toFixed(2); }).join(' ');
+    var refY = typeof t.ref === 'number' ? Math.max(1, Math.min(33, 32 - (t.ref - min) / span * 28 + 2)) : null;
     return '<svg class="rz-inspector-spark" viewBox="0 0 100 34" preserveAspectRatio="none" aria-hidden="true">' +
+      (refY === null ? '' : '<line class="ref" x1="0" x2="100" y1="' + refY.toFixed(2) + '" y2="' + refY.toFixed(2) + '" vector-effect="non-scaling-stroke"/>') +
       '<polyline points="' + pts + '" fill="none" stroke="#7dd3fc" stroke-width="1.2" vector-effect="non-scaling-stroke"/></svg>';
   }
   function renderPayloadTab(p, tab) {
@@ -468,17 +476,19 @@
         return html || '<div class="rz-inspector-empty">No dependencies declared.</div>';
       }
       case 'alarms': {
-        if (!t.alarms || !t.alarms.length) { return '<div class="rz-inspector-empty">No active alarms for the selected scenario.</div>'; }
+        var pts = t.alarmPoints && t.alarmPoints.length ? '<div class="rz-inspector-sec">Configured alarm points</div>' + payloadRows(t.alarmPoints, '') : '';
+        if (!t.alarms || !t.alarms.length) { return '<div class="rz-inspector-empty">No active alarms for the selected scenario.</div>' + pts; }
         return t.alarms.map(function (a) {
           return '<div class="rz-inspector-alarm" data-rz-authored-basis="simulated alarm record from the selected scenario (quality: simulated), never a field event (Track A §A5)">' +
             '<div class="rz-inspector-dep-k">' + esc(a.severity) + ' · ' + esc(a.lifecycle) + '</div>' +
             '<div class="rz-inspector-dep-v">' + esc(a.tag) + ' / ' + esc(a.point) + '</div><div>' + esc(a.message) + '</div></div>';
-        }).join('');
+        }).join('') + pts;
       }
       case 'trend': {
         if (!t.trend) { return '<div class="rz-inspector-empty">No trend point declared.</div>'; }
         var last = t.trend.series[t.trend.series.length - 1];
         return '<div data-rz-authored-basis="' + esc(t.trend.declared) + '">' + row(t.trend.label, (last == null ? '—' : last) + (t.trend.unit ? ' ' + t.trend.unit : '')) + sparkline(t.trend) +
+          (t.trend.rows && t.trend.rows.length ? payloadRows(t.trend.rows, '') : '') +
           '<div class="rz-inspector-empty">' + esc(t.trend.series.length + ' ticks · ' + t.trend.declared) + '</div></div>';
       }
       case 'maint': return payloadRows(t.maint, 'No maintenance rows.');

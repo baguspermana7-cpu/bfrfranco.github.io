@@ -11,6 +11,43 @@ release sections rather than semver.
 
 ---
 
+## v3.66.0 — 2026-11-17 — Conventional cockpits: every symbol opens, the inspector is filled, one equipment modal
+
+### Added
+- **One payload builder for the Conventional P&ID sheets** (`js/conv/payloads.js`, 51 symbol classes). A click on any
+  tagged symbol of the chiller, fire, fuel and water sheets opens the inspector with all six tabs filled: the sheet's
+  own state rows, class readings, design basis from the engine registry, upstream/downstream equipment, configured
+  alarm points, a 60-tick trend with its reference line, and the maintenance task with its interval and standard.
+  Engine values carry the basis mark and open the basis drawer; seeded training values carry a visible `SIM` mark.
+- **One equipment modal** (`js/conv/equipment-modal.js`): "Open equipment HMI" in the inspector, or a double-click on
+  the symbol, opens the drawn symbol, readings, trend, design basis, operator guidance, alarms and maintenance.
+  Focus stays inside it, the page behind is inert, `Esc` closes it and focus returns to where it came from.
+
+### Fixed
+- **Chiller plant: 25 of 29 symbols did nothing on click.** Only CH-01…04 opened anything; pumps, transmitters,
+  valves, the expansion tank and the CRAH coils now open the inspector.
+- **Fire and fuel inspectors opened to a title and one row** (38 of 40 symbols had two rows or fewer, five tabs
+  empty). They now average 5.8–5.9 of 6 tabs with content.
+- **Chiller secondary supply could print colder than the primary header** (18.9 °C against 19.4 °C). The secondary
+  supply is the primary supply plus a non-negative blend term, so the floor is the primary temperature.
+- **A closing inspector swallowed the click on the next symbol** on a phone: while it slid out it still took the
+  pointer. A closed panel takes no pointer events.
+- Water sheet: symbols without a hand-written record (valves, transmitters, connectors) opened nothing; they open
+  the class record now, and the page's own engine rows still win tab by tab.
+
+### Gates
+- `tools/test-conv-payloads.mjs` (Node, 8 laws): class for every tagged symbol, six tabs with content, basis rows
+  resolve and equal the registry at the printed precision, everything else SIM or declared, same tick → same payload,
+  no random draw. Fails on a planted wrong registry id.
+- `tools/test-conv-equipment-modal.mjs`: 90 items over four pages at 390 and 1440 — open, focus trap, inert page,
+  `Esc`, focus return, no timer left, traced cells, no overflow. Fails 18 of 18 with the modal wiring removed.
+- `tools/test-conv-depth.mjs` is a ratchet now (`tools/conv-depth-thresholds.json`): chiller, fire, fuel and water are
+  strict on symbols that open, inspector depth and engine-hooked cells; the other five pages stay monitored.
+- `tools/test-conv-modal-no-self-repeat.mjs`: no modal on the nine Conventional pages repeats the sheet it was
+  opened from (0 found).
+- Not in this release: state colour and motion, trend/multitrend, the SLD from 150 kV, protection curves, network
+  modals — see `documentation/product-transformation/02-prds/PRD-CONV-LIVING-PLANT/PRD.md` (phases P1–P7).
+
 ## v3.65.3 — 2026-11-17 — datahallAI: on a phone the opened item of a schematic is in view
 
 ### Fixed

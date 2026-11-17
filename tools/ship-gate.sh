@@ -168,6 +168,12 @@ gate "Conventional text budget — no prose at rest, words within budget, drawin
 gate "Conventional HMI sheets — no text struck by a pipe, a zone border or a foreign body or outline (W3, C1-C5)" node tools/test-conv-sheet-text-clear.mjs
 gate "Conventional HMI sheets — flow, values and states follow evidence and quality; cmd/fb apart; marks without colour; every asset opens (W4 B1-B6)" node tools/test-conv-bms-truth.mjs
 gate "Conventional HMI sheets — alarm reaches its mark <= 250 ms, motion stops off screen; frame budgets reported (W4 B7)" node tools/test-conv-sheet-perf.mjs
+# v3.66.0 — PRD-CONV-LIVING-PLANT P0: the depth layer. One payload builder, one equipment modal, a ratchet on what a
+# click opens. Before it: chiller opened 4 of 29 symbols and 38 of 40 fire/fuel inspectors held <= 2 rows.
+gate "Conventional payloads — every symbol class: 6 tabs with content, basis rows resolve and equal the registry, rest SIM/declared, deterministic" node --test tools/test-conv-payloads.mjs
+gate "Conventional equipment modal — open, focus trap, inert page, Esc, focus return, no timers left, traced cells (390 + 1440)" node tools/test-conv-equipment-modal.mjs
+gate "Conventional depth ratchet — symbols open, inspector depth, engine-hooked cells (tools/conv-depth-thresholds.json)" node tools/test-conv-depth.mjs
+gate "Conventional modals — no modal repeats the sheet it was opened from (owner C10)" node tools/test-conv-modal-no-self-repeat.mjs
 # v3.21.9 — the reveal gate existed but was never wired, so it went stale for five releases (it
 # still expected four floor views after the building became six levels). Every building level must
 # open its own floor plan.

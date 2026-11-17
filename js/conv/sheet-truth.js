@@ -105,7 +105,28 @@
   var VALUE_LABEL = { st: 'State', cmd: 'Command', q: 'Flow', p: 'Pressure', lvl: 'Level', vol: 'Volume', dur: 'Autonomy',
     pct: 'Level', use: 'Usable', mw: 'Load' };
   function endNode(end) { return typeof end === 'string' ? end.split('.')[0] : null; }
+  /* D-1 (CONV_EXECUTION_PLAN_2026-11-16 AD1): js/conv/payloads.js is the builder now; this keeps the old call shape.
+     Without payloads.js loaded the legacy body below still answers, so no page breaks on a missing script. */
+  function sheetsOf(edges) {
+    var out = null;
+    Object.keys(root).forEach(function (k) {
+      if (out || !/^RZ[A-Za-z]+Sheets$/.test(k)) return;
+      var S = root[k]; if (!S) return;
+      Object.keys(S).forEach(function (sk) { if (!out && S[sk] && S[sk].edges === edges) out = S[sk]; });
+    });
+    return out;
+  }
   function sheetPayload(o) {
+    if (root.RZConvPayloads) {
+      var sh = o.nodes ? null : sheetsOf(o.edges);
+      var x = {}; Object.keys(o).forEach(function (k) { x[k] = o[k]; });
+      x.page = o.page || o.classId; x.nodes = o.nodes || (sh ? sh.nodes : []);
+      if (typeof x.tick !== 'number') x.tick = Math.floor(Date.now() / 4000);
+      return root.RZConvPayloads.build(x);
+    }
+    return legacyPayload(o);
+  }
+  function legacyPayload(o) {
     var n = o.node, r = o.read || {}, values = r.values || {}, live = [], alarms = [];
     var tag = n.tag || n.id, quality = { good: 'measured', stale: 'stale', bad: 'bad', nodata: 'no data' };
     Object.keys(values).forEach(function (k) {
@@ -138,14 +159,34 @@
     };
   }
   /* open(n, api, el) handler for RZHmiSheet: inspector beside the sheet; focus returns to the symbol on close */
+  /* AD5: "Open equipment HMI" in the inspector, or a double-click on the symbol, opens the deep modal
+     (js/conv/equipment-modal.js) on the same payload, refreshed every 4 s while it is open. */
+  function deep(build, n, trigger, sym) {
+    if (!root.RZConvModal) return false;
+    var p = build(n); if (!p) return false;
+    return root.RZConvModal.open(p, { trigger: trigger, symbol: sym, rebuild: function () { return build(n); } });
+  }
+  var DBL = {};
   function opener(build, hostSel) {
+    var last = {};
+    if (!DBL[hostSel] && root.document) {
+      DBL[hostSel] = 1;
+      root.document.addEventListener('dblclick', function (e) {
+        var g = e.target && e.target.closest ? e.target.closest(hostSel + ' .hmi-node[data-node]') : null;
+        if (!g || !last.n || last.n.id !== g.getAttribute('data-node')) return;
+        e.preventDefault(); deep(build, last.n, g, g);
+      }, true);
+    }
     return function (n, api, el) {
+      last.n = n;
       if (!root.RZInspector || typeof root.RZInspector.openPayload !== 'function') return;
       var payload = build(n); if (!payload) return;
-      root.RZInspector.openPayload(payload, { trigger: el, onNavigate: function (id) {
-        var t = document.querySelector(hostSel + ' .hmi-node[data-node="' + id + '"]');
-        if (t && t.dispatchEvent) t.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-      } });
+      root.RZInspector.openPayload(payload, { trigger: el,
+        onOpenHmi: function (p, btn) { deep(build, n, btn, el); },
+        onNavigate: function (id) {
+          var t = document.querySelector(hostSel + ' .hmi-node[data-node="' + id + '"]');
+          if (t && t.dispatchEvent) t.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+        } });
     };
   }
   /* B4: alarm, acknowledged and selected stay distinguishable without colour. An asset in alarm carries a drawn

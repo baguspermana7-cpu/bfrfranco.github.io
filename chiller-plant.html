@@ -553,7 +553,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
         ]
     }
     </script>
-    <script src="js/rz-version.js?v=20261117-7a5ada93" defer></script>
+    <script src="js/rz-version.js?v=20261117-f6183154" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- Conventional BMS single scenario engine — single source of truth for the
@@ -566,7 +566,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
     <script src="js/rz-engine-versions.js?v=20261110-a5518a77"></script>
     <script src="js/conv-engine.js?v=2.2.0"></script>
     <!-- v1.134.2 — generated parameter registry + the shared basis drawer. -->
-    <script src="js/conv-parameters.js?v=20261115-5f46ff93"></script>
+    <script src="js/conv-parameters.js?v=20261117-283a6ef8"></script>
     <!-- v1.134.25 — RZExplain, the site glossary engine. The cockpits were the only
          substantial pages carrying none of it, so terms an operator has to read
          (approach temperature, cycles of concentration, N+1, WUE) had nowhere to go.
@@ -587,13 +587,15 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
     <script src="js/rz-eng-symbols.js?v=20261115-b780482c"></script>
     <script src="js/rz-hmi-sheet.js?v=20261117-646bccf7"></script>
     <script src="js/conv/chiller-sheet.js?v=20261115-d7f3f3c6"></script>
-    <script src="js/conv/sheet-truth.js?v=20261115-438fc2a7"></script>
+    <script src="js/conv/sheet-truth.js?v=20261117-bdf6882a"></script>
+    <script src="js/conv/payloads.js?v=20261117-500c9796"></script>
+    <script src="js/conv/equipment-modal.js?v=20261117-1728631b"></script>
     <!-- v1.43.1 — Right-side inspector extended to chiller-plant. Click any
          tagged pipe to see Live/Capacity/Deps/Alarms/Trend/Maint tabs without
          occluding topology. Closes review doc-27 §3.2 P0 cross-page parity. -->
     <!-- v1.43.4 — alarm state machine + color discipline (review §3.3 + §4.3). -->
     <script src="js/rz-alarm-state.js?v=20260920-a912ad23" defer></script>
-    <script src="js/rz-inspector.js?v=20261113-3c562e79" defer></script>
+    <script src="js/rz-inspector.js?v=20261117-2f28b242" defer></script>
     <!-- v1.43.2 — Data-quality service: top-banner + per-element chip integration. -->
     <script src="js/rz-telemetry-quality.js?v=20261113-8feb0dfd" defer></script>
     <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
@@ -1076,7 +1078,10 @@ const LOOP_FLOW_DESIGN = (CHW.flowPerMachine != null)
   : ((CHW.flow != null && ENGINE_CHILLERS_RUNNING) ? CHW.flow / ENGINE_CHILLERS_RUNNING : null);
 const LOOP_FLOW_MIN = LOOP_FLOW_DESIGN != null ? r1(LOOP_FLOW_DESIGN * 0.55) : 0;
 const LOOP_FLOW_MAX = LOOP_FLOW_DESIGN != null ? r1(LOOP_FLOW_DESIGN * 1.15) : 24;
-const LOOP_T1_MIN = CHW.chws != null ? r1(CHW.chws - 1.6) : 16;
+/* D9 (CONV audit 2026-11-16): a secondary supply is the primary CHWS plus a non-negative blend term
+   (T_sec_sup = T_prim_sup + mixing_k, mixing_k >= 0 — the decoupler can only mix warmer return water in).
+   The old floor CHWS - 1.6 K let the modal print 18.9 °C against a 19.4 °C primary: colder water from nowhere. */
+const LOOP_T1_MIN = CHW.chws != null ? r1(CHW.chws) : 16;
 const LOOP_T1_MAX = CHW.chws != null ? r1(CHW.chws + 1.6) : 22.5;
 const LOOP_T2_MIN = (CHW.chws != null && CHW.dt != null) ? r1(CHW.chws + CHW.dt - 1.8) : 20.8;
 const LOOP_T2_MAX = (CHW.chws != null && CHW.dt != null) ? r1(CHW.chws + CHW.dt + 1.8) : 25.0;
@@ -1101,7 +1106,7 @@ function rescaleLoopsToEngine(loops) {
     const spread = (i - 1.5) * 0.4;           // deterministic, symmetric about the design point
     return Object.assign({}, lp, {
       flow: r1(perLoopFlow + spread * 2),
-      t1: r1(CHW.chws + spread * 0.25),
+      t1: r1(CHW.chws + Math.abs(spread) * 0.25),   /* mixing_k >= 0 (D9) */
       t2: r1(CHW.chws + CHW.dt + spread * 0.35),
     });
   });
@@ -1563,11 +1568,20 @@ function chwBranchFlow(pump) {
   return chwPointFlow('ch' + pump.slice(2) + ':q');
 }
 
-function chwOpen(n){
+/* D-2 (CONV_EXECUTION_PLAN_2026-11-16): every symbol on the P&ID opens the inspector through js/conv/payloads.js;
+   "Open equipment HMI" or a double-click opens the deep modal (js/conv/equipment-modal.js). The loop modal of the
+   four chillers stays one click further: its operator controls (compressor staging, pump changeover) are not
+   part of the equipment payload. */
+const chwInspect = (T4 && T4.opener) ? T4.opener(function (n) {
+  const sheet = chwSheetMode === 'unavailable' ? window.RZChillerSheets.unavailable : window.RZChillerSheets.pid;
+  return T4.sheetPayload({ classId: 'chiller', node: n, read: chwRead(n), store: chwPoints, edges: sheet.edges, nodes: sheet.nodes,
+    declared: 'CH-M-101 simulated chiller plant (engine planes + authored operating state; no field device is read)',
+    scenario: CHW_AUTHORITY_AVAILABLE ? 'design point' : 'authority unavailable' });
+}, '#chw-sheet-host') : null;
+function chwOpen(n, api, el){
+  if(chwInspect) chwInspect(n, api, el);
   const lp = chwLoopOf(n.id);
-  if(!lp || !CHW_AUTHORITY_AVAILABLE) return;
-  openModal(lp.id);
-  if(window.RZBMSShell && typeof updateLoopInspector === 'function') updateLoopInspector(lp.id);
+  if(lp && CHW_AUTHORITY_AVAILABLE && window.RZBMSShell && typeof updateLoopInspector === 'function') updateLoopInspector(lp.id);
 }
 function mountChwSheet(mode){
   const host = $('chw-sheet-host');

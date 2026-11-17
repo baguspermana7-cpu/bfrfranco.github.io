@@ -1,6 +1,6 @@
 # PRD-CONV-LIVING-PLANT — the Conventional cockpits as a living plant
 
-Status: **DRAFT for owner approval (2026-11-17). Nothing in this PRD is executed until the owner says go.**
+Status: **APPROVED 2026-11-17 — the owner delegated the open decisions ("kamu yang tentukan yang terbaik"); the §14 defaults stand.**
 Scope: the 9 DC Conventional pages (`dc-conventional`, `datahall`, `chiller-plant`, `water-system`, `fire-system`,
 `fuel-system`, `ict`, `EPMS_Telemetry`, `cdu-mini-bms`). `datahallAI.html` and `js/datahall-ai/*` are out of scope.
 Supersedes the order of work in `standarization/Audit result/CONV_EXECUTION_PLAN_2026-11-16.md` (its engine and
@@ -551,5 +551,6 @@ motion), `manual/*.html` of each page, this PRD's status table.
 
 | phase | status |
 |---|---|
-| P0 | BUILT, not released (`conv-w6` @ `ce8fa84d7`); awaiting OD-8 |
-| P1–P7 | NOT STARTED — awaiting owner approval of this PRD |
+| P0 | SHIPPED v3.66.0. C10 probed on all 9 Conventional pages: 0 modals repeat their sheet (gate `test-conv-modal-no-self-repeat.mjs`). The only "SCADA" block is on `datahallAI.html` (`js/datahall-ai/hmi-sheets.js`), which belongs to the LTC session — reported there, not edited here. |
+| P1 | NEXT — VFX core on the chiller plant |
+| P2–P7 | NOT STARTED |

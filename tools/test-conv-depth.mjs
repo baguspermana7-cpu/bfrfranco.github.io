@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-/* test-conv-depth.mjs — MONITOR (exit 0; prints the baseline). Per conv cockpit, in the authorised audit state at 1440,
+/* test-conv-depth.mjs — RATCHET (pages listed in tools/conv-depth-thresholds.json are STRICT; the rest MONITOR). Per conv cockpit, in the authorised audit state at 1440,
    measure what the operator actually gets:
    T  traceability — visible numerals: hooked to a registry id (data-basis-param), declared only
       (data-rz-authored-basis), or bare; plus whether a visible evidence mark sits beside hooked ones
@@ -100,10 +100,13 @@ for (const page of PAGES) {
     const after = await pg.evaluate((s) => document.querySelectorAll(s).length, OPEN_SEL);
     const opened = ok && after > before;
     const insp = await pg.evaluate(async () => { const a = document.querySelector('aside.rz-inspector.open, .rz-inspector.open'); if (!a) return null;
-      const res = { tabs: 0, live: 0, basis: a.querySelectorAll('[data-basis-param]').length };
+      const res = { tabs: 0, live: 0, basis: 0 };
       for (const t of a.querySelectorAll('[role=tab]')) { t.click(); await new Promise((r) => setTimeout(r, 50));
-        const body = a.querySelector('[role=tabpanel]:not([hidden])') || a; const n = body.querySelectorAll('tr, li, [class*="row"]').length;
-        if (/live/i.test(t.textContent)) res.live = n; if (n > 1) res.tabs++; }
+        const body = a.querySelector('[role=tabpanel]:not([hidden])') || a;
+        /* content = value rows, dependency cards or alarm cards (a DEPS tab has no rows, only cards) */
+        const n = body.querySelectorAll('tr, li, [class*="row"], .rz-inspector-dep, .rz-inspector-alarm').length;
+        res.basis += body.querySelectorAll('[data-basis-param]').length;
+        if (/live/i.test(t.textContent)) res.live = n; if (n >= 1) res.tabs++; }
       return res; });
     if (insp) { M.insp = M.insp || { n: 0, liveLe2: 0, tabsSum: 0, basis: 0 }; M.insp.n++; if (insp.live <= 2) M.insp.liveLe2++; M.insp.tabsSum += insp.tabs; M.insp.basis += insp.basis; }
     const ps = (M.perSvg[c.svg] = M.perSvg[c.svg] || { n: 0, open: 0 }); ps.n++;
@@ -126,4 +129,21 @@ for (const page of PAGES) {
 }
 await browser.close(); srv.close();
 if (OUT) fs.writeFileSync(OUT, JSON.stringify(report, null, 1));
-console.log('\nCONV DEPTH — MONITOR (baseline printed; no thresholds enforced yet)');
+/* GD ratchet: a page with an entry in tools/conv-depth-thresholds.json fails below it; a page without one stays MONITOR.
+   Entries only ever rise (the D-2..D-5 work raises them as pages land). */
+const TH = JSON.parse(fs.readFileSync(path.join(ROOT, 'tools/conv-depth-thresholds.json'), 'utf8')).pages || {};
+const fails = [];
+for (const [page, r] of Object.entries(report)) {
+  const th = TH[page]; if (!th) continue;
+  const M = r.M, T = r.T, I = M.insp || { n: 0, liveLe2: 0, tabsSum: 0, basis: 0 };
+  const chk = (ok, what) => { if (!ok) fails.push(page + ': ' + what); };
+  if (th.openedPct != null) chk(M.clicked && 100 * M.opened / M.clicked >= th.openedPct, `opened ${M.opened}/${M.clicked} < ${th.openedPct} %`);
+  if (th.liveLe2Max != null) chk(I.liveLe2 <= th.liveLe2Max, `LIVE <= 2 rows on ${I.liveLe2} > ${th.liveLe2Max}`);
+  if (th.avgTabsMin != null) chk(I.n && I.tabsSum / I.n >= th.avgTabsMin, `avg tabs ${(I.tabsSum / Math.max(1, I.n)).toFixed(1)} < ${th.avgTabsMin}`);
+  if (th.bareMax != null) chk(T.bare <= th.bareMax, `bare numerals ${T.bare} > ${th.bareMax}`);
+  if (th.labelTipPct != null) chk(T.labels && 100 * T.tipLabel / T.labels >= th.labelTipPct, `label tooltips ${T.tipLabel}/${T.labels} < ${th.labelTipPct} %`);
+  if (th.inspectorBasisMin != null) chk(I.basis >= th.inspectorBasisMin, `inspector basis cells ${I.basis} < ${th.inspectorBasisMin}`);
+}
+const strict = Object.keys(report).filter((p) => TH[p]);
+if (fails.length) { console.log('\n' + fails.join('\n')); console.log(`\nCONV DEPTH — FAIL (${fails.length} below threshold; strict pages: ${strict.join(', ')})`); process.exit(1); }
+console.log(`\nCONV DEPTH — PASS (strict: ${strict.join(', ') || 'none'}; MONITOR: ${Object.keys(report).filter((p) => !TH[p]).join(', ') || 'none'})`);

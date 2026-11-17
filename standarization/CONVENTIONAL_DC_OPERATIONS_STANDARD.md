@@ -320,6 +320,27 @@ Before release:
 
 ## 10. Change and lesson ledger
 
+### 2026-11-17 — equipment inspection contract (v3.66.0, PRD-CONV-LIVING-PLANT P0)
+
+- **Every tagged symbol opens.** A click (or Enter) on a tagged symbol of a governed sheet opens the right-side
+  inspector; "Open equipment HMI" or a double-click opens the equipment modal. A pointer cursor without an action
+  is a defect.
+- **One builder, one modal.** Payloads come from `js/conv/payloads.js` (class table); pages do not hand-build
+  inspector rows. A page with richer engine reads passes them through `RZConvPayloads.merge()`. The modal is
+  `js/conv/equipment-modal.js`; no page adds its own.
+- **Six tabs, none empty.** LIVE ≥ 4 rows; CAPACITY from the registry; DEPS from the drawing's own edges; ALARMS =
+  active events plus the configured alarm points; TREND = 60 seeded ticks with a reference line; MAINT = task,
+  interval, standard, and a last-test line labelled TRAINING RECORD.
+- **Every row is traced.** `basis` (registry id, evidence mark, opens the basis drawer), or `sim: true` (visible SIM
+  mark), or `declared` (≥ 40 characters). A basis id that does not resolve prints UNAVAILABLE and fails the gate.
+- **A modal never repeats the sheet it was opened from.**
+- **Lesson.** The audit-state harness strips `inert` through its auth-blocker observer, so a gate that reads `inert`
+  reports the harness. The modal marks what it inerted with `data-rz-cvm-inert`; the gate reads that.
+- **Lesson.** A panel that slides out still receives pointer events during the slide; the next tap lands on it.
+  Closed panels get `pointer-events: none`.
+- Gates: `test-conv-payloads.mjs`, `test-conv-equipment-modal.mjs`, `test-conv-depth.mjs` (ratchet,
+  `tools/conv-depth-thresholds.json`: numbers only rise), `test-conv-modal-no-self-repeat.mjs`.
+
 ### 2026-08-30 — operator cockpit truth, scope and responsive reachability
 
 | Symptom | Root cause | Decision / prevention | Reusable lesson |
