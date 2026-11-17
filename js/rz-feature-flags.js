@@ -568,9 +568,9 @@ window._rzFeatures = (function () {
       if (!raw) return 'free';
       var s = JSON.parse(raw);
       if (!s || !s.email) return 'free';
-      if (s.role === 'root') return 'root';
+      /* without auth.js nothing can prove a privileged role: the record is client-written, so it is worth at most
+         the paywall tier (v3.64.0, audit S1) */
       var email = String(s.email).toLowerCase();
-      if (email.indexOf('admin@') === 0 || email.indexOf('bagus@') === 0) return 'root';
       if (email.indexOf('demo@') === 0) return 'demo';
       /* Any other authenticated session is treated as pro */
       return 'pro';
@@ -593,7 +593,8 @@ window._rzFeatures = (function () {
       var raw = localStorage.getItem('rz_premium_session');
       if (!raw) return '';
       var s = JSON.parse(raw);
-      return (s && s.role) || '';
+      var r = (s && s.role) || '';
+      return r === 'root' || r === 'educator' ? 'pro' : r;   // unproven without auth.js (v3.64.0, audit S1)
     } catch (e) { return ''; }
   }
 

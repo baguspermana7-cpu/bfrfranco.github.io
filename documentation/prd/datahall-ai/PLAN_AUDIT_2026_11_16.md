@@ -127,9 +127,9 @@ Order: W0 → W1 → W2 → W3 → W4 → W5 → W6. A HIGH found mid-wave preem
 
 | Wave | Release | Fixes | Depends on | Size |
 |---|---|---|---|---|
-| W0 | v3.63.2 | S0 + this plan + honest CHANGELOG (S1 named as open) | gate green | in flight |
-| W1 | v3.63.3 | C1–C10, S3, S4 | W0 pushed | 11 cards, 1 gate |
-| W2 | v3.64.0 | S1, S2, (S5) | W1; peer notified (shared `auth.js`) | Opus only, 1 gate |
+| W0 | v3.63.2 | S0 + this plan + honest CHANGELOG (S1 named as open) | gate green | shipped 2d8d4a935 |
+| W1 | v3.63.3 | C1–C10, S3, S4 | W0 pushed | shipped 34039abfb (laws L1–L5, L7, L9; C6 and the mimic by reading) |
+| W2 | v3.64.0 | S1 for root and educator (Z1–Z3). Open: Pro tier from the record, S2, S5, inline gates of dc-conventional and the LTC modelling lab | W1 | Opus only, 1 gate |
 | W3 | v3.64.1 | U1–U6 | D1 | 4 cards, 1 gate |
 | W4 | v3.65.0–.2 | 15 missing + 9 thin L3 | W1 (C1 leak multiplies with more modals) | 3 batches, 3 gates |
 | W5 | v3.66.0 | E1–E3 | W4 (moves the code W4 edits) | 1 design + ~6 cards |

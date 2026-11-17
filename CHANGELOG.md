@@ -11,6 +11,36 @@ release sections rather than semver.
 
 ---
 
+## v3.64.0 — 2026-11-17 — sign-in: root and educator need a Supabase proof, a hand-written session record grants neither
+
+### Security
+- **A hand-written session record no longer gives root or educator access.** The record in the browser's localStorage
+  (`rz_premium_session`) is written by the client. `auth.js` took the role from it: typing `role: "root"`, a root email
+  or `role: "educator"` into it opened every page gated by `enforceTierFeatureAccess` (64 pages, DC AI among them) and
+  the root-only links, with nobody signed in. Reproduced in a browser before the fix (6 of 7 variants opened DC AI).
+  Now `root` and `educator` are granted only to the account Supabase's server confirms is signed in on that page load
+  (`getUser()`, which sends the token to the server — not `getSession()`, which only reads a token the visitor can
+  write: the first version of this fix took that as proof and the review of it opened root with a forged token); an
+  unproven record is worth the Pro tier at most, and a record that names a root email without a proof is removed. A
+  proof for a different account than the record names does not count. The `v2` flag and a token-shaped key no longer
+  skip the check.
+- While Supabase has not answered yet, a gated page stays locked without a login prompt; the gate runs again when the
+  answer arrives, so a signed-in root or educator sees no prompt.
+- `js/rz-feature-flags.js` without auth.js: the fallback reader no longer returns `root` or `educator` from the record.
+
+### Still open
+- A hand-written record still gives the **Pro** tier (calculator Pro features). The page content is static HTML either
+  way; a real boundary needs server-side delivery (owner decision D3).
+- `dc-conventional.html` and `ltc-system-modelling-lab.html` carry their own inline gate that unlocks from the record
+  before auth.js decides (root email fast path / direct reader). Not changed here: pages of another work stream.
+- The Supabase client is loaded from a CDN without an integrity hash (S2). The offline demo account stays (S5, D2).
+
+### Gates
+- `tools/test-dh-operator.mjs` Z1 (seven hand-written records, nobody signed in: all locked), Z2 (the proven root still
+  opens, no prompt left open), Z3 (a proof for another account does not count), Z4 (a forged local token is not a
+  proof). Z1 and Z3 fail on v3.63.3; Z4 fails on the first version of this fix.
+- Standard: `standarization/AUTH_STANDARD.md`, "Privileged roles need a proof".
+
 ## v3.63.3 — 2026-11-17 — datahallAI: closed drawings are released, hall SLD items read their own hall, fire register and tray fixes
 
 ### Fixed

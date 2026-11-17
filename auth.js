@@ -259,14 +259,58 @@
         return ROOT_EMAILS.indexOf(String(email || '').toLowerCase().trim()) !== -1;
     }
     function isRootAccess(session) {
-        return !!(session && isRootEmail(session.email));
+        return getRoleFromSession(session) === 'root';
     }
     function isRootSession() {
         return isRootAccess(getSession());
     }
+    /* PRIVILEGED ROLES NEED PROOF (v3.64.0, audit 2026-11-16 S1). The session record in localStorage is written by
+       the client: anyone can type {role:"root"} or a root email into it. `root` and `educator` are therefore granted
+       only to the account Supabase proves is signed in on THIS page load (`proven`, set by proveIdentity() or by a
+       successful Supabase sign-in). Unproven, such a record is worth `pro` — the paywall tier, never an admin or
+       educator boundary. The Worker path (rz_auth_v2 / rz_auth_gw) is not a proof: both keys are client-written. */
+    var proven = null;          /* { email, role } from Supabase, or null */
+    var proofState = 'idle';    /* 'idle' | 'pending' | 'done' */
+    function normEmail(e) { return String(e || '').toLowerCase().trim(); }
+    function claimedRole(session) { return session ? (session.role || detectRole(session.email)) : ''; }
+    function isPrivileged(role) { return role === 'root' || role === 'educator'; }
     function getRoleFromSession(session) {
         if (!session) return '';
-        return session.role || detectRole(session.email);
+        var claim = claimedRole(session);
+        /* a root EMAIL is a root claim whatever the role field says */
+        if (detectRole(session.email) === 'root') claim = 'root';
+        if (!isPrivileged(claim)) return claim;
+        if (proven && proven.email === normEmail(session.email)) return proven.role;
+        return 'pro';
+    }
+    /* true until Supabase has answered for a record that claims a privileged role (also before init() ran) */
+    function proofPending() {
+        if (proofState === 'done') return false;
+        var s = getSession();
+        return !!s && (isPrivileged(claimedRole(s)) || detectRole(s.email) === 'root');
+    }
+    /* Who Supabase's SERVER says is signed in. getUser() sends the token to /auth/v1/user; getSession() only reads
+       the sb-*-auth-token key from localStorage, which a visitor can write (a forged token named a root email and was
+       taken as proof — review of v3.64.0). Resolves { email, unknown }: unknown = the server could not be asked. */
+    function serverUser(supa) {
+        var none = function (unknown) { return { email: '', unknown: !!unknown }; };
+        try {
+            if (supa && supa.client && supa.client.auth && typeof supa.client.auth.getUser === 'function') {
+                return Promise.resolve(supa.client.auth.getUser()).then(function (r) {
+                    var u = r && r.data && r.data.user, err = r && r.error;
+                    if (u && u.email) return { email: normEmail(u.email), unknown: false };
+                    return none(!!err && (!err.status || err.status >= 500 || /fetch|network|retry/i.test(String(err.name || '') + ' ' + String(err.message || ''))));
+                }, function () { return none(true); });
+            }
+            if (supa && typeof supa.getUser === 'function') {
+                return Promise.resolve(supa.getUser()).then(function (u) { return u && u.email ? { email: normEmail(u.email), unknown: false } : none(false); }, function () { return none(true); });
+            }
+        } catch (e) {}
+        return Promise.resolve(none(true));
+    }
+    function setProven(email, role) {
+        proven = email ? { email: normEmail(email), role: role || 'pro' } : null;
+        proofState = 'done';
     }
     function normalizePathFromHref(href) {
         if (!href) return '';
@@ -875,8 +919,9 @@
 
             var rescueLink = ' <a href="#" onclick="event.preventDefault();if(navigator.serviceWorker){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()});});}if(window.caches){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})});}localStorage.removeItem(\'rz_premium_session\');localStorage.removeItem(\'rz_auth_v2\');localStorage.removeItem(\'rz_auth_gw\');localStorage.removeItem(\'rz_auth_csrf\');setTimeout(function(){location.reload()},500);return false;" style="color:#FFC44D;text-decoration:underline;cursor:pointer">Try fresh reload</a>';
             function _showErr(msg) { if (!errorEl) return; errorEl.innerHTML = msg + rescueLink; errorEl.classList.add('show'); }
-            function _finish(u) {
+            function _finish(u, fromSupabase) {
                 if (errorEl) { errorEl.classList.remove('show'); errorEl.textContent = ''; }
+                if (fromSupabase) setProven(u.email, u.role); else setProven(null);
                 setSession(u.email, u.tier, u.role);
                 if (formEl) formEl.style.display = 'none';
                 if (tierLabel) tierLabel.textContent = 'Access Activated';
@@ -922,10 +967,10 @@
                         return supa.getProfile().then(function (pr) {
                             var tier = (pr && pr.data && pr.data.tier) || 'pro';
                             return resolveServerRole(supa, emailNorm).then(function (role) {
-                                _finish({ email: emailNorm, tier: tier, role: role });
+                                _finish({ email: emailNorm, tier: tier, role: role }, true);
                             });
                         }).catch(function () {
-                            _finish({ email: emailNorm, tier: 'pro', role: detectRole(emailNorm) });
+                            _finish({ email: emailNorm, tier: 'pro', role: detectRole(emailNorm) }, true);
                         });
                     });
                 }
@@ -951,6 +996,7 @@
                local mirror even if the revoke call fails. */
             if (AUTH_V2) {
                 logoutV2().then(function () {
+                    proven = null;
                     updateAuthUI();
                     var dropdown = document.getElementById('rzUserDropdown');
                     if (dropdown) dropdown.classList.remove('show');
@@ -962,7 +1008,7 @@
                 });
                 return;
             }
-            clearSession();
+            clearSession(); proven = null;
             updateAuthUI();
             var dropdown = document.getElementById('rzUserDropdown');
             if (dropdown) dropdown.classList.remove('show');
@@ -1051,6 +1097,13 @@
 
             var allowed = lastGate.allowed;
 
+            if (!allowed && proofPending()) {
+                /* the stored record claims a privileged role and Supabase has not answered yet: stay locked, no
+                   prompt; afterProof() runs this gate again */
+                if (typeof document !== 'undefined' && document.body) document.body.classList.add('locked');
+                return false;
+            }
+
             if (allowed) {
                 if (typeof document !== 'undefined' && document.body) {
                     document.body.classList.remove('locked');
@@ -1132,18 +1185,20 @@
             if (!hasSupabaseToken()) return;                   // not Supabase-logged-in
             ensureSupabase().then(function () {
                 var supa = window.rzSupa;
-                if (!supa || typeof supa.getSession !== 'function') return;
-                Promise.resolve(supa.getSession()).then(function (sess) {
-                    var email = sess && sess.user && sess.user.email;
+                if (!supa) return;
+                serverUser(supa).then(function (who) {
+                    var email = who.email;
                     if (!email) return;
                     email = String(email).toLowerCase().trim();
                     var role = detectRole(email);
                     var finish = function (tier) {
                         resolveServerRole(supa, email).then(function (r) {
+                            setProven(email, r);
                             setSession(email, tier || (role === 'demo' ? 'demo' : 'pro'), r);
                             updateAuthUI();
                             updateRootOnlyLinksUI();
                             try { window.dispatchEvent(new Event('rz-auth-change')); } catch (e) {}
+                            if (lastGate) window._rzAuth.enforceTierFeatureAccess(lastGate.key);
                         });
                     };
                     if (typeof supa.getProfile === 'function') {
@@ -1156,13 +1211,59 @@
         } catch (e) {}
     }
 
+    /* Ask Supabase who is signed in, once per page load, when the stored record claims a privileged role. Until it
+       answers, a gated page stays locked without a prompt; then the gate runs again with the proven role. */
+    function afterProof() {
+        updateAuthUI();
+        updateRootOnlyLinksUI();
+        try { window.dispatchEvent(new Event('rz-auth-change')); } catch (e) {}
+        if (lastGate) {
+            var ok = window._rzAuth.enforceTierFeatureAccess(lastGate.key);
+            if (ok && typeof window._rzAuth.hideModal === 'function') window._rzAuth.hideModal();
+        }
+    }
+    function proveIdentity() {
+        var s = getSession();
+        var claim = s ? claimedRole(s) : '';
+        if (s && detectRole(s.email) === 'root') claim = 'root';
+        if (!s || !isPrivileged(claim)) { proofState = 'done'; return; }
+        proofState = 'pending';
+        /* answered = Supabase's server said who is (or that nobody is) signed in; not answered = it could not be
+           asked (offline, module blocked): the record is kept, its privileged role stays unproven */
+        var fail = function (answered) {
+            proven = null; proofState = 'done';
+            var cur = getSession();
+            if (answered === true && cur && normEmail(cur.email) === normEmail(s.email)) {
+                if (detectRole(cur.email) === 'root') { clearSession(); }
+                else { cur.role = 'pro'; try { localStorage.setItem('rz_premium_session', JSON.stringify(cur)); } catch (e) {} }
+            }
+            afterProof();
+        };
+        try {
+            ensureSupabase().then(function (supa) {
+                if (!supa || !supa.configured) return fail(false);
+                return serverUser(supa).then(function (who) {
+                    if (!who.email || who.email !== normEmail(s.email)) return fail(!who.unknown);
+                    return resolveServerRole(supa, who.email).then(function (role) {
+                        setProven(who.email, role);
+                        var cur = getSession();
+                        if (cur && normEmail(cur.email) === who.email && cur.role !== role) {
+                            cur.role = role; try { localStorage.setItem('rz_premium_session', JSON.stringify(cur)); } catch (e) {}
+                        }
+                        afterProof();
+                    });
+                });
+            }).catch(function () { fail(false); });
+        } catch (e) { fail(false); }
+    }
+
     /* Re-check the educator role of an existing session against the server (at most every 10 min per
        tab, after first paint). A session that says 'educator' without a Supabase login is downgraded:
        that role could only have come from the retired client-side list. */
     function syncServerRole() {
         try {
             var s = getSession();
-            if (!s || s.v2 || (s.role !== 'pro' && s.role !== 'educator')) return;
+            if (!s || (s.role !== 'pro' && s.role !== 'educator')) return;
             if (detectRole(s.email) !== 'pro') return;
             var apply = function (role) {
                 var cur = getSession();
@@ -1178,12 +1279,14 @@
             if (Date.now() - last < 600000 && Date.now() >= last) return;
             ensureSupabase().then(function (supa) {
                 if (!supa || !supa.configured) return;
-                return Promise.resolve(supa.getSession()).then(function (sess) {
-                    var em = sess && sess.user && String(sess.user.email || '').toLowerCase().trim();
+                return serverUser(supa).then(function (who) {
+                    var em = who.email;
                     if (!em || em !== String(s.email).toLowerCase().trim()) return;
                     return resolveServerRole(supa, em).then(function (role) {
                         try { sessionStorage.setItem('rz_role_checked_v1', String(Date.now())); } catch (e) {}
+                        setProven(em, role);
                         apply(role);
+                        if (lastGate) window._rzAuth.enforceTierFeatureAccess(lastGate.key);
                     });
                 });
             }).catch(function () {});
@@ -1199,6 +1302,7 @@
         updateAuthUI();
         updateRootOnlyLinksUI();
         rehydrateFromSupabase();
+        proveIdentity();
         setTimeout(syncServerRole, 0);
         /* Phase 3: when flag is on, refresh the local mirror from the
            Worker once per page-load. hydrateSessionFromWorker() resolves

@@ -21,6 +21,8 @@
  *      ≤ 20 ms at 1440 and ≤ 34 ms at 390 with 4x CPU throttle (headless Chrome, software compositing); alarm source
  *      change -> badge on the sheet < 500 ms
  *   O8 reduced motion: with prefers-reduced-motion: reduce no flow path animates
+ *   Z1 a hand-written session record (root / educator role, root email, v2 flag, token-shaped key) opens nothing while
+ *      nobody is signed in at Supabase · Z2 the proven root still opens · Z3 a proof for another account does not count
  *   A1 fail closed: with auth.js blocked and a forged root session in localStorage the page stays locked (the gate
  *      never unlocks from a client-written record; only _rzAuth decides)
  *   A2 a signed-in Pro session (Supabase module stub, no audit helper) still opens the page
@@ -33,7 +35,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import puppeteer from 'puppeteer';
 import { enterAuthorizedAuditState } from './lib/cockpit-audit-state.mjs';
-import { isSupabaseModule, signedInStorage, signedInSupabaseBody } from './lib/signed-in-supabase.mjs';
+import { isSupabaseModule, signedInStorage, signedInSupabaseBody, signedOutSupabaseBody, forgedTokenSupabaseBody } from './lib/signed-in-supabase.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.webp': 'image/webp', '.woff2': 'font/woff2' };
@@ -264,6 +266,60 @@ await pr.close();
   const a2 = await ps.evaluate(() => ({ locked: document.body.classList.contains('locked'), auth: !!window._rzAuth }));
   law('A2', !a2.locked && a2.auth, `signed-in Pro session: page locked ${a2.locked} (want false), _rzAuth present ${a2.auth}`);
   await ps.close();
+  // Z1 (audit 2026-11-16 S1): auth.js loaded, nobody signed in at Supabase, a hand-written session record in
+  // localStorage. Whatever the record claims (root role, the v2 flag, a token-shaped key beside it), the page stays locked.
+  const forged = [
+    ['root role', { email: 'forged@example.com', tier: 'pro', role: 'root', expires: '2099-01-01T00:00:00Z' }, false],
+    ['root role + v2', { email: 'forged@example.com', tier: 'pro', role: 'root', v2: true, expires: '2099-01-01T00:00:00Z' }, false],
+    ['root role + token key', { email: 'forged@example.com', tier: 'pro', role: 'root', expires: '2099-01-01T00:00:00Z' }, true],
+    ['root email', { email: 'admin@resistancezero.com', tier: 'pro', expires: '2099-01-01T00:00:00Z' }, true],
+    ['pro tier', { email: 'forged@example.com', tier: 'pro', role: 'pro', v2: true, expires: '2099-01-01T00:00:00Z' }, true],
+    ['educator role + token key', { email: 'forged@example.com', tier: 'pro', role: 'educator', expires: '2099-01-01T00:00:00Z' }, true],
+    ['educator role + v2', { email: 'forged@example.com', tier: 'pro', role: 'educator', v2: true, expires: '2099-01-01T00:00:00Z' }, true],
+  ];
+  const z1 = [];
+  for (const [name, rec, token] of forged) {
+    const pz = await browser.newPage();
+    await pz.setRequestInterception(true);
+    pz.on('request', (r) => {
+      if (isSupabaseModule(r.url())) return r.respond({ status: 200, contentType: 'text/javascript', body: signedOutSupabaseBody() });
+      return r.url().startsWith(ORIGIN) || r.url().startsWith('data:') ? r.continue() : r.abort();
+    });
+    await pz.evaluateOnNewDocument((rec, token) => { try { if (!sessionStorage.getItem('z1')) { sessionStorage.setItem('z1', '1'); localStorage.setItem('rz_premium_session', JSON.stringify(rec)); if (token) localStorage.setItem('sb-gate-auth-token', '{"gate":true}'); } } catch (e) { /* none */ } }, rec, token);
+    await pz.goto(ORIGIN + 'datahallAI.html', { waitUntil: 'networkidle2', timeout: 60000 });
+    await pz.waitForNavigation({ waitUntil: 'networkidle2', timeout: 6000 }).catch(() => {});
+    await wait(2500);
+    const st = await pz.evaluate(() => ({ locked: document.body.classList.contains('locked'), auth: !!window._rzAuth }));
+    z1.push(`${name}: ${st.locked ? 'locked' : 'OPEN'}${st.auth ? '' : ' (no _rzAuth)'}`);
+    await pz.close();
+  }
+  law('Z1', z1.every((x) => /: locked$/.test(x)), `signed out at Supabase + a hand-written session record: ${z1.join('; ')}`);
+  // Z2: the real root (Supabase says admin@ is signed in) still opens the page and reads as root.
+  // Z3: Supabase proves a DIFFERENT account than the record names: the record's root claim is worth nothing.
+  const proofCase = async (supaEmail, rec, body) => {
+    const pz = await browser.newPage();
+    await pz.setRequestInterception(true);
+    pz.on('request', (r) => {
+      if (isSupabaseModule(r.url())) return r.respond({ status: 200, contentType: 'text/javascript', body: body || signedInSupabaseBody({ email: supaEmail, tier: 'pro' }) });
+      return r.url().startsWith(ORIGIN) || r.url().startsWith('data:') ? r.continue() : r.abort();
+    });
+    await pz.evaluateOnNewDocument((rec) => { try { if (!sessionStorage.getItem('z2')) { sessionStorage.setItem('z2', '1'); localStorage.setItem('rz_premium_session', JSON.stringify(rec)); localStorage.setItem('sb-gate-auth-token', '{"gate":true}'); } } catch (e) { /* none */ } }, rec);
+    await pz.goto(ORIGIN + 'datahallAI.html', { waitUntil: 'networkidle2', timeout: 60000 });
+    await pz.waitForNavigation({ waitUntil: 'networkidle2', timeout: 6000 }).catch(() => {});
+    await wait(2500);
+    const st = await pz.evaluate(() => ({ locked: document.body.classList.contains('locked'), role: window._rzAuth ? window._rzAuth.getRoleFromSession(window._rzAuth.getSession()) : 'no _rzAuth',
+      modal: !!document.querySelector('#rzLoginModal.show, .rz-modal.show, .rz-login-modal.show') }));
+    await pz.close(); return st;
+  };
+  const z2 = await proofCase('admin@resistancezero.com', { email: 'admin@resistancezero.com', tier: 'pro', role: 'root', expires: '2099-01-01T00:00:00Z' });
+  law('Z2', !z2.locked && z2.role === 'root', `Supabase proves the root account: page locked ${z2.locked} (want false), role "${z2.role}" (want root), login prompt left open ${z2.modal}`);
+  const z3 = await proofCase('someone@example.com', { email: 'admin@resistancezero.com', tier: 'pro', role: 'root', expires: '2099-01-01T00:00:00Z' });
+  law('Z3', z3.locked && z3.role !== 'root', `Supabase proves another account than the record names: page locked ${z3.locked} (want true), role "${z3.role}" (want not root)`);
+  // Z4 (review of v3.64.0): a forged token in localStorage — getSession() names the root account or an educator, the
+  // server-validated getUser() says nobody. The local token is not a proof.
+  const z4a = await proofCase(null, { email: 'admin@resistancezero.com', tier: 'pro', role: 'root', expires: '2099-01-01T00:00:00Z' }, forgedTokenSupabaseBody({ email: 'admin@resistancezero.com' }));
+  const z4b = await proofCase(null, { email: 'forged@example.com', tier: 'pro', role: 'educator', expires: '2099-01-01T00:00:00Z' }, forgedTokenSupabaseBody({ email: 'forged@example.com' }));
+  law('Z4', z4a.locked && z4a.role !== 'root' && z4b.locked && z4b.role !== 'educator', `forged local token (getSession names the account, getUser says nobody): root record locked ${z4a.locked} role "${z4a.role}"; educator record locked ${z4b.locked} role "${z4b.role}" (want locked, unprivileged)`);
 }
 
 await browser.close(); srv.close();

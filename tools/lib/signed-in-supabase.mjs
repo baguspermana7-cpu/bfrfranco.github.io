@@ -38,3 +38,30 @@ export function signedInStorage({ email = 'gate.user@resistancezero.com', tier =
   ];
 }
 
+/** A visitor with NO Supabase session: the module loads and answers, nobody is signed in. For gates that prove a
+ *  client-written session record grants nothing (audit 2026-11-16 S1). */
+export function signedOutSupabaseBody() {
+  return `const ok=(d)=>async()=>({data:d,error:null});
+    const api={configured:true,
+      getUser:async()=>null,getSession:async()=>null,
+      getProfile:ok(null),
+      signIn:async()=>({error:'gate stub'}),signOut:async()=>({}),
+      isEducator:ok(false),getFeatureOverrides:ok([]),listEducators:ok([]),
+      listAllProfiles:ok([]),listAuditLog:ok([]),listSubscribers:ok([])};
+    api.ready=Promise.resolve(api);window.rzSupa=api;window.dispatchEvent(new CustomEvent("rz-supa-ready",{detail:api}));`;
+}
+
+/** A forged local token: supabase-js getSession() only reads localStorage, so it "returns" the user the visitor wrote
+ *  there; the server-validated getUser() says nobody is signed in. A gate that takes getSession() as proof fails here. */
+export function forgedTokenSupabaseBody({ email = 'admin@resistancezero.com' } = {}) {
+  const user = { id: 'forged', email };
+  return `const u=${JSON.stringify(user)};
+    const ok=(d)=>async()=>({data:d,error:null});
+    const api={configured:true,
+      getUser:async()=>null,getSession:async()=>({user:u}),
+      getProfile:ok(null),
+      signIn:async()=>({error:'gate stub'}),signOut:async()=>({}),
+      isEducator:ok(true),getFeatureOverrides:ok([]),listEducators:ok([]),
+      listAllProfiles:ok([]),listAuditLog:ok([]),listSubscribers:ok([])};
+    api.ready=Promise.resolve(api);window.rzSupa=api;window.dispatchEvent(new CustomEvent("rz-supa-ready",{detail:api}));`;
+}

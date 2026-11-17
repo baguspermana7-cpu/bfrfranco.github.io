@@ -387,8 +387,26 @@ locked; failed on v3.63.1) and A2 (a signed-in Pro session still opens). dc-conv
 
 Scope of this rule: it covers the inline gate only. `_rzAuth` itself still takes the role from the stored session record
 (`auth.js` `getSession`, `enforceTierFeatureAccess`), which is also client-written — a hand-written `role: "root"` passes
-once auth.js has loaded. That is open as S1 in `documentation/prd/datahall-ai/PLAN_AUDIT_2026_11_16.md` (v3.64.0: role
-only from a verified Supabase session).
+once auth.js has loaded. Closed for `root` and `educator` in v3.64.0 (next paragraph); the Pro tier still comes from the record.
+
+**Privileged roles need a proof (v3.64.0, audit 2026-11-16 S1).** `rz_premium_session` is a client-written mirror:
+it names who the UI shows, it proves nothing. In `auth.js`:
+- `getRoleFromSession()` returns `root` or `educator` only when `proven` (the account the Supabase SERVER confirmed on
+  this page load through `serverUser()` → `auth.getUser()`, role from `resolveServerRole` / `is_educator()`) has the
+  same email as the record. Never `auth.getSession()`: it reads `sb-*-auth-token` from localStorage without checking
+  the signature, so a typed token names any account. When the server cannot be asked (offline) the record is kept
+  and its privileged role stays unproven; only an answer "nobody / someone else" removes a root-email record. Otherwise the
+  record is worth `pro` at most. A root email in the record is a root claim whatever its `role` field says.
+- `proveIdentity()` runs at init when the record claims a privileged role; a Supabase sign-in, `rehydrateFromSupabase`
+  and `syncServerRole` set the proof too. No proof: a root-email record is removed, any other loses the role.
+- The Worker path (`rz_auth_v2`, `rz_auth_gw`) is not a proof: both keys are client-written.
+- `enforceTierFeatureAccess()` keeps the page locked without a prompt while the proof is pending and runs again when it
+  lands (`afterProof`). `isRootAccess()` follows the proven role.
+- Never add a synchronous "fast path" that unlocks from the record (root email list, `role` field) in a page.
+  Known holdouts: `dc-conventional.html` (`readSessionDirect`), `ltc-system-modelling-lab.html` (`rootFastPath`).
+- Gate: `tools/test-dh-operator.mjs` Z1–Z4 (Z1, Z3 fail on v3.63.3; Z4 on a `getSession()`-based proof). Rebuild `auth.min.js` with
+  `terser auth.js -o auth.min.js --compress --mangle` and fix the tokens of both files.
+Limit: the Pro tier is still taken from the record (paywall grade); static HTML is downloadable whatever the gate does.
 
 ### Educator allowlist storage (server, v3.57.x — audit F2)
 
