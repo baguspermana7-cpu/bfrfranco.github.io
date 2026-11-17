@@ -123,6 +123,7 @@ try {
     for (const theme of ['dark', 'light']) {
       for (const viewport of VIEWPORTS) {
         const tab = await browser.newPage();
+        if (process.env.RZ_GEO_TRACE) console.error(`[geo ${new Date().toISOString().slice(11, 19)}] ${diagram.page} · ${diagram.label} · ${theme} · ${viewport.name}`);
         await tab.setViewport({ width: viewport.width, height: viewport.height });
         await tab.evaluateOnNewDocument((t) => {
           try { localStorage.setItem('theme', t); } catch (e) { /* private mode */ }
@@ -141,7 +142,10 @@ try {
           await enterAuthorizedAuditState(tab, tabSet.cockpit);
           await assertAuthorizedAuditState(tab, tabSet.cockpit);
         }
-        await tab.waitForSelector(diagram.selector, { timeout: 20000 }).catch(() => {});
+        /* A cockpit builds a panel only when its tab is shown (v3.11.7), so a tabbed drawing does not exist yet: waiting
+           for it here spent the full 20 s on every load (datahallAI: 24 drawings x 2 themes x 4 viewports, 45 min —
+           the step never finished inside the ship gate). activateTab() has its own readiness wait. */
+        if (!diagram.tabEntry) await tab.waitForSelector(diagram.selector, { timeout: 20000 }).catch(() => {});
         if (diagram.tabEntry) {
           await activateTab(tab, tabSet, diagram.tabEntry);
         } else {

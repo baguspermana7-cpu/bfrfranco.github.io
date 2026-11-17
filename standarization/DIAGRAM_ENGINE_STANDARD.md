@@ -33,6 +33,13 @@ The geometry survey (`tools/test-conv-geometry.mjs`) measures the result: at ado
 `datahallAI.html` reported 218 findings across four viewports and two themes, dominated by
 the building isometric.
 
+**Geometry gate and deferred panels (2026-11-17).** `tools/test-conv-geometry.mjs` waits for a drawing's selector before
+measuring only when the drawing has no tab entry. A cockpit builds a panel when its tab is first shown, so a tabbed
+drawing does not exist before `activateTab()`: waiting for it first cost the full 20 s on each of datahallAI's 192
+loads (24 drawings × 2 themes × 4 viewports ≈ 45 min) and ship-gate step [63] never finished — four releases stopped
+it by hand and re-ran the other pages. Now 659 s for the whole gate, datahallAI included (9,632 texts measured, no
+row with 0). `RZ_GEO_TRACE=1` prints one line per load: when a gate "hangs", look at its progress before stopping it.
+
 ---
 
 ## 2. What the engine guarantees
