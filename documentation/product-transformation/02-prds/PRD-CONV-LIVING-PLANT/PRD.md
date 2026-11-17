@@ -204,6 +204,44 @@ practice one click away, so both readings are honest and available.
 | Firewall | allowed flow passes; denied flow stops at the firewall with a small deny mark and the counter increments | policy verdict | a deny never crosses |
 | Failover | active → standby switchover of HA pairs / MLAG | HA state | one active per pair |
 
+### 5.7 Ideas taken from OriginKit (owner reference, 2026-11-17)
+
+Source: https://www.originkit.dev — 810 animated components (sitemap crawl of titles and descriptions, 2026-11-17):
+299 backgrounds, 134 interactive elements, 103 animations, 91 text, 50 galleries, 43 image, 30 buttons, 30 loaders,
+24 cursors. About 475 are WebGL/shader, 172 use three.js; they ship as React / Framer components.
+
+How they can be used here:
+
+- **Not as drop-ins.** This site is zero-build vanilla JS; the components are React/Framer and mostly three.js. Each
+  idea below is re-written as a small SVG / canvas effect in `js/conv/vfx-effects/`, with no new dependency.
+- **Licence** (their Licensing page, read 2026-11-17): use, modification and use inside an open-source application
+  are allowed, no attribution required; redistributing the components as a library, template or kit is not. A
+  re-implementation inside this site's own pages is within it. The catalogue itself is not copied into the repo.
+- **Only where the motion is a measurement** (law L-A). The same visual idea is rejected as decoration.
+
+| OriginKit idea | what it does there | use here (bound to) | phase |
+|---|---|---|---|
+| `chevron-duct` | chevron rings receding down a tunnel | airflow chevrons in the CRAH supply duct and the hot-aisle return; speed ∝ airflow m³/s, colour = air temperature | P3 |
+| `flow-field` | noise-warped streamlines | data-hall section view: particles advected along a declared velocity field (cold aisle → rack → hot aisle → CRAH); density ∝ airflow | P3 |
+| `risinglines` | line sparks and soft blobs rising | cooling-tower plume and hot-aisle heat rise; rate ∝ evaporation L/min / rack kW; absent when the fan or rack is off | P3 |
+| `contour-loop`, `wireframe-terrain-noise` | travelling contour lines | data-hall plan: temperature contour lines interpolated from rack inlet temperatures (a Thermal-mode overlay), with the legend in °C | P3 |
+| `pulse-grid` | circuit segments lighting up | SLD: a conductor segment lights when energised, pulse rate ∝ kW on that branch (from `sld-topology.js`); ICT: link pulses ∝ utilisation | P5, P6 |
+| `plexus-chain-drift` | drifting linked chains | ICT topology traffic between nodes; packets ∝ utilisation, stop at a firewall deny | P6 |
+| `scan-effect` | a light band sweeping through depth | aspirating detector: the sweep along the sampling pipe = one transport-time cycle; fire-zone scan in the stage strip | P3 |
+| `dither-globe`, `globe-mesh` | interactive globes | index / market pages only if the dots are the real sites of the DC corpus; otherwise not built | later, separate PRD |
+| `mask-text-reveal` | clip-path text reveal | index hero heading, once on first view (clip-path only, 240 ms, none under reduced motion) | separate index PRD |
+| `link-preview` | page thumbnail on hover | index cards: the page's own OG card as a static preview on hover/focus (no cursor lean) | separate index PRD |
+
+Rejected, with the rule that rejects them:
+
+| idea | rule |
+|---|---|
+| cursor trails, magnetic buttons, tilt, cursor-reactive grids (`kineticgrid`, `interactive-grid`, 24 cursors) | CLAUDE.md rejected pattern 4 (cursor-tracking) |
+| glow borders and neon buttons (`neon-border`, `orbit-border-button`, `scan-grid-button`, `slide-fill-button`) | UX law 14 and the register: hover is a border-colour change, no glow, no transform |
+| shader / particle backgrounds as decoration (`flow-field` as a hero, `predictive-arc`, `wave-arcs`, `blinkingsquares`) | rejected patterns 1, 11, 15 (dot grids, aurora/mesh, decorative fixed canvases) |
+| `typewriter`, `text-reveal-wall`, `flickertext`, scramble text | rejected pattern 14 (ticker) and MOTION_STANDARD: text that must be read does not animate |
+| three.js for a cockpit effect | performance budget: one compositor layer per sheet; a headless repaint already costs ~30 ms |
+
 ---
 
 ## 6. Equipment modal with its own drawing (C1)
