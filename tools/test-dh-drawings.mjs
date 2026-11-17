@@ -38,6 +38,7 @@
  * L2  an isolation after Clear register gets a new record id and reaches Alarms · L4 the point table follows the
  *     point set · L7 a very long reason is capped and still recorded
  * U1  every drawing (svg with an id) has an accessible name
+ * U8  at 390 px the opened item sits inside the visible part of its schematic
  * U7  at 390 px a sheet modal whose only header button is Close keeps a one-line header
  * L5  a compute tray opens as itself · L9 a data-tip is rendered as text
  * M4  two items drawn in turn in one modal slot each show their own reading (memo keyed on the item, not the node id)
@@ -672,6 +673,17 @@ const u7 = await ph.evaluate(async () => { const O = window.RZDatahallAIHmiOpene
   const r = h ? { head: Math.round(h.getBoundingClientRect().height), btn: Math.round(b.getBoundingClientRect().height), right: Math.round(h.getBoundingClientRect().right - b.getBoundingClientRect().right) } : null;
   document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await new Promise((r) => setTimeout(r, 200)); return r; });
 law('U7', !!u7 && u7.head <= u7.btn + 20 && u7.right >= 0 && u7.right <= 16, `390 sheet modal header: ${u7 ? u7.head + ' px high with a ' + u7.btn + ' px Close button, ' + u7.right + ' px from the right edge' : 'not opened'} (one line)`);
+// U8 (v3.65.3): on a phone the item that was opened is inside the visible part of its schematic (the main transformer
+// sat on the right edge of the frame, half outside it)
+const u8 = await ph.evaluate(async () => { const O = window.RZDatahallAIHmiOpeners, wait = (ms) => new Promise((r) => setTimeout(r, ms)), out = [];
+  for (const [name, fn, sel] of [['main transformer', () => O.maintx('A'), '[data-node="tx-mainA"]'], ['fire panel', () => O.facp('DH-01'), '[data-node="facp"]'], ['cylinder bank', () => O.cylbank('DH-01'), '[data-node="bank"]']]) {
+    fn(); await wait(1000);
+    const sv = document.querySelector('.hmi-modal-back:not([hidden]) .hmi-m-draw svg.hmi-svg'), g = sv && sv.querySelector(sel), vp = sv && sv.parentElement;
+    if (!g) { out.push(name + ': not drawn'); } else { const a = g.getBoundingClientRect(), b = vp.getBoundingClientRect(), cx = a.left + a.width / 2;
+      out.push(`${name}: ${cx >= b.left + 24 && cx <= b.right - 24 && a.left >= b.left - 1 && a.right <= b.right + 1 ? 'inside' : 'CUT'} (${Math.round(a.left - b.left)}…${Math.round(a.right - b.left)} of ${Math.round(b.width)})`); }
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await wait(250); }
+  return out; });
+law('U8', u8.length === 3 && u8.every((x) => /: inside /.test(x)), `390 sheet modal, opened item in the frame: ${u8.join('; ')}`);
 law('U1', u1.n > 10 && u1.bad.length === 0, `${u1.n} drawings with an id: ${u1.bad.length} without an accessible name${u1.bad.length ? ' — ' + u1.bad.slice(0, 8).join(', ') : ''}`);
 await ph.close();
 

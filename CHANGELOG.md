@@ -11,6 +11,21 @@ release sections rather than semver.
 
 ---
 
+## v3.65.3 — 2026-11-17 — datahallAI: on a phone the opened item of a schematic is in view
+
+### Fixed
+- **On a phone a schematic modal opened at the left edge of its drawing**, so the item that was opened could sit half
+  outside the frame (the main transformer: 351…405 px of a 374 px frame). The opened item is now brought to the middle
+  of the frame, without zooming.
+
+### Gates
+- `tools/test-dh-drawings.mjs` U8: at 390 px the main transformer, the fire panel and the cylinder bank sit inside the
+  visible part of their schematic — the transformer fails on v3.65.2.
+- Title length (77 characters) stays: the operator-UI contract (`ship-gate` [53]) requires "Simulated Operations" in
+  the title and a shorter one dropped either that or the platform name. A 59-character title failed that gate.
+- Closed as not findings: three `<h1>` (two are inside print-window templates in script; the page has one); the labels
+  above section headings (the site register allows mono eyebrows).
+
 ## v3.65.2 — 2026-11-17 — datahallAI: the fire panel opens its own schematic, the cylinder bank opens the release sheet
 
 ### Added

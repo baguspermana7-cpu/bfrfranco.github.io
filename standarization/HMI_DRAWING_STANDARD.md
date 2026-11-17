@@ -173,6 +173,9 @@ its own data draws its own sheet: `leak-l3` (24 zones, one loop; a node with `pu
 when its own row is in fault), `fws-l3` (branches from the engine's CDU count). Nothing is drawn that the payload or
 the engine does not state. Laws M6, M7 (`tools/test-dh-drawings.mjs`), both red on v3.64.1.
 
+**Opened item in view (v3.65.3).** `RZHmiSheet` exposes `center(nodeId)`: scrolls the frame so the node is in its
+middle, no zoom. `openSheetModal` centres the opened item after render (a phone shows part of a sheet). Law U8.
+
 **Counted, not typed (v3.65.2).** `facp-l3` draws one symbol per circuit and device type and takes each count from
 the fire point inventory at draw time (`address` prefix × `type`); law M9 compares the drawn counts with the
 inventory's. `openSheetModal` takes `svgId` and `focus` like `drawAtBodyTop` (the cylinder bank on DH-F-102). An

@@ -146,6 +146,8 @@ Order: W0 → W1 → W2 → W3 → W4 → W5 → W6. A HIGH found mid-wave preem
 | W4 | v3.65.0 – v3.65.2 | leak detection, HTW piping, main transformer bay, generator yard and fire panel drawn; WAN node, security zone, BMS application / field group and cylinder bank open on their architecture. Laws M6–M9, U7. H3 21 → 32 of 45 |
 | gate | 88988ca47 | ship-gate step [63] finishes on this page (a 20 s wait per load, not a hang) |
 
+The decisions and the plan for everything below are in `PRD_PENDING_2026_11_17.md` (2026-11-17).
+
 Open, each waiting on something named:
 - **Owner check:** a real root sign-in on the live site (no credentials in the build session).
 - **Owner decisions:** D1 (U4 eyebrows), D2 (S5 demo account), D3 (Pro tier is still taken from the client record).
@@ -156,10 +158,10 @@ Open, each waiting on something named:
   drawn with fewer than 8 symbols (a switch with its uplinks, downlinks, management port and two supplies is 5–6): the
   page models hold nothing more to draw, so they are not padded to reach the count.
 - **U5** (spacing-scale sweep): not started; cosmetic, changes pixels on every tab.
-- **W5** (1.19 MB inline script, two blocks of 917 KB and 239 KB): 64 tools reference this page and 29 of them parse
-  its inline source (engine adapter, basis map, drawing code). Moving the blocks needs one shared reader
-  (`page source = html + its same-origin scripts`) adopted by all 29, several owned by the Conventional work stream.
-  Design first, with that stream; not a single-session change.
+- **W5** (1.19 MB inline script, two blocks of 917 KB and 239 KB): at least 8 tools search for text that exists only
+  inside those two blocks (static scan of their string and regex searches), plus the page-wide scanners. An earlier
+  line here said "29 tools": that was a filename grep that also counted site-wide tools. The real number comes from a
+  dry run of the gate against a moved copy — `PRD_PENDING_2026_11_17.md` §4.
 - **W6** (R135 commissioning scenarios): waits for the owner's acceptance of the drawings (owner rule in the PRD).
 
 ### W1 — task cards

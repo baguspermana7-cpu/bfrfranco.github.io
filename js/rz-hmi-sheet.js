@@ -445,6 +445,15 @@
       if (vp && px && vp.scrollWidth > vp.clientWidth + 1) vp.scrollLeft = Math.max(0, (n.x - view.x) / view.w * px - vp.clientWidth / 2);
     }
 
+    /* bring an item to the middle of the frame without zooming: on a phone a sheet is wider than its viewport and
+       opens at its left edge, so the item that was opened could sit half outside it (v3.65.3) */
+    function centerNode(id) {
+      var n = nodes[id], vp = svg.parentElement; if (!n || !vp) return;
+      var px = svg.clientWidth, py = svg.clientHeight;
+      if (px && vp.scrollWidth > vp.clientWidth + 1) vp.scrollLeft = Math.max(0, (n.x - view.x) / view.w * px - vp.clientWidth / 2);
+      if (py && vp.scrollHeight > vp.clientHeight + 1) vp.scrollTop = Math.max(0, (n.y - view.y) / view.h * py - vp.clientHeight / 2);
+    }
+
     var fsel = frame.querySelector('[data-find]');
     if (fsel) fsel.addEventListener('change', function () {
       var id = fsel.value; if (!id) return;
@@ -455,7 +464,7 @@
     });
     var api = { sheet: sheet, svg: svg, frame: frame, update: update, trace: trace, clearTrace: clearTrace, fit: fit, zoom: zoomAt, focus: focusNode,
       view: function () { return { x: view.x, y: view.y, w: view.w, h: view.h, z: view.z }; },
-      node: function (id) { return nodes[id]; }, graph: graph, destroy: function () {
+      node: function (id) { return nodes[id]; }, graph: graph, center: centerNode, destroy: function () {
         root.removeEventListener('pointermove', onPanMove); root.removeEventListener('pointerup', onPanEnd);
         clearTimeout(tipTimer); clearTimeout(movingT); host.innerHTML = ''; hideTip();
       } };

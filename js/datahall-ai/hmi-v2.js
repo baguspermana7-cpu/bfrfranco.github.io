@@ -690,6 +690,10 @@
     if (cfg.svgId) sheet.svgId = cfg.svgId;   // a tab sheet drawn again in the modal: no duplicate id
     var api = modalSheet = win.RZHmiSheet.render(back.querySelector('.hmi-m-draw'), sheet, sheetOpts({ sheet: cfg.read || cfg.sheet }));
     if (cfg.focus) setTimeout(function () { var gs = api.svg.querySelectorAll('.hmi-node[data-rz-equipment="' + cfg.focus + '"]'); for (var i = 0; i < gs.length; i++) gs[i].setAttribute('data-selected', ''); }, 60);
+    setTimeout(function () {   // the opened item in the middle of the frame (a phone shows part of the sheet)
+      var g = api.svg.querySelector('.hmi-node[data-rz-equipment="' + (cfg.focus || cfg.cls + ':' + cfg.id) + '"]');
+      if (g && api.center) api.center(g.getAttribute('data-node'));
+    }, 80);
     back.querySelector('[data-close]').addEventListener('click', close);
     back.querySelector('[data-close]').focus();
     return true;
