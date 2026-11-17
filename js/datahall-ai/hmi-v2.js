@@ -157,7 +157,7 @@
   function find(p, re) { var rs = rows(p); for (var i = 0; i < rs.length; i++) if (re.test(rs[i].label || '') || re.test(rs[i].point || '')) return rs[i]; return null; }
   var CLS_PAYLOAD = { cdu: 'cdu', 'cdu-pump': 'cdu', chiller: 'chiller', stp: 'stp', ahu: 'ahu', 'battery-a': 'battery-a', 'battery-b': 'battery-b', 'dry-cooler': 'dry-cooler', 'fws-pump-station': 'fws-pump-station', 'cw-pump-station': 'cw-pump-station', chem: 'chem', 'tcs-manifold': 'tcs-manifold', leak: 'leak', 'fws-piping': 'fws-piping', 'net-wan': 'net-wan', 'net-zone': 'net-zone', 'sld-tx': 'sld-tx', 'sld-mv-sub': 'sld-mv-sub', 'sld-msb': 'sld-msb', 'sld-ups-a': 'sld-ups-a', 'sld-ups-b': 'sld-ups-b',
     'sld-rack-psu': 'sld-rack-psu', 'rack-ct': 'rack-ct', 'rack-ns': 'rack-ns', 'rack-psu': 'rack-psu', 'rack-busbar': 'rack-busbar', 'rack-manifold': 'rack-manifold', 'rack-leak': 'rack-leak',
-    'fire-facp': 'fire-facp', 'fire-zone': 'fire-zone', 'fire-vesda': 'fire-vesda', 'fire-mcp': 'fire-mcp', 'fire-epo': 'fire-epo', 'fire-point': 'fire-point',
+    'fire-facp': 'fire-facp', 'fire-cylinder-bank': 'fire-cylinder-bank', 'fire-zone': 'fire-zone', 'fire-vesda': 'fire-vesda', 'fire-mcp': 'fire-mcp', 'fire-epo': 'fire-epo', 'fire-point': 'fire-point',
     'sld-main-tx': 'sld-main-tx', 'site-genset-yard': 'site-genset-yard', 'net-core': 'net-core', 'net-spine': 'net-spine', 'net-leaf': 'net-leaf', 'rack-unit': 'rack-unit', crah: 'crah', 'bms-server': 'bms-server', 'bms-controller': 'bms-controller', 'bms-network': 'bms-network', 'bms-gateway': 'bms-gateway', 'bms-field': 'bms-field', 'bms-ldc': 'bms-ldc', 'bms-app': 'bms-app' };
   /* fire points keep their full inventory id (DH-01-Z05-SD1-02); the point state comes from the workstation snapshot through the payload */
   function fireStateOf(p) {
@@ -408,6 +408,12 @@
     var OP = win.RZDatahallAIHmiOpeners = win.RZDatahallAIHmiOpeners || {}; if (!OP.fire) OP.fire = openFireZone;   // tier-2 of the fire-zone payload
     /* tier-2 of the main transformer and the generator yard (v3.65.1): their own L3 sheet, states from the site SLD's scenario mapping */
     if (!OP.maintx) OP.maintx = function (feed) { var L = String(feed || 'A').toUpperCase() === 'B' ? 'B' : 'A'; return openSheetModal({ cls: 'sld-main-tx', id: L + '01', tag: 'TX-M' + L + '01', name: 'Main transformer', sheet: 'main-tx-l3', o: { feed: L }, read: 'dh-e-001' }); };
+    /* tier-2 of the fire panel (its own L3, counted from the point inventory) and of the agent cylinder bank (the
+       release sheet DH-F-102 with the bank selected) — v3.65.2 */
+    if (!OP.facp) OP.facp = function (hp) { var fi = fireInventory(), m = /(\d+)/.exec(String(hp || '')); if (!fi) return false;
+      return openSheetModal({ cls: 'fire-facp', id: String(hp || 'DH-01'), tag: 'FACP-01', name: 'Fire alarm control panel', sheet: 'facp-l3', o: { fire: fi, hall: m ? Number(m[1]) : 1 } }); };
+    if (!OP.cylbank) OP.cylbank = function (hp) { var fi = fireInventory(); if (!fi) return false;
+      return openSheetModal({ cls: 'fire-cylinder-bank', id: String(hp || 'DH-01'), tag: 'CYL-BANK', name: 'Clean-agent cylinder bank', sheet: 'dh-f-102', o: { fire: fi }, read: 'dh-f-102', svgId: 'fireRelL3Svg', focus: 'fire-cylinder-bank:DH-01' }); };
     if (!OP.genset) OP.genset = function () { return openSheetModal({ cls: 'site-genset-yard', id: 'G01', tag: 'GEN YARD', name: 'Generator yard', sheet: 'genset-l3', read: 'dh-e-001' }); };
     mount('coolSvg', 'dh-m-103', 'hmiCoolSvg');
     mountNew('coolSvg', 'dh-m-101', 'hmiCoolOverSvg', { before: true });                         // overview first: where every item sits
@@ -681,7 +687,9 @@
       '<div class="hmi-m-foot"><div><div class="hmi-m-sec">Alarms</div><ul class="hmi-evt">' + (al.map(function (a) { return '<li>' + esc(a.text || a.message || a.point || '') + '</li>'; }).join('') || '<li>None active</li>') + '</ul></div></div></div>';
     back.hidden = false;
     if (modalSheet) modalSheet.destroy();
-    modalSheet = win.RZHmiSheet.render(back.querySelector('.hmi-m-draw'), sheet, sheetOpts({ sheet: cfg.read || cfg.sheet }));
+    if (cfg.svgId) sheet.svgId = cfg.svgId;   // a tab sheet drawn again in the modal: no duplicate id
+    var api = modalSheet = win.RZHmiSheet.render(back.querySelector('.hmi-m-draw'), sheet, sheetOpts({ sheet: cfg.read || cfg.sheet }));
+    if (cfg.focus) setTimeout(function () { var gs = api.svg.querySelectorAll('.hmi-node[data-rz-equipment="' + cfg.focus + '"]'); for (var i = 0; i < gs.length; i++) gs[i].setAttribute('data-selected', ''); }, 60);
     back.querySelector('[data-close]').addEventListener('click', close);
     back.querySelector('[data-close]').focus();
     return true;

@@ -28,6 +28,7 @@
  * M2  a fire zone click opens its detection schematic with every device of the zone; Shift+click keeps the inspector
  * M3  the battery modal draws its L3 sheet
  * M5  an opener that cannot draw falls back to the inspector
+ * M9  the fire panel draws its own L3 with the inventory's circuit counts; the cylinder bank opens the release sheet selected
  * M8  the main transformer and the generator yard draw their own L3; the transformer follows the electrical scenario
  * M7  leak detection (24 zones, the scenario's wet zone in fault) and HTW piping (branches to the engine's CDU count) draw
  *     their own L3
@@ -37,6 +38,7 @@
  * L2  an isolation after Clear register gets a new record id and reaches Alarms · L4 the point table follows the
  *     point set · L7 a very long reason is capped and still recorded
  * U1  every drawing (svg with an id) has an accessible name
+ * U7  at 390 px a sheet modal whose only header button is Close keeps a one-line header
  * L5  a compute tray opens as itself · L9 a data-tip is rendered as text
  * M4  two items drawn in turn in one modal slot each show their own reading (memo keyed on the item, not the node id)
  * F15-F18 zone map DH-F-104 (Zones view): every zone of the hall once, means available / total = the isolation
@@ -450,6 +452,24 @@ law('M8', !!m8.tx && m8.tx.cls === 'sld-main-tx' && m8.tx.n >= 8 && m8.tx.pts > 
   && (!m8.txLost || m8.txLost.tx !== 'running'),
   `main transformer: ${m8.tx ? m8.tx.n + ' symbols, ' + m8.tx.pts + ' points, state ' + m8.tx.tx : 'NOT opened'}; under "${m8.scenario}" state ${m8.txLost ? m8.txLost.tx : 'not run'} (want not running); generator yard: ${m8.gen ? m8.gen.n + ' symbols, ' + m8.gen.gens + ' sets, standby group from ' + m8.gen.last : 'NOT opened'} (engine duty ${m8.duty})`);
 
+// ── M9 the fire panel draws its own schematic, every circuit count equal to the point inventory; the cylinder bank
+// opens the release sheet with itself selected (v3.65.2; both opened the inspector only) ─────────────────────────────
+await showSheet(pg, 'fire', 'Mimic'); await wait(1500);
+const m9 = await pg.evaluate(async () => { const wait = (ms) => new Promise((r) => setTimeout(r, ms)), W = window.RZDatahallAIFireWorkstation, inv = W.inventory();
+  const want = {}; inv.points.forEach((p) => { if (p.hall !== 1) return; const k = String(p.address || '').split(':')[0]; if (/^(L1|L2|L3|ASD|NAC|REL|ABT|PAV|EPO)$/.test(k)) want[k + '|' + p.type] = (want[k + '|' + p.type] || 0) + 1; });
+  const open = async (sel) => { const g = document.querySelector(sel); if (!g) return null; g.dispatchEvent(new MouseEvent('click', { bubbles: true })); await wait(900);
+    const m = document.querySelector('.hmi-modal-back:not([hidden])'), sv = m && m.querySelector('.hmi-m-draw svg.hmi-svg');
+    const r = { cls: m ? m.querySelector('.hmi-modal').getAttribute('data-rz-modal-class') : null, n: sv ? sv.querySelectorAll('.hmi-node [data-sym]').length : 0,
+      tags: sv ? [...sv.querySelectorAll('.hmi-node')].map((g) => g.getAttribute('aria-label') || (g.querySelector('title') || {}).textContent || '').filter((t) => / × /.test(t)) : [],
+      sel: sv ? [...sv.querySelectorAll('.hmi-node[data-selected]')].map((g) => g.getAttribute('data-rz-equipment')) : [], dup: sv ? document.querySelectorAll('#' + CSS.escape(sv.id)).length : 0,
+      untraced: m ? [...m.querySelectorAll('.hmi-pt .pt-val')].filter((v) => !v.hasAttribute('data-basis-param') && !v.getAttribute('data-rz-authored-basis')).length : -1 };
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await wait(250); return r; };
+  const facp = await open('#hmiFireSvg [data-rz-equipment^="fire-facp:"]'), bank = await open('#hmiFireRelSvg [data-rz-equipment^="fire-cylinder-bank:"]');
+  const drawn = facp ? facp.tags.map((t) => Number((/: (\d+) × /.exec(t) || [])[1])).filter((x) => x > 0).sort((a, b) => a - b).join(',') : '';
+  return { facp, bank, drawn, wantCounts: Object.values(want).sort((a, b) => a - b).join(',') }; });
+law('M9', !!m9.facp && m9.facp.cls === 'fire-facp' && m9.facp.n >= 8 && m9.drawn === m9.wantCounts && m9.facp.untraced === 0 && !!m9.bank && m9.bank.cls === 'fire-cylinder-bank' && m9.bank.n >= 8 && m9.bank.sel.join() === 'fire-cylinder-bank:DH-01' && m9.bank.dup === 1 && m9.bank.untraced === 0,
+  `fire panel: ${m9.facp ? m9.facp.n + ' symbols, circuit counts ' + m9.drawn + ' (inventory ' + m9.wantCounts + '), untraced points ' + m9.facp.untraced : 'NOT opened'}; cylinder bank: ${m9.bank ? m9.bank.n + ' symbols on the release sheet, selected ' + (m9.bank.sel.join() || 'none') + (m9.bank.dup > 1 ? ', DUPLICATE id' : '') + ', untraced points ' + m9.bank.untraced : 'NOT opened'}`);
+
 // ── L1 a closed sheet leaves nothing behind (audit 2026-11-16 C1, C7): every render added pointermove + pointerup on
 // window and destroy() removed neither, so each modal open kept a whole drawing alive; a pending tooltip timer fired
 // after the modal had closed ────────────────────────────────────────────────────────────────────────────────────────
@@ -646,6 +666,12 @@ const u1 = await ph.evaluate(() => {
   const bad = [...document.querySelectorAll('svg[id]')].filter((v) => !named(v)).map((v) => v.id);
   return { n: document.querySelectorAll('svg[id]').length, bad };
 });
+// U7 (v3.65.2): on a phone a sheet modal whose only header button is Close keeps one header line (it wrapped: 91 px)
+const u7 = await ph.evaluate(async () => { const O = window.RZDatahallAIHmiOpeners; if (!O || !O.facp) return null; O.facp('DH-01'); await new Promise((r) => setTimeout(r, 900));
+  const h = document.querySelector('.hmi-modal-back:not([hidden]) .hmi-modal > header'), b = h && h.querySelector('[data-close]');
+  const r = h ? { head: Math.round(h.getBoundingClientRect().height), btn: Math.round(b.getBoundingClientRect().height), right: Math.round(h.getBoundingClientRect().right - b.getBoundingClientRect().right) } : null;
+  document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await new Promise((r) => setTimeout(r, 200)); return r; });
+law('U7', !!u7 && u7.head <= u7.btn + 20 && u7.right >= 0 && u7.right <= 16, `390 sheet modal header: ${u7 ? u7.head + ' px high with a ' + u7.btn + ' px Close button, ' + u7.right + ' px from the right edge' : 'not opened'} (one line)`);
 law('U1', u1.n > 10 && u1.bad.length === 0, `${u1.n} drawings with an id: ${u1.bad.length} without an accessible name${u1.bad.length ? ' — ' + u1.bad.slice(0, 8).join(', ') : ''}`);
 await ph.close();
 

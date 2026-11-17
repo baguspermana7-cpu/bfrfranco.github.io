@@ -1481,7 +1481,46 @@
     return finish(s);
   }
 
-  var BUILDERS = { 'dh-m-103': dhM103, cdu: cduSheet, 'dh-e-101': dhE101, 'dh-r-101': dhR101, 'dh-f-101': dhF101, 'dh-e-001': dhE001, 'dh-n-101': dhN101, 'dh-a-101': dhA101, 'dh-b-101': dhB101, 'dh-n-102': dhN102, 'dh-n-104': dhN104, 'dh-m-102': dhM102, 'dh-m-104': dhM104, 'dh-m-101': dhM101, chiller: chillerL3, crah: crahL3, battery: batteryL3, 'pump-station': pumpStationL3, 'tcs-manifold': tcsManifoldL3, 'chem-dosing': chemDosingL3, 'dry-cooler': dryCoolerL3, switch: switchL3, 'bms-controller': bmsCtlL3, 'sld-mimic': sldMimicL3, 'rack-power': rackPowerL3, stp: stpL3, ahu: ahuL3, tray: trayL3, 'nvswitch-tray': nvswitchTrayL3, 'dh-f-102': dhF102, 'dh-f-103': dhF103, 'dh-f-104': dhF104, 'bms-node': bmsNodeL3, 'fire-zone-l3': fireZoneL3, 'leak-l3': leakL3, 'fws-l3': fwsPipingL3, 'main-tx-l3': mainTxL3, 'genset-l3': gensetYardL3 };
+  /* ── L3 fire alarm control panel (v3.65.2): the panel with every circuit the point inventory of its hall puts on it —
+     the three SLC loops with their devices by type, the aspirating units, the notification circuits, the release, abort
+     and pre-action circuits to the suppression sheet, the EPO stations, the standby battery and the supervisory link to
+     the BMS. Every count is counted from the inventory (o.fire); a circuit with no point is not drawn. ─────────────── */
+  function facpL3(snap, o) {
+    var inv = o && o.fire, hall = (o && o.hall) || 1, hp = 'DH-' + pad(hall);
+    if (!inv || !inv.points) throw new Error('hmi-sheets: FACP sheet needs the fire point inventory');
+    var cnt = {}; inv.points.forEach(function (p) { if (p.hall !== hall) return; var k = String(p.address || '').split(':')[0] + '|' + p.type; cnt[k] = (cnt[k] || 0) + 1; });
+    var n = function (k) { return cnt[k] || 0; };
+    var W = 940, H = 520, PX = 110, s = Sheet({ id: 'facp-l3', no: hp + '-FACP', title: hp + ' FIRE ALARM CONTROL PANEL', size: [W, H], svgId: 'facpL3Svg', basis: 'fire point inventory, counted per circuit' });
+    s.legend = [['signal', 'SLC / CONTROL CIRCUIT'], ['data', 'SUPERVISORY LINK']]; s.legendAt = [650, 14];
+    var facp = s.n({ id: 'facp', tag: 'FACP-01', name: 'FIRE ALARM PANEL', sym: 'facp', x: PX, y: 250, size: 48, cls: 'fire-facp', eqId: hp, tagAt: 'below', label: 'Fire alarm control panel ' + hp });
+    var rows = [
+      ['L1', 'SLC LOOP 1', [['smokeDetector', 'L1|smoke_spot', 'SMOKE'], ['manualStation', 'L1|mcp', 'CALL POINT']]],
+      ['L2', 'SLC LOOP 2', [['smokeDetector', 'L2|smoke_spot', 'SMOKE'], ['manualStation', 'L2|mcp', 'CALL POINT']]],
+      ['L3', 'SLC LOOP 3', [['heatDetector', 'L3|heat_spot', 'HEAT'], ['heatDetector', 'L3|lhd', 'LINEAR HEAT'], ['smokeDetector', 'L3|beam', 'BEAM'], ['manualStation', 'L3|mcp', 'CALL POINT']]],
+      ['ASD', 'ASPIRATING', [['aspirating', 'ASD|vesda', 'VESDA']]],
+      ['NAC', 'NOTIFICATION', [['sounder', 'NAC|facp_nac', 'SOUNDER / STROBE CIRCUIT']]],
+      ['REL', 'RELEASE', [['releasePanel', 'REL|release', 'RELEASE'], ['abortSwitch', 'ABT|abort', 'ABORT'], ['preActionValve', 'PAV|preaction_solenoid', 'PRE-ACTION']]],
+      ['EPO', 'EPO', [['epo', 'EPO|epo', 'EPO STATION']]]
+    ].filter(function (r) { return r[2].some(function (d) { return n(d[1]) > 0; }); });
+    var Y0 = 60, DY = (H - 120) / Math.max(1, rows.length - 1);
+    rows.forEach(function (r, i) {
+      var y = Math.round(Y0 + i * DY), prev = facp, k = 0;
+      r[2].forEach(function (d) {
+        var c = n(d[1]); if (!c) return;
+        var x = 330 + k * 150, id = s.n({ id: (r[0] + '-' + d[1].split('|')[1]).toLowerCase().replace(/[^a-z0-9]+/g, '-'), tag: r[0] + ' ×' + c, name: d[2], sym: d[0], x: x, y: y, size: 28, cls: 'fire-facp', eqId: hp, tagAt: 'below',
+          label: r[1] + ': ' + c + ' × ' + d[2].toLowerCase() + ' (' + String(d[1]).split('|')[0] + ' circuit)' });
+        s.e(prev, id, 'signal', k === 0 ? { w: 'signal', via: [[PX + 90, 250], [PX + 90, y]], line: r[1] } : { w: 'signal' });
+        prev = id; k++;
+      });
+      if (r[0] === 'REL') { var or = s.n({ id: 'os-f102', tag: 'DH-F-102', name: 'SUPPRESSION', sym: 'offSheet', x: 330 + k * 150, y: y, size: 22, tagAt: 'below', label: 'Clean-agent release and pre-action (sheet DH-F-102)' }); s.e(prev, or + '.port', 'signal', { w: 'signal' }); }
+    });
+    var bat = s.n({ id: 'bat', tag: 'BAT', name: 'STANDBY BATTERY', sym: 'batteryIec', x: PX, y: 400, size: 30, cls: 'fire-facp', eqId: hp, tagAt: 'below', label: 'FACP standby battery (float)' });
+    s.e(bat, facp, 'signal', { w: 'branch' });
+    if (n('NET|facp_comms')) { var ob = s.n({ id: 'os-bms', tag: 'DH-B-101', name: 'BMS · MONITOR ONLY', sym: 'offSheet', x: PX, y: 90, size: 22, rot: 270, tagAt: 'right', label: 'Supervisory link to the BMS, monitor only (sheet DH-B-101)' }); s.e(facp, ob + '.port', 'data', { w: 'signal' }); }
+    return finish(s);
+  }
+
+  var BUILDERS = { 'dh-m-103': dhM103, cdu: cduSheet, 'dh-e-101': dhE101, 'dh-r-101': dhR101, 'dh-f-101': dhF101, 'dh-e-001': dhE001, 'dh-n-101': dhN101, 'dh-a-101': dhA101, 'dh-b-101': dhB101, 'dh-n-102': dhN102, 'dh-n-104': dhN104, 'dh-m-102': dhM102, 'dh-m-104': dhM104, 'dh-m-101': dhM101, chiller: chillerL3, crah: crahL3, battery: batteryL3, 'pump-station': pumpStationL3, 'tcs-manifold': tcsManifoldL3, 'chem-dosing': chemDosingL3, 'dry-cooler': dryCoolerL3, switch: switchL3, 'bms-controller': bmsCtlL3, 'sld-mimic': sldMimicL3, 'rack-power': rackPowerL3, stp: stpL3, ahu: ahuL3, tray: trayL3, 'nvswitch-tray': nvswitchTrayL3, 'dh-f-102': dhF102, 'dh-f-103': dhF103, 'dh-f-104': dhF104, 'bms-node': bmsNodeL3, 'fire-zone-l3': fireZoneL3, 'leak-l3': leakL3, 'fws-l3': fwsPipingL3, 'main-tx-l3': mainTxL3, 'genset-l3': gensetYardL3, 'facp-l3': facpL3 };
   for (var hb = 2; hb <= 9; hb++) BUILDERS['dh-e-10' + hb] = dhE101;   // DH-E-102 ... : same builder, o.hall picks the hall (the builder refuses a hall the engine does not have)
   var API = {
     build: function (id, snap, o) { if (!BUILDERS[id]) throw new Error('hmi-sheets: no sheet ' + id); return BUILDERS[id](snap, o); },

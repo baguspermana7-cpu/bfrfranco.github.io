@@ -1009,7 +1009,7 @@
   function agentLabel() { var F = firePointsApi(); return F && F.AGENT_LABEL ? F.AGENT_LABEL : AGENT_LABEL_FALLBACK; }
   var FIRE_REASON = 'state from the fire cause-and-effect engine (RZDatahallAIFireCauseEffect) for the selected event; normal when no event is set (Track A §A6)';
   var FIRE_SPEC = 'fire-protection design selections are page-authored to NFPA 72 / NFPA 2001 — the engine publishes no fire quantity (Track A §A6)';
-  def('fire-facp', { kind: 'scenario', label: 'FACP', system: 'fire', tier2: null }, function (b, ctx, id) {
+  def('fire-facp', { kind: 'scenario', label: 'FACP', system: 'fire', tier2: 'facp' }, function (b, ctx, id) {
     var hp = hallPrefix(ctx, id);
     b.title = 'Fire alarm control panel ' + hp;
     b.ST('live', 'panel', 'Panel', fireState(ctx, null), FIRE_REASON);
@@ -1023,6 +1023,7 @@
     b.D('capacity', 'model', 'Panel', 'NFS2-3030 class, 640 points, 12 SLC loops', FIRE_SPEC);
     b.S('live', 'batt_v', 'Standby battery', { value: 26.8, text: '26.8 V float' }, 0.2, 'V', { digits: 1 });
     b.dep('downstream', 'fire-zone:' + hp + '-Z01', 'Detection zones');
+    b.tier2('facp', [hp]);
     b.trend('batt_v', 'Standby battery', 'V', { value: 26.8 }, 0.2);
   });
   def('fire-vesda', { kind: 'scenario', label: 'VESDA', system: 'fire', tier2: null }, function (b, ctx, id) {
@@ -1105,7 +1106,7 @@
     }
     b.dep('upstream', 'fire-facp:' + hp, 'FACP');
   });
-  def('fire-cylinder-bank', { kind: 'scenario', label: 'Agent cylinders', system: 'fire', tier2: null }, function (b, ctx, id) {
+  def('fire-cylinder-bank', { kind: 'scenario', label: 'Agent cylinders', system: 'fire', tier2: 'cylbank' }, function (b, ctx, id) {
     var hp = hallPrefix(ctx, id), fs = ctx.fire && ctx.fire.summary ? ctx.fire.summary : null;
     b.title = 'Cylinder bank ' + hp + ' — ' + agentLabel();
     b.S('live', 'pressure_bar', 'Cylinder pressure', { value: 42, text: '42 bar charged' }, 0.5, 'bar', { digits: 1 });
@@ -1114,6 +1115,7 @@
     b.D('capacity', 'agent', 'Agent', agentLabel() + ' — 4 × 180 L superpressurised cylinders (indicative); design concentration per NFPA 2001 for the selected agent is pending', FIRE_SPEC);
     b.dep('upstream', 'fire-zone:' + hp + '-Z01', 'Zones');
     b.trend('pressure_bar', 'Cylinder pressure', 'bar', { value: 42 }, 0.5);
+    b.tier2('cylbank', [hp]);
   });
   def('fire-mcp', { kind: 'scenario', label: 'Manual call point', system: 'fire', tier2: null }, function (b, ctx, id) {
     var hp = hallPrefix(ctx, id), pid = /^DH-/.test(String(id)) ? String(id) : hp + '-MCP-' + id, fp = firePointOf(ctx, pid), inv = fireInventory(ctx), rec = inv ? inv.byId[pid] : null;

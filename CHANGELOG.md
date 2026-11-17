@@ -11,6 +11,28 @@ release sections rather than semver.
 
 ---
 
+## v3.65.2 — 2026-11-17 — datahallAI: the fire panel opens its own schematic, the cylinder bank opens the release sheet
+
+### Added
+- **Fire alarm control panel schematic** (Fire → Mimic → FACP): the panel with every circuit the hall's point inventory
+  puts on it — three SLC loops with their devices by type (34 and 34 smoke detectors, 9 heat, 4 linear heat, 2 beam, a
+  call point per loop), 4 aspirating units, 2 notification circuits, 12 release, 12 abort and 12 pre-action circuits to
+  the suppression sheet, 3 EPO stations, the standby battery, the monitor-only link to the BMS. Every count is counted
+  from the inventory at draw time; a circuit with no point is not drawn.
+- **The clean-agent cylinder bank** opens the release sheet (DH-F-102) with the bank selected. Both opened the inspector
+  only (Shift+click still does).
+
+### Fixed
+- On a phone the header of a schematic modal with only a Close button took two lines (91 px, the button alone on the
+  second); it is one line (61 px).
+
+### Gates
+- `tools/test-dh-drawings.mjs` M9 (fire panel: its circuit counts equal the inventory's, points traceable; cylinder
+  bank: release sheet, bank selected, no duplicate id) — fails on v3.65.1. U7 (390 px header on one line) — 91 px
+  with the v3.65.1 stylesheet. H3 (reported): 32 of 45.
+- Without a schematic by design (4): a fire point, the aspirating detector, the manual call point and the EPO station
+  are isolable points — a click opens the inspector, where the isolation workflow lives.
+
 ## v3.65.1 — 2026-11-17 — datahallAI: the main transformer and the generator yard open their own schematic
 
 ### Added

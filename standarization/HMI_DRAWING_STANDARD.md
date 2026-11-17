@@ -173,6 +173,13 @@ its own data draws its own sheet: `leak-l3` (24 zones, one loop; a node with `pu
 when its own row is in fault), `fws-l3` (branches from the engine's CDU count). Nothing is drawn that the payload or
 the engine does not state. Laws M6, M7 (`tools/test-dh-drawings.mjs`), both red on v3.64.1.
 
+**Counted, not typed (v3.65.2).** `facp-l3` draws one symbol per circuit and device type and takes each count from
+the fire point inventory at draw time (`address` prefix × `type`); law M9 compares the drawn counts with the
+inventory's. `openSheetModal` takes `svgId` and `focus` like `drawAtBodyTop` (the cylinder bank on DH-F-102). An
+isolable fire point (detector, VESDA unit, call point, EPO) keeps the inspector on a plain click: its isolation
+workflow is there, so H3 will not count those four classes. Phone: a modal header whose only button is Close stays on
+one line (law U7).
+
 **Sheet modal (v3.65.1).** A class with its own L3 and no legacy modal opens through `openSheetModal({ cls, id, tag,
 name, sheet, o, read })` in `hmi-v2.js`: the sheet, the payload's points and alarms, the CDU / fire-zone shell. `read`
 names the sheet whose scenario mapping the nodes use (`dh-e-001` for `main-tx-l3` and `genset-l3`, whose node ids are
