@@ -28,7 +28,8 @@ read but not run, it says so.
 
 | Finding | Evidence | Status |
 |---|---|---|
-| Any session with an email is Pro | `auth.js` `getTier()`: no session → `free`; demo email → `demo`; every other email → `pro`. The `tier` stored in the record (from `profiles.tier`) is not read. | Read from the code, not yet reproduced in a browser. First task of P1 is the law that reproduces it. |
+| Any session with an email is Pro | `auth.js` `getTier()`: no session → `free`; demo email → `demo`; every other email → `pro`. The `tier` stored in the record (from `profiles.tier`) is not read. | **Reproduced** 2026-11-17, `tools/test-tier-authority.mjs`: T1 a signed-in account whose profile says `free` reads `pro`; T2 a typed record with nobody signed in reads `pro`. |
+| The calculators do not ask auth.js at all | `capex-calculator.html` `checkPremiumSession()`: any unexpired `rz_premium_session` sets `isPremiumUser = true` and `userTier = data.tier || 'pro'`. No email, no server. 101 pages read the key inline; 22 of them set a Pro state of their own (`isPremiumUser` / `activatePremiumUI` / `isPro`). | **Reproduced**: in T1 and T2 the calculator's Pro mode is on. |
 | The record itself is client-written | v3.64.0 closed this for `root` and `educator` only. | Proven (laws Z1–Z4). |
 | A free sign-up exists | `account.html` sign-up; migration `2026-11-14-signup-never-root.sql`; `profiles.tier` default `free`. | Read. |
 | 64 Pro-only and 96 demo-or-Pro features over 57 page entries | `js/rz-feature-flags.js` matrix. | Counted. |
@@ -50,8 +51,9 @@ Consequence: a visitor who signs up for free, or types a record, gets every Pro 
 
 | Phase | Release | Change | Files | Executor |
 |---|---|---|---|---|
-| P1-0 | no release | Laws first, red: T1 a free profile reads `free` and a Pro-only control stays locked; T2 a typed `tier:"pro"` record reads `free`; T3 the demo account reads `demo`; T4 a Pro profile reads `pro` with no prompt left open; T5 with Supabase unreachable a previously proven Pro user is not signed out and not upgraded (reads the last proven tier for this tab only, held in memory) | `tools/test-tier-authority.mjs` (new), stub `tierSupabaseBody({tier})` in `tools/lib/signed-in-supabase.mjs` | Opus |
-| P1-1 | v3.66.0 | `proven` gains `tier`; `getTier()` reads it; `proveIdentity()` runs for every record with an email, not only privileged claims; while pending, Pro controls render locked without a prompt and re-render on `rz-auth-change` | `auth.js`, `auth.min.js`, `js/rz-feature-flags.js` | Opus |
+| P1-0 | done 2026-11-17 for T1–T4 (`tools/test-tier-authority.mjs --report`: T1, T2 red; T3, T4 green) | Laws first, red: T1 a free profile reads `free` and a Pro-only control stays locked; T2 a typed `tier:"pro"` record reads `free`; T3 the demo account reads `demo`; T4 a Pro profile reads `pro` with no prompt left open; T5 with Supabase unreachable a previously proven Pro user is not signed out and not upgraded (reads the last proven tier for this tab only, held in memory) | `tools/test-tier-authority.mjs` (new), stub `tierSupabaseBody({tier})` in `tools/lib/signed-in-supabase.mjs` | Opus |
+| P1-1 | v3.66.0 | `proven` gains `tier`; `getTier()` reads it; `proveIdentity()` runs for every record with an email, not only privileged claims; while pending, Pro controls render locked without a prompt and re-render on `rz-auth-change`. New `_rzAuth.onTier(cb)`: calls `cb(tier)` once the proof has landed and again on every change — the one call a page needs | `auth.js`, `auth.min.js`, `js/rz-feature-flags.js` | Opus |
+| P1-1b | v3.66.0 – v3.66.x | The 22 pages that set a Pro state from the record: their inline reader is replaced by `_rzAuth.onTier(...)` (free until the proof lands). One page first (`capex-calculator.html`, laws T1–T4 on it), then the rest in groups of five by a codemod whose output is diffed page by page; each group ships with T1/T2 run on every page in it | 22 pages | Opus writes the codemod and the first page; Ark runs the groups |
 | P1-2 | same release | Sample every page family that reads the tier once at load and never again: one calculator with PDF export, one with Monte Carlo, `account.html`, one article with a Pro block. Each must re-render on `rz-auth-change`. | page fixes as found | Opus finds, Ark fixes per page (≤ 2 files a card) |
 | P1-3 | v3.66.1 | Demo as a Supabase account; `VALID_USERS`, `findUser`, the offline branches and the demo literal removed from `auth.js`; public copy unchanged | `auth.js`, `auth.min.js`; one SQL statement for the owner to run (in the PR text, not executed by the build session) | Opus |
 | P1-4 | later, per calculator | Pro-only result computed by `POST /calc` with the Supabase token; the page keeps its free computation | `cf-worker` (deploy by the owner), one calculator at a time | design per calculator |
@@ -71,7 +73,7 @@ Consequence: a visitor who signs up for free, or types a record, gets every Pro 
 
 ### 1.5 Done when
 
-T1–T6 green, each quoted red on v3.65.3; Z1–Z4 still green; `test-rz-ops-access`, `test-feature-overrides`,
+T1–T6 green on every one of the 22 pages (T1 and T2 are red on v3.65.3; T3 and T4 must stay green); Z1–Z4 still green; `test-rz-ops-access`, `test-feature-overrides`,
 `audit-page-gates` green; the owner confirms a root, a Pro and the demo sign-in on the live site; `AUTH_STANDARD.md`
 states that tier and role have one source.
 
