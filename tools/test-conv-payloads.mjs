@@ -105,3 +105,19 @@ test('P8 trend: 60 points, reference line, rows traced', () => {
     assert.ok(typeof p.tabs.trend.ref === 'number', p.id + ' ref');
   }
 });
+
+test('P9 a chilled-water return transmitter reads the return temperature, a supply one the supply', () => {
+  const sh = sheets.chiller, chws = IDX['cooling.chws_c'].value, chwr = IDX['cooling.chwr_c'].value;
+  assert.ok(Math.abs(chwr - chws) > 2, 'registry supply and return must differ for this law to mean anything');
+  const tts = sh.nodes.filter((n) => n.sym === 'instField' && n.inst === 'TT');
+  const ret = tts.filter((n) => /^(tthr|ttr\d)/.test(n.id)), sup = tts.filter((n) => /^(tths|tts\d)/.test(n.id));
+  assert.ok(ret.length >= 2 && sup.length >= 2 && ret.length + sup.length === tts.length, 'every TT is classed supply or return');
+  for (const [list, want, word] of [[ret, chwr, 'return'], [sup, chws, 'supply']]) {
+    for (const n of list) {
+      const p = P.build({ page: 'chiller', node: n, read: { values: {} }, edges: sh.edges, nodes: sh.nodes, tick: 7 });
+      const pv = p.tabs.live.find((r) => r.label === 'Process value');
+      assert.ok(Math.abs(parseFloat(pv.text) - want) <= 0.5, `${n.tag} (${word}) process value ${pv.text} is not near ${want}`);
+      assert.equal(p.tabs.trend.ref, want, `${n.tag} trend reference`);
+    }
+  }
+});

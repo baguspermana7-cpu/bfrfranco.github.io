@@ -1,0 +1,93 @@
+/* conv-vfx.css — process-bound colour and motion for the Conventional HMI sheets (js/conv/vfx.js,
+   PRD-CONV-LIVING-PLANT §4). A line's BODY colour is its condition; the moving dashes keep the medium colour, so the
+   medium stays readable; every state also has a dash pattern, so the sheet reads without colour.
+   Modes on .hmi-frame[data-vfx-mode]: state (default) | thermal | medium | flat. Tokens only; both themes. */
+:root:not([data-theme="dark"]) {
+  --vfx-run: #1a7f37; --vfx-warn: #8a5300; --vfx-alarm: #b42318; --vfx-stby: #3f6475; --vfx-stop: #6b7280; --vfx-na: #9aa3ad;
+  --vfx-bar-bg: #ffffff; --vfx-bar-line: rgba(15, 23, 42, .14); --vfx-bar-text: #1b2430; --vfx-bar-mute: #4b5563; --vfx-acc: #7a4800;
+}
+[data-theme="dark"] {
+  --vfx-run: #3fb950; --vfx-warn: #e8b563; --vfx-alarm: #f85149; --vfx-stby: #7fa6b8; --vfx-stop: #8b93a1; --vfx-na: #5b6370;
+  --vfx-bar-bg: #121316; --vfx-bar-line: rgba(255, 255, 255, .12); --vfx-bar-text: #e8edf5; --vfx-bar-mute: #9aa4b2; --vfx-acc: #e8b563;
+}
+
+/* ── state mode: the pipe body carries the condition ─────────────────────────────────────────────── */
+.hmi-frame[data-vfx-mode="state"] .hmi-svg .hmi-edge[data-vstate="running"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke: var(--vfx-run); }
+.hmi-frame[data-vfx-mode="state"] .hmi-svg .hmi-edge[data-vstate="warning"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke: var(--vfx-warn); }
+.hmi-frame[data-vfx-mode="state"] .hmi-svg .hmi-edge[data-vstate="alarm"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke: var(--vfx-alarm); }
+.hmi-frame[data-vfx-mode="state"] .hmi-svg .hmi-edge[data-vstate="stopped"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke: var(--vfx-stop); }
+/* standby: charged and ready, no water moving — a solid line in the standby colour, never a dashed "stopped" one */
+.hmi-frame .hmi-svg .hmi-edge[data-vstate="standby"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke-dasharray: none; }
+.hmi-frame[data-vfx-mode="state"] .hmi-svg .hmi-edge[data-vstate="standby"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke: var(--vfx-stby); }
+.hmi-frame[data-vfx-mode="state"] .hmi-svg .hmi-edge[data-vstate="mismatch"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke: var(--vfx-warn); }
+.hmi-frame[data-vfx-mode="state"] .hmi-svg .hmi-edge[data-vstate="unavailable"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke: var(--vfx-na); }
+/* flat (ISA-101 practice): grey when normal, colour only on abnormal */
+.hmi-frame[data-vfx-mode="flat"] .hmi-svg .hmi-edge[data-vstate]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke: var(--vfx-stop); }
+.hmi-frame[data-vfx-mode="flat"] .hmi-svg .hmi-edge[data-vstate="warning"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi),
+.hmi-frame[data-vfx-mode="flat"] .hmi-svg .hmi-edge[data-vstate="mismatch"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke: var(--vfx-warn); }
+.hmi-frame[data-vfx-mode="flat"] .hmi-svg .hmi-edge[data-vstate="alarm"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke: var(--vfx-alarm); }
+.hmi-frame[data-vfx-mode="flat"] .hmi-svg .hmi-flow[data-vstate] { stroke: var(--vfx-stop); }
+/* thermal: the body is the water temperature; a line with no temperature point, or with no flow, stays neutral */
+.hmi-frame[data-vfx-mode="thermal"] .hmi-svg .hmi-edge[data-vstate]:not([data-vstate="stopped"]):not([data-vstate="unavailable"]):not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke: var(--vfx-t, var(--vfx-na)); }
+.hmi-frame[data-vfx-mode="thermal"] .hmi-svg .hmi-edge[data-vstate="stopped"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke: var(--vfx-stop); }
+.hmi-frame[data-vfx-mode="thermal"] .hmi-svg .hmi-edge[data-vstate="unavailable"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke: var(--vfx-na); }
+.hmi-frame[data-vfx-mode="thermal"] .hmi-svg .hmi-flow[data-vstate] { stroke: var(--hmi-text, #e8edf5); opacity: .75; }
+
+/* ── the second signal: pattern, in every mode ───────────────────────────────────────────────────── */
+.hmi-frame[data-vfx-mode] .hmi-svg .hmi-edge[data-vstate="warning"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke-dasharray: 12 3; }
+.hmi-frame[data-vfx-mode] .hmi-svg .hmi-edge[data-vstate="alarm"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke-dasharray: 7 2 1.5 2; }
+.hmi-frame[data-vfx-mode] .hmi-svg .hmi-edge[data-vstate="mismatch"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke-dasharray: 2 3; }
+.hmi-frame[data-vfx-mode] .hmi-svg .hmi-edge[data-vstate="unavailable"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke-dasharray: 1 4; }
+
+/* ── flow: longer dashes than the sheet's dots; the period comes from the flow (inline animation-duration) ── */
+.hmi-frame[data-vfx-mode] .hmi-svg .hmi-flow[data-vstate] { stroke-dasharray: 5 11; stroke-width: 1.6; stroke-linecap: round; }
+.hmi-frame[data-vfx-mode] .hmi-svg .hmi-flow[data-vstate]:not([data-vmove]) { display: none; }
+
+/* ── symbols: body outline by condition ──────────────────────────────────────────────────────────── */
+.hmi-frame[data-vfx-mode="state"] .hmi-svg .hmi-node[data-vstate="running"] .b { stroke: var(--vfx-run); }
+.hmi-frame[data-vfx-mode="state"] .hmi-svg .hmi-node[data-vstate="standby"] .b { stroke: var(--vfx-stby); }
+.hmi-frame[data-vfx-mode="state"] .hmi-svg .hmi-node[data-vstate="warning"] .b,
+.hmi-frame[data-vfx-mode="flat"] .hmi-svg .hmi-node[data-vstate="warning"] .b { stroke: var(--vfx-warn); }
+.hmi-frame[data-vfx-mode="state"] .hmi-svg .hmi-node[data-vstate="alarm"] .b,
+.hmi-frame[data-vfx-mode="flat"] .hmi-svg .hmi-node[data-vstate="alarm"] .b { stroke: var(--vfx-alarm); }
+.hmi-frame[data-vfx-mode="state"] .hmi-svg .hmi-node[data-vstate="mismatch"] .b { stroke: var(--vfx-warn); stroke-dasharray: 2 2; }
+.hmi-frame[data-vfx-mode="state"] .hmi-svg .hmi-node[data-vstate="stopped"] .b { stroke: var(--vfx-stop); }
+
+/* pump rotor: a broken ring inside the casing; it turns only while the pump runs, at its speed */
+.hmi-svg .vfx-rotor { fill: none; stroke: currentColor; stroke-width: 1.2; stroke-dasharray: 4 5.2; opacity: .85; pointer-events: none;
+  transform-box: fill-box; transform-origin: center; color: var(--vfx-stop); }
+.hmi-frame[data-vfx-mode="state"] .hmi-svg .hmi-node[data-vstate="running"] .vfx-rotor { color: var(--vfx-run); }
+.hmi-frame[data-vfx-mode="state"] .hmi-svg .hmi-node[data-vstate="warning"] .vfx-rotor { color: var(--vfx-warn); }
+@media (prefers-reduced-motion: no-preference) {
+  .hmi-svg .vfx-rotor[data-spin] { animation: vfx-turn 1s linear infinite; }
+}
+@keyframes vfx-turn { to { transform: rotate(360deg); } }
+.hmi-depth.is-offscreen .vfx-rotor { animation-play-state: paused !important; }
+
+/* ── view bar + legend ───────────────────────────────────────────────────────────────────────────── */
+.vfx-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 4px 12px; background: var(--vfx-bar-bg);
+  border-bottom: 1px solid var(--vfx-bar-line); color: var(--vfx-bar-text); font: 400 11px/1.3 'IBM Plex Sans', system-ui, sans-serif; }
+.vfx-bar-k { font: 600 11px/1 'JetBrains Mono', ui-monospace, monospace; letter-spacing: .05em; text-transform: uppercase; color: var(--vfx-bar-mute); }
+.vfx-modes { display: inline-flex; }
+.vfx-mode { padding: 4px 8px; border: 1px solid var(--vfx-bar-line); background: transparent; color: var(--vfx-bar-mute); font: inherit; cursor: pointer; }
+.vfx-mode + .vfx-mode { border-left: 0; }
+.vfx-mode:first-child { border-radius: 3px 0 0 3px; } .vfx-mode:last-child { border-radius: 0 3px 3px 0; }
+.vfx-mode[aria-pressed="true"] { color: var(--vfx-bar-text); border-color: var(--vfx-acc); box-shadow: inset 0 -2px 0 var(--vfx-acc); }
+.vfx-mode:focus-visible { outline: 2px solid var(--vfx-acc); outline-offset: 1px; }
+@media (pointer: coarse) { .vfx-mode { min-height: 44px; padding: 4px 12px; } }
+.vfx-legend { display: inline-flex; flex-wrap: wrap; gap: 4px 12px; color: var(--vfx-bar-mute); }
+.vfx-lg { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.vfx-lg-line { display: inline-block; width: 26px; height: 2px; background: var(--vfx-stop); }
+.vfx-lg-line[data-vstate="running"] { background: var(--vfx-run); }
+.vfx-lg-line[data-vstate="warning"] { background: repeating-linear-gradient(90deg, var(--vfx-warn) 0px 12px, transparent 12px 15px); }
+.vfx-lg-line[data-vstate="alarm"] { background: repeating-linear-gradient(90deg, var(--vfx-alarm) 0px 7px, transparent 7px 9px, var(--vfx-alarm) 9px 10.5px, transparent 10.5px 12.5px); }
+.vfx-lg-line[data-vstate="standby"] { background: var(--vfx-stby); }
+.vfx-lg-line[data-vstate="stopped"] { background: repeating-linear-gradient(90deg, var(--vfx-stop) 0px 6px, transparent 6px 10px); }
+.vfx-lg-line[data-vstate="mismatch"] { background: repeating-linear-gradient(90deg, var(--vfx-warn) 0px 2px, transparent 2px 5px); }
+.vfx-lg-line[data-vstate="unavailable"] { background: repeating-linear-gradient(90deg, var(--vfx-na) 0px 1px, transparent 1px 5px); }
+.vfx-ramp { display: inline-block; width: 46px; height: 6px; border-radius: 1px; background: linear-gradient(90deg, rgb(59, 130, 246), rgb(232, 181, 99), rgb(239, 68, 68)); }
+.vfx-lg-ramp { display: none; }
+.vfx-legend[data-mode="thermal"] .vfx-lg:not(.vfx-lg-ramp) { display: none; }
+.vfx-legend[data-mode="thermal"] .vfx-lg-ramp { display: inline-flex; }
+.vfx-legend[data-mode="medium"] .vfx-lg { display: none; }
+.vfx-legend[data-mode="flat"] .vfx-lg[data-vstate="running"], .vfx-legend[data-mode="flat"] .vfx-lg[data-vstate="standby"] { display: none; }

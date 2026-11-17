@@ -1,6 +1,7 @@
 # PRD-CONV-LIVING-PLANT — the Conventional cockpits as a living plant
 
 Status: **APPROVED 2026-11-17 — the owner delegated the open decisions ("kamu yang tentukan yang terbaik"); the §14 defaults stand.**
+Shipped: P0 in v3.66.0 (2026-11-17); P1 (line state, motion, standby, view modes on chiller/fire/fuel/water) and P2 (trend + multitrend) in v3.67.0 (2026-11-18). Open: P3–P7.
 Scope: the 9 DC Conventional pages (`dc-conventional`, `datahall`, `chiller-plant`, `water-system`, `fire-system`,
 `fuel-system`, `ict`, `EPMS_Telemetry`, `cdu-mini-bms`). `datahallAI.html` and `js/datahall-ai/*` are out of scope.
 Supersedes the order of work in `standarization/Audit result/CONV_EXECUTION_PLAN_2026-11-16.md` (its engine and

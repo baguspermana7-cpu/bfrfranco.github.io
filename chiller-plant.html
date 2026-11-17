@@ -553,7 +553,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
         ]
     }
     </script>
-    <script src="js/rz-version.js?v=20261117-f6183154" defer></script>
+    <script src="js/rz-version.js?v=20261117-4a42d12a" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- Conventional BMS single scenario engine — single source of truth for the
@@ -566,7 +566,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
     <script src="js/rz-engine-versions.js?v=20261110-a5518a77"></script>
     <script src="js/conv-engine.js?v=2.2.0"></script>
     <!-- v1.134.2 — generated parameter registry + the shared basis drawer. -->
-    <script src="js/conv-parameters.js?v=20261117-283a6ef8"></script>
+    <script src="js/conv-parameters.js?v=20261117-9a57a2fe"></script>
     <!-- v1.134.25 — RZExplain, the site glossary engine. The cockpits were the only
          substantial pages carrying none of it, so terms an operator has to read
          (approach temperature, cycles of concentration, N+1, WUE) had nowhere to go.
@@ -583,19 +583,23 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
     <script src="js/rz-breaker-symbols.js?v=20260920-d428580e"></script>
     <link rel="stylesheet" href="css/rz-hmi.css?v=20261117-fe9b28c8">
     <link rel="stylesheet" href="css/conv-hmi-depth.css?v=20261115-09997c8c">
+    <link rel="stylesheet" href="css/conv-vfx.css?v=20261117-6e5c9ca8">
     <script src="js/conv/hmi-depth.js?v=20261115-d3e4a5ed"></script>
     <script src="js/rz-eng-symbols.js?v=20261115-b780482c"></script>
     <script src="js/rz-hmi-sheet.js?v=20261117-646bccf7"></script>
     <script src="js/conv/chiller-sheet.js?v=20261115-d7f3f3c6"></script>
     <script src="js/conv/sheet-truth.js?v=20261117-bdf6882a"></script>
-    <script src="js/conv/payloads.js?v=20261117-500c9796"></script>
-    <script src="js/conv/equipment-modal.js?v=20261117-1728631b"></script>
+    <script src="js/conv/payloads.js?v=20261117-d2a17788"></script>
+    <script src="js/conv/equipment-modal.js?v=20261117-4acc4243"></script>
+    <script src="js/conv/vfx.js?v=20261117-89056876"></script>
+    <script src="js/conv/history.js?v=20261117-1c72fb7f"></script>
+    <script src="js/rz-trend.js?v=20261117-e60cac7c"></script>
     <!-- v1.43.1 — Right-side inspector extended to chiller-plant. Click any
          tagged pipe to see Live/Capacity/Deps/Alarms/Trend/Maint tabs without
          occluding topology. Closes review doc-27 §3.2 P0 cross-page parity. -->
     <!-- v1.43.4 — alarm state machine + color discipline (review §3.3 + §4.3). -->
     <script src="js/rz-alarm-state.js?v=20260920-a912ad23" defer></script>
-    <script src="js/rz-inspector.js?v=20261117-2f28b242" defer></script>
+    <script src="js/rz-inspector.js?v=20261117-bbb735d4" defer></script>
     <!-- v1.43.2 — Data-quality service: top-banner + per-element chip integration. -->
     <script src="js/rz-telemetry-quality.js?v=20261113-8feb0dfd" defer></script>
     <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
@@ -1438,7 +1442,7 @@ function chwFlow(e){
      runs, and is unavailable when neither runs and one is not good. */
   var ps = CHW_EDGE_POINTS[e.id];
   if(ps) {
-    var fs = ps.map(chwPointFlow);
+    var fs = ps.map(chwTrainFlow);
     if(fs.indexOf('running') >= 0) return 'running';
     return fs.indexOf('unavailable') >= 0 ? 'unavailable' : 'stopped';
   }
@@ -1561,6 +1565,13 @@ function chwPointText(id) {
   return T4.text(r, CHW_POINTS[id]);
 }
 function chwPointFlow(id) { return CHW_AUTHORITY_AVAILABLE && chwPoints ? T4.flowState(chwPoints.get(id)) : 'unavailable'; }
+/* a train's branch point (chN:q) is a calculated reference, not a meter: with neither of the train's two pumps
+   proven running there is no water moving in that train, whatever the reference says */
+function chwTrainFlow(id) {
+  var m = /^ch(\d):q$/.exec(id), f = chwPointFlow(id);
+  if (!m || f !== 'running') return f;
+  return (chwPumpFb('pa' + m[1]) === 'on' || chwPumpFb('pb' + m[1]) === 'on') ? f : 'stopped';
+}
 /* a pump's own branch moves only while that pump runs and agrees with its command */
 function chwBranchFlow(pump) {
   if (chwPumpMismatch(pump)) return 'unavailable';
@@ -1578,15 +1589,49 @@ const chwInspect = (T4 && T4.opener) ? T4.opener(function (n) {
     declared: 'CH-M-101 simulated chiller plant (engine planes + authored operating state; no field device is read)',
     scenario: CHW_AUTHORITY_AVAILABLE ? 'design point' : 'authority unavailable' });
 }, '#chw-sheet-host') : null;
+if(window.RZTrend){ window.RZTrend.bind(document); }
 function chwOpen(n, api, el){
   if(chwInspect) chwInspect(n, api, el);
   const lp = chwLoopOf(n.id);
   if(lp && CHW_AUTHORITY_AVAILABLE && window.RZBMSShell && typeof updateLoopInspector === 'function') updateLoopInspector(lp.id);
 }
+/* P1 (PRD-CONV-LIVING-PLANT §4-§5): line colour = condition, dash speed = flow / design flow, pump rotor = drive
+   speed, Thermal mode = the engine CHWS/CHWR planes. Every input below is a value the page already holds. */
+function chwVfx(){
+  var V = window.RZConvVfx, host = $('chw-sheet-host'); if(!V || !host || !chwSheet) return;
+  var frame = host.querySelector('.hmi-frame'), svg = host.querySelector('svg.hmi-svg'); if(!frame || !svg) return;
+  var sheet = chwSheetMode === 'unavailable' ? window.RZChillerSheets.unavailable : window.RZChillerSheets.pid;
+  var lo = CHW.chws, hi = CHW.chwr;
+  V.mount(frame, { tempRange: (lo != null && hi != null) ? [conv.t(lo, ui.unit), conv.t(hi, ui.unit)] : null, tempUnit: '°' + conv.tu(ui.unit) });
+  function val(pid){ var r = chwPoints ? chwPoints.get(pid) : null; return r && r.quality === 'good' ? r.value : null; }
+  V.apply(svg, { edges: sheet.edges, flow: chwFlow, tempRange: [lo, hi],
+    ratio: function(e){
+      var pump = CHW_EDGE_PUMP[e.id];
+      if(pump){ var lp = st.loops[Number(pump.slice(2)) - 1]; return lp && LOOP_FLOW_DESIGN ? lp.flow / LOOP_FLOW_DESIGN : null; }
+      var ps = CHW_EDGE_POINTS[e.id]; if(!ps) return null;
+      var sum = 0, des = 0;
+      ps.forEach(function(p){ var v = val(p); if(v != null) sum += v; des += (p === 'sref:q') ? (CHW.flow || 0) : (LOOP_FLOW_DESIGN || 0); });
+      return des > 0 ? sum / des : null;
+    },
+    temp: function(e){
+      if(!CHW_AUTHORITY_AVAILABLE) return null;
+      /* supply side: chiller outlet legs, supply headers, secondary pumps, CRAH supply drops;
+         return side: CRAH returns, return headers, the pump branches and the leg into each evaporator */
+      if(/^e-(s\d|hs|sec|avs|c[A-D]s$)/.test(e.id)) return st.header.chws;
+      if(/^e-(r\d|hr|ev\d|p[ab]\d|avr|et$|c[A-D]r$)/.test(e.id)) return st.header.chwr;
+      return null;
+    },
+    speed: function(id){
+      var m = /^p([ab])(\d)$/.exec(id);
+      if(m){ var lp = st.loops[Number(m[2]) - 1]; return lp ? (m[1] === 'a' ? lp.spdA : lp.spdB) : null; }
+      /* secondary pumps publish no drive speed: the rotor follows the secondary flow as a share of design */
+      return (/^ps\d$/.test(id) && CHW.flow) ? Math.min(100, 100 * st.header.flow / CHW.flow) : null;
+    } });
+}
 function mountChwSheet(mode){
   const host = $('chw-sheet-host');
   if(!host || !window.RZHmiSheet || !window.RZChillerSheets) return;
-  if(chwSheet && chwSheetMode === mode){ chwSheet.update(); chwTagLines(); if(window.RZHmiDepth) window.RZHmiDepth.apply(host.querySelector('svg.hmi-svg'), { levels: {} }); return; }
+  if(chwSheet && chwSheetMode === mode){ chwSheet.update(); chwTagLines(); if(window.RZHmiDepth) window.RZHmiDepth.apply(host.querySelector('svg.hmi-svg'), { levels: {} }); chwVfx(); return; }
   if(chwSheet && chwSheet.destroy) chwSheet.destroy();
   const sheet = mode === 'unavailable' ? window.RZChillerSheets.unavailable : window.RZChillerSheets.pid;
   chwSheet = window.RZHmiSheet.render(host, sheet, { read: chwRead, flow: chwFlow, open: chwOpen });
@@ -1596,6 +1641,7 @@ function mountChwSheet(mode){
   if(svg) svg.setAttribute('aria-label', mode === 'unavailable' ? 'Chiller plant authority unavailable' : 'Chiller P&ID mimic');
   chwTagLines();
   if(window.RZHmiDepth) window.RZHmiDepth.apply(host.querySelector('svg.hmi-svg'), { levels: {} });   /* W3 depth */
+  chwVfx();
 }
 function drawUnavailablePid(){ mountChwSheet('unavailable'); }
 function drawPid(){

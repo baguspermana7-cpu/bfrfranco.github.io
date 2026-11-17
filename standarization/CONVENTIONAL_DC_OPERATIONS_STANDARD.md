@@ -320,6 +320,27 @@ Before release:
 
 ## 10. Change and lesson ledger
 
+### 2026-11-18 — line state and motion contract (v3.67.0, PRD-CONV-LIVING-PLANT P1/P2)
+
+- **A line is painted by its own state.** On a governed P&ID sheet the pipe body carries `data-vstate` from
+  `RZConvVfx.apply()`: running, warning, alarm, standby, stopped, mismatch, unavailable. The state comes from the
+  page's own flow function and the alarm or mismatch at the line's ends; a page never colours a line by hand.
+- **Colour is never the only signal.** Every non-running state has its own dash pattern; standby is solid in the
+  standby colour.
+- **Motion is a measurement.** Dash period = `dashSeconds(flow / design)`; rotor period = `rotorSeconds(speed %)`.
+  A stopped, standby or no-data line shows no moving dashes. `prefers-reduced-motion` removes the animation only.
+- **Standby needs evidence.** A no-flow line reads standby only when the page states why it is held ready
+  (fire: header pressure above the low alarm; N2: not released). Without that it is stopped.
+- **A calculated flow reference is not a meter.** A line that follows a calculated branch reference also needs a
+  proven mover: a chiller train with neither pump proven running is stopped.
+- **Thermal view** is offered only on a sheet with temperature points, and only running lines take a temperature colour.
+- **Trend.** A reading that has a trend definition opens `RZTrend`; the history is `RZConvHistory` (deterministic,
+  labelled SIMULATED). A page loads `js/conv/history.js` + `js/rz-trend.js`; it does not build its own trend.
+- **Lessons.** A probe placed on `<body>` read the wrong theme token because the sheet host pins its own theme;
+  a download anchor clicked on `<body>` counted as an outside click and closed the inspector; removing a colour rule
+  for no-flow lines exposed the medium colour underneath, so the neutral colour is set explicitly.
+- Gates: `test-conv-vfx-core`, `test-conv-history`, `test-conv-vfx-trend`, `test-conv-vfx-sheets` (ship gate).
+
 ### 2026-11-17 — equipment inspection contract (v3.66.0, PRD-CONV-LIVING-PLANT P0)
 
 - **Every tagged symbol opens.** A click (or Enter) on a tagged symbol of a governed sheet opens the right-side

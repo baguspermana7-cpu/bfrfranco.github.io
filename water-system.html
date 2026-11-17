@@ -74,10 +74,14 @@
     <script src="js/rz-hmi-sheet.js?v=20261117-646bccf7"></script>
     <link rel="stylesheet" href="css/conv-hmi-depth.css?v=20261115-09997c8c">
     <script src="js/conv/hmi-depth.js?v=20261115-d3e4a5ed"></script>
+    <link rel="stylesheet" href="css/conv-vfx.css?v=20261117-6e5c9ca8">
+    <script src="js/conv/vfx.js?v=20261117-89056876"></script>
+    <script src="js/conv/history.js?v=20261117-1c72fb7f"></script>
+    <script src="js/rz-trend.js?v=20261117-e60cac7c"></script>
     <script src="js/conv/water-sheet.js?v=20261115-d6200856"></script>
     <script src="js/conv/sheet-truth.js?v=20261117-bdf6882a"></script>
-    <script src="js/conv/payloads.js?v=20261117-500c9796"></script>
-    <script src="js/conv/equipment-modal.js?v=20261117-1728631b"></script>
+    <script src="js/conv/payloads.js?v=20261117-d2a17788"></script>
+    <script src="js/conv/equipment-modal.js?v=20261117-4acc4243"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4" crossorigin="anonymous"></script>
     <!-- conv-engine: single scenario basis (WUE = water vol / IT energy, computed).
          Loaded NON-deferred + external so window.CONV_CALC exists before the
@@ -86,7 +90,7 @@
     <script src="js/conv-engine.js?v=2.2.0"></script>
     <!-- v1.134.3 — generated parameter registry + the ONE shared basis drawer.
          Replaces provenance restated by hand; see js/rz-basis-drawer.js. -->
-    <script src="js/conv-parameters.js?v=20261117-283a6ef8"></script>
+    <script src="js/conv-parameters.js?v=20261117-9a57a2fe"></script>
     <!-- v1.134.25 — RZExplain, the site glossary engine. The cockpits were the only
          substantial pages carrying none of it, so terms an operator has to read
          (approach temperature, cycles of concentration, N+1, WUE) had nowhere to go.
@@ -108,7 +112,7 @@
          to see its medium / state / capacity / flow / etc. tabs. Additive. -->
     <!-- v1.43.4 — alarm state machine + color discipline (review §3.3 + §4.3). -->
     <script src="js/rz-alarm-state.js?v=20260920-a912ad23" defer></script>
-    <script src="js/rz-inspector.js?v=20261117-2f28b242" defer></script>
+    <script src="js/rz-inspector.js?v=20261117-bbb735d4" defer></script>
     <!-- v1.43.2 — Data-quality service: top-banner + per-element chip. -->
     <script src="js/rz-telemetry-quality.js?v=20261113-8feb0dfd" defer></script>
     <script src="js/rz-provenance.js?v=20261111-6f1cd061" defer></script>
@@ -450,7 +454,7 @@
             .kpi-grid > .kpi .th { display: flex; align-items: center; }
         }
 </style>
-    <script src="js/rz-version.js?v=20261117-f6183154" defer></script>
+    <script src="js/rz-version.js?v=20261117-4a42d12a" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
 <style id="rz-skiplink-v1">
@@ -1077,6 +1081,7 @@
                 if (window.RZHmiDepth) window.RZHmiDepth.apply(document.getElementById('water-svg'), { levels: {
                     rawtank: { pct: siteBalanceAvailable ? rawPct : null, medium: 'pw' },
                     domtank: { pct: siteBalanceAvailable ? domPct : null, medium: 'pw' } } });
+                if (window.RZConvVfx) window.RZConvVfx.bind(host, window.RZWaterSheets.pid, waterFlow);   /* line colour = condition */
             }
 
             // ---- Render once (deterministic) ------------------------------

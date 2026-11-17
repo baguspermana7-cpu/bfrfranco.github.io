@@ -442,7 +442,10 @@
         + ' data-evidence="' + esc(evOf(r.basis)) + '" tabindex="0" role="button" style="--rz-ev:' + evColor(evOf(r.basis)) + '" title="' + esc(r.basis + ' · ' + evOf(r.basis)) + '"';
     }
     var col = r.quality === 'simulated' ? '#b0678f' : r.quality === 'replay' ? '#d49a2a' : r.quality === 'state' ? '#7dd3fc' : '#8fa2b8';
-    return ' data-rz-authored-basis="' + esc(r.declared || '') + '"' + (r.sim ? ' data-rz-sim="1"' : '') + ' style="--rz-ev:' + col + '" title="' + esc((r.quality || 'declared').toUpperCase() + ' · ' + (r.declared || '')) + '"';
+    /* P2: a simulated reading with a trend definition opens its history (js/rz-trend.js) on click / Enter */
+    var tr = '';
+    if (r.trend && root.RZTrend) { root.RZTrend.register([r.trend]); tr = ' data-trend="' + esc(r.trend.id) + '" tabindex="0" role="button" aria-label="' + esc(r.label + ': open trend') + '"'; }
+    return ' data-rz-authored-basis="' + esc(r.declared || '') + '"' + (r.sim ? ' data-rz-sim="1"' : '') + tr + ' style="--rz-ev:' + col + '" title="' + esc((r.quality || 'declared').toUpperCase() + ' · ' + (r.declared || '')) + '"';
   }
   function payloadRow(r) {
     var cls = 'rz-inspector-v' + (r.state ? ' state-' + esc(r.state) : '');
@@ -630,6 +633,8 @@
     /* ESC to close. */
     doc.addEventListener('keydown', function (e) {
       if (e.key !== 'Escape' || !isOpen()) { return; }
+      /* the equipment modal and the trend modal sit above the inspector and own ESC first */
+      if ((root.RZConvModal && root.RZConvModal.isOpen()) || (root.RZTrend && root.RZTrend.isOpen())) { return; }
       /* a centre modal above the inspector owns ESC first (DHModal on the AI cockpit) */
       if (root.DHModal && typeof root.DHModal.isOpen === 'function' && root.DHModal.isOpen()) { return; }
       close();
@@ -648,6 +653,7 @@
         /* v1.46.0 — a click inside a DHModal panel or on its scrim is never an "outside" intent: the panel
            was opened FROM the inspector and the inspector must still be there when it closes */
         if (t.classList && (t.classList.contains('dh-modal-host') || t.classList.contains('dh-scrim'))) { return; }
+        if (t.classList && (t.classList.contains('rz-trend') || t.classList.contains('rz-cvm'))) { return; }
         t = t.parentNode;
       }
       close();

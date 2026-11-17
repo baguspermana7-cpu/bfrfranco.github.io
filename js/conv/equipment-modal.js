@@ -41,7 +41,7 @@
     '.rz-cvm-sec h3{margin:0 0 6px;font:600 10.5px/1.3 IBM Plex Sans,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--cvm-mute)}' +
     '.rz-cvm-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:3px 0;border-bottom:1px dashed var(--cvm-line)}.rz-cvm-row:last-child{border-bottom:0}' +
     '.rz-cvm-k{color:var(--cvm-mute);min-width:0}.rz-cvm-v{font-family:JetBrains Mono,monospace;text-align:right;overflow-wrap:anywhere}' +
-    '.rz-cvm-v[data-basis-param]{cursor:pointer;text-decoration:underline dotted}' +
+    '.rz-cvm-v[data-basis-param],.rz-cvm-v[data-trend]{cursor:pointer;text-decoration:underline dotted}' +
     '.rz-cvm-v[data-basis-param]::after,.rz-cvm-v[data-rz-authored-basis]::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;margin-left:6px;vertical-align:middle;background:var(--rz-ev,#8fa2b8)}' +
     '.rz-cvm-v[data-rz-sim]::before{content:"SIM";display:inline-block;margin-right:6px;padding:0 3px;border:1px solid rgba(176,103,143,.75);border-radius:2px;font:600 9px/1.4 JetBrains Mono,monospace;color:#e3a6c6;vertical-align:1px}' +
     '[data-theme="light"] .rz-cvm-v[data-rz-sim]::before{color:#7d2d59}' +
@@ -59,10 +59,15 @@
   }
   function ev(id) { return root.RZSvgBasis ? root.RZSvgBasis.evidenceOf(id) : 'DERIVED'; }
   function evColor(cls) { return root.RZEvidence ? root.RZEvidence.color(cls) : '#8fa2b8'; }
+  function trendAttr(r) {
+    if (!r.trend || !root.RZTrend) return '';
+    root.RZTrend.register([r.trend]);
+    return ' data-trend="' + esc(r.trend.id) + '" tabindex="0" role="button" aria-label="' + esc(r.label + ': open trend') + '"';
+  }
   function cell(r) {
     var a;
     if (r.basis) a = ' data-basis-param="' + esc(r.basis) + '" tabindex="0" role="button" style="--rz-ev:' + evColor(ev(r.basis)) + '" title="' + esc(r.basis + ' · ' + ev(r.basis) + ' — open the basis') + '"';
-    else a = ' data-rz-authored-basis="' + esc(r.declared || '') + '"' + (r.sim ? ' data-rz-sim="1"' : '') + ' style="--rz-ev:' + (r.sim ? '#b0678f' : '#8fa2b8') + '" title="' + esc(r.declared || '') + '"';
+    else a = ' data-rz-authored-basis="' + esc(r.declared || '') + '"' + (r.sim ? ' data-rz-sim="1"' : '') + trendAttr(r) + ' style="--rz-ev:' + (r.sim ? '#b0678f' : '#8fa2b8') + '" title="' + esc(r.declared || '') + '"';
     return '<span class="rz-cvm-v"' + a + '>' + esc(r.text) + (r.unit ? ' ' + esc(r.unit) : '') + '</span>';
   }
   function rows(list) {
@@ -114,6 +119,7 @@
   }
   function onKey(e) {
     if (!el || el.hidden) return;
+    if (root.RZTrend && root.RZTrend.isOpen()) return;   /* the trend modal sits above this one and owns the keyboard */
     if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(); return; }
     if (e.key === 'Tab') {
       var f = focusables(); if (!f.length) return;

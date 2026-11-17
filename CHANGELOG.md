@@ -11,6 +11,45 @@ release sections rather than semver.
 
 ---
 
+## v3.67.0 — 2026-11-18 — Conventional P&ID sheets: line colour and motion follow the process, trend modal
+
+### Added
+- **Process-bound line colour on the chiller, fire, fuel and water sheets** (`js/conv/vfx.js`, `css/conv-vfx.css`).
+  A view bar on each sheet switches the line colour mode: State (green running, amber warning, red alarm, slate
+  standby, grey dashed stopped, dotted no data), Medium, Flat (grey, colour only on abnormal), and on the chiller plant
+  Thermal (supply to return temperature ramp). Every state also has a dash pattern, so colour is never the only signal.
+- **Motion that means something.** The moving dashes on a line run at a period derived from its flow as a share of
+  design (2.0 m/s at design, clamped 0.2–3.0 m/s); a pump rotor turns with its drive speed; a line with no flow shows
+  no motion. Reduced-motion preference stops the animation and keeps the states.
+- **Standby as its own state.** A fire main at rest is charged and held ready: the pump set, riser, header, wet and
+  pre-action branches read standby while the header holds above the low-pressure alarm, the N2 line while the system is
+  not released. The make-up and test/drain lines stay stopped.
+- **Trend modal** (`js/rz-trend.js`, `js/conv/history.js`): a click on a simulated reading in the inspector or the
+  equipment modal opens its trend. Add series to compare (multitrend), ranges 5 m to 7 d, cursor readout by click or
+  arrow keys, min/max/mean and time above limit, CSV export. The history is a deterministic training series per point,
+  labelled SIMULATED; engine-anchored points show their engine reference line.
+- **Protection and topology libraries, not yet on a page** (`js/conv/tcc.js`, `js/conv/sld-topology.js`): IEC 60255
+  inverse-time curves, transformer damage and inrush points, cable withstand, a coordination check, and an
+  energisation solver from breaker states. They carry Node tests and wait for the SLD work (PRD phases P4–P5).
+
+### Fixed
+- **A chilled-water return transmitter reads the return temperature.** TT-CHWR and the per-train TT-n02 showed the
+  supply value (19.4 °C) as process value and trend reference beside the sheet's own 27 °C. Found on the live v3.66.0
+  modal.
+- **A chiller train with no pump running moves no water.** With both pumps of a train off, its supply, return and
+  evaporator legs kept the running state from the calculated branch reference. They now stop.
+- **Thermal view**: pump branches, the leg into each evaporator and the CRAH drops now sit on the correct side
+  (return / supply); a line with no flow stays neutral instead of taking a temperature colour.
+- **Export CSV no longer closes the inspector** under the trend modal (the download link was clicked on `<body>`).
+
+### Gates
+- `tools/test-conv-vfx-core.mjs` (6), `test-conv-history.mjs` (7), `test-conv-tcc.mjs` (5), `test-conv-sld-topology.mjs`
+  (7), `test-conv-payloads.mjs` law P9; browser gates `test-conv-vfx-trend.mjs` (40 checks) and
+  `test-conv-vfx-sheets.mjs` (31 checks). All wired into `tools/ship-gate.sh`.
+- Standard: `standarization/CONVENTIONAL_DC_OPERATIONS_STANDARD.md` §10 "line state and motion contract".
+
+---
+
 ## v3.66.0 — 2026-11-17 — Conventional cockpits: every symbol opens, the inspector is filled, one equipment modal
 
 ### Added

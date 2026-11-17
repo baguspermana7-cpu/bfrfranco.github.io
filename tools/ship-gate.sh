@@ -174,6 +174,15 @@ gate "Conventional payloads — every symbol class: 6 tabs with content, basis r
 gate "Conventional equipment modal — open, focus trap, inert page, Esc, focus return, no timers left, traced cells (390 + 1440)" node tools/test-conv-equipment-modal.mjs
 gate "Conventional depth ratchet — symbols open, inspector depth, engine-hooked cells (tools/conv-depth-thresholds.json)" node tools/test-conv-depth.mjs
 gate "Conventional modals — no modal repeats the sheet it was opened from (owner C10)" node tools/test-conv-modal-no-self-repeat.mjs
+# v3.67.0 (PRD-CONV-LIVING-PLANT P1/P2) — line colour and motion are bound to the process: a line is painted by its own
+# flow state, the dash period follows flow, a rotor follows speed, no-flow lines never move. Before it every pipe on the
+# four P&ID sheets was the same grey in every condition. The trend modal reads one deterministic history per point.
+gate "Conventional VFX core — state grammar, standby, flow speed, rotor, thermal ramp, deterministic" node --test tools/test-conv-vfx-core.mjs
+gate "Conventional history — deterministic series per point, stats, limits, CSV" node --test tools/test-conv-history.mjs
+gate "Conventional TCC curves — IEC 60255 families, transformer damage/inrush, cable withstand, coordination" node --test tools/test-conv-tcc.mjs
+gate "Conventional SLD topology — energisation from breaker states, bus balance" node --test tools/test-conv-sld-topology.mjs
+gate "Conventional VFX + trend on the chiller plant — state colour, flow speed, rotor, thermal, reduced motion, trend modal (390 + 1440)" node tools/test-conv-vfx-trend.mjs
+gate "Conventional VFX on fire, fuel, water — view bar, line states, standby, running colour + motion, trend from the inspector" node tools/test-conv-vfx-sheets.mjs
 # v3.21.9 — the reveal gate existed but was never wired, so it went stale for five releases (it
 # still expected four floor views after the building became six levels). Every building level must
 # open its own floor plan.

@@ -5,7 +5,7 @@
  *   build(o)   o = { page, node:{id,sym,tag,label}, read, store, edges, mismatch, acked, declared, scenario, tick,
  *                    engineVersion }
  *              -> a frozen payload for RZInspector.openPayload: six tabs, none empty.
- *   classOf(page, sym) -> the class recipe (page-specific first, then the generic symbol class), or null.
+ *   classOf(page, sym[, node]) -> the class recipe (page-specific first, then the generic symbol class; a return-header transmitter gets the return anchor), or null.
  *   rows       every row is { label, text, unit, quality, basis | declared, sim? }:
  *                basis    = a registry id in data/conv-parameters.json; text is the registry value at the printed
  *                           precision (the registry is generated from js/conv-engine.js, so it IS the engine value).
@@ -354,10 +354,33 @@
     cap: [B('Design pump demand', 'fire.pump_demand_lpm', 0), D('Range', '0–150 % of pump rating')], al: [D('Flow with no demand', 'flow > 5 % while no pump runs')], m: 'meter',
     g: 'Flow with no pump running means a head, a test valve or a leak is open.' };
 
-  function classOf(page, sym) {
-    return CLASSES[page + ':' + sym] || CLASSES[sym] || null;
+  /* A transmitter on the return header measures the return temperature: same recipe, the other registry anchor. */
+  function onReturn(page, n) {
+    return page === 'chiller' && n && n.sym === 'instField' && /^(tthr|ttr\d)/.test(n.id || '');
+  }
+  function swapAnchor(spec) {
+    if (!spec || spec.id !== 'cooling.chws_c' || spec.label !== 'Process value') return spec;
+    var out = {}, k;
+    for (k in spec) if (Object.prototype.hasOwnProperty.call(spec, k)) out[k] = spec[k];
+    out.id = 'cooling.chwr_c'; out.amp = 0.25;
+    return out;
+  }
+  function classOf(page, sym, n) {
+    var cls = CLASSES[page + ':' + sym] || CLASSES[sym] || null, out, k;
+    if (!cls || !onReturn(page, n)) return cls;
+    out = {};
+    for (k in cls) if (Object.prototype.hasOwnProperty.call(cls, k)) out[k] = cls[k];
+    out.live = cls.live.map(swapAnchor); out.tr = swapAnchor(cls.tr);
+    return out;
   }
 
+  /* P2: a simulated reading is a trend point (js/rz-trend.js draws its history from js/conv/history.js) */
+  function trendDef(ctx, spec, base, unit, cls) {
+    var d = { id: ctx.id + ':' + spec.label.toLowerCase().replace(/[^a-z0-9]+/g, '-'), label: (ctx.tag || ctx.id) + ' · ' + spec.label, unit: unit,
+      base: base, amp: spec.amp, digits: isNum(spec.digits) ? spec.digits : 1, shape: 'load', cls: cls, group: ctx.tag || ctx.id };
+    if (cls === 'ENGINE') d.ref = base;
+    return d;
+  }
   function rowOf(spec, ctx) {
     var p, v;
     switch (spec.k) {
@@ -369,10 +392,12 @@
         p = param(spec.id);
         v = p && isNum(p.value) ? wave(ctx.id + ':' + spec.label, ctx.tick, p.value, spec.amp, spec.period) : null;
         return { label: spec.label, text: fmt(v, spec.digits), unit: unitOf(p), quality: 'simulated', sim: true,
-          declared: SIMD + '; anchored on the engine value ' + spec.id };
+          declared: SIMD + '; anchored on the engine value ' + spec.id,
+          trend: p && isNum(p.value) ? trendDef(ctx, spec, p.value, unitOf(p), 'ENGINE') : null };
       case 'S':
         v = spec.amp ? wave(ctx.id + ':' + spec.label, ctx.tick, spec.base, spec.amp, spec.period) : spec.base;
-        return { label: spec.label, text: fmt(v, spec.digits), unit: spec.unit || '', quality: 'simulated', sim: true, declared: SIMD };
+        return { label: spec.label, text: fmt(v, spec.digits), unit: spec.unit || '', quality: 'simulated', sim: true, declared: SIMD,
+          trend: spec.amp ? trendDef(ctx, spec, spec.base, spec.unit || '', 'SIM') : null };
       default:
         return { label: spec.label, text: spec.text, unit: '', quality: 'declared', declared: DECL };
     }
@@ -432,9 +457,9 @@
   }
 
   function build(o) {
-    var n = o.node || {}, page = o.page || o.classId || 'conv', cls = classOf(page, n.sym);
+    var n = o.node || {}, page = o.page || o.classId || 'conv', cls = classOf(page, n.sym, n);
     var reg = registry(), tick = isNum(o.tick) ? o.tick : 0, id = n.id || 'x', tag = n.tag || id;
-    var ctx = { id: page + ':' + id, tick: tick };
+    var ctx = { id: page + ':' + id, tick: tick, tag: tag };
     var r = o.read || {}, values = r.values || {}, live = [], alarms = [];
     var qualityWord = { good: 'measured', stale: 'stale', bad: 'bad', nodata: 'no data' };
     /* 1. the sheet's own state rows (what the drawing prints), each with its point quality */
