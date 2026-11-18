@@ -1,6 +1,6 @@
 # PRD-SITE-CHROME — one navbar position, one theme button, on every page
 
-Status: **APPROVED by the owner 2026-11-18 (plan mode, defaults OD-1 … OD-7 as written). Phase N0 in progress.**
+Status: **APPROVED by the owner 2026-11-18 (plan mode, defaults OD-1 … OD-7 as written). Phase N0 done (0197411b0); N1 done in v3.68.0 (12 pages: 9 calculators, compare, tools, DC Solutions — the family is 12 pages, not ≈ 20; module is `js/rz-chrome.js`, tool `tools/sweep-site-chrome.py`). Next: N2 journal.**
 Owner comment (R166): "Navbar position, theme button nggak konsisten. Rancang PRD dengan detail dan comprehensive."
 
 ## Reconciliation with the other draft of the same PRD

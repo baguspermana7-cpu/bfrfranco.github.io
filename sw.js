@@ -2,7 +2,7 @@
 // Cache-first for static assets, network-first for HTML pages
 // CACHE_NAME is auto-synced from js/rz-version.js by tools/sync-sw-version.py
 
-const CACHE_NAME = 'rz-cache-v3.67.0'; // version-aware: invalidates on every site bump
+const CACHE_NAME = 'rz-cache-v3.68.0'; // version-aware: invalidates on every site bump
 
 // v1.29.0 — Critical auth/config files that MUST be fetched fresh when online.
 // Cached only as offline fallback. Rescues users stranded on a stale SW
@@ -14,6 +14,8 @@ const NETWORK_FIRST_PATHS = [
   '/js/rz-version.js',
   '/js/rz-feature-flags.js',
   '/js/rz-mobile-nav.js',
+  '/js/rz-chrome.js',
+  '/css/rz-chrome.css',
   '/js/rz-cookie-consent.js',
   '/js/rz-documentation-ui.js',
   '/js/rz-telemetry-quality.js',

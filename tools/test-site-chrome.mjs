@@ -49,7 +49,7 @@ for (const f of CFG.app) if (!all.includes(f)) fail('CH9', f, 'listed as app but
 // CH7 — source scan (script and style bodies of the page itself)
 for (const f of pages) {
   const s = fs.readFileSync(path.join(ROOT, f), 'utf8'), why = [];
-  if (/function\s+toggleTheme\s*\(|(themeToggle|theme-toggle|themeBtn)[\s\S]{0,160}addEventListener\(\s*['"]click/.test(s)) why.push('own toggle code');
+  if (/function\s+toggle\w*Theme\w*\s*\(|(themeToggle|theme-toggle|themeBtn)[\s\S]{0,160}addEventListener\(\s*['"]click/.test(s)) why.push('own toggle code');
   const keys = [...s.matchAll(/localStorage\.(?:getItem|setItem)\(\s*['"]((?:rz[-_])?(?:admin[-_])?theme|darkMode|dark-mode|color-theme)['"]/g)].map((m) => m[1]).filter((k) => k !== 'theme');
   if (keys.length) why.push('theme key ' + [...new Set(keys)].join(','));
   if (/<style[^>]*>[\s\S]*?(^|[\s}])\.navbar\s*\{[\s\S]*?<\/style>/m.test(s)) why.push('.navbar rule in the page');
@@ -72,13 +72,13 @@ const measure = () => {
   const tsel = '[data-rz-theme-toggle], #themeToggle, #navThemeBtn, .theme-toggle, .theme-btn, .rz-theme-btn, [aria-label*="theme" i], [onclick*="toggleTheme"]';
   const ts = [...new Set([...document.querySelectorAll(tsel)])].filter(vis), t = ts[0] || null, tr = t ? t.getBoundingClientRect() : null;
   const x = (sel) => { const e = [...document.querySelectorAll(sel)].filter(vis)[0]; return e ? Math.round(e.getBoundingClientRect().left) : null; };
-  const order = [['search', x('.nav-search-btn, [data-rz-search], #rzSearchBtn')], ['theme', tr ? Math.round(tr.left) : null], ['signin', x('.rz-auth-wrap, #rzLoginBtn, .rz-login-btn, .rz-user-btn')], ['menu', x('.rz-nav-burger')]].filter((p) => p[1] != null).sort((a, b) => a[1] - b[1]).map((p) => p[0]);
+  const order = [['search', x('[data-rz-slot="search"], .nav-search-btn, [data-rz-search], #rzSearchBtn, #navSearchBtn')], ['theme', tr ? Math.round(tr.left) : null], ['signin', x('[data-rz-slot="signin"], .rz-auth-wrap, .nav-auth-wrap, #rzLoginBtn, .rz-login-btn, .rz-user-btn')], ['menu', x('.rz-nav-burger, .rz-nav-burger-bound')]].filter((p) => p[1] != null).sort((a, b) => a[1] - b[1]).map((p) => p[0]);
   const narrow = bar ? [...bar.querySelectorAll('button, a.btn, [role=button]')].filter(vis).filter((e) => e.getBoundingClientRect().width < 43.5).length : 0;
   const text = t ? [...t.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent.trim()).join('') + [...t.querySelectorAll('i, span')].map((n) => n.textContent.trim()).join('') : '';
   return { bar: bar ? bar.tagName.toLowerCase() + '.' + String(bar.className || '').split(' ')[0] : null, pos: bc ? bc.position : '', top: br ? Math.round(br.top) : null, h: br ? Math.round(br.height) : 0,
     tN: ts.length, tIn: !!(t && bar && bar.contains(t)), tW: tr ? Math.round(tr.width) : 0, tH: tr ? Math.round(tr.height) : 0, tRight: tr ? Math.round(innerWidth - tr.right) : null,
     svg: !!(t && t.querySelector('svg')), font: !!(t && t.querySelector('i[class*="fa-"]')), text, label: t ? (t.getAttribute('aria-label') || t.getAttribute('title') || '') : '',
-    order, narrow, overflow: document.documentElement.scrollWidth > innerWidth + 1, theme: document.documentElement.getAttribute('data-theme') || '', fp: window.__rzFirstPaintTheme === undefined ? null : window.__rzFirstPaintTheme };
+    order, narrow, overflow: document.documentElement.scrollWidth > innerWidth + 1, theme: document.documentElement.getAttribute('data-theme') || '', fp: window.__rzFirstPaintTheme !== undefined ? window.__rzFirstPaintTheme : window.__rzRafTheme !== undefined ? window.__rzRafTheme : null };
 };
 
 const WIDTHS = FULL ? [[1440, 900], [768, 1024], [390, 844]] : [[1440, 900], [390, 844]];
@@ -89,6 +89,8 @@ for (const [w, h] of WIDTHS) {
   await pg.setRequestInterception(true);
   pg.on('request', (r) => (r.url().startsWith(O) || r.url().startsWith('data:') ? r.continue() : r.abort()));
   await pg.evaluateOnNewDocument((stored) => { try { localStorage.setItem('rz_cookie_consent', 'declined'); if (!sessionStorage.getItem('__ch')) { sessionStorage.setItem('__ch', '1'); localStorage.setItem('theme', stored); } } catch (e) { /* none */ }
+    /* the paint entry can arrive late, or not at all, on a loaded machine: the first animation frame is the fallback */
+    try { requestAnimationFrame(() => { if (window.__rzRafTheme === undefined) window.__rzRafTheme = document.documentElement.getAttribute('data-theme') || ''; }); } catch (e) { /* none */ }
     try { new PerformanceObserver((l) => { if (window.__rzFirstPaintTheme === undefined && l.getEntries().length) window.__rzFirstPaintTheme = document.documentElement.getAttribute('data-theme') || ''; }).observe({ type: 'paint', buffered: true }); } catch (e) { /* none */ } }, stored);
   for (const f of pages) {
     const kind = kindOf(f), token = CFG.heights[kind];
@@ -110,7 +112,7 @@ for (const [w, h] of WIDTHS) {
       if (m.order.join() !== want.join()) fail('CH4', f, `${tag} order ${m.order.join(' · ') || 'none'}`);
       if (m.fp !== stored) {   // one reload before it counts: the paint entry can arrive after the 900 ms settle on a loaded machine
         await pg.goto(O + f, { waitUntil: 'domcontentloaded', timeout: 30000 }); await new Promise((r) => setTimeout(r, 1500));
-        const fp2 = await pg.evaluate(() => (window.__rzFirstPaintTheme === undefined ? null : window.__rzFirstPaintTheme));
+        const fp2 = await pg.evaluate(() => (window.__rzFirstPaintTheme !== undefined ? window.__rzFirstPaintTheme : window.__rzRafTheme !== undefined ? window.__rzRafTheme : null));
         if (fp2 !== stored) fail('CH6', f, `${tag} stored ${stored}, theme at first paint "${fp2 == null ? 'not recorded' : fp2}" (two loads)`);
       }
       if (w < 500 && (m.h > token + 1 || m.narrow || m.overflow)) fail('CH8', f, `${tag} bar ${m.h} px (token ${token}), ${m.narrow} control(s) under 44 px${m.overflow ? ', page scrolls sideways' : ''}`);
@@ -128,12 +130,18 @@ for (const [w, h] of WIDTHS) {
 }
 await browser.close(); srv.close();
 
+// A page that was in the folder when the run started and is gone now was another gate's temporary file (the
+// sharded ship gate runs them side by side): it is not a finding. Seen 2026-11-18: 170 pages against a baseline of 169.
+const gone = pages.filter((f) => !fs.existsSync(path.join(ROOT, f)));
+for (const f of gone) { for (const m of Object.values(fails)) m.delete(f); for (const map of Object.values(offsets)) for (const [off, files] of map) map.set(off, files.filter((x) => x !== f)); }
+if (gone.length) console.log(`ignored ${gone.length} page(s) removed during the run: ${gone.join(', ')}`);
+
 // CH3 — one position per kind, width and slot set: every page off the most common offset fails
 for (const [k, map] of Object.entries(offsets)) { const top = [...map.entries()].sort((a, b) => b[1].length - a[1].length)[0][0];
   for (const [off, files] of map) if (Math.abs(off - top) > 1) files.forEach((f) => fail('CH3', f, `${k.split('|').slice(0, 2).join(' @')}: button ${off} px from the right edge, family value ${top}`)); }
 
 const counts = Object.fromEntries(Object.entries(fails).map(([k, m]) => [k, m.size]));
-if (LIST && fails[LIST]) for (const [f, why] of fails[LIST]) console.log(`  ${LIST} ${f}: ${why}`);
+for (const L of LIST === 'all' ? Object.keys(fails) : LIST && fails[LIST] ? [LIST] : []) for (const [f, why] of fails[L]) console.log(`  ${L} ${f}: ${why}`);
 if (RECORD) { fs.writeFileSync(BASE_FILE, JSON.stringify({ recorded: new Date().toISOString().slice(0, 10), pages: pages.length, widths: WIDTHS.map((x) => x[0]), counts }, null, 2) + '\n'); console.log('baseline recorded', JSON.stringify(counts)); process.exit(0); }
 const base = fs.existsSync(BASE_FILE) ? JSON.parse(fs.readFileSync(BASE_FILE, 'utf8')) : null;
 let bad = 0;

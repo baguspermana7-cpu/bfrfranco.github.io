@@ -95,7 +95,7 @@ async function main() {
       let got = await read();
       if (got !== theme) {
         /* storage did not reach this page's theme code: use the page's own control, as a reader would */
-        const hasToggle = await p.evaluate(() => { const b = document.querySelector('#themeToggle, .theme-toggle'); if (!b) return false; b.click(); return true; });
+        const hasToggle = await p.evaluate(() => { const b = document.querySelector('[data-rz-theme-toggle], #themeToggle, .theme-toggle'); if (!b) return false; b.click(); return true; });
         if (hasToggle) { await new Promise((r) => setTimeout(r, 300)); got = await read(); }
         if (got !== theme) {
           if (hasToggle) deadToggles.add(page); else singleTheme.add(`${page} (${got} only)`);

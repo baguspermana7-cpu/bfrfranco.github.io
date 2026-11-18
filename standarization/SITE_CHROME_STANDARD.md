@@ -30,8 +30,17 @@ A page is `bare` only with a written reason in the config. A new page is a `site
 
 Order, left to right, wherever the control exists: **search · theme · sign-in / account · menu**.
 On a phone (≤ 768 px) the bar keeps **theme · menu**; search and sign-in live in the menu drawer.
-Each slot is a 44 × 44 box with one gap token, so the theme button's distance from the right edge depends only on
-which slots exist — it is the same on every page of a kind.
+Each slot is a 44 × 44 box with one gap token (`--rz-bar-gap`, 8 px); sign-in is a fixed-width slot
+(`--rz-bar-signin`, 104 px) whatever widget fills it (Login, an avatar, an e-mail); the bar's content sits in one
+measure (`--rz-bar-measure`, 1120 px, 20 px gutters below it). So the theme button's distance from the right edge
+depends only on which slots exist — measured after phase N1: 272 px at 1440 and 72 px at 390 on all 12 pages.
+
+Slots are marked in the markup: `data-rz-bar` on the bar, `data-rz-slot="search|theme|signin"` on the controls.
+On a phone `js/rz-chrome.js` moves the search and sign-in elements into the drawer (and back above 768 px); a
+sign-in widget that `auth.js` injects among the links is moved behind the theme button on desktop.
+
+`html, body { overflow-x: hidden }` (the old mobile patch) makes a sticky bar scroll away with the page on a phone;
+`css/rz-chrome.css` sets `overflow-x: clip` at ≤ 768 px, which stops sideways scroll without that side effect.
 
 ## 4. The theme button
 
@@ -77,7 +86,45 @@ Exactly one visible theme button per page, inside the bar.
 ## 7. Baseline (2026-11-18, before any refit)
 
 Recorded in `tools/site-chrome-baseline.json` by `--baseline`. Re-record only after a refit that lowered a count;
-never to make a regression pass. `--list=CH2` prints every failing page of a law with its reason.
+never to make a regression pass. `--list=CH2` prints every failing page of a law with its reason, `--list=all`
+every law.
+
+2026-11-18, phase N1: the gate was tightened before the first refit and re-measured on the unrefitted tree, which
+is why three counts rose without any page changing — CH7 115 → 121 (any `toggle…Theme` function counts, not only
+`toggleTheme`), CH4 128 → 140 and CH6 14 → 18, CH3 37 → 38 (the calculators' `#navSearchBtn` and `.nav-auth-wrap`
+are now seen as slots). The N1 refit is measured against those tightened numbers.
+CH6 was also unstable on an unchanged tree (14, 18, 20, 41, 44 across five runs): the paint entry arrives late or
+never on a loaded machine and was counted as a failure. It now falls back to the theme at the first animation
+frame, so every page gets a verdict.
+
+| law | N0 baseline | tightened, before any refit | after N1 (recorded) |
+|---|---|---|---|
+| CH1 | 134 | 134 | 132 |
+| CH2 | 169 | 169 | 157 |
+| CH3 | 37 | 38 | 28 |
+| CH4 | 128 | 140 | 128 |
+| CH5 | 2 | 2 | 1 |
+| CH6 | 14 | 18 | 16 (none "not recorded": 13 pages with no theme at first paint, 3 with the wrong one; 0 refitted pages) |
+| CH7 | 115 | 121 | 109 |
+| CH8 | 162 | 162 | 150 |
+| CH9 | 0 | 0 | 0 |
+
+## 7b. Refitting a page
+
+`python3 tools/sweep-site-chrome.py --apply <page.html> …` then
+`node tools/test-asset-cache-tokens.mjs --fix css/rz-chrome.css js/rz-chrome.js`. The tool stamps the head snippet,
+the slots and the button, removes the page's own toggle code and one-line `.navbar { … }` rules, and loads the
+stylesheet and the module last in `<head>`. What it cannot remove safely it prints as "left for hand review".
+`--check` (ship gate) fails when a refitted page is no longer what the tool produces: never hand-edit the stamped
+parts. Red proof of the module: with `toggle()` removed, CH5 fails on every refitted page.
+
+| phase | family | pages | state |
+|---|---|---|---|
+| N1 | calculators, compare, tools, DC Solutions | 12 | refitted 2026-11-18: 0 failures on CH1–CH9 |
+| N2 | journal | 39 | open |
+| N3 | incidents | 51 | open |
+| N4 | hubs, guides, legal, account, homepage | ≈ 50 | open |
+| N5 | app kind (cockpits, labs, rz-ops) | 21 | open |
 
 ## 8. Who edits what
 

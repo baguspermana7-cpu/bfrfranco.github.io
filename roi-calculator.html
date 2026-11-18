@@ -27,6 +27,7 @@
   })();
 </script>
     <meta charset="UTF-8">
+    <script data-rz-chrome-head>(function(){var d=document.documentElement,t=null;try{t=localStorage.getItem('theme')}catch(e){}if(t!=='light'&&t!=='dark')t=d.getAttribute('data-rz-kind')==='app'?'dark':'light';d.setAttribute('data-theme',t)})();</script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Center ROI Calculator | Investment Return Analysis</title>
     <meta name="description" content="Calculate data center investment ROI with NPV, IRR, and payback analysis. Interactive financial model with occupancy ramps and sensitivity analysis.">
@@ -166,7 +167,7 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha384-iw3OoTErCYJJB9mCa8LNS2hbsQ7M3C0EpIsO/H5+EGAkPGc6rk+V8i04oW/K5xq0" crossorigin="anonymous">
     <script src="js/vendor/chart.umd.min.js?v=20261110-74401d73" defer></script>
-    <script src="js/rz-version.js?v=20261117-4a42d12a" defer></script>
+    <script src="js/rz-version.js?v=20261118-9febe551" defer></script>
     <script src="js/rz-calc-utils.js?v=20260920-ef3425ae" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
@@ -209,13 +210,15 @@
     <link rel="stylesheet" href="css/rz-hub.css?v=20261015-f49c6a25">
     <link rel="stylesheet" href="css/rz-tool.css?v=20261114-55710c32">
 <link rel="stylesheet" href="css/rz-project.css?v=20261111-31355e5e" data-rz-proj-css>
+    <link rel="stylesheet" href="css/rz-chrome.css?v=20261118-6c704e01">
+    <script src="js/rz-chrome.js?v=20261118-0d7ef3da" defer></script>
 </head>
 <body class="hub tool" data-rz-calc="roi" data-rz-account-pill="off" data-rz-embed-keep-ids="itCapacity pueValue electricityRate primaryValue">
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <script>(function(){var t=localStorage.getItem('theme')||'light';document.documentElement.setAttribute('data-theme',t);})();</script>
     
 
-    <nav class="navbar hub-nav" id="navbar" aria-label="Primary">
+    <nav class="navbar hub-nav" id="navbar" aria-label="Primary" data-rz-bar>
   <div class="nav-container wrap">
     <a href="index.html" class="nav-brand">
       <img src="assets/favicon-32.png" alt="" width="24" height="24">
@@ -251,8 +254,9 @@
       </div>
       <a href="index.html" class="nav-link">← Portfolio</a>
     </div>
-    <button class="nav-icon" id="navSearchBtn" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
-          <div class="nav-auth-wrap" id="navAuthWrap">
+    <button class="nav-icon" id="navSearchBtn" data-rz-slot="search" aria-label="Search (Ctrl+K)" title="Search (Ctrl+K)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+    <button type="button" class="rz-theme-btn" id="navThemeBtn" data-rz-theme-toggle data-rz-slot="theme" aria-label="Switch to dark theme" aria-pressed="false"><svg class="rz-i-moon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg><svg class="rz-i-sun" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></button>
+          <div class="nav-auth-wrap" id="navAuthWrap" data-rz-slot="signin">
         <button class="nav-login-btn" id="navLoginBtn" onclick="handlePremiumTab()"><span class="nav-login-text">Login</span></button>
         <button class="nav-user-btn" id="navUserBtn" style="display:none;" onclick="toggleUserDropdown()"><span class="nav-user-avatar" id="navUserAvatar">U</span><span class="nav-user-email" id="navUserEmail"></span></button>
         <div class="nav-user-dropdown" id="navUserDropdown">
@@ -261,7 +265,6 @@
           <button class="nav-dd-logout" onclick="logoutPremium()">Logout</button>
         </div>
       </div>
-    <button class="nav-icon theme-toggle" id="navThemeBtn" onclick="toggleCalcTheme()" aria-label="Toggle dark mode" title="Toggle dark/light mode"><i id="themeIcon" class="fas fa-moon"></i></button>
   </div>
 </nav>
 
@@ -1577,24 +1580,6 @@
 <script src="js/rz-sensitivity.js?v=20261111-3cab8280"></script>
 <script type="module" src="js/rz-supabase.js?v=20261114-4d629a29"></script>
 
-<script>
-    // The navbar theme button (id="navThemeBtn", onclick="toggleCalcTheme()") called a
-    // function that did not exist on this page, so the toggle did nothing -- while the
-    // page carries 93 [data-theme="dark"] rules and was fully ready for it. Same
-    // implementation as capex-calculator.html / opex-calculator.html / cx-calculator.html.
-    function toggleCalcTheme() {
-        var t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', t);
-        localStorage.setItem('theme', t);
-        var icon = document.getElementById('themeIcon');
-        if (icon) icon.className = t === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-    }
-    (function(){
-        var icon = document.getElementById('themeIcon');
-        var t = document.documentElement.getAttribute('data-theme');
-        if (icon) icon.className = t === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-    })();
-</script>
 <script src="js/rz-sw-register.js?v=20261110-ce520462" defer></script>
 <script src="js/rz-command-palette.js?v=20261111-5028a9f4" defer></script>
 </body>

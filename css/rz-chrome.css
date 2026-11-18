@@ -1,0 +1,110 @@
+/* rz-chrome.css — THE top bar and theme button (standarization/SITE_CHROME_STANDARD.md).
+ * Loaded last in <head> by every refitted page, the homepage included (it does not load styles.css).
+ * A page never carries its own `.navbar { … }` rule or theme-button rule; they live here.
+ * Applies only to a bar stamped `data-rz-bar` by tools/sweep-site-chrome.py.
+ */
+:root {
+  --rz-bar-h: 56px;
+  --rz-bar-slot: 44px;
+  --rz-bar-gap: 8px;
+  --rz-bar-signin: 104px;
+  --rz-bar-measure: 1120px;
+  --rzc-bg: var(--rz-bg-base, #ffffff);
+  --rzc-line: var(--rz-line-tier-2, rgba(25, 27, 32, 0.14));
+  --rzc-line-strong: var(--rz-line-tier-1, rgba(25, 27, 32, 0.32));
+  --rzc-ink: var(--rz-text-secondary, #4a5160);
+  --rzc-ink-strong: var(--rz-text-primary, #14161a);
+  --rzc-focus: var(--rz-accent-signal, #7a4800);
+}
+:root[data-rz-kind="app"] { --rz-bar-h: 48px; }
+:root[data-theme="dark"] {
+  --rzc-bg: var(--rz-bg-base, #0b0c0e);
+  --rzc-line: var(--rz-line-tier-2, rgba(255, 255, 255, 0.12));
+  --rzc-line-strong: var(--rz-line-tier-1, rgba(255, 255, 255, 0.3));
+  --rzc-ink: var(--rz-text-secondary, #a0aec0);
+  --rzc-ink-strong: var(--rz-text-primary, #e8edf5);
+  --rzc-focus: var(--rz-accent-signal, #e8b563);
+}
+
+/* ---- the bar: sticky, one height ---- */
+.navbar[data-rz-bar] {
+  position: sticky; top: 0; left: auto; right: auto;
+  box-sizing: border-box; height: var(--rz-bar-h); padding: 0 !important;
+  background: var(--rzc-bg) !important; border-bottom: 1px solid var(--rzc-line) !important;
+  box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+.navbar[data-rz-bar] .nav-container {
+  display: flex; align-items: center; gap: 0 !important; box-sizing: border-box;
+  /* one measure and one gutter on every page, so the cluster's right edge is the same everywhere */
+  width: min(var(--rz-bar-measure), 100% - 40px); max-width: none; margin: 0 auto; padding: 0 !important;
+  height: calc(var(--rz-bar-h) - 1px);
+}
+.navbar[data-rz-bar] .nav-container > .nav-links { margin-right: 8px; }
+/* sign-in is a fixed-width slot: the theme button does not move when the widget changes
+   (Login, an avatar, an e-mail) */
+.navbar[data-rz-bar] .nav-container > [data-rz-slot="signin"] { display: flex; justify-content: flex-start; align-items: center; width: var(--rz-bar-signin); }
+.navbar[data-rz-bar] .nav-container > [data-rz-slot="signin"] > button { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* the older portfolio nav (logo · ul.nav-menu · controls) spreads its children; keep the cluster together at the right */
+.navbar[data-rz-bar] .nav-container:has(> ul.nav-menu) { justify-content: flex-start; }
+.navbar[data-rz-bar] .nav-container > ul.nav-menu { margin-left: auto; margin-right: auto; }
+
+/* ---- right-hand cluster: search · theme · sign-in · menu, each a 44 px box ---- */
+.navbar[data-rz-bar] [data-rz-slot] { flex: none; margin: 0 0 0 var(--rz-bar-gap); }
+.navbar[data-rz-bar] .rz-theme-btn,
+.navbar[data-rz-bar] button[data-rz-slot="search"] {
+  position: relative; display: inline-grid; place-items: center;
+  width: var(--rz-bar-slot); height: var(--rz-bar-slot); min-height: var(--rz-bar-slot); padding: 0;
+  border: 0; border-radius: 0; background: none; color: var(--rzc-ink); cursor: pointer;
+  transition: color 120ms ease-out;
+}
+/* the 36 px visual box inside the 44 px hit area */
+.navbar[data-rz-bar] .rz-theme-btn::before,
+.navbar[data-rz-bar] button[data-rz-slot="search"]::before {
+  content: ""; position: absolute; inset: 4px; border: 1px solid var(--rzc-line); border-radius: 4px;
+  pointer-events: none; transition: border-color 120ms ease-out;
+}
+.navbar[data-rz-bar] .rz-theme-btn:hover,
+.navbar[data-rz-bar] button[data-rz-slot="search"]:hover { color: var(--rzc-ink-strong); }
+.navbar[data-rz-bar] .rz-theme-btn:hover::before,
+.navbar[data-rz-bar] button[data-rz-slot="search"]:hover::before { border-color: var(--rzc-line-strong); }
+.navbar[data-rz-bar] .rz-theme-btn:focus-visible,
+.navbar[data-rz-bar] button[data-rz-slot="search"]:focus-visible { outline: 2px solid var(--rzc-focus); outline-offset: -4px; }
+.navbar[data-rz-bar] .rz-theme-btn svg { width: 16px; height: 16px; display: block; }
+
+/* a moon while the page is light, a sun while it is dark — from data-theme, so it is right at first paint */
+.rz-theme-btn .rz-i-sun { display: none !important; }
+[data-theme="dark"] .rz-theme-btn .rz-i-sun { display: block !important; }
+[data-theme="dark"] .rz-theme-btn .rz-i-moon { display: none !important; }
+
+/* ---- phone: the bar keeps theme · menu; search and sign-in sit in the drawer ---- */
+@media (max-width: 768px) {
+  /* `overflow-x: hidden` on html/body turns them into scroll containers and a sticky bar scrolls away with the
+     page; `clip` stops sideways scroll without that side effect */
+  html, body { overflow-x: clip !important; }
+  .navbar[data-rz-bar] .nav-container > [data-rz-slot="search"],
+  .navbar[data-rz-bar] .nav-container > [data-rz-slot="signin"] { display: none; }
+  .navbar[data-rz-bar] .rz-nav-burger, .navbar[data-rz-bar] .rz-nav-burger-bound { flex: none; width: var(--rz-bar-slot); height: var(--rz-bar-slot); min-width: var(--rz-bar-slot); }
+  .navbar[data-rz-bar] .nav-links > [data-rz-slot],
+  .navbar[data-rz-bar] .nav-menu > [data-rz-slot] {
+    display: flex; align-items: center; justify-content: flex-start; gap: 10px;
+    width: 100%; height: 44px; min-height: 44px; margin: 0; padding: 0 20px; box-sizing: border-box;
+  }
+  .navbar[data-rz-bar] .nav-container:has(> ul.nav-menu) > :first-child { margin-right: auto; }
+  /* the open drawer is opaque: the older nav let the page show through it in the light theme */
+  body.rz-nav-open .navbar[data-rz-bar] .nav-menu, body.rz-nav-open .navbar[data-rz-bar] .nav-links { background: var(--rzc-bg) !important; }
+  /* sign-in inside the drawer is a full row with its word, not a lone icon */
+  .navbar[data-rz-bar] .nav-menu > .rz-auth-wrap .rz-login-btn,
+  .navbar[data-rz-bar] .nav-links > .rz-auth-wrap .rz-login-btn { min-height: 44px; }
+  .navbar[data-rz-bar] .nav-menu > .rz-auth-wrap .rz-login-text,
+  .navbar[data-rz-bar] .nav-links > .rz-auth-wrap .rz-login-text { display: inline !important; }
+  .navbar[data-rz-bar] .nav-links > button[data-rz-slot="search"]::before,
+  .navbar[data-rz-bar] .nav-menu > button[data-rz-slot="search"]::before { content: none; }
+  .navbar[data-rz-bar] .nav-links > button[data-rz-slot="search"]::after,
+  .navbar[data-rz-bar] .nav-menu > button[data-rz-slot="search"]::after { content: "Search"; font: inherit; font-size: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navbar[data-rz-bar] .rz-theme-btn, .navbar[data-rz-bar] .rz-theme-btn::before,
+  .navbar[data-rz-bar] button[data-rz-slot="search"], .navbar[data-rz-bar] button[data-rz-slot="search"]::before { transition: none; }
+}

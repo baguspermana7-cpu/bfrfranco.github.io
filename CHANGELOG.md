@@ -11,6 +11,35 @@ release sections rather than semver.
 
 ---
 
+## v3.68.0 — 2026-11-18 — One top bar and one theme button: calculators, compare, tools, DC Solutions
+
+Owner, 2026-11-17: "Navbar position, theme button nggak konsisten." PRD `documentation/prd/PRD_SITE_CHROME.md`,
+phase N1 (the first of five page families).
+
+### Added
+- **`js/rz-chrome.js` + `css/rz-chrome.css`** — the one theme switch and the one bar. A press sets `<html data-theme>`,
+  writes `localStorage.theme` and dispatches `rz-theme-change`; a choice made in another tab is applied; Enter and
+  Space work; the button names the theme it switches to. The bar is sticky at 56 px at every width.
+- **`tools/sweep-site-chrome.py`** — refits a page (head snippet that sets the theme before first paint, slot marks,
+  the canonical button, removal of the page's own toggle code) and, with `--check`, fails the ship gate when a
+  refitted page was edited by hand.
+
+### Changed
+- **12 pages refitted** (9 calculators, `compare.html`, `tools.html`, `datacenter-solutions.html`). Before: bar 81 px
+  and fixed on 2 of them, theme button 36 x 36 on 10, an icon font on 10, three different slot orders, three
+  positions. After, measured in a browser on all 12 at 1440 and 390 px in both themes: bar 56 px sticky, button
+  44 x 44 with an SVG sun or moon, order search, theme, sign-in, menu; the button sits 272 px from the right edge
+  on a desktop and 72 px on a phone on every page.
+- **Phone:** the bar keeps theme and menu; search and sign-in are rows in the menu drawer. The drawer of the older
+  nav is opaque (the page showed through it in the light theme).
+- `tools/test-site-chrome.mjs`: sees any `toggle...Theme` function and the calculators' search and sign-in controls;
+  first paint has an animation-frame fallback (the paint entry alone gave 14 to 44 failures on an unchanged tree).
+
+### Fixed
+- A sticky bar scrolled away with the page on a phone wherever the page set `overflow-x: hidden` on html and body;
+  refitted pages use `overflow-x: clip`.
+- `roi-calculator.html`: an orphan comment about a function that no longer exists is gone.
+
 ## v3.67.0 — 2026-11-18 — Conventional P&ID sheets: line colour and motion follow the process, trend modal
 
 ### Added
