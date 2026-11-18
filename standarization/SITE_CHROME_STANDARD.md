@@ -82,6 +82,7 @@ Exactly one visible theme button per page, inside the bar.
 | CH7 | source: no own toggle code, no theme key other than `theme`, no `.navbar {` rule in the page, no `data-theme` literal on `<html>` |
 | CH8 | phone: bar not taller than its token, no control under 44 px, no sideways scroll |
 | CH9 | the config names only existing files, every `bare` entry has a reason (strict from day one) |
+| CH10 | phone, refitted pages: a press on the menu button shows the drawer (strict from day one). `css/rz-chrome.css` must never contain the open-state class of `rz-mobile-nav.js` in a selector — that script then stops injecting its drawer CSS |
 
 ## 7. Baseline (2026-11-18, before any refit)
 

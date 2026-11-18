@@ -11,6 +11,16 @@ release sections rather than semver.
 
 ---
 
+## v3.68.1 — 2026-11-18 — Phone menu opens again on the ten refitted calculators
+
+### Fixed
+- **The menu button did nothing on a phone on ten calculator pages** (v3.68.0, live for about 20 minutes).
+  `css/rz-chrome.css` carried a selector with `rz-mobile-nav.js`'s open-state class; that script reads the page's
+  stylesheets, took it for a page that draws its own open menu, and stopped injecting its drawer CSS. The selector
+  is gone and the file says why it must not come back. Found on the live site with a real tap, not by a gate.
+- `tools/test-site-chrome.mjs` law **CH10** (strict): on a phone, a press on the menu button of a refitted page shows
+  the drawer. Red on v3.68.0 (capex, fire: "drawer display none, height 0"), green after the fix.
+
 ## v3.68.0 — 2026-11-18 — One top bar and one theme button: calculators, compare, tools, DC Solutions
 
 Owner, 2026-11-17: "Navbar position, theme button nggak konsisten." PRD `documentation/prd/PRD_SITE_CHROME.md`,

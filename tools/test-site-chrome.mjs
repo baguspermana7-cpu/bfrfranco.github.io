@@ -14,6 +14,9 @@
  *   CH7  source: no page carries its own toggle function, a theme key other than `theme`, or a `.navbar {` rule
  *   CH8  phone: the bar is not taller than its token, no bar control is narrower than 44 px, no sideways scroll
  *   CH9  the exemption list names only files that exist, each with a reason
+ *   CH10 phone, refitted pages (data-rz-bar): a press on the menu button shows the drawer (strict from day one —
+ *        v3.68.0 shipped 10 pages whose menu did not open: a `body.rz-nav-open` selector in rz-chrome.css made
+ *        rz-mobile-nav.js skip its own open-state CSS)
  *
  * RATCHET until the last family is refitted (phase N6): the number of failing pages per law may fall, a rise fails.
  * Baseline: tools/site-chrome-baseline.json (re-record with --baseline after a refit, never to pass a regression).
@@ -39,7 +42,7 @@ const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css
 
 const all = fs.readdirSync(ROOT).filter((f) => f.endsWith('.html')).sort();
 const pages = all.filter((f) => kindOf(f) !== 'bare' && (!ONLY || ONLY.has(f)));
-const fails = { CH1: new Map(), CH2: new Map(), CH3: new Map(), CH4: new Map(), CH5: new Map(), CH6: new Map(), CH7: new Map(), CH8: new Map(), CH9: new Map() };
+const fails = { CH1: new Map(), CH2: new Map(), CH3: new Map(), CH4: new Map(), CH5: new Map(), CH6: new Map(), CH7: new Map(), CH8: new Map(), CH9: new Map(), CH10: new Map() };
 const fail = (law, f, why) => { if (!fails[law].has(f)) fails[law].set(f, why); };
 
 // CH9 — the exemption list
@@ -116,6 +119,13 @@ for (const [w, h] of WIDTHS) {
         if (fp2 !== stored) fail('CH6', f, `${tag} stored ${stored}, theme at first paint "${fp2 == null ? 'not recorded' : fp2}" (two loads)`);
       }
       if (w < 500 && (m.h > token + 1 || m.narrow || m.overflow)) fail('CH8', f, `${tag} bar ${m.h} px (token ${token}), ${m.narrow} control(s) under 44 px${m.overflow ? ', page scrolls sideways' : ''}`);
+      if (w < 500) {
+        const d = await pg.evaluate(async () => { const bar = document.querySelector('[data-rz-bar]'); if (!bar) return null;
+          const g = bar.querySelector('.rz-nav-burger, .rz-nav-burger-bound'), l = bar.querySelector('.nav-links, .nav-menu'); if (!g || !l) return { g: !!g, l: !!l };
+          g.click(); await new Promise((r) => setTimeout(r, 450)); const r = l.getBoundingClientRect(), o = { g: true, l: true, disp: getComputedStyle(l).display, h: Math.round(r.height), links: l.querySelectorAll('a').length };
+          g.click(); await new Promise((r) => setTimeout(r, 250)); return o; });
+        if (d && (!d.g || !d.l || d.disp === 'none' || d.h < 44 || !d.links)) fail('CH10', f, `@${w} menu button ${d.g ? 'present' : 'missing'}, drawer display ${d.disp || 'n/a'}, height ${d.h || 0}`);
+      }
       if (m.tN === 1 && w === 1440) {
         const r = await pg.evaluate(async () => { const sel = '[data-rz-theme-toggle], #themeToggle, #navThemeBtn, .theme-toggle, .theme-btn, .rz-theme-btn, [aria-label*="theme" i], [onclick*="toggleTheme"]';
           const t = [...document.querySelectorAll(sel)].find((e) => e.getBoundingClientRect().width > 0), a = document.documentElement.getAttribute('data-theme');
@@ -146,7 +156,7 @@ if (RECORD) { fs.writeFileSync(BASE_FILE, JSON.stringify({ recorded: new Date().
 const base = fs.existsSync(BASE_FILE) ? JSON.parse(fs.readFileSync(BASE_FILE, 'utf8')) : null;
 let bad = 0;
 for (const [law, n] of Object.entries(counts)) {
-  const b = base ? base.counts[law] : 0, strict = law === 'CH9' || !base, ok = strict ? n === 0 : n <= b;
+  const b = base ? base.counts[law] : 0, strict = law === 'CH9' || law === 'CH10' || !base, ok = strict ? n === 0 : n <= b;
   if (!ok) bad++;
   const sample = [...fails[law].entries()].slice(0, 2).map(([f, why]) => `${f} (${why})`).join('; ');
   console.log(`${ok ? 'PASS' : 'FAIL'} ${law} ${n} page(s) fail${base && !strict ? ` (ratchet: baseline ${b})` : ''}${n ? ' — e.g. ' + sample : ''}`);
