@@ -11,6 +11,34 @@ release sections rather than semver.
 
 ---
 
+## v3.69.0 — 2026-11-18 — Conventional data hall: the air path of a row as a section, labelled row footer
+
+### Added
+- **Air path view on the data hall** (`js/conv/air-section.js`, `datahall.html`). A Plan / Air path switch on the
+  stage. Air path draws one row as a schematic section: CRAH with coil and fan, supply air to the cold aisle, the rack
+  pair, the contained hot aisle rising into the ceiling void and back to the CRAH, and the chilled-water supply and
+  return at the coil. A row strip (A…Y) moves the cut; clicking a row letter on the plan opens that row.
+- **Bound, not decorative.** Streamline speed follows the row airflow as a share of design, the fan wheel turns with
+  the CRAH fan speed, line colour is the air temperature on the thermal ramp (declared 24–40 °C display range), the
+  rack tint follows row heat against the row rating, and the chilled-water stubs move only with the valve open. With
+  no airflow nothing moves and the lines are drawn dashed grey. Reduced motion stops the animation and keeps the
+  arrowheads. An inlet above the recommended maximum or the alarm limit colours the inlet reading.
+- **Every reading in the section is one the plan already shows for that row** (row heat, rack inlet, hot aisle,
+  air ΔT, return air, airflow) or an engine plane (supply air, CHWS, CHWR).
+
+### Changed
+- **The six numbers under each row are named.** A sticky key column labels every footer line with its unit (kW,
+  in °C, hot °C, min / max / avg in the unit of the active mode); the footer type is 11 px instead of 9 and 8.5 px.
+
+### Gates
+- `tools/test-conv-air-section.mjs` (8 laws, Node) and `tools/test-conv-datahall-air.mjs` (48 checks in a browser at
+  1440 and 390). Planted defects that failed first: air that moves with no airflow; a section that ignores the
+  selected row; a streamline animation not tied to airflow.
+
+### Not in this release
+- Fire sequence and water front, cooling-tower effects, trend on the data-hall readings, the manual page for the new
+  view (PRD-CONV-LIVING-PLANT P3 remainder).
+
 ## v3.68.1 — 2026-11-18 — Phone menu opens again on the ten refitted calculators
 
 ### Fixed

@@ -320,6 +320,24 @@ Before release:
 
 ## 10. Change and lesson ledger
 
+### 2026-11-18 — air section contract (v3.69.0, PRD-CONV-LIVING-PLANT P3 data hall)
+
+- **One module draws an air path:** `RZAirSection` (`js/conv/air-section.js`). `model()` is pure: values in, periods
+  and colours out. A page never animates air by hand.
+- **Bindings.** Streamline period = `RZConvVfx.dashSeconds(airflow / design airflow)`; fan period =
+  `rotorSeconds(fan %)`; colour = `thermal(temperature, 24, 40)` for air and `thermal(t, 16, 30)` for the
+  chilled-water stubs (display ranges, declared on the page); rack tint = row heat / row rating. No airflow or no
+  running CRAH means no motion, a still fan and dashed grey lines.
+- **A section restates, it does not invent.** Each reading equals the value the plan shows for the selected row or an
+  engine plane; the gate compares the section text with the plan footer for three rows.
+- **A physical section is not a block diagram.** Its geometry is one authored cut inside the module; block diagrams
+  still go through `RZDiagram`.
+- **Row footers are labelled.** A key column names each footer line and its unit; a number without a name on the same
+  line is a defect.
+- **Stage views obey the authority rule:** the Plan / Air path buttons are disabled with the other controls when the
+  engine snapshot is missing.
+- Gates: `test-conv-air-section.mjs`, `test-conv-datahall-air.mjs`.
+
 ### 2026-11-18 — line state and motion contract (v3.67.0, PRD-CONV-LIVING-PLANT P1/P2)
 
 - **A line is painted by its own state.** On a governed P&ID sheet the pipe body carries `data-vstate` from

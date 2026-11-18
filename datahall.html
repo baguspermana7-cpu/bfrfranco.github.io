@@ -259,6 +259,16 @@
             flex: 1; min-width: 0; display: flex; flex-direction: column;
             background: var(--bg-core); padding: 10px; overflow: hidden;
         }
+        /* v3.69.0 — one stage, two views of the same hall: the plan, or the air path of one row as a section */
+        .center-stage[data-view="air"] .floor { display: none; }
+        .center-stage:not([data-view="air"]) .air-sec { display: none; }
+        .view-seg { display: inline-flex; gap: 0; margin-right: 6px; }
+        .view-seg .view-btn + .view-btn { border-left: 0; }
+        .as-rows { display: flex; flex-wrap: wrap; gap: 4px; margin: 4px 0 8px; }
+        .as-row-btn { min-width: 28px; padding: 4px; border: 1px solid var(--border); border-radius: 3px; background: transparent; color: var(--txt-dim); font: 600 11px 'JetBrains Mono', ui-monospace, monospace; cursor: pointer; }
+        .as-row-btn[aria-pressed="true"] { color: var(--sel); border-color: var(--sel); }
+        .as-row-btn:focus-visible { outline: 2px solid var(--sel); outline-offset: 1px; }
+        @media (pointer: coarse) { .as-row-btn { min-width: 44px; min-height: 44px; } }
 
         /* Hall balance summary band */
         .balance-band {
@@ -274,14 +284,14 @@
 
         /* Heatmap mode toggle */
         .mode-bar { display: flex; gap: 6px; margin-bottom: 9px; flex-shrink: 0; flex-wrap: wrap; }
-        .mode-btn {
+        .mode-btn, .view-btn {
             font-size: 11px; font-weight: 600; padding: 6px 12px; min-height: 32px;
             border: 1px solid var(--border); border-radius: 4px;
             background: rgba(255,255,255,0.02); color: var(--txt-dim); cursor: pointer;
             transition: background .15s, color .15s, border-color .15s;
         }
-        .mode-btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
-        .mode-btn.active { background: rgba(56,189,248,0.14); color: var(--sel); border-color: rgba(56,189,248,0.5); }
+        .mode-btn:hover, .view-btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
+        .mode-btn.active, .view-btn.active { background: rgba(56,189,248,0.14); color: var(--sel); border-color: rgba(56,189,248,0.5); }
         .legend { display: flex; align-items: center; gap: 12px; margin-left: auto; font-size: 10px; color: var(--txt-faint); flex-wrap: wrap; }
         .lg-item { display: flex; align-items: center; gap: 5px; }
         .lg-sw { width: 11px; height: 11px; border-radius: 2px; border: 1px solid rgba(255,255,255,0.12); }
@@ -394,13 +404,24 @@
         /* Rack fill set inline by JS from utilization tier — no neon */
         /* v1.134.26 — nowrap forced the three readings onto one 169px line inside a 28px column.
            They stack instead — each fits its own line at the 64px track minimum. */
-        .zone-foot { flex: 0 0 auto; font-size: 9px; color: var(--txt-faint); text-align: center; padding: 2px; border-top: 1px solid var(--border-soft); white-space: normal; line-height: 1.25; }
+        .zone-foot { flex: 0 0 auto; font-size: 11px; color: var(--txt-faint); text-align: center; padding: 2px 0; border-top: 1px solid var(--border-soft); white-space: normal; line-height: 13px; }
+        /* v3.69.0 — the row footer is six numbers; a sticky key column names each line once, with its unit */
+        .zone-field { grid-template-columns: 48px; }
+        .zone-key { position: sticky; left: 0; z-index: 2; background: var(--bg-panel); }
+        .zone-key .zone-racks { display: flex; align-items: center; justify-content: center; color: var(--txt-dim); font-size: 11px; text-align: center; line-height: 13px; }
+        .zk-foot > span { display: block; text-align: left; padding-left: 4px; color: var(--txt-dim); white-space: nowrap; }
+        .zk-foot > .zk-in { color: var(--medium-chw, #7dd3fc); }
+        .zk-foot > .zk-hot { color: var(--st-warn, #d99a2b); }
+        .zone[data-z] .zone-head { cursor: pointer; }
+        .zone.sec-on { border-color: var(--sel); }
+        .zone.sec-on .zone-head { color: var(--sel); }
+        .air-sec { flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: thin; }
         .zone-foot > .zf-kw, .zone-foot > .zf-in, .zone-foot > .zf-hot { display: block; }
         .zone-foot > .zf-in { color: var(--medium-chw, #7dd3fc); }
         .zone-foot > .zf-hot { color: var(--st-warn, #d99a2b); }
         .lg-unit { font-family: 'JetBrains Mono', monospace; color: var(--text-dim, #9aa3ad); }
         /* v2.10.0 — per-row min / avg / max under the row heat (owner comment 12) */
-        .zone-foot .zf-stats { display: block; margin-top: 1px; color: var(--txt-dim); letter-spacing: -0.2px; font-size: 8.5px; line-height: 1.2; white-space: normal; }
+        .zone-foot .zf-stats { display: block; color: var(--txt-dim); letter-spacing: -0.2px; font-size: 11px; line-height: 13px; white-space: normal; }
         .zone-foot .zf-stats b { font-weight: 700; color: var(--txt-main, #e2e8f0); }
 
         /* --- CRAH POPOVER (v1.41.4 — replaces full-screen modal for CRAH details) --- */
@@ -527,7 +548,7 @@
             .balance-band { flex-wrap: wrap; }
             .bb-cell { min-width: 48%; }
             .sidebar { max-height: 200px; }
-            .mode-btn { min-height: 44px; }
+            .mode-btn, .view-btn { min-height: 44px; }
             button, a.btn, [role="button"] { min-height: 44px; }
             .legend { width: 100%; margin-left: 0; }
         }
@@ -548,7 +569,10 @@
          page used to carry its own hand-written basisFor dictionary; a drawer that restates
          provenance by hand is how v1.132.0 shipped a drawer explaining a density it had not
          derived. The drawer renders the registry now, so it cannot claim what is not there. -->
-    <script src="js/conv-parameters.js?v=20261117-9a57a2fe"></script>
+    <script src="js/conv-parameters.js?v=20261118-ea7afe03"></script>
+    <link rel="stylesheet" href="css/conv-vfx.css?v=20261118-fa0f1a56">
+    <script src="js/conv/vfx.js?v=20261117-89056876"></script>
+    <script src="js/conv/air-section.js?v=20261117-99ef3c34"></script>
     <!-- v1.134.25 — RZExplain, the site glossary engine. The cockpits were the only
          substantial pages carrying none of it, so terms an operator has to read
          (approach temperature, cycles of concentration, N+1, WUE) had nowhere to go.
@@ -566,7 +590,7 @@
          CRAH grid + all displayed values are unchanged. P1 datahall metadata. -->
     <script src="js/rz-telemetry-quality.js?v=20261113-8feb0dfd" defer></script>
     <script src="js/rz-provenance.js?v=20261111-6f1cd061" defer></script>
-    <script src="js/rz-version.js?v=20261118-3ec4020b" defer></script>
+    <script src="js/rz-version.js?v=20261118-fa28c0ad" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
 <style id="rz-skiplink-v1">
@@ -841,6 +865,10 @@
             </div>
 
             <div class="mode-bar">
+                <span class="view-seg" role="group" aria-label="Stage view">
+                    <button class="view-btn active" data-view="plan" aria-pressed="true" onclick="setStageView('plan')" disabled>Plan</button>
+                    <button class="view-btn" data-view="air" aria-pressed="false" onclick="setStageView('air')" disabled>Air path</button>
+                </span>
                 <button class="mode-btn"        data-mode="power" aria-pressed="false"  onclick="setMode('power')" disabled>Power Density</button>
                 <button class="mode-btn active" data-mode="temp" aria-pressed="true"   onclick="setMode('temp')" disabled>Rack-Inlet Temp</button>
                 <button class="mode-btn"        data-mode="cooling-margin" aria-pressed="false" onclick="setMode('cooling-margin')" disabled>Cooling Margin</button>
@@ -883,6 +911,13 @@
                      data-rz-distribution="cooling.hot_aisle_c"
                      data-rz-distribution-selector=".zone-foot .zf-hot"
                      data-rz-distribution-mode="per-item"></div>
+            </div>
+            <!-- v3.69.0 — the air path of one row as a schematic section (js/conv/air-section.js). -->
+            <div class="air-sec" id="air-sec"
+                 data-rz-authored-basis="Section readings restate the selected row of the floor field above (row heat, rack inlet, hot aisle, air-side delta-T, return air and row airflow are the row values that field reconciles against hall.it_load_kw, cooling.rack_inlet_target_c and cooling.hot_aisle_c), the CRAH fan and valve position of the CRAH status list, and the engine supply-air and chilled-water planes. The drawing is a schematic cut, not to scale; the air temperature colour ramp spans a declared 24 to 40 C display range.">
+                <div class="air-sec-head"><b>Air path</b><span id="air-sec-title"></span><span>schematic, not to scale · line colour = air temperature · speed = airflow</span></div>
+                <div class="as-rows" id="as-rows" role="group" aria-label="Row of the section"></div>
+                <div id="air-sec-host"></div>
             </div>
         </div>
 
@@ -1023,7 +1058,7 @@
             }
         }
         function setAuthorityControls(enabled) {
-            var controls = document.querySelectorAll('#hall-selector button,.mode-btn');
+            var controls = document.querySelectorAll('#hall-selector button,.mode-btn,.view-btn');
             for (var i = 0; i < controls.length; i++) {
                 controls[i].disabled = !enabled;
                 if (enabled) controls[i].removeAttribute('aria-disabled');
@@ -1833,16 +1868,17 @@
             // Row count is derived from the hall's rack count — the grid must follow it.
             /* v1.134.26 — no inline column count; .zone-field holds a 64px track minimum
                and scrolls. Forcing repeat(ZONES, 1fr) squeezed every row footer to 28px. */
-            var fh = '';
+            var fh = '<div class="zone zone-key"><div class="zone-head">Row</div><div class="zone-racks"><span id="zk-unit"></span></div>'
+                + '<div class="zone-foot zk-foot"><span>kW</span><span class="zk-in">in °C</span><span class="zk-hot">hot °C</span><span id="zk-min"></span><span id="zk-max"></span><span id="zk-avg"></span></div></div>';
             for (var z = 0; z < ZONES; z++) {
                 var zn = zones[z];
                 var rowChar = String.fromCharCode(65 + z);
-                fh += '<div class="zone">' +
+                fh += '<div class="zone" data-z="' + z + '">' +
                     /* v1.134.19 — was "Row A · CA-A01", which ellipsised to "Row ..." on all 25
                        columns: the same non-label 25 times. The row letter is what distinguishes
                        them and it fits; the full aisle tag stays in the title attribute and in the
                        inspector, where there is room to read it. */
-                    '<div class="zone-head" title="Row ' + rowChar + ' \u00b7 ' + zoneAisleTag(z) + '">' + rowChar + '</div>' +
+                    '<div class="zone-head" onclick="window.__sectionRow(' + z + ');window.setStageView(\'air\')" title="Row ' + rowChar + ' \u00b7 ' + zoneAisleTag(z) + ' \u00b7 click: air path section">' + rowChar + '</div>' +
                     '<div class="zone-racks" id="zr-' + z + '"></div>' +
                     /* v1.134.23 — one text node carried three different quantities, so none of
                        them could be declared against its own basis and all 75 readings counted as
@@ -1926,8 +1962,55 @@
             var zf = document.getElementById('zone-field');
             var unit = ({ power: 'kW', temp: '°C', 'cooling-margin': 'K', alarms: '%' })[currentMode] || '';
             if (zf) zf.setAttribute('data-unit', unit);
+            var statUnit = (currentMode === 'temp' || currentMode === 'cooling-margin') ? '°C' : 'kW';
+            var keyText = { 'zk-min': 'min ' + statUnit, 'zk-max': 'max ' + statUnit, 'zk-avg': 'avg ' + statUnit, 'zk-unit': unit ? 'rack ' + unit : 'rack' };
+            for (var kid in keyText) { var kel = document.getElementById(kid); if (kel) kel.textContent = keyText[kid]; }
             legendFor(currentMode);
+            paintAirSection();
         }
+
+        /* v3.69.0 — the air path of ONE row, drawn as a section (PRD-CONV-LIVING-PLANT §5.2, §9). Every value is
+           one this page already shows for that row; RZAirSection binds speed to airflow and colour to temperature. */
+        var sectionRow = 0;
+        function airSectionData() {
+            var zn = zones[sectionRow] || zones[0];
+            var unit = crahUnits.filter(function (u) { return u.running; })[0];
+            return {
+                row: String.fromCharCode(65 + zn.z), running: !!unit,
+                airflowM3s: zn.airflow, designAirflowM3s: (SITE_IT_KW / ZONES) / (AIR_RHO_CP * DESIGN_AIRSIDE_DELTA_T_C),
+                fanPct: unit ? unit.fan : 0, valvePct: unit ? unit.valve : 0,
+                supplyC: CRAH_LEAVING_AIR_C, inletC: zn.rackInletC, hotC: zn.hotAisleC, returnC: zn.returnAirC, dtK: zn.airsideDeltaTC,
+                chwsC: S.cooling.chws_c, chwrC: S.cooling.chwr_c,
+                heatKw: zn.heat, designHeatKw: RACKS_PER_ZONE * RACK_RATING_KW,
+                warnC: RACK_INLET_RECOMMENDED_MAX_C, alarmC: 30
+            };
+        }
+        function paintAirSection() {
+            var host = document.getElementById('air-sec-host');
+            if (!host || !window.RZAirSection) return;
+            if (sectionRow >= zones.length) sectionRow = 0;
+            var d = airSectionData();
+            if (host.querySelector('.as-svg')) window.RZAirSection.update(host, d); else window.RZAirSection.render(host, d);
+            var title = document.getElementById('air-sec-title');
+            if (title) title.textContent = 'section through Row ' + d.row + ' · ' + zoneAisleTag(sectionRow);
+            var strip = document.getElementById('as-rows');
+            if (strip) {
+                if (strip.children.length !== zones.length) {
+                    strip.innerHTML = zones.map(function (zn) { return '<button type="button" class="as-row-btn" data-row="' + zn.z + '" onclick="window.__sectionRow(' + zn.z + ')" title="Row ' + String.fromCharCode(65 + zn.z) + ' \u00b7 ' + zoneAisleTag(zn.z) + '">' + String.fromCharCode(65 + zn.z) + '</button>'; }).join('');
+                }
+                for (var b = 0; b < strip.children.length; b++) strip.children[b].setAttribute('aria-pressed', b === sectionRow ? 'true' : 'false');
+            }
+            var cols = document.querySelectorAll('.zone[data-z]');
+            for (var i = 0; i < cols.length; i++) cols[i].classList.toggle('sec-on', +cols[i].getAttribute('data-z') === sectionRow);
+        }
+        window.__sectionRow = function (z) { if (z >= 0 && z < zones.length) { sectionRow = z; paintAirSection(); } };
+        window.setStageView = function (view) {
+            var stage = document.querySelector('.center-stage'); if (!stage) return;
+            if (view === 'air') stage.setAttribute('data-view', 'air'); else stage.removeAttribute('data-view');
+            var vb = document.querySelectorAll('.view-btn');
+            for (var i = 0; i < vb.length; i++) { var on = vb[i].getAttribute('data-view') === (view === 'air' ? 'air' : 'plan'); vb[i].classList.toggle('active', on); vb[i].setAttribute('aria-pressed', on ? 'true' : 'false'); }
+        };
+        window.__airSectionData = airSectionData;
 
         function wireRacks() {
             var nodes = document.querySelectorAll('.rack');
@@ -1969,6 +2052,7 @@
 
         function selectRack(idx) {
             selectedRackIdx = idx;
+            window.__sectionRow(Math.floor(idx / RACKS_PER_ZONE));
             var prev = document.querySelector('.rack.sel');
             if (prev) prev.classList.remove('sel');
             var el = document.querySelector('.rack[data-idx="' + idx + '"]');

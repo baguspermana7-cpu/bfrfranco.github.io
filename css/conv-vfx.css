@@ -91,3 +91,47 @@
 .vfx-legend[data-mode="thermal"] .vfx-lg-ramp { display: inline-flex; }
 .vfx-legend[data-mode="medium"] .vfx-lg { display: none; }
 .vfx-legend[data-mode="flat"] .vfx-lg[data-vstate="running"], .vfx-legend[data-mode="flat"] .vfx-lg[data-vstate="standby"] { display: none; }
+
+/* ── air section (js/conv/air-section.js) ────────────────────────────────────────────────────────────
+   One schematic cut through a data-hall row. Colours arrive as --as-* from the model (temperature on the
+   thermal ramp); motion exists only while the model publishes a duration, and never under reduced motion —
+   the arrowheads stay, so direction is still readable. */
+.air-sec { border: 1px solid var(--border, #31353F); border-radius: 4px; background: var(--bg-panel, #15171a); padding: 8px; }
+.air-sec-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-bottom: 4px; color: var(--txt-dim, #94a3b8); font: 400 11px/1.3 'IBM Plex Sans', system-ui, sans-serif; }
+.air-sec-head b { font: 600 11px/1.3 'JetBrains Mono', ui-monospace, monospace; letter-spacing: .05em; text-transform: uppercase; color: var(--txt-main, #e2e8f0); }
+.air-sec { display: flex; flex-direction: column; }
+.air-sec > #air-sec-host { flex: 1 1 auto; min-height: 0; }
+.as-scroll { height: 100%; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; }
+.as-svg { display: block; width: 100%; min-width: 680px; max-height: 100%; height: auto; color: var(--txt-dim, #94a3b8); }
+.as-svg .as-wall { fill: none; stroke: var(--txt-dim, #94a3b8); stroke-width: 1.4; }
+.as-svg .as-ceil { fill: none; stroke: var(--txt-dim, #94a3b8); stroke-width: 1; stroke-dasharray: 6 4; }
+.as-svg .as-box { fill: none; stroke: var(--txt-main, #e2e8f0); stroke-width: 1.2; }
+.as-svg .as-coil { fill: none; stroke: var(--as-chws, var(--vfx-stop)); stroke-width: 1.4; }
+.as-svg .as-fan-ring { fill: none; stroke: var(--txt-dim, #94a3b8); stroke-width: 1; }
+.as-svg .as-fan { fill: var(--vfx-stop); transform-origin: 136px 186px; transform-box: view-box; }
+.as-svg[data-fan] .as-fan { fill: var(--vfx-run); }
+.as-svg .as-rack { fill: var(--as-rack, transparent); fill-opacity: .28; stroke: var(--txt-main, #e2e8f0); stroke-width: 1.2; }
+.as-svg .as-rack-u { fill: none; stroke: var(--txt-dim, #94a3b8); stroke-width: .6; opacity: .6; }
+.as-svg .as-line { fill: none; stroke-width: 1.6; stroke: var(--vfx-stop); stroke-dasharray: 6 4; }
+.as-svg[data-air] .as-line { stroke-dasharray: none; }
+.as-svg[data-air] .as-line.as-cold { stroke: var(--as-cold); }
+.as-svg[data-air] .as-line.as-hot { stroke: var(--as-hot); }
+.as-svg[data-air] .as-line.as-thr { stroke: inherit; }
+.as-svg .as-line.as-chws, .as-svg .as-line.as-chwr { stroke-width: 2.4; }
+.as-svg[data-chw] .as-line.as-chws { stroke: var(--as-chws); stroke-dasharray: none; }
+.as-svg[data-chw] .as-line.as-chwr { stroke: var(--as-chwr); stroke-dasharray: none; }
+.as-svg .as-g-cold { stop-color: var(--as-cold, var(--vfx-stop)); } .as-svg .as-g-hot { stop-color: var(--as-hot, var(--vfx-stop)); }
+.as-svg .as-flow { display: none; fill: none; stroke: var(--bg-panel, #15171a); stroke-width: 1.6; stroke-dasharray: 2 14; pointer-events: none; }
+.as-svg .as-flow.as-chws, .as-svg .as-flow.as-chwr { stroke-width: 2.4; }
+.as-svg .as-name { fill: var(--txt-main, #e2e8f0); font: 600 11px 'IBM Plex Sans', system-ui, sans-serif; }
+.as-svg .as-lbl { fill: var(--txt-dim, #94a3b8); font: 400 11px 'IBM Plex Sans', system-ui, sans-serif; }
+.as-svg .as-val { fill: var(--txt-main, #e2e8f0); font: 600 11px 'JetBrains Mono', ui-monospace, monospace; }
+.as-svg .as-val[data-basis-param] { cursor: pointer; }
+.as-svg[data-vstate="warning"] [data-as="inlet"] { fill: var(--vfx-warn); }
+.as-svg[data-vstate="alarm"] [data-as="inlet"] { fill: var(--vfx-alarm); }
+@media (prefers-reduced-motion: no-preference) {
+  .as-svg[data-air] .as-flow.as-cold, .as-svg[data-air] .as-flow.as-hot, .as-svg[data-air] .as-flow.as-thr { display: inline; animation: as-march var(--as-air-dur, 1s) linear infinite; }
+  .as-svg[data-chw] .as-flow.as-chws, .as-svg[data-chw] .as-flow.as-chwr { display: inline; animation: as-march var(--as-chw-dur, 1s) linear infinite; }
+  .as-svg[data-fan] .as-fan { animation: vfx-turn var(--as-fan-dur, 1s) linear infinite; }
+}
+@keyframes as-march { to { stroke-dashoffset: -16; } }

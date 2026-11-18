@@ -1,7 +1,7 @@
 # PRD-CONV-LIVING-PLANT — the Conventional cockpits as a living plant
 
 Status: **APPROVED 2026-11-17 — the owner delegated the open decisions ("kamu yang tentukan yang terbaik"); the §14 defaults stand.**
-Shipped: P0 in v3.66.0 (2026-11-17); P1 (line state, motion, standby, view modes on chiller/fire/fuel/water) and P2 (trend + multitrend) in v3.67.0 (2026-11-18). Open: P3–P7.
+Shipped: P0 in v3.66.0 (2026-11-17); P1 (line state, motion, standby, view modes on chiller/fire/fuel/water) and P2 (trend + multitrend) in v3.67.0 (2026-11-18). P3 data hall (air path section, labelled row footer) in v3.69.0 (2026-11-18). Open: P3 remainder (fire sequence and water front, cooling tower), P4–P7.
 Scope: the 9 DC Conventional pages (`dc-conventional`, `datahall`, `chiller-plant`, `water-system`, `fire-system`,
 `fuel-system`, `ict`, `EPMS_Telemetry`, `cdu-mini-bms`). `datahallAI.html` and `js/datahall-ai/*` are out of scope.
 Supersedes the order of work in `standarization/Audit result/CONV_EXECUTION_PLAN_2026-11-16.md` (its engine and
@@ -502,7 +502,7 @@ actually looked at.
 |---|---|---|---|
 | **P0** | reproduce and fix C10 (modal repeating its own sheet) on every page; the depth layer already built: payload builder, equipment modal, inspector tabs on chiller, fire, fuel, water; depth gate ratchet; chiller secondary-supply physics fix | Opus (done locally, needs ship gate) | v3.66.0 |
 | **P1** | VFX core: clock, state grammar, view modes, flow chevrons, rotors, levels, thermal mode — on the **chiller plant** as the reference page | Opus | v3.67.0 |
-| **P2** | Trend + multitrend + history, wired on all pages that have points | Opus core, Ark wiring per page | v3.68.0 |
+| **P2** | Trend + multitrend + history, wired on all pages that have points | Opus core, Ark wiring per page | v3.69.0 |
 | **P3** | VFX rolled out: water, fuel, fire (sequence + water front), cooling tower, data hall air (plan + section), rack metric legend | Ark per page, Opus review | v3.69.0 |
 | **P4** | Electrical engine family (HV/MV/protection parameters) + W-E E-1 fleet corrections; topology solver; `tcc.js` + `protection.js` with Node gates | Opus | v3.70.0 (MINOR, engine) |
 | **P5** | SLD from 150 kV GIS: sheet, readout chips, energisation + power-flow VFX, fault and transfer sequences, TCC modal, interlock strip | Opus | v3.71.0 |
@@ -553,5 +553,7 @@ motion), `manual/*.html` of each page, this PRD's status table.
 | phase | status |
 |---|---|
 | P0 | SHIPPED v3.66.0. C10 probed on all 9 Conventional pages: 0 modals repeat their sheet (gate `test-conv-modal-no-self-repeat.mjs`). The only "SCADA" block is on `datahallAI.html` (`js/datahall-ai/hmi-sheets.js`), which belongs to the LTC session — reported there, not edited here. |
-| P1 | NEXT — VFX core on the chiller plant |
-| P2–P7 | NOT STARTED |
+| P1 | SHIPPED v3.67.0 — line state, motion, standby, view modes on chiller, fire, fuel, water |
+| P2 | SHIPPED v3.67.0 — trend + multitrend on the four sheets; data hall and ICT not wired yet |
+| P3 | PARTLY SHIPPED v3.69.0 — data hall air path section and labelled row footer. Open: fire sequence and water front, cooling tower, rack heat shimmer, leak scenario |
+| P4–P7 | NOT STARTED |
