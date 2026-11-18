@@ -337,6 +337,12 @@ Before release:
   one unit's share). A = kW / (sqrt3 x kV x pf). kW in = kW out at every bus. A conductor with flow is running, an
   energised one without flow standby (via the `rest` argument of `RZConvVfx.bind`), a dead one stopped (grey, dashed).
   The drawn contact of a breaker or switch is its position (`data-pos`, `css/conv-vfx.css`).
+- **Dash speed is not a quantity on this sheet.** Every conductor that carries power moves its dashes at the same
+  speed; the state colour and dash pattern say whether power flows, and the kW / A / load % chips say how much. Do not
+  read a faster or slower line as more or less power.
+- **No contradicting chrome.** While the HV / MV view is shown, the legacy LV rail (utility sources, GEN A/B/C) and its
+  breaker counters are hidden; the rail lists PLN LINE 1/2 and TX-1/2 with state and load from the solve, the genset
+  fleet from the engine, and both breaker counters count E-S-101's own breakers. The LV view restores the legacy chrome.
 - **Interlocks refuse in words.** A disconnector moves only with its breaker open; an earthing switch closes only with
   its disconnectors open and the circuit dead; a breaker never closes onto an earthed circuit; 2-out-of-3 on
   incomer-incomer-tie; the generator incomers close only on a running, synchronised generator bus (the gensets are off).
@@ -344,7 +350,11 @@ Before release:
 - **Protection curves are drawn from the engine, never typed.** `js/conv/tcc-modal.js` plots the typical chain (LV main
   LSIG, 20 kV feeder, 20 kV incomer, 150 kV transformer bay) through `js/conv/tcc.js` from `electrical.pro_*`, with the
   3,150 kVA damage curve, the inrush point and the LV-fault / 20 kV-fault markers, each curve with its own dash. The
-  coordination table is `tcc.coordinate()` run by the engine's grading rule. A relay without an inverse-time stage in the
+  coordination table is `tcc.coordinate()` run by the engine's grading rule. Each device curve stops at the largest
+  current that device can see (LV main: the LV maximum fault; 20 kV devices: the 20 kV fault level; the 150 kV
+  transformer relay: that fault referred through the transformer) and ends in a mark; `tcc.lsig()` keeps applying its
+  long-time I²t law above the short-time pickup, so an unclipped LV curve showed a fictitious fall below the 0.2 s
+  short-time delay above about 2.4 kA at 20 kV. A relay without an inverse-time stage in the
   engine basis (87L/21, 87B, 50BF, 51G) offers no curve rather than an invented one.
 - **Symbol library.** `resistor` (IEC 60617-4, the NGR) was added to `tools/hmi-symbol-defs.py`; nothing existing moved.
 - Gates: `node --test tools/test-conv-epms-model.mjs` (normal state, model builder, engine flows, bus balance, interlock

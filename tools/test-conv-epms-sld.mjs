@@ -21,6 +21,11 @@
        point + 2 fault markers + a coordination table whose margins are all >= the engine grading margin; Esc closes
        it and focus returns to the button that opened it
    V12 no page error; no sideways page scroll at 390 px
+   V13 every TCC device curve stops at the largest current its device can see (LV main: the LV maximum fault referred
+       to 20 kV; 20 kV feeder, incomer and the 150 kV transformer relay: the 20 kV fault level), read back from the
+       drawn path, x 1.001; each ends in a mark and its legend line says so
+   V14 while the HV / MV view is shown the legacy LV chrome is gone (no "(20kV)" utility heading, no GEN A/B/C rail,
+       no legacy breaker counters) and the rail + both breaker counters equal the simulation; the LV view restores them
    Usage: node tools/test-conv-epms-sld.mjs [--shots=<dir>]   (browser gates run through rz-lane, see the brief) */
 import puppeteer from 'puppeteer';
 import http from 'node:http';
@@ -173,6 +178,30 @@ for (const W of [1440, 390]) {
     ok(Math.abs(inKw - sum) <= 0.005 * inKw + 2, `V6${at} ${inc} chip ${inKw} kW != its feeders ${sum} kW`);
   }
   if (W === 1440) { await shot(pg, 'epms-sld-normal-1440.png', null); await shot(pg, 'epms-sld-normal-mv-1440.png', 'i1-ct'); }
+  const chromeOf = () => pg.evaluate(() => {
+    const vis = (id) => { const e = document.getElementById(id); return !!(e && e.offsetParent !== null); };
+    const txt = document.body.innerText;
+    return { gen: /\bGEN C\b/.test(txt), util: /utility sources \(20kv\)/i.test(txt), legacyTrips: vis('epms-trips'), legacyBottom: vis('val-breakers'),
+      trips: (document.getElementById('epms-sld-trips') || {}).textContent, bottom: (document.getElementById('val-sld-breakers') || {}).textContent,
+      rail: [...document.querySelectorAll('#epms-rail-sources [data-rail]')].map((li) => li.textContent), genLine: (document.getElementById('epms-rail-gen') || {}).textContent,
+      railShown: vis('epms-sld-rail'), sim: window.RZEpmsPage.breakers() };
+  });
+  const chromeOk = (c, when) => {
+    ok(!c.gen && !c.util && !c.legacyTrips && !c.legacyBottom, `V14${at} ${when}: legacy chrome still shown in the HV / MV view (GEN C ${c.gen}, (20kV) ${c.util}, legacy counters ${c.legacyTrips}/${c.legacyBottom})`);
+    ok(c.trips === `${c.sim.total - c.sim.closed} open` && c.bottom === `${c.sim.closed} / ${c.sim.total}`, `V14${at} ${when}: counters "${c.trips}" / "${c.bottom}" != simulation ${c.sim.closed} closed of ${c.sim.total}`);
+  };
+  if (W === 1440) {
+    const c = await chromeOf();
+    chromeOk(c, 'normal');
+    ok(c.railShown && c.rail.length === 4 && /PLN LINE 1/.test(c.rail[0]) && /TX-2/.test(c.rail[3]) && new RegExp(`${E.hv_tx_load_pct_normal.toFixed(1)} %`).test(c.rail[2]),
+      `V14${at} rail sources ${JSON.stringify(c.rail)}`);
+    ok(new RegExp(`^${E.genset_count} sets`).test(c.genLine) && /OFF/.test(c.genLine), `V14${at} rail generation "${c.genLine}"`);
+    await pg.click('.epms-view-btn[data-epms-view="lv"]'); await sleep(300);
+    const lv = await chromeOf();
+    ok(lv.gen && lv.util && lv.legacyTrips && lv.legacyBottom && !lv.railShown, `V14${at} the LV view did not restore the legacy rail and counters (GEN C ${lv.gen}, (20kV) ${lv.util}, counters ${lv.legacyTrips}/${lv.legacyBottom}, new rail ${lv.railShown})`);
+    if (SHOTS) { await pg.mouse.move(2, 2); await pg.screenshot({ path: path.join(SHOTS, 'epms-lv-view-1440.png') }); }
+    await pg.click('.epms-view-btn[data-epms-view="sld"]'); await sleep(300);
+  }
 
   if (W === 1440) {
     /* V7 tie refused */
@@ -193,6 +222,7 @@ for (const W of [1440, 390]) {
     ok(['fa1-cb', 'fa2-cb', 'fa3-cb', 'fa4-cb'].every((f) => s.vals[f + ':kw'] === '0 kW' && s.vals[f + ':amp'] === '0 A'),
       `V9${at} section A feeder chips not 0: ${['fa1-cb', 'fa4-cb'].map((f) => s.vals[f + ':kw'] + ' ' + s.vals[f + ':amp']).join(' | ')}`);
     ok(num(s.vals['tx1:pw']) === 0, `V9${at} TX-1 still reads load: ${s.vals['tx1:pw']}`);
+    chromeOk(await chromeOf(), 'after CB-IN1 opened');
     await shot(pg, 'epms-sld-section-a-dead-1440.png', 'i1-ct');
     /* V10 tie closed: allowed, A re-energised from TX-2 */
     e = await act(pg, 'tie', 'sim-close'); ok(!e, `V10${at} ${e}`);
@@ -234,6 +264,23 @@ for (const W of [1440, 390]) {
     ok(t.legend >= 8 && t.legendBelow, `V11${at} legend ${t.legend} items, below the plot ${t.legendBelow}`);
     const E2 = await pg.evaluate(() => window.CONV_CALC.snapshot.electrical.pro_grading_margin_s);
     ok(t.rows.length >= 6 && t.rows.every((m) => m === 'inf' || Number(m) >= E2 - 1e-9), `V11${at} coordination margins ${t.rows.join(', ')} (need >= ${E2})`);
+    const clip = await pg.evaluate(() => {
+      const m = document.querySelector('.tcc-modal:not([hidden])'), svg = m.querySelector('svg.tcc-plot');
+      const [ML, pw, I0, I1] = svg.getAttribute('data-tcc-axis').split(',').map(Number);
+      const out = {};
+      m.querySelectorAll('path.tcc-curve[data-tcc-curve]').forEach((p) => {
+        const xs = (p.getAttribute('d').match(/[ML]\s*(-?[\d.]+)/g) || []).map((t) => Number(t.slice(1)));
+        const x = Math.max(...xs);
+        out[p.getAttribute('data-tcc-curve')] = I0 * Math.pow(I1 / I0, (x - ML) / pw);
+      });
+      return { maxI: out, ends: m.querySelectorAll('[data-tcc-end]').length,
+        legend: [...m.querySelectorAll('.tcc-legend li')].filter((li) => /drawn to its maximum fault current/.test(li.textContent)).length };
+    });
+    const LIM = { lsig: E.dist_tx_through_fault_mv_a, feeder: E.mv_fault_level_ka * 1000, incomer: E.mv_fault_level_ka * 1000, hv: E.mv_fault_level_ka * 1000 };
+    for (const [id, lim] of Object.entries(LIM)) {
+      ok(clip.maxI[id] <= lim * 1.001, `V13${at} ${id} curve drawn to ${Math.round(clip.maxI[id])} A at 20 kV, past its maximum fault ${Math.round(lim)} A`);
+    }
+    ok(clip.ends === 4 && clip.legend === 4, `V13${at} ${clip.ends} end marks, ${clip.legend} legend lines naming the clip (want 4 / 4)`);
     ok(t.focusIn, `V11${at} focus did not move into the modal`);
     ok(!t.over && !t.panelOver, `V11${at} the TCC modal scrolls the page or its panel sideways`);
     if (SHOTS) await pg.screenshot({ path: path.join(SHOTS, `epms-tcc-${W}.png`) });
@@ -254,4 +301,4 @@ for (const W of [1440, 390]) {
 }
 await browser.close(); srv.close();
 if (fails.length) { console.log(fails.slice(0, 40).join('\n')); console.log(`\nCONV EPMS SLD — FAIL (${fails.length} of ${checks} checks)`); process.exit(1); }
-console.log(`\nCONV EPMS SLD — PASS (${checks} checks: default view, 150 kV tags, ANSI names, engine labels, normal flow, bus balance, interlocks, section loss + tie transfer, TCC modal, 390 px)`);
+console.log(`\nCONV EPMS SLD — PASS (${checks} checks: default view, 150 kV tags, ANSI names, engine labels, normal flow, bus balance, interlocks, section loss + tie transfer, TCC modal + fault-limit clip, HV/MV vs LV chrome, 390 px)`);

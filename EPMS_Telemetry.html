@@ -508,7 +508,7 @@
 <link rel="stylesheet" href="css/rz-hmi.css?v=20261117-fe9b28c8">
 <link rel="stylesheet" href="css/conv-hmi-depth.css?v=20261115-09997c8c">
 <link rel="stylesheet" href="css/conv-vfx.css?v=20261118-a7ff9ee3">
-<link rel="stylesheet" href="css/conv-tcc.css?v=20261118-d1c176cf">
+<link rel="stylesheet" href="css/conv-tcc.css?v=20261118-d0e76545">
 <script src="js/rz-eng-symbols.js?v=20261118-b87f635c"></script>
 <script src="js/rz-hmi-sheet.js?v=20261117-646bccf7"></script>
 <script src="js/conv/vfx.js?v=20261117-89056876"></script>
@@ -521,8 +521,8 @@
 <script src="js/conv/sld-topology.js?v=20261118-597640aa"></script>
 <script src="js/conv/tcc.js?v=20261118-4e103126"></script>
 <script src="js/conv/epms-sheet.js?v=20261118-db9d834f"></script>
-<script src="js/conv/epms-sim.js?v=20261118-8fac0c31"></script>
-<script src="js/conv/tcc-modal.js?v=20261118-a2cd8062"></script>
+<script src="js/conv/epms-sim.js?v=20261118-a499784e"></script>
+<script src="js/conv/tcc-modal.js?v=20261118-e31d9000"></script>
 <style id="epms-sld-css">
 /* the view switch: its own class, so no page code or gate that selects .btn / .zoom-btn picks it up */
 .epms-view { display: inline-flex; flex: 0 0 auto; }
@@ -540,6 +540,14 @@
 .epms-sld-msg b { font: 600 11px/1.4 'JetBrains Mono', ui-monospace, monospace; color: #E8B563; letter-spacing: .04em; }
 .epms-sld-msg[data-refused="1"] { border-color: #b45309; }
 .epms-sheet-host { min-width: 0; }
+/* legacy LV chrome shows only with the LV view; the E-S-101 rail and counters only with the HV / MV view */
+body[data-epms-view="sld"] .epms-lv-only { display: none !important; }
+body:not([data-epms-view="sld"]) .epms-sld-only { display: none !important; }
+.epms-rail-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font: 400 12px/1.35 'IBM Plex Sans', system-ui, sans-serif; color: #cbd5e1; }
+.epms-rail-list li { display: flex; justify-content: space-between; gap: 8px; }
+.epms-rail-list b, .epms-rail-line b { font: 600 11px/1.35 'JetBrains Mono', ui-monospace, monospace; color: #e2e8f0; }
+.epms-rail-line { margin: 0; font: 400 12px/1.35 'IBM Plex Sans', system-ui, sans-serif; color: #cbd5e1; }
+.epms-rail-gap { margin-top: 10px; }
 /* the legacy drawing's zoom / export controls act on the LV view only */
 body[data-epms-view="sld"] .epms-zoom-group { display: none !important; }
 @media (max-width: 768px) { .epms-sheet-host svg.hmi-svg { touch-action: pan-x pan-y; } }
@@ -566,7 +574,8 @@ body[data-epms-view="sld"] .epms-zoom-group { display: none !important; }
     <span style="color:#94a3b8;">Utility <b id="epms-utility" style="color:#94a3b8;" title="Awaiting simulation state">—</b></span>
     <span style="color:#94a3b8;">UPS A/B <b id="epms-ups" style="color:#94a3b8;" title="Awaiting simulation state">—</b></span>
     <span style="color:#94a3b8;">Gen <b id="epms-gen" style="color:#94a3b8;" title="Awaiting simulation state">—</b></span>
-    <span style="color:#94a3b8;">Breakers <b id="epms-trips" style="color:#94a3b8;" title="Awaiting simulation state">—</b></span>
+    <span class="epms-lv-only" style="color:#94a3b8;">Breakers <b id="epms-trips" style="color:#94a3b8;" title="Awaiting simulation state">—</b></span>
+    <span class="epms-sld-only" style="color:#94a3b8;">Breakers <b id="epms-sld-trips" style="color:#e2e8f0;" title="Open circuit breakers on E-S-101 (simulation)">—</b></span>
     <span style="flex:1"></span>
     <!-- v1.134.11 — the UPS nameplate basis: module rating, modules per system and the load one
          system carries. All engine-published and rendered nowhere, so the single-line showed UPS
@@ -705,7 +714,15 @@ body[data-epms-view="sld"] .epms-zoom-group { display: none !important; }
     <div class="epms-main" data-rz-cockpit-root="epms">
         <div class="sidebar pointer" id="epmsSidebar">
             
-            <div class="ctrl-box">
+            <div class="ctrl-box epms-sld-only" id="epms-sld-rail" aria-label="E-S-101 sources and generation">
+                <div class="ctrl-title">Sources · E-S-101 simulation</div>
+                <ul class="epms-rail-list" id="epms-rail-sources"><li>UNAVAILABLE</li></ul>
+                <div class="ctrl-title epms-rail-gap">Generation</div>
+                <p class="epms-rail-line" id="epms-rail-gen">UNAVAILABLE</p>
+                <div class="ctrl-title epms-rail-gap">Breakers</div>
+                <p class="epms-rail-line" id="epms-rail-cb">UNAVAILABLE</p>
+            </div>
+            <div class="ctrl-box epms-lv-only">
                 <div class="ctrl-title">Utility Sources (20kV)</div>
                 <div class="btn" id="btn-u-a" onclick="toggleSource('A')" aria-disabled="true">
                     <span>Utility A</span><div class="led"></div>
@@ -718,21 +735,21 @@ body[data-epms-view="sld"] .epms-zoom-group { display: none !important; }
                 </div>
             </div>
 
-            <div class="ctrl-box">
+            <div class="ctrl-box epms-lv-only">
                 <div class="ctrl-title">Generators</div>
                 <div class="btn" id="btn-gen-a" aria-disabled="true"><span>GEN A</span><div class="led"></div></div>
                 <div class="btn" id="btn-gen-b" aria-disabled="true"><span>GEN B</span><div class="led"></div></div>
                 <div class="btn" id="btn-gen-c" aria-disabled="true"><span>GEN C</span><div class="led"></div></div>
             </div>
 
-            <div class="ctrl-box">
+            <div class="ctrl-box epms-lv-only">
                 <div class="ctrl-title">Status</div>
                 <div id="logs" style="height: 250px; overflow-y: auto; font-size: 10px; color: #94a3b8; font-family:'JetBrains Mono',monospace;font-feature-settings:'zero' 1;padding-right:5px;">
                     <div>&gt; EPMS authority check pending.</div>
                 </div>
             </div>
 
-            <div class="btn" onclick="resetView()" style="margin-top: auto;">Reset View</div>
+            <div class="btn epms-lv-only" onclick="resetView()" style="margin-top: auto;">Reset View</div>
         </div>
         <section id="epms-sld-view" class="epms-sld-view pointer" aria-label="E-S-101 HV / MV single-line">
             <p class="epms-sld-msg" id="epms-sld-msg" role="status" aria-live="polite"><b>SIMULATION</b> Select a breaker or switch to operate it; the interlocks are enforced and every flow is re-solved.</p>
@@ -772,10 +789,16 @@ body[data-epms-view="sld"] .epms-zoom-group { display: none !important; }
                 <div class="status-value" id="val-freq" style="color:#94a3b8;" title="UNAVAILABLE — not metered in the current basis">—</div>
             </div>
         </div>
-        <div class="status-box">
+        <div class="status-box epms-lv-only">
             <div>
                 <div class="status-label">Breakers</div>
                 <div class="status-value" id="val-breakers" data-rz-authored-basis="Breaker position counts come from the SIMULATED single-line topology drawn on this page. conv-engine.js models loads, capacities, redundancy classes and the thermal chain; it publishes no switchgear schedule, so there is no parameter that could say how many devices exist or how many are closed. The loads those breakers carry ARE engine-bound and stay in the denominator - it is the device inventory that is authored here.">—</div>
+            </div>
+        </div>
+        <div class="status-box epms-sld-only">
+            <div>
+                <div class="status-label">Breakers</div>
+                <div class="status-value" id="val-sld-breakers" title="Closed / total circuit breakers on E-S-101" data-rz-authored-basis="Circuit-breaker positions on E-S-101 are the SIMULATED switching state of this page (closed / total), operated from the inspector; conv-engine.js publishes no breaker positions.">—</div>
             </div>
         </div>
         <div class="status-box" id="box-alarms">
@@ -2340,6 +2363,23 @@ init();
         if (window.RZConvVfx) window.RZConvVfx.bind(host, SHEET, flow, rest);
         if (window.RZConvTruth && window.RZConvTruth.marks) window.RZConvTruth.marks(svg);
     }
+    /* the rail and the two breaker counters while the HV / MV view is shown: the solve, never the legacy LV drawing */
+    function setText(id, html) { var el = document.getElementById(id); if (el) el.innerHTML = html; }
+    function chrome() {
+        if (!LIVE) return;
+        var row = function (id) {
+            var n = BY[id], d = res.dev[id], st = d && d.energised ? (d.kw > 0.5 ? 'LIVE' : 'NO LOAD') : 'DEAD';
+            var v = n.tx ? d.pct.toFixed(1) + ' %' : kw(d && d.kw);
+            return '<li data-rail="' + id + '"><span>' + n.tag + '</span><b>' + st + ' · ' + v + '</b></li>';
+        };
+        setText('epms-rail-sources', ['l1-src', 'l2-src', 'tx1', 'tx2'].map(row).join(''));
+        setText('epms-rail-gen', '<b>' + E.genset_count + ' sets</b> · ' + E.genset_per_hall + ' per hall (N+1) · <b>' + (sim.gen ? 'RUNNING' : 'OFF') + '</b>');
+        var cbs = SHEET.nodes.filter(function (n) { return n.sw === 'cb'; }), closed = cbs.filter(function (n) { return sim.closed[n.id]; }).length;
+        var open = cbs.length - closed;
+        setText('epms-rail-cb', '<b>' + closed + ' / ' + cbs.length + '</b> closed · <b>' + open + '</b> open');
+        setText('epms-sld-trips', open + ' open');
+        setText('val-sld-breakers', closed + ' / ' + cbs.length);
+    }
     function say(text, refused) {
         if (!msgEl) return;
         msgEl.innerHTML = '<b>SIMULATION</b> ' + text.replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; });
@@ -2349,7 +2389,7 @@ init();
         var n = BY[id]; if (!LIVE || !n || !n.sw) return null;
         var r = SIM.operate(SHEET, sim, id, !sim.closed[id], B);
         ops++;
-        if (r.ok) { sim = r.state; res = SIM.solve(SHEET, sim, B); paint(); lastMsg = r.reason + '; flows re-solved'; say(lastMsg, false); }
+        if (r.ok) { sim = r.state; res = SIM.solve(SHEET, sim, B); paint(); chrome(); lastMsg = r.reason + '; flows re-solved'; say(lastMsg, false); }
         else { lastMsg = 'REFUSED — ' + r.reason; say(lastMsg, true); }
         return r;
     }
@@ -2358,7 +2398,7 @@ init();
         var inr = Tc.txInrush(E.dist_tx_kva, V20, E.pro_inrush_x, E.pro_inrush_s);
         return { title: n.tag + ' — ' + (n.label || ''), sub: 'Typical chain: LV main → 20 kV feeder → 20 kV incomer → 150 kV transformer bay',
             Vref: V20, vLabel: E.mv_voltage_kv + ' kV', I: [10, 100000], t: [0.01, 1000],
-            curves: SIM.chain(B).map(function (c) { return { id: c.id, label: c.label, dev: c.dev, V: c.V, em: c.id === em }; }),
+            curves: SIM.chain(B).map(function (c) { return { id: c.id, label: c.label, dev: c.dev, V: c.V, Imax: c.Imax, em: c.id === em }; }),
             damage: { kva: E.dist_tx_kva, V: V20, z: E.dist_tx_impedance_pct, label: grp(E.dist_tx_kva) + ' kVA transformer through-fault damage (IEEE C57.109)' },
             inrush: { I: inr.I, t: inr.t, label: 'Transformer inrush, ' + E.pro_inrush_x + ' × full-load current for ' + E.pro_inrush_s + ' s' },
             markers: [{ I: E.dist_tx_through_fault_mv_a, label: 'LV maximum fault referred to ' + E.mv_voltage_kv + ' kV' },
@@ -2396,6 +2436,7 @@ init();
            only and pins its sheet host dark, so the gradients are pinned with it (a light canvas behind dark text otherwise) */
         var defs = document.querySelector('svg.hmi-defs'); if (defs) defs.setAttribute('data-theme', 'dark');
         paint();
+        chrome();
         setView('sld');
         if (!LIVE) say('EPMS authority unavailable — the single-line is drawn without states, flows or switching.', true);
         /* read-only handle for the gates: the solved state, never a way to change it */
@@ -2404,6 +2445,11 @@ init();
             closed: function (id) { return LIVE ? !!sim.closed[id] : null; },
             dev: function (id) { return LIVE && res.dev[id] ? JSON.parse(JSON.stringify(res.dev[id])) : null; },
             edge: function (id) { return LIVE && res.edges[id] ? { energised: res.edges[id].energised, kw: res.edges[id].kw } : null; },
+            breakers: function () {
+                if (!LIVE) return null;
+                var cbs = SHEET.nodes.filter(function (n) { return n.sw === 'cb'; });
+                return { total: cbs.length, closed: cbs.filter(function (n) { return sim.closed[n.id]; }).length };
+            },
             balance: function () {
                 if (!LIVE) return null;
                 var out = {}, m = res.model;

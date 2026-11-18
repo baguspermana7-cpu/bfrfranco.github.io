@@ -178,10 +178,12 @@
     return { ok: true, reason: tagOf(by, id) + (close ? ' closed' : ' opened'), state: next };
   }
 
-  /* the typical unit's protection chain, load side first, from the engine's published settings */
+  /* the typical unit's protection chain, load side first, from the engine's published settings. Imax = the largest
+     current the device can see, at its own voltage: the LV main the LV maximum fault, every 20 kV device the 20 kV fault
+     level, the 150 kV transformer relay that fault referred through the transformer. A curve is never drawn past it. */
   function chain(b) {
-    var e = b.e;
-    return [
+    var e = b.e, mvA = e.mv_fault_level_ka * 1000;
+    var out = [
       { id: 'lsig', label: 'LV main LSIG', V: e.lv_voltage_v, dev: { kind: 'lsig', Ir: e.pro_lv_ir_a, tr: e.pro_lv_tr_s, Isd: e.pro_lv_isd_a, tsd: e.pro_lv_tsd_s, i2t: false } },
       { id: 'feeder', label: '20 kV feeder 50/51 (' + e.pro_feeder_curve + ')', V: e.mv_voltage_kv * 1000,
         dev: { kind: 'relay', curve: e.pro_feeder_curve, Is: e.pro_feeder_is_a, TMS: e.pro_feeder_tms, inst: { I: e.pro_feeder_inst_a, t: e.pro_feeder_inst_s } } },
@@ -190,6 +192,9 @@
       { id: 'hv', label: '150 kV transformer 51 (' + e.pro_hv_curve + ')', V: e.hv_voltage_kv * 1000,
         dev: { kind: 'relay', curve: e.pro_hv_curve, Is: e.pro_hv_is_a, TMS: e.pro_hv_tms } }
     ];
+    var lim = { lsig: e.lv_fault_level_ka * 1000, feeder: mvA, incomer: mvA, hv: mvA * e.mv_voltage_kv / e.hv_voltage_kv };
+    out.forEach(function (c) { c.Imax = lim[c.id]; });
+    return out;
   }
   /* the grading check the engine's rule states: the whole chain at the LV maximum fault, each upstream pair at the
      20 kV fault. Currents are reported referred to 20 kV. */

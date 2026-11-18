@@ -12,7 +12,8 @@
       earthed circuit, generator incomer with the gensets off, a device already in position
    M5 operate() never changes the state it was given
    M6 N-1: CB-IN1 open kills section A (0 kW); then the tie closes and TX-2 carries 2 x normal = the engine's N-1 figure
-   M7 the protection chain comes from the engine keys and coordinates (every margin >= the engine grading margin)
+   M7 the protection chain comes from the engine keys and coordinates (every margin >= the engine grading margin); each
+      device carries the largest current it can see (LV fault, 20 kV fault, 20 kV fault referred to 150 kV)
    M8 the sheet carries no literal colour and the simulation no clock or random source */
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -142,6 +143,10 @@ test('M7 protection chain from the engine, coordinated', () => {
   assert.deepEqual(ch.map((c) => c.id), ['lsig', 'feeder', 'incomer', 'hv']);
   assert.equal(ch[1].dev.curve, E.pro_feeder_curve); assert.equal(ch[1].dev.TMS, E.pro_feeder_tms); assert.equal(ch[1].dev.Is, E.pro_feeder_is_a);
   assert.equal(ch[2].dev.TMS, E.pro_incomer_tms); assert.equal(ch[3].dev.Is, E.pro_hv_is_a); assert.equal(ch[0].dev.Ir, E.pro_lv_ir_a);
+  near(ch[0].Imax, E.lv_fault_level_ka * 1000, 1e-9, 'LV main sees at most the LV fault');
+  near(ch[1].Imax, E.mv_fault_level_ka * 1000, 1e-9, 'feeder sees at most the 20 kV fault');
+  near(ch[2].Imax, E.mv_fault_level_ka * 1000, 1e-9, 'incomer sees at most the 20 kV fault');
+  near(ch[3].Imax * E.hv_voltage_kv, E.mv_fault_level_ka * 1000 * E.mv_voltage_kv, 1e-6, '150 kV relay sees the 20 kV fault referred');
   const co = SIM.coordination(B);
   assert.ok(co.ok, 'chain coordinates');
   assert.ok(co.rows.length >= 6);

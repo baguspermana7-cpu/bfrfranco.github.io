@@ -34,7 +34,7 @@
       var d = '', on = false;
       pts.forEach(function (p) {
         if (!inBox(p[0], p[1])) { on = false; return; }
-        d += (on ? 'L' : 'M') + X(p[0]).toFixed(1) + ' ' + Y(p[1]).toFixed(1) + ' '; on = true;
+        d += (on ? 'L' : 'M') + X(p[0]).toFixed(2) + ' ' + Y(p[1]).toFixed(2) + ' '; on = true;
       });
       return d;
     }
@@ -53,9 +53,16 @@
     g += '<text class="tcc-ax tcc-ax-t" x="' + (ML + pw / 2) + '" y="' + (H - 6) + '" text-anchor="middle">current referred to ' + esc(spec.vLabel) + '</text>';
     var curves = '';
     spec.curves.forEach(function (c, i) {
+      /* a curve stops at the largest current its device can see (c.Imax, at the device voltage) and ends in a mark */
       var lo = T.refer(I0, spec.Vref, c.V), hi = T.refer(I1, spec.Vref, c.V);
+      if (c.Imax > 0 && c.Imax < hi) hi = c.Imax;
       var pts = T.points(c.dev, lo, hi, 160).map(function (p) { return [T.refer(p[0], c.V, spec.Vref), p[1]]; });
       curves += '<path class="tcc-curve' + (c.em ? ' is-em' : '') + '" data-tcc-curve="' + esc(c.id) + '" style="stroke-dasharray:' + DASH[i % DASH.length] + '" d="' + poly(pts) + '"/>';
+      var last = pts.length ? pts[pts.length - 1] : null;
+      if (last && c.Imax > 0 && inBox(last[0], last[1])) {
+        var ex = X(last[0]).toFixed(1), ey = Y(last[1]);
+        curves += '<line class="tcc-end' + (c.em ? ' is-em' : '') + '" data-tcc-end="' + esc(c.id) + '" x1="' + ex + '" y1="' + (ey - 5).toFixed(1) + '" x2="' + ex + '" y2="' + (ey + 5).toFixed(1) + '"/>';
+      }
     });
     if (spec.damage) {
       var dpts = [], d = spec.damage;
@@ -70,7 +77,7 @@
       var mx = X(m.I).toFixed(1);
       curves += '<g class="tcc-marker" data-tcc-marker="' + i + '"><line x1="' + mx + '" y1="' + MT + '" x2="' + mx + '" y2="' + (MT + ph) + '" style="stroke-dasharray:' + (i ? '6 2 1 2' : '3 3') + '"/></g>';
     });
-    return '<svg class="tcc-plot" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc('Time–current curves, ' + spec.title) + '">' +
+    return '<svg class="tcc-plot" viewBox="0 0 ' + W + ' ' + H + '" data-tcc-axis="' + [ML, pw, I0, I1].join(',') + '" role="img" aria-label="' + esc('Time–current curves, ' + spec.title) + '">' +
       '<rect class="tcc-bg" x="' + ML + '" y="' + MT + '" width="' + pw + '" height="' + ph + '"/>' + g + curves + '</svg>';
   }
   function swatch(dash, cls) {
@@ -78,7 +85,10 @@
   }
   function legend(spec) {
     var h = '<ul class="tcc-legend">';
-    spec.curves.forEach(function (c, i) { h += '<li' + (c.em ? ' class="is-em"' : '') + '>' + swatch(DASH[i % DASH.length], 'tcc-curve' + (c.em ? ' is-em' : '')) + esc(c.label) + (c.em ? ' <b>(this device)</b>' : '') + '</li>'; });
+    spec.curves.forEach(function (c, i) {
+      var lim = c.Imax > 0 ? ' — drawn to its maximum fault current, ' + fmtA(root.RZConvTcc.refer(c.Imax, c.V, spec.Vref)) + ' at ' + spec.vLabel : '';
+      h += '<li' + (c.em ? ' class="is-em"' : '') + '>' + swatch(DASH[i % DASH.length], 'tcc-curve' + (c.em ? ' is-em' : '')) + esc(c.label + lim) + (c.em ? ' <b>(this device)</b>' : '') + '</li>';
+    });
     if (spec.damage) h += '<li>' + swatch('', 'tcc-damage') + esc(spec.damage.label) + '</li>';
     if (spec.inrush) h += '<li><svg class="tcc-sw" viewBox="0 0 30 10" width="30" height="10" aria-hidden="true"><circle class="tcc-inrush-dot" cx="15" cy="5" r="4"/></svg>' + esc(spec.inrush.label) + '</li>';
     (spec.markers || []).forEach(function (m, i) { h += '<li>' + swatch(i ? '6 2 1 2' : '3 3', 'tcc-marker-ln') + esc(m.label) + ' — ' + fmtA(m.I) + '</li>'; });
