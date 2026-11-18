@@ -11,6 +11,24 @@ release sections rather than semver.
 
 ---
 
+## v3.73.0 — 2026-11-18 — One top bar and one theme button: the incident library (51 pages)
+
+PRD `documentation/prd/PRD_SITE_CHROME.md`, phase N3.
+
+### Changed
+- **`tools/build-incidents.py`** now emits the standard bar: the head snippet, `data-rz-bar`, the canonical theme
+  button, `css/rz-chrome.css` and `js/rz-chrome.js`. Its own `.navbar` and `.theme-btn` rules and its inline toggle
+  script are gone. The 50 dossiers and the hub are rebuilt; the builder's output and `sweep-site-chrome.py` agree
+  byte for byte (both `--check` commands pass).
+- Before: bar 58 px (61 px on a phone), the theme control a 26 px wide "◐" character, sign-in dropped in the middle of
+  the bar. After, on all 51 at 1440 and 390 px: bar 56 px sticky, the group ROOT, theme, sign-in at the right, theme
+  button 44 x 44 at 272 px / 72 px from the right edge — the same numbers as the calculators and the journal.
+- **First visit is light, as on every site page.** The old script applied dark when nothing was stored and wrote that
+  default into `localStorage.theme`, so opening one incident page turned the whole site dark for that visitor.
+  A stored choice is still honoured.
+- `tools/sweep-site-chrome.py` marks a bar that `styles.css` used to fix (`data-rz-bar="lift"`); only those give
+  their height back. The incident bar was already in the flow and is not lifted (42 pages re-stamped).
+- `css/rz-chrome.css`: the sign-in slot keeps its fixed width inside a grouped control row (`.nav-right`).
 ## v3.72.0 — 2026-11-18 — ICT network: every block opens a device modal
 
 ### Added

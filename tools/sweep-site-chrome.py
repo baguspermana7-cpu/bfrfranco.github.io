@@ -5,7 +5,7 @@
 Per page, idempotent:
   1. the head snippet (theme before first paint) — one string, identical on every page, stamped here only
   2. no `data-theme` literal on <html>; `data-rz-kind="app"` on app pages (tools/site-chrome.config.json)
-  3. `data-rz-bar` on the bar; `data-rz-slot` on search and sign-in
+  3. `data-rz-bar` on the bar (`="lift"` where styles.css had it fixed); `data-rz-slot` on search and sign-in
   4. the theme button replaced by the canonical markup (old id kept as an alias), placed before sign-in
   5. the page's own toggle code, icon code and one-line `.navbar { … }` rules removed
   6. css/rz-chrome.css and js/rz-chrome.js loaded last in <head>
@@ -112,9 +112,13 @@ def refit(name, s):
     bar = BAR.search(s)
     if not bar:
         return original, ['no .navbar bar found — nothing stamped']
-    if 'data-rz-bar' not in bar.group(0):
-        s = s[:bar.end() - 1] + ' data-rz-bar>' + s[bar.end():]
-        bar = BAR.search(s)
+    # a bar that styles.css made `position: fixed` was out of the flow and the page pads for it: mark it, so the
+    # stylesheet gives its height back. A bar the page already kept in the flow (incidents, hub pages) is not marked.
+    lift = bool(re.search(r'href="(?:\.\./)?styles(?:\.min)?\.css', s)) and 'hub-nav' not in bar.group(0)
+    tag = re.sub(r'\sdata-rz-bar(?:="[^"]*")?', '', bar.group(0))
+    tag = tag[:-1] + (' data-rz-bar="lift">' if lift else ' data-rz-bar>')
+    s = s[:bar.start()] + tag + s[bar.end():]
+    bar = BAR.search(s)
     end = min([x for x in (s.find('</nav>', bar.end()), s.find('</header>', bar.end())) if x > 0] or [len(s)])
     nav = s[bar.end():end]
     nav = re.sub(r'(<button\b(?![^>]*data-rz-slot)[^>]*\bid="navSearchBtn")', r'\1 data-rz-slot="search"', nav)
