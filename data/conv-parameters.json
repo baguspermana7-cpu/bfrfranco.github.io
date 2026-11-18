@@ -91,6 +91,7 @@
       ],
       "tests": [
         "test-conv-design-basis.mjs",
+        "test-conv-epms-model.mjs",
         "test-conv-snapshot-binding.mjs",
         "test-datahall-ai-rack-density.mjs"
       ],
@@ -2176,7 +2177,7 @@
       "formula": "site it_design_kw x PUE / pf / 1000",
       "formulaExpr": "site.it_design_kw * site.pue / electrical.power_factor_design / 1000",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [
         "site.it_design_kw",
         "site.pue",
@@ -2217,7 +2218,7 @@
       "formula": "epms_total_kw / pf / 1000",
       "formulaExpr": "electrical.epms_total_kw / electrical.power_factor_design / 1000",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [
         "electrical.epms_total_kw",
         "electrical.power_factor_design"
@@ -2254,8 +2255,6 @@
       "value": 40,
       "formula": "per stream per hall x streams x halls",
       "formulaExpr": "electrical.dist_tx_per_stream_per_hall * electrical.dist_tx_streams * campus.hall_count",
-      "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
       "deps": [
         "electrical.dist_tx_per_stream_per_hall",
         "electrical.dist_tx_streams",
@@ -2274,8 +2273,14 @@
         "electrical.power_factor_design",
         "site.pue"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 2
+        }
+      ],
       "tests": [
+        "test-conv-epms-sld.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
       "docs": [],
@@ -2295,7 +2300,7 @@
       "formula": "kVA x 1000 / (sqrt3 x V)",
       "formulaExpr": "electrical.dist_tx_kva * 1000 / ( 1.7320508 * electrical.lv_voltage_v )",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [
         "electrical.dist_tx_kva",
         "electrical.lv_voltage_v"
@@ -2328,7 +2333,7 @@
       "formula": "kVA / (sqrt3 x kV)",
       "formulaExpr": "electrical.dist_tx_kva / ( 1.7320508 * electrical.mv_voltage_kv )",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [
         "electrical.dist_tx_kva",
         "electrical.mv_voltage_kv"
@@ -2359,8 +2364,6 @@
       "kind": "authored",
       "value": 7,
       "formula": null,
-      "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "STANDARD",
@@ -2368,7 +2371,12 @@
       "dependsOnInputs": [
         "electrical.dist_tx_impedance_pct"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
@@ -2388,8 +2396,6 @@
       "kind": "authored",
       "value": 3150,
       "formula": null,
-      "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -2397,9 +2403,15 @@
       "dependsOnInputs": [
         "electrical.dist_tx_kva"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 4
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
+        "test-conv-epms-sld.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [],
@@ -2419,7 +2431,7 @@
       "formula": "hall kVA / (units x kVA) x 100",
       "formulaExpr": "electrical.hall_facility_design_kw / electrical.power_factor_design / ( electrical.dist_tx_per_stream_per_hall * electrical.dist_tx_kva ) * 100",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [
         "electrical.hall_facility_design_kw",
         "electrical.power_factor_design",
@@ -2460,7 +2472,7 @@
       "formula": "hall kVA / (units x streams x kVA) x 100",
       "formulaExpr": "electrical.hall_facility_design_kw / electrical.power_factor_design / ( electrical.dist_tx_per_stream_per_hall * electrical.dist_tx_streams * electrical.dist_tx_kva ) * 100",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [
         "electrical.hall_facility_design_kw",
         "electrical.power_factor_design",
@@ -2502,7 +2514,7 @@
       "formula": "ceil(hall kW / pf / kVA): one stream alone carries the hall",
       "formulaExpr": "ceil( electrical.hall_facility_design_kw / electrical.power_factor_design / electrical.dist_tx_kva )",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Drawn by E-S-101 (P5a) through js/conv/payloads.js inspector rows or js/conv/epms-sim.js (relay chain, flows, TCC curves) rather than a page-level read the registry greps; not a stand-alone operator figure.",
       "deps": [
         "electrical.hall_facility_design_kw",
         "electrical.power_factor_design",
@@ -2540,7 +2552,7 @@
       "value": 2,
       "formula": null,
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Drawn by E-S-101 (P5a) through js/conv/payloads.js inspector rows or js/conv/epms-sim.js (relay chain, flows, TCC curves) rather than a page-level read the registry greps; not a stand-alone operator figure.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -2550,6 +2562,7 @@
       ],
       "consumers": [],
       "tests": [
+        "test-conv-epms-model.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [],
@@ -2568,8 +2581,6 @@
       "value": 1185,
       "formula": "LV board fault seen on the 20 kV side = kVA / ((source z + Z%/100) x sqrt3 x kV_mv); the LV voltage cancels",
       "formulaExpr": "electrical.dist_tx_kva / ( ( electrical.dist_tx_kva / 1000 / ( 1.7320508 * electrical.mv_voltage_kv * electrical.mv_fault_level_ka ) + electrical.dist_tx_impedance_pct / 100 ) * 1.7320508 * electrical.mv_voltage_kv )",
-      "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
       "deps": [
         "electrical.dist_tx_kva",
         "electrical.mv_voltage_kv",
@@ -2593,9 +2604,16 @@
         "electrical.power_factor_design",
         "site.pue"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
+        "test-conv-epms-model.mjs",
+        "test-conv-epms-sld.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
       "docs": [],
@@ -2640,6 +2658,7 @@
       "tests": [
         "test-conv-calc.mjs",
         "test-conv-electrical-hvmv.mjs",
+        "test-conv-epms-model.mjs",
         "test-conv-formula.mjs (formula evaluated)",
         "test-conv-basis-drawer.mjs (drawer value vs EPMS_Telemetry.html)"
       ],
@@ -2699,8 +2718,6 @@
       "value": 32,
       "formula": "per hall x halls",
       "formulaExpr": "electrical.genset_per_hall * campus.hall_count",
-      "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
       "deps": [
         "electrical.genset_per_hall",
         "campus.hall_count"
@@ -2718,8 +2735,14 @@
         "electrical.genset_unit_kw",
         "site.pue"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 4
+        }
+      ],
       "tests": [
+        "test-conv-epms-sld.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
       "docs": [],
@@ -2737,8 +2760,6 @@
       "kind": "authored",
       "value": 0.8,
       "formula": null,
-      "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -2746,7 +2767,12 @@
       "dependsOnInputs": [
         "electrical.genset_max_loading"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
@@ -2768,7 +2794,7 @@
       "formula": "((per hall - 1) x unit x max loading - hall kW) / hall kW x 100",
       "formulaExpr": "( ( electrical.genset_per_hall - 1 ) * electrical.genset_unit_kw * electrical.genset_max_loading - electrical.hall_facility_design_kw ) / electrical.hall_facility_design_kw * 100",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Drawn by E-S-101 (P5a) through js/conv/payloads.js inspector rows or js/conv/epms-sim.js (relay chain, flows, TCC curves) rather than a page-level read the registry greps; not a stand-alone operator figure.",
       "deps": [
         "electrical.genset_per_hall",
         "electrical.genset_unit_kw",
@@ -2808,8 +2834,6 @@
       "value": 8,
       "formula": "ceil(hall kW / (unit kW x max loading)) + spare",
       "formulaExpr": "ceil( electrical.hall_facility_design_kw / ( electrical.genset_unit_kw * electrical.genset_max_loading ) ) + electrical.genset_spare_per_hall",
-      "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
       "deps": [
         "electrical.hall_facility_design_kw",
         "electrical.genset_unit_kw",
@@ -2829,9 +2853,15 @@
         "electrical.genset_unit_kw",
         "site.pue"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 2
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
+        "test-conv-epms-sld.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
       "docs": [],
@@ -2850,7 +2880,7 @@
       "value": 1,
       "formula": null,
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -2877,8 +2907,6 @@
       "kind": "authored",
       "value": 3000,
       "formula": null,
-      "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -2886,7 +2914,12 @@
       "dependsOnInputs": [
         "electrical.genset_unit_kw"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
@@ -2907,7 +2940,7 @@
       "value": 0.2,
       "formula": null,
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -2936,7 +2969,7 @@
       "formula": "hall it_design_kw x site PUE",
       "formulaExpr": "hall.it_design_kw * site.pue",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [
         "hall.it_design_kw",
         "site.pue"
@@ -2972,7 +3005,7 @@
       "value": 2,
       "formula": null,
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -2999,8 +3032,6 @@
       "kind": "authored",
       "value": 25,
       "formula": null,
-      "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -3008,9 +3039,15 @@
       "dependsOnInputs": [
         "electrical.hv_fault_level_ka"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
+        "test-conv-epms-sld.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [],
@@ -3029,7 +3066,7 @@
       "value": 2,
       "formula": null,
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -3058,7 +3095,7 @@
       "formula": "sqrt3 x kV x kA",
       "formulaExpr": "1.7320508 * electrical.hv_voltage_kv * electrical.hv_fault_level_ka",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Drawn by E-S-101 (P5a) through js/conv/payloads.js inspector rows or js/conv/epms-sim.js (relay chain, flows, TCC curves) rather than a page-level read the registry greps; not a stand-alone operator figure.",
       "deps": [
         "electrical.hv_voltage_kv",
         "electrical.hv_fault_level_ka"
@@ -3090,7 +3127,7 @@
       "value": 40,
       "formula": null,
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Drawn by E-S-101 (P5a) through js/conv/payloads.js inspector rows or js/conv/epms-sim.js (relay chain, flows, TCC curves) rather than a page-level read the registry greps; not a stand-alone operator figure.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -3119,7 +3156,7 @@
       "value": 2,
       "formula": null,
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -3147,7 +3184,7 @@
       "value": 2,
       "formula": null,
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -3176,7 +3213,7 @@
       "formula": "MVA x 1000 / (sqrt3 x kV)",
       "formulaExpr": "electrical.hv_tx_mva * 1000 / ( 1.7320508 * electrical.hv_voltage_kv )",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [
         "electrical.hv_tx_mva",
         "electrical.hv_voltage_kv"
@@ -3214,7 +3251,7 @@
       "value": 12.5,
       "formula": null,
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Drawn by E-S-101 (P5a) through js/conv/payloads.js inspector rows or js/conv/epms-sim.js (relay chain, flows, TCC curves) rather than a page-level read the registry greps; not a stand-alone operator figure.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -3243,7 +3280,7 @@
       "formula": "demand / ((count - 1) x rating) x 100",
       "formulaExpr": "electrical.demand_mva / ( ( electrical.hv_tx_count - 1 ) * electrical.hv_tx_mva ) * 100",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Drawn by E-S-101 (P5a) through js/conv/payloads.js inspector rows or js/conv/epms-sim.js (relay chain, flows, TCC curves) rather than a page-level read the registry greps; not a stand-alone operator figure.",
       "deps": [
         "electrical.demand_mva",
         "electrical.hv_tx_count",
@@ -3268,6 +3305,8 @@
       "consumers": [],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
+        "test-conv-epms-model.mjs",
+        "test-conv-epms-sld.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
       "docs": [
@@ -3289,7 +3328,7 @@
       "formula": "design demand / ((count - 1) x rating) x 100",
       "formulaExpr": "electrical.demand_design_mva / ( ( electrical.hv_tx_count - 1 ) * electrical.hv_tx_mva ) * 100",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [
         "electrical.demand_design_mva",
         "electrical.hv_tx_count",
@@ -3331,7 +3370,7 @@
       "formula": "demand / (count x rating) x 100",
       "formulaExpr": "electrical.demand_mva / ( electrical.hv_tx_count * electrical.hv_tx_mva ) * 100",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Drawn by E-S-101 (P5a) through js/conv/payloads.js inspector rows or js/conv/epms-sim.js (relay chain, flows, TCC curves) rather than a page-level read the registry greps; not a stand-alone operator figure.",
       "deps": [
         "electrical.demand_mva",
         "electrical.hv_tx_count",
@@ -3355,6 +3394,8 @@
       ],
       "consumers": [],
       "tests": [
+        "test-conv-epms-model.mjs",
+        "test-conv-epms-sld.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
       "docs": [],
@@ -3373,8 +3414,6 @@
       "value": 63,
       "formula": "smallest IEC 60076-1 R10 rating (31.5, 40, 50, 63, 80, 100 MVA) >= hv_tx_sizing_mva",
       "formulaNotExpressible": "A lookup in the IEC 60076-1 preferred-rating list, which the formula evaluator cannot express.",
-      "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
       "deps": [
         "electrical.hv_tx_sizing_mva"
       ],
@@ -3389,9 +3428,15 @@
         "electrical.power_factor_design",
         "site.pue"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 2
+        }
+      ],
       "tests": [
-        "test-conv-electrical-hvmv.mjs"
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-epms-sld.mjs"
       ],
       "docs": [],
       "source": {
@@ -3410,7 +3455,7 @@
       "formula": "max(demand_design_mva, demand_mva x (1 + growth_margin))",
       "formulaNotExpressible": "A max() of two demands, which the formula evaluator cannot express.",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [
         "electrical.demand_design_mva",
         "electrical.demand_mva"
@@ -3447,8 +3492,6 @@
       "kind": "authored",
       "value": 150,
       "formula": null,
-      "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ADOPTED",
@@ -3456,9 +3499,16 @@
       "dependsOnInputs": [
         "electrical.hv_voltage_kv"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 4
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
+        "test-conv-epms-model.mjs",
+        "test-conv-epms-sld.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [],
@@ -3477,8 +3527,6 @@
       "value": 59.25,
       "formula": "MVA / ((MVA / 20 kV fault MVA + Z%/100) x sqrt3 x kV_lv); the 20 kV fault MVA does not depend on the 20 kV voltage",
       "formulaExpr": "( electrical.dist_tx_kva / 1000 ) / ( ( electrical.dist_tx_kva / 1000 / ( electrical.hv_tx_mva / ( electrical.hv_tx_mva / electrical.hv_source_mva + electrical.hv_tx_impedance_pct / 100 ) ) + electrical.dist_tx_impedance_pct / 100 ) * 1.7320508 * electrical.lv_voltage_v / 1000 )",
-      "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
       "deps": [
         "electrical.dist_tx_kva",
         "electrical.hv_tx_mva",
@@ -3504,9 +3552,15 @@
         "electrical.power_factor_design",
         "site.pue"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
+        "test-conv-epms-model.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
       "docs": [],
@@ -3524,8 +3578,6 @@
       "kind": "authored",
       "value": 400,
       "formula": null,
-      "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -3533,7 +3585,12 @@
       "dependsOnInputs": [
         "electrical.lv_voltage_v"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 2
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
@@ -3588,7 +3645,7 @@
       "value": 2,
       "formula": null,
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -3616,8 +3673,6 @@
       "value": 962.3,
       "formula": "kV x 1000 / sqrt3 / R",
       "formulaExpr": "electrical.mv_voltage_kv * 1000 / 1.7320508 / electrical.mv_ngr_ohm",
-      "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
       "deps": [
         "electrical.mv_voltage_kv",
         "electrical.mv_ngr_ohm"
@@ -3629,7 +3684,12 @@
         "electrical.mv_ngr_ohm",
         "electrical.mv_voltage_kv"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-formula.mjs (formula evaluated)"
       ],
@@ -3649,8 +3709,6 @@
       "value": 13.5,
       "formula": "tx MVA / ((tx MVA / source MVA + Z%/100) x sqrt3 x kV); bus tie open",
       "formulaExpr": "electrical.hv_tx_mva / ( ( electrical.hv_tx_mva / electrical.hv_source_mva + electrical.hv_tx_impedance_pct / 100 ) * 1.7320508 * electrical.mv_voltage_kv )",
-      "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
       "deps": [
         "electrical.hv_tx_mva",
         "electrical.hv_source_mva",
@@ -3672,9 +3730,16 @@
         "electrical.power_factor_design",
         "site.pue"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 3
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
+        "test-conv-epms-model.mjs",
+        "test-conv-epms-sld.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
       "docs": [],
@@ -3692,8 +3757,6 @@
       "kind": "authored",
       "value": 12,
       "formula": null,
-      "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -3701,8 +3764,14 @@
       "dependsOnInputs": [
         "electrical.mv_ngr_ohm"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
       "tests": [
+        "test-conv-epms-sld.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [],
@@ -3722,7 +3791,7 @@
       "formula": "MVA x 1000 / (sqrt3 x kV)",
       "formulaExpr": "electrical.hv_tx_mva * 1000 / ( 1.7320508 * electrical.mv_voltage_kv )",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [
         "electrical.hv_tx_mva",
         "electrical.mv_voltage_kv"
@@ -3759,8 +3828,6 @@
       "kind": "authored",
       "value": 20,
       "formula": null,
-      "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -3768,9 +3835,16 @@
       "dependsOnInputs": [
         "electrical.mv_voltage_kv"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 7
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
+        "test-conv-epms-model.mjs",
+        "test-conv-epms-sld.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [],
@@ -3813,7 +3887,7 @@
       "value": 0.95,
       "formula": null,
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Drawn by E-S-101 (P5a) through js/conv/payloads.js inspector rows or js/conv/epms-sim.js (relay chain, flows, TCC curves) rather than a page-level read the registry greps; not a stand-alone operator figure.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -3824,6 +3898,7 @@
       "consumers": [],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
+        "test-conv-epms-model.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [],
@@ -3842,7 +3917,7 @@
       "value": "EI",
       "formula": null,
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Drawn by E-S-101 (P5a) through js/conv/payloads.js inspector rows or js/conv/epms-sim.js (relay chain, flows, TCC curves) rather than a page-level read the registry greps; not a stand-alone operator figure.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -3850,7 +3925,8 @@
       "dependsOnInputs": [],
       "consumers": [],
       "tests": [
-        "test-conv-electrical-hvmv.mjs"
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-epms-model.mjs"
       ],
       "docs": [],
       "source": {
@@ -3869,7 +3945,7 @@
       "formula": "feeder time at inrush x FLA > inrush duration (or no operation)",
       "formulaNotExpressible": "A yes/no comparison of the relay curve against the inrush point, not an arithmetic value.",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "DERIVED",
@@ -3896,7 +3972,7 @@
       "formula": "instantaneous multiple x LV through-fault at 20 kV",
       "formulaExpr": "electrical.pro_inst_x * electrical.dist_tx_through_fault_mv_a",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Drawn by E-S-101 (P5a) through js/conv/payloads.js inspector rows or js/conv/epms-sim.js (relay chain, flows, TCC curves) rather than a page-level read the registry greps; not a stand-alone operator figure.",
       "deps": [
         "electrical.pro_inst_x",
         "electrical.dist_tx_through_fault_mv_a"
@@ -3940,7 +4016,7 @@
       "value": 0.05,
       "formula": null,
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Drawn by E-S-101 (P5a) through js/conv/payloads.js inspector rows or js/conv/epms-sim.js (relay chain, flows, TCC curves) rather than a page-level read the registry greps; not a stand-alone operator figure.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -3970,7 +4046,7 @@
       "formula": "pickup multiple x transformer FLA at 20 kV",
       "formulaExpr": "electrical.pro_feeder_pickup_x * electrical.dist_tx_fla_mv_a",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Drawn by E-S-101 (P5a) through js/conv/payloads.js inspector rows or js/conv/epms-sim.js (relay chain, flows, TCC curves) rather than a page-level read the registry greps; not a stand-alone operator figure.",
       "deps": [
         "electrical.pro_feeder_pickup_x",
         "electrical.dist_tx_fla_mv_a"
@@ -3986,6 +4062,7 @@
       "consumers": [],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
+        "test-conv-epms-model.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
       "docs": [],
@@ -4005,7 +4082,7 @@
       "formula": "LV Isd referred to 20 kV = Isd multiple x distribution transformer FLA at 20 kV (Ir is that FLA; the LV voltage cancels)",
       "formulaExpr": "electrical.pro_lv_isd_x * electrical.dist_tx_fla_mv_a",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [
         "electrical.pro_lv_isd_x",
         "electrical.dist_tx_fla_mv_a"
@@ -4040,7 +4117,7 @@
       "formula": "feeder curve time at the LV Isd referred to 20 kV",
       "formulaNotExpressible": "IEC 60255-151 inverse time needs a power (I/Is)^alpha, which the evaluator cannot express; tools/test-conv-electrical-hvmv.mjs recomputes it and cross-checks it with js/conv/tcc.js.",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [
         "electrical.pro_feeder_tms",
         "electrical.pro_feeder_is_a",
@@ -4076,7 +4153,7 @@
       "value": 1.25,
       "formula": null,
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -4105,7 +4182,7 @@
       "formula": "feeder (EI) time at the LV through-fault with the published TMS",
       "formulaNotExpressible": "IEC 60255-151 inverse time needs a power (I/Is)^alpha, which the evaluator cannot express; tools/test-conv-electrical-hvmv.mjs recomputes it and cross-checks it with js/conv/tcc.js.",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [
         "electrical.pro_feeder_tms",
         "electrical.pro_feeder_is_a",
@@ -4153,7 +4230,7 @@
       "formula": "smallest TMS step meeting BOTH: EI time at LV Isd (20 kV) >= LV long-time time there + margin, and EI time at the LV through-fault >= LV short-time delay + margin",
       "formulaNotExpressible": "IEC 60255-151 inverse time needs a power (I/Is)^alpha and a round-up to the setting step; the evaluator has neither. tools/test-conv-electrical-hvmv.mjs recomputes it and proves one step lower fails a grading point.",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Drawn by E-S-101 (P5a) through js/conv/payloads.js inspector rows or js/conv/epms-sim.js (relay chain, flows, TCC curves) rather than a page-level read the registry greps; not a stand-alone operator figure.",
       "deps": [
         "electrical.pro_feeder_is_a",
         "electrical.pro_feeder_lt_grading_a",
@@ -4173,7 +4250,8 @@
       ],
       "consumers": [],
       "tests": [
-        "test-conv-electrical-hvmv.mjs"
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-epms-model.mjs"
       ],
       "docs": [],
       "source": {
@@ -4191,7 +4269,7 @@
       "value": 0.3,
       "formula": null,
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Drawn by E-S-101 (P5a) through js/conv/payloads.js inspector rows or js/conv/epms-sim.js (relay chain, flows, TCC curves) rather than a page-level read the registry greps; not a stand-alone operator figure.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -4202,6 +4280,8 @@
       "consumers": [],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
+        "test-conv-epms-model.mjs",
+        "test-conv-epms-sld.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [
@@ -4222,7 +4302,7 @@
       "value": "SI",
       "formula": null,
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Drawn by E-S-101 (P5a) through js/conv/payloads.js inspector rows or js/conv/epms-sim.js (relay chain, flows, TCC curves) rather than a page-level read the registry greps; not a stand-alone operator figure.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -4249,7 +4329,7 @@
       "formula": "20 kV fault MVA x 1000 / (sqrt3 x kV_hv); the 20 kV voltage cancels",
       "formulaExpr": "( electrical.hv_tx_mva / ( electrical.hv_tx_mva / electrical.hv_source_mva + electrical.hv_tx_impedance_pct / 100 ) ) * 1000 / ( 1.7320508 * electrical.hv_voltage_kv )",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [
         "electrical.hv_tx_mva",
         "electrical.hv_source_mva",
@@ -4292,7 +4372,7 @@
       "formula": "pickup multiple x power transformer FLA at 150 kV",
       "formulaExpr": "electrical.pro_hv_pickup_x * electrical.hv_tx_fla_a",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Drawn by E-S-101 (P5a) through js/conv/payloads.js inspector rows or js/conv/epms-sim.js (relay chain, flows, TCC curves) rather than a page-level read the registry greps; not a stand-alone operator figure.",
       "deps": [
         "electrical.pro_hv_pickup_x",
         "electrical.hv_tx_fla_a"
@@ -4313,6 +4393,7 @@
       "consumers": [],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
+        "test-conv-epms-model.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
       "docs": [],
@@ -4331,7 +4412,7 @@
       "value": 1.2,
       "formula": null,
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -4360,7 +4441,7 @@
       "formula": "SI time at the grading current with the published TMS",
       "formulaNotExpressible": "IEC 60255-151 inverse time needs a power (I/Is)^alpha, which the evaluator cannot express; tools/test-conv-electrical-hvmv.mjs recomputes it and cross-checks it with js/conv/tcc.js.",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [
         "electrical.pro_hv_tms",
         "electrical.pro_hv_is_a",
@@ -4406,7 +4487,7 @@
       "formula": "smallest TMS step with standard-inverse time at the referred 20 kV fault >= incomer time + margin",
       "formulaNotExpressible": "IEC 60255-151 inverse time needs a power (I/Is)^alpha and a round-up to the setting step; the evaluator has neither. tools/test-conv-electrical-hvmv.mjs recomputes it and proves one step lower fails a grading point.",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Drawn by E-S-101 (P5a) through js/conv/payloads.js inspector rows or js/conv/epms-sim.js (relay chain, flows, TCC curves) rather than a page-level read the registry greps; not a stand-alone operator figure.",
       "deps": [
         "electrical.pro_hv_is_a",
         "electrical.pro_hv_grading_a",
@@ -4445,7 +4526,7 @@
       "value": "SI",
       "formula": null,
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Drawn by E-S-101 (P5a) through js/conv/payloads.js inspector rows or js/conv/epms-sim.js (relay chain, flows, TCC curves) rather than a page-level read the registry greps; not a stand-alone operator figure.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -4472,7 +4553,7 @@
       "formula": "pickup multiple x power transformer FLA at 20 kV",
       "formulaExpr": "electrical.pro_incomer_pickup_x * electrical.mv_tx_fla_a",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Drawn by E-S-101 (P5a) through js/conv/payloads.js inspector rows or js/conv/epms-sim.js (relay chain, flows, TCC curves) rather than a page-level read the registry greps; not a stand-alone operator figure.",
       "deps": [
         "electrical.pro_incomer_pickup_x",
         "electrical.mv_tx_fla_a"
@@ -4511,7 +4592,7 @@
       "value": 1.1,
       "formula": null,
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -4540,7 +4621,7 @@
       "formula": "SI time at the grading current with the published TMS",
       "formulaNotExpressible": "IEC 60255-151 inverse time needs a power (I/Is)^alpha, which the evaluator cannot express; tools/test-conv-electrical-hvmv.mjs recomputes it and cross-checks it with js/conv/tcc.js.",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [
         "electrical.pro_incomer_tms",
         "electrical.pro_incomer_is_a",
@@ -4585,7 +4666,7 @@
       "formula": "smallest TMS step with standard-inverse time at the 20 kV fault >= feeder time there + margin",
       "formulaNotExpressible": "IEC 60255-151 inverse time needs a power (I/Is)^alpha and a round-up to the setting step; the evaluator has neither. tools/test-conv-electrical-hvmv.mjs recomputes it and proves one step lower fails a grading point.",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Drawn by E-S-101 (P5a) through js/conv/payloads.js inspector rows or js/conv/epms-sim.js (relay chain, flows, TCC curves) rather than a page-level read the registry greps; not a stand-alone operator figure.",
       "deps": [
         "electrical.pro_incomer_is_a",
         "electrical.mv_fault_level_ka",
@@ -4605,7 +4686,8 @@
       ],
       "consumers": [],
       "tests": [
-        "test-conv-electrical-hvmv.mjs"
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-epms-model.mjs"
       ],
       "docs": [],
       "source": {
@@ -4622,8 +4704,6 @@
       "kind": "authored",
       "value": 0.1,
       "formula": null,
-      "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -4631,7 +4711,12 @@
       "dependsOnInputs": [
         "electrical.pro_inrush_s"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 2
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
@@ -4651,8 +4736,6 @@
       "kind": "authored",
       "value": 12,
       "formula": null,
-      "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -4660,7 +4743,12 @@
       "dependsOnInputs": [
         "electrical.pro_inrush_x"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 2
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
@@ -4681,7 +4769,7 @@
       "value": 1.3,
       "formula": null,
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -4710,7 +4798,7 @@
       "formula": "Ir = distribution transformer FLA at 0.4 kV",
       "formulaExpr": "electrical.dist_tx_fla_lv_a",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Drawn by E-S-101 (P5a) through js/conv/payloads.js inspector rows or js/conv/epms-sim.js (relay chain, flows, TCC curves) rather than a page-level read the registry greps; not a stand-alone operator figure.",
       "deps": [
         "electrical.dist_tx_fla_lv_a"
       ],
@@ -4724,6 +4812,7 @@
       "consumers": [],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
+        "test-conv-epms-model.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
       "docs": [],
@@ -4743,7 +4832,7 @@
       "formula": "Isd multiple x Ir",
       "formulaExpr": "electrical.pro_lv_isd_x * electrical.pro_lv_ir_a",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Drawn by E-S-101 (P5a) through js/conv/payloads.js inspector rows or js/conv/epms-sim.js (relay chain, flows, TCC curves) rather than a page-level read the registry greps; not a stand-alone operator figure.",
       "deps": [
         "electrical.pro_lv_isd_x",
         "electrical.pro_lv_ir_a"
@@ -4777,7 +4866,7 @@
       "value": 4,
       "formula": null,
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -4806,7 +4895,7 @@
       "formula": "tr x (6 / Isd multiple)^2",
       "formulaExpr": "electrical.pro_lv_tr_s * 6 / electrical.pro_lv_isd_x * 6 / electrical.pro_lv_isd_x",
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [
         "electrical.pro_lv_tr_s",
         "electrical.pro_lv_isd_x"
@@ -4839,7 +4928,7 @@
       "value": 4,
       "formula": null,
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Drawn by E-S-101 (P5a) through js/conv/payloads.js inspector rows or js/conv/epms-sim.js (relay chain, flows, TCC curves) rather than a page-level read the registry greps; not a stand-alone operator figure.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -4870,7 +4959,7 @@
       "value": 0.2,
       "formula": null,
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Drawn by E-S-101 (P5a) through js/conv/payloads.js inspector rows or js/conv/epms-sim.js (relay chain, flows, TCC curves) rather than a page-level read the registry greps; not a stand-alone operator figure.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -4899,7 +4988,7 @@
       "value": 1.5,
       "formula": null,
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Published for the HV/MV basis (PRD-CONV-LIVING-PLANT §8.1-8.2); E-S-101 (P5a) does not draw it — a derivation step or a grading input behind the values it does draw.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -4930,7 +5019,7 @@
       "value": 0.01,
       "formula": null,
       "display": "internal",
-      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "displayReason": "Drawn by E-S-101 (P5a) through js/conv/payloads.js inspector rows or js/conv/epms-sim.js (relay chain, flows, TCC curves) rather than a page-level read the registry greps; not a stand-alone operator figure.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -6782,11 +6871,16 @@
         {
           "page": "fuel-system.html",
           "reads": 2
+        },
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
         }
       ],
       "tests": [
         "test-conv-cooling-water-ui.mjs",
         "test-conv-depth.mjs",
+        "test-conv-epms-model.mjs",
         "test-conv-fire-fuel-operator.mjs",
         "test-conv-hall-scope.mjs",
         "test-conv-parameter-registry.mjs",

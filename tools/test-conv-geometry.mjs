@@ -58,6 +58,8 @@ const DIAGRAMS = Object.freeze([
   /* EPMS: the root SVG (viewBox 0 0 3600 2600) holds every layer — wires, flow, devices, breakers and
      the telemetry text. Targeting a single layer (e.g. #l-wires) reports texts=0 and measures nothing. */
   { page: 'EPMS_Telemetry.html', selector: 'svg#viewport', label: 'EPMS single-line' },
+  /* P5a — E-S-101, the HV / MV single-line: the page's default view since P5a (the legacy drawing above is the LV view) */
+  { page: 'EPMS_Telemetry.html', selector: 'svg#epms-sld-svg', label: 'EPMS E-S-101 HV / MV single-line' },
   /* v3.37.0 — cdu-mini-bms loads the instrument shell since P23 (it declares that register), and the
      survey-coverage gate rightly asked who measures its two process drawings. */
   { page: 'cdu-mini-bms.html', selector: 'svg[aria-label^="CDU piping"]', label: 'CDU P&ID' },

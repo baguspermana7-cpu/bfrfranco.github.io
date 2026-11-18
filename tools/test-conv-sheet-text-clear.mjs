@@ -5,7 +5,7 @@
  * The geometry gate (test-conv-geometry) checks text against text only. W3 (v3.62.0) found three defects it could not
  * see, each on a screenshot: TK-402 values across a zone divider, PT-101's value cut by a divider, UST-01's tag struck
  * by its own fill pipe, and the domestic tank body covering the DOMESTIC tag. This gate measures them in the browser
- * at 1440 px on each sheet (fire FS-M-101, chiller CH-M-101, water WT-M-101, fuel FU-M-101):
+ * at 1440 px on each sheet (fire FS-M-101, chiller CH-M-101, water WT-M-101, fuel FU-M-101, EPMS E-S-101):
  *
  *   C1  no visible sheet text has a pipe/cable (path.hmi-edge, not the flow overlay) running through its box
  *   C2  no visible sheet text is crossed by a zone or box border (rect.hmi-zone / rect.hmi-box)
@@ -31,7 +31,7 @@ import { primeCockpitAuditDocument, enterAuthorizedAuditState } from './lib/cock
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const only = (process.argv.find((a) => a.startsWith('--page=')) || '').split('=')[1];
 const PAGES = [['fire-system.html', '#fire-sheet-host'], ['chiller-plant.html', '#chw-sheet-host'],
-  ['water-system.html', '#water-sheet-host'], ['fuel-system.html', '#fuel-sheet-host']].filter(([p]) => !only || p === only);
+  ['water-system.html', '#water-sheet-host'], ['fuel-system.html', '#fuel-sheet-host'], ['EPMS_Telemetry.html', '#epms-sheet-host']].filter(([p]) => !only || p === only);
 const MIME = { '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.json': 'application/json',
   '.png': 'image/png', '.webp': 'image/webp', '.woff2': 'font/woff2', '.html': 'text/html' };
 const srv = http.createServer((q, r) => {
@@ -108,7 +108,7 @@ for (const [page, hostSel] of PAGES) {
   await pg.setViewport({ width: 1440, height: 1000 });
   await primeCockpitAuditDocument(pg, 'dark');
   await pg.goto(ORIGIN + page, { waitUntil: 'networkidle0', timeout: 90000 });
-  await enterAuthorizedAuditState(pg, page.replace('.html', ''));
+  await enterAuthorizedAuditState(pg, page === 'EPMS_Telemetry.html' ? 'epms' : page.replace('.html', ''));
   await pg.waitForFunction((h) => { const s = document.querySelector(h + ' svg'); return s && s.getBoundingClientRect().width > 0; }, { timeout: 20000 }, hostSel).catch(() => {});
   await new Promise((r) => setTimeout(r, 1500));
   if (process.env.RZ_TEXT_CLEAR_PLANT === '1') await pg.evaluate((h) => {

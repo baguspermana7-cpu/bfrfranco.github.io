@@ -24,7 +24,7 @@ const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const arg = (k) => (process.argv.find((a) => a.startsWith('--' + k + '=')) || '').split('=')[1];
 const only = arg('page'), SHOTS = arg('shots'), THEME = arg('theme') || 'dark';
 const PAGES = [['chiller-plant.html', '#chw-sheet-host'], ['fire-system.html', '#fire-sheet-host'], ['fuel-system.html', '#fuel-sheet-host'],
-  ['water-system.html', '#water-sheet-host']].filter(([p]) => !only || p === only);
+  ['water-system.html', '#water-sheet-host'], ['EPMS_Telemetry.html', '#epms-sheet-host']].filter(([p]) => !only || p === only);
 const MIME = { '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.json': 'application/json',
   '.png': 'image/png', '.webp': 'image/webp', '.woff2': 'font/woff2', '.html': 'text/html' };
 const srv = http.createServer((q, r) => {
@@ -47,7 +47,7 @@ for (const [page, host] of PAGES) {
     await pg.setViewport({ width: W, height: W > 800 ? 1000 : 844, deviceScaleFactor: 1 });
     await primeCockpitAuditDocument(pg, THEME);
     await pg.goto(ORIGIN + page, { waitUntil: 'networkidle0', timeout: 90000 });
-    await enterAuthorizedAuditState(pg, page.replace('.html', ''));
+    await enterAuthorizedAuditState(pg, page === 'EPMS_Telemetry.html' ? 'epms' : page.replace('.html', ''));
     await sleep(2000);
     const wired = await pg.evaluate((h) => !!(window.RZConvModal && document.querySelector(h + ' .hmi-node')), host);
     if (!wired) { fails.push(`${page}@${W}: modal module or sheet missing`); await pg.close(); continue; }

@@ -354,6 +354,57 @@
     cap: [B('Design pump demand', 'fire.pump_demand_lpm', 0), D('Range', '0–150 % of pump rating')], al: [D('Flow with no demand', 'flow > 5 % while no pump runs')], m: 'meter',
     g: 'Flow with no pump running means a head, a test valve or a leak is open.' };
 
+  /* E-S-101 HV / MV single-line (EPMS_Telemetry.html, PRD-CONV-LIVING-PLANT §8.1). Ratings are engine values; the
+     flows and states are the page's own topology solve (read() rows above these). Protection settings are TRAINING
+     values by the engine's grading rule, never a relay study. */
+  STD.cb = ['Breaker timing, trip-coil and contact-resistance test', 'per NFPA 70B condition of maintenance (typically 1–3 years); SF6 density monitored continuously', 'NFPA 70B — circuit breakers; IEC 62271-100'];
+  STD.ds = ['Disconnector / earthing-switch operation and interlock check', 'operate and verify interlocks annually; inspect per NFPA 70B condition', 'NFPA 70B — switches; IEC 62271-102'];
+  STD.tx = ['Transformer oil DGA, insulation and winding tests', 'DGA annually; electrical tests per condition', 'IEEE C57.104 / NFPA 70B — transformers'];
+  STD.relay = ['Protection relay secondary-injection test', 'at commissioning, then per the utility / NFPA 70B interval (typically 3–6 years)', 'IEC 60255 / NFPA 70B — protective relays'];
+  STD.itx = ['Instrument transformer ratio and burden check', 'with the relay test of the bay', 'IEC 61869 / NFPA 70B'];
+  STD.sa = ['Surge arrester leakage-current and counter reading', 'annually', 'IEC 60099-5 practice'];
+  var HVR = B('150 kV switchgear rating', 'electrical.hv_switchgear_rated_ka', 0), MVF = B('20 kV fault level', 'electrical.mv_fault_level_ka', 1);
+  var EG = 'A breaker or switch is operated only through the simulation button in the inspector; the interlock states any condition that is not met.';
+  CLASSES['epms:utilitySource'] = { name: 'PLN 150 kV incoming line', role: 'Brings the utility supply into the GIS line bay through a cable sealing end',
+    live: [D('Supply', 'PLN 150 kV, two independent lines'), D('Auto-reclose 79', 'blocked: the incoming circuit is cable')], cap: [B('Voltage', 'electrical.hv_voltage_kv', 0), B('Fault level at the GIS', 'electrical.hv_fault_level_ka', 0), B('Source short-circuit power', 'electrical.hv_source_mva', 0)],
+    al: [D('Line voltage lost', 'undervoltage 27 on the line VT')], m: 'none', g: 'Either line carries the whole site through the coupler; a lost line is ridden through without load transfer.' };
+  CLASSES['epms:surgeArrester'] = { name: 'Surge arrester', role: 'Clamps switching and lightning surges at the cable sealing end',
+    live: [D('Type', 'metal-oxide, station class'), D('Connection', 'phase to earth at the cable sealing end')], cap: [B('System voltage', 'electrical.hv_voltage_kv', 0)], al: [D('Counter step', 'operation counter increments on each discharge')], m: 'sa',
+    g: 'Rising leakage current means a degrading arrester; plan its replacement at the next line outage.' };
+  CLASSES['epms:voltageTransformer'] = { name: 'Voltage transformer', role: 'Feeds the line voltage to the distance protection, metering and synchro-check',
+    live: [D('Secondary', '110 V / sqrt3'), D('Accuracy', 'class 0.2 metering, 3P protection')], cap: [B('Primary voltage', 'electrical.hv_voltage_kv', 0)], al: [D('VT fuse failure', 'blocks distance 21 and alarms')], m: 'itx',
+    g: 'A VT supervision alarm blocks the distance element; the line differential 87L still protects the line.' };
+  CLASSES['epms:currentTransformer'] = { name: 'Current transformer', role: 'Feeds the bay current to its protection relay and meter',
+    live: [D('Cores', 'protection class 5P + metering class 0.2S'), D('Secondary', '1 A')], cap: [MVF, HVR], al: [D('CT open circuit', 'differential supervision alarm')], m: 'itx',
+    g: 'Never open a CT secondary under load; short it at the test block first.' };
+  CLASSES['epms:disconnector'] = { name: 'Disconnector', role: 'Provides a visible isolation point; it never makes or breaks load current',
+    live: [D('Interlock', 'moves only with its breaker open'), D('Operation', 'motor-operated, off-load only')], cap: [HVR, B('System voltage', 'electrical.hv_voltage_kv', 0)], al: [D('Position discrepancy', 'auxiliary contacts disagree for 5 s')], m: 'ds', g: EG };
+  CLASSES['epms:earthSwitch'] = { name: 'Earthing switch', role: 'Earths an isolated, dead circuit for safe work',
+    live: [D('Interlock', 'closes only with its disconnectors open and the circuit dead'), D('Type', 'maintenance earthing switch, no making capacity')], cap: [HVR], al: [D('Closed on live circuit', 'prevented by interlock')], m: 'ds', g: EG };
+  CLASSES['epms:cbIec'] = { name: 'Circuit breaker', role: 'Makes and breaks load and fault current on command of its protection relay',
+    live: [D('Operating mechanism', 'spring-charged, motor recharge'), D('Interrupting medium', 'SF6 at 150 kV, vacuum at 20 kV, air at 0.4 kV')], cap: [HVR, MVF, B('LV fault level at the board', 'electrical.lv_fault_level_ka', 1)],
+    al: [D('Trip-circuit supervision', 'trip coil continuity lost'), D('Spring not charged', 'closing inhibited')], m: 'cb', g: EG };
+  CLASSES['epms:protectionRelay'] = { name: 'Protection relay', role: 'Measures the bay current and trips its breaker on a fault (IEEE C37.2 device numbers)',
+    live: [D('Settings', 'TRAINING values by the engine grading rule, not a relay study'), D('Trip path', 'own breaker; 86 lockout where the function locks out')], cap: [B('Grading margin', 'electrical.pro_grading_margin_s', 1), B('TMS step', 'electrical.pro_tms_step', 2)],
+    al: [D('Relay healthy', 'watchdog contact opens on self-test failure'), D('Lockout 86', '87T / 87B / 50BF trips lock out until the operator resets')], m: 'relay',
+    g: 'Open the time–current curves to see this relay against the devices below and above it.' };
+  CLASSES['epms:transformer2w'] = { name: 'Power transformer', role: 'Transforms the supply between voltage levels; each unit is sized to carry its share with one unit lost',
+    live: [D('Cooling', 'ONAN / ONAF'), D('Tap changer', 'on-load, HV winding')], cap: [B('Rating (150/20 kV units)', 'electrical.hv_tx_mva', 0), B('Impedance (150/20 kV)', 'electrical.hv_tx_impedance_pct', 1), B('Load, normal', 'electrical.hv_tx_load_pct_normal', 1), B('Load, one unit lost', 'electrical.hv_tx_load_pct_n1', 1), B('Distribution unit rating', 'electrical.dist_tx_kva', 0)],
+    al: [D('Buchholz 63', 'gas alarm, then trip'), D('Winding temperature 26/49', 'alarm then trip')], m: 'tx',
+    g: 'With one 150/20 kV unit out the other carries the site through the 20 kV bus tie; watch its load against the N-1 figure.' };
+  CLASSES['epms:resistor'] = { name: 'Neutral earthing resistor', role: 'Limits the 20 kV earth-fault current at the transformer star point',
+    live: [D('Connection', 'transformer 20 kV star point to earth'), D('Duty', 'short-time rated, 10 s')], cap: [B('Resistance', 'electrical.mv_ngr_ohm', 0), B('Earth-fault current', 'electrical.mv_earth_fault_a', 1)],
+    al: [D('Standby earth fault 51G', 'trips the 20 kV incomer, then the transformer')], m: 'tx', g: 'The NGR limits an earth fault to a current the feeder earth-fault relays still see.' };
+  CLASSES['epms:generatorIec'] = { name: 'Diesel genset block', role: 'Standby generation on the 20 kV generator bus, N+1 per hall',
+    live: [D('State', 'off (simulation: gensets are not started on this sheet)'), D('Synchronising', '25 sync-check on the generator bus')], cap: [B('Gensets installed', 'electrical.genset_count', 0), B('Unit rating', 'electrical.genset_unit_kw', 0), B('Gensets per hall', 'electrical.genset_per_hall', 0), B('N-1 margin', 'electrical.genset_n1_margin_pct', 1)],
+    al: [D('Fail to start', 'no voltage 10 s after start command')], m: 'nfpa110gen', g: 'The generator incomers close only on a synchronised, running generator bus.' };
+  CLASSES['epms:earth'] = { name: 'Earth electrode', role: 'Connects the neutral earthing resistor to the substation earth grid',
+    live: [D('Connection', 'substation earth grid'), D('Data', 'none on this symbol')], cap: [B('Earth-fault current it carries', 'electrical.mv_earth_fault_a', 1)],
+    al: [D('Supervision', 'earth-grid resistance test, not a live point')], m: 'ds', g: 'The earth path is tested with the grid survey; it carries current only during a 20 kV earth fault.' };
+  CLASSES['epms:offSheet'] = { name: 'Off-sheet connection', role: 'Continues this circuit on another drawing (hall ring or LV distribution)',
+    live: [D('Continues to', 'see DEPS'), D('Data', 'the load shown is the hall stream share the topology solve carries')], cap: [B('Units per stream per hall', 'electrical.dist_tx_per_stream_per_hall', 0), B('Distribution units on site', 'electrical.dist_tx_count', 0)],
+    al: [D('Supervision', 'on the connected drawing')], m: 'none', g: 'Follow the connection to the drawing that owns the circuit.' };
+
   /* A transmitter on the return header measures the return temperature: same recipe, the other registry anchor. */
   function onReturn(page, n) {
     return page === 'chiller' && n && n.sym === 'instField' && /^(tthr|ttr\d)/.test(n.id || '');
@@ -435,7 +486,8 @@
     return rows;
   }
 
-  var VALUE_LABEL = { st: 'State', kw: 'Electrical input', t: 'Temperature', fb: 'Feedback', spd: 'Speed', cmd: 'Command', q: 'Flow', p: 'Pressure', lvl: 'Level', vol: 'Volume', dur: 'Autonomy', pct: 'Level', use: 'Usable', mw: 'Load' };
+  var VALUE_LABEL = { st: 'State', kw: 'Electrical input', t: 'Temperature', fb: 'Feedback', spd: 'Speed', cmd: 'Command', q: 'Flow', p: 'Pressure', lvl: 'Level', vol: 'Volume', dur: 'Autonomy', pct: 'Level', use: 'Usable', mw: 'Load',
+    pw: 'Power flow', amp: 'Current', ld: 'Load', r: 'Rating', u: 'Unit rating', bus: 'Bus', bb1: 'Busbar 1', bb2: 'Busbar 2', set: 'Setting' };
   function endNode(end) { return typeof end === 'string' ? end.split('.')[0] : null; }
   function byId(nodes, id) { for (var i = 0; i < nodes.length; i++) if (nodes[i].id === id) return nodes[i]; return null; }
   function tagOf(nodes, id) { var n = byId(nodes, id); return n && n.tag ? n.tag : String(id).toUpperCase(); }

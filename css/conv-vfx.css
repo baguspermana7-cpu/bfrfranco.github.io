@@ -135,3 +135,12 @@
   .as-svg[data-fan] .as-fan { animation: vfx-turn var(--as-fan-dur, 1s) linear infinite; }
 }
 @keyframes as-march { to { stroke-dashoffset: -16; } }
+
+/* ── switching devices on the single-line (E-S-101, js/conv/epms-sim.js) ─────────────────────────────────
+   The drawn contact IS the device position: open = the symbol's angled blade, closed = the blade turned onto the
+   line (data-pos from the page's switching state). The blade travels in 180 ms; reduced motion snaps it. */
+.hmi-svg .hmi-node[data-pos] .b { transform-box: fill-box; transform-origin: 100% 100%; }
+.hmi-svg .hmi-node[data-pos="closed"] .b { transform: rotate(33deg); }
+@media (prefers-reduced-motion: no-preference) {
+  .hmi-svg .hmi-node[data-pos] .b { transition: transform 180ms cubic-bezier(.2, 0, 0, 1); }
+}

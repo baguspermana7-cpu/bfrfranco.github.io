@@ -11,6 +11,45 @@ release sections rather than semver.
 
 ---
 
+## v3.74.0 — 2026-11-18 — EPMS: single-line diagram from the 150 kV GIS, switching with interlocks, time–current curves
+
+### Added
+- **E-S-101 HV / MV single-line, the new default view of `EPMS_Telemetry.html`** (`js/conv/epms-sheet.js`). Two PLN
+  150 kV line bays (surge arrester, VT, line disconnector with earth switch, breaker, CT, two busbar disconnectors),
+  double busbar BB1 / BB2 with bus coupler, two transformer bays, TX-1 and TX-2 63 MVA 150/20 kV with the neutral
+  earthed through a 12 Ω resistor, 20 kV incomers, bus sections A and B with a normally open bus tie, hall ring
+  feeders, a typical 3,150 kVA 20/0.4 kV unit down to its LV board, and the generator bus. Every rating, fault level
+  and count is read from engine 2.3.0. The previous LV drawing stays as the second view.
+- **Protection on the drawing.** A relay beside each breaker with its device numbers: 87L / 21, 87B, 50BF, 87T with
+  50/51, 51G on the neutral resistor, 50/51 and 50N/51N on the 20 kV feeders, LSIG on the LV main.
+- **Readings beside the equipment.** kW and A per bay, load % per transformer, from a topology solve
+  (`js/conv/sld-topology.js`). Normal state: 21,750 kW per line, 36.3 % per transformer.
+- **Switching in the simulation, with interlocks** (`js/conv/epms-sim.js`). A breaker or switch is operated from the
+  inspector; every flow is re-solved. A disconnector moves only with its breaker open; an earth switch closes only
+  on a dead, isolated circuit; the 20 kV bus tie closes only with one incomer open; a generator breaker stays open
+  while the sets are off. A refused command states the unmet condition. Opening an incomer kills its bus section;
+  closing the tie restores it from the other transformer at 72.7 %, the engine's N-1 figure.
+- **Time–current curve modal** (`js/conv/tcc-modal.js`) from any relay or breaker that has settings: LV main,
+  20 kV feeder, 20 kV incomer and 150 kV transformer relay on one log-log plot referred to 20 kV, with the
+  transformer through-fault damage curve, the inrush point, the two fault-level markers and a coordination table
+  (margin ≥ 0.3 s). Each curve stops at the largest current its device can see.
+- A resistor symbol (IEC 60617-4) in the engineering symbol library.
+
+### Changed
+- While the HV / MV view is shown, the left rail and the breaker counters come from the new simulation (sources,
+  transformer load, 32 generating sets, breakers of this sheet). The legacy rail returns with the LV view.
+
+### Limits, stated
+- Relay settings are training values derived by rule, not a relay study. Relays without an inverse-time stage in
+  the engine (87L, 87B, 50BF, 51G) open no curve. Dash speed on this sheet is uniform: colour and pattern say
+  whether power flows, the chips say how much.
+- The LV view still shows the retired three-set generation and 20 kV utility wording.
+
+### Gates
+- `tools/test-conv-epms-sld.mjs` (122 checks, browser, 1440 and 390) and `tools/test-conv-epms-model.mjs` (8 tests).
+  Planted defects that failed first: the tie rule removed, a typed "60 MVA", a missing damage curve, a feeder load
+  off by 2 %, curves drawn past their fault limit, legacy chrome left in the new view.
+
 ## v3.73.0 — 2026-11-18 — One top bar and one theme button: the incident library (51 pages)
 
 PRD `documentation/prd/PRD_SITE_CHROME.md`, phase N3.
