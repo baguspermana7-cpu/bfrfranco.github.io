@@ -556,4 +556,5 @@ motion), `manual/*.html` of each page, this PRD's status table.
 | P1 | SHIPPED v3.67.0 — line state, motion, standby, view modes on chiller, fire, fuel, water |
 | P2 | SHIPPED v3.67.0 — trend + multitrend on the four sheets; data hall and ICT not wired yet |
 | P3 | PARTLY SHIPPED v3.69.0 — data hall air path section and labelled row footer. Open: fire sequence and water front, cooling tower, rack heat shimmer, leak scenario |
-| P4–P7 | NOT STARTED |
+| P4 | PARTLY SHIPPED v3.70.0 — engine 2.3.0: HV/MV, generation fleet, graded protection settings (additive). Open: fuel and UPS part-load curves, page literals of the retired fleet, `protection.js` interlocks |
+| P5–P7 | NOT STARTED |

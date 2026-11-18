@@ -11,6 +11,35 @@ release sections rather than semver.
 
 ---
 
+## v3.70.0 — 2026-11-18 — Conventional engine 2.3.0: 150 kV / 20 kV basis, generation fleet, graded protection settings
+
+### Added
+- **Electrical HV/MV family in the Conventional engine** (`js/conv-engine.js` 2.2.0 → 2.3.0, 77 new parameters,
+  none rendered yet — they are the basis the single-line diagram redraw will draw from). 150 kV double-busbar
+  substation inputs; two 150/20 kV transformers sized on the larger of full design demand (61.05 MVA) and adopted
+  demand plus growth, on the IEC 60076-1 preferred ratings: 2 × 63 MVA, 96.9 % with one unit out at design load.
+  20 kV fault level 13.5 kA with the source impedance included; neutral earth fault 962 A through a 12 Ω resistor.
+- **Distribution and generation fleet.** 3,150 kVA 20/0.4 kV transformers, five per stream per hall (40), 96.9 % on
+  contingency, LV fault level 59.3 kA. Gensets 3,000 kW at 0.8 maximum loading, N+1 per hall: 8 per hall, 32.
+- **Graded overcurrent settings.** LV main (long time 4 s at 6 × Ir, short time 4 × Ir 0.2 s), 20 kV transformer
+  feeder (IEC extremely inverse, TMS 1.08, instantaneous above the LV through-fault), 20 kV incomer and 150 kV
+  feeder (IEC standard inverse, TMS 0.10 and 0.18). Each TMS is the smallest step that keeps a 0.3 s margin over the
+  device below it. These are training values derived by rule, not a relay study.
+
+### Why the feeder is extremely inverse
+- A standard-inverse feeder relay trips before the LV main on an LV overload: the LV long-time band is I²t-shaped
+  and a standard-inverse curve crosses it. The gate found this once the long-time stage was modelled.
+
+### Gates
+- `tools/test-conv-electrical-hvmv.mjs` (6 tests): every derived value recomputed independently, transformer and
+  genset contingency laws, smallest-step TMS, and the chain checked by the separate `js/conv/tcc.js` module. A
+  standard-inverse feeder, a TMS one step lower and a longer LV long-time delay each fail it.
+- No value published by engine 2.2.0 changed (128 keys compared).
+
+### Not in this release
+- The fuel consumption curve, the UPS efficiency curve and the page literals that still state the retired fleet
+  (3 gensets on the fuel and EPMS pages) — they change displayed numbers and ship with the SLD redraw.
+
 ## v3.69.0 — 2026-11-18 — Conventional data hall: the air path of a row as a section, labelled row footer
 
 ### Added

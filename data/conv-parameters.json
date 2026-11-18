@@ -1,6 +1,6 @@
 {
   "generatedBy": "tools/build-conv-parameter-registry.mjs",
-  "engineVersion": "2.2.0",
+  "engineVersion": "2.3.0",
   "note": "GENERATED — do not hand-edit. Curated metadata lives in data/conv-parameters.curated.json.",
   "parameters": [
     {
@@ -2168,6 +2168,445 @@
       }
     },
     {
+      "id": "electrical.demand_design_mva",
+      "label": "Site electrical demand at full IT design",
+      "unit": "MVA",
+      "kind": "derived",
+      "value": 61.053,
+      "formula": "site it_design_kw x PUE / pf / 1000",
+      "formulaExpr": "site.it_design_kw * site.pue / electrical.power_factor_design / 1000",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "site.it_design_kw",
+        "site.pue",
+        "electrical.power_factor_design"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "electrical.power_factor_design",
+        "site.pue"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [
+        "standarization/CONVENTIONAL_DC_OPERATIONS_STANDARD.md"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.demand_mva",
+      "label": "Site electrical demand",
+      "unit": "MVA",
+      "kind": "derived",
+      "value": 45.789,
+      "formula": "epms_total_kw / pf / 1000",
+      "formulaExpr": "electrical.epms_total_kw / electrical.power_factor_design / 1000",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.epms_total_kw",
+        "electrical.power_factor_design"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_load_kw",
+        "campus.halls.1.it_load_kw",
+        "campus.halls.2.it_load_kw",
+        "campus.halls.3.it_load_kw",
+        "electrical.power_factor_design",
+        "site.pue"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.dist_tx_count",
+      "label": "Distribution transformers installed",
+      "unit": null,
+      "kind": "derived",
+      "value": 40,
+      "formula": "per stream per hall x streams x halls",
+      "formulaExpr": "electrical.dist_tx_per_stream_per_hall * electrical.dist_tx_streams * campus.hall_count",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.dist_tx_per_stream_per_hall",
+        "electrical.dist_tx_streams",
+        "campus.hall_count"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "electrical.dist_tx_kva",
+        "electrical.dist_tx_streams",
+        "electrical.power_factor_design",
+        "site.pue"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.dist_tx_fla_lv_a",
+      "label": "Distribution transformer FLA at 0.4 kV",
+      "unit": "A",
+      "kind": "derived",
+      "value": 4546.6,
+      "formula": "kVA x 1000 / (sqrt3 x V)",
+      "formulaExpr": "electrical.dist_tx_kva * 1000 / ( 1.7320508 * electrical.lv_voltage_v )",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.dist_tx_kva",
+        "electrical.lv_voltage_v"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.dist_tx_kva",
+        "electrical.lv_voltage_v"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.dist_tx_fla_mv_a",
+      "label": "Distribution transformer FLA at 20 kV",
+      "unit": "A",
+      "kind": "derived",
+      "value": 90.93,
+      "formula": "kVA / (sqrt3 x kV)",
+      "formulaExpr": "electrical.dist_tx_kva / ( 1.7320508 * electrical.mv_voltage_kv )",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.dist_tx_kva",
+        "electrical.mv_voltage_kv"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.dist_tx_kva",
+        "electrical.mv_voltage_kv"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.dist_tx_impedance_pct",
+      "label": "Distribution transformer impedance",
+      "unit": "%",
+      "kind": "authored",
+      "value": 7,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "STANDARD",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.dist_tx_impedance_pct"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "IEC 60076-5 minimum short-circuit impedance for 2,501-6,300 kVA. Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.dist_tx_kva",
+      "label": "Distribution transformer rating",
+      "unit": "kVA",
+      "kind": "authored",
+      "value": 3150,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.dist_tx_kva"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "20/0.4 kV unit rating (execution plan E-1). Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.dist_tx_load_pct_contingency",
+      "label": "Distribution transformer loading, one stream",
+      "unit": "%",
+      "kind": "derived",
+      "value": 96.9,
+      "formula": "hall kVA / (units x kVA) x 100",
+      "formulaExpr": "electrical.hall_facility_design_kw / electrical.power_factor_design / ( electrical.dist_tx_per_stream_per_hall * electrical.dist_tx_kva ) * 100",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.hall_facility_design_kw",
+        "electrical.power_factor_design",
+        "electrical.dist_tx_per_stream_per_hall",
+        "electrical.dist_tx_kva"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "electrical.dist_tx_kva",
+        "electrical.power_factor_design",
+        "site.pue"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.dist_tx_load_pct_normal",
+      "label": "Distribution transformer loading, both streams",
+      "unit": "%",
+      "kind": "derived",
+      "value": 48.5,
+      "formula": "hall kVA / (units x streams x kVA) x 100",
+      "formulaExpr": "electrical.hall_facility_design_kw / electrical.power_factor_design / ( electrical.dist_tx_per_stream_per_hall * electrical.dist_tx_streams * electrical.dist_tx_kva ) * 100",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.hall_facility_design_kw",
+        "electrical.power_factor_design",
+        "electrical.dist_tx_per_stream_per_hall",
+        "electrical.dist_tx_streams",
+        "electrical.dist_tx_kva"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "electrical.dist_tx_kva",
+        "electrical.dist_tx_streams",
+        "electrical.power_factor_design",
+        "site.pue"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.dist_tx_per_stream_per_hall",
+      "label": "Distribution transformers per stream per hall",
+      "unit": null,
+      "kind": "derived",
+      "value": 5,
+      "formula": "ceil(hall kW / pf / kVA): one stream alone carries the hall",
+      "formulaExpr": "ceil( electrical.hall_facility_design_kw / electrical.power_factor_design / electrical.dist_tx_kva )",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.hall_facility_design_kw",
+        "electrical.power_factor_design",
+        "electrical.dist_tx_kva"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "electrical.dist_tx_kva",
+        "electrical.power_factor_design",
+        "site.pue"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.dist_tx_streams",
+      "label": "Distribution streams per hall",
+      "unit": null,
+      "kind": "authored",
+      "value": 2,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.dist_tx_streams"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "2N electrical topology: A and B streams. Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.dist_tx_through_fault_mv_a",
+      "label": "LV fault referred to 20 kV",
+      "unit": "A",
+      "kind": "derived",
+      "value": 1185,
+      "formula": "LV board fault seen on the 20 kV side = kVA / ((source z + Z%/100) x sqrt3 x kV_mv); the LV voltage cancels",
+      "formulaExpr": "electrical.dist_tx_kva / ( ( electrical.dist_tx_kva / 1000 / ( 1.7320508 * electrical.mv_voltage_kv * electrical.mv_fault_level_ka ) + electrical.dist_tx_impedance_pct / 100 ) * 1.7320508 * electrical.mv_voltage_kv )",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.dist_tx_kva",
+        "electrical.mv_voltage_kv",
+        "electrical.mv_fault_level_ka",
+        "electrical.dist_tx_impedance_pct"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "electrical.dist_tx_impedance_pct",
+        "electrical.dist_tx_kva",
+        "electrical.hv_fault_level_ka",
+        "electrical.hv_tx_impedance_pct",
+        "electrical.hv_voltage_kv",
+        "electrical.mv_voltage_kv",
+        "electrical.power_factor_design",
+        "site.pue"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
       "id": "electrical.epms_total_kw",
       "label": "EPMS metered total",
       "unit": "kW",
@@ -2200,6 +2639,7 @@
       ],
       "tests": [
         "test-conv-calc.mjs",
+        "test-conv-electrical-hvmv.mjs",
         "test-conv-formula.mjs (formula evaluated)",
         "test-conv-basis-drawer.mjs (drawer value vs EPMS_Telemetry.html)"
       ],
@@ -2252,6 +2692,861 @@
       }
     },
     {
+      "id": "electrical.genset_count",
+      "label": "Gensets installed",
+      "unit": null,
+      "kind": "derived",
+      "value": 32,
+      "formula": "per hall x halls",
+      "formulaExpr": "electrical.genset_per_hall * campus.hall_count",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.genset_per_hall",
+        "campus.hall_count"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "electrical.genset_max_loading",
+        "electrical.genset_spare_per_hall",
+        "electrical.genset_unit_kw",
+        "site.pue"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.genset_max_loading",
+      "label": "Genset maximum loading",
+      "unit": null,
+      "kind": "authored",
+      "value": 0.8,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.genset_max_loading"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "Maximum continuous loading of one set (execution plan E-1). Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.genset_n1_margin_pct",
+      "label": "Genset margin with one set lost",
+      "unit": "%",
+      "kind": "derived",
+      "value": 15.9,
+      "formula": "((per hall - 1) x unit x max loading - hall kW) / hall kW x 100",
+      "formulaExpr": "( ( electrical.genset_per_hall - 1 ) * electrical.genset_unit_kw * electrical.genset_max_loading - electrical.hall_facility_design_kw ) / electrical.hall_facility_design_kw * 100",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.genset_per_hall",
+        "electrical.genset_unit_kw",
+        "electrical.genset_max_loading",
+        "electrical.hall_facility_design_kw"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "electrical.genset_max_loading",
+        "electrical.genset_spare_per_hall",
+        "electrical.genset_unit_kw",
+        "site.pue"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.genset_per_hall",
+      "label": "Gensets per hall",
+      "unit": null,
+      "kind": "derived",
+      "value": 8,
+      "formula": "ceil(hall kW / (unit kW x max loading)) + spare",
+      "formulaExpr": "ceil( electrical.hall_facility_design_kw / ( electrical.genset_unit_kw * electrical.genset_max_loading ) ) + electrical.genset_spare_per_hall",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.hall_facility_design_kw",
+        "electrical.genset_unit_kw",
+        "electrical.genset_max_loading",
+        "electrical.genset_spare_per_hall"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "electrical.genset_max_loading",
+        "electrical.genset_spare_per_hall",
+        "electrical.genset_unit_kw",
+        "site.pue"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.genset_spare_per_hall",
+      "label": "Spare gensets per hall",
+      "unit": null,
+      "kind": "authored",
+      "value": 1,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.genset_spare_per_hall"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "N+1 per hall block (execution plan E-1). Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.genset_unit_kw",
+      "label": "Genset unit rating",
+      "unit": "kW",
+      "kind": "authored",
+      "value": 3000,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.genset_unit_kw"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "3 MW class set (execution plan E-1). Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.growth_margin",
+      "label": "Transformer growth margin",
+      "unit": null,
+      "kind": "authored",
+      "value": 0.2,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.growth_margin"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "Margin added to the demand before a standard transformer rating is chosen. Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.hall_facility_design_kw",
+      "label": "Hall design facility load",
+      "unit": "kW",
+      "kind": "derived",
+      "value": 14500,
+      "formula": "hall it_design_kw x site PUE",
+      "formulaExpr": "hall.it_design_kw * site.pue",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "hall.it_design_kw",
+        "site.pue"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "site.pue"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.hv_bus_count",
+      "label": "150 kV busbars",
+      "unit": null,
+      "kind": "authored",
+      "value": 2,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.hv_bus_count"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "Double busbar with coupler (PRD OD-3). Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.hv_fault_level_ka",
+      "label": "150 kV system fault level",
+      "unit": "kA",
+      "kind": "authored",
+      "value": 25,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.hv_fault_level_ka"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "Three-phase fault level at the 150 kV bus; the utility has issued no fault-level letter. Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.hv_line_bays",
+      "label": "150 kV line bays",
+      "unit": null,
+      "kind": "authored",
+      "value": 2,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.hv_line_bays"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "Two PLN incoming lines (PRD §8.1). Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.hv_source_mva",
+      "label": "150 kV source fault MVA",
+      "unit": "MVA",
+      "kind": "derived",
+      "value": 6495.2,
+      "formula": "sqrt3 x kV x kA",
+      "formulaExpr": "1.7320508 * electrical.hv_voltage_kv * electrical.hv_fault_level_ka",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.hv_voltage_kv",
+        "electrical.hv_fault_level_ka"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.hv_fault_level_ka",
+        "electrical.hv_voltage_kv"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.hv_switchgear_rated_ka",
+      "label": "150 kV GIS rated short-time current",
+      "unit": "kA",
+      "kind": "authored",
+      "value": 40,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.hv_switchgear_rated_ka"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "40 kA class GIS rating. Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.hv_tx_bays",
+      "label": "150 kV transformer bays",
+      "unit": null,
+      "kind": "authored",
+      "value": 2,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.hv_tx_bays"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "One bay per power transformer (PRD §8.1). Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.hv_tx_count",
+      "label": "Power transformers 150/20 kV",
+      "unit": null,
+      "kind": "authored",
+      "value": 2,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.hv_tx_count"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "N+1: two units, each able to carry the site alone (PRD §8.1). Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.hv_tx_fla_a",
+      "label": "Power transformer FLA at 150 kV",
+      "unit": "A",
+      "kind": "derived",
+      "value": 242.5,
+      "formula": "MVA x 1000 / (sqrt3 x kV)",
+      "formulaExpr": "electrical.hv_tx_mva * 1000 / ( 1.7320508 * electrical.hv_voltage_kv )",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.hv_tx_mva",
+        "electrical.hv_voltage_kv"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "electrical.hv_voltage_kv",
+        "electrical.power_factor_design",
+        "site.pue"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.hv_tx_impedance_pct",
+      "label": "Power transformer impedance",
+      "unit": "%",
+      "kind": "authored",
+      "value": 12.5,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.hv_tx_impedance_pct"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "Impedance on the transformer's own rating, typical of a 60 MVA 150/20 kV unit. Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.hv_tx_load_pct_n1",
+      "label": "Power transformer loading, one unit lost",
+      "unit": "%",
+      "kind": "derived",
+      "value": 72.7,
+      "formula": "demand / ((count - 1) x rating) x 100",
+      "formulaExpr": "electrical.demand_mva / ( ( electrical.hv_tx_count - 1 ) * electrical.hv_tx_mva ) * 100",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.demand_mva",
+        "electrical.hv_tx_count",
+        "electrical.hv_tx_mva"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.0.it_load_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.1.it_load_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.2.it_load_kw",
+        "campus.halls.3.it_design_kw",
+        "campus.halls.3.it_load_kw",
+        "electrical.hv_tx_count",
+        "electrical.power_factor_design",
+        "site.pue"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [
+        "standarization/CONVENTIONAL_DC_OPERATIONS_STANDARD.md"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.hv_tx_load_pct_n1_design",
+      "label": "Power transformer loading, one unit lost, at full design",
+      "unit": "%",
+      "kind": "derived",
+      "value": 96.9,
+      "formula": "design demand / ((count - 1) x rating) x 100",
+      "formulaExpr": "electrical.demand_design_mva / ( ( electrical.hv_tx_count - 1 ) * electrical.hv_tx_mva ) * 100",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.demand_design_mva",
+        "electrical.hv_tx_count",
+        "electrical.hv_tx_mva"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "electrical.hv_tx_count",
+        "electrical.power_factor_design",
+        "site.pue"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [
+        "standarization/CONVENTIONAL_DC_OPERATIONS_STANDARD.md"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.hv_tx_load_pct_normal",
+      "label": "Power transformer loading, both in service",
+      "unit": "%",
+      "kind": "derived",
+      "value": 36.3,
+      "formula": "demand / (count x rating) x 100",
+      "formulaExpr": "electrical.demand_mva / ( electrical.hv_tx_count * electrical.hv_tx_mva ) * 100",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.demand_mva",
+        "electrical.hv_tx_count",
+        "electrical.hv_tx_mva"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.0.it_load_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.1.it_load_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.2.it_load_kw",
+        "campus.halls.3.it_design_kw",
+        "campus.halls.3.it_load_kw",
+        "electrical.hv_tx_count",
+        "electrical.power_factor_design",
+        "site.pue"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.hv_tx_mva",
+      "label": "Power transformer rating",
+      "unit": "MVA",
+      "kind": "derived",
+      "value": 63,
+      "formula": "smallest IEC 60076-1 R10 rating (31.5, 40, 50, 63, 80, 100 MVA) >= hv_tx_sizing_mva",
+      "formulaNotExpressible": "A lookup in the IEC 60076-1 preferred-rating list, which the formula evaluator cannot express.",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.hv_tx_sizing_mva"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "electrical.power_factor_design",
+        "site.pue"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.hv_tx_sizing_mva",
+      "label": "Power transformer sizing demand",
+      "unit": "MVA",
+      "kind": "derived",
+      "value": 61.053,
+      "formula": "max(demand_design_mva, demand_mva x (1 + growth_margin))",
+      "formulaNotExpressible": "A max() of two demands, which the formula evaluator cannot express.",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.demand_design_mva",
+        "electrical.demand_mva"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "electrical.power_factor_design",
+        "site.pue"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs"
+      ],
+      "docs": [
+        "standarization/CONVENTIONAL_DC_OPERATIONS_STANDARD.md"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.hv_voltage_kv",
+      "label": "HV supply voltage",
+      "unit": "kV",
+      "kind": "authored",
+      "value": 150,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.hv_voltage_kv"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "PLN 150 kV transmission level for a customer substation of this size. Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.lv_fault_level_ka",
+      "label": "LV board fault level",
+      "unit": "kA",
+      "kind": "derived",
+      "value": 59.25,
+      "formula": "MVA / ((MVA / 20 kV fault MVA + Z%/100) x sqrt3 x kV_lv); the 20 kV fault MVA does not depend on the 20 kV voltage",
+      "formulaExpr": "( electrical.dist_tx_kva / 1000 ) / ( ( electrical.dist_tx_kva / 1000 / ( electrical.hv_tx_mva / ( electrical.hv_tx_mva / electrical.hv_source_mva + electrical.hv_tx_impedance_pct / 100 ) ) + electrical.dist_tx_impedance_pct / 100 ) * 1.7320508 * electrical.lv_voltage_v / 1000 )",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.dist_tx_kva",
+        "electrical.hv_tx_mva",
+        "electrical.hv_source_mva",
+        "electrical.hv_tx_impedance_pct",
+        "electrical.dist_tx_impedance_pct",
+        "electrical.lv_voltage_v"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "electrical.dist_tx_impedance_pct",
+        "electrical.dist_tx_kva",
+        "electrical.hv_fault_level_ka",
+        "electrical.hv_tx_impedance_pct",
+        "electrical.hv_voltage_kv",
+        "electrical.lv_voltage_v",
+        "electrical.power_factor_design",
+        "site.pue"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.lv_voltage_v",
+      "label": "LV distribution voltage",
+      "unit": "V",
+      "kind": "authored",
+      "value": 400,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.lv_voltage_v"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "400 V three-phase. Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
       "id": "electrical.metering_tolerance_pct",
       "label": "Metering tolerance",
       "unit": "%",
@@ -2286,6 +3581,207 @@
       }
     },
     {
+      "id": "electrical.mv_bus_sections",
+      "label": "20 kV bus sections",
+      "unit": null,
+      "kind": "authored",
+      "value": 2,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.mv_bus_sections"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "Two bus sections with a bus tie (PRD §8.1). Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.mv_earth_fault_a",
+      "label": "20 kV earth-fault current (NGR limited)",
+      "unit": "A",
+      "kind": "derived",
+      "value": 962.3,
+      "formula": "kV x 1000 / sqrt3 / R",
+      "formulaExpr": "electrical.mv_voltage_kv * 1000 / 1.7320508 / electrical.mv_ngr_ohm",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.mv_voltage_kv",
+        "electrical.mv_ngr_ohm"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.mv_ngr_ohm",
+        "electrical.mv_voltage_kv"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.mv_fault_level_ka",
+      "label": "20 kV fault level, one transformer",
+      "unit": "kA",
+      "kind": "derived",
+      "value": 13.5,
+      "formula": "tx MVA / ((tx MVA / source MVA + Z%/100) x sqrt3 x kV); bus tie open",
+      "formulaExpr": "electrical.hv_tx_mva / ( ( electrical.hv_tx_mva / electrical.hv_source_mva + electrical.hv_tx_impedance_pct / 100 ) * 1.7320508 * electrical.mv_voltage_kv )",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.hv_tx_mva",
+        "electrical.hv_source_mva",
+        "electrical.hv_tx_impedance_pct",
+        "electrical.mv_voltage_kv"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "electrical.hv_fault_level_ka",
+        "electrical.hv_tx_impedance_pct",
+        "electrical.hv_voltage_kv",
+        "electrical.mv_voltage_kv",
+        "electrical.power_factor_design",
+        "site.pue"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.mv_ngr_ohm",
+      "label": "20 kV neutral earthing resistor",
+      "unit": "ohm",
+      "kind": "authored",
+      "value": 12,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.mv_ngr_ohm"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "Low-resistance earthing for a cable network. Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.mv_tx_fla_a",
+      "label": "Power transformer FLA at 20 kV",
+      "unit": "A",
+      "kind": "derived",
+      "value": 1818.7,
+      "formula": "MVA x 1000 / (sqrt3 x kV)",
+      "formulaExpr": "electrical.hv_tx_mva * 1000 / ( 1.7320508 * electrical.mv_voltage_kv )",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.hv_tx_mva",
+        "electrical.mv_voltage_kv"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "electrical.mv_voltage_kv",
+        "electrical.power_factor_design",
+        "site.pue"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.mv_voltage_kv",
+      "label": "MV distribution voltage",
+      "unit": "kV",
+      "kind": "authored",
+      "value": 20,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.mv_voltage_kv"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "PLN 20 kV medium-voltage level. Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
       "id": "electrical.nameplate_evidence_class",
       "label": "Electrical nameplate evidence class",
       "unit": null,
@@ -2307,6 +3803,1154 @@
       "source": {
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "electrical.power_factor_design",
+      "label": "Design power factor",
+      "unit": null,
+      "kind": "authored",
+      "value": 0.95,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.power_factor_design"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "Design power factor at the 20 kV metering point. Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.pro_feeder_curve",
+      "label": "20 kV feeder relay curve",
+      "unit": null,
+      "kind": "authored",
+      "value": "EI",
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "IEC 60255-151 extremely inverse: the LV long-time band is I^2 t shaped and only an I^2-shaped relay curve stays above it up to the LV short-time pickup. Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.pro_feeder_inrush_ok",
+      "label": "Feeder clear of transformer inrush",
+      "unit": null,
+      "kind": "authored",
+      "value": true,
+      "formula": "feeder time at inrush x FLA > inrush duration (or no operation)",
+      "formulaNotExpressible": "A yes/no comparison of the relay curve against the inrush point, not an arithmetic value.",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.pro_feeder_inst_a",
+      "label": "20 kV feeder 50 pickup",
+      "unit": "A",
+      "kind": "derived",
+      "value": 1540.5,
+      "formula": "instantaneous multiple x LV through-fault at 20 kV",
+      "formulaExpr": "electrical.pro_inst_x * electrical.dist_tx_through_fault_mv_a",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.pro_inst_x",
+        "electrical.dist_tx_through_fault_mv_a"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "electrical.dist_tx_impedance_pct",
+        "electrical.dist_tx_kva",
+        "electrical.hv_fault_level_ka",
+        "electrical.hv_tx_impedance_pct",
+        "electrical.hv_voltage_kv",
+        "electrical.mv_voltage_kv",
+        "electrical.power_factor_design",
+        "electrical.pro_inst_x",
+        "site.pue"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.pro_feeder_inst_s",
+      "label": "Feeder instantaneous time",
+      "unit": "s",
+      "kind": "authored",
+      "value": 0.05,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.pro_feeder_inst_s"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "Operating time of the feeder instantaneous stage. Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.pro_feeder_is_a",
+      "label": "20 kV feeder 51 pickup",
+      "unit": "A",
+      "kind": "derived",
+      "value": 113.67,
+      "formula": "pickup multiple x transformer FLA at 20 kV",
+      "formulaExpr": "electrical.pro_feeder_pickup_x * electrical.dist_tx_fla_mv_a",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.pro_feeder_pickup_x",
+        "electrical.dist_tx_fla_mv_a"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.dist_tx_kva",
+        "electrical.mv_voltage_kv",
+        "electrical.pro_feeder_pickup_x"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.pro_feeder_lt_grading_a",
+      "label": "Feeder long-time grading current (LV Isd at 20 kV)",
+      "unit": "A",
+      "kind": "derived",
+      "value": 363.7,
+      "formula": "LV Isd referred to 20 kV = Isd multiple x distribution transformer FLA at 20 kV (Ir is that FLA; the LV voltage cancels)",
+      "formulaExpr": "electrical.pro_lv_isd_x * electrical.dist_tx_fla_mv_a",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.pro_lv_isd_x",
+        "electrical.dist_tx_fla_mv_a"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.dist_tx_kva",
+        "electrical.mv_voltage_kv",
+        "electrical.pro_lv_isd_x"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.pro_feeder_lt_t_s",
+      "label": "Feeder operating time at the long-time grading current",
+      "unit": "s",
+      "kind": "derived",
+      "value": 9.351,
+      "formula": "feeder curve time at the LV Isd referred to 20 kV",
+      "formulaNotExpressible": "IEC 60255-151 inverse time needs a power (I/Is)^alpha, which the evaluator cannot express; tools/test-conv-electrical-hvmv.mjs recomputes it and cross-checks it with js/conv/tcc.js.",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.pro_feeder_tms",
+        "electrical.pro_feeder_is_a",
+        "electrical.pro_feeder_lt_grading_a"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.pro_feeder_pickup_x",
+        "electrical.pro_grading_margin_s",
+        "electrical.pro_lv_isd_x",
+        "electrical.pro_lv_tr_s",
+        "electrical.pro_tms_step"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.pro_feeder_pickup_x",
+      "label": "20 kV feeder pickup multiple",
+      "unit": null,
+      "kind": "authored",
+      "value": 1.25,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.pro_feeder_pickup_x"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "Overcurrent pickup as a multiple of the distribution transformer FLA at 20 kV. Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.pro_feeder_t_s",
+      "label": "20 kV feeder operating time at the LV through-fault",
+      "unit": "s",
+      "kind": "derived",
+      "value": 0.802,
+      "formula": "feeder (EI) time at the LV through-fault with the published TMS",
+      "formulaNotExpressible": "IEC 60255-151 inverse time needs a power (I/Is)^alpha, which the evaluator cannot express; tools/test-conv-electrical-hvmv.mjs recomputes it and cross-checks it with js/conv/tcc.js.",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.pro_feeder_tms",
+        "electrical.pro_feeder_is_a",
+        "electrical.dist_tx_through_fault_mv_a"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "electrical.dist_tx_impedance_pct",
+        "electrical.dist_tx_kva",
+        "electrical.hv_fault_level_ka",
+        "electrical.hv_tx_impedance_pct",
+        "electrical.hv_voltage_kv",
+        "electrical.power_factor_design",
+        "electrical.pro_feeder_pickup_x",
+        "electrical.pro_grading_margin_s",
+        "electrical.pro_lv_isd_x",
+        "electrical.pro_lv_tr_s",
+        "electrical.pro_tms_step",
+        "site.pue"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.pro_feeder_tms",
+      "label": "20 kV feeder 51 TMS (extremely inverse)",
+      "unit": null,
+      "kind": "derived",
+      "value": 1.08,
+      "formula": "smallest TMS step meeting BOTH: EI time at LV Isd (20 kV) >= LV long-time time there + margin, and EI time at the LV through-fault >= LV short-time delay + margin",
+      "formulaNotExpressible": "IEC 60255-151 inverse time needs a power (I/Is)^alpha and a round-up to the setting step; the evaluator has neither. tools/test-conv-electrical-hvmv.mjs recomputes it and proves one step lower fails a grading point.",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.pro_feeder_is_a",
+        "electrical.pro_feeder_lt_grading_a",
+        "electrical.pro_lv_lt_t_s",
+        "electrical.pro_grading_margin_s",
+        "electrical.pro_tms_step"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.pro_feeder_pickup_x",
+        "electrical.pro_grading_margin_s",
+        "electrical.pro_lv_isd_x",
+        "electrical.pro_lv_tr_s",
+        "electrical.pro_tms_step"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.pro_grading_margin_s",
+      "label": "Protection grading margin",
+      "unit": "s",
+      "kind": "authored",
+      "value": 0.3,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.pro_grading_margin_s"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [
+        "standarization/CONVENTIONAL_DC_OPERATIONS_STANDARD.md"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "Numerical-relay grading margin (PRD §8.2, OD-5). Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.pro_hv_curve",
+      "label": "150 kV transformer feeder relay curve",
+      "unit": null,
+      "kind": "authored",
+      "value": "SI",
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "IEC 60255-151 standard inverse. Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.pro_hv_grading_a",
+      "label": "20 kV fault referred to 150 kV",
+      "unit": "A",
+      "kind": "derived",
+      "value": 1800.2,
+      "formula": "20 kV fault MVA x 1000 / (sqrt3 x kV_hv); the 20 kV voltage cancels",
+      "formulaExpr": "( electrical.hv_tx_mva / ( electrical.hv_tx_mva / electrical.hv_source_mva + electrical.hv_tx_impedance_pct / 100 ) ) * 1000 / ( 1.7320508 * electrical.hv_voltage_kv )",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.hv_tx_mva",
+        "electrical.hv_source_mva",
+        "electrical.hv_tx_impedance_pct",
+        "electrical.hv_voltage_kv"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "electrical.hv_fault_level_ka",
+        "electrical.hv_tx_impedance_pct",
+        "electrical.hv_voltage_kv",
+        "electrical.power_factor_design",
+        "site.pue"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.pro_hv_is_a",
+      "label": "150 kV transformer feeder 51 pickup",
+      "unit": "A",
+      "kind": "derived",
+      "value": 290.98,
+      "formula": "pickup multiple x power transformer FLA at 150 kV",
+      "formulaExpr": "electrical.pro_hv_pickup_x * electrical.hv_tx_fla_a",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.pro_hv_pickup_x",
+        "electrical.hv_tx_fla_a"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "electrical.hv_voltage_kv",
+        "electrical.power_factor_design",
+        "electrical.pro_hv_pickup_x",
+        "site.pue"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.pro_hv_pickup_x",
+      "label": "150 kV transformer feeder pickup multiple",
+      "unit": null,
+      "kind": "authored",
+      "value": 1.2,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.pro_hv_pickup_x"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "Overcurrent pickup as a multiple of the power transformer FLA at 150 kV. Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.pro_hv_t_s",
+      "label": "150 kV relay operating time at the referred 20 kV fault",
+      "unit": "s",
+      "kind": "derived",
+      "value": 0.679,
+      "formula": "SI time at the grading current with the published TMS",
+      "formulaNotExpressible": "IEC 60255-151 inverse time needs a power (I/Is)^alpha, which the evaluator cannot express; tools/test-conv-electrical-hvmv.mjs recomputes it and cross-checks it with js/conv/tcc.js.",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.pro_hv_tms",
+        "electrical.pro_hv_is_a",
+        "electrical.pro_hv_grading_a"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "electrical.hv_fault_level_ka",
+        "electrical.hv_tx_impedance_pct",
+        "electrical.hv_voltage_kv",
+        "electrical.power_factor_design",
+        "electrical.pro_feeder_inst_s",
+        "electrical.pro_grading_margin_s",
+        "electrical.pro_hv_pickup_x",
+        "electrical.pro_incomer_pickup_x",
+        "electrical.pro_tms_step",
+        "site.pue"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.pro_hv_tms",
+      "label": "150 kV transformer feeder 51 TMS",
+      "unit": null,
+      "kind": "derived",
+      "value": 0.18,
+      "formula": "smallest TMS step with standard-inverse time at the referred 20 kV fault >= incomer time + margin",
+      "formulaNotExpressible": "IEC 60255-151 inverse time needs a power (I/Is)^alpha and a round-up to the setting step; the evaluator has neither. tools/test-conv-electrical-hvmv.mjs recomputes it and proves one step lower fails a grading point.",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.pro_hv_is_a",
+        "electrical.pro_hv_grading_a",
+        "electrical.pro_incomer_t_s",
+        "electrical.pro_grading_margin_s",
+        "electrical.pro_tms_step"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.hv_tx_impedance_pct",
+        "electrical.pro_feeder_inst_s",
+        "electrical.pro_grading_margin_s",
+        "electrical.pro_hv_pickup_x",
+        "electrical.pro_incomer_pickup_x",
+        "electrical.pro_tms_step"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.pro_incomer_curve",
+      "label": "20 kV incomer relay curve",
+      "unit": null,
+      "kind": "authored",
+      "value": "SI",
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "IEC 60255-151 standard inverse. Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.pro_incomer_is_a",
+      "label": "20 kV incomer 51 pickup",
+      "unit": "A",
+      "kind": "derived",
+      "value": 2000.5,
+      "formula": "pickup multiple x power transformer FLA at 20 kV",
+      "formulaExpr": "electrical.pro_incomer_pickup_x * electrical.mv_tx_fla_a",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.pro_incomer_pickup_x",
+        "electrical.mv_tx_fla_a"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "electrical.mv_voltage_kv",
+        "electrical.power_factor_design",
+        "electrical.pro_incomer_pickup_x",
+        "site.pue"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.pro_incomer_pickup_x",
+      "label": "20 kV incomer pickup multiple",
+      "unit": null,
+      "kind": "authored",
+      "value": 1.1,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.pro_incomer_pickup_x"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "Overcurrent pickup as a multiple of the power transformer FLA at 20 kV. Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.pro_incomer_t_s",
+      "label": "20 kV incomer operating time at the 20 kV fault",
+      "unit": "s",
+      "kind": "derived",
+      "value": 0.36,
+      "formula": "SI time at the grading current with the published TMS",
+      "formulaNotExpressible": "IEC 60255-151 inverse time needs a power (I/Is)^alpha, which the evaluator cannot express; tools/test-conv-electrical-hvmv.mjs recomputes it and cross-checks it with js/conv/tcc.js.",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.pro_incomer_tms",
+        "electrical.pro_incomer_is_a",
+        "electrical.mv_fault_level_ka"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "electrical.hv_fault_level_ka",
+        "electrical.hv_tx_impedance_pct",
+        "electrical.hv_voltage_kv",
+        "electrical.power_factor_design",
+        "electrical.pro_feeder_inst_s",
+        "electrical.pro_grading_margin_s",
+        "electrical.pro_incomer_pickup_x",
+        "electrical.pro_tms_step",
+        "site.pue"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.pro_incomer_tms",
+      "label": "20 kV incomer 51 TMS",
+      "unit": null,
+      "kind": "derived",
+      "value": 0.1,
+      "formula": "smallest TMS step with standard-inverse time at the 20 kV fault >= feeder time there + margin",
+      "formulaNotExpressible": "IEC 60255-151 inverse time needs a power (I/Is)^alpha and a round-up to the setting step; the evaluator has neither. tools/test-conv-electrical-hvmv.mjs recomputes it and proves one step lower fails a grading point.",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.pro_incomer_is_a",
+        "electrical.mv_fault_level_ka",
+        "electrical.pro_feeder_inst_s",
+        "electrical.pro_grading_margin_s",
+        "electrical.pro_tms_step"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.hv_tx_impedance_pct",
+        "electrical.pro_feeder_inst_s",
+        "electrical.pro_grading_margin_s",
+        "electrical.pro_incomer_pickup_x",
+        "electrical.pro_tms_step"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.pro_inrush_s",
+      "label": "Transformer inrush duration",
+      "unit": "s",
+      "kind": "authored",
+      "value": 0.1,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.pro_inrush_s"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "Declared inrush point at 0.1 s (PRD §8.2). Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.pro_inrush_x",
+      "label": "Transformer inrush multiple",
+      "unit": null,
+      "kind": "authored",
+      "value": 12,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.pro_inrush_x"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "Declared inrush point, 12 x FLA (PRD §8.2). Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.pro_inst_x",
+      "label": "Feeder instantaneous multiple",
+      "unit": null,
+      "kind": "authored",
+      "value": 1.3,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.pro_inst_x"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "Instantaneous pickup as a multiple of the LV through-fault referred to 20 kV, so it does not see an LV fault. Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.pro_lv_ir_a",
+      "label": "LV main long-time pickup Ir",
+      "unit": "A",
+      "kind": "derived",
+      "value": 4546.6,
+      "formula": "Ir = distribution transformer FLA at 0.4 kV",
+      "formulaExpr": "electrical.dist_tx_fla_lv_a",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.dist_tx_fla_lv_a"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.dist_tx_kva",
+        "electrical.lv_voltage_v"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.pro_lv_isd_a",
+      "label": "LV main short-time pickup Isd",
+      "unit": "A",
+      "kind": "derived",
+      "value": 18186.5,
+      "formula": "Isd multiple x Ir",
+      "formulaExpr": "electrical.pro_lv_isd_x * electrical.pro_lv_ir_a",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.pro_lv_isd_x",
+        "electrical.pro_lv_ir_a"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.dist_tx_kva",
+        "electrical.lv_voltage_v",
+        "electrical.pro_lv_isd_x"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.pro_lv_isd_x",
+      "label": "LV main short-time pickup multiple",
+      "unit": null,
+      "kind": "authored",
+      "value": 4,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.pro_lv_isd_x"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "LSIG short-time pickup as a multiple of Ir. Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.pro_lv_lt_t_s",
+      "label": "LV main long-time time just below Isd",
+      "unit": "s",
+      "kind": "derived",
+      "value": 9,
+      "formula": "tr x (6 / Isd multiple)^2",
+      "formulaExpr": "electrical.pro_lv_tr_s * 6 / electrical.pro_lv_isd_x * 6 / electrical.pro_lv_isd_x",
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [
+        "electrical.pro_lv_tr_s",
+        "electrical.pro_lv_isd_x"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.pro_lv_isd_x",
+        "electrical.pro_lv_tr_s"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.pro_lv_tr_s",
+      "label": "LV main long-time delay",
+      "unit": "s",
+      "kind": "authored",
+      "value": 4,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.pro_lv_tr_s"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [
+        "standarization/CONVENTIONAL_DC_OPERATIONS_STANDARD.md"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "LSIG long-time delay in seconds at 6 x Ir (I^2 t band). Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.pro_lv_tsd_s",
+      "label": "LV main short-time delay",
+      "unit": "s",
+      "kind": "authored",
+      "value": 0.2,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.pro_lv_tsd_s"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "LSIG short-time delay. Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.pro_tms_max",
+      "label": "Relay TMS setting range maximum",
+      "unit": null,
+      "kind": "authored",
+      "value": 1.5,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.pro_tms_max"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [
+        "standarization/CONVENTIONAL_DC_OPERATIONS_STANDARD.md"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "Top of the relay time-multiplier setting range; a graded TMS above it is not settable. Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.pro_tms_step",
+      "label": "Relay TMS setting step",
+      "unit": null,
+      "kind": "authored",
+      "value": 0.01,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for the P4 150 kV SLD sheet and the TCC modal (PRD-CONV-LIVING-PLANT §8.1-8.2); no cockpit renders it until that drawing lands.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.pro_tms_step"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-electrical-hvmv.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [
+        "standarization/CONVENTIONAL_DC_OPERATIONS_STANDARD.md"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
+        "asOf": "2026-11-18",
+        "method": "Time-multiplier setting resolution. Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
       }
     },
     {
@@ -4405,7 +7049,7 @@
       "label": "Engine version",
       "unit": null,
       "kind": "authored",
-      "value": "2.2.0",
+      "value": "2.3.0",
       "formula": null,
       "formulaNotExpressible": "The engine's own version string.",
       "deps": [],
@@ -4451,6 +7095,7 @@
         "test-conv-cooling-water-ui.mjs",
         "test-conv-dashboard-authority.mjs",
         "test-conv-design-studio-browser.mjs",
+        "test-conv-electrical-hvmv.mjs",
         "test-conv-engine-version-pins.mjs",
         "test-conv-parameter-registry.mjs",
         "test-conv-sheet-perf.mjs",
@@ -4701,6 +7346,7 @@
       ],
       "consumers": [],
       "tests": [
+        "test-conv-electrical-hvmv.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
       "docs": [
@@ -4895,6 +7541,7 @@
       "tests": [
         "test-conv-calc.mjs",
         "test-conv-design-basis.mjs",
+        "test-conv-electrical-hvmv.mjs",
         "test-conv-parameter-registry.mjs",
         "test-conv-snapshot-binding.mjs",
         "test-datahall-ai-authority.mjs",

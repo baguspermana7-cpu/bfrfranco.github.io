@@ -181,6 +181,7 @@ gate "Conventional VFX core — state grammar, standby, flow speed, rotor, therm
 gate "Conventional history — deterministic series per point, stats, limits, CSV" node --test tools/test-conv-history.mjs
 gate "Conventional TCC curves — IEC 60255 families, transformer damage/inrush, cable withstand, coordination" node --test tools/test-conv-tcc.mjs
 gate "Conventional SLD topology — energisation from breaker states, bus balance" node --test tools/test-conv-sld-topology.mjs
+gate "Conventional HV/MV basis — 150/20/0.4 kV ratings, fault levels, N-1 loading, graded TMS cross-checked with tcc.js" node --test tools/test-conv-electrical-hvmv.mjs
 gate "Conventional VFX + trend on the chiller plant — state colour, flow speed, rotor, thermal, reduced motion, trend modal (390 + 1440)" node tools/test-conv-vfx-trend.mjs
 gate "Conventional VFX on fire, fuel, water — view bar, line states, standby, running colour + motion, trend from the inspector" node tools/test-conv-vfx-sheets.mjs
 gate "Conventional air section core — no airflow no motion, speed follows airflow, colour is temperature, deterministic" node --test tools/test-conv-air-section.mjs

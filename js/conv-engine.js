@@ -248,6 +248,20 @@
      */
     var UPS_MODULE_KW_RATED = 1250;
 
+    /* 150/20 kV POWER TRANSFORMER RATINGS (MVA) — the IEC 60076-1 preferred
+     * ratings (R10 series) in the range this site can need. The engine picks the
+     * smallest rating that covers the sizing demand (the larger of the full design
+     * demand and the adopted demand plus growth margin); it never interpolates a
+     * non-preferred size.
+     * source: IEC 60076-1 preferred values of rated power (R10). evidenceClass: 'STANDARD'
+     * Added engine 2.3.0 (PRD-CONV-LIVING-PLANT §8.1, P4a).
+     */
+    var HV_TX_STANDARD_MVA = [31.5, 40, 50, 63, 80, 100];
+    /* IEC 60255-151 inverse-time constants t = TMS * k / ((I/Is)^alpha - 1).
+     * source: IEC 60255-151:2009 Table 1. evidenceClass: 'STANDARD' */
+    var IEC_CURVES = { SI: { k: 0.14, a: 0.02 }, VI: { k: 13.5, a: 1 }, EI: { k: 80, a: 2 }, LTI: { k: 120, a: 1 } };
+    var SQRT3 = Math.sqrt(3);
+
     /* --- Pure derivation helpers -------------------------------------------- */
 
     function round1(n) { return Math.round(n * 10) / 10; }
@@ -600,8 +614,88 @@
             // source: 09-engineering-basis-and-calculations.md line 77
             //         metering tolerance for epms.total_kw (doc-00 line 77 "+/- metering_delta",
             //         doc-12 line 9 "within 2%")
-            metering_tolerance_pct: 2
+            metering_tolerance_pct: 2,
             // (no authored ups_module_count — it is derived)
+
+            /* ==============================================================
+             * HV / MV / GENERATION / PROTECTION BASIS — added engine 2.3.0
+             * (PRD-CONV-LIVING-PLANT §8.1 OD-4, P4a). Every value below is a
+             * TRAINING DESIGN VALUE: evidenceClass 'ASSUMED' unless stated.
+             * No utility letter, no transformer test certificate, no relay
+             * study exists for this site. The protection settings are declared
+             * training settings derived by a stated grading rule, NOT a relay
+             * coordination study, and must never be used to set a real relay.
+             * ============================================================== */
+            // source: ASSUMED design power factor at the 20 kV metering point. evidenceClass: 'ASSUMED'
+            power_factor_design: 0.95,
+            // source: ASSUMED growth margin on transformer sizing. evidenceClass: 'ASSUMED'
+            growth_margin: 0.20,
+            // source: PLN transmission voltage level (150 kV). evidenceClass: 'ADOPTED'
+            hv_voltage_kv: 150,
+            // source: ASSUMED three-phase system fault level at the 150 kV bus (utility letter absent). evidenceClass: 'ASSUMED'
+            hv_fault_level_ka: 25,
+            // source: ASSUMED 150 kV GIS rated short-time current (40 kA class). evidenceClass: 'ASSUMED'
+            hv_switchgear_rated_ka: 40,
+            // source: PRD §8.1 — two PLN incoming lines. evidenceClass: 'ASSUMED'
+            hv_line_bays: 2,
+            // source: PRD §8.1 — two transformer bays. evidenceClass: 'ASSUMED'
+            hv_tx_bays: 2,
+            // source: PRD OD-3 — double busbar with coupler. evidenceClass: 'ASSUMED'
+            hv_bus_count: 2,
+            // source: PRD §8.1 — 2 units, N+1: each unit alone carries the site. evidenceClass: 'ASSUMED'
+            hv_tx_count: 2,
+            // source: ASSUMED 150/20 kV transformer impedance on its own rating. evidenceClass: 'ASSUMED'
+            hv_tx_impedance_pct: 12.5,
+            // source: ASSUMED 20 kV distribution voltage (PLN medium voltage). evidenceClass: 'ASSUMED'
+            mv_voltage_kv: 20,
+            // source: ASSUMED low-resistance neutral earthing resistor, cable network. evidenceClass: 'ASSUMED'
+            mv_ngr_ohm: 12,
+            // source: PRD §8.1 — two 20 kV bus sections + bus tie. evidenceClass: 'ASSUMED'
+            mv_bus_sections: 2,
+            // source: ASSUMED 20/0.4 kV distribution transformer unit rating (plan E-1). evidenceClass: 'ASSUMED'
+            dist_tx_kva: 3150,
+            // source: IEC 60076-5 minimum impedance for 2,501-6,300 kVA. evidenceClass: 'STANDARD'
+            dist_tx_impedance_pct: 7,
+            // source: 2N electrical topology — A and B streams. evidenceClass: 'ASSUMED'
+            dist_tx_streams: 2,
+            // source: ASSUMED LV distribution voltage. evidenceClass: 'ASSUMED'
+            lv_voltage_v: 400,
+            // source: ASSUMED genset unit rating (plan E-1, 3 MW class). evidenceClass: 'ASSUMED'
+            genset_unit_kw: 3000,
+            // source: ASSUMED maximum continuous loading of one set (plan E-1). evidenceClass: 'ASSUMED'
+            genset_max_loading: 0.8,
+            // source: ASSUMED N+1 per hall block (plan E-1). evidenceClass: 'ASSUMED'
+            genset_spare_per_hall: 1,
+            // source: PRD §8.2 OD-5 — numerical-relay grading margin. evidenceClass: 'ASSUMED'
+            pro_grading_margin_s: 0.3,
+            // source: ASSUMED training pickup multiples of the protected FLA. evidenceClass: 'ASSUMED'
+            pro_feeder_pickup_x: 1.25,
+            pro_incomer_pickup_x: 1.1,
+            pro_hv_pickup_x: 1.2,
+            // source: ASSUMED feeder instantaneous = this x the LV through-fault referred to 20 kV. evidenceClass: 'ASSUMED'
+            pro_inst_x: 1.3,
+            // source: ASSUMED feeder instantaneous operating time. evidenceClass: 'ASSUMED'
+            pro_feeder_inst_s: 0.05,
+            // source: ASSUMED LV main LSIG short-time pickup (x Ir) and delay. evidenceClass: 'ASSUMED'
+            pro_lv_isd_x: 4,
+            pro_lv_tsd_s: 0.2,
+            // source: ASSUMED LV main LSIG long-time delay, seconds at 6 x Ir. evidenceClass: 'ASSUMED'
+            pro_lv_tr_s: 4,
+            // source: ASSUMED relay TMS setting step. evidenceClass: 'ASSUMED'
+            pro_tms_step: 0.01,
+            // source: ASSUMED top of the relay TMS setting range. evidenceClass: 'ASSUMED'
+            pro_tms_max: 1.5,
+            /* Relay curve families (IEC 60255-151). The 20 kV feeder is EXTREMELY
+             * inverse: the LV main long-time band is I^2 t shaped, and only an EI
+             * curve (also I^2-shaped) can stay above it from the long-time region
+             * up to the LV short-time pickup. Incomer and 150 kV stay standard
+             * inverse. ASSUMED training settings. evidenceClass: 'ASSUMED' */
+            pro_feeder_curve: 'EI',
+            pro_incomer_curve: 'SI',
+            pro_hv_curve: 'SI',
+            // source: PRD §8.2 — declared transformer inrush point, 12 x FLA at 0.1 s. evidenceClass: 'ASSUMED'
+            pro_inrush_x: 12,
+            pro_inrush_s: 0.1
         },
         fuel: {
             // source: 09-engineering-basis-and-calculations.md line 16, 126
@@ -691,11 +785,227 @@
             basis: 'Adopted project scenario — simulated, not measured telemetry',
             basis_doc: 'conv/review/09-engineering-basis-and-calculations.md',
             study_doc: 'js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)',
-            version: '2.2.0'
+            version: '2.3.0'
         }
     };
 
     /* --- Computed convenience snapshot (frozen) ----------------------------- */
+
+    /* --- HV / MV / generation / protection (engine 2.3.0) ------------------ */
+
+    /* IEC 60255-151 inverse time: t = TMS x k / ((I/Is)^alpha - 1).
+     * Same conventions as js/conv/tcc.js so the curve and the settings agree:
+     * no operation below 1.05 x Is (the formula has no meaning there), and the
+     * characteristic is held flat above 20 x Is (the standard's upper limit) —
+     * without that hold an EI curve reads ~6 ms at 120 x Is, which no relay does. */
+    function iecTime(curve, Is, tms, I) {
+        var c = IEC_CURVES[curve];
+        if (!c || !(Is > 0) || !(tms > 0) || !(I > 0)) return null;
+        var mult = I / Is;
+        if (mult < 1.05) return null;
+        if (mult > 20) mult = 20;
+        return tms * c.k / (Math.pow(mult, c.a) - 1);
+    }
+    /* Smallest multiple of the setting step whose time meets EVERY grading point
+     * (points = [{ I, need }]). The 1e-9 guard keeps an exact multiple from
+     * rounding up a whole step. */
+    function gradeTms(curve, Is, points, step) {
+        if (!(step > 0)) return null;
+        var tms = 0;
+        for (var i = 0; i < points.length; i++) {
+            var perTms = iecTime(curve, Is, 1, points[i].I);
+            if (perTms === null) return null;
+            var t = Math.ceil(points[i].need / perTms / step - 1e-9) * step;
+            if (t > tms) tms = t;
+        }
+        return Math.round(tms * 1e6) / 1e6;
+    }
+    /* LV LSIG trip unit without instantaneous: long time tr x (6 Ir / I)^2 above
+     * 1.05 Ir, short time tsd at and above Isd. */
+    function lsigTime(Ir, tr, Isd, tsd, I) {
+        if (!(I > 0)) return null;
+        if (I >= Isd) return tsd;
+        return I >= 1.05 * Ir ? tr * Math.pow(6 * Ir / I, 2) : null;
+    }
+    function fastestOf(list) {
+        var t = null;
+        for (var i = 0; i < list.length; i++) {
+            if (list[i] !== null && (t === null || list[i] < t)) t = list[i];
+        }
+        return t;
+    }
+
+    /* Derivation chain (all from the authored electrical inputs above plus the
+     * engine's own facility load, hall design capacity and PUE):
+     *   demand_mva        = epms_total_kw / pf / 1000                     43,500 -> 45.789
+     *   demand_design_mva = site it_design_kw x PUE / pf / 1000           58,000 -> 61.053
+     *   hv_tx_sizing_mva  = max(design demand, demand x (1 + growth))      61.053
+     *   hv_tx_mva         = smallest IEC R10 rating >= sizing demand       63
+     *   hv_source_mva     = sqrt3 x 150 kV x 25 kA                         6,495.2
+     *   mv fault (one tx, tie open, source included), per unit on the tx base:
+     *     z = tx_mva / source_mva + Z%/100 ; I = tx_mva / (z sqrt3 kV)     13.50 kA
+     *   hall design facility kW = hall it_design_kw x site PUE             14,500
+     *   dist tx per stream per hall = ceil(hall kW / pf / kVA)             5
+     *   LV fault at the board: z = kVA_base / (sqrt3 kV I_mv) + Z%/100     59.25 kA
+     *   gensets per hall  = ceil(hall kW / (unit x max loading)) + spare   8
+     * Protection grading rule: each relay TMS is the SMALLEST step that gives
+     * (downstream operating time at the grading current + margin) at every
+     * grading point, on that relay's IEC 60255-151 curve. The feeder (EI) is
+     * graded at two points: just below the LV short-time pickup (4 x Ir referred
+     * to 20 kV) over the LV long-time band, and at the LV maximum fault over the
+     * LV short-time delay. TRAINING SETTINGS, not a relay study. */
+    function electricalHvMv(m) {
+        var e = m.electrical;
+        var pf = e.power_factor_design;
+        var demandMva = epmsTotalKw(m) / pf / 1000;
+        var demandDesignMva = m.site.it_design_kw * m.site.pue / pf / 1000;
+        var required = Math.max(demandDesignMva, demandMva * (1 + e.growth_margin));
+        var txMva = null;
+        for (var i = 0; i < HV_TX_STANDARD_MVA.length; i++) {
+            if (HV_TX_STANDARD_MVA[i] >= required) { txMva = HV_TX_STANDARD_MVA[i]; break; }
+        }
+        var hvFla = txMva === null ? null : txMva * 1000 / (SQRT3 * e.hv_voltage_kv);
+        var mvFla = txMva === null ? null : txMva * 1000 / (SQRT3 * e.mv_voltage_kv);
+        var sourceMva = SQRT3 * e.hv_voltage_kv * e.hv_fault_level_ka;
+        var zMv = txMva === null ? null : txMva / sourceMva + e.hv_tx_impedance_pct / 100;
+        var mvFaultKa = zMv === null ? null : txMva / (zMv * SQRT3 * e.mv_voltage_kv);
+        var earthFaultA = e.mv_voltage_kv * 1000 / SQRT3 / e.mv_ngr_ohm;
+
+        /* Per-hall design facility load; counts are summed hall by hall. */
+        var halls = m.campus.halls, hallKwMax = 0, distTotal = 0, gensetTotal = 0;
+        var distPerStream = 0, gensetPerHall = 0;
+        var unitGenKw = e.genset_unit_kw * e.genset_max_loading;
+        var n1MarginMin = null;
+        for (var h = 0; h < halls.length; h++) {
+            var hallKw = halls[h].it_design_kw * m.site.pue;
+            var perStream = Math.ceil(hallKw / pf / e.dist_tx_kva);
+            var gens = Math.ceil(hallKw / unitGenKw) + e.genset_spare_per_hall;
+            var margin = ((gens - 1) * unitGenKw - hallKw) / hallKw * 100;
+            distTotal += perStream * e.dist_tx_streams;
+            gensetTotal += gens;
+            if (hallKw > hallKwMax) { hallKwMax = hallKw; distPerStream = perStream; gensetPerHall = gens; }
+            if (n1MarginMin === null || margin < n1MarginMin) n1MarginMin = margin;
+        }
+        var hallKva = hallKwMax / pf;
+        var distMvFla = e.dist_tx_kva / (SQRT3 * e.mv_voltage_kv);
+        var distLvFla = e.dist_tx_kva * 1000 / (SQRT3 * e.lv_voltage_v);
+        var lvKv = e.lv_voltage_v / 1000;
+        var zLv = mvFaultKa === null ? null
+            : (e.dist_tx_kva / 1000) / (SQRT3 * e.mv_voltage_kv * mvFaultKa) + e.dist_tx_impedance_pct / 100;
+        var lvFaultKa = zLv === null ? null : (e.dist_tx_kva / 1000) / (zLv * SQRT3 * lvKv);
+        var throughMvA = lvFaultKa === null ? null : lvFaultKa * 1000 * lvKv / e.mv_voltage_kv;
+
+        /* Protection chain, load side first. */
+        var step = e.pro_tms_step, gm = e.pro_grading_margin_s;
+        var lvIr = distLvFla, lvIsd = e.pro_lv_isd_x * lvIr;
+        var mvPerLv = lvKv / e.mv_voltage_kv;                /* LV amperes -> 20 kV amperes */
+        var lvAt = function (Imv) { return lsigTime(lvIr, e.pro_lv_tr_s, lvIsd, e.pro_lv_tsd_s, Imv / mvPerLv); };
+        var feederIs = e.pro_feeder_pickup_x * distMvFla;
+        var feederInstA = throughMvA === null ? null : e.pro_inst_x * throughMvA;
+        /* grading point (i): just below Isd the LV main is still on its long-time band */
+        var gradeLtA = lvIsd * mvPerLv;
+        var gradeLtNeed = e.pro_lv_tr_s * Math.pow(6 / e.pro_lv_isd_x, 2) + gm;
+        var feederTms = throughMvA === null ? null : gradeTms(e.pro_feeder_curve, feederIs, [
+            { I: gradeLtA, need: gradeLtNeed },
+            { I: throughMvA, need: e.pro_lv_tsd_s + gm }
+        ], step);
+        var feederAt = function (I) {
+            return fastestOf([iecTime(e.pro_feeder_curve, feederIs, feederTms, I),
+                feederInstA !== null && I >= feederInstA ? e.pro_feeder_inst_s : null]);
+        };
+        var feederT = throughMvA === null ? null : feederAt(throughMvA);
+        var feederLtT = feederTms === null ? null : feederAt(gradeLtA);
+        var inrushA = e.pro_inrush_x * distMvFla;
+        var inrushT = feederAt(inrushA);
+        var inrushOk = inrushT === null || inrushT > e.pro_inrush_s;
+
+        var mvFaultA = mvFaultKa === null ? null : mvFaultKa * 1000;
+        var incomerIs = mvFla === null ? null : e.pro_incomer_pickup_x * mvFla;
+        var feederAtMv = mvFaultA === null ? null : feederAt(mvFaultA);
+        var incomerTms = feederAtMv === null ? null
+            : gradeTms(e.pro_incomer_curve, incomerIs, [{ I: mvFaultA, need: feederAtMv + gm }], step);
+        var incomerT = incomerTms === null ? null : iecTime(e.pro_incomer_curve, incomerIs, incomerTms, mvFaultA);
+
+        var hvGradeA = mvFaultA === null ? null : mvFaultA * e.mv_voltage_kv / e.hv_voltage_kv;
+        var hvIs = hvFla === null ? null : e.pro_hv_pickup_x * hvFla;
+        var hvTms = incomerT === null ? null
+            : gradeTms(e.pro_hv_curve, hvIs, [{ I: hvGradeA, need: incomerT + gm }], step);
+        var hvT = hvTms === null ? null : iecTime(e.pro_hv_curve, hvIs, hvTms, hvGradeA);
+        var lvLtT = lvAt(gradeLtA * (1 - 1e-9));
+
+        var r1n = function (v) { return v === null ? null : round1(v); };
+        var r2n = function (v) { return v === null ? null : round2(v); };
+        var r3n = function (v) { return v === null ? null : Math.round(v * 1000) / 1000; };
+        return {
+            demand_mva: r3n(demandMva),
+            demand_design_mva: r3n(demandDesignMva),
+            hv_tx_sizing_mva: r3n(required),
+            hv_tx_mva: txMva,
+            hv_tx_fla_a: r1n(hvFla),
+            mv_tx_fla_a: r1n(mvFla),
+            hv_tx_load_pct_normal: txMva === null ? null : round1(demandMva / (e.hv_tx_count * txMva) * 100),
+            hv_tx_load_pct_n1: txMva === null || e.hv_tx_count < 2 ? null
+                : round1(demandMva / ((e.hv_tx_count - 1) * txMva) * 100),
+            hv_tx_load_pct_n1_design: txMva === null || e.hv_tx_count < 2 ? null
+                : round1(demandDesignMva / ((e.hv_tx_count - 1) * txMva) * 100),
+            hv_source_mva: round1(sourceMva),
+            mv_fault_level_ka: r2n(mvFaultKa),
+            mv_earth_fault_a: round1(earthFaultA),
+            hall_facility_design_kw: round1(hallKwMax),
+            dist_tx_per_stream_per_hall: distPerStream,
+            dist_tx_count: distTotal,
+            dist_tx_load_pct_normal: round1(hallKva / (distPerStream * e.dist_tx_streams * e.dist_tx_kva) * 100),
+            dist_tx_load_pct_contingency: round1(hallKva / (distPerStream * e.dist_tx_kva) * 100),
+            dist_tx_fla_mv_a: round2(distMvFla),
+            dist_tx_fla_lv_a: round1(distLvFla),
+            lv_fault_level_ka: r2n(lvFaultKa),
+            dist_tx_through_fault_mv_a: r1n(throughMvA),
+            genset_per_hall: gensetPerHall,
+            genset_count: gensetTotal,
+            genset_n1_margin_pct: n1MarginMin === null ? null : round1(n1MarginMin),
+            pro_lv_ir_a: round1(lvIr),
+            pro_lv_isd_a: round1(lvIsd),
+            pro_feeder_lt_grading_a: round1(gradeLtA),
+            pro_lv_lt_t_s: lvLtT === null ? null : Math.round(lvLtT * 1000) / 1000,
+            pro_feeder_lt_t_s: r3n(feederLtT),
+            pro_feeder_is_a: round2(feederIs),
+            pro_feeder_tms: feederTms,
+            pro_feeder_inst_a: r1n(feederInstA),
+            pro_feeder_t_s: r3n(feederT),
+            pro_feeder_inrush_ok: inrushOk,
+            pro_incomer_is_a: r1n(incomerIs),
+            pro_incomer_tms: incomerTms,
+            pro_incomer_t_s: r3n(incomerT),
+            pro_hv_grading_a: r1n(hvGradeA),
+            pro_hv_is_a: r2n(hvIs),
+            pro_hv_tms: hvTms,
+            pro_hv_t_s: r3n(hvT)
+        };
+    }
+
+    /* ADDITIVE (2.3.0) — the authored HV/MV/generation/protection inputs are
+     * republished unchanged (so a page and the registry can cite them) and the
+     * derived family from electricalHvMv() is appended. No existing key is touched. */
+    var HV_MV_AUTHORED_KEYS = [
+        'power_factor_design', 'growth_margin',
+        'hv_voltage_kv', 'hv_fault_level_ka', 'hv_switchgear_rated_ka', 'hv_line_bays', 'hv_tx_bays',
+        'hv_bus_count', 'hv_tx_count', 'hv_tx_impedance_pct',
+        'mv_voltage_kv', 'mv_ngr_ohm', 'mv_bus_sections',
+        'dist_tx_kva', 'dist_tx_impedance_pct', 'dist_tx_streams', 'lv_voltage_v',
+        'genset_unit_kw', 'genset_max_loading', 'genset_spare_per_hall',
+        'pro_grading_margin_s', 'pro_feeder_pickup_x', 'pro_incomer_pickup_x', 'pro_hv_pickup_x',
+        'pro_inst_x', 'pro_feeder_inst_s', 'pro_lv_isd_x', 'pro_lv_tsd_s', 'pro_lv_tr_s', 'pro_tms_step',
+        'pro_tms_max', 'pro_feeder_curve', 'pro_incomer_curve', 'pro_hv_curve',
+        'pro_inrush_x', 'pro_inrush_s'
+    ];
+    function withHvMv(m, base) {
+        var out = {}, key, i;
+        for (key in base) { if (Object.prototype.hasOwnProperty.call(base, key)) out[key] = base[key]; }
+        for (i = 0; i < HV_MV_AUTHORED_KEYS.length; i++) out[HV_MV_AUTHORED_KEYS[i]] = m.electrical[HV_MV_AUTHORED_KEYS[i]];
+        var derived = electricalHvMv(m);
+        for (key in derived) { if (Object.prototype.hasOwnProperty.call(derived, key)) out[key] = derived[key]; }
+        return out;
+    }
 
     function computeHalls(m) {
         var out = [];
@@ -797,7 +1107,7 @@
                 study_id: m.campus.study_id,
                 halls: computeHalls(m)
             },
-            electrical: {
+            electrical: withHvMv(m, {
                 /* v1.134.10 — the UPS efficiency was an authored model input that the snapshot
                    never published, so ups_loss_kw could not be checked against its own formula.
                    Publishing it makes that arithmetic verifiable. */
@@ -826,7 +1136,7 @@
                 ups_redundancy: m.electrical.ups_redundancy,
                 nameplate_evidence_class: m.meta.nameplate_evidence_class,
                 metering_tolerance_pct: m.electrical.metering_tolerance_pct
-            },
+            }),
             cooling: {
                 /* The whole air-to-water chain is published, not just the water
                    end, so a page can render any plane without re-deriving one

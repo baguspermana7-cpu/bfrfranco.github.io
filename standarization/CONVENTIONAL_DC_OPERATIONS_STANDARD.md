@@ -320,6 +320,42 @@ Before release:
 
 ## 10. Change and lesson ledger
 
+### 2026-11-18 — electrical HV/MV, generation and protection basis (engine 2.3.0, v3.70.0)
+
+- **What the family is.** `js/conv-engine.js` 2.3.0 adds flat `electrical.*` keys, additive only (no value that existed
+  in 2.2.0 moved): 36 authored inputs (150 kV supply and fault level, 2 x N+1 150/20 kV transformers, 20 kV NGR and bus
+  sections, 3,150 kVA 20/0.4 kV units in A/B streams, 3 MW gensets at 80 % loading N+1 per hall, relay pickups, curves,
+  steps and range) and derived values: demand, transformer rating, FLA and loading, 20 kV and LV fault levels, NGR
+  earth-fault current, distribution transformer and genset counts with their contingency loading and N-1 margin.
+  Every authored value carries a source comment and an evidence class; they are ASSUMED training design values
+  (150 kV ADOPTED, IEC 60076-5 impedance STANDARD). Curated metadata lives in `data/conv-parameters.curated.json`.
+- **Transformer sizing basis.** The 150/20 kV units are sized on the LARGER of the full design demand
+  (`electrical.demand_design_mva` = site IT design x PUE / pf = 61.05 MVA) and the adopted demand plus growth margin
+  (54.95 MVA), published as `electrical.hv_tx_sizing_mva`, then rounded up to an IEC 60076-1 preferred (R10) rating
+  (31.5 / 40 / 50 / 63 / 80 / 100 MVA): 2 x 63 MVA. Sizing on the adopted load alone gave 60 MVA, which would carry
+  101.8 % with one unit lost at design load; `electrical.hv_tx_load_pct_n1_design` (96.9 %) is now gated <= 100 %.
+- **Settings are training values, not a relay study.** The published LSIG, 20 kV feeder 51/50, 20 kV incomer 51 and
+  150 kV transformer-feeder 51 settings exist so the SLD and TCC modal draw curves from engine parameters (PRD §8.2
+  K3). They must never be used to set a real relay.
+- **Grading rule.** IEC 60255-151 curves, with the conventions of `js/conv/tcc.js` (pickup above 1.05 x Is, flat
+  above 20 x Is). Each TMS is the smallest multiple of `electrical.pro_tms_step` whose operating time meets EVERY
+  grading point (downstream time there + `electrical.pro_grading_margin_s`, 0.3 s), and must not exceed
+  `electrical.pro_tms_max` (1.5). Feeder: (i) just below the LV short-time pickup (4 x Ir referred to 20 kV) over the
+  LV long-time band (`electrical.pro_lv_tr_s` 4 s at 6 x Ir, so 9 s there), (ii) at the LV through-fault over the
+  0.2 s short-time delay; incomer over the feeder instantaneous at the 20 kV fault; 150 kV relay over the incomer at
+  that fault referred to 150 kV. The feeder instantaneous sits at 1.3 x the LV through-fault, and the inrush point
+  (12 x FLA, 0.1 s) must lie below the feeder curve.
+- **Why the feeder is extremely inverse.** The LV main long-time band is I²t-shaped (t ∝ 1/I²). A standard-inverse
+  relay is almost flat by comparison: graded at the LV fault, it crossed the long-time band near 2.3 x Ir with a
+  negative margin for any long-time delay above about 0.25 s. Only an I²-shaped relay curve (EI, `pro_feeder_curve`)
+  can stay above the band from the long-time region up to the short-time pickup, and it also stays below the
+  transformer through-fault damage curve. Incomer and 150 kV relays stay standard inverse.
+- Gate: `node --test tools/test-conv-electrical-hvmv.mjs` — expected values recomputed from the authored inputs,
+  N-1 loading at adopted and design demand, LV fault <= 65 kA and 20 kV fault <= 25 kA, the smallest-step rule (one
+  step lower fails a grading point) and TMS <= range, and an independent cross-check through `js/conv/tcc.js`: full
+  chain WITH the long-time stage via `coordinate()`, a 16-point feeder-over-LV sweep, the damage curve, and planted
+  defects (feeder back to SI, feeder TMS one step lower, a halved upstream TMS) that must be reported.
+
 ### 2026-11-18 — air section contract (v3.69.0, PRD-CONV-LIVING-PLANT P3 data hall)
 
 - **One module draws an air path:** `RZAirSection` (`js/conv/air-section.js`). `model()` is pure: values in, periods
