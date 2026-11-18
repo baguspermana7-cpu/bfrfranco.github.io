@@ -11,6 +11,23 @@ release sections rather than semver.
 
 ---
 
+## v3.71.0 — 2026-11-18 — One top bar and one theme button: the journal (40 pages)
+
+PRD `documentation/prd/PRD_SITE_CHROME.md`, phase N2.
+
+### Changed
+- **40 journal pages refitted** with `tools/sweep-site-chrome.py`: 30 articles, 3 Future Forward, 3 Global Analysis
+  pages and the four hubs (`articles`, `insights`, `geopolitics`, `future-forward`). Before: bar fixed at 81 px
+  (61 to 93 px on a phone), theme button last after sign-in, a 26 px wide search control on a phone. After,
+  measured on all 40 at 1440 and 390 px: bar 56 px sticky, order search, theme, sign-in, menu, theme button 44 x 44
+  at 272 px (desktop) and 72 px (phone) from the right edge — the same numbers as the 12 calculator pages.
+- The article content starts where it did: the old bar was out of the flow and every page pads for it, so the
+  refitted bar gives its height back (`margin-bottom: -56px`). Checked against the live page.
+- `js/rz-chrome.js`: sign-in is placed directly after the theme button wherever `auth.js` injected it.
+- `tools/test-site-chrome.mjs`: a rule that only hides the bar (`.navbar { display: none }`, the print hide) is not
+  a bar rule (CH7); slots inside a closed drawer that is slid off-screen are not counted as bar slots (CH4).
+- `tools/sweep-site-chrome.py`: a page with no bar is left untouched; a missing file is reported, not a crash.
+
 ## v3.70.0 — 2026-11-18 — Conventional engine 2.3.0: 150 kV / 20 kV basis, generation fleet, graded protection settings
 
 ### Added

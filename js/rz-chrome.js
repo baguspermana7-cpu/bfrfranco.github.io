@@ -121,8 +121,10 @@
     var g = bar.querySelector('.rz-nav-burger, .rz-nav-burger-bound');
     if (g && g.style.getPropertyValue('margin-left') !== '8px') g.style.setProperty('margin-left', '8px', 'important');
     if (!t || !a) return;
-    if (t.parentNode === a.parentNode) { if (a.compareDocumentPosition(t) & 4) a.parentNode.insertBefore(t, a); }
-    else if (!(mq && mq.matches) && t.nextSibling !== a) t.parentNode.insertBefore(a, t.nextSibling);   // injected among the links: its desktop place is after the theme button
+    /* sign-in goes directly after the theme button (so search · theme · sign-in holds whatever auth.js chose);
+       on a phone a widget that already sits in the drawer stays there */
+    var inDrawer = a.parentNode !== t.parentNode;
+    if (t.nextElementSibling !== a && !(inDrawer && mq && mq.matches)) t.parentNode.insertBefore(a, t.nextSibling);
   }
 
   function init() {

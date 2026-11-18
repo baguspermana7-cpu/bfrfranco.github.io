@@ -20,6 +20,8 @@ A page is `bare` only with a written reason in the config. A new page is a `site
 
 ## 2. The bar
 
+- A bar that used to be `position: fixed` (the older portfolio nav) gives its height back with a negative bottom
+  margin, because each of those pages pads its content for a bar that was out of the flow.
 - `position: sticky; top: 0` on every kind. Not `fixed` (it needs a hand-tuned body offset on every page, which is
   where 13 different heights came from) and not `static` (the bar scrolls away).
 - One height per kind (the token above). A second row — breadcrumbs, a status strip, a reading-progress line — sits
@@ -98,17 +100,18 @@ CH6 was also unstable on an unchanged tree (14, 18, 20, 41, 44 across five runs)
 never on a loaded machine and was counted as a failure. It now falls back to the theme at the first animation
 frame, so every page gets a verdict.
 
-| law | N0 baseline | tightened, before any refit | after N1 (recorded) |
-|---|---|---|---|
-| CH1 | 134 | 134 | 132 |
-| CH2 | 169 | 169 | 157 |
-| CH3 | 37 | 38 | 28 |
-| CH4 | 128 | 140 | 128 |
-| CH5 | 2 | 2 | 1 |
-| CH6 | 14 | 18 | 16 (none "not recorded": 13 pages with no theme at first paint, 3 with the wrong one; 0 refitted pages) |
-| CH7 | 115 | 121 | 109 |
-| CH8 | 162 | 162 | 150 |
-| CH9 | 0 | 0 | 0 |
+| law | N0 baseline | tightened, before any refit | after N1 | after N2 (recorded) |
+|---|---|---|---|---|
+| CH1 | 134 | 134 | 132 | 91 |
+| CH2 | 169 | 169 | 157 | 116 |
+| CH3 | 37 | 38 | 28 | 13 |
+| CH4 | 128 | 140 | 128 | 89 |
+| CH5 | 2 | 2 | 1 | 1 |
+| CH6 | 14 | 18 | 16 (none "not recorded": 13 pages with no theme at first paint, 3 with the wrong one; 0 refitted pages) | 15 |
+| CH7 | 115 | 121 | 109 | 99 |
+| CH8 | 162 | 162 | 150 | 109 |
+| CH9 | 0 | 0 | 0 | 0 |
+| CH10 | — | — | 0 (strict) | 0 (strict) |
 
 ## 7b. Refitting a page
 
@@ -122,7 +125,7 @@ parts. Red proof of the module: with `toggle()` removed, CH5 fails on every refi
 | phase | family | pages | state |
 |---|---|---|---|
 | N1 | calculators, compare, tools, DC Solutions | 12 | refitted 2026-11-18: 0 failures on CH1–CH9 |
-| N2 | journal | 39 | open |
+| N2 | journal: 30 articles, 3 FF, 3 Global Analysis, 4 hubs (`article-9-paper.html` has no bar and is left alone) | 40 | refitted 2026-11-18 (v3.71.0): 0 failures on CH1–CH10 |
 | N3 | incidents | 51 | open |
 | N4 | hubs, guides, legal, account, homepage | ≈ 50 | open |
 | N5 | app kind (cockpits, labs, rz-ops) | 21 | open |

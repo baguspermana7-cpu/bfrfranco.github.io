@@ -48,6 +48,9 @@
 /* the older portfolio nav (logo · ul.nav-menu · controls) spreads its children; keep the cluster together at the right */
 .navbar[data-rz-bar] .nav-container:has(> ul.nav-menu) { justify-content: flex-start; }
 .navbar[data-rz-bar] .nav-container > ul.nav-menu { margin-left: auto; margin-right: auto; }
+/* that nav used to be `position: fixed`, out of the flow, and each page pads its content for it; in the flow
+   it would add its own height on top of that padding. Give the height back so the content starts where it did. */
+.navbar[data-rz-bar]:has(> .nav-container > ul.nav-menu) { margin-bottom: calc(-1 * var(--rz-bar-h)); z-index: 1000; }
 
 /* ---- right-hand cluster: search · theme · sign-in · menu, each a 44 px box ---- */
 .navbar[data-rz-bar] [data-rz-slot] { flex: none; margin: 0 0 0 var(--rz-bar-gap); }

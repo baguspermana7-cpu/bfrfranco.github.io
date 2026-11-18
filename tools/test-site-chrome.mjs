@@ -12,6 +12,7 @@
  *   CH5  a press flips <html data-theme> and localStorage.theme; a second press flips them back
  *   CH6  the stored theme is on <html> at the first paint (no flash)
  *   CH7  source: no page carries its own toggle function, a theme key other than `theme`, or a `.navbar {` rule
+ *        (a rule that only hides the bar — `display: none`, the print hide — is not a bar rule)
  *   CH8  phone: the bar is not taller than its token, no bar control is narrower than 44 px, no sideways scroll
  *   CH9  the exemption list names only files that exist, each with a reason
  *   CH10 phone, refitted pages (data-rz-bar): a press on the menu button shows the drawer (strict from day one —
@@ -55,7 +56,7 @@ for (const f of pages) {
   if (/function\s+toggle\w*Theme\w*\s*\(|(themeToggle|theme-toggle|themeBtn)[\s\S]{0,160}addEventListener\(\s*['"]click/.test(s)) why.push('own toggle code');
   const keys = [...s.matchAll(/localStorage\.(?:getItem|setItem)\(\s*['"]((?:rz[-_])?(?:admin[-_])?theme|darkMode|dark-mode|color-theme)['"]/g)].map((m) => m[1]).filter((k) => k !== 'theme');
   if (keys.length) why.push('theme key ' + [...new Set(keys)].join(','));
-  if (/<style[^>]*>[\s\S]*?(^|[\s}])\.navbar\s*\{[\s\S]*?<\/style>/m.test(s)) why.push('.navbar rule in the page');
+  if (/<style[^>]*>[\s\S]*?(^|[\s}])\.navbar\s*\{(?!\s*display\s*:\s*none\b[^{}]*\})[\s\S]*?<\/style>/m.test(s)) why.push('.navbar rule in the page');
   if (/<html[^>]*\sdata-theme="(?:dark|light)"/.test(s)) why.push('hard-coded data-theme on <html>');
   if (why.length) fail('CH7', f, why.join('; '));
 }
@@ -74,7 +75,8 @@ const measure = () => {
   const bar = bars[0] || null, br = bar ? bar.getBoundingClientRect() : null, bc = bar ? getComputedStyle(bar) : null;
   const tsel = '[data-rz-theme-toggle], #themeToggle, #navThemeBtn, .theme-toggle, .theme-btn, .rz-theme-btn, [aria-label*="theme" i], [onclick*="toggleTheme"]';
   const ts = [...new Set([...document.querySelectorAll(tsel)])].filter(vis), t = ts[0] || null, tr = t ? t.getBoundingClientRect() : null;
-  const x = (sel) => { const e = [...document.querySelectorAll(sel)].filter(vis)[0]; return e ? Math.round(e.getBoundingClientRect().left) : null; };
+  const onScreen = (e) => { const r = e.getBoundingClientRect(); return r.right > 0 && r.left < innerWidth; };   // a closed drawer slid off-screen still holds its slots
+  const x = (sel) => { const e = [...document.querySelectorAll(sel)].filter(vis).filter(onScreen)[0]; return e ? Math.round(e.getBoundingClientRect().left) : null; };
   const order = [['search', x('[data-rz-slot="search"], .nav-search-btn, [data-rz-search], #rzSearchBtn, #navSearchBtn')], ['theme', tr ? Math.round(tr.left) : null], ['signin', x('[data-rz-slot="signin"], .rz-auth-wrap, .nav-auth-wrap, #rzLoginBtn, .rz-login-btn, .rz-user-btn')], ['menu', x('.rz-nav-burger, .rz-nav-burger-bound')]].filter((p) => p[1] != null).sort((a, b) => a[1] - b[1]).map((p) => p[0]);
   const narrow = bar ? [...bar.querySelectorAll('button, a.btn, [role=button]')].filter(vis).filter((e) => e.getBoundingClientRect().width < 43.5).length : 0;
   const text = t ? [...t.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent.trim()).join('') + [...t.querySelectorAll('i, span')].map((n) => n.textContent.trim()).join('') : '';

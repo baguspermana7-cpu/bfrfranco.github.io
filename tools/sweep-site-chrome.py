@@ -75,6 +75,7 @@ def cut_function(s, m):
 
 def refit(name, s):
     notes = []
+    original = s
     # 2. <html>
     def html_tag(m):
         t = re.sub(r'\sdata-theme="(?:dark|light)"', '', m.group(0))
@@ -110,7 +111,7 @@ def refit(name, s):
     # 3. bar
     bar = BAR.search(s)
     if not bar:
-        return s, ['no .navbar bar found — nothing stamped']
+        return original, ['no .navbar bar found — nothing stamped']
     if 'data-rz-bar' not in bar.group(0):
         s = s[:bar.end() - 1] + ' data-rz-bar>' + s[bar.end():]
         bar = BAR.search(s)
@@ -158,7 +159,7 @@ def refit(name, s):
     left = sorted(set(re.findall(r'toggle\w*Theme\w*\s*\(|themeIcon|getElementById\(\'themeToggle\'\)', s)))
     if left:
         notes.append('left for hand review: ' + ', '.join(left))
-    if re.search(r'(?m)(^|[\s}])\.navbar\s*\{', '\n'.join(re.findall(r'<style[^>]*>([\s\S]*?)</style>', s))):
+    if re.search(r'(?m)(^|[\s}])\.navbar\s*\{(?!\s*display\s*:\s*none\b[^{}]*\})', '\n'.join(re.findall(r'<style[^>]*>([\s\S]*?)</style>', s))):
         notes.append('a multi-line .navbar rule is still in the page')
     return s, notes
 
@@ -177,6 +178,9 @@ def main():
             continue
         if f in HOLD:
             print(f'skip  {f} — {HOLD[f]}')
+            continue
+        if not p.exists():
+            print(f'skip  {f} — no such file')
             continue
         src = p.read_text(encoding='utf8')
         out, notes = refit(f, src)
