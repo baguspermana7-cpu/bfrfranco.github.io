@@ -186,6 +186,8 @@ gate "Conventional VFX + trend on the chiller plant — state colour, flow speed
 gate "Conventional VFX on fire, fuel, water — view bar, line states, standby, running colour + motion, trend from the inspector" node tools/test-conv-vfx-sheets.mjs
 gate "Conventional air section core — no airflow no motion, speed follows airflow, colour is temperature, deterministic" node --test tools/test-conv-air-section.mjs
 gate "Conventional data hall air path — labelled row footer, Plan / Air path views, section readings = plan and engine, bound motion, reduced motion" node tools/test-conv-datahall-air.mjs
+gate "Conventional network modal core — device classes, connections, firewall default deny, gateway links, nothing invented" node --test tools/test-conv-net-modal.mjs
+gate "ICT network — every block opens its modal, connections = drawing, metered links = register, keyboard, scenario, 390 px" node tools/test-conv-ict-modal.mjs
 # v3.21.9 — the reveal gate existed but was never wired, so it went stale for five releases (it
 # still expected four floor views after the building became six levels). Every building level must
 # open its own floor plan.

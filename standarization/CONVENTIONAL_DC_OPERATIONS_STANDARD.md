@@ -320,6 +320,20 @@ Before release:
 
 ## 10. Change and lesson ledger
 
+### 2026-11-18 — network block contract (v3.72.0, PRD-CONV-LIVING-PLANT §8.3)
+
+- **Every block of a network drawing opens.** Single click or Enter: inspector. Double-click or the inspector's
+  "Open device detail": the modal of `RZNetModal` (`js/conv/net-modal.js`). `build()` is pure; a page passes its own
+  model (node, adjacent edges with their link-register rows, fault domain, alarms) and never formats the modal itself.
+- **Content by device class**: firewall (zones, policy ending in default deny, interfaces), core/access switch (port
+  map + connections), gateway (protocol, port, link to its cockpit), router (circuits), all (dependencies, alarms).
+- **What is not modelled is said, not drawn.** No session, CPU, hit-count, per-port or optical value appears unless
+  the page holds a basis for it. A policy table is labelled design intent.
+- **Service ports are the registered ones** (BACnet/IP UDP 47808, Modbus TCP 502, SNMP UDP 161, NTP UDP 123, syslog
+  UDP 514, HTTPS TCP 443, SSH TCP 22, RTSP TCP 554, BGP TCP 179); an allow rule without a port fails the gate.
+- **An SVG element is not clickable from script.** Keyboard handlers call the page function, never `element.click()`.
+- Gates: `test-conv-net-modal.mjs`, `test-conv-ict-modal.mjs`.
+
 ### 2026-11-18 — electrical HV/MV, generation and protection basis (engine 2.3.0, v3.70.0)
 
 - **What the family is.** `js/conv-engine.js` 2.3.0 adds flat `electrical.*` keys, additive only (no value that existed

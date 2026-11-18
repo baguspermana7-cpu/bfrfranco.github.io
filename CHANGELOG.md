@@ -11,6 +11,30 @@ release sections rather than semver.
 
 ---
 
+## v3.72.0 — 2026-11-18 — ICT network: every block opens a device modal
+
+### Added
+- **A deep modal for every block of the network architecture** on `ict.html` (`js/conv/net-modal.js`): firewalls,
+  core and access switches, OT gateways, routers and WAN paths, rack groups and services, in all six segments (62
+  blocks). Double-click a block, or use "Open device detail" in the inspector.
+- **Firewalls** show their zones and conduits (IEC 62443-3-2) and a policy table (source zone, destination zone,
+  service with its registered port, condition, action) that ends in a default deny. **Switches** show one cell and
+  one row per drawn connection with capacity, traffic and utilisation where the link is metered. **Gateways** name
+  their protocol and port and link to the cockpit of the subsystem they serve. Every modal has Dependencies (the
+  fault domain) and Alarms (from the page's own register); a simulated scenario reaches the modal.
+- **No invented telemetry.** Session counts, CPU, rule hit counters, per-port counters and optical levels are not
+  modelled on this page; the modal says so instead of drawing a number. The policy is a design intent, not a rule
+  base read from a device.
+
+### Fixed
+- **A block could not be opened from the keyboard.** Enter or Space on a block called `click()` on an SVG group,
+  which has no such method, so the handler threw and nothing happened. It now opens the inspector.
+
+### Gates
+- `tools/test-conv-net-modal.mjs` (7 laws, Node) and `tools/test-conv-ict-modal.mjs` (290 checks in a browser:
+  every block of every segment, metered links against the page's link register, keyboard path, scenario, 390 px).
+  Its first run found the keyboard defect above and gateways without a connections table.
+
 ## v3.71.0 — 2026-11-18 — One top bar and one theme button: the journal (40 pages)
 
 PRD `documentation/prd/PRD_SITE_CHROME.md`, phase N2.

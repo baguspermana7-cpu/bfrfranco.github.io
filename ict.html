@@ -496,6 +496,8 @@
     .insp-block { background: var(--panel-2); border: 1px solid var(--line); border-radius: 5px; padding: 12px; margin-bottom: 12px; }
     .insp-block h4 { font-size: 11px; text-transform: uppercase; color: var(--text-dim); letter-spacing: .5px; margin-bottom: 9px; font-weight: 700; }
     .kv { display: flex; justify-content: space-between; font-size: 12px; padding: 5px 0; border-bottom: 1px solid var(--line-soft); }
+    .node-detail-btn { margin-top: 12px; width: 100%; min-height: 44px; padding: 8px 12px; border: 1px solid var(--line, #31353F); border-radius: 3px; background: transparent; color: inherit; font: 600 13px 'IBM Plex Sans', system-ui, sans-serif; cursor: pointer; }
+    .node-detail-btn:hover, .node-detail-btn:focus-visible { border-color: #E8B563; outline: none; }
     .kv:last-child { border-bottom: none; }
     .kv .k { color: var(--text-dim); }
     .kv .v { color: #fff; font-family: 'JetBrains Mono', monospace; font-weight: 600; }
@@ -645,7 +647,7 @@
     <script src="js/rz-eng-symbols.js?v=20261115-b780482c"></script>
     <!-- v1.134.3 — generated parameter registry + the ONE shared basis drawer.
          Replaces provenance restated by hand; see js/rz-basis-drawer.js. -->
-    <script src="js/conv-parameters.js?v=20261118-536a38ba"></script>
+    <script src="js/conv-parameters.js?v=20261118-d36e41d0"></script>
     <!-- v1.134.25 — RZExplain, the site glossary engine. The cockpits were the only
          substantial pages carrying none of it, so terms an operator has to read
          (approach temperature, cycles of concentration, N+1, WUE) had nowhere to go.
@@ -666,9 +668,10 @@
     <script src="js/rz-line-model.js?v=20260920-c4511df5"></script>
     <script src="js/rz-alarm-state.js?v=20260920-a912ad23" defer></script>
     <script src="js/rz-inspector.js?v=20261117-bbb735d4" defer></script>
+    <script src="js/conv/net-modal.js?v=20261118-34973a6a" defer></script>
     <script src="js/rz-telemetry-quality.js?v=20261113-8feb0dfd" defer></script>
     <script src="js/rz-provenance.js?v=20261111-6f1cd061" defer></script>
-    <script src="js/rz-version.js?v=20261118-c2c6b210" defer></script>
+    <script src="js/rz-version.js?v=20261118-30274e79" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- v1.43.20 — instrument register (RZ Dark System v1). Chrome-only, dark-only, scoped. -->
@@ -1512,6 +1515,7 @@
             for (var n = 0; n < m.nodes.length; n++) {
                 var nd = m.nodes[n], x = nd.x - nd.w / 2, y0 = nd.y - NODE_H / 2;
                 svg += '<g class="node ' + esc(nd.state) + '" data-node="' + esc(nd.id) + '" tabindex="0" role="button" aria-label="' + esc(nd.label + ' ' + nd.stateText) + '">'
+                    + '<title>' + esc(nd.label) + ' — click: inspector · double-click: device detail</title>'
                     + '<rect x="' + x + '" y="' + y0 + '" width="' + nd.w + '" height="' + NODE_H + '" rx="3"/>'
                     + archGlyph(nd, x + 11, y0 + 14)
                     + '<text class="n-lbl" x="' + (x + 20) + '" y="' + (y0 + 18) + '">' + esc(nd.label) + '</text>'
@@ -1566,7 +1570,10 @@
                 '<h4>Node</h4>' + kv('Device', nd.label) + kv('Role', nd.sub) + kv('Layer', ARCH_LAYERS[nd.layer])
               + kv('State', nd.stateText, stCls) + kv('Upstream', up.length ? up.join(', ') : '—') + kv('Downstream', dn.length ? dn.join(', ') : '—')
               + kv('Fault domain', affected.length ? affected.length + ' downstream: ' + affected.join(', ') : 'local (no downstream dependency)')
-              + kv('Scenario', m.scenario.label) + kv('Source', 'Authored architecture (basis)');
+              + kv('Scenario', m.scenario.label) + kv('Source', 'Authored architecture (basis)')
+              + '<button type="button" class="node-detail-btn" id="node-detail-btn">Open device detail</button>';
+            var detailBtn = document.getElementById('node-detail-btn');
+            if (detailBtn) detailBtn.addEventListener('click', function () { openNodeModal(key, id, detailBtn); });
             var svgEl = document.querySelector('#canvas svg.ict-arch'); if (!svgEl) return;
             svgEl.querySelectorAll('.edge.sel,.edge-lbl.sel').forEach(function (el) { el.classList.remove('sel'); });
             svgEl.querySelectorAll('.node').forEach(function (g) {
@@ -1579,11 +1586,45 @@
                 p.classList.toggle('dim', !(down[fromId] && down[toId]));
             });
         }
+        /* v3.72.0 — every block opens a deep modal (owner comment C4). The modal restates this page's authored
+           architecture through js/conv/net-modal.js; it draws no number the page does not already hold. */
+        function nodeModalInput(key, id) {
+            var m = archModel(key), nd = m.byId[id]; if (!nd) return null;
+            var seg = SEGMENTS[key], down = archDownstream(m, id), up = [], dn = [], peer = [], affected = [];
+            function adj(node, ed) {
+                var lk = ed.link !== null && ed.link !== undefined && seg.links ? seg.links[ed.link] : null;
+                return { label: node.label, state: ed.state, kind: ed.kind,
+                    link: lk ? { tag: lk[0], role: lk[1], capGbps: lk[2], trafficGbps: lk[3], state: lk[7], redundancy: lk[8] } : null };
+            }
+            for (var e = 0; e < m.edges.length; e++) {
+                var ed = m.edges[e];
+                if (ed.kind === 'peer') { if (ed.from.id === id) peer.push(adj(ed.to, ed)); else if (ed.to.id === id) peer.push(adj(ed.from, ed)); continue; }
+                if (ed.to.id === id) up.push(adj(ed.from, ed));
+                if (ed.from.id === id) dn.push(adj(ed.to, ed));
+            }
+            for (var n = 0; n < m.nodes.length; n++) if (down[m.nodes[n].id] && m.nodes[n].id !== id) affected.push(m.nodes[n].label);
+            var alarms = (ALARMS[key] || []).filter(function (a) {
+                var dev = String(a.dev || ''); return dev === id || dev.indexOf(id) === 0 || id.indexOf(dev) === 0 || dev.split('-')[0] === id;
+            });
+            var facts = [];
+            if (/^TOR-/.test(id)) facts = [['Access switches, campus', TOR_COUNT + ' installed · ' + NETWORK_CAPACITY_BASIS.access.survivableSwitches + ' after one loss'], ['Failure domain', NETWORK_CAPACITY_BASIS.access.scope]];
+            if (/^SW-CORE/.test(id)) facts = [['Core capacity', NETWORK_CAPACITY_BASIS.core.installedGbps + ' Gbps installed · ' + NETWORK_CAPACITY_BASIS.core.usableGbps + ' usable · ' + NETWORK_CAPACITY_BASIS.core.survivableGbps + ' after one loss'], ['Basis', NETWORK_CAPACITY_BASIS.core.scope]];
+            if (id === 'SPINE') facts = [['Fabric capacity', NETWORK_CAPACITY_BASIS.fabric.installedGbps + ' Gbps installed · ' + NETWORK_CAPACITY_BASIS.fabric.usableGbps + ' usable'], ['Basis', NETWORK_CAPACITY_BASIS.fabric.scope]];
+            return { segKey: key, segTitle: seg.title, layerName: ARCH_LAYERS[nd.layer], node: nd, scenario: m.scenario, up: up, down: dn, peer: peer, affected: affected, alarms: alarms, facts: facts };
+        }
+        function openNodeModal(key, id, trigger) {
+            if (!window.RZNetModal) return;
+            var input = nodeModalInput(key, id); if (!input) return;
+            window.RZNetModal.open(window.RZNetModal.build(input), trigger);
+        }
+        window.__ictNodeModalInput = nodeModalInput;
         function bindArchitecture(key) {
             var svgEl = document.querySelector('#canvas svg.ict-arch'); if (!svgEl) return;
             svgEl.querySelectorAll('.node').forEach(function (g) {
                 g.addEventListener('click', function () { showNodeDetail(key, g.getAttribute('data-node')); });
-                g.addEventListener('keydown', function (ev) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); g.click(); } });
+                g.addEventListener('dblclick', function () { openNodeModal(key, g.getAttribute('data-node'), g); });
+                /* an SVG <g> has no click(): the old g.click() threw, so the keyboard never opened a block */
+                g.addEventListener('keydown', function (ev) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); showNodeDetail(key, g.getAttribute('data-node')); } });
             });
             svgEl.querySelectorAll('.edge-hit,.edge').forEach(function (p) {
                 p.addEventListener('click', function () {
