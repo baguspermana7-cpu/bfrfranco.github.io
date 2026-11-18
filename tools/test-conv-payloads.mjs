@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /* test-conv-payloads.mjs — js/conv/payloads.js, the one inspector payload builder of the Conventional sheets
    (CONV_EXECUTION_PLAN_2026-11-16 §4 GD, AD1–AD3, AD6, AD7). Run: node --test tools/test-conv-payloads.mjs
-   P1 every tagged symbol on the four P&ID sheets has a class recipe (no symbol falls through to "no class recipe")
+   P1 every tagged symbol on the four P&ID sheets and the E-S-101 single-line has a class recipe (no symbol falls through to "no class recipe")
    P2 every payload is frozen and has six tabs with content (LIVE >= 4 rows; alarms tab = active events OR configured points)
    P3 every basis row resolves in data/conv-parameters.json and prints the registry value at its precision
    P4 every other row is SIM (sim:true) or declared with >= 40 characters; no NaN, no "undefined"
@@ -24,10 +24,10 @@ const IDX = Object.fromEntries(REG.parameters.map((p) => [p.id, p]));
 /* the sheets register themselves on window.RZ*Sheets */
 const sheets = {};
 for (const [page, file, key] of [['chiller', 'chiller-sheet.js', 'RZChillerSheets'], ['fire', 'fire-sheet.js', 'RZFireSheets'],
-  ['fuel', 'fuel-sheet.js', 'RZFuelSheets'], ['water', 'water-sheet.js', 'RZWaterSheets']]) {
+  ['fuel', 'fuel-sheet.js', 'RZFuelSheets'], ['water', 'water-sheet.js', 'RZWaterSheets'], ['epms', 'epms-sheet.js', 'RZEpmsSheets']]) {
   const win = {};
   new Function('window', fs.readFileSync(path.join(ROOT, 'js/conv', file), 'utf8'))(win);
-  sheets[page] = win[key].pid;
+  sheets[page] = win[key].pid || win[key].sld;
 }
 const tagged = (sh) => sh.nodes.filter((n) => n.sym !== 'junction');
 

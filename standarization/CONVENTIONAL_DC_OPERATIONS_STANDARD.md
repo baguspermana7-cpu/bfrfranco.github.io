@@ -320,6 +320,38 @@ Before release:
 
 ## 10. Change and lesson ledger
 
+### 2026-11-18 — single-line contract (E-S-101, PRD-CONV-LIVING-PLANT P5a)
+
+- **One governed sheet draws the electrical plant from 150 kV.** `js/conv/epms-sheet.js` (`RZEpmsSheets.sld`, E-S-101) is
+  geometry only and is the DEFAULT view of `EPMS_Telemetry.html`; the hand-built LV one-line stays as the second view
+  ("LV distribution"). The view buttons carry their own class (`.epms-view-btn`). The first `<svg>` under
+  `#epms-sheet-host` is the sheet; the host is pinned `data-theme="dark"` and so is the document-level gradient `<defs>`
+  (a dark-only cockpit otherwise shades a light canvas behind dark-theme text).
+- **No number is typed in the sheet.** Ratings, voltages, fault levels, the NGR, LVSB and genset counts and the relay
+  settings are `electrical.*` engine values written by the page's `read()`; only equipment tags and ANSI device numbers
+  are authored. The sheet module carries no literal colour.
+- **Positions are a simulation, flows are a solve.** Breaker and switch positions are a deterministic page state
+  (`RZEpmsSim.normalState`: both lines in, coupler closed, both transformers in, 20 kV bus tie open, feeders closed,
+  generator breakers open, earth switches open, gensets off). Every switching device and transformer is a branch of the
+  `js/conv/sld-topology.js` model; loads are the engine's adopted hall facility loads per stream (the typical LV unit takes
+  one unit's share). A = kW / (sqrt3 x kV x pf). kW in = kW out at every bus. A conductor with flow is running, an
+  energised one without flow standby (via the `rest` argument of `RZConvVfx.bind`), a dead one stopped (grey, dashed).
+  The drawn contact of a breaker or switch is its position (`data-pos`, `css/conv-vfx.css`).
+- **Interlocks refuse in words.** A disconnector moves only with its breaker open; an earthing switch closes only with
+  its disconnectors open and the circuit dead; a breaker never closes onto an earthed circuit; 2-out-of-3 on
+  incomer-incomer-tie; the generator incomers close only on a running, synchronised generator bus (the gensets are off).
+  Operations come only from the inspector's "SIMULATION · Open / Close" button and are re-solved at once.
+- **Protection curves are drawn from the engine, never typed.** `js/conv/tcc-modal.js` plots the typical chain (LV main
+  LSIG, 20 kV feeder, 20 kV incomer, 150 kV transformer bay) through `js/conv/tcc.js` from `electrical.pro_*`, with the
+  3,150 kVA damage curve, the inrush point and the LV-fault / 20 kV-fault markers, each curve with its own dash. The
+  coordination table is `tcc.coordinate()` run by the engine's grading rule. A relay without an inverse-time stage in the
+  engine basis (87L/21, 87B, 50BF, 51G) offers no curve rather than an invented one.
+- **Symbol library.** `resistor` (IEC 60617-4, the NGR) was added to `tools/hmi-symbol-defs.py`; nothing existing moved.
+- Gates: `node --test tools/test-conv-epms-model.mjs` (normal state, model builder, engine flows, bus balance, interlock
+  truth table, N-1 transfer, coordinated chain) and `tools/test-conv-epms-sld.mjs` (browser, 1440 + 390, driven through the
+  page's own UI). E-S-101 is in the lists of `test-conv-sheet-text-clear`, `test-conv-geometry`,
+  `test-conv-equipment-modal` and `test-conv-payloads`.
+
 ### 2026-11-18 — electrical HV/MV, generation and protection basis (engine 2.3.0, v3.70.0)
 
 - **What the family is.** `js/conv-engine.js` 2.3.0 adds flat `electrical.*` keys, additive only (no value that existed
