@@ -303,4 +303,5 @@ whole conv family → push → verify live.
 
 | phase | status |
 |---|---|
-| E1–E8 | NOT STARTED — PRD written 2026-11-18 |
+| E1 | BUILT, NOT RELEASED (2026-11-18, branch `conv-e1`, local commit) — engine 2.4.0: refrigeration cycle (R-134a Antoine fit), hydronic fleet, tower cells, CRAH per unit, mechanical headroom, `CONV_CALC.getFleet`; additive (0 of 252 published 2.3.0 keys changed except `meta.version`); gate `tools/test-conv-plant-internals.mjs` with 3 red proofs; Node gates only — browser gates not run (lanes busy). Gate name differs from §9 (`…-hydronic` / `…-refrigeration`): one file covers both. Tower standby 0 and one condenser pump per chiller follow the E1 brief, not OD-3/OD-4 N+1 — open. |
+| E2–E8 | NOT STARTED |

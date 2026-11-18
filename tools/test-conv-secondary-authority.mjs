@@ -6,6 +6,10 @@ import puppeteer from 'puppeteer';
 
 const ROOT = process.cwd();
 const CURRENT_ENGINE_SOURCE = await readFile(resolve(ROOT, 'js/conv-engine.js'), 'utf8');
+/* The same-version fixture must carry the PUBLISHED engine version; a typed literal went stale
+   at the 2.3.0 bump and silently turned this case into a version-mismatch case. */
+const ENGINE_PUBLISHED_VERSION = (CURRENT_ENGINE_SOURCE.match(/version: '(\d+\.\d+\.\d+)'/) || [])[1];
+assert.ok(ENGINE_PUBLISHED_VERSION, 'engine meta.version not found in js/conv-engine.js');
 const BLANK_METADATA_ENGINE = CURRENT_ENGINE_SOURCE
   .replace("scenario: 'Simulated'", "scenario: '   '")
   .replace("data_quality: 'GOOD'", "data_quality: ''");
@@ -33,7 +37,7 @@ const LEGACY_ENGINE = `window.CONV_CALC = Object.freeze({
 
 const INCOMPLETE_CURRENT_ENGINE = `window.CONV_CALC = Object.freeze({
   snapshot: Object.freeze({
-    meta: Object.freeze({ version:'2.2.0', scenario:'Simulated', data_quality:'GOOD' }),
+    meta: Object.freeze({ version:'${ENGINE_PUBLISHED_VERSION}', scenario:'Simulated', data_quality:'GOOD' }),
     site: Object.freeze({ it_load_kw:30000, facility_load_kw:43500, non_it_load_kw:13500, pue:1.45 }),
     racks: Object.freeze({}),
     campus: Object.freeze({ halls:Object.freeze(['A','B','C','D']) }),

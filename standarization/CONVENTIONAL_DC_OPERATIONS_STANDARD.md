@@ -320,6 +320,43 @@ Before release:
 
 ## 10. Change and lesson ledger
 
+### 2026-11-18 — plant internals basis (engine 2.4.0, PRD-CONV-EQUIPMENT-TRUTH E1)
+
+- **Additive only.** Engine 2.3.0 → 2.4.0 adds 63 `cooling.*` keys (18 authored, 45 derived) and
+  `CONV_CALC.getFleet(kind, hallCode?)`; a flattened snapshot diff against 2.3.0 shows 0 changed and 0 removed keys
+  (only `meta.version`). Every new key is in `data/conv-parameters.curated.json` with `display: internal` until the
+  equipment modal (E2+) draws it. Gate: `node --test tools/test-conv-plant-internals.mjs`.
+- **Reuse before naming.** Unit load % is `cooling.chiller_part_load_pct`, cycle COP is `cooling.plant_cop`, tower
+  range is `cooling.cdw_range_k`, unit compressor input is `cooling.chiller_input_per_machine_kw_e` — no second name.
+- **Chiller.** Unit duty = `heat_rejection_kw` / running (4,464.3 kW_th); condenser = duty + input (5,200.5; × 7 =
+  `tower_rejection_kw_th`); unit CHW flow = `plant_duty_flow_lps` / running (140.3 L/s); unit CDW flow = condenser /
+  (cp × range) (248.5 L/s). Cycle: evaporator saturation = CHWS − 1.5 K (17.9 °C), condenser saturation = CDW return +
+  1.5 K (38.5 °C), lift 20.6 K; R-134a pressures from an Antoine fit (A 14.67309, B 2236.949, C −24.44, kPa / K) to the
+  published saturation table (STANDARD; the fit is DERIVED, max error 0.08 % over −10…60 °C, gate ≤ 1 % over 0…50 °C):
+  535.3 / 977.1 kPa abs, ratio 1.825; Carnot COP 14.13, cycle fraction 0.429. Superheat, subcooling, IGV position,
+  oil pressure and discharge temperature are NOT modelled and are not published.
+- **Pumps.** Primary: 2 per train (20), one per running chiller (7) at the unit CHW flow, 15 m; secondary:
+  ceil(982.3 / 250) = 4 duty + 1 standby, equal share 245.6 L/s, 30 m; condenser: one per chiller (10 / 7) at the unit
+  CDW flow, 25 m. kW_e = ρ g Q H / η_pump / (η_motor × η_VFD) = 28.0 / 98.0 / 82.6 kW per pump; fleet 1,166.4 kW.
+  Speed is 100 %: the model has one operating point and it is the design point (affinity laws not exercised).
+- **Towers.** One cell per chiller, 0 standby (10 / 7); cell rated = 5,000 × (1 + specific power) = 5,824.5 kW_th, load
+  89.3 %, approach 32 − 27 = 5.0 K; fan speed = cell load, fan kW = 55 × speed³ = 39.15 kW, fleet 274.0 kW.
+- **CRAH.** Unit duty = hall IT load / running = 7,500 / 58 = 129.31 kW (99.5 %), fan speed = load % (constant air
+  ΔT), unit CHW flow 4.06 L/s. No valve position.
+- **Mechanical check.** Chillers 5,153.4 + pumps 1,166.4 + tower fans 274.0 = 6,593.9 kW_e against the PUE-implied
+  non-IT load 13,500 − UPS loss 1,250 = 12,250 kW: headroom 5,656.1 kW (≥ 0, gated). CRAH fans, lighting and controls
+  are not in the 6,593.9.
+- **Two existing quantities disagree (reported, not changed — additive release).** `cooling.flow_per_machine_lps`
+  (134.7 L/s) divides the IT-only `flow_lps` (943.0), while the machines carry `heat_rejection_kw` (IT + UPS loss) =
+  `plant_duty_flow_lps` 982.3 L/s; the new unit evaporator flow uses the duty (140.3 L/s). The CRAH coils, sized on
+  hall IT load, pass 943.0 L/s in total: 39.3 L/s (1,250 kW of UPS loss) of chiller duty has no coil in the model.
+- **Fleet tables.** `getFleet` kinds `chiller`, `chw_primary_pump`, `chw_secondary_pump`, `cdw_pump`, `tower_cell`,
+  `crah` (hall), `genset` (hall, all standby). Units 1…running run (primary: the A pump of trains 1…running), tags
+  zero-padded (`CH-01`, `CHWP-01A/B`, `CHWP-S1`, `CDWP-01`, `CT-01`, `CRAH-A01`, `GEN-A1`); Σ running unit duty / flow =
+  the plant value; identical on two calls.
+- **Lesson kept.** Gates that typed the engine version (`'2.3.0'`, and three stale `'2.2.0'` / `?v=2.0.0` fixtures
+  from earlier bumps that had silently become no-ops) now derive it from the engine or the generated registry.
+
 ### 2026-11-18 — single-line contract (E-S-101, v3.74.0, PRD-CONV-LIVING-PLANT P5a)
 
 - **One governed sheet draws the electrical plant from 150 kV.** `js/conv/epms-sheet.js` (`RZEpmsSheets.sld`, E-S-101) is

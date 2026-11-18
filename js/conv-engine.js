@@ -262,6 +262,29 @@
     var IEC_CURVES = { SI: { k: 0.14, a: 0.02 }, VI: { k: 13.5, a: 1 }, EI: { k: 80, a: 2 }, LTI: { k: 120, a: 1 } };
     var SQRT3 = Math.sqrt(3);
 
+    /* ====================================================================
+     * PLANT INTERNALS — added engine 2.4.0 (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5, E1)
+     * ==================================================================== */
+    /* R-134a saturation pressure table, values as published in refrigerant property
+     * tables (ASHRAE Fundamentals / NIST), rounded. Pressure in bar ABSOLUTE.
+     * evidenceClass: 'STANDARD' (the table only). */
+    var R134A_SAT_TABLE = [
+        { t_c: -10, p_bar_abs: 2.006 }, { t_c: 0, p_bar_abs: 2.928 }, { t_c: 10, p_bar_abs: 4.146 },
+        { t_c: 20, p_bar_abs: 5.717 }, { t_c: 30, p_bar_abs: 7.702 }, { t_c: 40, p_bar_abs: 10.166 },
+        { t_c: 50, p_bar_abs: 13.18 }, { t_c: 60, p_bar_abs: 16.82 }
+    ];
+    /* Antoine form ln(P / kPa) = A - B / (T / K + C), FITTED to R134A_SAT_TABLE by least
+     * squares on ln P for each trial C (C scanned in 0.01 K steps, the C with the smallest
+     * maximum relative error kept), then rounded. Fit error against the table: max 0.08 %
+     * over -10 ... 60 C (gate: <= 1 % over 0 ... 50 C, tools/test-conv-plant-internals.mjs).
+     * evidenceClass: 'DERIVED' (a fit to the STANDARD table, not a published equation). */
+    var R134A_ANTOINE = { A: 14.67309, B: 2236.949, C: -24.44 };
+    var REFRIGERANT_ANTOINE = { 'R-134a': R134A_ANTOINE };
+    // source: SI definition of 0 C. evidenceClass: 'STANDARD'
+    var KELVIN_OFFSET = 273.15;
+    // source: standard atmosphere, 101.325 kPa (gauge = absolute - this). evidenceClass: 'STANDARD'
+    var ATM_KPA = 101.325;
+
     /* --- Pure derivation helpers -------------------------------------------- */
 
     function round1(n) { return Math.round(n * 10) / 10; }
@@ -593,8 +616,57 @@
              * evidenceClass: 'ASSUMED' — replace with the site wet-bulb basis when it exists.
              */
             cdw_supply_c: 32.0,
-            cdw_range_k: 5.0
+            cdw_range_k: 5.0,
             // (no authored chillers_running / chillers_total — both are derived)
+
+            /* ==============================================================
+             * PLANT INTERNALS BASIS — added engine 2.4.0
+             * (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.4, phase E1). Every value below
+             * is a TRAINING DESIGN VALUE: evidenceClass 'ASSUMED' unless stated.
+             * No chiller rating sheet, pump curve or tower selection exists for
+             * this site; the cycle and fleet values derived from these are a
+             * consistent simulation, not a vendor rating.
+             * ============================================================== */
+            // source: PRD-CONV-EQUIPMENT-TRUTH OD-1 default (common centrifugal fluid). evidenceClass: 'ADOPTED'
+            chiller_refrigerant: 'R-134a',
+            // source: ASSUMED flooded-evaporator approach, AHRI 550/590 rating context. evidenceClass: 'ASSUMED'
+            chiller_evap_approach_k: 1.5,
+            // source: ASSUMED shell-and-tube condenser approach, AHRI 550/590 rating context. evidenceClass: 'ASSUMED'
+            chiller_cond_approach_k: 1.5,
+            // source: STANDARD water density used for hydraulic power (kg/m3). evidenceClass: 'STANDARD'
+            water_density_kg_m3: 1000,
+            // source: standard gravity, 9.80665 m/s2 (CGPM 1901). evidenceClass: 'STANDARD'
+            gravity_m_s2: 9.80665,
+            // source: ASSUMED pump hydraulic efficiency at the duty point. evidenceClass: 'ASSUMED'
+            pump_efficiency: 0.80,
+            // source: ASSUMED pump motor efficiency (IE3 class, large motor). evidenceClass: 'ASSUMED'
+            pump_motor_efficiency: 0.95,
+            // source: ASSUMED VFD efficiency at full speed. evidenceClass: 'ASSUMED'
+            pump_vfd_efficiency: 0.97,
+            /* Pump speed at the duty point. The model has one operating point per pump and
+             * it IS the design point, so speed is 100 %; no part-speed operation is modelled.
+             * evidenceClass: 'ADOPTED' */
+            pump_speed_pct: 100,
+            // source: PRD OD-4 — one duty + one standby primary pump per chiller train. evidenceClass: 'ADOPTED'
+            chw_primary_pumps_per_train: 2,
+            // source: ASSUMED primary (evaporator) loop head, m. evidenceClass: 'ASSUMED'
+            chw_primary_head_m: 15,
+            // source: ASSUMED secondary (distribution) loop head, m. evidenceClass: 'ASSUMED'
+            chw_secondary_head_m: 30,
+            // source: ASSUMED condenser-water loop head incl. tower static lift, m. evidenceClass: 'ASSUMED'
+            cdw_head_m: 25,
+            // source: ASSUMED rated flow of one secondary CHW pump, L/s. evidenceClass: 'ASSUMED'
+            chw_secondary_unit_flow_lps: 250,
+            // source: PRD OD-4 — N+1 on the secondary header. evidenceClass: 'ASSUMED'
+            pump_standby_per_header: 1,
+            /* Design ambient wet-bulb for the tower. No site wet-bulb basis has been
+             * supplied (the cdw_supply_c block above says so); 27 C is a tropical design
+             * figure. evidenceClass: 'ASSUMED' */
+            tower_design_wet_bulb_c: 27,
+            // source: ASSUMED fan motor rating of one induced-draft cell, kW. evidenceClass: 'ASSUMED'
+            tower_fan_motor_kw: 55,
+            // source: task E1 basis — one cell per chiller, no extra standby cell. evidenceClass: 'ASSUMED'
+            tower_standby_cells: 0
         },
         electrical: {
             // source: 09-engineering-basis-and-calculations.md line 39
@@ -785,7 +857,7 @@
             basis: 'Adopted project scenario — simulated, not measured telemetry',
             basis_doc: 'conv/review/09-engineering-basis-and-calculations.md',
             study_doc: 'js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)',
-            version: '2.3.0'
+            version: '2.4.0'
         }
     };
 
@@ -1007,6 +1079,267 @@
         return out;
     }
 
+    /* --- Plant internals (engine 2.4.0, PRD-CONV-EQUIPMENT-TRUTH E1) ----------
+     * Saturation pressure (kPa abs) of the named refrigerant at t C from the fitted
+     * Antoine form above. null for an unknown refrigerant: never a guess. */
+    function refrigerantSatKpa(refrigerant, tC) {
+        var f = REFRIGERANT_ANTOINE[refrigerant];
+        if (!f || typeof tC !== 'number' || !isFinite(tC)) return null;
+        return Math.exp(f.A - f.B / (tC + KELVIN_OFFSET + f.C));
+    }
+
+    /* Hydraulic power kW = rho g Q H / 1000, Q in m3/s (L/s / 1000). */
+    function pumpHydraulicKw(c, flowLps, headM) {
+        return c.water_density_kg_m3 * c.gravity_m_s2 * (flowLps / 1000) * headM / 1000;
+    }
+    /* Electrical input kW = hydraulic / pump eff / (motor eff x VFD eff). */
+    function pumpElectricalKw(c, flowLps, headM) {
+        return pumpHydraulicKw(c, flowLps, headM) / c.pump_efficiency
+            / (c.pump_motor_efficiency * c.pump_vfd_efficiency);
+    }
+
+    /* Unrounded plant-internals values. Everything here derives from the engine's own
+     * published quantities (heat rejection, running counts, specific power, CDW range,
+     * CHW delta-T, hall IT load) plus the authored internals basis on MODEL.cooling.
+     * The chain, at the adopted scenario:
+     *   unit duty          = 31,250 / 7                      = 4,464.3 kW_th
+     *   unit input         = 31,250 x 0.16491 / 7            =   736.2 kW_e
+     *   unit condenser     = duty + input                    = 5,200.5 kW_th  (x 7 = tower rejection)
+     *   unit CHW flow      = plant duty flow / running       =   140.3 L/s
+     *   unit CDW flow      = 5,200.5 / (4.186 x 5)           =   248.5 L/s
+     *   evap sat           = CHWS 19.4 - 1.5                 =  17.9 C  -> 535.3 kPa abs
+     *   cond sat           = CDW return 37.0 + 1.5           =  38.5 C  -> 977.1 kPa abs
+     *   Carnot COP         = (17.9 + 273.15) / 20.6          =  14.13 ; plant COP 6.06 -> 0.429
+     *   secondary pumps    = ceil(982.3 / 250) + 1           =   5 (4 duty)
+     *   tower cell load    = 5,200.5 / (5,000 x 1.16491)     =  89.3 %  -> fan 55 x 0.893^3 kW
+     *   CRAH unit duty     = 7,500 / 58                      =   129.3 kW */
+    function plantInternals(m) {
+        var c = m.cooling;
+        var heatRej = heatRejectionKw(m);
+        var running = chillersRunning(m), total = chillersTotal(m);
+        var sp = c.chiller_specific_power_kw_e_per_kw_th;
+        var cp = c.water_cp_kj_per_kg_k;
+        var dutyFlow = heatRej / (cp * chwDeltaT(m));
+        var unitDuty = running ? heatRej / running : null;
+        var unitInput = running ? heatRej * sp / running : null;
+        var unitCond = unitDuty === null ? null : unitDuty + unitInput;
+        var unitChwFlow = running ? dutyFlow / running : null;
+        var unitCdwFlow = unitCond === null ? null : unitCond / (cp * c.cdw_range_k);
+
+        var evapSat = chwsC(m) - c.chiller_evap_approach_k;
+        var condSat = c.cdw_supply_c + c.cdw_range_k + c.chiller_cond_approach_k;
+        var lift = condSat - evapSat;
+        var pEvap = refrigerantSatKpa(c.chiller_refrigerant, evapSat);
+        var pCond = refrigerantSatKpa(c.chiller_refrigerant, condSat);
+        var carnot = lift > 0 ? (evapSat + KELVIN_OFFSET) / lift : null;
+        var cop = 1 / sp;
+
+        /* Hydronic fleet. Primary: chw_primary_pumps_per_train per chiller train, one
+         * running per running chiller. Secondary: duty pumps share the plant duty flow
+         * equally, + the header standby. Condenser: one per chiller. */
+        var priCount = total * c.chw_primary_pumps_per_train;
+        var secDuty = Math.ceil(dutyFlow / c.chw_secondary_unit_flow_lps);
+        var secCount = secDuty + c.pump_standby_per_header;
+        var secFlow = secDuty ? dutyFlow / secDuty : null;
+        var priKw = unitChwFlow === null ? null : pumpElectricalKw(c, unitChwFlow, c.chw_primary_head_m);
+        var secKw = secFlow === null ? null : pumpElectricalKw(c, secFlow, c.chw_secondary_head_m);
+        var cdwKw = unitCdwFlow === null ? null : pumpElectricalKw(c, unitCdwFlow, c.cdw_head_m);
+        var priFleet = priKw === null ? null : priKw * running;
+        var secFleet = secKw === null ? null : secKw * secDuty;
+        var cdwFleet = cdwKw === null ? null : cdwKw * running;
+        var pumpFleet = (priFleet === null || secFleet === null || cdwFleet === null) ? null
+            : priFleet + secFleet + cdwFleet;
+
+        /* Heat rejection: one cell per chiller (+ declared standby cells); a cell is rated
+         * for the condenser duty of one chiller at full capacity. Fan speed follows cell
+         * load (declared rule), fan power the cube law. */
+        var cellRated = c.chiller_unit_kw_th * (1 + sp);
+        var cellLoad = unitCond === null ? null : unitCond / cellRated * 100;
+        var fanKw = cellLoad === null ? null : c.tower_fan_motor_kw * Math.pow(cellLoad / 100, 3);
+        var fanFleet = fanKw === null ? null : fanKw * running;
+
+        /* CRAH per unit: hall sensible demand = hall IT load (the substitution crahRequired()
+         * makes), shared by the running units. Fan speed = load % under constant air delta-T. */
+        var hallDemand = m.campus.halls.length ? m.site.it_load_kw / m.campus.halls.length : 0;
+        var crahRun = crahRequired(m);
+        var crahDuty = crahRun ? hallDemand / crahRun : null;
+        var crahLoad = crahDuty === null ? null : crahDuty / c.crah_unit_sensible_kw * 100;
+        var crahChw = crahDuty === null ? null : crahDuty / (cp * chwDeltaT(m));
+
+        var chillerInput = heatRej * sp;
+        var mechInput = pumpFleet === null || fanFleet === null ? null : chillerInput + pumpFleet + fanFleet;
+        var mechHeadroom = mechInput === null ? null : nonItLoadKw(m) - upsLossKw(m) - mechInput;
+
+        return {
+            unitDuty: unitDuty, unitInput: unitInput, unitCond: unitCond, unitChwFlow: unitChwFlow,
+            unitCdwFlow: unitCdwFlow, evapSat: evapSat, condSat: condSat, lift: lift,
+            pEvap: pEvap, pCond: pCond, carnot: carnot, cop: cop,
+            priCount: priCount, priRunning: running, secDuty: secDuty, secCount: secCount,
+            secFlow: secFlow, cdwCount: total, cdwRunning: running,
+            priKw: priKw, secKw: secKw, cdwKw: cdwKw,
+            priFleet: priFleet, secFleet: secFleet, cdwFleet: cdwFleet, pumpFleet: pumpFleet,
+            cellCount: total + c.tower_standby_cells, cellRunning: running, cellRated: cellRated,
+            cellLoad: cellLoad, approach: c.cdw_supply_c - c.tower_design_wet_bulb_c,
+            fanKw: fanKw, fanFleet: fanFleet,
+            crahDuty: crahDuty, crahLoad: crahLoad, crahChw: crahChw,
+            mechInput: mechInput, mechHeadroom: mechHeadroom
+        };
+    }
+
+    /* ADDITIVE (2.4.0) — authored internals inputs republished unchanged, derived values
+     * appended. No key published by 2.3.0 is touched (gate: flattened snapshot diff). */
+    var INTERNALS_AUTHORED_KEYS = [
+        'chiller_refrigerant', 'chiller_evap_approach_k', 'chiller_cond_approach_k',
+        'water_density_kg_m3', 'gravity_m_s2', 'pump_efficiency', 'pump_motor_efficiency',
+        'pump_vfd_efficiency', 'pump_speed_pct', 'chw_primary_pumps_per_train', 'chw_primary_head_m',
+        'chw_secondary_head_m', 'cdw_head_m', 'chw_secondary_unit_flow_lps', 'pump_standby_per_header',
+        'tower_design_wet_bulb_c', 'tower_fan_motor_kw', 'tower_standby_cells'
+    ];
+    function withPlantInternals(m, base) {
+        var out = {}, key, i;
+        for (key in base) { if (Object.prototype.hasOwnProperty.call(base, key)) out[key] = base[key]; }
+        for (i = 0; i < INTERNALS_AUTHORED_KEYS.length; i++) out[INTERNALS_AUTHORED_KEYS[i]] = m.cooling[INTERNALS_AUTHORED_KEYS[i]];
+        var p = plantInternals(m);
+        var r1n = function (v) { return v === null ? null : round1(v); };
+        var r2n = function (v) { return v === null ? null : round2(v); };
+        var r3n = function (v) { return v === null ? null : Math.round(v * 1000) / 1000; };
+        var derived = {
+            chiller_unit_duty_kw_th: r1n(p.unitDuty),
+            chiller_unit_chw_flow_lps: r1n(p.unitChwFlow),
+            chiller_unit_condenser_duty_kw_th: r1n(p.unitCond),
+            chiller_unit_cdw_flow_lps: r1n(p.unitCdwFlow),
+            chiller_evap_sat_c: round2(p.evapSat),
+            chiller_cond_sat_c: round2(p.condSat),
+            chiller_lift_k: round2(p.lift),
+            chiller_evap_sat_kpa_abs: r1n(p.pEvap),
+            chiller_evap_sat_kpa_g: p.pEvap === null ? null : round1(p.pEvap - ATM_KPA),
+            chiller_cond_sat_kpa_abs: r1n(p.pCond),
+            chiller_cond_sat_kpa_g: p.pCond === null ? null : round1(p.pCond - ATM_KPA),
+            chiller_pressure_ratio: (p.pEvap && p.pCond) ? r3n(p.pCond / p.pEvap) : null,
+            chiller_carnot_cop: r2n(p.carnot),
+            chiller_carnot_fraction: p.carnot ? r3n(p.cop / p.carnot) : null,
+            chw_primary_pump_count: p.priCount,
+            chw_primary_pumps_running: p.priRunning,
+            chw_primary_pump_flow_lps: r1n(p.unitChwFlow),
+            chw_primary_pump_kw_e: r1n(p.priKw),
+            chw_primary_fleet_kw_e: r1n(p.priFleet),
+            chw_secondary_pump_count: p.secCount,
+            chw_secondary_pumps_running: p.secDuty,
+            chw_secondary_pump_flow_lps: r1n(p.secFlow),
+            chw_secondary_pump_kw_e: r1n(p.secKw),
+            chw_secondary_fleet_kw_e: r1n(p.secFleet),
+            cdw_pump_count: p.cdwCount,
+            cdw_pumps_running: p.cdwRunning,
+            cdw_pump_flow_lps: r1n(p.unitCdwFlow),
+            cdw_pump_kw_e: r1n(p.cdwKw),
+            cdw_fleet_kw_e: r1n(p.cdwFleet),
+            pump_fleet_input_kw: r1n(p.pumpFleet),
+            tower_cell_count: p.cellCount,
+            tower_cells_running: p.cellRunning,
+            tower_cell_rejection_kw_th: r1n(p.unitCond),
+            tower_cell_rated_kw_th: round1(p.cellRated),
+            tower_cell_load_pct: r1n(p.cellLoad),
+            tower_approach_k: round2(p.approach),
+            tower_fan_speed_pct: r1n(p.cellLoad),
+            tower_fan_kw: r2n(p.fanKw),
+            tower_fan_fleet_kw: r1n(p.fanFleet),
+            crah_unit_duty_kw: r2n(p.crahDuty),
+            crah_unit_load_pct: r1n(p.crahLoad),
+            crah_fan_speed_pct: r1n(p.crahLoad),
+            crah_unit_chw_flow_lps: r2n(p.crahChw),
+            mech_plant_input_kw: r1n(p.mechInput),
+            mech_plant_headroom_kw: r1n(p.mechHeadroom)
+        };
+        for (key in derived) { if (Object.prototype.hasOwnProperty.call(derived, key)) out[key] = derived[key]; }
+        return out;
+    }
+
+    function pad2(n) { return n < 10 ? '0' + n : String(n); }
+
+    /* Fleet unit table — PURE over a model (default: the frozen model). Units 1...running
+     * run, the rest stand by (deterministic lead order: lowest number leads). Unknown kind,
+     * or a hall-scoped kind without a known hall, returns null. Values per unit are the
+     * UNROUNDED internals rounded to 0.01, so Sigma running units = the plant value within
+     * rounding. */
+    var FLEET_KINDS = ['chiller', 'chw_primary_pump', 'chw_secondary_pump', 'cdw_pump', 'tower_cell', 'crah', 'genset'];
+    function fleet(m, kind, hallCode) {
+        var p = plantInternals(m), c = m.cooling, out = [], i, run;
+        var r2 = round2;
+        var hall = null;
+        if (kind === 'crah' || kind === 'genset') {
+            if (typeof hallCode !== 'string') return null;
+            for (i = 0; i < m.campus.halls.length; i++) {
+                if (String(m.campus.halls[i].code).toUpperCase() === hallCode.toUpperCase()) hall = m.campus.halls[i];
+            }
+            if (!hall) return null;
+        }
+        /* op = operating values (0 when standby); fixed = ratings that hold either way */
+        var unit = function (n, tag, isRun, loadPct, op, fixed) {
+            var u = { n: n, tag: tag, state: isRun ? 'running' : 'standby', loadPct: isRun ? loadPct : 0 }, k;
+            for (k in op) { if (Object.prototype.hasOwnProperty.call(op, k)) u[k] = isRun ? op[k] : 0; }
+            for (k in fixed) { if (Object.prototype.hasOwnProperty.call(fixed, k)) u[k] = fixed[k]; }
+            return u;
+        };
+        var chLoad = p.unitDuty === null ? null : r2(p.unitDuty / c.chiller_unit_kw_th * 100);
+        if (kind === 'chiller') {
+            run = chillersRunning(m);
+            for (i = 1; i <= chillersTotal(m); i++) {
+                out.push(unit(i, 'CH-' + pad2(i), i <= run, chLoad, {
+                    dutyKwTh: r2(p.unitDuty), inputKwE: r2(p.unitInput), condenserDutyKwTh: r2(p.unitCond),
+                    chwFlowLps: r2(p.unitChwFlow), cdwFlowLps: r2(p.unitCdwFlow)
+                }, { ratedKwTh: c.chiller_unit_kw_th }));
+            }
+        } else if (kind === 'chw_primary_pump') {
+            /* two pumps per train, A = duty, B = standby; A of trains 1...running run */
+            var perTrain = c.chw_primary_pumps_per_train, n = 0, t, j;
+            run = chillersRunning(m);
+            for (t = 1; t <= chillersTotal(m); t++) {
+                for (j = 0; j < perTrain; j++) {
+                    n += 1;
+                    out.push(unit(n, 'CHWP-' + pad2(t) + String.fromCharCode(65 + j), j === 0 && t <= run, 100, {
+                        flowLps: r2(p.unitChwFlow), kwE: r2(p.priKw), speedPct: c.pump_speed_pct
+                    }, { headM: c.chw_primary_head_m }));
+                }
+            }
+        } else if (kind === 'chw_secondary_pump') {
+            for (i = 1; i <= p.secCount; i++) {
+                out.push(unit(i, 'CHWP-S' + i, i <= p.secDuty, r2(p.secFlow / c.chw_secondary_unit_flow_lps * 100), {
+                    flowLps: r2(p.secFlow), kwE: r2(p.secKw), speedPct: c.pump_speed_pct
+                }, { headM: c.chw_secondary_head_m, ratedFlowLps: c.chw_secondary_unit_flow_lps }));
+            }
+        } else if (kind === 'cdw_pump') {
+            run = chillersRunning(m);
+            for (i = 1; i <= p.cdwCount; i++) {
+                out.push(unit(i, 'CDWP-' + pad2(i), i <= run, 100, {
+                    flowLps: r2(p.unitCdwFlow), kwE: r2(p.cdwKw), speedPct: c.pump_speed_pct
+                }, { headM: c.cdw_head_m }));
+            }
+        } else if (kind === 'tower_cell') {
+            for (i = 1; i <= p.cellCount; i++) {
+                out.push(unit(i, 'CT-' + pad2(i), i <= p.cellRunning, r2(p.cellLoad), {
+                    rejectionKwTh: r2(p.unitCond), cdwFlowLps: r2(p.unitCdwFlow),
+                    fanSpeedPct: r2(p.cellLoad), fanKw: r2(p.fanKw)
+                }, { ratedKwTh: round1(p.cellRated), fanMotorKw: c.tower_fan_motor_kw }));
+            }
+        } else if (kind === 'crah') {
+            run = crahRequired(m);
+            for (i = 1; i <= run + 1; i++) {
+                out.push(unit(i, 'CRAH-' + hall.code + pad2(i), i <= run, r2(p.crahLoad), {
+                    dutyKw: r2(p.crahDuty), chwFlowLps: r2(p.crahChw), fanSpeedPct: r2(p.crahLoad)
+                }, { sensibleKw: c.crah_unit_sensible_kw }));
+            }
+        } else if (kind === 'genset') {
+            var gens = electricalHvMv(m).genset_per_hall;
+            for (i = 1; i <= gens; i++) {
+                out.push({ n: i, tag: 'GEN-' + hall.code + i, state: 'standby', loadPct: 0,
+                    ratingKw: m.electrical.genset_unit_kw, outputKw: 0 });
+            }
+        } else {
+            return null;
+        }
+        return out;
+    }
+
     function computeHalls(m) {
         var out = [];
         var halls = m.campus.halls;
@@ -1137,7 +1470,7 @@
                 nameplate_evidence_class: m.meta.nameplate_evidence_class,
                 metering_tolerance_pct: m.electrical.metering_tolerance_pct
             }),
-            cooling: {
+            cooling: withPlantInternals(m, {
                 /* The whole air-to-water chain is published, not just the water
                    end, so a page can render any plane without re-deriving one
                    from another with a private constant (that is how the 15.2 C
@@ -1238,7 +1571,7 @@
                     : null,
                 duty_rt: round1(heatRej / 3.517),
                 nameplate_evidence_class: m.meta.nameplate_evidence_class
-            },
+            }),
             environment: {
                 avg_temp_c: m.environment.avg_temp_c,
                 avg_rh_pct: m.environment.avg_rh_pct,
@@ -1404,7 +1737,13 @@
         },
         // frozen computed snapshot
         snapshot: SNAPSHOT,
-        recompute: function (m) { return compute(m || CONV_MODEL); }
+        recompute: function (m) { return compute(m || CONV_MODEL); },
+        /* engine 2.4.0 — plant internals. getFleet(kind, hallCode?) returns a fresh unit
+         * table (kinds in fleetKinds); 'crah' and 'genset' need a hall code. */
+        fleetKinds: FLEET_KINDS,
+        getFleet: function (kind, hallCode, m) { return fleet(m || CONV_MODEL, kind, hallCode); },
+        refrigerantSatKpa: refrigerantSatKpa,
+        r134aSatTable: R134A_SAT_TABLE
     };
 
     deepFreeze(CONV_CALC);

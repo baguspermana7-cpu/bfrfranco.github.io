@@ -3562,6 +3562,1232 @@
       },
       "formulaExpr": "water.total_treated_lpm * 60 / site.it_load_kw",
       "explainKey": "wue"
+    },
+    {
+      "id": "cooling.chiller_refrigerant",
+      "label": "Chiller refrigerant",
+      "unit": null,
+      "scope": "plant",
+      "evidenceClass": "ADOPTED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.cooling (plant internals basis, engine 2.4.0)",
+        "asOf": "2026-11-18",
+        "method": "PRD-CONV-EQUIPMENT-TRUTH OD-1 default: R-134a, the common centrifugal fluid with widely published property data. Training design value for the simulated plant (engine 2.4.0); no chiller rating sheet, pump curve or tower selection exists for this site."
+      },
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chiller_evap_approach_k",
+      "label": "Evaporator approach (CHWS - evaporator saturation)",
+      "unit": "K",
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.cooling (plant internals basis, engine 2.4.0)",
+        "asOf": "2026-11-18",
+        "method": "Flooded evaporator approach in the AHRI 550/590 rating context. Training design value for the simulated plant (engine 2.4.0); no chiller rating sheet, pump curve or tower selection exists for this site."
+      },
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chiller_cond_approach_k",
+      "label": "Condenser approach (condenser saturation - leaving CDW)",
+      "unit": "K",
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.cooling (plant internals basis, engine 2.4.0)",
+        "asOf": "2026-11-18",
+        "method": "Shell-and-tube condenser approach in the AHRI 550/590 rating context. Training design value for the simulated plant (engine 2.4.0); no chiller rating sheet, pump curve or tower selection exists for this site."
+      },
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.water_density_kg_m3",
+      "label": "Water density for hydraulic power",
+      "unit": "kg/m3",
+      "scope": "plant",
+      "evidenceClass": "STANDARD",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.cooling (plant internals basis, engine 2.4.0)",
+        "asOf": "2026-11-18",
+        "method": "Density of water, 1000 kg/m3, used in rho g Q H. Training design value for the simulated plant (engine 2.4.0); no chiller rating sheet, pump curve or tower selection exists for this site."
+      },
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.gravity_m_s2",
+      "label": "Standard gravity",
+      "unit": "m/s2",
+      "scope": "plant",
+      "evidenceClass": "STANDARD",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.cooling (plant internals basis, engine 2.4.0)",
+        "asOf": "2026-11-18",
+        "method": "Standard acceleration of gravity 9.80665 m/s2 (CGPM 1901). Training design value for the simulated plant (engine 2.4.0); no chiller rating sheet, pump curve or tower selection exists for this site."
+      },
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.pump_efficiency",
+      "label": "Pump hydraulic efficiency",
+      "unit": "fraction",
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.cooling (plant internals basis, engine 2.4.0)",
+        "asOf": "2026-11-18",
+        "method": "Pump efficiency at the duty point, all three services. Training design value for the simulated plant (engine 2.4.0); no chiller rating sheet, pump curve or tower selection exists for this site."
+      },
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.pump_motor_efficiency",
+      "label": "Pump motor efficiency",
+      "unit": "fraction",
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.cooling (plant internals basis, engine 2.4.0)",
+        "asOf": "2026-11-18",
+        "method": "IE3-class large motor. Training design value for the simulated plant (engine 2.4.0); no chiller rating sheet, pump curve or tower selection exists for this site."
+      },
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.pump_vfd_efficiency",
+      "label": "Pump VFD efficiency",
+      "unit": "fraction",
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.cooling (plant internals basis, engine 2.4.0)",
+        "asOf": "2026-11-18",
+        "method": "Drive efficiency at full speed. Training design value for the simulated plant (engine 2.4.0); no chiller rating sheet, pump curve or tower selection exists for this site."
+      },
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.pump_speed_pct",
+      "label": "Pump speed at the duty point",
+      "unit": "%",
+      "scope": "plant",
+      "evidenceClass": "ADOPTED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.cooling (plant internals basis, engine 2.4.0)",
+        "asOf": "2026-11-18",
+        "method": "The model has one operating point per pump and it IS the design point, so speed is 100 %; part-speed operation (affinity laws) is not modelled and no value here uses this figure in arithmetic. Training design value for the simulated plant (engine 2.4.0); no chiller rating sheet, pump curve or tower selection exists for this site."
+      },
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chw_primary_pumps_per_train",
+      "label": "Primary CHW pumps per chiller train",
+      "unit": null,
+      "scope": "plant",
+      "evidenceClass": "ADOPTED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.cooling (plant internals basis, engine 2.4.0)",
+        "asOf": "2026-11-18",
+        "method": "PRD OD-4: one duty + one standby per train. Training design value for the simulated plant (engine 2.4.0); no chiller rating sheet, pump curve or tower selection exists for this site."
+      },
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chw_primary_head_m",
+      "label": "Primary CHW loop head",
+      "unit": "m",
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.cooling (plant internals basis, engine 2.4.0)",
+        "asOf": "2026-11-18",
+        "method": "Evaporator-side primary loop head. Training design value for the simulated plant (engine 2.4.0); no chiller rating sheet, pump curve or tower selection exists for this site."
+      },
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chw_secondary_head_m",
+      "label": "Secondary CHW loop head",
+      "unit": "m",
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.cooling (plant internals basis, engine 2.4.0)",
+        "asOf": "2026-11-18",
+        "method": "Distribution (secondary) loop head to the halls. Training design value for the simulated plant (engine 2.4.0); no chiller rating sheet, pump curve or tower selection exists for this site."
+      },
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.cdw_head_m",
+      "label": "Condenser-water loop head",
+      "unit": "m",
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.cooling (plant internals basis, engine 2.4.0)",
+        "asOf": "2026-11-18",
+        "method": "Condenser loop head including the tower static lift. Training design value for the simulated plant (engine 2.4.0); no chiller rating sheet, pump curve or tower selection exists for this site."
+      },
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chw_secondary_unit_flow_lps",
+      "label": "Secondary CHW pump rated flow",
+      "unit": "L/s",
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.cooling (plant internals basis, engine 2.4.0)",
+        "asOf": "2026-11-18",
+        "method": "Rated flow of one secondary pump; the duty count is sized on it. Training design value for the simulated plant (engine 2.4.0); no chiller rating sheet, pump curve or tower selection exists for this site."
+      },
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.pump_standby_per_header",
+      "label": "Standby pumps per header",
+      "unit": null,
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.cooling (plant internals basis, engine 2.4.0)",
+        "asOf": "2026-11-18",
+        "method": "PRD OD-4: N+1 on the secondary header. Training design value for the simulated plant (engine 2.4.0); no chiller rating sheet, pump curve or tower selection exists for this site."
+      },
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.tower_design_wet_bulb_c",
+      "label": "Tower design wet-bulb",
+      "unit": "C",
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.cooling (plant internals basis, engine 2.4.0)",
+        "asOf": "2026-11-18",
+        "method": "Tropical design ambient wet-bulb; no site wet-bulb basis has been supplied. Training design value for the simulated plant (engine 2.4.0); no chiller rating sheet, pump curve or tower selection exists for this site."
+      },
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.tower_fan_motor_kw",
+      "label": "Tower cell fan motor rating",
+      "unit": "kW",
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.cooling (plant internals basis, engine 2.4.0)",
+        "asOf": "2026-11-18",
+        "method": "Induced-draft cell fan motor. Training design value for the simulated plant (engine 2.4.0); no chiller rating sheet, pump curve or tower selection exists for this site."
+      },
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.tower_standby_cells",
+      "label": "Standby tower cells",
+      "unit": null,
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.cooling (plant internals basis, engine 2.4.0)",
+        "asOf": "2026-11-18",
+        "method": "One cell per chiller, no extra standby cell (E1 basis; PRD OD-3 asks N+1 — open owner point). Training design value for the simulated plant (engine 2.4.0); no chiller rating sheet, pump curve or tower selection exists for this site."
+      },
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chiller_unit_duty_kw_th",
+      "label": "Chiller unit evaporator duty",
+      "unit": "kW_th",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "heat_rejection_kw / chillers_running",
+      "deps": [
+        "cooling.chillers_running",
+        "cooling.heat_rejection_kw"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "cooling.heat_rejection_kw / cooling.chillers_running",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chiller_unit_chw_flow_lps",
+      "label": "Chiller unit evaporator (CHW) flow",
+      "unit": "L/s",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "plant_duty_flow_lps / chillers_running",
+      "deps": [
+        "cooling.chillers_running",
+        "cooling.plant_duty_flow_lps"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating. Uses the DUTY flow (IT + UPS loss); the older flow_per_machine_lps divides the IT-only reference flow and is 4.2 % lower."
+      },
+      "formulaExpr": "cooling.plant_duty_flow_lps / cooling.chillers_running",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chiller_unit_condenser_duty_kw_th",
+      "label": "Chiller unit condenser duty",
+      "unit": "kW_th",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "unit evaporator duty + unit compressor input",
+      "deps": [
+        "cooling.chiller_input_per_machine_kw_e",
+        "cooling.chiller_unit_duty_kw_th"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating. Energy balance: x running = tower_rejection_kw_th."
+      },
+      "formulaExpr": "cooling.chiller_unit_duty_kw_th + cooling.chiller_input_per_machine_kw_e",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chiller_unit_cdw_flow_lps",
+      "label": "Chiller unit condenser-water flow",
+      "unit": "L/s",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "unit condenser duty / (cp x cdw_range_k)",
+      "deps": [
+        "cooling.cdw_range_k",
+        "cooling.chiller_unit_condenser_duty_kw_th",
+        "cooling.water_cp_kj_per_kg_k"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "cooling.chiller_unit_condenser_duty_kw_th / (cooling.water_cp_kj_per_kg_k * cooling.cdw_range_k)",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chiller_evap_sat_c",
+      "label": "Evaporator saturation temperature",
+      "unit": "C",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "chws_c - chiller_evap_approach_k",
+      "deps": [
+        "cooling.chiller_evap_approach_k",
+        "cooling.chws_c"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "cooling.chws_c - cooling.chiller_evap_approach_k",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chiller_cond_sat_c",
+      "label": "Condenser saturation temperature",
+      "unit": "C",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "cdw_return_c + chiller_cond_approach_k",
+      "deps": [
+        "cooling.cdw_return_c",
+        "cooling.chiller_cond_approach_k"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "cooling.cdw_return_c + cooling.chiller_cond_approach_k",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chiller_lift_k",
+      "label": "Refrigeration lift",
+      "unit": "K",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "chiller_cond_sat_c - chiller_evap_sat_c",
+      "deps": [
+        "cooling.chiller_cond_sat_c",
+        "cooling.chiller_evap_sat_c"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "cooling.chiller_cond_sat_c - cooling.chiller_evap_sat_c",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chiller_evap_sat_kpa_abs",
+      "label": "Evaporator saturation pressure (absolute)",
+      "unit": "kPa",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "exp(A - B / (T_evap,K + C)), Antoine fit to the R-134a saturation table",
+      "deps": [
+        "cooling.chiller_evap_sat_c",
+        "cooling.chiller_refrigerant"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating. R-134a saturation pressure table (ASHRAE Fundamentals / NIST, rounded) is STANDARD; the Antoine fit to it is DERIVED."
+      },
+      "formulaNotExpressible": "Antoine form ln P = A - B/(T + C); the evaluator has no exp(). Fit and table are checked by tools/test-conv-plant-internals.mjs (<= 1 % over 0-50 C).",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chiller_evap_sat_kpa_g",
+      "label": "Evaporator saturation pressure (gauge)",
+      "unit": "kPa(g)",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "evaporator kPa abs - 101.325",
+      "deps": [
+        "cooling.chiller_evap_sat_kpa_abs"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "cooling.chiller_evap_sat_kpa_abs - 101.325",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chiller_cond_sat_kpa_abs",
+      "label": "Condenser saturation pressure (absolute)",
+      "unit": "kPa",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "exp(A - B / (T_cond,K + C)), Antoine fit to the R-134a saturation table",
+      "deps": [
+        "cooling.chiller_cond_sat_c",
+        "cooling.chiller_refrigerant"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating. R-134a saturation pressure table (ASHRAE Fundamentals / NIST, rounded) is STANDARD; the Antoine fit to it is DERIVED."
+      },
+      "formulaNotExpressible": "Antoine form ln P = A - B/(T + C); the evaluator has no exp(). Fit and table are checked by tools/test-conv-plant-internals.mjs (<= 1 % over 0-50 C).",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chiller_cond_sat_kpa_g",
+      "label": "Condenser saturation pressure (gauge)",
+      "unit": "kPa(g)",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "condenser kPa abs - 101.325",
+      "deps": [
+        "cooling.chiller_cond_sat_kpa_abs"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "cooling.chiller_cond_sat_kpa_abs - 101.325",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chiller_pressure_ratio",
+      "label": "Compressor pressure ratio",
+      "unit": null,
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "condenser kPa abs / evaporator kPa abs",
+      "deps": [
+        "cooling.chiller_cond_sat_kpa_abs",
+        "cooling.chiller_evap_sat_kpa_abs"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "cooling.chiller_cond_sat_kpa_abs / cooling.chiller_evap_sat_kpa_abs",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chiller_carnot_cop",
+      "label": "Carnot COP at the saturation temperatures",
+      "unit": null,
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "(chiller_evap_sat_c + 273.15) / chiller_lift_k",
+      "deps": [
+        "cooling.chiller_evap_sat_c",
+        "cooling.chiller_lift_k"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "(cooling.chiller_evap_sat_c + 273.15) / cooling.chiller_lift_k",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chiller_carnot_fraction",
+      "label": "Cycle efficiency (COP / Carnot COP)",
+      "unit": "fraction",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "plant_cop / chiller_carnot_cop (plant_cop = duty / input = 1 / specific power)",
+      "deps": [
+        "cooling.chiller_carnot_cop",
+        "cooling.plant_cop"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "cooling.plant_cop / cooling.chiller_carnot_cop",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chw_primary_pump_count",
+      "label": "Primary CHW pumps installed",
+      "unit": null,
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "chillers_total x chw_primary_pumps_per_train",
+      "deps": [
+        "cooling.chillers_total",
+        "cooling.chw_primary_pumps_per_train"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "cooling.chillers_total * cooling.chw_primary_pumps_per_train",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chw_primary_pumps_running",
+      "label": "Primary CHW pumps running",
+      "unit": null,
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "one duty pump per running chiller = chillers_running",
+      "deps": [
+        "cooling.chillers_running"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaNotExpressible": "Equal to chillers_running by the train rule (one duty pump per running train); stated, not computed.",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chw_primary_pump_flow_lps",
+      "label": "Primary CHW pump flow",
+      "unit": "L/s",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "= chiller unit evaporator flow",
+      "deps": [
+        "cooling.chiller_unit_chw_flow_lps"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaNotExpressible": "The pump flow IS the unit evaporator flow (one pump per train); a formula would only restate the dependency.",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chw_primary_pump_kw_e",
+      "label": "Primary CHW pump electrical input",
+      "unit": "kW_e",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "rho g Q H / 1000 / pump eff / (motor eff x VFD eff), Q in m3/s",
+      "deps": [
+        "cooling.chw_primary_head_m",
+        "cooling.chw_primary_pump_flow_lps",
+        "cooling.gravity_m_s2",
+        "cooling.pump_efficiency",
+        "cooling.pump_motor_efficiency",
+        "cooling.pump_vfd_efficiency",
+        "cooling.water_density_kg_m3"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "cooling.water_density_kg_m3 * cooling.gravity_m_s2 * cooling.chw_primary_pump_flow_lps / 1000 * cooling.chw_primary_head_m / 1000 / cooling.pump_efficiency / (cooling.pump_motor_efficiency * cooling.pump_vfd_efficiency)",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chw_primary_fleet_kw_e",
+      "label": "Primary CHW pump fleet input",
+      "unit": "kW_e",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "per-pump kW x pumps running",
+      "deps": [
+        "cooling.chw_primary_pump_kw_e",
+        "cooling.chw_primary_pumps_running"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "cooling.chw_primary_pump_kw_e * cooling.chw_primary_pumps_running",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chw_secondary_pump_count",
+      "label": "Secondary CHW pumps installed",
+      "unit": null,
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "ceil(plant_duty_flow_lps / unit flow) + standby per header",
+      "deps": [
+        "cooling.chw_secondary_unit_flow_lps",
+        "cooling.plant_duty_flow_lps",
+        "cooling.pump_standby_per_header"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "ceil(cooling.plant_duty_flow_lps / cooling.chw_secondary_unit_flow_lps) + cooling.pump_standby_per_header",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chw_secondary_pumps_running",
+      "label": "Secondary CHW pumps running",
+      "unit": null,
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "ceil(plant_duty_flow_lps / unit flow)",
+      "deps": [
+        "cooling.chw_secondary_unit_flow_lps",
+        "cooling.plant_duty_flow_lps"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "ceil(cooling.plant_duty_flow_lps / cooling.chw_secondary_unit_flow_lps)",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chw_secondary_pump_flow_lps",
+      "label": "Secondary CHW pump flow",
+      "unit": "L/s",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "plant_duty_flow_lps / secondary pumps running (equal share)",
+      "deps": [
+        "cooling.chw_secondary_pumps_running",
+        "cooling.plant_duty_flow_lps"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "cooling.plant_duty_flow_lps / cooling.chw_secondary_pumps_running",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chw_secondary_pump_kw_e",
+      "label": "Secondary CHW pump electrical input",
+      "unit": "kW_e",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "rho g Q H / 1000 / pump eff / (motor eff x VFD eff), Q in m3/s",
+      "deps": [
+        "cooling.chw_secondary_head_m",
+        "cooling.chw_secondary_pump_flow_lps",
+        "cooling.gravity_m_s2",
+        "cooling.pump_efficiency",
+        "cooling.pump_motor_efficiency",
+        "cooling.pump_vfd_efficiency",
+        "cooling.water_density_kg_m3"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "cooling.water_density_kg_m3 * cooling.gravity_m_s2 * cooling.chw_secondary_pump_flow_lps / 1000 * cooling.chw_secondary_head_m / 1000 / cooling.pump_efficiency / (cooling.pump_motor_efficiency * cooling.pump_vfd_efficiency)",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chw_secondary_fleet_kw_e",
+      "label": "Secondary CHW pump fleet input",
+      "unit": "kW_e",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "per-pump kW x pumps running",
+      "deps": [
+        "cooling.chw_secondary_pump_kw_e",
+        "cooling.chw_secondary_pumps_running"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "cooling.chw_secondary_pump_kw_e * cooling.chw_secondary_pumps_running",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.cdw_pump_count",
+      "label": "Condenser-water pumps installed",
+      "unit": null,
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "one per chiller = chillers_total",
+      "deps": [
+        "cooling.chillers_total"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaNotExpressible": "Equal to chillers_total by the one-pump-per-chiller rule; stated, not computed.",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.cdw_pumps_running",
+      "label": "Condenser-water pumps running",
+      "unit": null,
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "one per running chiller = chillers_running",
+      "deps": [
+        "cooling.chillers_running"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaNotExpressible": "Equal to chillers_running by the one-pump-per-chiller rule; stated, not computed.",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.cdw_pump_flow_lps",
+      "label": "Condenser-water pump flow",
+      "unit": "L/s",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "= chiller unit condenser-water flow",
+      "deps": [
+        "cooling.chiller_unit_cdw_flow_lps"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaNotExpressible": "The pump flow IS the unit condenser-water flow (one pump per chiller); a formula would only restate the dependency.",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.cdw_pump_kw_e",
+      "label": "Condenser-water pump electrical input",
+      "unit": "kW_e",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "rho g Q H / 1000 / pump eff / (motor eff x VFD eff), Q in m3/s",
+      "deps": [
+        "cooling.cdw_head_m",
+        "cooling.cdw_pump_flow_lps",
+        "cooling.gravity_m_s2",
+        "cooling.pump_efficiency",
+        "cooling.pump_motor_efficiency",
+        "cooling.pump_vfd_efficiency",
+        "cooling.water_density_kg_m3"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "cooling.water_density_kg_m3 * cooling.gravity_m_s2 * cooling.cdw_pump_flow_lps / 1000 * cooling.cdw_head_m / 1000 / cooling.pump_efficiency / (cooling.pump_motor_efficiency * cooling.pump_vfd_efficiency)",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.cdw_fleet_kw_e",
+      "label": "Condenser-water pump fleet input",
+      "unit": "kW_e",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "per-pump kW x pumps running",
+      "deps": [
+        "cooling.cdw_pump_kw_e",
+        "cooling.cdw_pumps_running"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "cooling.cdw_pump_kw_e * cooling.cdw_pumps_running",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.pump_fleet_input_kw",
+      "label": "Pump fleet electrical input (all services)",
+      "unit": "kW_e",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "primary + secondary + condenser fleet kW",
+      "deps": [
+        "cooling.cdw_fleet_kw_e",
+        "cooling.chw_primary_fleet_kw_e",
+        "cooling.chw_secondary_fleet_kw_e"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "cooling.chw_primary_fleet_kw_e + cooling.chw_secondary_fleet_kw_e + cooling.cdw_fleet_kw_e",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.tower_cell_count",
+      "label": "Cooling tower cells installed",
+      "unit": null,
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "chillers_total + tower_standby_cells (one cell per chiller)",
+      "deps": [
+        "cooling.chillers_total",
+        "cooling.tower_standby_cells"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "cooling.chillers_total + cooling.tower_standby_cells",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.tower_cells_running",
+      "label": "Cooling tower cells running",
+      "unit": null,
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "one per running chiller = chillers_running",
+      "deps": [
+        "cooling.chillers_running"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaNotExpressible": "Equal to chillers_running by the one-cell-per-chiller rule; stated, not computed.",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.tower_cell_rejection_kw_th",
+      "label": "Cooling tower cell heat rejection",
+      "unit": "kW_th",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "= chiller unit condenser duty",
+      "deps": [
+        "cooling.chiller_unit_condenser_duty_kw_th"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaNotExpressible": "One cell per chiller: the cell rejects exactly that chiller's condenser duty; a formula would only restate the dependency. Law: cells running x this = tower_rejection_kw_th.",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.tower_cell_rated_kw_th",
+      "label": "Cooling tower cell rated rejection",
+      "unit": "kW_th",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "chiller_unit_kw_th x (1 + specific power)",
+      "deps": [
+        "cooling.chiller_specific_power_kw_e_per_kw_th",
+        "cooling.chiller_unit_kw_th"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "cooling.chiller_unit_kw_th * (1 + cooling.chiller_specific_power_kw_e_per_kw_th)",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.tower_cell_load_pct",
+      "label": "Cooling tower cell load",
+      "unit": "%",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "cell rejection / cell rated x 100",
+      "deps": [
+        "cooling.tower_cell_rated_kw_th",
+        "cooling.tower_cell_rejection_kw_th"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "cooling.tower_cell_rejection_kw_th / cooling.tower_cell_rated_kw_th * 100",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.tower_approach_k",
+      "label": "Cooling tower approach to wet-bulb",
+      "unit": "K",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "cdw_supply_c - tower_design_wet_bulb_c",
+      "deps": [
+        "cooling.cdw_supply_c",
+        "cooling.tower_design_wet_bulb_c"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "cooling.cdw_supply_c - cooling.tower_design_wet_bulb_c",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.tower_fan_speed_pct",
+      "label": "Cooling tower fan speed",
+      "unit": "%",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "= cell load % (declared rule: fan speed follows cell load)",
+      "deps": [
+        "cooling.tower_cell_load_pct"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaNotExpressible": "A declared control rule (speed = cell load %), not arithmetic; the formula would only restate the dependency.",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.tower_fan_kw",
+      "label": "Cooling tower fan power, one cell",
+      "unit": "kW",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "motor kW x (speed / 100)^3 (fan cube law)",
+      "deps": [
+        "cooling.tower_fan_motor_kw",
+        "cooling.tower_fan_speed_pct"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "cooling.tower_fan_motor_kw * (cooling.tower_fan_speed_pct / 100) * (cooling.tower_fan_speed_pct / 100) * (cooling.tower_fan_speed_pct / 100)",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.tower_fan_fleet_kw",
+      "label": "Cooling tower fan fleet power",
+      "unit": "kW",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "fan kW x cells running",
+      "deps": [
+        "cooling.tower_cells_running",
+        "cooling.tower_fan_kw"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "cooling.tower_fan_kw * cooling.tower_cells_running",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.crah_unit_duty_kw",
+      "label": "CRAH unit sensible duty",
+      "unit": "kW",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "hall IT load / crah_running (hall sensible demand = hall IT load, as crah_required uses)",
+      "deps": [
+        "campus.hall_count",
+        "cooling.crah_running",
+        "site.it_load_kw"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "site.it_load_kw / campus.hall_count / cooling.crah_running",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.crah_unit_load_pct",
+      "label": "CRAH unit load",
+      "unit": "%",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "crah_unit_duty_kw / crah_unit_sensible_kw x 100",
+      "deps": [
+        "cooling.crah_unit_duty_kw",
+        "cooling.crah_unit_sensible_kw"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "cooling.crah_unit_duty_kw / cooling.crah_unit_sensible_kw * 100",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.crah_fan_speed_pct",
+      "label": "CRAH fan speed",
+      "unit": "%",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "= unit load % (declared rule: constant air delta-T, airflow proportional to sensible duty)",
+      "deps": [
+        "cooling.crah_unit_load_pct"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaNotExpressible": "A declared control rule (constant air delta-T), not arithmetic; the formula would only restate the dependency. No valve position is published.",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.crah_unit_chw_flow_lps",
+      "label": "CRAH unit CHW flow",
+      "unit": "L/s",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "crah_unit_duty_kw / (cp x chw_delta_t)",
+      "deps": [
+        "cooling.chw_delta_t",
+        "cooling.crah_unit_duty_kw",
+        "cooling.water_cp_kj_per_kg_k"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      },
+      "formulaExpr": "cooling.crah_unit_duty_kw / (cooling.water_cp_kj_per_kg_k * cooling.chw_delta_t)",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.mech_plant_input_kw",
+      "label": "Mechanical plant electrical input",
+      "unit": "kW_e",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "chiller_input_kw_e + pump_fleet_input_kw + tower_fan_fleet_kw",
+      "deps": [
+        "cooling.chiller_input_kw_e",
+        "cooling.pump_fleet_input_kw",
+        "cooling.tower_fan_fleet_kw"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating. CRAH fans and other auxiliaries are not in it."
+      },
+      "formulaExpr": "cooling.chiller_input_kw_e + cooling.pump_fleet_input_kw + cooling.tower_fan_fleet_kw",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.mech_plant_headroom_kw",
+      "label": "Non-IT budget left after the mechanical plant",
+      "unit": "kW_e",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "non_it_load_kw - ups_loss_kw - mech_plant_input_kw",
+      "deps": [
+        "cooling.mech_plant_input_kw",
+        "electrical.ups_loss_kw",
+        "site.non_it_load_kw"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals()",
+        "asOf": "2026-11-18",
+        "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating. Law: >= 0 (the plant fits inside the PUE-implied non-IT load). The remainder covers CRAH fans, lighting, controls and losses not modelled."
+      },
+      "formulaExpr": "site.non_it_load_kw - electrical.ups_loss_kw - cooling.mech_plant_input_kw",
+      "display": "internal",
+      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
     }
   ]
 }
