@@ -130,7 +130,8 @@
       compressor: { label: "Compressor / nitrogen generator", category: "process" },
       coolingTowerCell: { label: "Cooling tower cell (induced draft, with basin)", category: "process" },
       uvSteriliser: { label: "UV steriliser", category: "process" },
-      gensetDiesel: { label: "Diesel generating set (engine + alternator)", category: "process" }
+      gensetDiesel: { label: "Diesel generating set (engine + alternator)", category: "process" },
+      resistor: { label: "Resistor (neutral earthing resistor)", category: "electrical" }
     },
     MARKUP: {
       utility: "<path d=\"M24 4 L11 44 M24 4 L37 44\" /><path d=\"M16 26 L32 38 M32 26 L16 38\" stroke-width=\"1.3\" /><path d=\"M7 16 H41 M10 30 H38\" /><path d=\"M9 16 v4 M39 16 v4 M14 30 v4 M34 30 v4\" stroke-width=\"1.4\" /><path d=\"M24 8 v4\" stroke-width=\"1.4\" />",
@@ -255,7 +256,8 @@
       compressor: "<path d=\"M0 24 H10 M38 24 H48\"/><circle class=\"b\" cx=\"24\" cy=\"24\" r=\"14\"/><path d=\"M14 14 L36 19 M14 34 L36 29\"/>",
       coolingTowerCell: "<path d=\"M0 36 H9 M48 12 H38 M48 42 H40 M24 44 V48\"/><path class=\"b\" d=\"M8 44 L12 6 H36 L40 44 Z\"/><path d=\"M9 34 H39\" stroke-dasharray=\"3 2\"/><path d=\"M16 2 H32 M24 2 V6\"/><path d=\"M17 18 L31 18 M16 24 L32 24\"/>",
       uvSteriliser: "<path d=\"M0 24 H6 M42 24 H48\"/><rect class=\"b\" x=\"6\" y=\"14\" width=\"36\" height=\"20\" rx=\"10\"/><path d=\"M14 24 H34\" stroke-width=\"2.2\"/><path d=\"M16 8 L18 12 M24 6 V11 M32 8 L30 12 M16 40 L18 36 M24 42 V37 M32 40 L30 36\"/>",
-      gensetDiesel: "<path d=\"M0 30 H6 M0 42 H6 M42 24 H48\"/><rect class=\"b\" x=\"6\" y=\"12\" width=\"20\" height=\"34\" rx=\"1\"/><path d=\"M10 20 H22 M10 26 H22 M10 32 H22\"/><path d=\"M26 24 H28\"/><circle class=\"b\" cx=\"35\" cy=\"24\" r=\"7\"/><path d=\"M31 24 C32.5 21 34 21 35 24 C36 27 37.5 27 39 24\"/>"
+      gensetDiesel: "<path d=\"M0 30 H6 M0 42 H6 M42 24 H48\"/><rect class=\"b\" x=\"6\" y=\"12\" width=\"20\" height=\"34\" rx=\"1\"/><path d=\"M10 20 H22 M10 26 H22 M10 32 H22\"/><path d=\"M26 24 H28\"/><circle class=\"b\" cx=\"35\" cy=\"24\" r=\"7\"/><path d=\"M31 24 C32.5 21 34 21 35 24 C36 27 37.5 27 39 24\"/>",
+      resistor: "<path d=\"M24 0 V12 M24 36 V48\"/><rect class=\"b\" x=\"17\" y=\"12\" width=\"14\" height=\"24\"/>"
     },
     /* HMI fields (R128, PRD §4): standard, ports on the 6-unit grid, states, tag prefix. Only kinds that declare them. */
     STANDARD: {
@@ -345,7 +347,8 @@
       compressor: "ISO 10628-2",
       coolingTowerCell: "ISO 10628-2",
       uvSteriliser: "ISO 10628-2",
-      gensetDiesel: "ISO 10628-2 / IEC 60617-6"
+      gensetDiesel: "ISO 10628-2 / IEC 60617-6",
+      resistor: "IEC 60617-4"
     },
     PORTS: {
       pumpCentrifugal: {"suction":[0,24,"liquid"],"discharge":[48,24,"liquid"]},
@@ -434,7 +437,8 @@
       compressor: {"suction":[0,24,"gas"],"discharge":[48,24,"gas"]},
       coolingTowerCell: {"makeup":[0,36,"liquid"],"hotIn":[48,12,"liquid"],"basinOut":[48,42,"liquid"],"blowdown":[24,48,"liquid"]},
       uvSteriliser: {"inlet":[0,24,"liquid"],"outlet":[48,24,"liquid"]},
-      gensetDiesel: {"fuelIn":[0,30,"liquid"],"fuelRet":[0,42,"liquid"],"out":[48,24,"power"]}
+      gensetDiesel: {"fuelIn":[0,30,"liquid"],"fuelRet":[0,42,"liquid"],"out":[48,24,"power"]},
+      resistor: {"line":[24,0,"power"],"load":[24,48,"power"]}
     },
     STATES: {
       pumpCentrifugal: ["running","stopped","standby","fault","manual"],
@@ -523,7 +527,8 @@
       compressor: ["running","stopped","standby","fault"],
       coolingTowerCell: ["running","stopped","fault"],
       uvSteriliser: ["running","stopped","fault"],
-      gensetDiesel: ["running","stopped","standby","fault"]
+      gensetDiesel: ["running","stopped","standby","fault"],
+      resistor: []
     },
     TAG: {
       pumpCentrifugal: "P",
@@ -612,7 +617,8 @@
       compressor: "C",
       coolingTowerCell: "CT",
       uvSteriliser: "UV",
-      gensetDiesel: "G"
+      gensetDiesel: "G",
+      resistor: "NGR"
     },
     /** A standalone <svg> for one kind, sized in CSS px. */
     svg: function (kind, size, cls) {
