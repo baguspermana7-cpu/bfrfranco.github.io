@@ -161,20 +161,24 @@
   /* open(n, api, el) handler for RZHmiSheet: inspector beside the sheet; focus returns to the symbol on close */
   /* AD5: "Open equipment HMI" in the inspector, or a double-click on the symbol, opens the deep modal
      (js/conv/equipment-modal.js) on the same payload, refreshed every 4 s while it is open. */
-  function deep(build, n, trigger, sym) {
+  /* more(n) (optional, E2): extra modal options for this item, e.g. { internal: {...} } for a machine whose inside is drawn
+     (js/conv/internals.js); returning null leaves the modal exactly as before */
+  function deep(build, n, trigger, sym, more) {
     if (!root.RZConvModal) return false;
     var p = build(n); if (!p) return false;
-    return root.RZConvModal.open(p, { trigger: trigger, symbol: sym, rebuild: function () { return build(n); } });
+    var o = { trigger: trigger, symbol: sym, rebuild: function () { return build(n); } }, x = more ? more(n) : null;
+    if (x) Object.keys(x).forEach(function (k) { o[k] = x[k]; });
+    return root.RZConvModal.open(p, o);
   }
   var DBL = {};
-  function opener(build, hostSel) {
+  function opener(build, hostSel, more) {
     var last = {};
     if (!DBL[hostSel] && root.document) {
       DBL[hostSel] = 1;
       root.document.addEventListener('dblclick', function (e) {
         var g = e.target && e.target.closest ? e.target.closest(hostSel + ' .hmi-node[data-node]') : null;
         if (!g || !last.n || last.n.id !== g.getAttribute('data-node')) return;
-        e.preventDefault(); deep(build, last.n, g, g);
+        e.preventDefault(); deep(build, last.n, g, g, more);
       }, true);
     }
     return function (n, api, el) {
@@ -182,7 +186,7 @@
       if (!root.RZInspector || typeof root.RZInspector.openPayload !== 'function') return;
       var payload = build(n); if (!payload) return;
       root.RZInspector.openPayload(payload, { trigger: el,
-        onOpenHmi: function (p, btn) { deep(build, n, btn, el); },
+        onOpenHmi: function (p, btn) { deep(build, n, btn, el, more); },
         onNavigate: function (id) {
           var t = document.querySelector(hostSel + ' .hmi-node[data-node="' + id + '"]');
           if (t && t.dispatchEvent) t.dispatchEvent(new MouseEvent('click', { bubbles: true }));

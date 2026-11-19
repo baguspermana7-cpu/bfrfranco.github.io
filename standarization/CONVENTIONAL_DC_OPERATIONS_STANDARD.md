@@ -320,6 +320,49 @@ Before release:
 
 ## 10. Change and lesson ledger
 
+### 2026-11-18 — equipment internals contract (modal v2 + chiller inside, PRD-CONV-EQUIPMENT-TRUTH E2)
+
+- **The modal draws the INSIDE, never the outside.** `RZConvModal.open(payload, { internal })` (v2.0.0, same API) shows,
+  when `RZConvInternals.has(class)`: header with tag, class, state chip and a unit navigator (`◂ 03 of 10 ▸`), a fleet
+  strip (one cell per `getFleet` unit: state colour + pattern + load %), the internal drawing (RZHmiSheet, pan/zoom,
+  View bar State / Thermal / Medium / Flat, media key), the block detail of the selected block (name, standard, state,
+  two-line role, values with unit and basis dot), then the unit's plant-sheet sections (`payloadFor(i)`; a unit the plant
+  sheet does not draw yet says so in one line). Classes without an internal sheet open the v1 modal unchanged. The page
+  opts in per item: `T4.opener(build, host, more)` merges `more(n)` (e.g. `chwDeepOpts`) into the modal options.
+- **Registry.** `js/conv/internals.js` (UMD, Node-tested) holds `register / has / get / model / read / detail / flow /
+  temp / tempRange / ratio` and the ONE table of display formats. A class file (`js/conv/internals/<class>.js`) holds
+  geometry, engine-key names and the block catalogue only: `tools/test-conv-internals-core.mjs` strips its GEOMETRY
+  block, comments and `standard:` text and fails on any digit left (planted `var DESIGN_SUPERHEAT = 5;` → red).
+- **Values.** Every drawn value is an engine key of the SELECTED unit (`CONV_CALC.getFleet(class)[n]`) or a plant key
+  that holds for every running unit (`snapshot.cooling`); a derived one carries its formula (COP = duty ÷ input). A value
+  the engine does not model is the text "not modelled" (superheat, subcooling, IGV position, oil pressure/temperature,
+  discharge temperature, VFD speed, intermediate pressure, HGBV/EXV opening, relief set point, purge). A reading that
+  exists only while the unit runs is "—" on a standby unit — no "standing" pressure is invented. A block-detail cell is
+  traced to its registry id only when that id IS this unit's value; a fleet row of a non-running unit is declared.
+- **Laws (gated).** Evaporator duty + compressor input = condenser duty within 0.1 % on the DISPLAYED numbers
+  (4464.3 + 736.2 = 5200.5 kW); Σ running-unit duty = unit duty × running, Σ input = `chiller_input_kw_e`; a standby unit
+  has no running line and no running-only number; the PRD §5.1 chiller catalogue (17 blocks) is on the drawing, tagged,
+  with a role. `node --test tools/test-conv-internals-core.mjs` (7 laws, 4 planted defects red) and
+  `node tools/test-conv-internals-render.mjs` (1440 + 390: not a clone, blocks select, values = model = engine, fleet
+  10 / 7, 01 → 08 standby still, Thermal, reduced motion, text ≥ 11 px with no overlap / pipe / foreign body, Escape +
+  focus return, no sideways scroll; `--plant=clone|nomodel|balance|overlap|motion` each red).
+- **Line grammar inside a machine.** Media get their own classes and tokens (`m-ref_lpv`, `m-ref_hpv`, `m-ref_liq`,
+  `m-ref_flash`, `m-oil`, light + dark in `css/conv-vfx.css`). Running unit: water and refrigerant `running`;
+  standby: water `stopped` (isolated), refrigerant and oil `standby` (charged, at rest); hot-gas bypass and purge flow
+  `unavailable` (not modelled). Thermal: water at its own temperature, refrigerant at the saturation temperature of its
+  pressure level (range evaporator → condenser saturation); a line with no temperature stays neutral.
+- **Readable in a modal.** The internal sheet never renders below 0.92 × its 740-unit width (scroller at 390 px) and its
+  text is 12 units, so no label is under 11 px; the drawing takes the modal's theme (flat `--hmi-bg` ground).
+- **Symbols added (additive, `tools/hmi-symbol-defs.py`):** `compressorCentrifugal` (suction, discharge, interstage
+  economiser, shaft, oil ports), `guideVanes`, `motorIec`, `vfdDrive`, `flashTank`, `purgeUnit`, `pumpGear`, `oilSump`.
+  `RZHmiSheet` gained `tagAt: 'at'` + `tagXY` (additive) for compact drawings.
+- **Registry.** The conv parameter registry now reads the `js/conv/internals/*.js` files a page loads as part of that
+  page; the 11 cycle keys the chiller drawing reads lost `display: internal`; the four per-unit plant figures keep it with
+  a reason that names the fleet-row link.
+- **Known, not changed here:** the plant sheet's own canvas takes the root (light) gradient while its labels carry a dark
+  halo (the page sets `data-theme="dark"` on the sheet host only) — visible on CH-M-101 today; the plant sheet still draws
+  four of ten chillers (phase E3).
+
 ### 2026-11-18 — plant internals basis (engine 2.4.0, PRD-CONV-EQUIPMENT-TRUTH E1)
 
 - **Additive only.** Engine 2.3.0 → 2.4.0 adds 63 `cooling.*` keys (18 authored, 45 derived) and

@@ -3574,9 +3574,7 @@
         "section": "MODEL.cooling (plant internals basis, engine 2.4.0)",
         "asOf": "2026-11-18",
         "method": "PRD-CONV-EQUIPMENT-TRUTH OD-1 default: R-134a, the common centrifugal fluid with widely published property data. Training design value for the simulated plant (engine 2.4.0); no chiller rating sheet, pump curve or tower selection exists for this site."
-      },
-      "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+      }
     },
     {
       "id": "cooling.chiller_evap_approach_k",
@@ -3589,9 +3587,7 @@
         "section": "MODEL.cooling (plant internals basis, engine 2.4.0)",
         "asOf": "2026-11-18",
         "method": "Flooded evaporator approach in the AHRI 550/590 rating context. Training design value for the simulated plant (engine 2.4.0); no chiller rating sheet, pump curve or tower selection exists for this site."
-      },
-      "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+      }
     },
     {
       "id": "cooling.chiller_cond_approach_k",
@@ -3604,9 +3600,7 @@
         "section": "MODEL.cooling (plant internals basis, engine 2.4.0)",
         "asOf": "2026-11-18",
         "method": "Shell-and-tube condenser approach in the AHRI 550/590 rating context. Training design value for the simulated plant (engine 2.4.0); no chiller rating sheet, pump curve or tower selection exists for this site."
-      },
-      "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+      }
     },
     {
       "id": "cooling.water_density_kg_m3",
@@ -3852,7 +3846,7 @@
       },
       "formulaExpr": "cooling.heat_rejection_kw / cooling.chillers_running",
       "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+      "displayReason": "Per-unit plant figure. The chiller equipment modal (PRD-CONV-EQUIPMENT-TRUTH E2) draws each unit's own value from its CONV_CALC.getFleet('chiller') row and links here as that value's basis; no cockpit reads this plant-level figure itself."
     },
     {
       "id": "cooling.chiller_unit_chw_flow_lps",
@@ -3873,7 +3867,7 @@
       },
       "formulaExpr": "cooling.plant_duty_flow_lps / cooling.chillers_running",
       "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+      "displayReason": "Per-unit plant figure. The chiller equipment modal (PRD-CONV-EQUIPMENT-TRUTH E2) draws each unit's own value from its CONV_CALC.getFleet('chiller') row and links here as that value's basis; no cockpit reads this plant-level figure itself."
     },
     {
       "id": "cooling.chiller_unit_condenser_duty_kw_th",
@@ -3894,7 +3888,7 @@
       },
       "formulaExpr": "cooling.chiller_unit_duty_kw_th + cooling.chiller_input_per_machine_kw_e",
       "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+      "displayReason": "Per-unit plant figure. The chiller equipment modal (PRD-CONV-EQUIPMENT-TRUTH E2) draws each unit's own value from its CONV_CALC.getFleet('chiller') row and links here as that value's basis; no cockpit reads this plant-level figure itself."
     },
     {
       "id": "cooling.chiller_unit_cdw_flow_lps",
@@ -3916,7 +3910,7 @@
       },
       "formulaExpr": "cooling.chiller_unit_condenser_duty_kw_th / (cooling.water_cp_kj_per_kg_k * cooling.cdw_range_k)",
       "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+      "displayReason": "Per-unit plant figure. The chiller equipment modal (PRD-CONV-EQUIPMENT-TRUTH E2) draws each unit's own value from its CONV_CALC.getFleet('chiller') row and links here as that value's basis; no cockpit reads this plant-level figure itself."
     },
     {
       "id": "cooling.chiller_evap_sat_c",
@@ -3935,9 +3929,7 @@
         "asOf": "2026-11-18",
         "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
       },
-      "formulaExpr": "cooling.chws_c - cooling.chiller_evap_approach_k",
-      "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+      "formulaExpr": "cooling.chws_c - cooling.chiller_evap_approach_k"
     },
     {
       "id": "cooling.chiller_cond_sat_c",
@@ -3956,9 +3948,7 @@
         "asOf": "2026-11-18",
         "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
       },
-      "formulaExpr": "cooling.cdw_return_c + cooling.chiller_cond_approach_k",
-      "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+      "formulaExpr": "cooling.cdw_return_c + cooling.chiller_cond_approach_k"
     },
     {
       "id": "cooling.chiller_lift_k",
@@ -3977,9 +3967,7 @@
         "asOf": "2026-11-18",
         "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
       },
-      "formulaExpr": "cooling.chiller_cond_sat_c - cooling.chiller_evap_sat_c",
-      "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+      "formulaExpr": "cooling.chiller_cond_sat_c - cooling.chiller_evap_sat_c"
     },
     {
       "id": "cooling.chiller_evap_sat_kpa_abs",
@@ -3998,9 +3986,7 @@
         "asOf": "2026-11-18",
         "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating. R-134a saturation pressure table (ASHRAE Fundamentals / NIST, rounded) is STANDARD; the Antoine fit to it is DERIVED."
       },
-      "formulaNotExpressible": "Antoine form ln P = A - B/(T + C); the evaluator has no exp(). Fit and table are checked by tools/test-conv-plant-internals.mjs (<= 1 % over 0-50 C).",
-      "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+      "formulaNotExpressible": "Antoine form ln P = A - B/(T + C); the evaluator has no exp(). Fit and table are checked by tools/test-conv-plant-internals.mjs (<= 1 % over 0-50 C)."
     },
     {
       "id": "cooling.chiller_evap_sat_kpa_g",
@@ -4039,9 +4025,7 @@
         "asOf": "2026-11-18",
         "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating. R-134a saturation pressure table (ASHRAE Fundamentals / NIST, rounded) is STANDARD; the Antoine fit to it is DERIVED."
       },
-      "formulaNotExpressible": "Antoine form ln P = A - B/(T + C); the evaluator has no exp(). Fit and table are checked by tools/test-conv-plant-internals.mjs (<= 1 % over 0-50 C).",
-      "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+      "formulaNotExpressible": "Antoine form ln P = A - B/(T + C); the evaluator has no exp(). Fit and table are checked by tools/test-conv-plant-internals.mjs (<= 1 % over 0-50 C)."
     },
     {
       "id": "cooling.chiller_cond_sat_kpa_g",
@@ -4080,9 +4064,7 @@
         "asOf": "2026-11-18",
         "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
       },
-      "formulaExpr": "cooling.chiller_cond_sat_kpa_abs / cooling.chiller_evap_sat_kpa_abs",
-      "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+      "formulaExpr": "cooling.chiller_cond_sat_kpa_abs / cooling.chiller_evap_sat_kpa_abs"
     },
     {
       "id": "cooling.chiller_carnot_cop",
@@ -4101,9 +4083,7 @@
         "asOf": "2026-11-18",
         "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
       },
-      "formulaExpr": "(cooling.chiller_evap_sat_c + 273.15) / cooling.chiller_lift_k",
-      "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+      "formulaExpr": "(cooling.chiller_evap_sat_c + 273.15) / cooling.chiller_lift_k"
     },
     {
       "id": "cooling.chiller_carnot_fraction",
@@ -4122,9 +4102,7 @@
         "asOf": "2026-11-18",
         "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
       },
-      "formulaExpr": "cooling.plant_cop / cooling.chiller_carnot_cop",
-      "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+      "formulaExpr": "cooling.plant_cop / cooling.chiller_carnot_cop"
     },
     {
       "id": "cooling.chw_primary_pump_count",

@@ -782,7 +782,7 @@
       "consumers": [
         {
           "page": "chiller-plant.html",
-          "reads": 4
+          "reads": 5
         },
         {
           "page": "water-system.html",
@@ -790,6 +790,8 @@
         }
       ],
       "tests": [
+        "test-conv-internals-core.mjs",
+        "test-conv-internals-render.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
       "docs": [],
@@ -815,7 +817,7 @@
       "consumers": [
         {
           "page": "chiller-plant.html",
-          "reads": 4
+          "reads": 5
         },
         {
           "page": "water-system.html",
@@ -823,6 +825,8 @@
         }
       ],
       "tests": [
+        "test-conv-internals-core.mjs",
+        "test-conv-internals-render.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [],
@@ -875,8 +879,6 @@
       "value": 14.13,
       "formula": "(chiller_evap_sat_c + 273.15) / chiller_lift_k",
       "formulaExpr": "(cooling.chiller_evap_sat_c + 273.15) / cooling.chiller_lift_k",
-      "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet.",
       "deps": [
         "cooling.chiller_evap_sat_c",
         "cooling.chiller_lift_k"
@@ -893,8 +895,14 @@
         "cooling.rack_inlet_target_c",
         "cooling.supply_path_mixing_k"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 1
+        }
+      ],
       "tests": [
+        "test-conv-internals-core.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
       "docs": [],
@@ -913,8 +921,6 @@
       "value": 0.429,
       "formula": "plant_cop / chiller_carnot_cop (plant_cop = duty / input = 1 / specific power)",
       "formulaExpr": "cooling.plant_cop / cooling.chiller_carnot_cop",
-      "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet.",
       "deps": [
         "cooling.chiller_carnot_cop",
         "cooling.plant_cop"
@@ -932,8 +938,15 @@
         "cooling.rack_inlet_target_c",
         "cooling.supply_path_mixing_k"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 1
+        }
+      ],
       "tests": [
+        "test-conv-internals-core.mjs",
+        "test-conv-internals-render.mjs",
         "test-conv-plant-internals.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
@@ -952,8 +965,6 @@
       "kind": "authored",
       "value": 1.5,
       "formula": null,
-      "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -961,8 +972,14 @@
       "dependsOnInputs": [
         "cooling.chiller_cond_approach_k"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 1
+        }
+      ],
       "tests": [
+        "test-conv-internals-core.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [],
@@ -981,8 +998,6 @@
       "value": 38.5,
       "formula": "cdw_return_c + chiller_cond_approach_k",
       "formulaExpr": "cooling.cdw_return_c + cooling.chiller_cond_approach_k",
-      "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet.",
       "deps": [
         "cooling.cdw_return_c",
         "cooling.chiller_cond_approach_k"
@@ -995,8 +1010,15 @@
         "cooling.cdw_supply_c",
         "cooling.chiller_cond_approach_k"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 1
+        }
+      ],
       "tests": [
+        "test-conv-internals-core.mjs",
+        "test-conv-internals-render.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
       "docs": [],
@@ -1015,8 +1037,6 @@
       "value": 977.1,
       "formula": "exp(A - B / (T_cond,K + C)), Antoine fit to the R-134a saturation table",
       "formulaNotExpressible": "Antoine form ln P = A - B/(T + C); the evaluator has no exp(). Fit and table are checked by tools/test-conv-plant-internals.mjs (<= 1 % over 0-50 C).",
-      "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet.",
       "deps": [
         "cooling.chiller_cond_sat_c",
         "cooling.chiller_refrigerant"
@@ -1029,8 +1049,15 @@
         "cooling.cdw_supply_c",
         "cooling.chiller_cond_approach_k"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 1
+        }
+      ],
       "tests": [
+        "test-conv-internals-core.mjs",
+        "test-conv-internals-render.mjs",
         "test-conv-plant-internals.mjs"
       ],
       "docs": [],
@@ -1120,8 +1147,6 @@
       "kind": "authored",
       "value": 1.5,
       "formula": null,
-      "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -1129,8 +1154,14 @@
       "dependsOnInputs": [
         "cooling.chiller_evap_approach_k"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 1
+        }
+      ],
       "tests": [
+        "test-conv-internals-core.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [],
@@ -1149,8 +1180,6 @@
       "value": 17.9,
       "formula": "chws_c - chiller_evap_approach_k",
       "formulaExpr": "cooling.chws_c - cooling.chiller_evap_approach_k",
-      "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet.",
       "deps": [
         "cooling.chiller_evap_approach_k",
         "cooling.chws_c"
@@ -1164,8 +1193,15 @@
         "cooling.rack_inlet_target_c",
         "cooling.supply_path_mixing_k"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 1
+        }
+      ],
       "tests": [
+        "test-conv-internals-core.mjs",
+        "test-conv-internals-render.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
       "docs": [],
@@ -1184,8 +1220,6 @@
       "value": 535.3,
       "formula": "exp(A - B / (T_evap,K + C)), Antoine fit to the R-134a saturation table",
       "formulaNotExpressible": "Antoine form ln P = A - B/(T + C); the evaluator has no exp(). Fit and table are checked by tools/test-conv-plant-internals.mjs (<= 1 % over 0-50 C).",
-      "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet.",
       "deps": [
         "cooling.chiller_evap_sat_c",
         "cooling.chiller_refrigerant"
@@ -1199,8 +1233,15 @@
         "cooling.rack_inlet_target_c",
         "cooling.supply_path_mixing_k"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 1
+        }
+      ],
       "tests": [
+        "test-conv-internals-core.mjs",
+        "test-conv-internals-render.mjs",
         "test-conv-plant-internals.mjs"
       ],
       "docs": [],
@@ -1279,6 +1320,7 @@
         }
       ],
       "tests": [
+        "test-conv-internals-core.mjs",
         "test-conv-plant-internals.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
@@ -1340,8 +1382,6 @@
       "value": 20.6,
       "formula": "chiller_cond_sat_c - chiller_evap_sat_c",
       "formulaExpr": "cooling.chiller_cond_sat_c - cooling.chiller_evap_sat_c",
-      "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet.",
       "deps": [
         "cooling.chiller_cond_sat_c",
         "cooling.chiller_evap_sat_c"
@@ -1358,8 +1398,15 @@
         "cooling.rack_inlet_target_c",
         "cooling.supply_path_mixing_k"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 1
+        }
+      ],
       "tests": [
+        "test-conv-internals-core.mjs",
+        "test-conv-internals-render.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
       "docs": [],
@@ -1503,8 +1550,6 @@
       "value": 1.825,
       "formula": "condenser kPa abs / evaporator kPa abs",
       "formulaExpr": "cooling.chiller_cond_sat_kpa_abs / cooling.chiller_evap_sat_kpa_abs",
-      "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet.",
       "deps": [
         "cooling.chiller_cond_sat_kpa_abs",
         "cooling.chiller_evap_sat_kpa_abs"
@@ -1521,8 +1566,15 @@
         "cooling.rack_inlet_target_c",
         "cooling.supply_path_mixing_k"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 1
+        }
+      ],
       "tests": [
+        "test-conv-internals-core.mjs",
+        "test-conv-internals-render.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
       "docs": [],
@@ -1568,14 +1620,17 @@
       "kind": "authored",
       "value": "R-134a",
       "formula": null,
-      "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ADOPTED",
       "explainKey": null,
       "dependsOnInputs": [],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-plant-internals.mjs"
       ],
@@ -1666,7 +1721,7 @@
       "formula": "unit condenser duty / (cp x cdw_range_k)",
       "formulaExpr": "cooling.chiller_unit_condenser_duty_kw_th / (cooling.water_cp_kj_per_kg_k * cooling.cdw_range_k)",
       "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet.",
+      "displayReason": "Per-unit plant figure. The chiller equipment modal (PRD-CONV-EQUIPMENT-TRUTH E2) draws each unit's own value from its CONV_CALC.getFleet('chiller') row and links here as that value's basis; no cockpit reads this plant-level figure itself.",
       "deps": [
         "cooling.cdw_range_k",
         "cooling.chiller_unit_condenser_duty_kw_th",
@@ -1708,7 +1763,7 @@
       "formula": "plant_duty_flow_lps / chillers_running",
       "formulaExpr": "cooling.plant_duty_flow_lps / cooling.chillers_running",
       "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet.",
+      "displayReason": "Per-unit plant figure. The chiller equipment modal (PRD-CONV-EQUIPMENT-TRUTH E2) draws each unit's own value from its CONV_CALC.getFleet('chiller') row and links here as that value's basis; no cockpit reads this plant-level figure itself.",
       "deps": [
         "cooling.chillers_running",
         "cooling.plant_duty_flow_lps"
@@ -1748,7 +1803,7 @@
       "formula": "unit evaporator duty + unit compressor input",
       "formulaExpr": "cooling.chiller_unit_duty_kw_th + cooling.chiller_input_per_machine_kw_e",
       "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet.",
+      "displayReason": "Per-unit plant figure. The chiller equipment modal (PRD-CONV-EQUIPMENT-TRUTH E2) draws each unit's own value from its CONV_CALC.getFleet('chiller') row and links here as that value's basis; no cockpit reads this plant-level figure itself.",
       "deps": [
         "cooling.chiller_input_per_machine_kw_e",
         "cooling.chiller_unit_duty_kw_th"
@@ -1787,7 +1842,7 @@
       "formula": "heat_rejection_kw / chillers_running",
       "formulaExpr": "cooling.heat_rejection_kw / cooling.chillers_running",
       "display": "internal",
-      "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet.",
+      "displayReason": "Per-unit plant figure. The chiller equipment modal (PRD-CONV-EQUIPMENT-TRUTH E2) draws each unit's own value from its CONV_CALC.getFleet('chiller') row and links here as that value's basis; no cockpit reads this plant-level figure itself.",
       "deps": [
         "cooling.chillers_running",
         "cooling.heat_rejection_kw"
@@ -1805,6 +1860,7 @@
       ],
       "consumers": [],
       "tests": [
+        "test-conv-internals-core.mjs",
         "test-conv-plant-internals.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
@@ -1881,6 +1937,7 @@
         }
       ],
       "tests": [
+        "test-conv-internals-core.mjs",
         "test-conv-plant-internals.mjs",
         "test-conv-formula.mjs (formula evaluated)",
         "test-conv-basis-drawer.mjs (drawer value vs dc-conventional.html)"
@@ -1933,6 +1990,7 @@
         }
       ],
       "tests": [
+        "test-conv-internals-core.mjs",
         "test-conv-plant-internals.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
@@ -2583,12 +2641,14 @@
         },
         {
           "page": "chiller-plant.html",
-          "reads": 7
+          "reads": 8
         }
       ],
       "tests": [
         "test-conv-calc.mjs",
         "test-conv-datahall-air.mjs",
+        "test-conv-internals-core.mjs",
+        "test-conv-internals-render.mjs",
         "test-conv-payloads.mjs",
         "test-conv-formula.mjs (formula evaluated)",
         "test-conv-basis-drawer.mjs (drawer value vs dc-conventional.html)"
@@ -2634,13 +2694,15 @@
         },
         {
           "page": "chiller-plant.html",
-          "reads": 7
+          "reads": 8
         }
       ],
       "tests": [
         "test-conv-calc.mjs",
         "test-conv-cooling-water-ui.mjs",
         "test-conv-datahall-air.mjs",
+        "test-conv-internals-core.mjs",
+        "test-conv-internals-render.mjs",
         "test-conv-payloads.mjs",
         "test-datahall-operator-engineering.mjs",
         "test-conv-formula.mjs (formula evaluated)",
@@ -3540,6 +3602,7 @@
         }
       ],
       "tests": [
+        "test-conv-internals-core.mjs",
         "test-conv-plant-internals.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
@@ -9185,6 +9248,7 @@
         "test-conv-epms-model.mjs",
         "test-conv-fire-fuel-operator.mjs",
         "test-conv-hall-scope.mjs",
+        "test-conv-internals-core.mjs",
         "test-conv-parameter-registry.mjs",
         "test-conv-payloads.mjs",
         "test-conv-secondary-authority.mjs",

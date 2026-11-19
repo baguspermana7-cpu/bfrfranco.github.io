@@ -10,7 +10,7 @@
  *   s.update(); s.trace(nodeId, 'up'|'down'|'both'); s.clearTrace(); s.fit(); s.destroy();
  *
  * Sheet JSON v1: { id, no, title, rev, basis, size:[w,h], nodes:[…], edges:[…], areas:[…], notes:[…] }
- *   node { id, tag, sym, x, y, size?, rot?, cls?, label?, tagAt?, values?:[{k, dx, dy, anchor}], lod?, inst? }
+ *   node { id, tag, sym, x, y, size?, rot?, cls?, label?, tagAt? ('above'|'below'|'left'|'right'|'belowV'|'none'|'at' + tagXY:[dx,dy,anchor]), values?:[{k, dx, dy, anchor}], lod?, inst? }
  *   edge { id?, from:'node.port' | [x,y], to:'node.port' | [x,y], via?:[[x,y]…], medium, w?:'main'|'branch'|'signal'|'bus', line?, flowOf? }
  *   area { x, y, w, h, label, kind:'zone'|'box' }   note { x, y, text, role }
  * Geometry is the sheet's; symbols come from RZEngSymbols (one library); every number comes from opts.read.
@@ -195,6 +195,9 @@
         if (at === 'above') ty = n.y - h - 4;
         else if (at === 'right') { tx = n.x + h + 4; ty = n.y + 3; anchor = 'start'; }
         else if (at === 'left') { tx = n.x - h - 4; ty = n.y + 3; anchor = 'end'; }
+        /* tagAt 'at' + tagXY [dx, dy, anchor]: the tag at an explicit offset from the symbol centre (a compact drawing
+           such as an equipment's internal sheet, where above/below/left/right would sit on a pipe) */
+        if (at === 'at' && n.tagXY) { tx = n.x + n.tagXY[0]; ty = n.y + n.tagXY[1]; anchor = n.tagXY[2] || 'middle'; }
         if (at === 'belowV') {
           textSvg += '<text data-role="tag" data-tag-of="' + esc(n.id) + '"' + (n.lod ? ' data-lod="' + n.lod + '"' : '') + ' text-anchor="end" transform="translate(' + r1(n.x + 3) + ' ' + r1(n.y + h + 4) + ') rotate(-90)">' + esc(n.tag) + '</text>';
         } else {

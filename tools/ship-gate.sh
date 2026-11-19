@@ -174,6 +174,8 @@ gate "Conventional payloads — every symbol class: 6 tabs with content, basis r
 gate "Conventional equipment modal — open, focus trap, inert page, Esc, focus return, no timers left, traced cells (390 + 1440)" node tools/test-conv-equipment-modal.mjs
 gate "Conventional depth ratchet — symbols open, inspector depth, engine-hooked cells (tools/conv-depth-thresholds.json)" node tools/test-conv-depth.mjs
 gate "Conventional modals — no modal repeats the sheet it was opened from (owner C10)" node tools/test-conv-modal-no-self-repeat.mjs
+gate "Conventional equipment internals — chiller model = engine 2.4.0, energy balance on displayed values, standby still, PRD §5.1 catalogue, no typed digit, red proofs" node --test tools/test-conv-internals-core.mjs
+gate "Conventional equipment internals in the modal — CH-01 inside drawn (not a clone), blocks select, values = model, navigator 01→08 standby still, fleet 10/7, Thermal, reduced motion, text clear (1440 + 390)" node tools/test-conv-internals-render.mjs
 # v3.67.0 (PRD-CONV-LIVING-PLANT P1/P2) — line colour and motion are bound to the process: a line is painted by its own
 # flow state, the dash period follows flow, a rotor follows speed, no-flow lines never move. Before it every pipe on the
 # four P&ID sheets was the same grey in every condition. The trend modal reads one deterministic history per point.
