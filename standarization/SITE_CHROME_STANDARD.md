@@ -182,6 +182,8 @@ Owner, 2026-11-18: "This button combo is looking a bit flat. We don't need the l
 - A page whose `html` and `body` both scroll (chiller-plant) gets `body { overflow-x: clip; overflow-y: visible }`
   under the bar, else `position: sticky` binds to a body that never scrolls.
 - Laws C1–C8 (`tools/test-conv-shell.mjs`): bar, positions, bare login, CTA rest / hover / pressed / reduced motion,
-  actions still work, 390 More menu, contrast ≥ 4.5 : 1, keyboard order. The hover laws run with Chrome's
+  actions still work, 390 More menu, contrast ≥ 4.5 : 1 in the dark AND the light theme (v3.78.1), keyboard order.
+  Bar colour rules for the auth chrome sit under `:root` so a page register (`rz-cockpit-instrument.css`, 0,2,1)
+  cannot repaint them. The hover laws run with Chrome's
   `--blink-settings=…HoverType=2…` flags and refuse to run when `(hover: hover)` does not match.
 - `datahallAI.html` adopts the same component and gate (owned by the DC AI session).

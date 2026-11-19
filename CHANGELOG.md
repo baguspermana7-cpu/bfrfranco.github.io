@@ -11,6 +11,18 @@ release sections rather than semver.
 
 ---
 
+## v3.78.1 — 2026-11-20 — Cockpit bar: Login readable in the light theme
+
+### Fixed
+- Light theme, `dc-conventional.html` and `cdu-mini-bms.html`: the bar's Login (and the signed-in account pill) drew
+  in the dark register's ink, 1.26:1 on the white bar. `css/rz-cockpit-instrument.css` styles auth chrome at
+  specificity 0,2,1 and outranked the bar's 0,2,0 rule; `css/conv-shell.css` now scopes those rules under `:root`
+  (0,3,0). Found on the live v3.77.0 screenshot.
+
+### Gates
+- `tools/test-conv-shell.mjs` adds a light-theme pass at 1440 px: every bar label holds 4.5:1. It failed on v3.77.0
+  (2 pages, 1.26:1) and passes now (476/0). Standard: `standarization/SITE_CHROME_STANDARD.md` §9.
+
 ## v3.78.0 — 2026-11-20 — DC AI cockpit: no flash of the old drawing on a tab, no modal that repeats its sheet, firewall conduits clickable
 
 PRD `documentation/prd/datahall-ai/PRD_DCAI_LIVING_PLANT.md`, phase A0, and owner R177.

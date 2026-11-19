@@ -78,7 +78,7 @@ await new Promise((r) => srv.listen(0, '127.0.0.1', r));
 const O = `http://127.0.0.1:${srv.address().port}/`;
 const browser = await puppeteer.launch({ args: ['--no-sandbox', '--blink-settings=primaryPointerType=4,availablePointerTypes=4,primaryHoverType=2,availableHoverTypes=2'] });
 
-async function open(file, { width, signedIn, reduce = false }) {
+async function open(file, { width, signedIn, reduce = false, theme = 'dark' }) {
   const page = await browser.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(String(e.message || e).slice(0, 160)));
@@ -91,7 +91,7 @@ async function open(file, { width, signedIn, reduce = false }) {
     return q.respond({ status: 204, contentType: 'text/plain', body: '' });
   });
   if (signedIn) await page.evaluateOnNewDocument((entries) => entries.forEach(([k, v]) => localStorage.setItem(k, v)), signedInStorage({ tier: 'pro' }));
-  await page.evaluateOnNewDocument(() => localStorage.setItem('theme', 'dark'));
+  await page.evaluateOnNewDocument((t) => localStorage.setItem('theme', t), theme);
   if (PLANT) await page.evaluateOnNewDocument((css) => document.addEventListener('DOMContentLoaded', () => { const s = document.createElement('style'); s.id = 'rz-plant'; s.textContent = css; document.head.appendChild(s); }), PLANT);
   await page.setViewport({ width, height: width > 800 ? 900 : 844, deviceScaleFactor: 1 });
   await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: reduce ? 'reduce' : 'no-preference' }]);   /* hover/pointer come from the launch flags (puppeteer cannot emulate them) */
@@ -299,6 +299,16 @@ for (const file of pages) {
     ok(rm.ring > 0, 'C4', `${file}: reduced motion shows no static ring`);
     await rp.close();
   }
+}
+
+/* ---------------------------------------------------------------- 1440 light: C7 (signed out)
+   since v3.77.0: the light theme read Login at 1.2:1 because a page register (rz-cockpit-instrument.css) outranked
+   the bar's own colour; every bar label must hold 4.5:1 in the light theme too */
+for (const file of pages) {
+  const { page } = await open(file, { width: 1440, signedIn: false, theme: 'light' });
+  const lowLight = await page.evaluate(contrastScan);
+  ok(!lowLight.length, 'C7', `${file}: light theme bar labels under 4.5:1: ${lowLight.join(' | ')}`);
+  await page.close();
 }
 
 /* ---------------------------------------------------------------- 390: C6 (signed in) */
