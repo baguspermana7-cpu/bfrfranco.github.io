@@ -179,6 +179,12 @@
   function apply(svg, opts) {
     if (!svg || !svg.closest('.hmi-depth')) return;
     watchViewport(svg.closest('.hmi-depth'));
+    /* The shaded sheet is pinned to one theme on its host, but RZHmiSheet keeps its gradients in ONE document-level
+       <svg class="hmi-defs"> that reads the DOCUMENT theme. On a page without data-theme the canvas and body fills
+       resolved to the light set under dark-theme text: light letters readable only through their halo. The defs
+       follow the host's pin. */
+    var pin = svg.closest('.hmi-depth').getAttribute('data-theme'), shared = root.document.querySelector('svg.hmi-defs');
+    if (pin && shared && shared.getAttribute('data-theme') !== pin) shared.setAttribute('data-theme', pin);
     var id = ensureDefs(svg);
     var nodes = svg.querySelector('g.hmi-nodes'); if (nodes) nodes.setAttribute('filter', 'url(#' + id + '-hd-shadow)');
     paintBodies(svg, id);

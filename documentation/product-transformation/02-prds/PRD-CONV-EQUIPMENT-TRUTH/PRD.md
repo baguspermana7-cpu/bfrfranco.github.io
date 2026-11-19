@@ -200,17 +200,39 @@ phase E6 with its gate. The audit judges against: this site's register and rejec
 ISA-101 (muted normal, colour for abnormal, overview → unit → equipment → diagnostics), ISA-5.1 / ISO 10628-2 /
 IEC 60617 symbols, units on every number, 11 px minimum text, 44 px touch targets, no sideways scroll.
 
-Known before the audit (from this session's own screenshots):
+### 7.1 Audit result (2026-11-18, tree v3.73.0 + branch conv-p5; 173 screenshots, every finding re-observed in a browser)
 
-| # | finding | page |
-|---|---|---|
-| U-1 | Nine pages carry nine different headers (button order, sizes, title position, clock, export) | all |
-| U-2 | The EPMS top strip still reads "Utility A+B · Gen Standby" from the legacy view while E-S-101 is shown | EPMS |
-| U-3 | The LV view's top bar wraps its title to three lines | EPMS |
-| U-4 | On the data hall, the heat-map mode buttons and the legend stay active in the Air path view where they do nothing | datahall |
-| U-5 | Inspectors sit in different places and use different row styles per page | all |
-| U-6 | Three modal families exist (equipment, network, TCC) with three looks | chiller/fire/fuel/water, ict, EPMS |
-| U-7 | Status words differ per page for the same state (RUN / RUNNING / ONLINE / UP / DUTY) without a glossary | all |
+Evidence: `~/.cache/qa-tmp/audit-ux/findings.md` (43 findings), `inventory.md` (every clickable equipment class per
+page), `shots/`. Inventory: chiller-plant 10 classes / 57 nodes, water 12 / 19, fire 19 / 49, fuel 10 / 22, EPMS
+E-S-101 13 / 94 — on all 64 classes the modal Drawing is the cloned symbol (2–12 primitives). No modal exists for
+the EPMS legacy view (84 devices open nothing), the data-hall racks and CRAH list, and `cdu-mini-bms` equipment.
+
+| id | sev | finding | work package |
+|---|---|---|---|
+| F1 | CRITICAL | Modal Drawing = clone of the one symbol on all 64 classes; nothing internal | E2, E4–E6 |
+| F2 | CRITICAL | Three generator fleets: fuel page 3 sets with GEN-B alone "RUNNING 43.5 MW"; EPMS legacy GEN A/B/C; E-S-101 32 sets | E5 (fuel sheet per hall, 8 sets; standby in normal) |
+| F3 | HIGH | EPMS legacy: a click on "Utility A" de-energises feed A and starts gensets while the page still reads NORMAL, 0 alarms, 43,500 kW | E5 (E-S-102 replaces the legacy view) |
+| F4 | HIGH | EPMS legacy: 84 devices open nothing; 98 breakers and 6 sources operate on one click, no select-before-operate | E5 |
+| F5 | HIGH | Fuel in NORMAL: a set at 43.5 MW with every day-tank fill valve closed and P-101 stopped; DT-GEN-B 455 L = 1.8 min of burn; no alarm | E5 (day tank sized per set burn, fill logic, low-level alarm) |
+| F6 | HIGH | Inspector is navy `rgba(15,23,42,.97)` with an 8 px backdrop blur — two rejected patterns | E7 |
+| F7 | HIGH | Sheet tags: light text with a dark halo on a light canvas | **fixed v3.74.1** (theme pin of the shared gradient defs) |
+| F8 | HIGH | Nine pages, nine top bars; 8 button classes, 28–52 px; `cdu-mini-bms` has no Back / Portfolio / Alarm history | E7 |
+| F9–F10 | HIGH | Light theme works on 2 of 9 pages; `dc-conventional` light callouts at 2.45–3.9 : 1 | E7 (decision OD-7) |
+| F11–F13 | HIGH | 390 px: `dc-conventional` bar overlaps and runs off screen; sheets open on an empty pan; text under 11 px on every page (CDU P&ID 6 px) | E7 |
+| F14 | HIGH | EPMS legacy "Fit" removes all 84 device labels | E5 |
+| F15–F16 | HIGH | Normal state in saturated colour (ISA-101); coloured left rails (rejected pattern) on five pages | E7 |
+| F17 | MEDIUM | Internal ids as equipment titles (`vs1`, `cka1`, `cv0`, `t1-pe`, `ictlink-it-0`); untagged valves | E3–E6 (ISA-5.1 tag on every symbol) |
+| F18 | MEDIUM | Units: ΔT printed in "C" instead of K; raw `kW_th`; "30.000 MW" beside "30.00 MW" and "30,000 kW" | E7 (one unit formatter) |
+| F19 | MEDIUM | Chiller sheet draws 4 of 10 machines | E3 |
+| F20 | MEDIUM | ICT chip "Active/Active" against a drawing with DUTY / STANDBY | E7 |
+| F21 | MEDIUM | EPMS "Per system 15,000 kW" is the load; the rating is 32 × 1,250 = 40,000 kW | E5 |
+| F22 | MEDIUM | Water page evaporation 447.8 L/min carries about half the condenser heat as latent; basis not shown | E1b (engine: state the evaporation basis) |
+| F23 | MEDIUM | TCC opened from the 150 kV bay plots the 3,150 kVA unit's damage and inrush curves, not TX-1's | E5 |
+| F24 | MEDIUM | Two legends on the HV / MV view (legacy feed legend + sheet legend) | E5 |
+
+Engine findings from phase E1 (2026-11-18), to close in E1b: `cooling.flow_per_machine_lps` (134.7) divides the
+IT-only flow by the machines, while the machines carry IT + UPS loss (140.3 L/s); the 1,250 kW of UPS loss has no
+terminal unit in the model (the CRAH fleet is sized on IT load only) — electrical rooms need their own cooling units.
 
 ---
 
@@ -298,6 +320,45 @@ whole conv family → push → verify live.
 | OD-4 | Pump arrangement | primary: one duty + one standby per chiller train (as drawn today); secondary and condenser: N+1 on headers |
 | OD-5 | Depth of drill-down | two levels (machine → sub-assembly) |
 | OD-6 | Order | E1 → E8 as listed; the chiller is the first visible proof |
+| OD-7 | Light theme on the cockpits | dark only; the toggle is hidden on the 7 pages that never switched |
+| OD-3/4 note | Tower cells and condenser pumps | one per chiller train, so their redundancy is the chillers' N+1 (10 installed for 7 running) |
+
+## 15. Orchestration (owner 2026-11-18: "kamu yang lakukan, autonomous, rancang kolaborasi dan orkestranya, jangan tanya saya")
+
+One integrator, several executors, one release train. Decisions are taken by the integrator from the PRD defaults
+and recorded here or in §13; nothing waits for a question.
+
+| role | who | where | does |
+|---|---|---|---|
+| Integrator | the main session (Fable) | worktree `rz-w5`, branch `conv-w6` | plans, writes briefs, reviews every screenshot and number, ports branches onto the moved `main`, runs the release gates, pushes, verifies live |
+| Executor | one Opus agent per work package | its own worktree and branch (`rz-e1` `conv-e1`, `rz-e7` `conv-e7a`, …) | builds one package to its laws, runs its gates, looks at its screenshots, commits locally, never pushes |
+| Auditor | read-only Opus agent | `rz-p1` | measures and screenshots; changes no tracked file |
+| Peer | the DC AI / site-chrome session | its own trees | ships on the same `main`; shared tables and files are agreed by message before either side edits them |
+
+Rules of the train:
+- **Two browser lanes, no third browser.** Lane 1 and lane 2 belong to this session; an executor is told its lane
+  and queues on `rz-lane`. Node-only packages run beside them.
+- **One package = one branch = one release**, except where a package only supplies the basis of the next (engine
+  2.4.0 ships with the modal that draws it).
+- **Order by conflict, not by wish**: packages that touch the same file are released one after the other; the
+  integrator ports each branch onto the moved `main` (checkout of the real files, regeneration of every generated
+  artefact, token fix) — never a rebase across the version-token churn.
+- **Release gate = `tools/run-conv-release-gates.sh`** (70 gates selected by what they cover) inside a lane, plus
+  the package's own new gates. A gate red for a reason outside the package is proven on `origin/main` before it is
+  set aside, and named in the release note.
+- **Evidence before words**: every executor report is checked by the integrator on at least the decisive numbers and
+  the screenshots before it is repeated to the owner.
+
+Train as of 2026-11-18:
+
+| # | release | package | branch | state |
+|---|---|---|---|---|
+| R1 | v3.74.1 | sheet labels readable (audit F7) | `conv-w6` | gates running |
+| R2 | next MINOR | E1 engine 2.4.0 + E2 modal v2 with chiller internals | `conv-e1` | E1 built, E2 in gates |
+| R3 | — | E7a one cockpit top bar, bare Login, primary CTA with lift, glow, label swap, plane loop | `conv-e7a` | executor running |
+| R4 | — | E3 CH-M-101 with 10 trains + CRAH banks × N + CH-M-102 condenser / towers | to open after R2 | queued |
+| R5 | — | fuel truth (audit F2, F5): 8 sets per hall, standby in normal, day tanks sized per set burn | to open after R2 | queued |
+| R6+ | — | E4–E6 internals by class; E5 E-S-102 LV sheet; PRD-APP-CLARITY packages from the app-pattern audit | — | queued |
 
 ## 14. Status
 

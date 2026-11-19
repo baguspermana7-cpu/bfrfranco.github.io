@@ -11,6 +11,20 @@ release sections rather than semver.
 
 ---
 
+## v3.74.1 — 2026-11-18 — Conventional P&ID sheets: labels readable again (dark canvas under dark-theme text)
+
+### Fixed
+- **Chiller, fire, fuel and water sheets drew a light canvas under light text.** The sheet is pinned to the dark
+  theme on its host, but the shared gradient definitions live in one document-level SVG and followed the document,
+  which has no theme on these pages. Canvas and equipment bodies resolved to the light set, so every tag was a light
+  letter readable only through its dark halo (audit finding F7). `js/conv/hmi-depth.js` now pins the shared
+  definitions to the host's theme. Measured after the fix on all four sheets: canvas rgb(27, 29, 33), tag text
+  rgb(218, 220, 223).
+
+### Docs
+- `PRD-CONV-EQUIPMENT-TRUTH` §7: the UI/UX and engineering audit of the 9 Conventional pages (43 findings with
+  screenshots) and the work packages it adds.
+
 ## v3.74.0 — 2026-11-18 — EPMS: single-line diagram from the 150 kV GIS, switching with interlocks, time–current curves
 
 ### Added
