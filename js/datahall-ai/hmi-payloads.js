@@ -959,7 +959,7 @@
     b.dep('downstream', 'net-spine:1', 'Spine switches');
     b.trend('util_pct', 'Uplink utilisation', '%', { value: 58 }, 10, { digits: 0 });
   });
-  def('net-wan', { kind: 'authored', label: 'WAN / internet edge', system: 'network', tier2: 'net' }, function (b, ctx, id) {
+  def('net-wan', { kind: 'authored', label: 'WAN / internet edge', system: 'network', tier2: null }, function (b, ctx, id) {
     b.title = 'WAN edge — ' + (id || 'border');
     b.D('live', 'committed', 'Committed transit', '800 Gb/s (2 carriers, diverse entry)', WAN_SPEC);
     b.D('live', 'installed', 'Installed capacity', '4.8 Tb/s (6 × 800G)', WAN_SPEC);
@@ -967,11 +967,45 @@
     b.ST('live', 'state', 'Session state', 'up', 'BGP session state is declared established in the simulation (Track A §A7)');
     b.D('capacity', 'survivable', 'Single-carrier loss', '400 Gb/s committed survives — demand exceeds it, so peak sheds to the replication queue', WAN_SPEC);
     b.D('capacity', 'scrub', 'DDoS scrubbing', 'always-on, carrier-side', WAN_SPEC);
-    b.tier2('net', ['wan', String(id || '1')]);
+    /* no tier-2 (PRD-DCAI-LIVING-PLANT A0, owner C10): this item has no drawing of its own yet, and a modal never
+       redraws the sheet the click came from — the click opens the inspector until the internal drawing lands (A2b) */
     b.trend('util_pct', 'Committed utilisation', '%', { value: 72 }, 6, { digits: 0 });
     b.D('maint', 'review', 'Contract review', 'demand model re-run per training-fleet change', WAN_SPEC);
   });
-  def('net-zone', { kind: 'authored', label: 'Security zone', system: 'network', tier2: 'net' }, function (b, ctx, id) {
+  /* A conduit of the IEC 62443 zoning (PRD-DCAI-LIVING-PLANT A0, owner C4 "kasih modal firewall … yang block-block
+     itu"): every row is read from the page's own zoning model (ZONES[k].outb / enf / never) — the same strings the
+     zone table prints. Nothing here is a firewall measurement; the page has none. */
+  var ZONE_ORDER = ['Z-EXT', 'Z4', 'Z3', 'ZF', 'ZM', 'Z2', 'Z1', 'Z0'];
+  function conduitOf(id) {
+    var Z = root && root.ZONES, cid = String(id || '').toUpperCase(), hit = null;
+    if (!Z) return null;
+    ZONE_ORDER.forEach(function (k, i) { var z = Z[k], m = z && /^(C\d+)\s*·\s*([^·]+)(?:·\s*(.+))?$/.exec(z.outb || '');
+      if (m && m[1] === cid && Z[ZONE_ORDER[i + 1]]) hit = { id: cid, from: k, to: ZONE_ORDER[i + 1], zf: z, zt: Z[ZONE_ORDER[i + 1]], protocol: m[2].trim(), rule: (m[3] || '').trim() }; });
+    return hit;
+  }
+  def('net-conduit', { kind: 'authored', label: 'Zone conduit', system: 'network', tier2: 'conduit' }, function (b, ctx, id) {
+    var c = conduitOf(id);
+    b.title = 'Conduit ' + String(id || '').toUpperCase();
+    if (!c) {   // no page zoning in reach (a Node test, or an id that is not a conduit): say what the class is, claim nothing else
+      b.D('live', 'model', 'Zoning model', 'IEC 62443 zones and conduits', ZONE_SPEC);
+      b.ST('live', 'state', 'Policy state', 'up', 'conduit policy is declared enforced in the simulation; no live firewall telemetry exists (Track A §A7)');
+      b.tier2('conduit', [String(id || 'C1').toUpperCase()]);
+      return;
+    }
+    b.title = 'Conduit ' + c.id + ' — ' + c.from + ' to ' + c.to;
+    b.D('live', 'from', 'From zone', c.from + ' · ' + c.zf.name + ' (' + c.zf.slt + ')', ZONE_SPEC);
+    b.D('live', 'to', 'To zone', c.to + ' · ' + c.zt.name + ' (' + c.zt.slt + ')', ZONE_SPEC);
+    b.D('live', 'protocol', 'Allowed protocol', c.protocol, ZONE_SPEC);
+    if (c.rule) b.D('live', 'rule', 'Direction and condition', c.rule, ZONE_SPEC);
+    b.ST('live', 'state', 'Policy state', 'up', 'conduit policy is declared enforced in the simulation; no live firewall telemetry exists (Track A §A7)');
+    b.D('capacity', 'enforcement', 'Enforcement point', c.zt.enf, ZONE_SPEC);
+    b.D('capacity', 'refused_from', 'Refused from ' + c.from, c.zf.never, ZONE_SPEC);
+    b.D('capacity', 'refused_to', 'Refused from ' + c.to, c.zt.never, ZONE_SPEC);
+    b.D('maint', 'review', 'Conduit review', 'per architecture change; rule-base audit is out of scope here', ZONE_SPEC);
+    b.dep('upstream', 'net-zone:' + c.from, c.from); b.dep('downstream', 'net-zone:' + c.to, c.to);
+    b.tier2('conduit', [c.id]);
+  });
+  def('net-zone', { kind: 'authored', label: 'Security zone', system: 'network', tier2: null }, function (b, ctx, id) {
     b.title = 'Security zone ' + (id || '');
     b.D('live', 'model', 'Zoning model', 'IEC 62443 zones and conduits', ZONE_SPEC);
     b.ST('live', 'state', 'Policy state', 'up', 'conduit policy is declared enforced in the simulation; no live firewall telemetry exists (Track A §A7)');
@@ -979,7 +1013,6 @@
     b.D('capacity', 'slt', 'Target security level', 'SL-T per zone, drawn on the zone block', ZONE_SPEC);
     b.D('capacity', 'conduits', 'Conduits', 'every crossing is a named conduit with a protocol and a direction', ZONE_SPEC);
     b.D('maint', 'review', 'Zone review', 'per architecture change; SL-A verification is out of scope here', ZONE_SPEC);
-    b.tier2('net', ['zone', String(id || 'ZI')]);
   });
 
   /* fire */
@@ -1106,7 +1139,7 @@
     }
     b.dep('upstream', 'fire-facp:' + hp, 'FACP');
   });
-  def('fire-cylinder-bank', { kind: 'scenario', label: 'Agent cylinders', system: 'fire', tier2: 'cylbank' }, function (b, ctx, id) {
+  def('fire-cylinder-bank', { kind: 'scenario', label: 'Agent cylinders', system: 'fire', tier2: null }, function (b, ctx, id) {
     var hp = hallPrefix(ctx, id), fs = ctx.fire && ctx.fire.summary ? ctx.fire.summary : null;
     b.title = 'Cylinder bank ' + hp + ' — ' + agentLabel();
     b.S('live', 'pressure_bar', 'Cylinder pressure', { value: 42, text: '42 bar charged' }, 0.5, 'bar', { digits: 1 });
@@ -1115,7 +1148,6 @@
     b.D('capacity', 'agent', 'Agent', agentLabel() + ' — 4 × 180 L superpressurised cylinders (indicative); design concentration per NFPA 2001 for the selected agent is pending', FIRE_SPEC);
     b.dep('upstream', 'fire-zone:' + hp + '-Z01', 'Zones');
     b.trend('pressure_bar', 'Cylinder pressure', 'bar', { value: 42 }, 0.5);
-    b.tier2('cylbank', [hp]);
   });
   def('fire-mcp', { kind: 'scenario', label: 'Manual call point', system: 'fire', tier2: null }, function (b, ctx, id) {
     var hp = hallPrefix(ctx, id), pid = /^DH-/.test(String(id)) ? String(id) : hp + '-MCP-' + id, fp = firePointOf(ctx, pid), inv = fireInventory(ctx), rec = inv ? inv.byId[pid] : null;
@@ -1185,16 +1217,16 @@
       b.D('capacity', 'protocols', 'Protocols', 'BACnet/IP · Modbus TCP · IEC 61850 · SNMP v3', BMS_SPEC);
       b.D('capacity', 'authority', 'Command authority', 'monitor-only — no write path from this cockpit', BMS_MONITOR_ONLY);
       b.trend('cpu_pct', 'CPU', '%', { value: 28 }, 8, { digits: 0 });
-      b.tier2('bms', [kind, String(id)]);
+      if (kind !== 'app' && kind !== 'field') b.tier2('bms', [kind, String(id)]);   // an application or a field group has no drawing of its own yet (A0, C10): inspector
     };
   }
   def('bms-server', { kind: 'authored', label: 'BMS server', system: 'bms', tier2: 'bms' }, bmsClass('BMS server', 'server'));
   def('bms-controller', { kind: 'authored', label: 'DDC controller', system: 'bms', tier2: 'bms' }, bmsClass('Controller', 'controller'));
   def('bms-network', { kind: 'authored', label: 'BMS network', system: 'bms', tier2: 'bms' }, bmsClass('Network segment', 'network'));
   def('bms-gateway', { kind: 'authored', label: 'Protocol gateway', system: 'bms', tier2: 'bms' }, bmsClass('Gateway', 'gateway'));
-  def('bms-field', { kind: 'authored', label: 'Field device group', system: 'bms', tier2: 'bms' }, bmsClass('Field group', 'field'));
+  def('bms-field', { kind: 'authored', label: 'Field device group', system: 'bms', tier2: null }, bmsClass('Field group', 'field'));
   def('bms-ldc', { kind: 'authored', label: 'Local display controller', system: 'bms', tier2: 'bms' }, bmsClass('LDC', 'ldc'));
-  def('bms-app', { kind: 'authored', label: 'Monitoring application', system: 'bms', tier2: 'bms' }, bmsClass('Application', 'app'));
+  def('bms-app', { kind: 'authored', label: 'Monitoring application', system: 'bms', tier2: null }, bmsClass('Application', 'app'));
 
   /* ------------------------------------------------------------------------
    * Public API

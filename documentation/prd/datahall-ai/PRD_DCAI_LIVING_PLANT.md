@@ -1,7 +1,7 @@
 # PRD-DCAI-LIVING-PLANT — the DC AI cockpit as a living plant (datahallAI.html)
 
-Status: **DRAFT rev 2 for owner approval, 2026-11-17 (independent review folded in). Nothing here is executed until
-the owner says go.**
+Status: **APPROVED by the owner 2026-11-18 ("Setujui, mulai dari A0"; his comment "animasi2nya sangat kurang" is
+about this cockpit). Phase A0 in progress. A0.5 agreed with the Conventional session the same day (§12a).**
 On approval this file is committed as `documentation/prd/datahall-ai/PRD_DCAI_LIVING_PLANT.md`, the neighbouring
 session is told (§12), and work starts at phase A0.
 
@@ -231,6 +231,17 @@ Every visual change: screenshots at 1440 and 390, dark and light, State and Flat
 | **A7c** | The eleven legacy modals onto the shell, one family per release | Ark, Opus review |
 Fifteen releases, not eight. Each phase: laws → red → build → green → screenshots → standards in the same release →
 ship gate → push → live check from the real site with real clicks → the owner sees pictures, not instructions.
+
+## 12a. What the two sessions agreed (A0.5, 2026-11-18, by message)
+| thing | agreed |
+|---|---|
+| State table | the eight states of PRD-CONV-LIVING-PLANT §4.1 are the single table (colour + dash pattern per state, motion only with flow). Today's tokens: `--vfx-run/-warn/-alarm/-stby/-stop/-na` in `css/conv-vfx.css` |
+| Tokens | this session adds `--hmi-st-*` to `css/rz-hmi.css` **additively, same values**; the Conventional session then aliases `--vfx-*` to them. Neither edits the other's file for this |
+| Trend | `RZTrend.register(pageId, { list, series, meta })`, point id `class:id:hall/point` — accepted if additive: today's callers (`data-trend` + `r.trend`) keep working, `tools/test-conv-vfx-trend.mjs` T1–T6 stays green |
+| Curves | when this page needs them: copy `js/conv/tcc.js` to `js/rz-tcc.js`; `js/conv/tcc.js` stays until its callers are switched by its owner |
+| Effect clock | `RZConvVfx` has no clock (CSS durations): nothing to merge yet |
+| Engine version in gates | derive it, never type it (their fire-authority gate went stale on a typed '2.2.0') |
+| Site chrome on the Conventional cockpits | theirs, from `SITE_CHROME_STANDARD.md` with `tools/sweep-site-chrome.py` |
 
 ## 12. Working with the neighbouring session (owner: "kasih tahu sesi sebelah")
 On approval one message goes to the Conventional session with this file's path and these proposals:

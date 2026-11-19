@@ -158,7 +158,7 @@
   var CLS_PAYLOAD = { cdu: 'cdu', 'cdu-pump': 'cdu', chiller: 'chiller', stp: 'stp', ahu: 'ahu', 'battery-a': 'battery-a', 'battery-b': 'battery-b', 'dry-cooler': 'dry-cooler', 'fws-pump-station': 'fws-pump-station', 'cw-pump-station': 'cw-pump-station', chem: 'chem', 'tcs-manifold': 'tcs-manifold', leak: 'leak', 'fws-piping': 'fws-piping', 'net-wan': 'net-wan', 'net-zone': 'net-zone', 'sld-tx': 'sld-tx', 'sld-mv-sub': 'sld-mv-sub', 'sld-msb': 'sld-msb', 'sld-ups-a': 'sld-ups-a', 'sld-ups-b': 'sld-ups-b',
     'sld-rack-psu': 'sld-rack-psu', 'rack-ct': 'rack-ct', 'rack-ns': 'rack-ns', 'rack-psu': 'rack-psu', 'rack-busbar': 'rack-busbar', 'rack-manifold': 'rack-manifold', 'rack-leak': 'rack-leak',
     'fire-facp': 'fire-facp', 'fire-cylinder-bank': 'fire-cylinder-bank', 'fire-zone': 'fire-zone', 'fire-vesda': 'fire-vesda', 'fire-mcp': 'fire-mcp', 'fire-epo': 'fire-epo', 'fire-point': 'fire-point',
-    'sld-main-tx': 'sld-main-tx', 'site-genset-yard': 'site-genset-yard', 'net-core': 'net-core', 'net-spine': 'net-spine', 'net-leaf': 'net-leaf', 'rack-unit': 'rack-unit', crah: 'crah', 'bms-server': 'bms-server', 'bms-controller': 'bms-controller', 'bms-network': 'bms-network', 'bms-gateway': 'bms-gateway', 'bms-field': 'bms-field', 'bms-ldc': 'bms-ldc', 'bms-app': 'bms-app' };
+    'sld-main-tx': 'sld-main-tx', 'site-genset-yard': 'site-genset-yard', 'net-core': 'net-core', 'net-spine': 'net-spine', 'net-leaf': 'net-leaf', 'net-conduit': 'net-conduit', 'rack-unit': 'rack-unit', crah: 'crah', 'bms-server': 'bms-server', 'bms-controller': 'bms-controller', 'bms-network': 'bms-network', 'bms-gateway': 'bms-gateway', 'bms-field': 'bms-field', 'bms-ldc': 'bms-ldc', 'bms-app': 'bms-app' };
   /* fire points keep their full inventory id (DH-01-Z05-SD1-02); the point state comes from the workstation snapshot through the payload */
   function fireStateOf(p) {
     if (!p) return { state: 'unknown' };
@@ -263,7 +263,7 @@
     if (n.sym === 'junction') return {};
     if (n.cls === 'fire-output') return interlockOf(n);
     var cls = n.cls && CLS_PAYLOAD[n.cls], id = n.eqId || n.id, fire = !!cls && cls.indexOf('fire-') === 0;
-    var fullId = fire || cls === 'net-zone';   // fire points and security zones keep their full id (DH-01-Z05-SD1-02, Z-EXT)
+    var fullId = fire || cls === 'net-zone' || cls === 'net-conduit';   // fire points, security zones and conduits keep their full id (DH-01-Z05-SD1-02, Z-EXT, C3)
     var p = cls ? payload(cls, fullId ? String(id) : String(id).replace(/^[A-Z]+-?/, '').replace(/-\d+$/, '') || '1', hallOfSheet(sheet)) : null;
     var tip = [];
     if (fire) {
@@ -408,12 +408,14 @@
     var OP = win.RZDatahallAIHmiOpeners = win.RZDatahallAIHmiOpeners || {}; if (!OP.fire) OP.fire = openFireZone;   // tier-2 of the fire-zone payload
     /* tier-2 of the main transformer and the generator yard (v3.65.1): their own L3 sheet, states from the site SLD's scenario mapping */
     if (!OP.maintx) OP.maintx = function (feed) { var L = String(feed || 'A').toUpperCase() === 'B' ? 'B' : 'A'; return openSheetModal({ cls: 'sld-main-tx', id: L + '01', tag: 'TX-M' + L + '01', name: 'Main transformer', sheet: 'main-tx-l3', o: { feed: L }, read: 'dh-e-001' }); };
-    /* tier-2 of the fire panel (its own L3, counted from the point inventory) and of the agent cylinder bank (the
-       release sheet DH-F-102 with the bank selected) — v3.65.2 */
+    /* tier-2 of the fire panel: its own L3, counted from the point inventory (v3.65.2). The cylinder bank has no
+       opener: v3.65.2 opened the release sheet DH-F-102 it sits on, with itself selected — a modal repeating its
+       parent sheet (owner C10, law M10). Its own internals are phase A5; until then the click opens the inspector. */
     if (!OP.facp) OP.facp = function (hp) { var fi = fireInventory(), m = /(\d+)/.exec(String(hp || '')); if (!fi) return false;
       return openSheetModal({ cls: 'fire-facp', id: String(hp || 'DH-01'), tag: 'FACP-01', name: 'Fire alarm control panel', sheet: 'facp-l3', o: { fire: fi, hall: m ? Number(m[1]) : 1 } }); };
-    if (!OP.cylbank) OP.cylbank = function (hp) { var fi = fireInventory(); if (!fi) return false;
-      return openSheetModal({ cls: 'fire-cylinder-bank', id: String(hp || 'DH-01'), tag: 'CYL-BANK', name: 'Clean-agent cylinder bank', sheet: 'dh-f-102', o: { fire: fi }, read: 'dh-f-102', svgId: 'fireRelL3Svg', focus: 'fire-cylinder-bank:DH-01' }); };
+    /* tier-2 of a zone conduit (A0, owner C4): its own L3 from the page zoning — source zone, enforcement, destination */
+    if (!OP.conduit) OP.conduit = function (cid) { if (!win.ZONES) return false;
+      return openSheetModal({ cls: 'net-conduit', id: String(cid || 'C1').toUpperCase(), tag: String(cid || 'C1').toUpperCase(), name: 'Zone conduit', sheet: 'conduit-l3', o: { zones: win.ZONES, id: cid }, read: 'dh-n-104' }); };
     if (!OP.genset) OP.genset = function () { return openSheetModal({ cls: 'site-genset-yard', id: 'G01', tag: 'GEN YARD', name: 'Generator yard', sheet: 'genset-l3', read: 'dh-e-001' }); };
     mount('coolSvg', 'dh-m-103', 'hmiCoolSvg');
     mountNew('coolSvg', 'dh-m-101', 'hmiCoolOverSvg', { before: true });                         // overview first: where every item sits
@@ -445,16 +447,14 @@
     });
     wrapOpener('net', function (kind, id) {
       if (/^(core|spine|leaf)$/.test(String(kind))) drawAtBodyTop('netModalBody', 'net-l3', 'switch', { kind: kind, id: id });
-      /* a WAN node or a security zone opens the architecture it is part of with itself selected (as the rack manifold
-         opens the rack elevation): one node alone has no schematic of its own in the page's authored model */
-      else if (String(kind) === 'wan' && win.WAN_NODES) drawAtBodyTop('netModalBody', 'net-l3', 'dh-n-102', { wan: win.WAN_NODES, svgId: 'wanL3Svg', focus: 'net-wan:' + id });
-      else if (String(kind) === 'zone' && win.ZONES) drawAtBodyTop('netModalBody', 'net-l3', 'dh-n-104', { zones: win.ZONES, svgId: 'secL3Svg', focus: 'net-zone:' + id });
+      /* a WAN node or a security zone draws nothing here: v3.65.0 drew the architecture sheet it sits on, with itself
+         selected — the parent sheet again inside the modal (owner C10, law M10). Their own drawings are phase A2b. */
     });
     wrapOpener('bms', function (kind, id) {
       if (!win.BMS_MODEL) return;
       if (kind === 'controller') drawAtBodyTop('bmsModalBody', 'bms-l3', 'bms-controller', { bms: win.BMS_MODEL, id: id });
       else if (/^(server|network|gateway|ldc)$/.test(String(kind || 'server'))) drawAtBodyTop('bmsModalBody', 'bms-l3', 'bms-node', { bms: win.BMS_MODEL, kind: String(kind || 'server'), id: id });   // the spec tables stay below the schematic
-      else if (/^(app|field)$/.test(String(kind))) drawAtBodyTop('bmsModalBody', 'bms-l3', 'dh-b-101', { bms: win.BMS_MODEL, svgId: 'bmsL3Svg', focus: 'bms-' + kind + ':' + id });   // an application or a field group: the BMS architecture with it selected
+      /* an application or a field group draws nothing here (v3.65.0 redrew the BMS architecture — C10, law M10) */
     });
     wrapOpener('rack', function (type) {
       if (/psu|power|shelf/.test(String(type))) { drawRackPower('rack-power'); return; }
@@ -582,7 +582,9 @@
     try { pageCduSheet = win.RZHmiSheet.render(host, win.RZDatahallAISheets.build('cdu', snap, { id: id }), sheetOpts()); }
     catch (e) { if (legacy) legacy.removeAttribute('data-dh2-retired'); if (win.console) console.warn('hmi-v2: CDU sheet', e.message); }
   }
-  function close() { if (!back) return; back.hidden = true; if (modalSheet) modalSheet.destroy(); modalSheet = null; if (lastFocus) lastFocus.focus(); }
+  /* focus goes back to the item the modal came from; its sheet shows a tooltip on focusin, which would pop up over the
+     sheet the reader just returned to (law L1: no tooltip 450 ms after Escape) — so the returned focus hides it */
+  function close() { if (!back) return; back.hidden = true; if (modalSheet) modalSheet.destroy(); modalSheet = null; if (lastFocus) { lastFocus.focus(); var t = doc.getElementById('hmiTip'); if (t) t.classList.remove('is-on'); } }
   function bandHtml(r) {
     if (!r || !r.band || r.value == null) return '';
     var lo = r.band[0], hi = r.band[1], span = (hi - lo) || 1, pad = span * 0.5, a = lo - pad, b = hi + pad, pct = function (x) { return Math.max(0, Math.min(100, (x - a) / (b - a) * 100)); };
@@ -745,7 +747,11 @@
     function slow() { var n = 0, t2 = setInterval(function () { n++; tick(); if (done() || n > 200) clearInterval(t2); }, 1500); }
     function onTab(ev) {   // a panel's sheets are drawn when it is shown: right after the page's own tab handler, and again once its builder has run
       if (ev.type === 'keydown' && !/^(Enter| |Arrow(Left|Right|Up|Down)|Home|End)$/.test(ev.key)) return;
-      if (ev.target.closest && ev.target.closest('#tabs, #fireTabs, #netTabs, .elec-tabs')) { setTimeout(tick, 60); setTimeout(tick, 600); }
+      /* the first mount runs in the next animation frame: after the page's own tab handler has shown the panel and
+         drawn its legacy mimic synchronously, but BEFORE the browser paints. A timer (the 60 ms tick alone) let the
+         browser paint the old mimic first and replace it 60-600 ms later (owner 2026-11-19: "sekilas lihat tampilan bms
+         yang lama"; law F0). The timers stay for builders that finish later. */
+      if (ev.target.closest && ev.target.closest('#tabs, #fireTabs, #netTabs, .elec-tabs')) { (win.requestAnimationFrame || setTimeout)(tick); setTimeout(tick, 60); setTimeout(tick, 600); }
     }
     doc.addEventListener('click', onTab, true); doc.addEventListener('keydown', onTab, true);   // hall SLDs are drawn lazily per sub-tab: mount after every tab click (mount() skips a sheet already up)
   }

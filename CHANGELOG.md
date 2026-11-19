@@ -11,6 +11,28 @@ release sections rather than semver.
 
 ---
 
+## v3.78.0 — 2026-11-20 — DC AI cockpit: no flash of the old drawing on a tab, no modal that repeats its sheet, firewall conduits clickable
+
+PRD `documentation/prd/datahall-ai/PRD_DCAI_LIVING_PLANT.md`, phase A0, and owner R177.
+
+### Fixed
+- **Opening Cooling & Piping (and rack, electrical, network, BMS) no longer shows the old drawing for a moment.**
+  The page's tab handler shows the panel and draws the legacy mimic at once; the new sheet was mounted only after a
+  60 ms timer, so the retired drawing painted first. The sheet now mounts in the next animation frame, before the
+  browser paints. Law F0 in `tools/test-dh-drawings.mjs`: without the fix 5 of 7 tabs flashed (rackSvg, coolSvg,
+  elecOvSvg, netSvg, bmsSvg); with it 7 of 7 are clean.
+- **A modal never redraws the sheet the click came from** (owner C10). The WAN node, security zone, BMS application,
+  field group and cylinder bank opened a copy of their own sheet; they now open the inspector until each gets a
+  drawing of its own. Law M10 compares drawn node ids (under 50 % shared) and replaces M6.
+
+- **Closing a modal no longer pops a tooltip over the sheet.** Focus returns to the item the modal came from, and the
+  sheet showed its tooltip on that focus; the returned focus now hides it (law L1, which caught it once the cylinder
+  bank opened the inspector instead of a modal).
+
+### Added
+- **Firewall conduits C1-C7 on DH-N-104 are clickable** (owner C4): new class `net-conduit` with a tooltip payload
+  from the zone model (from, to, protocol, rule, enforcement, refused) and its own drawing `conduit-l3`. Law N1.
+
 ## v3.77.0 — 2026-11-20 — Conventional cockpits: one top bar, same buttons in the same place on all nine pages
 
 ### Cockpit bar: one bar, same slots on every BMS page (PRD-CONV-EQUIPMENT-TRUTH E7a)

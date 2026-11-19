@@ -727,12 +727,41 @@
       if (i === order.length - 1) return;
       var m = /^(C\d+)\s*·\s*([^·]+)/.exec(z.outb || ''), cid = m ? m[1] : 'C' + (i + 1), proto = m ? m[2].trim() : '';
       var a = s.j('c' + i + 'a', CX, y + ZH, false), b = s.j('c' + i + 'b', CX, y + ZH + GAP, false);
-      var ep = s.n({ id: 'ep-' + cid.toLowerCase(), tag: cid, sym: 'netFirewall', x: CX, y: y + ZH + GAP / 2, size: 22, tagAt: 'right',
+      var ep = s.n({ id: 'ep-' + cid.toLowerCase(), tag: cid, sym: 'netFirewall', x: CX, y: y + ZH + GAP / 2, size: 22, tagAt: 'right', cls: 'net-conduit', eqId: cid,
         label: cid + ' ' + z.outb + ' — enforced by: ' + (Z[order[i + 1]].enf || '') });
       var monitor = /monitor/i.test(z.outb);
       s.e(a, ep, 'data', { w: monitor ? 'signal' : 'branch' });
       s.e(ep, b, 'data', { w: monitor ? 'signal' : 'branch', line: proto.toUpperCase().replace(/\s+/g, ' ').slice(0, 22) });
     });
+    return finish(s);
+  }
+
+  /* ── L3 conduit (PRD-DCAI-LIVING-PLANT A0, owner C4): one crossing of the IEC 62443 zoning as its own drawing — the
+     source zone with what it holds, the enforcement elements the destination zone names, the destination zone with
+     what it holds, the allowed protocol on the line. Every item is a string of the page zoning (o.zones = ZONES);
+     nothing is added. Not DH-N-104 again: of its nodes only the two zone blocks have a counterpart there (law M10). */
+  function conduitL3(snap, o) {
+    var Z = o && o.zones, order = ['Z-EXT', 'Z4', 'Z3', 'ZF', 'ZM', 'Z2', 'Z1', 'Z0'], cid = String(o && o.id || '').toUpperCase(), ix = -1, mm = null;
+    if (!Z) throw new Error('hmi-sheets: conduit L3 needs the page zoning');
+    order.forEach(function (k, i) { var m = Z[k] && /^(C\d+)\s*·\s*([^·]+)/.exec(Z[k].outb || ''); if (m && m[1] === cid && Z[order[i + 1]]) { ix = i; mm = m; } });
+    if (ix < 0) throw new Error('hmi-sheets: no conduit ' + cid + ' in the page zoning');
+    var from = order[ix], to = order[ix + 1], zf = Z[from], zt = Z[to], proto = mm[2].trim();
+    var list = function (t) { return String(t || '').split(/\s*,\s*|\s+\+\s+/).map(function (x) { return x.trim(); }).filter(Boolean).slice(0, 4); };
+    var W = 980, H = 440, CX = 190, s = Sheet({ id: 'conduit-l3', no: cid, title: 'CONDUIT ' + cid + ' ' + from + ' TO ' + to, size: [W, H], svgId: 'conduitL3Svg', basis: 'page IEC 62443 zoning' });
+    var chip = function (id, text, x, y, label) { var w = Math.max(96, Math.min(300, 18 + text.length * 7.4));
+      return s.n({ id: id, tag: text, box: [w, 28], x: x + w / 2, y: y, tagAt: 'none', boxSym: 'chip', text: text.toUpperCase(), textRole: 'tag', label: label }); };
+    var zone = function (id, k, z, y) { return s.n({ id: id, tag: k, box: [260, 52], x: CX, y: y, cls: 'net-zone', eqId: k, tagAt: 'none', boxSym: 'sec-zone', text: k + ' · ' + z.slt, textRole: 'tag',
+      label: k + ' ' + z.name + ' — target ' + z.slt + '; holds: ' + z.holds + '; never: ' + z.never }); };
+    zone('src', from, zf, 70); zone('dst', to, zt, 370);
+    list(zf.holds).forEach(function (t, i) { chip('src-h' + (i + 1), t, 370, 44 + i * 34, from + ' holds: ' + t); });
+    list(zt.holds).forEach(function (t, i) { chip('dst-h' + (i + 1), t, 370, 344 + i * 34, to + ' holds: ' + t); });
+    var ep = s.n({ id: 'enf', tag: cid, name: 'ENFORCEMENT', sym: 'netFirewall', x: CX, y: 220, size: 34, cls: 'net-conduit', eqId: cid, tagAt: 'left',
+      label: 'Conduit ' + cid + ' — ' + zf.outb + '; enforced by: ' + zt.enf });
+    list(zt.enf).forEach(function (t, i) { chip('enf-' + (i + 1), t, 370, 186 + i * 34, 'Enforcement element of ' + cid + ': ' + t); });
+    var a = s.j('ca', CX, 96, false), b = s.j('cb', CX, 344, false), monitor = /monitor|read-only/i.test(zf.outb);
+    s.e(a, ep, 'data', { w: monitor ? 'signal' : 'branch', line: proto.toUpperCase().replace(/\s+/g, ' ').slice(0, 22) });
+    s.e(ep, b, 'data', { w: monitor ? 'signal' : 'branch' });
+    s.n({ id: 'os-zoning', tag: 'DH-N-104', sym: 'offSheet', x: 60, y: 220, size: 20, tagAt: 'below', label: 'All zones and conduits (sheet DH-N-104)' });
     return finish(s);
   }
 
@@ -1520,7 +1549,7 @@
     return finish(s);
   }
 
-  var BUILDERS = { 'dh-m-103': dhM103, cdu: cduSheet, 'dh-e-101': dhE101, 'dh-r-101': dhR101, 'dh-f-101': dhF101, 'dh-e-001': dhE001, 'dh-n-101': dhN101, 'dh-a-101': dhA101, 'dh-b-101': dhB101, 'dh-n-102': dhN102, 'dh-n-104': dhN104, 'dh-m-102': dhM102, 'dh-m-104': dhM104, 'dh-m-101': dhM101, chiller: chillerL3, crah: crahL3, battery: batteryL3, 'pump-station': pumpStationL3, 'tcs-manifold': tcsManifoldL3, 'chem-dosing': chemDosingL3, 'dry-cooler': dryCoolerL3, switch: switchL3, 'bms-controller': bmsCtlL3, 'sld-mimic': sldMimicL3, 'rack-power': rackPowerL3, stp: stpL3, ahu: ahuL3, tray: trayL3, 'nvswitch-tray': nvswitchTrayL3, 'dh-f-102': dhF102, 'dh-f-103': dhF103, 'dh-f-104': dhF104, 'bms-node': bmsNodeL3, 'fire-zone-l3': fireZoneL3, 'leak-l3': leakL3, 'fws-l3': fwsPipingL3, 'main-tx-l3': mainTxL3, 'genset-l3': gensetYardL3, 'facp-l3': facpL3 };
+  var BUILDERS = { 'conduit-l3': conduitL3, 'dh-m-103': dhM103, cdu: cduSheet, 'dh-e-101': dhE101, 'dh-r-101': dhR101, 'dh-f-101': dhF101, 'dh-e-001': dhE001, 'dh-n-101': dhN101, 'dh-a-101': dhA101, 'dh-b-101': dhB101, 'dh-n-102': dhN102, 'dh-n-104': dhN104, 'dh-m-102': dhM102, 'dh-m-104': dhM104, 'dh-m-101': dhM101, chiller: chillerL3, crah: crahL3, battery: batteryL3, 'pump-station': pumpStationL3, 'tcs-manifold': tcsManifoldL3, 'chem-dosing': chemDosingL3, 'dry-cooler': dryCoolerL3, switch: switchL3, 'bms-controller': bmsCtlL3, 'sld-mimic': sldMimicL3, 'rack-power': rackPowerL3, stp: stpL3, ahu: ahuL3, tray: trayL3, 'nvswitch-tray': nvswitchTrayL3, 'dh-f-102': dhF102, 'dh-f-103': dhF103, 'dh-f-104': dhF104, 'bms-node': bmsNodeL3, 'fire-zone-l3': fireZoneL3, 'leak-l3': leakL3, 'fws-l3': fwsPipingL3, 'main-tx-l3': mainTxL3, 'genset-l3': gensetYardL3, 'facp-l3': facpL3 };
   for (var hb = 2; hb <= 9; hb++) BUILDERS['dh-e-10' + hb] = dhE101;   // DH-E-102 ... : same builder, o.hall picks the hall (the builder refuses a hall the engine does not have)
   var API = {
     build: function (id, snap, o) { if (!BUILDERS[id]) throw new Error('hmi-sheets: no sheet ' + id); return BUILDERS[id](snap, o); },

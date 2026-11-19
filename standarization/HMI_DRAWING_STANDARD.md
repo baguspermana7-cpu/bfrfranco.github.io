@@ -11,7 +11,7 @@ object built in code (`js/datahall-ai/hmi-sheets.js`, `RZDatahallAISheets.build(
 shared symbol library `js/rz-eng-symbols.js`. The page mounts a sheet into the `.bx` of the tab it replaces
 (`js/datahall-ai/hmi-v2.js mountAll`); the previous drawing in that box is retired (`data-dh2-retired`, hidden by
 `css/rz-dh-shell.css`), never deleted in the same release. A sheet with no legacy drawing gets its own box after an anchor drawing (`mountNew`). A builder that throws
-leaves the old drawing in place — never a blank box. A sheet is drawn only once its tab panel (`.pn`) is shown — on the tab click or key, never into a hidden panel at boot (gate `test-dcai-deferred-panels.mjs` D6: 6,127 attribute writes in hidden panels during 9 s before v3.62.1). `mount(..., {keep: true})` instead inserts the sheet right
+leaves the old drawing in place — never a blank box. A sheet is drawn only once its tab panel (`.pn`) is shown — on the tab click or key, never into a hidden panel at boot (gate `test-dcai-deferred-panels.mjs` D6: 6,127 attribute writes in hidden panels during 9 s before v3.62.1). The sheet is mounted in the animation frame that follows the tab click, before the browser paints: the page's own tab handler shows the panel and draws the legacy mimic synchronously, so a mount that waited for a 60 ms timer let the retired drawing paint first (owner R177, v3.77.0: "sekilas lihat tampilan bms yang lama" on Cooling & Piping; it happened on rack, cooling, electrical, network and BMS). Law **F0** (`tools/test-dh-drawings.mjs`) records the visible legacy `svg[id]` in the first frame after each tab click and fails any that is retired 1.5 s later. `mount(..., {keep: true})` instead inserts the sheet right
 after the drawing it complements and retires nothing — used where another contract still reads the old drawing
 (Room Layout: `#floorSvg` reveal, `hall-interact`).
 
@@ -166,19 +166,26 @@ words on the pre-redraw sheets; H13 read `floorSvg 0×0`. v3.63.0: F10 and F15 f
 read the drawing one register behind (cache keyed on the tick only) and the impaired zone at P2, F18 read the cleared
 register stale (`clearRegister` rendered without evaluating) — all three fixed in the same release.
 
-**L3 by architecture (v3.65.0).** A class whose authored model describes an architecture and not the inside of one
-item (a WAN node, a security zone, a BMS application, a field group) opens that architecture's sheet inside its modal
-with the item selected (`drawAtBodyTop(..., { svgId, focus })` — a second `svgId`, never a duplicate id). A class with
+**A modal never redraws the sheet the click came from (PRD-DCAI-LIVING-PLANT A0, owner C10: "konyol").** v3.65.0 made
+a WAN node, a security zone, a BMS application and a field group open the architecture sheet they sit on with the item
+selected, and v3.65.2 did the same for the cylinder bank on DH-F-102. That is withdrawn: those five classes have no
+tier-2 opener (`tier2: null`), a click opens the inspector, and each gets a drawing of its own in a later phase (A2b,
+A5). Law **M10** compares the SET OF DRAWN NODE IDS of a modal with its parent sheet (under 50 % shared), so a renamed
+copy still fails; it replaces M6, which asserted the opposite. A class with an own drawing of few items is fine — a
+conduit (`net-conduit`, `conduit-l3`: source zone and what it holds, the enforcement elements, the destination zone,
+the allowed protocol on the line) is drawn from `ZONES` alone and shares only its two zone blocks with DH-N-104.
+
+**L3 by own data (v3.65.0).** A class with
 its own data draws its own sheet: `leak-l3` (24 zones, one loop; a node with `pumpState` carries the payload alarm only
 when its own row is in fault), `fws-l3` (branches from the engine's CDU count). Nothing is drawn that the payload or
-the engine does not state. Laws M6, M7 (`tools/test-dh-drawings.mjs`), both red on v3.64.1.
+the engine does not state. Law M7 (`tools/test-dh-drawings.mjs`), red on v3.64.1.
 
 **Opened item in view (v3.65.3).** `RZHmiSheet` exposes `center(nodeId)`: scrolls the frame so the node is in its
 middle, no zoom. `openSheetModal` centres the opened item after render (a phone shows part of a sheet). Law U8.
 
 **Counted, not typed (v3.65.2).** `facp-l3` draws one symbol per circuit and device type and takes each count from
 the fire point inventory at draw time (`address` prefix × `type`); law M9 compares the drawn counts with the
-inventory's. `openSheetModal` takes `svgId` and `focus` like `drawAtBodyTop` (the cylinder bank on DH-F-102). An
+inventory's. An
 isolable fire point (detector, VESDA unit, call point, EPO) keeps the inspector on a plain click: its isolation
 workflow is there, so H3 will not count those four classes. Phone: a modal header whose only button is Close stays on
 one line (law U7).

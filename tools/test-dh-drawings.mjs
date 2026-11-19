@@ -28,11 +28,15 @@
  * M2  a fire zone click opens its detection schematic with every device of the zone; Shift+click keeps the inspector
  * M3  the battery modal draws its L3 sheet
  * M5  an opener that cannot draw falls back to the inspector
- * M9  the fire panel draws its own L3 with the inventory's circuit counts; the cylinder bank opens the release sheet selected
+ * M9  the fire panel draws its own L3 with the inventory's circuit counts; a click on the cylinder bank opens the
+ *     inspector and no modal that repeats the release sheet it sits on (M10)
  * M8  the main transformer and the generator yard draw their own L3; the transformer follows the electrical scenario
  * M7  leak detection (24 zones, the scenario's wet zone in fault) and HTW piping (branches to the engine's CDU count) draw
  *     their own L3
- * M6  a WAN node, security zone, BMS application and field group open their architecture sheet with the item selected
+ * N1  every block of the three network sheets carries a class or is an off-sheet reference; a conduit opens its own L3
+ * F0  the first painted frame after a tab opens shows no drawing that is retired afterwards (no old mimic flashes)
+ * M10 no modal contains the sheet the click came from, compared by drawn node ids (WAN node, security zone, BMS
+ *     application, field group, cylinder bank) — replaces M6, which asserted the opposite (v3.65.0, withdrawn: owner C10)
  * L1  a closed sheet leaves no window listener and no late tooltip behind
  * L3  an item on a hall SLD opens and reads as that hall
  * L2  an isolation after Clear register gets a new record id and reaches Alarms · L4 the point table follows the
@@ -149,6 +153,28 @@ const PROBE = {
 
 // ── 1440 dark: sheets ────────────────────────────────────────────────────────────────────────────────────────────
 const pg = await open({ width: 1440, height: 1000 }, 'dark');
+
+// ── F0 no old drawing flashes when a tab opens (owner 2026-11-19: "saat buka page cooling and piping sekilas lihat
+// tampilan bms yang lama <1 detik, baru ke tampilan baru"). Measured on a page where no tab has been opened yet: the
+// tab is clicked, the FIRST animation frame after the click (= the first painted frame) lists every drawing visible in
+// the panel, and 1.5 s later every one of those that has been retired is a flash. The sheets used to mount 60 ms and
+// 600 ms after the click, so the browser painted the legacy mimic first.
+const f0 = await pg.evaluate(async () => {
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms)), out = [];
+  const shown = (e) => !!e.getClientRects().length && getComputedStyle(e).visibility !== 'hidden';
+  for (const t of ['over', 'rack', 'cool', 'elec', 'net', 'bms', 'fire']) {
+    const b = document.querySelector(`#tabs [data-t="${t}"]`); if (!b) { out.push({ t, err: 'no tab' }); continue; }
+    b.click();
+    const first = await new Promise((r) => requestAnimationFrame(() => { const pn = document.querySelector('.pn.on');
+      r(pn ? [...pn.querySelectorAll('svg[id]')].filter((s) => !s.closest('.hmi-host') && !s.closest('[data-dh2-retired]') && shown(s)).map((s) => s.id) : []); }));
+    await wait(1500);
+    const flashed = first.filter((id) => { const s = document.getElementById(id); return !s || s.closest('[data-dh2-retired]') || !shown(s); });
+    out.push({ t, first: first.length, flashed });
+    document.querySelector('#tabs [data-t="dash"]').click(); await wait(300);
+  }
+  return out; });
+law('F0', f0.every((x) => !x.err && x.flashed.length === 0),
+  `first painted frame after opening a tab shows no drawing that is replaced afterwards: ${f0.map((x) => x.err ? x.t + ' ' + x.err : `${x.t} ${x.flashed.length ? 'FLASHED ' + x.flashed.join(',') : 'ok'}`).join('; ')}`);
 const sheetRows = [];
 for (const [tab, sub, legacyId, hmiId] of SHEETS) {
   await showSheet(pg, tab, sub);
@@ -397,20 +423,44 @@ const m5 = await pg.evaluate(async () => {
 });
 law('M5', m5, `zone click with a failing opener: inspector ${m5 ? 'opened' : 'NOT opened (nothing happened)'}`);
 
-// ── M6 a WAN node, a security zone, a BMS application and a field group open the architecture they belong to with
-// themselves selected (v3.65.0; each opened a text-only modal) ────────────────────────────────────────────────────────
-const m6 = await pg.evaluate(async () => { const O = window.RZDatahallAIHmiOpeners, wait = (ms) => new Promise((r) => setTimeout(r, ms)), out = [];
+// ── M10 no modal contains the sheet the click came from (PRD-DCAI-LIVING-PLANT A0, owner C10: "klik suatu block …
+// yang muncul modalnya schematic itu sendiri dimunculkan lagi di dalam modal — konyol"). Compared by the SET OF DRAWN
+// NODE IDS, not by sheet id: a renamed copy of the parent must still fail. v3.65.0 made the WAN node, the security zone,
+// the BMS application and the field group open their architecture sheet with the item selected (law M6, withdrawn).
+const m10 = await pg.evaluate(async () => { const O = window.RZDatahallAIHmiOpeners, wait = (ms) => new Promise((r) => setTimeout(r, ms)), out = [];
+  const ids = (sv) => (sv ? [...sv.querySelectorAll('.hmi-node[data-node]')].map((g) => g.getAttribute('data-node')) : []);
   const B = window.BMS_MODEL || {}, app = (B.apps || B.app || [])[0], fld = (B.field || B.fields || [])[0];
-  const cases = [['net', 'wan', '4', 'net-wan:4', '#netModalBody'], ['net', 'zone', 'Z2', 'net-zone:Z2', '#netModalBody'],
-    ['bms', 'app', app && app.id, app && 'bms-app:' + app.id, '#bmsModalBody'], ['bms', 'field', fld && fld.id, fld && 'bms-field:' + fld.id, '#bmsModalBody']];
-  for (const [op, kind, id, ref, body] of cases) { if (!id) { out.push(kind + ': no id in the page model'); continue; }
+  const cases = [['net', 'wan', '4', '#netModalBody', 'hmiWanSvg'], ['net', 'zone', 'Z2', '#netModalBody', 'hmiSecSvg'],
+    ['bms', 'app', app && app.id, '#bmsModalBody', 'hmiBmsSvg'], ['bms', 'field', fld && fld.id, '#bmsModalBody', 'hmiBmsSvg']];
+  for (const [op, kind, id, body, parentId] of cases) { if (!id) { out.push({ what: kind, err: 'no id in the page model' }); continue; }
+    const parent = ids(document.getElementById(parentId));
     O[op](kind, id); await wait(700);
-    const sv = document.querySelector(body + ' .hmi-host svg.hmi-svg'), sel = sv ? [...sv.querySelectorAll('.hmi-node[data-selected]')].map((g) => g.getAttribute('data-rz-equipment')) : [];
-    const n = sv ? sv.querySelectorAll('.hmi-node [data-sym]').length : 0, dup = sv ? document.querySelectorAll('#' + CSS.escape(sv.id)).length : 0;
-    out.push(`${kind} ${id}: ${sv ? n + ' symbols' : 'NOT drawn'}, selected ${sel.length && sel.every((x) => x === ref) ? 'ok' : 'WRONG ' + sel.slice(0, 2).join(',')}${dup > 1 ? ', DUPLICATE id ' + sv.id : ''}`);
+    const drawn = ids(document.querySelector(body + ' .hmi-host svg.hmi-svg')), same = drawn.filter((x) => parent.includes(x)).length;
+    out.push({ what: kind + ' ' + id, parent: parent.length, drawn: drawn.length, share: drawn.length ? same / drawn.length : 0 });
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); [...document.querySelectorAll('.modal.show .close, .dh-modal.show .close, [aria-label="Close"]')].forEach((x) => { try { x.click(); } catch (e) {} }); await wait(250); }
   return out; });
-law('M6', m6.length === 4 && m6.every((x) => /symbols, selected ok$/.test(x) && Number(/: (\d+) symbols/.exec(x)[1]) >= 8), `opened on their architecture, item selected: ${m6.join('; ')}`);
+law('M10', m10.length === 4 && m10.every((x) => !x.err && x.parent >= 8 && x.share < 0.5),
+  `a modal never redraws its parent sheet: ${m10.map((x) => x.err ? `${x.what}: ${x.err}` : `${x.what}: ${x.drawn} node(s) drawn, ${Math.round(x.share * 100)} % of them on the parent sheet (${x.parent} nodes)`).join('; ')}`);
+
+// ── N1 every block of the three network sheets answers a click: it carries a class (payload + inspector or modal) or is
+// an off-sheet reference (PRD-DCAI-LIVING-PLANT A0, owner C4 "kasih modal firewall … yang block-block itu"). The seven
+// conduit firewalls of DH-N-104 had no class. Then a conduit click draws its own L3 from the page zoning.
+const n1 = await pg.evaluate(async () => { const wait = (ms) => new Promise((r) => setTimeout(r, ms)), out = { bare: [], sheets: {} };
+  for (const id of ['hmiNetSvg', 'hmiWanSvg', 'hmiSecSvg']) { const sv = document.getElementById(id); out.sheets[id] = sv ? sv.querySelectorAll('.hmi-node').length : -1; if (!sv) continue;
+    for (const g of sv.querySelectorAll('.hmi-node')) { const sym = (g.querySelector('[data-sym]') || {}).getAttribute ? g.querySelector('[data-sym]').getAttribute('data-sym') : '';
+      if (sym === 'offSheet' || sym === 'junction' || g.getAttribute('data-rz-equipment')) continue; out.bare.push(id + ':' + g.getAttribute('data-node')); } }
+  const O = window.RZDatahallAIHmiOpeners, Z = window.ZONES || {};
+  const want = Object.keys(Z).map((k) => (/^(C\d+)/.exec(Z[k].outb || '') || [])[1]).filter(Boolean);
+  out.want = want.length; out.classed = [...document.querySelectorAll('#hmiSecSvg .hmi-node[data-rz-equipment^="net-conduit:"]')].map((g) => g.getAttribute('data-rz-equipment').split(':')[1]).sort().join(',');
+  const parent = [...document.querySelectorAll('#hmiSecSvg .hmi-node[data-node]')].map((g) => g.getAttribute('data-node'));
+  out.opened = O.conduit ? O.conduit('C3') : null; await wait(900);
+  const m = document.querySelector('.hmi-modal-back:not([hidden])'), sv = m && m.querySelector('.hmi-m-draw svg.hmi-svg'), ids = sv ? [...sv.querySelectorAll('.hmi-node[data-node]')].map((g) => g.getAttribute('data-node')) : [];
+  out.modal = { cls: m ? m.querySelector('.hmi-modal').getAttribute('data-rz-modal-class') : null, nodes: ids.length, share: ids.length ? ids.filter((x) => parent.includes(x)).length / ids.length : 1,
+    pts: m ? m.querySelectorAll('.hmi-pt').length : 0, untraced: m ? [...m.querySelectorAll('.hmi-pt .pt-val')].filter((v) => !v.hasAttribute('data-basis-param') && !v.getAttribute('data-rz-authored-basis')).length : -1,
+    proto: sv ? (sv.textContent.match(/GRPC[^<]{0,20}/i) || [''])[0].trim() : '' };
+  document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await wait(250); return out; });
+law('N1', n1.bare.length === 0 && n1.want === 7 && n1.classed === 'C1,C2,C3,C4,C5,C6,C7' && n1.modal.cls === 'net-conduit' && n1.modal.nodes >= 8 && n1.modal.share < 0.5 && n1.modal.pts >= 6 && n1.modal.untraced === 0 && /GRPC/i.test(n1.modal.proto),
+  `network blocks without a class: ${n1.bare.length}${n1.bare.length ? ' (' + n1.bare.slice(0, 6).join(', ') + ')' : ''} on ${JSON.stringify(n1.sheets)}; conduits classed ${n1.classed || 'none'} (zoning has ${n1.want}); conduit C3 modal: ${n1.modal.cls || 'NOT opened'}, ${n1.modal.nodes} nodes, ${Math.round(n1.modal.share * 100)} % shared with DH-N-104, ${n1.modal.pts} points, ${n1.modal.untraced} untraced, line "${n1.modal.proto}"`);
 
 // ── M7 leak detection and HTW piping draw their own schematic (v3.65.0): 24 zones on one loop, the wet zone of the
 // cooling scenario is the one in fault; the HTW sheet branches to the engine's CDU count ─────────────────────────────
@@ -463,13 +513,16 @@ const m9 = await pg.evaluate(async () => { const wait = (ms) => new Promise((r) 
     const r = { cls: m ? m.querySelector('.hmi-modal').getAttribute('data-rz-modal-class') : null, n: sv ? sv.querySelectorAll('.hmi-node [data-sym]').length : 0,
       tags: sv ? [...sv.querySelectorAll('.hmi-node')].map((g) => g.getAttribute('aria-label') || (g.querySelector('title') || {}).textContent || '').filter((t) => / × /.test(t)) : [],
       sel: sv ? [...sv.querySelectorAll('.hmi-node[data-selected]')].map((g) => g.getAttribute('data-rz-equipment')) : [], dup: sv ? document.querySelectorAll('#' + CSS.escape(sv.id)).length : 0,
+      ids: sv ? [...sv.querySelectorAll('.hmi-node[data-node]')].map((g) => g.getAttribute('data-node')) : [], insp: !!document.querySelector('aside.rz-inspector.open'),
       untraced: m ? [...m.querySelectorAll('.hmi-pt .pt-val')].filter((v) => !v.hasAttribute('data-basis-param') && !v.getAttribute('data-rz-authored-basis')).length : -1 };
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await wait(250); return r; };
+  const parentIds = [...document.querySelectorAll('#hmiFireRelSvg .hmi-node[data-node]')].map((g) => g.getAttribute('data-node'));
   const facp = await open('#hmiFireSvg [data-rz-equipment^="fire-facp:"]'), bank = await open('#hmiFireRelSvg [data-rz-equipment^="fire-cylinder-bank:"]');
+  if (bank) { bank.parent = parentIds.length; bank.share = bank.ids.length ? bank.ids.filter((x) => parentIds.includes(x)).length / bank.ids.length : 0; }
   const drawn = facp ? facp.tags.map((t) => Number((/: (\d+) × /.exec(t) || [])[1])).filter((x) => x > 0).sort((a, b) => a - b).join(',') : '';
   return { facp, bank, drawn, wantCounts: Object.values(want).sort((a, b) => a - b).join(',') }; });
-law('M9', !!m9.facp && m9.facp.cls === 'fire-facp' && m9.facp.n >= 8 && m9.drawn === m9.wantCounts && m9.facp.untraced === 0 && !!m9.bank && m9.bank.cls === 'fire-cylinder-bank' && m9.bank.n >= 8 && m9.bank.sel.join() === 'fire-cylinder-bank:DH-01' && m9.bank.dup === 1 && m9.bank.untraced === 0,
-  `fire panel: ${m9.facp ? m9.facp.n + ' symbols, circuit counts ' + m9.drawn + ' (inventory ' + m9.wantCounts + '), untraced points ' + m9.facp.untraced : 'NOT opened'}; cylinder bank: ${m9.bank ? m9.bank.n + ' symbols on the release sheet, selected ' + (m9.bank.sel.join() || 'none') + (m9.bank.dup > 1 ? ', DUPLICATE id' : '') + ', untraced points ' + m9.bank.untraced : 'NOT opened'}`);
+law('M9', !!m9.facp && m9.facp.cls === 'fire-facp' && m9.facp.n >= 8 && m9.drawn === m9.wantCounts && m9.facp.untraced === 0 && !!m9.bank && m9.bank.parent >= 8 && m9.bank.share < 0.5 && m9.bank.insp,
+  `fire panel: ${m9.facp ? m9.facp.n + ' symbols, circuit counts ' + m9.drawn + ' (inventory ' + m9.wantCounts + '), untraced points ' + m9.facp.untraced : 'NOT opened'}; cylinder bank click: ${m9.bank ? (m9.bank.insp ? 'inspector open' : 'inspector NOT open') + ', modal drew ' + m9.bank.ids.length + ' node(s), ' + Math.round(m9.bank.share * 100) + ' % of them on the release sheet it sits on (' + m9.bank.parent + ' nodes)' : 'node not found'}`);
 
 // ── L1 a closed sheet leaves nothing behind (audit 2026-11-16 C1, C7): every render added pointermove + pointerup on
 // window and destroy() removed neither, so each modal open kept a whole drawing alive; a pending tooltip timer fired
@@ -676,14 +729,14 @@ law('U7', !!u7 && u7.head <= u7.btn + 20 && u7.right >= 0 && u7.right <= 16, `39
 // U8 (v3.65.3): on a phone the item that was opened is inside the visible part of its schematic (the main transformer
 // sat on the right edge of the frame, half outside it)
 const u8 = await ph.evaluate(async () => { const O = window.RZDatahallAIHmiOpeners, wait = (ms) => new Promise((r) => setTimeout(r, ms)), out = [];
-  for (const [name, fn, sel] of [['main transformer', () => O.maintx('A'), '[data-node="tx-mainA"]'], ['fire panel', () => O.facp('DH-01'), '[data-node="facp"]'], ['cylinder bank', () => O.cylbank('DH-01'), '[data-node="bank"]']]) {
+  for (const [name, fn, sel] of [['main transformer', () => O.maintx('A'), '[data-node="tx-mainA"]'], ['fire panel', () => O.facp('DH-01'), '[data-node="facp"]']]) {   /* the cylinder bank has no modal since A0 (C10): it opens the inspector, law M9 */
     fn(); await wait(1000);
     const sv = document.querySelector('.hmi-modal-back:not([hidden]) .hmi-m-draw svg.hmi-svg'), g = sv && sv.querySelector(sel), vp = sv && sv.parentElement;
     if (!g) { out.push(name + ': not drawn'); } else { const a = g.getBoundingClientRect(), b = vp.getBoundingClientRect(), cx = a.left + a.width / 2;
       out.push(`${name}: ${cx >= b.left + 24 && cx <= b.right - 24 && a.left >= b.left - 1 && a.right <= b.right + 1 ? 'inside' : 'CUT'} (${Math.round(a.left - b.left)}…${Math.round(a.right - b.left)} of ${Math.round(b.width)})`); }
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await wait(250); }
   return out; });
-law('U8', u8.length === 3 && u8.every((x) => /: inside /.test(x)), `390 sheet modal, opened item in the frame: ${u8.join('; ')}`);
+law('U8', u8.length === 2 && u8.every((x) => /: inside /.test(x)), `390 sheet modal, opened item in the frame: ${u8.join('; ')}`);
 law('U1', u1.n > 10 && u1.bad.length === 0, `${u1.n} drawings with an id: ${u1.bad.length} without an accessible name${u1.bad.length ? ' — ' + u1.bad.slice(0, 8).join(', ') : ''}`);
 await ph.close();
 
