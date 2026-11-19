@@ -11,6 +11,58 @@ release sections rather than semver.
 
 ---
 
+## v3.75.0 — 2026-11-19 — Conventional: open a chiller and see its inside; engine 2.4.0 plant internals
+
+### Added
+- **The equipment modal shows how the machine works inside** (`js/conv/equipment-modal.js` 2.0.0,
+  `js/conv/internals.js`, `js/conv/internals/chiller.js`). Double-click a chiller on `chiller-plant.html`: an
+  internal drawing of the water-cooled centrifugal chiller — evaporator (flooded shell-and-tube), two-stage
+  centrifugal compressor with inlet guide vanes, motor, VFD, condenser, flash-tank economiser, EXV, oil sump + oil
+  pump + oil cooler, purge unit, hot-gas bypass, relief valve and unit control panel — with the suction vapour,
+  discharge gas, liquid, flash gas, oil, chilled-water and condenser-water paths, each in its own medium colour.
+  Every block is clickable and shows what it does, its values with units and its rating basis.
+- **Unit navigator and fleet strip.** `◂ 01 of 10 ▸` steps through all 10 chillers the engine has (the plant
+  sheet still draws four; corrected in the next phase). The strip shows 7 running at 89.3 % and 3 on standby; a
+  standby machine is drawn still, with no invented values.
+- **Engine 2.4.0** (`js/conv-engine.js`, additive: no 2.3.0 value changed). Per chiller: duty 4,464.3 kWth,
+  compressor 736.2 kWe, condenser duty 5,200.5 kWth (= duty + input), chilled water 140.3 L/s, condenser water
+  248.5 L/s. R-134a cycle from the leaving water temperatures and the design approaches: evaporator 17.9 °C /
+  535 kPa(a), condenser 38.5 °C / 977 kPa(a), lift 20.6 K, pressure ratio 1.83, COP 6.06 = 0.43 of Carnot
+  (saturation pressure from an Antoine fit within 0.08 % of the published table). Hydronic fleet (20 primary,
+  5 secondary, 10 condenser pumps), 10 tower cells (fan by the cube law), CRAH per unit, mechanical plant power
+  6,594 kW inside the non-IT budget, and `CONV_CALC.getFleet()` unit tables for every fleet.
+- Superheat, subcooling, guide-vane position, oil pressure and discharge temperature are shown as "not
+  modelled": the model has no basis for them.
+
+### Fixed
+- Five gates typed the engine version and had silently stopped testing their legacy-engine case; they now
+  derive it.
+
+### Gates
+- `tools/test-conv-plant-internals.mjs` (8, Node: independent hand calculation, energy balance per chiller,
+  Σ units = plant, pressure fit), `tools/test-conv-internals-core.mjs` (Node: catalogue, standby, no typed digit),
+  `tools/test-conv-internals-render.mjs` (browser 1440 + 390, dark + light: not a clone of the symbol, blocks
+  select, displayed values = model = engine, balance on the displayed numbers, navigator, fleet, Thermal, reduced
+  motion, no overlap). Planted defects that failed first: a cloned symbol, overlapping labels, condenser duty
+  without the compressor power, a perturbed fit, a running count off by one.
+
+### Docs and baseline
+- `CLAUDE.md` shared-module table: the equipment modal + internals registry and `tools/run-conv-release-gates.sh`
+  are now the baseline for every Conventional change.
+- `standarization/CONVENTIONAL_DC_OPERATIONS_STANDARD.md` §10: "plant internals basis (engine 2.4.0)" and
+  "equipment internals contract".
+- New PRD `PRD-APP-CLARITY` (hierarchy, frosted layers, accordions by order of operations, grouped left rails,
+  ⌘K quick actions, a text budget per page with a measured baseline of 39 app pages, the floating site bar and mega
+  menu, the cockpit bar); `PRD-CONV-EQUIPMENT-TRUTH` §15 orchestration.
+
+### Release runner
+- `tools/run-conv-release-gates.sh` served `$LTC_BASE` gates the literal `file`, so `audit-slop-render.mjs` stopped on
+  "Cannot navigate to invalid URL". The runner now serves this tree on an ephemeral 127.0.0.1 port for the run.
+
+### Known, not in this release
+- The chiller plant sheet still draws 4 of the 10 machines and one cooling coil per hall; the other equipment
+  classes still open the outer symbol (PRD-CONV-EQUIPMENT-TRUTH E3–E6).
+
 ## v3.74.1 — 2026-11-18 — Conventional P&ID sheets: labels readable again (dark canvas under dark-theme text)
 
 ### Fixed

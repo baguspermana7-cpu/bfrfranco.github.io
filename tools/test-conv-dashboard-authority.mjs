@@ -7,7 +7,10 @@ import puppeteer from 'puppeteer';
 const ROOT = process.cwd();
 const PAGE_SOURCE = await readFile(resolve(ROOT, 'dc-conventional.html'), 'utf8');
 const ENGINE_SOURCE = await readFile(resolve(ROOT, 'js/conv-engine.js'), 'utf8');
-const CURRENT_VERSION = '2.3.0';
+/* Derived, never typed: a literal here goes stale at every engine bump and turns the legacy
+   fixture's replace() into a silent no-op. */
+const CURRENT_VERSION = (ENGINE_SOURCE.match(/version: '(\d+\.\d+\.\d+)'/) || [])[1];
+assert.ok(CURRENT_VERSION, 'engine meta.version not found in js/conv-engine.js');
 const MIME = Object.freeze({
   '.css': 'text/css',
   '.html': 'text/html',

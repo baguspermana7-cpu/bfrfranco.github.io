@@ -258,7 +258,12 @@ export function buildRegistry() {
     const curated = JSON.parse(readFileSync(CURATED, 'utf8'));
     const curatedById = new Map(curated.parameters.map((p) => [p.id, p]));
 
-    const pageSources = COCKPITS.map((page) => ({ page, text: readFileSync(join(ROOT, page), 'utf8') }));
+    /* PRD-CONV-EQUIPMENT-TRUTH E2: an equipment internal drawing (js/conv/internals/<class>.js) prints engine values in
+       the page's equipment modal, so the class files a page loads are read as part of that page. Only that folder: the
+       shared modules a page loads are not a page reading a parameter. */
+    const internalsOf = (html) => [...html.matchAll(/<script[^>]+src="(js\/conv\/internals\/[\w-]+\.js)/g)]
+        .map((m) => readFileSync(join(ROOT, m[1]), 'utf8')).join('\n');
+    const pageSources = COCKPITS.map((page) => { const html = readFileSync(join(ROOT, page), 'utf8'); return { page, text: html + '\n' + internalsOf(html) }; });
     /* v1.134.25 — DOC ANCHORS. Plan B2 asked that every parameter have at least one doc anchor
        as well as a consumer and a test. The published methodology pages under manual/ and the
        standards under standarization/ already name parameters by their snapshot path, so the

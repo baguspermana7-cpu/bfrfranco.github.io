@@ -40,11 +40,21 @@ EXTRA=(
 # join "\"-continued lines, keep gate lines, strip the leading `gate "name" `
 mapfile -t CMDS < <(sed -e ':a' -e '/\\$/N; s/\\\n[[:space:]]*/ /; ta' tools/ship-gate.sh \
   | grep -E '^gate "' | grep -E "$FAMILY" | grep -Ev "$EXCLUDE" \
-  | sed -E 's/^gate "[^"]*"[[:space:]]+//' | sed -E 's/\$LTC_BASE/file/g')
+  | sed -E 's/^gate "[^"]*"[[:space:]]+//')
 for e in "${EXTRA[@]}"; do
   dup=0; for c in "${CMDS[@]}"; do [ "$c" = "$e" ] && dup=1; done
   [ $dup -eq 0 ] && CMDS+=("$e")
 done
+
+# gates that ship-gate.sh points at $LTC_BASE need a real http origin serving THIS tree (audit-slop-render cannot
+# navigate to "file/robots.txt"); bind an ephemeral port so a peer's server on a fixed port is never read instead
+if [ $LIST -eq 0 ]; then
+  LTC_PORT=$(python3 -c 'import socket; s=socket.socket(); s.bind(("127.0.0.1",0)); print(s.getsockname()[1])')
+  python3 -m http.server "$LTC_PORT" --bind 127.0.0.1 > "$LOG_DIR/http.log" 2>&1 & LTC_PID=$!
+  trap 'kill $LTC_PID 2>/dev/null' EXIT
+  LTC_BASE="http://127.0.0.1:$LTC_PORT"; export LTC_BASE
+  for _ in $(seq 1 40); do python3 -c 'import sys,urllib.request; urllib.request.urlopen(sys.argv[1]+"/js/rz-version.js",timeout=1)' "$LTC_BASE" 2>/dev/null && break; sleep 0.25; done
+fi
 
 if [ $LIST -eq 1 ]; then n=0; for c in "${CMDS[@]}"; do n=$((n+1)); echo "[$n] $c"; done; echo "${#CMDS[@]} gates"; exit 0; fi
 

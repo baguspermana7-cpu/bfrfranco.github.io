@@ -11,6 +11,15 @@
   --vfx-bar-bg: #121316; --vfx-bar-line: rgba(255, 255, 255, .12); --vfx-bar-text: #e8edf5; --vfx-bar-mute: #9aa4b2; --vfx-acc: #e8b563;
 }
 
+/* refrigerant and oil media of the equipment internal drawings (js/conv/internals/*.js, PRD-CONV-EQUIPMENT-TRUTH E2):
+   the medium colour of a line (Medium view, flow dashes, arrows); the State view still paints the body by condition */
+:root:not([data-theme="dark"]) { --hmi-m-ref-lpv: #1f6f66; --hmi-m-ref-hpv: #8f3f22; --hmi-m-ref-liq: #6e5a14; --hmi-m-ref-flash: #2f5f78; --hmi-m-oil: #5f4630; }
+[data-theme="dark"] { --hmi-m-ref-lpv: #7cc4b8; --hmi-m-ref-hpv: #d98a6a; --hmi-m-ref-liq: #d0b866; --hmi-m-ref-flash: #9ec3d9; --hmi-m-oil: #b39274; }
+.hmi-svg .m-ref_lpv { stroke: var(--hmi-m-ref-lpv); } .hmi-svg .m-ref_hpv { stroke: var(--hmi-m-ref-hpv); } .hmi-svg .m-ref_liq { stroke: var(--hmi-m-ref-liq); }
+.hmi-svg .m-ref_flash { stroke: var(--hmi-m-ref-flash); } .hmi-svg .m-oil { stroke: var(--hmi-m-oil); }
+.hmi-svg .hmi-arrow.m-ref_lpv { color: var(--hmi-m-ref-lpv); } .hmi-svg .hmi-arrow.m-ref_hpv { color: var(--hmi-m-ref-hpv); } .hmi-svg .hmi-arrow.m-ref_liq { color: var(--hmi-m-ref-liq); }
+.hmi-svg .hmi-arrow.m-ref_flash { color: var(--hmi-m-ref-flash); } .hmi-svg .hmi-arrow.m-oil { color: var(--hmi-m-oil); }
+
 /* ── state mode: the pipe body carries the condition ─────────────────────────────────────────────── */
 .hmi-frame[data-vfx-mode="state"] .hmi-svg .hmi-edge[data-vstate="running"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke: var(--vfx-run); }
 .hmi-frame[data-vfx-mode="state"] .hmi-svg .hmi-edge[data-vstate="warning"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke: var(--vfx-warn); }

@@ -131,7 +131,15 @@
       coolingTowerCell: { label: "Cooling tower cell (induced draft, with basin)", category: "process" },
       uvSteriliser: { label: "UV steriliser", category: "process" },
       gensetDiesel: { label: "Diesel generating set (engine + alternator)", category: "process" },
-      resistor: { label: "Resistor (neutral earthing resistor)", category: "electrical" }
+      resistor: { label: "Resistor (neutral earthing resistor)", category: "electrical" },
+      compressorCentrifugal: { label: "Centrifugal compressor (two-stage, interstage economiser port)", category: "process" },
+      guideVanes: { label: "Inlet guide vanes (variable, actuated)", category: "process" },
+      motorIec: { label: "Electric motor", category: "electrical" },
+      vfdDrive: { label: "Variable-frequency drive (AC/AC converter)", category: "electrical" },
+      flashTank: { label: "Economiser / flash tank (vertical vessel)", category: "process" },
+      purgeUnit: { label: "Purge unit (non-condensable gas removal)", category: "process" },
+      pumpGear: { label: "Gear pump (positive displacement)", category: "process" },
+      oilSump: { label: "Oil sump (reservoir with heater)", category: "process" }
     },
     MARKUP: {
       utility: "<path d=\"M24 4 L11 44 M24 4 L37 44\" /><path d=\"M16 26 L32 38 M32 26 L16 38\" stroke-width=\"1.3\" /><path d=\"M7 16 H41 M10 30 H38\" /><path d=\"M9 16 v4 M39 16 v4 M14 30 v4 M34 30 v4\" stroke-width=\"1.4\" /><path d=\"M24 8 v4\" stroke-width=\"1.4\" />",
@@ -257,7 +265,15 @@
       coolingTowerCell: "<path d=\"M0 36 H9 M48 12 H38 M48 42 H40 M24 44 V48\"/><path class=\"b\" d=\"M8 44 L12 6 H36 L40 44 Z\"/><path d=\"M9 34 H39\" stroke-dasharray=\"3 2\"/><path d=\"M16 2 H32 M24 2 V6\"/><path d=\"M17 18 L31 18 M16 24 L32 24\"/>",
       uvSteriliser: "<path d=\"M0 24 H6 M42 24 H48\"/><rect class=\"b\" x=\"6\" y=\"14\" width=\"36\" height=\"20\" rx=\"10\"/><path d=\"M14 24 H34\" stroke-width=\"2.2\"/><path d=\"M16 8 L18 12 M24 6 V11 M32 8 L30 12 M16 40 L18 36 M24 42 V37 M32 40 L30 36\"/>",
       gensetDiesel: "<path d=\"M0 30 H6 M0 42 H6 M42 24 H48\"/><rect class=\"b\" x=\"6\" y=\"12\" width=\"20\" height=\"34\" rx=\"1\"/><path d=\"M10 20 H22 M10 26 H22 M10 32 H22\"/><path d=\"M26 24 H28\"/><circle class=\"b\" cx=\"35\" cy=\"24\" r=\"7\"/><path d=\"M31 24 C32.5 21 34 21 35 24 C36 27 37.5 27 39 24\"/>",
-      resistor: "<path d=\"M24 0 V12 M24 36 V48\"/><rect class=\"b\" x=\"17\" y=\"12\" width=\"14\" height=\"24\"/>"
+      resistor: "<path d=\"M24 0 V12 M24 36 V48\"/><rect class=\"b\" x=\"17\" y=\"12\" width=\"14\" height=\"24\"/>",
+      compressorCentrifugal: "<path d=\"M0 24 H10 M24 0 V10 M38 24 H48 M42 6 L34 14 M18 48 V37 M30 48 V37\"/><circle class=\"b\" cx=\"24\" cy=\"24\" r=\"14\"/><path d=\"M14 14 L36 19 M14 34 L36 29\"/>",
+      guideVanes: "<path d=\"M0 24 H8 M40 24 H48 M24 12 V4 M18 4 H30\"/><rect class=\"b\" x=\"8\" y=\"12\" width=\"32\" height=\"24\" rx=\"1\"/><path d=\"M14 30 L20 18 M22 30 L28 18 M30 30 L36 18\"/>",
+      motorIec: "<path d=\"M0 24 H10 M38 24 H48\"/><circle class=\"b\" cx=\"24\" cy=\"24\" r=\"14\"/><path d=\"M17 31 V17 L24 26 L31 17 V31\"/>",
+      vfdDrive: "<path d=\"M0 24 H8 M40 24 H48 M24 0 V8\"/><rect class=\"b\" x=\"8\" y=\"8\" width=\"32\" height=\"32\" rx=\"1\"/><path d=\"M8 40 L40 8\"/><path d=\"M12 18 C14 14 16 14 18 18 C20 22 22 22 24 18\"/><path d=\"M26 32 C28 28 30 28 32 32 C34 36 36 36 38 32\"/>",
+      flashTank: "<path d=\"M34 12 H48 M24 0 V4 M24 44 V48\"/><rect class=\"b\" x=\"14\" y=\"4\" width=\"20\" height=\"40\" rx=\"8\"/><path d=\"M14 30 H34\" stroke-dasharray=\"3 2\"/><path d=\"M34 12 L28 17\"/>",
+      purgeUnit: "<path d=\"M0 24 H8 M40 30 H48 M24 12 V2 M20 6 L24 2 L28 6\"/><rect class=\"b\" x=\"8\" y=\"12\" width=\"32\" height=\"28\" rx=\"1\"/><path d=\"M14 20 L18 26 L22 20 L26 26 L30 20 L34 26\"/>",
+      pumpGear: "<path d=\"M0 24 H10 M38 24 H48\"/><circle class=\"b\" cx=\"24\" cy=\"24\" r=\"14\"/><circle cx=\"19\" cy=\"24\" r=\"5\"/><circle cx=\"29\" cy=\"24\" r=\"5\"/>",
+      oilSump: "<path d=\"M24 0 V10 M40 36 H48\"/><rect class=\"b\" x=\"8\" y=\"10\" width=\"32\" height=\"30\" rx=\"1\"/><path d=\"M8 22 H40\" stroke-dasharray=\"3 2\"/><path d=\"M14 34 L18 30 L22 34 L26 30 L30 34 L34 30\"/>"
     },
     /* HMI fields (R128, PRD §4): standard, ports on the 6-unit grid, states, tag prefix. Only kinds that declare them. */
     STANDARD: {
@@ -348,7 +364,15 @@
       coolingTowerCell: "ISO 10628-2",
       uvSteriliser: "ISO 10628-2",
       gensetDiesel: "ISO 10628-2 / IEC 60617-6",
-      resistor: "IEC 60617-4"
+      resistor: "IEC 60617-4",
+      compressorCentrifugal: "ISO 10628-2",
+      guideVanes: "ISO 14617-8",
+      motorIec: "IEC 60617-6",
+      vfdDrive: "IEC 60617-6",
+      flashTank: "ISO 10628-2",
+      purgeUnit: "ISO 10628-2",
+      pumpGear: "ISO 10628-2 / ISO 14617-9",
+      oilSump: "ISO 10628-2"
     },
     PORTS: {
       pumpCentrifugal: {"suction":[0,24,"liquid"],"discharge":[48,24,"liquid"]},
@@ -438,7 +462,15 @@
       coolingTowerCell: {"makeup":[0,36,"liquid"],"hotIn":[48,12,"liquid"],"basinOut":[48,42,"liquid"],"blowdown":[24,48,"liquid"]},
       uvSteriliser: {"inlet":[0,24,"liquid"],"outlet":[48,24,"liquid"]},
       gensetDiesel: {"fuelIn":[0,30,"liquid"],"fuelRet":[0,42,"liquid"],"out":[48,24,"power"]},
-      resistor: {"line":[24,0,"power"],"load":[24,48,"power"]}
+      resistor: {"line":[24,0,"power"],"load":[24,48,"power"]},
+      compressorCentrifugal: {"suction":[0,24,"gas"],"discharge":[24,0,"gas"],"economiser":[42,6,"gas"],"shaft":[48,24,"mech"],"oilIn":[30,48,"liquid"],"oilOut":[18,48,"liquid"]},
+      guideVanes: {"a":[0,24,"gas"],"b":[48,24,"gas"],"signal":[24,0,"signal"]},
+      motorIec: {"shaft":[0,24,"mech"],"power":[48,24,"power"]},
+      vfdDrive: {"load":[0,24,"power"],"line":[48,24,"power"],"signal":[24,0,"signal"]},
+      flashTank: {"liquidIn":[48,12,"liquid"],"gasOut":[24,0,"gas"],"liquidOut":[24,48,"liquid"]},
+      purgeUnit: {"inlet":[0,24,"gas"],"vent":[24,0,"gas"],"drain":[48,30,"liquid"]},
+      pumpGear: {"suction":[0,24,"liquid"],"discharge":[48,24,"liquid"]},
+      oilSump: {"drainIn":[24,0,"liquid"],"outlet":[48,36,"liquid"]}
     },
     STATES: {
       pumpCentrifugal: ["running","stopped","standby","fault","manual"],
@@ -528,7 +560,15 @@
       coolingTowerCell: ["running","stopped","fault"],
       uvSteriliser: ["running","stopped","fault"],
       gensetDiesel: ["running","stopped","standby","fault"],
-      resistor: []
+      resistor: [],
+      compressorCentrifugal: ["running","stopped","standby","fault"],
+      guideVanes: ["modulating","open","closed","fault"],
+      motorIec: ["running","stopped","standby","fault"],
+      vfdDrive: ["running","stopped","standby","fault"],
+      flashTank: ["running","stopped","standby"],
+      purgeUnit: ["running","stopped","standby","fault"],
+      pumpGear: ["running","stopped","standby","fault"],
+      oilSump: ["running","stopped","standby"]
     },
     TAG: {
       pumpCentrifugal: "P",
@@ -618,7 +658,15 @@
       coolingTowerCell: "CT",
       uvSteriliser: "UV",
       gensetDiesel: "G",
-      resistor: "NGR"
+      resistor: "NGR",
+      compressorCentrifugal: "C",
+      guideVanes: "IGV",
+      motorIec: "M",
+      vfdDrive: "VFD",
+      flashTank: "ECO",
+      purgeUnit: "PU",
+      pumpGear: "P",
+      oilSump: "OS"
     },
     /** A standalone <svg> for one kind, sized in CSS px. */
     svg: function (kind, size, cls) {

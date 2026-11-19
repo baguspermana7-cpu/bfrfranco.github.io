@@ -174,6 +174,8 @@ gate "Conventional payloads — every symbol class: 6 tabs with content, basis r
 gate "Conventional equipment modal — open, focus trap, inert page, Esc, focus return, no timers left, traced cells (390 + 1440)" node tools/test-conv-equipment-modal.mjs
 gate "Conventional depth ratchet — symbols open, inspector depth, engine-hooked cells (tools/conv-depth-thresholds.json)" node tools/test-conv-depth.mjs
 gate "Conventional modals — no modal repeats the sheet it was opened from (owner C10)" node tools/test-conv-modal-no-self-repeat.mjs
+gate "Conventional equipment internals — chiller model = engine 2.4.0, energy balance on displayed values, standby still, PRD §5.1 catalogue, no typed digit, red proofs" node --test tools/test-conv-internals-core.mjs
+gate "Conventional equipment internals in the modal — CH-01 inside drawn (not a clone), blocks select, values = model, navigator 01→08 standby still, fleet 10/7, Thermal, reduced motion, text clear (1440 + 390)" node tools/test-conv-internals-render.mjs
 # v3.67.0 (PRD-CONV-LIVING-PLANT P1/P2) — line colour and motion are bound to the process: a line is painted by its own
 # flow state, the dash period follows flow, a rotor follows speed, no-flow lines never move. Before it every pipe on the
 # four P&ID sheets was the same grey in every condition. The trend modal reads one deterministic history per point.
@@ -182,6 +184,7 @@ gate "Conventional history — deterministic series per point, stats, limits, CS
 gate "Conventional TCC curves — IEC 60255 families, transformer damage/inrush, cable withstand, coordination" node --test tools/test-conv-tcc.mjs
 gate "Conventional SLD topology — energisation from breaker states, bus balance" node --test tools/test-conv-sld-topology.mjs
 gate "Conventional HV/MV basis — 150/20/0.4 kV ratings, fault levels, N-1 loading, graded TMS cross-checked with tcc.js" node --test tools/test-conv-electrical-hvmv.mjs
+gate "Conventional plant internals — chiller cycle (R-134a fit), pump fleet, tower cells, CRAH per unit, fleet tables: energy/flow balances, headroom >= 0, red proofs" node --test tools/test-conv-plant-internals.mjs
 gate "Conventional E-S-101 model — normal state, model builder, engine flows, bus balance, interlock truth table, N-1 tie transfer, coordinated chain" node --test tools/test-conv-epms-model.mjs
 gate "Conventional E-S-101 single-line — default view, 150 kV tags, ANSI relays, engine labels, flows, interlocks in the UI, section loss + tie, TCC modal (1440 + 390)" node tools/test-conv-epms-sld.mjs
 gate "Conventional VFX + trend on the chiller plant — state colour, flow speed, rotor, thermal, reduced motion, trend modal (390 + 1440)" node tools/test-conv-vfx-trend.mjs

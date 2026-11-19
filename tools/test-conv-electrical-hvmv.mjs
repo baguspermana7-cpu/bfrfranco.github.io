@@ -107,8 +107,10 @@ const H = (() => {
     };
 })();
 
-test('V0 engine version is 2.3.0 and the relay curves are published', () => {
-    assert.equal(snap.meta.version, '2.3.0');
+test('V0 engine version carries the HV/MV family (>= 2.3.0) and the relay curves are published', () => {
+    /* derived, not typed: a pinned literal fails every later additive bump for no reason */
+    const [maj, min] = String(snap.meta.version).split('.').map(Number);
+    assert.ok(maj > 2 || (maj === 2 && min >= 3), `engine ${snap.meta.version} predates the HV/MV family`);
     assert.equal(el.pro_feeder_curve, 'EI');
     assert.equal(el.pro_incomer_curve, 'SI');
     assert.equal(el.pro_hv_curve, 'SI');

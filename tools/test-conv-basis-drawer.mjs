@@ -69,7 +69,7 @@ const server = createServer(async (req, res) => {
         let payload = await readFile(full);
         if (extname(full) === '.html' && requestUrl.searchParams.get('rzFixture') === 'matchedLegacy') {
             payload = Buffer.from(payload.toString('utf8')
-                .replace(/js\/conv-engine\.js\?v=2\.0\.0/g, 'js/conv-engine.js?v=1.9.0'));
+                .split(`js/conv-engine.js?v=${registry.engineVersion}`).join('js/conv-engine.js?v=1.9.0'));
         }
         res.writeHead(200, { 'content-type': MIME[extname(full)] || 'application/octet-stream' })
             .end(payload);
@@ -155,7 +155,7 @@ try {
     const AUTHORITY_FIXTURES = Object.freeze({
         missing: 'delete window.CONV_CALC;',
         legacy: `window.CONV_CALC={snapshot:{meta:{version:'1.9.0',scenario:'Legacy',data_quality:'GOOD'},site:{it_load_kw:1850,facility_load_kw:2682.5,non_it_load_kw:832.5,pue:1.45},racks:{at_8kw:231},electrical:{epms_total_kw:2682.5,ups_system_count:2,ups_module_kw_rated:250,ups_modules_per_system:5}}};`,
-        incomplete: `window.CONV_CALC={snapshot:{meta:{version:'2.2.0',scenario:'Simulated',data_quality:'GOOD'},site:{it_load_kw:30000,facility_load_kw:43500,non_it_load_kw:13500,pue:1.45},racks:{at_8kw:3750},electrical:{epms_total_kw:43500,ups_system_count:2,ups_module_kw_rated:500,ups_modules_per_system:10}}};`,
+        incomplete: `window.CONV_CALC={snapshot:{meta:{version:'${registry.engineVersion}',scenario:'Simulated',data_quality:'GOOD'},site:{it_load_kw:30000,facility_load_kw:43500,non_it_load_kw:13500,pue:1.45},racks:{at_8kw:3750},electrical:{epms_total_kw:43500,ups_system_count:2,ups_module_kw_rated:500,ups_modules_per_system:10}}};`,
         matchedLegacy: `window.CONV_CALC={snapshot:{meta:{version:'1.9.0',scenario:'Legacy',data_quality:'GOOD'},site:{it_load_kw:1850,facility_load_kw:2682.5,non_it_load_kw:832.5,pue:1.45},campus:{hall_count:4,racks_total:924,halls:[{},{},{},{}]},racks:{at_8kw:231},electrical:{epms_total_kw:2682.5,ups_system_count:2,ups_module_kw_rated:250,ups_modules_per_system:5}},getHallSnapshot:function(){return null;},wueFromFlowLpm:function(){return 1.2;}};`,
     });
     for (const page of ADOPTERS) {
