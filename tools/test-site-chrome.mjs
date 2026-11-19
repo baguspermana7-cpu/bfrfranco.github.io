@@ -18,6 +18,9 @@
  *   CH10 phone, refitted pages (data-rz-bar): a press on the menu button shows the drawer (strict from day one —
  *        v3.68.0 shipped 10 pages whose menu did not open: a `body.rz-nav-open` selector in rz-chrome.css made
  *        rz-mobile-nav.js skip its own open-state CSS)
+ *   CH11 refitted pages, both themes at 1440: every text in the bar reads at >= 4.5:1 against what is painted behind
+ *        it (strict — v3.74.0 was stopped before push: three pages kept light nav ink meant for a transparent bar
+ *        over a dark hero, 1.5:1 on the new white bar; the a11y gate samples 8 pages and happened to hold two of them)
  *
  * RATCHET until the last family is refitted (phase N6): the number of failing pages per law may fall, a rise fails.
  * Baseline: tools/site-chrome-baseline.json (re-record with --baseline after a refit, never to pass a regression).
@@ -43,7 +46,7 @@ const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css
 
 const all = fs.readdirSync(ROOT).filter((f) => f.endsWith('.html')).sort();
 const pages = all.filter((f) => kindOf(f) !== 'bare' && (!ONLY || ONLY.has(f)));
-const fails = { CH1: new Map(), CH2: new Map(), CH3: new Map(), CH4: new Map(), CH5: new Map(), CH6: new Map(), CH7: new Map(), CH8: new Map(), CH9: new Map(), CH10: new Map() };
+const fails = { CH1: new Map(), CH2: new Map(), CH3: new Map(), CH4: new Map(), CH5: new Map(), CH6: new Map(), CH7: new Map(), CH8: new Map(), CH9: new Map(), CH10: new Map(), CH11: new Map() };
 const fail = (law, f, why) => { if (!fails[law].has(f)) fails[law].set(f, why); };
 
 // CH9 — the exemption list
@@ -84,6 +87,23 @@ const measure = () => {
     tN: ts.length, tIn: !!(t && bar && bar.contains(t)), tW: tr ? Math.round(tr.width) : 0, tH: tr ? Math.round(tr.height) : 0, tRight: tr ? Math.round(innerWidth - tr.right) : null,
     svg: !!(t && t.querySelector('svg')), font: !!(t && t.querySelector('i[class*="fa-"]')), text, label: t ? (t.getAttribute('aria-label') || t.getAttribute('title') || '') : '',
     order, narrow, overflow: document.documentElement.scrollWidth > innerWidth + 1, theme: document.documentElement.getAttribute('data-theme') || '', fp: window.__rzFirstPaintTheme !== undefined ? window.__rzFirstPaintTheme : window.__rzRafTheme !== undefined ? window.__rzRafTheme : null };
+};
+
+// CH11 — lowest contrast of any text in the bar, against the first opaque background behind it
+const barContrast = () => {
+  const bar = document.querySelector('[data-rz-bar]'); if (!bar) return null;
+  const rgba = (c) => { const m = c.match(/[\d.]+/g) || []; return [+m[0] || 0, +m[1] || 0, +m[2] || 0, m[3] === undefined ? 1 : +m[3]]; };
+  const lum = (c) => { const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]); };
+  const bgOf = (e) => { for (let n = e; n; n = n.parentElement) { const c = rgba(getComputedStyle(n).backgroundColor); if (c[3] > 0.9) return c; } return rgba(getComputedStyle(document.body).backgroundColor); };
+  let worst = null;
+  for (const e of bar.querySelectorAll('*')) {
+    const own = [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim().length > 1); if (!own) continue;
+    const r = e.getBoundingClientRect(), cs = getComputedStyle(e); if (r.width < 2 || r.height < 2 || cs.visibility === 'hidden' || cs.display === 'none' || +cs.opacity < 0.1 || r.bottom < 0 || r.top > 80) continue;
+    let hidden = false; for (let n = e.parentElement; n && n !== bar; n = n.parentElement) { const c = getComputedStyle(n); if (c.visibility === 'hidden' || +c.opacity < 0.1) hidden = true; } if (hidden) continue;
+    const fg = rgba(cs.color), bg = bgOf(e), a = lum(fg), b = lum(bg), ratio = (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+    if (!worst || ratio < worst.ratio) worst = { ratio: Math.round(ratio * 100) / 100, text: e.textContent.trim().slice(0, 18), fg: fg.slice(0, 3).join(','), bg: bg.slice(0, 3).join(',') };
+  }
+  return worst;
 };
 
 const WIDTHS = FULL ? [[1440, 900], [768, 1024], [390, 844]] : [[1440, 900], [390, 844]];
@@ -135,6 +155,13 @@ for (const [w, h] of WIDTHS) {
           t.click(); await new Promise((r) => setTimeout(r, 120)); const c = document.documentElement.getAttribute('data-theme'), kc = localStorage.getItem('theme');
           return { a, b, c, kb, kc }; });
         if (!(r.a !== r.b && r.c === r.a && r.kb === r.b && r.kc === r.c)) fail('CH5', f, `press: ${r.a} → ${r.b} (stored ${r.kb}) → ${r.c} (stored ${r.kc})`);
+        await pg.addStyleTag({ content: '*, *::before, *::after { transition: none !important; animation: none !important; }' }).catch(() => {});   // a colour sampled mid-fade is not the colour
+        for (const pass of [0, 1]) {   // the stored theme, then the other one
+          if (pass) { await pg.evaluate(() => document.querySelector('[data-rz-bar] [data-rz-theme-toggle]')?.click()); await new Promise((r) => setTimeout(r, 250)); }
+          const c = await pg.evaluate(barContrast), th = await pg.evaluate(() => document.documentElement.getAttribute('data-theme'));
+          if (c && c.ratio < 4.5) fail('CH11', f, `@${w} ${th}: "${c.text}" ${c.ratio}:1 (rgb ${c.fg} on ${c.bg})`);
+          if (pass) { await pg.evaluate(() => document.querySelector('[data-rz-bar] [data-rz-theme-toggle]')?.click()); await new Promise((r) => setTimeout(r, 120)); }
+        }
       }
     } catch (e) { fail('CH1', f, `@${w} page did not load: ${String(e.message).slice(0, 50)}`); }
   }
@@ -158,7 +185,7 @@ if (RECORD) { fs.writeFileSync(BASE_FILE, JSON.stringify({ recorded: new Date().
 const base = fs.existsSync(BASE_FILE) ? JSON.parse(fs.readFileSync(BASE_FILE, 'utf8')) : null;
 let bad = 0;
 for (const [law, n] of Object.entries(counts)) {
-  const b = base ? base.counts[law] : 0, strict = law === 'CH9' || law === 'CH10' || !base, ok = strict ? n === 0 : n <= b;
+  const b = base ? base.counts[law] : 0, strict = law === 'CH9' || law === 'CH10' || law === 'CH11' || !base, ok = strict ? n === 0 : n <= b;
   if (!ok) bad++;
   const sample = [...fails[law].entries()].slice(0, 2).map(([f, why]) => `${f} (${why})`).join('; ');
   console.log(`${ok ? 'PASS' : 'FAIL'} ${law} ${n} page(s) fail${base && !strict ? ` (ratchet: baseline ${b})` : ''}${n ? ' — e.g. ' + sample : ''}`);

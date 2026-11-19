@@ -108,6 +108,9 @@ def refit(name, s):
         head = head.replace('js/rz-chrome.js?v=0', 'js/rz-chrome.js?v=' + old[1].group(1))
     s = head + rest
 
+    # a refitted bar is opaque, so the page no longer has a transparent nav over a dark hero: without this the links keep
+    # the light ink meant for that hero (1.5:1 on the bar) — gate law CH11
+    s = re.sub(r'(<body\b[^>]*?)\sdata-rz-nav-over-dark(?:="[^"]*")?([^>]*>)(?:<!-- P23:[^>]*-->)?', r'\1\2', s, count=1)
     # 3. bar
     bar = BAR.search(s)
     if not bar:

@@ -17,7 +17,8 @@
   --rzc-focus: var(--rz-accent-signal, #7a4800);
 }
 :root[data-rz-kind="app"] { --rz-bar-h: 48px; }
-:root[data-theme="dark"] {
+/* a page whose surface is dark in BOTH themes (achievements) declares `<html data-rz-surface="dark">`: its bar is dark too */
+:root[data-theme="dark"], :root[data-rz-surface="dark"] {
   --rzc-bg: var(--rz-bg-base, #0b0c0e);
   --rzc-line: var(--rz-line-tier-2, rgba(255, 255, 255, 0.12));
   --rzc-line-strong: var(--rz-line-tier-1, rgba(255, 255, 255, 0.3));
@@ -25,6 +26,12 @@
   --rzc-ink-strong: var(--rz-text-primary, #e8edf5);
   --rzc-focus: var(--rz-accent-signal, #e8b563);
 }
+
+/* on a dark-in-both-themes page the injected sign-in button must not keep its light-theme ink (2.57:1 on the dark bar) */
+:root[data-rz-surface="dark"]:not([data-theme="dark"]) .navbar[data-rz-bar] .rz-login-btn,
+:root[data-rz-surface="dark"]:not([data-theme="dark"]) .navbar[data-rz-bar] .rz-login-btn .rz-login-text,
+:root[data-rz-surface="dark"]:not([data-theme="dark"]) .navbar[data-rz-bar] .rz-login-btn svg { color: #e8b563 !important; }
+:root[data-rz-surface="dark"]:not([data-theme="dark"]) .navbar[data-rz-bar] .rz-login-btn { background: transparent !important; border-color: rgba(232, 181, 99, 0.45) !important; }
 
 /* ---- the bar: sticky, one height ---- */
 .navbar[data-rz-bar] {

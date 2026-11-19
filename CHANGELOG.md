@@ -11,6 +11,30 @@ release sections rather than semver.
 
 ---
 
+## v3.76.0 — 2026-11-20 — One top bar and one theme button: guides, comparisons, hubs and tools (32 pages)
+
+PRD `documentation/prd/PRD_SITE_CHROME.md`, phase N4, first part.
+
+### Changed
+- **32 more pages refitted** with `tools/sweep-site-chrome.py`: the 10 `compare-*` pages, the CDU hub and its three
+  guides, the four pillar pages, three infographics, `glossary`, `achievements`, `asean-dc-report-2026`,
+  `ai-engineering-maintenance`, `carbon-footprint`, `fire-checklist`, `tier-advisor`, `pln-sumatra-grid`,
+  `network-visualization-hub`, `rfs-readiness-workbench` and `tia-942-checklist`. Measured on all 32 at 1440 and
+  390 px: bar 56 px sticky, order search, theme, sign-in, menu, theme button 44 x 44 at 272 px / 72 px from the
+  right edge; 0 failures on CH1-CH11. 135 pages now carry the one bar.
+- **Gate law CH11** (strict): every text in a refitted bar reads at >= 4.5:1 in both themes. It caught three pages
+  before push whose light theme kept nav ink meant for a transparent bar over a dark hero (1.5:1 on the new white bar:
+  `pillar-cooling`, `pillar-power`, `asean-dc-report-2026`); the sweep now drops their `data-rz-nav-over-dark` mark.
+  `achievements.html` (dark surface in both themes) declares `<html data-rz-surface="dark">` and gets the dark bar in
+  both, with its sign-in ink fixed (2.57:1 before).
+- `tia-942-checklist.html`: its own `toggleCalcTheme` and the comment about it are gone; `test-tia-theme.mjs` and
+  `test-calc-onclick-handlers.mjs` still pass.
+
+### Not yet
+- `changelog.html` (its generator's template), the six `pln-java-grid*` pages and `network-compare.html` (no theme
+  button in the bar), `account`, `privacy`, `terms` (no bar at all), the homepage (rainbow mode) and the 21 app
+  pages are still on their old chrome.
+
 ## v3.75.0 — 2026-11-19 — Conventional: open a chiller and see its inside; engine 2.4.0 plant internals
 
 ### Added

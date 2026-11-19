@@ -25,6 +25,10 @@ A page is `bare` only with a written reason in the config. A new page is a `site
   those pages pads its content for a bar that was out of the flow. A bar that was already in the flow is not lifted.
 - A generated family (incidents) carries the standard bar in its generator's template; the generator's `--check`
   and the sweep's `--check` must both pass on its pages.
+- The bar is opaque in the page's theme. A page whose surface is dark in both themes declares
+  `<html data-rz-surface="dark">` and gets the dark bar in both; a page that had a transparent nav over a dark hero
+  (`body[data-rz-nav-over-dark]`) loses that mark at refit. Law CH11 measures every text in the bar at ≥ 4.5:1 in
+  both themes.
 - `position: sticky; top: 0` on every kind. Not `fixed` (it needs a hand-tuned body offset on every page, which is
   where 13 different heights came from) and not `static` (the bar scrolls away).
 - One height per kind (the token above). A second row — breadcrumbs, a status strip, a reading-progress line — sits
@@ -87,6 +91,7 @@ Exactly one visible theme button per page, inside the bar.
 | CH7 | source: no own toggle code, no theme key other than `theme`, no `.navbar {` rule in the page, no `data-theme` literal on `<html>` |
 | CH8 | phone: bar not taller than its token, no control under 44 px, no sideways scroll |
 | CH9 | the config names only existing files, every `bare` entry has a reason (strict from day one) |
+| CH11 | refitted pages, both themes at 1440: every text in the bar reads at ≥ 4.5:1 against what is painted behind it (strict) |
 | CH10 | phone, refitted pages: a press on the menu button shows the drawer (strict from day one). `css/rz-chrome.css` must never contain the open-state class of `rz-mobile-nav.js` in a selector — that script then stops injecting its drawer CSS |
 
 ## 7. Baseline (2026-11-18, before any refit)
@@ -103,18 +108,18 @@ CH6 was also unstable on an unchanged tree (14, 18, 20, 41, 44 across five runs)
 never on a loaded machine and was counted as a failure. It now falls back to the theme at the first animation
 frame, so every page gets a verdict.
 
-| law | N0 baseline | tightened, before any refit | after N1 | after N2 | after N3 (recorded) |
-|---|---|---|---|---|---|
-| CH1 | 134 | 134 | 132 | 91 | 40 |
-| CH2 | 169 | 169 | 157 | 116 | 65 |
-| CH3 | 37 | 38 | 28 | 13 | 13 |
-| CH4 | 128 | 140 | 128 | 89 | 38 |
-| CH5 | 2 | 2 | 1 | 1 | 1 |
-| CH6 | 14 | 18 | 16 (none "not recorded": 13 pages with no theme at first paint, 3 with the wrong one; 0 refitted pages) | 15 | 15 |
-| CH7 | 115 | 121 | 109 | 99 | 48 |
-| CH8 | 162 | 162 | 150 | 109 | 58 |
-| CH9 | 0 | 0 | 0 | 0 | 0 |
-| CH10 | — | — | 0 (strict) | 0 (strict) | 0 (strict) |
+| law | N0 baseline | tightened, before any refit | after N1 | after N2 | after N3 | after N4a (recorded) |
+|---|---|---|---|---|---|---|
+| CH1 | 134 | 134 | 132 | 91 | 40 | 33 |
+| CH2 | 169 | 169 | 157 | 116 | 65 | 33 |
+| CH3 | 37 | 38 | 28 | 13 | 13 | 6 |
+| CH4 | 128 | 140 | 128 | 89 | 38 | 7 |
+| CH5 | 2 | 2 | 1 | 1 | 1 | 1 |
+| CH6 | 14 | 18 | 16 (none "not recorded": 13 pages with no theme at first paint, 3 with the wrong one; 0 refitted pages) | 15 | 15 | 14 |
+| CH7 | 115 | 121 | 109 | 99 | 48 | 21 |
+| CH8 | 162 | 162 | 150 | 109 | 58 | 26 |
+| CH9 | 0 | 0 | 0 | 0 | 0 | 0 |
+| CH10 | — | — | 0 (strict) | 0 (strict) | 0 (strict) | 0 (strict) |
 
 ## 7b. Refitting a page
 
@@ -130,7 +135,8 @@ parts. Red proof of the module: with `toggle()` removed, CH5 fails on every refi
 | N1 | calculators, compare, tools, DC Solutions | 12 | refitted 2026-11-18: 0 failures on CH1–CH9 |
 | N2 | journal: 30 articles, 3 FF, 3 Global Analysis, 4 hubs (`article-9-paper.html` has no bar and is left alone) | 40 | refitted 2026-11-18 (v3.71.0): 0 failures on CH1–CH10 |
 | N3 | incidents: 50 dossiers + hub, through the `tools/build-incidents.py` template | 51 | refitted 2026-11-18 (v3.73.0): 0 failures on CH1–CH10 |
-| N4 | hubs, guides, legal, account, homepage | ≈ 50 | open |
+| N4a | guides, comparisons, hubs, pillars, infographics, glossary, tia-942, rfs workbench | 32 | refitted 2026-11-19 (v3.75.0): 0 failures on CH1–CH11 |
+| N4b | `changelog` (generator), 6 `pln-java-grid*`, `network-compare` (no theme button in the bar); `account`, `privacy`, `terms` (no bar); homepage (rainbow mode) | 13 | open |
 | N5 | app kind (cockpits, labs, rz-ops) | 21 | open |
 
 ## 8. Who edits what
