@@ -11,6 +11,44 @@ release sections rather than semver.
 
 ---
 
+## v3.77.0 — 2026-11-20 — Conventional cockpits: one top bar, same buttons in the same place on all nine pages
+
+### Cockpit bar: one bar, same slots on every BMS page (PRD-CONV-EQUIPMENT-TRUTH E7a)
+- New shared module `js/conv/shell.js` + `css/conv-shell.css`: the 9 cockpit pages (dc-conventional, datahall,
+  chiller-plant, water-system, fire-system, fuel-system, ict, EPMS_Telemetry, cdu-mini-bms) mark their bar with
+  `data-cv` slots, and the module puts every control in the same order and position: home · page title · live badge ·
+  alarms · PRD · Manual · Ask (primary CTA) · Login.
+- Login is bare text (no border, no fill). The primary CTA lifts 1 px with an inset shadow, shows a rotating
+  conic-gradient bloom on hover, a label swap and a paper-plane loop; reduced motion keeps only the colour change.
+- At 1100 px and below the secondary controls move into a More menu; the live badge hides at 600 px and below.
+- `auth.js`: the public PRD/Manual links lifted into the fixed layer now take the size of their slot, hide when the
+  slot has no box, and re-place on `rz-layout-change` (fixes the PRD/Manual pair drawn at 0,0 on dc-conventional).
+- Chiller page: `body` overflow is clipped on the x axis only, so the sticky bar holds (html and body both scrolled).
+- Phone (≤ 600 px): the theme button moves into More with a "Theme" label and the title takes up to two lines, held
+  at 12 px against the pages' old `h1 { font-size: 1.6rem !important }` patch (the dc-conventional title read "Co…").
+- Gated dc-conventional: while locked, the bar and its More panel are `inert` (only the old header was), and PRD /
+  Manual stand under the bar when their slot is inside the closed More menu (they were unreachable under the sign-in
+  overlay at ≤ 1100 px). Unlocked, the links return to their slots, so Tab order follows the menu.
+- EPMS on a phone: the provenance line and the feed / state legend fold to one line each (tap to open), so the
+  single-line keeps 569 px under the new bar (it had dropped to 521).
+- Gates updated to the bar, each first failing on the E7a tree: `test-telemetry-e2e.mjs` (EPMS opens on the HV/MV
+  single-line since v3.74.0, where zoom is hidden: the test switches to LV first; this gate was red on main since
+  v3.74.0), `test-conv-alarm-runtime.mjs` (launcher, PRD, Manual, Portfolio reached through More; title drawn whole;
+  locked page keeps the launcher inert), `test-fire-system-runtime-authority.mjs` (body overflow measured without the
+  bar, which bleeds across the body margin on purpose), `audit-slop-render.mjs` (the owner's CTA hover exempt by exact
+  selector), `test-telemetry-docs.mjs` (the CDU PRD/Manual links are matched by their `data-cv` slot, since the
+  navbar became the bar). The alarm-runtime gate now holds its simulated sign-in, because the page's async tier check
+  re-locked it mid-test; proven red by disabling the unlocked settle in `auth.js`.
+  `tools/run-conv-release-gates.sh` now also selects the telemetry gates.
+- Gate `tools/test-conv-shell.mjs` (dark theme, 1440 + 390 px, all 9 pages): slot order and x-positions equal across
+  pages; hover state read with real hover pointer flags; CTA opens its panel; Login has no border; at 390 a cut title
+  ends in an ellipsis and every item in the open More panel starts its text on one line (both failed before the fix:
+  "Conve" with no ellipsis, PRD/Manual centred while Portfolio/Alarm history sat left).
+- Standards: `SITE_CHROME_STANDARD.md` §9 (the cockpit bar), `ANTI_VIBECODE_STANDARD.md` §B-2026-11-19 (CTA motion
+  exception, owner's choice), `MOTION_STANDARD.md` owner exception, `CONVENTIONAL_DC_OPERATIONS_STANDARD.md`
+  2026-11-19 entry, `tools/ship-gate.sh`, `CLAUDE.md` shared-module row.
+
+
 ## v3.76.0 — 2026-11-20 — One top bar and one theme button: guides, comparisons, hubs and tools (32 pages)
 
 PRD `documentation/prd/PRD_SITE_CHROME.md`, phase N4, first part.

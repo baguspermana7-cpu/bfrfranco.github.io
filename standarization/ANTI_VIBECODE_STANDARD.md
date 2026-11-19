@@ -175,6 +175,16 @@ An over-eager de-slop pass must not remove these; they are the site's identity, 
   D14 the entrance choreography).
 - **Skeleton loaders** where real async loads occur (their PRESENCE is good — their ABSENCE is a tell).
 
+### B-2026-11-19 — owner exception: the ONE primary CTA of the cockpit bar
+
+Owner, 2026-11-18: "This button combo is looking a bit flat. We don't need the login button (or the like) to have an outline … the main CTA needs to have some more lift … add some indent shadow. On hover, give it a subtle glow with a conic gradient stroke … creating a bloom glow around it that's rotating … swap the text … to something that feels like a win … pastikan semua page di BMS button location sama posisi"; and "on hovering, change the text to something that feels like a win, and animate the send icon in a loop transition where the plane flies away and repeats".
+Scope: exactly one element per page — the primary CTA in the cockpit bar (`.cv-bar .cv-cta`, `css/conv-shell.css`).
+Allowed there and nowhere else: filled signal amber, an outer lift (y 1–2 px) plus inset top highlight and inset
+bottom shade; on hover / focus a rotating conic-gradient ring as a pseudo-element outside the box with a blurred copy
+as bloom (opacity ≤ 0.55, blur ≤ 12 px); a label swap to a win line; a paper-plane icon loop clipped to its box. The
+button width is fixed to the wider label (nothing shifts). Every other rule of this standard still applies to every
+other element, the bar included (Login bare, secondary buttons one hairline, no glow anywhere else).
+
 ## C. REQUIRED (present = good; absence is itself a vibecode tell)
 - **Terms of Service** (`terms.html`) and **Privacy Policy** (`privacy.html`) — must exist + be linked.
 - **Real product demos** — live calculators / virtual labs / cockpits (not screenshots of a fake app).

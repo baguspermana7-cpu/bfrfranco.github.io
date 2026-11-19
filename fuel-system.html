@@ -627,7 +627,7 @@
     <script src="js/datahall-ai/alarm-query.js?v=20260920-4d06f77a" defer></script>
     <script src="js/conv-alarm-events.js?v=20260920-05aca3f2" defer></script>
     <script src="js/conv-alarm-workspace.js?v=20260920-a6e2efa0" defer></script>
-    <script src="js/rz-version.js?v=20261119-45603d7e" defer></script>
+    <script src="js/rz-version.js?v=20261119-ec265353" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
 <style id="rz-skiplink-v1">
@@ -647,6 +647,7 @@
 </style>
 <script src="js/rz-telemetry-quality.js?v=20261113-8feb0dfd" defer></script>
 <script src="js/rz-provenance.js?v=20261111-6f1cd061" defer></script>
+<link rel="stylesheet" href="css/conv-shell.css?v=20261119-729e21d2">
 </head>
 <body data-rz-data-mode="simulated">
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -665,13 +666,10 @@
     </div>
 
     <!-- ============ 1. TOP STATUS / ALARM STRIP ============ -->
-    <header class="topbar">
+    <header class="topbar" data-cv-toolrow>
         <div class="tb-brand">
-            <div class="ic"><i class="fas fa-gas-pump"></i></div>
-            <div>
-                <h1>Fuel System &mdash; Diesel &amp; Generator Autonomy</h1>
-                <small>UST-01 &middot; DT-GEN-A/B/C &middot; P-101 &middot; CONV-BMS-BKS-01</small>
-            </div>
+            <h1 data-cv="title">Fuel System &mdash; Diesel &amp; Generator Autonomy</h1>
+            <small>UST-01 &middot; DT-GEN-A/B/C &middot; P-101 &middot; CONV-BMS-BKS-01</small>
         </div>
 
         <div class="alarm-strip" id="alarm-strip" aria-live="polite">
@@ -686,11 +684,12 @@
         </div>
         <p class="rz-prov" id="rz-prov-fuel-strip" data-rz-provenance="simulated" data-rz-prov-basis="conv-engine.js bulk fuel model; day-tank levels are local simulated state; since render = seconds since the model last drew"><b>Simulated</b> · conv-engine.js bulk fuel model; day-tank levels are local simulated state; since render = seconds since the model last drew</p>
 
-        <div class="tb-actions" data-rz-alarm-launch-slot><span data-rz-ask-slot></span>
-            <span class="tb-clock" id="clock">--:--:--</span>
-            <a href="dc-conventional.html" class="tb-link"><i class="fas fa-arrow-left"></i> Back</a>
+        <div class="tb-actions"><span data-rz-ask-slot data-cv="cta" data-cv-rest="Get the answer" data-cv-win="Answer in seconds"></span>
+            <span class="tb-clock" id="clock" data-cv="clock">--:--:--</span>
+            <a href="dc-conventional.html" class="tb-link" data-cv="back">Back</a>
         </div>
     </header>
+    <script src="js/conv/shell.js?v=20261119-fff76bfd"></script>
     <div data-rz-telemetry-banner-slot></div>
 
     <a id="main-content" tabindex="-1"></a>
@@ -1889,7 +1888,7 @@
         }
     })();
     </script>
-<script src="auth.js?v=20261116-a1a28053" defer></script>
+<script src="auth.js?v=20261119-da7c4afa" defer></script>
 <script src="rz-tracker.js?v=20261114-9a1fdf1c" defer></script>
 
 <style id="rz-cookie-banner-style">

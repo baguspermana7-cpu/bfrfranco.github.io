@@ -84,14 +84,14 @@ a { color: inherit; text-decoration: none; }
     background: #121316;
     backdrop-filter: none;
     border-bottom: 1px solid var(--border);
-    padding: 10px 20px;
+    padding: 0 16px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     position: sticky;
-    top: 0;
+    top: 48px; /* E7a: the page's own toolbar, under the cockpit bar (js/conv/shell.js) */
     z-index: 100;
-    height: 50px;
+    height: 44px;
 }
 
 .header-left {
@@ -176,7 +176,7 @@ body[data-conv-authority="current"] .status-dot {
 /* Main Layout - Fill viewport */
 .main-layout {
     display: flex;
-    height: calc(100vh - 50px);
+    height: calc(100vh - 92px);
     overflow: hidden;
 }
 
@@ -918,7 +918,7 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
         ]
     }
     </script>
-    <script src="js/rz-version.js?v=20261119-45603d7e" defer></script>
+    <script src="js/rz-version.js?v=20261119-ec265353" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- Conventional BMS single scenario engine — single source of truth for
@@ -969,37 +969,37 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
 </style>
 <script src="js/rz-telemetry-quality.js?v=20261113-8feb0dfd" defer></script>
 <script src="js/rz-provenance.js?v=20261111-6f1cd061" defer></script>
+<link rel="stylesheet" href="css/conv-shell.css?v=20261119-729e21d2">
 </head>
 <body data-rz-data-mode="simulated">
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
-<header class="header">
+<header class="header" data-cv-toolrow>
     <div class="header-left">
-        <h1 class="header-title">
+        <h1 class="header-title" data-cv="title">
             Conventional DC Dashboard
             <span class="live-badge" id="convAuthorityBadge">AUTHORITY UNAVAILABLE</span>
         </h1>
         <nav class="header-actions" aria-label="Dashboard actions">
-            <a class="back-btn rz-public-contract-link rz-prd-contract" href="prd/dc-conventional.html" style="min-width:44px">PRD</a>
-            <a class="back-btn rz-public-contract-link rz-manual-contract" href="manual/dc-conventional.html" style="min-width:44px">Manual</a>
+            <a class="back-btn rz-public-contract-link rz-prd-contract" href="prd/dc-conventional.html" data-cv="prd">PRD</a>
+            <a class="back-btn rz-public-contract-link rz-manual-contract" href="manual/dc-conventional.html" data-cv="manual">Manual</a>
 <span data-rz-ask-slot></span>
-            <span class="rz-conv-alarm-slot" data-rz-alarm-launch-slot></span>
-            <button class="back-btn" id="genDesignTrigConv" type="button" aria-haspopup="dialog" aria-disabled="true" disabled title="UNAVAILABLE until the current engine authority is validated" style="background:rgba(245,158,11,.10);border-color:rgba(245,158,11,.32);color:#fbbf24"><i class="fas fa-file-lines" aria-hidden="true"></i>Generate Design</button>
+            <button class="back-btn" id="genDesignTrigConv" type="button" aria-haspopup="dialog" aria-disabled="true" disabled title="UNAVAILABLE until the current engine authority is validated" data-cv="cta" data-cv-rest="Get my design" data-cv-win="Design ready in one click">Generate Design</button>
             <button class="back-btn" id="faqTrigConv" type="button" aria-haspopup="dialog" aria-disabled="true" disabled title="UNAVAILABLE until the current engine authority is validated">FAQ</button>
-            <a href="index.html" class="back-btn">
+            <a href="index.html" class="back-btn" data-cv="portfolio">
                 <span>←</span> Portfolio
             </a>
-            <a href="datacenter-solutions.html" class="back-btn">
+            <a href="datacenter-solutions.html" class="back-btn" data-cv="back" title="Back to DC Solutions">
                 <span>←</span> DC Solutions
             </a>
         </nav>
     </div>
     <div class="header-right">
-        <button class="theme-toggle" id="themeToggle" title="Toggle theme" aria-label="Toggle theme"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
-        <span class="status-dot"></span>
-        <span id="clock">--:--:--</span> WIB
+        <button class="theme-toggle" id="themeToggle" title="Toggle theme" aria-label="Toggle theme" data-cv="theme"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+        <span data-cv="clock"><span class="status-dot"></span><span id="clock">--:--:--</span> WIB</span>
     </div>
 </header>
+<script src="js/conv/shell.js?v=20261119-fff76bfd"></script>
 <div data-rz-telemetry-banner-slot></div>
 
 <div class="main-layout">
@@ -1719,7 +1719,7 @@ prefersDark.addEventListener('change',e=>{if(!localStorage.getItem('theme'))appl
 </script>
 
 <script src="js/rz-feature-flags.js?v=20261116-9dddc1c8" defer></script>
-<script src="auth.js?v=20261116-a1a28053" defer></script>
+<script src="auth.js?v=20261119-da7c4afa" defer></script>
 <script src="rz-engine.min.js?v=20261114-fd034bc4" defer></script>
 <script src="rz-tracker.js?v=20261114-9a1fdf1c" defer></script>
 

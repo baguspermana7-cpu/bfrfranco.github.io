@@ -189,6 +189,7 @@ gate "Conventional E-S-101 model — normal state, model builder, engine flows, 
 gate "Conventional E-S-101 single-line — default view, 150 kV tags, ANSI relays, engine labels, flows, interlocks in the UI, section loss + tie, TCC modal (1440 + 390)" node tools/test-conv-epms-sld.mjs
 gate "Conventional VFX + trend on the chiller plant — state colour, flow speed, rotor, thermal, reduced motion, trend modal (390 + 1440)" node tools/test-conv-vfx-trend.mjs
 gate "Conventional VFX on fire, fuel, water — view bar, line states, standby, running colour + motion, trend from the inspector" node tools/test-conv-vfx-sheets.mjs
+gate "Conventional cockpit bar — one 48 px bar, same slot positions on 9 pages, bare login, primary CTA lift/ring/win label/plane loop, More at 390, contrast, keyboard" node tools/test-conv-shell.mjs
 gate "Conventional air section core — no airflow no motion, speed follows airflow, colour is temperature, deterministic" node --test tools/test-conv-air-section.mjs
 gate "Conventional data hall air path — labelled row footer, Plan / Air path views, section readings = plan and engine, bound motion, reduced motion" node tools/test-conv-datahall-air.mjs
 gate "Conventional network modal core — device classes, connections, firewall default deny, gateway links, nothing invented" node --test tools/test-conv-net-modal.mjs

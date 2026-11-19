@@ -31,7 +31,7 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.min.css?v=20261108-ff5c7268">
 <link rel="stylesheet" href="css/rz-cockpit-instrument.css?v=20261105-c3fa9df6"><!-- P23: the instrument register this page declares -->
-    <script src="js/rz-version.js?v=20261119-45603d7e" defer></script>
+    <script src="js/rz-version.js?v=20261119-ec265353" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <script type="application/ld+json">
@@ -57,7 +57,10 @@
         body{ background:var(--bm-bg); color:var(--bm-text); font-family:var(--bm-sans); }
         /* chrome on the site register (v3.28.2): one accent, flat head; cyan stays inside the instruments */
         :root:not([data-theme="dark"]){ --bm-ui:#92400e; } [data-theme="dark"]{ --bm-ui:#E8B563; }
-        .bm-hero{ position:relative; padding:6.5rem 1.5rem 1.6rem; border-bottom:1px solid var(--bm-border); }
+        .bm-hero{ position:relative; padding:1.6rem 1.5rem 1.6rem; border-bottom:1px solid var(--bm-border); }
+        .cdu-related{ display:flex; flex-wrap:wrap; align-items:center; gap:0 20px; padding:0 24px; border-bottom:1px solid var(--bm-border); font-size:13px; }
+        .cdu-related a{ display:inline-flex; align-items:center; min-height:44px; color:var(--bm-ui); text-decoration:none; }
+        .cdu-related a:hover, .cdu-related a:focus-visible{ text-decoration:underline; text-underline-offset:4px; }
         .bm-hero>*{ position:relative; }
         .bm-kick{ font-family:var(--bm-mono); font-size:.7rem; letter-spacing:.08em; text-transform:uppercase; color:var(--bm-muted); font-weight:500; }
         .bm-hero h1{ font-family:var(--bm-sans); font-weight:600; font-size:clamp(1.5rem,3.4vw,2.3rem); letter-spacing:-.01em; margin:.45rem 0 .5rem; }
@@ -278,7 +281,8 @@
         @media (max-width:768px){
             html, body{ overflow-x:hidden; max-width:100vw; }
             img, picture, video, svg{ max-width:100%; height:auto; }
-            .bm-hero{ padding:5rem 1rem 1.4rem; }
+            .bm-hero{ padding:1.4rem 1rem 1.4rem; }
+            .cdu-related{ padding:0 12px; gap:0 14px; }
             .nav-menu, .nav-links{ display:none; }
             .footer-grid{ grid-template-columns:1fr; gap:1.25rem; padding:1rem; }
             button, a.btn, [role="button"]{ min-height:44px; }
@@ -286,36 +290,28 @@
         }
     </style>
 <script src="js/rz-telemetry-quality.js?v=20261113-8feb0dfd" defer></script>
+<link rel="stylesheet" href="css/conv-shell.css?v=20261119-729e21d2">
 </head>
 <body data-rz-data-mode="simulated">
     <a href="#main-content" class="skip-link">Skip to content</a>
 
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="nav-logo"><img src="assets/profile-photo.jpg" alt="Bagus Dwi Permana" class="nav-avatar" width="400" height="400"></a>
-            <a class="nav-link" href="prd/cdu-mini-bms.html" style="min-width:44px">PRD</a>
-            <a class="nav-link" href="manual/cdu-mini-bms.html" style="min-width:44px">Manual</a>
-            <ul class="nav-menu">
-                <li><a href="index.html" class="nav-link">Home</a></li>
-                <li class="nav-dropdown">
-                    <a href="datacenter-solutions.html" class="nav-link">DC Solutions <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></a>
-                    <ul class="dropdown-menu" role="menu">
-                        <li role="menuitem"><a href="datacenter-solutions.html" style="font-weight:600;">DC Solutions Hub</a></li>
-                        <li role="separator" style="border-bottom:1px solid rgba(255,255,255,0.1);margin:4px 0;"></li>
-                        <li role="menuitem"><a href="cdu-selection-guide.html">CDU Selection Guide</a></li>
-                        <li role="menuitem"><a href="cdu-checklist.html">CDU Checklist</a></li>
-                        <li role="menuitem"><a href="compare-air-vs-liquid-cooling.html">Air vs Liquid</a></li>
-                    </ul>
-                </li>
-                <li><a href="index.html#contact" class="nav-link">Contact</a></li>
-            </ul>
-            <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+    <!-- E7a: the site navbar became the cockpit bar (js/conv/shell.js); its related links stay one row below it -->
+    <nav class="cdu-related" data-cv-toolrow aria-label="Related pages">
+        <a href="index.html" data-cv="portfolio">Portfolio</a>
+        <a href="prd/cdu-mini-bms.html" data-cv="prd">PRD</a>
+        <a href="manual/cdu-mini-bms.html" data-cv="manual">Manual</a>
+        <span data-cv="title">CDU Mini-BMS</span>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" data-cv="theme">
                 <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
             </button>
-            <button class="hamburger" aria-label="Open navigation menu" aria-expanded="false"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button>
-        </div>
+        <a href="datacenter-solutions.html">DC Solutions</a>
+        <a href="cdu-selection-guide.html">CDU Selection Guide</a>
+        <a href="cdu-checklist.html">CDU Checklist</a>
+        <a href="compare-air-vs-liquid-cooling.html">Air vs Liquid</a>
+        <a href="index.html#contact">Contact</a>
     </nav>
+    <script src="js/conv/shell.js?v=20261119-fff76bfd"></script>
 
     <header class="bm-hero">
         <div class="bm-wrap">
@@ -1002,7 +998,7 @@
         simStart(); simUI();
     })();
     </script>
-    <script src="auth.js?v=20261116-a1a28053" defer></script>
+    <script src="auth.js?v=20261119-da7c4afa" defer></script>
 <script src="js/rz-command-palette.js?v=20261111-5028a9f4" defer></script>
 </body>
 </html>

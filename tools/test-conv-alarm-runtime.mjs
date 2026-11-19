@@ -18,6 +18,16 @@ function safePath(pathname) {
   return target.startsWith(`${resolve(ROOT)}${sep}`) ? target : null;
 }
 
+/* since v3.77.0 the cockpit bar (js/conv/shell.js) keeps the alarm launcher in its More menu at 1100 px and below */
+async function openCockpitMore(page) {
+  await new Promise((resolve) => setTimeout(resolve, 200));
+  const more = await page.$('.cv-more__btn');
+  if (!more || !(await more.evaluate((n) => n.getBoundingClientRect().width > 0))) return;
+  if (await more.evaluate((n) => n.getAttribute('aria-expanded') === 'true')) return;
+  await more.click();
+  await new Promise((resolve) => setTimeout(resolve, 600));
+}
+
 async function serve(request, response) {
   const target = safePath(new URL(request.url, 'http://127.0.0.1').pathname);
   if (!target) return response.writeHead(403).end('Forbidden');
@@ -127,6 +137,9 @@ try {
   });
 
   await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 });
+  await openCockpitMore(page);
+  /* the target is measured where the operator taps it; opening the dialog closes the More menu around it */
+  const launchTapHeight = await page.$eval('#rzConvAlarmLaunch', (node) => node.getBoundingClientRect().height);
   await page.click('#rzConvAlarmLaunch');
   const mobile = await page.evaluate(() => {
     const dialog = document.querySelector('.rz-conv-alarm-dialog');
@@ -160,7 +173,7 @@ try {
   assert.equal(mobile.resultReachable, true, 'mobile historian results must be reachable');
   assert.equal(mobile.footerReachable, true, 'mobile historian footer must be reachable');
   assert.equal(mobile.authInjectedIntoDialog, false, 'auth controls must not be injected into the alarm dialog');
-  assert.ok(mobile.launchHeight >= 44, `mobile alarm launch was ${mobile.launchHeight}px high`);
+  assert.ok(launchTapHeight >= 44, `mobile alarm launch was ${launchTapHeight}px high`);
   await page.keyboard.press('Escape');
 
   const operatorPages = [
@@ -170,6 +183,16 @@ try {
   for (const operatorPage of operatorPages) {
     await page.goto(`${origin}/${operatorPage}`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
     await page.waitForSelector('#rzConvAlarmLaunch', { timeout: 10_000 });
+    /* a page locked behind its sign-in gate keeps the whole cockpit bar inert, the launcher with it */
+    const gated = await page.evaluate(() => {
+      const launch = document.getElementById('rzConvAlarmLaunch');
+      return { locked: document.body.classList.contains('locked'), inert: Boolean(launch.closest('[inert]')) };
+    });
+    if (gated.locked) {
+      assert.equal(gated.inert, true, `${operatorPage}: locked page left the alarm launcher reachable`);
+      continue;
+    }
+    await openCockpitMore(page);
     const placement = await page.evaluate(() => {
       const launch = document.getElementById('rzConvAlarmLaunch');
       const rect = launch.getBoundingClientRect();
@@ -291,25 +314,9 @@ try {
     const scene = document.getElementById('scene');
     const topbar = document.querySelector('.topbar');
     const statusbar = document.querySelector('.status-bar');
-    const prd = document.querySelector('a[href="prd/epms-telemetry.html"]');
-    const manual = document.querySelector('a[href="manual/epms-telemetry.html"]');
     const sceneRect = scene.getBoundingClientRect();
     const topbarRect = topbar.getBoundingClientRect();
     const statusbarRect = statusbar.getBoundingClientRect();
-    const contractLinks = [prd, manual].map((link) => {
-      const rect = link.getBoundingClientRect();
-      const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
-      return rect.right <= window.innerWidth && (hit === link || link.contains(hit));
-    });
-    const headerTargets = [
-      document.querySelector('.epms-back-link'),
-      prd,
-      manual,
-      document.querySelector('.epms-portfolio-link'),
-    ].map((target) => {
-      const rect = target.getBoundingClientRect();
-      return rect.height >= 44 && rect.top >= topbarRect.top && rect.bottom <= topbarRect.bottom;
-    });
     return {
       sidebarHidden: getComputedStyle(sidebar).display === 'none',
       toggleHeight: toggle.getBoundingClientRect().height,
@@ -318,8 +325,6 @@ try {
       availableViewportHeight: window.innerHeight - viewport.getBoundingClientRect().top,
       sceneClearsControls: sceneRect.top >= topbarRect.bottom - 4
         && sceneRect.bottom <= statusbarRect.top + 4,
-      contractLinks,
-      headerTargets,
       expanded: toggle.getAttribute('aria-expanded'),
     };
   });
@@ -333,17 +338,27 @@ try {
   assert.ok(epmsClosed.viewportHeight >= 560,
     `EPMS context chrome left only ${epmsClosed.viewportHeight}px for the mobile SLD`);
   assert.equal(epmsClosed.sceneClearsControls, true, 'EPMS fitted scene must clear top and status controls');
-  assert.deepEqual(epmsClosed.contractLinks, [true, true], 'EPMS PRD and Manual must stay in the initial mobile viewport');
-  assert.deepEqual(epmsClosed.headerTargets, [true, true, true, true], 'EPMS mobile header targets must be 44px and contained by the rail');
   assert.equal(epmsClosed.expanded, 'false');
-  await assertKeyboardPath(page, '.epms-back-link', [
-    '.epms-prd-link',
-    '.epms-manual-link',
-    '.rz-ask-trigger',
-    '#rzConvAlarmLaunch',
-    '#epmsSidebarToggle',
-    '.epms-portfolio-link',
-  ], 'EPMS mobile header');
+  /* since v3.77.0 the cockpit bar (js/conv/shell.js) holds Back, the CTA and More on a phone; PRD, Manual, Portfolio
+     and Alarm history sit one tap away in More. Each must be a 44 px target in view and not covered. */
+  const backInBar = await page.$eval('.epms-back-link', (node) => {
+    const rect = node.getBoundingClientRect();
+    return Boolean(node.closest('.cv-bar')) && rect.height >= 44 && rect.left >= 0 && rect.right <= window.innerWidth;
+  });
+  assert.equal(backInBar, true, 'EPMS Back must be a 44 px target in the mobile cockpit bar');
+  await assertKeyboardPath(page, '.epms-back-link', ['.rz-ask-trigger', '.cv-more__btn'], 'EPMS mobile bar');
+  await openCockpitMore(page);
+  const moreTargets = await page.evaluate(() => ['.epms-prd-link', '.epms-manual-link', '.epms-portfolio-link', '#rzConvAlarmLaunch'].map((sel) => {
+    const node = document.querySelector(sel);
+    if (!node) return sel + ':missing';
+    const rect = node.getBoundingClientRect();
+    const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    const ok = rect.height >= 44 && rect.left >= 0 && rect.right <= window.innerWidth && rect.bottom <= window.innerHeight
+      && (hit === node || node.contains(hit));
+    return ok ? true : sel + ':' + Math.round(rect.width) + 'x' + Math.round(rect.height) + '@' + Math.round(rect.left) + ',' + Math.round(rect.top);
+  }));
+  assert.deepEqual(moreTargets, [true, true, true, true], 'EPMS PRD, Manual, Portfolio and Alarm history must be 44 px targets in the open More menu');
+  await page.keyboard.press('Escape');
   await page.click('#epmsSidebarToggle');
   assert.equal(await page.$eval('#epmsSidebar', (node) => getComputedStyle(node).display !== 'none'), true);
   await page.keyboard.press('Escape');
@@ -352,7 +367,8 @@ try {
   await page.goto(`${origin}/dc-conventional.html`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
   await page.waitForSelector('.header-title', { timeout: 10_000 });
   const dashboardHeader = await page.evaluate(() => {
-    const header = document.querySelector('.header');
+    /* since v3.77.0 the page title lives in the cockpit bar (js/conv/shell.js) */
+    const header = document.querySelector('.cv-bar') || document.querySelector('.header');
     const title = document.querySelector('.header-title');
     const actions = document.querySelector('.header-actions');
     const headerRect = header.getBoundingClientRect();
@@ -360,15 +376,25 @@ try {
     return {
       titleVisible: titleRect.width > 0 && titleRect.height > 0
         && titleRect.left >= headerRect.left && titleRect.right <= headerRect.right
-        && titleRect.top >= headerRect.top && titleRect.bottom <= headerRect.bottom,
+        && titleRect.top >= headerRect.top && titleRect.bottom <= headerRect.bottom
+        // the whole name is drawn: nothing clipped sideways or below the last line
+        && title.scrollWidth <= title.clientWidth + 1 && title.scrollHeight <= title.clientHeight + 1,
+      titleBox: { w: Math.round(titleRect.width), h: Math.round(titleRect.height), sw: title.scrollWidth, cw: title.clientWidth, sh: title.scrollHeight, ch: title.clientHeight },
       actionRailScrollable: Boolean(actions && actions.scrollWidth >= actions.clientWidth),
     };
   });
-  assert.equal(dashboardHeader.titleVisible, true, 'Conventional dashboard identity was clipped on mobile');
+  assert.equal(dashboardHeader.titleVisible, true, `Conventional dashboard identity was clipped on mobile (${JSON.stringify(dashboardHeader.titleBox)})`);
   assert.equal(dashboardHeader.actionRailScrollable, true, 'Conventional mobile actions need a dedicated rail');
   await page.waitForSelector('a.rz-prd-contract');
+  /* the page's tier gate settles after load and may lock again; unlock only once it has */
+  await page.waitForFunction(() => document.readyState === 'complete', { timeout: 30_000 });
+  await new Promise((resolve) => setTimeout(resolve, 1200));
   const contractLayerOrder = await page.evaluate(() => {
     document.body.classList.remove('locked');
+    /* the simulated sign-in must hold: the page's async tier check can add .locked back after this runs */
+    new MutationObserver(() => {
+      if (document.body.classList.contains('locked')) document.body.classList.remove('locked');
+    }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
     document.querySelector('.header')?.removeAttribute('inert');
     document.querySelectorAll('.root-gate, .rz-restricted-overlay, .rz-modal-overlay')
       .forEach((node) => node.remove());
@@ -378,29 +404,35 @@ try {
       && (layer.compareDocumentPosition(header) & Node.DOCUMENT_POSITION_FOLLOWING));
   });
   assert.equal(contractLayerOrder, true, 'public documentation layer must precede dashboard controls in keyboard order');
-  await assertKeyboardPath(page, 'a.rz-prd-contract', [
+  /* since v3.77.0, unlocked, the public links sit in the cockpit bar's More menu on a phone, in Tab order with the
+     other menu items (auth.js settles them back from the gate layer) */
+  await openCockpitMore(page);
+  await page.waitForFunction(() => Boolean(document.querySelector('.cv-more__panel a.rz-prd-contract')), { timeout: 5_000 });
+  await assertKeyboardPath(page, '.cv-more__panel a[href="index.html"]', [
+    'a.rz-prd-contract',
     'a.rz-manual-contract',
-    '.rz-ask-trigger',
     '#rzConvAlarmLaunch',
-    '#genDesignTrigConv',
-    '#faqTrigConv',
-    '.header-actions a[href="index.html"]',
-    '.header-actions a[href="datacenter-solutions.html"]',
-  ], 'Conventional dashboard mobile header');
+  ], 'Conventional dashboard mobile More menu');
+  await page.keyboard.press('Escape');
 
   await page.setViewport({ width: 600, height: 900, deviceScaleFactor: 1 });
   await page.goto(`${origin}/dc-conventional.html`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
   const tabletHeader = await page.evaluate(() => {
     const header = document.querySelector('.header').getBoundingClientRect();
-    const title = document.querySelector('.header-title').getBoundingClientRect();
+    /* since v3.77.0 the title sits in the cockpit bar; it must be drawn whole there */
+    const titleNode = document.querySelector('.header-title');
+    const bar = (document.querySelector('.cv-bar') || document.querySelector('.header')).getBoundingClientRect();
+    const title = titleNode.getBoundingClientRect();
     const actions = document.querySelector('.header-actions').getBoundingClientRect();
     return {
-      titleVisible: title.width > 0 && title.left >= header.left && title.right <= header.right
-        && title.top >= header.top && title.bottom <= header.bottom,
+      titleVisible: title.width > 0 && title.left >= bar.left && title.right <= bar.right
+        && title.top >= bar.top && title.bottom <= bar.bottom
+        && titleNode.scrollWidth <= titleNode.clientWidth + 1 && titleNode.scrollHeight <= titleNode.clientHeight + 1,
+      titleBox: { w: Math.round(title.width), sw: titleNode.scrollWidth, cw: titleNode.clientWidth, sh: titleNode.scrollHeight, ch: titleNode.clientHeight },
       actionsUsable: actions.width > 0 && actions.top >= header.top && actions.bottom <= header.bottom,
     };
   });
-  assert.equal(tabletHeader.titleVisible, true, 'Conventional dashboard identity was clipped at tablet width');
+  assert.equal(tabletHeader.titleVisible, true, `Conventional dashboard identity was clipped at tablet width (${JSON.stringify(tabletHeader.titleBox)})`);
   assert.equal(tabletHeader.actionsUsable, true, 'Conventional action rail collapsed at tablet width');
   assert.deepEqual(pageErrors, [], `alarm workspace page errors: ${pageErrors.join(' | ')}`);
   console.log('PASS Conventional alarm runtime, lifecycle provenance, modal isolation, focus, and mobile layout');

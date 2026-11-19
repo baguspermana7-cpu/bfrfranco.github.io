@@ -144,3 +144,44 @@ parts. Red proof of the module: with `toggle()` removed, CH5 fails on every refi
 Site, journal, incident and remaining pages, `datahallAI.html` and the LTC labs: the session that holds this PRD.
 The Conventional cockpits: the Conventional session, from this standard. Generated pages (incidents, journal hub
 and series, changelog) change in their generator's template, then are rebuilt.
+
+
+## 9. The cockpit bar (page kind `app`, the nine Conventional BMS pages) — 2026-11-19
+
+Owner, 2026-11-18: "This button combo is looking a bit flat. We don't need the login button (or the like) to have an outline … the main CTA needs to have some more lift … add some indent shadow. On hover, give it a subtle glow with a conic gradient stroke … creating a bloom glow around it that's rotating … swap the text … to something that feels like a win … pastikan semua page di BMS button location sama posisi". Component: `js/conv/shell.js` + `css/conv-shell.css`; gate `tools/test-conv-shell.mjs`.
+
+- **One 48 px bar, sticky at top 0**, built once by `shell.js`; the page marks what it already has with
+  `data-cv="back|portfolio|title|scope|prd|manual|cta|theme|clock"` and the module MOVES those elements into fixed
+  slots, so every id, class and handler page code or gates select keeps working. The page's own tools (zoom, export,
+  simulate, view switches) stay in its toolbar row under the bar (`data-cv-toolrow`).
+- **Slot order, left → right:** Back · Portfolio · title (+ scope) · ‹spacer› · PRD · Manual · Alarm history ·
+  primary CTA · Login · theme · clock (· More below 1101 px). Fixed widths: back 84, portfolio 108, PRD 56, manual 76,
+  alarm 124, CTA 236, login 104, theme 44, clock 112 px. **A slot the page cannot fill stays EMPTY at its width**, so
+  every slot sits at the same x on every page (law C2, ± 1 px, measured from the left for the left group and from the
+  right edge for the right group, also while the CTA is hovered).
+- **Login and its like are bare**: no border, no fill, weight 600; the accent underline on hover / focus only; hit
+  height ≥ 44 px.
+- **Alarm history is a secondary button** (one class: transparent, 1 px hairline face, 13 px): amber is reserved for
+  abnormal state (ISA-101).
+- **Exactly one primary CTA**: the Ask action on eight pages (`Get the answer`, win line `Answer in seconds`), the
+  Design Studio on `dc-conventional` (`Get my design`, win line `Design ready in one click`); `cdu-mini-bms` has no Ask
+  and keeps the slot empty. Its look is the owner exception of `ANTI_VIBECODE_STANDARD.md` §B (2026-11-19).
+- **≤ 1100 px** Portfolio, PRD, Manual and Alarm history move into one **More** menu (focus moved in, Escape returns,
+  every item ≥ 44 px, text of every item starts on one line); Back, title, CTA, Login stay. At 390 nothing of the bar
+  leaves the viewport.
+- **≤ 600 px** the theme button joins the More menu with a "Theme" label, and the title may take two lines (12 px,
+  clamped): a long name ("Conventional DC Dashboard") is read, never cut to "Co…". A title that is still cut ends in an
+  ellipsis (the bar title is `display:block`, never a flex box). The pages' v1.8.0 mobile patch sets
+  `h1 { font-size: 1.6rem !important }`; the bar holds its title size with `!important` scoped to `.cv-bar .cv-title`.
+- **Gated page** (`dc-conventional`): while `body.locked`, `auth.js` lifts the public PRD / Manual links into a fixed
+  layer above the sign-in gate, each in the box of its slot; a slot inside the closed More menu has no box, so its link
+  stands in a row just under the bar, right-aligned. The bar, its More panel and the old header are `inert` while
+  locked. Unlocked, the links go back into their slots (bar or More), so reading and Tab order follow the menu.
+- **EPMS on a phone** keeps ≥ 560 px for the single-line under the bar: the provenance line and the feed / state legend
+  fold to one line each (tap to open, `role=button` only where they fold).
+- A page whose `html` and `body` both scroll (chiller-plant) gets `body { overflow-x: clip; overflow-y: visible }`
+  under the bar, else `position: sticky` binds to a body that never scrolls.
+- Laws C1–C8 (`tools/test-conv-shell.mjs`): bar, positions, bare login, CTA rest / hover / pressed / reduced motion,
+  actions still work, 390 More menu, contrast ≥ 4.5 : 1, keyboard order. The hover laws run with Chrome's
+  `--blink-settings=…HoverType=2…` flags and refuse to run when `(hover: hover)` does not match.
+- `datahallAI.html` adopts the same component and gate (owned by the DC AI session).

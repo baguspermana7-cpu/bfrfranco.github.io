@@ -1,0 +1,282 @@
+/* conv-shell.css — the one cockpit top bar of the nine Conventional BMS pages (js/conv/shell.js builds it).
+   Standard: standarization/SITE_CHROME_STANDARD.md §9 (app kind, 48 px, slot order, the empty-slot rule).
+   Owner exception (2026-11-18, ANTI_VIBECODE_STANDARD + MOTION_STANDARD): the ONE primary CTA per page carries an
+   indent shadow, a rotating conic ring with a bloom on hover / focus, a label swap and a looping send icon.
+   Gate: tools/test-conv-shell.mjs. */
+
+@property --cv-angle { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+
+.cv-bar {
+  --cv-bg: #121316; --cv-line: rgba(255,255,255,.14); --cv-line-hi: rgba(255,255,255,.34);
+  --cv-ink: #e8edf5; --cv-muted: #a9b2bf; --cv-accent: #E8B563;
+  --cv-face: #E8B563; --cv-face-ink: #1b1205; --cv-ring-hi: #fff4dc;
+  --cv-gap: 8px;
+  --cv-w-back: 84px; --cv-w-portfolio: 108px; --cv-w-prd: 56px; --cv-w-manual: 76px; --cv-w-alarm: 124px;
+  --cv-cta-w: 236px; --cv-w-login: 104px; --cv-w-theme: 44px; --cv-w-clock: 112px;
+  position: sticky; top: 0; z-index: 1000;
+  box-sizing: border-box; height: 48px; min-height: 48px; max-height: 48px;
+  background: var(--cv-bg); border-bottom: 1px solid var(--cv-line); color: var(--cv-ink);
+  font: 400 13px/1.2 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+:root[data-theme="light"] .cv-bar {
+  --cv-bg: #ffffff; --cv-line: rgba(15,23,42,.16); --cv-line-hi: rgba(15,23,42,.42);
+  --cv-ink: #1f2329; --cv-muted: #4b5563; --cv-accent: #7A4800;
+}
+.cv-bar__in {
+  box-sizing: border-box; height: 100%; display: flex; align-items: center; gap: var(--cv-gap);
+  padding: 0 16px; min-width: 0;
+}
+.cv-slot { flex: 0 0 auto; display: flex; align-items: center; min-width: 0; height: 44px; }
+.cv-slot--back { width: var(--cv-w-back); }
+.cv-slot--portfolio { width: var(--cv-w-portfolio); }
+.cv-slot--title { flex: 1 1 auto; gap: 10px; overflow: hidden; }
+.cv-slot--prd { width: var(--cv-w-prd); }
+.cv-slot--manual { width: var(--cv-w-manual); }
+.cv-slot--alarm { width: var(--cv-w-alarm); }
+.cv-slot--cta { width: var(--cv-cta-w); }
+.cv-slot--login { width: var(--cv-w-login); }
+.cv-slot--theme { width: var(--cv-w-theme); }
+.cv-slot--clock { width: var(--cv-w-clock); justify-content: flex-end; }
+.cv-slot--more { display: none; width: 64px; }
+.cv-slot--alarm > [data-rz-alarm-launch-slot] { display: contents; }
+
+/* title + scope */
+.cv-bar .cv-title {
+  margin: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font: 600 14px/1.2 'IBM Plex Sans', system-ui, sans-serif; letter-spacing: 0; text-transform: none; color: var(--cv-ink);
+}
+/* the pages' v1.8.0 mobile patch sets `h1 { font-size: 1.6rem !important }` at <= 768 px; the bar title is an h1 on
+   most cockpits, so its size is held here with !important, scoped to the bar */
+@media (max-width: 768px) { .cv-bar .cv-title { font-size: 13px !important; line-height: 1.2 !important; } }
+/* page titles are often flex boxes (dc-conventional .header-title); a flex box never draws an ellipsis on its text */
+.cv-bar .cv-title { display: block; }
+.cv-bar .cv-title > * { vertical-align: middle; }
+.cv-bar .cv-title small, .cv-bar .cv-title .sub, .cv-bar .cv-title .brand-sub, .cv-bar .cv-scope {
+  font-size: 13px; font-weight: 400; color: var(--cv-muted); margin-left: 8px; letter-spacing: 0; text-transform: none;
+}
+.cv-bar .cv-scope { margin-left: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+
+/* secondary: one class, one height (44 px hit, 32 px face), 1 px hairline, text + optional icon */
+.cv-bar .cv-btn, .cv-more__panel .cv-btn {
+  position: relative; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  width: 100%; min-width: 44px; height: 44px; min-height: 44px; margin: 0; padding: 0 10px;
+  background: transparent; border: 0; border-radius: 4px; box-shadow: none; background-image: none;
+  color: var(--cv-ink); font: 500 13px/1 'IBM Plex Sans', system-ui, sans-serif; letter-spacing: 0; text-transform: none;
+  text-decoration: none; white-space: nowrap; cursor: pointer;
+}
+.cv-bar .cv-btn::before, .cv-more__panel .cv-btn::before {
+  content: ''; position: absolute; inset: 6px 0; border: 1px solid var(--cv-line); border-radius: 4px; pointer-events: none;
+  transition: border-color var(--rz-dur-tip, 160ms) var(--rz-ease-out, cubic-bezier(.23,1,.32,1));
+}
+.cv-bar .cv-btn:hover::before, .cv-more__panel .cv-btn:hover::before { border-color: var(--cv-line-hi); }
+.cv-bar .cv-btn:focus-visible, .cv-more__panel .cv-btn:focus-visible { outline: 2px solid var(--cv-accent); outline-offset: -4px; }
+.cv-bar .cv-btn svg, .cv-more__panel .cv-btn svg { width: 15px; height: 15px; flex: 0 0 15px; }
+.cv-bar .cv-btn i, .cv-more__panel .cv-btn i { display: none; }
+.cv-bar .cv-btn[disabled], .cv-bar .cv-btn[aria-disabled="true"] { cursor: not-allowed; color: var(--cv-muted); }
+
+/* theme: 44 x 44, 1 px hairline, no fill (SITE_CHROME_STANDARD §4) */
+.cv-bar .cv-icon-btn {
+  box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; min-width: 44px; min-height: 44px; margin: 0; padding: 0;
+  background: transparent; border: 1px solid var(--cv-line); border-radius: 4px; color: var(--cv-ink); cursor: pointer; box-shadow: none;
+}
+.cv-bar .cv-icon-btn:focus-visible { outline: 2px solid var(--cv-accent); outline-offset: 2px; }
+.cv-bar .cv-icon-btn svg { width: 16px; height: 16px; }
+
+/* login (and the account pill): a bare text button — no border, no fill; the accent underline on hover / focus only */
+.cv-slot--login .rz-auth-wrap { margin: 0; display: inline-flex; align-items: center; max-width: 100%; }
+.cv-bar .rz-login-btn, .cv-bar .rz-user-btn {
+  box-sizing: border-box; min-height: 44px; height: 44px; padding: 0 8px; gap: 6px; max-width: 100%;
+  background: transparent; border: 0; border-radius: 4px; box-shadow: none; background-image: none;
+  color: var(--cv-ink); font: 600 13px/1 'IBM Plex Sans', system-ui, sans-serif; letter-spacing: 0;
+  text-decoration: none; text-underline-offset: 4px; text-decoration-thickness: 2px;
+}
+.cv-bar .rz-login-btn i { display: none; }
+.cv-bar .rz-login-btn:hover, .cv-bar .rz-login-btn:focus-visible,
+.cv-bar .rz-user-btn:hover, .cv-bar .rz-user-btn:focus-visible {
+  background: transparent; border: 0; color: var(--cv-ink); text-decoration-line: underline; text-decoration-color: var(--cv-accent);
+}
+.cv-bar .rz-login-btn:focus-visible, .cv-bar .rz-user-btn:focus-visible { outline: 2px solid var(--cv-accent); outline-offset: -2px; }
+.cv-bar .rz-user-email { max-width: 56px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* clock */
+.cv-slot--clock, .cv-slot--clock * {
+  font-family: 'JetBrains Mono', 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px; color: var(--cv-muted);
+  font-variant-numeric: tabular-nums slashed-zero; font-feature-settings: "tnum" 1, "zero" 1; white-space: nowrap;
+}
+.cv-slot--clock .status-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 6px; animation: none; box-shadow: none; }
+
+/* ---- the primary CTA (owner exception 2026-11-18) ---------------------------------------------------- */
+.cv-bar .cv-cta {
+  position: relative; box-sizing: border-box; display: inline-flex; align-items: center; justify-content: stretch;
+  width: 100%; height: 44px; min-height: 44px; margin: 0; padding: 0; border: 0; border-radius: 4px;
+  background: transparent; background-image: none; box-shadow: none; color: var(--cv-face-ink); opacity: 1;
+  font: 600 13px/1 'IBM Plex Sans', system-ui, sans-serif; letter-spacing: 0; text-transform: none; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.cv-cta__face {
+  position: relative; box-sizing: border-box; display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; height: 34px; padding: 0 14px; border-radius: 4px;
+  background: var(--cv-face); color: var(--cv-face-ink);
+  box-shadow: 0 1px 2px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.42), inset 0 -2px 0 rgba(84,52,0,.30);
+  transition: box-shadow var(--rz-dur-press, 120ms) var(--rz-ease-out, cubic-bezier(.23,1,.32,1));
+}
+.cv-cta__labels { display: grid; overflow: hidden; height: 20px; align-items: center; }
+.cv-cta__rest, .cv-cta__win {
+  grid-area: 1 / 1; white-space: nowrap; text-align: center;
+  transition: opacity var(--rz-dur-menu, 200ms) var(--rz-ease-out, cubic-bezier(.23,1,.32,1)),
+              transform var(--rz-dur-menu, 200ms) var(--rz-ease-out, cubic-bezier(.23,1,.32,1));
+}
+.cv-cta__win { opacity: 0; transform: translateY(6px); }
+.cv-cta__icon { display: inline-flex; width: 16px; height: 16px; flex: 0 0 16px; overflow: hidden; }
+.cv-cta__icon svg { width: 16px; height: 16px; display: block; }
+/* ring (::before) and bloom (::after): outside the face, behind it, never catching the pointer */
+.cv-bar .cv-cta::before, .cv-bar .cv-cta::after {
+  content: ''; position: absolute; inset: 3px -2px; border-radius: 6px; z-index: -1; pointer-events: none;
+  background: conic-gradient(from var(--cv-angle), var(--cv-face) 0deg, var(--cv-ring-hi) 60deg, var(--cv-face) 140deg,
+                             var(--cv-face) 220deg, var(--cv-ring-hi) 280deg, var(--cv-face) 360deg);
+  opacity: 0; animation: none;
+  transition: opacity var(--rz-dur-tip, 160ms) var(--rz-ease-out, cubic-bezier(.23,1,.32,1));
+}
+.cv-bar .cv-cta::after { filter: blur(10px); }
+.cv-bar .cv-cta:focus-visible { outline: none; }
+.cv-bar .cv-cta:focus-visible .cv-cta__face { outline: 2px solid var(--cv-ink); outline-offset: 3px; }
+.cv-bar .cv-cta:focus-visible::before { opacity: 1; animation: cv-ring-spin 4s linear infinite; }
+.cv-bar .cv-cta:focus-visible::after { opacity: .5; animation: cv-ring-spin 4s linear infinite; }
+.cv-bar .cv-cta:focus-visible .cv-cta__rest { opacity: 0; transform: translateY(-6px); }
+.cv-bar .cv-cta:focus-visible .cv-cta__win { opacity: 1; transform: translateY(0); }
+.cv-bar .cv-cta:focus-visible .cv-cta__icon svg { animation: cv-plane 1.4s var(--rz-ease-in-out, cubic-bezier(.77,0,.175,1)) infinite; }
+@media (hover: hover) and (pointer: fine) {
+  .cv-bar .cv-cta:hover::before { opacity: 1; animation: cv-ring-spin 4s linear infinite; }
+  .cv-bar .cv-cta:hover::after { opacity: .5; animation: cv-ring-spin 4s linear infinite; }
+  .cv-bar .cv-cta:hover .cv-cta__rest { opacity: 0; transform: translateY(-6px); }
+  .cv-bar .cv-cta:hover .cv-cta__win { opacity: 1; transform: translateY(0); }
+  .cv-bar .cv-cta:hover .cv-cta__icon svg { animation: cv-plane 1.4s var(--rz-ease-in-out, cubic-bezier(.77,0,.175,1)) infinite; }
+}
+/* pressed: the elevation collapses, no glow */
+.cv-bar .cv-cta:active .cv-cta__face { box-shadow: inset 0 1px 2px rgba(84,52,0,.45); }
+.cv-bar .cv-cta:active::before, .cv-bar .cv-cta:active::after { opacity: 0; animation: none; }
+/* unavailable (dc-conventional before its engine authority validates): no ring, no swap */
+.cv-bar .cv-cta[disabled] { cursor: not-allowed; }
+.cv-bar .cv-cta[disabled] .cv-cta__face { background: #3a3326; color: #d9c7a3; box-shadow: none; }
+.cv-bar .cv-cta[disabled]::before, .cv-bar .cv-cta[disabled]::after { opacity: 0; animation: none; }
+.cv-bar .cv-cta[disabled] .cv-cta__rest { opacity: 1; transform: none; }
+.cv-bar .cv-cta[disabled] .cv-cta__win { opacity: 0; transform: translateY(6px); }
+.cv-bar .cv-cta[disabled] .cv-cta__icon svg { animation: none; }
+:root[data-theme="light"] .cv-bar .cv-cta[disabled] .cv-cta__face { background: #ece4d4; color: #5c4a2a; }
+
+@keyframes cv-ring-spin { to { --cv-angle: 360deg; } }
+/* the plane flies off up-right, re-enters from down-left and settles */
+@keyframes cv-plane {
+  0%   { transform: translate(0, 0); opacity: 1; }
+  40%  { transform: translate(14px, -14px); opacity: 0; }
+  41%  { transform: translate(-14px, 14px); opacity: 0; }
+  75%, 100% { transform: translate(0, 0); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cv-bar .cv-cta::before, .cv-bar .cv-cta::after { transition: none; }
+  .cv-bar .cv-cta:hover::before, .cv-bar .cv-cta:focus-visible::before { animation: none; opacity: .55; }
+  .cv-bar .cv-cta:hover::after, .cv-bar .cv-cta:focus-visible::after { animation: none; opacity: 0; }
+  .cv-bar .cv-cta:hover .cv-cta__icon svg, .cv-bar .cv-cta:focus-visible .cv-cta__icon svg { animation: none; }
+  .cv-cta__rest, .cv-cta__win, .cv-cta__face { transition: none; }
+  .cv-cta__win, .cv-bar .cv-cta:hover .cv-cta__rest, .cv-bar .cv-cta:focus-visible .cv-cta__rest,
+  .cv-bar .cv-cta:hover .cv-cta__win, .cv-bar .cv-cta:focus-visible .cv-cta__win { transform: none; }
+}
+
+/* ---- More menu (compact widths): Portfolio, PRD, Manual, Alarm history -------------------------------- */
+.cv-more__panel {
+  position: fixed; z-index: 1001; top: 52px; right: 12px; box-sizing: border-box;
+  width: min(260px, calc(100vw - 24px)); padding: 6px; display: flex; flex-direction: column; gap: 2px;
+  background: var(--cv-bg, #121316); border: 1px solid var(--cv-line, rgba(255,255,255,.14)); border-radius: 4px;
+  --cv-bg: #121316; --cv-line: rgba(255,255,255,.14); --cv-line-hi: rgba(255,255,255,.34); --cv-ink: #e8edf5; --cv-accent: #E8B563;
+  opacity: 1; transform: none;
+  transition: opacity var(--rz-dur-menu, 200ms) var(--rz-ease-out, cubic-bezier(.23,1,.32,1)),
+              transform var(--rz-dur-menu, 200ms) var(--rz-ease-out, cubic-bezier(.23,1,.32,1));
+  transform-origin: top right;
+}
+:root[data-theme="light"] .cv-more__panel { --cv-bg: #ffffff; --cv-line: rgba(15,23,42,.16); --cv-line-hi: rgba(15,23,42,.42); --cv-ink: #1f2329; --cv-accent: #7A4800; }
+.cv-more__panel[hidden] { display: none !important; }
+.cv-more__panel > * { display: flex; width: 100%; }
+.cv-more__panel .cv-btn, .cv-more__panel .rz-conv-alarm-launch { justify-content: flex-start; width: 100%; }
+.cv-more__panel [data-rz-alarm-launch-slot] { display: contents; }
+@media (prefers-reduced-motion: reduce) { .cv-more__panel { transition: none; } }
+
+@media (max-width: 1100px) {
+  .cv-bar .cv-slot--portfolio, .cv-bar .cv-slot--prd, .cv-bar .cv-slot--manual, .cv-bar .cv-slot--alarm { display: none; }
+  .cv-bar .cv-slot--more { display: flex; }
+}
+@media (max-width: 768px) {
+  .cv-bar { --cv-gap: 4px; }
+  .cv-bar__in { padding: 0 8px; }
+  .cv-bar .cv-slot--clock { display: none; }
+  .cv-bar .cv-slot--theme:empty { display: none; }
+  .cv-bar .cv-slot--back { width: 44px; }
+  .cv-bar .cv-slot--back .cv-btn__txt { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .cv-bar .cv-slot--login { width: auto; }
+  .cv-bar .cv-slot--more { width: 52px; }
+  .cv-bar .cv-slot--cta { width: auto; }
+  .cv-bar .cv-cta__face { padding: 0 10px; }
+  .cv-bar .cv-cta__win, .cv-bar .cv-cta__icon { display: none; }
+  .cv-bar .cv-title { font-size: 13px; }
+  .cv-bar .cv-title small, .cv-bar .cv-title .sub, .cv-bar .cv-title .brand-sub, .cv-bar .cv-scope { display: none; }
+  .cv-bar .rz-user-email { display: none; }
+}
+@media (hover: none) {
+  .cv-bar .cv-cta__win { display: none; }
+}
+@media print { .cv-bar, .cv-more__panel { display: none !important; } }
+[data-cv-toolrow][hidden] { display: none !important; }
+
+/* Alarm history is a SECONDARY action in the bar (amber is reserved for abnormal state, ISA-101): the launcher that
+   js/conv-alarm-workspace.js injects takes the secondary face. Its id, handler and badge are unchanged. */
+.cv-bar .rz-conv-alarm-launch, .cv-more__panel .rz-conv-alarm-launch {
+  box-sizing: border-box; display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  width: 100%; min-height: 44px; height: 44px; margin: 0; padding: 0 10px;
+  background: transparent !important; background-image: none !important; border: 0 !important; box-shadow: none !important;
+  color: var(--cv-ink) !important; font: 500 13px/1 'IBM Plex Sans', system-ui, sans-serif !important; letter-spacing: 0 !important;
+  text-transform: none !important; position: relative;
+}
+.cv-bar .rz-conv-alarm-launch::before {
+  content: ''; position: absolute; inset: 6px 0; border: 1px solid var(--cv-line); border-radius: 4px; pointer-events: none;
+}
+.cv-bar .rz-conv-alarm-launch:hover::before { border-color: var(--cv-line-hi); }
+.cv-bar .rz-conv-alarm-launch:focus-visible { outline: 2px solid var(--cv-accent); outline-offset: -4px; }
+/* auth.js paints its own pill; inside the cockpit bar Login stays bare (owner, 2026-11-18: "lose the outline") */
+.cv-bar .rz-auth-wrap, .cv-bar .rz-login-btn, .cv-bar .rz-user-btn {
+  background: transparent !important; background-image: none !important; border: 0 !important; box-shadow: none !important;
+}
+
+/* a page that makes BOTH html and body scroll containers (chiller-plant: overflow-y:auto on each) leaves the sticky bar
+   bound to a body that never scrolls; under the cockpit bar body clips sideways instead of scrolling */
+:root:has(> body > .cv-bar) > body { overflow-x: clip; overflow-y: visible; }
+@media (max-width: 600px) { .cv-bar .live-badge { display: none; } }
+
+/* dc-conventional: auth.js lifts the public PRD / Manual links into a fixed layer above the sign-in gate; they keep the
+   secondary-button face of the slot they stand for */
+.rz-public-contract-layer .cv-btn {
+  position: fixed; display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 10px;
+  background: transparent; border: 0; border-radius: 4px; color: var(--cv-ink, #e8edf5);
+  font: 500 13px/1 'IBM Plex Sans', system-ui, sans-serif; letter-spacing: 0; text-decoration: none; white-space: nowrap;
+}
+.rz-public-contract-layer .cv-btn::before {
+  content: ''; position: absolute; inset: 6px 0; border: 1px solid var(--cv-line, rgba(255,255,255,.14)); border-radius: 4px; pointer-events: none;
+}
+.rz-public-contract-layer .cv-btn:focus-visible { outline: 2px solid var(--cv-accent, #E8B563); outline-offset: -4px; }
+:root[data-theme="light"] .rz-public-contract-layer .cv-btn { --cv-ink: #1b2430; --cv-line: rgba(15,23,42,.18); }
+/* auth.js writes justify-content:center inline on the lifted links; in the More panel they line up with the rest */
+@media (max-width: 1100px) { .rz-public-contract-layer .cv-btn { justify-content: flex-start !important; } }
+.cv-more__panel .rz-conv-alarm-launch { justify-content: flex-start !important; }
+
+/* phone (<= 600 px): the theme button joins the More menu with a text label, and the page title may take two lines,
+   so a long title ("Conventional DC Dashboard") is read instead of cut to "Co…" */
+.cv-more__panel .cv-icon-btn {
+  box-sizing: border-box; display: flex; align-items: center; justify-content: flex-start; gap: 8px; width: 100%; min-height: 44px;
+  padding: 0 10px; background: transparent; border: 1px solid var(--cv-line); border-radius: 4px; color: var(--cv-ink);
+  font: 500 13px/1 'IBM Plex Sans', system-ui, sans-serif; cursor: pointer;
+}
+.cv-more__panel .cv-icon-btn::after { content: 'Theme'; }
+.cv-more__panel .cv-icon-btn svg { width: 15px; height: 15px; flex: 0 0 15px; }
+.cv-more__panel .cv-icon-btn:focus-visible { outline: 2px solid var(--cv-accent); outline-offset: -4px; }
+@media (max-width: 600px) {
+  .cv-bar .cv-title { white-space: normal; display: -webkit-box !important; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; line-height: 1.15 !important; font-size: 12px !important; }
+}

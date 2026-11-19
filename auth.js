@@ -69,8 +69,9 @@
         layer.className = 'rz-public-contract-layer';
         layer.setAttribute('aria-label', 'Public cockpit documentation');
         layer.style.cssText = 'position:fixed;inset:0;z-index:100002;pointer-events:none';
-        var bindings = config.links.map(function (link) {
-            var slot = publicContractSlot(link);
+        function lift(binding) {
+            var link = binding.link;
+            if (link.parentNode === layer) return;
             link.style.position = 'fixed';
             link.style.zIndex = '1';
             link.style.pointerEvents = 'auto';
@@ -80,7 +81,23 @@
             link.style.alignItems = 'center';
             link.style.justifyContent = 'center';
             layer.appendChild(link);
-            return { link: link, slot: slot };
+            binding.slot.style.display = '';
+        }
+        /* on a cockpit with the shared bar (js/conv/shell.js) an UNLOCKED page keeps the links where they belong, so
+           they sit in the bar or its More menu in reading and Tab order; only the sign-in gate lifts them above it */
+        function settle(binding) {
+            var link = binding.link, slot = binding.slot;
+            if (link.parentNode === slot.parentNode && link.nextSibling === slot) return;
+            link.setAttribute('style', binding.flowStyle);
+            if (!binding.flowStyle) link.removeAttribute('style');
+            slot.parentNode.insertBefore(link, slot);
+            slot.style.display = 'none';
+        }
+        var bindings = config.links.map(function (link) {
+            var binding = { link: link, flowStyle: link.getAttribute('style') || '' };
+            binding.slot = publicContractSlot(link);
+            lift(binding);
+            return binding;
         });
         if (config.header.parentNode === document.body) {
             document.body.insertBefore(layer, config.header);
@@ -89,23 +106,63 @@
         }
 
         function placeLinks() {
+            var locked = document.body.classList.contains('locked');
+            var parked = [];
+            if (!locked && document.querySelector('.cv-bar')) { bindings.forEach(settle); return; }
+            bindings.forEach(lift);
             bindings.forEach(function (binding) {
                 var rect = binding.slot.getBoundingClientRect();
+                /* a slot inside a closed menu (the cockpit bar's More panel at a phone width) has no box */
+                var shown = rect.width > 0 && rect.height > 0;
+                if (!shown && locked) { parked.push(binding); return; }
+                /* unlocked: the link waits in its closed menu instead of pinning at 0,0 over the page */
+                binding.link.style.visibility = shown ? '' : 'hidden';
                 binding.link.style.left = rect.left + 'px';
                 binding.link.style.top = rect.top + 'px';
+                /* the link takes the box of the slot it stands for, so it reads as the button it replaces */
+                if (shown) { binding.link.style.width = rect.width + 'px'; binding.link.style.height = rect.height + 'px'; binding.link.style.boxSizing = 'border-box'; }
             });
+            if (!parked.length) return;
+            /* locked behind the sign-in gate, the More menu sits under the overlay: the public PRD / Manual links are
+               the one thing a locked visitor may open, so they stand in a row just under the bar, right-aligned */
+            var bar = (document.querySelector('.cv-bar') || config.header).getBoundingClientRect();
+            var right = document.documentElement.clientWidth - 8;
+            for (var i = parked.length - 1; i >= 0; i--) {
+                var link = parked[i].link;
+                link.style.visibility = '';
+                link.style.width = '';
+                link.style.height = '44px';
+                link.style.boxSizing = 'border-box';
+                link.style.top = (Math.max(bar.bottom, 0) + 8) + 'px';
+                link.style.left = '0px';
+                var w = Math.max(link.getBoundingClientRect().width, 44);
+                right -= w;
+                link.style.left = right + 'px';
+                right -= 8;
+            }
+        }
+
+        /* the cockpit bar (js/conv/shell.js) moves the header's controls into .cv-bar and its More panel: the gate
+           makes all of them inert, not only the original header */
+        function gatedChrome() {
+            return [config.header, document.querySelector('.cv-bar'), document.getElementById('cvMorePanel')].filter(Boolean);
         }
 
         function syncGateState() {
-            if (document.body.classList.contains('locked')) config.header.setAttribute('inert', '');
-            else config.header.removeAttribute('inert');
+            var locked = document.body.classList.contains('locked');
+            gatedChrome().forEach(function (node) {
+                if (locked) node.setAttribute('inert', '');
+                else node.removeAttribute('inert');
+            });
         }
 
-        new MutationObserver(syncGateState).observe(document.body, {
+        new MutationObserver(function () { syncGateState(); placeLinks(); }).observe(document.body, {
             attributes: true,
             attributeFilter: ['class']
         });
         window.addEventListener('resize', placeLinks, { passive: true });
+        /* shell.js may build the bar after this runs: re-apply the gate to it when it lays out */
+        window.addEventListener('rz-layout-change', function () { syncGateState(); placeLinks(); });
         window.addEventListener('scroll', placeLinks, { passive: true });
         if (typeof ResizeObserver === 'function') {
             var observer = new ResizeObserver(placeLinks);

@@ -285,7 +285,8 @@ const COCKPITS = Object.freeze([
   { file: 'datahallAI.html', slug: 'datahallai', buttonClass: 'bbtn', existingManual: true },
   { file: 'dc-conventional.html', slug: 'dc-conventional', buttonClass: 'back-btn', existingManual: true },
   { file: 'datahall.html', slug: 'datahall', buttonClass: 'nav-btn', existingManual: true },
-  { file: 'cdu-mini-bms.html', slug: 'cdu-mini-bms', buttonClass: 'nav-link' },
+  /* since v3.77.0 the CDU navbar is the cockpit bar: its PRD/Manual links carry data-cv slots, not a class */
+  { file: 'cdu-mini-bms.html', slug: 'cdu-mini-bms', cvSlot: true },
   { file: 'rz-cockpit-mockup.html', slug: 'rz-cockpit-mockup', buttonClass: 'sub' },
 ]);
 
@@ -396,7 +397,9 @@ function assertCockpitButtons(cockpit) {
   const html = read(cockpit.file);
   for (const kind of ['prd', 'manual']) {
     const label = kind === 'prd' ? 'PRD' : 'Manual';
-    const pattern = new RegExp(`<a[^>]+class=["'][^"']*${cockpit.buttonClass}[^"']*["'][^>]+href=["']${kind}/${cockpit.slug}\\.html["'][^>]*>${label}</a>`, 'gi');
+    const pattern = cockpit.cvSlot
+      ? new RegExp(`<a[^>]+href=["']${kind}/${cockpit.slug}\\.html["'][^>]+data-cv=["']${kind}["'][^>]*>${label}</a>`, 'gi')
+      : new RegExp(`<a[^>]+class=["'][^"']*${cockpit.buttonClass}[^"']*["'][^>]+href=["']${kind}/${cockpit.slug}\\.html["'][^>]*>${label}</a>`, 'gi');
     const matches = html.match(pattern) || [];
     assert.equal(
       matches.length,

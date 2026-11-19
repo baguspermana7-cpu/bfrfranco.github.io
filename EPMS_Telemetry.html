@@ -462,7 +462,7 @@
     font-variant-numeric: tabular-nums slashed-zero;
 }
 </style>
-    <script src="js/rz-version.js?v=20261119-45603d7e" defer></script>
+    <script src="js/rz-version.js?v=20261119-ec265353" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- v1.24.0: bring EPMS onto the engine + BMS Shell. conv-engine.js loads
@@ -551,7 +551,21 @@ body:not([data-epms-view="sld"]) .epms-sld-only { display: none !important; }
 /* the legacy drawing's zoom / export controls act on the LV view only */
 body[data-epms-view="sld"] .epms-zoom-group { display: none !important; }
 @media (max-width: 768px) { .epms-sheet-host svg.hmi-svg { touch-action: pan-x pan-y; } }
+/* on a phone the provenance line folds to one line (tap to read it all): the cockpit bar took 48 px and the SLD keeps
+   its >= 560 px; the full basis stays in the markup, the title and the expanded line */
+@media (max-width: 600px) {
+  #rz-prov-epms-strip { cursor: pointer; }
+  #rz-prov-epms-strip:not(.is-open) { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #rz-prov-epms-strip:focus-visible { outline: 2px solid #E8B563; outline-offset: 2px; }
+  /* the feed / state legend folds to its heading on a phone; tap the heading to show the keys */
+  #epms-legend:not(.is-open) > span:not(:first-child) { display: none !important; }
+  #epms-legend > span:first-child { cursor: pointer; min-height: 24px; display: inline-flex; align-items: center; }
+  #epms-legend > span:first-child::after { content: ' \25B8'; }
+  #epms-legend.is-open > span:first-child::after { content: ' \25BE'; }
+  #epms-legend > span:first-child:focus-visible { outline: 2px solid #E8B563; outline-offset: 2px; }
+}
 </style>
+<link rel="stylesheet" href="css/conv-shell.css?v=20261119-729e21d2">
 </head>
 <body data-rz-basis-authority="unavailable" data-rz-data-mode="simulated">
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -657,17 +671,16 @@ body[data-epms-view="sld"] .epms-zoom-group { display: none !important; }
 </svg>
 
 <div class="ui">
-    <div class="topbar pointer">
-        <a href="dc-conventional.html" class="epms-back-link" style="display:flex; align-items:center; gap:8px; text-decoration:none; color:#94a3b8; font-size:12px; padding:6px 12px; border:1px solid #444; border-radius:4px; transition:color 0.2s, background-color 0.2s, border-color 0.2s, opacity 0.2s, box-shadow 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#94a3b8'">
+    <div class="topbar pointer" data-cv-toolrow>
+        <a href="dc-conventional.html" class="epms-back-link" data-cv="back" style="display:flex; align-items:center; gap:8px; text-decoration:none; color:#94a3b8; font-size:12px; padding:6px 12px; border:1px solid #444; border-radius:4px; transition:color 0.2s, background-color 0.2s, border-color 0.2s, opacity 0.2s, box-shadow 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#94a3b8'">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
             Back
         </a>
-        <a class="btn epms-prd-link" href="prd/epms-telemetry.html" style="min-width:44px">PRD</a>
-        <a class="btn epms-manual-link" href="manual/epms-telemetry.html" style="min-width:44px">Manual</a>
-<span data-rz-ask-slot></span>
-        <span class="rz-conv-alarm-slot" data-rz-alarm-launch-slot></span>
+        <a class="btn epms-prd-link" href="prd/epms-telemetry.html" data-cv="prd">PRD</a>
+        <a class="btn epms-manual-link" href="manual/epms-telemetry.html" data-cv="manual">Manual</a>
+<span data-rz-ask-slot data-cv="cta" data-cv-rest="Get the answer" data-cv-win="Answer in seconds"></span>
         <button class="zoom-btn epms-sidebar-toggle" id="epmsSidebarToggle" type="button" aria-expanded="false" aria-controls="epmsSidebar">Panels</button>
-        <a href="index.html" class="epms-portfolio-link" style="display:flex; align-items:center; gap:8px; text-decoration:none; color:#94a3b8; font-size:12px; padding:6px 12px; border:1px solid #444; border-radius:4px; transition:color 0.2s, background-color 0.2s, border-color 0.2s, opacity 0.2s, box-shadow 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#94a3b8'">
+        <a href="index.html" class="epms-portfolio-link" data-cv="portfolio" style="display:flex; align-items:center; gap:8px; text-decoration:none; color:#94a3b8; font-size:12px; padding:6px 12px; border:1px solid #444; border-radius:4px; transition:color 0.2s, background-color 0.2s, border-color 0.2s, opacity 0.2s, box-shadow 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#94a3b8'">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
             Portfolio
         </a>
@@ -675,7 +688,7 @@ body[data-epms-view="sld"] .epms-zoom-group { display: none !important; }
             <button type="button" class="epms-view-btn" data-epms-view="sld" aria-pressed="true" aria-controls="epms-sld-view">HV / MV single-line</button>
             <button type="button" class="epms-view-btn" data-epms-view="lv" aria-pressed="false">LV distribution</button>
         </span>
-        <h1 class="brand">EPMS V1.0 - Telemetry</h1>
+        <h1 class="brand" data-cv="title">EPMS V1.0 - Telemetry</h1>
         <div style="flex:1"></div>
         <div class="epms-zoom-group" style="display:flex; gap:8px; align-items:center;">
             <span style="font-size:10px; color:#9aa3af; margin-right:4px;">ZOOM:</span>
@@ -711,7 +724,8 @@ body[data-epms-view="sld"] .epms-zoom-group { display: none !important; }
             </div>
         </div>
     </div>
-    <div class="epms-main" data-rz-cockpit-root="epms">
+    <script src="js/conv/shell.js?v=20261119-fff76bfd"></script>
+        <div class="epms-main" data-rz-cockpit-root="epms">
         <div class="sidebar pointer" id="epmsSidebar">
             
             <div class="ctrl-box epms-sld-only" id="epms-sld-rail" aria-label="E-S-101 sources and generation" data-rz-authored-basis="E-S-101 rail · source and transformer kW / load % are the SIMULATED topology solve (js/conv/sld-topology.js) of the engine adopted hall loads through the breaker positions on this page; the genset count is conv-engine.js electrical.genset_count; breaker counts are the page switching state. A training simulation, not metering.">
@@ -1465,8 +1479,10 @@ function syncEpmsContextHeight() {
     const legend = document.getElementById('epms-legend');
     // PRD-Q06 FR-4: the simulated banner slot sits between the strip and the legend and is part of the context chrome.
     const bannerSlot = document.querySelector('[data-rz-telemetry-banner-slot]');
+    const shellBar = document.querySelector('.cv-bar');   // E7a: the 48 px cockpit bar sits above the context strips
     const contextHeight = Math.ceil(
-        (statusStrip ? statusStrip.getBoundingClientRect().height : 0)
+        (shellBar ? shellBar.getBoundingClientRect().height : 0)
+        + (statusStrip ? statusStrip.getBoundingClientRect().height : 0)
         + (bannerSlot ? bannerSlot.getBoundingClientRect().height : 0)
         + (legend ? legend.getBoundingClientRect().height : 0)
     );
@@ -2426,6 +2442,46 @@ init();
     document.querySelectorAll('.epms-view-btn').forEach(function (b) {
         b.addEventListener('click', function () { setView(b.getAttribute('data-epms-view')); });
     });
+    (function foldProvenance() {
+        var prov = document.getElementById('rz-prov-epms-strip');
+        if (!prov) return;
+        prov.title = prov.textContent.replace(/\s+/g, ' ').trim();
+        var phone = window.matchMedia ? window.matchMedia('(max-width: 600px)') : { matches: false };
+        function wire() {
+            /* a button only where it folds: on a phone */
+            if (phone.matches) { prov.setAttribute('tabindex', '0'); prov.setAttribute('role', 'button'); prov.setAttribute('aria-expanded', prov.classList.contains('is-open') ? 'true' : 'false'); }
+            else { prov.removeAttribute('tabindex'); prov.removeAttribute('role'); prov.removeAttribute('aria-expanded'); }
+        }
+        if (phone.addEventListener) phone.addEventListener('change', wire);
+        wire();
+        function toggle() {
+            if (!phone.matches) return;
+            var open = prov.classList.toggle('is-open');
+            prov.setAttribute('aria-expanded', open ? 'true' : 'false');
+        }
+        prov.addEventListener('click', toggle);
+        prov.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+    })();
+    (function foldLegend() {
+        var legend = document.getElementById('epms-legend');
+        var head = legend && legend.firstElementChild;
+        if (!head || !window.matchMedia) return;
+        var phone = window.matchMedia('(max-width: 600px)');
+        function wire() {
+            /* a button only where it folds something: on a phone */
+            if (phone.matches) { head.setAttribute('role', 'button'); head.setAttribute('tabindex', '0'); head.setAttribute('aria-expanded', legend.classList.contains('is-open') ? 'true' : 'false'); }
+            else { head.removeAttribute('role'); head.removeAttribute('tabindex'); head.removeAttribute('aria-expanded'); }
+        }
+        function toggle() {
+            if (!phone.matches) return;
+            var open = legend.classList.toggle('is-open');
+            head.setAttribute('aria-expanded', open ? 'true' : 'false');
+        }
+        head.addEventListener('click', toggle);
+        head.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+        if (phone.addEventListener) phone.addEventListener('change', wire);
+        wire();
+    })();
 
     function start() {
         var T = window.RZConvTruth;

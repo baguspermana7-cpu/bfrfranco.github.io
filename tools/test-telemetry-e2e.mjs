@@ -220,6 +220,10 @@ async function verifyDoc(browser, origin, path) {
 
 async function verifyControl(page, control) {
   if (control === 'epms') {
+    /* since v3.74.0 the page opens on the HV/MV single-line, where zoom is hidden on purpose (it scales the LV
+       drawing only); the operator switches to LV distribution first */
+    assert.equal(await page.$eval('.epms-zoom-group', (node) => getComputedStyle(node).display), 'none');
+    await page.click('.epms-view-btn[data-epms-view="lv"]');
     await page.click('.zoom-btn[title="75%"]');
     assert.equal(await page.$eval('#zoomIndicator', (node) => node.textContent.trim()), '75%');
   } else if (control === 'datahall') {
@@ -259,7 +263,7 @@ async function assertLockedControlBlocked(page, cockpit) {
   if (!cockpit.protectedControl) return;
   const state = await page.evaluate((selector) => {
     const control = document.querySelector(selector);
-    const header = control?.closest('.hdr, .header');
+    const header = control?.closest('.hdr, .header, .cv-bar');
     const rect = control?.getBoundingClientRect();
     control?.focus();
     return {
@@ -389,6 +393,13 @@ async function verifyCockpitMobile(browser, origin, cockpit) {
   await page.setViewport(VIEW_MOBILE);
   try {
     await openPage(page, origin, cockpit.path);
+    /* since v3.77.0 the cockpit bar (js/conv/shell.js) puts PRD and Manual in its More menu at 1100 px and below:
+       the public links stay one tap away, so open More before measuring them */
+    const more = await page.$('.cv-more__btn');
+    if (more && await more.evaluate((n) => n.getBoundingClientRect().width > 0)) {
+      await more.click();
+      await new Promise((resolve) => setTimeout(resolve, 400));
+    }
     const result = await page.evaluate((slug) => {
       const links = ['prd', 'manual'].map((kind) => {
         const href = `${kind}/${slug}.html`;
@@ -406,7 +417,8 @@ async function verifyCockpitMobile(browser, origin, cockpit) {
           top: top ? `${top.tagName.toLowerCase()}#${top.id}.${top.className}` : 'none',
         };
       });
-      const hamburger = document.querySelector('.hamburger')?.getBoundingClientRect();
+      /* the cockpit bar's More button is the phone menu since v3.77.0; older pages keep .hamburger */
+      const hamburger = (document.querySelector('.cv-more__btn') || document.querySelector('.hamburger'))?.getBoundingClientRect();
       return {
         links,
         overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,

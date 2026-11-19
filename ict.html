@@ -112,7 +112,7 @@
     .skip-link:focus{top:0}
 
     /* ---- Shell ------------------------------------------------------------- */
-    .shell { display: flex; flex-direction: column; height: 100vh; }
+    .shell { display: flex; flex-direction: column; height: calc(100vh - 48px); } /* E7a: under the 48 px cockpit bar */
 
     .topbar {
         height: 50px; flex: 0 0 50px; background: var(--panel-bg);
@@ -671,7 +671,7 @@
     <script src="js/conv/net-modal.js?v=20261118-34973a6a" defer></script>
     <script src="js/rz-telemetry-quality.js?v=20261113-8feb0dfd" defer></script>
     <script src="js/rz-provenance.js?v=20261111-6f1cd061" defer></script>
-    <script src="js/rz-version.js?v=20261119-45603d7e" defer></script>
+    <script src="js/rz-version.js?v=20261119-ec265353" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- v1.43.20 — instrument register (RZ Dark System v1). Chrome-only, dark-only, scoped. -->
@@ -688,6 +688,7 @@
   select, textarea { font-size: 16px !important; }
 }
 </style>
+<link rel="stylesheet" href="css/conv-shell.css?v=20261119-729e21d2">
 </head>
 <body data-rz-data-mode="simulated">
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -695,17 +696,17 @@
 
     <div class="shell" data-rz-cockpit-root="ict">
         <!-- Topbar -->
-        <div class="topbar">
-            <a href="dc-conventional.html" class="top-link" title="Back to Conventional DC dashboard">
+        <div class="topbar" data-cv-toolrow>
+            <a href="dc-conventional.html" class="top-link" title="Back to Conventional DC dashboard" data-cv="back">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                 Back
             </a>
-            <a href="index.html" class="top-link" title="Exit to portfolio">
+            <a href="index.html" class="top-link" title="Exit to portfolio" data-cv="portfolio">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
                 Portfolio
             </a>
-            <span class="rz-conv-alarm-slot" data-rz-alarm-launch-slot></span><span data-rz-ask-slot></span>
-            <h1 class="brand">ICT Network Operations <span class="sub">— BKS01 Conventional DC</span></h1>
+            <span data-rz-ask-slot data-cv="cta" data-cv-rest="Get the answer" data-cv-win="Answer in seconds"></span>
+            <h1 class="brand" data-cv="title">ICT Network Operations <span class="sub">— BKS01 Conventional DC</span></h1>
             <div class="top-spacer"></div>
             <div class="meta-chip" title="Single engineering basis: conv-engine.js">Basis <b id="m-basis" data-basis-param="site.it_load_kw" tabindex="0" role="button">UNAVAILABLE</b></div>
             <div class="meta-chip">Quality <b aria-describedby="rz-prov-ict-strip" id="m-quality">UNAVAILABLE</b></div>
@@ -718,6 +719,7 @@
                 Export (n/a)
             </button>
         </div>
+        <script src="js/conv/shell.js?v=20261119-fff76bfd"></script>
         <div data-rz-telemetry-banner-slot></div>
 
         <!-- Top alarm strip (information hierarchy #1) -->
@@ -2107,7 +2109,7 @@
         }
     })();
     </script>
-<script src="auth.js?v=20261116-a1a28053" defer></script>
+<script src="auth.js?v=20261119-da7c4afa" defer></script>
 <script src="rz-tracker.js?v=20261114-9a1fdf1c" defer></script>
 
 <style id="rz-cookie-banner-style">

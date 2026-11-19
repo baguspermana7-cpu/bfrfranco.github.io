@@ -22,7 +22,7 @@ LOG_DIR="${RZ_GATE_LOG_DIR:-$TMPDIR/conv-release-gates}"; mkdir -p "$LOG_DIR"
 LIST=0; FROM=1; ONLY=''
 while [ $# -gt 0 ]; do case "$1" in --list) LIST=1;; --from) FROM="$2"; shift;; --only) ONLY="$2"; shift;; esac; shift; done
 
-FAMILY='conv|Conventional|EPMS|epms|ICT |ict-|ict\.|datahall|chiller|fire|fuel|water|cockpit|operator|engine version|engine-version|registry|payload|formula|explain|value-bindings|eng-symbols|hmi'
+FAMILY='conv|Conventional|EPMS|epms|telemetry|ICT |ict-|ict\.|datahall|chiller|fire|fuel|water|cockpit|operator|engine version|engine-version|registry|payload|formula|explain|value-bindings|eng-symbols|hmi'
 EXCLUDE='datahall-ai|dcai|DC AI|pillar-fire|fire-calc|fire-ca|article|journal|incident|homepage|hub-tools'
 EXTRA=(
   'node tools/audit-a11y.mjs --strict'

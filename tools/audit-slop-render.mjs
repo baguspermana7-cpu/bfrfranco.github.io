@@ -124,6 +124,9 @@ function scan(keys) {
     const walk = (rs) => { for (const ru of rs) { if (ru.cssRules && !ru.selectorText) { walk(ru.cssRules); continue; }
       if (ru.selectorText && /:hover/.test(ru.selectorText) && ru.style && ru.style.transform && ru.style.transform !== 'none'
         && !/scale\(1\)|translate(?:X|Y)?\(0(?:px)?\)/.test(ru.style.transform)) {
+        // owner exception 2026-11-19 (ANTI_VIBECODE_STANDARD §B, E7a): the ONE primary CTA of the cockpit bar lifts
+        // and swaps its label on hover. Exempt by exact selector prefix, nothing else on the page.
+        if (/^\.cv-bar \.cv-cta:hover\b/.test(ru.selectorText)) continue;
         const sel = ru.selectorText.replace(/:hover/g, ''); try { if (document.querySelector(sel)) out.lift.push(ru.selectorText.slice(0, 50)); } catch {} } } };
     walk(rules);
   }

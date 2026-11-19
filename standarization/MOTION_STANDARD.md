@@ -164,6 +164,13 @@ that does not load `css/rz-article-dark.css`.
 
 ---
 
+### Owner exception 2026-11-19 — cockpit primary CTA
+
+"on hovering, change the text to something that feels like a win, and animate the send icon in a loop transition where the plane flies away and repeats". Only while hovered or focused: ring rotation through a registered `@property` angle, ~4 s linear; plane
+loop ~1.4 s (transform + opacity, clipped); label swap opacity + translateY ≤ 6 px on the `--rz-dur-*` /
+`--rz-ease-*` tokens. Reduced motion: no rotation, no loop, instant label swap. Pressed: the lift collapses, no ring.
+Touch (no hover): rest label only. A keyboard shortcut never triggers it. Gate: `tools/test-conv-shell.mjs` C4.
+
 ## Never ship
 
 | never | instead |

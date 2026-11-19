@@ -379,7 +379,16 @@ try {
       columns: getComputedStyle(document.querySelector('.fire-scope-strip')).gridTemplateColumns,
       layoutColumns: getComputedStyle(document.querySelector('.layout-grid')).gridTemplateColumns,
       overflow: Math.max(0, document.documentElement.scrollWidth - document.documentElement.clientWidth),
-      bodyOverflow: Math.max(0, document.body.scrollWidth - document.body.clientWidth),
+      /* the cockpit bar (js/conv/shell.js, v3.77.0) bleeds across the body margin to span the viewport on purpose;
+         content the body clips is measured without it */
+      bodyOverflow: (() => {
+        const bar = document.querySelector('.cv-bar');
+        const was = bar ? bar.style.display : '';
+        if (bar) bar.style.display = 'none';
+        const value = Math.max(0, document.body.scrollWidth - document.body.clientWidth);
+        if (bar) bar.style.display = was;
+        return value;
+      })(),
       mimic: (() => {
         const scroller = document.querySelector('.main-svg');
         if (!scroller) return null;

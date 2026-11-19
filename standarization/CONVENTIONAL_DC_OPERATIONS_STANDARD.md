@@ -399,6 +399,13 @@ Before release:
   the plant value; identical on two calls.
 - **Lesson kept.** Gates that typed the engine version (`'2.3.0'`, and three stale `'2.2.0'` / `?v=2.0.0` fixtures
   from earlier bumps that had silently become no-ops) now derive it from the engine or the generated registry.
+### 2026-11-19 — one cockpit bar (PRD-CONV-EQUIPMENT-TRUTH E7a, PRD-APP-CLARITY §6)
+
+- The nine Conventional pages carry ONE top bar (`js/conv/shell.js`, `css/conv-shell.css`): same slot order, same
+  x per slot on every page, empty slots kept at width. Detail and laws: `SITE_CHROME_STANDARD.md` §9.
+- A cockpit page never builds its own bar again: new header controls get a `data-cv` slot or go into the page's
+  toolbar row.
+- Gate: `tools/test-conv-shell.mjs` (in `tools/run-conv-release-gates.sh` through the family filter).
 
 ### 2026-11-18 — single-line contract (E-S-101, v3.74.0, PRD-CONV-LIVING-PLANT P5a)
 
