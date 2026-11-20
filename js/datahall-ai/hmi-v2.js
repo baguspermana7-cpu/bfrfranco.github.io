@@ -20,6 +20,21 @@
   function shell() {
     var hdr = $('header.hdr'); if (!hdr || hdr.getAttribute('data-dh2')) return;
     hdr.setAttribute('data-dh2', '1');
+    /* the cockpit bar (js/conv/shell.js, SITE_CHROME_STANDARD §9, owner R176) already holds back, portfolio, title, PRD,
+       manual, the Generate Design CTA, login, theme and clock, and auth.js handles the public links while locked: this
+       row keeps only the page's own tools under it — provenance banner, Ask, Replay and the Docs menu (BoD, FAQ) */
+    if ($('.cv-bar')) {
+      var row = el('nav', { class: 'dh2-nav dh2-toolrow', 'data-rz-shell-nav': '', 'aria-label': 'AI Data Hall tools' });
+      var dmenu = el('div', { class: 'dh2-menu', role: 'menu' }), ddocs = el('details', { class: 'dh2-docs' });
+      ddocs.appendChild(el('summary', { 'aria-label': 'Documents', title: 'Basis of design, FAQ' }, 'Docs'));
+      ['#bodTrig', '#faqTrig'].forEach(function (s) { var b = $(s); if (b) { b.className = 'dh2-mi'; b.setAttribute('role', 'menuitem'); dmenu.appendChild(b); } });
+      ddocs.appendChild(dmenu);
+      [$('[data-rz-telemetry-banner-slot]'), el('span', { class: 'dh2-sp' }), $('[data-rz-ask-slot]'), $('#rzReplayTrig'), ddocs].forEach(function (n) { if (n) row.appendChild(n); });
+      hdr.insertBefore(row, hdr.firstChild);
+      $$('.hdr-main, .hdr-r', hdr).forEach(function (n) { n.hidden = true; });
+      doc.addEventListener('click', function (e) { if (!ddocs.contains(e.target)) ddocs.removeAttribute('open'); });
+      return;
+    }
     var nav = el('nav', { class: 'dh2-nav', 'data-rz-shell-nav': '', 'aria-label': 'AI Data Hall' });
     var back = el('a', { class: 'dh2-back', href: 'datacenter-solutions.html', 'aria-label': 'Back to DC Solutions', title: 'Back to DC Solutions' }, '&#8592;');
     var title = el('span', { class: 'dh2-title' }, 'AI Data Hall');

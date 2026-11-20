@@ -11,6 +11,26 @@ release sections rather than semver.
 
 ---
 
+## v3.80.0 — 2026-11-20 — DC AI cockpit joins the BMS cockpit bar
+
+Owner R176: "button2 navbar pastikan semua page di bms ini button location sama posisi" — `datahallAI.html` was the one
+BMS page still on its own header.
+
+### Changed
+- `datahallAI.html` adopts the cockpit bar of `standarization/SITE_CHROME_STANDARD.md` §9 (`js/conv/shell.js` +
+  `css/conv-shell.css`): Back, Portfolio, title with the authority chip, PRD, Manual, the Generate Design CTA
+  ("Get my design", win line "Design ready in one click"), bare Login, theme and clock sit in the same slots, at the
+  same x, as on the nine Conventional pages. Its alarm slot stays empty at its width (alarms live in the cockpit's
+  own Alarms & Events tab). Below 1101 px Portfolio, PRD and Manual fold into More; at 390 px the bar no longer
+  clips the title or the theme button.
+- The DC AI row under the bar keeps the page's own tools only: provenance banner, Ask, Replay, Docs (Basis of
+  Design, FAQ). The row and the module tabs stick under the 48 px bar (above 1480 px both; below, only the tabs).
+- The account letter in the light theme is drawn at 6:1 (was 4.35:1 against the instrument register's avatar).
+
+### Gates
+- `tools/test-conv-shell.mjs` covers `datahallAI.html` (10 pages): crashed on the old header (no `.cv-bar`), then
+  3 findings (CTA action, alarm slot, light contrast 4.35:1), now 0. The DC AI header checks in
+  `tools/test-operator-cockpit-regressions.mjs` and law H11 of `tools/test-dh-drawings.mjs` read the bar.
 ## v3.79.0 — 2026-11-20 — Site bar: floating, translucent, with a mega menu
 
 Owner, 2026-11-18: a floating navbar with a rounded container, eight-pixel padding and a translucent background blur,

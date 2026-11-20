@@ -68,3 +68,14 @@ body[data-side="hidden"] .wrap .side { display: none; }
 /* the telemetry provenance banner in the nav row (was hidden inside .hdr-main) */
 .dh2-nav [data-rz-telemetry-banner-slot] { flex: 0 1 260px; max-width: 260px; min-width: 0; }
 @media (max-width: 600px) { .dh2-nav [data-rz-telemetry-banner-slot] { flex: 1 1 auto; max-width: none; } .dh2-nav .dh2-title { display: none; } }
+
+/* the cockpit bar (js/conv/shell.js, 48 px sticky, SITE_CHROME_STANDARD §9) sits above the DC AI tool row: the row and
+   the module tabs stick under it instead of under the top edge (owner R176) */
+.cv-bar ~ .hdr[data-dh2] { top: 48px; }
+.cv-bar ~ .tabs { top: 92px; }
+/* ≤ 1480 px the tool row scrolls away (position: relative in the page CSS) and only the tabs stick under the bar */
+@media (max-width: 1480px) { .cv-bar ~ .hdr[data-dh2] { top: 0; } .cv-bar ~ .tabs { top: 48px; } }
+.dh2-toolrow { height: 44px; }
+/* the instrument register paints the avatar letter in --c (#0e7490 light) on --bg3 (#e2e8f0): 4.35:1. In the bar it
+   holds AA (law C7 of tools/test-conv-shell.mjs) */
+[data-theme="light"] .cv-bar .rz-user-avatar { color: #155e75; }

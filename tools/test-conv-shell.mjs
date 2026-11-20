@@ -60,6 +60,8 @@ const PAGES = {
   'ict.html': { cta: ASK, back: 'dc-conventional.html', portfolio: 'index.html' },
   'EPMS_Telemetry.html': { cta: ASK, back: 'dc-conventional.html', portfolio: 'index.html' },
   'cdu-mini-bms.html': { cta: null, back: null, portfolio: 'index.html' },
+  /* the DC AI cockpit adopts the same bar (SITE_CHROME_STANDARD §9, owner R176): its generator is the primary action */
+  'datahallAI.html': { cta: DESIGN, back: 'datacenter-solutions.html', portfolio: 'index.html', identity: 'dc-ai', cta_id: 'genDesignTrig', alarm: false },   /* alarms live in its own Alarms & Events tab: the slot stays empty at its width */
 };
 const ONLY = arg('page') ? arg('page').split(',') : null;
 const pages = Object.keys(PAGES).filter((p) => !ONLY || ONLY.includes(p));
@@ -100,7 +102,7 @@ async function open(file, { width, signedIn, reduce = false, theme = 'dark', aud
   await page.goto(O + file, { waitUntil: 'load', timeout: 60000 });
   if (!(await page.evaluate(() => matchMedia('(hover: hover) and (pointer: fine)').matches))) throw new Error('hover / pointer emulation failed: the hover laws would measure nothing');
   /* the cockpits are tier-gated: clear the gate the way every cockpit gate does (tools/lib/cockpit-audit-state.mjs) */
-  if (audit) { try { await enterAuthorizedAuditState(page, file.replace(/\.html$/, '')); } catch (e) { /* not a gated identity (EPMS_Telemetry) */ } }
+  if (audit) { try { await enterAuthorizedAuditState(page, PAGES[file].identity || file.replace(/\.html$/, '')); } catch (e) { /* not a gated identity (EPMS_Telemetry) */ } }
   /* auth.js, rz-ask.js and conv-alarm-workspace.js fill their slots after load */
   await page.waitForFunction((hasCta) => {
     const s = document.querySelector('.cv-bar'); if (!s) return false;
@@ -210,6 +212,7 @@ for (const file of pages) {
   else {
     ok(prim === 1, 'C4', `${file}: ${prim} primary CTAs (want 1)`);
     if (file === 'dc-conventional.html') await page.waitForFunction(() => !document.getElementById('genDesignTrigConv').disabled, { timeout: 30000 }).catch(() => {});
+    if (want.cta_id) await page.waitForFunction((id) => !document.getElementById(id).disabled, { timeout: 30000 }, want.cta_id).catch(() => {});
     const read = () => {
       const b = document.querySelector('[data-cv-primary]'), f = b.querySelector('.cv-cta__face');
       const be = getComputedStyle(b, '::before'), af = getComputedStyle(b, '::after');
@@ -262,13 +265,13 @@ for (const file of pages) {
     if (SHOTS && file === 'datahall.html') await shotCta(page, 'rest');
     /* C5 the action */
     await page.click('[data-cv-primary]');
-    const acted = await page.waitForFunction((dc) => dc ? !!document.querySelector('#rzDesignStudio[data-open="true"]') : (document.getElementById('rz-ask-panel') && !document.getElementById('rz-ask-panel').hidden), { timeout: 8000 }, file === 'dc-conventional.html').then(() => true).catch(() => false);
-    ok(acted, 'C5', `${file}: the CTA did not ${file === 'dc-conventional.html' ? 'open the Design Studio' : 'open the Ask panel'}`);
+    const acted = await page.waitForFunction((dc) => dc ? !!document.querySelector('#rzDesignStudio[data-open="true"]') : (document.getElementById('rz-ask-panel') && !document.getElementById('rz-ask-panel').hidden), { timeout: 8000 }, want.cta === DESIGN).then(() => true).catch(() => false);
+    ok(acted, 'C5', `${file}: the CTA did not ${want.cta === DESIGN ? 'open the Design Studio' : 'open the Ask panel'}`);
     await page.keyboard.press('Escape'); await page.keyboard.press('Escape');
   }
   /* C5 alarm history + hrefs */
   const hasAlarm = await page.$('.cv-slot--alarm #rzConvAlarmLaunch');
-  if (file !== 'cdu-mini-bms.html') {
+  if (file !== 'cdu-mini-bms.html' && want.alarm !== false) {
     ok(!!hasAlarm, 'C5', `${file}: Alarm history is not in its slot`);
     if (hasAlarm) {
       const cls = await page.$eval('#rzConvAlarmLaunch', (b) => getComputedStyle(b).backgroundColor);

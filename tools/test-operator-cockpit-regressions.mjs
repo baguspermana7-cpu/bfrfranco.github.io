@@ -510,7 +510,7 @@ try {
           afterContent: afterStyle.content,
           afterImage: afterStyle.backgroundImage,
         },
-        headerDotAnimation: (() => { const d = document.querySelector('.hdr-r > .dot, .hdr .dh2-nav .dot'); return d ? getComputedStyle(d).animationName : 'missing'; })(),   // v3.60 one-row shell moves the status dot into the nav row
+        headerDotAnimation: (() => { const d = document.querySelector('.hdr-r > .dot, .hdr .dh2-nav .dot, .cv-bar [data-cv="clock"] > .dot'); return d ? getComputedStyle(d).animationName : 'missing'; })(),   // v3.60 one-row shell moves the status dot into the nav row; v3.80 the cockpit bar clock slot (R176)
         horizontalOverflow: document.documentElement.scrollWidth - window.innerWidth,
       };
     });

@@ -215,4 +215,7 @@ Owner, 2026-11-18: "This button combo is looking a bit flat. We don't need the l
   cannot repaint them. Login shows the word at every width (auth.js hides it at ≤ 768 px on other pages) and is
   ≥ 44 px wide (C6, v3.79.0). The hover laws run with Chrome's
   `--blink-settings=…HoverType=2…` flags and refuse to run when `(hover: hover)` does not match.
-- `datahallAI.html` adopts the same component and gate (owned by the DC AI session).
+- `datahallAI.html` adopts the same component and gate (v3.80.0, owned by the DC AI session): CTA = Generate Design
+  (`Get my design`), alarm slot empty at its width (alarms live in its Alarms & Events tab); `hmi-v2.js` keeps only the
+  page's own tools (provenance banner, Ask, Replay, Docs) in a row under the bar, sticky at 48 px above 1480 px; the
+  module tabs stick under it. The light-theme account letter is `#155e75` inside the bar (`css/rz-dh-shell.css`).

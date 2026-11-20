@@ -670,11 +670,15 @@ law(STRICT_ALL ? 'H1' : 'H1 modals (reported)', !STRICT_ALL || modalPaint === 0,
 
 // ── H11 shell ────────────────────────────────────────────────────────────────────────────────────────────────────
 const shell = await pg.evaluate(() => {
-  const nav = document.querySelector('header nav, .hub-nav, [data-rz-shell-nav]');
-  const head = document.querySelector('header') || document.body;
-  const ctrls = [...head.querySelectorAll('a,button')].filter((e) => e.getBoundingClientRect().width > 0 && !e.closest('#tabs'));
-  const outside = nav ? ctrls.filter((e) => !nav.contains(e)).length : ctrls.length;
-  const inNav = nav ? [...nav.querySelectorAll('a,button')].filter((e) => e.getBoundingClientRect().width > 0).length : 0;
+  /* since R176 the cockpit bar (.cv-bar, js/conv/shell.js) holds the page chrome and the tool row under it the page's
+     own tools: the shell is both, and every control of either header must sit in one of them */
+  const nav = document.querySelector('[data-rz-shell-nav], header nav, .hub-nav');
+  const bar = document.querySelector('.cv-bar');
+  const vis = (e) => e.getBoundingClientRect().width > 0;
+  const ctrls = [...document.querySelectorAll('header a, header button')].filter((e) => vis(e) && !e.closest('#tabs'));
+  const inShell = (e) => (nav && nav.contains(e)) || (bar && bar.contains(e));
+  const outside = nav ? ctrls.filter((e) => !inShell(e)).length : ctrls.length;
+  const inNav = nav ? [...nav.querySelectorAll('a,button')].filter(vis).length : 0;
   const sim = /SIMULATED\s*·\s*ENGINE BASIS/i.test(document.body.innerText);
   return { nav: !!nav, outside, inNav, sim };
 });
