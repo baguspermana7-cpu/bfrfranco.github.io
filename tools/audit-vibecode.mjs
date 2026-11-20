@@ -628,7 +628,12 @@ const PENDING = Object.assign({
   /* emptied 2026-11-07 (v3.24.45): LTC's v3.24.44 cleared every listed finding (22 entries went stale and failed the audit) */
 }, process.env.RZ_VIBECODE_PENDING ? JSON.parse(process.env.RZ_VIBECODE_PENDING) : {});   /* test seam: the gate's own test injects one entry to prove the mechanism */
 const pendingReason = (rel, rule) => (PENDING[rel] || []).includes(rule) ? `LTC-owned, fix scheduled in 3.24.42 (${rule})` : null;
-const exemptReason = (rel, rule) => { for (const [re, why] of EXEMPT) if (re.test(rel)) return why; return rule ? pendingReason(rel, rule) : null; };
+/* Owner exceptions pinned to ONE file and the named rule only (ANTI_VIBECODE_STANDARD §B); every other rule gates. */
+const OWNER_RULE_EXCEPTIONS = {
+  'css/rz-nav-float.css': { rules: ['large-radius'], why: 'owner exception §B-2026-11-20: the floating site bar and its mega panel carry a 12 px radius' },
+};
+const ownerRuleReason = (rel, rule) => { const x = OWNER_RULE_EXCEPTIONS[rel]; return x && rule && x.rules.includes(rule) ? x.why : null; };
+const exemptReason = (rel, rule) => { for (const [re, why] of EXEMPT) if (re.test(rel)) return why; return ownerRuleReason(rel, rule) || (rule ? pendingReason(rel, rule) : null); };
 const isStrict = (rel, rule) => HUB_STRICT.has(rel) || JOURNAL_STRICT(rel) || !exemptReason(rel, rule);
 
 function hexToHsl(hex) {
@@ -682,7 +687,7 @@ for (const f of files) {
     const m = blocks ? (blocks.length ? `${blocks.length} decorative block(s): ${blocks.map(block => block.sel).join(', ')}` : null) : r.test(t, f);
     if (!m) continue;
     const rel = f.replace(ROOT + "/", "");
-    findings.push({ file: rel, rule: r.id, msg: m, blocks, monitor: false, exempt: Boolean(r.scoped) && !isStrict(rel, r.id) ? exemptReason(rel, r.id) : undefined });
+    findings.push({ file: rel, rule: r.id, msg: m, blocks, monitor: false, exempt: Boolean(r.scoped) && !isStrict(rel, r.id) ? exemptReason(rel, r.id) : (ownerRuleReason(rel, r.id) || undefined) });
   }
 }
 

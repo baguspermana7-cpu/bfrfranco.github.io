@@ -4,7 +4,8 @@
  * standard: standarization/SITE_CHROME_STANDARD.md). Every root page is RENDERED at 1440 and 390 px (768 too with
  * --full) and measured; nothing is read from source except law CH7.
  *
- *   CH1  the page has a bar: computed position sticky, top 0, height = its kind's token (site 56, app 48) ± 1 px
+ *   CH1  the page has a bar: computed position sticky, top 0, height = its kind's token (site 56, app 48) ± 1 px; a
+ *        floating site bar (§2a, v3.79.0) sits at --rzf-top with the row + 2 x --rzf-pad + 2 px hairlines
  *   CH2  exactly one visible theme button, inside the bar, hit area >= 44 x 44, an <svg> icon and no text glyph,
  *        an accessible name that names the theme it switches to
  *   CH3  the button's distance from the right edge is the same on every page of a kind (reported: distinct offsets)
@@ -83,7 +84,12 @@ const measure = () => {
   const order = [['search', x('[data-rz-slot="search"], .nav-search-btn, [data-rz-search], #rzSearchBtn, #navSearchBtn')], ['theme', tr ? Math.round(tr.left) : null], ['signin', x('[data-rz-slot="signin"], .rz-auth-wrap, .nav-auth-wrap, #rzLoginBtn, .rz-login-btn, .rz-user-btn')], ['menu', x('.rz-nav-burger, .rz-nav-burger-bound')]].filter((p) => p[1] != null).sort((a, b) => a[1] - b[1]).map((p) => p[0]);
   const narrow = bar ? [...bar.querySelectorAll('button, a.btn, [role=button]')].filter(vis).filter((e) => e.getBoundingClientRect().width < 43.5).length : 0;
   const text = t ? [...t.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent.trim()).join('') + [...t.querySelectorAll('i, span')].map((n) => n.textContent.trim()).join('') : '';
-  return { bar: bar ? bar.tagName.toLowerCase() + '.' + String(bar.className || '').split(' ')[0] : null, pos: bc ? bc.position : '', top: br ? Math.round(br.top) : null, h: br ? Math.round(br.height) : 0,
+  /* since v3.79.0 the site bar floats (SITE_CHROME_STANDARD §2a): its top is --rzf-top and its outer height the row
+     plus 2 x --rzf-pad plus its two hairlines */
+  const rs = getComputedStyle(document.documentElement);
+  const floating = !!(bar && bar.matches('.navbar[data-rz-bar], .navbar[data-rz-float]') && document.documentElement.getAttribute('data-rz-kind') !== 'app' && parseFloat(bc.borderTopLeftRadius) >= 10);
+  const fTop = parseFloat(rs.getPropertyValue('--rzf-top')) || 0, fPad = parseFloat(rs.getPropertyValue('--rzf-pad')) || 0;
+  return { floating, fTop, fPad, bar: bar ? bar.tagName.toLowerCase() + '.' + String(bar.className || '').split(' ')[0] : null, pos: bc ? bc.position : '', top: br ? Math.round(br.top) : null, h: br ? Math.round(br.height) : 0,
     tN: ts.length, tIn: !!(t && bar && bar.contains(t)), tW: tr ? Math.round(tr.width) : 0, tH: tr ? Math.round(tr.height) : 0, tRight: tr ? Math.round(innerWidth - tr.right) : null,
     svg: !!(t && t.querySelector('svg')), font: !!(t && t.querySelector('i[class*="fa-"]')), text, label: t ? (t.getAttribute('aria-label') || t.getAttribute('title') || '') : '',
     order, narrow, overflow: document.documentElement.scrollWidth > innerWidth + 1, theme: document.documentElement.getAttribute('data-theme') || '', fp: window.__rzFirstPaintTheme !== undefined ? window.__rzFirstPaintTheme : window.__rzRafTheme !== undefined ? window.__rzRafTheme : null };
@@ -94,7 +100,14 @@ const barContrast = () => {
   const bar = document.querySelector('[data-rz-bar]'); if (!bar) return null;
   const rgba = (c) => { const m = c.match(/[\d.]+/g) || []; return [+m[0] || 0, +m[1] || 0, +m[2] || 0, m[3] === undefined ? 1 : +m[3]]; };
   const lum = (c) => { const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }; return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]); };
-  const bgOf = (e) => { for (let n = e; n; n = n.parentElement) { const c = rgba(getComputedStyle(n).backgroundColor); if (c[3] > 0.9) return c; } return rgba(getComputedStyle(document.body).backgroundColor); };
+  /* translucent layers (the floating bar's glass, §2a) are composited over the first opaque one below them, as the
+     screen paints them; skipping them measured the bar's ink against the page behind the glass */
+  const bgOf = (e) => { const layers = []; let base = null;
+    for (let n = e; n; n = n.parentElement) { const c = rgba(getComputedStyle(n).backgroundColor); if (c[3] > 0.9) { base = c; break; } if (c[3] > 0) layers.push(c); }
+    if (!base) base = rgba(getComputedStyle(document.body).backgroundColor);
+    if (base[3] <= 0.9) base = [255, 255, 255, 1];
+    for (let i = layers.length - 1; i >= 0; i--) { const l = layers[i], a = l[3]; base = [l[0] * a + base[0] * (1 - a), l[1] * a + base[1] * (1 - a), l[2] * a + base[2] * (1 - a), 1]; }
+    return base; };
   let worst = null;
   for (const e of bar.querySelectorAll('*')) {
     const own = [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim().length > 1); if (!own) continue;
@@ -126,7 +139,10 @@ for (const [w, h] of WIDTHS) {
       const m = await pg.evaluate(measure);
       const tag = `@${w}`;
       if (!m.bar) fail('CH1', f, `${tag} no bar`);
-      else if (m.pos !== 'sticky' || m.top !== 0 || Math.abs(m.h - token) > 1) fail('CH1', f, `${tag} ${m.bar} position ${m.pos}, top ${m.top}, height ${m.h} (want sticky, 0, ${token})`);
+      else {
+        const wantTop = m.floating ? m.fTop : 0, wantH = m.floating ? token + 2 * m.fPad + 2 : token;
+        if (m.pos !== 'sticky' || Math.abs(m.top - wantTop) > 1 || Math.abs(m.h - wantH) > 1) fail('CH1', f, `${tag} ${m.bar} position ${m.pos}, top ${m.top}, height ${m.h} (want sticky, ${wantTop}, ${wantH})`);
+      }
       if (m.tN !== 1) fail('CH2', f, `${tag} ${m.tN} theme buttons`);
       else if (!m.tIn) fail('CH2', f, `${tag} theme button outside the bar`);
       else if (m.tW < 44 || m.tH < 44) fail('CH2', f, `${tag} hit area ${m.tW}x${m.tH} (want >= 44x44)`);
@@ -140,7 +156,8 @@ for (const [w, h] of WIDTHS) {
         const fp2 = await pg.evaluate(() => (window.__rzFirstPaintTheme !== undefined ? window.__rzFirstPaintTheme : window.__rzRafTheme !== undefined ? window.__rzRafTheme : null));
         if (fp2 !== stored) fail('CH6', f, `${tag} stored ${stored}, theme at first paint "${fp2 == null ? 'not recorded' : fp2}" (two loads)`);
       }
-      if (w < 500 && (m.h > token + 1 || m.narrow || m.overflow)) fail('CH8', f, `${tag} bar ${m.h} px (token ${token}), ${m.narrow} control(s) under 44 px${m.overflow ? ', page scrolls sideways' : ''}`);
+      const capH = m.floating ? token + 2 * m.fPad + 2 : token;   /* §2a: the floating bar's row + padding + hairlines */
+      if (w < 500 && (m.h > capH + 1 || m.narrow || m.overflow)) fail('CH8', f, `${tag} bar ${m.h} px (token ${capH}), ${m.narrow} control(s) under 44 px${m.overflow ? ', page scrolls sideways' : ''}`);
       if (w < 500) {
         const d = await pg.evaluate(async () => { const bar = document.querySelector('[data-rz-bar]'); if (!bar) return null;
           const g = bar.querySelector('.rz-nav-burger, .rz-nav-burger-bound'), l = bar.querySelector('.nav-links, .nav-menu'); if (!g || !l) return { g: !!g, l: !!l };

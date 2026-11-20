@@ -185,6 +185,19 @@ as bloom (opacity ≤ 0.55, blur ≤ 12 px); a label swap to a win line; a paper
 button width is fixed to the wider label (nothing shifts). Every other rule of this standard still applies to every
 other element, the bar included (Login bare, secondary buttons one hairline, no glow anywhere else).
 
+### B-2026-11-20 — owner exception: the floating, translucent site bar and its mega menu
+
+Owner, 2026-11-18: "Make it a floating navbar, rounded corner container, eight pixel padding. Give it a translucent
+effect with background blur so that as content scrolls behind it, it starts to blur out, but we can still see and
+read the content … elevate this with a mega menu, flush to the width of the entire nav itself … make the fourth column
+a visual supporter for any highlighted menu item."
+Scope: exactly the site bar (`.navbar[data-rz-bar]`, and `index.html`'s `.navbar[data-rz-float]`) and its one mega
+panel (`css/rz-nav-float.css`, `js/rz-mega-menu.js`). Site kind only; an app page (the BMS cockpits) never gets it.
+Allowed there and nowhere else: a 12 px radius, a soft two-layer shadow, a translucent fill (alpha 0.82) with
+`backdrop-filter: blur(12–16 px)`. It is the ONE painted backdrop-filter on a page (§A blur and glass bans stand for
+every other element). Labels hold 4.5:1 against the bar composited over white AND over the darkest page ink. Gate:
+`tools/test-nav-float.mjs` F1–F10.
+
 ## C. REQUIRED (present = good; absence is itself a vibecode tell)
 - **Terms of Service** (`terms.html`) and **Privacy Policy** (`privacy.html`) — must exist + be linked.
 - **Real product demos** — live calculators / virtual labs / cockpits (not screenshots of a fake app).

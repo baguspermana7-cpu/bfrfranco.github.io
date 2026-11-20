@@ -1,0 +1,199 @@
+/* rz-nav-float.css — the floating site bar and its mega menu (standarization/SITE_CHROME_STANDARD.md §2a/§2b).
+ *
+ * Owner, 2026-11-18: "Make it a floating navbar, rounded corner container, eight pixel padding. Give it a translucent
+ * effect with background blur … the popovers … elevate this with a mega menu, flush to the width of the entire nav."
+ * Translucency, blur, a 12 px radius and a soft shadow are on the rejected list everywhere else; this is a dated owner
+ * exception for exactly ONE element (the site bar) and its mega panel — ANTI_VIBECODE_STANDARD.md §B (2026-11-18).
+ *
+ * Reaches the refitted pages through one @import at the top of css/rz-chrome.css (render-blocking, so the first paint
+ * is already the floating bar); index.html links this file itself and marks its nav `data-rz-float`.
+ * Site kind only: an app page (<html data-rz-kind="app">) never matches.
+ * NEVER write the open-state class of js/rz-mobile-nav.js in a selector here (SITE_CHROME_STANDARD §6 CH10).
+ */
+:root {
+  --rzf-top: 10px;          /* gap between the viewport top and the bar */
+  --rzf-side: 11px;         /* side margin below the measure: 11 + 1 border + 8 padding = the 20 px gutter of §3 */
+  --rzf-pad: 8px;           /* the owner's eight-pixel padding */
+  --rzf-radius: 12px;       /* the bar and its panel only; controls inside stay <= 4 px */
+  --rzf-row: var(--rz-bar-h, 56px);
+  --rzf-outer: calc(var(--rzf-row) + 2 * var(--rzf-pad) + 2px);
+  --rzf-glass: rgba(255, 255, 255, 0.82);
+  --rzf-solid: #ffffff;
+  --rzf-line: rgba(20, 22, 26, 0.12);
+  --rzf-line-strong: rgba(20, 22, 26, 0.28);
+  --rzf-ink: #2b2f36;
+  --rzf-ink-muted: #4a5160;
+  --rzf-tint: #f1f2f4;
+  --rzf-focus: #7a4800;
+  --rzf-shadow: 0 1px 2px rgba(15, 17, 20, 0.06), 0 10px 28px -14px rgba(15, 17, 20, 0.22);
+}
+/* a page whose surface is dark in both themes (achievements, §2) keeps the dark glass in the light theme too */
+:root[data-theme="dark"], :root[data-rz-surface="dark"] {
+  --rzf-glass: rgba(18, 19, 22, 0.82);
+  --rzf-solid: #121316;
+  --rzf-line: rgba(255, 255, 255, 0.11);
+  --rzf-line-strong: rgba(255, 255, 255, 0.26);
+  --rzf-ink: #d5dae2;
+  --rzf-ink-muted: #a0aab8;
+  --rzf-tint: rgba(255, 255, 255, 0.06);
+  --rzf-focus: #e8b563;
+  --rzf-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 32px -14px rgba(0, 0, 0, 0.7);
+}
+@media (max-width: 768px) { :root { --rzf-top: 8px; } }
+
+/* in-page anchors and the article heading anchors land below the bar */
+:root:not([data-rz-kind="app"]):has(.navbar[data-rz-bar], .navbar[data-rz-float]) { scroll-padding-top: calc(var(--rzf-top) + var(--rzf-outer) + 12px); }
+
+/* ---- the bar: a floating, translucent container ---- */
+:root:not([data-rz-kind="app"]) :is(.navbar[data-rz-bar], .navbar[data-rz-float]) {
+  position: sticky; top: var(--rzf-top); z-index: 1000;
+  box-sizing: border-box;
+  width: min(calc(var(--rz-bar-measure, 1120px) + 2 * var(--rzf-pad) + 2px), calc(100% - 2 * var(--rzf-side)));
+  max-width: none; height: var(--rzf-outer); min-height: 0;
+  margin-top: var(--rzf-top); margin-left: auto; margin-right: auto;
+  padding: var(--rzf-pad) !important;
+  border: 1px solid var(--rzf-line) !important; border-radius: var(--rzf-radius);
+  background: var(--rzf-glass) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(1.4); backdrop-filter: blur(14px) saturate(1.4);
+  box-shadow: var(--rzf-shadow);
+}
+/* the homepage bar stays out of the flow (its hero is padded for it); it floats the same way */
+:root:not([data-rz-kind="app"]) .navbar[data-rz-float] { position: fixed; left: 0; right: 0; margin-top: 0; }
+:root:not([data-rz-kind="app"]) :is(.navbar[data-rz-bar], .navbar[data-rz-float]) > .nav-container {
+  width: 100%; max-width: none; height: var(--rzf-row); margin: 0; padding: 0 !important;
+}
+/* no blur where it cannot run or the reader asked for less transparency: the same bar, opaque */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root:not([data-rz-kind="app"]) :is(.navbar[data-rz-bar], .navbar[data-rz-float]) { background: var(--rzf-solid) !important; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  :root:not([data-rz-kind="app"]) :is(.navbar[data-rz-bar], .navbar[data-rz-float]) {
+    background: var(--rzf-solid) !important; -webkit-backdrop-filter: none; backdrop-filter: none;
+  }
+}
+
+/* ---- the top-level row (js/rz-mega-menu.js), desktop ---- */
+.rz-mm-nav { display: none; }
+.rz-mm-panel, .rz-mm-drawer { display: none; }
+@media (min-width: 769px) {
+  :root[data-rz-mm] .rz-mm-nav { display: flex; align-items: center; gap: 2px; margin: 0 auto 0 16px; min-width: 0; }
+  :root[data-rz-mm] :is(.navbar[data-rz-bar], .navbar[data-rz-float]) .nav-container > :is(.nav-menu, .nav-links):not(:has(> :not([data-rz-mm-orig], .rz-mm-drawer))) { display: none !important; }
+  :root[data-rz-mm] :is(.navbar[data-rz-bar], .navbar[data-rz-float]) .nav-container > :is(.nav-menu, .nav-links) { margin-left: 0; margin-right: 0; }
+}
+@media (min-width: 769px) and (max-width: 1199px) { .rz-mm-nav [data-rz-mm-minor] { display: none; } }
+:root[data-rz-mm] :is(.navbar[data-rz-bar], .navbar[data-rz-float]) [data-rz-mm-orig] { display: none !important; }
+
+.rz-mm-top {
+  display: inline-flex; align-items: center; gap: 6px; box-sizing: border-box;
+  height: 40px; padding: 0 12px; margin: 0; border: 1px solid transparent; border-radius: 4px;
+  background: none; color: var(--rzf-ink); font: inherit; font-size: 14px; font-weight: 500; line-height: 1;
+  text-decoration: none; white-space: nowrap; cursor: pointer;
+  transition: border-color var(--rz-dur-press, 120ms) var(--rz-ease-out, ease-out), background-color var(--rz-dur-press, 120ms) var(--rz-ease-out, ease-out);
+}
+.rz-mm-top:hover, .rz-mm-top[aria-expanded="true"] { border-color: var(--rzf-line); background-color: var(--rzf-tint); color: var(--rzf-ink); }
+.rz-mm-top[aria-current="page"], .rz-mm-top[data-rz-mm-here] { border-color: var(--rzf-line-strong); }
+.rz-mm-top:focus-visible, .rz-mm-item:focus-visible, .rz-mm-open:focus-visible, .rz-mm-acc-btn:focus-visible { outline: 2px solid var(--rzf-focus); outline-offset: 1px; }
+.rz-mm-top svg { width: 12px; height: 12px; flex: none; }
+.rz-mm-top[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+/* ---- the mega panel: one panel as wide as the bar, dropped from it ---- */
+@media (min-width: 769px) {
+  .rz-mm-panel {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 1.15fr); gap: 0 20px;
+    position: absolute; top: calc(100% + 1px + 6px); left: -1px; right: -1px; z-index: 1;
+    box-sizing: border-box; max-height: calc(100vh - var(--rzf-top) - var(--rzf-outer) - 24px); overflow-y: auto;
+    padding: 18px 20px 20px; border: 1px solid var(--rzf-line); border-radius: var(--rzf-radius);
+    background: var(--rzf-solid); box-shadow: var(--rzf-shadow); color: var(--rzf-ink);
+    text-align: left; font-size: 14px; line-height: 1.35;
+    opacity: 1; transform: none;
+    transition: opacity var(--rz-dur-menu, 200ms) var(--rz-ease-out, cubic-bezier(.23, 1, .32, 1)),
+                transform var(--rz-dur-menu, 200ms) var(--rz-ease-out, cubic-bezier(.23, 1, .32, 1)),
+                visibility 0s linear 0s;
+  }
+  /* a 7 px bridge over the gap, so the pointer crossing it is still "on" the panel */
+  .rz-mm-panel::before { content: ""; position: absolute; left: 0; right: 0; top: -8px; height: 8px; }
+  .rz-mm-panel[hidden] { display: grid !important; visibility: hidden; opacity: 0; transform: translateY(-4px); pointer-events: none;
+    transition: opacity 140ms var(--rz-ease-out, ease-out), transform 140ms var(--rz-ease-out, ease-out), visibility 0s linear 140ms; }
+  /* opened from the keyboard: no animation (MOTION_STANDARD frequency gate) */
+  .rz-mm-panel.rz-mm-instant, .rz-mm-panel.rz-mm-instant[hidden] { transition: none; }
+}
+.rz-mm-col { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.rz-mm-label { margin: 0 0 6px; padding: 0 10px; font-size: 12px; font-weight: 600; letter-spacing: 0; color: var(--rzf-ink-muted); }
+.rz-mm-item {
+  display: block; box-sizing: border-box; padding: 7px 10px; border: 1px solid transparent; border-radius: 4px;
+  color: var(--rzf-ink); text-decoration: none;
+  transition: border-color var(--rz-dur-press, 120ms) var(--rz-ease-out, ease-out), background-color var(--rz-dur-press, 120ms) var(--rz-ease-out, ease-out);
+}
+.rz-mm-item:hover, .rz-mm-item:focus-visible, .rz-mm-item[data-rz-mm-lit] { border-color: var(--rzf-line); background-color: var(--rzf-tint); }
+.rz-mm-item[aria-current="page"] .rz-mm-t { text-decoration: underline; text-underline-offset: 3px; }
+.rz-mm-t { display: block; font-weight: 600; font-size: 14px; color: var(--rzf-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rz-mm-d { display: block; margin-top: 2px; font-size: 12.5px; color: var(--rzf-ink-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rz-mm-note { margin-left: 6px; padding: 0 4px; border: 1px solid var(--rzf-line); border-radius: 4px; font-size: 11px; font-weight: 500; color: var(--rzf-ink-muted); }
+
+/* column 4: the visual supporter — the highlighted item's card */
+.rz-mm-preview { margin: 0; padding: 0 0 0 20px; border-left: 1px solid var(--rzf-line); display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.rz-mm-media { position: relative; display: block; aspect-ratio: 1200 / 630; width: 100%; overflow: hidden; border: 1px solid var(--rzf-line); border-radius: 4px; background: var(--rzf-tint); }
+.rz-mm-media img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.rz-mm-media img[hidden] { display: none; }
+.rz-mm-ph { position: absolute; inset: 0; display: grid; place-items: center; font-size: 12px; font-weight: 600; color: var(--rzf-ink-muted); }
+.rz-mm-ph[hidden] { display: none; }
+.rz-mm-pt { margin: 2px 0 0; font-size: 15px; font-weight: 600; color: var(--rzf-ink); line-height: 1.3; }
+.rz-mm-pd { margin: 0; font-size: 13px; color: var(--rzf-ink-muted); line-height: 1.4; }
+.rz-mm-open { align-self: flex-start; display: inline-flex; align-items: center; min-height: 32px; padding: 0 10px; border: 1px solid var(--rzf-line); border-radius: 4px;
+  font-size: 13px; font-weight: 600; color: var(--rzf-ink); text-decoration: none; transition: border-color var(--rz-dur-press, 120ms) var(--rz-ease-out, ease-out); }
+.rz-mm-open:hover { border-color: var(--rzf-line-strong); }
+
+/* the search slot's shortcut hint, desktop pointers only */
+@media (min-width: 769px) and (hover: hover) and (pointer: fine) {
+  :is(.navbar[data-rz-bar], .navbar[data-rz-float]) [data-rz-kbd] { position: relative; }
+  :is(.navbar[data-rz-bar], .navbar[data-rz-float]) [data-rz-kbd]::after {
+    content: attr(data-rz-kbd); position: absolute; top: 50%; right: calc(100% + 2px); margin-top: -10px;
+    height: 20px; padding: 0 6px; box-sizing: border-box; border: 1px solid var(--rzf-line); border-radius: 4px;
+    font: 500 11px/18px "JetBrains Mono", "IBM Plex Mono", ui-monospace, monospace; color: var(--rzf-ink-muted);
+    white-space: nowrap; pointer-events: none;
+  }
+}
+
+/* ---- phone: no hover panel; the drawer carries the same groups as accordions ---- */
+@media (max-width: 768px) {
+  .rz-mm-drawer { display: block; list-style: none; margin: 0; padding: 0; width: 100%; }
+  .rz-mm-sec { margin: 0; padding: 14px 4px 4px; font-size: 12px; font-weight: 600; color: var(--rzf-ink-muted); }
+  .rz-mm-acc-btn {
+    display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 44px; box-sizing: border-box;
+    margin: 0; padding: 0 4px; border: 0; border-bottom: 1px solid var(--rzf-line); background: none;
+    color: var(--rzf-ink); font: inherit; font-size: 15px; font-weight: 600; text-align: left; cursor: pointer;
+  }
+  .rz-mm-acc-btn svg { width: 14px; height: 14px; flex: none; }
+  .rz-mm-acc-btn[aria-expanded="true"] svg { transform: rotate(180deg); }
+  .rz-mm-acc-list { margin: 0; padding: 0 0 6px 8px; }
+  .rz-mm-acc-list[hidden] { display: none; }
+  :is(.navbar[data-rz-bar], .navbar[data-rz-float]) .rz-mm-drawer a { display: flex !important; flex-direction: column; justify-content: center; min-height: 44px; box-sizing: border-box; }
+  :is(.navbar[data-rz-bar], .navbar[data-rz-float]) .rz-mm-drawer .rz-mm-d { white-space: normal; }
+  /* the drawer drops from the floating bar as a panel of the same family */
+  :root:not([data-rz-kind="app"]) :is(.navbar[data-rz-bar], .navbar[data-rz-float]) > .nav-container > :is(.nav-menu, .nav-links) {
+    margin-top: 7px !important; border: 1px solid var(--rzf-line) !important; border-radius: var(--rzf-radius); box-shadow: var(--rzf-shadow);
+    max-height: calc(100vh - var(--rzf-top) - var(--rzf-outer) - 16px) !important;
+    /* opaque: a backdrop-filter does not nest, so a glass drawer inside the glass bar showed the hero text through it */
+    background: var(--rzf-solid) !important; background-image: none !important;
+    text-align: left !important; align-items: stretch !important;
+  }
+  /* the plain entries (Home, Results, FAQ …) read as rows of the same list as the accordions: left, same size, hairline */
+  :root:not([data-rz-kind="app"]) :is(.navbar[data-rz-bar], .navbar[data-rz-float]) .rz-mm-drawer > a.rz-mm-dlink {
+    justify-content: flex-start !important; text-align: left !important; padding: 0 4px !important;
+    min-height: 44px; display: flex !important; flex-direction: row !important; align-items: center !important;
+    font-size: 15px !important; font-weight: 600 !important; color: var(--rzf-ink) !important;
+    border-bottom: 1px solid var(--rzf-line);
+  }
+  .rz-mm-sec { text-align: left; }
+  /* the bar's backdrop-filter makes it the containing block of its position:fixed drawer, so the older pages'
+     closed state (styles.css .nav-menu { left: -100% }) parked it at the bar's width and left 12 px of it on screen;
+     closed, it goes past the viewport's left edge. Open (.active, the pages' own class) is untouched. */
+  :root:not([data-rz-kind="app"]) :is(.navbar[data-rz-bar], .navbar[data-rz-float]) > .nav-container > .nav-menu:not(.active) {
+    left: calc(-100vw - 2 * var(--rzf-side)) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rz-mm-panel, .rz-mm-panel[hidden], .rz-mm-top, .rz-mm-item, .rz-mm-open { transition: none !important; }
+  .rz-mm-panel[hidden] { transform: none; }
+}

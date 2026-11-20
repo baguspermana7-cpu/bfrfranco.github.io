@@ -58,6 +58,7 @@ BUILDERS = [
     ("llms.txt", ["python3", "tools/build-llms-txt.py", "--check"]),
     ("llms-full.txt", ["python3", "tools/build-llms-full.py", "--check"]),
     ("search-sections.json", ["python3", "tools/build-search-sections.py", "--check"]),
+    ("data/nav-menu.json + nav float ?v= hashes", ["node", "tools/build-nav-menu.mjs", "--check"]),
     ("rz-explain-db.js + search-terms.json", ["python3", "tools/build-explain-db.py", "--check"]),
     ("Search Console indexing list", ["python3", "tools/build-indexing-list.py", "--check"]),
     ("data/journal.json + journal grids", ["python3", "tools/build-journal.py", "--check"]),

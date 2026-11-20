@@ -74,6 +74,15 @@ function scan(keys) {
   // Contact/Correspondence buttons are pills. Exempt ONLY on the homepage and ONLY for the element that carries
   // data-rz-owner-shape itself; the same attribute anywhere else is still reported (tools/test-slop-precision.mjs).
   const ownerShape = (e) => e.hasAttribute('data-rz-owner-shape') && /\/(index\.html)?$/.test(location.pathname);
+  /* owner exception §B-2026-11-20 (SITE_CHROME_STANDARD §2a/§2b): the floating site bar, its mega panel and its phone
+     drawer carry a 12 px radius, a soft shadow and (the bar only) a 12-16 px blur. Exact elements, site pages only, and
+     only within those values: anything rounder or blurrier is still a tell. */
+  const ownerFloat = (e, c) => {
+    if (document.documentElement.getAttribute('data-rz-kind') === 'app') return false;
+    if (!e.matches(':is(.navbar[data-rz-bar], .navbar[data-rz-float]), .rz-mm-panel, :is(.navbar[data-rz-bar], .navbar[data-rz-float]) > .nav-container > :is(.nav-menu, .nav-links)')) return false;
+    const rad = parseFloat(c.borderTopLeftRadius) || 0, bl = +((/blur\(([\d.]+)px\)/.exec(c.backdropFilter || '') || [])[1] || 0);
+    return rad <= 12 && (c.backdropFilter === 'none' || (bl >= 12 && bl <= 16 && e.matches('.navbar')));
+  };
   // K34 (owner 2026-11-09, "Mainkan gradien. Yg sangat cantik", scoped to the Cx page when asked): a gradient SURFACE
   // that carries data-rz-owner-gradient itself is not a `grad` tell on /cx-calculator.html only. Gradient text stays
   // banned everywhere; the attribute anywhere else is still reported (tools/test-slop-precision.mjs).
@@ -95,15 +104,15 @@ function scan(keys) {
     const rr = c.borderTopLeftRadius; const rad = /%/.test(rr) ? (parseFloat(rr) || 0) * Math.min(r.width, r.height) / 100 : (parseFloat(rr) || 0);
     const filled = !transparent(c.backgroundColor) || bt >= 1;
     if (rad >= 12 && r.height < 44 && filled && !(Math.abs(r.width - r.height) <= 2 && rad >= Math.min(r.width, r.height) / 2 - 0.5) && e.tagName !== 'INPUT' && !/toggle|switch|avatar|dot|knob|thumb/i.test(e.className) && !stateful(e) && !ownerShape(e)) out.pill.push(name(e));
-    if (rad > 8 && r.width >= 200 && !transparent(c.backgroundColor) && !ownerShape(e)) out.round.push(name(e));
-    if (c.backdropFilter && c.backdropFilter !== 'none') out.blur.push(name(e));
+    if (rad > 8 && r.width >= 200 && !transparent(c.backgroundColor) && !ownerShape(e) && !ownerFloat(e, c)) out.round.push(name(e));
+    if (c.backdropFilter && c.backdropFilter !== 'none' && !ownerFloat(e, c)) out.blur.push(name(e));
     const grad = /gradient/.test(c.backgroundImage);
     if (grad && r.width >= 120 && r.height >= 40 && !inArt(e) && !ownerGradient(e)) out.grad.push(name(e));
     if (grad && /text/.test(c.webkitBackgroundClip || c.backgroundClip)) out.gtext.push(name(e));
     if (c.transitionProperty.split(',').some((p) => p.trim() === 'all') && c.transitionDuration.split(',').some((d) => parseFloat(d) > 0)) out.tall.push(name(e));
     if (c.boxShadow !== 'none' && !/inset/.test(c.boxShadow) && r.width >= 160 && r.height >= 40 && !transparent(c.backgroundColor)
       && !(document.activeElement === e) && c.position !== 'fixed' && !e.closest('[role="dialog"],dialog,.modal,[class*="modal"],[class*="overlay"],[class*="dropdown"],[class*="popover"],[class*="tooltip"],[class*="toast"],[class*="sheet"]')
-      && !/^(0px 0px 0px \d+(?:\.\d+)?px)/.test(c.boxShadow) && !hairline(c.boxShadow)) out.shadow.push(name(e));
+      && !/^(0px 0px 0px \d+(?:\.\d+)?px)/.test(c.boxShadow) && !hairline(c.boxShadow) && !ownerFloat(e, c)) out.shadow.push(name(e));
     const fam = c.fontFamily.split(',')[0].replace(/["']/g, '').trim();
     if (/fraunces|playfair|georgia|garamond|merriweather|lora|crimson|cormorant|libre baskerville|times/i.test(fam) && parseFloat(c.fontSize) >= 20 && e.textContent.trim()) out.serif.push(name(e));
     if (!transparent(c.backgroundColor) && r.width >= 200 && r.height >= 80 && !inArt(e)) { const h = hue(c.backgroundColor), s = sat(c.backgroundColor), l = light(c.backgroundColor); if (h >= 205 && h <= 250 && s >= 0.35 && l <= 0.3) out.navy.push(name(e)); }

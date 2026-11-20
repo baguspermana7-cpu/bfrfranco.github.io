@@ -9,7 +9,8 @@
  *     focus; opening card B closes card A; the shown face sets the height; reduced motion fades, no rotation.
  *  L3 every card keeps its width and height when it turns (R126, replaces "as tall as its shown face"); phone 390: no
  *     horizontal scroll, cards one column; every logo 28 px tall and a vector.
- *  L4 nav: no backdrop-filter, no box-shadow, 64 +/- 2 px at 1440; the Contact pill once in the nav, the
+ *  L4 nav: floats (v3.79.0, §2a: data-rz-float, radius >= 10, blur 12-16 px, 74 +/- 2 px at 1440; it was flat and 64 px
+ *     before the owner's 2026-11-18 request); the Contact pill once in the nav, the
  *     pill CTA once in the hero and once in the contact section, each reaching #contact or mailto.
  *     No clock row (owner 2026-11-08).
  *  L2v2 (owner 2026-11-08) calm cards: one card background (current = 3 px amber top rule), square skill marker, sentence-case names.
@@ -106,10 +107,13 @@ try {
   // L4 (1440)
   const nav = await p.evaluate(() => { const n = document.querySelector('.navbar'), cs = getComputedStyle(n);
     const href = (sel) => [...document.querySelectorAll(sel)].map((a) => a.getAttribute('href'));
-    return { h: Math.round(n.getBoundingClientRect().height), blur: cs.backdropFilter, sh: cs.boxShadow,
+    return { h: Math.round(n.getBoundingClientRect().height), blur: cs.backdropFilter, sh: cs.boxShadow, float: n.hasAttribute('data-rz-float'), radius: parseFloat(cs.borderTopLeftRadius),
       navPill: href('.navbar .rz-pill-cta'), navPillShown: [...document.querySelectorAll('.navbar .rz-pill-cta')].filter((e) => e.offsetParent).length,
       hero: href('#home .rz-pill-cta'), contact: href('#contact .rz-pill-cta') }; });
-  check(nav.blur === 'none' && nav.sh === 'none' && Math.abs(nav.h - 64) <= 2, `L4 nav flat, ${nav.h}px (blur ${nav.blur}, shadow ${nav.sh})`);
+  /* since v3.79.0 the owner's floating bar replaces the flat nav (SITE_CHROME_STANDARD §2a, ANTI_VIBECODE §B-2026-11-20):
+     it floats (data-rz-float, radius >= 10), blurs 12-16 px and is the 56 px row + 2 x 8 px padding + 2 px hairlines */
+  const blurPx = +((/blur\(([\d.]+)px\)/.exec(nav.blur) || [])[1] || 0);
+  check(nav.float && nav.radius >= 10 && blurPx >= 12 && blurPx <= 16 && Math.abs(nav.h - 74) <= 2, `L4 nav floats, ${nav.h}px (float ${nav.float}, radius ${nav.radius}, blur ${nav.blur})`);
   const okHref = (l) => l.length === 1 && /^(#contact|mailto:)/.test(l[0]);
   check(okHref(nav.navPill) && nav.navPillShown === 1 && okHref(nav.hero) && okHref(nav.contact), `L4 pill CTA: nav ${nav.navPill}, hero ${nav.hero}, contact ${nav.contact}`);
   const look = await p.evaluate(() => { const cs = (e) => getComputedStyle(e);

@@ -78,7 +78,7 @@ await new Promise((r) => srv.listen(0, '127.0.0.1', r));
 const O = `http://127.0.0.1:${srv.address().port}/`;
 const browser = await puppeteer.launch({ args: ['--no-sandbox', '--blink-settings=primaryPointerType=4,availablePointerTypes=4,primaryHoverType=2,availableHoverTypes=2'] });
 
-async function open(file, { width, signedIn, reduce = false, theme = 'dark' }) {
+async function open(file, { width, signedIn, reduce = false, theme = 'dark', audit = true }) {
   const page = await browser.newPage();
   const errors = [];
   page.on('pageerror', (e) => errors.push(String(e.message || e).slice(0, 160)));
@@ -91,6 +91,8 @@ async function open(file, { width, signedIn, reduce = false, theme = 'dark' }) {
     return q.respond({ status: 204, contentType: 'text/plain', body: '' });
   });
   if (signedIn) await page.evaluateOnNewDocument((entries) => entries.forEach(([k, v]) => localStorage.setItem(k, v)), signedInStorage({ tier: 'pro' }));
+  /* signed out means signed out: the browser profile keeps the session a signed-in block stored before */
+  else await page.evaluateOnNewDocument((keys) => { try { keys.forEach((k) => localStorage.removeItem(k)); } catch (e) { /* none */ } }, signedInStorage({ tier: 'pro' }).map(([k]) => k));
   await page.evaluateOnNewDocument((t) => localStorage.setItem('theme', t), theme);
   if (PLANT) await page.evaluateOnNewDocument((css) => document.addEventListener('DOMContentLoaded', () => { const s = document.createElement('style'); s.id = 'rz-plant'; s.textContent = css; document.head.appendChild(s); }), PLANT);
   await page.setViewport({ width, height: width > 800 ? 900 : 844, deviceScaleFactor: 1 });
@@ -98,7 +100,7 @@ async function open(file, { width, signedIn, reduce = false, theme = 'dark' }) {
   await page.goto(O + file, { waitUntil: 'load', timeout: 60000 });
   if (!(await page.evaluate(() => matchMedia('(hover: hover) and (pointer: fine)').matches))) throw new Error('hover / pointer emulation failed: the hover laws would measure nothing');
   /* the cockpits are tier-gated: clear the gate the way every cockpit gate does (tools/lib/cockpit-audit-state.mjs) */
-  try { await enterAuthorizedAuditState(page, file.replace(/\.html$/, '')); } catch (e) { /* not a gated identity (EPMS_Telemetry) */ }
+  if (audit) { try { await enterAuthorizedAuditState(page, file.replace(/\.html$/, '')); } catch (e) { /* not a gated identity (EPMS_Telemetry) */ } }
   /* auth.js, rz-ask.js and conv-alarm-workspace.js fill their slots after load */
   await page.waitForFunction((hasCta) => {
     const s = document.querySelector('.cv-bar'); if (!s) return false;
@@ -308,6 +310,23 @@ for (const file of pages) {
   const { page } = await open(file, { width: 1440, signedIn: false, theme: 'light' });
   const lowLight = await page.evaluate(contrastScan);
   ok(!lowLight.length, 'C7', `${file}: light theme bar labels under 4.5:1: ${lowLight.join(' | ')}`);
+  await page.close();
+}
+
+/* ---------------------------------------------------------------- 390 signed out: C6 Login
+   since v3.79.0: at <= 768 px auth.js hides the Login text and the bar hid its icon, leaving an empty 16 px button on
+   eight cockpits; signed out, Login is a >= 44 x 44 target that shows the word */
+for (const file of pages) {
+  const { page } = await open(file, { width: 390, signedIn: false, audit: false });   /* what a signed-out visitor sees */
+  const lg = await page.evaluate(() => {
+    const b = document.querySelector('.cv-bar .rz-login-btn'); if (!b) return null;
+    const r = b.getBoundingClientRect(), c = getComputedStyle(b);
+    if (!r.width || c.display === 'none' || c.visibility === 'hidden') return { shown: false };
+    const w = document.createTreeWalker(b, NodeFilter.SHOW_TEXT); let text = '';
+    for (let t; (t = w.nextNode());) { const e = t.parentElement, q = e.getBoundingClientRect(); if (q.width > 0 && getComputedStyle(e).visibility !== 'hidden') text += t.textContent.trim(); }
+    return { shown: true, w: Math.round(r.width), h: Math.round(r.height), text };
+  });
+  if (lg && lg.shown !== false) ok(lg.w >= 44 && lg.h >= 44 && /log\s*in/i.test(lg.text), 'C6', `${file}: at 390 signed out, Login is ${lg.w}x${lg.h}px showing "${lg.text}"`);
   await page.close();
 }
 

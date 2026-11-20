@@ -399,6 +399,8 @@ gate "mobile nav — one hamburger per navbar, and it opens the menu" node tools
 # paint. A RATCHET until the last family is refitted: tools/site-chrome-baseline.json may fall, a rise fails.
 gate "site chrome — one bar position and one theme button on every page (ratchet, CH1-CH9)" node tools/test-site-chrome.mjs
 gate "site chrome — every refitted page is what the sweep tool produces" python3 tools/sweep-site-chrome.py --check
+gate "nav float — floating translucent site bar + mega menu on every site page (F1-F10)" node tools/test-nav-float.mjs
+gate "nav float — data/nav-menu.json and the nested ?v= hashes are what the builder produces" node tools/build-nav-menu.mjs --check
 gate "nav tap targets — no navigation link under 24px at 390px (WCAG 2.5.8)" node tools/test-tap-targets.mjs
 gate "mobile form controls — 16px text fields, or iOS zooms the viewport" node tools/test-mobile-forms.mjs
 # CACHE-KEY DRIFT is the min-twin bug's sibling: one shared asset requested under two `?v=`

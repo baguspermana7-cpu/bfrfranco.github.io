@@ -15,6 +15,7 @@
   if (window.RZChrome) return;
 
   var root = document.documentElement;
+  var SELF = document.currentScript;
   var KEY = 'theme';
   var ICONS =
     '<svg class="rz-i-moon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>' +
@@ -127,8 +128,19 @@
     if (t.nextElementSibling !== a && !(inDrawer && mq && mq.matches)) t.parentNode.insertBefore(a, t.nextSibling);
   }
 
+  /* the site bar's mega menu (SITE_CHROME_STANDARD §2b): site pages only. The ?v token is the file's hash, stamped
+     by tools/build-nav-menu.mjs (its --check fails when it drifts); index.html loads the script itself. */
+  function loadMegaMenu() {
+    if (window.__rzMegaMenu || root.getAttribute('data-rz-kind') === 'app' || !document.querySelector('.navbar[data-rz-bar]')) return;
+    var base = (SELF && SELF.src) ? SELF.src.replace(/js\/rz-chrome\.js(?:\?.*)?$/, '') : '';
+    var s = document.createElement('script');
+    s.src = base + 'js/rz-mega-menu.js?v=bd92828b';
+    s.defer = true;
+    document.head.appendChild(s);
+  }
+
   function init() {
-    paint(); order(); place();
+    paint(); order(); place(); loadMegaMenu();
     var bar = document.querySelector('[data-rz-bar]');
     if (bar) { try { new MutationObserver(function () { order(); place(); }).observe(bar, { childList: true, subtree: true }); } catch (e) { /* none */ } }
   }

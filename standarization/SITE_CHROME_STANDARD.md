@@ -25,7 +25,8 @@ A page is `bare` only with a written reason in the config. A new page is a `site
   those pages pads its content for a bar that was out of the flow. A bar that was already in the flow is not lifted.
 - A generated family (incidents) carries the standard bar in its generator's template; the generator's `--check`
   and the sweep's `--check` must both pass on its pages.
-- The bar is opaque in the page's theme. A page whose surface is dark in both themes declares
+- The bar takes the page's theme (since 2026-11-20 translucent with a blur, §2a; the contrast law below holds over
+  any content behind it). A page whose surface is dark in both themes declares
   `<html data-rz-surface="dark">` and gets the dark bar in both; a page that had a transparent nav over a dark hero
   (`body[data-rz-nav-over-dark]`) loses that mark at refit. Law CH11 measures every text in the bar at ≥ 4.5:1 in
   both themes.
@@ -34,6 +35,33 @@ A page is `bare` only with a written reason in the config. A new page is a `site
 - One height per kind (the token above). A second row — breadcrumbs, a status strip, a reading-progress line — sits
   **under** the bar, never inside it.
 - The bar never causes sideways scroll and never holds a control narrower than 44 px on a phone.
+
+## 2a. The floating bar (site kind) — 2026-11-20, owner exception ANTI_VIBECODE §B-2026-11-20
+
+- The site bar floats: `position: sticky`, 10 px from the top (8 px on a phone), 11 px side margin below the measure,
+  8 px padding, 12 px radius, one hairline, a soft shadow. It touches no viewport edge and stays put on scroll.
+- Translucent: `--rzf-glass` (alpha 0.82) with `backdrop-filter: blur(14px)`. It is the only painted backdrop-filter
+  on the page. Every label holds 4.5:1 over white and over the darkest page ink.
+- `scroll-padding-top` moves in-page anchors below it; the first heading starts under it at load.
+- Source: `css/rz-nav-float.css`, reached by one `@import` at the top of `css/rz-chrome.css` (so first paint already
+  floats). `index.html` links it directly and marks its nav `data-rz-float`. The `?v=` of that import is the file's
+  hash, stamped by `tools/build-nav-menu.mjs` (its `--check` fails on drift).
+- An app page (`<html data-rz-kind="app">`) never matches: the cockpits keep their own bar (§9).
+
+## 2b. The mega menu — 2026-11-20
+
+- Content is GENERATED: `data/nav-menu.json` from `tools/build-nav-menu.mjs` (sections, groups, items, a featured item
+  per section). Never hand-edit the JSON or put menu links in a page. Every href must be a file of the checkout.
+- `js/rz-mega-menu.js`, loaded by `js/rz-chrome.js` on site pages (token stamped by the builder) and by `index.html`
+  directly. Desktop (> 768 px): a top-level section with groups is a `<button aria-expanded aria-controls>`; it opens
+  ONE panel exactly as wide as the bar: three link columns and a fourth preview column for the highlighted item.
+  Opens on click and on 120 ms hover intent; closes 200 ms after leaving, on Escape (focus back to the trigger), on
+  Tab out and on a press outside. No animation when opened from the keyboard.
+- Phone (≤ 768 px): no panel; the groups are accordions inside the drawer of `js/rz-mobile-nav.js`, every target
+  ≥ 44 px high.
+- The page's own nav links stay in the markup for crawlers and are hidden (`[data-rz-mm-orig]`) only once the menu is
+  built. If the JSON cannot be read, nothing is hidden.
+- Gate `tools/test-nav-float.mjs` (F1–F10, planted defects `edge`, `blur2`, `alpha`, `width`, `deadlink`).
 
 ## 3. The right-hand cluster
 
@@ -184,6 +212,7 @@ Owner, 2026-11-18: "This button combo is looking a bit flat. We don't need the l
 - Laws C1–C8 (`tools/test-conv-shell.mjs`): bar, positions, bare login, CTA rest / hover / pressed / reduced motion,
   actions still work, 390 More menu, contrast ≥ 4.5 : 1 in the dark AND the light theme (v3.78.1), keyboard order.
   Bar colour rules for the auth chrome sit under `:root` so a page register (`rz-cockpit-instrument.css`, 0,2,1)
-  cannot repaint them. The hover laws run with Chrome's
+  cannot repaint them. Login shows the word at every width (auth.js hides it at ≤ 768 px on other pages) and is
+  ≥ 44 px wide (C6, v3.79.0). The hover laws run with Chrome's
   `--blink-settings=…HoverType=2…` flags and refuse to run when `(hover: hover)` does not match.
 - `datahallAI.html` adopts the same component and gate (owned by the DC AI session).
