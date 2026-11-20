@@ -151,6 +151,22 @@ vendor-curve substitute for the 40 MW study.
   filter, DPT, WIF) returning on a header shared with the day-tank overflow. Fourteen tagged lines, fail-closed
   first paint, one `renderPid()` from the page's deterministic state; every drawn value is engine-traced or
   declared simulated — no pump schedule, day-tank sizing or instrument reading is invented.
+  **Fuel truth (PRD-CONV-EQUIPMENT-TRUTH F2/F5, gate `tools/test-conv-fuel-truth.mjs`).** FU-M-101 is a PER-HALL
+  view: the hall selector comes from `CONV_CALC.listHalls()`, the sheet draws one fill valve + day tank + genset per row
+  of `CONV_CALC.getFleet('genset', hall)` with the fleet tags (GEN-A1 … GEN-A8, DT-GEN-A1, XV-A1), and the facts line
+  states the hall count and the site total in words and numbers only; the engine keys it reads (`getFleet`,
+  `electrical.genset_count`, `hall.facility_load_kw`) sit in its `data-source` / title, never in the visible text. The
+  day-tank basis shows one line ("Day tank 4,277 L = 4 h at rated burn · fill 50→90 %") and an info button (native
+  popover: click, tap, Enter) holding the explanation. No genset count or tag list is typed in the page
+  or the sheet file. NORMAL = utility healthy, every set STANDBY at 0 kW, every XV closed, P-101 stopped, no alarm.
+  UTILITY LOSS applies the engine sizing rule: the first (count − `electrical.genset_spare_per_hall`) sets run and share
+  the hall's `facility_load_kw` equally (each ≤ its rating), the spare stays STANDBY; burn = output ×
+  `fuel.specific_consumption_l_per_kwh`. Day tank per set (ASSUMED design basis, printed on the page): capacity = 4 h
+  of that set's rated burn; fill opens on a running set below 50 % and closes at 90 %, so a running set keeps ≥ 1.8 h
+  at rated burn (45 %); below 50 % with transfer unavailable (containment inhibit or P-101 fail) raises
+  `LAL-DT-<set> LO` in the alarm list, below 25 % `LO-LO`. A genset or day-tank symbol opens the equipment modal on
+  that set's inside (`js/conv/internals/genset.js`), navigator over the hall's sets. Open: the engine does not yet
+  publish the run split (PRD §6.5) — the page states the rule it applies.
 
 ### Water
 
@@ -320,6 +336,47 @@ Before release:
 
 ## 10. Change and lesson ledger
 
+### 2026-11-20 — quantity truth on the chiller plant sheets (CH-M-101 + CH-M-102, PRD-CONV-EQUIPMENT-TRUTH E3)
+
+- **The sheet holds no count.** `js/conv/chiller-sheet.js` builds both sheets from `CONV_CALC.getFleet()`
+  (`RZChillerSheets.fromEngine(C)`): one train per `chiller` unit (tag and state from the fleet), its primary pumps from
+  `chw_primary_pump` (pump A/B per train by tag), the secondary pumps from `chw_secondary_pump`, one CRAH coil bank per
+  `listHalls()` hall. The page's simulated loops are seeded from the same fleet (`seedLoops()`): a standby train is drawn
+  still (no flow, `STANDBY / 0/3 COMP / NO FLOW`), never animated. A count typed in the page is a defect.
+- **CRAH banks.** One typical coil per hall, value `× N · M RUN` from `getFleet('crah', hall)`; the hall selector marks the
+  hall's bank (`data-hall-selected`, dashed body). Double-click (≥ 800 px) or the inspector's "Open equipment HMI" opens
+  `RZConvModal` 2.1.0 in **fleet-only** mode (`internal.fleetOnly`): navigator over the hall's units, fleet strip, unit
+  rows from the fleet, and one line that the inside is not drawn yet (E4). Tower cells and CDW pumps use the same mode.
+- **CH-M-102 — condenser water and cooling towers.** Reached by the sheet switch above the legend (`data-chw-sheet-btn`,
+  `aria-pressed`, host `data-chw-sheet`). One column per `tower_cell` / `cdw_pump` unit: CDWR header → cell → basin
+  header → pump → `<CH-nn> COND` off-sheet. TT-CDWS / TT-CDWR read `cooling.cdw_supply_c` / `cdw_return_c`; each
+  running cell shows its `rejectionKwTh`, the CDWR inlet Σ of them — equal to `cooling.tower_rejection_kw_th` within 0.5 %.
+  Payload classes `condenser:coolingTowerCell`, `condenser:pumpCentrifugal`, `condenser:instField`.
+- **Readability.** Sheet text on the plant page is 12 units and both sheets are drawn at `minScale` 1, so no text is under
+  11 px at 1440 or 390 (the panel scrolls at 390, the page never does). Node ids: CDW pumps `cp<n>`, secondary `ps<n>`,
+  primary `p<letter><n>` (the letter class excludes `s`), so no regex on one family catches another.
+- **Gate** `tools/test-conv-quantity-truth.mjs`: L1 trains/pumps = fleet (tags + states), L2 CRAH label + hall mark +
+  modal, L3 CH-M-102 = fleet + Σ rejection, L4 every chiller opens its own unit and every tagged symbol's `<title>`
+  starts with its ISA tag, L5 text ≥ 11 px / no overlap / no pipe or zone border through text / no sideways scroll /
+  0 page errors — 1440 + 390, both themes; then again under a `getFleet` stub (8 chillers, 6 secondary pumps, 8 cells,
+  30 CRAH). `RZ_QT_PLANT=font|unit|sum|ignore|perf` plants a defect each law must catch.
+- **Integrator review (same day), now laws of the same gate:**
+  - *Motion cost (PERF1/PERF2).* A CSS dash or rotor animation inside the SVG repaints and re-layerizes the whole
+    drawing on every display frame: the 10-train sheet cost ~4 s of main thread per 5 s. The page now holds the sheet's
+    animations paused and a 3 Hz clock (`chwMotionClock`) places each VISIBLE moving element by an inline negative
+    `animation-delay` (per element — one inherited custom property restyled every node). Names, durations and flow
+    rules are unchanged. `hmi-depth.js` keeps geometry layers (specular, flanges, plinths, tube sheen) across updates
+    and only restamps the flow state. Measured as renderer main-thread CPU (`Performance.getMetrics` ThreadTime) over
+    5 s idle at 1440, best of 2 interleaved runs against the base ref served from git in the same run: ≤ 1.5 s and
+    ≤ base × 1.2; load-quiet (load + 500 ms without a request) ≤ base + 3 s.
+  - *No flow, no loop temperature (Q2).* A standby train shows `—` on CDWR / CDWS / TT-x01 / TT-x02.
+  - *One flow source (Q3).* A running train's CALC BRANCH REF is the engine's `getFleet('chiller')` `chwFlowLps`; the
+    per-train spread is gone.
+  - *NORMAL is quiet (Q4).* The NORMAL simulation reverts dp and loop temperatures to the engine plane with small noise
+    and caps them below the warning limits; 50 scans (60 simulated s) give 0 WARNING / ALARM marks on both sheets.
+  - *Clear and unclipped (Q1).* Labels keep 2 px of air from every pipe; CH-M-102 is 1025 units wide so it fits the
+    1440 panel with no sideways scroll; at 1034 and 390 every text is inside the scroll range.
+
 ### 2026-11-18 — equipment internals contract (modal v2 + chiller inside, PRD-CONV-EQUIPMENT-TRUTH E2)
 
 - **The modal draws the INSIDE, never the outside.** `RZConvModal.open(payload, { internal })` (v2.0.0, same API) shows,
@@ -360,8 +417,8 @@ Before release:
   page; the 11 cycle keys the chiller drawing reads lost `display: internal`; the four per-unit plant figures keep it with
   a reason that names the fleet-row link.
 - **Known, not changed here:** the plant sheet's own canvas takes the root (light) gradient while its labels carry a dark
-  halo (the page sets `data-theme="dark"` on the sheet host only) — visible on CH-M-101 today; the plant sheet still draws
-  four of ten chillers (phase E3).
+  halo (the page sets `data-theme="dark"` on the sheet host only) — visible on CH-M-101 today; the plant sheet drew four of
+  ten chillers until E3 (2026-11-20, see above).
 
 ### 2026-11-18 — plant internals basis (engine 2.4.0, PRD-CONV-EQUIPMENT-TRUTH E1)
 
@@ -407,6 +464,48 @@ Before release:
   toolbar row.
 - Gate: `tools/test-conv-shell.mjs` (in `tools/run-conv-release-gates.sh` through the family filter).
 
+### 2026-11-20 — LV distribution contract (E-S-102, PRD-CONV-EQUIPMENT-TRUTH E5)
+
+- **E-S-102 replaces the legacy LV drawing.** `js/conv/epms-lv.js` (`RZEpmsLv`) builds one sheet per hall through the
+  same `RZHmiSheet` pipeline as E-S-101: hall 20 kV ring A and B (each from its E-S-101 feeder, CB-FAn / CB-FBn) →
+  hall switchboard MVSB with a normally open bus tie → per stream a distribution transformer, LV main with LSIG trip
+  unit, LV main switchboard → UPS (input, rectifier, DC bus with battery breaker and battery, inverter, output, static
+  bypass) → rack PDU / RPP boards (A or B cord) and the mechanical + house board. `js/conv/epms-lv-view.js` draws it on
+  `EPMS_Telemetry.html`; the old `#viewport` SVG, its zoom buttons, the GEN A/B/C controls and the FEED/STATE legend
+  are removed, and `fitScreen()` / `toggleSource()` no longer exist.
+- **Repeated items are drawn once with their count from the engine.** "× 5" transformers and LV main switchboards per
+  stream (`dist_tx_per_stream_per_hall`, loading shown per unit), "× 500 racks" (`campus.halls[h].racks`), UPS modules
+  per hall per stream = `ups_modules_per_system / halls` × `ups_module_kw_rated`. Nothing the engine does not model is
+  drawn as a number: the PDU count and battery autonomy say "not modelled"; UPS losses sit in the mechanical load.
+- **Gensets are drawn as the engine's topology implies.** Each hall has its own 20 kV generator bus with
+  `getFleet('genset', hall)` sets (8 = 7 + 1 spare), one breaker per set and one generator incomer per switchboard
+  section. A set's output is limited to `genset_unit_kw × genset_max_loading`. The site total (`genset_count`) and the
+  supply chain (150 kV GIS → 20 kV on E-S-101 → hall rings → 400 V) are stated beside the hall selector.
+- **Hall selector.** Halls A–D rebind every tag (`TX-<hall><stream>`, `CB-R<hall><stream>` …) and value; each hall keeps
+  its own switching state. A ring of a hall is dead whenever its E-S-101 feeder is dead (event `rz-epms-change`).
+- **Select before operate.** E-S-102 operates only in two steps in the inspector: Select (nothing moves) → Execute or
+  Cancel. Execute without a selection, or after the item changed, is refused in words. Interlocks: the bus tie closes
+  only when one section is dead (no paralleling of the rings); a generator incomer closes only onto a dead section with
+  its ring incomer open and the generator bus live; a set's breaker closes only on a running set; a set stops only with
+  its breaker open. A UPS whose input dies discharges its battery; the battery never back-feeds the rectifier.
+- **One status for the page.** `window.RZEpmsStatus.paint` composes the alarm list from both sheets (all four halls of
+  E-S-102 + the E-S-101 LV units): a dead ring, a dead board, a UPS on battery, a load not supplied or an overloaded
+  source is an alarm; an item away from its normal position is ABNORMAL. A dead feed never shows NORMAL with 0 alarms.
+  The bottom total load is the served kW from the solve.
+- **Audit findings closed here.** F21: the strip shows "System rating" (modules × module rating, `ups_system_rated_kw`)
+  and "System load" (`ups_system_kw`) separately. F23: the TCC from a 150 kV transformer bay plots TX-1 / TX-2
+  (`hv_tx_mva`, `hv_tx_impedance_pct`, markers at `mv_tx_fla_a`), from a 20 kV feeder or LV main the distribution
+  unit. F24: each view shows one legend (the sheet's own).
+- **Inspector text.** E-S-102 payloads use the shared `epms:*` classes of `js/conv/payloads.js`; the five symbols those
+  classes do not describe (switchboard, rectifier, inverter, battery, static bypass) get their name and role from the
+  `KIND` table in `js/conv/epms-lv-view.js`, and the E-S-101 genset row "not started on this sheet" is replaced there.
+  Move them into `payloads.js` when that file is next released (its token sits on every Conventional page).
+- **Legibility.** E-S-102 opens at `minScale` 1.17 with the 9 px name / line / label roles set to 9.5 px for this sheet,
+  so every rendered label is ≥ 11 px at 1440 and 390; the panel scrolls sideways instead of shrinking the text.
+- **Gate.** `tools/test-conv-epms-lv.mjs` (E1–E5 at 1440 and 390, and three planted defects — a genset stubbed off the
+  drawing, the status forced NORMAL after a trip, the device handler removed — each of which must turn its law red).
+  `tools/test-epms-ats-rack-color.mjs` is retired with the drawing it tested.
+
 ### 2026-11-18 — single-line contract (E-S-101, v3.74.0, PRD-CONV-LIVING-PLANT P5a)
 
 - **One governed sheet draws the electrical plant from 150 kV.** `js/conv/epms-sheet.js` (`RZEpmsSheets.sld`, E-S-101) is
@@ -429,7 +528,8 @@ Before release:
   read a faster or slower line as more or less power.
 - **No contradicting chrome.** While the HV / MV view is shown, the legacy LV rail (utility sources, GEN A/B/C) and its
   breaker counters are hidden; the rail lists PLN LINE 1/2 and TX-1/2 with state and load from the solve, the genset
-  fleet from the engine, and both breaker counters count E-S-101's own breakers. The LV view restores the legacy chrome.
+  fleet from the engine, and both breaker counters count E-S-101's own breakers. The LV view shows E-S-102 and its own
+  rail (superseded 2026-11-20: the legacy LV chrome is gone, see the E-S-102 entry above).
 - **Interlocks refuse in words.** A disconnector moves only with its breaker open; an earthing switch closes only with
   its disconnectors open and the circuit dead; a breaker never closes onto an earthed circuit; 2-out-of-3 on
   incomer-incomer-tie; the generator incomers close only on a running, synchronised generator bus (the gensets are off).

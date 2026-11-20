@@ -286,9 +286,12 @@ try {
       refrigeration: (typeof loopMetrics === 'function' && typeof st !== 'undefined')
         ? st.loops.map((loop) => ({
             ...loopMetrics(loop),
+            standby: !!loop.standby,
             exvPct: typeof exvPositionPct === 'function' ? exvPositionPct(loop) : null,
           }))
         : [],
+      chillerFleet: (window.CONV_CALC && typeof window.CONV_CALC.getFleet === 'function')
+        ? (window.CONV_CALC.getFleet('chiller') || []).length : 0,
       plantAuthority: (typeof PLANT !== 'undefined' && typeof st !== 'undefined') ? {
         cop: PLANT.cop,
         kwPerRt: PLANT.kwPerRt,
@@ -324,7 +327,11 @@ try {
   assert.ok(chiller.documentHeight >= chiller.statusBottom, 'P&ID status strip must remain reachable');
   assert.match(chiller.loopText, /26\.[0-9]|27\.[0-9]/,
     'loop return temperatures must remain on the current 27 C CHWR plane after the simulation tick');
-  assert.equal(chiller.refrigeration.length, 4, 'all visible chillers must publish refrigeration diagnostics');
+  /* E3 (PRD-CONV-EQUIPMENT-TRUTH) — the page draws one train per chiller of CONV_CALC.getFleet('chiller') (10 on the
+     current engine), standby trains included. The law is unchanged — EVERY visible chiller publishes its refrigeration
+     diagnostics — only the count is read from the engine fleet instead of the typed 4 of the four-loop drawing. */
+  assert.ok(chiller.chillerFleet >= 1, 'engine chiller fleet must be readable');
+  assert.equal(chiller.refrigeration.length, chiller.chillerFleet, 'all visible chillers must publish refrigeration diagnostics');
   assert.deepEqual(chiller.plantAuthority, {
     cop: 6.06,
     kwPerRt: 0.58,
@@ -342,7 +349,18 @@ try {
   assert.match(chiller.loopText, /N\+1 margin 13\.75 MW/i);
   assert.doesNotMatch(chiller.loopText, /\bMFM\d*\b|HEADER FLOW/i,
     'calculated references must not masquerade as flow-meter instrumentation');
+  /* The operating bands below describe a machine that is RUNNING. Since E3 a standby train is drawn and publishes its
+     diagnostics too (asserted finite here), but its compressor is off, so its refrigerant side sits at the zero-load end
+     of the curve (suction 245 kPa) — holding a stopped machine to the running band would demand a fake operating point.
+     The band applies to every running train, and at least one must run. */
+  const runningTrains = chiller.refrigeration.filter((metric) => !metric.standby);
+  assert.ok(runningTrains.length >= 1, 'at least one chiller must run on a healthy plant');
   for (const metric of chiller.refrigeration) {
+    for (const key of ['suction', 'discharge', 'subcool']) {
+      assert.ok(Number.isFinite(metric[key]), `chiller diagnostics must publish a finite ${key}: ${metric[key]}`);
+    }
+  }
+  for (const metric of runningTrains) {
     assert.ok(metric.suction >= 300 && metric.suction <= 500,
       `normalised suction pressure escaped the authored operating band: ${metric.suction} kPa`);
     assert.ok(metric.discharge >= 800 && metric.discharge <= 1100,

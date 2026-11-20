@@ -220,12 +220,13 @@ async function verifyDoc(browser, origin, path) {
 
 async function verifyControl(page, control) {
   if (control === 'epms') {
-    /* since v3.74.0 the page opens on the HV/MV single-line, where zoom is hidden on purpose (it scales the LV
-       drawing only); the operator switches to LV distribution first */
-    assert.equal(await page.$eval('.epms-zoom-group', (node) => getComputedStyle(node).display), 'none');
+    /* phase E5 (PRD-CONV-EQUIPMENT-TRUTH): the legacy LV drawing and its zoom buttons are gone; LV distribution is
+       sheet E-S-102 with a hall selector, which is the control exercised here */
     await page.click('.epms-view-btn[data-epms-view="lv"]');
-    await page.click('.zoom-btn[title="75%"]');
-    assert.equal(await page.$eval('#zoomIndicator', (node) => node.textContent.trim()), '75%');
+    await page.waitForSelector('#epms-lv-host svg#epms-lv-svg', { timeout: 10_000 });
+    await page.click('.epms-hall-btn[data-epms-hall="1"]');
+    assert.equal(await page.$eval('.epms-hall-btn[data-epms-hall="1"]', (node) => node.getAttribute('aria-pressed')), 'true');
+    assert.match(await page.$eval('#epms-lv-host', (node) => node.textContent), /TX-BA/);
   } else if (control === 'datahall') {
     await page.click('.mode-btn[data-mode="temp"]');
     assert.ok(await page.$eval('.mode-btn[data-mode="temp"]', (node) => node.classList.contains('active')));

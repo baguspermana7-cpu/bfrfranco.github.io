@@ -3,7 +3,7 @@
    §8.1-8.2, phase P5a), in a real browser at 1440 and 390 px, driven through the page's own UI (clicks on the sheet
    symbols, the inspector's SIMULATION and "Time–current curves" buttons, Esc):
    V1  the default view is the HV / MV sheet (view switch pressed, panel shown); the first <svg> under the host is the
-       sheet; the LV distribution button switches to the legacy drawing and back
+       sheet; the LV distribution button switches to sheet E-S-102 (phase E5) and back
    V2  the 150 kV level and the 20 kV switchgear exist with every required tag drawn (list REQUIRED below)
    V3  every relay names its ANSI / IEEE C37.2 functions (87L/21, 87B, 50BF, 87T + 50/51, 51G, 50/51, 50/51 + 50N/51N, LSIG)
    V4  labels equal the engine: transformer MVA, 150 kV and 20 kV fault levels, NGR ohm, LVSB count, genset count and
@@ -133,8 +133,10 @@ for (const W of [1440, 390]) {
   ok(v1.first === 'epms-sld-svg', `V1${at} the first <svg> under the host is "${v1.first}", not the sheet`);
   if (W === 1440) {
     await pg.click('.epms-view-btn[data-epms-view="lv"]'); await sleep(200);
-    const lv = await pg.evaluate(() => ({ hidden: document.getElementById('epms-sld-view').hidden, legacy: document.getElementById('viewport').getBoundingClientRect().width > 200 }));
-    ok(lv.hidden && lv.legacy, `V1${at} the LV distribution button did not show the legacy drawing`);
+    /* phase E5 (PRD-CONV-EQUIPMENT-TRUTH): the legacy LV drawing is gone; the LV button shows sheet E-S-102 (its own gate:
+       tools/test-conv-epms-lv.mjs) */
+    const lv = await pg.evaluate(() => ({ hidden: document.getElementById('epms-sld-view').hidden, lvSheet: !!document.querySelector('#epms-lv-view:not([hidden]) svg#epms-lv-svg') }));
+    ok(lv.hidden && lv.lvSheet, `V1${at} the LV distribution button did not show sheet E-S-102`);
     await pg.click('.epms-view-btn[data-epms-view="sld"]'); await sleep(300);
   }
 
@@ -198,7 +200,8 @@ for (const W of [1440, 390]) {
     ok(new RegExp(`^${E.genset_count} sets`).test(c.genLine) && /OFF/.test(c.genLine), `V14${at} rail generation "${c.genLine}"`);
     await pg.click('.epms-view-btn[data-epms-view="lv"]'); await sleep(300);
     const lv = await chromeOf();
-    ok(lv.gen && lv.util && lv.legacyTrips && lv.legacyBottom && !lv.railShown, `V14${at} the LV view did not restore the legacy rail and counters (GEN C ${lv.gen}, (20kV) ${lv.util}, counters ${lv.legacyTrips}/${lv.legacyBottom}, new rail ${lv.railShown})`);
+    /* phase E5: the LV view shows E-S-102 and its own rail and counters; the three legacy gensets never come back */
+    ok(!lv.gen && !lv.util && lv.legacyTrips && lv.legacyBottom && !lv.railShown, `V14${at} the LV view shows legacy chrome or lost its counters (GEN C ${lv.gen}, (20kV) ${lv.util}, counters ${lv.legacyTrips}/${lv.legacyBottom}, E-S-101 rail ${lv.railShown})`);
     if (SHOTS) { await pg.mouse.move(2, 2); await pg.screenshot({ path: path.join(SHOTS, 'epms-lv-view-1440.png') }); }
     await pg.click('.epms-view-btn[data-epms-view="sld"]'); await sleep(300);
   }

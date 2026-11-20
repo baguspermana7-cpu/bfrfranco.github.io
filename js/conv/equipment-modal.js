@@ -14,6 +14,9 @@
  *                coloured by RZConvVfx, the block detail of the selected internal block, then the sections of
  *                payloadFor(i) (the plant-sheet payload of that unit, or null when the plant sheet does not draw it).
  *                Without it, or for a class with no internal sheet, the modal is exactly the v1 modal.
+ *                internal.fleetOnly (E3) { classKey, title, unit, fleet(), rows(unit) -> [[label, text]], payloadFor(i) }:
+ *                a class whose inside is not drawn yet (CRAH, tower cell, condenser pump) still gets the unit navigator,
+ *                the fleet strip and the unit's fleet row; no internal drawing, no block detail.
  *   close()    closes; clears its timer; un-inerts the page; focus returns to the trigger
  *   isOpen(), timers() -> number of live timers (0 when closed; a gate reads it)
  *
@@ -76,6 +79,7 @@
     '.rz-cvm-cell[data-vstate="stopped"] .rz-cvm-cell-bar{background:repeating-linear-gradient(90deg,var(--vfx-stop,#8b93a1) 0 4px,transparent 4px 8px)}' +
     '.rz-cvm-int{display:grid;grid-template-columns:minmax(0,62fr) minmax(0,38fr);gap:12px;padding:12px 16px 0}' +
     '@media (max-width:900px){.rz-cvm-int{grid-template-columns:minmax(0,1fr)}}' +
+    '.rz-cvm-int.rz-cvm-int-fleet{grid-template-columns:minmax(0,1fr)}' +
     '@media (max-width:640px){.rz-cvm-panel.is-int .rz-cvm-head{flex-wrap:wrap;position:static}.rz-cvm-panel.is-int .rz-cvm-head > div:first-child{flex:1 1 100%}' +
       '.rz-cvm-panel.is-int .rz-cvm-tools{flex:1 1 100%;justify-content:space-between}}' +
     '.rz-cvm-int-host .hmi-frame{border-radius:4px}' +
@@ -203,8 +207,11 @@
   /* ── v2: the inside of the machine (js/conv/internals.js) ─────────────────────────────────────────────────── */
   function intOn() {
     var I = opts && opts.internal, R = root.RZConvInternals;
+    if (I && I.fleetOnly) return typeof I.fleet === 'function' && typeof I.rows === 'function' && (I.fleet() || []).length > 0;
     return !!(I && R && R.has(I.classKey) && root.RZHmiSheet && typeof I.fleet === 'function' && (I.fleet() || []).length);
   }
+  function pctText(v) { var R = R_(); return R ? R.text(v, 'pct') : (typeof v === 'number' && isFinite(v) ? v.toFixed(1) + ' %' : '—'); }
+  function titleOf() { return IN.fleetOnly ? opts.internal.title : R_().get(opts.internal.classKey).title; }
   function R_() { return root.RZConvInternals; }
   function unitNo(u, i) { var m = /(\d+)$/.exec((u && u.tag) || ''); return m ? m[1] : ('0' + (i + 1)).slice(-2); }
   function vstateOf(u) { var s = u && u.state; return s === 'running' ? 'running' : s === 'standby' ? 'standby' : (s === 'fault' || s === 'trip') ? 'alarm' : 'stopped'; }
@@ -214,21 +221,21 @@
     IN.fleet = I.fleet() || [];
     if (IN.i >= IN.fleet.length) IN.i = IN.fleet.length - 1;
     IN.unit = IN.fleet[IN.i]; IN.snap = (typeof I.snapshot === 'function' ? I.snapshot() : null) || {};
-    IN.read = R.read(I.classKey, IN.unit, IN.snap);
+    IN.read = IN.fleetOnly ? null : R.read(I.classKey, IN.unit, IN.snap);
   }
   function intTop() {
-    var R = R_(), def = R.get(opts.internal.classKey), u = IN.unit, n = IN.fleet.length, vs = vstateOf(u);
+    var u = IN.unit, n = IN.fleet.length, vs = vstateOf(u), title = titleOf();
     var chip = vs === 'alarm' ? 'is-alarm' : 'is-normal';
-    return '<div class="rz-cvm-head"><div><div class="rz-cvm-kind">' + esc(def.title) + ' · ' + esc(opts.internal.scope || (current && current.label) || '') + '</div>' +
-        '<h2 class="rz-cvm-title" id="rz-cvm-title">' + esc(u.tag + ' — ' + def.title) + '</h2>' +
-        '<span class="rz-cvm-chip ' + chip + '" data-rz-cvm-state="' + esc(u.state) + '">' + esc(String(u.state).toUpperCase() + ' · LOAD ' + R.text(u.loadPct, 'pct')) + '</span></div>' +
+    return '<div class="rz-cvm-head"><div><div class="rz-cvm-kind">' + esc(title) + ' · ' + esc(opts.internal.scope || (current && current.label) || '') + '</div>' +
+        '<h2 class="rz-cvm-title" id="rz-cvm-title">' + esc(u.tag + ' — ' + title) + '</h2>' +
+        '<span class="rz-cvm-chip ' + chip + '" data-rz-cvm-state="' + esc(u.state) + '">' + esc(String(u.state).toUpperCase() + ' · LOAD ' + pctText(u.loadPct)) + '</span></div>' +
         '<div class="rz-cvm-tools"><div class="rz-cvm-nav" role="group" aria-label="Unit navigator: ' + n + ' units">' +
           '<button type="button" data-nav="-1" aria-label="Previous unit">◂</button>' +
           '<span class="rz-cvm-nav-n" aria-live="polite" data-rz-cvm-navn>' + esc(unitNo(u, IN.i)) + ' of ' + n + '</span>' +
           '<button type="button" data-nav="1" aria-label="Next unit">▸</button></div>' +
         '<button type="button" class="rz-cvm-close" aria-label="Close equipment detail">×</button></div></div>' +
       '<div class="rz-cvm-fleet" role="group" aria-label="Fleet: ' + n + ' units, one cell per unit">' + IN.fleet.map(function (f, i) {
-        var load = R.text(f.loadPct, 'pct');
+        var load = pctText(f.loadPct);
         return '<button type="button" class="rz-cvm-cell" data-unit="' + i + '" data-vstate="' + vstateOf(f) + '" aria-pressed="' + (i === IN.i ? 'true' : 'false') + '"' +
           ' aria-label="' + esc(f.tag + ', ' + f.state + ', load ' + load) + '">' +
           '<span class="rz-cvm-cell-row"><span>' + esc(unitNo(f, i)) + '</span><span class="rz-cvm-cell-st">' + esc(wordOf(f)) + '</span></span>' +
@@ -236,6 +243,14 @@
       }).join('') + '</div>';
   }
   function intDetail() {
+    if (IN.fleetOnly) {
+      return '<p class="rz-cvm-bd-std">' + esc(IN.unit.tag) + ' · fleet row of CONV_CALC.getFleet(\'' + esc(opts.internal.classKey) + '\') · engine ' + esc((IN.snap.meta && IN.snap.meta.version) || '—') + '</p>' +
+        (opts.internal.rows(IN.unit) || []).map(function (r) {
+          /* every fleet value is traced to its engine row (equipment-modal Q7) */
+          var basis = 'CONV_CALC.getFleet(\'' + opts.internal.classKey + '\') · ' + IN.unit.tag + ' · ' + r[0];
+          return '<div class="rz-cvm-row"><span class="rz-cvm-k">' + esc(r[0]) + '</span><span class="rz-cvm-v" data-rz-authored-basis="' + esc(basis) + '">' + esc(r[1]) + '</span></div>'; }).join('') +
+        '<p class="rz-cvm-note">The inside of this class is not drawn yet (PRD-CONV-EQUIPMENT-TRUTH phase E4); every value above is the engine\'s row for this unit.</p>';
+    }
     var R = R_(), I = opts.internal, def = R.get(I.classKey), d = R.detail(I.classKey, IN.block, IN.unit, IN.snap);
     var sel = '<select class="rz-cvm-bsel" data-rz-cvm-bsel aria-label="Internal block of ' + esc(IN.unit.tag) + '">' + def.blocks.map(function (b) {
       return '<option value="' + esc(b.id) + '"' + (b.id === IN.block ? ' selected' : '') + '>' + esc(b.name) + '</option>'; }).join('') + '</select>';
@@ -247,7 +262,7 @@
   }
   function intLower() {
     var I = opts.internal, p = typeof I.payloadFor === 'function' ? I.payloadFor(IN.i) : (IN.i === Number(I.unit) ? current : null);
-    var src = '<p class="rz-cvm-note" style="padding:0 16px 14px">Internal drawing: engine ' + esc((IN.snap.meta && IN.snap.meta.version) || '—') +
+    var src = '<p class="rz-cvm-note" style="padding:0 16px 14px">' + (IN.fleetOnly ? 'Unit' : 'Internal drawing') + ': engine ' + esc((IN.snap.meta && IN.snap.meta.version) || '—') +
       ' fleet row ' + esc(IN.unit.tag) + ' and plant cooling values; a value the engine does not model reads “not modelled”.</p>';
     if (!p) return '<p class="rz-cvm-lower-note">' + esc(IN.unit.tag) + ' has no symbol on the plant drawing yet, so it has no plant-sheet readings; its values are the engine fleet row shown above.</p>' + src;
     return '<div class="rz-cvm-grid">' + sections(p, false) + '</div>' + provenance(p) + src;
@@ -264,10 +279,21 @@
   }
   function refocus(k) { if (!k) return; var t = el.querySelector(k); if (t) { try { t.focus({ preventScroll: true }); } catch (e) { t.focus(); } } }
   function renderInt() {
-    var R = R_(), I = opts.internal, def = R.get(I.classKey), panel = el.querySelector('.rz-cvm-panel'), top = panel.scrollTop, fk = focusKey();
+    var R = R_(), I = opts.internal, panel = el.querySelector('.rz-cvm-panel'), top = panel.scrollTop, fk = focusKey();
     if (IN.sheet) { try { IN.sheet.destroy(); } catch (e) { /* gone */ } IN.sheet = null; }
     readFleet();
     panel.classList.add('is-int');
+    if (IN.fleetOnly) {
+      var fTop = intTop(), fDet = intDetail(), fLow = intLower();
+      panel.innerHTML = '<div data-rz-cvm-top>' + fTop + '</div>' +
+        '<div class="rz-cvm-int rz-cvm-int-fleet">' + sec('Unit', '<div data-rz-cvm-detail aria-live="polite">' + fDet + '</div>', 'rz-cvm-int-detail') + '</div>' +
+        '<div data-rz-cvm-lower>' + fLow + '</div>';
+      panel.querySelector('[data-rz-cvm-top]').__html = fTop; panel.querySelector('[data-rz-cvm-detail]').__html = fDet; panel.querySelector('[data-rz-cvm-lower]').__html = fLow;
+      panel.scrollTop = top;
+      refocus(fk);
+      return;
+    }
+    var def = R.get(I.classKey);
     var hTop = intTop(), hDet = intDetail(), hLow = intLower();
     panel.innerHTML = '<div data-rz-cvm-top>' + hTop + '</div>' +
       '<div class="rz-cvm-int">' +
@@ -364,8 +390,11 @@
     if (IN && IN.sheet) { try { IN.sheet.destroy(); } catch (e) { /* already gone */ } }
     current = payload; opts = o || {}; IN = null;
     if (intOn()) {
-      var def = root.RZConvInternals.get(opts.internal.classKey);
-      IN = { i: Math.max(0, Number(opts.internal.unit) || 0), block: opts.internal.block || def.defaultBlock || def.blocks[0].id, sheet: null };
+      if (opts.internal.fleetOnly) IN = { i: Math.max(0, Number(opts.internal.unit) || 0), block: null, sheet: null, fleetOnly: true };
+      else {
+        var def = root.RZConvInternals.get(opts.internal.classKey);
+        IN = { i: Math.max(0, Number(opts.internal.unit) || 0), block: opts.internal.block || def.defaultBlock || def.blocks[0].id, sheet: null };
+      }
     }
     lastTrigger = opts.trigger || doc.activeElement;
     el.hidden = false;
@@ -393,5 +422,5 @@
     if (t && t.isConnected && typeof t.focus === 'function') { try { t.focus({ preventScroll: true }); } catch (e) { t.focus(); } }
   }
   root.RZConvModal = Object.freeze({ open: open, close: close, isOpen: function () { return !!(el && !el.hidden); }, timers: function () { return timer ? 1 : 0; },
-    unit: function () { return IN ? IN.i : null; }, block: function () { return IN ? IN.block : null; }, version: '2.0.0' });
+    unit: function () { return IN ? IN.i : null; }, block: function () { return IN ? IN.block : null; }, version: '2.1.0' });
 })(typeof window !== 'undefined' ? window : null);

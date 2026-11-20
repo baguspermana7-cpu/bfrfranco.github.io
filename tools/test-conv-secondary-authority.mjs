@@ -140,17 +140,20 @@ async function readEpms(page) {
     authority: document.body.getAttribute('data-rz-basis-authority'),
     state: document.getElementById('epms-state')?.textContent.trim(),
     header: ['epms-fac', 'epms-it', 'epms-pue', 'epms-utility', 'epms-ups', 'epms-gen',
-      'epms-trips', 'epms-ups-basis', 'epms-ups-modules', 'epms-ups-sys', 'epms-dq', 'epms-scn']
+      'epms-trips', 'epms-ups-basis', 'epms-ups-modules', 'epms-ups-sys', 'epms-ups-load', 'epms-dq', 'epms-scn']
       .map((id) => document.getElementById(id)?.textContent.trim()),
     bottom: ['val-system', 'val-total-load', 'val-breakers', 'val-alarms']
       .map((id) => document.getElementById(id)?.textContent.trim()),
-    diagram: document.getElementById('scene')?.textContent.replace(/\s+/g, ' ').trim(),
-    telemetry: Array.from(document.querySelectorAll('.tele-txt')).map((node) => node.textContent.trim()),
-    runningFlows: Array.from(document.querySelectorAll('.flow')).filter((node) => (
+    /* phase E5 (PRD-CONV-EQUIPMENT-TRUTH): the legacy LV drawing (#scene, .tele-txt, .flow) is replaced by sheet
+       E-S-102; the diagram text is now the two sheets' messages and E-S-102 itself */
+    diagram: ['epms-sld-msg', 'epms-lv-msg', 'epms-lv-host'].map((id) => document.getElementById(id)?.textContent || '').join(' ').replace(/\s+/g, ' ').trim(),
+    cords: ['pa-ld:kw', 'pb-ld:kw'].map((k) => document.querySelector('#epms-lv-host text[data-val="' + k + '"]')?.textContent.trim()),
+    telemetry: Array.from(document.querySelectorAll('#epms-lv-host text[data-val]')).map((node) => node.textContent.trim()).filter((t) => t && t !== '—'),
+    runningFlows: Array.from(document.querySelectorAll('.flow, .hmi-flow')).filter((node) => (
       getComputedStyle(node).animationName !== 'none'
     )).length,
     controlsDisabled: Array.from(document.querySelectorAll(
-      '#btn-u-a,#btn-u-b,#btn-tie,#btn-gen-a,#btn-gen-b,#btn-gen-c,.export-btn,.export-item'
+      '.export-btn,.export-item'
     )).every((node) => node.getAttribute('aria-disabled') === 'true'),
     bodyText: document.body.innerText,
   }));
@@ -161,7 +164,7 @@ function assertEpmsUnavailable(state, label) {
   assert.match(state.state, /AUTHORITY UNAVAILABLE/);
   assert.ok(state.header.every((value) => value === '—'), `${label}: ${state.header.join(' | ')}`);
   assert.ok(state.bottom.every((value) => value === 'UNAVAILABLE' || value === '—'));
-  assert.match(state.diagram, /EPMS AUTHORITY UNAVAILABLE/);
+  assert.match(state.diagram, /EPMS authority unavailable/i);
   assert.deepEqual(state.telemetry, []);
   assert.equal(state.runningFlows, 0);
   assert.equal(state.controlsDisabled, true);
@@ -220,15 +223,18 @@ try {
 
   const healthyEpms = await openFixture(browser, origin, 'EPMS_Telemetry.html', undefined);
   await new Promise((accept) => setTimeout(accept, 700));
+  /* E-S-102 draws on first show of the LV view */
+  await healthyEpms.page.evaluate(() => document.querySelector('.epms-view-btn[data-epms-view="lv"]')?.click());
+  await new Promise((accept) => setTimeout(accept, 500));
   const epmsState = await readEpms(healthyEpms.page);
   assert.equal(epmsState.authority, 'current');
   assert.equal(epmsState.state, 'EPMS NORMAL');
   assert.deepEqual(epmsState.header.slice(0, 3), ['43.50', '30.00', '1.45']);
   assert.equal(epmsState.bottom[1], '43,500 kW', 'EPMS bottom total must reconcile to the governed aggregate');
-  assert.match(epmsState.diagram, /200 racks/, 'each of ten rack columns must disclose its aggregate scope');
+  assert.match(epmsState.diagram, /× 500 racks/i, 'E-S-102 must disclose the racks its rack PDU / RPP boards feed');
   assert.ok(epmsState.telemetry.length > 0);
-  assert.ok(epmsState.telemetry.filter((value) => /AGG 3,000kW · 200 racks/.test(value)).length === 10,
-    'all ten final rack legs must carry reconciled aggregate IT load rather than retired 6 kW labels');
+  assert.deepEqual(epmsState.cords, ['3,750 kW', '3,750 kW'],
+    'both rack cords of hall A must carry half the hall IT load (7,500 kW / 2) from the solve');
   assert.ok(epmsState.runningFlows > 0);
   const epmsChrome = await healthyEpms.page.evaluate(() => {
     const rect = (selector) => {
@@ -236,7 +242,7 @@ try {
       return box ? { top: box.top, bottom: box.bottom, left: box.left, right: box.right } : null;
     };
     return {
-      contextBottom: rect('#epms-legend')?.bottom,
+      contextBottom: rect('#epms-status-strip')?.bottom,
       topbar: rect('.topbar'),
       sidebar: rect('.sidebar'),
       statusbar: rect('.status-bar'),
@@ -252,7 +258,7 @@ try {
   assert.ok(epmsChrome.overflow <= 2, `EPMS desktop overflowed by ${epmsChrome.overflow}px`);
   await healthyEpms.page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
   assert.equal(await healthyEpms.page.evaluate(() => (
-    Array.from(document.querySelectorAll('.flow')).every((node) => getComputedStyle(node).animationName === 'none')
+    Array.from(document.querySelectorAll('.flow, .hmi-flow')).every((node) => getComputedStyle(node).animationName === 'none')
   )), true, 'EPMS must disable line-flow motion for reduced-motion users');
   assert.deepEqual(healthyEpms.errors, [], `current EPMS page errors: ${healthyEpms.errors.join(' | ')}`);
   await healthyEpms.page.close();

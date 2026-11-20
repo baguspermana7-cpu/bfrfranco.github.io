@@ -328,6 +328,44 @@
         .pid-wrap { overflow-x: auto; overflow-y: hidden; }
         /* FU-M-101 — the sheet never renders below its 1260-unit width; the panel scrolls (the renderer frame clips) */
         .fuel-sheet-host { min-width: 1260px; } .fuel-sheet-host svg.hmi-svg { touch-action: pan-x pan-y; }
+        /* F5 (PRD-CONV-EQUIPMENT-TRUTH): the sheet never draws below 1:1 (minScale 1, host floor = its width), so these
+           sizes are the smallest a label renders: no FU-M-101 text under 11 px at any viewport */
+        #fuel-sheet-host .hmi-svg [data-role="tag"] { font-size: 11.5px; }
+        #fuel-sheet-host .hmi-svg [data-role="value"], #fuel-sheet-host .hmi-svg [data-role="line"],
+        #fuel-sheet-host .hmi-svg [data-role="inst"], #fuel-sheet-host .hmi-svg .hmi-area-label { font-size: 11px; }
+        /* hall selector + operating mode + the fleet facts of the hall on the sheet */
+        .fuel-hallbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 0 0 8px; }
+        .fuel-seg { display: inline-flex; border: 1px solid var(--border-soft); border-radius: 4px; overflow: hidden; }
+        .fuel-seg-btn { min-height: 44px; min-width: 44px; padding: 0 14px; border: 0; border-right: 1px solid var(--border-soft);
+            background: transparent; color: var(--text-secondary); font: 600 0.8rem 'IBM Plex Sans', sans-serif; cursor: pointer;
+            transition: border-color var(--rz-dur-fast, 120ms) var(--rz-ease-out, ease-out), color var(--rz-dur-fast, 120ms) var(--rz-ease-out, ease-out); }
+        .fuel-seg-btn:last-child { border-right: 0; }
+        .fuel-seg-btn[aria-pressed="true"] { background: var(--panel-bg-2); color: var(--text-primary); box-shadow: inset 0 -2px 0 var(--diesel-main); }
+        .fuel-seg-btn:disabled { cursor: not-allowed; opacity: .5; }
+        .fuel-hall-facts { margin: 0; flex: 1 1 320px; color: var(--text-secondary); font: 500 0.75rem 'JetBrains Mono', monospace; line-height: 1.5; }
+        .fuel-hall-facts b { color: var(--text-primary); font-weight: 600; }
+        .fuel-dt-basis { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; color: var(--text-dim); font: 400 0.75rem 'IBM Plex Sans', sans-serif; line-height: 1.5; }
+        /* the explanation sits behind one info control (owner: values + one short line visible); a native popover opens on
+           click, tap, Enter or Space and closes on Escape or outside tap */
+        .fuel-info { flex: 0 0 auto; min-width: 44px; min-height: 44px; display: inline-grid; place-items: center; padding: 0; anchor-name: --fuel-dt-info;
+            border: 1px solid var(--border-soft); border-radius: 4px; background: transparent; color: var(--text-secondary);
+            font: 600 0.75rem 'JetBrains Mono', monospace; cursor: pointer; transition: border-color var(--rz-dur-fast, 120ms) var(--rz-ease-out, ease-out); }
+        .fuel-info:hover, .fuel-info:focus-visible { border-color: var(--diesel-main); color: var(--text-primary); }
+        .fuel-pop { max-width: min(440px, calc(100vw - 32px)); margin: 0; padding: 12px 14px; border: 1px solid var(--border-soft); border-radius: 4px;
+            background: var(--panel-bg-2); color: var(--text-secondary); font: 400 0.75rem/1.55 'IBM Plex Sans', sans-serif; }
+        @supports (position-anchor: --a) {
+            .fuel-pop { position-anchor: --fuel-dt-info; top: anchor(bottom); left: anchor(left); margin-top: 4px; position-try-fallbacks: flip-block, flip-inline; }
+        }
+        @media (max-width: 600px) {
+            /* phone: the note spans the 16 px gutters under its control instead of hugging one edge */
+            .fuel-pop { left: 16px; right: 16px; max-width: none; position-try-fallbacks: flip-block; }
+        }
+        .fuel-pop:not(:popover-open) { display: none; }
+        .fuel-pop p { margin: 0 0 6px; } .fuel-pop p:last-child { margin: 0; }
+        /* the view bar wraps inside the visible strip of the scrolling drawing (the sheet itself keeps >= 11 px text and
+           scrolls sideways on a phone) */
+        .pid-wrap { container-type: inline-size; }
+        #fuel-sheet-host .vfx-bar, #fuel-sheet-host .hmi-bar { max-width: 100cqw; flex-wrap: wrap; box-sizing: border-box; }
 
         /* ---- INTERLOCK / SAFETY INDICATORS (first-class) ---- */
         .ilk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -426,26 +464,29 @@
 
         /* ---- GENSET / DAY-TANK ROWS ---- */
         .gen-row {
-            display: grid; grid-template-columns: 50px 1fr; gap: 11px; align-items: center;
-            padding: 10px; border: 1px solid var(--border-soft); border-radius: 6px;
-            background: var(--panel-bg-2); margin-bottom: 9px;
+            display: grid; grid-template-columns: 76px 1fr; gap: 10px; align-items: center;
+            padding: 8px 10px; border: 1px solid var(--border-soft); border-radius: 4px;
+            background: var(--panel-bg-2); margin-bottom: 6px;
         }
         .gen-row:last-child { margin-bottom: 0; }
+        .gen-head { display: grid; grid-template-columns: 76px 1fr; gap: 10px; padding: 0 11px 4px; }
+        .gen-head .gi-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .gen-head .data-lbl { font-size: 0.7rem; }
         .gen-row.running { border-color: rgba(217,154,43,0.45); }
         .dt-mini {
-            position: relative; width: 38px; height: 52px; border: 2px solid #46566c;
+            position: relative; width: 30px; height: 40px; border: 2px solid #46566c;
             background: #121316; border-radius: 3px; overflow: hidden; margin: 0 auto;
         }
         .dt-mini > i { position: absolute; bottom: 0; left: 0; right: 0;
             background: linear-gradient(180deg, var(--diesel-bright), var(--diesel-main));
             transition: height 0.5s ease; }
-        .gen-tag { font-size: 0.55rem; color: var(--text-dim); text-align: center;
-            margin-top: 3px; font-family: 'JetBrains Mono', monospace; }
         .gen-info { display: flex; flex-direction: column; gap: 4px; }
         .gen-info .gi-top { display: flex; justify-content: space-between; align-items: center; }
         .gen-info .gi-name { font-size: 0.78rem; font-weight: 700; }
         .gen-info .gi-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;
-            font-size: 0.7rem; }
+            font-size: 0.72rem; }
+        .gen-info .gi-grid .data-lbl { font-size: 0.7rem; }
+        .gen-info .mode-chip { font-size: 0.7rem; }
         .gen-info .gi-grid .data-val { min-width: 0; font-size: 0.74rem; }
 
         /* ---- ALARM / EVENT LIST ---- */
@@ -595,21 +636,23 @@
     <script src="js/rz-eng-symbols.js?v=20261118-528d60ce"></script>
     <script src="js/rz-hmi-sheet.js?v=20261118-c18dfefa"></script>
     <link rel="stylesheet" href="css/conv-hmi-depth.css?v=20261115-09997c8c">
-    <script src="js/conv/hmi-depth.js?v=20261119-68b71c65"></script>
+    <script src="js/conv/hmi-depth.js?v=20261120-05f86b64"></script>
     <link rel="stylesheet" href="css/conv-vfx.css?v=20261118-5eed9b2f">
     <script src="js/conv/vfx.js?v=20261117-89056876"></script>
     <script src="js/conv/history.js?v=20261117-1c72fb7f"></script>
     <script src="js/rz-trend.js?v=20261117-e60cac7c"></script>
-    <script src="js/conv/fuel-sheet.js?v=20261115-f7db7ebe"></script>
+    <script src="js/conv/fuel-sheet.js?v=20261120-c0253af9"></script>
     <script src="js/conv/sheet-truth.js?v=20261118-eaae14ee"></script>
-    <script src="js/conv/payloads.js?v=20261118-d8db9d79"></script>
-    <script src="js/conv/equipment-modal.js?v=20261118-948d9c46"></script>
+    <script src="js/conv/payloads.js?v=20261120-86f5437d"></script>
+    <script src="js/conv/internals.js?v=20261118-271d125d"></script>
+    <script src="js/conv/internals/genset.js?v=20261120-3f6f9c5b"></script>
+    <script src="js/conv/equipment-modal.js?v=20261120-9b42a9b2"></script>
     <script src="js/rz-inspector.js?v=20261117-bbb735d4" defer></script>
     <script src="js/conv-engine.js?v=2.4.0"></script>
     <script src="js/rz-line-model.js?v=20260920-c4511df5"></script>
     <!-- v1.134.3 — generated parameter registry + the ONE shared basis drawer.
          Replaces provenance restated by hand; see js/rz-basis-drawer.js. -->
-    <script src="js/conv-parameters.js?v=20261118-6652e773"></script>
+    <script src="js/conv-parameters.js?v=20261120-89ea132a"></script>
     <!-- v1.134.25 — RZExplain, the site glossary engine. The cockpits were the only
          substantial pages carrying none of it, so terms an operator has to read
          (approach temperature, cycles of concentration, N+1, WUE) had nowhere to go.
@@ -627,7 +670,7 @@
     <script src="js/datahall-ai/alarm-query.js?v=20260920-4d06f77a" defer></script>
     <script src="js/conv-alarm-events.js?v=20260920-05aca3f2" defer></script>
     <script src="js/conv-alarm-workspace.js?v=20260920-a6e2efa0" defer></script>
-    <script src="js/rz-version.js?v=20261120-4c9777b5" defer></script>
+    <script src="js/rz-version.js?v=20261120-7ea867d8" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
 <style id="rz-skiplink-v1">
@@ -669,7 +712,7 @@
     <header class="topbar" data-cv-toolrow>
         <div class="tb-brand">
             <h1 data-cv="title">Fuel System &mdash; Diesel &amp; Generator Autonomy</h1>
-            <small>UST-01 &middot; DT-GEN-A/B/C &middot; P-101 &middot; CONV-BMS-BKS-01</small>
+            <small>UST-01 &middot; DT-GEN per set &middot; P-101 &middot; CONV-BMS-BKS-01</small>
         </div>
 
         <div class="alarm-strip" id="alarm-strip" aria-live="polite">
@@ -746,6 +789,16 @@
         <!-- v2.7.0 — the process picture is the primary storytelling element (doc-14 §6, doc-19 §8) -->
         <div class="panel pid-panel">
                 <div class="panel-header"><span data-explain="conv-fuel-pid-legend">Fuel process &mdash; FU-M-101</span><i class="fas fa-project-diagram ph-ic"></i></div>
+                <div class="fuel-hallbar" id="fuel-hallbar">
+                    <div class="fuel-seg" role="group" aria-label="Data hall shown on FU-M-101" id="fuel-hall-seg"></div>
+                    <div class="fuel-seg" role="group" aria-label="Operating mode" id="fuel-mode-seg">
+                        <button type="button" class="fuel-seg-btn" data-fuel-mode="normal" aria-pressed="true">Normal</button>
+                        <button type="button" class="fuel-seg-btn" data-fuel-mode="utility-loss" aria-pressed="false">Utility loss</button>
+                    </div>
+                    <p class="fuel-hall-facts" id="fuel-hall-facts" aria-live="polite">UNAVAILABLE</p>
+                </div>
+                <p class="fuel-dt-basis" id="fuel-dt-basis" data-rz-authored-basis="Day-tank capacity is the page's assumed design basis: the set rating and engine specific consumption (fuel.specific_consumption_l_per_kwh) times DT_CAP_HR hours; the engine has no day-tank model, the info popover shows the arithmetic."><span data-basis-line>&mdash;</span><button type="button" class="fuel-info" popovertarget="fuel-dt-basis-pop" aria-label="Day-tank basis" title="Day-tank basis">i</button></p>
+                <div class="fuel-pop" id="fuel-dt-basis-pop" popover role="note" aria-label="Day-tank basis">&mdash;</div>
                 <div class="pid-wrap">
                 <div id="fuel-sheet-host" class="fuel-sheet-host hmi-depth" data-theme="dark" data-rz-authored-basis="FU-M-101 · Every value drawn on this process diagram is either the engine's bulk-tank level, capacity and usable reserve (traced on the cards above) or SIMULATED local operating state — day-tank levels, pump flow and pressure, valve, genset and leak-point states — which conv-engine.js does not publish: it carries the fuel reserve, the burn rate and the autonomy figure, not a pump schedule, day-tank sizing, instrument readings or per-device state. Pipe sizes and instrument tags are page-authored design selections."></div>
                 </div>
@@ -1000,10 +1053,16 @@
         var POLISH_WIF_PPM = null;  // water-in-fuel ppm — no instrument (only a boolean interlock exists)
 
         /* ---- Deterministic operating state (no RNG for engineering) -- */
+        /* PRD-CONV-EQUIPMENT-TRUTH F2/F5 — the sheet is a per-hall view of the engine genset fleet. mode 'normal' =
+           utility healthy, every set STANDBY; 'utility-loss' = the hall's duty sets run (engine fleet rule below).
+           halls[code] holds that hall's day tanks: lv = level % per set, req = fill demand latched between the
+           fill-start and fill-stop setpoints, open = fill valve XV open this scan, pump = the hall's transfer pair
+           while another hall is shown (the selected hall's pair is pumpRunning / manualPump / flow below). */
         var state = {
             ustPct: FUEL.level_pct,        // 85 from engine
-            dtA: 92.0, dtB: 46.0, dtC: 88.0,
-            genRunning: 'B',               // failover demo: Genset B online
+            mode: 'normal',
+            hall: null,
+            halls: {},
             pumpRunning: false,
             manualPump: false,
             amps: 0.0, vib: 0.20, flow: 0, dp: 0.10,
@@ -1068,8 +1127,72 @@
             cardClassFor: cardClassFor,
             alarmClassFor: alarmClassFor
         });
-        var DT_LOW = 30, DT_LOWLOW = 25, DT_HIGH = 90;
         var SLA_HR = 24; // backup-power SLA: N+1 autonomy must exceed this
+
+        /* ---- Genset fleet per hall (engine) + operating mode (page) ----------------------------------------
+           Count, tags and ratings: CONV_CALC.getFleet('genset', hall) (engine 2.4.0 publishes every set STANDBY).
+           Utility loss applies the engine's own sizing rule, gensets per hall = ceil(hall kW / (rating x max
+           loading)) + spare: the first (count - electrical.genset_spare_per_hall) sets run and share the hall's
+           facility load (listHalls()[].facility_load_kw) equally; the spare stays STANDBY. Fuel burn per set =
+           output x fuel.specific_consumption_l_per_kwh. The engine does not yet publish this run split (PRD §6.5);
+           the page states it here so the split can be checked against the engine numbers it uses. */
+        var C = window.CONV_CALC || null;
+        var ELEC = SNAP ? SNAP.electrical : null;
+        var HALLS = (FUEL_AUTHORITY_AVAILABLE && C && typeof C.listHalls === 'function' && typeof C.getFleet === 'function') ? (C.listHalls() || []) : [];
+        var SFC = isNum(FUEL.specific_consumption_l_per_kwh) ? FUEL.specific_consumption_l_per_kwh : null;
+        var MODES = { 'normal': 'NORMAL · UTILITY', 'utility-loss': 'UTILITY LOSS · ON GENSETS' };
+        function hallOf(code) { for (var i = 0; i < HALLS.length; i++) if (HALLS[i].code === code) return HALLS[i]; return null; }
+        /* the engine fleet is a static design table (all rows STANDBY, getFleet ~0.6 ms per call): read once per hall, not
+           once per drawn value — the scan render reads it ~400 times */
+        var FLEET_ROWS = {};
+        function fleetRows(code) {
+            if (!C || !code) return [];
+            return FLEET_ROWS[code] || (FLEET_ROWS[code] = C.getFleet('genset', code) || []);
+        }
+
+        /* ---- Day-tank basis (ASSUMED design selection, declared on the page) ---------------------------------
+           Each set has its own day tank sized on that set's burn at its rating: capacity = DT_CAP_HR hours of
+           rated burn. The fill valve opens when a RUNNING set's tank falls below DT_FILL_START and closes at
+           DT_FILL_STOP; the pump answers within a few scans, so while fill is available a running set's tank never falls
+           below DT_LOW_PCT = DT_BASIS_HR hours at rated burn (the basis this page states, checked by
+           tools/test-conv-fuel-truth.mjs).
+           One 1 s scan = SIM_MIN_PER_SCAN simulated minute(s). PUMP_LPM is the P-101 nameplate the page prints. */
+        var DT_CAP_HR = 4, DT_FILL_START = 50, DT_FILL_STOP = 90, DT_LOW_PCT = 45, DT_LOWLOW = 25;
+        var DT_BASIS_HR = DT_CAP_HR * DT_LOW_PCT / 100;
+        var SIM_MIN_PER_SCAN = 1, PUMP_LPM = 180;
+
+        function filled(n, v) { var a = []; for (var i = 0; i < n; i++) a.push(v); return a; }
+        function initHalls() {
+            state.halls = {};
+            HALLS.forEach(function (h) {
+                var n = fleetRows(h.code).length;
+                state.halls[h.code] = { lv: filled(n, DT_FILL_STOP), req: filled(n, false), open: filled(n, false), pump: { run: false, flow: 0 } };
+            });
+            if (!state.hall || !hallOf(state.hall)) state.hall = HALLS.length ? HALLS[0].code : null;
+        }
+        /* setsOf(code): the hall's fleet rows with the mode applied and each set's day tank — new objects every call */
+        function setsOf(code) {
+            var rows = fleetRows(code), hall = hallOf(code), hs = state.halls[code];
+            var spare = ELEC && isNum(ELEC.genset_spare_per_hall) ? ELEC.genset_spare_per_hall : null;
+            var run = state.mode === 'utility-loss' && spare !== null ? Math.max(0, rows.length - spare) : 0;
+            var share = run > 0 && hall && isNum(hall.facility_load_kw) ? hall.facility_load_kw / run : 0;
+            return rows.map(function (u, i) {
+                var on = i < run, ratedLph = isNum(SFC) ? u.ratingKw * SFC : null;
+                var cap = isNum(ratedLph) ? DT_CAP_HR * ratedLph : null, pct = hs ? hs.lv[i] : null;
+                var litres = isNum(cap) && isNum(pct) ? cap * pct / 100 : null;
+                return { n: u.n, tag: u.tag, ratingKw: u.ratingKw, state: on ? 'running' : 'standby',
+                    outputKw: on ? share : 0, loadPct: on ? share / u.ratingKw * 100 : 0, lph: on && isNum(SFC) ? share * SFC : 0, ratedLph: ratedLph,
+                    dayTank: { pct: pct, litres: litres, capL: cap, hoursAtRated: isNum(litres) && ratedLph ? litres / ratedLph : null,
+                        fill: hs ? !!hs.open[i] : null, demand: hs ? !!hs.req[i] : null } };
+            });
+        }
+        function siteSetCount() { return HALLS.reduce(function (a, h) { return a + fleetRows(h.code).length; }, 0); }
+        /* fill is unavailable while containment inhibits transfer or the selected hall's duty pump failed to run */
+        function fillAvailable(code) {
+            var c = evaluateContainment(state.interlocks);
+            return c.transferPermissive && !(code === state.hall && state.interlocks.pumpfail);
+        }
+        function dtTag(s) { return 'DT-' + s.tag; }
 
         /* ---- Deterministic, bounded "process noise" (NOT engineering) -
          * Engineering outputs (autonomy/usable/consumption/genload) are pure
@@ -1084,21 +1207,15 @@
 
         var $ = function (id) { return document.getElementById(id); };
 
-        /* ---- Tank inventory model (day tanks are local buffers) ------ */
-        var DT_CAP = 1000; // L per generator day tank (engineering local buffer)
-        function dtVol(pct) { return Math.round(DT_CAP * pct / 100); }
-
         function buildTankTable() {
-            var rows = [
-                { tag: 'UST-01', pct: state.ustPct, vol: usableL(state.ustPct), serves: 'Bulk &rarr; all gensets', usable: true },
-                { tag: 'DT-GEN-A', pct: state.dtA, vol: dtVol(state.dtA), serves: 'Genset A' },
-                { tag: 'DT-GEN-B', pct: state.dtB, vol: dtVol(state.dtB), serves: 'Genset B (online)' },
-                { tag: 'DT-GEN-C', pct: state.dtC, vol: dtVol(state.dtC), serves: 'Genset C' }
-            ];
+            var rows = [{ tag: 'UST-01', pct: state.ustPct, vol: usableL(state.ustPct), serves: 'Bulk &rarr; all ' + siteSetCount() + ' gensets', usable: true }];
+            setsOf(state.hall).forEach(function (s) {
+                rows.push({ tag: dtTag(s), pct: s.dayTank.pct, vol: s.dayTank.litres, serves: s.tag + (s.state === 'running' ? ' (running)' : '') });
+            });
             var html = '';
             for (var i = 0; i < rows.length; i++) {
                 var r = rows[i];
-                var cls = r.pct < (r.usable ? 30 : DT_LOWLOW) ? 'pf-crit' : (r.pct < (r.usable ? 60 : DT_LOW) ? 'pf-warn' : 'pf-ok');
+                var cls = r.pct < (r.usable ? 30 : DT_LOWLOW) ? 'pf-crit' : (r.pct < (r.usable ? 60 : DT_FILL_START) ? 'pf-warn' : 'pf-ok');
                 var barW = Math.max(2, Math.min(100, r.pct));
                 /* v1.134.24 — the DAY-TANK rows carry simulated local state; the UST row above
                    them states the engine-bound bulk inventory and stays in the denominator. The
@@ -1110,36 +1227,34 @@
                     '<td class="r ' + cls + '">' + fmt1(r.pct) + '%' +
                         '<span class="mini-bar"><i style="width:' + barW + '%"></i></span></td>' +
                     '<td class="r">' + grp(r.vol) + ' L</td>' +
-                    '<td style="color:var(--text-dim);font-family:IBM Plex Sans,sans-serif;font-size:0.7rem;">' + r.serves + '</td>' +
+                    '<td style="color:var(--text-dim);font-family:IBM Plex Sans,sans-serif;font-size:0.72rem;">' + r.serves + '</td>' +
                     '</tr>';
             }
             $('tank-tbody').innerHTML = html;
         }
 
-        var DAY_TANK_BASIS = 'The DAY-TANK inventory (levels, volumes and their fill setpoints) is simulated local state. conv-engine.js models the BULK fuel system - tank capacity, usable fraction, burn rate and the autonomy those produce - and publishes no day-tank schedule: how many day tanks exist, how large they are and at what level each refills are local design decisions no engine parameter carries. The bulk figures on this page are engine-bound and stay in the denominator.';
+        var DAY_TANK_BASIS = 'Day-tank LEVELS and fill-valve states are simulated local state. How many day tanks exist and which set each serves come from the engine genset fleet (CONV_CALC.getFleet(\'genset\', hall), one tank per set); each tank\'s capacity is an ASSUMED design selection stated on this page: ' + DT_CAP_HR + ' h of that set\'s burn at its rating (rating x fuel.specific_consumption_l_per_kwh), fill opens below ' + DT_FILL_START + ' % on a running set and closes at ' + DT_FILL_STOP + ' %. The bulk figures on this page are engine-bound and stay in the denominator.';
 
         function buildGensetRows() {
-            var defs = [
-                { id: 'A', dt: state.dtA, run: state.genRunning === 'A' },
-                { id: 'B', dt: state.dtB, run: state.genRunning === 'B' },
-                { id: 'C', dt: state.dtC, run: state.genRunning === 'C' }
-            ];
-            var html = '';
-            for (var i = 0; i < defs.length; i++) {
-                var g = defs[i];
-                var dtCls = g.dt < DT_LOWLOW ? 'var(--crit)' : (g.dt < DT_LOW ? 'var(--warn)' : 'var(--text-primary)');
-                html += '<div class="gen-row' + (g.run ? ' running' : '') + '">' +
-                    '<div><div class="dt-mini"><i style="height:' + g.dt + '%"></i></div><div class="gen-tag">DT-GEN-' + g.id + '</div></div>' +
+            /* the three column names are printed ONCE above the rows (law T2: a hall of 8 sets repeated them 8 times);
+               each cell keeps its name as aria-label and title for a screen reader and a hover; the day tank's own tag
+               (DT-<set>) is the mini tank's title, the set tag beside it already names the pair */
+            var sets = setsOf(state.hall), html = sets.length ? '<div class="gen-head" aria-hidden="true"><span></span><div class="gi-grid">' +
+                '<span class="data-lbl">Day tank</span><span class="data-lbl">At rated</span><span class="data-lbl">Output</span></div></div>' : '';
+            for (var i = 0; i < sets.length; i++) {
+                var g = sets[i], d = g.dayTank, run = g.state === 'running';
+                var dtCls = d.pct < DT_LOWLOW ? 'var(--crit)' : (d.pct < DT_FILL_START ? 'var(--warn)' : 'var(--text-primary)');
+                html += '<div class="gen-row' + (run ? ' running' : '') + '" data-gen-row="' + g.tag + '">' +
+                    '<div><div class="dt-mini" role="img" aria-label="' + dtTag(g) + ' level" title="' + dtTag(g) + '"><i style="height:' + Math.max(0, Math.min(100, d.pct)) + '%"></i></div></div>' +
                     '<div class="gen-info">' +
-                        '<div class="gi-top"><span class="gi-name">Genset ' + g.id + '</span>' +
-                            '<span class="mode-chip' + (g.run ? ' run' : '') + '">' + (g.run ? 'RUNNING' : 'STANDBY') + '</span></div>' +
+                        '<div class="gi-top"><span class="gi-name">' + g.tag + '</span>' +
+                            '<span class="mode-chip' + (run ? ' run' : '') + '">' + (run ? 'RUNNING' : 'STANDBY') + '</span></div>' +
                         '<div class="gi-grid">' +
-                            /* v1.134.24 — day-tank level and volume are simulated local state and
-                               carry the declaration; the LOAD cell beside them is the engine's
-                               facility figure and deliberately stays in the denominator. */
-                            '<div data-rz-authored-basis="' + DAY_TANK_BASIS + '"><span class="data-lbl" style="font-size:0.62rem;">Day Tk</span><br><span class="data-val" style="color:' + dtCls + '">' + fmt1(g.dt) + '%</span></div>' +
-                            '<div data-rz-authored-basis="' + DAY_TANK_BASIS + '"><span class="data-lbl" style="font-size:0.62rem;">Volume</span><br><span class="data-val">' + grp(dtVol(g.dt)) + 'L</span></div>' +
-                            '<div><span class="data-lbl" style="font-size:0.62rem;">Load</span><br><span class="data-val">' + (g.run ? fmt1(FACILITY_MW) + 'MW' : '0.00MW') + '</span></div>' +
+                            /* day-tank level, volume and hours are simulated local state over the declared tank
+                               basis; the OUTPUT cell is the engine hall load shared by the running sets. */
+                            '<div data-rz-authored-basis="' + DAY_TANK_BASIS + '" aria-label="Day tank level" title="Day tank level"><span class="data-val" style="color:' + dtCls + '">' + fmt1(d.pct) + ' %</span></div>' +
+                            '<div data-rz-authored-basis="' + DAY_TANK_BASIS + '" aria-label="Hours at rated burn" title="Hours at rated burn"><span class="data-val">' + fmt1(d.hoursAtRated) + ' h</span></div>' +
+                            '<div aria-label="Output" title="Output"><span class="data-val">' + grp(g.outputKw) + ' kW</span></div>' +
                         '</div>' +
                     '</div></div>';
             }
@@ -1160,7 +1275,10 @@
                 rateEl.textContent = FUEL.specific_consumption_l_per_kwh.toFixed(3) + ' L/kWh';
             }
             $('kpi-genload').textContent = (Math.round(FACILITY_MW * 100) / 100).toFixed(2);
-            $('kpi-genload-sub').textContent = grp(SITE.facility_load_kw) + ' kW on gensets';
+            var running = HALLS.reduce(function (a, h) { return a + setsOf(h.code).filter(function (s) { return s.state === 'running'; }).length; }, 0);
+            $('kpi-genload-sub').textContent = state.mode === 'utility-loss'
+                ? grp(SITE.facility_load_kw) + ' kW on ' + running + ' running gensets'
+                : grp(SITE.facility_load_kw) + ' kW on utility · gensets STANDBY';
             $('fuel-current-basis-value').textContent = IT_MW.toFixed(2) + ' MW IT · ' +
                 (Math.round(FACILITY_MW * 100) / 100).toFixed(2) + ' MW facility · ' + grp(TANK_CAP) + ' L UST';
             $('kpi-np1').textContent = fmt1(n1);
@@ -1173,11 +1291,15 @@
         function evalAlarms() {
             var alarms = [];
             var tnow = new Date().toLocaleTimeString('en-GB');
-            // Day-tank low / low-low
-            ['A', 'B', 'C'].forEach(function (id) {
-                var v = id === 'A' ? state.dtA : id === 'B' ? state.dtB : state.dtC;
-                if (v < DT_LOWLOW) alarms.push({ sev: 'crit', t: tnow, tag: 'LIT-DT' + id + ' LO-LO', msg: 'Day Tank ' + id + ' critical (' + fmt1(v) + '% &lt; 25%) — interlock: lead pump forced RUN' });
-                else if (v < DT_LOW) alarms.push({ sev: 'warn', t: tnow, tag: 'LIT-DT' + id + ' LO', msg: 'Day Tank ' + id + ' low (' + fmt1(v) + '% &lt; 30%)' });
+            // Day-tank low-low (any hall), and low with fill unavailable (F5: a running set below its fill-start
+            // level whose fill valve cannot be fed raises an alarm instead of draining silently)
+            HALLS.forEach(function (h) {
+                var avail = fillAvailable(h.code);
+                setsOf(h.code).forEach(function (s) {
+                    var v = s.dayTank.pct, tag = 'LAL-' + dtTag(s);
+                    if (v < DT_LOWLOW) alarms.push({ sev: 'crit', t: tnow, tag: tag + ' LO-LO', msg: dtTag(s) + ' critical (' + fmt1(v) + ' % &lt; ' + DT_LOWLOW + ' %, ' + fmt1(s.dayTank.hoursAtRated) + ' h at rated burn)' + (avail ? '' : ' — fill unavailable') });
+                    else if (v < DT_FILL_START && !avail) alarms.push({ sev: 'warn', t: tnow, tag: tag + ' LO', msg: dtTag(s) + ' low (' + fmt1(v) + ' % &lt; ' + DT_FILL_START + ' % fill start) — fill unavailable, ' + fmt1(s.dayTank.hoursAtRated) + ' h at rated burn' });
+                });
             });
             // UST low / low-low
             if (state.ustPct < 30) alarms.push({ sev: 'crit', t: tnow, tag: 'LIT-101 LO-LO', msg: 'UST-01 critically low (' + fmt1(state.ustPct) + '% &lt; 30%) — autonomy at risk' });
@@ -1239,7 +1361,7 @@
             var pol = $('ilk-polish');
             pol.className = 'ilk ' + cardClassFor('polish', !state.interlocks.polish);
             pol.querySelector('.ilk-stat').textContent = state.interlocks.polish ? 'RUNNING' : 'FAULT';
-            var dtll = state.dtA < DT_LOWLOW || state.dtB < DT_LOWLOW || state.dtC < DT_LOWLOW;
+            var dtll = HALLS.some(function (h) { return state.halls[h.code] && state.halls[h.code].lv.some(function (v) { return v < DT_LOWLOW; }); });
             set('ilk-dtll', 'dtll', dtll, 'CLEAR', 'ACTIVE');
             set('ilk-pumpfail', 'pumpfail', state.interlocks.pumpfail, 'CLEAR', 'TRIPPED');
 
@@ -1266,38 +1388,53 @@
         /* ---- Pump / day-tank physics (deterministic transfer) ------- */
         function stepPhysics() {
             state.tick++;
-            // Running genset consumes its day tank (deterministic draw)
-            var rk = state.genRunning;
-            if (rk === 'A' && state.dtA > 0) state.dtA -= 0.10;
-            if (rk === 'B' && state.dtB > 0) state.dtB -= 0.10;
-            if (rk === 'C' && state.dtC > 0) state.dtC -= 0.10;
-
-            var runDt = rk === 'A' ? 'dtA' : rk === 'B' ? 'dtB' : 'dtC';
-
-            // Auto lead-pump logic: refill running day tank between low/high
-            if (!state.manualPump) {
-                if (state[runDt] <= DT_LOW) state.pumpRunning = true;
-                if (state[runDt] >= DT_HIGH) state.pumpRunning = false;
-            }
-            // Low-low interlock forces pump
-            if (state[runDt] < DT_LOWLOW) state.pumpRunning = true;
-
-            /* W4 B2: a healthy simulated pump answers its command one scan later; a seam-forced feedback wins.
-               Fuel moves when a pump RUNS (feedback), not when it is commanded. */
-            pumpFbSim.p101 = pumpCmd('p101'); pumpFbSim.p102 = pumpCmd('p102');
-            if (pumpFb('p101') === 'on' || pumpFb('p102') === 'on') {
-                state[runDt] = Math.min(100, state[runDt] + 0.45);
-                state.ustPct = Math.max(0, state.ustPct - 0.015);
-                if (state.amps < 14.4) state.amps += 1.2;
-                if (state.flow < 178) state.flow += 14;
-                state.vib = jitter(2.25, 0.18);
-                state.dp = jitter(4.2, 0.12);
-            } else {
-                if (state.amps > 0) state.amps = Math.max(0, state.amps - 0.7);
-                if (state.flow > 0) state.flow = Math.max(0, state.flow - 7);
-                state.vib = jitter(0.20, 0.06);
-                state.dp = jitter(0.12, 0.03);
-            }
+            var permissive = evaluateContainment(state.interlocks).transferPermissive, drawnL = 0;
+            HALLS.forEach(function (h) {
+                var code = h.code, hs = state.halls[code], sets = setsOf(code), sel = code === state.hall, flowLpm;
+                if (!hs) return;
+                // a running set burns its own day tank; fill demand latches below fill-start, clears at fill-stop
+                sets.forEach(function (s, i) {
+                    if (s.state === 'running' && s.dayTank.capL > 0) hs.lv[i] = Math.max(0, hs.lv[i] - s.lph / 60 * SIM_MIN_PER_SCAN / s.dayTank.capL * 100);
+                    if (s.state === 'running' && hs.lv[i] < DT_FILL_START) hs.req[i] = true;
+                    if (hs.lv[i] >= DT_FILL_STOP) hs.req[i] = false;
+                });
+                var demand = hs.req.some(Boolean);
+                if (sel) {
+                    // Auto lead-pump logic: run while any of this hall's day tanks asks for fuel and transfer is permitted
+                    if (!state.manualPump) state.pumpRunning = demand && permissive;
+                    /* W4 B2: a healthy simulated pump answers its command one scan later; a seam-forced feedback wins.
+                       Fuel moves when a pump RUNS (feedback), not when it is commanded. */
+                    pumpFbSim.p101 = pumpCmd('p101'); pumpFbSim.p102 = pumpCmd('p102');
+                    var fbOn = pumpFb('p101') === 'on' || pumpFb('p102') === 'on';
+                    if (fbOn) {
+                        if (state.amps < 14.4) state.amps += 1.2;
+                        state.flow = Math.min(PUMP_LPM, state.flow + 14);
+                        state.vib = jitter(2.25, 0.18);
+                        state.dp = jitter(4.2, 0.12);
+                    } else {
+                        if (state.amps > 0) state.amps = Math.max(0, state.amps - 0.7);
+                        if (state.flow > 0) state.flow = Math.max(0, state.flow - 7);
+                        state.vib = jitter(0.20, 0.06);
+                        state.dp = jitter(0.12, 0.03);
+                    }
+                    hs.open = hs.req.map(function (r) { return r && permissive && transferCmd(); });
+                    flowLpm = fbOn ? state.flow : 0;
+                } else {
+                    hs.pump = { run: demand && permissive, flow: demand && permissive ? PUMP_LPM : 0 };
+                    hs.open = hs.req.map(function (r) { return r && hs.pump.run; });
+                    flowLpm = hs.pump.flow;
+                }
+                var nOpen = hs.open.filter(Boolean).length;
+                if (nOpen && flowLpm > 0) {
+                    sets.forEach(function (s, i) {
+                        if (!hs.open[i] || !(s.dayTank.capL > 0)) return;
+                        var litres = flowLpm * SIM_MIN_PER_SCAN / nOpen;
+                        hs.lv[i] = Math.min(100, hs.lv[i] + litres / s.dayTank.capL * 100);
+                        drawnL += litres;
+                    });
+                }
+            });
+            if (isNum(TANK_CAP) && TANK_CAP > 0) state.ustPct = Math.max(0, state.ustPct - drawnL / TANK_CAP * 100);
 
             if (state.filling) {
                 if (state.ustPct < 98) state.ustPct = Math.min(98, state.ustPct + 0.25);
@@ -1359,6 +1496,7 @@
                 if (element) element.textContent = value;
             };
             setProcessControls(false);
+            document.querySelectorAll('[data-fuel-mode]').forEach(function (b) { b.disabled = true; });
             setText('as-state', 'UNAVAILABLE');
             $('as-state').className = 'as-state unavailable';
             ['as-crit', 'as-warn', 'as-stale'].forEach(function (id) { setText(id, DASH); });
@@ -1408,7 +1546,7 @@
         /* ---- FU-M-101 sheet (js/conv/fuel-sheet.js drawn by js/rz-hmi-sheet.js) -------------------
            One read() paints every vessel, device and line from the same deterministic state the cards
            use; geometry and symbols are the sheet's. Fails closed with the page (fuelSheetLive=false). */
-        var fuelSheet = null, fuelSheetLive = false;
+        var fuelSheet = null, fuelSheetLive = false, fuelOpen = null, fuelDepthSig = '', fuelDepthSvg = null, fuelDepthLevels = null, fuelDepthQueued = false;
         function fv(text, alarm) { return { text: text, alarm: alarm || null }; }
 
         /* ---- W4 point evidence + pump command / feedback (PRD-CONV-BMS-UIUX B1, B2, B3, B6) ---------------
@@ -1426,30 +1564,35 @@
         var T = window.RZConvTruth || null;
         var FILL_LPM = 210;
         var PUMP_PROVE_TICKS = 10;   /* "no flow within 10 s" (P-101 FAIL alarm text), one tick = the 1 s scan */
-        var FUEL_POINTS = {
-            'ft101:q': { unit: 'L/min', digits: 0, label: 'FT-101 transfer flow (state.flow)' },
-            'gena:mw': { unit: 'MW', digits: 1, label: 'GEN-A load, fuel burn evidence (site.facility_load_kw)' },
-            'genc:mw': { unit: 'MW', digits: 1, label: 'GEN-C load, fuel burn evidence (site.facility_load_kw)' },
-            'genb:mw': { unit: 'MW', digits: 1, label: 'GEN-B load, fuel burn evidence (site.facility_load_kw)' },
-            'fill:q':  { unit: 'L/min', digits: 0, label: 'Tanker fill rate while the hose is connected' },
-            'dta:in':  { unit: 'L/min', digits: 0, label: 'DT-GEN-A feed (FT-101 through XV-A)' },
-            'dtb:in':  { unit: 'L/min', digits: 0, label: 'DT-GEN-B feed (FT-101 through XV-B)' },
-            'dtc:in':  { unit: 'L/min', digits: 0, label: 'DT-GEN-C feed (FT-101 through XV-C)' }
-        };
-        var POINT_EDGES = {
-            'ft101:q': ['fs-suction', 'fs-transfer-header', 'fs-h2', 'fs-h3'],
-            'gena:mw': ['fs-gen-a-supply'], 'genb:mw': ['fs-gen-b-supply'], 'genc:mw': ['fs-gen-c-supply'],
-            'fill:q':  ['fs-fill'],
-            'dta:in':  ['fs-bus-b', 'fs-bus-a', 'fs-dt-a-feed', 'fs-dt-a-in'],
-            'dtb:in':  ['fs-bus-b', 'fs-dt-b-feed', 'fs-dt-b-in'],
-            'dtc:in':  ['fs-bus-c', 'fs-dt-c-feed', 'fs-dt-c-in']
-        };
+        /* points of the hall on the sheet (rebuilt by bindHallPoints when the hall changes):
+             ft101:q   FT-101 transfer flow of this hall's header (state.flow)
+             fill:q    tanker rate while the hose is connected
+             gen<k>:kw output of set k — hall load / running sets, 0 on STANDBY (the evidence that it burns)
+             dt<k>:in  set k's day-tank feed: FT-101 split over the open fill valves, a good 0 behind a closed XV */
+        var FUEL_POINTS = {}, POINT_EDGES = {}, EDGE_POINTS = {}, EDGE_PUMP = {}, fuelPoints = null, pointsHall = null;
         /* each pump's own branch carries the header flow only while that pump runs and agrees with its command */
         var PUMP_EDGES = { p101: ['fs-s1', 'fs-p101-discharge', 'fs-c1'], p102: ['fs-s2', 'fs-p102-discharge', 'fs-c2'] };
-        var EDGE_POINTS = {}, EDGE_PUMP = {};
-        Object.keys(POINT_EDGES).forEach(function (p) { POINT_EDGES[p].forEach(function (e) { (EDGE_POINTS[e] = EDGE_POINTS[e] || []).push(p); }); });
         Object.keys(PUMP_EDGES).forEach(function (p) { PUMP_EDGES[p].forEach(function (e) { EDGE_PUMP[e] = p; }); });
-        var fuelPoints = T ? T.createStore(FUEL_POINTS) : null;
+        function bindHallPoints(sheet) {
+            var sets = setsOf(state.hall), busOf = (sheet && sheet.busOf) || {};
+            FUEL_POINTS = {
+                'ft101:q': { unit: 'L/min', digits: 0, label: 'FT-101 transfer flow (state.flow)' },
+                'fill:q':  { unit: 'L/min', digits: 0, label: 'Tanker fill rate while the hose is connected' }
+            };
+            POINT_EDGES = { 'ft101:q': ['fs-suction', 'fs-transfer-header', 'fs-h2', 'fs-h3'], 'fill:q': ['fs-fill'] };
+            sets.forEach(function (s, i) {
+                var k = i + 1;
+                FUEL_POINTS['gen' + k + ':kw'] = { unit: 'kW', digits: 0, label: s.tag + ' output (hall.facility_load_kw / running sets)' };
+                FUEL_POINTS['dt' + k + ':in'] = { unit: 'L/min', digits: 0, label: dtTag(s) + ' feed (FT-101 through XV-' + s.tag.replace(/^GEN-/, '') + ')' };
+                POINT_EDGES['gen' + k + ':kw'] = ['fs-gen-' + k + '-supply'];
+                POINT_EDGES['dt' + k + ':in'] = ['fs-dt-' + k + '-feed', 'fs-dt-' + k + '-in'].concat(Object.keys(busOf).filter(function (e) { return busOf[e].indexOf(k) >= 0; }));
+            });
+            EDGE_POINTS = {};
+            Object.keys(POINT_EDGES).forEach(function (p) { POINT_EDGES[p].forEach(function (e) { (EDGE_POINTS[e] = EDGE_POINTS[e] || []).push(p); }); });
+            fuelPoints = T ? T.createStore(FUEL_POINTS) : null;
+            forcedPoint = {};
+            pointsHall = state.hall;
+        }
         var forcedPoint = {}, pumpForce = { p101: {}, p102: {} }, pumpFbSim = { p101: 'off', p102: 'off' }, failSince = null;
 
         /* P-101 command = the page's auto / manual / low-low logic (state.pumpRunning); P-102 is commanded as lag
@@ -1462,20 +1605,22 @@
         }
         function pumpFb(id) { return (pumpForce[id] && pumpForce[id].fb) || pumpFbSim[id] || 'off'; }
         function transferCmd() { return pumpCmd('p101') === 'on' || pumpCmd('p102') === 'on'; }
-        function xvOpen(K) { return transferCmd() && state.genRunning === K; }
+        function xvOpen(k) { var hs = state.halls[state.hall]; return !!(hs && hs.open[k - 1]); }
         function seedPoint(id, v) {
             if (!fuelPoints || forcedPoint[id]) return;
             fuelPoints.set(id, isNum(v) ? { value: v, quality: 'good' } : { quality: 'nodata' });
         }
         function seedFuelPoints() {
             if (!fuelPoints) return;
+            var sets = setsOf(state.hall), hs = state.halls[state.hall], nOpen = hs ? hs.open.filter(Boolean).length : 0;
             seedPoint('ft101:q', state.flow);
-            ['A', 'B', 'C'].forEach(function (K) { seedPoint('gen' + K.toLowerCase() + ':mw', state.genRunning === K ? FACILITY_MW : 0); });
+            sets.forEach(function (s, i) { seedPoint('gen' + (i + 1) + ':kw', s.outputKw); });
             seedPoint('fill:q', state.filling ? FILL_LPM : 0);
-            ['A', 'B', 'C'].forEach(function (K) {
-                var id = 'dt' + K.toLowerCase() + ':in';
+            var q = fuelPoints.get('ft101:q');
+            sets.forEach(function (s, i) {
+                var id = 'dt' + (i + 1) + ':in';
                 if (forcedPoint[id]) return;
-                fuelPoints.set(id, xvOpen(K) ? fuelPoints.get('ft101:q') : { value: 0, quality: 'good' });
+                fuelPoints.set(id, xvOpen(i + 1) ? (q && q.quality === 'good' && isNum(q.value) ? { value: q.value / nOpen, quality: 'good' } : q) : { value: 0, quality: 'good' });
             });
         }
         function pointText(id) { return fuelSheetLive && fuelPoints ? T.text(fuelPoints.get(id), FUEL_POINTS[id]) : 'UNAVAILABLE'; }
@@ -1502,24 +1647,26 @@
         function fuelRead(n) {
             var L = fuelSheetLive, U = 'UNAVAILABLE', o = { values: {} };
             var run = L && transferCmd(), polish = L && !!state.interlocks.polish;
-            var m = /^(xv|dt|gen)([abc])$/.exec(n.id), K = m ? m[2].toUpperCase() : null;
+            var m = /^(xv|dt|gen)(\d+)$/.exec(n.id), k = m ? Number(m[2]) : 0, set = m ? setsOf(state.hall)[k - 1] : null;
+            if (m && !set) { o.values.st = fv(U); return o; }
             if (m && m[1] === 'xv') {
-                var open = run && L && state.genRunning === K;
+                var open = L && xvOpen(k);
                 o.state = L ? (open ? 'open' : 'closed') : null;
                 o.values.st = fv(L ? (open ? 'OPEN' : 'CLOSED') : U); return o;
             }
             if (m && m[1] === 'dt') {
-                var pct = L ? state['dt' + K] : null;
+                var pct = L ? set.dayTank.pct : null, low = L && pct < DT_FILL_START && !fillAvailable(state.hall);
                 o.state = L ? (pct < DT_LOWLOW ? 'low' : 'normal') : null;
-                o.values.pct = fv(L ? fmt1(pct) + ' %' : U, L && pct < DT_LOWLOW ? '1' : (L && pct < DT_LOW ? '2' : null)); return o;
+                o.values.pct = fv(L ? fmt1(pct) + ' %' : U, L && pct < DT_LOWLOW ? '1' : (low ? '2' : null)); return o;
             }
             if (m && m[1] === 'gen') {
-                var isRun = L && state.genRunning === K;
+                var isRun = L && set.state === 'running';
                 o.state = L ? (isRun ? 'running' : 'standby') : null;
-                o.values = { st: fv(L ? (isRun ? 'RUNNING' : 'STANDBY') : U), mw: fv(L ? pointText('gen' + m[2] + ':mw') : DASH) }; return o;
+                o.values = { st: fv(L ? (isRun ? 'RUNNING' : 'STANDBY') : U), ld: fv(L ? pointText('gen' + k + ':kw') : DASH),
+                    q: fv(L ? grp(set.lph) + ' L/h' : DASH) }; return o;
             }
             switch (n.id) {
-                case 'fill': o.values.st = fv(L ? (state.filling ? 'CONNECTED · ' + pointText('fill:q') : 'CLOSED') : U); break;
+                case 'fill': o.values.st = fv(L ? (state.filling ? 'CONNECTED' : 'CLOSED') : U); o.values.q = fv(L ? pointText('fill:q') : DASH); break;
                 case 'ust':
                     o.state = L ? (state.filling ? 'filling' : 'normal') : null;
                     o.values = { pct: fv(L ? fmt1(state.ustPct) + ' %' : U, L && state.ustPct < FUEL.level_low_low_pct ? '1' : (L && state.ustPct < FUEL.level_low_pct ? '2' : null)),
@@ -1590,23 +1737,64 @@
                 if (fuelSheetLive && pumpMismatch(id)) g.setAttribute('data-mismatch', '1'); else g.removeAttribute('data-mismatch');
             });
         }
+        /* F4: a genset or its day tank opens the equipment modal on the INSIDE of that set (js/conv/internals/genset.js);
+           the navigator and the fleet strip step through this hall's sets (setsOf = the engine fleet with the mode applied) */
+        function fuelDeepOpts(n) {
+            var m = /^(gen|dt)(\d+)$/.exec((n && n.id) || ''), hall = state.hall;
+            if (!m || !fuelSheetLive || !window.RZConvInternals || !window.RZConvInternals.has('genset')) return null;
+            return { internal: { classKey: 'genset', unit: Number(m[2]) - 1, block: m[1] === 'dt' ? 'day-tank' : 'alternator',
+                scope: 'FU-M-101 · Hall ' + hall,
+                fleet: function () { return setsOf(hall); },
+                snapshot: function () { return SNAP; },
+                payloadFor: function (i) {
+                    var pid = window.RZFuelSheets.pid, node = hall === state.hall && pid ? pid.nodes.filter(function (x) { return x.id === 'gen' + (i + 1); })[0] : null;
+                    return node && T ? T.sheetPayload({ classId: 'fuel', node: node, read: fuelRead(node), store: fuelPoints, edges: pid.edges,
+                        declared: 'FU-M-101 simulated fuel plant (scan model; no field device is read)', tick: state.tick }) : null;
+                } } };
+        }
         function refreshFuelSheet() {
             var host = $('fuel-sheet-host');
             if (!host || !window.RZHmiSheet || !window.RZFuelSheets) return;
-            /* B5: a click or Enter on any symbol opens its detail beside the sheet; focus returns to it on close */
-            var fuelOpen = T ? T.opener(function (n) {
+            /* the hall on the sheet follows the selector: a new hall = a new sheet (tags and row count from its fleet) */
+            if (fuelSheet && fuelSheet.sheet && fuelSheet.sheet.hall !== state.hall) { fuelSheet.destroy(); fuelSheet = null; }
+            if (!fuelSheet) {
+                var sh = window.RZFuelSheets.select(fuelSheetLive ? fleetRows(state.hall) : [], fuelSheetLive ? state.hall : null);
+                bindHallPoints(sh);
+            }
+            /* B5: a click or Enter on any symbol opens its detail beside the sheet; focus returns to it on close. ONE opener
+               for the page: its double-click listener and the sheet's click must share the node they last saw, and a hall
+               change re-draws the sheet */
+            if (!fuelOpen && T) fuelOpen = T.opener(function (n) {
                 return T.sheetPayload({ classId: 'fuel', node: n, read: fuelRead(n), store: fuelPoints, edges: window.RZFuelSheets.pid.edges,
                     mismatch: function (id) { return !!pumpForce[id] && pumpMismatch(id); },
                     declared: 'FU-M-101 simulated fuel plant (scan model; no field device is read)', tick: state.tick });
-            }, '#fuel-sheet-host') : null;
+            }, '#fuel-sheet-host', fuelDeepOpts);
             if (!fuelSheet) fuelSheet = window.RZHmiSheet.render(host, window.RZFuelSheets.pid, { read: fuelRead, flow: fuelFlow, open: fuelOpen });
             if (fuelSheetLive) seedFuelPoints();
             fuelSheet.update();
             tagFuelSheet();
             if (window.RZHmiDepth) {
-                var L = fuelSheetLive, lvl = function (v) { return { pct: L ? v : null, medium: 'fuel' }; };
-                window.RZHmiDepth.apply($('fuel-svg'), { levels: { ust: lvl(L ? state.ustPct : null), dta: lvl(L ? state.dtA : null),
-                    dtb: lvl(L ? state.dtB : null), dtc: lvl(L ? state.dtC : null) } });
+                var L = fuelSheetLive, lvl = function (v) { return { pct: L ? v : null, medium: 'fuel' }; }, levels = { ust: lvl(L ? state.ustPct : null) };
+                setsOf(state.hall).forEach(function (s, i) { levels['dt' + (i + 1)] = lvl(L ? s.dayTank.pct : null); });
+                /* The depth pass repaints every body, flange and plinth (~150 ms on the 8-set sheet), so it runs only when
+                   what it paints changes: a symbol or line state, or a tank level by a visible step (1 % of the tank
+                   height is under half a pixel). Alarm and ack marks are refreshed on every scan either way. */
+                var svgEl = $('fuel-svg'), sig = svgEl ? [].map.call(svgEl.querySelectorAll('.hmi-node[data-node], path.hmi-edge[data-edge]'), function (e) {
+                    return e.getAttribute('data-state') || e.getAttribute('class') || '';
+                }).join('|') + '#' + Object.keys(levels).map(function (k) { var p = levels[k].pct; return p == null ? '-' : Math.round(p / 2); }).join(',') : '';
+                /* marks first, at once (alarm-to-mark budget 250 ms); a changed picture is repainted once it settles (one
+                   timer, 150 ms), so the shading never sits between an alarm and its mark */
+                if (T && T.marks) T.marks(svgEl);
+                if (sig !== fuelDepthSig || svgEl !== fuelDepthSvg) {
+                    fuelDepthSig = sig; fuelDepthSvg = svgEl; fuelDepthLevels = levels;
+                    if (!fuelDepthQueued) {
+                        fuelDepthQueued = true;
+                        setTimeout(function () {
+                            fuelDepthQueued = false;
+                            if (fuelDepthSvg && fuelDepthSvg.isConnected) window.RZHmiDepth.apply(fuelDepthSvg, { levels: fuelDepthLevels });
+                        }, 150);
+                    }
+                }
             }
             if (window.RZConvVfx) window.RZConvVfx.bind(host, window.RZFuelSheets.pid, fuelFlow);   /* line colour = condition */
         }
@@ -1670,6 +1858,7 @@
 
             buildTankTable();
             buildGensetRows();
+            bindHallFacts();
             renderPid();
             bindKpis();
             var alarms = evalAlarms();
@@ -1680,6 +1869,71 @@
             state.lastUpdate = 0;
             $('as-upd').textContent = '0s';
         }
+
+        /* ---- Hall selector + operating mode (F1, F2) -------------------------------------------------------
+           The hall buttons come from CONV_CALC.listHalls(); the facts line prints the hall's fleet and the site total
+           from the engine (no count is typed in this page). */
+        function renderHallBar() {
+            var seg = $('fuel-hall-seg');
+            if (!seg) return;
+            seg.innerHTML = HALLS.map(function (h) {
+                return '<button type="button" class="fuel-seg-btn" data-fuel-hall="' + h.code + '" aria-pressed="' + (h.code === state.hall) + '" aria-label="Hall ' + h.code + '">Hall ' + h.code + '</button>';
+            }).join('');
+        }
+        function syncSelectors() {
+            document.querySelectorAll('[data-fuel-hall]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-fuel-hall') === state.hall)); });
+            document.querySelectorAll('[data-fuel-mode]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-fuel-mode') === state.mode)); });
+        }
+        function bindHallFacts() {
+            var el = $('fuel-hall-facts'), hall = hallOf(state.hall), sets = setsOf(state.hall);
+            if (!el || !hall) return;
+            var run = sets.filter(function (s) { return s.state === 'running'; }), out = run.reduce(function (a, s) { return a + s.outputKw; }, 0);
+            var rated = sets.length ? sets[0].ratingKw : null;
+            el.innerHTML = '<b>Hall ' + hall.code + '</b> · <b>' + sets.length + '</b> sets × ' + grp(rated) + ' kW · ' +
+                (state.mode === 'utility-loss'
+                    ? '<b>' + run.length + ' running</b>, ' + (sets.length - run.length) + ' standby · ' + grp(out) + ' kW = hall load'
+                    : 'standby · ' + grp(hall.facility_load_kw) + ' kW on utility') +
+                ' · <b>' + siteSetCount() + '</b> sets · ' + HALLS.length + ' halls';
+            /* P1: the engine source is carried for the basis tooltip and the gate, never printed in the line */
+            var src = 'CONV_CALC.getFleet(\'genset\', \'' + hall.code + '\') · ' + HALLS.length + ' halls from listHalls() · electrical.genset_count ' +
+                (ELEC ? ELEC.genset_count : DASH) + ' · hall.facility_load_kw ' + grp(hall.facility_load_kw);
+            el.setAttribute('data-source', src);
+            el.setAttribute('title', 'Source: ' + src);
+            el.setAttribute('data-hall', hall.code);
+            el.setAttribute('data-sets', String(sets.length));
+            el.setAttribute('data-site-sets', String(siteSetCount()));
+            var b = $('fuel-dt-basis'), s0 = sets[0], line = b && b.querySelector('[data-basis-line]'), pop = $('fuel-dt-basis-pop');
+            if (line && s0) line.textContent = 'Day tank ' + grp(s0.dayTank.capL) + ' L · ' + fmt1(DT_CAP_HR) + ' h · fill ' + DT_FILL_START + '→' + DT_FILL_STOP + ' %';
+            if (pop && s0) pop.innerHTML = '<p><b>Assumed design basis.</b> One day tank per set, sized on that set\'s burn at its rating: ' +
+                grp(s0.ratingKw) + ' kW × ' + FUEL.specific_consumption_l_per_kwh.toFixed(3) + ' L/kWh = ' + grp(s0.ratedLph) + ' L/h, × ' + fmt1(DT_CAP_HR) + ' h = ' + grp(s0.dayTank.capL) + ' L.</p>' +
+                '<p>Fill opens on a running set below ' + DT_FILL_START + ' % and closes at ' + DT_FILL_STOP + ' %, so a running set keeps at least ' + fmt1(DT_BASIS_HR) +
+                ' h at rated burn (' + DT_LOW_PCT + ' %).</p><p>Below ' + DT_FILL_START + ' % with fill unavailable (transfer inhibited or P-101 failed) raises a LO alarm; below ' +
+                DT_LOWLOW + ' % a LO-LO alarm. One scan = ' + SIM_MIN_PER_SCAN + ' simulated min.</p>';
+        }
+        function selectHall(code) {
+            if (!FUEL_AUTHORITY_AVAILABLE || !hallOf(code) || code === state.hall) return;
+            var old = state.halls[state.hall];
+            if (old) old.pump = { run: state.pumpRunning, flow: state.flow };
+            state.hall = code;
+            var hs = state.halls[code];
+            state.pumpRunning = !!(hs && hs.pump.run); state.flow = hs ? hs.pump.flow : 0; state.manualPump = false;
+            pumpForce = { p101: {}, p102: {} }; pumpFbSim = { p101: state.pumpRunning ? 'on' : 'off', p102: 'off' }; failSince = null;
+            state.interlocks.pumpfail = false;
+            $('btn-pump').classList.remove('active');
+            syncSelectors();
+            render();
+        }
+        function setMode(mode) {
+            if (!FUEL_AUTHORITY_AVAILABLE || !MODES[mode] || mode === state.mode) return;
+            state.mode = mode;
+            state.acked = false;
+            syncSelectors();
+            render();
+        }
+        document.addEventListener('click', function (e) {
+            var h = e.target.closest && e.target.closest('[data-fuel-hall]'); if (h) { selectHall(h.getAttribute('data-fuel-hall')); return; }
+            var m = e.target.closest && e.target.closest('[data-fuel-mode]'); if (m) setMode(m.getAttribute('data-fuel-mode'));
+        });
 
         /* ---- Loops -------------------------------------------------- */
         setInterval(function () {
@@ -1707,13 +1961,15 @@
         window.resetSimulation = function () {
             if (!FUEL_AUTHORITY_AVAILABLE) return;
             state.ustPct = FUEL.level_pct;
-            state.dtA = 92.0; state.dtB = 46.0; state.dtC = 88.0;
+            state.mode = 'normal';
+            initHalls();
             state.pumpRunning = false; state.manualPump = false;
             state.amps = 0; state.vib = 0.20; state.flow = 0; state.dp = 0.10;
             state.filling = false; state.acked = false;
             state.interlocks = { leak: false, bund: false, water: false, polish: true, dtll: false, pumpfail: false };
             forcedPoint = {}; pumpForce = { p101: {}, p102: {} }; pumpFbSim = { p101: 'off', p102: 'off' }; failSince = null;
             seed = 1337;
+            syncSelectors();
             trend = []; for (var i = 0; i < 60; i++) trend.push(FUEL.level_pct);
             $('btn-pump').classList.remove('active');
             var bf = $('btn-fill'); bf.innerHTML = '<i class="fas fa-plug"></i> Connect Tanker Hose'; bf.classList.remove('active');
@@ -1819,6 +2075,9 @@
 
         /* ---- Initial paint ------------------------------------------ */
         if (FUEL_AUTHORITY_AVAILABLE) {
+            initHalls();
+            renderHallBar();
+            syncSelectors();
             setProcessControls(true);
             $('fill-status').textContent = 'DISCONNECTED';
             $('fill-status').style.color = 'var(--text-dim)';
@@ -1843,9 +2102,9 @@
                 edgesOf: function (id) {
                     var es = (POINT_EDGES[id] || []).slice();
                     /* FT-101 also evidences the day-tank feed its open valve routes it to */
-                    if (id === 'ft101:q') ['A', 'B', 'C'].forEach(function (K) {
-                        var d = 'dt' + K.toLowerCase() + ':in';
-                        if (!forcedPoint[d] && xvOpen(K)) POINT_EDGES[d].forEach(function (e) { if (es.indexOf(e) < 0) es.push(e); });
+                    if (id === 'ft101:q') setsOf(state.hall).forEach(function (s, i) {
+                        var d = 'dt' + (i + 1) + ':in';
+                        if (!forcedPoint[d] && xvOpen(i + 1)) POINT_EDGES[d].forEach(function (e) { if (es.indexOf(e) < 0) es.push(e); });
                     });
                     return es;
                 },
@@ -1882,7 +2141,12 @@
                     });
                     pumps.p101.fail = !!state.interlocks.pumpfail;
                     return { sheet: 'FU-M-101', available: fuelSheetLive, tick: state.tick, points: pts, pumps: pumps,
-                        tripped: Object.keys(tripped), acked: Object.keys(acked) };
+                        tripped: Object.keys(tripped), acked: Object.keys(acked),
+                        /* F2/F3: the hall on the sheet, the mode, every hall's sets with their day tanks, the alarm tags */
+                        hall: state.hall, mode: state.mode, fillAvailable: fillAvailable(state.hall),
+                        halls: HALLS.map(function (h) { return { code: h.code, loadKw: h.facility_load_kw, sets: setsOf(h.code) }; }),
+                        basis: { capHr: DT_CAP_HR, fillStartPct: DT_FILL_START, fillStopPct: DT_FILL_STOP, lowPct: DT_LOW_PCT, basisHr: DT_BASIS_HR, lowLowPct: DT_LOWLOW },
+                        alarms: evalAlarms().map(function (a) { return a.sev + ' ' + a.tag; }) };
                 }
             }, render);
         }

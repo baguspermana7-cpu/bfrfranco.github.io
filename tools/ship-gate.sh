@@ -122,7 +122,8 @@ gate "DC AI HMI drawings — H0 ratchet, H1 paint, H2 library, H4 names, H5 text
 gate "DC AI operator truth — one state model, no state without evidence, flow only with evidence, quality on values, alarm badge without colour, reduced motion (O1-O5, O8; BMS master prompt)" node tools/test-dh-operator.mjs
 gate "DC AI operator UI — markup contract" node tools/test-datahall-ai-operator-ui.mjs
 gate "DC AI operator UI — runtime contract" node tools/test-datahall-ai-operator-runtime.mjs
-gate "EPMS — ATS-to-rack source colour" node tools/test-epms-ats-rack-color.mjs
+# "EPMS — ATS-to-rack source colour" (tools/test-epms-ats-rack-color.mjs) retired in phase E5 of PRD-CONV-EQUIPMENT-TRUTH:
+# the legacy LV drawing whose rack ATS legs it coloured is gone; E-S-102 (gate below) feeds every rack by its A and B cords.
 gate "Conventional snapshot binding — no phantom keys, strips follow the engine" node tools/test-conv-snapshot-binding.mjs
 # The parameter registry is the single source of truth for what every Conventional number IS,
 # where it came from, and what moves it. Dependency edges are MEASURED (the engine is recomputed
@@ -176,6 +177,10 @@ gate "Conventional depth ratchet — symbols open, inspector depth, engine-hooke
 gate "Conventional modals — no modal repeats the sheet it was opened from (owner C10)" node tools/test-conv-modal-no-self-repeat.mjs
 gate "Conventional equipment internals — chiller model = engine 2.4.0, energy balance on displayed values, standby still, PRD §5.1 catalogue, no typed digit, red proofs" node --test tools/test-conv-internals-core.mjs
 gate "Conventional equipment internals in the modal — CH-01 inside drawn (not a clone), blocks select, values = model, navigator 01→08 standby still, fleet 10/7, Thermal, reduced motion, text clear (1440 + 390)" node tools/test-conv-internals-render.mjs
+gate "Conventional quantity truth — CH-M-101 trains/pumps/CRAH banks and CH-M-102 towers/CDW pumps = CONV_CALC.getFleet (also under a stubbed fleet), Σ tower rejection within 0.5 %, each chiller opens its own unit, text ≥ 11 px no overlap (1440 + 390, both themes)" node tools/test-conv-quantity-truth.mjs
+# PRD-CONV-EQUIPMENT-TRUTH F2/F5 (fuel truth): FU-M-101 drew GEN-A/B/C with GEN-B "RUNNING 43.5 MW" in NORMAL, every fill
+# valve closed and a 455 L day tank (1.8 min of burn), no alarm; the engine has 8 sets per hall, 32 site, all standby.
+gate "Conventional fuel truth — FU-M-101 per hall: 8 sets + day tanks from getFleet, site 32, standby in normal, utility-loss split = hall load, day tank per set burn + fill + LO alarm, modal per unit, text >= 11 px (1440 + 390)" node tools/test-conv-fuel-truth.mjs
 # v3.67.0 (PRD-CONV-LIVING-PLANT P1/P2) — line colour and motion are bound to the process: a line is painted by its own
 # flow state, the dash period follows flow, a rotor follows speed, no-flow lines never move. Before it every pipe on the
 # four P&ID sheets was the same grey in every condition. The trend modal reads one deterministic history per point.
@@ -187,6 +192,7 @@ gate "Conventional HV/MV basis — 150/20/0.4 kV ratings, fault levels, N-1 load
 gate "Conventional plant internals — chiller cycle (R-134a fit), pump fleet, tower cells, CRAH per unit, fleet tables: energy/flow balances, headroom >= 0, red proofs" node --test tools/test-conv-plant-internals.mjs
 gate "Conventional E-S-101 model — normal state, model builder, engine flows, bus balance, interlock truth table, N-1 tie transfer, coordinated chain" node --test tools/test-conv-epms-model.mjs
 gate "Conventional E-S-101 single-line — default view, 150 kV tags, ANSI relays, engine labels, flows, interlocks in the UI, section loss + tie, TCC modal (1440 + 390)" node tools/test-conv-epms-sld.mjs
+gate "Conventional E-S-102 LV distribution — no legacy drawing, gensets per hall = getFleet, select-before-operate, status follows the solve, every device opens its modal, fit legibility, F21 F23 F24, planted defects red (1440 + 390)" node tools/test-conv-epms-lv.mjs
 gate "Conventional VFX + trend on the chiller plant — state colour, flow speed, rotor, thermal, reduced motion, trend modal (390 + 1440)" node tools/test-conv-vfx-trend.mjs
 gate "Conventional VFX on fire, fuel, water — view bar, line states, standby, running colour + motion, trend from the inspector" node tools/test-conv-vfx-sheets.mjs
 gate "Conventional cockpit bar — one 48 px bar, same slot positions on 9 pages, bare login, primary CTA lift/ring/win label/plane loop, More at 390, contrast, keyboard" node tools/test-conv-shell.mjs

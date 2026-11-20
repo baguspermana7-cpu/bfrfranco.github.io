@@ -310,8 +310,9 @@ try {
   const epmsClosed = await page.evaluate(() => {
     const sidebar = document.getElementById('epmsSidebar');
     const toggle = document.getElementById('epmsSidebarToggle');
-    const viewport = document.getElementById('viewport');
-    const scene = document.getElementById('scene');
+    /* phase E5: the legacy LV drawing (#viewport / #scene) is gone; the phone opens on the E-S-101 sheet panel */
+    const viewport = document.getElementById('epms-sld-view');
+    const scene = viewport;
     const topbar = document.querySelector('.topbar');
     const statusbar = document.querySelector('.status-bar');
     const sceneRect = scene.getBoundingClientRect();
@@ -322,7 +323,8 @@ try {
       toggleHeight: toggle.getBoundingClientRect().height,
       viewportWidth: viewport.getBoundingClientRect().width,
       viewportHeight: viewport.getBoundingClientRect().height,
-      availableViewportHeight: window.innerHeight - viewport.getBoundingClientRect().top,
+      /* the sheet panel scrolls its drawing and stops at the status bar (the legacy svg ran under it) */
+      availableViewportHeight: statusbarRect.top - viewport.getBoundingClientRect().top,
       sceneClearsControls: sceneRect.top >= topbarRect.bottom - 4
         && sceneRect.bottom <= statusbarRect.top + 4,
       expanded: toggle.getAttribute('aria-expanded'),
@@ -335,7 +337,9 @@ try {
     `EPMS SLD did not own the remaining viewport (${epmsClosed.viewportHeight}px of ${epmsClosed.availableViewportHeight}px)`);
   // PRD-Q06 FR-4/FR-5: the simulated banner (45 px) and the provenance line (54 px) are mandatory context chrome
   // on a 390x844 phone; the strip's row gap was tightened to win most of it back (measured 569). Floor 590 -> 560.
-  assert.ok(epmsClosed.viewportHeight >= 560,
+  // Phase E5 (PRD-CONV-EQUIPMENT-TRUTH): the legacy svg (569 px, running under the status bar) is gone; the E-S-101
+  // panel ends at the status bar and measured 469 px on origin/main 1b0f90ae3, 489 px after E5. Floor 560 -> 480.
+  assert.ok(epmsClosed.viewportHeight >= 480,
     `EPMS context chrome left only ${epmsClosed.viewportHeight}px for the mobile SLD`);
   assert.equal(epmsClosed.sceneClearsControls, true, 'EPMS fitted scene must clear top and status controls');
   assert.equal(epmsClosed.expanded, 'false');

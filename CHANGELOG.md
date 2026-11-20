@@ -11,6 +11,39 @@ release sections rather than semver.
 
 ---
 
+## v3.81.0 — 2026-11-21 — BMS plant sheets draw the real fleet (chiller, fuel, EPMS LV)
+
+Owner: "di BMS dulu selesaikan dan di polish". PRD-CONV-EQUIPMENT-TRUTH E3, fuel truth (F2/F5) and E5-EPMS.
+
+### Changed
+- `chiller-plant.html` CH-M-101 draws every unit of `CONV_CALC.getFleet()`: 10 chiller trains (7 running, 3 standby),
+  20 primary and 5 secondary pumps, one CRAH coil bank per hall ("× 59 · 58 RUN") that opens the fleet in the
+  equipment modal. New sheet CH-M-102 (condenser water): 10 tower cells and 10 CDW pumps; Σ cell rejection equals the
+  engine's tower rejection (36,403 kWth) within 0.5 %. Standby trains show "—" for loop temperatures; branch flow is the
+  engine's per-unit flow; NORMAL shows no WARNING/ALARM chip.
+- Sheet motion runs off a 3 Hz clock on visible elements only: main-thread CPU over 5 s idle at 1440 px 903 ms
+  (origin/main 1,869 ms).
+- `fuel-system.html` FU-M-101 is per hall: 8 gensets + day tanks from the fleet (32 site), all standby in NORMAL;
+  utility loss runs 7 sets at the hall load split; day tank 4,277 L = 4 h per set, fill 50→90 %, LAL-DT low alarm.
+- `EPMS_Telemetry.html`: the legacy LV drawing (GEN A/B/C, zoom) is replaced by sheet E-S-102 — per hall 8 sets,
+  switchboards, UPS paths, select-then-execute breaker control with interlocks; system rating 40,000 kW and system
+  load shown separately; TCC uses the TX-1 63,000 kVA bay and the 3,150 kVA feeder.
+- `js/conv/equipment-modal.js` 2.1.0: fleet-only mode for classes without an internal sheet; new internal sheet
+  `js/conv/internals/genset.js`.
+
+### Fixed
+- `fuel-system.html`: TANKER FILL prints its own flow value; genset column names print once (names stay in the
+  tooltip); day-tank basis declared as authored basis (the engine has no day-tank model). Text budget 450 → 399 words.
+- CH-M-101: stacked value lines 17 units apart (12 px text overlapped 1.5 px at 14).
+- `test-operator-cockpit-regressions.mjs`: chiller count follows `getFleet('chiller')`; the operating band applies to
+  running trains, standby trains must publish finite values.
+
+### Gates
+- New: `test-conv-quantity-truth.mjs` (E3 incl. PERF0–2), `test-conv-fuel-truth.mjs`, `test-conv-epms-lv.mjs`.
+- Retired: `test-epms-ats-rack-color.mjs` (its drawing is gone).
+- Full release gate: 75/79 pass. [17] passed on 2 reruns (114 items). [72] navigation timeouts only. [73]
+  editorial-render fails identically on origin/main 2bc05a8b5 (86 rose rows), pre-existing.
+
 ## v3.80.0 — 2026-11-20 — DC AI cockpit joins the BMS cockpit bar
 
 Owner R176: "button2 navbar pastikan semua page di bms ini button location sama posisi" — `datahallAI.html` was the one

@@ -133,11 +133,6 @@
     
     @keyframes pulse { 0% { opacity:0.5; } 50% { opacity:1; } 100% { opacity:0.5; } }
 
-    /* SVG Canvas */
-    #viewport { position: absolute; top: var(--epms-context-height); right: 0; bottom: 0; left: 0;
-        width: 100%; height: calc(100dvh - var(--epms-context-height)); cursor: grab;
-        background-image: linear-gradient(rgba(148,163,184,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.08) 1px, transparent 1px); background-size: 40px 40px; }
-    #viewport:active { cursor: grabbing; }
 
     /* Wires */
     .wire { fill: none; stroke: #334155; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
@@ -384,7 +379,6 @@
     @media print {
         body { background: white !important; }
         .ui, .status-bar { display: none !important; }
-        #viewport { width: 100% !important; height: auto !important; }
     }
 
     /* v1.134.6 — the topbar's shrink handling started at 768 px, but the row of links plus
@@ -451,7 +445,6 @@
             box-shadow: 12px 0 28px rgba(0, 0, 0, 0.52);
         }
         .status-bar { left: 0; overflow-x: auto; }
-        #viewport { width: 100vw !important; height: calc(100dvh - var(--epms-context-height)) !important; max-width: none !important; }
     }
 
 #cookieAccept { background:#E8B563 !important; color:#16181d !important; }
@@ -462,7 +455,7 @@
     font-variant-numeric: tabular-nums slashed-zero;
 }
 </style>
-    <script src="js/rz-version.js?v=20261120-4c9777b5" defer></script>
+    <script src="js/rz-version.js?v=20261120-7ea867d8" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- v1.24.0: bring EPMS onto the engine + BMS Shell. conv-engine.js loads
@@ -472,7 +465,7 @@
     <script src="js/conv-engine.js?v=2.4.0"></script>
     <!-- v1.134.3 — generated parameter registry + the ONE shared basis drawer.
          Replaces provenance restated by hand; see js/rz-basis-drawer.js. -->
-    <script src="js/conv-parameters.js?v=20261118-6652e773"></script>
+    <script src="js/conv-parameters.js?v=20261120-89ea132a"></script>
     <!-- v1.134.25 — RZExplain, the site glossary engine. The cockpits were the only
          substantial pages carrying none of it, so terms an operator has to read
          (approach temperature, cycles of concentration, N+1, WUE) had nowhere to go.
@@ -515,13 +508,14 @@
 <script src="js/conv/history.js?v=20261117-1c72fb7f"></script>
 <script src="js/rz-trend.js?v=20261117-e60cac7c"></script>
 <script src="js/conv/sheet-truth.js?v=20261118-eaae14ee"></script>
-<script src="js/conv/payloads.js?v=20261118-d8db9d79"></script>
-<script src="js/conv/equipment-modal.js?v=20261118-948d9c46"></script>
+<script src="js/conv/payloads.js?v=20261120-86f5437d"></script>
+<script src="js/conv/equipment-modal.js?v=20261120-9b42a9b2"></script>
 <script src="js/rz-inspector.js?v=20261117-bbb735d4" defer></script>
 <script src="js/conv/sld-topology.js?v=20261118-597640aa"></script>
 <script src="js/conv/tcc.js?v=20261118-4e103126"></script>
 <script src="js/conv/epms-sheet.js?v=20261118-db9d834f"></script>
-<script src="js/conv/epms-sim.js?v=20261118-a499784e"></script>
+<script src="js/conv/epms-sim.js?v=20261120-7be9cf69"></script>
+<script src="js/conv/epms-lv.js?v=20261120-563d4b07"></script>
 <script src="js/conv/tcc-modal.js?v=20261118-e31d9000"></script>
 <style id="epms-sld-css">
 /* the view switch: its own class, so no page code or gate that selects .btn / .zoom-btn picks it up */
@@ -533,6 +527,8 @@
 .epms-view-btn[aria-pressed="true"] { color: #e2e8f0; border-color: #E8B563; box-shadow: inset 0 -2px 0 #E8B563; }
 .epms-view-btn:focus-visible { outline: 2px solid #E8B563; outline-offset: 1px; }
 @media (max-width: 768px) { .epms-view-btn { min-height: 44px; min-width: 44px; } }
+/* a phone keeps Panels, both views and Export on one row: the long half of each view name is dropped */
+@media (max-width: 480px) { .epms-long { display: none; } }
 .epms-sld-view { flex: 1 1 auto; min-width: 0; min-height: 0; overflow: auto; background: #0e0f12; padding: 8px; box-sizing: border-box;
   display: flex; flex-direction: column; gap: 6px; user-select: text; }
 .epms-sld-view[hidden] { display: none; }
@@ -540,6 +536,23 @@
 .epms-sld-msg b { font: 600 11px/1.4 'JetBrains Mono', ui-monospace, monospace; color: #E8B563; letter-spacing: .04em; }
 .epms-sld-msg[data-refused="1"] { border-color: #b45309; }
 .epms-sheet-host { min-width: 0; }
+/* E-S-102 opens at 1.17 x (sheet minScale): the 9 px name / line / legend roles are set to 9.5 here so no text on it
+   renders under 11 px at any width (PRD-CONV-EQUIPMENT-TRUTH §7 legibility floor) */
+#epms-lv-svg [data-role="name"], #epms-lv-svg [data-role="line"], #epms-lv-svg [data-role="legend"], #epms-lv-svg [data-role="label"] { font-size: 9.5px; }
+/* one sidebar width on both views (it once shrank to whatever the wider drawing left over) */
+@media (min-width: 769px) { #epmsSidebar { flex: 0 0 240px; width: 240px; } }
+.epms-lv-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.epms-lv-head .epms-sld-msg { flex: 1 1 320px; }
+.epms-hall { display: inline-flex; flex: 0 0 auto; }
+.epms-hall-btn { min-height: 32px; min-width: 64px; padding: 4px 10px; background: transparent; border: 1px solid #444; color: #9aa3af; cursor: pointer;
+  font: 600 12px/1.2 'IBM Plex Sans', system-ui, sans-serif; }
+.epms-hall-btn + .epms-hall-btn { border-left: 0; }
+.epms-hall-btn:first-child { border-radius: 4px 0 0 4px; } .epms-hall-btn:last-child { border-radius: 0 4px 4px 0; }
+.epms-hall-btn[aria-pressed="true"] { color: #e2e8f0; border-color: #E8B563; box-shadow: inset 0 -2px 0 #E8B563; }
+.epms-hall-btn:focus-visible { outline: 2px solid #E8B563; outline-offset: 1px; }
+.epms-lv-site { font: 500 12px/1.3 'JetBrains Mono', ui-monospace, monospace; color: #cbd5e1; cursor: help; }
+.epms-alarm-list li { display: block; color: #fca5a5; }
+@media (max-width: 768px) { .epms-hall-btn { min-height: 44px; min-width: 56px; } }
 /* legacy LV chrome shows only with the LV view; the E-S-101 rail and counters only with the HV / MV view */
 body[data-epms-view="sld"] .epms-lv-only { display: none !important; }
 body:not([data-epms-view="sld"]) .epms-sld-only { display: none !important; }
@@ -548,8 +561,6 @@ body:not([data-epms-view="sld"]) .epms-sld-only { display: none !important; }
 .epms-rail-list b, .epms-rail-line b { font: 600 11px/1.35 'JetBrains Mono', ui-monospace, monospace; color: #e2e8f0; }
 .epms-rail-line { margin: 0; font: 400 12px/1.35 'IBM Plex Sans', system-ui, sans-serif; color: #cbd5e1; }
 .epms-rail-gap { margin-top: 10px; }
-/* the legacy drawing's zoom / export controls act on the LV view only */
-body[data-epms-view="sld"] .epms-zoom-group { display: none !important; }
 @media (max-width: 768px) { .epms-sheet-host svg.hmi-svg { touch-action: pan-x pan-y; } }
 /* on a phone the provenance line folds to one line (tap to read it all): the cockpit bar took 48 px and the SLD keeps
    its >= 560 px; the full basis stays in the markup, the title and the expanded line */
@@ -557,12 +568,6 @@ body[data-epms-view="sld"] .epms-zoom-group { display: none !important; }
   #rz-prov-epms-strip { cursor: pointer; }
   #rz-prov-epms-strip:not(.is-open) { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   #rz-prov-epms-strip:focus-visible { outline: 2px solid #E8B563; outline-offset: 2px; }
-  /* the feed / state legend folds to its heading on a phone; tap the heading to show the keys */
-  #epms-legend:not(.is-open) > span:not(:first-child) { display: none !important; }
-  #epms-legend > span:first-child { cursor: pointer; min-height: 24px; display: inline-flex; align-items: center; }
-  #epms-legend > span:first-child::after { content: ' \25B8'; }
-  #epms-legend.is-open > span:first-child::after { content: ' \25BE'; }
-  #epms-legend > span:first-child:focus-visible { outline: 2px solid #E8B563; outline-offset: 2px; }
 }
 </style>
 <link rel="stylesheet" href="css/conv-shell.css?v=20261120-33ee363b">
@@ -596,7 +601,8 @@ body[data-epms-view="sld"] .epms-zoom-group { display: none !important; }
          loading with nothing saying what it was loaded against. -->
     <span style="color:#94a3b8;font-size:11px;">UPS <b id="epms-ups-basis" data-basis-param="electrical.ups_module_kw_rated" tabindex="0" role="button" title="UPS module rating — click for basis" style="color:#94a3b8;">&mdash;</b></span>
     <span style="color:#94a3b8;font-size:11px;">Modules <b id="epms-ups-modules" data-basis-param="electrical.ups_modules_per_system" tabindex="0" role="button" title="Modules per system — click for basis" style="color:#94a3b8;">&mdash;</b></span>
-    <span style="color:#94a3b8;font-size:11px;">Per system <b id="epms-ups-sys" data-basis-param="electrical.ups_system_kw" tabindex="0" role="button" title="Load per UPS system — click for basis" style="color:#94a3b8;">&mdash;</b></span>
+    <span style="color:#94a3b8;font-size:11px;">System rating <b id="epms-ups-sys" data-basis-param="electrical.ups_system_rated_kw" tabindex="0" role="button" title="Rating of one UPS system — click for basis" style="color:#94a3b8;">&mdash;</b></span>
+    <span style="color:#94a3b8;font-size:11px;">System load <b id="epms-ups-load" data-basis-param="electrical.ups_system_kw" tabindex="0" role="button" title="Load one UPS system carries — click for basis" style="color:#94a3b8;">&mdash;</b></span>
     <span style="color:#94a3b8;font-size:11px;">Data <b id="epms-dq" style="color:#94a3b8;" title="Awaiting engine snapshot">—</b></span>
     <span style="color:#94a3b8;font-size:11px;">Scenario <b id="epms-scn" style="color:#94a3b8;" title="Awaiting engine snapshot">—</b></span>
     <p class="rz-prov" id="rz-prov-epms-strip" data-rz-provenance="simulated" data-rz-prov-basis="single-line simulation on this page and conv-engine.js; system state, breakers, quality and scenario are not read from a site" style="flex-basis:100%;margin:0"><b>Simulated</b> · single-line simulation on this page and conv-engine.js; system state, breakers, quality and scenario are not read from a site</p>
@@ -606,16 +612,6 @@ body[data-epms-view="sld"] .epms-zoom-group { display: none !important; }
 @media (max-width:600px){#epms-status-strip{row-gap:2px!important;padding-top:4px!important;padding-bottom:4px!important;line-height:1.35}}</style>
 <div data-rz-telemetry-banner-slot style="min-height:45px"></div><!-- PRD-Q06 FR-4: height reserved so the first SLD fit already counts the banner (module is deferred) -->
 
-<!-- v1.24.0 doc-14 §2: Visible legend for line/breaker state (operator-facing, no doc lookup needed). -->
-<div id="epms-legend" aria-label="EPMS line and breaker status legend" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:6px 14px;background:#0e0f12;border-bottom:1px solid #2a2d33;font-family:'JetBrains Mono','IBM Plex Sans',sans-serif;font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:#94a3b8;">
-    <span style="font-weight:700;color:#9aa3af;">FEED / STATE:</span>
-    <span style="display:inline-flex;align-items:center;gap:5px;"><span style="display:inline-block;width:24px;height:2px;background:#ff3333;"></span><span style="color:#ff7777;font-weight:700;">Feed A identity</span></span>
-    <span style="display:inline-flex;align-items:center;gap:5px;"><span style="display:inline-block;width:24px;height:2px;background:#22c55e;"></span><span style="color:#22c55e;font-weight:700;">Feed B identity</span></span>
-    <span style="display:inline-flex;align-items:center;gap:5px;"><span style="display:inline-block;width:24px;height:2px;border-top:2px dashed #e2e8f0;"></span><span style="color:#e2e8f0;font-weight:700;">Moving dash = energized</span></span>
-    <span style="display:inline-flex;align-items:center;gap:5px;"><span style="display:inline-block;width:24px;height:1px;background:#475569;"></span><span style="color:#94a3b8;font-weight:700;">Grey = open / standby</span></span>
-    <span style="display:inline-flex;align-items:center;gap:5px;"><span style="display:inline-grid;place-items:center;width:14px;height:14px;border:1px solid #ef4444;color:#ef4444;font-weight:800;line-height:1;">×</span><span style="color:#ef4444;font-weight:700;">Breaker trip</span></span>
-    <span style="display:inline-flex;align-items:center;gap:5px;"><span style="display:inline-block;width:24px;height:2px;background:#eab308;"></span><span style="color:#eab308;font-weight:700;">Maintenance Bypass</span></span>
-</div>
 
 <script>
 /* v1.24.0: bind the EPMS top status strip to conv-engine.js so the values
@@ -650,25 +646,6 @@ body[data-epms-view="sld"] .epms-zoom-group { display: none !important; }
 })();
 </script>
 
-<!-- v1.134.18 — a PAN/ZOOM canvas. Content beyond the frame is off-screen, not clipped:
-     this one-line is 3600 x 2600 and is worked by panning, which is why it ships zoom and
-     fit controls. The declaration exempts the clipping rule ONLY; collisions, degenerate
-     labels and the legibility floor are still enforced on it. -->
-<svg id="viewport" viewBox="0 0 3600 2600" data-rz-pannable="1">
-    <defs>
-        <g id="sym-tx">
-            <circle cx="0" cy="-8" r="8" class="tx-circle"/>
-            <circle cx="0" cy="8" r="8" class="tx-circle"/>
-        </g>
-    </defs>
-    <g id="scene">
-        <g id="l-wires"></g>
-        <g id="l-flow"></g>
-        <g id="l-devices"></g>
-        <g id="l-breakers"></g>
-        <g id="l-tele"></g>
-    </g>
-</svg>
 
 <div class="ui">
     <div class="topbar pointer" data-cv-toolrow>
@@ -685,22 +662,12 @@ body[data-epms-view="sld"] .epms-zoom-group { display: none !important; }
             Portfolio
         </a>
         <span class="epms-view" role="group" aria-label="Drawing shown">
-            <button type="button" class="epms-view-btn" data-epms-view="sld" aria-pressed="true" aria-controls="epms-sld-view">HV / MV single-line</button>
-            <button type="button" class="epms-view-btn" data-epms-view="lv" aria-pressed="false">LV distribution</button>
+            <button type="button" class="epms-view-btn" data-epms-view="sld" aria-pressed="true" aria-controls="epms-sld-view">HV / MV<span class="epms-long"> single-line</span></button>
+            <button type="button" class="epms-view-btn" data-epms-view="lv" aria-pressed="false" aria-controls="epms-lv-view">LV<span class="epms-long"> distribution</span></button>
         </span>
         <h1 class="brand" data-cv="title">EPMS V1.0 - Telemetry</h1>
         <div style="flex:1"></div>
-        <div class="epms-zoom-group" style="display:flex; gap:8px; align-items:center;">
-            <span style="font-size:10px; color:#9aa3af; margin-right:4px;">ZOOM:</span>
-            <span id="zoomIndicator" class="zoom-indicator" data-rz-authored-basis="Zoom percentage is VIEWPORT state — how far the operator has scaled the drawing, and the same drawing at any zoom shows the same plant. It is not an engineering quantity and conv-engine.js could not publish one: there is nothing in a data-centre model that determines how large a diagram is on a screen. The same applies to the view line the log writes when the cockpit opens.">50%</span><span id="lodHint" class="zoom-indicator" style="opacity:.8">zoom in for values</span>
-            <button class="zoom-btn" onclick="setZoom(0.5)" title="50%">50%</button>
-            <button class="zoom-btn" onclick="setZoom(0.75)" title="75%">75%</button>
-            <button class="zoom-btn" onclick="setZoom(1.2)" title="120%">120%</button>
-            <button class="zoom-btn" onclick="fitScreen()" title="Fit to Screen" style="background:rgba(34,197,94,0.2); border-color:#22c55e;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
-                FIT
-            </button>
-            <div style="width:1px; height:20px; background:#334155; margin:0 8px;"></div>
+        <div class="epms-export-group" style="display:flex; gap:8px; align-items:center;">
             <div class="export-dropdown">
                 <button class="export-btn" aria-disabled="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -736,38 +703,31 @@ body[data-epms-view="sld"] .epms-zoom-group { display: none !important; }
                 <div class="ctrl-title epms-rail-gap">Breakers</div>
                 <p class="epms-rail-line" id="epms-rail-cb">UNAVAILABLE</p>
             </div>
-            <div class="ctrl-box epms-lv-only">
-                <div class="ctrl-title">Utility Sources (20kV)</div>
-                <div class="btn" id="btn-u-a" onclick="toggleSource('A')" aria-disabled="true">
-                    <span>Utility A</span><div class="led"></div>
-                </div>
-                <div class="btn" id="btn-u-b" onclick="toggleSource('B')" aria-disabled="true">
-                    <span>Utility B</span><div class="led"></div>
-                </div>
-                <div class="btn" id="btn-tie" onclick="toggleTie()" aria-disabled="true">
-                    <span>MV Bus Coupler (Tie)</span><div class="led"></div>
-                </div>
+            <div class="ctrl-box epms-lv-only" id="epms-lv-rail" aria-label="E-S-102 hall sources, UPS and generation">
+                <div class="ctrl-title">Hall <span id="epms-lv-rail-hall">—</span> · E-S-102</div>
+                <ul class="epms-rail-list" id="epms-lv-rail-sources"><li>UNAVAILABLE</li></ul>
+                <div class="ctrl-title epms-rail-gap">Generation</div>
+                <p class="epms-rail-line" id="epms-lv-rail-gen">UNAVAILABLE</p>
+                <div class="ctrl-title epms-rail-gap">Active alarms</div>
+                <ul class="epms-rail-list epms-alarm-list" id="epms-lv-rail-alarms"><li>UNAVAILABLE</li></ul>
             </div>
-
-            <div class="ctrl-box epms-lv-only">
-                <div class="ctrl-title">Generators</div>
-                <div class="btn" id="btn-gen-a" aria-disabled="true"><span>GEN A</span><div class="led"></div></div>
-                <div class="btn" id="btn-gen-b" aria-disabled="true"><span>GEN B</span><div class="led"></div></div>
-                <div class="btn" id="btn-gen-c" aria-disabled="true"><span>GEN C</span><div class="led"></div></div>
-            </div>
-
-            <div class="ctrl-box epms-lv-only">
-                <div class="ctrl-title">Status</div>
-                <div id="logs" style="height: 250px; overflow-y: auto; font-size: 10px; color: #94a3b8; font-family:'JetBrains Mono',monospace;font-feature-settings:'zero' 1;padding-right:5px;">
-                    <div>&gt; EPMS authority check pending.</div>
-                </div>
-            </div>
-
-            <div class="btn epms-lv-only" onclick="resetView()" style="margin-top: auto;">Reset View</div>
         </div>
         <section id="epms-sld-view" class="epms-sld-view pointer" aria-label="E-S-101 HV / MV single-line">
             <p class="epms-sld-msg" id="epms-sld-msg" role="status" aria-live="polite"><b>SIMULATION</b> Select a breaker or switch to operate it; the interlocks are enforced and every flow is re-solved.</p>
             <div id="epms-sheet-host" class="epms-sheet-host hmi-depth" data-theme="dark" data-rz-authored-basis="E-S-101 · Ratings, voltages, fault levels, counts and protection settings on this single-line are conv-engine.js electrical.* values. Breaker and switch positions are SIMULATED (a page state operated from the inspector), and each kW / A / load % is the topology solve (js/conv/sld-topology.js) of the engine's adopted hall loads through those positions: a training simulation, not metering."></div>
+        </section>
+        <section id="epms-lv-view" class="epms-sld-view pointer" aria-label="E-S-102 LV distribution, typical hall" hidden>
+            <div class="epms-lv-head">
+                <p class="epms-sld-msg" id="epms-lv-msg" role="status" aria-live="polite"><b>SIMULATION</b> Select an item, then Select and Execute to operate it.</p>
+                <span class="epms-hall" role="group" aria-label="Hall shown on E-S-102">
+                    <button type="button" class="epms-hall-btn" data-epms-hall="0" aria-pressed="true">Hall A</button>
+                    <button type="button" class="epms-hall-btn" data-epms-hall="1" aria-pressed="false">Hall B</button>
+                    <button type="button" class="epms-hall-btn" data-epms-hall="2" aria-pressed="false">Hall C</button>
+                    <button type="button" class="epms-hall-btn" data-epms-hall="3" aria-pressed="false">Hall D</button>
+                </span>
+                <span class="epms-lv-site" id="epms-lv-site" tabindex="0">—</span>
+            </div>
+            <div id="epms-lv-host" class="epms-sheet-host hmi-depth" data-theme="dark" data-rz-authored-basis="E-S-102 · Counts, ratings and loads on this sheet are conv-engine.js values for the hall shown (genset fleet from CONV_CALC.getFleet, transformers per stream, UPS modules, racks, hall IT and facility load). Breaker positions, source service and genset run state are SIMULATED (operated from the inspector, select then execute), and each kW / A / load % is the topology solve of those loads through those positions: a training simulation, not metering."></div>
         </section>
     </div>
 
@@ -829,13 +789,11 @@ body[data-epms-view="sld"] .epms-zoom-group { display: none !important; }
 <div class="toast" id="toast">Ready</div>
 
 <script>
-/* ==============================================
-   1. CONFIGURATION
-   ============================================== */
-/* v1.134.9 — the single-line's telemetry ladder, DERIVED. Each rung is the load the topology
-   below it actually carries: the incomer carries the facility, an ATSDB half of it (2N), a UPS
-   the IT load per system, a PDU its share of that, a rack its share of a PDU. The old ladder
-   was seven authored constants at the retired 1.85 MW scale. */
+/* EPMS authority, page chrome and the status painter (phase E5, PRD-CONV-EQUIPMENT-TRUTH). The legacy LV drawing that
+   lived here (three gensets GEN A/B/C, a 20 kV utility, one-click switching, its own pan / zoom and a status bar that
+   read NORMAL while a feed was dead) is retired: the LV view is now the governed sheet E-S-102 (js/conv/epms-lv.js,
+   drawn by js/rz-hmi-sheet.js and operated by js/conv/epms-lv-view.js). Every number the status strip and bar show is
+   painted by window.RZEpmsStatus.paint() from the solved E-S-101 + E-S-102 state; nothing here invents a value. */
 function epmsRuntimeAuthorityAvailable() {
   const currentEngineVersion = (window.RZ_ENGINE_VERSIONS || {}).conv || null;
   const engineScript = document.querySelector('script[src^="js/conv-engine.js"]');
@@ -865,659 +823,33 @@ function epmsRuntimeAuthorityAvailable() {
 const EPMS_RUNTIME_AUTHORITY_AVAILABLE = epmsRuntimeAuthorityAvailable();
 document.body.setAttribute('data-rz-basis-authority',
   EPMS_RUNTIME_AUTHORITY_AVAILABLE ? 'current' : 'unavailable');
-const EPMS_LADDER = (function () {
-  const s = EPMS_RUNTIME_AUTHORITY_AVAILABLE ? window.CONV_CALC.snapshot : null;
-  if (!s) return {
-    incomerKw:null, tieKw:null, atsdbKw:null, lvsbKw:null, dbKw:null,
-    upsKw:null, pduKw:null, rackKw:null, dahuKw:null
-  };
-  const facility = Math.round(s.site.facility_load_kw);
-  const itKw = Math.round(s.site.it_load_kw);
-  const systems = s.electrical.ups_system_count || 2;
-  const RACKS = 10, PDUS_PER_RACK = 2;      // ten aggregate rack columns, main + catcher PDU
-  const upsKw = Math.round(itKw / systems);
-  const pduKw = Math.round(itKw / (RACKS * PDUS_PER_RACK));
-  return {
-    incomerKw: facility,
-    /* The tie carries what one side would pick up, so it is sized on the incomer. */
-    tieKw: facility,
-    atsdbKw: Math.round(facility / systems),
-    /* Each LV switchboard serves one stream. NOTE a real 43.5 MW site splits LV distribution
-       across several transformers and boards; this single-line draws one per stream, so the
-       per-board current it reports is correspondingly large. That is the drawing's topology
-       showing through honestly, not a calculation error — the alternative would be to divide
-       by a transformer count the drawing does not have. */
-    lvsbKw: Math.round(facility / systems),
-    dbKw: Math.round(itKw / systems),
-    upsKw: upsKw,
-    pduKw: pduKw,
-    rackKw: Math.round(itKw / RACKS),
-    rackPositionsPerColumn: Math.round(s.campus.racks_total / RACKS),
-    /* Mechanical AHU branch: the non-IT load shared over the drawn DAHU feeders. */
-    dahuKw: Math.round(s.site.non_it_load_kw / 10),
-  };
-}());
 
-const GRID = {
-    SRC: 50, MV: 150, RMU: 300, TX: 450, LVSB: 650, ATSDB: 850, UPS: 1050, 
-    PDU: 1250,  
-    RACK_ATS: 1400, 
-    RACK: 1500,
-    MECH_ROW: 1750, // Pushed DOWN significantly for clearance
-    A: 600, C: 1800, B: 3000 // Widened center for Racks
-};
-
-const SIM = {
-    sources: { A: true, B: true },
-    genRunning: { A: false, B: false, C: false },
-    breakers: {},
-    energizedNodes: {} 
-};
-
-/* ==============================================
-   2. DATA MODEL
-   ============================================== */
-const DEVICES = [
-    // STREAM A (Left Side)
-    { id:'MV_A', lbl:'MV-A', sub:'Incomer', x:GRID.A, y:GRID.MV, w:140, type:'BOX' },
-    { id:'RMU_A', lbl:'RMU-A', sub:'Ring Unit', x:GRID.A, y:GRID.RMU, w:140, type:'BOX' },
-    { id:'TX_A', lbl:'Tx-A', sub:'20kV/400V', spec:'DYN5, 3150KVA', x:GRID.A, y:GRID.TX, w:0, type:'TX' },
-    { id:'LVSB_A', lbl:'LVSB-A', sub:'Main Board', x:GRID.A, y:GRID.LVSB, w:160, type:'BOX' },
-    { id:'GEN_A', lbl:'GEN-A', sub:'Standby', spec:'2.5 MW', x:GRID.A-250, y:GRID.LVSB, w:100, type:'GEN' },
-    
-    // Split ATSDB A
-    { id:'ATSDB_IT_A', lbl:'ATSDB-IT-A', sub:'Dist Board', x:GRID.A-120, y:GRID.ATSDB, w:120, type:'BOX' },
-    { id:'ATSDB_M_A', lbl:'ATSDB-Mech-A', sub:'Dist Board', x:GRID.A+120, y:GRID.ATSDB, w:120, type:'BOX' },
-    
-    // UPS A (IT & Mech)
-    { id:'UPS_A', lbl:'UPS-IT-A', sub:'Online', x:GRID.A-120, y:GRID.UPS, w:120, type:'BOX' },
-    { id:'UPS_M_A', lbl:'UPS-M-A', sub:'Cooling Support', x:GRID.A+120, y:GRID.UPS, w:120, type:'BOX' }, 
-
-    // STREAM B (Right Side)
-    { id:'MV_B', lbl:'MV-B', sub:'Incomer', x:GRID.B, y:GRID.MV, w:140, type:'BOX' },
-    { id:'RMU_B', lbl:'RMU-B', sub:'Ring Unit', x:GRID.B, y:GRID.RMU, w:140, type:'BOX' },
-    { id:'TX_B', lbl:'Tx-B', sub:'20kV/400V', spec:'DYN5, 3150KVA', x:GRID.B, y:GRID.TX, w:0, type:'TX' },
-    { id:'LVSB_B', lbl:'LVSB-B', sub:'Main Board', x:GRID.B, y:GRID.LVSB, w:160, type:'BOX' },
-    { id:'GEN_B', lbl:'GEN-B', sub:'Standby', spec:'2.5 MW', x:GRID.B+250, y:GRID.LVSB, w:100, type:'GEN' },
-    
-    // Split ATSDB B
-    { id:'ATSDB_IT_B', lbl:'ATSDB-IT-B', sub:'Dist Board', x:GRID.B+120, y:GRID.ATSDB, w:120, type:'BOX' },
-    { id:'ATSDB_M_B', lbl:'ATSDB-Mech-B', sub:'Dist Board', x:GRID.B-120, y:GRID.ATSDB, w:120, type:'BOX' },
-    
-    // UPS B (IT & Mech)
-    { id:'UPS_B', lbl:'UPS-IT-B', sub:'Online', x:GRID.B+120, y:GRID.UPS, w:120, type:'BOX' },
-    { id:'UPS_M_B', lbl:'UPS-M-B', sub:'Cooling Support', x:GRID.B-120, y:GRID.UPS, w:120, type:'BOX' }, 
-
-    // STREAM C (Center)
-    { id:'RMU_C', lbl:'RMU-C', sub:'Catcher Ring', x:GRID.C, y:GRID.RMU, w:140, type:'BOX' },
-    { id:'TX_C', lbl:'Tx-C', sub:'20kV/400V', spec:'DYN5, 3150KVA', x:GRID.C, y:GRID.TX, w:0, type:'TX' },
-    { id:'LVSB_C', lbl:'LVSB-C', sub:'Catcher Main', x:GRID.C, y:GRID.LVSB, w:160, type:'BOX' },
-    { id:'GEN_C', lbl:'GEN-C', sub:'Standby', spec:'2.5 MW', x:GRID.C+250, y:GRID.LVSB, w:100, type:'GEN' },
-    { id:'ATSDB_IT_C', lbl:'ATSDB-IT-C', sub:'Dist Board', x:GRID.C-100, y:GRID.ATSDB, w:120, type:'BOX' },
-    { id:'ATSDB_M_C', lbl:'ATSDB-Mech-C', sub:'Dist Board', x:GRID.C+100, y:GRID.ATSDB, w:120, type:'BOX' },
-    { id:'UPS_C', lbl:'UPS-IT-C', sub:'Online', x:GRID.C-100, y:GRID.UPS, w:120, type:'BOX' },
-
-    // COUPLERS (ATS PANELS)
-    { id:'ATS_PNL1', lbl:'ATS PNL 1', sub:'Tie A-C', x:GRID.A+380, y:GRID.ATSDB+50, w:100, type:'BOX' },
-    { id:'ATS_PNL2', lbl:'ATS PNL 2', sub:'Tie B-C', x:GRID.B-380, y:GRID.ATSDB+50, w:100, type:'BOX' },
-    
-    // CDP
-    /* v1.134.6 — was x: GRID.C+100 (=1900), which is rack 6's PDU B position, so "CDP PANEL"
-       and "PDU B" were drawn over one another. Placed left of the rack block instead. */
-    { id:'CDP', lbl:'CDP PANEL', sub:'Controls', x:950, y:GRID.PDU, w:100, type:'BOX' },
-
-    // --- MECHANICAL LOADS ZONE A (FAR LEFT) ---
-    { id:'CH_1', lbl:'CHILLER 1', sub:'Mech Load', x:150, y:GRID.MECH_ROW, w:100, type:'BOX' },
-    { id:'CH_3', lbl:'CHILLER 3', sub:'Mech Load', x:270, y:GRID.MECH_ROW, w:100, type:'BOX' },
-    { id:'AHU_1', lbl:'AHU SYS 1', sub:'Ventilation', x:390, y:GRID.MECH_ROW, w:100, type:'BOX' },
-
-    // --- MECHANICAL LOADS ZONE B (FAR RIGHT) ---
-    { id:'CH_2', lbl:'CHILLER 2', sub:'Mech Load', x:3200, y:GRID.MECH_ROW, w:100, type:'BOX' },
-    { id:'CH_4', lbl:'CHILLER 4', sub:'Mech Load', x:3320, y:GRID.MECH_ROW, w:100, type:'BOX' },
-    { id:'AHU_2', lbl:'AHU SYS 2', sub:'Ventilation', x:3440, y:GRID.MECH_ROW, w:100, type:'BOX' },
-];
-
-// DAHU UNITS (A Side Left, B Side Right)
-for(let i=0; i<5; i++){
-    // Zone A DAHU: 500 onwards
-    DEVICES.push({ 
-        id:`DAHU_A_${i}`, lbl:`DAHU A${i+1}`, sub:'Crit Cool', 
-        x: 550 + (i*110), y: GRID.MECH_ROW, w:90, type:'BOX' 
-    });
-    // Zone B DAHU: 2600 onwards
-    DEVICES.push({ 
-        id:`DAHU_B_${i}`, lbl:`DAHU B${i+1}`, sub:'Crit Cool', 
-        x: 2600 + (i*110), y: GRID.MECH_ROW, w:90, type:'BOX' 
-    });
-}
-
-// AGGREGATE RACK COLUMNS (CENTERED: 1100 to 2500)
-// Ten columns reconcile the full governed IT estate; they are not ten physical cabinets.
-const RACK_START_X = 1100;
-const RACK_GAP = 140;
-
-for(let i=0; i<10; i++){
-    let rx = RACK_START_X + (i * RACK_GAP);
-    DEVICES.push({ id:`rATS_${i}`, lbl:`ATS`, sub:``, x:rx, y:GRID.RACK_ATS, w:50, type:'ATS_BOX' });
-    DEVICES.push({
-        id:`RACK_${i}`, lbl:`RACK GROUP ${i+1}`,
-        sub:`${EPMS_LADDER.rackPositionsPerColumn} racks`, x:rx, y:GRID.RACK, w:100, type:'BOX'
-    });
-    
-    let isStreamA = i < 5;
-    let pduMainId = `PDU_${isStreamA?'A':'B'}_${i}`;
-    let pduCatchId = `PDU_C_${i}`;
-    
-    // Create Row PDU Devices
-    DEVICES.push({ id:pduMainId, lbl:`PDU ${isStreamA?'A':'B'}`, sub:'', x:rx - 35, y:GRID.PDU, w:60, type:'BOX' });
-    DEVICES.push({ id:pduCatchId, lbl:`PDU C`, sub:'', x:rx + 35, y:GRID.PDU, w:60, type:'BOX' });
-}
-
-/* ==============================================
-   3. WIRE DATABASE
-   ============================================== */
-const WIRES = [
-    // --- HV A ---
-    { id:'w_mv_a', from:'SRC_A', to:'MV_A', br:'br_mv_a', col:'A', v:20000 },
-    { id:'w_rmu_a', from:'MV_A', to:'RMU_A', br:'br_rmu_a', col:'A', v:20000 },
-    { id:'w_tx_a', from:'RMU_A', to:'TX_A', br:'br_tx_a', col:'A', v:20000 },
-    { id:'w_lvsb_a', from:'TX_A', to:'LVSB_A', br:'br_util_a', col:'A', v:400 },
-    { id:'w_gen_a', from:'GEN_A', to:'LVSB_A', br:'br_gen_a', col:'A', def:'open', v:400 },
-    { id:'w_mv_tie', from:'MV_A', to:'MV_B', br:'br_mv_tie', col:'A', def:'open', v:20000 },
-
-    // DIST A
-    { id:'w_db_a', from:'LVSB_A', to:'ATSDB_IT_A', br:'br_db_a', col:'A', v:400 },
-    { id:'w_ups_a', from:'ATSDB_IT_A', to:'UPS_A', br:'br_ups_a', col:'A', v:400 },
-    
-    // MECH A (UPS-M path)
-    { id:'w_db_m_a', from:'LVSB_A', to:'ATSDB_M_A', br:'br_db_m_a', col:'A', v:400 },
-    { id:'w_ups_m_a_in', from:'ATSDB_M_A', to:'UPS_M_A', br:'br_ups_m_a_in', col:'A', v:400 },
-    { id:'w_ats1_a', from:'ATSDB_M_A', to:'ATS_PNL1', br:'br_ats1_a', col:'A', v:400 },
-
-    // --- HV B ---
-    { id:'w_mv_b', from:'SRC_B', to:'MV_B', br:'br_mv_b', col:'B', v:20000 },
-    { id:'w_rmu_b', from:'MV_B', to:'RMU_B', br:'br_rmu_b', col:'B', v:20000 },
-    { id:'w_tx_b', from:'RMU_B', to:'TX_B', br:'br_tx_b', col:'B', v:20000 },
-    { id:'w_lvsb_b', from:'TX_B', to:'LVSB_B', br:'br_util_b', col:'B', v:400 },
-    { id:'w_gen_b', from:'GEN_B', to:'LVSB_B', br:'br_gen_b', col:'B', def:'open', v:400 },
-
-    // DIST B
-    { id:'w_db_b', from:'LVSB_B', to:'ATSDB_IT_B', br:'br_db_b', col:'B', v:400 },
-    { id:'w_ups_b', from:'ATSDB_IT_B', to:'UPS_B', br:'br_ups_b', col:'B', v:400 },
-
-    // MECH B
-    { id:'w_db_m_b', from:'LVSB_B', to:'ATSDB_M_B', br:'br_db_m_b', col:'B', v:400 },
-    { id:'w_ups_m_b_in', from:'ATSDB_M_B', to:'UPS_M_B', br:'br_ups_m_b_in', col:'B', v:400 },
-    { id:'w_ats2_b', from:'ATSDB_M_B', to:'ATS_PNL2', br:'br_ats2_b', col:'B', v:400 },
-
-    // --- HV C ---
-    { id:'w_ring_ac', from:'RMU_A', to:'RMU_C', br:'br_ring_ac', col:'A', v:20000 },
-    { id:'w_ring_bc', from:'RMU_B', to:'RMU_C', br:'br_ring_bc', col:'B', def:'open', v:20000 },
-    { id:'w_tx_c', from:'RMU_C', to:'TX_C', br:'br_tx_c', col:'C', v:20000 },
-    { id:'w_lvsb_c', from:'TX_C', to:'LVSB_C', br:'br_util_c', col:'C', v:400 },
-    { id:'w_gen_c', from:'GEN_C', to:'LVSB_C', br:'br_gen_c', col:'C', def:'open', v:400 },
-    { id:'w_db_c', from:'LVSB_C', to:'ATSDB_IT_C', br:'br_db_c', col:'C', v:400 },
-    { id:'w_ups_c', from:'ATSDB_IT_C', to:'UPS_C', br:'br_ups_c', col:'C', v:400 },
-    { id:'w_db_m_c', from:'LVSB_C', to:'ATSDB_M_C', br:'br_db_m_c', col:'C', v:400 },
-    { id:'w_ats1_c', from:'ATSDB_M_C', to:'ATS_PNL1', br:'br_ats1_c', col:'C', def:'open', v:400 },
-    { id:'w_ats2_c', from:'ATSDB_M_C', to:'ATS_PNL2', br:'br_ats2_c', col:'C', def:'open', v:400 },
-
-    // MECH & CONTROL (Routed to Far Left/Right)
-    { id:'w_ch1', from:'ATS_PNL1', to:'CH_1', br:'br_ch1', col:'A', v:400, route:'mech_left' },
-    { id:'w_ch3', from:'ATS_PNL1', to:'CH_3', br:'br_ch3', col:'A', v:400, route:'mech_left' },
-    { id:'w_ahu1', from:'ATSDB_M_A', to:'AHU_1', br:'br_ahu1', col:'A', v:400, route:'mech_left' },
-
-    { id:'w_ch2', from:'ATS_PNL2', to:'CH_2', br:'br_ch2', col:'B', v:400, route:'mech_right' },
-    { id:'w_ch4', from:'ATS_PNL2', to:'CH_4', br:'br_ch4', col:'B', v:400, route:'mech_right' },
-    { id:'w_ahu2', from:'ATSDB_M_B', to:'AHU_2', br:'br_ahu2', col:'B', v:400, route:'mech_right' },
-    
-    { id:'w_cdp', from:'UPS_C', to:'CDP', br:'br_cdp', col:'C', v:230 }
-];
-
-// WIRE DAHUs
-for(let i=0; i<5; i++){
-    // Route from UPS-M-A (approx x=720) to DAHU A (x=550+)
-    // Needs direct orthogonal drop
-    WIRES.push({ id:`w_dahu_a_${i}`, from:'UPS_M_A', to:`DAHU_A_${i}`, br:`br_dahu_a_${i}`, col:'A', v:400, route:'mech_drop' });
-}
-for(let i=0; i<5; i++){
-    WIRES.push({ id:`w_dahu_b_${i}`, from:'UPS_M_B', to:`DAHU_B_${i}`, br:`br_dahu_b_${i}`, col:'B', v:400, route:'mech_drop' });
-}
-
-// WIRE RACKS
-for(let i=0; i<10; i++){
-    const isA = i < 5;
-    const srcUPS = isA ? 'UPS_A' : 'UPS_B';
-    const srcCol = isA ? 'A' : 'B';
-    const pduMainId = `PDU_${srcCol}_${i}`;
-    const pduCatchId = `PDU_C_${i}`;
-    const atsId = `rATS_${i}`;
-    const rackId = `RACK_${i}`;
-
-    // UPS -> PDU Row (No Tele to save clutter)
-    WIRES.push({ id:`w_ups_pdu_m_${i}`, from:srcUPS, to:pduMainId, br:`br_pdu_m_${i}`, col:srcCol, v:400, noTele:true });
-    WIRES.push({ id:`w_ups_pdu_c_${i}`, from:'UPS_C', to:pduCatchId, br:`br_pdu_c_${i}`, col:'C', v:400, noTele:true });
-    // PDU -> ATS
-    WIRES.push({ id:`w_pdu_ats_m_${i}`, from:pduMainId, to:atsId, br:`br_ats_m_${i}`, col:srcCol, v:230, route:'left' });
-    WIRES.push({ id:`w_pdu_ats_c_${i}`, from:pduCatchId, to:atsId, br:`br_ats_c_${i}`, col:'C', v:230, route:'right' });
-    // ATS -> Rack
-    WIRES.push({ id:`w_ats_rack_${i}`, from:atsId, to:rackId, br:`br_rack_${i}`, col:srcCol, v:230 });
-}
-
-/* ==============================================
-   LOGIC & RENDER
-   ============================================== */
-function init(){
-    if (!EPMS_RUNTIME_AUTHORITY_AVAILABLE) {
-        paintEpmsAuthorityUnavailable();
-        return;
-    }
-    document.body.setAttribute('data-rz-basis-authority', 'current');
-    var state = document.getElementById('epms-state');
-    state.textContent = 'EPMS NORMAL';
-    state.style.color = '#22c55e';
-    document.querySelectorAll('#btn-u-a,#btn-u-b,#btn-tie').forEach((node) => {
-        node.removeAttribute('aria-disabled');
-        node.style.pointerEvents = '';
-    });
-    document.querySelectorAll('.export-btn,.export-item').forEach((node) => {
-        node.removeAttribute('aria-disabled');
-        node.style.pointerEvents = '';
-        node.style.opacity = '';
-    });
-    WIRES.forEach(w => SIM.breakers[w.br] = w.def || 'closed');
-    drawLayout();
-
-    // Auto-center the diagram after layout is drawn
-    setTimeout(() => {
-        /* v1.134.18 — was fitScreen(). Fit puts every label under 6 px on this drawing, so the
-           cockpit opened on a picture nobody could read. Open at the working zoom instead,
-           anchored at the utility incomers where the one-line starts; Fit stays one click away
-           for the overview. */
-        openAtWorkingZoom();
-        updateStatusBar();
-    }, 50);
-
-    setInterval(() => {
-        try {
-            runATSLogic();
-            calcPowerFlow();
-            updateUI();
-        } catch(e) { console.error(e); }
-    }, 500);
-    setInterval(updateStatusBar, 1000);
-}
-
-function runATSLogic(){
-    ['A', 'B', 'C'].forEach(stream => {
-        const utilBr = `br_util_${stream.toLowerCase()}`;
-        const genBr = `br_gen_${stream.toLowerCase()}`;
-        let utilHealthy = false;
-        
-        if(stream === 'A') {
-            const direct = SIM.sources.A && SIM.breakers['br_mv_a'] === 'closed';
-            const viaTie = SIM.sources.B && SIM.breakers['br_mv_b'] === 'closed' && SIM.breakers['br_mv_tie'] === 'closed';
-            utilHealthy = (direct || viaTie);
-        } 
-        else if (stream === 'B') {
-            const direct = SIM.sources.B && SIM.breakers['br_mv_b'] === 'closed';
-            const viaTie = SIM.sources.A && SIM.breakers['br_mv_a'] === 'closed' && SIM.breakers['br_mv_tie'] === 'closed';
-            utilHealthy = (direct || viaTie);
-        }
-        else if (stream === 'C') {
-            const aLive = (SIM.sources.A || (SIM.sources.B && SIM.breakers['br_mv_tie'] === 'closed'));
-            const bLive = (SIM.sources.B || (SIM.sources.A && SIM.breakers['br_mv_tie'] === 'closed'));
-            const ringA = aLive && SIM.breakers['br_rmu_a'] === 'closed' && SIM.breakers['br_ring_ac'] === 'closed';
-            const ringB = bLive && SIM.breakers['br_rmu_b'] === 'closed' && SIM.breakers['br_ring_bc'] === 'closed';
-            utilHealthy = ringA || ringB;
-        }
-
-        if(utilHealthy){
-            if(SIM.breakers[genBr] === 'closed'){
-                log(`ATS ${stream}: Utility Restored. Syncing...`);
-                SIM.breakers[genBr] = 'open'; 
-                setTimeout(() => { 
-                    SIM.breakers[utilBr] = 'closed'; 
-                    SIM.genRunning[stream] = false;
-                }, 1000);
-            }
-        } else {
-            if(SIM.breakers[utilBr] === 'closed'){
-                log(`ATS ${stream}: Power Lost! Starting Gen...`);
-                SIM.breakers[utilBr] = 'open';
-                SIM.genRunning[stream] = true;
-                setTimeout(() => {
-                    SIM.breakers[genBr] = 'closed';
-                    log(`ATS ${stream}: Generator Online`);
-                }, 2000);
-            }
-        }
-    });
-}
-
-function calcPowerFlow(){
-    SIM.energizedNodes = {};
-    SIM.energizedType = {};
-    document.querySelectorAll('.flow').forEach(el => el.setAttribute('class', 'flow'));
-    document.querySelectorAll('.tele-txt').forEach(el => el.textContent = '0V 0A 0kW');
-
-    const energize = (nodeId, color, sourceType) => {
-        if(SIM.energizedNodes[nodeId]) return;
-        SIM.energizedNodes[nodeId] = color;
-        SIM.energizedType[nodeId] = sourceType;
-
-        const wires = WIRES.filter(w => {
-            if(w.from === nodeId) return true;
-            if(w.from.x && nodeId === 'SRC_' + w.col) return true;
-            if(w.id === 'w_mv_tie' && w.to === nodeId) return true;
-            return false;
-        });
-
-        wires.forEach(w => {
-            let nextNode = w.to;
-            if(w.id === 'w_mv_tie' && w.to === nodeId) nextNode = w.from;
-
-            if(SIM.breakers[w.br] === 'closed'){
-                const flowEl = document.getElementById(`flow-${w.id}`);
-                if(flowEl){
-                    let visualClass = `energized-${color}`;
-                    if(sourceType === 'GEN') visualClass += '-gen';
-                    flowEl.setAttribute('class', `flow ${visualClass}`);
-                }
-                
-                const tele = document.getElementById(`tele-${w.id}`);
-                if(tele){
-                    /* v1.134.9 — this ladder was authored at the RETIRED 1.85 MW scale: 2,400 kW
-                       on the MV incomer, 6 kW per rack, 300 kW per UPS. The campus facility load
-                       is 43,500 kW, so the single-line was reporting a plant sixteen times
-                       smaller than the one every other strip on the same screen describes.
-                       Derived from the engine now and shared out by the topology's own counts,
-                       so a change of scenario moves the whole ladder. */
-                    let kw = EPMS_LADDER.incomerKw;
-                    if(w.to.includes('RACK')) kw = EPMS_LADDER.rackKw;
-                    else if(w.to.includes('LVSB')) kw = EPMS_LADDER.lvsbKw;
-                    else if(w.to.includes('DB')) kw = EPMS_LADDER.dbKw;
-                    else if(w.to.includes('PDU')) kw = EPMS_LADDER.pduKw;
-                    else if(w.to.includes('UPS')) kw = EPMS_LADDER.upsKw;
-                    else if(w.to.includes('ATSDB')) kw = EPMS_LADDER.atsdbKw;
-                    else if(w.to.includes('DAHU')) kw = EPMS_LADDER.dahuKw;
-                    if(w.id === 'w_mv_tie') kw = EPMS_LADDER.tieKw; 
-
-                    let amps = Math.floor((kw * 1000) / (1.732 * w.v * 0.9));
-                    tele.textContent = `${w.v}V ${amps}A ${kw}kW`;
-                }
-                energize(nextNode, color, sourceType);
-            }
-        });
-    };
-
-    if(SIM.sources.A) energize('SRC_A', 'A', 'UTIL');
-    if(SIM.sources.B) energize('SRC_B', 'B', 'UTIL');
-    if(SIM.genRunning.A && SIM.breakers['br_gen_a'] === 'closed') energize('GEN_A', 'A', 'GEN');
-    if(SIM.genRunning.B && SIM.breakers['br_gen_b'] === 'closed') energize('GEN_B', 'B', 'GEN');
-    if(SIM.genRunning.C && SIM.breakers['br_gen_c'] === 'closed') energize('GEN_C', 'C', 'GEN');
-
-    /* Rack ATS source selection (v1.131.1) — a rack ATS has TWO live inputs: its MAIN PDU feed and the
-       CATCHER (PDU_C) feed. The traversal above is first-come-first-served, so the catcher branch (reached
-       from source A) could claim a B-side rack ATS first and the ATS->rack leg then rendered A while its
-       main feed was clearly B — the colour-inheritance defect the owner reported.
-       An ATS transfers to exactly ONE source: prefer MAIN, fall back to CATCHER only when main is dead.
-       Both INPUT wires stay energized (they are genuinely live up to the ATS); only the OUTPUT leg and the
-       rack follow the SELECTED source. */
-    for(let i = 0; i < 10; i++){
-        const srcCol   = i < 5 ? 'A' : 'B';
-        const mainPdu  = `PDU_${srcCol}_${i}`;
-        const catchPdu = `PDU_C_${i}`;
-        const mainLive  = SIM.breakers[`br_ats_m_${i}`] === 'closed' && SIM.energizedNodes[mainPdu];
-        const catchLive = SIM.breakers[`br_ats_c_${i}`] === 'closed' && SIM.energizedNodes[catchPdu];
-        const selNode = mainLive ? mainPdu : (catchLive ? catchPdu : null);
-        const legEl = document.getElementById(`flow-w_ats_rack_${i}`);
-        const tele  = document.getElementById(`tele-w_ats_rack_${i}`);
-
-        if(selNode){
-            SIM.energizedNodes[`rATS_${i}`] = SIM.energizedNodes[selNode];
-            SIM.energizedType[`rATS_${i}`]  = SIM.energizedType[selNode];
-        } else {
-            delete SIM.energizedNodes[`rATS_${i}`];
-            delete SIM.energizedType[`rATS_${i}`];
-        }
-
-        if(selNode && SIM.breakers[`br_rack_${i}`] === 'closed'){
-            const col = SIM.energizedNodes[selNode];
-            const gen = SIM.energizedType[selNode] === 'GEN' ? '-gen' : '';
-            SIM.energizedNodes[`RACK_${i}`] = col;
-            SIM.energizedType[`RACK_${i}`]  = SIM.energizedType[selNode];
-            if(legEl) legEl.setAttribute('class', `flow energized-${col}${gen}`);
-            if(tele) tele.textContent = `AGG ${EPMS_LADDER.rackKw.toLocaleString()}kW · ${EPMS_LADDER.rackPositionsPerColumn} racks`;
-        } else {
-            delete SIM.energizedNodes[`RACK_${i}`];
-            delete SIM.energizedType[`RACK_${i}`];
-            if(legEl) legEl.setAttribute('class', 'flow');
-            if(tele) tele.textContent = '0V 0A 0kW';
-        }
-    }
-}
-
-/* ==============================================
-   UI & RENDER
-   ============================================== */
-function updateUI(){
-    ['A','B'].forEach(s => {
-        const b = document.getElementById(`btn-u-${s.toLowerCase()}`);
-        if(SIM.sources[s]) { b.classList.add('active'); b.classList.remove('off'); }
-        else { b.classList.add('off'); b.classList.remove('active'); }
-    });
-    ['A','B','C'].forEach(s => {
-        const b = document.getElementById(`btn-gen-${s.toLowerCase()}`);
-        if(SIM.genRunning[s]) { b.classList.add('active', 'gen-run'); b.classList.remove('off'); }
-        else { b.classList.remove('active', 'gen-run'); b.classList.add('off'); }
-    });
-    const tieBtn = document.getElementById('btn-tie');
-    if(SIM.breakers['br_mv_tie'] === 'closed') { tieBtn.classList.add('active'); tieBtn.classList.remove('off'); }
-    else { tieBtn.classList.add('off'); tieBtn.classList.remove('active'); }
-}
-
-const layers = { w: document.getElementById('l-wires'), f: document.getElementById('l-flow'), d: document.getElementById('l-devices'), b: document.getElementById('l-breakers'), t: document.getElementById('l-tele') };
-
-function drawLayout(){
-    DEVICES.forEach(d => {
-        const g = createSVG('g', {transform:`translate(${d.x},${d.y})`});
-        if(d.type === 'TX') {
-            const sym = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-            sym.setAttribute('href', '#sym-tx'); sym.setAttribute('transform', 'scale(2.5)');
-            sym.setAttribute('fill', 'none'); sym.setAttribute('stroke', '#e2e8f0');
-            g.append(sym);
-            const spec = createSVG('text', {x:35, y:5, class:'dev-spec', 'text-anchor':'start'});
-            spec.textContent = d.spec || ""; g.append(spec);
-            const lbl = createSVG('text', {x:0, y:-25, class:'dev-lbl'});
-            lbl.textContent = d.lbl; g.append(lbl);
-        } else if (d.type === 'ATS_BOX') {
-            const r = createSVG('rect', {x:-20, y:-10, width:40, height:20, class:'dev-rect', fill:'#1e293b'});
-            const t = createSVG('text', {x:0, y:4, class:'dev-lbl', 'font-size':'8px'});
-            t.textContent = "ATS"; g.append(r,t);
-        } else {
-            const r = createSVG('rect', {x:-d.w/2, y:-15, width:d.w, height:30, rx:4, class:'dev-rect'});
-            const t = createSVG('text', {x:0, y:5, class:'dev-lbl'}); t.textContent = d.lbl;
-            const s = createSVG('text', {x:0, y:22, class:'dev-sub'}); s.textContent = d.sub;
-            g.append(r,t,s);
-            if(d.spec && d.type !== 'TX'){
-               const sp = createSVG('text', {x:0, y:-25, class:'dev-spec'}); sp.textContent = d.spec; g.append(sp);
-            }
-        }
-        layers.d.appendChild(g);
-    });
-
-    /* Occupied telemetry-label slots for this render pass. Cleared each time the single-line
-       is rebuilt so the layout is a pure function of the wire list. */
-    const TELE_SLOTS = [];
-    WIRES.forEach(w => {
-        const src = getCoords(w.from); const dst = getCoords(w.to);
-        let path = ''; let midY = (src.y + dst.y) / 2; let brX = src.x, brY = midY;
-
-        if(w.route === 'left' || w.route === 'right'){
-            const channelX = w.route === 'left' ? dst.x - 15 : dst.x + 15;
-            path = `M ${src.x} ${src.y+15} L ${src.x} ${midY} L ${channelX} ${midY} L ${channelX} ${dst.y-10}`;
-            brX = channelX; brY = midY;
-        } else if (w.route === 'mech_left' || w.route === 'mech_right') {
-            // Complex routing for mechanical to avoid crossing
-            path = `M ${src.x} ${src.y+15} L ${src.x} ${midY} L ${dst.x} ${midY} L ${dst.x} ${dst.y-15}`;
-            if(src.x !== dst.x) brX = dst.x;
-        } else if (w.route === 'mech_drop') {
-            path = `M ${src.x} ${src.y+15} L ${src.x} ${dst.y-30} L ${dst.x} ${dst.y-30} L ${dst.x} ${dst.y-15}`;
-            brX = dst.x; brY = dst.y-30;
-        } else if(src.x === dst.x) {
-            path = `M ${src.x} ${src.y+15} L ${dst.x} ${dst.y-15}`;
-        } else if(src.y === dst.y) {
-            path = `M ${src.x+70} ${src.y} L ${dst.x-70} ${dst.y}`;
-            brX = (src.x+dst.x)/2; brY = src.y;
-        } else {
-            path = `M ${src.x} ${src.y+15} L ${src.x} ${midY} L ${dst.x} ${midY} L ${dst.x} ${dst.y-15}`;
-            if(src.x !== dst.x) brX = dst.x;
-        }
-        if(w.from.startsWith('SRC')) path = `M ${src.x} ${src.y} L ${dst.x} ${dst.y-15}`;
-
-        const wireEl = createSVG('path', {d:path, class:'wire', id:`wire-${w.id}`});
-        const flowEl = createSVG('path', {d:path, class:`flow`, id:`flow-${w.id}`});
-        layers.w.appendChild(wireEl); layers.f.appendChild(flowEl);
-
-        drawBreaker(w.br, brX, brY);
-
-        if(!w.noTele){
-            const tx = brX + 20;
-            /* v1.134.6 — the label was pinned to the breaker, so breakers close together
-               stacked their readings into an unreadable smear (both were real values). Step
-               the label down until its BOX is clear of every label already placed. A first
-               attempt keyed on the anchor point only, which fixed exact stacking and left the
-               real case untouched: these labels are 95 px wide, so two anchors 20 px apart
-               still overlap. Test the rectangle, not the point. Deterministic — no randomness,
-               so the layout is identical on every reload. */
-            let ty = brY - 12;
-            /* The reserved box is a little larger than the background rect: the rendered text
-               runs slightly past it, and reserving only the rect left ~6 px of real overlap. */
-            const W = 106, ABOVE = 11, BELOW = 5;
-            const overlaps = (y) => TELE_SLOTS.some((r) =>
-                tx - 4 < r.x2 && tx + W > r.x1 && y - ABOVE < r.y2 && y + BELOW > r.y1);
-            let guard = 0;
-            while (overlaps(ty) && guard < 10) { ty += 14; guard += 1; }
-            TELE_SLOTS.push({ x1: tx - 4, x2: tx + W, y1: ty - ABOVE, y2: ty + BELOW });
-            const teleG = createSVG('g', {transform:`translate(${tx}, ${ty})`});
-            const bg = createSVG('rect', {x:-2, y:-8, width:95, height:10, class:'tele-bg'});
-            const teleTxt = createSVG('text', {class:'tele-txt', id:`tele-${w.id}`});
-            teleTxt.textContent = "0V 0A 0kW";
-            teleG.append(bg, teleTxt); layers.t.appendChild(teleG);
-        }
-    });
-}
-
-function drawBreaker(id, x, y){
-    const g = createSVG('g', {transform:`translate(${x},${y})`, class:'br-group', id:`br-grp-${id}`, onmousedown:`handleBreakerClick(event, '${id}')`});
-    const box = createSVG('rect', {x:-6, y:-8, width:12, height:16, class:'br-box'});
-    const hit = createSVG('rect', {x:-15, y:-15, width:30, height:30, fill:'transparent'});
-    const trip = createSVG('path', {d:'M -8 -8 L 8 8 M 8 -8 L -8 8', class:'br-x'});
-    g.append(box, trip, hit); layers.b.appendChild(g);
-}
-
-function toggleSource(s){
-    if (!EPMS_RUNTIME_AUTHORITY_AVAILABLE) return false;
-    SIM.sources[s] = !SIM.sources[s]; log(`Source ${s} Toggled`); return true;
-}
-function toggleTie(){
-    if (!EPMS_RUNTIME_AUTHORITY_AVAILABLE) return false;
-    SIM.breakers['br_mv_tie'] = (SIM.breakers['br_mv_tie']==='closed'?'open':'closed'); log('Tie Toggled'); return true;
-}
-function handleBreakerClick(e, id){
-    if (!EPMS_RUNTIME_AUTHORITY_AVAILABLE) return false;
-    e.stopPropagation(); 
-    if(e.shiftKey) SIM.breakers[id] = 'trip';
-    else if(e.altKey) SIM.breakers[id] = 'open';
-    else SIM.breakers[id] = (SIM.breakers[id]==='closed'?'open':'closed');
-    updateView();
-}
-function updateView(){
-    for(let id in SIM.breakers){
-        const el = document.getElementById(`br-grp-${id}`);
-        if(el) {
-            el.setAttribute('class', `br-group ${SIM.breakers[id]}`);
-            const tx = el.querySelector('.br-x');
-            if(tx) tx.style.display = (SIM.breakers[id] === 'trip' ? 'block' : 'none');
-        }
-    }
-}
-function getCoords(idOrObj){
-    if(typeof idOrObj === 'object') return idOrObj;
-    const d = DEVICES.find(x => x.id === idOrObj);
-    if(d) return {x:d.x, y:d.y};
-    if(idOrObj === 'SRC_A') return {x:GRID.A, y:GRID.SRC};
-    if(idOrObj === 'SRC_B') return {x:GRID.B, y:GRID.SRC};
-    return {x:0, y:0};
-}
-function createSVG(tag, attrs){
-    const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
-    for(let k in attrs) {
-        if(k==='onmousedown') el.setAttribute(k, attrs[k]);
-        else if(k==='textContent') el.textContent = attrs[k];
-        else el.setAttribute(k, attrs[k]);
-    }
-    return el;
-}
-/* v1.134.24 — `basis` lets ONE entry declare itself. log() writes with textContent (rightly:
-   the messages are not markup), so an inline declaration would have printed as literal text.
-   Only the view line uses it — the operational entries state plant quantities and belong in
-   the coverage denominator like everything else. */
-function log(msg, basis){ const l=document.getElementById('logs'); const d=document.createElement('div'); d.textContent=`> ${msg}`; if(basis) d.setAttribute('data-rz-authored-basis', basis); l.prepend(d); }
-
-let scale = 0.5; let px = 0, py = 0;
-const scene = document.getElementById('scene');
-const viewportEl = document.getElementById('viewport');
-
-// Layout constants (screen pixels)
-const TOPBAR_HEIGHT_PX = 50;
-const STATUSBAR_HEIGHT_PX = 50;
-
+/* the context chrome above the drawing (cockpit bar, status strip, banner) sets where the drawing starts */
 function syncEpmsContextHeight() {
     const statusStrip = document.getElementById('epms-status-strip');
-    const legend = document.getElementById('epms-legend');
-    // PRD-Q06 FR-4: the simulated banner slot sits between the strip and the legend and is part of the context chrome.
     const bannerSlot = document.querySelector('[data-rz-telemetry-banner-slot]');
-    const shellBar = document.querySelector('.cv-bar');   // E7a: the 48 px cockpit bar sits above the context strips
+    const shellBar = document.querySelector('.cv-bar');
     const contextHeight = Math.ceil(
         (shellBar ? shellBar.getBoundingClientRect().height : 0)
         + (statusStrip ? statusStrip.getBoundingClientRect().height : 0)
         + (bannerSlot ? bannerSlot.getBoundingClientRect().height : 0)
-        + (legend ? legend.getBoundingClientRect().height : 0)
     );
     document.documentElement.style.setProperty('--epms-context-height', contextHeight + 'px');
     return contextHeight;
 }
-
-function epmsContextHeight() {
-    const raw = getComputedStyle(document.documentElement).getPropertyValue('--epms-context-height');
-    return Number.parseFloat(raw) || syncEpmsContextHeight();
-}
-
 syncEpmsContextHeight();
 if (typeof ResizeObserver === 'function') {
     const epmsChromeObserver = new ResizeObserver(syncEpmsContextHeight);
-    epmsChromeObserver.observe(document.getElementById('epms-status-strip'));
-    epmsChromeObserver.observe(document.getElementById('epms-legend'));
-    const epmsBannerSlot = document.querySelector('[data-rz-telemetry-banner-slot]');
-    if (epmsBannerSlot) epmsChromeObserver.observe(epmsBannerSlot);
+    [document.getElementById('epms-status-strip'), document.querySelector('[data-rz-telemetry-banner-slot]'), document.querySelector('.cv-bar')]
+        .forEach(function (node) { if (node) epmsChromeObserver.observe(node); });
 } else {
     window.addEventListener('resize', syncEpmsContextHeight);
 }
-
-function visibleSidebarWidth() {
-    const sidebar = document.getElementById('epmsSidebar');
-    if (window.innerWidth <= 768 || !sidebar || getComputedStyle(sidebar).display === 'none') return 0;
-    return sidebar.getBoundingClientRect().width;
-}
-
 function setEpmsSidebar(open) {
     const toggle = document.getElementById('epmsSidebarToggle');
     document.body.classList.toggle('epms-sidebar-open', open);
     if (toggle) toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
 }
-
 const sidebarToggle = document.getElementById('epmsSidebarToggle');
 if (sidebarToggle) {
     sidebarToggle.addEventListener('click', () => {
@@ -1539,225 +871,13 @@ if (epmsTopbar) {
     });
 }
 
-// Content bounds in SVG units (based on GRID configuration)
-const CONTENT_MIN_X = 80;
-const CONTENT_MAX_X = 3520;
-const CONTENT_MIN_Y = 20;
-const CONTENT_MAX_Y = 1820;
-const CONTENT_WIDTH = CONTENT_MAX_X - CONTENT_MIN_X;
-const CONTENT_HEIGHT = CONTENT_MAX_Y - CONTENT_MIN_Y;
-const CONTENT_CENTER_X = (CONTENT_MIN_X + CONTENT_MAX_X) / 2;
-const CONTENT_CENTER_Y = (CONTENT_MIN_Y + CONTENT_MAX_Y) / 2;
-
-// Convert screen pixels to SVG units using the transformation matrix
-function screenToSVG(screenX, screenY) {
-    const ctm = viewportEl.getScreenCTM();
-    if (!ctm) return { x: screenX, y: screenY };
-    const pt = viewportEl.createSVGPoint();
-    pt.x = screenX;
-    pt.y = screenY;
-    const svgPt = pt.matrixTransform(ctm.inverse());
-    return { x: svgPt.x, y: svgPt.y };
-}
-
-/* Smallest on-screen size at which a monospace telemetry value is worth drawing. Below this
-   the label is hidden rather than rendered as unreadable texture. */
-const LOD_MIN_TEXT_PX = 9;
-const LOD_SMALLEST_USER_FONT_PX = 8;    // .dev-sub / .tele-txt tier
-const LOD_IDENTITY_USER_FONT_PX = 11;   // .dev-lbl tier — device names
-
-/* The working zoom this cockpit OPENS at. Fit-to-screen puts a 3600 x 2600 single-line into
-   ~1680 x 800 and every label lands under 6 px, so "fit" shows an operator a picture they
-   cannot read. Open at the scale where device names are legible and let them pan — which is
-   how a real single-line is worked — and keep Fit as an explicit control for the overview. */
-function workingZoom(){
-    const svg = document.getElementById('viewport');
-    const vb = (svg && (svg.getAttribute('viewBox')||'').split(/\s+/).map(Number)) || [];
-    const rendered = svg ? svg.getBoundingClientRect().width : 0;
-    if (!vb[2] || !rendered) return 1.6;
-    return Math.min(2.4, Math.max(1.2, (LOD_MIN_TEXT_PX + 1) / (LOD_IDENTITY_USER_FONT_PX * (rendered / vb[2]))));
-}
-
-function applyLevelOfDetail() {
-    const svg = document.getElementById('viewport');
-    if (!svg) return;
-    const vb = (svg.getAttribute('viewBox') || '').split(/\s+/).map(Number);
-    const rendered = svg.getBoundingClientRect().width;
-    if (!vb[2] || !rendered) return;
-    const perUnit = (rendered / vb[2]) * scale;
-    const valuesPx = LOD_SMALLEST_USER_FONT_PX * perUnit;   // .dev-sub / .tele-txt tier
-    const identityPx = LOD_IDENTITY_USER_FONT_PX * perUnit; // .dev-lbl tier
-    svg.classList.toggle('lod-values', valuesPx >= LOD_MIN_TEXT_PX);
-    svg.classList.toggle('lod-identity', identityPx >= LOD_MIN_TEXT_PX);
-    const hint = document.getElementById('lodHint');
-    if (hint) {
-        hint.textContent = valuesPx >= LOD_MIN_TEXT_PX ? 'values shown'
-            : (identityPx >= LOD_MIN_TEXT_PX ? 'zoom in for values' : 'topology only');
-    }
-}
-
-function setTransform(){
-    scene.setAttribute('transform', `translate(${px},${py}) scale(${scale})`);
-    updateZoomIndicator();
-    applyLevelOfDetail();
-}
-
-const VIEWPORT_STATE_BASIS = "Zoom percentage is VIEWPORT state — how far the operator has scaled the drawing, and the same drawing at any zoom shows the same plant. It is not an engineering quantity and conv-engine.js could not publish one: there is nothing in a data-centre model that determines how large a diagram is on a screen.";
-
-function updateZoomIndicator() {
-    const indicator = document.getElementById('zoomIndicator');
-    if(indicator) indicator.textContent = Math.round(scale * 100) + '%';
-}
-
-/* Open the single-line where an operator starts reading it: the incoming utility end, at a
-   zoom where device names are legible. */
-function openAtWorkingZoom(){
-    scale = workingZoom();
-    /* Anchor near the top-left of the drawn content rather than its centre — the sources are
-       there, and a centred view of a wide one-line opens in the middle of nothing.
-       v1.134.20 — a first version anchored at a flat (40, 40) in SVG units, which ignored the
-       topbar, the context banner and the sidebar, so the drawing opened UNDERNEATH the page
-       chrome. fitScreen() computes that visible region carefully; this must use the same
-       measurements rather than a guess. The alarm-runtime gate caught it. */
-    const visibleLeft = visibleSidebarWidth();
-    const visibleTop = epmsContextHeight() + TOPBAR_HEIGHT_PX;
-    const inset = screenToSVG(visibleLeft + 24, visibleTop + 24);
-    px = inset.x - CONTENT_MIN_X * scale;
-    py = inset.y - CONTENT_MIN_Y * scale;
-    setTransform();
-    /* The view line states a ZOOM, not a plant quantity; it carries the same declaration as
-       the indicator it echoes so the coverage backlog stays about the engineering. */
-    log(`View: working zoom ${Math.round(scale*100)}% \u2014 pan to follow the one-line, or Fit for the overview`,
-        VIEWPORT_STATE_BASIS);
-}
-
-function fitScreen() {
-    // Get visible area in screen pixels
-    const screenWidth = window.innerWidth;
-    const screenHeight = window.innerHeight;
-
-    // Visible area (excluding sidebar and topbar)
-    const visibleLeft = visibleSidebarWidth();
-    const visibleTop = epmsContextHeight() + TOPBAR_HEIGHT_PX;
-    const visibleWidth = screenWidth - visibleLeft;
-    const visibleBottom = screenHeight - STATUSBAR_HEIGHT_PX;
-    const visibleHeight = visibleBottom - visibleTop;
-
-    // Convert visible area corners to SVG coordinates
-    const topLeft = screenToSVG(visibleLeft, visibleTop);
-    const bottomRight = screenToSVG(screenWidth, visibleBottom);
-
-    // Available space in SVG units
-    const availableSvgWidth = bottomRight.x - topLeft.x;
-    const availableSvgHeight = bottomRight.y - topLeft.y;
-
-    // Calculate scale to fit content
-    const scaleX = availableSvgWidth / CONTENT_WIDTH;
-    const scaleY = availableSvgHeight / CONTENT_HEIGHT;
-    scale = Math.min(scaleX, scaleY) * 0.85;
-
-    // Calculate center of visible area in SVG coordinates
-    const visibleCenterSvg = screenToSVG(
-        visibleLeft + visibleWidth / 2,
-        visibleTop + visibleHeight / 2
-    );
-
-    // Position: move content center to visible center
-    px = visibleCenterSvg.x - CONTENT_CENTER_X * scale;
-    py = visibleCenterSvg.y - CONTENT_CENTER_Y * scale;
-
-    setTransform();
-    log('View: Fit to Screen \u2014 topology only; zoom in for telemetry values');
-}
-
-function setZoom(newScale) {
-    // Get center of visible area in screen coords
-    const sidebarWidth = visibleSidebarWidth();
-    const visibleCenterX = sidebarWidth + (window.innerWidth - sidebarWidth) / 2;
-    const visibleTop = epmsContextHeight() + TOPBAR_HEIGHT_PX;
-    const visibleCenterY = visibleTop
-        + (window.innerHeight - visibleTop - STATUSBAR_HEIGHT_PX) / 2;
-
-    // Convert to SVG coords
-    const centerSvg = screenToSVG(visibleCenterX, visibleCenterY);
-
-    // Find what diagram point is currently at this center
-    const diagramX = (centerSvg.x - px) / scale;
-    const diagramY = (centerSvg.y - py) / scale;
-
-    // Set new scale
-    scale = newScale;
-
-    // Reposition to keep same point at center
-    px = centerSvg.x - diagramX * scale;
-    py = centerSvg.y - diagramY * scale;
-
-    setTransform();
-    log(`Zoom: ${Math.round(scale * 100)}%`);
-}
-
-function resetView(){
-    fitScreen();
-}
-
-// Mouse wheel zoom
-viewportEl.onwheel = (e) => {
-    e.preventDefault();
-    const oldScale = scale;
-    scale += e.deltaY * -0.0008;
-    scale = Math.min(Math.max(0.15, scale), 2);
-
-    // Convert mouse position to SVG coords
-    const mouseSvg = screenToSVG(e.clientX, e.clientY);
-
-    // Find what diagram point is under mouse
-    const diagramX = (mouseSvg.x - px) / oldScale;
-    const diagramY = (mouseSvg.y - py) / oldScale;
-
-    // Reposition to keep same point under mouse
-    px = mouseSvg.x - diagramX * scale;
-    py = mouseSvg.y - diagramY * scale;
-
-    setTransform();
-};
-
-// Pan with mouse drag
-viewportEl.onmousedown = (e) => {
-    if(e.target.closest('.br-group')) return;
-    e.preventDefault();
-
-    let lastSvg = screenToSVG(e.clientX, e.clientY);
-    viewportEl.style.cursor = 'grabbing';
-
-    document.onmousemove = (m) => {
-        const currentSvg = screenToSVG(m.clientX, m.clientY);
-        px += currentSvg.x - lastSvg.x;
-        py += currentSvg.y - lastSvg.y;
-        lastSvg = currentSvg;
-        setTransform();
-    };
-    document.onmouseup = () => {
-        document.onmousemove = null;
-        viewportEl.style.cursor = 'grab';
-    };
-};
-
-// Re-fit on window resize (debounced)
-let resizeTimeout;
-window.addEventListener('resize', () => {
-    clearTimeout(resizeTimeout);
-    resizeTimeout = setTimeout(fitScreen, 150);
-});
-
-// =============================================
-// STATUS BAR UPDATES
-// =============================================
-/* v1.134.0 — the header strip's six right-hand cells were hardcoded words sitting beside
-   three engine-bound numbers, so they asserted a healthy plant regardless of what the
-   simulation was doing: open every breaker and kill both utilities and it still read
-   "Utility OK / UPS A/B Online / Trips 0". Each cell now derives from a real source, and
-   anything without one renders the unavailable marker instead of a comforting default. */
-function updateEpmsStatusStrip(snapshot) {
+/* ── status strip + status bar ─────────────────────────────────────────────────────────────────────────────────────
+   paint(m): m = { alarms: [{prio, tag, text}], offNormal, servedKw, demandKw, ringsLive, ringsTotal, ringsLostA, ringsLostB,
+   onBattery, upsTotal, gensRunning, gensTotal, lvClosed, lvTotal, lvHall } from js/conv/epms-lv-view.js. A dead source,
+   a board without supply or a UPS on battery is an alarm; an off-normal position without an alarm reads ABNORMAL. */
+window.RZEpmsStatus = (function () {
+    var OK = '#22c55e', WARN = '#f59e0b', DIM = '#94a3b8', CYAN = '#06b6d4', BAD = '#ef4444';
+    function grp(v) { return Math.round(v).toLocaleString('en-US'); }
     function put(id, text, colour, why) {
         var el = document.getElementById(id);
         if (!el) return;
@@ -1765,254 +885,119 @@ function updateEpmsStatusStrip(snapshot) {
         el.style.color = colour;
         if (why) el.title = why; else el.removeAttribute('title');
     }
-    var OK = '#22c55e', WARN = '#f59e0b', DIM = '#94a3b8', CYAN = '#06b6d4';
-
-    if (!EPMS_RUNTIME_AUTHORITY_AVAILABLE) {
+    function engineCells(snapshot) {
+        var e = snapshot && snapshot.electrical;
+        if (e) {
+            put('epms-ups-basis', e.ups_module_kw_rated != null ? (grp(e.ups_module_kw_rated) + ' kW/module') : '—', DIM, 'Module rating');
+            put('epms-ups-modules', e.ups_modules_per_system != null ? (e.ups_modules_per_system + ' × ' + e.ups_system_count) : '—', DIM, 'Modules per system × systems');
+            /* F21: the rating is modules × module rating; the load is what one system carries. Two cells, two words. */
+            put('epms-ups-sys', e.ups_system_rated_kw != null ? (grp(e.ups_system_rated_kw) + ' kW') : '—', DIM,
+                e.ups_modules_per_system + ' modules × ' + grp(e.ups_module_kw_rated) + ' kW rated per system');
+            put('epms-ups-load', e.ups_system_kw != null ? (grp(e.ups_system_kw) + ' kW') : '—', DIM, 'Load one system carries in normal operation (2N)');
+        }
+        if (snapshot && snapshot.meta) {
+            put('epms-dq', String(snapshot.meta.data_quality || '—'), OK, 'Data quality of the engine snapshot');
+            put('epms-scn', String(snapshot.meta.scenario || '—'), CYAN, 'Engine scenario');
+        }
+    }
+    function unavailable() {
+        document.body.setAttribute('data-rz-basis-authority', 'unavailable');
         put('epms-state', 'EPMS AUTHORITY UNAVAILABLE', DIM, 'Governed EPMS basis unavailable');
-        ['epms-fac', 'epms-it', 'epms-pue', 'epms-utility', 'epms-ups', 'epms-gen',
-            'epms-trips', 'epms-ups-basis', 'epms-ups-modules', 'epms-ups-sys',
-            'epms-dq', 'epms-scn'].forEach(function (id) {
+        ['epms-fac', 'epms-it', 'epms-pue', 'epms-utility', 'epms-ups', 'epms-gen', 'epms-trips', 'epms-ups-basis', 'epms-ups-modules',
+            'epms-ups-sys', 'epms-ups-load', 'epms-dq', 'epms-scn'].forEach(function (id) {
             put(id, '—', DIM, 'UNAVAILABLE — governed EPMS basis did not validate');
         });
-        return;
+        ['val-system', 'val-total-load', 'val-breakers', 'val-alarms'].forEach(function (id) {
+            var node = document.getElementById(id); if (!node) return;
+            node.textContent = id === 'val-system' ? 'UNAVAILABLE' : '—';
+            node.className = 'status-value';
+        });
+        document.getElementById('box-system').className = 'status-box';
+        document.getElementById('ind-system').className = 'status-led off';
+        document.getElementById('box-alarms').className = 'status-box';
+        document.querySelectorAll('.export-btn,.export-item').forEach(function (node) {
+            node.setAttribute('aria-disabled', 'true');
+            node.style.pointerEvents = 'none';
+            node.style.opacity = '0.45';
+        });
     }
-
-    var utilA = !!SIM.sources.A, utilB = !!SIM.sources.B;
-    if (utilA && utilB)       put('epms-utility', 'A+B', OK, 'Both utility sources energised');
-    else if (utilA || utilB)  put('epms-utility', utilA ? 'A only' : 'B only', WARN, 'One utility source lost');
-    else                      put('epms-utility', 'LOST', '#ef4444', 'No utility source energised');
-
-    /* UPS availability is read from the same energisation map the single-line draws from,
-       so the words cannot disagree with the picture directly above them. */
-    var upsA = !!SIM.energizedNodes['UPS_A'], upsB = !!SIM.energizedNodes['UPS_B'];
-    if (upsA && upsB)         put('epms-ups', 'Online', OK, 'Both UPS systems energised');
-    else if (upsA || upsB)    put('epms-ups', upsA ? 'A only' : 'B only', WARN, 'One UPS system not energised');
-    else                      put('epms-ups', 'Offline', '#ef4444', 'Neither UPS system is energised');
-
-    var genLive = !!SIM.energizedNodes['GEN_A'] || !!SIM.energizedNodes['GEN_B'] || !!SIM.energizedNodes['GEN_C'];
-    put('epms-gen', genLive ? 'Running' : 'Standby', genLive ? WARN : DIM,
-        genLive ? 'At least one generator is carrying load' : 'No generator energised');
-
-    /* This model has no protective-trip state: SIM.breakers only ever holds 'closed' or
-       'open', and an open breaker is an operator action, not a trip. Counting them as
-       trips would invent protection events; reporting 0 would be an unearned all-clear.
-       Report what IS known — how many breakers are open — and label it as that. */
-    var openCount = 0;
-    for (var bid in SIM.breakers) {
-        if (SIM.breakers[bid] !== 'closed') openCount++;
+    var last = null;
+    function paint(m) {
+        if (!EPMS_RUNTIME_AUTHORITY_AVAILABLE || !m) { unavailable(); return; }
+        last = m;
+        var snap = window.CONV_CALC && window.CONV_CALC.snapshot, n = m.alarms.length;
+        var state = n ? 'ALARM' : (m.offNormal ? 'ABNORMAL' : 'NORMAL');
+        put('epms-state', 'EPMS ' + state + (n ? ' · ' + n : ''), n ? BAD : (m.offNormal ? WARN : OK),
+            n ? m.alarms.slice(0, 6).map(function (a) { return a.text; }).join('\n') : (m.offNormal ? m.offNormal + ' item(s) away from their normal position' : 'Every source live, every board supplied'));
+        put('epms-utility', m.ringsLive === m.ringsTotal ? 'A+B' : (m.ringsLostA === m.ringsTotal / 2 && !m.ringsLostB ? 'B only'
+            : (m.ringsLostB === m.ringsTotal / 2 && !m.ringsLostA ? 'A only' : m.ringsLive + ' / ' + m.ringsTotal)),
+            m.ringsLive === m.ringsTotal ? OK : (m.ringsLive ? WARN : BAD), m.ringsLive + ' of ' + m.ringsTotal + ' hall 20 kV rings live');
+        put('epms-ups', m.onBattery ? 'Battery ' + m.onBattery : 'Online', m.onBattery ? BAD : OK,
+            m.onBattery ? m.onBattery + ' of ' + m.upsTotal + ' UPS on battery' : 'All ' + m.upsTotal + ' UPS on mains');
+        put('epms-gen', m.gensRunning ? 'Running ' + m.gensRunning + ' / ' + m.gensTotal : 'Standby ' + m.gensTotal, m.gensRunning ? WARN : DIM,
+            m.gensRunning + ' of ' + m.gensTotal + ' sets running');
+        put('epms-trips', m.lvClosed + ' / ' + m.lvTotal + ' closed', DIM, 'Open breakers on E-S-102, hall ' + m.lvHall + ' (operator positions; trips are not modelled)');
+        engineCells(snap);
+        var total = document.getElementById('val-total-load');
+        total.textContent = grp(m.servedKw) + ' kW';
+        total.title = 'Load supplied ' + grp(m.servedKw) + ' kW of ' + grp(m.demandKw) + ' kW demand';
+        total.className = 'status-value' + (m.servedKw + 0.5 < m.demandKw ? ' error' : '');
+        var bk = document.getElementById('val-breakers');
+        bk.textContent = m.lvClosed + ' / ' + m.lvTotal;
+        bk.title = 'Closed / total breakers on E-S-102, hall ' + m.lvHall;
+        var sysBox = document.getElementById('box-system'), sysLed = document.getElementById('ind-system'), sysValue = document.getElementById('val-system');
+        var cls = n ? 'error' : (m.offNormal ? 'warning' : 'ok');
+        sysBox.className = 'status-box ' + (n ? 'error state-alarm' : (m.offNormal ? 'warning state-warn' : 'active state-ok'));
+        sysLed.className = 'status-led' + (n ? ' error' : (m.offNormal ? ' warning' : ''));
+        sysValue.textContent = n ? 'ALARM' : (m.offNormal ? 'ABNORMAL' : 'NORMAL');
+        sysValue.className = 'status-value ' + cls;
+        var alarmBox = document.getElementById('box-alarms'), alarmEl = document.getElementById('val-alarms');
+        alarmEl.textContent = String(n);
+        alarmEl.title = n ? m.alarms.map(function (a) { return a.text; }).join('\n') : 'No active alarm';
+        alarmBox.className = n ? 'status-box error state-alarm' : 'status-box';
+        alarmEl.className = 'status-value ' + (n ? 'error' : 'ok');
+        document.querySelectorAll('.export-btn,.export-item').forEach(function (node) {
+            node.removeAttribute('aria-disabled'); node.style.pointerEvents = ''; node.style.opacity = '';
+        });
+        document.getElementById('val-timestamp').textContent = new Date().toLocaleTimeString();
     }
-    put('epms-trips', openCount + ' open', openCount > 0 ? WARN : OK,
-        'Protective trips are not modelled in this basis. Showing open breakers instead: '
-        + openCount + ' of ' + Object.keys(SIM.breakers).length);
+    function data() { return last ? JSON.parse(JSON.stringify(last)) : null; }
+    return { paint: paint, unavailable: unavailable, data: data };
+}());
+if (!EPMS_RUNTIME_AUTHORITY_AVAILABLE) window.RZEpmsStatus.unavailable();
 
-    if (snapshot && snapshot.electrical) {
-        var e = snapshot.electrical;
-        put('epms-ups-basis', e.ups_module_kw_rated != null ? (e.ups_module_kw_rated + ' kW/module') : '—',
-            DIM, 'electrical.ups_module_kw_rated');
-        put('epms-ups-modules', e.ups_modules_per_system != null
-            ? (e.ups_modules_per_system + ' x ' + e.ups_system_count) : '—',
-            DIM, 'electrical.ups_modules_per_system x ups_system_count');
-        put('epms-ups-sys', e.ups_system_kw != null
-            ? (Math.round(e.ups_system_kw).toLocaleString() + ' kW') : '—',
-            DIM, 'electrical.ups_system_kw');
-    }
-    if (snapshot && snapshot.meta) {
-        put('epms-dq', String(snapshot.meta.data_quality || '—'), OK, 'snapshot.meta.data_quality');
-        put('epms-scn', String(snapshot.meta.scenario || '—'), CYAN, 'snapshot.meta.scenario');
-    } else {
-        put('epms-dq', '—', DIM, 'UNAVAILABLE — engine snapshot not loaded');
-        put('epms-scn', '—', DIM, 'UNAVAILABLE — engine snapshot not loaded');
-    }
+/* exports: the painted status model, never a second simulation */
+function epmsExportRows() {
+    var m = window.RZEpmsStatus.data(); if (!m) return null;
+    var rows = [['Status', 'Alarms', String(m.alarms.length)], ['Status', 'Off-normal items', String(m.offNormal)],
+        ['Load', 'Supplied kW', String(Math.round(m.servedKw))], ['Load', 'Demand kW', String(Math.round(m.demandKw))],
+        ['Sources', 'Hall rings live', m.ringsLive + ' / ' + m.ringsTotal], ['UPS', 'On battery', m.onBattery + ' / ' + m.upsTotal],
+        ['Generation', 'Sets running', m.gensRunning + ' / ' + m.gensTotal]];
+    m.alarms.forEach(function (a) { rows.push(['Alarm', a.tag, a.text]); });
+    return rows;
 }
-
-function updateStatusBar() {
-    if (!EPMS_RUNTIME_AUTHORITY_AVAILABLE) {
-        paintEpmsAuthorityUnavailable();
-        return;
-    }
-    var closedCount = 0;
-    var totalCount = 0;
-    for (var id in SIM.breakers) {
-        totalCount++;
-        if (SIM.breakers[id] === 'closed') closedCount++;
-    }
-    document.getElementById('val-breakers').textContent = closedCount + ' / ' + totalCount;
-
-    /* v1.134.0 RULE-2 REPAIR — "Total Load" was `2400 + Math.random()*100`, i.e. the
-       retired 1.85 MW basis wandering by the second, three inches below #epms-fac which
-       renders the engine's facility load. It is an EPMS total, so bind it to the engine's
-       own metered total. If no source is energised the site is dark and the total is 0;
-       if the engine is absent the cell says so rather than inventing a number.
-       Power factor and frequency are NOT published by conv-engine.js and are not metered
-       in this basis — their random walks are deleted, and the markup renders "—" with a
-       reason. Nothing writes those two cells on purpose. */
-    var epmsSnap = (window.CONV_CALC && window.CONV_CALC.snapshot) ? window.CONV_CALC.snapshot : null;
-    var totalLoadEl = document.getElementById('val-total-load');
-    if (!SIM.sources.A && !SIM.sources.B) {
-        totalLoadEl.textContent = '0 kW';
-    } else if (epmsSnap && epmsSnap.electrical && epmsSnap.electrical.epms_total_kw != null) {
-        totalLoadEl.textContent = Math.round(epmsSnap.electrical.epms_total_kw).toLocaleString() + ' kW';
-    } else {
-        totalLoadEl.textContent = '\u2014';
-        totalLoadEl.title = 'UNAVAILABLE \u2014 engine snapshot not loaded';
-    }
-    updateEpmsStatusStrip(epmsSnap);
-
-    var sysBox = document.getElementById('box-system');
-    var sysLed = document.getElementById('ind-system');
-    var sysValue = document.getElementById('val-system');
-    if (!SIM.sources.A && !SIM.sources.B) {
-        sysBox.className = 'status-box warning state-warn';
-        sysLed.className = 'status-led warning';
-        sysValue.textContent = 'GEN MODE';
-        sysValue.className = 'status-value warning';
-    } else {
-        sysBox.className = 'status-box active state-ok';
-        sysLed.className = 'status-led';
-        sysValue.textContent = 'ONLINE';
-        sysValue.className = 'status-value ok';
-    }
-
-    var alarmCount = 0;
-    for (var id in SIM.breakers) {
-        if (SIM.breakers[id] === 'trip') alarmCount++;
-    }
-    var alarmBox = document.getElementById('box-alarms');
-    var alarmEl = document.getElementById('val-alarms');
-    alarmEl.textContent = alarmCount;
-    if (alarmCount > 0) {
-        alarmBox.className = 'status-box error state-alarm';
-        alarmEl.className = 'status-value error';
-    } else {
-        alarmBox.className = 'status-box';
-        alarmEl.className = 'status-value ok';
-    }
-
-    document.getElementById('val-timestamp').textContent = new Date().toLocaleTimeString();
-}
-
-function paintEpmsAuthorityUnavailable() {
-    document.body.setAttribute('data-rz-basis-authority', 'unavailable');
-    updateEpmsStatusStrip(null);
-    var neutral = function (id, value) {
-        var node = document.getElementById(id);
-        if (!node) return;
-        node.textContent = value;
-        node.className = node.className.replace(/\b(?:ok|warning|error|active)\b/g, '').replace(/\s+/g, ' ').trim();
-    };
-    neutral('val-system', 'UNAVAILABLE');
-    neutral('val-total-load', '—');
-    neutral('val-breakers', '—');
-    neutral('val-alarms', '—');
-    document.getElementById('box-system').className = 'status-box';
-    document.getElementById('ind-system').className = 'status-led off';
-    document.getElementById('box-alarms').className = 'status-box';
-    document.querySelectorAll('#btn-u-a,#btn-u-b,#btn-tie,#btn-gen-a,#btn-gen-b,#btn-gen-c').forEach(function (node) {
-        node.className = 'btn';
-        node.setAttribute('aria-disabled', 'true');
-        node.style.pointerEvents = 'none';
-    });
-    document.querySelectorAll('.export-btn,.export-item').forEach(function (node) {
-        node.setAttribute('aria-disabled', 'true');
-        node.style.pointerEvents = 'none';
-        node.style.opacity = '0.45';
-    });
-    document.getElementById('logs').innerHTML = '<div>&gt; EPMS authority UNAVAILABLE. Simulation withheld.</div>';
-    ['l-wires', 'l-flow', 'l-devices', 'l-breakers', 'l-tele'].forEach(function (id) {
-        document.getElementById(id).replaceChildren();
-    });
-    var notice = createSVG('text', {
-        x:1800, y:1250, class:'dev-lbl', 'font-size':'42px', 'text-anchor':'middle'
-    });
-    notice.textContent = 'EPMS AUTHORITY UNAVAILABLE';
-    document.getElementById('l-devices').appendChild(notice);
-}
-
-// =============================================
-// EXPORT FUNCTIONS
-// =============================================
-function getSystemData() {
-    if (!EPMS_RUNTIME_AUTHORITY_AVAILABLE) return null;
-    var data = {
-        timestamp: new Date().toISOString(),
-        sources: {A: SIM.sources.A, B: SIM.sources.B},
-        generators: {A: SIM.genRunning.A, B: SIM.genRunning.B, C: SIM.genRunning.C},
-        breakers: {},
-        totalLoad: document.getElementById('val-total-load').textContent,
-        powerFactor: document.getElementById('val-pf').textContent,
-        frequency: document.getElementById('val-freq').textContent
-    };
-    for (var id in SIM.breakers) {
-        data.breakers[id] = SIM.breakers[id];
-    }
-    return data;
-}
-
 function exportPDF() {
-    var data = getSystemData();
-    if (!data) return false;
-    var html = '<!DOCTYPE html><html><head><title>EPMS Report</title>';
-    html += '<style>body{font-family:Arial;padding:40px}h1{color:#373B46;border-bottom:3px solid #373B46}';
-    html += 'h2{color:#475569;margin-top:30px}table{width:100%;border-collapse:collapse;margin:15px 0}';
-    html += 'th,td{border:1px solid #ddd;padding:10px;text-align:left}th{background:#f1f5f9}';
-    html += '.ok{color:#22c55e;font-weight:bold}.off{color:#94a3b8}</style></head><body>';
-    html += '<h1>EPMS Telemetry Report</h1>';
-    html += '<p>Generated: ' + new Date().toLocaleString() + '</p>';
-    html += '<h2>System Metrics</h2>';
-    html += '<table><tr><th scope="col">Metric</th><th scope="col">Value</th></tr>';
-    html += '<tr><td>Total Load</td><td>' + data.totalLoad + '</td></tr>';
-    html += '<tr><td>Power Factor</td><td>' + data.powerFactor + '</td></tr>';
-    html += '<tr><td>Frequency</td><td>' + data.frequency + '</td></tr></table>';
-    html += '<h2>Power Sources</h2><table><tr><th scope="col">Source</th><th scope="col">Status</th></tr>';
-    html += '<tr><td>Utility A</td><td class="' + (data.sources.A ? 'ok' : 'off') + '">' + (data.sources.A ? 'ACTIVE' : 'OFF') + '</td></tr>';
-    html += '<tr><td>Utility B</td><td class="' + (data.sources.B ? 'ok' : 'off') + '">' + (data.sources.B ? 'ACTIVE' : 'OFF') + '</td></tr>';
-    html += '<tr><td>Generator A</td><td class="' + (data.generators.A ? 'ok' : 'off') + '">' + (data.generators.A ? 'RUNNING' : 'STANDBY') + '</td></tr>';
-    html += '<tr><td>Generator B</td><td class="' + (data.generators.B ? 'ok' : 'off') + '">' + (data.generators.B ? 'RUNNING' : 'STANDBY') + '</td></tr>';
-    html += '<tr><td>Generator C</td><td class="' + (data.generators.C ? 'ok' : 'off') + '">' + (data.generators.C ? 'RUNNING' : 'STANDBY') + '</td></tr></table>';
-    html += '</body></html>';
-
-    var win = window.open('', '_blank');
-    win.document.write(html);
-    win.document.close();
-    win.print();
-    log('Export: PDF Report');
+    var rows = epmsExportRows(); if (!rows) return false;
+    var esc = function (t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+    var html = '<!DOCTYPE html><html><head><title>EPMS Report</title><style>body{font-family:Arial;padding:40px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:8px;text-align:left}</style></head><body>' +
+        '<h1>EPMS simulation report</h1><p>Generated ' + esc(new Date().toLocaleString()) + ' · simulated single-line state, not metering</p><table><tr><th scope="col">Group</th><th scope="col">Item</th><th scope="col">Value</th></tr>' +
+        rows.map(function (r) { return '<tr><td>' + esc(r[0]) + '</td><td>' + esc(r[1]) + '</td><td>' + esc(r[2]) + '</td></tr>'; }).join('') + '</table></body></html>';
+    var win = window.open('', '_blank'); if (!win) return false;
+    win.document.write(html); win.document.close(); win.print();
 }
-
+function epmsDownload(name, type, text) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text], { type: type }));
+    a.download = name; a.click();
+}
 function exportCSV() {
-    var data = getSystemData();
-    if (!data) return false;
-    var csv = 'Category,Item,Value,Status\n';
-    csv += 'Metrics,Total Load,' + data.totalLoad + ',\n';
-    csv += 'Metrics,Power Factor,' + data.powerFactor + ',\n';
-    csv += 'Metrics,Frequency,' + data.frequency + ',\n';
-    csv += 'Source,Utility A,20kV,' + (data.sources.A ? 'ACTIVE' : 'OFF') + '\n';
-    csv += 'Source,Utility B,20kV,' + (data.sources.B ? 'ACTIVE' : 'OFF') + '\n';
-    csv += 'Generator,GEN A,2.5MW,' + (data.generators.A ? 'RUNNING' : 'STANDBY') + '\n';
-    csv += 'Generator,GEN B,2.5MW,' + (data.generators.B ? 'RUNNING' : 'STANDBY') + '\n';
-    csv += 'Generator,GEN C,2.5MW,' + (data.generators.C ? 'RUNNING' : 'STANDBY') + '\n';
-    for (var id in data.breakers) {
-        csv += 'Breaker,' + id + ',,' + data.breakers[id].toUpperCase() + '\n';
-    }
-    var blob = new Blob([csv], {type: 'text/csv'});
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'EPMS_Data.csv';
-    a.click();
-    log('Export: CSV Downloaded');
+    var rows = epmsExportRows(); if (!rows) return false;
+    epmsDownload('EPMS_Data.csv', 'text/csv', 'Group,Item,Value\n' + rows.map(function (r) { return r.map(function (c) { return '"' + String(c).replace(/"/g, '""') + '"'; }).join(','); }).join('\n'));
 }
-
 function exportJSON() {
-    var data = getSystemData();
-    if (!data) return false;
-    var blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
-    var a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'EPMS_Data.json';
-    a.click();
-    log('Export: JSON Downloaded');
+    var m = window.RZEpmsStatus.data(); if (!m) return false;
+    epmsDownload('EPMS_Data.json', 'application/json', JSON.stringify(m, null, 2));
 }
-
-init();
 </script>
 
 <style id="rz-cookie-banner-style">
@@ -2405,22 +1390,32 @@ init();
         var n = BY[id]; if (!LIVE || !n || !n.sw) return null;
         var r = SIM.operate(SHEET, sim, id, !sim.closed[id], B);
         ops++;
-        if (r.ok) { sim = r.state; res = SIM.solve(SHEET, sim, B); paint(); chrome(); lastMsg = r.reason + '; flows re-solved'; say(lastMsg, false); }
+        if (r.ok) { sim = r.state; res = SIM.solve(SHEET, sim, B); paint(); chrome(); lastMsg = r.reason + '; flows re-solved'; say(lastMsg, false);
+            document.dispatchEvent(new CustomEvent('rz-epms-change', { detail: { sheet: 'E-S-101', id: id } })); }
         else { lastMsg = 'REFUSED — ' + r.reason; say(lastMsg, true); }
         return r;
     }
-    function tccSpec(n) {
-        var Tc = window.RZConvTcc, V20 = E.mv_voltage_kv * 1000, em = protOf(n), co = SIM.coordination(B);
-        var inr = Tc.txInrush(E.dist_tx_kva, V20, E.pro_inrush_x, E.pro_inrush_s);
+    /* F23 (PRD-CONV-EQUIPMENT-TRUTH §7.1): the damage curve, the inrush point and the markers are those of the transformer
+       the opened bay protects — TX-1 / TX-2 (hv_tx_mva, hv_tx_impedance_pct) from a 150 kV transformer bay, the
+       distribution unit (dist_tx_kva) from a 20 kV feeder or an LV main. em: the chain member to emphasise. */
+    function tccSpec(n, em) {
+        var Tc = window.RZConvTcc, V20 = E.mv_voltage_kv * 1000, co = SIM.coordination(B);
+        if (em === undefined) em = protOf(n);
+        var hv = em === 'hv', kva = hv ? E.hv_tx_mva * 1000 : E.dist_tx_kva, z = hv ? E.hv_tx_impedance_pct : E.dist_tx_impedance_pct;
+        var txName = hv ? 'TX-' + (n.id.charAt(1) === '2' ? '2' : '1') + ' ' + E.hv_tx_mva + ' MVA ' + E.hv_voltage_kv + ' / ' + E.mv_voltage_kv + ' kV' : grp(E.dist_tx_kva) + ' kVA distribution transformer';
+        var inr = Tc.txInrush(kva, V20, E.pro_inrush_x, E.pro_inrush_s);
         return { title: n.tag + ' — ' + (n.label || ''), sub: 'Typical chain: LV main → 20 kV feeder → 20 kV incomer → 150 kV transformer bay',
             Vref: V20, vLabel: E.mv_voltage_kv + ' kV', I: [10, 100000], t: [0.01, 1000],
             curves: SIM.chain(B).map(function (c) { return { id: c.id, label: c.label, dev: c.dev, V: c.V, Imax: c.Imax, em: c.id === em }; }),
-            damage: { kva: E.dist_tx_kva, V: V20, z: E.dist_tx_impedance_pct, label: grp(E.dist_tx_kva) + ' kVA transformer through-fault damage (IEEE C57.109)' },
-            inrush: { I: inr.I, t: inr.t, label: 'Transformer inrush, ' + E.pro_inrush_x + ' × full-load current for ' + E.pro_inrush_s + ' s' },
-            markers: [{ I: E.dist_tx_through_fault_mv_a, label: 'LV maximum fault referred to ' + E.mv_voltage_kv + ' kV' },
+            damage: { kva: kva, V: V20, z: z, label: txName + ' through-fault damage (IEEE C57.109), referred to ' + E.mv_voltage_kv + ' kV' },
+            inrush: { I: inr.I, t: inr.t, label: txName + ' inrush, ' + E.pro_inrush_x + ' × full-load current for ' + E.pro_inrush_s + ' s' },
+            markers: hv ? [{ I: E.mv_tx_fla_a, label: txName + ' full-load current at ' + E.mv_voltage_kv + ' kV' },
+                { I: E.mv_fault_level_ka * 1000, label: E.mv_voltage_kv + ' kV fault level (through-fault of the transformer)' }]
+                : [{ I: E.dist_tx_through_fault_mv_a, label: 'LV maximum fault referred to ' + E.mv_voltage_kv + ' kV' },
                 { I: E.mv_fault_level_ka * 1000, label: E.mv_voltage_kv + ' kV fault level' }],
-            rows: co.rows, margin: co.margin };
+            txKva: kva, rows: co.rows, margin: co.margin };
     }
+    window.RZEpmsTccSpec = function (n, em) { return LIVE ? tccSpec(n, em) : null; };
     var ACT = window.RZDatahallAIInspectorActions = window.RZDatahallAIInspectorActions || {};
     ACT.epmsSimSwitch = function (p) {
         var n = BY[p.id]; if (!n) return;
@@ -2433,11 +1428,13 @@ init();
     };
 
     function setView(v) {
-        var sld = v !== 'lv';
+        var sld = v !== 'lv', lvPanel = document.getElementById('epms-lv-view');
         if (panel) panel.hidden = !sld;
+        if (lvPanel) lvPanel.hidden = sld;
         document.body.setAttribute('data-epms-view', sld ? 'sld' : 'lv');
         document.querySelectorAll('.epms-view-btn').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-epms-view') === (sld ? 'sld' : 'lv') ? 'true' : 'false'); });
         if (sld && sheet) sheet.fit();
+        if (!sld && window.RZEpmsLvView) window.RZEpmsLvView.show();
     }
     document.querySelectorAll('.epms-view-btn').forEach(function (b) {
         b.addEventListener('click', function () { setView(b.getAttribute('data-epms-view')); });
@@ -2461,26 +1458,6 @@ init();
         }
         prov.addEventListener('click', toggle);
         prov.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
-    })();
-    (function foldLegend() {
-        var legend = document.getElementById('epms-legend');
-        var head = legend && legend.firstElementChild;
-        if (!head || !window.matchMedia) return;
-        var phone = window.matchMedia('(max-width: 600px)');
-        function wire() {
-            /* a button only where it folds something: on a phone */
-            if (phone.matches) { head.setAttribute('role', 'button'); head.setAttribute('tabindex', '0'); head.setAttribute('aria-expanded', legend.classList.contains('is-open') ? 'true' : 'false'); }
-            else { head.removeAttribute('role'); head.removeAttribute('tabindex'); head.removeAttribute('aria-expanded'); }
-        }
-        function toggle() {
-            if (!phone.matches) return;
-            var open = legend.classList.toggle('is-open');
-            head.setAttribute('aria-expanded', open ? 'true' : 'false');
-        }
-        head.addEventListener('click', toggle);
-        head.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
-        if (phone.addEventListener) phone.addEventListener('change', wire);
-        wire();
     })();
 
     function start() {
@@ -2522,6 +1499,7 @@ init();
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();
 </script>
+<script src="js/conv/epms-lv-view.js?v=20261120-95d75ff3"></script>
 <script src="js/rz-command-palette.js?v=20261111-5028a9f4" defer></script>
 </body>
 </html>

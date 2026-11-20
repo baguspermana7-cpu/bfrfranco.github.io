@@ -16,6 +16,11 @@
  *   chain(basis), coordination(basis)   the protection chain of the typical unit (LV LSIG, 20 kV feeder, 20 kV
  *                                 incomer, 150 kV transformer feeder) from engine settings, and its grading check
  *
+ *   1.1.0 (E-S-102, additive; E-S-101 unchanged): a load node may carry its engine kW (n.kw); a grid source its rating
+ *   (n.ratingKw) and state.lost; a genset UNIT (n.unit) runs from state.run; a battery (src 'battery') from state.batt;
+ *   state.blocked holds a two-terminal device open (a rectifier never back-feeds its dead input); rectifier, inverter and
+ *   static switch are two-terminal devices; a typical transformer drawn for N in parallel (n.units) is loaded per unit.
+ *
  *   kW are the engine's adopted hall facility loads split per stream (campus.halls[i].facility_load_kw / streams);
  *   the typical LV unit carries one stream's share divided by the units per stream. A = kW / (sqrt3 x kV x pf).
  *   Losses are not modelled (the topology solver's rule), so kW into every bus equals kW out.
@@ -23,8 +28,10 @@
 (function (root) {
   'use strict';
   var SQRT3 = Math.sqrt(3);
-  var TWO = { cbIec: 1, cbDrawout: 1, disconnector: 1, currentTransformer: 1, transformer2w: 1 };
+  var TWO = { cbIec: 1, cbDrawout: 1, disconnector: 1, currentTransformer: 1, transformer2w: 1, rectifier: 1, inverterIec: 1, staticSwitch: 1 };
   var A_PORT = { line: 1, hv: 1 }, B_PORT = { load: 1, lv: 1 };
+  /* E-S-102: converters name their ports by what they carry; the input side is the a terminal */
+  var SIDE = { rectifier: { ac: 'a', dc: 'b' }, inverterIec: { dc: 'a', ac: 'b' } };
   function isNum(n) { return typeof n === 'number' && isFinite(n); }
   function Sld() {
     if (root && root.RZConvSld) return root.RZConvSld;
@@ -49,9 +56,12 @@
     sheet.nodes.forEach(function (n) { if (n.sw) closed[n.id] = n.normal !== 'open'; });
     return { closed: closed, gen: false };
   }
+  function copyMap(m) { var c = {}; Object.keys(m || {}).forEach(function (k) { c[k] = m[k]; }); return c; }
+  /* lost / run / batt (E-S-102): sources out of service, gensets running, batteries discharging; copied when present */
   function copyState(s) {
-    var c = {}; Object.keys(s.closed).forEach(function (k) { c[k] = s.closed[k]; });
-    return { closed: c, gen: !!s.gen };
+    var o = { closed: copyMap(s.closed), gen: !!s.gen };
+    ['lost', 'run', 'batt'].forEach(function (k) { if (s[k]) o[k] = copyMap(s[k]); });
+    return o;
   }
 
   function basis(snap) {
@@ -67,6 +77,7 @@
   /* kW a load node draws: the hall's stream share; the drawn typical unit takes one unit's part of it and the ring
      beside it the rest, so the feeder still carries exactly the stream share */
   function loadKw(n, b) {
+    if (isNum(n.kw)) return n.kw;   /* E-S-102: the builder stamps the engine kW of this hall on the node */
     var stream = b.hallKw[n.hall] / b.e.dist_tx_streams, units = b.e.dist_tx_per_stream_per_hall;
     if (n.load === 'feeder') return stream;
     if (n.load === 'lvsb') return stream / units;
@@ -81,6 +92,7 @@
     var i = ref.lastIndexOf('.'), id = ref.slice(0, i), port = ref.slice(i + 1), n = by[id];
     if (!n) return null;
     if (!TWO[n.sym]) return id;
+    if (SIDE[n.sym]) return SIDE[n.sym][port] ? id + ':' + SIDE[n.sym][port] : null;
     return A_PORT[port] ? id + ':a' : (B_PORT[port] ? id + ':b' : null);
   }
 
@@ -90,11 +102,15 @@
     sheet.nodes.forEach(function (n) {
       if (TWO[n.sym]) {
         add({ id: n.id + ':a', kind: 'bus' }); add({ id: n.id + ':b', kind: 'bus' });
-        branches.push({ id: 'dev:' + n.id, a: n.id + ':a', b: n.id + ':b', closed: n.sw ? !!state.closed[n.id] : true });
+        branches.push({ id: 'dev:' + n.id, a: n.id + ':a', b: n.id + ':b', closed: n.sw ? !!state.closed[n.id] && !(state.blocked && state.blocked[n.id]) : !(state.blocked && state.blocked[n.id]) });
       } else if (n.src === 'grid') {
-        add({ id: n.id, kind: 'source', ratingKw: b.e.hv_source_mva * 1000, available: true });
+        add({ id: n.id, kind: 'source', ratingKw: isNum(n.ratingKw) ? n.ratingKw : b.e.hv_source_mva * 1000, available: !(state.lost && state.lost[n.id]) });
+      } else if (n.src === 'gen' && n.unit) {
+        add({ id: n.id, kind: 'source', ratingKw: n.ratingKw, available: !!(state.run && state.run[n.id]) });
       } else if (n.src === 'gen') {
         add({ id: n.id, kind: 'source', ratingKw: b.e.genset_count * b.e.genset_unit_kw * b.e.genset_max_loading, available: !!state.gen });
+      } else if (n.src === 'battery') {
+        add({ id: n.id, kind: 'source', ratingKw: n.ratingKw, available: !!(state.batt && state.batt[n.id]) });
       } else if (n.load) {
         add({ id: n.id, kind: 'load', kw: loadKw(n, b) });
       } else if (n.sym === 'junction' || n.sym === 'surgeArrester' || n.sym === 'voltageTransformer') {
@@ -134,7 +150,7 @@
       } else return;
       d.a = amps(d.kw, kv, pf);
       if (n.tx === 'hv') d.pct = 100 * d.kw / (b.e.hv_tx_mva * 1000 * pf);
-      if (n.tx === 'dist') d.pct = 100 * d.kw / (b.e.dist_tx_kva * pf);
+      if (n.tx === 'dist') d.pct = 100 * d.kw / ((n.units || 1) * b.e.dist_tx_kva * pf);   /* units: a typical drawn for N in parallel */
       out.dev[n.id] = d;
     });
     return out;
@@ -218,7 +234,7 @@
   }
 
   var API = { normalState: normalState, basis: basis, model: model, solve: solve, operate: operate, chain: chain, coordination: coordination,
-    loadKw: loadKw, amps: amps, version: '1.0.0' };
+    loadKw: loadKw, amps: amps, version: '1.1.0' };
   if (root) root.RZEpmsSim = Object.freeze(API);
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
 })(typeof window !== 'undefined' ? window : null);

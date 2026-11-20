@@ -137,6 +137,25 @@
       al: [D('High supply air', '> rack inlet target + 2 K'), D('Valve saturated', '100 % open for 5 min')],
       tr: { label: 'Supply air', id: 'cooling.crah_supply_air_c', amp: 0.2, digits: 1 }, m: 'a180coil',
       g: 'A valve pinned at 100 % with warm supply air means the coil is short of chilled water: check the secondary pump head and the balancing valve.' },
+    /* condenser water and cooling towers (CH-M-102, PRD-CONV-EQUIPMENT-TRUTH E3) */
+    'condenser:coolingTowerCell': { name: 'Cooling tower cell (induced draft)', role: 'Rejects the condenser heat of one chiller train to atmosphere by evaporation',
+      live: [SB('CDW in (hot)', 'cooling.cdw_return_c', 0.2, 1), SB('CDW out (basin)', 'cooling.cdw_supply_c', 0.15, 1), S('Basin level', '%', 72, 2, 0), S('Fan vibration', 'mm/s', 2.1, 0.3, 1)],
+      cap: [B('Heat rejected per cell', 'cooling.tower_cell_rejection_kw_th', 0), B('Cell rating', 'cooling.tower_cell_rated_kw_th', 0), B('Cells running', 'cooling.tower_cells_running', 0), B('Cells installed', 'cooling.tower_cell_count', 0), B('Approach', 'cooling.tower_approach_k', 1), B('Design wet-bulb', 'cooling.tower_design_wet_bulb_c', 1), B('Fan motor', 'cooling.tower_fan_motor_kw', 0)],
+      al: [D('High basin outlet temperature', 'CDW supply > design + 1.5 K for 5 min'), D('Fan vibration', 'vibration switch trip'), D('Low basin level', 'make-up valve fails to restore level in 10 min')],
+      tr: { label: 'CDW out (basin)', id: 'cooling.cdw_supply_c', amp: 0.15, digits: 1 }, m: 'a180coil',
+      g: 'A rising approach at steady load means fouled fill or poor air flow: check the fan, the louvres and the distribution nozzles. Stage another cell before the running cells pass 95 % fan speed.' },
+    'condenser:pumpCentrifugal': { name: 'Condenser-water pump', role: 'Moves condenser water from the tower basins through one chiller condenser',
+      live: [S('Speed', '%', 100, 2, 0), S('Motor current', 'A', 142, 5, 0), S('Differential head', 'kPa', 245, 9, 0), S('Vibration (ISO 10816)', 'mm/s', 1.9, 0.3, 1)],
+      cap: [B('Flow per pump', 'cooling.cdw_pump_flow_lps', 1), B('Motor input', 'cooling.cdw_pump_kw_e', 1), B('Head', 'cooling.cdw_head_m', 0), B('Pumps running', 'cooling.cdw_pumps_running', 0), B('Pumps installed', 'cooling.cdw_pump_count', 0), B('Condenser range', 'cooling.cdw_range_k', 1)],
+      al: [D('Command / feedback mismatch', 'run command without run feedback for 10 s'), D('Condenser flow loss', 'flow switch open 10 s → chiller trip'), D('High vibration', '> 4.5 mm/s (ISO 10816 zone C)')],
+      tr: { label: 'Differential head', unit: 'kPa', base: 245, amp: 9, digits: 0 }, m: 'a180pump',
+      g: 'A condenser pump that stops trips its chiller on flow loss: start the standby train before stopping a running pump.' },
+    'condenser:instField': { name: 'Temperature transmitter', role: 'Measures condenser-water temperature for tower fan and bypass control',
+      live: [SB('Process value', 'cooling.cdw_supply_c', 0.15, 1), D('Range', '0–60 °C, 4–20 mA'), D('Signal quality', 'good (simulated loop)')],
+      cap: [B('CDW supply basis', 'cooling.cdw_supply_c', 1), B('CDW return basis', 'cooling.cdw_return_c', 1), B('Condenser range', 'cooling.cdw_range_k', 1)],
+      al: [D('Out of range', 'signal < 3.8 mA or > 20.5 mA → BAD quality'), D('High CDW supply', '> design + 1.5 K → stage a cell')],
+      tr: { label: 'Process value', id: 'cooling.cdw_supply_c', amp: 0.15, digits: 1 }, m: 'cal',
+      g: 'CDW supply above design raises every chiller lift: check that the running cells match the running chillers before adjusting setpoints.' },
     /* fire */
     'fire:pumpCentrifugal': { name: 'Fire pump', role: 'Pressurises the sprinkler and pre-action risers on demand',
       live: [S('Discharge pressure', 'bar', 9.8, 0.2, 1), S('Suction pressure', 'bar', 1.4, 0.05, 2), S('Driver current', 'A', 0, 0, 0)],
@@ -407,13 +426,14 @@
 
   /* A transmitter on the return header measures the return temperature: same recipe, the other registry anchor. */
   function onReturn(page, n) {
-    return page === 'chiller' && n && n.sym === 'instField' && /^(tthr|ttr\d)/.test(n.id || '');
+    return n && n.sym === 'instField' && ((page === 'chiller' && /^(tthr|ttr\d)/.test(n.id || '')) || (page === 'condenser' && n.id === 'ttcr'));
   }
   function swapAnchor(spec) {
-    if (!spec || spec.id !== 'cooling.chws_c' || spec.label !== 'Process value') return spec;
+    var to = { 'cooling.chws_c': 'cooling.chwr_c', 'cooling.cdw_supply_c': 'cooling.cdw_return_c' };
+    if (!spec || !to[spec.id] || spec.label !== 'Process value') return spec;
     var out = {}, k;
     for (k in spec) if (Object.prototype.hasOwnProperty.call(spec, k)) out[k] = spec[k];
-    out.id = 'cooling.chwr_c'; out.amp = 0.25;
+    out.id = to[spec.id]; out.amp = 0.25;
     return out;
   }
   function classOf(page, sym, n) {

@@ -204,6 +204,19 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
 .legend .warn{border-color:rgba(182,141,73,.65);color:#e3c88f}
 .legend .alarm{border-color:rgba(187,93,93,.7);color:#ecb7b7}
 .chw-sheet-host{display:block}
+/* E3 PERF: sheet motion stepped by the 3 Hz chwMotionClock (see chwMotionClock) */
+@media (prefers-reduced-motion: no-preference){
+  #chw-sheet-host .hmi-svg .hmi-flow[data-flow="running"],#chw-sheet-host .hmi-svg .vfx-rotor[data-spin]{animation-play-state:paused}
+}
+/* E3 (PRD-CONV-EQUIPMENT-TRUTH §12, P-8): the plant sheets draw at 1:1 or larger (minScale 1), so 12-unit text renders
+   at 11 px or more at 1440 and 390; the hall the selector names is outlined on its CRAH bank */
+.sheet-switch{display:flex;gap:6px;flex-wrap:wrap}
+.sheet-switch .hall-btn{flex:0 1 auto;min-height:36px;padding:6px 10px;font-size:12px}
+#chw-sheet-host .hmi-svg [data-role="tag"],#chw-sheet-host .hmi-svg [data-role="value"],#chw-sheet-host .hmi-svg [data-role="line"],
+#chw-sheet-host .hmi-svg [data-role="name"],#chw-sheet-host .hmi-svg [data-role="label"],#chw-sheet-host .hmi-svg .hmi-zone-label,
+#chw-sheet-host .hmi-svg .hmi-area-label,#chw-sheet-host .hmi-svg [data-role="inst"],#chw-sheet-host .hmi-svg .hmi-alarm-badge text{font-size:12px}
+#chw-sheet-host .hmi-node[data-hall-selected] .b{stroke-dasharray:4 3}
+#chw-sheet-host .hmi-node[data-hall-selected]{color:var(--hmi-info)}
 /* v1.25.4 — pro-BMS responsive SVG. Diagram keeps design width on mobile so blocks
    don't overlap; user pans horizontally instead of squishing.
    v1.29.3 — Plant Capacity / Loop Summary / Drawing Info panels live at x=1520–2280 (viewBox 2300).
@@ -553,7 +566,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
         ]
     }
     </script>
-    <script src="js/rz-version.js?v=20261120-4c9777b5" defer></script>
+    <script src="js/rz-version.js?v=20261120-7ea867d8" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- Conventional BMS single scenario engine — single source of truth for the
@@ -566,7 +579,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
     <script src="js/rz-engine-versions.js?v=20261118-892678a4"></script>
     <script src="js/conv-engine.js?v=2.4.0"></script>
     <!-- v1.134.2 — generated parameter registry + the shared basis drawer. -->
-    <script src="js/conv-parameters.js?v=20261118-6652e773"></script>
+    <script src="js/conv-parameters.js?v=20261120-89ea132a"></script>
     <!-- v1.134.25 — RZExplain, the site glossary engine. The cockpits were the only
          substantial pages carrying none of it, so terms an operator has to read
          (approach temperature, cycles of concentration, N+1, WUE) had nowhere to go.
@@ -584,15 +597,15 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
     <link rel="stylesheet" href="css/rz-hmi.css?v=20261117-fe9b28c8">
     <link rel="stylesheet" href="css/conv-hmi-depth.css?v=20261115-09997c8c">
     <link rel="stylesheet" href="css/conv-vfx.css?v=20261118-5eed9b2f">
-    <script src="js/conv/hmi-depth.js?v=20261119-68b71c65"></script>
+    <script src="js/conv/hmi-depth.js?v=20261120-05f86b64"></script>
     <script src="js/rz-eng-symbols.js?v=20261118-528d60ce"></script>
     <script src="js/rz-hmi-sheet.js?v=20261118-c18dfefa"></script>
-    <script src="js/conv/chiller-sheet.js?v=20261115-d7f3f3c6"></script>
+    <script src="js/conv/chiller-sheet.js?v=20261120-14d7baeb"></script>
     <script src="js/conv/sheet-truth.js?v=20261118-eaae14ee"></script>
-    <script src="js/conv/payloads.js?v=20261118-d8db9d79"></script>
+    <script src="js/conv/payloads.js?v=20261120-86f5437d"></script>
     <script src="js/conv/internals.js?v=20261118-271d125d"></script>
     <script src="js/conv/internals/chiller.js?v=20261118-221272d9"></script>
-    <script src="js/conv/equipment-modal.js?v=20261118-948d9c46"></script>
+    <script src="js/conv/equipment-modal.js?v=20261120-9b42a9b2"></script>
     <script src="js/conv/vfx.js?v=20261117-89056876"></script>
     <script src="js/conv/history.js?v=20261117-1c72fb7f"></script>
     <script src="js/rz-trend.js?v=20261117-e60cac7c"></script>
@@ -699,6 +712,10 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
 
   <div class="stage">
     <section tabindex="0" class="pid-panel">
+      <div class="sheet-switch" role="group" aria-label="Plant drawing">
+        <button class="hall-btn" type="button" data-chw-sheet-btn="ch-m-101" aria-pressed="true">CH-M-101 · Chilled water</button>
+        <button class="hall-btn" type="button" data-chw-sheet-btn="ch-m-102" aria-pressed="false">CH-M-102 · Condenser water + towers</button>
+      </div>
       <div class="legend">
         <span class="chws" id="lgChws">Primary CHWS &mdash;</span>
         <span class="chwr" id="lgChwr">Primary CHWR &mdash;</span>
@@ -826,12 +843,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
             </div>
             <div class="field">
               <label>Fault Loop</label>
-              <select id="faultSel" aria-label="Fault Sel">
-                <option value="1">CH-1</option>
-                <option value="2">CH-2</option>
-                <option value="3">CH-3</option>
-                <option value="4">CH-4</option>
-              </select>
+              <select id="faultSel" aria-label="Fault Sel"></select>
             </div>
           </div>
           <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
@@ -917,6 +929,7 @@ function selectHallView(hall){
   });
   $("chillerHallLabel").textContent = `Current site plant authority · selected Hall ${selected} demand`;
   paintChillerBasisCard();
+  if(typeof chwMarkHall === "function") chwMarkHall();
 }
 
 /* --- Canonical CHW basis from the single scenario engine ---------------------
@@ -1067,7 +1080,9 @@ const PLANT = (function () {
    Each running machine carries an equal share of the calculated IT-reference flow, and its water sits on the
    published CHWS/CHWR planes with a small deterministic per-loop spread so the mimic still
    reads as four distinct machines rather than four identical ones. Nothing here is authored
-   at a scale of its own any more — that is what produced 4 x 18 L/s against a 943 L/s header. */
+   at a scale of its own any more — that is what produced 4 x 18 L/s against a 943 L/s header.
+   E3 (2026-11-20): every engine chiller is drawn now, and each running train carries the engine's own per-unit
+   flow (getFleet('chiller') chwFlowLps) on the CHWS/CHWR planes; the per-loop spread is gone (one source). */
 const ENGINE_CHILLERS_RUNNING = (function () {
   const s = engineSnap();
   return (s && s.cooling && s.cooling.chillers_running) ? s.cooling.chillers_running : null;
@@ -1107,15 +1122,41 @@ const LOOP_FLOW_WARNING_MIN = LOOP_FLOW_DESIGN != null ? LOOP_FLOW_DESIGN * 0.80
 const LOOP_T2_WARNING_MAX = CHW.chwr != null ? CHW.chwr + 0.8 : 23.2;
 const LOOP_T2_ALARM_MAX = CHW.chwr != null ? CHW.chwr + 1.5 : 24.0;
 
+function engineFleet(kind, hall) {
+  try {
+    const f = (window.CONV_CALC && typeof window.CONV_CALC.getFleet === 'function') ? window.CONV_CALC.getFleet(kind, hall) : null;
+    return Array.isArray(f) ? f : [];
+  } catch (e) { return []; }
+}
+const LOOP_SEEDS = [
+  { dp1: 97, dp2: 73, spd: 85, comps: [1, 1, 1] }, { dp1: 87, dp2: 68, spd: 57, comps: [1, 0, 1] },
+  { dp1: 65, dp2: 90, spd: 77, comps: [1, 1, 1] }, { dp1: 87, dp2: 75, spd: 78, comps: [1, 0, 1] }
+];
+function seedLoops() {
+  const pri = engineFleet('chw_primary_pump');
+  const runs = (tag) => pri.some((p) => p.tag === tag && p.state === 'running');
+  return engineFleet('chiller').map(function (u, i) {
+    const sd = LOOP_SEEDS[i % LOOP_SEEDS.length], run = u.state === 'running';
+    const tt = (/(\d+)$/.exec(u.tag || '') || [0, String(i + 1)])[1];
+    const pumpA = !runs('CHWP-' + tt + 'B');   /* A is duty unless the engine runs B */
+    /* ref = the engine's per-unit point the NORMAL simulation holds to (E3 Q3/Q4): branch flow = the unit's
+       chwFlowLps, dp around its seed, never a free random walk across the warning limits */
+    return { id: i + 1, tag: u.tag, standby: !run, flow: 0, dp1: sd.dp1, dp2: sd.dp2, t1: 0, t2: 0, pumpA: pumpA,
+      ref: { flow: run && u.chwFlowLps != null && isFinite(u.chwFlowLps) ? u.chwFlowLps : null, dp1: sd.dp1, dp2: sd.dp2 },
+      spdA: run && pumpA ? sd.spd : 0, spdB: run && !pumpA ? sd.spd : 0, comps: run ? sd.comps.slice() : [0, 0, 0] };
+  });
+}
 function rescaleLoopsToEngine(loops) {
   if (CHW.flow == null || CHW.chws == null || CHW.dt == null || !ENGINE_CHILLERS_RUNNING) return loops;
   const perLoopFlow = CHW.flow / ENGINE_CHILLERS_RUNNING;
-  return loops.map(function (lp, i) {
-    const spread = (i - 1.5) * 0.4;           // deterministic, symmetric about the design point
+  return loops.map(function (lp) {
+    if (lp.standby) return Object.assign({}, lp, { flow: 0, t1: r1(CHW.chws), t2: r1(CHW.chws + CHW.dt) });
+    /* E3 Q3: one source — each running train carries the engine's own per-unit flow (getFleet('chiller')
+       chwFlowLps), not a per-train spread around the plant mean that the engine never said */
     return Object.assign({}, lp, {
-      flow: r1(perLoopFlow + spread * 2),
-      t1: r1(CHW.chws + Math.abs(spread) * 0.25),   /* mixing_k >= 0 (D9) */
-      t2: r1(CHW.chws + CHW.dt + spread * 0.35),
+      flow: r1(lp.ref && lp.ref.flow != null ? lp.ref.flow : perLoopFlow),
+      t1: r1(CHW.chws),   /* mixing_k >= 0 (D9) */
+      t2: r1(CHW.chws + CHW.dt),
     });
   });
 }
@@ -1166,12 +1207,11 @@ const st = {
      on the published CHWS/CHWR planes. The authored part that survives is the per-loop
      OPERATING STATE — which pump is duty, drive speed, compressor staging, DP split — because
      that is what the mimic exists to show and no engine publishes it. */
-  loops:[
-    {id:1, flow:0, dp1:97, dp2:73, t1:0, t2:0, pumpA:true, spdA:85, spdB:0, comps:[1,1,1]},
-    {id:2, flow:0, dp1:87, dp2:68, t1:0, t2:0, pumpA:false,spdA:0, spdB:57, comps:[1,0,1]},
-    {id:3, flow:0, dp1:65, dp2:90, t1:0, t2:0, pumpA:true, spdA:77, spdB:0, comps:[1,1,1]},
-    {id:4, flow:0, dp1:87, dp2:75, t1:0, t2:0, pumpA:false,spdA:0, spdB:78, comps:[1,0,1]}
-  ],
+  /* E3 (PRD-CONV-EQUIPMENT-TRUTH §6.1, §6.5): one loop per chiller the engine has. Which machine runs and which
+     primary pump is duty come from the engine's unit-state tables (CONV_CALC.getFleet), never from this page; a
+     standby machine is drawn and stays still. The authored part is the per-loop operating detail of a running
+     machine (drive speed, compressor staging, DP split), taken from four seeds in turn. */
+  loops: seedLoops(),
   alarm:{ level:"NORMAL", issues:[], firstOut:"", firstTs:0, ack:false, ackTs:0, sig:"" },
   hist:[],
   spark:{ cop:[], kwRt:[], flow:[], dt:[], dp:[] }
@@ -1184,6 +1224,8 @@ function evalLoop(loop){
   const dpAvg = (loop.dp1+loop.dp2)/2;
   const forced = ui.forced.has(loop.id);
   if(forced) return { level:"ALARM", msg:"forced disconnect", disconnected:true, dpAvg };
+  /* E3: a machine the engine holds in standby is not running and not in fault */
+  if(loop.standby) return { level:"NORMAL", msg:"standby", disconnected:false, stopped:true, standby:true, dpAvg };
   /* W4 B1: the branch flow is a point with a quality. Only the forced fault or a bad / no-data point is a
      disconnect; a good 0 is a stopped train (no alarm); a stale point keeps its last value. */
   const rec = (typeof chwLoopRec === 'function') ? chwLoopRec(loop) : null;
@@ -1369,10 +1411,21 @@ function exvPositionPct(loop){
  * ==========================================================================*/
 let chwSheet = null, chwSheetMode = null;
 const CHW_UNAV = 'UNAVAILABLE';
-function chwLoopOf(id){
-  const m = /^(?:ch|cd[rs]|pa|pb|tts|ttr)(\d)$/.exec(id || '');
-  return m ? st.loops[Number(m[1]) - 1] : null;
+/* E3: the sheets are built from the engine's fleets (js/conv/chiller-sheet.js fromEngine): CH-M-101 draws every
+   chiller train, its primary pumps, the secondary pump set and one CRAH bank per hall; CH-M-102 the tower cells and
+   condenser-water pumps. The page keeps the one built set and draws whichever sheet the switch selects. */
+const CHW_SHEETS = window.RZChillerSheets ? window.RZChillerSheets.fromEngine(window.CONV_CALC) : null;
+let chwView = 'ch-m-101';
+function chwSheetOf(mode){
+  if(!CHW_SHEETS) return null;
+  return { pid: CHW_SHEETS.pid, unavailable: CHW_SHEETS.unavailable, cdw: CHW_SHEETS.cdw, cdwUnavailable: CHW_SHEETS.cdwUnavailable }[mode] || CHW_SHEETS.pid;
 }
+function chwCurrentSheet(){ return chwSheetOf(chwSheetMode || 'pid'); }
+function chwLoopOf(id){
+  const m = /^(?:ch|cd[rs]|p[a-rt-z]|tts|ttr)(\d+)$/.exec(id || '');
+  return m ? st.loops[Number(m[1]) - 1] || null : null;
+}
+function chwFleetUnit(kind, n){ const f = engineFleet(kind); return f[n - 1] || null; }
 function chwVal(text, alarm){ return { text: text, alarm: alarm || null }; }
 function chwHall(code){
   return (window.CONV_CALC && typeof window.CONV_CALC.getHallSnapshot === 'function') ? window.CONV_CALC.getHallSnapshot(code) : null;
@@ -1386,7 +1439,11 @@ function chwRead(n){
     const e = evalLoop(lp), m = loopMetrics(lp), dis = e.disconnected;
     const al = e.level === 'ALARM' ? '1' : (e.level === 'WARNING' ? '2' : null);
     const flowTxt = `${conv.f(lp.flow,ui.unit)} ${conv.fu(ui.unit)}`;
-    if(/^ch/.test(n.id)){
+    if(/^ch/.test(n.id) && lp.standby){
+      out.state = ok ? 'standby' : null;
+      out.values = !ok ? { st: chwVal(CHW_UNAV), kw: chwVal('—'), q: chwVal('—') } : { st: chwVal('STANDBY'), kw: chwVal('0/3 COMP'), q: chwVal('NO FLOW') };
+      out.rows = ok ? [['Status', 'STANDBY · engine unit-state table'], ['Compressors', '0 / 3'], ['Branch flow', 'none (machine off)']] : [['Status', CHW_UNAV]];
+    } else if(/^ch/.test(n.id)){
       const comps = lp.comps.reduce((a,b)=>a+b,0);
       out.state = !ok ? null : (dis ? 'fault' : (e.stopped || !comps ? 'stopped' : 'running'));
       out.alarm = ok ? al : null;
@@ -1395,6 +1452,9 @@ function chwRead(n){
         kw: chwVal(m.compKw != null ? `${m.compKw} kW` : '—'),
         q: chwVal(`CALC BRANCH REF ${chwPointText('ch'+lp.id+':q')}`) };
       out.rows = ok ? [['Status', e.level + (dis || e.stopped ? ' · ' + e.msg : '')], ['Branch flow (calc ref)', chwPointText('ch' + lp.id + ':q')], ['Compressors', comps + ' / 3'], ['Electrical', m.compKw != null ? m.compKw + ' kW' : '—']] : [['Status', CHW_UNAV]];
+    } else if(/^(cdr|cds|tts|ttr)/.test(n.id) && lp.standby){
+      /* E3 Q2: a train with no flow has no loop temperature — the water in it is static */
+      out.values = { t: chwVal(ok ? '—' : CHW_UNAV) };
     } else if(/^cdr/.test(n.id)){
       out.values = { t: chwVal(ok && PLANT.cdwr != null ? T(PLANT.cdwr) : CHW_UNAV) };
     } else if(/^cds/.test(n.id)){
@@ -1404,7 +1464,7 @@ function chwRead(n){
     } else if(/^ttr/.test(n.id)){
       out.values = { t: chwVal(ok ? T(lp.t2) : CHW_UNAV, ok && lp.t2 > LOOP_T2_WARNING_MAX ? '2' : null) };
     } else {
-      const isA = /^pa/.test(n.id), run = isA ? m.runA : m.runB, spd = isA ? lp.spdA : lp.spdB;
+      const isA = /^pa/.test(n.id), isB = /^pb/.test(n.id), run = isA ? m.runA : (isB ? m.runB : false), spd = isA ? lp.spdA : (isB ? lp.spdB : 0);
       /* W4 B2: command and feedback are two values; a mismatch marks the symbol (data-alarm + data-mismatch) */
       const pc = chwPumpCmd(n.id), pf = chwPumpFb(n.id), mm = chwPumpMismatch(n.id);
       out.state = !ok ? null : (pf === 'on' ? 'running' : 'standby');
@@ -1412,33 +1472,70 @@ function chwRead(n){
       out.values = !ok ? { cmd: chwVal('—'), st: chwVal(CHW_UNAV) } : {
         cmd: chwVal(pc === 'on' ? 'CMD ON' : 'CMD OFF', mm ? '2' : null),
         st: chwVal(pf === 'on' ? 'RUN' : 'STOP', mm ? '2' : null) };
-      out.rows = ok ? [['Mode', run ? 'Duty' : 'Standby'], ['Speed', Math.round(spd) + ' %'], ['Head', (isA ? m.headA : m.headB) + ' m'], ['Current', (isA ? m.ampA : m.ampB) + ' A']] : [['Mode', CHW_UNAV]];
+      out.rows = ok ? [['Mode', run ? 'Duty' : 'Standby'], ['Speed', Math.round(spd) + ' %'], ['Head', (isA ? m.headA : (isB ? m.headB : 0)) + ' m'], ['Current', (isA ? m.ampA : (isB ? m.ampB : 0)) + ' A']] : [['Mode', CHW_UNAV]];
     }
     return out;
   }
   if(n.id === 'tths') out.values = { t: chwVal(ok ? T(st.header.chws) : CHW_UNAV) };
   else if(n.id === 'tthr') out.values = { t: chwVal(ok ? T(st.header.chwr) : CHW_UNAV) };
-  else if(n.id === 'ps1' || n.id === 'ps2'){
-    const duty = n.id === 'ps1';
+  else if(/^ps\d+$/.test(n.id)){
+    /* E3: duty / standby of each secondary pump is the engine's unit-state table */
+    const u = chwFleetUnit('chw_secondary_pump', Number(n.id.slice(2))), duty = !!(u && u.state === 'running');
     out.state = !ok ? null : (duty ? 'running' : 'standby');
     out.values = { st: chwVal(!ok ? CHW_UNAV : (duty ? 'DUTY' : 'STBY')) };
+    if(ok && u) out.rows = [['Mode', duty ? 'Duty' : 'Standby'], ['Flow', duty ? conv.f(u.flowLps, ui.unit) + ' ' + conv.fu(ui.unit) : '—'], ['Motor', duty ? u.kwE + ' kWe' : '—'], ['Head', u.headM + ' m']];
   } else if(n.id === 'sref'){
     out.values = { q: chwVal(ok ? `IT-REFERENCE FLOW ${chwPointText('sref:q')}` : CHW_UNAV) };
-  } else if(/^crah[A-D]$/.test(n.id)){
+  } else if(/^crah[A-Z]+$/.test(n.id)){
     const code = n.id.slice(4), h = ok ? chwHall(code) : null, ES = ok ? engineSnap() : null, CR = ES ? ES.cooling : null;
     const n1 = (v) => (v == null || !isFinite(v)) ? '—' : Number(v).toFixed(1);
-    out.state = ok ? 'running' : 'stopped';
+    /* E3: the bank is a typical coil of the hall's CRAH fleet: × installed · running from CONV_CALC.getFleet('crah', hall) */
+    const fl = engineFleet('crah', code), runN = fl.filter((u) => u.state === 'running').length;
+    out.state = ok ? (runN ? 'running' : 'standby') : 'stopped';
     out.values = !ok ? { it: chwVal(CHW_UNAV), n: chwVal('—'), air: chwVal('—') } : {
+      n: chwVal(`× ${fl.length} · ${runN} RUN`),
       it: chwVal(`${h ? Math.round(h.it_load_kw).toLocaleString('en-US') : '—'} kW IT`),
-      n: chwVal(`${CR ? CR.crah_running : '—'} / ${CR ? CR.crah_installed : '—'} RUN`),
       air: chwVal(`${n1(CR && CR.crah_supply_air_c)} / ${n1(CR && CR.crah_return_air_c)} °C`) };
-    if(CR) out.rows = [['Unit sensible', Math.round(CR.crah_unit_sensible_kw) + ' kW'], ['Available / N+1', Math.round(CR.crah_available_kw) + ' / ' + Math.round(CR.crah_n1_available_kw) + ' kW'], ['Air ΔT', n1(CR.airside_delta_t_k) + ' K'], ['CHW coil ΔT', n1(CR.chw_delta_t) + ' K']];
+    if(CR) out.rows = [['Fleet (hall ' + code + ')', fl.length + ' installed · ' + runN + ' running'], ['Unit sensible', Math.round(CR.crah_unit_sensible_kw) + ' kW'], ['Available / N+1', Math.round(CR.crah_available_kw) + ' / ' + Math.round(CR.crah_n1_available_kw) + ' kW'], ['Air ΔT', n1(CR.airside_delta_t_k) + ' K'], ['CHW coil ΔT', n1(CR.chw_delta_t) + ' K']];
+  } else if(n.id === 'rin'){
+    /* CH-M-102: heat rejected and condenser-water flow, each the sum over the units the engine runs */
+    const cells = engineFleet('tower_cell').filter((u) => u.state === 'running'), pumps = engineFleet('cdw_pump').filter((u) => u.state === 'running');
+    const rej = cells.reduce((a, u) => a + u.rejectionKwTh, 0), q = pumps.reduce((a, u) => a + u.flowLps, 0), ES = ok ? engineSnap() : null;
+    out.values = !ok ? { r: chwVal(CHW_UNAV), q: chwVal('—') } : {
+      r: chwVal(`Σ ${Math.round(rej).toLocaleString('en-US')} kWth`), q: chwVal(`Σ ${conv.f(q, ui.unit)} ${conv.fu(ui.unit)}`) };
+    out.rows = ok ? [['Heat rejected · Σ ' + cells.length + ' running cells', Math.round(rej).toLocaleString('en-US') + ' kWth'],
+      ['Engine tower rejection', ES && ES.cooling ? Math.round(ES.cooling.tower_rejection_kw_th).toLocaleString('en-US') + ' kWth' : '—'],
+      ['CDW flow · Σ ' + pumps.length + ' running pumps', conv.f(q, ui.unit) + ' ' + conv.fu(ui.unit)]] : [['Status', CHW_UNAV]];
+  } else if(n.id === 'ttcr'){
+    out.values = { t: chwVal(ok && PLANT.cdwr != null ? T(PLANT.cdwr) : CHW_UNAV) };
+  } else if(n.id === 'ttcs'){
+    out.values = { t: chwVal(ok && PLANT.cdws != null ? T(PLANT.cdws) : CHW_UNAV) };
+  } else if(/^ct\d+$/.test(n.id)){
+    const u = chwFleetUnit('tower_cell', Number(n.id.slice(2))), run = !!(u && u.state === 'running');
+    out.state = ok && u ? (run ? 'running' : 'standby') : null;
+    out.values = !ok || !u ? { st: chwVal(CHW_UNAV), q: chwVal('—'), fan: chwVal('—') } : {
+      st: chwVal(run ? `RUN ${Math.round(u.loadPct)} %` : 'STBY'),
+      q: chwVal(run ? `${Math.round(u.rejectionKwTh).toLocaleString('en-US')} kWth` : '—'),
+      fan: chwVal(run ? `FAN ${Math.round(u.fanKw)} kW` : '—') };
+    if(ok && u) out.rows = [['State', run ? 'Running' : 'Standby'], ['Heat rejected', run ? Math.round(u.rejectionKwTh).toLocaleString('en-US') + ' kWth' : '—'],
+      ['Rated', Math.round(u.ratedKwTh).toLocaleString('en-US') + ' kWth'], ['Fan speed', run ? u.fanSpeedPct.toFixed(1) + ' %' : '—'], ['CDW in / out', T(PLANT.cdwr) + ' / ' + T(PLANT.cdws)]];
+  } else if(/^cp\d+$/.test(n.id)){
+    const u = chwFleetUnit('cdw_pump', Number(n.id.slice(2))), run = !!(u && u.state === 'running');
+    out.state = ok && u ? (run ? 'running' : 'standby') : null;
+    out.values = !ok || !u ? { st: chwVal(CHW_UNAV), q: chwVal('—') } : {
+      st: chwVal(run ? 'RUN' : 'STBY'), q: chwVal(run ? `${conv.f(u.flowLps, ui.unit)} ${conv.fu(ui.unit)}` : '—') };
+    if(ok && u) out.rows = [['Mode', run ? 'Duty' : 'Standby'], ['Flow', run ? conv.f(u.flowLps, ui.unit) + ' ' + conv.fu(ui.unit) : '—'], ['Motor', run ? u.kwE + ' kWe' : '—'], ['Head', u.headM + ' m']];
   }
   return out;
 }
 function chwFlow(e){
   if(!e.flowOf) return null;
   if(!CHW_AUTHORITY_AVAILABLE || !chwPoints) return 'unavailable';
+  /* E3: CH-M-102 lines and the secondary pump branches follow the engine's unit-state tables */
+  var ek = e.flowOf;
+  if(/^(ct|cp)\d+$/.test(ek)) { var eu = chwFleetUnit(ek.slice(0, 2) === 'ct' ? 'tower_cell' : 'cdw_pump', Number(ek.slice(2))); return eu && eu.state === 'running' ? 'running' : 'stopped'; }
+  if(ek === 'cdwr' || ek === 'cdws') return engineFleet('cdw_pump').some(function (u) { return u.state === 'running'; }) ? 'running' : 'stopped';
+  if(/^s\d+$/.test(ek)) { var su = chwFleetUnit('chw_secondary_pump', Number(ek.slice(1))); return su && su.state === 'running' ? chwPointFlow('sref:q') : 'stopped'; }
   /* B2: a pump's own branch follows its cmd/fb, not the header point */
   if(CHW_EDGE_PUMP[e.id]) return chwBranchFlow(CHW_EDGE_PUMP[e.id]);
   /* B1: an edge takes its flow from the measured point it evidences (good>0=running,
@@ -1453,7 +1550,7 @@ function chwFlow(e){
   /* no point evidences it: dead legs (vents, expansion, header ends) and the decoupler at the design point
      carry no flow (stopped, as before); anything else, the condenser-water stubs included, is unavailable */
   var k = e.flowOf;
-  if(k === 'still' || k === 'dec' || k === 's2') return 'stopped';
+  if(k === 'still' || k === 'dec') return 'stopped';
   return 'unavailable';
 }
 /* Line-model adoption on the sheet: every process pipe carries data-rz-line + data-current,
@@ -1470,7 +1567,9 @@ function chwTagLines(){
     p.setAttribute('data-current', cur || (/^e-(s|hs)/.test(id) ? lineTemperature(st.header.chws) : (/^e-cd/.test(id) ? 'condenser water' : lineTemperature(st.header.chwr))));
   });
   svg.querySelectorAll('[data-val$=":q"]').forEach((t) => {
-    if(/^ch\d:q$/.test(t.getAttribute('data-val'))) t.setAttribute('data-rz-loop-flow', '1');
+    /* a standby machine carries no branch flow, so only the running trains are items of the per-machine share */
+    const m = /^ch(\d+):q$/.exec(t.getAttribute('data-val')), lp = m ? st.loops[Number(m[1]) - 1] : null;
+    if(lp && !lp.standby) t.setAttribute('data-rz-loop-flow', '1'); else t.removeAttribute('data-rz-loop-flow');
   });
   /* B2: a command / feedback mismatch is marked on the pump symbol, not by colour alone */
   Object.keys(chwPumpForce).forEach(function (id) {
@@ -1478,8 +1577,8 @@ function chwTagLines(){
     if (CHW_AUTHORITY_AVAILABLE && chwPumpMismatch(id)) g.setAttribute('data-mismatch', '1'); else g.removeAttribute('data-mismatch');
   });
   svg.querySelectorAll('.hmi-node[data-node^="ch"]').forEach((g) => {
-    const m = /^ch(\d)$/.exec(g.getAttribute('data-node'));
-    if(m) g.setAttribute('data-loop-id', String(st.loops[Number(m[1]) - 1].id));
+    const m = /^ch(\d+)$/.exec(g.getAttribute('data-node')), lp = m ? st.loops[Number(m[1]) - 1] : null;
+    if(lp) g.setAttribute('data-loop-id', String(lp.id));
   });
 }
 
@@ -1497,25 +1596,23 @@ function chwTagLines(){
  * ==========================================================================*/
 var T4 = window.RZConvTruth || null;
 /* Points (seeds, all already computed by this page):
-     ch1:q..ch4:q  loop.flow of each primary train, the figure printed as CALC BRANCH REF (chwRead, ch node 'q')
+     ch1:q..chN:q  loop.flow of each primary train (one per engine chiller), the figure printed as CALC BRANCH REF (chwRead, ch node 'q')
      sref:q        st.header.flow, the IT-REFERENCE FLOW printed at CHWS · SECONDARY (chwRead, sref node)
-     hallA:q..D:q  st.header.flow shared over the four halls the sheet draws (the same reference, no new number)
+     hall<X>:q     st.header.flow shared over the halls the sheet draws (CONV_CALC.listHalls; the same reference, no new number)
    A train under the forced-disconnect fault (ui.forced, #faultBtn) seeds its point as quality bad. */
-var CHW_HALLS = ['A', 'B', 'C', 'D'];
+var CHW_HALLS = CHW_SHEETS ? CHW_SHEETS.pid.halls.slice() : [];
 var CHW_POINTS = {}, CHW_POINT_EDGES = {}, CHW_SHARED_EDGES = {}, CHW_PUMP_EDGES = {};
 (function () {
   var n, i;
-  for (n = 1; n <= 4; n++) {
-    CHW_POINTS['ch' + n + ':q'] = { unit: 'L/s', digits: 1, label: 'CH-0' + n + ' branch flow (loop.flow, calc ref)' };
+  for (n = 1; n <= st.loops.length; n++) {
+    CHW_POINTS['ch' + n + ':q'] = { unit: 'L/s', digits: 1, label: (st.loops[n - 1].tag || 'CH-' + n) + ' branch flow (loop.flow, calc ref)' };
     CHW_POINT_EDGES['ch' + n + ':q'] = ['e-s' + n + 'a', 'e-s' + n + 'b', 'e-s' + n, 'e-r' + n, 'e-r' + n + 'a', 'e-r' + n + 'b', 'e-ev' + n];
-    CHW_PUMP_EDGES['pa' + n] = ['e-pa' + n + 's', 'e-pa' + n + 'd', 'e-pa' + n + 'c'];
-    CHW_PUMP_EDGES['pb' + n] = ['e-pb' + n + 's', 'e-pb' + n + 'd', 'e-pb' + n + 'c'];
     /* primary headers carry the trains that have joined them: e-hs1/e-hr1 train 1, e-hs4/e-hr4 trains 1-4 */
     var up = []; for (i = 1; i <= n; i++) up.push('ch' + i + ':q');
     CHW_SHARED_EDGES['e-hs' + n] = up; CHW_SHARED_EDGES['e-hr' + n] = up;
   }
   CHW_POINTS['sref:q'] = { unit: 'L/s', digits: 1, label: 'Secondary IT-reference flow (st.header.flow)' };
-  CHW_POINT_EDGES['sref:q'] = ['e-sec0', 'e-sec0b', 'e-s1s', 'e-s1d', 'e-hr5', 'e-hr6'];
+  CHW_POINT_EDGES['sref:q'] = ['e-sec0', 'e-sec0b', 'e-hrEt', 'e-hrDec'];
   CHW_HALLS.forEach(function (h, k) {
     CHW_POINTS['hall' + h + ':q'] = { unit: 'L/s', digits: 1, label: 'Hall ' + h + ' CRAH supply (IT-reference share)' };
     CHW_POINT_EDGES['hall' + h + ':q'] = ['e-c' + h + 's', 'e-c' + h + 'r'];
@@ -1523,7 +1620,11 @@ var CHW_POINTS = {}, CHW_POINT_EDGES = {}, CHW_SHARED_EDGES = {}, CHW_PUMP_EDGES
     CHW_SHARED_EDGES['e-hs' + h] = CHW_HALLS.slice(k).map(function (x) { return 'hall' + x + ':q'; });
     if (k > 0) CHW_SHARED_EDGES['e-hr' + h] = CHW_HALLS.slice(0, k).map(function (x) { return 'hall' + x + ':q'; });
   });
-  CHW_SHARED_EDGES['e-hrD2'] = CHW_HALLS.map(function (x) { return 'hall' + x + ':q'; });
+  CHW_SHARED_EDGES['e-hrRet'] = CHW_HALLS.map(function (x) { return 'hall' + x + ':q'; });
+  /* the primary pumps the sheet draws (CHWP-nnA / B …, from the engine's primary fleet) */
+  (CHW_SHEETS ? CHW_SHEETS.pid.nodes : []).forEach(function (nd) {
+    if (/^p[a-rt-z]\d+$/.test(nd.id)) CHW_PUMP_EDGES[nd.id] = ['e-' + nd.id + 's', 'e-' + nd.id + 'd', 'e-' + nd.id + 'c'];
+  });
 })();
 var CHW_EDGE_POINTS = {}, CHW_EDGE_PUMP = {};
 Object.keys(CHW_POINT_EDGES).forEach(function (p) { CHW_POINT_EDGES[p].forEach(function (e) { (CHW_EDGE_POINTS[e] = CHW_EDGE_POINTS[e] || []).push(p); }); });
@@ -1538,10 +1639,11 @@ Object.keys(CHW_PUMP_EDGES).forEach(function (id) { chwPumpForce[id] = {}; chwPu
 function chwPumpCmd(id) {
   var f = chwPumpForce[id] && chwPumpForce[id].cmd;
   if (f) return f;
-  var m = /^p([ab])(\d)$/.exec(id); if (!m) return 'off';
+  var m = /^p([a-rt-z])(\d+)$/.exec(id); if (!m) return 'off';
   var lp = st.loops[Number(m[2]) - 1]; if (!lp) return 'off';
   if (m[1] === 'a') return (lp.pumpA && lp.spdA > 0) ? 'on' : 'off';
-  return (!lp.pumpA && lp.spdB > 0) ? 'on' : 'off';
+  if (m[1] === 'b') return (!lp.pumpA && lp.spdB > 0) ? 'on' : 'off';
+  return 'off';
 }
 function chwPumpFb(id) { return (chwPumpForce[id] && chwPumpForce[id].fb) || chwPumpFbSim[id] || 'off'; }
 function chwPumpMismatch(id) { return chwPumpCmd(id) !== chwPumpFb(id); }
@@ -1572,9 +1674,9 @@ function chwPointFlow(id) { return CHW_AUTHORITY_AVAILABLE && chwPoints ? T4.flo
 /* a train's branch point (chN:q) is a calculated reference, not a meter: with neither of the train's two pumps
    proven running there is no water moving in that train, whatever the reference says */
 function chwTrainFlow(id) {
-  var m = /^ch(\d):q$/.exec(id), f = chwPointFlow(id);
+  var m = /^ch(\d+):q$/.exec(id), f = chwPointFlow(id);
   if (!m || f !== 'running') return f;
-  return (chwPumpFb('pa' + m[1]) === 'on' || chwPumpFb('pb' + m[1]) === 'on') ? f : 'stopped';
+  return Object.keys(CHW_PUMP_EDGES).some(function (p) { return p.slice(2) === m[1] && chwPumpFb(p) === 'on'; }) ? f : 'stopped';
 }
 /* a pump's own branch moves only while that pump runs and agrees with its command */
 function chwBranchFlow(pump) {
@@ -1588,22 +1690,49 @@ function chwBranchFlow(pump) {
    four chillers stays one click further: its operator controls (compressor staging, pump changeover) are not
    part of the equipment payload. */
 function chwBuild(n) {
-  const sheet = chwSheetMode === 'unavailable' ? window.RZChillerSheets.unavailable : window.RZChillerSheets.pid;
-  return T4.sheetPayload({ classId: 'chiller', node: n, read: chwRead(n), store: chwPoints, edges: sheet.edges, nodes: sheet.nodes,
-    declared: 'CH-M-101 simulated chiller plant (engine planes + authored operating state; no field device is read)',
+  const sheet = chwCurrentSheet(), cdw = /^cdw/.test(chwSheetMode || '');
+  return T4.sheetPayload({ classId: 'chiller', page: cdw ? 'condenser' : undefined, node: n, read: chwRead(n), store: chwPoints, edges: sheet.edges, nodes: sheet.nodes,
+    declared: (cdw ? 'CH-M-102' : 'CH-M-101') + ' simulated chiller plant (engine planes + fleet unit-state tables + authored operating state; no field device is read)',
     scenario: CHW_AUTHORITY_AVAILABLE ? 'design point' : 'authority unavailable' });
 }
-/* E2 (PRD-CONV-EQUIPMENT-TRUTH §4): a chiller opens its INSIDE (js/conv/internals/chiller.js) on the unit that was clicked;
-   the navigator and the fleet strip reach every unit the engine has (CONV_CALC.getFleet('chiller')), the units the plant
-   sheet draws keep their plant-sheet sections below the drawing. Pumps, valves and the rest open the modal as before. */
+/* E2/E3 (PRD-CONV-EQUIPMENT-TRUTH §4, §6.1): the deep modal opens on the unit that was clicked. A chiller opens its
+   INSIDE (js/conv/internals/chiller.js) on its own fleet row — CH-05 opens CH-05; a CRAH bank opens the CRAH fleet of
+   its hall (unit navigator over every unit); a tower cell or a condenser-water pump opens its fleet. The navigator and
+   the fleet strip read CONV_CALC.getFleet, never this page. Pumps, valves and the rest open the modal as before. */
+const CHW_FLEET_ROWS = {
+  crah: (u) => [['State', u.state], ['Load', u.loadPct + ' %'], ['Sensible duty', u.dutyKw + ' kW'], ['Rated sensible', u.sensibleKw + ' kW'], ['CHW flow', u.chwFlowLps + ' L/s'], ['Fan speed', u.fanSpeedPct + ' %']],
+  tower_cell: (u) => [['State', u.state], ['Load', u.loadPct + ' %'], ['Heat rejected', u.rejectionKwTh + ' kWth'], ['Rated', u.ratedKwTh + ' kWth'], ['CDW flow', u.cdwFlowLps + ' L/s'], ['Fan', u.fanSpeedPct + ' % · ' + u.fanKw + ' kW']],
+  cdw_pump: (u) => [['State', u.state], ['Flow', u.flowLps + ' L/s'], ['Motor', u.kwE + ' kWe'], ['Speed', u.speedPct + ' %'], ['Head', u.headM + ' m']]
+};
+function chwFleetOpts(kind, title, scope, unit, hall, bankId) {
+  return { internal: { classKey: kind, title: title, scope: scope, unit: unit, fleetOnly: true,
+    fleet: function () { return engineFleet(kind, hall); },
+    snapshot: function () { return engineSnap(); },
+    rows: CHW_FLEET_ROWS[kind],
+    payloadFor: function (i) {
+      const u = engineFleet(kind, hall)[i], sheet = chwCurrentSheet();
+      /* a CRAH unit is one of the typical bank's units: its plant-sheet readings are the bank's */
+      const node = u && sheet ? sheet.nodes.filter(function (x) { return bankId ? x.id === bankId : x.tag === u.tag; })[0] : null;
+      return node ? chwBuild(node) : null;
+    } } };
+}
 function chwDeepOpts(n) {
-  const m = /^ch(\d+)$/.exec((n && n.id) || '');
-  if (!m || !CHW_AUTHORITY_AVAILABLE || !window.RZConvInternals || !window.CONV_CALC || typeof window.CONV_CALC.getFleet !== 'function') return null;
-  return { internal: { classKey: 'chiller', unit: Number(m[1]) - 1, scope: 'CH-M-101',
-    fleet: function () { return window.CONV_CALC.getFleet('chiller'); },
+  const id = (n && n.id) || '';
+  if (!CHW_AUTHORITY_AVAILABLE || !window.CONV_CALC || typeof window.CONV_CALC.getFleet !== 'function') return null;
+  let m = /^crah([A-Z]+)$/.exec(id);
+  if (m) return chwFleetOpts('crah', 'CRAH unit', 'CH-M-101 · Hall ' + m[1], 0, m[1], id);
+  m = /^(ct|cp)(\d+)$/.exec(id);
+  if (m) return m[1] === 'ct' ? chwFleetOpts('tower_cell', 'Cooling tower cell', 'CH-M-102', Number(m[2]) - 1)
+    : chwFleetOpts('cdw_pump', 'Condenser-water pump', 'CH-M-102', Number(m[2]) - 1);
+  if (!/^ch\d+$/.test(id) || !window.RZConvInternals) return null;
+  const fleet = engineFleet('chiller'), unit = fleet.map(function (u) { return u.tag; }).indexOf(n.tag);
+  if (unit < 0) return null;
+  return { internal: { classKey: 'chiller', unit: unit, scope: 'CH-M-101',
+    fleet: function () { return engineFleet('chiller'); },
     snapshot: function () { return engineSnap(); },
     payloadFor: function (i) {
-      const node = window.RZChillerSheets && window.RZChillerSheets.pid.nodes.filter(function (x) { return x.id === 'ch' + (i + 1); })[0];
+      const u = engineFleet('chiller')[i], sheet = chwSheetOf('pid');
+      const node = u && sheet ? sheet.nodes.filter(function (x) { return x.tag === u.tag && /^ch\d+$/.test(x.id); })[0] : null;
       return node ? chwBuild(node) : null;
     } } };
 }
@@ -1611,17 +1740,31 @@ const chwInspect = (T4 && T4.opener) ? T4.opener(chwBuild, '#chw-sheet-host', ch
 if(window.RZTrend){ window.RZTrend.bind(document); }
 function chwOpen(n, api, el){
   if(chwInspect) chwInspect(n, api, el);
-  const lp = chwLoopOf(n.id);
+  const lp = /^cdw/.test(chwSheetMode || '') ? null : chwLoopOf(n.id);
   if(lp && CHW_AUTHORITY_AVAILABLE && window.RZBMSShell && typeof updateLoopInspector === 'function') updateLoopInspector(lp.id);
 }
 /* P1 (PRD-CONV-LIVING-PLANT §4-§5): line colour = condition, dash speed = flow / design flow, pump rotor = drive
-   speed, Thermal mode = the engine CHWS/CHWR planes. Every input below is a value the page already holds. */
+   speed, Thermal mode = the engine CHWS/CHWR planes (CDWS/CDWR on CH-M-102). Every input below is a value the page
+   already holds or an engine fleet row. */
 function chwVfx(){
   var V = window.RZConvVfx, host = $('chw-sheet-host'); if(!V || !host || !chwSheet) return;
   var frame = host.querySelector('.hmi-frame'), svg = host.querySelector('svg.hmi-svg'); if(!frame || !svg) return;
-  var sheet = chwSheetMode === 'unavailable' ? window.RZChillerSheets.unavailable : window.RZChillerSheets.pid;
-  var lo = CHW.chws, hi = CHW.chwr;
+  var sheet = chwCurrentSheet(), cdw = /^cdw/.test(chwSheetMode || '');
+  var lo = cdw ? PLANT.cdws : CHW.chws, hi = cdw ? PLANT.cdwr : CHW.chwr;
   V.mount(frame, { tempRange: (lo != null && hi != null) ? [conv.t(lo, ui.unit), conv.t(hi, ui.unit)] : null, tempUnit: '°' + conv.tu(ui.unit) });
+  if(cdw){
+    var unitOf = function(k){ var m = /^(ct|cp)(\d+)$/.exec(k || ''); return m ? chwFleetUnit(m[1] === 'ct' ? 'tower_cell' : 'cdw_pump', Number(m[2])) : null; };
+    V.apply(svg, { edges: sheet.edges, flow: chwFlow, tempRange: [lo, hi],
+      ratio: function(e){ var u = unitOf(e.flowOf); return u && u.loadPct > 0 ? u.loadPct / 100 : (e.flowOf === 'cdwr' || e.flowOf === 'cdws' ? 1 : null); },
+      temp: function(e){
+        if(!CHW_AUTHORITY_AVAILABLE) return null;
+        /* warm: the return from the condensers and each cell's hot-water inlet; cold: basins, CDWS header, pumps */
+        if(e.flowOf === 'cdwr' || /^e-ct\d+i$/.test(e.id)) return PLANT.cdwr;
+        return PLANT.cdws;
+      },
+      speed: function(id){ var m = /^cp(\d+)$/.exec(id); if(!m) return null; var u = chwFleetUnit('cdw_pump', Number(m[1])); return u && u.state === 'running' ? u.speedPct : 0; } });
+    return;
+  }
   function val(pid){ var r = chwPoints ? chwPoints.get(pid) : null; return r && r.quality === 'good' ? r.value : null; }
   V.apply(svg, { edges: sheet.edges, flow: chwFlow, tempRange: [lo, hi],
     ratio: function(e){
@@ -1636,36 +1779,91 @@ function chwVfx(){
       if(!CHW_AUTHORITY_AVAILABLE) return null;
       /* supply side: chiller outlet legs, supply headers, secondary pumps, CRAH supply drops;
          return side: CRAH returns, return headers, the pump branches and the leg into each evaporator */
-      if(/^e-(s\d|hs|sec|avs|c[A-D]s$)/.test(e.id)) return st.header.chws;
-      if(/^e-(r\d|hr|ev\d|p[ab]\d|avr|et$|c[A-D]r$)/.test(e.id)) return st.header.chwr;
+      if(/^e-(s\d|hs|sec|avs|c[A-Z]+s$)/.test(e.id)) return st.header.chws;
+      if(/^e-(r\d|hr|ev\d|p[a-rt-z]\d|avr|et$|c[A-Z]+r$)/.test(e.id)) return st.header.chwr;
       return null;
     },
     speed: function(id){
-      var m = /^p([ab])(\d)$/.exec(id);
-      if(m){ var lp = st.loops[Number(m[2]) - 1]; return lp ? (m[1] === 'a' ? lp.spdA : lp.spdB) : null; }
-      /* secondary pumps publish no drive speed: the rotor follows the secondary flow as a share of design */
-      return (/^ps\d$/.test(id) && CHW.flow) ? Math.min(100, 100 * st.header.flow / CHW.flow) : null;
+      var m = /^p([a-rt-z])(\d+)$/.exec(id);
+      if(m){ var lp = st.loops[Number(m[2]) - 1]; return lp ? (m[1] === 'a' ? lp.spdA : (m[1] === 'b' ? lp.spdB : 0)) : null; }
+      /* secondary pumps publish no drive speed: a duty pump's rotor follows the secondary flow as a share of design */
+      var s = /^ps(\d+)$/.exec(id);
+      if(s){ var su = chwFleetUnit('chw_secondary_pump', Number(s[1])); if(!su || su.state !== 'running') return 0; }
+      return (s && CHW.flow) ? Math.min(100, 100 * st.header.flow / CHW.flow) : null;
     } });
+}
+/* E3: the hall selector marks that hall's CRAH bank on CH-M-101 */
+function chwMarkHall(){
+  const svg = $('pidSvg'); if(!svg) return;
+  const hall = document.body.dataset.activeHall || '';
+  svg.querySelectorAll('.hmi-node[data-node^="crah"]').forEach(function (g) {
+    if (g.getAttribute('data-node') === 'crah' + hall) g.setAttribute('data-hall-selected', ''); else g.removeAttribute('data-hall-selected');
+  });
 }
 function mountChwSheet(mode){
   const host = $('chw-sheet-host');
-  if(!host || !window.RZHmiSheet || !window.RZChillerSheets) return;
-  if(chwSheet && chwSheetMode === mode){ chwSheet.update(); chwTagLines(); if(window.RZHmiDepth) window.RZHmiDepth.apply(host.querySelector('svg.hmi-svg'), { levels: {} }); chwVfx(); return; }
+  if(!host || !window.RZHmiSheet || !CHW_SHEETS) return;
+  if(chwSheet && chwSheetMode === mode){ chwSheet.update(); chwTagLines(); chwMarkHall(); if(window.RZHmiDepth) window.RZHmiDepth.apply(host.querySelector('svg.hmi-svg'), { levels: {} }); chwVfx(); return; }
   if(chwSheet && chwSheet.destroy) chwSheet.destroy();
-  const sheet = mode === 'unavailable' ? window.RZChillerSheets.unavailable : window.RZChillerSheets.pid;
-  chwSheet = window.RZHmiSheet.render(host, sheet, { read: chwRead, flow: chwFlow, open: chwOpen });
+  const sheet = chwSheetOf(mode);
   chwSheetMode = mode;
+  chwSheet = window.RZHmiSheet.render(host, sheet, { read: chwRead, flow: chwFlow, open: chwOpen });
   chwSheet.update();
-  const svg = $('pidSvg');
-  if(svg) svg.setAttribute('aria-label', mode === 'unavailable' ? 'Chiller plant authority unavailable' : 'Chiller P&ID mimic');
+  host.setAttribute('data-chw-sheet', sheet.no);
+  const svg = host.querySelector('svg.hmi-svg');
+  if(svg) svg.setAttribute('aria-label', /unavailable/i.test(mode) ? 'Chiller plant authority unavailable' : (/^cdw/.test(mode) ? 'Condenser water and cooling towers P&ID mimic' : 'Chiller P&ID mimic'));
   chwTagLines();
+  chwMarkHall();
   if(window.RZHmiDepth) window.RZHmiDepth.apply(host.querySelector('svg.hmi-svg'), { levels: {} });   /* W3 depth */
   chwVfx();
 }
-function drawUnavailablePid(){ mountChwSheet('unavailable'); }
+function drawUnavailablePid(){ mountChwSheet(chwView === 'ch-m-102' ? 'cdwUnavailable' : 'unavailable'); }
 function drawPid(){
   if(!CHW_AUTHORITY_AVAILABLE){ drawUnavailablePid(); return; }
-  mountChwSheet('pid');
+  mountChwSheet(chwView === 'ch-m-102' ? 'cdw' : 'pid');
+}
+/* E3: CH-M-101 / CH-M-102 switch, the same pressed-button pattern as the hall selector */
+/* E3 PERF — the sheet's motion runs on a 3 Hz clock, not on every display frame. A CSS dash or rotor animation inside
+   this SVG repaints and re-layerizes the WHOLE 10-train drawing on every frame (measured: ~4 s of main thread per 5 s;
+   pausing only the sheet's animations dropped it to ~0.6 s). The CSS animations stay (same names, durations and flow
+   rules); the page's CSS holds them paused and this clock places each moving element by a negative inline
+   animation-delay 3 times a second, so the sheet paints 3 frames a second instead of 60. The delay is written per
+   element, not as one inherited custom property on the host: that restyled every node of the drawing on each tick
+   (UpdateLayoutTree 1.4 s per 5 s). Off screen or in a hidden tab the clock stops writing. */
+(function chwMotionClock(){
+  var host = document.getElementById('chw-sheet-host');
+  if(!host) return;
+  /* only the moving elements inside the viewport are stepped: the 10-train sheet is ~2.5 screens tall, and a line
+     the reader cannot see needs no frame (it resumes on the first tick after it scrolls in) */
+  var svg = null, seen = null, io = null;
+  function watch(){
+    var cur = host.querySelector('svg.hmi-svg');
+    if(cur === svg) return;
+    svg = cur; seen = new Set();
+    if(io) io.disconnect();
+    if(!svg) return;
+    if(typeof IntersectionObserver !== 'function'){ seen = null; return; }
+    io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting) seen.add(e.target); else seen.delete(e.target); }); });
+    svg.querySelectorAll('.hmi-flow, .vfx-rotor').forEach(function(el){ io.observe(el); });
+  }
+  setInterval(function(){
+    if(document.hidden || host.classList.contains('is-offscreen')) return;
+    watch();
+    if(!svg) return;
+    var d = '-' + (performance.now() / 1000).toFixed(2) + 's';
+    var els = seen ? Array.from(seen) : svg.querySelectorAll('.hmi-flow, .vfx-rotor');
+    for(var i = 0; i < els.length; i++){
+      var el = els[i];
+      if(el.isConnected && (el.getAttribute('data-flow') === 'running' || el.hasAttribute('data-spin'))) el.style.animationDelay = d;
+    }
+  }, 333);
+})();
+
+function selectChwView(view){
+  if(view !== 'ch-m-101' && view !== 'ch-m-102') return;
+  chwView = view;
+  document.querySelectorAll('[data-chw-sheet-btn]').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-chw-sheet-btn') === view ? 'true' : 'false'); });
+  drawPid();
 }
 
 /* ============================================================================
@@ -2083,6 +2281,7 @@ function stepProcess(){
       lp.t2 = r1(clamp(lp.t2 + r(0.0,0.2), LOOP_T2_MIN, LOOP_T2_MAX));
       return;
     }
+    if(lp.standby) return;   /* E3: a standby machine (engine unit-state table) stays still */
 
     // Auto-changeover occurs only on the modeled vibration threshold. A healthy
     // duty pump must not swap at random because that creates false first-out events.
@@ -2101,13 +2300,23 @@ function stepProcess(){
       const t2t = lp.t1 + (CHW.dt != null ? CHW.dt : 3.3) + r(-0.45,0.45);
       lp.t2 = r1(clamp(lp.t2 + (t2t-lp.t2)*0.22 + r(-0.06,0.06), LOOP_T2_MIN, LOOP_T2_MAX));
     } else {
-      lp.flow = r1(clamp(lp.flow + r(-0.9,0.9), LOOP_FLOW_MIN, LOOP_FLOW_MAX));
-      if(lp.pumpA){ lp.spdA = clamp(lp.spdA + r(-8,8), 42, 92); lp.spdB = 0; }
-      else { lp.spdB = clamp(lp.spdB + r(-8,8), 42, 92); lp.spdA = 0; }
-      lp.dp1 = Math.round(clamp(lp.dp1 + r(-6,6), 54, 145));
-      lp.dp2 = Math.round(clamp(lp.dp2 + r(-6,6), 54, 145));
-      lp.t1 = r1(clamp(lp.t1 + r(-0.24,0.24), LOOP_T1_MIN, LOOP_T1_MAX));
-      lp.t2 = r1(clamp(lp.t2 + r(-0.28,0.28), LOOP_T2_MIN, LOOP_T2_MAX));
+      /* E3 Q4: NORMAL holds every basis value inside its normal band. The old free walks (flow ±0.9 down to 55 %
+         of design, dp ±6 up to 145 kPa, CHWR ±0.28 K up to CHWR + 1.8 K) crossed the WARNING limits at rest, so 4
+         of 7 running trains read WARNING with nothing wrong (ACCURACY_VALIDATION rule 2, ISA-101 normal = muted).
+         Flow is the engine's per-unit value; dp and the loop temperatures revert to the engine plane with a small
+         measurement noise and are capped below the warning limits. A warning now comes from a scenario. */
+      lp.flow = r1(lp.ref && lp.ref.flow != null ? lp.ref.flow : clamp(lp.flow, LOOP_FLOW_WARNING_MIN, LOOP_FLOW_MAX));
+      /* E3: the floor keeps a healthy duty pump under the 2.5 mm/s changeover threshold (vib = 1.2 + (100 - spd)
+         x 0.028 crosses it below 53.6 %), so the duty pump stays the one the engine's unit-state table names; the
+         old 42 % floor let a random walk swap pumps, the false first-out the comment above rules out */
+      if(lp.pumpA){ lp.spdA = clamp(lp.spdA + r(-8,8), 55, 92); lp.spdB = 0; }
+      else { lp.spdB = clamp(lp.spdB + r(-8,8), 55, 92); lp.spdA = 0; }
+      const rd1 = lp.ref ? lp.ref.dp1 : 90, rd2 = lp.ref ? lp.ref.dp2 : 80;
+      lp.dp1 = Math.round(clamp(lp.dp1 + (rd1 - lp.dp1) * 0.3 + r(-3,3), 54, 115));
+      lp.dp2 = Math.round(clamp(lp.dp2 + (rd2 - lp.dp2) * 0.3 + r(-3,3), 54, 115));
+      const t1r = CHW.chws != null ? CHW.chws : lp.t1, t2r = (CHW.chws != null && CHW.dt != null) ? CHW.chws + CHW.dt : lp.t2;
+      lp.t1 = r1(clamp(lp.t1 + (t1r - lp.t1) * 0.3 + r(-0.1,0.1), LOOP_T1_MIN, LOOP_T1_MAX));
+      lp.t2 = r1(clamp(lp.t2 + (t2r - lp.t2) * 0.3 + r(-0.12,0.12), LOOP_T2_MIN, LOOP_T2_WARNING_MAX - 0.3));
     }
 
     // Compressor staging: stage up on high load, stage down on low
@@ -2133,7 +2342,8 @@ function stepProcess(){
   st.header.coolingKw = B.coolingKw;
   // Header DP is a hydraulic reading (not an engine engineering value) — it may
   // track the secondary-side pump duty for realism, but stays a plant DP figure.
-  st.header.dp = Math.round(st.loops.reduce((s,l)=>s+(l.dp1+l.dp2)/2,0)/st.loops.length);
+  const dpLoops = st.loops.filter((l)=>!l.standby);
+  st.header.dp = dpLoops.length ? Math.round(dpLoops.reduce((s,l)=>s+(l.dp1+l.dp2)/2,0)/dpLoops.length) : 0;
 
   // Ambient temp drift (condenser-side environment, not an engine value)
   ui.ambient = r1(clamp(ui.ambient + r(-0.15, 0.15), 28, 42));
@@ -2216,6 +2426,12 @@ function bind(){
     button.addEventListener("click", ()=>selectHallView(button.dataset.hall));
   });
   selectHallView(document.body.dataset.activeHall || "A");
+  document.querySelectorAll("[data-chw-sheet-btn]").forEach(button=>{
+    button.addEventListener("click", ()=>selectChwView(button.getAttribute("data-chw-sheet-btn")));
+  });
+  /* E3: the fault selector lists the trains the engine has (no typed count) */
+  const fsel = $("faultSel");
+  if(fsel && !fsel.options.length) st.loops.forEach((lp)=>{ const o = document.createElement("option"); o.value = String(lp.id); o.textContent = lp.tag || ("CH-" + lp.id); fsel.appendChild(o); });
 
   $("simTgl").addEventListener("click", ()=>{ ui.sim = !ui.sim; syncToggles(); renderAll(); });
   $("maintTgl").addEventListener("click", ()=>{ ui.maint = !ui.maint; syncToggles(); renderAll(); });
@@ -2378,14 +2594,14 @@ function initBmsShellShim(){
    holds a point until clearTrip / a reload. */
 function installChwSeam(){
   if(!T4 || !chwPoints) return;
-  const trainOf = (n) => { const m = /^ch([1-4])$/.exec(n || ''); return m ? Number(m[1]) : null; };
+  const trainOf = (n) => { const m = /^ch(\d+)$/.exec(n || ''); return m && st.loops[Number(m[1]) - 1] ? Number(m[1]) : null; };
   T4.seam({
     points: () => chwPoints.ids(),
     edgesOf: (id) => {
       const es = (CHW_POINT_EDGES[id] || []).slice();
       /* a train point also evidences the branch of the pump that runs on it */
-      const m = /^ch(\d):q$/.exec(id);
-      if(m) ['pa', 'pb'].forEach((p) => { const pid = p + m[1]; if(chwPumpFb(pid) === 'on' && !chwPumpMismatch(pid)) CHW_PUMP_EDGES[pid].forEach((e) => es.push(e)); });
+      const m = /^ch(\d+):q$/.exec(id);
+      if(m) Object.keys(CHW_PUMP_EDGES).filter((pid) => pid.slice(2) === m[1]).forEach((pid) => { if(chwPumpFb(pid) === 'on' && !chwPumpMismatch(pid)) CHW_PUMP_EDGES[pid].forEach((e) => es.push(e)); });
       return es;
     },
     setPoint: (id, rec) => { const r = chwPoints.set(id, rec); chwForcedPoint[id] = true; return r; },

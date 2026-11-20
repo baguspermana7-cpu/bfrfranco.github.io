@@ -81,6 +81,14 @@
           "reads": 11
         },
         {
+          "page": "chiller-plant.html",
+          "reads": 1
+        },
+        {
+          "page": "fuel-system.html",
+          "reads": 10
+        },
+        {
           "page": "ict.html",
           "reads": 2
         },
@@ -91,13 +99,16 @@
       ],
       "tests": [
         "test-conv-design-basis.mjs",
+        "test-conv-epms-lv.mjs",
         "test-conv-epms-model.mjs",
+        "test-conv-fuel-truth.mjs",
         "test-conv-plant-internals.mjs",
         "test-conv-snapshot-binding.mjs",
         "test-datahall-ai-rack-density.mjs"
       ],
       "docs": [
-        "manual/datahall.html"
+        "manual/datahall.html",
+        "standarization/CONVENTIONAL_DC_OPERATIONS_STANDARD.md"
       ],
       "source": {
         "ref": "js/conv-engine.js",
@@ -278,7 +289,7 @@
         },
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 4
+          "reads": 2
         }
       ],
       "tests": [
@@ -792,6 +803,7 @@
       "tests": [
         "test-conv-internals-core.mjs",
         "test-conv-internals-render.mjs",
+        "test-conv-quantity-truth.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
       "docs": [],
@@ -827,9 +839,12 @@
       "tests": [
         "test-conv-internals-core.mjs",
         "test-conv-internals-render.mjs",
+        "test-conv-quantity-truth.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
       ],
-      "docs": [],
+      "docs": [
+        "standarization/CONVENTIONAL_DC_OPERATIONS_STANDARD.md"
+      ],
       "source": {
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-29",
@@ -2822,10 +2837,6 @@
         {
           "page": "datahall.html",
           "reads": 2
-        },
-        {
-          "page": "chiller-plant.html",
-          "reads": 1
         }
       ],
       "tests": [
@@ -2985,10 +2996,6 @@
         {
           "page": "datahall.html",
           "reads": 2
-        },
-        {
-          "page": "chiller-plant.html",
-          "reads": 1
         }
       ],
       "tests": [
@@ -4426,11 +4433,12 @@
         },
         {
           "page": "chiller-plant.html",
-          "reads": 3
+          "reads": 5
         }
       ],
       "tests": [
         "test-conv-plant-internals.mjs",
+        "test-conv-quantity-truth.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
       "docs": [
@@ -4770,11 +4778,12 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 4
+          "reads": 3
         }
       ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
+        "test-conv-epms-lv.mjs",
         "test-conv-epms-sld.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
       ],
@@ -4898,6 +4907,7 @@
       ],
       "consumers": [],
       "tests": [
+        "test-conv-epms-lv.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
       "docs": [],
@@ -5016,7 +5026,7 @@
         },
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 7
+          "reads": 3
         }
       ],
       "tests": [
@@ -5101,15 +5111,23 @@
       ],
       "consumers": [
         {
+          "page": "fuel-system.html",
+          "reads": 2
+        },
+        {
           "page": "EPMS_Telemetry.html",
           "reads": 4
         }
       ],
       "tests": [
+        "test-conv-epms-lv.mjs",
         "test-conv-epms-sld.mjs",
+        "test-conv-fuel-truth.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
-      "docs": [],
+      "docs": [
+        "standarization/CONVENTIONAL_DC_OPERATIONS_STANDARD.md"
+      ],
       "source": {
         "ref": "js/conv-engine.js",
         "section": "electricalHvMv()",
@@ -5225,7 +5243,9 @@
       ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
+        "test-conv-epms-lv.mjs",
         "test-conv-epms-sld.mjs",
+        "test-conv-fuel-truth.mjs",
         "test-conv-plant-internals.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
@@ -5253,11 +5273,20 @@
       "dependsOnInputs": [
         "electrical.genset_spare_per_hall"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "fuel-system.html",
+          "reads": 3
+        }
+      ],
       "tests": [
+        "test-conv-epms-lv.mjs",
+        "test-conv-fuel-truth.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
       ],
-      "docs": [],
+      "docs": [
+        "standarization/CONVENTIONAL_DC_OPERATIONS_STANDARD.md"
+      ],
       "source": {
         "ref": "js/conv-engine.js",
         "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
@@ -5624,7 +5653,12 @@
       "dependsOnInputs": [
         "electrical.hv_tx_impedance_pct"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
       ],
@@ -5796,11 +5830,12 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 2
+          "reads": 4
         }
       ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
+        "test-conv-epms-lv.mjs",
         "test-conv-epms-sld.mjs"
       ],
       "docs": [],
@@ -5867,11 +5902,12 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 4
+          "reads": 5
         }
       ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
+        "test-conv-epms-lv.mjs",
         "test-conv-epms-model.mjs",
         "test-conv-epms-sld.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
@@ -6098,7 +6134,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 3
+          "reads": 4
         }
       ],
       "tests": [
@@ -6173,7 +6209,12 @@
         "electrical.power_factor_design",
         "site.pue"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
         "test-conv-formula.mjs (formula evaluated)"
@@ -6203,11 +6244,12 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 7
+          "reads": 11
         }
       ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
+        "test-conv-epms-lv.mjs",
         "test-conv-epms-model.mjs",
         "test-conv-epms-sld.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
@@ -6260,10 +6302,16 @@
       "dependsOnInputs": [
         "electrical.power_factor_design"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "fuel-system.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
         "test-conv-epms-model.mjs",
+        "test-conv-fuel-truth.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [],
@@ -7644,6 +7692,7 @@
         }
       ],
       "tests": [
+        "test-conv-epms-lv.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
       "docs": [],
@@ -7673,6 +7722,7 @@
         }
       ],
       "tests": [
+        "test-conv-epms-lv.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)",
         "test-conv-basis-drawer.mjs (drawer value vs EPMS_Telemetry.html)"
       ],
@@ -7712,6 +7762,7 @@
         }
       ],
       "tests": [
+        "test-conv-epms-lv.mjs",
         "test-conv-formula.mjs (formula evaluated)",
         "test-conv-basis-drawer.mjs (drawer value vs EPMS_Telemetry.html)"
       ],
@@ -7771,7 +7822,7 @@
         },
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 4
+          "reads": 2
         }
       ],
       "tests": [
@@ -7810,10 +7861,11 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 6
+          "reads": 5
         }
       ],
       "tests": [
+        "test-conv-epms-lv.mjs",
         "test-conv-formula.mjs (formula evaluated)",
         "test-conv-basis-drawer.mjs (drawer value vs EPMS_Telemetry.html)"
       ],
@@ -7849,10 +7901,16 @@
         {
           "page": "dc-conventional.html",
           "reads": 3
+        },
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 4
         }
       ],
       "tests": [
-        "test-conv-formula.mjs (formula evaluated)"
+        "test-conv-epms-lv.mjs",
+        "test-conv-formula.mjs (formula evaluated)",
+        "test-conv-basis-drawer.mjs (drawer value vs EPMS_Telemetry.html)"
       ],
       "docs": [],
       "source": {
@@ -8716,15 +8774,17 @@
       "consumers": [
         {
           "page": "fuel-system.html",
-          "reads": 5
+          "reads": 12
         }
       ],
       "tests": [
+        "test-conv-fuel-truth.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)",
         "test-conv-basis-drawer.mjs (drawer value vs fuel-system.html)"
       ],
       "docs": [
-        "manual/fuel-system.html"
+        "manual/fuel-system.html",
+        "standarization/CONVENTIONAL_DC_OPERATIONS_STANDARD.md"
       ],
       "source": {
         "ref": "js/conv-engine.js",
@@ -8930,7 +8990,9 @@
         "test-conv-formula.mjs (formula evaluated)",
         "test-conv-basis-drawer.mjs (drawer value vs datahall.html)"
       ],
-      "docs": [],
+      "docs": [
+        "standarization/CONVENTIONAL_DC_OPERATIONS_STANDARD.md"
+      ],
       "source": {
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28",
@@ -9142,13 +9204,14 @@
         },
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 2
+          "reads": 1
         }
       ],
       "tests": [
         "test-conv-calc.mjs",
         "test-conv-design-basis.mjs",
         "test-conv-document-parity.mjs",
+        "test-conv-epms-lv.mjs",
         "test-conv-snapshot-binding.mjs",
         "test-datahall-ai-electrical-live.mjs",
         "test-datahall-ai-electrical-topology.mjs",
@@ -9247,6 +9310,7 @@
         "test-conv-depth.mjs",
         "test-conv-epms-model.mjs",
         "test-conv-fire-fuel-operator.mjs",
+        "test-conv-fuel-truth.mjs",
         "test-conv-hall-scope.mjs",
         "test-conv-internals-core.mjs",
         "test-conv-parameter-registry.mjs",
@@ -9336,7 +9400,7 @@
         },
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 6
+          "reads": 4
         }
       ],
       "tests": [
@@ -9452,7 +9516,7 @@
         },
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 6
+          "reads": 4
         }
       ],
       "tests": [
@@ -9461,6 +9525,7 @@
         "test-conv-dashboard-authority.mjs",
         "test-conv-fire-fuel-operator.mjs",
         "test-conv-parameter-registry.mjs",
+        "test-conv-quantity-truth.mjs",
         "test-datahall-ai-electrical-live.mjs",
         "test-datahall-ai-electrical-topology.mjs",
         "test-datahall-ai-fire-points.mjs",
@@ -9728,7 +9793,7 @@
         },
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 4
+          "reads": 3
         }
       ],
       "tests": [
@@ -9868,7 +9933,7 @@
         },
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 4
+          "reads": 3
         }
       ],
       "tests": [
@@ -9920,7 +9985,7 @@
         },
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 3
+          "reads": 1
         }
       ],
       "tests": [

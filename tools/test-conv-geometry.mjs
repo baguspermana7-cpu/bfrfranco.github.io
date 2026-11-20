@@ -55,10 +55,10 @@ const DIAGRAMS = Object.freeze([
   { page: 'water-system.html', selector: '#water-svg', label: 'water process' },
   { page: 'fuel-system.html', selector: '#fuel-svg', label: 'fuel P&ID' },
   { page: 'ict.html', selector: 'svg.ict-arch', label: 'ICT architecture (default segment)' },
-  /* EPMS: the root SVG (viewBox 0 0 3600 2600) holds every layer — wires, flow, devices, breakers and
-     the telemetry text. Targeting a single layer (e.g. #l-wires) reports texts=0 and measures nothing. */
-  { page: 'EPMS_Telemetry.html', selector: 'svg#viewport', label: 'EPMS single-line' },
-  /* P5a — E-S-101, the HV / MV single-line: the page's default view since P5a (the legacy drawing above is the LV view) */
+  /* E5 (PRD-CONV-EQUIPMENT-TRUTH) — E-S-102, LV distribution of a typical hall, replaced the legacy svg#viewport drawing;
+     it is drawn when the LV view is first shown, so the entry clicks that view first (`click`) */
+  { page: 'EPMS_Telemetry.html', selector: 'svg#epms-lv-svg', label: 'EPMS E-S-102 LV distribution', click: '.epms-view-btn[data-epms-view="lv"]' },
+  /* P5a — E-S-101, the HV / MV single-line: the page's default view since P5a */
   { page: 'EPMS_Telemetry.html', selector: 'svg#epms-sld-svg', label: 'EPMS E-S-101 HV / MV single-line' },
   /* v3.37.0 — cdu-mini-bms loads the instrument shell since P23 (it declares that register), and the
      survey-coverage gate rightly asked who measures its two process drawings. */
@@ -147,6 +147,7 @@ try {
         /* A cockpit builds a panel only when its tab is shown (v3.11.7), so a tabbed drawing does not exist yet: waiting
            for it here spent the full 20 s on every load (datahallAI: 24 drawings x 2 themes x 4 viewports, 45 min —
            the step never finished inside the ship gate). activateTab() has its own readiness wait. */
+        if (diagram.click) await tab.evaluate((sel) => document.querySelector(sel)?.click(), diagram.click);
         if (!diagram.tabEntry) await tab.waitForSelector(diagram.selector, { timeout: 20000 }).catch(() => {});
         if (diagram.tabEntry) {
           await activateTab(tab, tabSet, diagram.tabEntry);

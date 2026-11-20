@@ -26,8 +26,11 @@ const sheets = {};
 for (const [page, file, key] of [['chiller', 'chiller-sheet.js', 'RZChillerSheets'], ['fire', 'fire-sheet.js', 'RZFireSheets'],
   ['fuel', 'fuel-sheet.js', 'RZFuelSheets'], ['water', 'water-sheet.js', 'RZWaterSheets'], ['epms', 'epms-sheet.js', 'RZEpmsSheets']]) {
   const win = {};
+  /* FU-M-101 is drawn per hall from the engine genset fleet (CONV_CALC.getFleet), so its sheet needs the engine */
+  if (page === 'fuel') new Function('window', fs.readFileSync(path.join(ROOT, 'js/conv-engine.js'), 'utf8'))(win);
   new Function('window', fs.readFileSync(path.join(ROOT, 'js/conv', file), 'utf8'))(win);
   sheets[page] = win[key].pid || win[key].sld;
+  if (win[key].cdw) sheets.condenser = win[key].cdw;   /* CH-M-102 (E3): the condenser page of the chiller cockpit */
 }
 const tagged = (sh) => sh.nodes.filter((n) => n.sym !== 'junction');
 

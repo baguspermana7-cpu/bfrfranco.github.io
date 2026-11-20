@@ -67,7 +67,9 @@
   /* highlight clipped to the body's own outline, inserted above the fill and below the symbol's strokes */
   function paintSpecular(b, id) {
     var g = b.parentNode, node = b.closest('.hmi-node'), nid = node.getAttribute('data-node') || '';
-    var prev = g.querySelector(':scope > .hd-spec'); if (prev) prev.remove();
+    /* geometry only: a body keeps its highlight across updates (re-measuring every body on every 1.2 s scan held the
+       main thread busy enough on the 10-train CH-M-101 that the page never went network-idle, E3) */
+    if (g.querySelector(':scope > .hd-spec')) return;
     var bb; try { bb = b.getBBox(); } catch (e) { return; }
     if (!bb || bb.width < 4 || bb.height < 4) return;
     var round = /^(circle|ellipse)$/i.test(b.tagName), cid = id + '-hd-sc-' + nid + '-' + Array.prototype.indexOf.call(g.children, b);
@@ -90,19 +92,28 @@
     if (!layer) { layer = el('g', { 'class': 'hd-sheen', 'aria-hidden': 'true' }); host.appendChild(layer); }
     var casing = host.querySelector('g.hd-casing');
     if (!casing) { casing = el('g', { 'class': 'hd-casing', 'aria-hidden': 'true' }); host.insertBefore(casing, host.firstChild); }
-    layer.textContent = ''; casing.textContent = '';
-    host.querySelectorAll('path.hmi-edge[data-edge]').forEach(function (p) {
+    var edges = host.querySelectorAll('path.hmi-edge[data-edge]');
+    /* same pipes as last time: only the flow state moves, so restamp it on the tube layers already drawn instead of
+       rebuilding ~3 paths per pipe on every scan (E3: 209 pipes on the 10-train sheet) */
+    if (layer.__hdN === edges.length && layer.childNodes.length) {
+      edges.forEach(function (p) { var fl = p.getAttribute('data-flow') || ''; (p.__hd || []).forEach(function (e) { if (e.getAttribute('data-flow') !== fl) e.setAttribute('data-flow', fl); }); });
+      return;
+    }
+    layer.textContent = ''; casing.textContent = ''; layer.__hdN = edges.length;
+    edges.forEach(function (p) {
       var c = p.getAttribute('class') || '', d = p.getAttribute('d'), fl = p.getAttribute('data-flow') || '';
+      p.__hd = [];
       if (/w-(inst|signal)|m-(power|data|feed_a|feed_b|dc)\b/.test(c) || !/\bm-/.test(c)) return;
+      var add = function (parent, e) { parent.appendChild(e); p.__hd.push(e); };
       /* a tube: dark wall under the medium, a highlight riding up-left of the centre line. Chilled water is
          insulated: an aluminium cladding jacket, wider than the bare pipe, with a seam ring every 22 units */
       if (/\bm-chw\b/.test(c)) {
-        casing.appendChild(el('path', { d: d, 'class': 'hd-insul', 'data-flow': fl }));
-        casing.appendChild(el('path', { d: d, 'class': 'hd-insul-seam', 'data-flow': fl }));
+        add(casing, el('path', { d: d, 'class': 'hd-insul', 'data-flow': fl }));
+        add(casing, el('path', { d: d, 'class': 'hd-insul-seam', 'data-flow': fl }));
       } else {
-        casing.appendChild(el('path', { d: d, 'class': 'hd-casing-line', 'data-flow': fl }));
+        add(casing, el('path', { d: d, 'class': 'hd-casing-line', 'data-flow': fl }));
       }
-      layer.appendChild(el('path', { d: d, 'class': 'hd-sheen-line', 'data-flow': fl, transform: 'translate(-0.45 -0.6)' }));
+      add(layer, el('path', { d: d, 'class': 'hd-sheen-line', 'data-flow': fl, transform: 'translate(-0.45 -0.6)' }));
     });
   }
   /* equipment that stands on the floor gets a plinth: a concrete pad under its body, drawn beneath the node layer */
@@ -111,7 +122,9 @@
     var nodes = svg.querySelector('g.hmi-nodes'); if (!nodes) return;
     var layer = svg.querySelector('g.hd-plinths');
     if (!layer) { layer = el('g', { 'class': 'hd-plinths', 'aria-hidden': 'true' }); nodes.parentNode.insertBefore(layer, nodes); }
-    layer.textContent = '';
+    var count = nodes.querySelectorAll('.hmi-node').length;
+    if (layer.childNodes.length && layer.__hdN === count) return;   /* geometry only, as the flanges */
+    layer.textContent = ''; layer.__hdN = count;
     var inv; try { inv = svg.getScreenCTM().inverse(); } catch (e) { return; }
     if (!inv) return;
     var pt = svg.createSVGPoint ? svg.createSVGPoint() : null; if (!pt) return;
@@ -130,8 +143,11 @@
     var host = svg.querySelector('g.hmi-edges'), sheen = host && host.querySelector('g.hd-sheen'); if (!sheen) return;
     var layer = host.querySelector('g.hd-flanges');
     if (!layer) { layer = el('g', { 'class': 'hd-flanges', 'aria-hidden': 'true' }); host.appendChild(layer); }
-    layer.textContent = '';
-    host.querySelectorAll('path.hmi-edge[data-edge]').forEach(function (p) {
+    var edges = host.querySelectorAll('path.hmi-edge[data-edge]');
+    /* flanges follow geometry, not state: drawn once per set of pipes, not on every update */
+    if (layer.childNodes.length && layer.__hdN === edges.length) return;
+    layer.textContent = ''; layer.__hdN = edges.length;
+    edges.forEach(function (p) {
       var c = p.getAttribute('class') || '';
       if (/w-(inst|signal)|m-(power|data|feed_a|feed_b|dc)\b/.test(c) || !/\bm-/.test(c)) return;
       var ends = (p.getAttribute('data-ends') || '').split('|'), L; try { L = p.getTotalLength(); } catch (e) { return; }
