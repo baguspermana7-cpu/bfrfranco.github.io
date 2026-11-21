@@ -434,6 +434,18 @@ Before release:
   `supabase/migrations/2026-11-20-conv-points.sql` once in the Supabase SQL editor
   (`documentation/product-transformation/02-prds/PRD-CONV-POINT-STATUS-TREND/RUNBOOK-DB.md`); until then the fallback serves.
 
+### 2026-11-21 — Data hall space (v3.83.0, PRD-CONV-DATAHALL-SPACE, R182)
+
+- The data hall page gives the screen to the hall: one 44 px hall bar, the floor, one 320 px inspector
+  (hall / rack / CRAH / row). No explanation prints at rest; it lives in the (i) panel, the Events drawer or a
+  tooltip. Text budget 120 words (`test-conv-text-budget`).
+- The floor fills its stage: `RZFloorPlan` lays rows out in 1–3 bands so cabinets stay readable (≥ 12×9 px at 1440;
+  measured 33×45). A box larger than its drawing does not count (SP1 measures the drawn hall).
+- A row strip prints one number (row kW). Inlet, hot aisle, ΔT and min / avg / max live in the row panel as points.
+- A closing bottom sheet never eats the next tap (`js/rz-sheet.js`).
+- Gate: `tools/test-conv-datahall-space.mjs` SP1–SP10 (floor share, 25 rows, floor top, words, sentences, numbers
+  printed once, no inner scroll boxes, every reading id kept and reachable, selection, 0 errors).
+
 ### 2026-11-21 — How a page marks its numbers (PRD-CONV-POINT-STATUS-TREND T2/T3 pilot: chiller-plant, cdu-mini-bms)
 
 Every rendered number is exactly one of three things (P-3). A page says which with one attribute; it never types a limit

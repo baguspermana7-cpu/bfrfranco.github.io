@@ -404,6 +404,7 @@ Music: `my-video/public/audio/intro-music.mp3` — currently a synthesized elect
 | `tools/inject-schema-faq-howto.py` | add FAQ/HowTo JSON-LD to calc/tool pages |
 | `tools/test-datahall-calc.mjs` | DC AI engine — 57/57 doc-21 worked examples |
 | `tools/test-conv-calc.mjs` | DC Conv engine — 22/22 DoD identities |
+| `tools/test-conv-datahall-space.mjs` | Data hall gives the screen to the hall — SP1–SP10 (floor share, readable cabinets, words, no inner scroll, every reading kept), 43 checks |
 | `tools/probe-accuracy-validation.mjs` | Reviewer's 23 acceptance tests + cross-page Rule-1 consistency — 82/82 executed assertions at v2.0.0 (GB300 DC AI switch; see standarization/ACCURACY_VALIDATION.md) |
 | `tools/build-countries-data.mjs` | Generates `rz-engine.js DATA.countries` (single-source country reference) from `dcmoc/src/constants/countries.ts`. Rerun after editing countries.ts, then terser + `?v=` bump. See standarization/ENGINE_UNIFICATION.md |
 | `tools/test-reference-parity.mjs` | Reference-data parity gate — fails if `DATA.countries` drifts from the DCMOC source, or per-country electricity/grid-carbon/tax/enums/currency diverge (126/0) |

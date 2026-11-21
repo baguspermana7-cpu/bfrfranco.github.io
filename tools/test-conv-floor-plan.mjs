@@ -355,6 +355,10 @@ for (const theme of ['dark', 'light']) {
     check('FX3', l3 && l3.kind === 'row' && l3.id === 3, `${T}: row click -> ${JSON.stringify(l3)}`);
     /* FX4 keyboard: focus starts at cabinet 0; Down -> j1 (idx 1); Right -> line R (idx 11); Enter */
     await pg.evaluate(() => { window.__fp.last = null; window.__fp.plan.select(null); window.__fp.plan.focus(0); });
+    /* under a loaded lane the plan can still be settling (a rebuild swaps the svg): press keys only once the focused
+       svg carries the cursor (release gate v3.83.0 read last:null, ad:null once; the rerun passed) */
+    await pg.waitForFunction(() => { const s = document.querySelector('.fp-svg'); return s && document.activeElement === s && s.getAttribute('aria-activedescendant') === 'fp-rk-0'; }, { timeout: 5000 })
+      .catch(() => pg.evaluate(() => window.__fp.plan.focus(0)));
     await pg.keyboard.press('ArrowDown'); await pg.keyboard.press('ArrowRight'); await pg.keyboard.press('Enter');
     const kl = await pg.evaluate(() => ({ last: window.__fp.last, ad: document.querySelector('.fp-svg').getAttribute('aria-activedescendant') }));
     check('FX4', kl.last && kl.last.kind === 'rack' && kl.last.id === 11 && kl.ad === 'fp-rk-11', `${T}: keyboard -> ${JSON.stringify(kl)}`);

@@ -1,6 +1,6 @@
 # PRD-CONV-DATAHALL-SPACE: the data hall page gives its space to the data hall
 
-Status: DRAFT 2026-11-21 · Owner comment R182 · Companion of PRD-CONV-DATAHALL-FLOOR (how the floor is DRAWN).
+Status: BUILT v3.83.0 (2026-11-21) · Owner comment R182 · Companion of PRD-CONV-DATAHALL-FLOOR (how the floor is DRAWN).
 This PRD decides how much of the page the floor GETS, and where the text goes.
 
 ## 0. The owner's words

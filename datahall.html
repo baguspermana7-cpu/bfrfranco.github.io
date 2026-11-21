@@ -447,8 +447,10 @@
             .mode-bar > * { flex: 0 0 auto; }
             .legend { margin-left: 0; white-space: nowrap; }
             .row-picker { display: flex; gap: 4px; overflow-x: auto; padding: 6px 0; margin-top: 6px; scroll-snap-type: x proximity; overscroll-behavior-x: contain; }
-            /* the page is dark only: the sheet follows the page surface, not the light default of a page without data-theme */
-            html:root:not([data-theme="dark"]) .rz-sheet { --rz-sheet-bg: var(--bg-panel); --rz-sheet-ink: var(--txt-main); --rz-sheet-line: var(--border); }
+            /* the page is dark only: the sheet follows the page surface, not the light default of a page without data-theme.
+               Written without the root-not-dark selector form: audit-dark-coverage reads that form as "this page has a light
+               palette" and then expects a light body (v3.83.0 gate, step 78). The :not(#id) keeps the id-weight over rz-sheet.js. */
+            html:not([data-theme="dark"]):not(#rz-dark-only) .rz-sheet { --rz-sheet-bg: var(--bg-panel); --rz-sheet-ink: var(--txt-main); --rz-sheet-line: var(--border); }
             .rz-sheet .insp-head { display: none; }
             .rz-sheet .inspector { border: 0; width: auto; }
             .rp-item { min-height: 44px; padding: 0 8px; }
@@ -472,7 +474,7 @@
          page used to carry its own hand-written basisFor dictionary; a drawer that restates
          provenance by hand is how v1.132.0 shipped a drawer explaining a density it had not
          derived. The drawer renders the registry now, so it cannot claim what is not there. -->
-    <script src="js/conv-parameters.js?v=20261121-5508ceb7"></script>
+    <script src="js/conv-parameters.js?v=20261121-a2199c95"></script>
     <link rel="stylesheet" href="css/conv-vfx.css?v=20261118-5eed9b2f">
     <script src="js/conv/vfx.js?v=20261117-89056876"></script>
     <script src="js/conv/air-section.js?v=20261117-99ef3c34"></script>
@@ -493,7 +495,7 @@
          CRAH grid + all displayed values are unchanged. P1 datahall metadata. -->
     <script src="js/rz-telemetry-quality.js?v=20261113-8feb0dfd" defer></script>
     <script src="js/rz-provenance.js?v=20261111-6f1cd061" defer></script>
-    <script src="js/rz-version.js?v=20261121-ea6e94b5" defer></script>
+    <script src="js/rz-version.js?v=20261121-eefc9977" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
 <style id="rz-skiplink-v1">

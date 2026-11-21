@@ -11,6 +11,50 @@ release sections rather than semver.
 
 ---
 
+## v3.83.0 — 2026-11-21 — The data hall gets the screen
+
+Owner (R182): "Datahall nya sangat kurang, too much text malah yg penting gak ada cukup space datahall itu sendiri."
+PRD-CONV-DATAHALL-SPACE (laws SP1–SP10) with PRD-CONV-DATAHALL-FLOOR FP2.
+
+### Changed
+- `datahall.html`: one 44 px hall bar (state, hall A–D, crit / warn / maint, IT, cooling, PUE), the floor, and one
+  320 px inspector (hall / rack / CRAH / row). Explanations moved into the (i) panel and the Events drawer; the
+  inspector's long blocks open on demand. Measured at 1440: floor 11.1 % → 58.5 % of the screen, floor top
+  498 → 142 px, cabinet 11×4 → 33×45 px; at 390 the floor top 1593 → 238 px. Text at rest 400 → 120 words.
+- `js/conv/floor-plan.js`: rows lay out in 1–3 bands, each with its own north and south CRAH gallery, so the hall
+  fills the stage instead of one thin strip; `onBuild` and `watchHeight` options; the keyboard cursor crosses bands.
+- Row strip prints only the row kW. A click on it opens the row panel: heat, inlet, hot aisle, air-side ΔT and
+  min / avg / max of cabinet load and inlet, all points with state and trend, plus the 20 cabinets as a list.
+  Not built: airflow per row and the CRAH units serving a row (the engine has one CRAH pool per hall; naming
+  units per row would be invented).
+- Phone: the inspector is a bottom sheet and a row picker leads into a row; tablet: a right drawer.
+
+### Fixed
+- `js/rz-sheet.js`: a closing sheet's scrim stayed clickable for up to 520 ms and swallowed the next tap (on the
+  data hall at 390 px the Air path button did nothing after Escape). Scrim and sheet drop pointer events when the
+  close starts.
+
+- `datahall.html`: the phone sheet's dark-surface rule no longer reads as a light palette to
+  `audit-dark-coverage` (it expected a light body on a dark-only page); same effect, selector without
+  `:root:not([data-theme="dark"])`.
+- `data/conv-parameters.json` rebuilt: two parameters now list the gates that read them.
+
+### Gates
+- New `tools/test-conv-datahall-space.mjs` (43 checks; 31 of 42 red on v3.82.0). It and `test-conv-floor-plan`
+  (fixture and datahall target, never wired before) now run in `tools/ship-gate.sh`.
+- `test-conv-datahall-air` D1 rewritten to PRD-CONV-DATAHALL-FLOOR 3.6 (one number per strip, the panel
+  restates it, the page is clickable after Escape: red at 390 before the rz-sheet fix).
+- `test-conv-floor-plan` FL2 judges the palette against the theme the page draws (datahall is dark-only; the
+  fixture still proves the light palette). `test-conv-text-budget` datahall 400 → 120.
+- `tools/lib/cockpit-audit-state.mjs`: the priming script no longer throws in the about:blank document a mobile
+  viewport reloads (SecurityError on localStorage; the page itself was clean).
+
+### Known
+- `audit-editorial-render` stays red with the same 87 page rises as origin/main 9b6f01410 (fuel-system 817 → 939
+  measured on both trees); it comes from the site bar's navbar/footer values, outside this release.
+- `test-conv-floor-plan` FX4 (keyboard) failed once under a loaded lane and passed on rerun; it now waits until the
+  focused plan carries its cursor before pressing keys.
+
 ## v3.82.0 — 2026-11-21 — Every BMS number shows its state and opens an instrument trend
 
 Owner: point colours (normal green, TCS 35 °C green / 37 °C amber / red above), "semua angka … saat di klik bisa keluar
