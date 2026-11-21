@@ -6,7 +6,13 @@
  *                 crahUnits: [{n, tag, running, status?}], rackInletFor(idx) -> °C, ratingKw, racksPerZone (20) }
  *               — the page's own `racks`, `zones`, `crahUnits`, `rackInletFor`, RACK_RATING_KW; no engine arithmetic here.
  *       opts  = { rackTag(idx), zoneTag(z), crahTag(n), thresholds, mode, onRack(idx, el), onCrah(n, el), onRow(z),
- *                 ids: {top, bottom} }
+ *                 ids: {top, bottom}, crahAttrs: {north: {attr: v}, south: {...}},
+ *                 measure: element whose clientWidth / clientHeight is the space the drawing may take (default: host),
+ *                 height: number | function -> the height bound in px; giving it lets the drawing pick 1, 2 or 3 row BANDS,
+ *                 maxBands (1..3), minUnit (px, default 7), watchHeight (false: a height change does not rebuild),
+ *                 onBuild(inst): called after every (re)build, so a page can decorate the strips it asked for }
+ *       Rows are laid out in bands (band b = rows [b*k, (b+1)*k)), each band stacked below the last ON THE SCREEN with its own
+ *       north and south CRAH gallery; the unit u = min(fit to width, fit to height, 22 px) is the largest over the band counts.
  *   paint(mode)                'power' | 'temp' | 'cooling-margin' | 'alarms' | 'space'. Writes ATTRIBUTES (fill, points,
  *                              data-state, display) and the text of nodes that already exist; never adds or removes a node.
  *   select({rack}|{row}|{crah}|null), legend(el, mode), palette(theme), classify(mode, model, idx, thresholds), unit().
@@ -28,7 +34,7 @@
   GEO.cabY1 = GEO.cabY0 + GEO.perLine * GEO.kd;                 // 17.9
   GEO.sY0 = GEO.cabY1 + GEO.gap;                                // 18.6
   GEO.slabY = GEO.sY0 + GEO.gD + 0.6;                           // 20.8
-  var U_MIN = 7, U_MAX = 16, PAD = 8, STRIP_H = 40;
+  var U_MIN = 7, U_MAX = 22, PAD = 8, STRIP_H = 34;
   var MODES = ['power', 'temp', 'cooling-margin', 'alarms', 'space'];
   var DEFAULT_T = { utilWarn: 0.85, utilAlarm: 0.95, utilCap: 1.05, inletMin: 18, inletMax: 27, inletAlarm: 30, marginAlarm: -3 };
 
@@ -134,7 +140,7 @@
     '.fp-ring-row{stroke:var(--fp-accent);stroke-width:1.5}',
     '.fp-root:not(.fp-labels) .rk-id,.fp-root:not(.fp-labels) .rk-val,.fp-root .cr-n{display:none}',
     '.fp-svg text{fill:var(--fp-ink);font:9px "JetBrains Mono","IBM Plex Mono",monospace}',
-    '.zone-strip{position:relative;height:' + STRIP_H + 'px}',
+    '.zone-strip{position:absolute;left:0;right:0;height:' + STRIP_H + 'px}',
     '.zone{position:absolute;top:2px;text-align:center;font-family:"JetBrains Mono","IBM Plex Mono",monospace;font-size:10px;line-height:1.3}',
     '.zone-head{display:block;margin:0 auto;width:20px;padding:1px 0;border:1px solid transparent;border-radius:2px;color:var(--fp-ink);cursor:pointer;font-size:11px}',
     '.zone[data-sel] .zone-head{border-color:var(--fp-accent);outline:0}',
@@ -213,25 +219,27 @@
     for (k in DEFAULT_T) T[k] = DEFAULT_T[k];
     if (opts.thresholds) for (k in opts.thresholds) T[k] = opts.thresholds[k];
     var perZone = model.racksPerZone || 20, Z = Math.floor(model.racks.length / perZone), perLine = perZone / 2;
-    var inst = { model: model, mode: opts.mode || 'temp', host: host, sel: null, u: 0 };
-    var u, H, ox, oy, root, scroll, canvas, svg, strip, tip, ringSel, ringHover, ringRow, rackEls = [], crahEls = [], zoneEls = [], cache = [], cursor = null;
+    var inst = { model: model, mode: opts.mode || 'temp', host: host, sel: null, u: 0, bands: 1 };
+    var u, H, ox, oy, topPx, planPx, pitch, nb = 1, kRows = Z, root, scroll, canvas, svg, tip, ringSel, ringHover, ringRow, rackEls = [], crahEls = [], zoneEls = [], cache = [], cursor = null;
     var ids = opts.ids || { top: 'crah-top', bottom: 'crah-bottom' };
+    var meas = opts.measure || host;
     var rackTag = opts.rackTag || function (i) { return 'R-' + i; };
     var zoneTag = opts.zoneTag || function (z) { return 'Row ' + String.fromCharCode(65 + z); };
     var crahTag = opts.crahTag || function (n, c) { return (c && c.tag) || ('CRAH-' + n); };
-    var wSlab = Z * GEO.rowW + 1.0, totalUnits = wSlab + SHX * GEO.slabY;
 
-    function P(x, y, h) { return (ox + x * u + y * u * SHX).toFixed(3) + ',' + (oy + y * u * SHY - h * H).toFixed(3); }
-    function pts(a) { var s = [], i; for (i = 0; i < a.length; i++) s.push(P(a[i][0], a[i][1], a[i][2])); return s.join(' '); }
+    /* One band is a row of the hall drawn by itself; band b sits one pitch below band b-1 ON THE SCREEN (not in the floor
+       plane), so every band keeps its own north and south CRAH gallery and the oblique shear costs no extra width. */
+    function P(x, y, h, b) { return (ox + x * u + y * u * SHX).toFixed(3) + ',' + (oy + (b || 0) * pitch + y * u * SHY - h * H).toFixed(3); }
+    function pts(a, b) { var s = [], i; for (i = 0; i < a.length; i++) s.push(P(a[i][0], a[i][1], a[i][2], b)); return s.join(' '); }
     function cell(idx) {
-      var z = Math.floor(idx / perZone), r = idx % perZone, line = r < perLine ? 0 : 1;
-      return { z: z, line: line, j: r % perLine, x0: 0.5 + z * GEO.rowW + (line ? GEO.cabW + GEO.hot : 0), y0: GEO.cabY0 + (r % perLine) * GEO.kd };
+      var z = Math.floor(idx / perZone), r = idx % perZone, line = r < perLine ? 0 : 1, b = Math.floor(z / kRows), zl = z - b * kRows;
+      return { z: z, b: b, zl: zl, line: line, j: r % perLine, x0: 0.5 + zl * GEO.rowW + (line ? GEO.cabW + GEO.hot : 0), y0: GEO.cabY0 + (r % perLine) * GEO.kd };
     }
-    function boxPts(x0, y0, w, d, h) {
+    function boxPts(x0, y0, w, d, h, b) {
       return {
-        top: pts([[x0, y0, h], [x0 + w, y0, h], [x0 + w, y0 + d, h], [x0, y0 + d, h]]),
-        front: pts([[x0, y0 + d, 0], [x0 + w, y0 + d, 0], [x0 + w, y0 + d, h], [x0, y0 + d, h]]),
-        side: pts([[x0, y0, 0], [x0, y0 + d, 0], [x0, y0 + d, h], [x0, y0, h]])
+        top: pts([[x0, y0, h], [x0 + w, y0, h], [x0 + w, y0 + d, h], [x0, y0 + d, h]], b),
+        front: pts([[x0, y0 + d, 0], [x0 + w, y0 + d, 0], [x0 + w, y0 + d, h], [x0, y0 + d, h]], b),
+        side: pts([[x0, y0, 0], [x0, y0 + d, 0], [x0, y0 + d, h], [x0, y0, h]], b)
       };
     }
     function hOf(idx) {
@@ -240,72 +248,102 @@
       var f = model.ratingKw ? rk.kw / model.ratingKw : 0;
       return f < 0 ? 0 : f;
     }
+    function rowsIn(b) { return Math.min(kRows, Z - b * kRows); }
+    function slabW(b) { return rowsIn(b) * GEO.rowW + 1.0; }
 
+    /* PRD-CONV-DATAHALL-SPACE 3.1: pick 1, 2 or 3 bands so the unit u = min(fit to the width, fit to the height) is the
+       largest. Height is bounded only when the page says so (opts.height: a number or a function), so a page that does not
+       pass it keeps the one-band strip of FP1. */
     function layout() {
-      var W = opts.width || host.clientWidth || 1100;
-      var fit = (W - 2 * PAD) / totalUnits;
-      u = Math.max(U_MIN, Math.min(U_MAX, fit));
-      H = H_UNITS * u; ox = PAD; oy = Math.ceil(GEO.wall * u) + 6;
-      inst.u = u;
+      var W = opts.width || meas.clientWidth || host.clientWidth || 1100;
+      var Hh = typeof opts.height === 'function' ? opts.height() : opts.height;
+      var bounded = Hh != null && isFinite(Hh) && Hh > 0;
+      var maxB = Math.max(1, Math.min(3, opts.maxBands != null ? opts.maxBands : (Hh != null ? 3 : 1)));
+      var uMin = opts.minUnit || U_MIN, best = null, b, kk, fitW, fitH, uu;
+      for (b = 1; b <= maxB; b++) {
+        kk = Math.ceil(Z / b);
+        fitW = (W - 2 * PAD) / (kk * GEO.rowW + 1.0 + SHX * GEO.slabY);
+        fitH = bounded ? (((Hh - 2) / b) - 16 - STRIP_H) / (GEO.wall + GEO.slabY * SHY) : Infinity;
+        uu = Math.min(fitW, fitH, U_MAX);
+        if (!best || uu > best.u + 1e-6) best = { b: b, k: kk, u: uu };
+      }
+      nb = best.b; kRows = best.k;
+      u = Math.max(uMin, Math.floor(best.u * 100) / 100);
+      H = H_UNITS * u; ox = PAD;
+      topPx = Math.ceil(GEO.wall * u) + 6; oy = topPx;
+      planPx = Math.ceil(GEO.slabY * u * SHY) + 4;
+      pitch = topPx + planPx + STRIP_H;
+      inst.u = u; inst.bands = nb;
     }
 
     function build() {
       layout();
-      var i, j, z, n, c;
+      var i, j, z, n, c, b;
       host.innerHTML = '';
       rackEls = []; crahEls = []; zoneEls = []; cache = [];
-      var svgW = Math.ceil(ox + totalUnits * u + PAD), svgH = Math.ceil(oy + GEO.slabY * u * SHY + 8);
+      var totalUnits = kRows * GEO.rowW + 1.0 + SHX * GEO.slabY;
+      var svgW = Math.ceil(ox + totalUnits * u + PAD), svgH = nb * pitch + 2;
+      /* a page that bounds the height gets a host that is exactly the drawing: no empty stage around it */
+      if (opts.height != null) { host.style.width = Math.min(svgW, meas.clientWidth || svgW) + 'px'; host.style.height = svgH + 'px'; }
       root = html('div', 'fp-root', host);
-      root.setAttribute('data-fp', '1'); root.setAttribute('data-u', u.toFixed(2));
+      root.setAttribute('data-fp', '1'); root.setAttribute('data-u', u.toFixed(2)); root.setAttribute('data-bands', String(nb));
       scroll = html('div', 'fp-scroll', root);
-      canvas = html('div', 'fp-canvas', scroll); canvas.style.width = svgW + 'px';
-      for (i = 0; i < Z; i += 5) { var sn = html('span', 'fp-snap', canvas); sn.style.left = Math.max(0, Math.floor(ox + (0.5 + i * GEO.rowW) * u + SHX * GEO.cabY0 * u - 6)) + 'px'; }
+      canvas = html('div', 'fp-canvas', scroll); canvas.style.width = svgW + 'px'; canvas.style.height = svgH + 'px';
+      for (i = 0; i < kRows; i += 5) { var sn = html('span', 'fp-snap', canvas); sn.style.left = Math.max(0, Math.floor(ox + (0.5 + i * GEO.rowW) * u + SHX * GEO.cabY0 * u - 6)) + 'px'; }
       svg = el('svg', { 'class': 'fp-svg', width: svgW, height: svgH, viewBox: '0 0 ' + svgW + ' ' + svgH, role: 'group', tabindex: '0',
         'aria-label': 'Data hall floor plan. Arrow keys move between cabinets and CRAH units, Enter opens the focused one.' }, canvas);
 
-      /* floor: slab, tile grid, wall on the north and west edges */
-      var g = el('g', { 'class': 'fp-floor' }, svg), d = '', x, y;
-      el('polygon', { 'class': 'fp-slab', points: pts([[0, 0, 0], [wSlab, 0, 0], [wSlab, GEO.slabY, 0], [0, GEO.slabY, 0]]) }, g);
-      for (x = 2; x < wSlab; x += 2) d += 'M' + P(x, 0, 0) + 'L' + P(x, GEO.slabY, 0);
-      for (y = 2; y < GEO.slabY; y += 2) d += 'M' + P(0, y, 0) + 'L' + P(wSlab, y, 0);
-      el('path', { 'class': 'fp-tiles', d: d }, g);
-      var da = '';
-      for (z = 0; z < Z; z++) { var ha = 0.5 + z * GEO.rowW + GEO.cabW; da += 'M' + P(ha, GEO.cabY0, 0) + 'L' + P(ha + GEO.hot, GEO.cabY0, 0) + 'L' + P(ha + GEO.hot, GEO.cabY1, 0) + 'L' + P(ha, GEO.cabY1, 0) + 'Z'; }
-      el('path', { 'class': 'fp-aisle-hot', d: da }, g);
-      var sf = 4 / H;
-      el('polygon', { 'class': 'fp-slab-face', points: pts([[0, GEO.slabY, 0], [wSlab, GEO.slabY, 0], [wSlab, GEO.slabY, -sf], [0, GEO.slabY, -sf]]) }, g);
-      el('polygon', { 'class': 'fp-slab-face', points: pts([[0, 0, 0], [0, GEO.slabY, 0], [0, GEO.slabY, -sf], [0, 0, -sf]]) }, g);
-      var wall = el('g', { 'class': 'fp-wall' }, svg), wh = GEO.wall * u / H;
-      el('polygon', { 'class': 'wall-edge', 'data-edge': 'north', points: pts([[0, 0, 0], [wSlab, 0, 0], [wSlab, 0, wh], [0, 0, wh]]) }, wall);
-      el('polygon', { 'class': 'wall-edge', 'data-edge': 'west', points: pts([[0, 0, 0], [0, GEO.slabY, 0], [0, GEO.slabY, wh], [0, 0, wh]]) }, wall);
+      /* floor: slab, tile grid, wall on the north and west edges (one of each per band) */
+      var g = el('g', { 'class': 'fp-floor' }, svg), wall = el('g', { 'class': 'fp-wall' }, svg), x, y, wS, d, da, sf = 4 / H, wh = GEO.wall * u / H;
+      for (b = 0; b < nb; b++) {
+        wS = slabW(b); d = ''; da = '';
+        el('polygon', { 'class': 'fp-slab', points: pts([[0, 0, 0], [wS, 0, 0], [wS, GEO.slabY, 0], [0, GEO.slabY, 0]], b) }, g);
+        for (x = 2; x < wS; x += 2) d += 'M' + P(x, 0, 0, b) + 'L' + P(x, GEO.slabY, 0, b);
+        for (y = 2; y < GEO.slabY; y += 2) d += 'M' + P(0, y, 0, b) + 'L' + P(wS, y, 0, b);
+        el('path', { 'class': 'fp-tiles', d: d }, g);
+        for (z = b * kRows; z < b * kRows + rowsIn(b); z++) { var ha = 0.5 + (z - b * kRows) * GEO.rowW + GEO.cabW; da += 'M' + P(ha, GEO.cabY0, 0, b) + 'L' + P(ha + GEO.hot, GEO.cabY0, 0, b) + 'L' + P(ha + GEO.hot, GEO.cabY1, 0, b) + 'L' + P(ha, GEO.cabY1, 0, b) + 'Z'; }
+        el('path', { 'class': 'fp-aisle-hot', d: da }, g);
+        el('polygon', { 'class': 'fp-slab-face', points: pts([[0, GEO.slabY, 0], [wS, GEO.slabY, 0], [wS, GEO.slabY, -sf], [0, GEO.slabY, -sf]], b) }, g);
+        el('polygon', { 'class': 'fp-slab-face', points: pts([[0, 0, 0], [0, GEO.slabY, 0], [0, GEO.slabY, -sf], [0, 0, -sf]], b) }, g);
+        el('polygon', { 'class': 'wall-edge', 'data-edge': 'north', 'data-band': b, points: pts([[0, 0, 0], [wS, 0, 0], [wS, 0, wh], [0, 0, wh]], b) }, wall);
+        el('polygon', { 'class': 'wall-edge', 'data-edge': 'west', 'data-band': b, points: pts([[0, 0, 0], [0, GEO.slabY, 0], [0, GEO.slabY, wh], [0, 0, wh]], b) }, wall);
+      }
 
-      /* CRAH galleries: north first (far), south last (near) */
-      var units = model.crahUnits || [], split = Math.ceil(units.length / 2);
-      function gallery(name, id, from, to, y0) {
-        var gg = el('g', { 'class': 'fp-crah', id: id, 'data-gallery': name }, svg), cnt = to - from, slot = (wSlab - 1.0) / Math.max(1, cnt);
+      /* CRAH galleries: ONE <g id> per side holding one gallery per band; the north units and the south units are split
+         across the bands in order, so a row sits between the CRAHs that serve it. North first (far), south last (near). */
+      var units = model.crahUnits || [], split = Math.ceil(units.length / 2), nSouth = units.length - split;
+      function side(id, name) {
+        var gw = el('g', { 'class': 'fp-crah', id: id, 'data-gallery': name }, svg), at = opts.crahAttrs && opts.crahAttrs[name], a;
+        if (at) for (a in at) if (Object.prototype.hasOwnProperty.call(at, a)) gw.setAttribute(a, at[a]);
+        return gw;
+      }
+      function gallery(wrap, name, from, to, y0, band) {
+        var gg = el('g', { 'class': 'fp-crah-band', 'data-gallery': name, 'data-band': band }, wrap), cnt = to - from, slot = (slabW(band) - 1.0) / Math.max(1, cnt);
         for (var q = 0; q < cnt; q++) {
           var cu = units[from + q], nn = cu.n != null ? cu.n : from + q + 1, bx = 0.5 + q * slot + 0.12, bw = slot - 0.24;
-          var cg = el('g', { 'class': 'crah-cell', 'data-crah': nn, id: 'fp-cr-' + nn }, gg), bp = boxPts(bx, y0, bw, GEO.gD, GEO.crahH / H_UNITS);
+          var cg = el('g', { 'class': 'crah-cell', 'data-crah': nn, id: 'fp-cr-' + nn }, gg), bp = boxPts(bx, y0, bw, GEO.gD, GEO.crahH / H_UNITS, band);
           var cell3 = { side: el('polygon', { 'class': 'cr-side', points: bp.side }, cg), front: el('polygon', { 'class': 'cr-front', points: bp.front }, cg), top: el('polygon', { 'class': 'cr-top', points: bp.top }, cg) };
           var fan = [], rr = Math.min(bw, GEO.gD) * 0.34, a;
           for (a = 0; a < 20; a++) fan.push([bx + bw / 2 + rr * Math.cos(a * Math.PI / 10), y0 + GEO.gD / 2 + rr * Math.sin(a * Math.PI / 10), GEO.crahH / H_UNITS]);
-          el('polygon', { 'class': 'cr-fan', points: pts(fan) }, cg);
-          var tx = el('text', { 'class': 'cr-n', x: (ox + (bx + bw / 2) * u + (y0 + GEO.gD) * u * SHX).toFixed(1), y: (oy + (y0 + GEO.gD) * u * SHY + 9).toFixed(1), 'text-anchor': 'middle' }, cg);
+          el('polygon', { 'class': 'cr-fan', points: pts(fan, band) }, cg);
+          var tx = el('text', { 'class': 'cr-n', x: (ox + (bx + bw / 2) * u + (y0 + GEO.gD) * u * SHX).toFixed(1), y: (oy + band * pitch + (y0 + GEO.gD) * u * SHY + 9).toFixed(1), 'text-anchor': 'middle' }, cg);
           tx.textContent = String(nn);
-          crahEls.push({ g: cg, p: cell3, n: nn, u: cu, top: bp.top, gal: name, i: q, cx: bx + bw / 2 });
+          crahEls.push({ g: cg, p: cell3, n: nn, u: cu, top: bp.top, gal: name, band: band, i: q, cx: bx + bw / 2 });
         }
       }
-      gallery('north', ids.top, 0, split, GEO.nY0);
+      var wrapN = side(ids.top, 'north');
+      for (b = 0; b < nb; b++) gallery(wrapN, 'north', Math.round(b * split / nb), Math.round((b + 1) * split / nb), GEO.nY0, b);
 
       /* cabinets: far to near = north to south; at equal depth the east row (farther from the west viewpoint) first */
       var order = [];
-      for (j = 0; j < perLine; j++) for (z = Z - 1; z >= 0; z--) { order.push(z * perZone + perLine + j); order.push(z * perZone + j); }
+      for (b = 0; b < nb; b++) for (j = 0; j < perLine; j++) for (z = b * kRows + rowsIn(b) - 1; z >= b * kRows; z--) { order.push(z * perZone + perLine + j); order.push(z * perZone + j); }
       var caps = el('g', { 'class': 'fp-caps' }, svg);
       for (z = 0; z < Z; z++) {
-        var xa = 0.5 + z * GEO.rowW + GEO.cabW - 0.06, xb = 0.5 + z * GEO.rowW + GEO.cabW + GEO.hot + 0.06;
+        b = Math.floor(z / kRows);
+        var zl = z - b * kRows, xa = 0.5 + zl * GEO.rowW + GEO.cabW - 0.06, xb = 0.5 + zl * GEO.rowW + GEO.cabW + GEO.hot + 0.06;
         var cg2 = el('g', { 'class': 'hot-cap', 'data-z': z }, caps);
-        el('polygon', { 'class': 'cap-top', points: pts([[xa, GEO.cabY0, GEO.capH], [xb, GEO.cabY0, GEO.capH], [xb, GEO.cabY1, GEO.capH], [xa, GEO.cabY1, GEO.capH]]) }, cg2);
-        el('path', { 'class': 'cap-post', d: 'M' + P(xa, GEO.cabY0, GEO.capH) + 'L' + P(xa, GEO.cabY0, 0) + 'M' + P(xb, GEO.cabY0, GEO.capH) + 'L' + P(xb, GEO.cabY0, 0) }, cg2);
+        el('polygon', { 'class': 'cap-top', points: pts([[xa, GEO.cabY0, GEO.capH], [xb, GEO.cabY0, GEO.capH], [xb, GEO.cabY1, GEO.capH], [xa, GEO.cabY1, GEO.capH]], b) }, cg2);
+        el('path', { 'class': 'cap-post', d: 'M' + P(xa, GEO.cabY0, GEO.capH, b) + 'L' + P(xa, GEO.cabY0, 0, b) + 'M' + P(xb, GEO.cabY0, GEO.capH, b) + 'L' + P(xb, GEO.cabY0, 0, b) }, cg2);
       }
       var field = el('g', { 'class': 'fp-field' }, svg);
       for (n = 0; n < order.length; n++) {
@@ -313,7 +351,7 @@
         c = cell(i);
         var rg = el('g', { 'class': 'rack', 'data-idx': i, id: 'fp-rk-' + i, 'data-state': 'ok', role: 'img' }, field);
         var rp = { side: el('polygon', { 'class': 'rk-side' }, rg), front: el('polygon', { 'class': 'rk-front' }, rg), top: el('polygon', { 'class': 'rk-top' }, rg) };
-        var tid = el('text', { 'class': 'rk-id', x: (ox + (c.x0 + 0.5) * u + (c.y0 + GEO.kd) * u * SHX).toFixed(1), y: (oy + (c.y0 + GEO.kd) * u * SHY - 2).toFixed(1), 'text-anchor': 'middle' }, rg);
+        var tid = el('text', { 'class': 'rk-id', x: (ox + (c.x0 + 0.5) * u + (c.y0 + GEO.kd) * u * SHX).toFixed(1), y: (oy + c.b * pitch + (c.y0 + GEO.kd) * u * SHY - 2).toFixed(1), 'text-anchor': 'middle' }, rg);
         tid.textContent = String(rackTag(i)).replace(/^R-/, '');
         var tv = el('text', { 'class': 'rk-val', x: tid.getAttribute('x'), y: (+tid.getAttribute('y') + 9).toFixed(1), 'text-anchor': 'middle' }, rg);
         tv.textContent = '';
@@ -323,34 +361,40 @@
       /* hot-aisle door frame at the south end of each row (the cap's roof is drawn BEFORE the cabinets, see below) */
       var doors = el('g', { 'class': 'fp-doors' }, svg);
       for (z = 0; z < Z; z++) {
-        var da2 = 0.5 + z * GEO.rowW + GEO.cabW - 0.06, db = 0.5 + z * GEO.rowW + GEO.cabW + GEO.hot + 0.06;
-        el('polygon', { 'class': 'hot-door', 'data-z': z, points: pts([[da2, GEO.cabY1, 0], [db, GEO.cabY1, 0], [db, GEO.cabY1, GEO.capH], [da2, GEO.cabY1, GEO.capH]]) }, doors);
+        b = Math.floor(z / kRows);
+        var zl2 = z - b * kRows, da2 = 0.5 + zl2 * GEO.rowW + GEO.cabW - 0.06, db = 0.5 + zl2 * GEO.rowW + GEO.cabW + GEO.hot + 0.06;
+        el('polygon', { 'class': 'hot-door', 'data-z': z, points: pts([[da2, GEO.cabY1, 0], [db, GEO.cabY1, 0], [db, GEO.cabY1, GEO.capH], [da2, GEO.cabY1, GEO.capH]], b) }, doors);
       }
-      gallery('south', ids.bottom, split, units.length, GEO.sY0);
+      var wrapS = side(ids.bottom, 'south');
+      for (b = 0; b < nb; b++) gallery(wrapS, 'south', split + Math.round(b * nSouth / nb), split + Math.round((b + 1) * nSouth / nb), GEO.sY0, b);
 
       ringRow = el('polygon', { 'class': 'fp-ring fp-ring-row', points: '', display: 'none' }, svg);
       ringSel = el('polygon', { 'class': 'fp-ring fp-ring-sel', points: '', display: 'none' }, svg);
       ringHover = el('polygon', { 'class': 'fp-ring fp-ring-hover', points: '', display: 'none' }, svg);
 
-      /* row strip: HTML under the SVG columns (letters, one kW per row; inlet / hot aisle / stats are screen-reader only) */
-      strip = html('div', 'zone-strip', canvas);
-      for (z = 0; z < Z; z++) {
-        var zn = model.zones[z], zc = ox + (0.5 + z * GEO.rowW + 1.4) * u + GEO.slabY * u * SHX, cw = GEO.rowW * u;
-        var zd = html('div', 'zone', strip); zd.setAttribute('data-z', z); zd.style.left = Math.round(zc - cw / 2) + 'px'; zd.style.width = Math.round(cw) + 'px';
-        var zh = html('span', 'zone-head', zd, String.fromCharCode(65 + z)); zh.title = zoneTag(z);
-        var zf = html('span', 'zone-foot num', zd);
-        html('span', 'zf-kw', zf, zn.heat.toFixed(0)).title = 'row heat, kW';
-        html('span', 'zf-in sr-only', zf, zn.rackInletC.toFixed(1));
-        html('span', 'zf-hot sr-only', zf, zn.hotAisleC.toFixed(1));
-        html('span', 'zf-stats sr-only', zf, '');
-        zoneEls[z] = zd;
+      /* row strip, one per band: HTML under the SVG columns (letters, one kW per row; inlet / hot aisle / stats are screen-reader only) */
+      var strips = [];
+      for (b = 0; b < nb; b++) {
+        var strip = html('div', 'zone-strip', canvas); strip.style.top = (b * pitch + topPx + planPx) + 'px'; strips.push(strip);
+        for (z = b * kRows; z < b * kRows + rowsIn(b); z++) {
+          var zn = model.zones[z], zc = ox + (0.5 + (z - b * kRows) * GEO.rowW + 1.4) * u + GEO.slabY * u * SHX, cw = GEO.rowW * u;
+          var zd = html('div', 'zone', strip); zd.setAttribute('data-z', z); zd.style.left = Math.round(zc - cw / 2) + 'px'; zd.style.width = Math.round(cw) + 'px';
+          var zh = html('span', 'zone-head', zd, String.fromCharCode(65 + z)); zh.title = zoneTag(z);
+          var zf = html('span', 'zone-foot num', zd);
+          html('span', 'zf-kw', zf, zn.heat.toFixed(0)).title = 'row heat, kW';
+          html('span', 'zf-in sr-only', zf, zn.rackInletC.toFixed(1));
+          html('span', 'zf-hot sr-only', zf, zn.hotAisleC.toFixed(1));
+          html('span', 'zf-stats sr-only', zf, '');
+          zoneEls[z] = zd;
+        }
       }
       tip = html('div', 'fp-tip', root); tip.hidden = true; tip.setAttribute('role', 'tooltip');
       host.setAttribute('data-fp-host', '1');
       applyTheme();
-      wire();
+      wire(strips);
       inst.paint(inst.mode);
       if (inst.sel) inst.select(inst.sel);
+      if (typeof opts.onBuild === 'function') opts.onBuild(inst);
     }
 
     /* ---- theme: the discrete hex steps, emitted once per theme onto the stage's custom properties ---- */
@@ -395,7 +439,7 @@
         e.g.setAttribute('data-state', r.state); setAttr(e.g, 'data-step', String(r.step)); setAttr(e.g, 'data-kw', String(model.racks[i].kw));
         if (e.val.textContent !== r.text) e.val.textContent = r.text;
         if (c.h !== h) {
-          bp = boxPts(e.c.x0, e.c.y0, GEO.cabW, GEO.kd, h);
+          bp = boxPts(e.c.x0, e.c.y0, GEO.cabW, GEO.kd, h, e.c.b);
           e.p.top.setAttribute('points', bp.top); e.p.front.setAttribute('points', bp.front); e.p.side.setAttribute('points', bp.side); c.h = h;
         }
         if (r.state === 'spare') {
@@ -423,21 +467,21 @@
 
     /* ---- selection, rings ---- */
     function ringPts(sel) {
-      if (sel.rack != null) { var e = rackEls[sel.rack], h = cache[sel.rack].h || 0; return boxPts(e.c.x0, e.c.y0, GEO.cabW, GEO.kd, h).top; }
+      if (sel.rack != null) { var e = rackEls[sel.rack], h = cache[sel.rack].h || 0; return boxPts(e.c.x0, e.c.y0, GEO.cabW, GEO.kd, h, e.c.b).top; }
       if (sel.crah != null) { for (var i = 0; i < crahEls.length; i++) if (crahEls[i].n === sel.crah) return crahEls[i].top; }
       return null;
     }
-    function rowPts(z) { var x0 = 0.5 + z * GEO.rowW - 0.1; return pts([[x0, GEO.cabY0 - 0.15, 0], [x0 + 2.9, GEO.cabY0 - 0.15, 0], [x0 + 2.9, GEO.cabY1 + 0.15, 0], [x0, GEO.cabY1 + 0.15, 0]]); }
+    function rowPts(z) { var b = Math.floor(z / kRows), x0 = 0.5 + (z - b * kRows) * GEO.rowW - 0.1; return pts([[x0, GEO.cabY0 - 0.15, 0], [x0 + 2.9, GEO.cabY0 - 0.15, 0], [x0 + 2.9, GEO.cabY1 + 0.15, 0], [x0, GEO.cabY1 + 0.15, 0]], b); }
     function refreshRings() {
       var s = inst.sel, p;
-      for (var i = 0; i < model.racks.length; i++) if (rackEls[i]) rackEls[i].g.removeAttribute('data-sel');
+      for (var i = 0; i < model.racks.length; i++) if (rackEls[i]) { rackEls[i].g.removeAttribute('data-sel'); rackEls[i].g.classList.remove('sel'); }
       for (var z = 0; z < Z; z++) zoneEls[z].removeAttribute('data-sel');
       ringRow.setAttribute('display', 'none'); ringSel.setAttribute('display', 'none');
       if (!s) return;
       if (s.row != null) { ringRow.setAttribute('points', rowPts(s.row)); ringRow.removeAttribute('display'); zoneEls[s.row].setAttribute('data-sel', '1'); return; }
       p = ringPts(s);
       if (p) { ringSel.setAttribute('points', p); ringSel.removeAttribute('display'); }
-      if (s.rack != null) { rackEls[s.rack].g.setAttribute('data-sel', '1'); zoneEls[rackEls[s.rack].c.z].setAttribute('data-sel', '1'); }
+      if (s.rack != null) { rackEls[s.rack].g.setAttribute('data-sel', '1'); rackEls[s.rack].g.classList.add('sel'); zoneEls[rackEls[s.rack].c.z].setAttribute('data-sel', '1'); }
     }
     inst.select = function (sel) { inst.sel = sel || null; refreshRings(); };
 
@@ -490,10 +534,11 @@
     }
     function colOf(idx) { var c = rackEls[idx].c; return c.z * 2 + c.line; }
     function idxOf(col, j) { return Math.floor(col / 2) * perZone + (col % 2) * perLine + j; }
-    function centerOfCol(col) { return 0.5 + Math.floor(col / 2) * GEO.rowW + (col % 2 ? GEO.cabW + GEO.hot : 0) + GEO.cabW / 2; }
-    function nearestCrah(gal, x) {
+    function centerOfCol(col) { return 0.5 + (Math.floor(col / 2) % kRows) * GEO.rowW + (col % 2 ? GEO.cabW + GEO.hot : 0) + GEO.cabW / 2; }
+    function bandOfCol(col) { return Math.floor(Math.floor(col / 2) / kRows); }
+    function nearestCrah(gal, x, band) {
       var best = -1, bd = 1e9, i, dd;
-      for (i = 0; i < crahEls.length; i++) { if (crahEls[i].gal !== gal) continue; dd = Math.abs(crahEls[i].cx - x); if (dd < bd) { bd = dd; best = i; } }
+      for (i = 0; i < crahEls.length; i++) { if (crahEls[i].gal !== gal || crahEls[i].band !== band) continue; dd = Math.abs(crahEls[i].cx - x); if (dd < bd) { bd = dd; best = i; } }
       return best;
     }
     function move(key) {
@@ -503,8 +548,8 @@
         var col = colOf(cursor.idx), j = rackEls[cursor.idx].c.j;
         if (key === 'ArrowRight') col = Math.min(Z * 2 - 1, col + 1);
         else if (key === 'ArrowLeft') col = Math.max(0, col - 1);
-        else if (key === 'ArrowDown') { if (j === perLine - 1) { ci = nearestCrah('south', centerOfCol(col)); if (ci >= 0) { cursor = { k: 'c', ci: ci }; return; } } else j++; }
-        else if (key === 'ArrowUp') { if (j === 0) { ci = nearestCrah('north', centerOfCol(col)); if (ci >= 0) { cursor = { k: 'c', ci: ci }; return; } } else j--; }
+        else if (key === 'ArrowDown') { if (j === perLine - 1) { ci = nearestCrah('south', centerOfCol(col), bandOfCol(col)); if (ci >= 0) { cursor = { k: 'c', ci: ci }; return; } } else j++; }
+        else if (key === 'ArrowUp') { if (j === 0) { ci = nearestCrah('north', centerOfCol(col), bandOfCol(col)); if (ci >= 0) { cursor = { k: 'c', ci: ci }; return; } } else j--; }
         cursor = { k: 'r', idx: idxOf(col, j) };
       } else {
         c = crahEls[cursor.ci];
@@ -513,7 +558,7 @@
           if (crahEls[i] && crahEls[i].gal === c.gal) cursor = { k: 'c', ci: i };
         } else if ((key === 'ArrowDown' && c.gal === 'north') || (key === 'ArrowUp' && c.gal === 'south')) {
           var best = 0, bd = 1e9, cc;
-          for (cc = 0; cc < Z * 2; cc++) { var dd = Math.abs(centerOfCol(cc) - c.cx); if (dd < bd) { bd = dd; best = cc; } }
+          for (cc = c.band * kRows * 2; cc < Math.min(Z * 2, (c.band + 1) * kRows * 2); cc++) { var dd = Math.abs(centerOfCol(cc) - c.cx); if (dd < bd) { bd = dd; best = cc; } }
           cursor = { k: 'r', idx: idxOf(best, c.gal === 'north' ? 0 : perLine - 1) };
         }
       }
@@ -524,7 +569,7 @@
       else { var ch = crahEls[cursor.ci]; inst.select({ crah: ch.n }); if (opts.onCrah) opts.onCrah(ch.n, ch.g); }
     }
 
-    function wire() {
+    function wire(strips) {
       svg.addEventListener('pointermove', function (ev) {
         var t = up(ev.target, '.rack,.crah-cell');
         if (!t) { hideTip(); hoverRing(null); return; }
@@ -549,26 +594,29 @@
         else if (k === 'Enter' || k === ' ') { ev.preventDefault(); activate(); }
         else if (k === 'Escape') { inst.select(null); }
       });
-      strip.addEventListener('click', function (ev) {
-        var t = ev.target, zd = null;
-        while (t && t !== strip) { if (t.getAttribute && t.getAttribute('data-z') != null && t.className.indexOf('zone') === 0) { zd = t; break; } t = t.parentNode; }
-        if (!zd) return;
-        var z = +zd.getAttribute('data-z'); inst.select({ row: z }); if (opts.onRow) opts.onRow(z, zd);
+      strips.forEach(function (strip) {
+        strip.addEventListener('click', function (ev) {
+          var t = ev.target, zd = null;
+          while (t && t !== strip) { if (t.getAttribute && t.getAttribute('data-z') != null && t.className.indexOf('zone') === 0) { zd = t; break; } t = t.parentNode; }
+          if (!zd) return;
+          var z = +zd.getAttribute('data-z'); inst.select({ row: z }); if (opts.onRow) opts.onRow(z, zd);
+        });
       });
     }
 
     /* ---- resize: rebuilt only when the host's width moved by more than a pixel; selection and mode survive ---- */
-    var lastW = host.clientWidth, raf = 0;
+    var lastW = meas.clientWidth, lastH = meas.clientHeight, raf = 0;
     if (global.ResizeObserver && !opts.width) {
       inst.ro = new global.ResizeObserver(function () {
-        var w = host.clientWidth;
-        if (Math.abs(w - lastW) < 2 || !w) return;
-        lastW = w;
+        var w = meas.clientWidth, h = meas.clientHeight, hMoved = (opts.height != null) && opts.watchHeight !== false && Math.abs(h - lastH) >= 2;
+        if ((Math.abs(w - lastW) < 2 && !hMoved) || !w) return;
+        lastW = w; lastH = h;
         if (raf) global.cancelAnimationFrame(raf);
         raf = global.requestAnimationFrame(function () { raf = 0; build(); });
       });
-      inst.ro.observe(host);
+      inst.ro.observe(meas);
     }
+    inst.relayout = function () { lastW = meas.clientWidth; lastH = meas.clientHeight; build(); };
     function onTheme() { applyTheme(); }
     global.addEventListener('rz-theme-change', onTheme);
     if (global.MutationObserver) { inst.mo = new global.MutationObserver(onTheme); inst.mo.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] }); }
@@ -593,14 +641,14 @@
     box.className = (box.className.replace(/\bfp-legend\b/g, '') + ' fp-legend').replace(/^\s+/, '');
     function item(state, text) { var s = html('span', 'lg-item', box); html('span', 'fp-sw', s).setAttribute('data-state', state); s.appendChild(document.createTextNode(text)); }
     if (mode === 'space') { item('neutral', 'occupied'); item('spare', 'spare'); }
+    else if (mode === 'temp') { item('ok', 'normal'); item('warn', 'warning > ' + T.inletMax + ' °C'); item('alarm', 'alarm > ' + T.inletAlarm + ' °C'); item('spare', 'spare'); }
+    else if (mode === 'cooling-margin') { item('ok', 'normal'); item('warn', 'warning < 0 K'); item('alarm', 'alarm < −' + Math.abs(T.marginAlarm) + ' K'); item('spare', 'spare'); }
     else { item('ok', 'normal'); item('warn', 'warning'); item('alarm', 'alarm'); item('spare', 'spare'); }
     html('span', 'lg-item', box, 'height = rack load (kW / ' + rating.toFixed(0) + ' kW rating)');
-    if (mode === 'temp') html('span', 'lg-item', box, 'warn > ' + T.inletMax + ' °C · alarm > ' + T.inletAlarm + ' °C');
-    if (mode === 'cooling-margin') html('span', 'lg-item', box, 'warn < 0 K · alarm < −' + Math.abs(T.marginAlarm) + ' K');
   }
 
   var RZFloorPlan = {
-    version: '1.0.0',
+    version: '1.1.0',
     MODES: MODES,
     current: null,
     render: function (host, model, opts) { var i = create(host, model, opts); RZFloorPlan.current = i; return i; },
