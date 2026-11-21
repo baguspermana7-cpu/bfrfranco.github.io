@@ -139,69 +139,92 @@
         .brand-sub { font-size: 0.65rem; color: var(--txt-faint); font-weight: 600; letter-spacing: 1px; margin-left: 4px; }
         .spacer { flex: 1; }
         .clock { font-size: 0.78rem; color: var(--txt-faint); padding: 5px 10px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 4px; }
-        .hall-scope-bar {
-            display: flex; align-items: center; justify-content: space-between; gap: 12px;
-            flex-shrink: 0; padding: 6px 14px; background: rgba(18,19,22,.88);
-            border-bottom: 1px solid var(--border); color: var(--txt-dim); font-size: 11px;
-        }
-        .hall-scope-copy { min-width: 0; line-height: 1.35; }
-        .hall-scope-copy strong { color: var(--txt-main); }
-        .hall-selector { display: flex; gap: 4px; flex-shrink: 0; }
-        .hall-selector button {
-            min-width: 42px; min-height: 30px; padding: 4px 9px; border: 1px solid var(--border);
-            background: rgba(255,255,255,.025); color: var(--txt-dim); cursor: pointer;
-            font: 700 10px/1 'JetBrains Mono',monospace;
-        }
-        .hall-selector button:hover { border-color: var(--sel); color: var(--txt-main); }
-        .hall-selector button[aria-pressed="true"] {
-            border-color: var(--sel); color: var(--sel); background: rgba(56,189,248,.12);
-        }
-
-        /* --- ALARM STRIP (operator-first, top of hierarchy) --- */
-        .alarm-strip {
-            display: flex; align-items: stretch; gap: 1px; flex-shrink: 0;
-            background: var(--border-soft); border-bottom: 1px solid var(--border);
-        }
-        .as-cell {
-            background: var(--bg-panel); padding: 6px 14px;
-            display: flex; flex-direction: column; gap: 1px; min-width: 90px;
-        }
-        .as-cell .as-lbl { font-size: 9px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--txt-faint); font-weight: 700; }
-        .as-cell .as-val { font-size: 14px; font-weight: 700; }
-        .as-state { display: flex; align-items: center; gap: 8px; padding: 6px 16px; background: var(--bg-panel); }
+        /* --- HALL HEAD (PRD-CONV-DATAHALL-SPACE 3.1): ONE 44 px bar. #alarmStrip is the bar; the balance band, the
+               provenance sentence and the rest drop from the (i) button as #dh-info. --- */
+        .hall-head { position: relative; flex: 0 0 auto; z-index: 40; background: var(--bg-panel); border-bottom: 1px solid var(--border); }
+        .alarm-strip { display: flex; align-items: center; min-height: 44px; background: var(--bg-panel); }
+        .alarm-strip > * { flex: 0 0 auto; }
+        .as-state { display: flex; align-items: center; gap: 8px; padding: 0 14px; height: 44px; border-right: 1px solid var(--border-soft); }
         .as-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
         .as-state.normal .as-dot { background: var(--st-normal); }
         .as-state.warn   .as-dot { background: var(--st-warn); }
-        .as-state.alarm  .as-dot { background: var(--st-alarm); animation: blink 1s steps(1) infinite; }
-        .as-state.unavailable .as-dot { background: var(--txt-faint); animation: none; }
-        .as-state .as-state-txt { font-size: 13px; font-weight: 800; letter-spacing: 0.5px; }
+        .as-state.alarm  .as-dot { background: var(--st-alarm); }
+        .as-state.unavailable .as-dot { background: var(--txt-faint); }
+        .as-state .as-state-txt { font-size: 13px; font-weight: 700; }
         .as-state.normal .as-state-txt { color: var(--st-normal); }
         .as-state.warn   .as-state-txt { color: var(--st-warn); }
         .as-state.alarm  .as-state-txt { color: var(--st-alarm); }
         .as-state.unavailable .as-state-txt { color: var(--txt-faint); }
+        .hall-selector { display: flex; align-items: center; gap: 4px; padding: 0 12px; height: 44px; border-right: 1px solid var(--border-soft); }
+        .hall-selector button {
+            min-width: 32px; min-height: 32px; padding: 0 6px; border: 1px solid var(--border); border-radius: 3px;
+            background: transparent; color: var(--txt-dim); cursor: pointer; font: 700 12px/1 'JetBrains Mono',monospace;
+        }
+        .hall-selector button:hover { border-color: var(--txt-faint); color: var(--txt-main); }
+        .hall-selector button[aria-pressed="true"] { border-color: var(--txt-main); color: var(--txt-main); background: rgba(255,255,255,.08); }
+        .as-cell { height: 44px; padding: 0 12px; display: flex; flex-direction: column; justify-content: center; min-width: 0; border-right: 1px solid var(--border-soft); }
+        .as-cell .as-lbl { font-size: 10px; line-height: 1.2; color: var(--txt-faint); font-weight: 600; }
+        .as-cell .as-val { font-size: 15px; line-height: 1.2; font-weight: 700; }
+        .as-cell .as-unit { font-size: 11px; font-weight: 400; color: var(--txt-dim); }
+        .as-cell[data-basis-param], .as-cell[data-basis] { cursor: pointer; }
+        .as-cell[data-basis-param]:hover, .as-cell[data-basis]:hover { background: rgba(255,255,255,.04); }
+        .as-cell .pill { margin-left: 6px; }
         .v-crit  { color: var(--st-alarm); }
         .v-warn  { color: var(--st-warn); }
         .v-ok    { color: var(--st-normal); }
         .v-na    { color: var(--txt-faint); }
         .v-zero  { color: var(--txt-dim); }
-        .as-spacer { flex: 1; background: var(--bg-panel); }
-        .as-scenario { display: flex; align-items: center; gap: 6px; padding: 6px 16px; background: var(--bg-panel); font-size: 11px; color: var(--txt-dim); }
-        .as-chip { padding: 2px 8px; border-radius: 3px; font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
-            background: rgba(56,189,248,0.12); color: var(--sel); border: 1px solid rgba(56,189,248,0.35); }
+        .as-spacer { flex: 1 1 auto; }
+        .as-scenario { display: flex; align-items: center; gap: 6px; height: 44px; padding: 0 8px 0 0; }
+        .as-chip { padding: 2px 8px; border-radius: 3px; font-size: 10px; font-weight: 700;
+            background: transparent; color: var(--txt-dim); border: 1px solid var(--border); }
+        .dh-btn {
+            min-height: 34px; padding: 0 12px; border: 1px solid var(--border); border-radius: 3px; background: transparent;
+            color: var(--txt-dim); font: 600 12px/1 'IBM Plex Sans', system-ui, sans-serif; cursor: pointer;
+        }
+        .dh-btn:hover { color: var(--txt-main); border-color: var(--txt-faint); }
+        .dh-btn[aria-expanded="true"] { color: var(--txt-main); border-color: var(--txt-main); background: rgba(255,255,255,.08); }
+        .dh-btn.dh-i { min-width: 34px; padding: 0; font-size: 16px; }
+        .dh-btn:focus-visible, .hall-selector button:focus-visible, .mode-btn:focus-visible, .view-btn:focus-visible,
+.insp-sum:focus-visible, .insp-x:focus-visible, .row-chip:focus-visible { outline: 2px solid var(--txt-main); outline-offset: 1px; }
+        .dh-info { position: absolute; left: 0; right: 0; top: 100%; z-index: 45; max-height: calc(100vh - 100px); overflow-y: auto;
+            background: var(--bg-panel); border-bottom: 1px solid var(--border); padding: 10px 14px 12px; scrollbar-width: thin; }
+        .dh-info[hidden] { display: none; }
+        .dh-info .dh-meta { display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center; margin-top: 10px; font-size: 11px; color: var(--txt-dim); }
+        .dh-info .dh-meta .num { color: var(--txt-main); }
+        .dh-info .dh-meta [data-basis], .dh-info .dh-meta [data-basis-param] { cursor: pointer; border-bottom: 1px dotted rgba(148,163,184,.4); }
+        .dh-info .rz-prov { margin: 8px 0 0; font-size: 11px; color: var(--txt-faint); }
+        .dh-info .rz-manual-link { padding: 8px 0 0 !important; text-align: left !important; }
 
+        /* --- MAIN LAYOUT: the stage, and ONE 320 px inspector (PRD 3.1) --- */
+        .main-grid { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 320px; }
+        .inspector { width: 320px; min-height: 0; display: flex; flex-direction: column; background: var(--bg-panel); border-left: 1px solid var(--border); }
+        .insp-head { flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 40px; padding: 0 8px 0 12px; border-bottom: 1px solid var(--border-soft); }
+        .insp-title { margin: 0; font-size: 13px; font-weight: 700; color: var(--txt-main); }
+        .insp-x { min-width: 32px; min-height: 32px; border: 1px solid var(--border); border-radius: 3px; background: transparent; color: var(--txt-dim); cursor: pointer; font: 16px/1 'IBM Plex Sans', sans-serif; }
+        .insp-x:hover { color: var(--txt-main); border-color: var(--txt-faint); }
+        .inspector[data-inspector-state="hall"] .insp-x { display: none; }
+        .insp-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 4px 12px 14px; scrollbar-width: thin; }
+        .insp-sec { display: none; }
+        .inspector[data-inspector-state="hall"] .insp-sec[data-insp="hall"],
+        .inspector[data-inspector-state="rack"] .insp-sec[data-insp="rack"],
+        .inspector[data-inspector-state="crah"] .insp-sec[data-insp="crah"],
+        .inspector[data-inspector-state="row"]  .insp-sec[data-insp="row"] { display: block; }
+        .insp-sec[hidden] { display: none !important; }
+        .insp-group { padding: 8px 0; border-bottom: 1px solid var(--border-soft); }
+        .insp-group > .kv:last-child { margin-bottom: 0; }
+        .insp-det { border-bottom: 1px solid var(--border-soft); }
+        /* a disclosure is a button that shows or hides the block after it ([hidden], so a closed block is not on the screen at all) */
+        .insp-sum { display: flex; align-items: center; width: 100%; min-height: 34px; padding: 0; background: transparent; border: 0; cursor: pointer; text-align: left; font: 600 12px 'IBM Plex Sans', system-ui, sans-serif; color: var(--txt-dim); }
+        .insp-sum:hover, .insp-sum[aria-expanded="true"] { color: var(--txt-main); }
+        .insp-sum::after { content: '+'; margin-left: auto; font-family: 'JetBrains Mono', monospace; color: var(--txt-faint); }
+        .insp-sum[aria-expanded="true"]::after { content: '\2212'; }
+        .insp-det-body[hidden] { display: none; }
+        .insp-det-body { padding-bottom: 6px; }
+        .insp-det-body .formula { margin-top: 0; border-top: 0; padding-top: 0; }
+        .crah-sum { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--txt-dim); padding: 2px 0 4px; }
+        .crah-sum b { color: var(--txt-main); font-weight: 600; }
         @keyframes blink { 50% { opacity: 0.25; } }
-
-        /* --- MAIN LAYOUT --- */
-        .main-grid {
-            display: flex; flex: 1; min-height: 0;
-        }
-        .sidebar {
-            width: 244px; background: var(--bg-panel);
-            border-right: 1px solid var(--border);
-            display: flex; flex-direction: column; gap: 9px; padding: 11px; overflow-y: auto;
-            flex-shrink: 0;
-        }
-        .sidebar-right { border-left: 1px solid var(--border); border-right: none; width: 270px; }
 
         .panel {
             background: var(--bg-raised); border: 1px solid var(--border); border-radius: 5px; padding: 10px;
@@ -216,11 +239,6 @@
         .kv .k { color: var(--txt-dim); }
         .kv .v { font-weight: 700; }
         .kv-sub { font-size: 10px; color: var(--txt-faint); margin-top: 2px; }
-        .crah-sum { display: flex; gap: 14px; font-size: 12px; color: var(--txt-dim); padding: 2px 0 6px; }
-        .crah-sum b { color: var(--txt-main); font-weight: 600; }
-        .crah-units > summary { cursor: pointer; font-size: 11px; color: var(--txt-dim); padding: 4px 0; min-height: 24px; }
-        .crah-units > summary:focus-visible { outline: 2px solid var(--accent, #f59e0b); outline-offset: 2px; }
-        .crah-units[open] > summary { color: var(--txt-main); }
         .formula { font-size: 9.5px; color: var(--txt-faint); margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--border-soft); line-height: 1.45; }
         .basis-split { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
         .basis-cell { border: 1px solid var(--border-soft); padding: 7px; background: rgba(5,6,7,.25); }
@@ -254,11 +272,8 @@
         .u-tag { font-weight: 700; min-width: 58px; }
         .u-meta { color: var(--txt-faint); margin-left: auto; font-size: 10px; }
 
-        /* --- CENTER STAGE --- */
-        .center-stage {
-            flex: 1; min-width: 0; display: flex; flex-direction: column;
-            background: var(--bg-core); padding: 10px; overflow: hidden;
-        }
+        /* --- CENTER STAGE: mode bar + the floor (RZFloorPlan draws into #zone-field) --- */
+        .center-stage { min-width: 0; min-height: 0; display: flex; flex-direction: column; background: var(--bg-core); padding: 8px 10px; overflow: hidden; }
         /* v3.69.0 — one stage, two views of the same hall: the plan, or the air path of one row as a section */
         .center-stage[data-view="air"] .floor { display: none; }
         .center-stage:not([data-view="air"]) .air-sec { display: none; }
@@ -266,189 +281,59 @@
         .view-seg .view-btn + .view-btn { border-left: 0; }
         .as-rows { display: flex; flex-wrap: wrap; gap: 4px; margin: 4px 0 8px; }
         .as-row-btn { min-width: 28px; padding: 4px; border: 1px solid var(--border); border-radius: 3px; background: transparent; color: var(--txt-dim); font: 600 11px 'JetBrains Mono', ui-monospace, monospace; cursor: pointer; }
-        .as-row-btn[aria-pressed="true"] { color: var(--sel); border-color: var(--sel); }
-        .as-row-btn:focus-visible { outline: 2px solid var(--sel); outline-offset: 1px; }
+        .as-row-btn[aria-pressed="true"] { color: var(--txt-main); border-color: var(--txt-main); }
+        .as-row-btn:focus-visible { outline: 2px solid var(--txt-main); outline-offset: 1px; }
         @media (pointer: coarse) { .as-row-btn { min-width: 44px; min-height: 44px; } }
 
-        /* Hall balance summary band */
-        .balance-band {
-            display: flex; gap: 1px; background: var(--border-soft);
-            border: 1px solid var(--border); border-radius: 5px; overflow: hidden;
-            margin-bottom: 10px; flex-shrink: 0;
-        }
-        .bb-cell { background: var(--bg-raised); padding: 8px 14px; flex: 1; min-width: 0; }
-        .bb-cell .bb-lbl { font-size: 9.5px; color: var(--txt-faint); text-transform: uppercase; letter-spacing: 0.6px; font-weight: 700; }
-        .bb-cell .bb-val { font-size: 17px; font-weight: 800; margin-top: 2px; }
+        /* the balance band lives in the (i) panel now: a grid of cells, no strip */
+        .balance-band { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1px; background: var(--border-soft); border: 1px solid var(--border); }
+        .bb-cell { background: var(--bg-raised); padding: 8px 12px; min-width: 0; }
+        .bb-cell .bb-lbl { font-size: 11px; color: var(--txt-faint); font-weight: 600; }
+        .bb-cell .bb-val { font-size: 16px; font-weight: 700; margin-top: 2px; }
         .bb-cell .bb-unit { font-size: 11px; color: var(--txt-dim); font-weight: 600; }
-        .bb-cell .bb-sub { font-size: 10px; color: var(--txt-faint); margin-top: 1px; }
+        .bb-cell .bb-sub { font-size: 11px; color: var(--txt-faint); margin-top: 1px; }
 
-        /* Heatmap mode toggle */
-        .mode-bar { display: flex; gap: 6px; margin-bottom: 9px; flex-shrink: 0; flex-wrap: wrap; }
+        .mode-bar { display: flex; align-items: center; gap: 6px; flex: 0 0 auto; flex-wrap: wrap; min-height: 34px; margin-bottom: 6px; }
         .mode-btn, .view-btn {
-            font-size: 11px; font-weight: 600; padding: 6px 12px; min-height: 32px;
-            border: 1px solid var(--border); border-radius: 4px;
-            background: rgba(255,255,255,0.02); color: var(--txt-dim); cursor: pointer;
-            transition: background .15s, color .15s, border-color .15s;
+            font-size: 12px; font-weight: 600; padding: 0 11px; min-height: 30px;
+            border: 1px solid var(--border); border-radius: 3px;
+            background: transparent; color: var(--txt-dim); cursor: pointer;
         }
-        .mode-btn:hover, .view-btn:hover { background: rgba(255,255,255,0.06); color: #fff; }
-        .mode-btn.active, .view-btn.active { background: rgba(56,189,248,0.14); color: var(--sel); border-color: rgba(56,189,248,0.5); }
-        .legend { display: flex; align-items: center; gap: 12px; margin-left: auto; font-size: 10px; color: var(--txt-faint); flex-wrap: wrap; }
-        .lg-item { display: flex; align-items: center; gap: 5px; }
-        .lg-sw { width: 11px; height: 11px; border-radius: 2px; border: 1px solid rgba(255,255,255,0.12); }
-        /* v2.10.0 — continuous ramp legend (owner comment 12): one bar, threshold ticks, no discrete swatches */
-        .lg-ramp { display: flex; align-items: center; gap: 6px; }
-        .lg-bar { position: relative; width: 220px; height: 10px; border-radius: 2px; border: 1px solid rgba(255,255,255,0.14); }
-        .lg-tick { position: absolute; top: -3px; width: 1px; height: 16px; background: rgba(255,255,255,0.55); }
-        .lg-tick span { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); font-size: 9px; white-space: nowrap; color: var(--txt-faint); }
-        .lg-ramp .lg-end { font-size: 9px; color: var(--txt-faint); }
-        .mode-bar { padding-bottom: 10px; }
+        .mode-btn:hover, .view-btn:hover { color: var(--txt-main); border-color: var(--txt-faint); }
+        .mode-btn.active, .view-btn.active { background: rgba(255,255,255,.08); color: var(--txt-main); border-color: var(--txt-main); }
+        .mode-btn:disabled, .view-btn:disabled { opacity: .58; }
+        .legend { margin-left: auto; font-size: 11px; color: var(--txt-faint); }
 
-        /* Floor — CRAH rows top/bottom, rack zones center */
+        /* Floor: the drawing sets its own size (#zone-field is exactly the drawing); the box only measures the space */
         .floor {
-            flex: 1; min-height: 0; display: grid;
-            grid-template-rows: auto minmax(0, 1fr) auto;
-            gap: 6px; background: var(--bg-panel);
-            border: 1px solid var(--border); border-radius: 5px; padding: 8px;
-            /* v1.134.26 — the floor used to absorb every squeeze itself: at 768 the 1fr
-               field row shrank until a zone head measured 6px tall for 17px of text.
-               Heads and footers hold their size now and the floor scrolls instead. */
-            overflow-y: auto; scrollbar-width: thin;
+            flex: 1 1 0; min-height: 0; min-width: 0; overflow: hidden; display: flex; justify-content: center; align-items: flex-start;
+            background: var(--bg-panel); border: 1px solid var(--border); border-radius: 4px;
         }
-        /* v1.134.26 — the rail used to divide the WHOLE fleet across the panel width
-           (repeat(30, 1fr) set inline). At 1440 that left 23px per cell for a 26px tag,
-           at 768 18px, at 390 five: every "CRAH-A01" rendered as "A0" — a unit tag cut
-           mid-digit names a DIFFERENT unit. Hold a legible track minimum and let the
-           rail scroll sideways instead; the north/south floor-plan metaphor survives. */
-        .crah-rail {
-            display: grid; gap: 5px;
-            grid-auto-flow: column; grid-auto-columns: minmax(38px, 1fr);
-            overflow-x: auto; overscroll-behavior-x: contain;
-            scrollbar-width: thin; padding-bottom: 2px;
-        }
-        .crah-rail::-webkit-scrollbar { height: 5px; }
-        .crah-rail::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-        .crah-rail > * { min-height: 30px; }
-        .crah-cell {
-            border: 1px solid var(--border-soft); border-radius: 3px;
-            display: flex; align-items: center; justify-content: center; gap: 5px;
-            font-size: 9.5px; font-weight: 700; color: var(--txt-dim);
-            background: rgba(63,157,107,0.07); cursor: pointer; overflow: hidden;
-        }
-        .crah-cell:hover { border-color: var(--sel); }
-        .crah-cell .cc-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--st-normal); flex-shrink: 0; }
-        .crah-cell.stby { background: rgba(58,70,88,0.18); color: var(--txt-faint); }
-        .crah-cell.stby .cc-dot { background: var(--st-offline); }
-        .crah-cell.warn { background: rgba(217,154,43,0.12); color: var(--st-warn); }
-        .crah-cell.warn .cc-dot { background: var(--st-warn); }
-        .crah-cell.alarm { background: rgba(228,86,74,0.15); color: var(--st-alarm); border-color: rgba(228,86,74,0.5); }
-        .crah-cell.alarm .cc-dot { background: var(--st-alarm); animation: blink 1s steps(1) infinite; }
-
-        /* v1.134.26 — the field divided the whole 25-row hall across the panel width, so a
-           zone column was 28px at 1440 and 21px at 768 while its own footer ("322 kW ·
-           IN 25.1°C · HOT 36.9°C", the owner's v2.10.0 per-row readings) measures 169px.
-           Every one of those 75 numbers was drawn and none could be read. Hold a track
-           minimum wide enough for the footer and let the field scroll sideways — the same
-           treatment the CRAH rail gets, and the same doctrine as the cabinet LOD rule:
-           a number too small to read is not a smaller number, it is noise. */
-        .zone-field {
-            display: grid; gap: 6px; min-height: 0;
-            grid-auto-flow: column; grid-auto-columns: minmax(32px, 1fr);
-            overflow-x: auto; overscroll-behavior-x: contain;
-            scrollbar-width: thin;
-        }
-        .zone-field::-webkit-scrollbar { height: 5px; }
-        .zone-field::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-        .zone {
-            display: flex; flex-direction: column; min-width: 0;
-            border: 1px solid var(--border-soft); border-radius: 3px; overflow: hidden;
-            background: rgba(255,255,255,0.012);
-        }
-        .zone-head {
-            flex: 0 0 auto;
-            font-size: 9px; font-weight: 700; color: var(--txt-dim); text-align: center;
-            padding: 3px 2px; background: rgba(255,255,255,0.03);
-            border-bottom: 1px solid var(--border-soft); white-space: nowrap;
-            overflow: hidden; text-overflow: ellipsis;
-        }
-        .zone-racks { flex: 1; display: grid; grid-template-rows: repeat(10, 1fr); gap: 2px; padding: 3px; min-height: 0; }
-        .rack {
-            border-radius: 1px; cursor: pointer; position: relative;
-            border: 1px solid transparent; transition: outline .1s, background .3s;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            font-size: 8px; line-height: 1.1; color: rgba(255,255,255,0.85);
-            text-align: center; padding: 1px; overflow: hidden;
-        }
-        .rack:hover { outline: 1px solid #fff; outline-offset: -1px; z-index: 5; }
-        .rack.sel { outline: 2px solid var(--sel); outline-offset: -1px; z-index: 6; }
-        /* v1.134.19 — LEVEL OF DETAIL on the cabinet field.
-           A hall is 500 cabinets. At the width this grid gets, a cell is ~15 px across while
-           "A-AL01" at 7.5 px needs nearer 30 — so every cabinet carried two strings that could
-           not be read, 1,000 of them, smeared into texture that looked like data. The heatmap
-           colour IS the information at that size, and it is accurate; the strings were not.
-           Labels appear only when a cell is wide enough to hold them (.rack-field.lod-labels,
-           set from the measured cell width), and the exact figures for any one cabinet are one
-           hover or click away in the inspector — which is how you read a specific cabinet
-           anyway. Same rule the EPMS single-line got in v1.134.18: an unreadable number is not
-           a smaller number, it is noise. */
-        #zone-field .rack .rk-id,
-        #zone-field .rack .rk-val { display: none; }
-        #zone-field.lod-labels .rack .rk-id { display: block; }
-        #zone-field.lod-labels .rack .rk-val { display: block; }
-        .rack .rk-id { font-weight: 700; font-size: 7.5px; letter-spacing: -0.2px; opacity: 0.92; }
-        .rack .rk-val { font-size: 7.5px; opacity: 0.78; margin-top: 1px; font-variant-numeric: tabular-nums; }
-        .rack.excursion { animation: rk-pulse 0.9s ease-in-out infinite; }
-        @keyframes rk-pulse {
-            0%, 100% { box-shadow: inset 0 0 0 1px rgba(255,80,80,0.0); }
-            50% { box-shadow: inset 0 0 0 2px rgba(255,80,80,0.85); }
-        }
-        /* Rack fill set inline by JS from utilization tier — no neon */
-        /* v1.134.26 — nowrap forced the three readings onto one 169px line inside a 28px column.
-           They stack instead — each fits its own line at the 64px track minimum. */
-        .zone-foot { flex: 0 0 auto; font-size: 11px; color: var(--txt-faint); text-align: center; padding: 2px 0; border-top: 1px solid var(--border-soft); white-space: normal; line-height: 13px; }
-        /* v3.69.0 — the row footer is six numbers; a sticky key column names each line once, with its unit */
-        .zone-field { grid-template-columns: 48px; }
-        .zone-key { position: sticky; left: 0; z-index: 2; background: var(--bg-panel); }
-        .zone-key .zone-racks { display: flex; align-items: center; justify-content: center; color: var(--txt-dim); font-size: 11px; text-align: center; line-height: 13px; }
-        .zk-foot > span { display: block; text-align: left; padding-left: 4px; color: var(--txt-dim); white-space: nowrap; }
-        .zk-foot > .zk-in { color: var(--medium-chw, #7dd3fc); }
-        .zk-foot > .zk-hot { color: var(--st-warn, #d99a2b); }
-        .zone[data-z] .zone-head { cursor: pointer; }
-        .zone.sec-on { border-color: var(--sel); }
-        .zone.sec-on .zone-head { color: var(--sel); }
+        .zone-field { flex: 0 0 auto; position: relative; }
         .air-sec { flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: thin; }
-        .zone-foot > .zf-kw, .zone-foot > .zf-in, .zone-foot > .zf-hot { display: block; }
-        .zone-foot > .zf-in { color: var(--medium-chw, #7dd3fc); }
-        .zone-foot > .zf-hot { color: var(--st-warn, #d99a2b); }
-        .lg-unit { font-family: 'JetBrains Mono', monospace; color: var(--text-dim, #9aa3ad); }
-        /* v2.10.0 — per-row min / avg / max under the row heat (owner comment 12) */
-        .zone-foot .zf-stats { display: block; color: var(--txt-dim); letter-spacing: -0.2px; font-size: 11px; line-height: 13px; white-space: normal; }
-        .zone-foot .zf-stats b { font-weight: 700; color: var(--txt-main, #e2e8f0); }
+        .row-picker { display: none; }
+        .row-chip { min-width: 44px; min-height: 44px; background: transparent; color: var(--txt-main); border: 1px solid var(--border); border-radius: 3px; font: 12px 'JetBrains Mono', monospace; cursor: pointer; flex: 0 0 auto; scroll-snap-align: start; }
+        .row-chip[aria-pressed="true"] { border-color: var(--txt-main); background: rgba(255,255,255,.08); }
+        /* the row panel: two flat lists of ten cabinets, 44 px rows (the touch way into a cabinet the plan draws at 10 px) */
+        .rp-list { list-style: none; margin: 0 0 8px; padding: 0; }
+        .rp-list .lh { color: var(--txt-faint); font-size: 11px; margin: 6px 0 2px; }
+        .rp-item { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 32px; padding: 0 4px; background: transparent; color: var(--txt-main); border: 0; border-top: 1px solid var(--border-soft); font: inherit; font-size: 12px; cursor: pointer; text-align: left; }
+        .rp-item .v { font-family: 'JetBrains Mono', monospace; color: var(--txt-dim); }
+        .rp-meta { color: var(--txt-dim); font-size: 12px; margin: 0 0 6px; }
+        .rp-actions { display: flex; gap: 6px; margin-top: 6px; }
+        .rp-actions button { min-height: 34px; padding: 0 12px; background: transparent; color: var(--txt-dim); border: 1px solid var(--border); border-radius: 3px; font: 600 12px 'IBM Plex Sans', sans-serif; cursor: pointer; }
+        .rp-actions button:hover { color: var(--txt-main); border-color: var(--txt-faint); }
 
-        /* --- CRAH POPOVER (v1.41.4 — replaces full-screen modal for CRAH details) --- */
-        .crah-pop {
-            position: absolute; z-index: 950; display: none;
-            background: var(--bg-panel); border: 1px solid var(--border);
-            border-radius: 5px; padding: 10px 12px; font-size: 11px; color: #fff;
-            min-width: 240px; max-width: 280px;
-            box-shadow: 0 12px 32px rgba(0,0,0,0.55);
-        }
-        .crah-pop.open { display: block; animation: cp-fade 0.16s ease-out; }
-        @keyframes cp-fade { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+        /* --- CRAH card in the inspector (was a floating popover; the inspector is the one place a selection reads) --- */
+        .crah-pop { display: none; color: var(--txt-main); font-size: 12px; }
+        .crah-pop.open { display: block; }
         .crah-pop .cp-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px solid var(--border-soft); }
-        .crah-pop .cp-title { font-weight: 700; font-size: 12px; color: var(--sel); }
-        .crah-pop .cp-state { font-size: 9.5px; padding: 1px 6px; border-radius: 4px; font-weight: 700; }
-        .crah-pop .cp-state.run { background: rgba(34,197,94,0.18); color: #22c55e; }
-        .crah-pop .cp-state.stby { background: rgba(245,158,11,0.18); color: #f59e0b; }
-        .crah-pop .cp-close { position: absolute; top: 6px; right: 8px; cursor: pointer; color: var(--txt-dim); font-size: 14px; line-height: 1; }
-        .crah-pop .cp-close:hover { color: #fff; }
-        .crah-pop .cp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; font-size: 11px; }
+        .crah-pop .cp-title { font-weight: 700; font-size: 13px; }
+        .crah-pop .cp-state { font-size: 11px; padding: 1px 6px; border-radius: 3px; font-weight: 700; border: 1px solid var(--border); color: var(--txt-dim); }
+        .crah-pop .cp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; font-size: 12px; }
         .crah-pop .cp-grid .cp-k { color: var(--txt-dim); }
         .crah-pop .cp-grid .cp-v { font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
-
-        /* --- CRAH CELL inline SAT (v1.41.4) --- */
-        .crah-cell { position: relative; }
-        .crah-cell .cc-sat { display: block; font-size: 7.5px; font-weight: 600; opacity: 0.78; margin-top: 1px; font-variant-numeric: tabular-nums; }
-        .crah-cell.cc-affected { box-shadow: 0 0 0 1.5px rgba(255,80,80,0.85); }
+        .rack-card-title { font-weight: 700; color: var(--txt-main); margin-bottom: 6px; }
 
         /* --- EXCURSION BANNER (v1.41.4 simulator) --- */
         .excursion-banner {
@@ -471,15 +356,17 @@
         #tooltip .tt-row { display: flex; justify-content: space-between; gap: 14px; margin-bottom: 2px; }
         #tooltip .tt-row .tt-k { color: var(--txt-dim); }
 
-        /* --- BOTTOM EVENT LOG --- */
+        /* --- EVENTS DRAWER (was the bottom panel) --- */
         .bottom-panel {
-            height: 116px; background: var(--bg-panel); border-top: 1px solid var(--border);
-            display: flex; flex-direction: column; flex-shrink: 0;
+            position: fixed; left: 0; right: 0; bottom: 0; z-index: 55; height: min(42vh, 300px);
+            background: var(--bg-panel); border-top: 1px solid var(--border);
+            display: flex; flex-direction: column;
         }
+        .bottom-panel[hidden] { display: none; }
         .log-header {
-            padding: 5px 12px; background: rgba(255,255,255,0.02); color: var(--txt-faint);
-            font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.7px;
-            border-bottom: 1px solid var(--border-soft); display: flex; align-items: center; gap: 10px;
+            padding: 0 6px 0 12px; min-height: 38px; background: rgba(255,255,255,0.02); color: var(--txt-faint);
+            font-size: 12px; font-weight: 600;
+            border-bottom: 1px solid var(--border-soft); display: flex; align-items: center; justify-content: space-between; gap: 10px;
         }
         .log-container { flex: 1; overflow-y: auto; padding: 5px 10px; font-size: 11px; }
         .log-entry { margin-bottom: 2px; display: flex; gap: 10px; line-height: 1.5; }
@@ -510,24 +397,26 @@
 
         /* --- RESPONSIVE --- */
         @media (max-width: 1280px) {
-            .sidebar { width: 210px; }
-            .sidebar-right { width: 232px; }
+            .main-grid { grid-template-columns: minmax(0, 1fr) 300px; }
+            .inspector { width: 300px; }
         }
+        /* tablet and phone: the page scrolls (only the desktop frame is viewport-locked); the inspector rests under the
+           floor and opens as a right drawer (tablet) or a bottom sheet (phone, js/rz-sheet.js) on a selection */
         @media (max-width: 1024px) {
-            .main-grid { flex-direction: column; }
-            .sidebar { width: 100%; max-height: 168px; flex-direction: row; flex-wrap: wrap; }
-            .sidebar-right { display: none; }
-            .panel { min-width: 150px; flex: 1; }
-            .center-stage { min-height: 60vh; }
-            /* v1.134.26 — the cockpit shell is a 100vh app frame with overflow hidden. Once
-               the layout stacks (sidebar on top, right rail dropped) the stage no longer fits
-               that frame: at 390 the balance band alone took 543px of it, the floor plan was
-               handed 18px, and the bottom 123px of the stage was cut with no way to reach it.
-               A stacked layout scrolls; only the desktop frame stays viewport-locked. */
             body { height: auto; min-height: 100vh; overflow-y: auto; }
+            .main-grid { display: block; }
             .center-stage { overflow: visible; }
-            .floor { overflow: visible; }
-            .zone-field { min-height: 220px; }
+            .floor { flex: none; overflow: visible; }
+            .inspector { width: auto; border-left: 0; border-top: 1px solid var(--border); }
+            .insp-body { overflow: visible; }
+            .alarm-strip { flex-wrap: wrap; }
+            .dh-info { max-height: none; position: static; }
+        }
+        @media (min-width: 601px) and (max-width: 1024px) {
+            .inspector:not([data-inspector-state="hall"]) {
+                position: fixed; top: 48px; right: 0; bottom: 0; width: 320px; z-index: 60; border-top: 0; border-left: 1px solid var(--border);
+            }
+            .inspector:not([data-inspector-state="hall"]) .insp-body { overflow-y: auto; }
         }
         @media (max-width: 768px) {
             html, body { overflow-x: hidden; max-width: 100vw; }
@@ -537,24 +426,39 @@
             .brand-sub { display: none; }
             .clock { font-size: 0.72rem; }
             .nav-btn { padding: 8px 11px; font-size: 11px; min-height: 44px; }
-            .hall-scope-bar { align-items: flex-start; flex-direction: column; }
-            .hall-selector { width: 100%; }
-            .hall-selector button { flex: 1; min-height: 44px; }
-            .alarm-strip { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; }
-            .as-state, .as-scenario { grid-column: 1 / -1; }
-            .as-cell { min-width: 0; }
-            .as-cell:nth-child(6) { grid-column: 1 / -1; }
-            .as-spacer { display: none; }
-            .balance-band { flex-wrap: wrap; }
-            .bb-cell { min-width: 48%; }
-            .sidebar { max-height: 200px; }
             .mode-btn, .view-btn { min-height: 44px; }
             button, a.btn, [role="button"] { min-height: 44px; }
-            .legend { width: 100%; margin-left: 0; }
+        }
+        @media (max-width: 600px) {
+            /* a 2-row grid bar: state + hall chips, then six cells; the scenario row (banner, (i), Events) is the last row */
+            .alarm-strip { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); align-items: stretch; }
+            .alarm-strip > * { flex: none; }
+            .as-state { grid-column: 1 / -1; grid-row: 1; border-right: 0; }
+            .hall-selector { grid-column: 3 / -1; grid-row: 1; justify-self: end; border-right: 0; padding: 0 6px; gap: 2px; }
+            .hall-selector button { min-width: 44px; min-height: 44px; }
+            .as-cell { padding: 0 6px; border-right: 0; border-top: 1px solid var(--border-soft); }
+            .as-cell .as-val { font-size: 14px; }
+            .as-cell .pill { margin-left: 0; font-size: 9px; padding: 0 3px; }
+            .as-spacer { display: none; }
+            .as-scenario { grid-column: 1 / -1; padding: 0 6px 0 0; border-top: 1px solid var(--border-soft); justify-content: flex-start; }
+            .as-scenario .dh-btn { min-width: 44px; }
+            .as-scenario [data-dh-disclose="events"] { margin-left: auto; }
+            .center-stage { padding: 6px 8px; }
+            .mode-bar { flex-wrap: nowrap; overflow-x: auto; scroll-snap-type: x proximity; overscroll-behavior-x: contain; scrollbar-width: none; }
+            .mode-bar > * { flex: 0 0 auto; }
+            .legend { margin-left: 0; white-space: nowrap; }
+            .row-picker { display: flex; gap: 4px; overflow-x: auto; padding: 6px 0; margin-top: 6px; scroll-snap-type: x proximity; overscroll-behavior-x: contain; }
+            /* the page is dark only: the sheet follows the page surface, not the light default of a page without data-theme */
+            html:root:not([data-theme="dark"]) .rz-sheet { --rz-sheet-bg: var(--bg-panel); --rz-sheet-ink: var(--txt-main); --rz-sheet-line: var(--border); }
+            .rz-sheet .insp-head { display: none; }
+            .rz-sheet .inspector { border: 0; width: auto; }
+            .rp-item { min-height: 44px; padding: 0 8px; }
+            .rp-actions button { min-height: 44px; }
+            .bottom-panel { height: 50vh; }
+            .dh-info .dh-meta { gap: 8px 14px; }
         }
         @media (max-width: 480px) {
             .bb-cell { min-width: 100%; }
-            .zone-field { gap: 3px; }
         }
     [data-theme="dark"] #cookieAccept{background:#E8B563 !important;color:#16181d !important}
 #cookieAccept{background:#E8B563 !important;color:#16181d !important}
@@ -622,16 +526,6 @@
     <!-- v1.41.4 — Excursion simulator banner -->
     <div class="excursion-banner" id="excursionBanner" role="status" aria-live="polite"></div>
 
-    <!-- v1.41.4 — Floating CRAH popover (replaces modal — does NOT disable main screen) -->
-    <div class="crah-pop" id="crahPop" role="dialog" aria-modal="false" aria-labelledby="cp-title">
-      <span class="cp-close" onclick="window.__closeCrahPop()" role="button" tabindex="0" aria-label="Close">&times;</span>
-      <div class="cp-head">
-        <span class="cp-title" id="cp-title">CRAH Authority UNAVAILABLE</span>
-        <span class="cp-state" id="cp-state">UNAVAILABLE</span>
-      </div>
-      <div class="cp-grid" id="cp-grid">UNAVAILABLE</div>
-    </div>
-
     <!-- Equipment inspector modal (kept for any non-CRAH inspector use) -->
     <div class="modal-overlay" id="unitModal">
         <div class="modal-box">
@@ -656,67 +550,103 @@
         <div class="clock num" id="clock" data-cv="clock">--:--:--</div>
     </div>
     <script src="js/conv/shell.js?v=20261119-fff76bfd"></script>
-    <div data-rz-telemetry-banner-slot></div>
-
-    <!-- ALARM STRIP — operator-first, top of information hierarchy -->
+    <!-- PRD-CONV-DATAHALL-SPACE 3.1 — the hall head: ONE 44 px bar (#alarmStrip), the (i) panel (#dh-info) drops from it.
+         #dh-ops-rollup is the ancestor of every basis hook of the old rollup (the drawer click handler and the probe read it). -->
+    <header class="hall-head" id="dh-ops-rollup">
     <div class="alarm-strip" id="alarmStrip">
         <div class="as-state unavailable" id="as-state">
             <div class="as-dot"></div>
             <div class="as-state-txt" id="as-state-txt">UNAVAILABLE</div>
         </div>
+        <div class="hall-selector" id="hall-selector" role="group" aria-label="Select data hall operational scope" title="Hall">
+            <button type="button" data-hall="A" aria-pressed="true" aria-label="Hall A" onclick="selectHall('A')" disabled>A</button>
+            <button type="button" data-hall="B" aria-pressed="false" aria-label="Hall B" onclick="selectHall('B')" disabled>B</button>
+            <button type="button" data-hall="C" aria-pressed="false" aria-label="Hall C" onclick="selectHall('C')" disabled>C</button>
+            <button type="button" data-hall="D" aria-pressed="false" aria-label="Hall D" onclick="selectHall('D')" disabled>D</button>
+        </div>
         <div class="as-cell">
-            <div class="as-lbl">Critical</div>
+            <div class="as-lbl">Crit</div>
             <div class="as-val num v-na" id="as-crit">UNAVAILABLE</div>
         </div>
         <div class="as-cell">
-            <div class="as-lbl">Warning</div>
+            <div class="as-lbl">Warn</div>
             <div class="as-val num v-na" id="as-warn">UNAVAILABLE</div>
         </div>
         <div class="as-cell">
-            <div class="as-lbl">Maint / Bypass</div>
+            <div class="as-lbl">Maint</div>
             <div class="as-val num v-na" id="as-maint">UNAVAILABLE</div>
         </div>
-        <div class="as-cell">
-            <div class="as-lbl">Comms</div>
-            <div class="as-val num v-na" aria-describedby="rz-prov-dh-strip" id="as-comms">UNAVAILABLE</div>
+        <!-- the hall numbers, once each: IT load, cooling margin with the N+1 verdict, PUE (the balance band and the density sit in the (i) panel) -->
+        <div class="as-cell" data-basis-param="hall.it_load_kw" tabindex="0" role="button" aria-label="Hall IT load — click for basis">
+            <div class="as-lbl">IT</div>
+            <div class="as-val num"><b id="dh-rack-load" data-point="datahall.hall.it_load_mw" data-pt-label="Hall IT load" data-pt-unit="MW" data-pt-digits="2" data-pt-cls="ENGINE">UNAVAILABLE</b> <span class="as-unit">MW</span></div>
         </div>
-        <div class="as-cell">
-            <div class="as-lbl">Page clock</div>
-            <div class="as-val num" aria-describedby="rz-prov-dh-strip" id="as-update" style="color:var(--txt-dim)">--</div>
+        <div class="as-cell" data-basis="margin" tabindex="0" role="button" aria-label="Cooling margin — click for basis">
+            <div class="as-lbl">Cooling</div>
+            <div class="as-val num"><b id="dh-cooling-margin" data-point="datahall.cooling.margin_pct" data-pt-label="Cooling margin" data-pt-unit="%" data-pt-digits="1" data-pt-cls="ENGINE">UNAVAILABLE</b><span class="as-unit">%</span><span class="pill unavailable" id="bb-np1">UNAVAILABLE</span></div>
+        </div>
+        <div class="as-cell" data-basis-param="site.pue" tabindex="0" role="button" aria-label="PUE — click for basis">
+            <div class="as-lbl">PUE</div>
+            <div class="as-val num"><b id="dh-pue">UNAVAILABLE</b></div>
         </div>
         <div class="as-spacer"></div>
         <div class="as-scenario">
-            <span>Data Quality</span>
-            <span class="as-chip" aria-describedby="rz-prov-dh-strip" id="as-dq">UNAVAILABLE</span>
-            <span>Scenario</span>
-            <span class="as-chip" id="as-scn">UNAVAILABLE</span>
-        </div>
-    </div>
-    <p class="rz-prov" id="rz-prov-dh-strip" style="padding:0 14px" data-rz-provenance="simulated" data-rz-prov-basis="conv-engine.js scenario; comms = the page read a valid model snapshot; data quality = the model's own flag; page clock = your browser time"><b>Simulated</b> · conv-engine.js scenario; comms = the page read a valid model snapshot; data quality = the model's own flag; page clock = your browser time</p>
-
-    <!-- v1.24.1 doc-14 §3: Operations Rollup — engineering summary first read after alarms.
-         Rack Load · Cooling Margin · PUE · Power Density (engine-bound to CONV_CALC.snapshot).
-         v1.33.2 — each metric clickable for basis drawer (ACCURACY_VALIDATION.md Rule 6). -->
-    <div id="dh-ops-rollup" role="status" aria-live="polite" style="display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:8px 14px;background:rgba(18,19,22,0.65);border-bottom:1px solid #2a2d33;font-family:'JetBrains Mono','IBM Plex Sans',sans-serif;font-size:12px;color:#cbd5e1;font-variant-numeric:tabular-nums;">
-        <span style="color:#9aa3af;font-weight:700;letter-spacing:.06em;text-transform:uppercase;">Operations Rollup</span>
-        <span data-basis="state" tabindex="0" role="button" aria-label="Hall state — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">Hall <b id="dh-hall-state" style="color:#9aa3af;">UNAVAILABLE</b></span>
-        <span data-basis-param="hall.it_load_kw" tabindex="0" role="button" aria-label="Rack Load — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">Rack Load <b id="dh-rack-load" data-point="datahall.hall.it_load_mw" data-pt-label="Hall IT load" data-pt-unit="MW" data-pt-digits="2" data-pt-cls="ENGINE">UNAVAILABLE</b><span style="color:#94a3b8;font-weight:400;"> MW</span></span>
-        <span data-basis="margin" tabindex="0" role="button" aria-label="Cooling Margin — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">Cooling Margin <b id="dh-cooling-margin" data-point="datahall.cooling.margin_pct" data-pt-label="Cooling margin" data-pt-unit="%" data-pt-digits="1" data-pt-cls="ENGINE">UNAVAILABLE</b><span style="color:#94a3b8;font-weight:400;">%</span></span>
-        <span data-basis-param="site.pue" tabindex="0" role="button" aria-label="PUE — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">PUE <b id="dh-pue" style="color:#9aa3af;">UNAVAILABLE</b></span>
-        <span data-basis-param="hall.rack_actual_avg_kw" tabindex="0" role="button" aria-label="Power Density — click for basis" style="cursor:pointer;border-bottom:1px dotted rgba(148,163,184,.4);">Power Density <b id="dh-pd" data-point="hall.rack_actual_avg_kw" data-pt-label="Power density" data-pt-unit="kW/rack" data-pt-digits="1" data-pt-cls="ENGINE">UNAVAILABLE</b><span style="color:#94a3b8;font-weight:400;"> kW/rack</span></span>
-        <span style="flex:1"></span>
-    </div>
-
-    <div class="hall-scope-bar">
-        <div class="hall-scope-copy"><strong id="hall-scope-label" data-explain="conv-dh-hall-scope">Data Hall A</strong></div>
-        <div class="hall-selector" id="hall-selector" role="group" aria-label="Select data hall operational scope">
-            <button type="button" data-hall="A" aria-pressed="true" onclick="selectHall('A')" disabled>Hall A</button>
-            <button type="button" data-hall="B" aria-pressed="false" onclick="selectHall('B')" disabled>Hall B</button>
-            <button type="button" data-hall="C" aria-pressed="false" onclick="selectHall('C')" disabled>Hall C</button>
-            <button type="button" data-hall="D" aria-pressed="false" onclick="selectHall('D')" disabled>Hall D</button>
+            <div data-rz-telemetry-banner-slot data-rz-telemetry-compact data-rz-telemetry-label="Simulated"></div>
+            <button type="button" class="dh-btn dh-i" data-dh-disclose="info" aria-expanded="false" aria-controls="dh-info" aria-label="Hall details and provenance" title="Hall details and provenance">&#9432;</button>
+            <button type="button" class="dh-btn" data-dh-disclose="events" aria-expanded="false" aria-controls="dh-events">Events</button>
         </div>
     </div>
 
+    <div class="dh-info" id="dh-info" hidden>
+        <div class="balance-band" id="balanceBand">
+            <div class="bb-cell">
+                <div class="bb-lbl" id="bb-hall-label">Hall A IT Load</div>
+                <div class="bb-val num"><span id="bb-itload" data-point="datahall.hall.rack_sum_mw" data-pt-label="Hall IT load (rack sum)" data-pt-unit="MW" data-pt-digits="3" data-pt-cls="ENGINE">UNAVAILABLE</span> <span class="bb-unit">MW</span></div>
+                <!-- v1.134.11 — this sub-line was briefly hooked to hall.facility_load_kw. It shows the
+                     hall's IT load summed from the cabinet field, not the facility load, and the
+                     drawer gate rejected the mismatch. Corrected, and the facility figure given
+                     its own cell below rather than borrowed from a line that means something else. -->
+                <div class="bb-sub" id="bb-itsub" data-rz-authored-basis="Active-cabinet count and the active average are summaries of the SIMULATED rack field, not engine quantities: conv-engine.js publishes the hall IT load and the installed rack count, and the occupancy pattern that decides which cabinets are live is generated on this page. The field itself is not exempt - its per-cabinet values are a declared distribution whose SUM is verified against hall.it_load_kw on every run, so the quantity these lines summarise is checked even though the split is simulated." data-basis-param="hall.it_load_kw" tabindex="0" role="button" title="Hall IT load — click for basis">UNAVAILABLE</div>
+                <div class="bb-sub" id="bb-facsub" data-basis-param="hall.facility_load_kw" tabindex="0" role="button" title="Hall facility load — click for basis">UNAVAILABLE</div>
+            </div>
+            <div class="bb-cell">
+                <div class="bb-lbl">Rack Count / Avg</div>
+                <div class="bb-val num"><span id="bb-racks" data-rz-authored-basis="Active-cabinet count and the active average are summaries of the SIMULATED rack field, not engine quantities: conv-engine.js publishes the hall IT load and the installed rack count, and the occupancy pattern that decides which cabinets are live is generated on this page. The field itself is not exempt - its per-cabinet values are a declared distribution whose SUM is verified against hall.it_load_kw on every run, so the quantity these lines summarise is checked even though the split is simulated.">UNAVAILABLE</span></div>
+                <div class="bb-sub" id="bb-avg" data-rz-authored-basis="Active-cabinet count and the active average are summaries of the SIMULATED rack field, not engine quantities: conv-engine.js publishes the hall IT load and the installed rack count, and the occupancy pattern that decides which cabinets are live is generated on this page. The field itself is not exempt - its per-cabinet values are a declared distribution whose SUM is verified against hall.it_load_kw on every run, so the quantity these lines summarise is checked even though the split is simulated." >UNAVAILABLE</div>
+            </div>
+            <div class="bb-cell">
+                <div class="bb-lbl">Hall Utilization</div>
+                <div class="bb-val num" data-basis-param="hall.utilisation_pct" tabindex="0" role="button" title="Hall utilisation — click for basis"><span id="bb-util" data-point="datahall.rack.load_pct" data-pt-label="Hall utilisation" data-pt-unit="%" data-pt-digits="1" data-pt-cls="ENGINE">UNAVAILABLE</span> <span class="bb-unit">%</span></div>
+                <div class="bb-sub" id="bb-design" data-basis-param="hall.it_design_kw" tabindex="0" role="button" title="Hall IT design capacity — click for basis">UNAVAILABLE</div>
+            </div>
+            <div class="bb-cell">
+                <div class="bb-lbl">Hall IT reconciliation</div>
+                <div class="bb-val num v-na" id="bb-balance">UNAVAILABLE</div>
+                <div class="bb-sub" id="bb-balsub" data-const>UNAVAILABLE</div>
+            </div>
+            <div class="bb-cell">
+                <div class="bb-lbl">Cooling Demand / Avail</div>
+                <div class="bb-val num"><span id="bb-cool">UNAVAILABLE</span></div>
+                <div class="bb-sub" id="bb-coolsub">UNAVAILABLE</div>
+            </div>
+            <div class="bb-cell">
+                <div class="bb-lbl">N+1 Cooling</div>
+                <div class="bb-sub" id="bb-np1sub">UNAVAILABLE</div>
+            </div>
+        </div>
+        <div class="dh-meta">
+            <strong id="hall-scope-label" data-explain="conv-dh-hall-scope">Data Hall A</strong>
+            <span data-basis="state" tabindex="0" role="button" aria-label="Hall state — click for basis">Hall <b id="dh-hall-state" style="color:#9aa3af;">UNAVAILABLE</b></span>
+            <span data-basis-param="hall.rack_actual_avg_kw" tabindex="0" role="button" aria-label="Power Density — click for basis">Power density <b id="dh-pd" class="num" data-point="hall.rack_actual_avg_kw" data-pt-label="Power density" data-pt-unit="kW/rack" data-pt-digits="1" data-pt-cls="ENGINE">UNAVAILABLE</b> kW/rack</span>
+            <span>Comms <b class="as-val num v-na" aria-describedby="rz-prov-dh-strip" id="as-comms">UNAVAILABLE</b></span>
+            <span>Page clock <b class="as-val num" aria-describedby="rz-prov-dh-strip" id="as-update" style="color:var(--txt-dim)">--</b></span>
+            <span>Data quality <span class="as-chip" aria-describedby="rz-prov-dh-strip" id="as-dq">UNAVAILABLE</span></span>
+            <span>Scenario <span class="as-chip" id="as-scn">UNAVAILABLE</span></span>
+        </div>
+        <p class="rz-prov" id="rz-prov-dh-strip" data-rz-provenance="simulated" data-rz-prov-basis="conv-engine.js scenario; comms = the page read a valid model snapshot; data quality = the model's own flag; page clock = your browser time"><b>Simulated</b> · conv-engine.js scenario; comms = the page read a valid model snapshot; data quality = the model's own flag; page clock = your browser time</p>
+        <div class="rz-manual-link" style="text-align:center; padding:0.9rem 1rem 1.3rem;"><style>.rz-manual-link a{display:inline-block;font-family:'JetBrains Mono','Courier New',monospace;font-size:0.72rem;letter-spacing:0.04em;text-decoration:none;border:1px solid;border-radius:4px;padding:0.45rem 0.85rem;color:#969eaa;border-color:rgba(160,168,180,0.35)}.rz-manual-link a:hover{color:#E8B563;border-color:rgba(232,181,99,0.5)}</style><a href="manual/datahall.html">Technical Manual &amp; Methodology &#8599;</a></div>
+    </div>
+    </header>
 
     <script>
     /* v1.24.1 doc-14 §3 — bind ops rollup to engine + mount the mode selector via the shell. */
@@ -760,131 +690,34 @@
 
     <div class="main-grid" data-rz-cockpit-root="datahall">
 
-        <!-- LEFT: cooling plant + CRAH air-side status -->
-        <div class="sidebar" tabindex="0">
-            <div class="panel">
-                <div class="panel-title">Chiller Plant Feed</div>
-                <!-- v1.134.2 — CH-01/02/03 were the fixed strings RUN/RUN/STBY, a 3-chiller
-                     plant that no longer exists (the engine runs 7 of 10). Replaced by the
-                     engine's own counts. -->
-                <div class="kv" data-basis-param="cooling.chillers_running" tabindex="0" role="button"
-                     title="Chillers running — click for basis"><span class="k">Chillers</span><span class="v num" id="ch-count">UNAVAILABLE</span></div>
-                <div class="kv" style="margin-top:7px; padding-top:7px; border-top:1px solid var(--border-soft);"
-                     data-basis-param="cooling.rack_inlet_target_c" tabindex="0" role="button"
-                     title="Rack-inlet design target — click for basis">
-                    <span class="k">Rack inlet (target)</span><span class="v num" id="th-inlet" data-const>UNAVAILABLE</span>
-                </div>
-                <!-- The supply-air plane and the two assumptions that place it. These were the
-                     invisible half of the 15.2 C question: the temperature was shown, the coil
-                     approach and the containment assumption behind it were not. -->
-                <div class="kv" data-basis-param="cooling.crah_supply_air_c" tabindex="0" role="button"
-                     title="CRAH supply air — click for basis"><span class="k">CRAH supply air</span><span class="v num" id="th-supply" data-point="cooling.crah_supply_air_c" data-pt-label="CRAH supply air" data-pt-unit="°C" data-pt-digits="1" data-pt-cls="ENGINE">UNAVAILABLE</span></div>
-                <!-- v1.134.11 — the containment assumption that places the supply plane. It was
-                     engine-published and shown nowhere, so the one number that decides whether
-                     25.4 C supply is credible was invisible. -->
-                <div class="kv" data-basis-param="cooling.supply_path_mixing_k" tabindex="0" role="button"
-                     title="Supply-path mixing (containment assumption) — click for basis"><span class="k">Supply-path mixing</span><span class="v num" id="th-mixing" data-const>UNAVAILABLE</span></div>
-                <!-- v1.134.23 — the chain used to stop at the supply plane and resume at CHWS,
-                     leaving the two AIR planes downstream of the rack unstated even though this
-                     cockpit draws a hot-aisle temperature for every row. The rise across the rack
-                     and the return-path mixing were page constants; both are engine-published now,
-                     so the chain reads rack inlet -> hot aisle -> CRAH return without a gap. -->
-                <div class="kv" data-basis-param="cooling.airside_delta_t_k" tabindex="0" role="button"
-                     title="Airside rise across the rack (ADOPTED) — click for basis"><span class="k">Airside &Delta;T</span><span class="v num" id="th-airdt" data-const>UNAVAILABLE</span></div>
-                <div class="kv" data-basis-param="cooling.hot_aisle_c" tabindex="0" role="button"
-                     title="Hot-aisle temperature — click for basis"><span class="k">Hot aisle</span><span class="v num" id="th-hot" data-point="cooling.hot_aisle_c" data-pt-label="Hot aisle" data-pt-unit="°C" data-pt-digits="1" data-pt-cls="ENGINE">UNAVAILABLE</span></div>
-                <div class="kv" data-basis-param="cooling.return_path_mixing_k" tabindex="0" role="button"
-                     title="Return-path mixing (containment assumption) — click for basis"><span class="k">Return-path mixing</span><span class="v num" id="th-retmix" data-const>UNAVAILABLE</span></div>
-                <div class="kv" data-basis-param="cooling.crah_return_air_c" tabindex="0" role="button"
-                     title="CRAH return air — click for basis"><span class="k">CRAH return air</span><span class="v num" id="th-return" data-point="cooling.crah_return_air_c" data-pt-label="CRAH return air" data-pt-unit="°C" data-pt-digits="1" data-pt-cls="ENGINE">UNAVAILABLE</span></div>
-                <div class="kv" data-basis-param="cooling.chw_coil_approach_k" tabindex="0" role="button"
-                     title="Coil approach (ASSUMED) — click for basis"><span class="k">Coil approach</span><span class="v num" id="th-approach" data-const>UNAVAILABLE</span></div>
-                <div class="kv" data-basis-param="cooling.chws_c" tabindex="0" role="button"
-                     title="CHWS — click for basis"><span class="k">CHWS</span><span class="v num" id="chws" data-point="cooling.chws_c" data-pt-label="CHW supply" data-pt-unit="°C" data-pt-digits="1" data-pt-cls="ENGINE">UNAVAILABLE</span></div>
-                <div class="kv" data-basis-param="cooling.chwr_c" tabindex="0" role="button"
-                     title="CHWR — click for basis"><span class="k">CHWR</span><span class="v num" id="chwr" data-point="cooling.chwr_c" data-pt-label="CHW return" data-pt-unit="°C" data-pt-digits="1" data-pt-cls="ENGINE">UNAVAILABLE</span></div>
-                <div class="kv" data-basis-param="cooling.chw_delta_t" tabindex="0" role="button"
-                     title="CHW delta-T — click for basis"><span class="k">&Delta;T</span><span class="v num" id="chdt" data-point="cooling.chw_delta_t" data-pt-label="CHW ΔT" data-pt-unit="K" data-pt-digits="1" data-pt-cls="ENGINE">UNAVAILABLE</span></div>
-                <div class="kv" data-basis-param="cooling.flow_lps" tabindex="0" role="button"
-                     title="CHW flow — click for basis"><span class="k">CHW Flow</span><span class="v num" id="chflow" data-point="cooling.flow_lps" data-pt-label="CHW flow" data-pt-unit="L/s" data-pt-digits="1" data-pt-cls="ENGINE">UNAVAILABLE</span></div>
-                <div class="formula" id="f-flow" data-const>UNAVAILABLE</div>
-            </div>
-
-            <div class="panel">
-                <div class="panel-title">CRAH Air-Side Status</div>
-                <!-- v1.134.9 — declared authored page basis; see the reason on the element. -->
-                <div id="crah-list" data-rz-authored-basis="Per-CRAH leaving-air, return-air and saturation readings are simulated unit state. conv-engine.js models the hall's thermal PLANES (rack inlet, CRAH supply, CHWS, CHWR, delta-T) and the plant's chilled-water flow; it publishes no per-CRAH quantity, so these readings have no engine parameter to trace to. The hall's cooling demand, its available capacity and every thermal plane on this page are engine-bound and stay in the denominator.">UNAVAILABLE</div>
-                <div class="formula" id="crah-air-note" data-const>UNAVAILABLE</div>
-            </div>
-        </div>
-
-        <!-- CENTER: balance band + heatmap mode + rack floor -->
-        <div class="center-stage">
-            <div class="balance-band" id="balanceBand">
-                <div class="bb-cell">
-                    <div class="bb-lbl" id="bb-hall-label">Hall A IT Load</div>
-                    <div class="bb-val num"><span id="bb-itload" data-point="datahall.hall.rack_sum_mw" data-pt-label="Hall IT load (rack sum)" data-pt-unit="MW" data-pt-digits="3" data-pt-cls="ENGINE">UNAVAILABLE</span> <span class="bb-unit">MW</span></div>
-                    <!-- v1.134.11 — this sub-line was briefly hooked to hall.facility_load_kw. It shows the
-                         hall's IT load summed from the cabinet field, not the facility load, and the
-                         drawer gate rejected the mismatch. Corrected, and the facility figure given
-                         its own cell below rather than borrowed from a line that means something else. -->
-                    <div class="bb-sub" id="bb-itsub" data-rz-authored-basis="Active-cabinet count and the active average are summaries of the SIMULATED rack field, not engine quantities: conv-engine.js publishes the hall IT load and the installed rack count, and the occupancy pattern that decides which cabinets are live is generated on this page. The field itself is not exempt - its per-cabinet values are a declared distribution whose SUM is verified against hall.it_load_kw on every run, so the quantity these lines summarise is checked even though the split is simulated." data-basis-param="hall.it_load_kw" tabindex="0" role="button" title="Hall IT load — click for basis">UNAVAILABLE</div>
-                    <div class="bb-sub" id="bb-facsub" data-basis-param="hall.facility_load_kw" tabindex="0" role="button" title="Hall facility load — click for basis">UNAVAILABLE</div>
-                </div>
-                <div class="bb-cell">
-                    <div class="bb-lbl">Rack Count / Avg</div>
-                    <div class="bb-val num"><span id="bb-racks" data-rz-authored-basis="Active-cabinet count and the active average are summaries of the SIMULATED rack field, not engine quantities: conv-engine.js publishes the hall IT load and the installed rack count, and the occupancy pattern that decides which cabinets are live is generated on this page. The field itself is not exempt - its per-cabinet values are a declared distribution whose SUM is verified against hall.it_load_kw on every run, so the quantity these lines summarise is checked even though the split is simulated.">UNAVAILABLE</span></div>
-                    <div class="bb-sub" id="bb-avg" data-rz-authored-basis="Active-cabinet count and the active average are summaries of the SIMULATED rack field, not engine quantities: conv-engine.js publishes the hall IT load and the installed rack count, and the occupancy pattern that decides which cabinets are live is generated on this page. The field itself is not exempt - its per-cabinet values are a declared distribution whose SUM is verified against hall.it_load_kw on every run, so the quantity these lines summarise is checked even though the split is simulated." >UNAVAILABLE</div>
-                </div>
-                <div class="bb-cell">
-                    <div class="bb-lbl">Hall Utilization</div>
-                    <div class="bb-val num" data-basis-param="hall.utilisation_pct" tabindex="0" role="button" title="Hall utilisation — click for basis"><span id="bb-util" data-point="datahall.rack.load_pct" data-pt-label="Hall utilisation" data-pt-unit="%" data-pt-digits="1" data-pt-cls="ENGINE">UNAVAILABLE</span> <span class="bb-unit">%</span></div>
-                    <div class="bb-sub" id="bb-design" data-basis-param="hall.it_design_kw" tabindex="0" role="button" title="Hall IT design capacity — click for basis">UNAVAILABLE</div>
-                </div>
-                <div class="bb-cell">
-                    <div class="bb-lbl">Hall IT reconciliation</div>
-                    <div class="bb-val num v-na" id="bb-balance">UNAVAILABLE</div>
-                    <div class="bb-sub" id="bb-balsub" data-const>UNAVAILABLE</div>
-                </div>
-                <div class="bb-cell">
-                    <div class="bb-lbl">Cooling Demand / Avail</div>
-                    <div class="bb-val num"><span id="bb-cool">UNAVAILABLE</span></div>
-                    <div class="bb-sub" id="bb-coolsub">UNAVAILABLE</div>
-                </div>
-                <div class="bb-cell">
-                    <div class="bb-lbl">N+1 Cooling</div>
-                    <div class="bb-val"><span class="pill unavailable" id="bb-np1">UNAVAILABLE</span></div>
-                    <div class="bb-sub" id="bb-np1sub">UNAVAILABLE</div>
-                </div>
-            </div>
-
+        <!-- STAGE: mode bar + the floor (js/conv/floor-plan.js draws the hall into #zone-field) or the air path of one row -->
+        <div class="center-stage" id="dh-stage">
             <div class="mode-bar">
                 <span class="view-seg" role="group" aria-label="Stage view">
                     <button class="view-btn active" data-view="plan" aria-pressed="true" onclick="setStageView('plan')" disabled>Plan</button>
                     <button class="view-btn" data-view="air" aria-pressed="false" onclick="setStageView('air')" disabled>Air path</button>
                 </span>
-                <button class="mode-btn"        data-mode="power" aria-pressed="false"  onclick="setMode('power')" disabled>Power Density</button>
-                <button class="mode-btn active" data-mode="temp" aria-pressed="true"   onclick="setMode('temp')" disabled>Rack-Inlet Temp</button>
-                <button class="mode-btn"        data-mode="cooling-margin" aria-pressed="false" onclick="setMode('cooling-margin')" disabled>Cooling Margin</button>
+                <button class="mode-btn"        data-mode="power" aria-pressed="false"  onclick="setMode('power')" disabled>Power</button>
+                <button class="mode-btn active" data-mode="temp" aria-pressed="true"   onclick="setMode('temp')" disabled>Inlet temp</button>
+                <button class="mode-btn"        data-mode="cooling-margin" aria-pressed="false" onclick="setMode('cooling-margin')" disabled>Margin</button>
                 <button class="mode-btn"        data-mode="alarms" aria-pressed="false" onclick="setMode('alarms')" disabled>Alarms</button>
                 <button class="mode-btn"        data-mode="space" aria-pressed="false"  onclick="setMode('space')" disabled>Space</button>
                 <div class="legend" id="legend"></div>
             </div>
 
             <div class="floor" id="main-content" tabindex="-1">
-                <div class="crah-rail" id="crah-top" aria-label="CRAH air-side units (north)" data-rz-authored-basis="CRAH unit index numbers: equipment tags of the selected hall (CRAH-A01..), not quantities; state is the cell colour"></div>
                 <!-- v1.134.3 — DECLARED DISTRIBUTION. This field renders 500 per-cabinet values plus 25
                      per-row footers. Registering 500 parameters would be noise, and leaving them in
                      the coverage denominator drowned every other page (datahall alone is 579 of the
                      966 numbers on the whole suite). The honest treatment is to register the WHOLE
                      FIELD against the quantity it must reconcile to: the coverage gate excludes these
                      cells from the denominator only because it verifies their SUM equals
-                     hall.it_load_kw. A field that stops reconciling fails the gate. -->
+                     hall.it_load_kw. A field that stops reconciling fails the gate.
+                     The CRAH galleries (#crah-top, #crah-bottom) are <g> groups INSIDE the drawing now. -->
                 <div class="zone-field" id="zone-field"
                      data-rz-distribution="hall.it_load_kw"
                      data-rz-distribution-selector=".rack .rk-val"
                      data-rz-distribution-mode="sum"></div>
-                <div class="crah-rail" id="crah-bottom" aria-label="CRAH air-side units (south)" data-rz-authored-basis="CRAH unit index numbers: equipment tags of the selected hall (CRAH-A01..), not quantities; state is the cell colour"></div>
                 <!-- v1.134.23 — three MORE declared distributions for the per-row footers. Each
                      buys its exclusion with a check, and each names the plane it reconciles to:
                      the row heats must SUM to the hall IT load; every row's inlet must sit at the
@@ -906,6 +739,8 @@
                      data-rz-distribution-selector=".zone-foot .zf-hot"
                      data-rz-distribution-mode="per-item"></div>
             </div>
+            <!-- phone: a 44 px chip per row and the row panel are the way into a cabinet the plan draws at 10 px -->
+            <div class="row-picker" id="row-picker" role="group" aria-label="Rows"></div>
             <!-- v3.69.0 — the air path of one row as a schematic section (js/conv/air-section.js). -->
             <div class="air-sec" id="air-sec"
                  data-rz-authored-basis="Section readings restate the selected row of the floor field above (row heat, rack inlet, hot aisle, air-side delta-T, return air and row airflow are the row values that field reconciles against hall.it_load_kw, cooling.rack_inlet_target_c and cooling.hot_aisle_c), the CRAH fan and valve position of the CRAH status list, and the engine supply-air and chilled-water planes. The drawing is a schematic cut, not to scale; the air temperature colour ramp spans a declared 24 to 40 C display range.">
@@ -915,49 +750,117 @@
             </div>
         </div>
 
-        <!-- RIGHT: alarms + environment + selected detail -->
-        <div class="sidebar sidebar-right">
-            <div class="panel">
-                <div class="panel-title">Active Alarms</div>
-                <div id="alarm-list" style="font-size:11px; color:var(--txt-faint);">Authority UNAVAILABLE</div>
+        <!-- INSPECTOR: ONE 320 px column. Nothing selected = the hall; a click on a cabinet, a CRAH or a row = that thing. Escape = the hall. -->
+        <aside class="inspector" id="dh-inspector" data-inspector-state="hall" aria-label="Inspector">
+            <div class="insp-head">
+                <h2 class="insp-title" id="insp-title">Hall A</h2>
+                <button type="button" class="insp-x" id="insp-x" aria-label="Close, back to the hall">&times;</button>
             </div>
-            <div class="panel">
-                <div class="panel-title" id="env-hall-title">Environment (Hall A)</div>
-                <div class="kv"><span class="k">Rack-inlet / cold-aisle</span><span class="v num" id="env-temp" data-point="datahall.rack.inlet_c" data-pt-label="Rack inlet (average)" data-pt-unit="°C" data-pt-digits="1">UNAVAILABLE</span></div>
-                <div class="kv"><span class="k">Avg Hot-Aisle</span><span class="v num" id="env-hot-aisle" data-point="datahall.hall.hot_aisle_avg_c" data-pt-label="Hot aisle (average)" data-pt-unit="°C" data-pt-digits="1">UNAVAILABLE</span></div>
-                <div class="kv"><span class="k">CRAH Return</span><span class="v num" id="env-return" data-point="datahall.hall.return_air_avg_c" data-pt-label="CRAH return (average)" data-pt-unit="°C" data-pt-digits="1">UNAVAILABLE</span></div>
-                <div class="kv"><span class="k">Avg RH</span><span class="v num" id="env-rh" data-point="environment.avg_rh_pct" data-pt-label="Relative humidity" data-pt-unit="%" data-pt-digits="1">UNAVAILABLE</span></div>
-                <div class="kv"><span class="k">Dew Point</span><span class="v num" id="env-dewpoint" data-point="datahall.hall.dewpoint_c" data-pt-label="Dew point" data-pt-unit="°C" data-pt-digits="1" data-rz-authored-basis="Dew point and the hottest measured rack inlet are simulated hall environment: conv-engine.js publishes the design thermal PLANES (rack inlet target, hot aisle, CRAH supply and return) and a site annual average humidity, but no instantaneous per-hall psychrometric state. Binding a simulated instantaneous reading to a design plane would be the wrong-plane defect this programme exists to remove.">UNAVAILABLE</span></div>
-                <!-- v2.10.0 — hall-level min / avg / max (owner comment 12): the same simulated cabinet field the
-                     floor draws, aggregated; declared as such on each cell. -->
-                <div class="kv" data-rz-authored-basis="Rack-load and rack-inlet minimum / average / maximum are aggregates of the SIMULATED cabinet field this page draws (deterministic, seeded per hall, reconciled by sum to the engine's hall IT load); conv-engine.js publishes the hall totals and the thermal planes, not per-cabinet statistics."><span class="k">Rack load min / avg / max</span><span class="v num" id="env-rack-range">UNAVAILABLE</span></div>
-                <div class="kv" data-rz-authored-basis="Rack-load and rack-inlet minimum / average / maximum are aggregates of the SIMULATED cabinet field this page draws (deterministic, seeded per hall, reconciled by sum to the engine's hall IT load); conv-engine.js publishes the hall totals and the thermal planes, not per-cabinet statistics."><span class="k">Row load min / max</span><span class="v num" id="env-row-range">UNAVAILABLE</span></div>
-                <div class="kv" data-rz-authored-basis="Rack-load and rack-inlet minimum / average / maximum are aggregates of the SIMULATED cabinet field this page draws (deterministic, seeded per hall, reconciled by sum to the engine's hall IT load); conv-engine.js publishes the hall totals and the thermal planes, not per-cabinet statistics."><span class="k">Rack-inlet min / avg / max</span><span class="v num" id="env-inlet-range">UNAVAILABLE</span></div>
-                <div class="kv"><span class="k">Hottest Rack-Inlet</span><span class="v num v-na" id="env-hot" data-rz-authored-basis="Dew point and the hottest measured rack inlet are simulated hall environment: conv-engine.js publishes the design thermal PLANES (rack inlet target, hot aisle, CRAH supply and return) and a site annual average humidity, but no instantaneous per-hall psychrometric state. Binding a simulated instantaneous reading to a design plane would be the wrong-plane defect this programme exists to remove.">UNAVAILABLE</span></div>
-            </div>
-            <div class="panel">
-                <div class="panel-title" data-explain="conv-dh-density">Rack Density Basis</div>
-                <div class="basis-split">
-                    <div class="basis-cell"><div class="basis-label">Current operating density</div><div class="basis-value" id="density-current" data-rz-authored-basis="Active-cabinet count and the active average are summaries of the SIMULATED rack field, not engine quantities: conv-engine.js publishes the hall IT load and the installed rack count, and the occupancy pattern that decides which cabinets are live is generated on this page. The field itself is not exempt - its per-cabinet values are a declared distribution whose SUM is verified against hall.it_load_kw on every run, so the quantity these lines summarise is checked even though the split is simulated.">UNAVAILABLE</div><div class="basis-note">IT kW / active rack</div></div>
-                    <div class="basis-cell"><div class="basis-label">Installed rack study</div><div class="basis-value" id="density-study">UNAVAILABLE</div><div class="basis-note">positions × cabinet design rating</div></div>
-                    <!-- v1.134.11 — the selected peak was briefly hooked to the wrapper of the
-                         design-average cell, so its drawer explained 30 kW/rack beside a line reading
-                         "500 x 20 kW". The drawer gate rejected it; the peak has its own cell now. -->
-                    <div class="basis-cell" data-basis-param="hall.rack_selected_peak_kw" tabindex="0" role="button" title="Cabinet selected peak — click for basis"><div class="basis-label">Selected cabinet peak</div><div class="basis-value" id="density-peak" data-const>UNAVAILABLE</div></div>
+            <div class="insp-body" data-inspector-body>
+                <div class="insp-sec" data-insp="hall">
+                    <!-- the air chain, rack inlet to CRAH return -->
+                    <div class="insp-group">
+                        <div class="kv" data-basis-param="cooling.rack_inlet_target_c" tabindex="0" role="button"
+                             title="Rack-inlet design target — click for basis"><span class="k">Rack inlet</span><span class="v num" id="th-inlet" data-const>UNAVAILABLE</span></div>
+                        <div class="kv" data-basis-param="cooling.crah_supply_air_c" tabindex="0" role="button"
+                             title="CRAH supply air — click for basis"><span class="k">Supply air</span><span class="v num" id="th-supply" data-point="cooling.crah_supply_air_c" data-pt-label="CRAH supply air" data-pt-unit="°C" data-pt-digits="1" data-pt-cls="ENGINE">UNAVAILABLE</span></div>
+                        <div class="kv" data-basis-param="cooling.hot_aisle_c" tabindex="0" role="button"
+                             title="Hot-aisle temperature — click for basis"><span class="k">Hot aisle</span><span class="v num" id="th-hot" data-point="cooling.hot_aisle_c" data-pt-label="Hot aisle" data-pt-unit="°C" data-pt-digits="1" data-pt-cls="ENGINE">UNAVAILABLE</span></div>
+                        <div class="kv" data-basis-param="cooling.crah_return_air_c" tabindex="0" role="button"
+                             title="CRAH return air — click for basis"><span class="k">Return air</span><span class="v num" id="th-return" data-point="cooling.crah_return_air_c" data-pt-label="CRAH return air" data-pt-unit="°C" data-pt-digits="1" data-pt-cls="ENGINE">UNAVAILABLE</span></div>
+                    </div>
+                    <div class="insp-group" id="env-hall-title" aria-label="Environment (Hall A)">
+                        <div class="kv"><span class="k">Inlet avg</span><span class="v num" id="env-temp" data-point="datahall.rack.inlet_c" data-pt-label="Rack inlet (average)" data-pt-unit="°C" data-pt-digits="1">UNAVAILABLE</span></div>
+                        <div class="kv"><span class="k">Humidity</span><span class="v num" id="env-rh" data-point="environment.avg_rh_pct" data-pt-label="Relative humidity" data-pt-unit="%" data-pt-digits="1">UNAVAILABLE</span></div>
+                        <div class="kv"><span class="k">Dew point</span><span class="v num" id="env-dewpoint" data-point="datahall.hall.dewpoint_c" data-pt-label="Dew point" data-pt-unit="°C" data-pt-digits="1" data-rz-authored-basis="Dew point and the hottest measured rack inlet are simulated hall environment: conv-engine.js publishes the design thermal PLANES (rack inlet target, hot aisle, CRAH supply and return) and a site annual average humidity, but no instantaneous per-hall psychrometric state. Binding a simulated instantaneous reading to a design plane would be the wrong-plane defect this programme exists to remove.">UNAVAILABLE</span></div>
+                        <div class="kv"><span class="k">Hottest inlet</span><span class="v num v-na" id="env-hot" data-rz-authored-basis="Dew point and the hottest measured rack inlet are simulated hall environment: conv-engine.js publishes the design thermal PLANES (rack inlet target, hot aisle, CRAH supply and return) and a site annual average humidity, but no instantaneous per-hall psychrometric state. Binding a simulated instantaneous reading to a design plane would be the wrong-plane defect this programme exists to remove.">UNAVAILABLE</span></div>
+                    </div>
+                    <!-- v1.134.9 — declared authored page basis; see the reason on the element. -->
+                    <div class="insp-group">
+                        <div id="crah-list" data-rz-authored-basis="Per-CRAH leaving-air, return-air and saturation readings are simulated unit state. conv-engine.js models the hall's thermal PLANES (rack inlet, CRAH supply, CHWS, CHWR, delta-T) and the plant's chilled-water flow; it publishes no per-CRAH quantity, so these readings have no engine parameter to trace to. The hall's cooling demand, its available capacity and every thermal plane on this page are engine-bound and stay in the denominator.">UNAVAILABLE</div>
+                    </div>
+                    <div class="insp-group">
+                        <div id="alarm-list" style="font-size:12px; color:var(--txt-faint);">Authority UNAVAILABLE</div>
+                    </div>
+
+                    <section class="insp-det"><button type="button" class="insp-sum" data-dh-disclose="water" aria-expanded="false">Chilled water</button><div class="insp-det-body" hidden>
+                        <!-- v1.134.2 — CH-01/02/03 were the fixed strings RUN/RUN/STBY, a 3-chiller
+                             plant that no longer exists (the engine runs 7 of 10). Replaced by the
+                             engine's own counts. -->
+                        <div class="kv" data-basis-param="cooling.chillers_running" tabindex="0" role="button"
+                             title="Chillers running — click for basis"><span class="k">Chillers</span><span class="v num" id="ch-count">UNAVAILABLE</span></div>
+                        <div class="kv" data-basis-param="cooling.chws_c" tabindex="0" role="button"
+                             title="CHWS — click for basis"><span class="k">CHWS</span><span class="v num" id="chws" data-point="cooling.chws_c" data-pt-label="CHW supply" data-pt-unit="°C" data-pt-digits="1" data-pt-cls="ENGINE">UNAVAILABLE</span></div>
+                        <div class="kv" data-basis-param="cooling.chwr_c" tabindex="0" role="button"
+                             title="CHWR — click for basis"><span class="k">CHWR</span><span class="v num" id="chwr" data-point="cooling.chwr_c" data-pt-label="CHW return" data-pt-unit="°C" data-pt-digits="1" data-pt-cls="ENGINE">UNAVAILABLE</span></div>
+                        <div class="kv" data-basis-param="cooling.chw_delta_t" tabindex="0" role="button"
+                             title="CHW delta-T — click for basis"><span class="k">&Delta;T</span><span class="v num" id="chdt" data-point="cooling.chw_delta_t" data-pt-label="CHW ΔT" data-pt-unit="K" data-pt-digits="1" data-pt-cls="ENGINE">UNAVAILABLE</span></div>
+                        <div class="kv" data-basis-param="cooling.flow_lps" tabindex="0" role="button"
+                             title="CHW flow — click for basis"><span class="k">Flow</span><span class="v num" id="chflow" data-point="cooling.flow_lps" data-pt-label="CHW flow" data-pt-unit="L/s" data-pt-digits="1" data-pt-cls="ENGINE">UNAVAILABLE</span></div>
+                        <div class="formula" id="f-flow" data-const>UNAVAILABLE</div>
+                    </div></section>
+                    <section class="insp-det"><button type="button" class="insp-sum" data-dh-disclose="assumptions" aria-expanded="false">Assumptions</button><div class="insp-det-body" hidden>
+                        <!-- v1.134.11 — the containment assumption that places the supply plane. It was
+                             engine-published and shown nowhere, so the one number that decides whether
+                             25.4 C supply is credible was invisible. v1.134.23 — and the rise across the rack and
+                             the return-path mixing, so the chain reads rack inlet -> hot aisle -> CRAH return without a gap. -->
+                        <div class="kv" data-basis-param="cooling.supply_path_mixing_k" tabindex="0" role="button"
+                             title="Supply-path mixing (containment assumption) — click for basis"><span class="k">Supply-path mixing</span><span class="v num" id="th-mixing" data-const>UNAVAILABLE</span></div>
+                        <div class="kv" data-basis-param="cooling.airside_delta_t_k" tabindex="0" role="button"
+                             title="Airside rise across the rack (ADOPTED) — click for basis"><span class="k">Airside &Delta;T</span><span class="v num" id="th-airdt" data-const>UNAVAILABLE</span></div>
+                        <div class="kv" data-basis-param="cooling.return_path_mixing_k" tabindex="0" role="button"
+                             title="Return-path mixing (containment assumption) — click for basis"><span class="k">Return-path mixing</span><span class="v num" id="th-retmix" data-const>UNAVAILABLE</span></div>
+                        <div class="kv" data-basis-param="cooling.chw_coil_approach_k" tabindex="0" role="button"
+                             title="Coil approach (ASSUMED) — click for basis"><span class="k">Coil approach</span><span class="v num" id="th-approach" data-const>UNAVAILABLE</span></div>
+                        <div class="formula" id="crah-air-note" data-const>UNAVAILABLE</div>
+                    </div></section>
+                    <section class="insp-det"><button type="button" class="insp-sum" data-dh-disclose="ranges" aria-expanded="false">Ranges</button><div class="insp-det-body" hidden>
+                        <div class="kv"><span class="k">Hot aisle avg</span><span class="v num" id="env-hot-aisle" data-point="datahall.hall.hot_aisle_avg_c" data-pt-label="Hot aisle (average)" data-pt-unit="°C" data-pt-digits="1">UNAVAILABLE</span></div>
+                        <div class="kv"><span class="k">CRAH return avg</span><span class="v num" id="env-return" data-point="datahall.hall.return_air_avg_c" data-pt-label="CRAH return (average)" data-pt-unit="°C" data-pt-digits="1">UNAVAILABLE</span></div>
+                        <!-- v2.10.0 — hall-level min / avg / max (owner comment 12): the same simulated cabinet field the
+                             floor draws, aggregated; declared as such on each cell. -->
+                        <div class="kv" data-rz-authored-basis="Rack-load and rack-inlet minimum / average / maximum are aggregates of the SIMULATED cabinet field this page draws (deterministic, seeded per hall, reconciled by sum to the engine's hall IT load); conv-engine.js publishes the hall totals and the thermal planes, not per-cabinet statistics."><span class="k">Rack load</span><span class="v num" id="env-rack-range">UNAVAILABLE</span></div>
+                        <div class="kv" data-rz-authored-basis="Rack-load and rack-inlet minimum / average / maximum are aggregates of the SIMULATED cabinet field this page draws (deterministic, seeded per hall, reconciled by sum to the engine's hall IT load); conv-engine.js publishes the hall totals and the thermal planes, not per-cabinet statistics."><span class="k">Row load</span><span class="v num" id="env-row-range">UNAVAILABLE</span></div>
+                        <div class="kv" data-rz-authored-basis="Rack-load and rack-inlet minimum / average / maximum are aggregates of the SIMULATED cabinet field this page draws (deterministic, seeded per hall, reconciled by sum to the engine's hall IT load); conv-engine.js publishes the hall totals and the thermal planes, not per-cabinet statistics."><span class="k">Rack inlet</span><span class="v num" id="env-inlet-range">UNAVAILABLE</span></div>
+                    </div></section>
+                    <section class="insp-det"><button type="button" class="insp-sum" data-dh-disclose="density" data-explain="conv-dh-density" aria-expanded="false">Density</button><div class="insp-det-body" hidden>
+                        <div class="basis-split">
+                            <div class="basis-cell"><div class="basis-label">Current operating density</div><div class="basis-value" id="density-current" data-rz-authored-basis="Active-cabinet count and the active average are summaries of the SIMULATED rack field, not engine quantities: conv-engine.js publishes the hall IT load and the installed rack count, and the occupancy pattern that decides which cabinets are live is generated on this page. The field itself is not exempt - its per-cabinet values are a declared distribution whose SUM is verified against hall.it_load_kw on every run, so the quantity these lines summarise is checked even though the split is simulated.">UNAVAILABLE</div><div class="basis-note">IT kW / active rack</div></div>
+                            <div class="basis-cell"><div class="basis-label">Installed rack study</div><div class="basis-value" id="density-study">UNAVAILABLE</div><div class="basis-note">positions × cabinet design rating</div></div>
+                            <!-- v1.134.11 — the selected peak was briefly hooked to the wrapper of the
+                                 design-average cell, so its drawer explained 30 kW/rack beside a line reading
+                                 "500 x 20 kW". The drawer gate rejected it; the peak has its own cell now. -->
+                            <div class="basis-cell" data-basis-param="hall.rack_selected_peak_kw" tabindex="0" role="button" title="Cabinet selected peak — click for basis"><div class="basis-label">Selected cabinet peak</div><div class="basis-value" id="density-peak" data-const>UNAVAILABLE</div></div>
+                        </div>
+                    </div></section>
                 </div>
-                
+
+                <div class="insp-sec" data-insp="rack">
+                    <div id="sel-detail" style="font-size:12px; color:var(--txt-faint);">Authority UNAVAILABLE</div>
+                </div>
+
+                <!-- v1.41.4 CRAH card (was a floating popover that sat on the floor; the inspector is the one place a selection reads) -->
+                <div class="insp-sec" data-insp="crah">
+                    <div class="crah-pop" id="crahPop" role="group" aria-labelledby="cp-title">
+                        <div class="cp-head">
+                            <span class="cp-title" id="cp-title">CRAH Authority UNAVAILABLE</span>
+                            <span class="cp-state" id="cp-state">UNAVAILABLE</span>
+                        </div>
+                        <div class="cp-grid" id="cp-grid">UNAVAILABLE</div>
+                    </div>
+                </div>
+
+                <section class="insp-sec" data-insp="row" id="row-panel" aria-label="Row detail" hidden></section>
             </div>
-            <div class="panel" style="flex:1;">
-                <div class="panel-title">Selected</div>
-                <div id="sel-detail" style="font-size:11px; color:var(--txt-faint);">Authority UNAVAILABLE</div>
-            </div>
-        </div>
+        </aside>
     </div>
 
-    <div class="bottom-panel">
+    <!-- the Events drawer: the event log is read on request, not kept on the screen -->
+    <div class="bottom-panel" id="dh-events" hidden role="region" aria-label="Event log">
         <div class="log-header">
-            <span>Event Log</span>
-            <span style="color:var(--txt-dim); font-weight:600; letter-spacing:0;">deterministic &mdash; bound to single scenario basis (conv-engine)</span>
+            <span>Event log</span>
+            <span style="color:var(--txt-dim); font-weight:400;">deterministic &mdash; bound to single scenario basis (conv-engine)</span>
+            <button type="button" class="dh-btn" id="dh-events-close" aria-label="Close the event log">Close</button>
         </div>
         <!-- v1.134.19 — this shipped with a CRITICAL "Data Hall authority UNAVAILABLE." line baked
              into the markup as a placeholder. Nothing removed it when authority WAS available, so a
@@ -972,6 +875,7 @@
          trend) or a constant (data-const: a design value, a rating or a count; neutral, its basis one click away) -->
     <link rel="stylesheet" href="css/conv-point.css?v=20261120-8daa6374">
     <script src="js/conv/history.js?v=20261120-8d390d7e"></script>
+    <script src="js/conv/floor-plan.js?v=20261121-5d15fabe"></script>
     <script src="js/rz-sheet.js?v=20261120-3bf159cb" defer></script>
     <script src="js/rz-trend.js?v=20261121-1300d194"></script>
     <script src="js/conv/point-status.js?v=20261120-40be4933"></script>
@@ -979,6 +883,8 @@
     /* the sidebar and the balance band are dense: a number keeps its font, the glyph of a state is the only addition */
     #dh-ops-rollup b[data-point] { color: inherit; }
     .crah-sum [data-point], .u-meta [data-point], .zf-stats [data-point] { font: inherit; }
+    /* the row min / max / avg stay in the DOM as points for the readers and the trend, and are not drawn in the strip (the row panel shows them) */
+    .zone-foot .zf-stats * { display: inline-block; width: 1px; height: 1px; overflow: hidden; }
     </style>
 
     <script>
@@ -1128,8 +1034,7 @@
             document.getElementById('unitModal').style.display = 'none';
             document.getElementById('crahPop').classList.remove('open');
             document.getElementById('zone-field').innerHTML = '';
-            document.getElementById('crah-top').innerHTML = '';
-            document.getElementById('crah-bottom').innerHTML = '';
+            document.getElementById('row-picker').innerHTML = '';
             document.getElementById('legend').textContent = 'UNAVAILABLE';
             document.getElementById('log-box').innerHTML =
                 '<div class="log-entry"><span class="l-crit">Data Hall authority UNAVAILABLE — requested conv-engine v' +
@@ -1138,6 +1043,7 @@
             disableAuthorityDrawers();
             window.__inspectCrah = function () { return false; };
             window.__closeCrahPop = function () { return false; };
+            window.__openRow = function () { return false; };
             window.closeModal = function () { return false; };
             window.selectHall = function () { return false; };
             window.setMode = function () { return false; };
@@ -1480,7 +1386,6 @@
         /* ============================================================
          * RENDER
          * ========================================================== */
-        var TT = document.getElementById('tooltip');
         var currentMode = 'temp';
         var selectedRackIdx = null;
 
@@ -1700,6 +1605,7 @@
             syncPoints();
         }
 
+        var crahUnitsOpen = false;
         function paintCrahList() {
             var html = '';
             crahUnits.forEach(function (u) {
@@ -1718,7 +1624,8 @@
             document.getElementById('crah-list').innerHTML =
                 '<div class="crah-sum num"><span><b>' + run.length + '</b> RUN</span><span><b>' + (n - run.length) + '</b> STBY</span>' +
                 '<span>LA ' + pt('datahall.crah.leaving_air_avg_c', 'CRAH leaving air (running average)', '°C', 1, avg('leavingAirC')) + ' \u2192 RA ' + pt('datahall.crah.return_air_avg_c', 'CRAH return air (running average)', '°C', 1, avg('returnAirC')) + ' \u00b0C</span></div>' +
-                '<details class="crah-units"><summary>' + n + ' units</summary>' + html + '</details>';
+                '<div class="crah-units"><button type="button" class="insp-sum" data-dh-disclose="crah-units" aria-expanded="' + (crahUnitsOpen ? 'true' : 'false') + '">' + n + ' units</button>' +
+                '<div class="insp-det-body"' + (crahUnitsOpen ? '' : ' hidden') + '>' + html + '</div></div>';
             document.getElementById('crah-air-note').innerHTML =
                 '<span data-explain="conv-dh-crah-air">LA&rarr;RA</span> · contained hot aisle · 0 K mixing';
             syncPoints();
@@ -1769,76 +1676,16 @@
         }
 
         var LEGEND_BAND_BASIS = 'The heat-map legend bands are a UI CLASSIFICATION chosen so an operator can read utilisation and temperature at a glance. They are thresholds for colouring cells, not engineering quantities - conv-engine.js publishes rack loads, design capacities and thermal planes, and no band boundary follows from any of them. Registering a colour cut-off as a design parameter would put a presentation choice into the basis. The ASHRAE 18-27 C figures in the thermal legend are the published recommended envelope, quoted as a reference band, not a value this cockpit derives.';
-        /* the rack unit and the row-foot key are written once here, not on every cell */
+        /* the legend is the floor plan's own: discrete state keys (PRD-CONV-DATAHALL-FLOOR 3.3), no gradient bar */
         function legendFor(mode) {
-            legendBody(mode);
             var lgEl = document.getElementById('legend');
-            var unit = ({ power: 'kW', temp: '°C', 'cooling-margin': 'K', alarms: '%' })[mode] || '';
             if (!lgEl) return;
-            lgEl.insertAdjacentHTML('afterbegin', (unit ? '<span class="lg-item lg-unit">rack · ' + unit + '</span>' : '')
-                + '<span class="lg-item lg-unit" data-explain="conv-dh-row-foot">row foot · kW · in · hot · min · max · avg</span>');
-            if (window.RZExplain && window.RZExplain.attachExplicit) window.RZExplain.attachExplicit(lgEl);
-        }
-        function legendBody(mode) {
-            var lg = document.getElementById('legend');
-            /* v1.134.23 — band boundaries are a presentation choice, declared as such on
-               the host rather than left to read as untraced engineering values. */
-            lg.setAttribute('data-rz-authored-basis', LEGEND_BAND_BASIS);
-            var items;
-            var ramp = mode === 'power' ? { stops: RAMP_POWER, lo: '0 %', hi: '>105 %', ticks: [[0.70, '70'], [0.85, '85'], [0.95, '95']], title: 'utilisation of the 20 kW rating (%)' }
-                : mode === 'temp' ? { stops: RAMP_TEMP, lo: '18 °C', hi: '30 °C', ticks: [[25.4, '25.4'], [27, '27']], title: 'rack inlet (°C) · recommended 18–27 °C' }
-                : mode === 'cooling-margin' ? { stops: RAMP_MARGIN, lo: '0 K', hi: '7 K', ticks: [[1, '1'], [3, '3'], [5, '5']], title: 'margin (K) to the 27 °C recommended maximum' }
-                : null;
-            if (ramp) {
-                var lo = ramp.stops[0][0], hi = ramp.stops[ramp.stops.length - 1][0];
-                lg.innerHTML = '<span class="lg-item"><span class="lg-sw" style="background:#24262D"></span>Spare</span>'
-                    + '<span class="lg-ramp" title="' + ramp.title + '"><span class="lg-end" data-const>' + ramp.lo + '</span>'
-                    + '<span class="lg-bar" style="background:' + rampCss(ramp.stops) + '">'
-                    + ramp.ticks.map(function (tk) { return '<span class="lg-tick" style="left:' + (((tk[0] - lo) / (hi - lo)) * 100).toFixed(1) + '%"><span>' + tk[1] + '</span></span>'; }).join('')
-                    + '</span><span class="lg-end" data-const>' + ramp.hi + '</span></span>';
-                return;
-            }
-            if (mode === 'alarms') {
-                items = [['#24262D', 'Normal'], ['#7a5a1f', 'Warning'], ['#9a342f', 'Critical']];
-            } else {
-                items = [['#24262D', 'Spare slot'], ['#2f5e46', 'Occupied']];
-            }
-            lg.innerHTML = items.map(function (it) {
-                return '<span class="lg-item"><span class="lg-sw" style="background:' + it[0] + '"></span>' + it[1] + '</span>';
-            }).join('');
+            lgEl.setAttribute('data-rz-authored-basis', LEGEND_BAND_BASIS);
+            window.RZFloorPlan.legend(lgEl, mode, RACK_RATING_KW);
+            /* the rating and the two thresholds in the key are declared presentation constants (their basis is on the host) */
+            for (var i = 0; i < lgEl.children.length; i++) if (/\d/.test(lgEl.children[i].textContent)) lgEl.children[i].setAttribute('data-const', '');
         }
 
-        /* v2.10.0 — CONTINUOUS RAMP (owner comment 12: "rack-grid gradient"). The discrete tiers
-           painted 463 cabinets one flat green; the differences between them — which are the point
-           of a heat map — were invisible. Colour now interpolates between severity stops whose
-           POSITIONS are the same thresholds the tiers used (the thresholds are the alarm philosophy,
-           the ramp is presentation): normal sits on a muted slate → green band (doc-03: "muted
-           neutral rack blocks for normal"), amber begins where the warning threshold begins, red
-           where the breach threshold begins. Red is still reserved for breach. */
-        var RAMP_POWER = [[0.00, '#282B33'], [0.40, '#2b4a5e'], [0.70, '#3f7a58'], [0.85, '#b0892a'], [0.95, '#c05a2a'], [1.05, '#c0392b']];
-        var RAMP_TEMP  = [[18, '#2b4a5e'], [22, '#2f5e46'], [25.4, '#3f7a58'], [27, '#b0892a'], [30, '#c0392b']];
-        var RAMP_MARGIN = [[0, '#c0392b'], [1, '#c05a2a'], [3, '#b0892a'], [5, '#3f7a58'], [7, '#2b4a5e']];
-        function hexLerp(a, b, t) {
-            var ah = parseInt(a.slice(1), 16), bh = parseInt(b.slice(1), 16);
-            var r = Math.round(((ah >> 16) & 255) + (((bh >> 16) & 255) - ((ah >> 16) & 255)) * t);
-            var g = Math.round(((ah >> 8) & 255) + (((bh >> 8) & 255) - ((ah >> 8) & 255)) * t);
-            var bl = Math.round((ah & 255) + ((bh & 255) - (ah & 255)) * t);
-            return '#' + ((1 << 24) + (r << 16) + (g << 8) + bl).toString(16).slice(1);
-        }
-        function rampColor(stops, v) {
-            if (v <= stops[0][0]) return stops[0][1];
-            for (var i = 1; i < stops.length; i++) {
-                if (v <= stops[i][0]) {
-                    var t = (v - stops[i - 1][0]) / (stops[i][0] - stops[i - 1][0]);
-                    return hexLerp(stops[i - 1][1], stops[i][1], t);
-                }
-            }
-            return stops[stops.length - 1][1];
-        }
-        function rampCss(stops) {
-            var lo = stops[0][0], hi = stops[stops.length - 1][0];
-            return 'linear-gradient(90deg,' + stops.map(function (st) { return st[1] + ' ' + (((st[0] - lo) / (hi - lo)) * 100).toFixed(1) + '%'; }).join(',') + ')';
-        }
         /* Per-cabinet inlet: the row's cold-aisle temperature plus a SIMULATED aisle-end
            recirculation allowance (cabinets at the ends of a contained aisle see the most
            bypass). Declared on the field; the row footer keeps the row plane the gate checks. */
@@ -1875,156 +1722,79 @@
             }
             return rp('min', a.min) + '<br>' + rp('max', a.max) + '<br><b>' + rp('avg', a.avg) + '</b>';
         }
-        function rackFill(rk, zone) {
-            if (currentMode === 'space') return rk.occupied ? '#2f5e46' : '#24262D';
-            if (currentMode === 'temp')  return rk.occupied ? rampColor(RAMP_TEMP, rackInletFor(rk.idx)) : '#24262D';
-            if (currentMode === 'cooling-margin') {
-                /* Tint by rack-inlet margin to the declared 27C recommended maximum. */
-                if (!rk.occupied) return '#24262D';
-                return rampColor(RAMP_MARGIN, RACK_INLET_RECOMMENDED_MAX_C - rackInletFor(rk.idx));
-            }
-            if (currentMode === 'alarms') {
-                if (!rk.occupied) return '#24262D';
-                if (rk.util > 0.95) return '#9a342f';
-                if (rk.util > 0.85) return '#7a5a1f';
-                return '#24262D';
-            }
-            return rk.occupied ? rampColor(RAMP_POWER, rk.util) : '#24262D'; // power density (default) — continuous ramp
+        /* v3.71.0 - the floor is js/conv/floor-plan.js (PRD-CONV-DATAHALL-FLOOR FP2): one SVG hall with depth, drawn once and
+           repainted by attribute. The model it reads is a live view of this page's own racks / zones / crahUnits (those are
+           re-assigned on a hall swap and by the excursion simulator), never a copy. */
+        var fp = null, fpModel = null;
+        var floorBox = document.getElementById('main-content');
+        function floorModel() {
+            if (fpModel) return fpModel;
+            fpModel = { racksPerZone: RACKS_PER_ZONE, ratingKw: RACK_RATING_KW, rackInletFor: rackInletFor };
+            Object.defineProperty(fpModel, 'racks', { enumerable: true, get: function () { return racks; } });
+            Object.defineProperty(fpModel, 'zones', { enumerable: true, get: function () { return zones; } });
+            Object.defineProperty(fpModel, 'crahUnits', { enumerable: true, get: function () { return crahUnits; } });
+            return fpModel;
         }
-
+        /* the height the drawing may take: desktop = what the stage leaves; tablet / phone = a bound the page owns (the page scrolls there) */
+        function floorHeightPx() {
+            var w = window.innerWidth;
+            if (w <= 600) return 300;
+            if (w <= 1024) return Math.max(380, Math.round(window.innerHeight * 0.6));
+            return floorBox.clientHeight;
+        }
+        function sizeFloorBox() { floorBox.style.height = window.innerWidth <= 1024 ? floorHeightPx() + 'px' : ''; }
+        var CRAH_RAIL_BASIS = 'CRAH unit index numbers: equipment tags of the selected hall (CRAH-A01..), not quantities; state is the cell colour';
+        function rackValText(gi) {
+            var rk = racks[gi];
+            if (!rk.occupied) return currentMode === 'space' ? 'spare' : '\u2014';
+            if (currentMode === 'power') return rk.kw.toFixed(1);
+            if (currentMode === 'temp') return rackInletFor(gi).toFixed(1);
+            if (currentMode === 'cooling-margin') return (RACK_INLET_RECOMMENDED_MAX_C - rackInletFor(gi)).toFixed(1);
+            if (currentMode === 'alarms') return String(Math.round(rk.util * 100));
+            return 'IT';
+        }
         function renderFloor() {
-            // CRAH rails: north = CRAH 1..10, south = CRAH 11..20
-            // v1.41.4 — inline SAT value per cell; click opens floating popover (not modal)
-            function rail(start, end) {
-                var h = '';
-                for (var n = start; n <= end; n++) {
-                    var u = crahUnits[n - 1];
-                    var cls = u.running ? '' : 'stby';
-                    h += '<div class="crah-cell ' + cls + '" data-crah="' + u.n + '" ' +
-                        'onclick="window.__inspectCrah(' + u.n + ', event)" ' +
-                        'title="' + u.tag + ' — ' + u.state + ' — leaving air ' + (u.running ? u.leavingAirC.toFixed(1) + '°C' : 'off') + '">' +
-                        '<span class="cc-dot"></span>' + u.tag.replace(/^CRAH-[A-Z]*/, '') +
-                        /* v1.134.19 — the saturation figure ellipsised to "25." here. A number cut
-                           mid-digit reads as a different number; the CRAH air-side list on the left
-                           carries the same value at a legible size. Tag only, value on hover. */
-                        '</div>';
-                }
-                return h;
-            }
-            /* v1.134.0 — the rail split was hardcoded to the retired 20-unit fleet.
-               Split the DERIVED fleet in half instead: north rail takes the first
-               half, south rail the remainder, whatever the count. */
-            var railSplit = Math.ceil(CRAH_TOTAL / 2);
-            var railTop = document.getElementById('crah-top');
-            var railBottom = document.getElementById('crah-bottom');
-            /* v1.134.26 — no inline column count. Forcing repeat(N, 1fr) across the panel
-               squeezed every cell below its own tag width; .crah-rail now holds a 38px
-               track minimum and scrolls. */
-            railTop.innerHTML = rail(1, railSplit);
-            railBottom.innerHTML = rail(railSplit + 1, CRAH_TOTAL);
-
-            var field = document.getElementById('zone-field');
-            // Row count is derived from the hall's rack count — the grid must follow it.
-            /* v1.134.26 — no inline column count; .zone-field holds a 64px track minimum
-               and scrolls. Forcing repeat(ZONES, 1fr) squeezed every row footer to 28px. */
-            var fh = '<div class="zone zone-key"><div class="zone-head">Row</div><div class="zone-racks"><span id="zk-unit"></span></div>'
-                + '<div class="zone-foot zk-foot"><span>kW</span><span class="zk-in">in °C</span><span class="zk-hot">hot °C</span><span id="zk-min"></span><span id="zk-max"></span><span id="zk-avg"></span></div></div>';
-            for (var z = 0; z < ZONES; z++) {
-                var zn = zones[z];
-                var rowChar = String.fromCharCode(65 + z);
-                fh += '<div class="zone" data-z="' + z + '">' +
-                    /* v1.134.19 — was "Row A · CA-A01", which ellipsised to "Row ..." on all 25
-                       columns: the same non-label 25 times. The row letter is what distinguishes
-                       them and it fits; the full aisle tag stays in the title attribute and in the
-                       inspector, where there is room to read it. */
-                    '<div class="zone-head" onclick="window.__sectionRow(' + z + ');window.setStageView(\'air\')" title="Row ' + rowChar + ' \u00b7 ' + zoneAisleTag(z) + ' \u00b7 click: air path section">' + rowChar + '</div>' +
-                    '<div class="zone-racks" id="zr-' + z + '"></div>' +
-                    /* v1.134.23 — one text node carried three different quantities, so none of
-                       them could be declared against its own basis and all 75 readings counted as
-                       untraced. Split into named spans: the row heat reconciles by SUM to the
-                       hall's IT load, the inlet and hot-aisle temperatures sit PER ROW on the
-                       engine's published planes. */
-                    '<div class="zone-foot num">' +
-                      /* v1.134.26 — the " · " separators went with the single-line layout;
-                         the three readings are their own lines now. */
-                      /* labels and units live once in the legend key; the column carries numbers */
-                      '<span class="zf-kw" title="row heat, kW">' + zn.heat.toFixed(0) + '</span>' +
-                      '<span class="zf-in" title="rack inlet, °C">' + zn.rackInletC.toFixed(1) + '</span>' +
-                      '<span class="zf-hot" title="hot aisle, °C">' + zn.hotAisleC.toFixed(1) + '</span>' +
-                      '<span class="zf-stats" id="zs-' + z + '" data-rz-authored-basis="' + ROW_STATS_BASIS + '"></span>' +
-                    '</div>' +
-                    '</div>';
-            }
-            field.innerHTML = fh;
-            // Racks: 20 per zone laid out as 2 cols x 10 rows visually = 10-row grid,
-            // but we render a 10-row column twice (L then R) for cabinet realism.
-            for (var z2 = 0; z2 < ZONES; z2++) {
-                var holder = document.getElementById('zr-' + z2);
-                holder.style.gridTemplateRows = 'repeat(10, 1fr)';
-                holder.style.gridTemplateColumns = '1fr 1fr';
-                holder.style.gridAutoFlow = 'column';
-                var rh = '';
-                for (var rr = 0; rr < RACKS_PER_ZONE; rr++) {
-                    var gi = z2 * RACKS_PER_ZONE + rr;
-                    rh += '<div class="rack" data-idx="' + gi + '"></div>';
-                }
-                holder.innerHTML = rh;
-            }
-            wireRacks();
+            var host = document.getElementById('zone-field');
+            if (fp) { fp.destroy(); fp = null; }
+            sizeFloorBox();
+            fp = window.RZFloorPlan.render(host, floorModel(), {
+                mode: currentMode,
+                measure: floorBox,
+                height: floorHeightPx,
+                rackTag: rackTag,
+                zoneTag: zoneAisleTag,
+                crahTag: function (n) { return crahTag(n); },
+                crahAttrs: { north: { 'data-rz-authored-basis': CRAH_RAIL_BASIS }, south: { 'data-rz-authored-basis': CRAH_RAIL_BASIS } },
+                onRack: function (idx) { selectRack(idx); },
+                onCrah: function (n) { window.__inspectCrah(n); },
+                onRow: function (z) { window.__openRow(z); },
+                onBuild: function () { paintStrips(); syncPoints(); }
+            });
+            var rp = document.getElementById('row-picker');
+            var ph = '';
+            for (var z = 0; z < ZONES; z++) ph += '<button type="button" class="row-chip" data-z="' + z + '" aria-pressed="false" aria-label="Row ' + String.fromCharCode(65 + z) + '" onclick="window.__openRow(' + z + ')">' + String.fromCharCode(65 + z) + '</button>';
+            rp.innerHTML = ph;
             repaintRacks();
-            applyRackLabelDetail();
         }
-
-        /* A cabinet cell must be wide enough to hold its own tag before that tag is drawn.
-           "A-AL01" at 7.5px measures ~30px; below that the label is not information. Measured
-           from the live cell, so a wider viewport or a future layout change turns the labels
-           back on by itself rather than needing this number revisited. */
-        var RACK_LABEL_MIN_CELL_PX = 30;
-        function applyRackLabelDetail() {
-            var field = document.getElementById('zone-field');
-            if (!field) return;
-            var cell = field.querySelector('.rack');
-            if (!cell) return;
-            var w = cell.getBoundingClientRect().width;
-            field.classList.toggle('lod-labels', w >= RACK_LABEL_MIN_CELL_PX);
-        }
-        window.addEventListener('resize', applyRackLabelDetail);
-
-        function repaintRacks() {
-            // v1.41.4 — per-mode inline labels (rack ID + value), excursion ring
+        /* the row strips under the drawing carry the row kW; inlet / hot aisle / min-max-avg stay in the DOM for the readers and gates that trace them */
+        function paintStrips() {
             for (var z = 0; z < ZONES; z++) {
-                var zn = zones[z];
-                for (var rr = 0; rr < RACKS_PER_ZONE; rr++) {
-                    var gi = z * RACKS_PER_ZONE + rr;
-                    var el = document.querySelector('.rack[data-idx="' + gi + '"]');
-                    if (!el) continue;
-                    var rk = racks[gi];
-                    el.style.background = rackFill(rk, zn);
-                    var idShort = rackTag(gi).replace('R-', '');  // e.g. AL01
-                    var valTxt = '';
-                    /* the unit is written once, on the field and in the legend title — not on every rack */
-                    if (rk.occupied) {
-                        if (currentMode === 'power') valTxt = rk.kw.toFixed(1);
-                        else if (currentMode === 'temp') valTxt = rackInletFor(gi).toFixed(1);
-                        else if (currentMode === 'cooling-margin') valTxt = (RACK_INLET_RECOMMENDED_MAX_C - rackInletFor(gi)).toFixed(1);
-                        else if (currentMode === 'alarms') valTxt = String(Math.round(rk.util * 100));
-                        else valTxt = 'IT';
-                    } else {
-                        valTxt = currentMode === 'space' ? 'spare' : '—';
-                    }
-                    el.innerHTML = '<span class="rk-id">' + idShort + '</span><span class="rk-val">' + valTxt + '</span>';
-                    el.classList.toggle('excursion', !!(zn.excursionUntil && zn.excursionUntil > Date.now()));
-                }
-                var zs = document.getElementById('zs-' + z);
-                if (zs) zs.innerHTML = rowStatsText(z);
+                var strip = document.querySelector('#zone-field .zone[data-z="' + z + '"]');
+                if (!strip) continue;
+                var zn = zones[z], a = strip.querySelector('.zf-kw'), b = strip.querySelector('.zf-in'), c = strip.querySelector('.zf-hot'), d = strip.querySelector('.zf-stats');
+                if (a) a.textContent = zn.heat.toFixed(0);
+                if (b) b.textContent = zn.rackInletC.toFixed(1);
+                if (c) c.textContent = zn.hotAisleC.toFixed(1);
+                if (d) { d.setAttribute('data-rz-authored-basis', ROW_STATS_BASIS); d.innerHTML = rowStatsText(z); }
             }
-            var zf = document.getElementById('zone-field');
-            var unit = ({ power: 'kW', temp: '°C', 'cooling-margin': 'K', alarms: '%' })[currentMode] || '';
-            if (zf) zf.setAttribute('data-unit', unit);
-            var statUnit = (currentMode === 'temp' || currentMode === 'cooling-margin') ? '°C' : 'kW';
-            var keyText = { 'zk-min': 'min ' + statUnit, 'zk-max': 'max ' + statUnit, 'zk-avg': 'avg ' + statUnit, 'zk-unit': unit ? 'rack ' + unit : 'rack' };
-            for (var kid in keyText) { var kel = document.getElementById(kid); if (kel) kel.textContent = keyText[kid]; }
+        }
+        function repaintRacks() {
+            if (!fp) return;
+            fp.paint(currentMode);
+            paintStrips();
             legendFor(currentMode);
+            var chips = document.querySelectorAll('#row-picker .row-chip');
+            for (var i = 0; i < chips.length; i++) chips[i].setAttribute('aria-pressed', (inspState === 'row' && +chips[i].getAttribute('data-z') === inspRow) ? 'true' : 'false');
             paintAirSection();
             syncPoints();
         }
@@ -2072,51 +1842,52 @@
         };
         window.__airSectionData = airSectionData;
 
-        function wireRacks() {
-            var nodes = document.querySelectorAll('.rack');
-            for (var i = 0; i < nodes.length; i++) {
-                (function (el) {
-                    el.addEventListener('mouseenter', function (e) { showRackTip(e, +el.getAttribute('data-idx')); });
-                    el.addEventListener('mousemove', moveTip);
-                    el.addEventListener('mouseleave', hideTip);
-                    el.addEventListener('click', function () { selectRack(+el.getAttribute('data-idx')); });
-                })(nodes[i]);
+        /* --- Inspector: ONE 320 px column. States: hall (rest) | rack | crah | row. Escape and the close button return it to the hall.
+           On a phone a selection opens it as a bottom sheet (js/rz-sheet.js); on a tablet it is a right drawer (CSS). --- */
+        var insp = document.getElementById('dh-inspector');
+        var inspState = 'hall', inspRow = -1, sheetOpen = false;
+        var phoneMq = window.matchMedia ? window.matchMedia('(max-width: 600px)') : null;
+        function hallTitle() { return 'Hall ' + SELECTED_HALL; }
+        function setInspState(state, title) {
+            inspState = state;
+            insp.setAttribute('data-inspector-state', state);
+            document.getElementById('insp-title').textContent = title || hallTitle();
+            document.getElementById('row-panel').hidden = state !== 'row';
+            if (state !== 'hall' && phoneMq && phoneMq.matches && window.RZSheet && !sheetOpen) {
+                sheetOpen = true;
+                window.RZSheet.open({
+                    title: title || hallTitle(), content: insp,
+                    onClose: function () {
+                        sheetOpen = false;
+                        document.querySelector('.main-grid').appendChild(insp);
+                        resetInspector();
+                    }
+                });
             }
         }
-
-        function showRackTip(e, idx) {
-            var rk = racks[idx];
-            var zn = zones[Math.floor(idx / RACKS_PER_ZONE)];
-            var t = tierOf(rk.util, rk.occupied);
-            TT.innerHTML =
-                '<div class="tt-tag">' + rackTag(idx) + '</div>' +
-                (rk.occupied
-                    ? '<div class="tt-row"><span class="tt-k">Load</span><span class="num">' + rk.kw.toFixed(2) + ' kW</span></div>' +
-                      '<div class="tt-row"><span class="tt-k">Utilization</span><span class="num">' + Math.round(rk.util * 100) + '% of ' + RACK_RATING_KW + ' kW</span></div>' +
-                      '<div class="tt-row"><span class="tt-k">State</span><span>' + t.name + '</span></div>' +
-                      '<div class="tt-row"><span class="tt-k">Rack inlet</span><span class="num">' + rackInletFor(idx).toFixed(1) + ' °C</span></div>' +
-                      '<div class="tt-row"><span class="tt-k">Row cold aisle</span><span class="num">' + zn.rackInletC.toFixed(1) + ' °C</span></div>' +
-                      '<div class="tt-row"><span class="tt-k">Hot aisle</span><span class="num">' + zn.hotAisleC.toFixed(1) + ' °C</span></div>'
-                    : '<div class="tt-row"><span class="tt-k">State</span><span>Spare / unoccupied</span></div>');
-            TT.style.display = 'block';
-            moveTip(e);
+        function resetInspector() {
+            selectedRackIdx = null; inspRow = -1;
+            insp.setAttribute('data-inspector-state', 'hall'); inspState = 'hall';
+            document.getElementById('insp-title').textContent = hallTitle();
+            document.getElementById('row-panel').hidden = true;
+            document.getElementById('crahPop').classList.remove('open');
+            if (fp) fp.select(null);
+            var chips = document.querySelectorAll('#row-picker .row-chip');
+            for (var i = 0; i < chips.length; i++) chips[i].setAttribute('aria-pressed', 'false');
         }
-        function moveTip(e) {
-            var x = e.clientX + 14, y = e.clientY + 14;
-            var w = TT.offsetWidth, h = TT.offsetHeight;
-            if (x + w > window.innerWidth) x = e.clientX - w - 14;
-            if (y + h > window.innerHeight) y = e.clientY - h - 14;
-            TT.style.left = x + 'px'; TT.style.top = y + 'px';
+        function closeInspector() {
+            if (sheetOpen && window.RZSheet && window.RZSheet.isOpen()) { window.RZSheet.close(); return; }
+            resetInspector();
         }
-        function hideTip() { TT.style.display = 'none'; }
+        window.__closeInspector = closeInspector;
+        document.getElementById('insp-x').addEventListener('click', closeInspector);
 
         function selectRack(idx) {
-            selectedRackIdx = idx;
+            selectedRackIdx = idx; inspRow = -1;
             window.__sectionRow(Math.floor(idx / RACKS_PER_ZONE));
-            var prev = document.querySelector('.rack.sel');
-            if (prev) prev.classList.remove('sel');
-            var el = document.querySelector('.rack[data-idx="' + idx + '"]');
-            if (el) el.classList.add('sel');
+            document.getElementById('crahPop').classList.remove('open');
+            if (fp) fp.select({ rack: idx });
+            setInspState('rack', rackTag(idx));
             var rk = racks[idx];
             var zn = zones[Math.floor(idx / RACKS_PER_ZONE)];
             var t = tierOf(rk.util, rk.occupied);
@@ -2124,28 +1895,28 @@
             var allocatedCoolingKw = rk.kw * coolingCoverage;
             var coolingDutyUtilization = allocatedCoolingKw > 0 ? (rk.kw / allocatedCoolingKw) * 100 : 0;
             document.getElementById('sel-detail').innerHTML =
-                '<div style="font-weight:800;color:var(--sel);margin-bottom:6px;">' + rackTag(idx) + '</div>' +
+                '<div class="rack-card-title">' + rackTag(idx) + '</div>' +
                 row('Status', rk.occupied ? t.name : 'Spare / unoccupied') +
                 (rk.occupied ? (
                     row('Electrical load', rk.kw.toFixed(2) + ' kW') +
                     row('Rating', RACK_RATING_KW + ' kW') +
                     row('Utilization', Math.round(rk.util * 100) + ' %') +
                     row('Row / Aisle', String.fromCharCode(65 + zn.z) + ' / ' + zoneAisleTag(zn.z)) +
-                    row('Rack-inlet / cold-aisle', rackInletFor(idx).toFixed(1) + ' °C (row ' + zn.rackInletC.toFixed(1) + ' + aisle-end allowance)') +
-                    row('Hot-aisle temperature', zn.hotAisleC.toFixed(1) + ' °C') +
-                    row('Air-side ΔT', zn.airsideDeltaTC.toFixed(1) + ' K') +
+                    row('Rack-inlet / cold-aisle', rackInletFor(idx).toFixed(1) + ' \u00b0C (row ' + zn.rackInletC.toFixed(1) + ' + aisle-end allowance)') +
+                    row('Hot-aisle temperature', zn.hotAisleC.toFixed(1) + ' \u00b0C') +
+                    row('Air-side \u0394T', zn.airsideDeltaTC.toFixed(1) + ' K') +
                     row('Relative humidity', zn.rhPct.toFixed(1) + ' % RH') +
-                    row('Dew point', zn.dewPointC.toFixed(1) + ' °Cdp') +
+                    row('Dew point', zn.dewPointC.toFixed(1) + ' \u00b0Cdp') +
                     row('Actual heat load', rk.kw.toFixed(2) + ' kWth') +
                     row('Allocated cooling', allocatedCoolingKw.toFixed(2) + ' kWth') +
                     row('Cooling coverage', (coolingCoverage * 100).toFixed(1) + ' %') +
                     row('Cooling duty utilization', coolingDutyUtilization.toFixed(1) + ' %') +
                     row('Plant cooling efficiency', 'Not rack-derived')
                 ) : '') +
-                '<div class="formula"><b>Sensible heat equivalence:</b> rack electrical kW ≈ rack sensible kWth. '
+                '<div class="formula"><b>Sensible heat equivalence:</b> rack electrical kW \u2248 rack sensible kWth. '
                 + 'Cooling coverage = allocated cooling / actual heat load; duty utilization = actual heat / allocated duty. '
                 + 'Plant COP/efficiency requires chiller input power and is intentionally not inferred from this rack snapshot. '
-                + 'Source: calculated · conv-engine snapshot · ' + S.meta.scenario + ' · v' + S.meta.version + '</div>';
+                + 'Source: calculated \u00b7 conv-engine snapshot \u00b7 ' + S.meta.scenario + ' \u00b7 v' + S.meta.version + '</div>';
         }
         function row(k, v) {
             return '<div class="kv" style="font-size:11px;"><span class="k">' + k +
@@ -2156,9 +1927,10 @@
         function cprow(k, v) {
             return '<div class="cp-k">' + k + '</div><div class="cp-v num">' + v + '</div>';
         }
-        window.__inspectCrah = function (n, ev) {
+        window.__inspectCrah = function (n) {
             var u = crahUnits[n - 1];
-            var pop = document.getElementById('crahPop');
+            if (!u) return;
+            selectedRackIdx = null; inspRow = -1;
             document.getElementById('cp-title').textContent = u.tag;
             var stEl = document.getElementById('cp-state');
             stEl.textContent = u.state;
@@ -2174,34 +1946,74 @@
                 cprow('CHWS / CHWR', S.cooling.chws_c.toFixed(1) + ' / ' + S.cooling.chwr_c.toFixed(1) + ' °C') +
                 cprow('Redundancy', N1_PASS ? 'N+1 ✓' : 'N+1 ✗') +
                 cprow('Source', S.meta.scenario + ' · ' + S.meta.data_quality);
-            // Position next to the clicked cell
-            var cell = ev && ev.currentTarget ? ev.currentTarget : document.querySelector('[data-crah="' + n + '"]');
-            if (cell) {
-                var rect = cell.getBoundingClientRect();
-                var docX = rect.left + window.scrollX;
-                var docY = rect.bottom + window.scrollY + 4;
-                var popW = 260;
-                if (docX + popW > window.innerWidth + window.scrollX - 8) {
-                    docX = window.innerWidth + window.scrollX - popW - 8;
-                }
-                pop.style.left = docX + 'px';
-                pop.style.top = docY + 'px';
-            }
-            pop.classList.add('open');
-            if (ev) ev.stopPropagation();
+            document.getElementById('crahPop').classList.add('open');
+            if (fp) fp.select({ crah: n });
+            setInspState('crah', u.tag);
         };
         window.__closeCrahPop = function () { document.getElementById('crahPop').classList.remove('open'); };
-        // Click anywhere outside popover or CRAH cell closes it
+
+        /* --- Row panel: the two lines of ten cabinets of one row as 44 px-class list rows (the way into a cabinet the plan draws at 10 px) --- */
+        window.__openRow = function (z) {
+            if (z < 0 || z >= ZONES) return;
+            var zn = zones[z], letter = String.fromCharCode(65 + z), occ = 0, i, lines = ['', ''];
+            for (i = 0; i < RACKS_PER_ZONE; i++) {
+                var gi = z * RACKS_PER_ZONE + i, rk = racks[gi];
+                if (rk.occupied) occ++;
+                lines[i < RACKS_PER_ZONE / 2 ? 0 : 1] += '<li><button type="button" class="rp-item" data-rp="' + gi + '"><span>' + rackTag(gi) + '</span><span class="v">' + rackValText(gi) + '</span></button></li>';
+            }
+            var panel = document.getElementById('row-panel');
+            panel.innerHTML =
+                '<div class="rack-card-title">Row ' + letter + ' · ' + zoneAisleTag(z) + '</div>' +
+                '<p class="rp-meta">' + zn.heat.toFixed(0) + ' kW · inlet ' + zn.rackInletC.toFixed(1) + ' °C · hot aisle ' + zn.hotAisleC.toFixed(1) + ' °C · ' + occ + ' of ' + RACKS_PER_ZONE + ' occupied</p>' +
+                '<div class="lh">Line 1</div><ul class="rp-list">' + lines[0] + '</ul>' +
+                '<div class="lh">Line 2</div><ul class="rp-list">' + lines[1] + '</ul>' +
+                '<div class="rp-actions"><button type="button" data-rp-air="' + z + '">Air path</button></div>';
+            inspRow = z;
+            window.__sectionRow(z);
+            document.getElementById('crahPop').classList.remove('open');
+            selectedRackIdx = null;
+            if (fp) fp.select({ row: z });
+            setInspState('row', 'Row ' + letter);
+            var chips = document.querySelectorAll('#row-picker .row-chip');
+            for (var c = 0; c < chips.length; c++) chips[c].setAttribute('aria-pressed', +chips[c].getAttribute('data-z') === z ? 'true' : 'false');
+        };
+        document.getElementById('row-panel').addEventListener('click', function (e) {
+            var t = e.target.closest ? e.target.closest('[data-rp],[data-rp-air]') : null;
+            if (!t) return;
+            if (t.hasAttribute('data-rp')) { selectRack(+t.getAttribute('data-rp')); return; }
+            window.__sectionRow(+t.getAttribute('data-rp-air'));
+            window.setStageView('air');
+        });
+
+        /* --- Disclosures: the (i) panel and the Events drawer. Escape closes a selection first, then a disclosure. --- */
+        function setDisclosure(which, open) {
+            var box = document.getElementById(which === 'info' ? 'dh-info' : 'dh-events');
+            var btn = document.querySelector('[data-dh-disclose="' + which + '"]');
+            box.hidden = !open;
+            if (btn) btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        }
         document.addEventListener('click', function (e) {
-            var pop = document.getElementById('crahPop');
-            if (!pop.classList.contains('open')) return;
-            if (pop.contains(e.target) || e.target.closest('.crah-cell')) return;
-            window.__closeCrahPop();
+            var t = e.target.closest ? e.target.closest('button[data-dh-disclose]') : null;
+            if (t) {
+                var which = t.getAttribute('data-dh-disclose');
+                if (which === 'info' || which === 'events') setDisclosure(which, document.getElementById(which === 'info' ? 'dh-info' : 'dh-events').hidden);
+                else if (t.classList.contains('insp-sum') && t.nextElementSibling) {
+                    var open = t.nextElementSibling.hidden;
+                    t.nextElementSibling.hidden = !open;
+                    t.setAttribute('aria-expanded', open ? 'true' : 'false');
+                    if (which === 'crah-units') crahUnitsOpen = open;
+                }
+            }
         });
-        // Esc also closes
+        document.getElementById('dh-events-close').addEventListener('click', function () { setDisclosure('events', false); });
         document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape') window.__closeCrahPop();
+            if (e.key !== 'Escape') return;
+            if (inspState !== 'hall') { closeInspector(); return; }
+            if (!document.getElementById('dh-events').hidden) setDisclosure('events', false);
+            else if (!document.getElementById('dh-info').hidden) setDisclosure('info', false);
         });
+        /* the floor re-measures with the window (the drawing rebuilds only when its available space changes) */
+        window.addEventListener('resize', sizeFloorBox);
 
         /* --- Legacy equipment modal (kept for non-CRAH use) --------------- */
         function mrow(k, v) {
@@ -2320,7 +2132,7 @@
             document.getElementById('brand-hall').textContent = hall;
             document.getElementById('hall-scope-label').textContent = 'Data Hall ' + hall;
             document.getElementById('bb-hall-label').textContent = 'Hall ' + hall + ' IT Load';
-            document.getElementById('env-hall-title').textContent = 'Environment (Hall ' + hall + ')';
+            document.getElementById('env-hall-title').setAttribute('aria-label', 'Environment (Hall ' + hall + ')');
             /* v1.134.4 — REAL SCOPE SWAP. This handler used to change headings and leave the
                cabinet field, the zone thermals and the alarm set exactly as they were, so all
                four halls drew the identical floor and the selector was decoration. Re-read the
@@ -2338,7 +2150,6 @@
             setHallSeed(hall);
             buildRackField();
             buildZoneField();
-            selectedRackIdx = null;
             crahUnits = crahUnits.map(function (unit) {
                 var next = {};
                 for (var key in unit) if (unit.hasOwnProperty(key)) next[key] = unit[key];
@@ -2351,10 +2162,9 @@
             paintCrahList();
             paintAlarmList();
             paintAlarmStrip();
+            closeInspector();
             renderFloor();
-            if (selectedRackIdx !== null) selectRack(selectedRackIdx);
-            else document.getElementById('sel-detail').textContent = 'Hall ' + hall + ' selected. Hover or click a rack / CRAH unit to inspect.';
-            window.__closeCrahPop();
+            document.getElementById('sel-detail').textContent = 'Hall ' + hall + ' selected. Hover or click a rack / CRAH unit to inspect.';
             log('Scope · Hall ' + hall, 'info');
         }
         window.selectHall = selectHall;
@@ -2526,7 +2336,6 @@ d.addEventListener('keydown',function(e){
 });
 })();
 </script>
-    <div class="rz-manual-link" style="text-align:center; padding:0.9rem 1rem 1.3rem;"><style>.rz-manual-link a{display:inline-block;font-family:'JetBrains Mono','Courier New',monospace;font-size:0.72rem;letter-spacing:0.04em;text-decoration:none;border:1px solid;border-radius:4px;padding:0.45rem 0.85rem;color:#969eaa;border-color:rgba(160,168,180,0.35)}.rz-manual-link a:hover{color:#E8B563;border-color:rgba(232,181,99,0.5)}</style><a href="manual/datahall.html">Technical Manual &amp; Methodology &#8599;</a></div>
 <script src="js/rz-command-palette.js?v=20261111-5028a9f4" defer></script>
 </body>
 </html>

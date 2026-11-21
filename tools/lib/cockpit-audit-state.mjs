@@ -16,9 +16,13 @@ function cockpitRootSelector(cockpitIdentity) {
 
 export async function primeCockpitAuditDocument(page, theme) {
   await page.evaluateOnNewDocument((activeTheme) => {
-    localStorage.setItem('theme', activeTheme);
-    localStorage.setItem('rz_theme', activeTheme);
-    localStorage.setItem('rz_cookie_consent', 'declined');
+    /* a mobile-emulated setViewport() reloads the initial about:blank document, an opaque origin where reading localStorage
+       throws SecurityError (it showed as a page error at 390 px on ANY page, a 6-byte one included); only a real origin is primed */
+    try {
+      localStorage.setItem('theme', activeTheme);
+      localStorage.setItem('rz_theme', activeTheme);
+      localStorage.setItem('rz_cookie_consent', 'declined');
+    } catch (e) { /* opaque origin: nothing to prime */ }
   }, theme);
 }
 

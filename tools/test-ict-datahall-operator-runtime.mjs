@@ -85,7 +85,10 @@ try {
   const selectedRack = await hall.$('.rack:not(.sel)');
   assert.ok(selectedRack);
   await selectedRack.click();
-  await hall.click('.crah-cell[data-crah="1"]');
+  /* SELECTOR ONLY (PRD-CONV-DATAHALL-FLOOR FL12): the floor is drawn with depth, and the north gallery sits BEHIND the first cabinet row (tall
+     cabinets overlap it, as a real hall does), so the centre of a north unit is a cabinet. The south gallery is the front edge: its units are
+     fully visible and clickable. The claim is unchanged: a click on a CRAH unit opens that unit's detail. */
+  await hall.click('#crah-bottom .crah-cell');
   const hallState = await hall.evaluate(() => ({
     selectedHall: document.querySelector('#hall-selector button[aria-pressed="true"]')?.getAttribute('data-hall'),
     scope: document.getElementById('hall-scope-label')?.textContent,

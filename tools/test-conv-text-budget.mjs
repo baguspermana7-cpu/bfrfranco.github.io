@@ -21,7 +21,8 @@ import { primeCockpitAuditDocument, enterAuthorizedAuditState } from './lib/cock
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 /* words budget per page: set from the redraw, never raised to pass */
 export const BUDGET = {
-  'datahall.html': 400, 'chiller-plant.html': 400, 'fire-system.html': 400,
+  /* datahall 400 -> 120 (PRD-CONV-DATAHALL-SPACE: the floor gets the screen; text moved into the (i) panel, the inspector and the Events drawer) */
+  'datahall.html': 120, 'chiller-plant.html': 400, 'fire-system.html': 400,
   'fuel-system.html': 400, 'water-system.html': 400, 'ict.html': 400,
 };
 /* T4 ratchet while a drawing waits for its redraw: the count may fall, never rise.

@@ -151,6 +151,9 @@ async function measure(file, o = {}) {
   await page.goto(O + file, { waitUntil: 'load', timeout: 90000 });
   try { await enterAuthorizedAuditState(page, IDENTITY[file] || file.replace(/\.html$/, '')); } catch (e) { /* not a gated identity */ }
   await new Promise((r) => setTimeout(r, SETTLE_MS));
+  /* SELECTOR / STATE ONLY (PRD-CONV-DATAHALL-SPACE §5): the hall's numbers rest in closed disclosures ((i), Events, the inspector's blocks);
+     a gate that counts them opens them first. The floors in the baseline are unchanged. */
+  if (file === 'datahall.html') { await page.evaluate(() => document.querySelectorAll('[data-dh-disclose]').forEach((b) => b.click())); await new Promise((r) => setTimeout(r, 400)); }
   const inv = await page.evaluate(inventory);
   if (has('--list')) inv.list = await page.evaluate(listUnclassified);
   if (o.laws) inv.laws = await page.evaluate(pointLaws);

@@ -225,13 +225,17 @@ try {
   }, { ip: '', country: '', cc: '', city: '' },
   'localhost tracker events must never reuse cached production-like geolocation');
   const hall = await page.evaluate(() => {
+    /* SELECTOR ONLY (PRD-CONV-DATAHALL-FLOOR FL12): the floor is one SVG whose cabinets are drawn far-to-near, so DOM order is no longer
+       cabinet order; the first occupied cabinet is still the one with the lowest data-idx, exactly as before. */
     const occupied = Array.from(document.querySelectorAll('#zone-field .rack'))
+      .sort((a, b) => Number(a.getAttribute('data-idx')) - Number(b.getAttribute('data-idx')))
       .find((node) => /^\d+\.\d+$/.test(node.querySelector('.rk-val')?.textContent || ''));
     return {
       activeMode: document.querySelector('.mode-btn.active')?.getAttribute('data-mode'),
       rackValue: occupied?.querySelector('.rk-val')?.textContent || '',
       rackUnit: document.getElementById('zone-field')?.getAttribute('data-unit') || '',
-      rackFill: occupied ? getComputedStyle(occupied).backgroundColor : '',
+      /* SELECTOR ONLY: a cabinet is an SVG group now; its colour is the fill of its top face (the claim below is unchanged) */
+      rackFill: occupied ? getComputedStyle(occupied.querySelector('.rk-top')).fill : '',
       balanceLabel: document.querySelector('#bb-balance')?.previousElementSibling?.textContent?.trim(),
       balance: document.getElementById('bb-balance')?.textContent?.trim(),
       balanceBasis: document.getElementById('bb-balsub')?.textContent?.trim(),
