@@ -135,6 +135,17 @@
     '.hot-door{fill:none;stroke:var(--fp-ink);stroke-opacity:.3;stroke-width:1}',
     '.hot-cap .cap-post{fill:none;stroke:var(--fp-ink);stroke-opacity:.2;stroke-width:1}',
     '.fp-ring{fill:none;pointer-events:none}',
+    /* L4 (PRD-CONV-BMS-LIVE): air that moves. Supply in the chilled-water supply tone, exhaust by hot-aisle temperature */
+    '.fp-root{--fp-air-cold:#78a2d6;--fp-air-h1:#c8925a;--fp-air-h2:#cf7a6a;--fp-air-h3:#e0604f}',
+    '[data-theme="light"] .fp-root{--fp-air-cold:#2f5e96;--fp-air-h1:#8a5a24;--fp-air-h2:#8f4335;--fp-air-h3:#a3281c}',
+    '.fp-air{pointer-events:none}',
+    '.fp-air path{fill:none;stroke-width:2.6;stroke-linecap:round;stroke-dasharray:6 10;stroke-opacity:.95}',
+    '.fp-air .air-cold{stroke:var(--fp-air-cold)}',
+    '.fp-air .air-hot[data-t="1"]{stroke:var(--fp-air-h1)}.fp-air .air-hot[data-t="2"]{stroke:var(--fp-air-h2)}.fp-air .air-hot[data-t="3"]{stroke:var(--fp-air-h3)}',
+    '.fp-air path[data-off]{display:none}',
+    '@keyframes fp-air{to{stroke-dashoffset:-16}}',
+    '@media (prefers-reduced-motion:no-preference){.fp-air path{animation:fp-air 1.4s linear infinite}}',
+    '.fp-root.fp-offscreen .fp-air path{animation-play-state:paused}',
     '.fp-ring-sel{stroke:var(--fp-accent);stroke-width:1.5}',
     '.fp-ring-hover{stroke:var(--fp-ink);stroke-width:1}',
     '.fp-ring-row{stroke:var(--fp-accent);stroke-width:1.5}',
@@ -220,7 +231,7 @@
     if (opts.thresholds) for (k in opts.thresholds) T[k] = opts.thresholds[k];
     var perZone = model.racksPerZone || 20, Z = Math.floor(model.racks.length / perZone), perLine = perZone / 2;
     var inst = { model: model, mode: opts.mode || 'temp', host: host, sel: null, u: 0, bands: 1 };
-    var u, H, ox, oy, topPx, planPx, pitch, nb = 1, kRows = Z, root, scroll, canvas, svg, tip, ringSel, ringHover, ringRow, rackEls = [], crahEls = [], zoneEls = [], cache = [], cursor = null;
+    var u, H, ox, oy, topPx, planPx, pitch, nb = 1, kRows = Z, root, scroll, canvas, svg, tip, ringSel, ringHover, ringRow, rackEls = [], crahEls = [], zoneEls = [], cache = [], cursor = null, airEls = [];
     var ids = opts.ids || { top: 'crah-top', bottom: 'crah-bottom' };
     var meas = opts.measure || host;
     var rackTag = opts.rackTag || function (i) { return 'R-' + i; };
@@ -370,6 +381,34 @@
       var wrapS = side(ids.bottom, 'south');
       for (b = 0; b < nb; b++) gallery(wrapS, 'south', split + Math.round(b * nSouth / nb), split + Math.round((b + 1) * nSouth / nb), GEO.sY0, b);
 
+      /* L4 (PRD-CONV-BMS-LIVE): the air moves. Supply leaves each gallery along every cold aisle toward the middle of the
+         rows; exhaust runs along each hot-aisle cap from the middle back to both galleries. One path per aisle end; paint()
+         sets speed (row heat, airflow ~ heat at a fixed delta-T), colour (hot-aisle temperature) and whether a CRAH feeds it. */
+      var air = el('g', { 'class': 'fp-air', 'aria-hidden': 'true' }, svg), yMid = (GEO.cabY0 + GEO.cabY1) / 2, AIR_H = 1.0;   /* supply drawn at the top plane of the cold aisle: on the floor the cabinets hide it */
+      airEls = [];
+      for (b = 0; b < nb; b++) {
+        var r0 = b * kRows, rn = rowsIn(b), k;
+        for (k = 0; k <= rn; k++) {
+          var xc = 0.5 + k * GEO.rowW - GEO.cold / 2, rows = [];
+          if (k > 0) rows.push(r0 + k - 1); if (k < rn) rows.push(r0 + k);
+          airEls.push({ kind: 'cold', end: 'north', band: b, x: xc, rows: rows,
+            el: el('path', { 'class': 'air-cold', 'data-air': 'cold', d: 'M' + P(xc, GEO.nY0 + GEO.gD, AIR_H, b) + 'L' + P(xc, yMid, AIR_H, b) }, air) });
+          airEls.push({ kind: 'cold', end: 'south', band: b, x: xc, rows: rows,
+            el: el('path', { 'class': 'air-cold', 'data-air': 'cold', d: 'M' + P(xc, GEO.sY0, AIR_H, b) + 'L' + P(xc, yMid, AIR_H, b) }, air) });
+        }
+        for (k = 0; k < rn; k++) {
+          var xh = 0.5 + k * GEO.rowW + GEO.cabW + GEO.hot / 2;
+          airEls.push({ kind: 'hot', band: b, x: xh, rows: [r0 + k],
+            el: el('path', { 'class': 'air-hot', 'data-air': 'hot', 'data-z': r0 + k,
+              d: 'M' + P(xh, yMid, GEO.capH, b) + 'L' + P(xh, GEO.cabY0, GEO.capH, b) + 'M' + P(xh, yMid, GEO.capH, b) + 'L' + P(xh, GEO.cabY1, GEO.capH, b) }, air) });
+        }
+      }
+      if (global.IntersectionObserver) {   /* off screen the air stands still (B7 P4) */
+        if (inst.airIo) inst.airIo.disconnect();
+        inst.airIo = new global.IntersectionObserver(function (es) { es.forEach(function (e) { root.classList.toggle('fp-offscreen', !e.isIntersecting); }); });
+        inst.airIo.observe(svg);
+      }
+
       ringRow = el('polygon', { 'class': 'fp-ring fp-ring-row', points: '', display: 'none' }, svg);
       ringSel = el('polygon', { 'class': 'fp-ring fp-ring-sel', points: '', display: 'none' }, svg);
       ringHover = el('polygon', { 'class': 'fp-ring fp-ring-hover', points: '', display: 'none' }, svg);
@@ -465,8 +504,36 @@
       }
       host.setAttribute('data-unit', { power: 'kW', temp: '°C', 'cooling-margin': 'K', alarms: '%' }[mode] || '');
       root.setAttribute('data-mode', mode);
+      paintAir();
       if (inst.sel) refreshRings();
     };
+    function paintAir() {
+      var zs = model.zones || [], sum = 0, cnt = 0, i, a, heat, z, near, best, q, cu;
+      for (i = 0; i < zs.length; i++) if (zs[i] && zs[i].heat > 0) { sum += zs[i].heat; cnt++; }
+      var mean = cnt ? sum / cnt : 0;
+      for (i = 0; i < airEls.length; i++) {
+        a = airEls[i]; heat = 0;
+        for (z = 0; z < a.rows.length; z++) heat += (zs[a.rows[z]] && zs[a.rows[z]].heat) || 0;
+        heat = a.rows.length ? heat / a.rows.length : 0;
+        var off = !(heat > 0) || !mean;
+        if (a.kind === 'cold' && !off) {   /* the nearest CRAH of that gallery feeds this aisle end; off -> no supply from it */
+          near = null; best = 1e9;
+          for (q = 0; q < crahEls.length; q++) { cu = crahEls[q]; if (cu.gal === a.end && cu.band === a.band && Math.abs(cu.cx - a.x) < best) { best = Math.abs(cu.cx - a.x); near = cu; } }
+          if (near && near.u && near.u.running === false) off = true;
+        }
+        if (a.kind === 'hot') {
+          var t = zs[a.rows[0]] && zs[a.rows[0]].hotAisleC;
+          setAttr(a.el, 'data-t', t == null ? '1' : (t > 40 ? '3' : (t > 35 ? '2' : '1')));
+        }
+        if (off) { setAttr(a.el, 'data-off', ''); continue; }
+        if (a.el.hasAttribute('data-off')) a.el.removeAttribute('data-off');
+        /* 1.4 s per dash period at the mean row heat; a hotter row moves its air faster (0.6 .. 3 s) */
+        var sec = Math.max(0.6, Math.min(3, 1.4 * mean / heat));
+        var dur = sec.toFixed(2) + 's';
+        if (a.el.style.animationDuration !== dur) a.el.style.animationDuration = dur;
+        a.el.setAttribute('data-air-s', sec.toFixed(2));
+      }
+    }
 
     /* ---- selection, rings ---- */
     function ringPts(sel) {

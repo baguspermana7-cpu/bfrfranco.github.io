@@ -663,6 +663,7 @@
     <script src="js/rz-trend.js?v=20261121-1b095901"></script>
     <link rel="stylesheet" href="css/conv-point.css?v=20261120-8daa6374">
     <link rel="stylesheet" href="css/conv-motion.css?v=20261121-88ede45d">
+    <link rel="stylesheet" href="css/conv-live.css?v=20261121-07a6a408">
     <script src="js/conv/point-status.js?v=20261121-9a98a915"></script>
 <script src="js/conv/motion.js?v=20261121-f2d16763" defer></script>
     <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
@@ -679,7 +680,7 @@
     <script src="js/conv/net-modal.js?v=20261118-34973a6a" defer></script>
     <script src="js/rz-telemetry-quality.js?v=20261113-8feb0dfd" defer></script>
     <script src="js/rz-provenance.js?v=20261111-6f1cd061" defer></script>
-    <script src="js/rz-version.js?v=20261121-eecc819c" defer></script>
+    <script src="js/rz-version.js?v=20261121-0a4cc15b" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- v1.43.20 — instrument register (RZ Dark System v1). Chrome-only, dark-only, scoped. -->
@@ -1548,6 +1549,12 @@
                     + ' data-direction="' + (ed.kind === 'peer' ? 'bidirectional' : 'forward') + '" data-state="' + lineState + '"'
                     + (lk ? ' data-capacity="' + lk[2] + ' Gbps"' : '') + ' data-current="' + esc(current) + '"'
                     + ' data-redundancy="' + (ed.state === 'stby' ? 'standby' : ed.kind === 'peer' ? 'redundant_a' : 'duty') + '"/>';
+                /* PRD-CONV-BMS-LIVE L5: a link that carries traffic shows it moving; speed from its load (current / capacity),
+                   0.6 s per dash period at full load, 2.4 s at a quarter or less; standby, off and conduit lines stay still */
+                if ((ed.state === 'up' || ed.state === 'warn' || ed.state === 'bad') && ed.kind !== 'conduit' && (!lk || lk[7] === 'up')) {
+                    var ld = lk && lk[2] > 0 ? lk[3] / lk[2] : null, fsec = ld == null ? 1.6 : Math.max(0.6, Math.min(2.4, 0.6 / Math.max(ld, 0.25)));
+                    svg += '<path class="edge-flow' + (ed.state === 'up' ? '' : ' ' + esc(ed.state)) + '" d="' + d + '" data-edge-flow="' + e + '" data-load="' + (ld == null ? '' : ld.toFixed(3)) + '" style="animation-duration:' + fsec.toFixed(2) + 's" aria-hidden="true"/>';
+                }
                 if (lk) {
                     var top = ed.from.layer <= ed.to.layer ? ed.from : ed.to, bot = top === ed.from ? ed.to : ed.from;
                     var mx, my;

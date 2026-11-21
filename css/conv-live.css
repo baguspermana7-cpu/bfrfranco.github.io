@@ -1,0 +1,63 @@
+/* conv-live.css — the plant is seen running (PRD-CONV-BMS-LIVE, owner R184). Loaded after css/conv-vfx.css and
+   css/conv-motion.css on the Conventional BMS pages. It changes how the process motion READS, never what drives it:
+   the speed of every slug and rotor stays the inline duration js/conv/vfx.js computes from flow and speed points,
+   off-screen pausing stays css/conv-hmi-depth.css (.is-offscreen), reduced motion stays still.
+   Gate: tools/test-conv-live.mjs (LV1–LV9). Colour comes from the medium (--hmi-m-*) or the state; nothing else. */
+
+/* L1 · flow you can see: medium-coloured slugs, 1.8 px inside a 2.8–3.6 px medium tube (L2), lifted toward the ink */
+.hmi-frame[data-vfx-mode] .hmi-svg .hmi-flow[data-vstate][data-vmove] {
+  stroke-width: 1.8; stroke-dasharray: 5 11; stroke-linecap: round; opacity: 1;
+}
+.hmi-frame[data-vfx-mode]:not([data-vfx-mode="flat"]):not([data-vfx-mode="thermal"]) .hmi-svg .hmi-flow[data-vmove].m-chw { stroke: color-mix(in oklch, var(--hmi-m-chw) 55%, var(--hmi-text)); }
+.hmi-frame[data-vfx-mode]:not([data-vfx-mode="flat"]):not([data-vfx-mode="thermal"]) .hmi-svg .hmi-flow[data-vmove].m-cw { stroke: color-mix(in oklch, var(--hmi-m-cw) 55%, var(--hmi-text)); }
+.hmi-frame[data-vfx-mode]:not([data-vfx-mode="flat"]):not([data-vfx-mode="thermal"]) .hmi-svg .hmi-flow[data-vmove].m-fw { stroke: color-mix(in oklch, var(--hmi-m-fw) 55%, var(--hmi-text)); }
+.hmi-frame[data-vfx-mode]:not([data-vfx-mode="flat"]):not([data-vfx-mode="thermal"]) .hmi-svg .hmi-flow[data-vmove].m-pw { stroke: color-mix(in oklch, var(--hmi-m-pw) 55%, var(--hmi-text)); }
+.hmi-frame[data-vfx-mode]:not([data-vfx-mode="flat"]):not([data-vfx-mode="thermal"]) .hmi-svg .hmi-flow[data-vmove].m-dr { stroke: color-mix(in oklch, var(--hmi-m-dr) 55%, var(--hmi-text)); }
+.hmi-frame[data-vfx-mode]:not([data-vfx-mode="flat"]):not([data-vfx-mode="thermal"]) .hmi-svg .hmi-flow[data-vmove].m-fuel { stroke: color-mix(in oklch, var(--hmi-m-fuel) 55%, var(--hmi-text)); }
+.hmi-frame[data-vfx-mode]:not([data-vfx-mode="flat"]):not([data-vfx-mode="thermal"]) .hmi-svg .hmi-flow[data-vmove].m-agent { stroke: color-mix(in oklch, var(--hmi-m-agent) 55%, var(--hmi-text)); }
+.hmi-frame[data-vfx-mode]:not([data-vfx-mode="flat"]):not([data-vfx-mode="thermal"]) .hmi-svg .hmi-flow[data-vmove].m-htw { stroke: color-mix(in oklch, var(--hmi-m-htw) 55%, var(--hmi-text)); }
+.hmi-frame[data-vfx-mode]:not([data-vfx-mode="flat"]):not([data-vfx-mode="thermal"]) .hmi-svg .hmi-flow[data-vmove].m-tcs_s { stroke: color-mix(in oklch, var(--hmi-m-tcs-s) 55%, var(--hmi-text)); }
+.hmi-frame[data-vfx-mode]:not([data-vfx-mode="flat"]):not([data-vfx-mode="thermal"]) .hmi-svg .hmi-flow[data-vmove].m-tcs_r { stroke: color-mix(in oklch, var(--hmi-m-tcs-r) 55%, var(--hmi-text)); }
+.hmi-frame[data-vfx-mode]:not([data-vfx-mode="flat"]):not([data-vfx-mode="thermal"]) .hmi-svg .hmi-flow[data-vmove].m-feed_a { stroke: color-mix(in oklch, var(--hmi-feed-a) 55%, var(--hmi-text)); }
+.hmi-frame[data-vfx-mode]:not([data-vfx-mode="flat"]):not([data-vfx-mode="thermal"]) .hmi-svg .hmi-flow[data-vmove].m-feed_b { stroke: color-mix(in oklch, var(--hmi-feed-b) 55%, var(--hmi-text)); }
+/* electrical power: an energised conductor stays green (state); the current reads as bright ink dots moving along it */
+.hmi-frame[data-vfx-mode]:not([data-vfx-mode="flat"]):not([data-vfx-mode="thermal"]) .hmi-svg .hmi-flow[data-vmove].m-power { stroke: var(--hmi-text); stroke-width: 2.4; stroke-dasharray: 0.1 15.9; }
+/* a line beside an alarmed asset still flows, in red */
+.hmi-frame[data-vfx-mode] .hmi-svg .hmi-flow[data-vmove][data-vstate="alarm"] { stroke: var(--vfx-alarm); }
+
+/* L2 · medium colour by default: in the State view a RUNNING pipe body is its medium, deepened toward the surface so the
+   lifted slugs of L1 stand out on it (the slugs say it runs);
+   standby, stopped, warning, alarm and unavailable keep the state colours and dash patterns of css/conv-vfx.css */
+.hmi-frame[data-vfx-mode="state"] .hmi-svg .hmi-edge.m-chw[data-vstate="running"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke: color-mix(in oklch, var(--hmi-m-chw) 80%, var(--hmi-bg)); }
+.hmi-frame[data-vfx-mode="state"] .hmi-svg .hmi-edge.m-cw[data-vstate="running"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke: color-mix(in oklch, var(--hmi-m-cw) 80%, var(--hmi-bg)); }
+.hmi-frame[data-vfx-mode="state"] .hmi-svg .hmi-edge.m-fw[data-vstate="running"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke: color-mix(in oklch, var(--hmi-m-fw) 80%, var(--hmi-bg)); }
+.hmi-frame[data-vfx-mode="state"] .hmi-svg .hmi-edge.m-pw[data-vstate="running"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke: color-mix(in oklch, var(--hmi-m-pw) 80%, var(--hmi-bg)); }
+.hmi-frame[data-vfx-mode="state"] .hmi-svg .hmi-edge.m-dr[data-vstate="running"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke: color-mix(in oklch, var(--hmi-m-dr) 80%, var(--hmi-bg)); }
+.hmi-frame[data-vfx-mode="state"] .hmi-svg .hmi-edge.m-fuel[data-vstate="running"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke: color-mix(in oklch, var(--hmi-m-fuel) 80%, var(--hmi-bg)); }
+.hmi-frame[data-vfx-mode="state"] .hmi-svg .hmi-edge.m-agent[data-vstate="running"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke: color-mix(in oklch, var(--hmi-m-agent) 80%, var(--hmi-bg)); }
+.hmi-frame[data-vfx-mode="state"] .hmi-svg .hmi-edge.m-htw[data-vstate="running"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke: color-mix(in oklch, var(--hmi-m-htw) 80%, var(--hmi-bg)); }
+.hmi-frame[data-vfx-mode="state"] .hmi-svg .hmi-edge.m-tcs_s[data-vstate="running"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke: color-mix(in oklch, var(--hmi-m-tcs-s) 80%, var(--hmi-bg)); }
+.hmi-frame[data-vfx-mode="state"] .hmi-svg .hmi-edge.m-tcs_r[data-vstate="running"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke: color-mix(in oklch, var(--hmi-m-tcs-r) 80%, var(--hmi-bg)); }
+
+/* a running pipe is a filled tube of its medium: wider than the slugs it carries (the shadow tube stays its rim) */
+.hmi-frame[data-vfx-mode="state"] .hmi-svg .hmi-edge[class*=" m-"][data-vstate="running"].w-main:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke-width: 3.6; }
+.hmi-frame[data-vfx-mode="state"] .hmi-svg .hmi-edge[class*=" m-"][data-vstate="running"].w-branch:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi) { stroke-width: 2.8; }
+
+/* chilled water is insulated (css/conv-hmi-depth.css draws an aluminium jacket 7.2 px wide over it): while it runs the
+   jacket takes the chilled-water tone, so a running CHW main reads blue, a stopped one stays bare aluminium */
+.hmi-frame[data-vfx-mode="state"] .hmi-svg .hd-insul[data-flow="running"],
+.hmi-frame[data-vfx-mode="medium"] .hmi-svg .hd-insul[data-flow="running"] { stroke: color-mix(in oklch, var(--hd-clad) 45%, var(--hmi-m-chw)); }
+
+/* L3 · rotating equipment reads: a running rotor is heavier and in the ink, so its turn is seen at 1:1 */
+.hmi-svg .vfx-rotor[data-spin] { stroke-width: 1.8; opacity: 1; }
+
+/* L5 · ICT links carry traffic (ict.html draws .edge-flow over every UP link; speed from load, inline) */
+/* packets, not dashes: round 3 px dots 12 px apart, so a moving UP link never reads as the dashed STANDBY line */
+svg.ict-arch .edge-flow { fill: none; stroke: color-mix(in oklch, #4a6a8a 35%, var(--text, #e8edf5)); stroke-width: 3; stroke-linecap: round;
+  stroke-dasharray: 0.1 11.9; pointer-events: none; }
+svg.ict-arch .edge-flow.warn { stroke: var(--st-warn); }
+svg.ict-arch .edge-flow.bad { stroke: var(--st-bad); }
+@keyframes conv-live-flow { to { stroke-dashoffset: -12; } }
+@media (prefers-reduced-motion: no-preference) {
+  svg.ict-arch .edge-flow { animation: conv-live-flow 1.2s linear infinite; }
+}

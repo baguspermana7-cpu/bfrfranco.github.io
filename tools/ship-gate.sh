@@ -210,6 +210,7 @@ gate "Conventional air section core — no airflow no motion, speed follows airf
 gate "Conventional data hall air path — one-number row strip + row panel, Plan / Air path views, section readings = plan and engine, bound motion, reduced motion" node tools/test-conv-datahall-air.mjs
 gate "Conventional data hall space — the hall gets the screen (SP1-SP10)" node tools/test-conv-datahall-space.mjs
 gate "Conventional motion — state marks, pointer dialogs, press, panel swaps, arrival, reduced motion (MO1-MO7)" node tools/test-conv-motion.mjs
+gate "Conventional live plant — moving flow, medium colour, current, data-hall air, ict traffic, speed from the process (LV0-LV8)" node tools/test-conv-live.mjs
 gate "Conventional floor plan module — fixture FL/FX laws" node tools/test-conv-floor-plan.mjs
 gate "Conventional floor plan on datahall.html — FL laws on the real page" node tools/test-conv-floor-plan.mjs --target=datahall.html
 gate "Conventional network modal core — device classes, connections, firewall default deny, gateway links, nothing invented" node --test tools/test-conv-net-modal.mjs

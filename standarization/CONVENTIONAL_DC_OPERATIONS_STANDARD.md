@@ -459,6 +459,17 @@ Before release:
   (`js/conv/floor-plan.js` `build()`; FX4 of `test-conv-floor-plan` forces the rebuild).
 - Gate `tools/test-conv-motion.mjs` (MO1–MO7). Rules: `standarization/MOTION_STANDARD.md` "Conventional BMS pages".
 
+
+### 2026-11-21 — The plant is seen running (PRD-CONV-BMS-LIVE, R184)
+
+- Every Conventional cockpit links `css/conv-live.css` after `conv-motion.css`. A new sheet medium adds its slug rule
+  (lifted toward the ink) and its State-view running tube rule (deepened toward the surface) there.
+- Motion is a reading: only on a running line, unit, link or air path; speed from flow, speed, row heat or link load;
+  still off screen and under reduced motion. A page never animates a stopped thing to look busy (fuel at utility
+  normal is still, and that is correct).
+- Data hall plan (`js/conv/floor-plan.js`): supply/exhaust air paths are part of the plan; `paint()` sets their speed and
+  colour, never adds or removes them. ICT (`ict.html`): an `.edge-flow` per UP link with `data-load`.
+- Gate `tools/test-conv-live.mjs` (LV0–LV8).
 ### 2026-11-21 — How a page marks its numbers (PRD-CONV-POINT-STATUS-TREND T2/T3 pilot: chiller-plant, cdu-mini-bms)
 
 Every rendered number is exactly one of three things (P-3). A page says which with one attribute; it never types a limit

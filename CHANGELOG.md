@@ -11,6 +11,33 @@ release sections rather than semver.
 
 ---
 
+## v3.86.0 — 2026-11-21 — The plant is seen running
+
+Owner (R184): "saya masih tidak belum melihat perubahan signifikan. Masih abu2 semua tidak ada animasi yg immersive dll".
+PRD-CONV-BMS-LIVE. Measured on v3.84.0: 0 moving marks in view on 6 of the 8 Conventional pages, 1.7–6.6 % of the
+first screen coloured. Every new motion is a reading: it exists only on something that runs and its speed is a process
+value; stopped things stay still, off screen and under reduced motion nothing moves.
+
+### Added
+- `css/conv-live.css` (all 8 cockpits, after `conv-motion.css`): a running pipe is a 2.8–3.6 px tube of its medium
+  (chilled water, condenser, process water, fuel, agent, drain) carrying 1.8 px slugs of the same medium lifted toward
+  the ink; the slug speed is the existing `RZConvVfx` flow binding. The insulated chilled-water jacket takes the CHW
+  tone while the line runs and stays bare aluminium when stopped. Energised conductors (EPMS) carry ink current dots.
+- `js/conv/floor-plan.js`: the data hall air moves — supply along every cold aisle from both CRAH galleries, exhaust
+  along every hot-aisle cap, coloured by the row's hot-aisle temperature; speed from row heat (1.4 s per period at the
+  mean, 0.6–3 s); a gallery end whose nearest CRAH is off sends no supply. Paused off screen.
+- `ict.html`: every UP link carries round packets at a speed from its load (0.6 s at full load to 2.4 s at ≤ 25 %);
+  standby links stay still; a degraded link's packets are amber.
+
+### Changed
+- `chiller-plant.html`: the sheet motion clock steps at 24 Hz instead of 3 Hz (3 Hz read as a frozen plant; a free
+  60 fps sheet costs ~4 s of main thread per 5 s, so it stays a clock).
+- `test-conv-motion` MO5 accepts the process loops `fp-air`, `conv-live-flow`, `as-march`.
+
+### Gates
+- New `tools/test-conv-live.mjs` (LV0–LV8, 39 checks; 7 laws red on v3.84.0: no air, no traffic, 1.6 px slugs, grey
+  jacket, 333 ms clock, no current dots, no stylesheet), wired into `tools/ship-gate.sh`.
+
 ## v3.85.0 — 2026-11-21 — DC AI: cooling sheets come alive, point limits with sources, a tidier Data Hall tab
 
 Owner C8 (PRD-DCAI-LIVING-PLANT phase A1): "animasi saat running jangan abu-abu semua … bisa hijau, orange atau merah

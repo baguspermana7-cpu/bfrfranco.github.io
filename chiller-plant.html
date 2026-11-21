@@ -204,7 +204,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
 .legend .warn{border-color:rgba(182,141,73,.65);color:#e3c88f}
 .legend .alarm{border-color:rgba(187,93,93,.7);color:#ecb7b7}
 .chw-sheet-host{display:block}
-/* E3 PERF: sheet motion stepped by the 3 Hz chwMotionClock (see chwMotionClock) */
+/* E3 PERF: sheet motion stepped by the 24 Hz chwMotionClock (see chwMotionClock) */
 @media (prefers-reduced-motion: no-preference){
   #chw-sheet-host .hmi-svg .hmi-flow[data-flow="running"],#chw-sheet-host .hmi-svg .vfx-rotor[data-spin]{animation-play-state:paused}
 }
@@ -566,7 +566,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
         ]
     }
     </script>
-    <script src="js/rz-version.js?v=20261121-eecc819c" defer></script>
+    <script src="js/rz-version.js?v=20261121-0a4cc15b" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- Conventional BMS single scenario engine — single source of truth for the
@@ -613,6 +613,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
     <script src="js/rz-sheet.js?v=20261121-67db3ea5" defer></script>
     <link rel="stylesheet" href="css/conv-point.css?v=20261120-8daa6374">
     <link rel="stylesheet" href="css/conv-motion.css?v=20261121-88ede45d">
+    <link rel="stylesheet" href="css/conv-live.css?v=20261121-07a6a408">
     <!-- this cockpit is dark-only (no data-theme on <html>): the phone trend sheet (js/rz-sheet.js) must not take its light skin -->
     <style>:root:not(#rz-chiller) .rz-sheet{--rz-sheet-bg:#16181d;--rz-sheet-ink:#e8ecf1;--rz-sheet-line:rgba(160,168,180,.4)}</style>
     <script src="js/conv/point-status.js?v=20261121-9a98a915"></script>
@@ -1841,6 +1842,8 @@ function drawPid(){
    animation-delay 3 times a second, so the sheet paints 3 frames a second instead of 60. The delay is written per
    element, not as one inherited custom property on the host: that restyled every node of the drawing on each tick
    (UpdateLayoutTree 1.4 s per 5 s). Off screen or in a hidden tab the clock stops writing. */
+/* PRD-CONV-BMS-LIVE L1 (owner R184 "tidak ada animasi"): 3 Hz read as a frozen plant (7.6 px jumps). The clock now steps at
+   24 Hz (42 ms): the dash moves ~1 px a step, smooth to the eye, still well under the 60 fps cost measured above. */
 (function chwMotionClock(){
   var host = document.getElementById('chw-sheet-host');
   if(!host) return;
@@ -1867,7 +1870,7 @@ function drawPid(){
       var el = els[i];
       if(el.isConnected && (el.getAttribute('data-flow') === 'running' || el.hasAttribute('data-spin'))) el.style.animationDelay = d;
     }
-  }, 333);
+  }, 42);
 })();
 
 function selectChwView(view){

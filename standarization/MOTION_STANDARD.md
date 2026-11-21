@@ -226,6 +226,23 @@ Escape closed the trend and left the drawer over the page. The trend's keyboard 
 its click. Gate `tools/test-conv-motion.mjs` MO1–MO7, 360 checks on 8 pages × both motion preferences, red on v3.83.0
 (129 findings) and on a seeded `transition: all 500ms ease-in` / `scale(0)` / `infinite` (MO7, 5 findings).
 
+## Conventional BMS — the running plant (owner R184, 2026-11-21, PRD-CONV-BMS-LIVE)
+
+Process motion is continuous and that is allowed here, because it is a reading, not decoration: it exists only on a
+thing that runs, its speed is a process value, and it stops off screen and under reduced motion.
+
+- Flow: a running line carries 1.8 px slugs (dash 5 × 11) inside a 2.8–3.6 px tube of its medium; slugs are the medium
+  lifted 45 % toward the ink, the tube the medium deepened 20 % toward the surface. Speed: `RZConvVfx.dashSeconds`.
+- Electrical current: ink dots (0.1 × 15.9, 2.4 px) on the green energised conductor.
+- Insulated chilled water: the aluminium jacket takes the CHW tone only while the line runs.
+- Data hall: supply air along every cold aisle from both galleries, exhaust along every hot-aisle cap; 1.4 s per period
+  at mean row heat, faster for hotter rows (0.6–3 s); no supply from a gallery end whose nearest CRAH is off.
+- Network: UP links carry round packets (0.1 × 11.9, 3 px), 0.6 s per period at full load to 2.4 s at ≤ 25 %; standby
+  links never move.
+- A sheet too large to repaint every frame steps its motion with a clock (chiller: 24 Hz, never below 20 Hz).
+- Never: glow, blur, drop shadow, particles without a process value, a moving mark on a stopped line.
+- Gate: `tools/test-conv-live.mjs`. Styles: `css/conv-live.css` (after `conv-vfx.css` and `conv-motion.css`).
+
 ## Homepage choreography (owner R102–R104, 2026-11-09, v3.35.5)
 
 "Animasi motionnya sangat2 kurang payah. Cari inspirasi" / "klik cards lgsung flip … flipnya kaku". Built after the
