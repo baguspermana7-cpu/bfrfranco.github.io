@@ -42,6 +42,8 @@ Every count on a sheet is a formula over the engine snapshot or the fire invento
 ## 2. Visual language (ISA-101, PRD §3)
 
 - Grey line work; **colour only for abnormal state**. Alarm hues `--hmi-alm-1/2/3` are used by nothing else.
+  **Exception, owner C8 (2026-11-17):** on the Cooling & Piping sheets the default view is the *State* view of §4d —
+  the grey practice stays one click away as *Flat*.
 - Filled body = running (`--hmi-fill-run`), outline = stopped, `--hmi-fill-run-2` = standby. Selected / traced = `--hmi-info`.
 - Feed A/B and media identity (HTW, TCS supply/return, CHW, CW, agent, fuel, air, data) live on the **stroke** only.
 - Line weights: main 2.0, branch 1.4, instrument 1.0, signal 0.8 dashed 4-2, zone boundary 1.0 dashed 8-4, dimension 0.6.
@@ -117,6 +119,31 @@ Click → `open(node)` → the L3 modal (`cdu` class draws its own sheet; other 
 - **Alarm without colour.** A diamond badge with the ISA priority digit sits top-right of an alarmed symbol, hollow
   once acknowledged, kept while the source is active. Gate `tools/test-dh-operator.mjs` (O1–O5, O8), proven red 9/12 on
   8fdf0a429.
+
+## 4d. The living plant (PRD-DCAI-LIVING-PLANT phase A1, owner C8 "jangan abu-abu semua … hijau, orange atau merah tergantung kondisi")
+
+- **One grammar for both cockpits.** DH-M-101…104 take `js/conv/vfx.js` (`RZConvVfx`) and `css/conv-vfx.css` exactly as
+  the Conventional pages do (PRD-CONV-LIVING-PLANT §4.1: running · warning · alarm · standby · stopped · mismatch ·
+  no data). No second table, no DC AI hex literals; the view bar offers State (default) · Thermal · Medium · Flat, the
+  choice is shared with the Conventional cockpits (`rz_conv_vfx_mode`, convenience only).
+- **Inputs are the flow pass of the same repaint** (`hmi-v2.js vfxApply`, after `update()`): line state = `flowMap()`
+  (`na` signal / tap lines take none); a branch whose pumps or unit are all on standby is *charged* → standby (solid),
+  not stopped; a node that makes no claim (`na`) takes no condition colour, `nosample` reads no data.
+- **Motion is a measurement.** Dash period = `dashSeconds(ratio)`, ratio = the driving pump's speed ÷ nominal (flow ∝
+  speed): CDU pump `pump_rpm` ÷ 1450 rpm, HTW station `vfd_hz` ÷ 50 Hz; a running branch with no pump of its own on the
+  sheet moves at design (ratio 1); the CDW station publishes no drive speed and turns at design while it runs
+  (declared). The rotor of a running pump turns at `rotorSeconds(speed %)`; a standby or tripped pump is still.
+  `data-vfx-ratio` on each moving flow path is the number the gate checks.
+- **DH-M-104 (TCS rows)** has no pump: its off-sheet references carry `flowSrc: 'tcs'` and read the CDU line (running
+  while any CDU of the hall has a running secondary pump) — before A1 all 104 lines were `unknown`.
+- **Thermal** paints TCS supply / return by the engine planes p07 / p08 on the declared range [p05 HTW supply, p08 TCS
+  return]; HTW / CHW / CW lines are drawn as one medium without a leg, so they stay neutral there (no invented split).
+- **Budget.** Off screen a sheet pauses its dashes and rotors (`.hmi-host.is-offscreen`, IntersectionObserver);
+  under `prefers-reduced-motion` nothing moves, colours and dash patterns stay.
+- Gate `tools/test-dh-vfx.mjs` (V0–V5, 80 checks; red 45/76 on 2bc05a8b5): bar and views, every process line tagged,
+  running painted, dash period and rotor equal to the published speed, the CDU-pump-failure scenario stops that pump's
+  rotor and discharge dashes, second signal per state, reduced motion and off-screen pause, Thermal = engine planes,
+  Flat = grey, 390 px without overflow.
 
 ## 4c. Repaint cost (v3.63.0, O11)
 

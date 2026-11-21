@@ -310,7 +310,28 @@
       v[x.k] = { text: text(r) };
     });
     rows(p).slice(0, 6).forEach(function (r) { tip.push([r.label, text(r)]); });
-    return { state: st, quality: n.sym === 'offSheet' ? undefined : qualityOf(p), alarm: al ? al.prio : null, ack: al ? al.ack : false, values: v, rows: tip };
+    return { state: st, speed: /^pump/.test(n.sym || '') && st === 'running' ? speedOf(p) : null, quality: n.sym === 'offSheet' ? undefined : qualityOf(p), alarm: al ? al.prio : null, ack: al ? al.ack : false, values: v, rows: tip };
+  }
+
+  /* drive speed of a running pump in % of nominal, from the row its payload publishes (PRD-DCAI-LIVING-PLANT E2):
+     a CDU pump publishes rpm (nominal 1450 rpm, a 4-pole motor on 50 Hz), the HTW station its VFD frequency (50 Hz =
+     100 %). A pump that publishes no drive speed (CDW station) turns at design speed while it runs: declared, not measured. */
+  var NOMINAL = { pump_rpm: 1450, vfd_hz: 50 };
+  function speedOf(p) {
+    var rs = rows(p);
+    for (var i = 0; i < rs.length; i++) { var r = rs[i], nom = NOMINAL[r.point]; if (nom && typeof r.value === 'number' && isFinite(r.value)) return r.value / nom * 100; }
+    return 100;
+  }
+  /* an off-sheet reference that carries flow evidence (DH-M-104: the TCS headers come from the CDU line): the loop runs
+     while any CDU of the hall has a running secondary pump, and stops when none has */
+  function loopState(src, hall) {
+    if (src !== 'tcs') return null;
+    var snap = win.DCAI_CALC && win.DCAI_CALC.snapshot, n = snap && snap.equipment ? snap.equipment.cdu_installed_per_hall : 0, any = false, seen = false;
+    for (var i = 1; i <= (n || 0) && !any; i++) {
+      var p = payload('cdu', String(i), hall); if (!p) continue; seen = true;
+      for (var k = 1; k <= 3 && !any; k++) if (stateOf({ pump: k }, p) === 'running') any = true;
+    }
+    return seen ? (any ? 'running' : 'stopped') : null;
   }
 
   /* ── flow only with evidence (owner brief O3) ─────────────────────────────────────────────────────────────
@@ -352,6 +373,10 @@
       else if (B.movers.length) r = B.movers.some(function (n) { return n.state === 'running'; }) ? 'running' : 'stopped';
       else if (B.ev.length) r = B.ev.some(function (n) { return n.state === 'running' || n.state === 'fault'; }) ? 'running' : 'stopped';   // a fault on a heat exchanger / chiller does not prove zero flow; only a mover's stop does
       res[b] = r || null;
+      /* a branch held ready — its pump or its unit on standby (a standby CDU is isolated and idle until a duty unit trips)
+         — is charged, not stopped; the mover that drives a running branch */
+      B.rest = r === 'stopped' && all.some(function (n) { return n.state === 'standby'; }) && all.every(function (n) { return n.state === 'standby' || n.state === 'stopped'; });
+      B.mover = (B.movers.filter(function (n) { return n.state === 'running'; })[0] || {}).id || null;
     });
     for (var pass = 0; pass < 4; pass++) {   // headers between tees take "running" from a running neighbour branch
       Object.keys(br).forEach(function (b) {
@@ -360,15 +385,23 @@
         if (on) res[b] = 'running';
       });
     }
-    proc.forEach(function (e) { out[e.id] = res[find(e.id)] || 'unknown'; });
-    return out;
+    var rest = {}, mover = {};
+    proc.forEach(function (e) { var b = find(e.id); out[e.id] = res[b] || 'unknown'; if (br[b].rest) rest[e.id] = true; if (br[b].mover) mover[e.id] = br[b].mover; });
+    return { flow: out, rest: rest, mover: mover };
   }
   /* the options every sheet render gets: read() records each node's state for the flow pass of the same repaint */
   function sheetOpts(extra) {
-    var st = {}, dirty = true, map = null;
+    var st = {}, dirty = true, map = null, gr = null;
     var o = {
-      read: function (n) { var d = read(n, extra && extra.sheet), o = st[n.id]; if (!o || o.state !== d.state || o.quality !== d.quality) { st[n.id] = { state: d.state, quality: d.quality, sym: n.sym, cls: n.cls }; dirty = true; } return d; },   // the flow pass re-runs only when a state changed
-      flow: function (e, graph) { if (dirty) { map = flowMap(graph, st); dirty = false; } return map[e.id]; }
+      read: function (n) {
+        var d = read(n, extra && extra.sheet), s0 = d.state, o = st[n.id];
+        if (n.flowSrc) s0 = loopState(n.flowSrc, hallOfSheet(extra && extra.sheet));   // evidence from another sheet; the symbol itself shows nothing new
+        if (!o || o.state !== s0 || o.quality !== d.quality) { st[n.id] = { id: n.id, state: s0, quality: d.quality, sym: n.sym, cls: n.cls }; dirty = true; }
+        st[n.id].speed = d.speed;
+        return d;
+      },   // the flow pass re-runs only when a state changed
+      flow: function (e, graph) { gr = graph; if (dirty) { map = flowMap(graph, st); dirty = false; } return map.flow[e.id]; },
+      vfxInfo: function () { return map && gr ? { flow: map.flow, rest: map.rest, mover: map.mover, st: st, graph: gr } : null; }
     };
     for (var k in extra || {}) if (k !== 'sheet') o[k] = extra[k];
     return o;
@@ -405,7 +438,9 @@
       if (win.console) console.warn('hmi-v2: ' + sheetId + ' not drawn — ' + e.message); return;
     }
     sheet.svgId = svgNewId;
-    sheets[sheetId] = R.render(host, sheet, sheetOpts({ open: open, sheet: sheetId }));
+    var so = sheetOpts({ open: open, sheet: sheetId });
+    sheets[sheetId] = R.render(host, sheet, so);
+    vfxBind(sheetId, host, so);
   }
   /* a sheet with no legacy drawing to replace: its own box, inserted right after the box of an anchor drawing */
   function mountNew(anchorSvgId, sheetId, svgNewId, o) {
@@ -417,7 +452,9 @@
     bx.appendChild(host);
     if (o && o.before) ab.insertAdjacentElement('beforebegin', bx); else (o && o.after ? doc.querySelector(o.after) || ab : ab).insertAdjacentElement('afterend', bx);
     sheet.svgId = svgNewId;
-    sheets[sheetId] = R.render(host, sheet, sheetOpts({ open: open, sheet: sheetId }));
+    var so = sheetOpts({ open: open, sheet: sheetId });
+    sheets[sheetId] = R.render(host, sheet, so);
+    vfxBind(sheetId, host, so);
   }
   function mountAll() {
     var OP = win.RZDatahallAIHmiOpeners = win.RZDatahallAIHmiOpeners || {}; if (!OP.fire) OP.fire = openFireZone;   // tier-2 of the fire-zone payload
@@ -503,8 +540,48 @@
       } else if (!prev) O.cdu = function (num) { openCdu(num); };
     }
   }
+  /* ── 4b. the living plant (PRD-DCAI-LIVING-PLANT phase A1, owner C8): the Cooling & Piping sheets take the shared
+     state grammar of js/conv/vfx.js (RZConvVfx — the one table both cockpits use): body colour = condition, a dash
+     pattern as the second signal, dashes that move at the driving pump's published speed, rotors that turn at it, and
+     the Thermal / Medium / Flat views. Nothing is painted that the flow pass of the same repaint did not prove. */
+  var VFX = { 'dh-m-101': 1, 'dh-m-102': 1, 'dh-m-103': 1, 'dh-m-104': 1 }, vfxOpts = {};
+  var vfxSeen = win.IntersectionObserver ? new win.IntersectionObserver(function (es) {   // motion pauses off screen
+    es.forEach(function (e) { e.target.classList.toggle('is-offscreen', !e.isIntersecting); });
+  }) : null;
+  function vfxBind(sheetId, host, so) {
+    if (!VFX[sheetId]) return;
+    vfxOpts[sheetId] = so;
+    if (vfxSeen) vfxSeen.observe(host);
+    vfxApply(sheetId);
+  }
+  function vfxApply(sheetId) {
+    var V = win.RZConvVfx, api = sheets[sheetId], so = vfxOpts[sheetId], info = so && so.vfxInfo();
+    if (!V || !api || !info) return;
+    var svg = api.svg, frame = svg.closest('.hmi-frame'); if (!frame) return;
+    var snap = win.DCAI_CALC && win.DCAI_CALC.snapshot, pl = snap && snap.design && snap.design.planes;
+    var range = pl && isFinite(pl.p05_htw_supply_c) && isFinite(pl.p08_tcs_return_c) ? [pl.p05_htw_supply_c, pl.p08_tcs_return_c] : null;
+    var hasT = info.graph.some(function (e) { return e.m === 'tcs_s' || e.m === 'tcs_r'; });
+    V.mount(frame, hasT && range ? { tempRange: [Math.round(range[0] * 10) / 10, Math.round(range[1] * 10) / 10], tempUnit: '°C' } : { thermal: false });
+    /* dash speed: flow follows pump speed (affinity law), so ratio = the driving pump's speed / nominal; a running branch
+       with no pump of its own on this sheet moves at design speed (1.0) */
+    var ratio = function (e) { var m = info.mover[e.id], n = m && info.st[m]; return n && isFinite(n.speed) ? n.speed / 100 : 1; };
+    V.apply(svg, { edges: info.graph,
+      flow: function (e) { var f = info.flow[e.id]; return f == null || f === 'na' ? null : f; },
+      rest: function (e) { return !!info.rest[e.id]; },
+      ratio: ratio,
+      temp: function (e) { return !pl ? null : e.m === 'tcs_s' ? pl.p07_tcs_supply_c : e.m === 'tcs_r' ? pl.p08_tcs_return_c : null; },
+      tempRange: range,
+      speed: function (id) { var n = info.st[id]; return n ? n.speed : null; } });
+    info.graph.forEach(function (e) {
+      if (info.flow[e.id] !== 'running') return;
+      svg.querySelectorAll('path[data-edge-flow="' + e.id + '"]').forEach(function (f) { var r = String(Math.round(ratio(e) * 1000) / 1000); if (f.getAttribute('data-vfx-ratio') !== r) f.setAttribute('data-vfx-ratio', r); });
+    });
+    /* a symbol that makes no state claim (na) takes no condition colour; one with no samples reads "no data" */
+    Array.prototype.forEach.call(svg.querySelectorAll('.hmi-node[data-state="na"][data-vstate]'), function (g) { g.removeAttribute('data-vstate'); });
+    Array.prototype.forEach.call(svg.querySelectorAll('.hmi-node[data-quality="nosample"]'), function (g) { if (g.getAttribute('data-vstate') !== 'unavailable') g.setAttribute('data-vstate', 'unavailable'); });
+  }
   function repaintNow() {
-    Object.keys(sheets).forEach(function (k) { if (sheets[k] && sheets[k].svg.getBoundingClientRect().width) sheets[k].update(); });
+    Object.keys(sheets).forEach(function (k) { if (sheets[k] && sheets[k].svg.getBoundingClientRect().width) { sheets[k].update(); vfxApply(k); } });
     if (pageCduSheet && pageCduSheet.svg.getBoundingClientRect().width) pageCduSheet.update();
     Object.keys(pageSheets).forEach(function (k) { var p = pageSheets[k]; if (p && p.svg.getBoundingClientRect().width) p.update(); });   // L3 sheets inside page modals, only while shown
   }

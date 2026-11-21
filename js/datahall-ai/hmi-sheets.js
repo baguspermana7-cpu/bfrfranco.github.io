@@ -856,8 +856,8 @@
     var W = 1240, H = 560, X0 = 110, DX = (W - 220) / (rows - 1), yS = 90, yR = 130;
     var s = Sheet({ id: 'dh-m-104', no: 'DH-M-104', title: 'DH-01 TCS ROWS', size: [W, H], svgId: 'coolRowsSvg', sheet: '4/5' });
     s.legend = COOL_LEGEND; s.legendAt = [640, 532]; s.legendCols = 3;
-    var osS = s.n({ id: 'os-ts', tag: 'DH-M-103', sym: 'offSheet', x: 40, y: yS, size: 22, tagAt: 'below', label: 'TCS supply from the CDU line (sheet DH-M-103)' });
-    var osR = s.n({ id: 'os-tr', tag: 'DH-M-103', sym: 'offSheet', x: 40, y: yR + 40, size: 22, rot: 180, tagAt: 'below', label: 'TCS return to the CDU line (sheet DH-M-103)' });
+    var osS = s.n({ id: 'os-ts', tag: 'DH-M-103', sym: 'offSheet', x: 40, y: yS, size: 22, tagAt: 'below', flowSrc: 'tcs', label: 'TCS supply from the CDU line (sheet DH-M-103)' });
+    var osR = s.n({ id: 'os-tr', tag: 'DH-M-103', sym: 'offSheet', x: 40, y: yR + 40, size: 22, rot: 180, tagAt: 'below', flowSrc: 'tcs', label: 'TCS return to the CDU line (sheet DH-M-103)' });
     var prevS = osS + '.port';
     for (var r = 1; r <= rows; r++) {
       var x = X0 + (r - 1) * DX, js = s.j('s' + r, x, yS, r < rows), jr = s.j('r' + r, x + 8, yR, r < rows);

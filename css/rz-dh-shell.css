@@ -79,3 +79,26 @@ body[data-side="hidden"] .wrap .side { display: none; }
 /* the instrument register paints the avatar letter in --c (#0e7490 light) on --bg3 (#e2e8f0): 4.35:1. In the bar it
    holds AA (law C7 of tools/test-conv-shell.mjs) */
 [data-theme="light"] .cv-bar .rz-user-avatar { color: #155e75; }
+/* PRD-DCAI-LIVING-PLANT A1: a Cooling & Piping sheet scrolled off screen stops its flow dashes and rotors (law V3b) */
+.hmi-host.is-offscreen .hmi-svg .hmi-flow, .hmi-host.is-offscreen .hmi-svg .vfx-rotor { animation-play-state: paused !important; }
+
+/* ── PRD-DCAI-NUMBERS B5a — Data Hall polish (owner N3, 2026-11-20; gate tools/test-dh-hall.mjs) ──────────────────── */
+/* DH3: the alarm strip names the worst severity once. The state word becomes a dot; the word stays for assistive
+   technology (and in the tooltip), the count chip beside it carries the visible text. */
+.dh-alarmbar .ab-state { padding: 2px 4px; gap: 0; }
+.dh-alarmbar .ab-state .ab-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; display: block; }
+.dh-alarmbar .ab-sr { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+/* DH2: one line per chip; the bar scrolls sideways on a phone, with an edge fade where more chips wait */
+#p-hall .dh-nav { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+#p-hall .dh-nav::-webkit-scrollbar { display: none; }
+#p-hall .dh-nav .dh-btn { flex: 0 0 auto; white-space: nowrap; }
+@media (max-width: 600px) {
+  #p-hall .dh-nav { mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent); -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 24px), transparent); padding-right: 16px; }
+  #p-hall .dh-nav .dh-btn { padding: 6px 12px; }
+  /* DH1: the nine KPI tiles as a 3-column grid, not nine stacked cards */
+  #p-hall .kpi { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
+  #p-hall .kpi .k { padding: 5px 7px; min-width: 0; }
+  #p-hall .kpi .k .kl { font-size: 9px; }
+  #p-hall .kpi .k .kv { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #p-hall .kpi .k .ks { font-size: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+}

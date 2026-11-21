@@ -858,3 +858,31 @@ a move stage. A move keeps every cross-block name reachable from where it is rea
 Tab modules load through `js/datahall-ai/tab-loader.js`: `RZDatahallTabLoader.create({tab: [urls]}).ensureTab(id)` loads
 in order, once (single flight), announces `rz:tab-ready` {id} on `document`, and on failure announces `rz:tab-error`
 {id, url} without caching the failure, so the next activation retries. Gates wait for `rz:tab-ready`, never a timer.
+
+## Point limits and the Data Hall tab (PRD-DCAI-NUMBERS B1 + B5a, v3.82.0)
+
+**Point limits.** `js/datahall-ai/points.js` (`window.RZDatahallAIPoints`, UMD) is the one registry of DC AI point
+limits. A record is a point class (`cdu/tcs_supply_c`): kind `high | low | window | none`, limits RELATIVE to the
+engine setpoint (`design.planes.*` or a snapshot path) or absolute, a written source and an evidence class
+(`standard` = published limit, `design` = engine or page design figure, `assumed` = declared training setting, shown
+as "limits ASSUMED"). `resolve(id, snapshot)` returns the absolute shape `RZPointStatus.define()` takes. Rules:
+- a limit with no source is not written: the record is kind `none` and the value shows without a colour;
+- the design point plus the simulator's noise amplitude must classify `normal` (a fixed 35/37 °C band on a 40 °C TCS
+  design paints the healthy plant red);
+- a typed setpoint must equal the value the payload row authors.
+Gate `tools/test-dcai-points.mjs`; the owner's table: `node tools/test-dcai-points.mjs --table`.
+
+**Data Hall tab.**
+- The alarm strip names the worst severity once: the state is a coloured dot whose word is screen-reader text and
+  tooltip; the count chip carries the visible word.
+- The hall selector never wraps a label and scrolls sideways on a phone with an edge fade; a picked chip is centred
+  horizontally (never `scrollIntoView`, which moves the page).
+- At <= 600 px the KPI strip is a 3-column grid (<= 200 px tall), not nine stacked cards.
+- The sidebar hall title uses `var(--t1)`, never a literal (light theme was 1.48:1).
+- Above the plan: one hall line (<= 8 words, geometry in its tooltip) and one AREA CHECK chip (the floor budget and the
+  closure sentences in its tooltip). Never free prose lines there.
+- Aisle sensors are upright chips named `TT-HA-nn-p` / `TT-CA-nn-p`, the value only, the unit in one legend and the
+  tooltip (`data-unit`). No rotated value text.
+- Any hall item with `data-tip` shows its tooltip on hover, keyboard focus and a tap; the tooltip is clamped inside
+  the window.
+Gate `tools/test-dh-hall.mjs` (DH1-DH4, DH6, DH9-DH11).

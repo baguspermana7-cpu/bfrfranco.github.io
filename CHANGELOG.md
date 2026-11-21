@@ -11,6 +11,60 @@ release sections rather than semver.
 
 ---
 
+## v3.85.0 — 2026-11-21 — DC AI: cooling sheets come alive, point limits with sources, a tidier Data Hall tab
+
+Owner C8 (PRD-DCAI-LIVING-PLANT phase A1): "animasi saat running jangan abu-abu semua … bisa hijau, orange atau merah
+tergantung kondisi; alur dan animasinya tampak hidup". Owner N1 + N3 (PRD-DCAI-NUMBERS phases B1, B5a and B5b):
+"parameter angka yg normal kasih warna hijau … kuning … merah"; "uiux datahall nya itu sangat perlu di refine dan di
+polish more".
+
+### Changed — Cooling & Piping sheets
+- The four Cooling & Piping sheets of `datahallAI.html` (DH-M-101 overview, DH-M-102 heat rejection, DH-M-103 CDU
+  line, DH-M-104 TCS rows) take the same state grammar as the Conventional cockpits (`js/conv/vfx.js`,
+  `css/conv-vfx.css`): a line's body is green while water moves, blue-grey on standby, dashed grey when stopped,
+  amber on a warning, red on an alarm, dotted when there is no data. Every state also has its own dash pattern, so
+  the sheet reads without colour. A view bar on each sheet switches State (default), Thermal, Medium and Flat (the
+  former grey look).
+- The moving dashes run at the speed of the pump that drives the line (CDU pump rpm ÷ 1450, HTW station VFD Hz ÷ 50),
+  and each running pump's rotor turns at that speed. Standby and tripped pumps stand still. A standby CDU's branch
+  reads standby (charged and ready), not stopped.
+- DH-M-104 reads its flow from the CDU line. Before, all 104 of its lines showed "unknown" because the sheet has no
+  pump of its own.
+- Thermal paints the TCS supply and return lines with the engine temperatures (p07 / p08).
+- A sheet scrolled off screen pauses its motion. With reduced motion, nothing moves; colours and patterns remain.
+
+### Added
+- `js/datahall-ai/points.js`: the limits of 61 DC AI point classes. 51 have a band (6 from a published standard,
+  2 from a design figure, 43 declared training settings, labelled as assumed), 10 show their value without a colour
+  because no defensible limit exists. Limits follow the engine setpoint: TCS supply design is 40 °C, so the warning is
+  above 41 °C and the alarm above 43 °C. The page does not colour numbers yet; that is the next phase.
+
+### Changed — Data Hall tab
+- Phone: the nine KPI tiles are a 3-column grid (about 170 px, was 572 px of stacked cards).
+- The hall selector keeps "DH-1" on one line and scrolls sideways on a phone; DH-7 and DH-8 were cut off. A picked
+  hall is centred in the bar.
+- The alarm strip says the worst severity once ("Critical 1" with a red dot); the state word stays for screen
+  readers and in the tooltip.
+- Light theme: the sidebar hall title is readable (was 1.48:1, now the theme text colour).
+
+### Changed — Data Hall plan
+- The hall line reads "DATA HALL DH-01 · 440 racks · 67,382 kW IT"; the geometry sentence (size, height, rows, density)
+  is its tooltip.
+- The two floor-budget sentences (FLOOR … / CLOSES …, 40 words) are one chip, "AREA CHECK ✓ the room holds the plan",
+  red with ✗ when the engine's width or length stack does not fit. Its tooltip carries both sentences.
+- The 60 aisle temperatures stand upright in small chips framed in the aisle colour (cold cyan, hot amber), with the
+  unit in one legend. Each is named (TT-HA-01-1 … TT-CA-10-3); its tooltip leads with the live reading.
+- The plan's tooltips answer keyboard focus and a tap, not only a mouse, and never start outside the window on a
+  phone (one flipped to -132 px).
+### Gates
+- New `tools/test-dh-vfx.mjs` (V0–V5, 80 checks, in the ship gate): red 45/76 on v3.80.0, 80/0 now. It also covers the
+  "CDU pump 1 failure" scenario: the failed pump's rotor and discharge dashes stop, then restart on Normal.
+- New `tools/test-dcai-points.mjs` (833 checks; a warning limit moved below the setpoint fails 27).
+- New `tools/test-dh-hall.mjs` (120 checks; red 32 on v3.81.0 for the tab, 22 on the B5a page for the plan, 2 for
+  the tooltip clamp).
+- Standards: `HMI_DRAWING_STANDARD.md` §2 exception + new §4d; `DATAHALL_AI_STANDARD.md` "Point limits and the Data
+  Hall tab".
+
 ## v3.84.0 — 2026-11-21 — Motion that carries state
 
 Owner (R183): "Continue, polish more effect2 animasi semuanya". PRD-CONV-BMS-MOTION (laws MO0–MO7) on the eight

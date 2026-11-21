@@ -772,7 +772,7 @@ body[data-datahall-authority="unavailable"] #tabs,
 body[data-datahall-authority="unavailable"] .wrap{display:none !important}
 body[data-datahall-authority="unavailable"] .hdr-r>.dot,body[data-datahall-authority="unavailable"] [data-cv="clock"]>.dot{background:#64748b !important;box-shadow:none !important;animation:none !important}
 body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:none}
-</style>    <script src="js/rz-version.js?v=20261121-5262e586" defer></script>
+</style>    <script src="js/rz-version.js?v=20261121-eecc819c" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <!-- v3.5.0 — hold the 8.5px legibility floor by SCALE, not by font size. Five of this page's
          fifteen diagrams were already clear; the dense ones (cooling P&ID, the four SLDs, the hall
@@ -888,7 +888,8 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
 }
 </style>
     <link rel="stylesheet" href="css/rz-hmi.css?v=20261117-fe9b28c8">
-    <link rel="stylesheet" href="css/rz-dh-shell.css?v=20261119-4882452d">
+    <link rel="stylesheet" href="css/conv-vfx.css?v=20261118-5eed9b2f">
+    <link rel="stylesheet" href="css/rz-dh-shell.css?v=20261120-a7d2ebad">
     <link rel="stylesheet" href="css/conv-shell.css?v=20261120-33ee363b">
 </head><body class="locked" data-rz-data-mode="simulated" data-datahall-authority="unavailable" data-rz-inspector-dock="1">
 <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -966,7 +967,7 @@ Requested model/calculation versions and the complete locked schema must validat
 <aside tabindex="0" class="side">
 <div class="dh-head" style="display:flex;align-items:flex-start;gap:6px">
 <div style="flex:1;min-width:0">
-<div id="dhName" style="font-size:14px;font-weight:700;color:#cbd5e1;font-family:IBM Plex Sans">Datahall-1</div>
+<div id="dhName" style="font-size:14px;font-weight:700;color:var(--t1);font-family:IBM Plex Sans">Datahall-1</div>
 <div id="dhLoc" style="font-size:9px;color:var(--t3);margin-top:2px">Floor 2 · North Wing</div>
 </div>
 <button type="button" class="dh-sidetog" id="sideTog" aria-label="Collapse sidebar to widen diagram" title="Collapse sidebar to widen diagram">&#9666;</button>
@@ -1167,7 +1168,7 @@ Requested model/calculation versions and the complete locked schema must validat
 <marker id="hpArrB" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0L10 5 0 10z" fill="var(--b)"/></marker>
 <marker id="hpArrO" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0L10 5 0 10z" fill="var(--o)"/></marker>
 </defs>
-<g class="rz-basis" data-basis-param="geometry.hall_area_m2" data-basis-params="geometry.hall_area_m2 geometry.hall_length_m geometry.hall_width_m geometry.hall_height_m compute.racks_per_hall geometry.it_density_kw_per_m2" data-rz-text-group="basis" data-evidence="DERIVED" tabindex="0" role="button"><title>Hall geometry · DERIVED · geometry.hall_area_m2</title><text id="hallGeomCap" x="70" y="24" fill="var(--t1)" font-family="JetBrains Mono" font-size="13" font-weight="600">DATA HALL</text><circle class="rz-basis-mark" cx="62" cy="20" r="2.2" fill="#3f9d6b" stroke="var(--bg2,#0b1220)" stroke-width="0.5"/></g>
+<g class="rz-basis" data-basis-param="geometry.hall_area_m2" data-basis-params="geometry.hall_area_m2 geometry.hall_length_m geometry.hall_width_m geometry.hall_height_m compute.racks_per_hall geometry.it_density_kw_per_m2 power.total_it_hall_kwe" data-rz-text-group="basis" data-evidence="DERIVED" tabindex="0" role="button"><title>Hall geometry · DERIVED · geometry.hall_area_m2</title><text id="hallGeomCap" x="70" y="24" fill="var(--t1)" font-family="JetBrains Mono" font-size="13" font-weight="600">DATA HALL</text><circle class="rz-basis-mark" cx="62" cy="20" r="2.2" fill="#3f9d6b" stroke="var(--bg2,#0b1220)" stroke-width="0.5"/></g>
 <g id="hc"></g></svg>
 <div class="hp-bar" id="hallLayers" role="group" aria-label="Hall plan layers">
 <span class="hp-bar-l">Layers</span>
@@ -3291,6 +3292,8 @@ if(!info)return;
 // Update active button
 nav.querySelectorAll('.dh-btn').forEach(function(b){b.classList.remove('active')});
 btn.classList.add('active');
+// PRD-DCAI-NUMBERS D2: centre the picked chip in the scrollable bar (horizontal only, the page does not jump)
+var nr=nav.getBoundingClientRect(),br=btn.getBoundingClientRect();nav.scrollLeft+=br.left-nr.left-(nr.width-br.width)/2;
 // Update sidebar heading
 var dn=$('dhName');if(dn)dn.textContent=info.name;
 var dl=$('dhLoc');if(dl)dl.textContent=info.loc;
@@ -3374,8 +3377,11 @@ const galN=bn('fanWallGalleries'),modsPer=bn('fanWallModules'),airPlantM2=bn('ai
 let s='';
 const cap=$('hallGeomCap');
 if(cap){const A=bn('hallAreaM2'),H=bn('hallHeightM'),D=bn('itDensityKwM2');
-cap.textContent='DATA HALL DH-0'+(window.currentDH||1)+' — '+em(Lm)+' m × '+em(Wm)+' m — '+grp(A)+' m² — '+em(H)+' m clear — '
- +grp(racksHall)+' racks in '+em(rows)+' rows × '+em(perRow)+' between two fan-wall galleries — '+(D==null?DASH:D.toFixed(0))+' kW/m²';}
+/* PRD-DCAI-NUMBERS D4 (owner: less visible text, more tooltips): the line names the hall, its racks and its IT load;
+   the geometry sentence moves into the tooltip of the same line */
+cap.textContent='DATA HALL DH-0'+(window.currentDH||1)+' · '+grp(racksHall)+' racks · '+grp(bn('itHall'))+' kW IT';
+if(cap.parentNode&&cap.parentNode.setAttribute)cap.parentNode.setAttribute('data-tip',em(Lm)+' m × '+em(Wm)+' m · '+grp(A)+' m² · '+em(H)+' m clear · '
+ +grp(racksHall)+' racks in '+em(rows)+' rows × '+em(perRow)+' between two fan-wall galleries · '+(D==null?DASH:D.toFixed(0))+' kW/m²');}
 const need=[rows,perRow,banks,rpb,Lm,Wm,pitchM,rackWM,rackDM,coldM,hotM,xaM,cduD,galN,modsPer,airPlantM2];
 if(need.some(v=>v==null)||rpb*banks!==rows||rpb%2||banks!==1){
 s+=tx(HX0,HY0+20,'HALL PLAN UNAVAILABLE — engine geometry (rows, racks per row, aisles, galleries, hall size) not loaded','var(--r)',12,0,1);
@@ -3432,11 +3438,21 @@ cards.forEach(k=>{s+=`<rect x="${k.x}" y="38" width="342" height="92" rx="3" fil
  s+=tx(k.x+14,84,k.v,k.c,19,'start',1,k.vo);
  s+=tx(k.x+14,104,k.a,'var(--t2)',10,'start',0,k.ao);
  s+=tx(k.x+14,120,k.b,'var(--t3)',10,'start',0,k.bo);});
-/* the floor budget, term by term — the engine's proof that the room holds what it is given */
-s+=tx(HX0,152,'FLOOR '+grp(bn('hallAreaM2'))+' m² = racks + aisles '+grp(bn('rackFieldM2'))+' · corridor '+grp(bn('crossAisleM2'))+' · CDU line '+grp(bn('cduGalleryM2'))+' · fan walls '+grp(airPlantM2)+' · spare '+grp(bn('floorSpareM2'))+' m²','var(--t2)',10,'start',0,
- bo('hallAreaM2',{also:['rackFieldM2','crossAisleM2','cduGalleryM2','airPlantM2','floorSpareM2']}));
-s+=tx(HX0,170,'CLOSES: width '+em(bn('widthStackM'))+' m of '+em(Wm)+' m · length '+em(bn('lengthStackM'))+' m of '+em(Lm)+' m · fan-wall face '+grp(bn('fanWallFaceM2'))+' of '+grp(bn('fanWallFaceAvailM2'))+' m² at '+em(bn('fanWallVelocityMs'))+' m/s','var(--t3)',10,'start',0,
- bo('widthStackM',{also:['hallWidthM','lengthStackM','hallLengthM','fanWallFaceM2','fanWallFaceAvailM2','fanWallVelocityMs']}));
+/* the floor budget, term by term — the engine's proof that the room holds what it is given. PRD-DCAI-NUMBERS D4: the
+   two sentences that stood here are the tooltip of one chip; the chip says whether the room closes. */
+{const wS=bn('widthStackM'),lS=bn('lengthStackM'),fits=wS!=null&&lS!=null&&wS<=Wm+1e-6&&lS<=Lm+1e-6;
+ const tipF='FLOOR '+grp(bn('hallAreaM2'))+' m² = racks + aisles '+grp(bn('rackFieldM2'))+' · corridor '+grp(bn('crossAisleM2'))+' · CDU line '+grp(bn('cduGalleryM2'))+' · fan walls '+grp(airPlantM2)+' · spare '+grp(bn('floorSpareM2'))+' m²'
+  +' — CLOSES: width '+em(wS)+' m of '+em(Wm)+' m · length '+em(lS)+' m of '+em(Lm)+' m · fan-wall face '+grp(bn('fanWallFaceM2'))+' of '+grp(bn('fanWallFaceAvailM2'))+' m² at '+em(bn('fanWallVelocityMs'))+' m/s';
+ const lab=fits?'AREA CHECK ✓ the room holds the plan':'AREA CHECK ✗ the plan does not fit',col=fits?'var(--g)':'var(--r)';
+ s+=`<g class="hp-area" data-tip="${tipF.replace(/"/g,'&quot;')}" tabindex="0" role="button" aria-label="${(lab+'. '+tipF).replace(/"/g,'&quot;')}">`
+  +`<rect x="${HX0}" y="142" width="${lab.length*6.1+20}" height="18" rx="2" fill="var(--bg3)" fill-opacity=".55" stroke="var(--bd)" stroke-width="1"/>`
+  +tx(HX0+10,155,lab,col,10,'start',1)+'</g>';
+ /* legend, laid left to right from a measured start (JetBrains Mono 10 px = 6 px a character): label, then a swatch
+    before each aisle word, so no swatch can sit on a letter */
+ {const cw=6,segs=[['AISLE SENSORS °C',null],['cold aisle','var(--c)'],['hot aisle','var(--o)']];
+  let lx=HX1-segs.reduce((n,g)=>n+g[0].length*cw+(g[1]?13:0)+14,0)+14;
+  segs.forEach(g=>{if(g[1]){s+=`<rect x="${lx.toFixed(1)}" y="147" width="9" height="9" rx="1" fill="var(--bg1)" stroke="${g[1]}" stroke-width="1.4"/>`;lx+=13;}
+   s+=tx(+lx.toFixed(1),155,g[0],'var(--t3)',10,'start',0);lx+=g[0].length*cw+14;});}}
 
 /* dimension lines and north arrow */
 s+=`<g class="hp-dim" stroke="var(--t3)" stroke-width=".8"><line x1="${HX0}" y1="${HY1+46}" x2="${HX1}" y2="${HY1+46}"/><line x1="${HX0}" y1="${HY1+42}" x2="${HX0}" y2="${HY1+50}"/><line x1="${HX1}" y1="${HY1+42}" x2="${HX1}" y2="${HY1+50}"/><line x1="${HX0-50}" y1="${HY0b}" x2="${HX0-50}" y2="${HY1}"/><line x1="${HX0-54}" y1="${HY0b}" x2="${HX0-46}" y2="${HY0b}"/><line x1="${HX0-54}" y1="${HY1}" x2="${HX0-46}" y2="${HY1}"/></g>`;
@@ -3570,9 +3586,10 @@ s+=`<g class="hp-ly hp-ly-air">`+pill(X(39),Y(Wm-.55)-7,M(22.4),15)+tx(X(Lm-.6),
 /* ===== AISLE SENSORS — three points along every aisle ======================================== */
 for(let p=0;p<pairs;p++){const pi=p,hx=X(hotM0(p)+hotM),cx=X(pairM(p)+coldM/2);
 for(let si=0;si<SENS_PTS;si++){const fy=Y(yF0)+fh*(si+.5)/SENS_PTS;
+const tagN=String(pi+1).padStart(2,'0'),pt=si+1;
 s+=`<g class="hp-sens" data-pi="${pi}" data-rz-authored-basis="simulated aisle sensor: temperature jitter around the engine air planes (design.planes.p09 supply / p11 return); never a field reading">`
- +`<g transform="rotate(-90 ${hx} ${fy.toFixed(1)})"><rect x="${(hx-23).toFixed(1)}" y="${(fy-7.5).toFixed(1)}" width="46" height="13" rx="2" fill="var(--bg1,#0b1220)" fill-opacity=".82"/><text x="${hx}" y="${(fy+3).toFixed(1)}" fill="var(--o)" font-family="${J}" font-size="10" text-anchor="middle" font-weight="600" id="H${pi}${si}t">— °C</text></g>`
- +`<g transform="rotate(-90 ${cx} ${fy.toFixed(1)})"><rect x="${(cx-23).toFixed(1)}" y="${(fy-7.5).toFixed(1)}" width="46" height="13" rx="2" fill="var(--bg1,#0b1220)" fill-opacity=".82"/><text x="${cx}" y="${(fy+3).toFixed(1)}" fill="var(--c)" font-family="${J}" font-size="10" text-anchor="middle" font-weight="600" id="C${pi}${si}t">— °C</text></g></g>`;}}
+ +`<g data-tip="TT-HA-${tagN}-${pt} · hot aisle ${tagN}, point ${pt} of ${SENS_PTS}" data-unit="°C"><rect x="${(hx-13).toFixed(1)}" y="${(fy-6.5).toFixed(1)}" width="26" height="12" rx="2" fill="var(--bg1,#0b1220)" fill-opacity=".9" stroke="var(--o)" stroke-width=".8"/><text x="${hx}" y="${(fy+3).toFixed(1)}" fill="var(--o)" font-family="${J}" font-size="9" text-anchor="middle" font-weight="600" id="H${pi}${si}t">—</text></g>`
+ +`<g data-tip="TT-CA-${tagN}-${pt} · cold aisle ${tagN}, point ${pt} of ${SENS_PTS}" data-unit="°C"><rect x="${(cx-13).toFixed(1)}" y="${(fy-6.5).toFixed(1)}" width="26" height="12" rx="2" fill="var(--bg1,#0b1220)" fill-opacity=".9" stroke="var(--c)" stroke-width=".8"/><text x="${cx}" y="${(fy+3).toFixed(1)}" fill="var(--c)" font-family="${J}" font-size="9" text-anchor="middle" font-weight="600" id="C${pi}${si}t">—</text></g></g>`;}}
 
 /* ===== UTILITY ENTRIES on the east wall — HTW to the CDU line, CHW to both galleries ========= */
 s+=`<g class="fws-pipe-click" data-rz-equipment="fws-piping:dh01" tabindex="0" role="button" data-tip="HTW riser from the roof dry coolers to the CDU primaries · ${em(bn('htwSupplyC'))} °C supply / ${em(bn('htwReturnC'))} °C return · ${grp(bn('htwFlowHallM3h'))} m³/h per hall">`;
@@ -3621,7 +3638,7 @@ const SR=Math.ceil(_rpb/2)*_bk,SP=3;   /* containment pairs across the hall x po
    picks up a little on the throw, so the anchor walks with the point index — still declared
    simulated jitter about the engine air planes, never a field reading, and still 1 decimal
    (v2.18.0: five digits printed 25.78698 C on a 2.8 px glyph). */
-if(rzPanelOn('hall'))for(let r=0;r<SR;r++)for(let si=0;si<SP;si++){const ht=$('H'+r+si+'t'),hh=$('H'+r+si+'h'),ct=$('C'+r+si+'t'),ch=$('C'+r+si+'h');if(ht){const v=RZ_SIM('hac'+r+'-'+si,33.4+si*1.1,37.2+si*1.1,1);ht.textContent=v+'\u00B0C';const hz=$('H'+r+si+'z');if(hz)hz.setAttribute('fill',hallHeat(parseFloat(v),.34));}if(hh)hh.textContent=RZ_SIM('hah'+r+'-'+si,40,65,1)+'%';if(ct){const v=RZ_SIM('cac'+r+'-'+si,25.3+r*0.05+si*0.22,25.8+r*0.05+si*0.22,1);ct.textContent=v+'\u00B0C';document.querySelectorAll('#hSvg .C'+r+si+'z').forEach(z=>z.setAttribute('fill',hallHeat(parseFloat(v),.16)));}if(ch)ch.textContent=RZ_SIM('cah'+r+'-'+si,45,70,1)+'%'}
+if(rzPanelOn('hall'))for(let r=0;r<SR;r++)for(let si=0;si<SP;si++){const ht=$('H'+r+si+'t'),hh=$('H'+r+si+'h'),ct=$('C'+r+si+'t'),ch=$('C'+r+si+'h');if(ht){const v=RZ_SIM('hac'+r+'-'+si,33.4+si*1.1,37.2+si*1.1,1);ht.textContent=v;const hz=$('H'+r+si+'z');if(hz)hz.setAttribute('fill',hallHeat(parseFloat(v),.34));}if(hh)hh.textContent=RZ_SIM('hah'+r+'-'+si,40,65,1)+'%';if(ct){const v=RZ_SIM('cac'+r+'-'+si,25.3+r*0.05+si*0.22,25.8+r*0.05+si*0.22,1);ct.textContent=v;document.querySelectorAll('#hSvg .C'+r+si+'z').forEach(z=>z.setAttribute('fill',hallHeat(parseFloat(v),.16)));}if(ch)ch.textContent=RZ_SIM('cah'+r+'-'+si,45,70,1)+'%'}
 /* PUE/IT/DLC are ENGINE-DERIVED (not random). GPU% and W/GPU remain live
  * telemetry jitter (genuine sensor readings, not basis-of-design values). */
 /* v3.11.7 — these five cells live inside #p-hall; #sUA/#sUB below do not, so this function keeps
@@ -12165,9 +12182,19 @@ showTip(e);return;
 }
 }
 }
+/* PRD-DCAI-NUMBERS D4/D6/D11: any other hall item that carries data-tip (the hall line, the area check, every aisle
+   sensor). A sensor's tooltip leads with its live reading. */
+var dt=t.closest&&t.closest('[data-tip]');
+if(dt&&hSvg.contains(dt)){hallTipText(dt);showTip(e);return;}
 tip.style.display='none';
 });
 hSvg.addEventListener('mouseleave',function(){tip.style.display='none'});
+function hallTipText(dt){var v=dt.querySelector('text[id]'),u=dt.getAttribute('data-unit'),live=v&&/\d/.test(v.textContent)?v.textContent+(u?' '+u:'')+' · ':'';tip.textContent=live+dt.getAttribute('data-tip');}
+/* keyboard focus and a tap show the same tooltip, anchored to the item (the hover path above is mouse-only) */
+function hallTipAt(dt){var r=dt.getBoundingClientRect();hallTipText(dt);showTip({clientX:r.left+r.width/2,clientY:r.bottom});}
+hSvg.addEventListener('focusin',function(e){var dt=e.target.closest&&e.target.closest('[data-tip]');if(dt&&hSvg.contains(dt))hallTipAt(dt);});
+hSvg.addEventListener('focusout',function(){tip.style.display='none'});
+hSvg.addEventListener('pointerup',function(e){if(e.pointerType==='mouse')return;var dt=e.target.closest&&e.target.closest('[data-tip]');if(dt&&hSvg.contains(dt))hallTipAt(dt);});
 function showTip(e){
 var was=tip.style.display!=='block';
 tip.style.display='block';
@@ -12176,6 +12203,8 @@ if(was&&tip.animate)tip.animate(matchMedia('(prefers-reduced-motion: reduce)').m
 var left=e.clientX+12,top=e.clientY+12;
 if(left+260>window.innerWidth)left=e.clientX-268;
 if(top+200>window.innerHeight)top=window.innerHeight-210;
+/* D11: on a phone the flip to the left could start off screen; keep the whole tip inside the window */
+left=Math.max(4,Math.min(left,window.innerWidth-tip.offsetWidth-4));
 tip.style.left=left+'px';tip.style.top=Math.max(4,top)+'px';
 }
 // === UNIVERSAL TOOLTIP for ALL other SVGs (data-tip attribute) ===
@@ -12743,7 +12772,7 @@ function paint(bar){
   var a=rules(); var st=fmtState(a);
   var age=Math.max(1,Math.round((Date.now()-pageStart)/1000)%60);
   bar.innerHTML=
-    '<span class="ab ab-state '+st.cls+'">'+st.t+'</span>'+
+    '<span class="ab ab-state '+st.cls+'" title="Hall state: '+st.t+'"><i class="ab-dot" aria-hidden="true"></i><span class="ab-sr">'+st.t+'</span></span>'+
     '<span class="ab ab-crit'+(a.crit>0?' hot':'')+'">Critical <b>'+a.crit+'</b></span>'+
     '<span class="ab ab-warn'+(a.warn>0?' hot':'')+'">Warning <b>'+a.warn+'</b></span>'+
     '<span class="ab ab-maint">Maintenance <b>'+a.maint+'</b></span>'+
@@ -15736,6 +15765,7 @@ if(faqBtn){ faqBtn.addEventListener('click',openFaqDialog); }
     <!-- HMI drawing layer (R128-R134, R143): symbol library, sheet renderer, datahallAI sheets, mount + payload binding -->
     <script src="js/rz-eng-symbols.js?v=20261118-528d60ce"></script>
     <script src="js/rz-hmi-sheet.js?v=20261120-4c3244f4"></script>
-    <script src="js/datahall-ai/hmi-sheets.js?v=20261119-ea36470b"></script>
-    <script src="js/datahall-ai/hmi-v2.js?v=20261119-4e543a23"></script>
+    <script src="js/datahall-ai/hmi-sheets.js?v=20261120-25a06ecc"></script>
+    <script src="js/conv/vfx.js?v=20261117-89056876"></script>
+    <script src="js/datahall-ai/hmi-v2.js?v=20261120-4ce8afcd"></script>
 </body></html>

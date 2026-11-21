@@ -119,6 +119,9 @@ gate "DC AI fire — FACP cause and effect" node tools/test-datahall-ai-fire-cau
 gate "DC AI fire workstation — inventory formula, isolation refusals, two-means rule, records, expiry, purity" node --test tools/test-datahall-ai-fire-points.mjs
 gate "DC AI fire workstation — runtime: scoped sub-tabs, isolate via inspector, impairment banner + strip, C&E block, persistence" node tools/test-datahall-ai-fire-runtime.mjs
 gate "DC AI HMI drawings — H0 ratchet, H1 paint, H2 library, H4 names, H5 text budget, H6 fit 1440/390, H13 first open, F1-F9 fire sheet, F10-F14 interlocks DH-F-103, F15-F18 zone map DH-F-104 (R128-R134, R143)" node tools/test-dh-drawings.mjs
+gate "DC AI living plant (A1) — Cooling & Piping state colour, motion bound to pump speed, standby, pump-failure perturbation, Thermal/Flat, reduced motion, off-screen pause" node tools/test-dh-vfx.mjs
+gate "DC AI point limits (B1) — every band sourced, relative to the engine setpoint, ordered, design point normal" node tools/test-dcai-points.mjs
+gate "DC AI Data Hall tab (B5a) — compact KPI grid on a phone, hall selector one line and reachable, one severity word, title contrast, no sideways scroll" node tools/test-dh-hall.mjs
 gate "DC AI operator truth — one state model, no state without evidence, flow only with evidence, quality on values, alarm badge without colour, reduced motion (O1-O5, O8; BMS master prompt)" node tools/test-dh-operator.mjs
 gate "DC AI operator UI — markup contract" node tools/test-datahall-ai-operator-ui.mjs
 gate "DC AI operator UI — runtime contract" node tools/test-datahall-ai-operator-runtime.mjs
