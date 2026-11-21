@@ -4,7 +4,8 @@
    Per sheet, in a real browser at 1440 (and overflow at 390):
    S1 the view bar is mounted with State / Medium / Flat and NO Thermal button (the sheet has no temperature points)
    S2 every line the page gives a flow state carries data-vstate; the states on the sheet = the page's own flow function
-   S3 a running line is painted the running colour and its flow dashes move; a stopped line shows no moving dashes
+   S3 a running line is painted the running colour (or, State view, its medium tube: PRD-CONV-BMS-LIVE L2) and its flow
+      dashes move; a stopped line shows no moving dashes
    S4 a stopped or no-data line carries a dash pattern (second signal beside colour)
    S6 a standby line (charged, no flow) is solid, in the standby colour, with no moving dashes; the fire main at rest
       reads standby while the header holds pressure, its test/drain and make-up lines stopped
@@ -57,7 +58,11 @@ for (const [page, HOST, key] of SHEETS) {
         out.counts[st] = (out.counts[st] || 0) + 1;
         const cs = getComputedStyle(p), f = host.querySelector('path[data-edge-flow="' + e.id + '"]'), fc = f ? getComputedStyle(f) : null;
         const moving = !!fc && fc.display !== 'none' && fc.animationName !== 'none';
-        if (st === 'running') { if (cs.stroke !== run) out.wrongRun.push(e.id); if (!moving) out.noMove.push(e.id); }
+        /* PRD-CONV-BMS-LIVE L2: in the State view a running pipe of a known medium is a tube of that medium (the slugs say it
+           runs); it must still never read as standby. Any other running pipe keeps the running colour. */
+        const med = /(^|\s)m-(chw|cw|fw|pw|dr|fuel|agent|htw|tcs_s|tcs_r)(\s|$)/.test(p.getAttribute('class') || '');
+        const runOk = cs.stroke === run || (med && cs.stroke !== stby && cs.stroke !== 'none');
+        if (st === 'running') { if (!runOk) out.wrongRun.push(e.id); if (!moving) out.noMove.push(e.id); }
         if (st === 'standby') { if (moving) out.stillRun.push(e.id); if (cs.strokeDasharray && cs.strokeDasharray !== 'none') out.stbyDashed.push(e.id); if (cs.stroke !== stby) out.stbyColour.push(e.id); }
         out.st[e.id] = st;
         if (st === 'stopped' || st === 'unavailable') { if (moving) out.stillRun.push(e.id); if (!cs.strokeDasharray || cs.strokeDasharray === 'none') out.noDash.push(e.id); }

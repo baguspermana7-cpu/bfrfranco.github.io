@@ -3,7 +3,8 @@
    on the chiller plant, in a real browser (PRD-CONV-LIVING-PLANT §4, §5.1, §7).
    VFX
    B1 the view bar is mounted; default mode "state"; the four modes switch the frame attribute and aria-pressed
-   B2 state mode: a running line's painted stroke is the running colour; after RZConvSim stops a train's pump the
+   B2 state mode: a running line's painted stroke is the running colour, or (PRD-CONV-BMS-LIVE L2) its medium colour for
+      a medium pipe, never the standby colour; after RZConvSim stops a train's pump the
       lines of that branch are no longer "running" and their flow dashes are hidden (0 motion at 0 flow)
    B3 flow speed follows flow: the dash period on a branch = RZConvVfx.dashSeconds(flow / design) (±0.02 s)
    B4 pump rotor: the duty pump's rotor spins with a period = rotorSeconds(speed); the standby pump's does not
@@ -72,15 +73,16 @@ const rgb = (s) => (s.match(/\d+(\.\d+)?/g) || []).slice(0, 3).map(Number);
     svg.querySelectorAll('path[data-edge][data-vstate]').forEach((p) => {
       const st = p.getAttribute('data-vstate'); out.counts[st] = (out.counts[st] || 0) + 1;
       const f = svg.querySelector('path[data-edge-flow="' + p.getAttribute('data-edge') + '"]'), cs = getComputedStyle(p), fc = f ? getComputedStyle(f) : null;
-      out.edges[p.getAttribute('data-edge')] = { st, stroke: cs.stroke, dash: cs.strokeDasharray, flowShown: fc ? fc.display !== 'none' : false, anim: fc ? fc.animationName : 'none', dur: fc ? parseFloat(fc.animationDuration) : 0 };
+      out.edges[p.getAttribute('data-edge')] = { st, med: /(^|\s)m-(chw|cw|fw|pw|dr|fuel|agent|htw|tcs_s|tcs_r)(\s|$)/.test(p.getAttribute('class') || ''), stroke: cs.stroke, dash: cs.strokeDasharray, flowShown: fc ? fc.display !== 'none' : false, anim: fc ? fc.animationName : 'none', dur: fc ? parseFloat(fc.animationDuration) : 0 };
     });
-    const probe = document.createElement('i'); probe.style.color = 'var(--vfx-run)'; document.querySelector(H).appendChild(probe); out.run = getComputedStyle(probe).color; probe.remove();
+    const probe = document.createElement('i'); probe.style.color = 'var(--vfx-run)'; document.querySelector(H).appendChild(probe); out.run = getComputedStyle(probe).color; probe.style.color = 'var(--vfx-stby)'; out.stby = getComputedStyle(probe).color; probe.remove();
     return out;
   }, HOST);
   let s = await snap();
   const running = Object.entries(s.edges).filter(([, e]) => e.st === 'running');
   ok(running.length >= 10, 'B2 fewer than 10 running lines at the design point: ' + JSON.stringify(s.counts));
-  ok(running.every(([, e]) => e.stroke === s.run), 'B2 a running line is not painted the running colour: ' + JSON.stringify((running.find(([, e]) => e.stroke !== s.run) || []).concat(s.run)));
+  const runOk = (e) => e.stroke === s.run || (e.med && e.stroke !== s.stby && e.stroke !== 'none');
+  ok(running.every(([, e]) => runOk(e)), 'B2 a running line is not painted the running (or its medium) colour: ' + JSON.stringify((running.find(([, e]) => !runOk(e)) || []).concat(s.run)));
   ok(running.every(([, e]) => e.flowShown && e.anim !== 'none'), 'B2 a running line shows no moving flow');
   /* B3: branch of train 1 */
   const b3 = await pg.evaluate(() => { const lp = st.loops[0]; return { want: window.RZConvVfx.dashSeconds(lp.flow / LOOP_FLOW_DESIGN), id: 'e-s1' }; });

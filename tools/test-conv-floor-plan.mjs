@@ -9,7 +9,8 @@
    FL5  cabinet height in px is monotonic in kW (Spearman = 1); spare cabinets have height 0
    FL6  0 painted colours in the stage in the cyan family (OKLCH hue 180-245, chroma > 0.06)
    FL7  no text is in a state token colour or a chromatic series colour, except a state word with a glyph
-   FL8  no animation, glow (box-shadow blur, text-shadow, filter) on any stage element
+   FL8  no animation, glow (box-shadow blur, text-shadow, filter) on any stage element; only the process air paths
+        (paths inside .fp-air running keyframes fp-air, PRD-CONV-BMS-LIVE L4) may move
    FL9  25 hot-aisle caps, the installed CRAH count, a floor slab and a wall of 2 edges
    FL10 <= 30 visible numbers in the plan area at 1440, in every mode
    FL11 390 px: no page-level sideways scroll; cabinet unit u >= 7 px in a scroller; row panel opens, 44 px targets
@@ -304,7 +305,9 @@ for (const theme of ['dark', 'light']) {
       ['', '::before', '::after'].forEach((ps) => {
         const s = ps ? getComputedStyle(e, ps) : cs;
         if (ps && s.content === 'none') return;
-        if (s.animationName !== 'none' && parseFloat(s.animationDuration) > 0) o.anim.push(`${g.tag(e)}${ps} ${s.animationName}`);
+        /* PRD-CONV-BMS-LIVE L4: the hall's air paths (.fp-air path, keyframes fp-air, speed from airflow) are process motion */
+        const air = !ps && e.tagName.toLowerCase() === 'path' && !!e.closest('.fp-air') && s.animationName === 'fp-air';
+        if (s.animationName !== 'none' && parseFloat(s.animationDuration) > 0 && !air) o.anim.push(`${g.tag(e)}${ps} ${s.animationName}`);
         if (s.boxShadow !== 'none') { const body = s.boxShadow.replace(/rgba?\([^)]*\)|color\([^)]*\)/g, ' '); const nums = (body.match(/-?[\d.]+px/g) || []).map(parseFloat); if (nums[2] > 0) o.glow.push(`${g.tag(e)}${ps} box-shadow ${s.boxShadow.slice(0, 50)}`); }
         if (s.textShadow !== 'none') o.glow.push(`${g.tag(e)}${ps} text-shadow`);
         if (s.filter !== 'none') o.glow.push(`${g.tag(e)}${ps} filter ${s.filter}`);

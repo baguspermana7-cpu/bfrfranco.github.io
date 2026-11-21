@@ -239,7 +239,10 @@ thing that runs, its speed is a process value, and it stops off screen and under
   at mean row heat, faster for hotter rows (0.6–3 s); no supply from a gallery end whose nearest CRAH is off.
 - Network: UP links carry round packets (0.1 × 11.9, 3 px), 0.6 s per period at full load to 2.4 s at ≤ 25 %; standby
   links never move.
-- A sheet too large to repaint every frame steps its motion with a clock (chiller: 24 Hz, never below 20 Hz).
+- A sheet too large to repaint every frame never steps the sheet itself fast: every step repaints the whole drawing
+  (chiller: ~60 ms a step). Its running flow moves on a separate thin SVG layer laid over the sheet (copies of the flow
+  lines, same computed stroke and speed), stepped at 24 Hz by writing the dash offset of the copies in view only;
+  the sheet's own flow lines are hidden. Rotors may stay on a 3 Hz sheet clock.
 - Never: glow, blur, drop shadow, particles without a process value, a moving mark on a stopped line.
 - Gate: `tools/test-conv-live.mjs`. Styles: `css/conv-live.css` (after `conv-vfx.css` and `conv-motion.css`).
 

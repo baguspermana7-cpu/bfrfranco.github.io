@@ -204,10 +204,13 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
 .legend .warn{border-color:rgba(182,141,73,.65);color:#e3c88f}
 .legend .alarm{border-color:rgba(187,93,93,.7);color:#ecb7b7}
 .chw-sheet-host{display:block}
-/* E3 PERF: sheet motion stepped by the 24 Hz chwMotionClock (see chwMotionClock) */
+/* E3 PERF: rotors stepped by the 3 Hz chwMotionClock; flow runs on its own layer (see chwMotionClock) */
 @media (prefers-reduced-motion: no-preference){
   #chw-sheet-host .hmi-svg .hmi-flow[data-flow="running"],#chw-sheet-host .hmi-svg .vfx-rotor[data-spin]{animation-play-state:paused}
 }
+/* PRD-CONV-BMS-LIVE: the running flow moves on its own sparse layer over the sheet (see chwMotionClock) */
+#chw-sheet-host svg.chw-flow-layer{position:absolute;pointer-events:none;overflow:hidden;will-change:transform;z-index:1}
+#chw-sheet-host svg.hmi-svg.chw-flow-lifted .hmi-flow{visibility:hidden}
 /* E3 (PRD-CONV-EQUIPMENT-TRUTH §12, P-8): the plant sheets draw at 1:1 or larger (minScale 1), so 12-unit text renders
    at 11 px or more at 1440 and 390; the hall the selector names is outlined on its CRAH bank */
 .sheet-switch{display:flex;gap:6px;flex-wrap:wrap}
@@ -566,7 +569,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
         ]
     }
     </script>
-    <script src="js/rz-version.js?v=20261121-0a4cc15b" defer></script>
+    <script src="js/rz-version.js?v=20261121-a36f006f" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- Conventional BMS single scenario engine — single source of truth for the
@@ -1842,35 +1845,99 @@ function drawPid(){
    animation-delay 3 times a second, so the sheet paints 3 frames a second instead of 60. The delay is written per
    element, not as one inherited custom property on the host: that restyled every node of the drawing on each tick
    (UpdateLayoutTree 1.4 s per 5 s). Off screen or in a hidden tab the clock stops writing. */
-/* PRD-CONV-BMS-LIVE L1 (owner R184 "tidak ada animasi"): 3 Hz read as a frozen plant (7.6 px jumps). The clock now steps at
-   24 Hz (42 ms): the dash moves ~1 px a step, smooth to the eye, still well under the 60 fps cost measured above. */
+/* PRD-CONV-BMS-LIVE L1 (owner R184 "tidak ada animasi"): 3 Hz read as a frozen plant (7.6 px jumps), and stepping the
+   sheet faster cannot work: each tick repaints the whole drawing (~60 ms measured), so 24 Hz pinned the main thread
+   (5 s CPU per 5 s, alarm-to-mark 319 ms). The running flow therefore moves on its OWN layer: a second, sparse SVG laid
+   exactly over the sheet holds a copy of every flow line (same path, same computed stroke, dash and speed from
+   js/conv/vfx.js) and animates natively; only that thin layer repaints. The sheet's own flow lines stay (gates and
+   colours read them) but are hidden. Rotors stay on the 3 Hz clock. Pan and zoom follow the sheet's viewBox and its
+   gesture transform; colours and speeds are copied whenever vfx.js repaints a line or the mode changes, and a copy
+   outside the viewport is paused. */
 (function chwMotionClock(){
   var host = document.getElementById('chw-sheet-host');
   if(!host) return;
-  /* only the moving elements inside the viewport are stepped: the 10-train sheet is ~2.5 screens tall, and a line
-     the reader cannot see needs no frame (it resumes on the first tick after it scrolls in) */
-  var svg = null, seen = null, io = null;
-  function watch(){
+  var NS = 'http://www.w3.org/2000/svg';
+  var svg = null, ov = null, mo = null, ro = null, seen = null, io = null, fo = null, oio = null, inView = new Set(), queued = false;
+  /* copy after the sheet's own repaint has reached the screen (an alarm mark must not wait for the copy) */
+  function later(){ if(queued) return; queued = true; setTimeout(function(){ queued = false; sync(); }, 120); }
+  var COPY = ['stroke', 'stroke-width', 'stroke-dasharray', 'stroke-linecap', 'opacity'];
+  var motion = [];   /* per copy: seconds per 16-unit dash period (from the line's vfx.js duration), 0 = still; sign = direction */
+  function place(){
+    if(!svg || !ov) return;
+    var par = svg.parentNode, pr = par.getBoundingClientRect(), t = svg.style.transform;
+    if(t) svg.style.transform = '';              /* measure the resting box, not the gesture preview */
+    var sr = svg.getBoundingClientRect();
+    if(t){ svg.style.transform = t; if(mo) mo.takeRecords(); }   /* our own measuring write is not a pan: drop its records */
+    ov.style.left = (sr.left - pr.left - par.clientLeft + par.scrollLeft) + 'px'; ov.style.top = (sr.top - pr.top - par.clientTop + par.scrollTop) + 'px';
+    ov.style.width = sr.width + 'px'; ov.style.height = sr.height + 'px';
+    ov.setAttribute('viewBox', svg.getAttribute('viewBox') || '');
+    ov.setAttribute('preserveAspectRatio', svg.getAttribute('preserveAspectRatio') || 'xMidYMid meet');
+    ov.style.transform = svg.style.transform; ov.style.transformOrigin = svg.style.transformOrigin;
+  }
+  function sync(){
+    if(!svg || !ov) return;
+    var src = svg.querySelectorAll('.hmi-flow'), kids = ov.children;
+    while(kids.length > src.length) ov.removeChild(ov.lastChild);
+    motion.length = src.length;
+    for(var i = 0; i < src.length; i++){
+      var o = kids[i];
+      if(!o){ o = document.createElementNS(NS, 'path'); o.setAttribute('class', 'chw-flow-copy'); ov.appendChild(o); }
+      var a = src[i], d = a.getAttribute('d');
+      if(o.getAttribute('d') !== d) o.setAttribute('d', d);
+      var cs = getComputedStyle(a), st = 'fill:none;';
+      for(var k = 0; k < COPY.length; k++) st += COPY[k] + ':' + cs.getPropertyValue(COPY[k]) + ';';
+      if(a.getAttribute('data-flow') !== 'running' || cs.display === 'none') st += 'display:none;';
+      if(o.getAttribute('style') !== st) o.setAttribute('style', st);
+      var dur = parseFloat(cs.animationDuration) || 0, run = cs.animationName !== 'none' && dur > 0 && st.indexOf('display:none') < 0;
+      motion[i] = run ? (/reverse/.test(cs.animationDirection) ? -dur : dur) : 0;
+    }
+  }
+  function mount(){
     var cur = host.querySelector('svg.hmi-svg');
     if(cur === svg) return;
-    svg = cur; seen = new Set();
-    if(io) io.disconnect();
+    if(mo) mo.disconnect(); if(ro) ro.disconnect(); if(io) io.disconnect(); if(fo) fo.disconnect(); if(oio) oio.disconnect();
+    if(ov && ov.parentNode) ov.parentNode.removeChild(ov);
+    svg = cur; ov = null; seen = new Set();
     if(!svg) return;
-    if(typeof IntersectionObserver !== 'function'){ seen = null; return; }
-    io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting) seen.add(e.target); else seen.delete(e.target); }); });
-    svg.querySelectorAll('.hmi-flow, .vfx-rotor').forEach(function(el){ io.observe(el); });
+    ov = document.createElementNS(NS, 'svg');
+    ov.setAttribute('class', 'chw-flow-layer'); ov.setAttribute('aria-hidden', 'true');
+    var par = svg.parentNode; if(getComputedStyle(par).position === 'static') par.style.position = 'relative';
+    par.insertBefore(ov, svg.nextSibling);
+    svg.classList.add('chw-flow-lifted');
+    place(); sync();
+    inView = new Set();
+    if(typeof IntersectionObserver === 'function'){
+      oio = new IntersectionObserver(function(es){ es.forEach(function(e){ var k = Array.prototype.indexOf.call(ov.children, e.target);
+        if(e.isIntersecting) inView.add(k); else inView.delete(k); }); });
+      Array.prototype.forEach.call(ov.children, function(c){ oio.observe(c); });
+    } else for(var q = 0; q < ov.children.length; q++) inView.add(q);
+    /* the flow lines change only when js/conv/vfx.js repaints them: copy then, not on a timer */
+    fo = new MutationObserver(function(rs){ for(var r = 0; r < rs.length; r++){ var t = rs[r].target; if(t.classList && t.classList.contains('hmi-flow')){ later(); return; } } });
+    fo.observe(svg, { subtree: true, attributes: true, attributeFilter: ['class', 'style', 'data-flow', 'data-vstate', 'data-vmove', 'd'] });
+    mo = new MutationObserver(function(){ place(); });
+    mo.observe(svg, { attributes: true, attributeFilter: ['viewBox', 'style'] });
+    var frame = svg.closest('.hmi-frame');
+    if(frame) new MutationObserver(later).observe(frame, { attributes: true, attributeFilter: ['data-vfx-mode'] });
+    if(typeof ResizeObserver === 'function'){ ro = new ResizeObserver(place); ro.observe(svg); }
+    if(typeof IntersectionObserver === 'function'){
+      io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting) seen.add(e.target); else seen.delete(e.target); }); });
+      svg.querySelectorAll('.vfx-rotor').forEach(function(el){ io.observe(el); });
+    } else seen = null;
   }
-  setInterval(function(){
+  setInterval(function(){ if(!document.hidden) mount(); }, 500);   /* a redrawn sheet is a new svg: mount it */
+  setInterval(function(){                         /* the flow layer: 24 Hz step of the copies in view (a thin layer) */
+    if(document.hidden || host.classList.contains('is-offscreen') || !ov) return;
+    var t = performance.now() / 1000, kids = ov.children;   /* the dash offset is written directly: no style or animation work */
+    inView.forEach(function(k){ var o = kids[k], m = motion[k]; if(o && m) o.setAttribute('stroke-dashoffset', (-16 * ((t / m) % 1)).toFixed(2)); });
+  }, 42);
+  setInterval(function(){                         /* rotors: 3 Hz step (each step repaints the sheet) */
     if(document.hidden || host.classList.contains('is-offscreen')) return;
-    watch();
+    mount();
     if(!svg) return;
     var d = '-' + (performance.now() / 1000).toFixed(2) + 's';
-    var els = seen ? Array.from(seen) : svg.querySelectorAll('.hmi-flow, .vfx-rotor');
-    for(var i = 0; i < els.length; i++){
-      var el = els[i];
-      if(el.isConnected && (el.getAttribute('data-flow') === 'running' || el.hasAttribute('data-spin'))) el.style.animationDelay = d;
-    }
-  }, 42);
+    var els = seen ? Array.from(seen) : svg.querySelectorAll('.vfx-rotor');
+    for(var i = 0; i < els.length; i++){ var el = els[i]; if(el.isConnected && el.hasAttribute('data-spin')) el.style.animationDelay = d; }
+  }, 333);
 })();
 
 function selectChwView(view){

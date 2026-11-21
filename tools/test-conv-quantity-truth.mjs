@@ -423,7 +423,10 @@ async function perfOf(origin, label) {
   const anim = await pg.evaluate(async () => {
     const host = document.querySelector('#chw-sheet-host'); if (!host) return null;
     const all = host.getAnimations({ subtree: true });
-    const moving = [...host.querySelectorAll('.hmi-flow[data-flow="running"]')].filter((e) => getComputedStyle(e).animationName !== 'none');
+    /* PRD-CONV-BMS-LIVE: the running flow is drawn on its own thin layer over the sheet (.chw-flow-copy, offset stepped
+       by script); the sheet's own lines are hidden. Phase is read where the motion is drawn. */
+    const lay = [...host.querySelectorAll('svg.chw-flow-layer .chw-flow-copy')].filter((e) => getComputedStyle(e).display !== 'none');
+    const moving = lay.length ? lay : [...host.querySelectorAll('.hmi-flow[data-flow="running"]')].filter((e) => getComputedStyle(e).animationName !== 'none');
     const r = host.getBoundingClientRect(), vis = moving.filter((e) => { const b = e.getBoundingClientRect(); return b.bottom > Math.max(0, r.top) && b.top < Math.min(innerHeight, r.bottom); });
     const ph = () => vis.map((e) => getComputedStyle(e).strokeDashoffset).join('|');
     const p1 = ph(); await new Promise((res) => setTimeout(res, 900)); const p2 = ph();

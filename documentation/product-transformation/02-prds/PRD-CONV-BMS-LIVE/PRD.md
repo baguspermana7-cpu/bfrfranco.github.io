@@ -1,6 +1,6 @@
 # PRD-CONV-BMS-LIVE — the plant is seen running (owner R184)
 
-Status: BUILT v3.86.0 (gate tools/test-conv-live.mjs 39/39; 7 of 9 laws red on v3.84.0)
+Status: BUILT v3.86.1 (gate tools/test-conv-live.mjs 41/41; 7 of 9 laws red on v3.84.0)
 Owner comment (2026-11-21, after v3.84.0): "saya masih tidak belum melihat perubahan signifikan. Masih abu2 semua tidak
 ada animasi yg immersive dll".
 
@@ -41,8 +41,12 @@ L1 · Flow you can see (sheets: chiller, fuel, water, fire, EPMS).
   inside a 2.8–3.6 px running tube (L2); alarm lines keep their red, standby/stopped carry no slugs. Electrical current:
   ink dots on the green energised conductor. Insulated CHW: the aluminium jacket takes the CHW tone while running.
 - Speed bound to the line: unchanged `RZConvVfx.dashSeconds(flow / design)` (already process-bound).
-- Smooth: the chiller's stepper is raised from 3 Hz to 24 Hz. It stays a stepper: its own comment measured a free-running
-  10-train sheet at ~4 s of main thread per 5 s. In-view gating stays (`.is-offscreen` + B7 P4).
+- Smooth: the chiller's flow moves on its own layer. v3.86.0 raised the sheet stepper from 3 Hz to 24 Hz; the release gate
+  then measured each step repainting the whole 10-train drawing (~60 ms): 24 Hz pinned the main thread (2.3 s CPU per
+  5 s idle, over the 1.5 s law; alarm-to-mark 319 ms, over 250). v3.86.1: a thin SVG layer over the sheet carries a
+  copy of every flow line (same path, computed stroke and dash, speed from vfx.js); a 24 Hz clock writes the dash
+  offset of the copies in view; the sheet's lines are hidden; rotors back on the 3 Hz sheet clock. Measured idle CPU
+  ~1.25 s per 5 s (v3.84.0 ~0.8 s, v3.86.0 ~2.4 s). In-view gating stays (`.is-offscreen` + B7 P4).
 
 L2 · Medium colour by default. The pipe body takes its medium colour at reduced chroma in the State view too (CHW
 supply/return, condenser, fuel, water, agent, power feeds A/B); the state is carried by the slugs (running), the dash
@@ -72,7 +76,8 @@ L6 · Reduced motion: no slugs move and no rotor turns; colour stays (the plant 
 - LV5 datahall Plan: ≥ 25 cold-aisle and ≥ 25 hot-aisle air paths animate; an off CRAH bay has none.
 - LV6 ict: every UP link animates, no STANDBY link animates.
 - LV7 reduced motion: 0 running slug/rotor animations, colours unchanged.
-- LV8 static: chiller clock ≤ 50 ms; 8 pages link `conv-live.css` after `conv-motion.css`; no glow/filter/shadow.
+- LV2 also: the chiller flow layer sits exactly over the sheet (rect, viewBox), one copy per flow line, same path and stroke.
+- LV8 static: chiller flow-layer step ≤ 50 ms; 8 pages link `conv-live.css` after `conv-motion.css`; no glow/filter/shadow.
 - LV9 (reported, not gated) coloured share at the first sheet: chiller 3.9 → 5.7 %, ict 5.9 → 6.1 %, datahall 28 %.
   Fuel and fire stay grey at utility-normal because nothing in them runs; colour there would be decoration.
 

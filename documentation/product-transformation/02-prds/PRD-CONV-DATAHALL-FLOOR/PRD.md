@@ -228,7 +228,7 @@ The legend is one line of discrete keys, with no bar:
 | FL5 | Cabinet height in px is monotonic in kW (Spearman ρ = 1 over the occupied set) and spare cabinets have height 0 | flat cells |
 | FL6 | 0 painted colours in the stage within ΔE 12 of cyan (hue 190–215°, chroma > 0.06 OKLCH), in both themes | cyan active mode, selection, in-°C text |
 | FL7 | No text node in the stage has a colour from the state tokens or a series colour, except state words with a glyph | 25 cyan + 25 amber footer numbers |
-| FL8 | No `animation` on any stage element in the NORMAL scenario; no `box-shadow` glow | pulse / blink / glow rules |
+| FL8 | No `animation` on any stage element in the NORMAL scenario except the process air paths (`.fp-air path`, keyframes `fp-air`, speed from airflow; PRD-CONV-BMS-LIVE L4, v3.86.1); no `box-shadow` glow | pulse / blink / glow rules |
 | FL9 | The plan draws hot-aisle caps (25), CRAH units (installed count from the engine), a floor slab and a wall | none |
 | FL10 | Visible numbers in the plan area ≤ 30 at 1440 (footer kW per row + legend) | 150+ footer numbers |
 | FL11 | 390 px: no page-level sideways scroll; the plan scroller holds u ≥ 7 px; the row panel opens with 44 px targets | tiny cells |

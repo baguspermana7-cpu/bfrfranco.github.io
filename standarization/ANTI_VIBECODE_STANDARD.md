@@ -635,6 +635,8 @@ ceiling; tolerance 0.5 px) — a scale edited in design.md and not regenerated f
 It skips what is not authored layout: SVG internals, iframes, icon fonts, hidden or zero-size boxes, `gap`
 on a box that is not flex/grid, vertical margin on an inline box; a font is checked only on an element
 that owns a text node; it waits for the DOM to settle (element count stable for two 250 ms polls, max 4 s).
+The floating site bar itself (`.navbar[data-rz-bar]`, `.navbar[data-rz-float]`, the dated owner exception of
+§B, 2026-11-18) is skipped for margin and radius only (v3.86.1). Its controls are still counted.
 
 Enforcement is a RATCHET, not a zero target: `tools/editorial-render-ratchet.json` holds the measured
 count for each of 278 pages and a page may only fall. A page that rises fails; `--tighten` lowers the

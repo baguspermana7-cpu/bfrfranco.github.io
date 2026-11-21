@@ -11,6 +11,40 @@ release sections rather than semver.
 
 ---
 
+## v3.86.1 — 2026-11-22 — The chiller flow runs on its own layer
+
+PRD-CONV-BMS-LIVE follow-up. The v3.86.0 release gate (run after push) failed three checks on the chiller sheet: idle
+main-thread CPU 2306 ms per 5 s (law: 1500), alarm-to-mark 319 ms (law: 250), and two vfx-sheet colour checks.
+
+### Fixed
+- `chiller-plant.html`: the 24 Hz clock stepped the whole 10-train drawing, and each step repainted all of it (~60 ms
+  measured). The running flow now moves on a thin SVG layer laid exactly over the sheet. It holds one copy of every
+  flow line, with the same path, computed stroke, dash and vfx.js speed. A 24 Hz clock writes the dash offset of the
+  copies in view only. The sheet's own flow lines stay but are hidden. Rotors go back to the 3 Hz sheet clock. Copies
+  are refreshed when vfx.js repaints a line or the view mode changes, after the sheet's own frame. Pan and zoom follow
+  the sheet's viewBox and gesture transform. Idle CPU, interleaved A/B on one machine: v3.84.0 ~0.8 s, v3.86.0
+  ~2.4 s, now ~1.25 s per 5 s.
+- `tools/test-conv-vfx-sheets.mjs` S3 now accepts the State-view medium tube (PRD L2) for a running line of a known
+  medium. It still fails a running line painted in the standby colour. Fuel and water went red after v3.86.0 because
+  S3 still demanded the green body.
+- `tools/test-conv-vfx-trend.mjs` B2 takes the same rule as S3: a running medium pipe may wear its medium colour,
+  never the standby colour.
+- `tools/test-conv-floor-plan.mjs` FL8 lets the hall's air paths move (paths inside `.fp-air` with keyframes `fp-air`,
+  speed from airflow, PRD L4). Any other animation or glow on the stage still fails.
+- `tools/audit-editorial-render.mjs` (render scale, P22) went red on 87 pages. The same red shows on the v3.84.0 tree,
+  so v3.86 did not cause it. The cause is the floating site bar of v3.79.0: its 12 px radius, 10 px top gap and auto
+  side margins were counted as off-scale values on every page. These values are the dated owner exception
+  (ANTI_VIBECODE_STANDARD §B, 2026-11-18). The audit now skips only the margins and radius of the bar itself
+  (`.navbar[data-rz-bar]`, `.navbar[data-rz-float]`). Controls inside the bar are still counted. The ratchet is not raised.
+- `fuel-system.html` stayed red after that: 939 off-scale values, ratchet 817. v3.81.0 (the real fleet) multiplied
+  tank-table rows with 7 px/6 px cell padding. The cells are now `8px 4px` on the 4 px grid, and the header matches
+  `4px` at the sides. Count is 795. Rows stay on one line (screenshot compared against v3.86.0).
+
+### Gates
+- `test-conv-live` LV2 checks that the chiller flow layer covers the sheet: same rect and viewBox, one copy per line,
+  same path and stroke. LV8 reads the flow-layer step (42 ms). 41 checks in all.
+- `test-conv-quantity-truth` PERF0 reads the motion phase on the flow layer.
+
 ## v3.86.0 — 2026-11-21 — The plant is seen running
 
 Owner (R184): "saya masih tidak belum melihat perubahan signifikan. Masih abu2 semua tidak ada animasi yg immersive dll".

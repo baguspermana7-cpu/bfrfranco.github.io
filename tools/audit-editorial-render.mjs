@@ -79,15 +79,19 @@ export function walkInPage(scale) {
     for (var n = el.firstChild; n; n = n.nextSibling) if (n.nodeType === 3 && n.nodeValue.trim()) { ownsText = true; break; }
     if (ownsText) { var fs = parseFloat(cs.fontSize); if (!near(fs, fonts)) hit('font', el, 'font-size', Math.round(fs * 100) / 100 + 'px'); }
     /* only values that move something: gap on a flex/grid/multi-column box, vertical margin on a non-inline box */
+    /* the floating site bar (css/rz-nav-float.css) is a dated owner exception (ANTI_VIBECODE_STANDARD §B, 2026-11-18):
+       its own 12 px radius, its top gap and its auto-centring margins are the exception, not drift (v3.86.1) */
+    var siteBar = el.matches('.navbar[data-rz-bar], .navbar[data-rz-float]');
     var layoutBox = /flex|grid/.test(cs.display) || (cs.columnCount !== 'auto' && cs.columnCount !== '1');
     var inline = cs.display === 'inline';
     ['marginTop', 'marginRight', 'marginBottom', 'marginLeft', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'rowGap', 'columnGap'].forEach(function (p) {
       if ((p === 'rowGap' || p === 'columnGap') && !layoutBox) return;
       if ((p === 'marginTop' || p === 'marginBottom') && inline) return;
+      if (siteBar && p.indexOf('margin') === 0) return;
       var v = parseFloat(cs[p]); if (isFinite(v) && !onGrid(v)) hit('space', el, p, Math.round(v * 100) / 100 + 'px');
     });
     ['borderTopLeftRadius', 'borderTopRightRadius', 'borderBottomRightRadius', 'borderBottomLeftRadius'].forEach(function (p) {
-      var raw = cs[p]; if (!radiusOk(raw, r.width, r.height)) hit('radius', el, p, raw);
+      var raw = cs[p]; if (!siteBar && !radiusOk(raw, r.width, r.height)) hit('radius', el, p, raw);
     });
   }
   out.kinds = Object.keys(kinds).length;

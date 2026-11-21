@@ -45,7 +45,7 @@ function check(id, ok, msg) { (results[id] = results[id] || { pass: 0, fail: [] 
 
 const PAGES = { 'chiller-plant': { min: 6, sel: '#chw-sheet-host .hmi-frame' }, 'water-system': { min: 6, sel: '#water-sheet-host .hmi-frame' },
   EPMS_Telemetry: { min: 6, sel: '.hmi-frame' }, ict: { min: 6, sel: 'svg.ict-arch' }, datahall: { min: 25, sel: '.fp-root' } };
-const MARKS = '.hmi-flow[data-vmove], .hmi-flow[data-flow="running"], .fp-air path:not([data-off]), svg.ict-arch .edge-flow';
+const MARKS = '.hmi-flow[data-vmove], .hmi-flow[data-flow="running"], .chw-flow-copy, .fp-air path:not([data-off]), svg.ict-arch .edge-flow';
 
 /* OKLab chroma of an rgb()/rgba() string (alpha ignored) */
 function chroma(css) {
@@ -83,6 +83,14 @@ const names = Object.keys(PAGES).filter((n) => !PAGE || n === PAGE);
 for (const name of names) {
   const { pg, errs } = await open(name, false);
   if (want('LV1')) { const m = await advancing(pg); check('LV1', m.moved >= PAGES[name].min, `${name}: ${m.moved} of ${m.inView} marks in view advance (need ${PAGES[name].min})`); }
+  if (want('LV2') && name === 'chiller-plant') {   /* the chiller's flow runs on its own layer laid exactly over the sheet */
+    const L = await pg.evaluate(() => { const s = document.querySelector('#chw-sheet-host svg.hmi-svg'), o = document.querySelector('#chw-sheet-host svg.chw-flow-layer');
+      if (!s || !o) return null; const a = s.getBoundingClientRect(), b = o.getBoundingClientRect(), f = s.querySelectorAll('.hmi-flow'), c = o.querySelectorAll('.chw-flow-copy');
+      const i = [...f].findIndex((e) => e.getAttribute('data-flow') === 'running');
+      return { off: Math.max(Math.abs(a.x - b.x), Math.abs(a.y - b.y), Math.abs(a.width - b.width), Math.abs(a.height - b.height)), vb: s.getAttribute('viewBox') === o.getAttribute('viewBox'),
+        n: f.length, copies: c.length, sameD: i >= 0 && c[i] && c[i].getAttribute('d') === f[i].getAttribute('d'), stroke: i >= 0 && c[i] && getComputedStyle(c[i]).stroke === getComputedStyle(f[i]).stroke }; });
+    check('LV2', !!L && L.off < 1 && L.vb && L.n === L.copies && L.sameD && L.stroke, `${name}: flow layer ${JSON.stringify(L)}`);
+  }
   if (want('LV2') && (name === 'chiller-plant' || name === 'water-system')) {
     const w = await pg.evaluate(() => { const f = document.querySelector('.hmi-flow[data-vmove][data-vstate="running"]'); if (!f) return null;
       const id = f.getAttribute('data-edge-flow'), t = document.querySelector('.hmi-edge[data-edge="' + id + '"]');
@@ -158,8 +166,8 @@ if (want('LV7')) for (const name of names) {
 }
 
 if (want('LV8')) {
-  const ch = readFileSync(resolve(ROOT, 'chiller-plant.html'), 'utf8'), ms = +((ch.match(/chwMotionClock[\s\S]*?\},\s*(\d+)\);\s*\}\)\(\);/) || [])[1] || NaN);
-  check('LV8', ms <= 50, `chiller-plant chwMotionClock interval ${ms} ms (need <= 50)`);
+  const ch = readFileSync(resolve(ROOT, 'chiller-plant.html'), 'utf8'), ms = +((ch.match(/the flow layer: 24 Hz[\s\S]*?\},\s*(\d+)\);/) || [])[1] || NaN);
+  check('LV8', ms <= 50, `chiller-plant flow layer step ${ms} ms (need <= 50)`);
   for (const p of ['dc-conventional', 'datahall', 'chiller-plant', 'fuel-system', 'water-system', 'fire-system', 'ict', 'EPMS_Telemetry']) {
     const s = readFileSync(resolve(ROOT, p + '.html'), 'utf8');
     check('LV8', /href="css\/conv-live\.css\?v=/.test(s) && s.indexOf('conv-live.css') > s.indexOf('conv-motion.css'), `${p}: links css/conv-live.css after conv-motion.css`);
