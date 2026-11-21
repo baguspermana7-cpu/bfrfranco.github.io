@@ -139,6 +139,8 @@
         s.sheet.classList.remove('rz-in', 'rz-dragging');
         s.sheet.style.transform = '';          /* let the class own the exit */
         s.scrim.classList.remove('rz-in');
+        s.scrim.style.pointerEvents = 'none';  /* a closing scrim fades for up to 520 ms; it must not eat the next click */
+        s.sheet.style.pointerEvents = 'none';
         document.removeEventListener('keydown', onKey, true);
         document.documentElement.style.overflow = s.prevOverflow;
         var done = function () {

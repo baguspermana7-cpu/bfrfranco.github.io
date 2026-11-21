@@ -2,7 +2,8 @@
 /* test-conv-datahall-air.mjs — STRICT. datahall.html: the row footer is labelled and the air path of a row is drawn
    as a section whose motion and colour are bound to that row's values (PRD-CONV-LIVING-PLANT §5.2, §9).
    Real browser, 1440 and 390:
-   D1 a key column names each of the six footer lines with its unit; every key line sits on the line it names
+   D1 the row strip prints one number (row kW); a click opens the row panel with heat, inlet, hot aisle, delta T and
+      min / avg / max of load and inlet as points that agree with the strip (PRD-CONV-DATAHALL-FLOOR 3.6)
       (same top, ±1.5 px); the min/max/avg unit follows the mode (°C in temperature, kW in power)
    D2 the stage opens on Plan (section hidden); "Air path" shows the section and hides the plan; pressed states follow
    D3 for the first, a middle and the last row the section's inlet, hot-aisle and row-heat readings EQUAL that row's
@@ -62,24 +63,44 @@ const rgb = (s) => (s.match(/[\d.]+/g) || []).map(Number);
 for (const W of [1440, 390]) {
   const { pg, errs } = await open(W, false);
   const T = `datahall@${W}`;
-  /* D1 */
-  const key = await pg.evaluate(() => {
-    const k = document.querySelector('.zone-key .zk-foot'), z = document.querySelector('.zone[data-z="0"] .zone-foot');
-    if (!k || !z) return null;
-    const tops = (root) => { const out = []; const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); let n; while ((n = w.nextNode())) { if (!n.nodeValue.trim()) continue; const r = document.createRange(); r.selectNodeContents(n); out.push({ t: n.nodeValue.trim(), top: r.getBoundingClientRect().top }); } return out; };
-    return { key: tops(k), row: tops(z), unit: document.getElementById('zk-unit').textContent };
+  /* D1 (PRD-CONV-DATAHALL-FLOOR 3.6, F12): the row strip prints one line, the row heat in kW; a click on the strip
+     opens the row panel, which carries the rest as points: heat, inlet, hot aisle, air-side delta T and min / avg / max
+     of cabinet load and inlet. Each panel number agrees with the strip / model value it restates. */
+  const foot = await pg.evaluate(() => {
+    const z = document.querySelector('#zone-field .zone[data-z="0"]');
+    if (!z) return null;
+    const lines = [];
+    const w = document.createTreeWalker(z, NodeFilter.SHOW_TEXT); let n;
+    while ((n = w.nextNode())) {
+      if (!n.nodeValue.trim()) continue;
+      /* a reader-only span (1 px, clipped) is not printed; the row letter names the strip, it is not a reading */
+      const b = n.parentElement.getBoundingClientRect(), t = n.nodeValue.trim();
+      if (b.width > 2 && b.height > 2 && !/^[A-Z]$/.test(t)) lines.push(t);
+    }
+    const kw = z.querySelector('.zf-kw');
+    return { lines, kw: kw && kw.textContent.trim() };
   });
-  ok(key && key.key.length === 6 && key.row.length === 6, `D1 ${T} key column / footer lines: ` + JSON.stringify(key && [key.key.length, key.row.length]));
-  if (key && key.key.length === 6 && key.row.length === 6) {
-    const off = key.key.map((k, i) => Math.abs(k.top - key.row[i].top));
-    ok(Math.max(...off) <= 1.5, `D1 ${T} a key line is not on the line it names (px offsets ${off.map((o) => o.toFixed(1))})`);
-    ok(key.key.map((k) => k.t).join('|') === 'kW|in °C|hot °C|min °C|max °C|avg °C', `D1 ${T} key labels in temperature mode: ` + key.key.map((k) => k.t).join('|'));
-    ok(key.row.every((r) => /^\d+(\.\d)?$/.test(r.t)), `D1 ${T} footer line is not a number: ` + key.row.map((r) => r.t).join('|'));
-    await pg.evaluate(() => window.setMode('power'));
-    const kp = await pg.evaluate(() => [...document.querySelectorAll('.zone-key .zk-foot > span')].map((s) => s.textContent).join('|') + ' / ' + document.getElementById('zk-unit').textContent);
-    ok(kp === 'kW|in °C|hot °C|min kW|max kW|avg kW / rack kW', `D1 ${T} key labels in power mode: ` + kp);
-    await pg.evaluate(() => window.setMode('temp'));
-  }
+  ok(foot && foot.lines.length === 1 && /^\d+$/.test(foot.lines[0]) && foot.lines[0] === foot.kw,
+    `D1 ${T} the row strip does not print exactly one number, the row kW: ` + JSON.stringify(foot));
+  await pg.evaluate(() => { const z = document.querySelector('#zone-field .zone[data-z="0"]'); z.scrollIntoView({ block: 'center' }); });
+  const zb = await pg.evaluate(() => { const b = document.querySelector('#zone-field .zone[data-z="0"]').getBoundingClientRect(); return { x: b.x + b.width / 2, y: b.y + b.height / 2 }; });
+  await pg.mouse.click(zb.x, zb.y); await sleep(300);
+  const panel = await pg.evaluate(() => {
+    const insp = document.getElementById('dh-inspector'), p = document.getElementById('row-panel');
+    const v = (id) => { const e = p.querySelector('[data-point="' + id + '"]'); return e && e.getClientRects().length ? Number(e.textContent) : null; };
+    return { state: insp && insp.getAttribute('data-inspector-state'), heat: v('datahall.row.A.heat_kw'), inlet: v('datahall.row.A.inlet_c'),
+      hot: v('datahall.row.A.hot_aisle_c'), dt: v('datahall.row.A.air_delta_t_c'),
+      mam: ['load_min_kw', 'load_avg_kw', 'load_max_kw', 'inlet_min_c', 'inlet_avg_c', 'inlet_max_c'].map((k) => v('datahall.row.A.' + k)),
+      strip: { kw: Number(document.querySelector('.zone[data-z="0"] .zf-kw').textContent), in: Number(document.querySelector('.zone[data-z="0"] .zf-in').textContent), hot: Number(document.querySelector('.zone[data-z="0"] .zf-hot').textContent) } };
+  });
+  ok(panel.state === 'row', `D1 ${T} a click on row A's strip does not open the row panel: ` + panel.state);
+  ok(panel.heat === panel.strip.kw && panel.inlet === panel.strip.in && panel.hot === panel.strip.hot,
+    `D1 ${T} the row panel does not restate the row heat / inlet / hot aisle: ` + JSON.stringify(panel));
+  ok(panel.dt > 0 && panel.mam.every((x) => x !== null && Number.isFinite(x)) && panel.mam[0] <= panel.mam[1] && panel.mam[1] <= panel.mam[2] && panel.mam[3] <= panel.mam[4] && panel.mam[4] <= panel.mam[5],
+    `D1 ${T} the row panel lacks delta T or an ordered min / avg / max: ` + JSON.stringify(panel));
+  await pg.keyboard.press('Escape'); await sleep(150);
+  const cover = await pg.evaluate(() => { const b = document.querySelector('.view-btn[data-view="air"]'); b.scrollIntoView({ block: 'center' }); const r = b.getBoundingClientRect(); const e = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2); return { hit: !!e && (e === b || b.contains(e)), el: e && (e.id || e.className), state: document.getElementById('dh-inspector').getAttribute('data-inspector-state') }; });
+  ok(cover.hit && cover.state === 'hall', `D1 ${T} after Escape the Air path button is covered or the inspector stays open: ` + JSON.stringify(cover));
   /* D2 */
   const vis = () => pg.evaluate(() => { const v = (s) => { const e = document.querySelector(s); return !!e && e.getClientRects().length > 0; };
     return { floor: v('#zone-field'), sec: v('#air-sec'), svg: v('#air-sec-host .as-svg'), pressed: [...document.querySelectorAll('.view-btn')].map((b) => b.getAttribute('data-view') + '=' + b.getAttribute('aria-pressed')).join() }; });
@@ -146,4 +167,4 @@ for (const W of [1440, 390]) {
 }
 await browser.close(); srv.close();
 if (fails.length) { console.error(`FAIL — ${fails.length} of ${checks} checks`); fails.forEach((f) => console.error('  ✗ ' + f)); process.exit(1); }
-console.log(`PASS — ${checks} checks: labelled row footer, Plan / Air path views, section readings = plan and engine, motion and colour bound, reduced motion, no overlap`);
+console.log(`PASS — ${checks} checks: row strip + row panel, Plan / Air path views, section readings = plan and engine, motion and colour bound, reduced motion, no overlap`);

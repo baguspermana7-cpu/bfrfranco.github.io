@@ -205,7 +205,8 @@ for (const theme of ['dark', 'light']) {
     const tok = {}; ['ok', 'warn', 'alarm'].forEach((s) => { tok[s] = g.oklch(g.rgba(g.rgbStr(g.hex((rs.getPropertyValue('--rz-pt-' + s)).trim())))); });
     const tops = []; Object.keys(p).forEach((s) => p[s].top.forEach((hx) => tops.push(g.rgbStr(g.hex(hx)))));
     const L = {}; Object.keys(p).forEach((s) => { L[s] = { top: p[s].top.map((h) => g.oklch(g.hex(h))), front: g.oklch(g.hex(p[s].front)), side: g.oklch(g.hex(p[s].side)) }; });
-    return { tops, L, tok, face: RZFloorPlan.FACE_L, mag: RZFloorPlan.MAG_DL };
+    return { tops, L, tok, face: RZFloorPlan.FACE_L, mag: RZFloorPlan.MAG_DL,
+      drawn: document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark' };
   });
   const allowed = new Set(pal ? pal.tops : []);
   for (const m of MODES) {
@@ -220,9 +221,13 @@ for (const theme of ['dark', 'light']) {
     check('FL2', fills.size <= 9, `${T} ${m}: ${fills.size} distinct cabinet fills (> 9)`);
     info('FL2', `${T} ${m}: ${fills.size} distinct fills`);
   }
+  /* The palette is judged against the theme the page actually drew in. A dark-only page (datahall.html never sets
+     data-theme) draws the dark palette in the light run too; that is correct, not drift. The fixture sets data-theme,
+     so the light palette is still proven there. */
+  if (pal && pal.drawn !== theme) info('FL2', `${T}: page draws in ${pal.drawn} (no ${theme} theme on this page)`);
   if (pal) {
     for (const s of ['ok', 'warn', 'alarm']) {
-      const L = pal.L[s], th = theme, fl = pal.face[th], tok = pal.tok[s];
+      const L = pal.L[s], th = pal.drawn, fl = pal.face[th], tok = pal.tok[s];
       L.top.forEach((o, i) => check('FL2', Math.abs(o.L - (fl.top + pal.mag[i])) < 0.012, `${T} ${s} top step ${i + 1}: OKLCH L ${o.L.toFixed(3)} expected ${(fl.top + pal.mag[i]).toFixed(2)}`));
       check('FL2', Math.abs(L.front.L - fl.front) < 0.012 && Math.abs(L.side.L - fl.side) < 0.012, `${T} ${s} front/side L ${L.front.L.toFixed(3)}/${L.side.L.toFixed(3)} expected ${fl.front}/${fl.side}`);
       [L.front, L.side, ...L.top].forEach((o) => { const dh = Math.abs(((o.h - tok.h + 540) % 360) - 180); check('FL2', dh < 8, `${T} ${s} hue ${o.h.toFixed(0)} vs token ${tok.h.toFixed(0)}`); });

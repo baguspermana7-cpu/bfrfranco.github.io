@@ -162,6 +162,10 @@ The legend is one line of discrete keys, with no bar:
 - **Row panel.** It opens beside the plan at 1440 and below the plan on a phone. It shows heat, inlet,
   hot aisle, ΔT and airflow (all points), min / avg / max of cabinet load and of inlet, and the CRAH units serving
   the row.
+  - *Built (FP2, 2026-11-21):* heat, inlet, hot aisle, air-side ΔT and min / avg / max of load and inlet are points in
+    the row panel; `test-conv-datahall-air` D1 proves the strip prints one number and the panel restates the strip.
+    Not built: airflow per row and the serving CRAH units. The engine sizes one CRAH pool for the hall and has no
+    row-to-unit assignment, so naming units per row would be invented.
 
 ### 3.7 Motion
 

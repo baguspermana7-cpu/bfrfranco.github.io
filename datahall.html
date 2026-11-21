@@ -319,7 +319,6 @@
         .rp-list .lh { color: var(--txt-faint); font-size: 11px; margin: 6px 0 2px; }
         .rp-item { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 32px; padding: 0 4px; background: transparent; color: var(--txt-main); border: 0; border-top: 1px solid var(--border-soft); font: inherit; font-size: 12px; cursor: pointer; text-align: left; }
         .rp-item .v { font-family: 'JetBrains Mono', monospace; color: var(--txt-dim); }
-        .rp-meta { color: var(--txt-dim); font-size: 12px; margin: 0 0 6px; }
         .rp-actions { display: flex; gap: 6px; margin-top: 6px; }
         .rp-actions button { min-height: 34px; padding: 0 12px; background: transparent; color: var(--txt-dim); border: 1px solid var(--border); border-radius: 3px; font: 600 12px 'IBM Plex Sans', sans-serif; cursor: pointer; }
         .rp-actions button:hover { color: var(--txt-main); border-color: var(--txt-faint); }
@@ -876,7 +875,7 @@
     <link rel="stylesheet" href="css/conv-point.css?v=20261120-8daa6374">
     <script src="js/conv/history.js?v=20261120-8d390d7e"></script>
     <script src="js/conv/floor-plan.js?v=20261121-5d15fabe"></script>
-    <script src="js/rz-sheet.js?v=20261120-3bf159cb" defer></script>
+    <script src="js/rz-sheet.js?v=20261121-67db3ea5" defer></script>
     <script src="js/rz-trend.js?v=20261121-1300d194"></script>
     <script src="js/conv/point-status.js?v=20261120-40be4933"></script>
     <style>
@@ -1952,6 +1951,25 @@
         };
         window.__closeCrahPop = function () { document.getElementById('crahPop').classList.remove('open'); };
 
+        /* PRD-CONV-DATAHALL-FLOOR 3.6: the row strip prints only the row kW; the row panel carries the rest as points
+           (heat, inlet, hot aisle, air-side delta T, and min / avg / max of cabinet load and of inlet). The engine has no
+           row-to-CRAH assignment (one CRAH pool serves the hall), so the panel names no serving units. */
+        function rowPanelReadings(z, letter, occ) {
+            var zn = zones[z], st = rowStats(z), id = 'datahall.row.' + letter + '.';
+            function kvp(k, pid, label, unit, d, v) { return '<div class="kv"><span class="k">' + k + '</span><span class="v num">' + pt(id + pid, 'Row ' + letter + ' ' + label, unit, d, v.toFixed(d)) + ' ' + unit + '</span></div>'; }
+            function mam(k, kind, unit, d, a) { return '<div class="kv"><span class="k">' + k + '</span><span class="v num">'
+                + pt(id + kind + '_min_' + (unit === 'kW' ? 'kw' : 'c'), 'Row ' + letter + ' cabinet ' + kind + ' min', unit, d, a.min.toFixed(d)) + ' / '
+                + pt(id + kind + '_avg_' + (unit === 'kW' ? 'kw' : 'c'), 'Row ' + letter + ' cabinet ' + kind + ' avg', unit, d, a.avg.toFixed(d)) + ' / '
+                + pt(id + kind + '_max_' + (unit === 'kW' ? 'kw' : 'c'), 'Row ' + letter + ' cabinet ' + kind + ' max', unit, d, a.max.toFixed(d)) + ' ' + unit + '</span></div>'; }
+            return '<div class="insp-group rp-read">'
+                + kvp('Heat', 'heat_kw', 'heat', 'kW', 0, zn.heat)
+                + kvp('Inlet', 'inlet_c', 'rack inlet', '°C', 1, zn.rackInletC)
+                + kvp('Hot aisle', 'hot_aisle_c', 'hot aisle', '°C', 1, zn.hotAisleC)
+                + kvp('ΔT air', 'air_delta_t_c', 'air-side ΔT', 'K', 1, zn.airsideDeltaTC)
+                + (st.n ? mam('Load min/avg/max', 'load', 'kW', 1, st.kw) + mam('Inlet min/avg/max', 'inlet', '°C', 1, st.inlet) : '')
+                + '<div class="kv"><span class="k">Occupied</span><span class="v num">' + ptc(occ + ' / ' + RACKS_PER_ZONE) + '</span></div>'
+                + '</div>';
+        }
         /* --- Row panel: the two lines of ten cabinets of one row as 44 px-class list rows (the way into a cabinet the plan draws at 10 px) --- */
         window.__openRow = function (z) {
             if (z < 0 || z >= ZONES) return;
@@ -1964,7 +1982,7 @@
             var panel = document.getElementById('row-panel');
             panel.innerHTML =
                 '<div class="rack-card-title">Row ' + letter + ' · ' + zoneAisleTag(z) + '</div>' +
-                '<p class="rp-meta">' + zn.heat.toFixed(0) + ' kW · inlet ' + zn.rackInletC.toFixed(1) + ' °C · hot aisle ' + zn.hotAisleC.toFixed(1) + ' °C · ' + occ + ' of ' + RACKS_PER_ZONE + ' occupied</p>' +
+                rowPanelReadings(z, letter, occ) +
                 '<div class="lh">Line 1</div><ul class="rp-list">' + lines[0] + '</ul>' +
                 '<div class="lh">Line 2</div><ul class="rp-list">' + lines[1] + '</ul>' +
                 '<div class="rp-actions"><button type="button" data-rp-air="' + z + '">Air path</button></div>';
@@ -1974,6 +1992,7 @@
             selectedRackIdx = null;
             if (fp) fp.select({ row: z });
             setInspState('row', 'Row ' + letter);
+            syncPoints();
             var chips = document.querySelectorAll('#row-picker .row-chip');
             for (var c = 0; c < chips.length; c++) chips[c].setAttribute('aria-pressed', +chips[c].getAttribute('data-z') === z ? 'true' : 'false');
         };
