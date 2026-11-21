@@ -1,0 +1,46 @@
+/* conv-motion.css — motion that carries state on the eight Conventional BMS pages (PRD-CONV-BMS-MOTION, R183).
+   Rules: standarization/MOTION_STANDARD.md. Tokens only, <= 300 ms, no loop, no pulse, no glow, no transition-all.
+   Gate: tools/test-conv-motion.mjs (MO1–MO7). Process motion (pipe flow, rotors) stays in css/conv-vfx.css.
+   The trend dialog's own enter/exit lives with the dialog in js/rz-trend.js; panel swaps and the page arrival run
+   through js/conv/motion.js (Web Animations, id "cvm-…"). */
+
+/* M1 · a point's state colour crossfades instead of flipping in one frame */
+[data-rz-cockpit-root] [data-point] {
+  transition: color 240ms var(--rz-ease-out, cubic-bezier(.23, 1, .32, 1)),
+              fill 240ms var(--rz-ease-out, cubic-bezier(.23, 1, .32, 1)),
+              outline-color 240ms var(--rz-ease-out, cubic-bezier(.23, 1, .32, 1));
+}
+/* M1 · a point that WORSENS (RZPointStatus.apply sets data-pt-arrive for 900 ms): a 1 px ring closes onto the number
+   once and fades, and the glyph fades in. Improving gets the crossfade only. Never repeats. */
+@keyframes cvm-arrive {
+  from { outline: 1px solid currentColor; outline-offset: 5px; }
+  to   { outline: 1px solid transparent; outline-offset: 1px; }
+}
+@keyframes cvm-arrive-alarm {
+  from { outline-offset: 5px; outline-color: transparent; }
+}
+@keyframes cvm-fade { from { opacity: 0; } }
+[data-pt-arrive][data-pt-state="warn"]:not(text) { animation: cvm-arrive 280ms var(--rz-ease-out, cubic-bezier(.23, 1, .32, 1)) 1 both; }
+[data-pt-arrive][data-pt-state="alarm"]:not(text) { animation: cvm-arrive-alarm 280ms var(--rz-ease-out, cubic-bezier(.23, 1, .32, 1)) 1; }
+[data-pt-arrive]:not(text)::after,
+text[data-pt-arrive] .rz-pt-g { animation: cvm-fade 200ms var(--rz-ease-out, cubic-bezier(.23, 1, .32, 1)) 1; }
+
+/* M3 · press feedback on HTML controls. `scale` (the individual property) composes with any transform a control
+   already has. Zero specificity: a page's own transition list wins; js/conv/motion.js appends `scale` to it on the
+   first pointerdown so the press still eases. */
+:where([data-rz-cockpit-root] button, [data-rz-cockpit-root] [role="button"]:not(svg *)) {
+  transition: scale 120ms var(--rz-ease-out, cubic-bezier(.23, 1, .32, 1));
+}
+:where([data-rz-cockpit-root] button:not(:disabled):not(.cv-cta):not([data-point]),
+       [data-rz-cockpit-root] [role="button"]:not(svg *):not([data-point]):not([aria-disabled="true"])):active {
+  scale: .97;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-rz-cockpit-root] [data-point] {
+    transition: color 120ms var(--rz-ease-out, cubic-bezier(.23, 1, .32, 1)), fill 120ms var(--rz-ease-out, cubic-bezier(.23, 1, .32, 1));
+  }
+  [data-pt-arrive][data-pt-state="warn"]:not(text),
+  [data-pt-arrive][data-pt-state="alarm"]:not(text) { animation: none; }
+  :where([data-rz-cockpit-root] button, [data-rz-cockpit-root] [role="button"]):active { scale: none; }
+}

@@ -53,11 +53,20 @@
   var api = {};
 
   /* State colours are the tokens of css/conv-point.css (one source, PRD §4.1); without that file the state still reads by
-     glyph and word. Motion: none on the modal (MOTION_STANDARD §1: opened from a keyboard shortcut too); the phone sheet
-     moves the way js/rz-sheet.js moves. */
+     glyph and word. Motion (PRD-CONV-BMS-MOTION M2): opened or closed by POINTER, the modal fades and scales from .97
+     (200 ms in, 160 ms out, opacity only under reduced motion); opened by Enter / t / a #trend= link or closed by Escape
+     it stays instant (MOTION_STANDARD §1: a keyboard action never animates). The phone sheet moves the way
+     js/rz-sheet.js moves. */
   var CSS = '' +
     '.rz-trend{position:fixed;inset:0;z-index:2147482100;display:flex;align-items:center;justify-content:center;padding:14px;background:rgba(5,6,8,.62)}' +
     '.rz-trend[hidden]{display:none}' +
+    '.rz-trend.rz-trend--anim{transition:opacity 200ms var(--rz-ease-out,cubic-bezier(.23,1,.32,1))}' +
+    '.rz-trend.rz-trend--anim .rz-trend-panel{transition:opacity 200ms var(--rz-ease-out,cubic-bezier(.23,1,.32,1)),transform 200ms var(--rz-ease-out,cubic-bezier(.23,1,.32,1))}' +
+    '.rz-trend.rz-trend--from,.rz-trend.rz-trend--leave{opacity:0}' +
+    '.rz-trend.rz-trend--from .rz-trend-panel,.rz-trend.rz-trend--leave .rz-trend-panel{opacity:0;transform:scale(.97)}' +
+    '.rz-trend.rz-trend--leave,.rz-trend.rz-trend--leave .rz-trend-panel{transition-duration:160ms;pointer-events:none}' +
+    '@media (prefers-reduced-motion:reduce){.rz-trend.rz-trend--from .rz-trend-panel,.rz-trend.rz-trend--leave .rz-trend-panel{transform:none}' +
+    '.rz-trend.rz-trend--anim,.rz-trend.rz-trend--anim .rz-trend-panel{transition-duration:120ms}}' +
     '.rz-trend-panel{--tr-bg:#121316;--tr-panel:#191b1f;--tr-line:rgba(255,255,255,.12);--tr-text:#e8edf5;--tr-mute:#9aa4b2;--tr-acc:#E8B563;--tr-grid:rgba(255,255,255,.07);' +
       'background:var(--tr-bg);color:var(--tr-text);border:1px solid var(--tr-line);border-radius:4px;width:min(1040px,100%);max-height:calc(100vh - 28px);overflow:auto;font:13px/1.4 "IBM Plex Sans",system-ui,sans-serif}' +
     '[data-theme="light"] .rz-trend-panel{--tr-bg:#fff;--tr-panel:#f5f7fa;--tr-line:rgba(20,22,26,.14);--tr-text:#1b2430;--tr-mute:#4b5563;--tr-acc:#7A4800;--tr-grid:rgba(20,22,26,.08)}' +
@@ -521,7 +530,7 @@
     doc.body.appendChild(el);
     el.addEventListener('click', function (e) {
       var t = e.target;
-      if (t === el || (t.closest && t.closest('[data-close]'))) { close(); return; }
+      if (t === el || (t.closest && t.closest('[data-close]'))) { close(e.detail > 0); return; }
       var rg = t.closest && t.closest('[data-range]'); if (rg) { setRange(rg.getAttribute('data-range')); cursorT = null; draw(); return; }
       var rm = t.closest && t.closest('[data-remove]'); if (rm && pens.length > 1) { pens.splice(pens.indexOf(rm.getAttribute('data-remove')), 1); draw(); el.querySelector('.rz-trend-add').focus(); return; }
       var inf = t.closest && t.closest('.rz-trend-info');
@@ -607,18 +616,31 @@
     } else mode = 'modal';
     panel.setAttribute('role', 'dialog'); panel.setAttribute('aria-modal', 'true');
     if (el.parentNode !== doc.body) doc.body.appendChild(el);
-    el.hidden = false; draw();
+    var fresh = el.hidden || el.classList.contains('rz-trend--leave');
+    stopLeave();
+    el.hidden = false;
+    if (mode === 'modal' && o.animate && fresh) {   /* M2: from scale .97 + transparent, retargets if it was leaving */
+      el.classList.add('rz-trend--anim', 'rz-trend--from'); void el.offsetWidth; el.classList.remove('rz-trend--from');
+    } else el.classList.remove('rz-trend--anim');
+    draw();
     inertPage([el]);
     el.querySelector('[data-close]').focus();
     return true;
   }
-  function close() {
+  var leaveT = null;
+  function stopLeave() { if (leaveT) { clearTimeout(leaveT); leaveT = null; } if (el) el.classList.remove('rz-trend--leave'); }
+  function close(animate) {
     if (!openFlag) return;
     openFlag = false;
     inerted.forEach(function (c) { c.removeAttribute('inert'); c.removeAttribute('data-rz-trend-inert'); }); inerted = [];
     doc.removeEventListener('keydown', onKey, true);
     if (sheet && root.RZSheet) { sheet = null; root.RZSheet.close(); }   /* the sheet exits with the panel still in it */
-    else if (mode !== 'sheet') el.hidden = true;
+    else if (mode !== 'sheet') {
+      if (animate === true && mode === 'modal' && el.classList.contains('rz-trend--anim')) {   /* M2 exit, the way it came */
+        el.classList.add('rz-trend--leave');
+        leaveT = setTimeout(function () { leaveT = null; el.classList.remove('rz-trend--leave'); if (!openFlag) el.hidden = true; }, 180);
+      } else { stopLeave(); el.hidden = true; }
+    }
     try { if (/^#trend=/.test(root.location.hash)) root.history.replaceState(null, '', root.location.pathname + root.location.search); } catch (e) { /* see draw() */ }
     var t = lastTrigger; lastTrigger = null;
     if (t && t.isConnected && t.focus) { try { t.focus({ preventScroll: true }); } catch (e) { t.focus(); } }
@@ -634,13 +656,16 @@
     if (host.__rzTrendBound) return; host.__rzTrendBound = true;
     host.addEventListener('click', function (e) {
       var t = e.target.closest && e.target.closest('[data-trend]'); if (!t || (el && el.contains(t))) return;
-      if (open(t.getAttribute('data-trend'), optsOf(t))) { e.preventDefault(); e.stopPropagation(); }
+      var oc = optsOf(t); oc.animate = e.detail > 0;   /* a pointer click animates; Enter on a button also fires click, with detail 0 */
+      if (open(t.getAttribute('data-trend'), oc)) { e.preventDefault(); e.stopPropagation(); }
     }, true);
     host.addEventListener('keydown', function (e) {
       if (e.key !== 'Enter' && e.key !== 't' && e.key !== 'T') return;
       var t = e.target.closest && e.target.closest('[data-trend]'); if (!t || (el && el.contains(t))) return;
-      if (open(t.getAttribute('data-trend'), optsOf(t))) e.preventDefault();
-    });
+      /* capture + stop, like the click above: a number inside a basis tile opened the trend AND the tile's basis drawer on
+         Enter (v3.82.0), and Escape then closed only the trend. One key opens one dialog. */
+      if (open(t.getAttribute('data-trend'), optsOf(t))) { e.preventDefault(); e.stopPropagation(); }
+    }, true);
   }
   function fromHash() {
     var m = /^#trend=([^&]+)(?:&r=([A-Za-z0-9]+))?/.exec(root.location.hash || ''); if (!m) return false;

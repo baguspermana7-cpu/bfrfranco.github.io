@@ -383,8 +383,8 @@
       el = doc.createElement('div'); el.className = 'rz-cvm'; el.hidden = true;
       el.innerHTML = '<div class="rz-cvm-panel" role="dialog" aria-modal="true" aria-labelledby="rz-cvm-title"></div>';
       el.addEventListener('click', function (e) {
-        if (e.target === el) { close(); return; }
-        if (IN && e.target.closest && e.target.closest('.rz-cvm-close')) { close(); return; }
+        if (e.target === el) { close(e.detail > 0); return; }
+        if (IN && e.target.closest && e.target.closest('.rz-cvm-close')) { close(e.detail > 0); return; }
         if (IN && e.target.closest) {
           var nv = e.target.closest('[data-nav]'); if (nv) { step(Number(nv.getAttribute('data-nav'))); return; }
           var uc = e.target.closest('[data-unit]'); if (uc) { go(Number(uc.getAttribute('data-unit'))); return; }
@@ -408,8 +408,11 @@
       }
     }
     lastTrigger = opts.trigger || doc.activeElement;
+    var M = root.RZConvMotion, fresh = el.hidden || !!leaving;
+    if (leaving) { leaving.cancel(); leaving = null; }
     el.hidden = false;
     render();
+    if (fresh && M && M.byPointer()) M.dialogIn(el, el.querySelector('.rz-cvm-panel'));   /* PRD-CONV-BMS-MOTION M4; keyboard stays instant */
     setInert(true);
     doc.addEventListener('keydown', onKey, true);
     el.querySelector('.rz-cvm-close').focus();
@@ -421,12 +424,15 @@
     }
     return true;
   }
-  function close() {
-    if (!el || el.hidden) return;
+  var leaving = null;
+  function close(byPointer) {
+    if (!el || el.hidden || leaving) return;
     if (timer) { root.clearInterval(timer); timer = null; }
     if (IN && IN.sheet) { try { IN.sheet.destroy(); } catch (e) { /* already gone */ } }
     IN = null;
-    el.hidden = true;
+    var M = root.RZConvMotion;
+    if (byPointer === true && M) leaving = M.dialogOut(el, el.querySelector('.rz-cvm-panel'), function () { leaving = null; el.hidden = true; el.style.pointerEvents = ''; });
+    else el.hidden = true;
     setInert(false);
     doc.removeEventListener('keydown', onKey, true);
     var t = lastTrigger; lastTrigger = null; current = null;

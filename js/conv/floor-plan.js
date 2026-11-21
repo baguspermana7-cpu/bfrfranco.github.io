@@ -279,6 +279,8 @@
     function build() {
       layout();
       var i, j, z, n, c, b;
+      /* a rebuild (resize, relayout) replaces the svg: a keyboard user who was on the plan keeps focus and cursor */
+      var hadFocus = !!(svg && document.activeElement === svg);
       host.innerHTML = '';
       rackEls = []; crahEls = []; zoneEls = []; cache = [];
       var totalUnits = kRows * GEO.rowW + 1.0 + SHX * GEO.slabY;
@@ -394,6 +396,7 @@
       wire(strips);
       inst.paint(inst.mode);
       if (inst.sel) inst.select(inst.sel);
+      if (hadFocus) { try { svg.focus({ preventScroll: true }); } catch (e) { svg.focus(); } showCursor(); }
       if (typeof opts.onBuild === 'function') opts.onBuild(inst);
     }
 
@@ -483,7 +486,13 @@
       if (p) { ringSel.setAttribute('points', p); ringSel.removeAttribute('display'); }
       if (s.rack != null) { rackEls[s.rack].g.setAttribute('data-sel', '1'); rackEls[s.rack].g.classList.add('sel'); zoneEls[rackEls[s.rack].c.z].setAttribute('data-sel', '1'); }
     }
-    inst.select = function (sel) { inst.sel = sel || null; refreshRings(); };
+    inst.select = function (sel) {
+      var was = inst.sel; inst.sel = sel || null; refreshRings();
+      /* PRD-CONV-BMS-MOTION M6: a NEW selection made with the pointer fades its ring in (160 ms, opacity); a repaint or a
+         keyboard selection stays instant */
+      var M = window.RZConvMotion;
+      if (sel && M && M.byPointer() && JSON.stringify(sel) !== JSON.stringify(was)) M.fade(sel.row != null ? ringRow : ringSel);
+    };
 
     /* ---- tooltip ---- */
     var tipKey = '';

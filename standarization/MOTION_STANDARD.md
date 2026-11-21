@@ -203,6 +203,29 @@ a `scale(0)` entrance, and removing the sheet's `rz-dragging` class produced 12
 failures naming each defect. A gate nobody has seen fail is a gate nobody should
 believe.
 
+## Conventional BMS pages (owner R183, 2026-11-21, PRD-CONV-BMS-MOTION)
+
+"polish more effect2 animasi semuanya". Motion on the eight cockpits carries state; nothing decorative was added.
+Shared module: `css/conv-motion.css` + `js/conv/motion.js` (`window.RZConvMotion`), Web Animations carry the id `cvm-…`.
+
+| Moment | Motion | Keyboard / reduced |
+|---|---|---|
+| A point WORSENS (ok → warn → alarm) | colour crossfades 240 ms; `RZPointStatus.apply()` sets `data-pt-arrive` 900 ms: a 1 px ring closes from 5 px onto the number once, the glyph fades in | improving = crossfade only; reduced = 120 ms colour, no ring |
+| Trend dialog, opened / closed by the pointer | scrim + panel fade, panel from `scale(.97)`, 200 ms in, 160 ms out, retargets when reopened mid-exit, the leaving dialog takes no clicks | Enter / t / `#trend=` open and Escape close stay instant (§1); reduced = opacity 120 ms |
+| Equipment modal (`RZConvModal`), pointer | same as the trend dialog (`dialogIn` / `dialogOut`) | keyboard instant |
+| Press on any HTML control in the cockpit root | `scale: .97` (the individual property, composes with a control's own transform), 120 ms; `motion.js` appends `scale` to a page's own transition list on the first pointerdown | reduced = none |
+| Data hall inspector content swap | body fades + rises 4 px, first 6 blocks 30 ms apart, 200 ms | reduced = opacity |
+| Plan ↔ Air path, floor-plan selection ring (pointer) | opacity 160 ms in place | keyboard selection instant |
+| The page arrives | the first screen's blocks, 240 ms, 40 ms stagger, ≤ 8, done ≤ 600 ms, once, when the sign-in gate clears | reduced = opacity 160 ms, no stagger |
+
+Never on these pages: a loop, pulse, blink or glow (pipe flow and rotors in `js/conv/vfx.js` are process motion and
+stay), a count-up or number roll, a chart line drawing itself, an animated mode switch (temp / power recolour at once).
+
+Found by the gate: Enter on a number inside a basis tile opened the trend AND the tile's basis drawer (v3.82.0);
+Escape closed the trend and left the drawer over the page. The trend's keyboard listener is now capture + stop, like
+its click. Gate `tools/test-conv-motion.mjs` MO1–MO7, 360 checks on 8 pages × both motion preferences, red on v3.83.0
+(129 findings) and on a seeded `transition: all 500ms ease-in` / `scale(0)` / `infinite` (MO7, 5 findings).
+
 ## Homepage choreography (owner R102–R104, 2026-11-09, v3.35.5)
 
 "Animasi motionnya sangat2 kurang payah. Cari inspirasi" / "klik cards lgsung flip … flipnya kaku". Built after the

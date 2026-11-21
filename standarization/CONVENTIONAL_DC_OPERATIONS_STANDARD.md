@@ -446,6 +446,19 @@ Before release:
 - Gate: `tools/test-conv-datahall-space.mjs` SP1–SP10 (floor share, 25 rows, floor top, words, sentences, numbers
   printed once, no inner scroll boxes, every reading id kept and reachable, selection, 0 errors).
 
+### 2026-11-21 — Motion that carries state (PRD-CONV-BMS-MOTION, R183)
+
+- Every Conventional cockpit loads `css/conv-motion.css` and `js/conv/motion.js` (after `point-status.js`). A new
+  cockpit adds both; a page never hand-rolls its own enter, press or state animation.
+- A point's state colour crossfades; a point that worsens is marked once (`data-pt-arrive`, 900 ms). A page that
+  repaints its numbers on a tick does not mark the first paint (no previous state) and does not re-mark a flap.
+- Dialogs animate only when the pointer opens or closes them; keyboard stays instant. A leaving dialog takes no clicks.
+- Panels that swap content call `RZConvMotion.swap(el, { stagger: true })`; a view that replaces another in place calls
+  `RZConvMotion.fade(el)`. Dialogs: `dialogIn` / `dialogOut` when `RZConvMotion.byPointer()`.
+- A component that rebuilds its DOM (resize, relayout) keeps keyboard focus and cursor if it had them
+  (`js/conv/floor-plan.js` `build()`; FX4 of `test-conv-floor-plan` forces the rebuild).
+- Gate `tools/test-conv-motion.mjs` (MO1–MO7). Rules: `standarization/MOTION_STANDARD.md` "Conventional BMS pages".
+
 ### 2026-11-21 — How a page marks its numbers (PRD-CONV-POINT-STATUS-TREND T2/T3 pilot: chiller-plant, cdu-mini-bms)
 
 Every rendered number is exactly one of three things (P-3). A page says which with one attribute; it never types a limit

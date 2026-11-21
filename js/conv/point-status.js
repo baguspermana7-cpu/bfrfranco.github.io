@@ -251,7 +251,16 @@
     setAttr(el, 'aria-label', name + ': ' + (isNum(v) ? num(v, d) : 'no data') + (unit && isNum(v) ? ' ' + unit : '') + ', ' + STATES[ev.state] + (ev.dir ? (ev.dir === 'hi' ? ' high' : ' low') : '') + '. Open trend.');
     setAttr(el, 'data-pt-tip', tooltipText(id, v, { unit: unit, label: name, digits: d, prev: prev }));
     svgGlyph(el, ev);
+    markArrival(el, prev.state, ev.state);
     return ev;
+  }
+  /* PRD-CONV-BMS-MOTION M1: a point that WORSENS carries data-pt-arrive for 900 ms (css/conv-motion.css settles a ring
+     and fades the glyph in once). Improving, or the first paint of a page (no previous state), is not news. */
+  var RANK = { ok: 0, info: 0, none: 0, warn: 1, alarm: 2 };
+  function markArrival(el, was, now) {
+    if (!was || !(RANK[now] > (RANK[was] || 0)) || el.__rzPtArrive) return;   /* a flap inside 900 ms keeps the running settle */
+    el.setAttribute('data-pt-arrive', '');
+    el.__rzPtArrive = setTimeout(function () { el.removeAttribute('data-pt-arrive'); el.__rzPtArrive = null; }, 900);
   }
 
   /* ── tooltip: one node, shown on hover or focus of a point, text from data-pt-tip ─────────────────────────────── */

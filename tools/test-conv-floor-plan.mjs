@@ -354,11 +354,10 @@ for (const theme of ['dark', 'light']) {
     const l3 = await clickEl('.zone[data-z="3"] .zone-head');
     check('FX3', l3 && l3.kind === 'row' && l3.id === 3, `${T}: row click -> ${JSON.stringify(l3)}`);
     /* FX4 keyboard: focus starts at cabinet 0; Down -> j1 (idx 1); Right -> line R (idx 11); Enter */
-    await pg.evaluate(() => { window.__fp.last = null; window.__fp.plan.select(null); window.__fp.plan.focus(0); });
-    /* under a loaded lane the plan can still be settling (a rebuild swaps the svg): press keys only once the focused
-       svg carries the cursor (release gate v3.83.0 read last:null, ad:null once; the rerun passed) */
-    await pg.waitForFunction(() => { const s = document.querySelector('.fp-svg'); return s && document.activeElement === s && s.getAttribute('aria-activedescendant') === 'fp-rk-0'; }, { timeout: 5000 })
-      .catch(() => pg.evaluate(() => window.__fp.plan.focus(0)));
+    /* a rebuild while the plan has keyboard focus (a late ResizeObserver under load, or relayout) replaced the svg and
+       dropped focus and cursor: v3.83.0 and v3.84.0 release gates read {last:null, ad:null}. relayout() here forces that
+       rebuild on every run, so focus must survive it (red before the floor-plan.js fix, same reading). */
+    await pg.evaluate(() => { window.__fp.last = null; window.__fp.plan.select(null); window.__fp.plan.focus(0); window.__fp.plan.relayout(); });
     await pg.keyboard.press('ArrowDown'); await pg.keyboard.press('ArrowRight'); await pg.keyboard.press('Enter');
     const kl = await pg.evaluate(() => ({ last: window.__fp.last, ad: document.querySelector('.fp-svg').getAttribute('aria-activedescendant') }));
     check('FX4', kl.last && kl.last.kind === 'rack' && kl.last.id === 11 && kl.ad === 'fp-rk-11', `${T}: keyboard -> ${JSON.stringify(kl)}`);
@@ -433,7 +432,8 @@ for (const theme of ['dark', 'light']) {
   check('FL11', f.u >= 7, `${T}: cabinet unit u = ${f.u.toFixed(1)} px (need >= 7)`);
   check('FL11', !f.scroller || (f.scroller.sw > f.scroller.cw && /auto|scroll/.test(f.scroller.ox)), `${T}: plan scroller ${JSON.stringify(f.scroller)}`);
   check('FL11', !!f.chip && f.chip.w >= 44 && f.chip.h >= 44, `${T}: row chip ${JSON.stringify(f.chip)} (a 44 x 44 target is required)`);
-  check('FL11', !!(f.panel && f.panel.items.length === 20 && f.panel.items.every((h) => h >= 44)), `${T}: row panel ${JSON.stringify(f.panel)} (20 rows of >= 44 px required)`);
+  /* 0.01 px float tolerance: a row read while the panel's swap (PRD-CONV-BMS-MOTION M4) translates by a fraction measures 43.9999 */
+  check('FL11', !!(f.panel && f.panel.items.length === 20 && f.panel.items.every((h) => h >= 44 - 0.01)), `${T}: row panel ${JSON.stringify(f.panel)} (20 rows of >= 44 px required)`);
   check('FL0', errs.length === 0, `${T} page errors: ${errs.slice(0, 3).join(' | ')}`);
   if (SHOTS) for (const m of MODES) { await pg.evaluate((mm) => { window.__fp && window.__fp.plan.select(null); const p = document.querySelector('#row-panel'); if (p) p.hidden = true; window.__g.setMode(mm); }, m); await sleep(150); const el = await pg.$('#fp-stage') || await pg.$('.floor'); await el.screenshot({ path: path.join(SHOTS, `${IS_PAGE ? 'dh' : 'fx'}-390-dark-${m}.png`) }); }
   await pg.close();

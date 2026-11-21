@@ -11,6 +11,40 @@ release sections rather than semver.
 
 ---
 
+## v3.84.0 — 2026-11-21 — Motion that carries state
+
+Owner (R183): "Continue, polish more effect2 animasi semuanya". PRD-CONV-BMS-MOTION (laws MO0–MO7) on the eight
+Conventional BMS pages. Every motion marks a change of state or answers an input; nothing loops.
+
+### Added
+- `css/conv-motion.css`: a point's state colour crossfades in 240 ms; a point that worsens (normal → warning →
+  alarm) gets one 1 px ring that closes onto the number and fades (280 ms), and its glyph fades in. Improving gets
+  the crossfade only. HTML controls in the cockpit press to `scale: .97` in 120 ms.
+- `js/conv/motion.js` (`window.RZConvMotion`): panel swaps (opacity + 4 px rise, 200 ms, children 30 ms apart),
+  view fades (160 ms), pointer-opened dialogs (200 ms in, 160 ms out, the closing scrim never eats a click), and a
+  one-time arrival of the cockpit blocks once the sign-in gate has cleared (240 ms, 40 ms stagger, ≤ 8 blocks).
+- `js/conv/point-status.js` marks the worsening arrival (`data-pt-arrive`, 900 ms).
+- `js/rz-trend.js`: the trend dialog enters and leaves when the pointer opened it; a keyboard open or Escape stays
+  instant (MOTION_STANDARD §1). `js/conv/equipment-modal.js` follows the same rule.
+- `datahall.html`: the inspector body swaps with a stagger when the selection changes; Plan ↔ Air path fades.
+  `js/conv/floor-plan.js`: the selection ring fades in on a new pointer selection.
+- Reduced motion: opacity only, ≤ 160 ms; the ring and press are off.
+
+### Fixed
+- `js/rz-trend.js`: Enter on a number inside a basis tile opened the trend AND the basis drawer; Escape then left
+  the drawer open. The trend's keyboard listener now runs in the capture phase and stops the event.
+- `js/conv/floor-plan.js`: a rebuild while the plan had keyboard focus (a resize, or `relayout()`) replaced the
+  svg and dropped focus and the cursor, so the next arrow key went nowhere. The rebuilt plan takes focus back and
+  shows the same cursor. This was the "flaky" FX4 of the v3.83.0 and v3.84.0 release gates.
+
+### Gates
+- New `tools/test-conv-motion.mjs` (MO0–MO7, 360 checks, 8 pages, both motion preferences; 129 findings on
+  v3.83.0, 5 on a seeded CSS mutation for MO7), wired into `tools/ship-gate.sh`.
+- `test-conv-floor-plan` FX4 forces a rebuild between focus and the arrow keys (4 findings on the old floor-plan.js,
+  0 after); the wait-and-refocus workaround is gone.
+- `test-conv-floor-plan` FL11 reads row heights with a 0.01 px float tolerance (a row measured mid-swap reads
+  43.9999 px).
+
 ## v3.83.0 — 2026-11-21 — The data hall gets the screen
 
 Owner (R182): "Datahall nya sangat kurang, too much text malah yg penting gak ada cukup space datahall itu sendiri."
