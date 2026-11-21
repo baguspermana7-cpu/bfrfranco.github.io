@@ -83,7 +83,9 @@ const browser = await puppeteer.launch({ args: ['--no-sandbox'] });
    registered value. Compare the leading numbers, tolerating display rounding — the same
    comparison _dcmoc_trace_parity_probe.mjs makes, for the same reason. */
 function leadingNumber(text) {
-    const m = String(text).replace(/,/g, '').match(/-?\d+(?:\.\d+)?/);
+    /* An equipment tag in front of the value ("BB1 150 kV", "TX-2 31.5 MVA") is a name, not the number:
+       drop letter-led tags before reading, so the comparison still meets the value itself. */
+    const m = String(text).replace(/,/g, '').replace(/\b[A-Za-z]+-?\d+\b/g, '').match(/-?\d+(?:\.\d+)?/);
     return m ? Number(m[0]) : null;
 }
 

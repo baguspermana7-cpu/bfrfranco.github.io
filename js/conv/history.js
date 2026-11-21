@@ -11,6 +11,11 @@
  *   stats(points)                 -> { n, min, max, mean, last }   (null fields on an empty window)
  *   aboveLimit(points, limit)     -> minutes with v > limit, as a share 0..1 of the window
  *   csv(columns)                  columns = [{ label, unit, cls: 'SIM'|'ENGINE', points }] -> text; one row per time
+ *   RANGES                        the trend ranges (PRD-CONV-POINT-STATUS-TREND §4.3): key -> [window minutes, step minutes]
+ *                                 1H 1 min · 8H 2 min · 1D 5 min · 7D 30 min · 30D 30 min (1 440 samples)
+ *   bounded(def, limits)          P-6 "a normal plant has a normal past": returns a COPY of def whose amp keeps the whole
+ *                                 series inside the normal band [lo_warn, hi_warn] (alarm band where a warn bound is null).
+ *                                 A base already outside the band is an engine breach and is returned unchanged.
  *   Every series is SIMULATED and must be labelled so by whatever draws it (rz-trend.js does).
  */
 (function (root) {
@@ -65,7 +70,28 @@
     ts.forEach(function (t) { lines.push([new Date(t).toISOString()].concat(maps.map(function (m) { return m[t] == null ? '' : m[t]; })).join(',')); });
     return lines.join('\n') + '\n';
   }
-  var API = { value: value, series: series, stats: stats, aboveLimit: aboveLimit, csv: csv, SHAPES: Object.keys(SHAPES), version: '1.0.0' };
+  var RANGES = { '1H': [60, 1], '8H': [480, 2], '1D': [1440, 5], '7D': [10080, 30], '30D': [43200, 30] };
+  /* the worst excursion of value() from base is amp * (1 + 0.12) (shape -1..1 plus noise -1..1) plus rounding; HEADROOM
+     keeps it short of the band edge so the deadband never sees the history touch a limit */
+  var HEADROOM = 0.85;
+  function edge(L, side) {
+    if (!L) return null;
+    var w = side === 'hi' ? L.hi_warn : L.lo_warn, a = side === 'hi' ? L.hi_alarm : L.lo_alarm;
+    return isNum(w) ? w : (isNum(a) ? a : null);
+  }
+  function bounded(def, L) {
+    var out = {}, k;
+    for (k in def) if (Object.prototype.hasOwnProperty.call(def, k)) out[k] = def[k];
+    if (!def || !isNum(def.base) || !L) return out;
+    var hi = edge(L, 'hi'), lo = edge(L, 'lo'), room = Infinity;
+    if (isNum(hi)) { if (def.base > hi) return out; room = Math.min(room, hi - def.base); }
+    if (isNum(lo)) { if (def.base < lo) return out; room = Math.min(room, def.base - lo); }
+    if (room === Infinity) return out;
+    var maxAmp = room * HEADROOM / 1.12, amp = isNum(def.amp) ? Math.abs(def.amp) : maxAmp;
+    out.amp = Math.min(amp, maxAmp);
+    return out;
+  }
+  var API = { value: value, series: series, stats: stats, aboveLimit: aboveLimit, csv: csv, SHAPES: Object.keys(SHAPES), RANGES: RANGES, bounded: bounded, version: '1.1.0' };
   if (root) root.RZConvHistory = Object.freeze(API);
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
 })(typeof window !== 'undefined' ? window : null);

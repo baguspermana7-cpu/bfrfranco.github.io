@@ -123,6 +123,11 @@
         .tier-badge.educator{background:rgba(8,145,178,0.18);color:var(--fs-cyn)}
         .tier-badge.root{background:rgba(239,68,68,0.18);color:var(--fs-red)}
         /* Supabase panel: instrument-style state banner (border-left color = state) */
+        .pl-in{width:60px;background:var(--fs-bg3);color:var(--fs-t2);border:1px solid var(--fs-bd);border-radius:4px;padding:5px 6px;font:0.76rem 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+        .pl-basis{width:150px;font-family:inherit}
+        .pl-in:focus-visible{outline:1px solid var(--fs-amb);outline-offset:1px}
+        .pl-in[aria-invalid="true"]{border-color:var(--fs-red)}
+        #plTable td{padding:6px 8px;vertical-align:top}
         .supa-status{display:flex;align-items:center;gap:9px;font-size:0.76rem;color:var(--fs-t2);background:var(--fs-bg3);border:1px solid var(--fs-bd);border-left:2px solid var(--fs-bd);border-radius:4px;padding:8px 12px;line-height:1.35}
         .supa-status i{flex:0 0 auto;font-size:0.8rem}
         .supa-status a{color:var(--fs-cyn);text-decoration:underline}
@@ -580,14 +585,14 @@
         .map-popup-row .lbl{color:var(--fs-t4)}.map-popup-row .val{color:var(--fs-t2);font-weight:600}
         .map-popup-badge{display:inline-block;padding:1px 6px;border-radius:4px;font-size:0.6rem;font-weight:600}
     </style>
-    <script src="js/rz-version.js?v=20261120-7ea867d8" defer></script>
+    <script src="js/rz-version.js?v=20261121-ea6e94b5" defer></script>
     <script src="js/rz-explain-db.js?v=20261115-9c8be43f" defer></script>
     <script src="js/rz-explain.js?v=20261103-f581e6ac" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-feature-flags.js?v=20261116-9dddc1c8" defer></script>
     <!-- Supabase (real accounts) — live "Supabase Accounts" panel, root-gated by RLS -->
     <script src="js/rz-config.js?v=20260920-eed056f9"></script>
-    <script type="module" src="js/rz-supabase.js?v=20261114-4d629a29"></script>
+    <script type="module" src="js/rz-supabase.js?v=20261120-01bba6de"></script>
 </head>
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -700,6 +705,9 @@
             <div class="nav-group-label" style="margin-top:0.75rem">System</div>
             <a class="nav-item" data-section="audit" onclick="showSection('audit')">
                 <i class="fas fa-clipboard-list"></i> Audit Log
+            </a>
+            <a class="nav-item" data-section="pointlimits" onclick="showSection('pointlimits')">
+                <i class="fas fa-sliders-h"></i> Point limits
             </a>
             <a class="nav-item" href="setup-supabase.html" target="_blank" rel="noopener">
                 <i class="fas fa-user-check"></i> Owner Actions <i class="fas fa-external-link-alt" style="margin-left:auto;font-size:0.65rem;opacity:.6"></i>
@@ -1421,6 +1429,18 @@
             </div>
         </div>
         <div id="auditTimeline" style="max-height:600px;overflow-y:auto;"></div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════ POINT LIMITS ══════════════════════════════════════ -->
+<div class="section" id="sec-pointlimits">
+    <div class="section-header">
+        <div><h1>Point limits</h1><p>Supabase <code>conv_points</code>: the operating limits of the Conventional cockpit points (PRD-CONV-POINT-STATUS-TREND §5b). The cockpits read them after first paint and fall back to the shipped registry when the database is unreachable. Only a root account can save: the database refuses any other save and writes every change to <code>audit_log</code>.</p></div>
+    </div>
+    <div class="card">
+        <div id="plStatus" class="supa-status" style="margin-bottom:0.75rem"><i class="fas fa-circle-notch" style="color:var(--fs-t4)"></i><span>Open this tab to read conv_points.</span></div>
+        <p style="font-size:0.74rem;color:var(--fs-t4);margin:0 0 0.75rem">Order law: LL ≤ L &lt; H ≤ HH. An empty box is no bound. Deadband ≥ 0 (empty = 1 % of the span).</p>
+        <div class="tbl-overflow"><table class="data-tbl" id="plTable"><thead><tr><th scope="col">Point</th><th scope="col">Unit</th><th scope="col">LL</th><th scope="col">L</th><th scope="col">H</th><th scope="col">HH</th><th scope="col">Deadband</th><th scope="col">Evidence</th><th scope="col">Basis</th><th scope="col"></th></tr></thead><tbody id="plTbody"></tbody></table></div>
     </div>
 </div>
 
@@ -2272,9 +2292,10 @@ function showSection(id){
     document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
     document.getElementById('sec-'+id).classList.add('active');
     document.querySelectorAll('.nav-item').forEach(n=>{n.classList.toggle('active',n.dataset.section===id)});
-    const titles={dashboard:'Dashboard',revenue:'Revenue Analytics',mayar:'Mayar Payments',activity:'User Activity',users:'User Management',features:'Feature Flags',tiers:'Tier Manager',subscribers:'Newsletter Subscribers',benchmarks:'DC Industry Intelligence',audit:'Audit Log',settings:'System Settings','stock-investment':'Stock Investment','finance-terminal':'Finance Terminal','idr-stocks':'IDR Stocks'};
+    const titles={pointlimits:'Point limits',dashboard:'Dashboard',revenue:'Revenue Analytics',mayar:'Mayar Payments',activity:'User Activity',users:'User Management',features:'Feature Flags',tiers:'Tier Manager',subscribers:'Newsletter Subscribers',benchmarks:'DC Industry Intelligence',audit:'Audit Log',settings:'System Settings','stock-investment':'Stock Investment','finance-terminal':'Finance Terminal','idr-stocks':'IDR Stocks'};
     if(id==='tiers' && typeof refreshTiersV2==='function' && typeof AUTH_V2!=='undefined' && AUTH_V2) refreshTiersV2();
     if(id==='audit' && typeof refreshAuditV2State==='function') refreshAuditV2State();
+    if(id==='pointlimits' && typeof loadPointLimits==='function') loadPointLimits();
     if(id==='mayar'&&typeof renderMayar==='function')renderMayar();
     if(id==='activity'&&typeof renderActivity==='function')renderActivity();
     document.getElementById('topbarTitle').textContent=titles[id]||id;
@@ -3159,6 +3180,62 @@ window.uploadLegacyFlags=async function(){
     loadFeatureOverrides();
 };
 window.discardLegacyFlags=function(){LEGACY_FLAG_OVERRIDES=null;renderLegacyFlagCard();};
+
+// ═══════════════════════════════════════════════════════════════
+// POINT LIMITS — Supabase conv_points (PRD-CONV-POINT-STATUS-TREND §5b): public read, root write under RLS, audited
+// ═══════════════════════════════════════════════════════════════
+var PL_KEYS=['lo_alarm','lo_warn','hi_warn','hi_alarm'],PL_EV=['STANDARD','ASSUMED','DERIVED','ADOPTED','VENDOR','MEASURED','SIMULATED','UNAVAILABLE'];
+function plVal(v){return v===null||v===undefined?'':String(v)}
+async function loadPointLimits(){
+    var S=window.rzSupa,tb=document.getElementById('plTbody');
+    if(!tb)return;
+    if(!S||!S.configured||typeof S.getConvPoints!=='function'){setStatusLine('plStatus','Supabase is not configured on this page.','err');tb.innerHTML='';return;}
+    setStatusLine('plStatus','Loading conv_points…','loading');
+    var r=await S.getConvPoints().catch(function(e){return {data:[],error:(e&&e.message)||String(e)}});
+    if(r.error){setStatusLine('plStatus','Supabase error reading conv_points: '+r.error+' (the owner runs supabase/migrations/2026-11-20-conv-points.sql once, RUNBOOK-DB.md).','err');tb.innerHTML='';return;}
+    var list=r.data||[];
+    tb.innerHTML=list.length?list.map(function(x){
+        var id=rzEsc(x.id),cells=PL_KEYS.concat(['deadband']).map(function(k){
+            return '<td><input class="pl-in" data-k="'+k+'" inputmode="decimal" autocomplete="off" value="'+rzEsc(plVal(x[k]))+'" aria-label="'+k+' · '+id+'"></td>';
+        }).join('');
+        var ev='<select class="pl-in" data-k="evidence_class" aria-label="evidence class · '+id+'" style="width:auto">'+PL_EV.map(function(c){return '<option'+(c===x.evidence_class?' selected':'')+'>'+c+'</option>'}).join('')+'</select>';
+        return '<tr data-pl="'+id+'"><td><div style="font-size:0.78rem">'+rzEsc(x.label||x.id)+'</div><code style="font-size:0.66rem;color:var(--fs-t4)">'+id+'</code></td><td>'+rzEsc(x.unit||'')+'</td>'+cells+
+            '<td>'+ev+'</td><td><input class="pl-in pl-basis" data-k="basis" autocomplete="off" value="'+rzEsc(x.basis||'')+'" aria-label="basis · '+id+'"></td>'+
+            '<td><button class="btn btn-sm btn-amber" data-id="'+id+'" onclick="savePointLimit(this)">Save</button></td></tr>';
+    }).join(''):'<tr><td colspan="10" style="color:var(--fs-t4);padding:1rem">conv_points is empty: run the migration (RUNBOOK-DB.md).</td></tr>';
+    setStatusLine('plStatus',list.length+' points in Supabase conv_points.','ok');
+}
+/* the order law the database also enforces (conv_points_order_chk): LL <= L < H <= HH, deadband >= 0 */
+function plCheck(p){
+    var i,j,a,b,any=false;
+    for(i=0;i<PL_KEYS.length;i++){a=p[PL_KEYS[i]];if(a!==null&&!isFinite(a))return PL_KEYS[i]+' is not a number';if(a!==null)any=true;}
+    if(!any)return 'set at least one bound';
+    for(i=0;i<PL_KEYS.length;i++)for(j=i+1;j<PL_KEYS.length;j++){
+        a=p[PL_KEYS[i]];b=p[PL_KEYS[j]];if(a===null||b===null)continue;
+        var strict=!(i===0&&j===1)&&!(i===2&&j===3);
+        if(strict?!(a<b):!(a<=b))return PL_KEYS[i]+' '+a+(strict?' must be < ':' must be ≤ ')+PL_KEYS[j]+' '+b;
+    }
+    if(p.deadband!==null&&!(isFinite(p.deadband)&&p.deadband>=0))return 'deadband must be ≥ 0';
+    return null;
+}
+window.savePointLimit=async function(btn){
+    var tr=btn.closest('tr'),id=btn.getAttribute('data-id'),patch={},bad=null;
+    tr.querySelectorAll('[data-k]').forEach(function(inp){
+        var k=inp.getAttribute('data-k'),v=String(inp.value).trim();
+        inp.removeAttribute('aria-invalid');
+        if(k==='basis'||k==='evidence_class'){patch[k]=v||null;return;}
+        patch[k]=v===''?null:Number(v);
+        if(v!==''&&!isFinite(patch[k])){bad=bad||k+' is not a number';inp.setAttribute('aria-invalid','true');}
+    });
+    bad=bad||plCheck(patch);
+    if(bad){setStatusLine('plStatus','Not saved ('+id+'): '+bad,'warn');return;}
+    var S=window.rzSupa;
+    if(!S||typeof S.setConvPointLimits!=='function'){setStatusLine('plStatus','Supabase is not configured on this page.','err');return;}
+    setStatusLine('plStatus','Saving '+id+'…','loading');
+    var r=await S.setConvPointLimits(id,patch).catch(function(e){return {error:(e&&e.message)||String(e)}});
+    if(r&&r.error){setStatusLine('plStatus','Not saved ('+id+'): '+r.error,'err');return;}
+    setStatusLine('plStatus','Saved '+id+'. The cockpits pick it up within 5 minutes (their limits cache).','ok');
+};
 
 // ═══════════════════════════════════════════════════════════════
 // EDUCATORS — Supabase educator_allowlist (root-only read/write under RLS)

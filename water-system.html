@@ -71,17 +71,17 @@
     </script>
     <link rel="stylesheet" href="css/rz-hmi.css?v=20261117-fe9b28c8">
     <script src="js/rz-eng-symbols.js?v=20261118-528d60ce"></script>
-    <script src="js/rz-hmi-sheet.js?v=20261118-c18dfefa"></script>
+    <script src="js/rz-hmi-sheet.js?v=20261120-4c3244f4"></script>
     <link rel="stylesheet" href="css/conv-hmi-depth.css?v=20261115-09997c8c">
     <script src="js/conv/hmi-depth.js?v=20261120-05f86b64"></script>
     <link rel="stylesheet" href="css/conv-vfx.css?v=20261118-5eed9b2f">
     <script src="js/conv/vfx.js?v=20261117-89056876"></script>
-    <script src="js/conv/history.js?v=20261117-1c72fb7f"></script>
-    <script src="js/rz-trend.js?v=20261117-e60cac7c"></script>
-    <script src="js/conv/water-sheet.js?v=20261115-d6200856"></script>
+    <script src="js/conv/history.js?v=20261120-8d390d7e"></script>
+    <script src="js/rz-trend.js?v=20261121-1300d194"></script>
+    <script src="js/conv/water-sheet.js?v=20261120-d53cd730"></script>
     <script src="js/conv/sheet-truth.js?v=20261118-eaae14ee"></script>
     <script src="js/conv/payloads.js?v=20261120-86f5437d"></script>
-    <script src="js/conv/equipment-modal.js?v=20261120-9b42a9b2"></script>
+    <script src="js/conv/equipment-modal.js?v=20261120-6105f01f"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4" crossorigin="anonymous"></script>
     <!-- conv-engine: single scenario basis (WUE = water vol / IT energy, computed).
          Loaded NON-deferred + external so window.CONV_CALC exists before the
@@ -90,14 +90,18 @@
     <script src="js/conv-engine.js?v=2.4.0"></script>
     <!-- v1.134.3 — generated parameter registry + the ONE shared basis drawer.
          Replaces provenance restated by hand; see js/rz-basis-drawer.js. -->
-    <script src="js/conv-parameters.js?v=20261120-89ea132a"></script>
+    <script src="js/conv-parameters.js?v=20261121-5508ceb7"></script>
     <!-- v1.134.25 — RZExplain, the site glossary engine. The cockpits were the only
          substantial pages carrying none of it, so terms an operator has to read
          (approach temperature, cycles of concentration, N+1, WUE) had nowhere to go.
          Loaded BEFORE the basis drawer, which wires the keys from the registry. -->
     <script src="js/rz-explain-db.js?v=20261115-9c8be43f" defer></script>
     <script src="js/rz-explain.js?v=20261103-f581e6ac" defer></script>
-    <script src="js/rz-basis-drawer.js?v=20261112-b6a9180c"></script>
+    <script src="js/rz-basis-drawer.js?v=20261120-1b2aa7f7"></script>
+    <!-- PRD-CONV-POINT-STATUS-TREND T2/T3: every number shows its state from the limits registry and opens its trend -->
+    <script src="js/rz-sheet.js?v=20261120-3bf159cb" defer></script>
+    <link rel="stylesheet" href="css/conv-point.css?v=20261120-8daa6374">
+    <script src="js/conv/point-status.js?v=20261120-40be4933"></script>
 <script src="js/rz-ask.js?v=20261113-42137266" data-rz-ask-index="data/explain/water-system.json" defer></script>
     <!-- v1.42.5 — Semantic line model. Allows probe-line-model.mjs to audit
          the static SVG pipes tagged with data-rz-line / data-from / data-to
@@ -454,7 +458,7 @@
             .kpi-grid > .kpi .th { display: flex; align-items: center; }
         }
 </style>
-    <script src="js/rz-version.js?v=20261120-7ea867d8" defer></script>
+    <script src="js/rz-version.js?v=20261121-ea6e94b5" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
 <style id="rz-skiplink-v1">
@@ -509,10 +513,10 @@
     <section class="ops-context" aria-label="Site water engineering basis">
         <div class="basis-card current" data-basis="current">
             <div class="basis-title" id="waterSiteLabel">Current engine basis · site-wide plant</div>
-            <div class="basis-value" id="water-current-basis-value">Site scope · engine basis loading…</div>
+            <div class="basis-value" id="water-current-basis-value" data-const>Site scope · engine basis loading…</div>
         </div>
         <div class="basis-card study" data-basis="study">
-            <div class="basis-title">Site capacity study · 40 MW IT</div>
+            <div class="basis-title" data-const>Site capacity study · 40 MW IT</div>
             <div class="basis-value"><span class="basis-guard">READ-ONLY PLANNING BASIS</span> · no effect on current site pumps, flow, or WUE</div>
         </div>
     </section>
@@ -522,29 +526,29 @@
     <div class="kpi-grid" data-rz-fact-list data-rz-doc-section="ws-kpi" data-rz-doc-label="Water KPI band — WUE, make-up, treatment flow, filter DP">
         <div class="kpi hero">
             <h3>Instant WUE</h3>
-            <div class="v"><span id="kWue" data-basis-param="water.wue_l_per_kwh" tabindex="0" role="button">&mdash;</span> <small>L/kWh</small></div>
-            <div class="th" id="kWueTh" data-basis-param="water.wue_target_l_per_kwh"
+            <div class="v"><span id="kWue" data-basis-param="water.wue_l_per_kwh" data-point="water.wue_l_per_kwh" data-pt-label="Instant WUE" data-pt-unit="L/kWh" data-pt-digits="2" tabindex="0" role="button">&mdash;</span> <small>L/kWh</small></div>
+            <div class="th" id="kWueTh" data-const data-basis-param="water.wue_target_l_per_kwh"
                  tabindex="0" role="button" title="WUE design target — click for basis">Target &middot; computed</div>
         </div>
         <div class="kpi">
             <h3>Cooling Makeup Flow</h3>
-            <div class="v"><span id="kMakeup" data-basis-param="water.flow_lpm_for_wue" tabindex="0" role="button">&mdash;</span> <small>L/min</small></div>
-            <div class="th" id="kMakeupTh">Site total &middot; derived from WUE &times; IT load</div>
+            <div class="v"><span id="kMakeup" data-basis-param="water.flow_lpm_for_wue" data-point="water.flow_lpm_for_wue" data-pt-label="Cooling makeup flow" data-pt-unit="L/min" data-pt-digits="1" data-pt-cls="ENGINE" tabindex="0" role="button">&mdash;</span> <small>L/min</small></div>
+            <div class="th" id="kMakeupTh" data-const>Site total &middot; derived from WUE &times; IT load</div>
         </div>
         <div class="kpi">
             <h3>Total Treatment Flow</h3>
-            <div class="v"><span id="kTotal">&mdash;</span> <small>L/min</small></div>
-            <div class="th" id="kTotalTh">Site makeup + domestic/process</div>
+            <div class="v"><span id="kTotal" data-point="water.total_treated_lpm" data-pt-label="Total treatment flow" data-pt-unit="L/min" data-pt-digits="1" data-pt-cls="ENGINE">&mdash;</span> <small>L/min</small></div>
+            <div class="th" id="kTotalTh" data-const>Site makeup + domestic/process</div>
         </div>
         <div class="kpi">
             <h3>Filter DP</h3>
-            <div class="v"><span id="kDp" data-rz-authored-basis="Treatment-train instrument readings and vessel levels - raw and domestic tank level and volume, filter differential pressure, treated TDS, UV lamp intensity - are simulated local plant state, together with the alarm thresholds beside them. conv-engine.js models the water BALANCE (cooling makeup, domestic draw, the treated total, the tower split and WUE) and publishes no treatment-train schedule: how large the raw tank is, at what differential a filter is backwashed and at what TDS the treated water is rejected are local design and alarm-philosophy decisions no engine parameter carries. Every balance figure on this page is engine-bound and stays in the denominator.">UNAVAILABLE</span> <small>bar</small></div>
-            <div class="th unavailable" id="kDpTh">UNAVAILABLE</div>
+            <div class="v"><span id="kDp" data-point="water.filter_dp_bar" data-pt-label="Filter DP" data-pt-unit="bar" data-pt-digits="2" data-rz-authored-basis="Treatment-train instrument readings and vessel levels - raw and domestic tank level and volume, filter differential pressure, treated TDS, UV lamp intensity - are simulated local plant state, together with the alarm thresholds beside them. conv-engine.js models the water BALANCE (cooling makeup, domestic draw, the treated total, the tower split and WUE) and publishes no treatment-train schedule: how large the raw tank is, at what differential a filter is backwashed and at what TDS the treated water is rejected are local design and alarm-philosophy decisions no engine parameter carries. Every balance figure on this page is engine-bound and stays in the denominator.">UNAVAILABLE</span> <small>bar</small></div>
+            <div class="th unavailable" id="kDpTh" data-const>UNAVAILABLE</div>
         </div>
         <div class="kpi">
             <h3>Treated TDS</h3>
-            <div class="v"><span id="kTds" data-rz-authored-basis="Treatment-train instrument readings and vessel levels - raw and domestic tank level and volume, filter differential pressure, treated TDS, UV lamp intensity - are simulated local plant state, together with the alarm thresholds beside them. conv-engine.js models the water BALANCE (cooling makeup, domestic draw, the treated total, the tower split and WUE) and publishes no treatment-train schedule: how large the raw tank is, at what differential a filter is backwashed and at what TDS the treated water is rejected are local design and alarm-philosophy decisions no engine parameter carries. Every balance figure on this page is engine-bound and stays in the denominator.">UNAVAILABLE</span> <small>ppm</small></div>
-            <div class="th unavailable" id="kTdsTh">UNAVAILABLE</div>
+            <div class="v"><span id="kTds" data-point="water.tds_ppm" data-pt-label="Treated TDS" data-pt-unit="ppm" data-pt-digits="0" data-rz-authored-basis="Treatment-train instrument readings and vessel levels - raw and domestic tank level and volume, filter differential pressure, treated TDS, UV lamp intensity - are simulated local plant state, together with the alarm thresholds beside them. conv-engine.js models the water BALANCE (cooling makeup, domestic draw, the treated total, the tower split and WUE) and publishes no treatment-train schedule: how large the raw tank is, at what differential a filter is backwashed and at what TDS the treated water is rejected are local design and alarm-philosophy decisions no engine parameter carries. Every balance figure on this page is engine-bound and stays in the denominator.">UNAVAILABLE</span> <small>ppm</small></div>
+            <div class="th unavailable" id="kTdsTh" data-const>UNAVAILABLE</div>
         </div>
     </div>
 
@@ -565,12 +569,12 @@
                     <div class="pump-pair">
                         <div class="pump-unit state-unavailable" data-pump-id="P-301A" data-role="duty" data-state="unavailable">
                             <span class="pump-icon pump-symbol" aria-hidden="true"></span>
-                            <div><div class="pump-name">P-301A · Duty</div><div class="pump-meta">No current point authority</div></div>
+                            <div><div class="pump-name">P-301A · Duty</div><div class="pump-meta" data-const>No current point authority</div></div>
                             <div class="pump-state">UNAVAILABLE</div>
                         </div>
                         <div class="pump-unit state-unavailable" data-pump-id="P-301B" data-role="standby" data-state="unavailable">
                             <span class="pump-icon pump-symbol" aria-hidden="true"></span>
-                            <div><div class="pump-name">P-301B · Standby</div><div class="pump-meta">No current point authority</div></div>
+                            <div><div class="pump-name">P-301B · Standby</div><div class="pump-meta" data-const>No current point authority</div></div>
                             <div class="pump-state">UNAVAILABLE</div>
                         </div>
                     </div>
@@ -578,9 +582,9 @@
                 <section class="plant-summary">
                     <div class="summary-title">Site Treatment Header</div>
                     <div class="allocation-list">
-                        <div class="allocation-row"><span>Total treated flow · site</span><strong id="alloc-treatment" class="unavailable">UNAVAILABLE</strong></div>
-                        <div class="allocation-row"><span>Cooling makeup · site · WUE included</span><strong id="alloc-makeup" class="unavailable">UNAVAILABLE</strong></div>
-                        <div class="allocation-row"><span>Domestic/process · site · WUE excluded</span><strong id="alloc-domestic" class="unavailable">UNAVAILABLE</strong></div>
+                        <div class="allocation-row"><span>Total treated flow · site</span><strong id="alloc-treatment" class="unavailable" data-point="water.total_treated_lpm" data-pt-label="Total treated flow" data-pt-unit="L/min" data-pt-digits="1" data-pt-cls="ENGINE">UNAVAILABLE</strong></div>
+                        <div class="allocation-row"><span>Cooling makeup · site · WUE included</span><strong id="alloc-makeup" class="unavailable" data-point="water.flow_lpm_for_wue" data-pt-label="Cooling makeup flow" data-pt-unit="L/min" data-pt-digits="1" data-pt-cls="ENGINE">UNAVAILABLE</strong></div>
+                        <div class="allocation-row"><span>Domestic/process · site · WUE excluded</span><strong id="alloc-domestic" class="unavailable" data-point="water.domestic_lpm" data-pt-label="Domestic / process draw" data-pt-unit="L/min" data-pt-digits="1" data-pt-cls="ENGINE">UNAVAILABLE</strong></div>
                         <div class="allocation-row"><span>Downstream hall allocation</span><strong id="alloc-hall" class="unavailable">UNAVAILABLE</strong></div>
                     </div>
                     <div class="scope-note" id="water-scope-note" data-explain="conv-water-hall-alloc">one site plant · hall split needs submeter</div>
@@ -599,11 +603,11 @@
         <div>
             <div class="panel" data-rz-doc-section="ws-wue" data-rz-doc-label="WUE reconciliation">
                 <div class="panel-title">WUE Reconciliation</div>
-                <div class="insp-row"><span class="k">IT Load · site</span><span class="vv unavailable" id="iIt" data-basis-param="site.it_load_kw" tabindex="0" role="button">UNAVAILABLE</span></div>
-                <div class="insp-row"><span class="k">IT Energy · site (1 h)</span><span class="vv unavailable" id="iItE">UNAVAILABLE</span></div>
-                <div class="insp-row"><span class="k">WUE-incl water · site (1 h)</span><span class="vv unavailable" id="iWaterHr">UNAVAILABLE</span></div>
-                <div class="insp-row"><span class="k">Instant WUE · site</span><span class="vv unavailable" id="iWue" data-basis-param="water.wue_l_per_kwh" tabindex="0" role="button">UNAVAILABLE</span></div>
-                <div class="insp-row"><span class="k">24 h WUE · historian</span><span class="vv unavailable" id="iWue24">UNAVAILABLE</span></div>
+                <div class="insp-row"><span class="k">IT Load · site</span><span class="vv unavailable" id="iIt" data-const data-basis-param="site.it_load_kw" tabindex="0" role="button">UNAVAILABLE</span></div>
+                <div class="insp-row"><span class="k" data-const>IT Energy · site (1 h)</span><span class="vv unavailable" id="iItE" data-const>UNAVAILABLE</span></div>
+                <div class="insp-row"><span class="k" data-const>WUE-incl water · site (1 h)</span><span class="vv unavailable" id="iWaterHr" data-point="water.makeup_l_per_h" data-pt-label="WUE-incl water, site, 1 h" data-pt-unit="L" data-pt-digits="0" data-pt-cls="ENGINE">UNAVAILABLE</span></div>
+                <div class="insp-row"><span class="k">Instant WUE · site</span><span class="vv unavailable" id="iWue" data-basis-param="water.wue_l_per_kwh" data-point="water.wue_l_per_kwh" data-pt-label="Instant WUE" data-pt-unit="L/kWh" data-pt-digits="2" tabindex="0" role="button">UNAVAILABLE</span></div>
+                <div class="insp-row"><span class="k" data-const>24 h WUE · historian</span><span class="vv unavailable" id="iWue24" data-const>UNAVAILABLE</span></div>
                 <div class="balance-note" id="balanceNote" data-explain="conv-water-wue-basis">WUE = water &divide; IT energy &middot; site</div>
             </div>
 
@@ -611,31 +615,31 @@
                 <div class="panel-title">Site Water Scope</div>
                 <div class="insp-row">
                     <span class="k">Cooling makeup <span class="scope-tag incl">WUE</span></span>
-                    <span class="vv unavailable" id="iScMk" data-basis-param="water.flow_lpm_for_wue" tabindex="0" role="button">UNAVAILABLE</span>
+                    <span class="vv unavailable" id="iScMk" data-basis-param="water.flow_lpm_for_wue" data-point="water.flow_lpm_for_wue" data-pt-label="Cooling makeup flow" data-pt-unit="L/min" data-pt-digits="1" data-pt-cls="ENGINE" tabindex="0" role="button">UNAVAILABLE</span>
                 </div>
                 <div class="insp-row" style="padding-left:14px;">
-                    <span class="k">&boxur; Evaporation · model</span><span class="vv unavailable" id="iScEv">UNAVAILABLE</span>
+                    <span class="k">&boxur; Evaporation · model</span><span class="vv unavailable" id="iScEv" data-point="water.evaporation_lpm" data-pt-label="Evaporation" data-pt-unit="L/min" data-pt-digits="1" data-pt-cls="ENGINE">UNAVAILABLE</span>
                 </div>
                 <div class="insp-row" style="padding-left:14px;">
-                    <span class="k">&boxur; Blowdown · model</span><span class="vv unavailable" id="iScBd">UNAVAILABLE</span>
+                    <span class="k">&boxur; Blowdown · model</span><span class="vv unavailable" id="iScBd" data-point="water.blowdown_lpm" data-pt-label="Blowdown" data-pt-unit="L/min" data-pt-digits="1" data-pt-cls="ENGINE">UNAVAILABLE</span>
                 </div>
                 <div class="insp-row" style="padding-left:14px;">
-                    <span class="k">&boxur; Drift · model</span><span class="vv unavailable" id="iScDr">UNAVAILABLE</span>
+                    <span class="k">&boxur; Drift · model</span><span class="vv unavailable" id="iScDr" data-point="water.drift_lpm" data-pt-label="Drift" data-pt-unit="L/min" data-pt-digits="2" data-pt-cls="ENGINE">UNAVAILABLE</span>
                 </div>
                 <div class="insp-row">
                     <span class="k">Domestic / process <span class="scope-tag excl">EXCL</span></span>
-                    <span class="vv unavailable" id="iScDom">UNAVAILABLE</span>
+                    <span class="vv unavailable" id="iScDom" data-point="water.domestic_lpm" data-pt-label="Domestic / process draw" data-pt-unit="L/min" data-pt-digits="1" data-pt-cls="ENGINE">UNAVAILABLE</span>
                 </div>
                 <div class="insp-row">
                     <span class="k"><b>Total treatment</b></span>
-                    <span class="vv unavailable" id="iScTot">UNAVAILABLE</span>
+                    <span class="vv unavailable" id="iScTot" data-point="water.total_treated_lpm" data-pt-label="Total treatment flow" data-pt-unit="L/min" data-pt-digits="1" data-pt-cls="ENGINE">UNAVAILABLE</span>
                 </div>
                 <div class="balance-note" id="scope-reconciliation-note" data-explain="conv-water-recon">
                     <span id="scope-reconciliation-values" hidden>
-                        <b id="iWhyTot">&mdash;</b> &minus; <b id="iWhyDom">&mdash;</b>
-                        = <b id="iWhyMk">&mdash;</b> L/min &middot; WUE
-                        <b id="iWhyWue" data-basis-param="water.wue_l_per_kwh" tabindex="0" role="button">&mdash;</b>
-                        / all-treated <b id="iWhyAll" data-basis-param="water.wue_all_treated_l_per_kwh" tabindex="0" role="button" title="WUE on the whole treated flow — click for basis">&mdash;</b> L/kWh.
+                        <b id="iWhyTot" data-point="water.total_treated_lpm" data-pt-label="Total treatment flow" data-pt-unit="L/min" data-pt-digits="1" data-pt-cls="ENGINE">&mdash;</b> &minus; <b id="iWhyDom" data-point="water.domestic_lpm" data-pt-label="Domestic / process draw" data-pt-unit="L/min" data-pt-digits="1" data-pt-cls="ENGINE">&mdash;</b>
+                        = <b id="iWhyMk" data-point="water.flow_lpm_for_wue" data-pt-label="Cooling makeup flow" data-pt-unit="L/min" data-pt-digits="1" data-pt-cls="ENGINE">&mdash;</b> L/min &middot; WUE
+                        <b id="iWhyWue" data-basis-param="water.wue_l_per_kwh" data-point="water.wue_l_per_kwh" data-pt-label="Instant WUE" data-pt-unit="L/kWh" data-pt-digits="2" tabindex="0" role="button">&mdash;</b>
+                        / all-treated <b id="iWhyAll" data-basis-param="water.wue_all_treated_l_per_kwh" data-point="water.wue_all_treated_l_per_kwh" data-pt-label="WUE on the whole treated flow" data-pt-unit="L/kWh" data-pt-digits="2" data-pt-cls="ENGINE" tabindex="0" role="button" title="WUE on the whole treated flow — click for basis">&mdash;</b> L/kWh.
                     </span>
                     <span id="scope-reconciliation-unavailable">UNAVAILABLE &middot; no engine snapshot</span>
                 </div>
@@ -652,7 +656,7 @@
 
     <!-- Bottom trend strip -->
     <div class="chart-card" data-rz-doc-section="ws-trend" data-rz-doc-label="Filter DP and cooling make-up flow — 24 h trend" style="margin-bottom:14px;">
-        <div class="panel-title">Filter DP &amp; Cooling Makeup Flow — 24 h Trend
+        <div class="panel-title">Filter DP &amp; Cooling Makeup Flow — <span data-const>24 h</span> Trend
             <span class="sub">— thresholds shown; current marker right edge</span>
         </div>
         <div class="trend-chart-frame">
@@ -671,17 +675,17 @@
         </div>
         <div class="status-item">
             <div class="status-led led-unavailable" id="led-tank"></div>
-            <span class="k">RAW TANK</span><span class="vv" id="status-tank" data-rz-authored-basis="Treatment-train instrument readings and vessel levels - raw and domestic tank level and volume, filter differential pressure, treated TDS, UV lamp intensity - are simulated local plant state, together with the alarm thresholds beside them. conv-engine.js models the water BALANCE (cooling makeup, domestic draw, the treated total, the tower split and WUE) and publishes no treatment-train schedule: how large the raw tank is, at what differential a filter is backwashed and at what TDS the treated water is rejected are local design and alarm-philosophy decisions no engine parameter carries. Every balance figure on this page is engine-bound and stays in the denominator.">UNAVAILABLE</span>
+            <span class="k">RAW TANK</span><span class="vv" id="status-tank" data-point="water.raw_tank_pct" data-pt-label="TK-101 raw tank level" data-pt-unit="%" data-pt-digits="0" data-rz-authored-basis="Treatment-train instrument readings and vessel levels - raw and domestic tank level and volume, filter differential pressure, treated TDS, UV lamp intensity - are simulated local plant state, together with the alarm thresholds beside them. conv-engine.js models the water BALANCE (cooling makeup, domestic draw, the treated total, the tower split and WUE) and publishes no treatment-train schedule: how large the raw tank is, at what differential a filter is backwashed and at what TDS the treated water is rejected are local design and alarm-philosophy decisions no engine parameter carries. Every balance figure on this page is engine-bound and stays in the denominator.">UNAVAILABLE</span>
         </div>
         <div class="status-item">
             <div class="status-led led-unavailable" id="led-pump"></div>
             <span class="k">BOOSTER PAIR</span><span class="vv" id="status-pump">UNAVAILABLE</span>
         </div>
         <div class="status-item">
-            <span class="k">MAKEUP</span><span class="vv" id="status-flow">UNAVAILABLE</span>
+            <span class="k">MAKEUP</span><span class="vv" id="status-flow" data-point="water.flow_lpm_for_wue" data-pt-label="Cooling makeup flow" data-pt-unit="L/min" data-pt-digits="1" data-pt-cls="ENGINE">UNAVAILABLE</span>
         </div>
         <div class="status-item">
-            <span class="k">WUE</span><span class="vv" id="status-wue">UNAVAILABLE</span>
+            <span class="k">WUE</span><span class="vv" id="status-wue" data-point="water.wue_l_per_kwh" data-pt-label="Instant WUE" data-pt-unit="L/kWh" data-pt-digits="2">UNAVAILABLE</span>
         </div>
         <div class="status-spacer"></div>
         <div class="status-item">
@@ -814,15 +818,24 @@
             }
 
             // ---- Threshold evaluation (doc-07 §"Alarm Rules") --------------
+            /* PRD-CONV-POINT-STATUS-TREND P-1/P-2: every bound is a row of the limits registry (data/conv-limits.curated.json,
+               read through RZPointStatus); this page types none. level(v, id) = 'bad' | 'warn' | 'ok' for the value against its
+               row (the same classify() the number on the page uses, without a deadband: a scan has no previous state). */
+            var PS = window.RZPointStatus || null;
+            function lim(id, k) { var L = PS ? PS.limits(id) : null; return L && L[k] != null ? L[k] : null; }
+            function level(v, id) {
+                var L = PS ? PS.limits(id) : null; if (!L || !ok(v)) return 'ok';
+                if ((L.lo_alarm != null && v < L.lo_alarm) || (L.hi_alarm != null && v > L.hi_alarm)) return 'bad';
+                if ((L.lo_warn != null && v < L.lo_warn) || (L.hi_warn != null && v > L.hi_warn)) return 'warn';
+                return 'ok';
+            }
             function evalThresholds() {
                 var crit = 0, warn = 0;
                 if (!siteBalanceAvailable) return { crit: 0, warn: 0, unavailable: true };
-                if (rawPct < 30) crit++; else if (rawPct < 40) warn++;
-                if (domPct < 40) crit++; else if (domPct < 50) warn++;
-                if (filterDp > 0.80) crit++; else if (filterDp > 0.65) warn++;
-                if (tds > 500) crit++; else if (tds > 350) warn++;
-                if (uvInt < 70) crit++; else if (uvInt < 85) warn++;
-                if (wueComputed > WUE_TARGET) warn++;
+                [[rawPct, 'water.raw_tank_pct'], [domPct, 'water.dom_tank_pct'], [filterDp, 'water.filter_dp_bar'], [tds, 'water.tds_ppm'],
+                 [uvInt, 'water.uv_intensity_pct'], [wueComputed, 'water.wue_l_per_kwh']].forEach(function (p) {
+                    var lv = level(p[0], p[1]); if (lv === 'bad') crit++; else if (lv === 'warn') warn++;
+                });
                 return { crit: crit, warn: warn, unavailable: false };
             }
 
@@ -987,11 +1000,11 @@
                 switch (n.id) {
                     case 'meter': o.values = { q: wv(pointText('meter:q')), p: wv(A ? '2.1 bar' : UNAV) }; break;
                     case 'rawtank':
-                        o.state = A ? (rawPct < 30 ? 'low' : 'normal') : null;
-                        o.values = { pct: wv(A ? rawPct + ' %' : UNAV, A && rawPct < 30 ? '2' : null), vol: wv(A ? f1(rawVol) + ' m³' : '—'),
+                        o.state = A ? (level(rawPct, 'water.raw_tank_pct') === 'bad' ? 'low' : 'normal') : null;
+                        o.values = { pct: wv(A ? rawPct + ' %' : UNAV, A && level(rawPct, 'water.raw_tank_pct') === 'bad' ? '2' : null), vol: wv(A ? f1(rawVol) + ' m³' : '—'),
                             aut: wv(A ? f1(rawVol * 1000 / totalLpm / 60) + ' h' : '—') }; break;
                     case 'filter':
-                        o.values = { dp: wv(A ? 'DP ' + f2(filterDp) + ' bar' : UNAV, A && filterDp > 0.80 ? '1' : (A && filterDp > 0.65 ? '2' : null)),
+                        o.values = { dp: wv(A ? 'DP ' + f2(filterDp) + ' bar' : UNAV, A && level(filterDp, 'water.filter_dp_bar') === 'bad' ? '1' : (A && level(filterDp, 'water.filter_dp_bar') === 'warn' ? '2' : null)),
                             io: wv(A ? '2.4 → ' + f1(2.4 - filterDp) + ' bar' : '—') }; break;
                     case 'backwash': o.state = A ? (bwActive ? 'open' : 'closed') : null;
                         o.values = { st: wv(A ? (bwActive ? 'ACTIVE' : 'INHIBIT') : UNAV) }; break;
@@ -1001,8 +1014,8 @@
                     case 'dosing': o.values = { cl2: wv(pointText('dosing:cl2')), res: wv(A ? cl2Res + ' ppm' : '—') }; break;
                     case 'uv': o.state = A ? 'running' : null; o.values = { int: wv(A ? uvInt + ' % INT' : UNAV) }; break;
                     case 'domtank':
-                        o.state = A ? (domPct < 40 ? 'low' : 'normal') : null;
-                        o.values = { pct: wv(A ? domPct + ' %' : UNAV, A && domPct < 40 ? '2' : null), vol: wv(A ? f1(domVol) + ' m³' : '—'),
+                        o.state = A ? (level(domPct, 'water.dom_tank_pct') === 'bad' ? 'low' : 'normal') : null;
+                        o.values = { pct: wv(A ? domPct + ' %' : UNAV, A && level(domPct, 'water.dom_tank_pct') === 'bad' ? '2' : null), vol: wv(A ? f1(domVol) + ' m³' : '—'),
                             aut: wv(A ? f1(domVol * 1000 / DOMESTIC_LPM / 60) + ' h' : '—') }; break;
                     case 'service': o.values = { q: wv(pointText('service:q')) }; break;
                     case 'fmk': o.values = { q: wv(pointText('fmk:q')) }; break;
@@ -1097,18 +1110,18 @@
                     : 'UNAVAILABLE · ' + unavailableBasisReason);
                 set('kDp', siteBalanceAvailable ? f2(filterDp) : 'UNAVAILABLE');
                 set('kTds', siteBalanceAvailable ? Math.round(tds) : 'UNAVAILABLE');
-                set('kDpTh', siteBalanceAvailable ? 'Backwash > 0.80 bar' : 'UNAVAILABLE');
-                set('kTdsTh', siteBalanceAvailable ? 'Limit < 500 ppm' : 'UNAVAILABLE');
+                set('kDpTh', siteBalanceAvailable ? 'Backwash > ' + f2(lim('water.filter_dp_bar', 'hi_alarm')) + ' bar' : 'UNAVAILABLE');
+                set('kTdsTh', siteBalanceAvailable ? 'Limit < ' + nfmt(lim('water.tds_ppm', 'hi_alarm')) + ' ppm' : 'UNAVAILABLE');
 
                 var th = evalThresholds();
                 document.getElementById('kWueTh').className = 'th '
-                    + (th.unavailable ? 'unavailable' : (wueComputed > WUE_TARGET ? 'warn' : 'ok'));
+                    + (th.unavailable ? 'unavailable' : '');   /* a threshold line is a constant: neutral; the WUE number carries the state */
                 document.getElementById('kMakeupTh').className = 'th'
                     + (th.unavailable ? ' unavailable' : '');
                 document.getElementById('kTotalTh').className = 'th'
                     + (th.unavailable ? ' unavailable' : '');
-                document.getElementById('kDpTh').className = 'th ' + (th.unavailable ? 'unavailable' : (filterDp > 0.80 ? 'bad' : (filterDp > 0.65 ? 'warn' : 'ok')));
-                document.getElementById('kTdsTh').className = 'th ' + (th.unavailable ? 'unavailable' : (tds > 500 ? 'bad' : (tds > 350 ? 'warn' : 'ok')));
+                document.getElementById('kDpTh').className = 'th ' + (th.unavailable ? 'unavailable' : '');
+                document.getElementById('kTdsTh').className = 'th ' + (th.unavailable ? 'unavailable' : '');
 
                 // Alarm strip
                 var state = th.unavailable ? 'UNAVAILABLE'
@@ -1142,8 +1155,7 @@
                 ['iIt', 'iItE', 'iWaterHr'].forEach(function (id) {
                     markUnavailable(id, !siteBalanceAvailable);
                 });
-                document.getElementById('iWue').className = 'vv '
-                    + (th.unavailable ? 'unavailable' : (wueComputed > WUE_TARGET ? 'warn' : 'ok'));
+                document.getElementById('iWue').className = 'vv ' + (th.unavailable ? 'unavailable' : 'ok');   /* its state: RZPointStatus */
                 markUnavailable('iWue24', true);
 
                 // Site scope. The engine publishes no downstream hall submeters.
@@ -1217,12 +1229,14 @@
                     var control = document.getElementById(id);
                     if (control) control.disabled = !siteBalanceAvailable;
                 });
+                /* the registry state of the HTML points (the sheet applies its own) */
+                if (PS) PS.bindAll(document.body);
             }
 
             function alarmRow(sev, label, detail) {
                 return '<li><span class="sev ' + sev + '">' +
                     (sev === 'bad' ? 'ALARM' : sev === 'warn' ? 'WARN' : sev === 'unavailable' ? 'UNAVAILABLE' : 'OK') +
-                    '</span><span class="msg" data-rz-authored-basis="' + TREATMENT_STATE_BASIS +
+                    '</span><span class="msg" data-const data-rz-authored-basis="' + TREATMENT_STATE_BASIS +
                     '"><b>' + label + '</b> &mdash; ' + detail + '</span></li>';
             }
             var TREATMENT_STATE_BASIS = 'Treatment-train instrument readings and vessel levels - raw and domestic tank level and volume, filter differential pressure, treated TDS, UV lamp intensity - are simulated local plant state, together with the alarm thresholds beside them. conv-engine.js models the water BALANCE (cooling makeup, domestic draw, the treated total, the tower split and WUE) and publishes no treatment-train schedule: how large the raw tank is, at what differential a filter is backwashed and at what TDS the treated water is rejected are local design and alarm-philosophy decisions no engine parameter carries. Every balance figure on this page is engine-bound and stays in the denominator.';
@@ -1232,21 +1246,22 @@
                     return;
                 }
                 var rows = '';
-                rows += alarmRow(rawPct < 30 ? 'bad' : rawPct < 40 ? 'warn' : 'ok',
-                    'Raw Tank TK-101', rawPct + '% / ' + f1(rawVol) + ' m³ (low &lt; 30%)');
-                rows += alarmRow(domPct < 40 ? 'bad' : domPct < 50 ? 'warn' : 'ok',
-                    'Domestic Tank TK-402', domPct + '% / ' + f1(domVol) + ' m³ (low &lt; 40%)');
-                rows += alarmRow(filterDp > 0.80 ? 'bad' : filterDp > 0.65 ? 'warn' : 'ok',
-                    'Filter FLT-201', 'DP ' + f2(filterDp) + ' bar (backwash &gt; 0.80)');
-                rows += alarmRow(tds > 500 ? 'bad' : tds > 350 ? 'warn' : 'ok',
-                    'Treated TDS', Math.round(tds) + ' ppm (limit &lt; 500)');
-                rows += alarmRow(uvInt < 70 ? 'bad' : uvInt < 85 ? 'warn' : 'ok',
+                rows += alarmRow(level(rawPct, 'water.raw_tank_pct'),
+                    'Raw Tank TK-101', rawPct + '% / ' + f1(rawVol) + ' m³ (low &lt; ' + lim('water.raw_tank_pct', 'lo_alarm') + '%)');
+                rows += alarmRow(level(domPct, 'water.dom_tank_pct'),
+                    'Domestic Tank TK-402', domPct + '% / ' + f1(domVol) + ' m³ (low &lt; ' + lim('water.dom_tank_pct', 'lo_alarm') + '%)');
+                rows += alarmRow(level(filterDp, 'water.filter_dp_bar'),
+                    'Filter FLT-201', 'DP ' + f2(filterDp) + ' bar (backwash &gt; ' + f2(lim('water.filter_dp_bar', 'hi_alarm')) + ')');
+                rows += alarmRow(level(tds, 'water.tds_ppm'),
+                    'Treated TDS', Math.round(tds) + ' ppm (limit &lt; ' + nfmt(lim('water.tds_ppm', 'hi_alarm')) + ')');
+                rows += alarmRow(level(uvInt, 'water.uv_intensity_pct'),
                     'UV-401', uvInt + '% intensity, lamp healthy');
                 rows += alarmRow('ok', 'Dosing DOS-302', 'cmd ON, run feedback OK');
                 document.getElementById('alarmList').innerHTML = rows;
             }
 
             render();
+            window.addEventListener('rz-point-limits', render);   /* the database rows arrive after first paint */
 
             // ---- W4 simulation / test seam (simulated data mode only; never a write path) -------------
             /* trip() drives an alarm this page already models below its own threshold (TK-101 low-low

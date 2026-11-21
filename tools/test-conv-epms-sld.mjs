@@ -68,10 +68,12 @@ const SEC_A = ['ma-2', 'ma-3', 'ma-4', 'ma-5', 'ma-6', 'fa1-a', 'fa1-b', 'fa1-c'
 const snap = (pg) => pg.evaluate((H) => {
   const host = document.querySelector(H);
   const vs = (id) => { const p = host.querySelector('path.hmi-edge[data-edge="' + id + '"]:not(.hmi-flow):not(.hmi-edge-shadow):not(.hmi-edge-hi)'); return p ? p.getAttribute('data-vstate') : null; };
-  const val = (k) => { const t = host.querySelector('text[data-val="' + k + '"]'); return t ? t.textContent.trim() : null; };
+  /* a point's state glyph (tspan.rz-pt-g, aria-hidden, PRD-CONV-POINT-STATUS-TREND) is decoration, not the value */
+  const vtext = (t) => { let x = ''; t.childNodes.forEach((n) => { if (!(n.classList && n.classList.contains('rz-pt-g'))) x += n.textContent; }); return x.trim(); };
+  const val = (k) => { const t = host.querySelector('text[data-val="' + k + '"]'); return t ? vtext(t) : null; };
   const out = { edges: {}, vals: {} };
   host.querySelectorAll('path.hmi-edge[data-edge]:not(.hmi-flow)').forEach((p) => { out.edges[p.getAttribute('data-edge')] = vs(p.getAttribute('data-edge')); });
-  host.querySelectorAll('text[data-val]').forEach((t) => { out.vals[t.getAttribute('data-val')] = t.textContent.trim(); });
+  host.querySelectorAll('text[data-val]').forEach((t) => { out.vals[t.getAttribute('data-val')] = vtext(t); });
   out.msg = (document.getElementById('epms-sld-msg') || {}).textContent || '';
   out.over = document.documentElement.scrollWidth > innerWidth + 1;
   return out;

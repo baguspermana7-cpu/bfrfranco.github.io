@@ -1,0 +1,57 @@
+/* conv-point.css — point state on a number (PRD-CONV-POINT-STATUS-TREND §4.1, OD-1).
+   The ONLY place the three state colours are defined. Colour goes on the number's text, never a fill, a glow or a badge.
+   Colour is never the only cue (P-4): warning carries ▲ (▼ low), alarm carries ◆ and a 1 px outline; the state word is
+   in aria-label and in the tooltip. Each colour clears 4.5:1 on its theme's surface (tools/test-conv-trend-ranges.mjs).
+   Flat view (rz-hmi-sheet shade mode "flat", ISA-101 strict) keeps NORMAL values in page ink; warning and alarm stay. */
+:root {
+  --rz-pt-ok: #3fb950;
+  --rz-pt-warn: #e8b563;
+  --rz-pt-alarm: #ff6b5e;
+  --rz-pt-tip-bg: #191b1f;
+  --rz-pt-tip-ink: #e8edf5;
+  --rz-pt-tip-line: rgba(255, 255, 255, .16);
+  --rz-pt-focus: #e8b563;
+}
+[data-theme="light"] {
+  --rz-pt-ok: #1a7f37;
+  --rz-pt-warn: #7a4800;
+  --rz-pt-alarm: #b42318;
+  --rz-pt-tip-bg: #ffffff;
+  --rz-pt-tip-ink: #1b2430;
+  --rz-pt-tip-line: rgba(15, 23, 42, .16);
+  --rz-pt-focus: #7a4800;
+}
+
+[data-point] { cursor: pointer; }
+[data-point]:focus-visible { outline: 2px solid var(--rz-pt-focus); outline-offset: 2px; border-radius: 2px; }
+/* T2/T3 affordance: a number reads as clickable without noise — a 1 px underline on hover only (no glow, no fill, no
+   motion); a constant (data-const) with a basis gets the same dotted hint its basis buttons already carry. */
+[data-point]:hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+text[data-point]:hover { text-decoration: underline; }
+/* no layout shift when a glyph appears (polish bar): a point with limits reserves the glyph's width while it is normal */
+[data-pt-state="ok"]:not(text)::after { content: "\00a0▲"; font-size: .82em; visibility: hidden; }
+text .rz-pt-g-off { visibility: hidden; }
+
+/* normal: green text, unless Flat view is on (page-wide flag, or the sheet frame's own shade attribute) */
+/* :not(#rz-pt) lifts each state rule to id weight: a page's own value rule (.kv .v, .hmi-svg [data-role="value"],
+   [data-alarm]) is class-weight and must never repaint a state (T3: a warn number in a side card stayed page ink) */
+:root:not([data-pt-flat]):not(#rz-pt) [data-pt-state="ok"]:not(.hmi-frame[data-shade="flat"] [data-pt-state]) { color: var(--rz-pt-ok); fill: var(--rz-pt-ok); }
+:root:not(#rz-pt) [data-pt-state="warn"] { color: var(--rz-pt-warn); fill: var(--rz-pt-warn); }
+:root:not(#rz-pt) [data-pt-state="alarm"] { color: var(--rz-pt-alarm); fill: var(--rz-pt-alarm); }
+[data-pt-state="none"] { font-style: italic; opacity: .72; }
+
+/* glyphs on HTML numbers; SVG text gets a tspan.rz-pt-g from point-status.js */
+[data-pt-state="warn"]:not(text)::after { content: "\00a0▲"; font-size: .82em; }
+[data-pt-state="warn"][data-pt-dir="lo"]:not(text)::after { content: "\00a0▼"; }
+[data-pt-state="alarm"]:not(text)::after { content: "\00a0◆"; font-size: .82em; }
+[data-pt-state="alarm"]:not(text) { outline: 1px solid currentColor; outline-offset: 1px; border-radius: 2px; }
+[data-pt-state="alarm"]:not(text):focus-visible { outline: 2px solid var(--rz-pt-focus); outline-offset: 2px; }
+text[data-pt-state="alarm"] { font-weight: 700; }
+
+.rz-pt-tip {
+  position: fixed; z-index: 2147482300; pointer-events: none; max-width: min(360px, calc(100vw - 16px));
+  padding: 5px 8px; border: 1px solid var(--rz-pt-tip-line); border-radius: 3px;
+  background: var(--rz-pt-tip-bg); color: var(--rz-pt-tip-ink);
+  font: 12px/1.45 "IBM Plex Sans", system-ui, sans-serif; font-variant-numeric: tabular-nums;
+}
+.rz-pt-tip[hidden] { display: none; }

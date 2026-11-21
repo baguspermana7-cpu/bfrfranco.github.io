@@ -377,6 +377,100 @@ Before release:
   - *Clear and unclipped (Q1).* Labels keep 2 px of air from every pipe; CH-M-102 is 1025 units wide so it fits the
     1440 panel with no sideways scroll; at 1034 and 390 every text is inside the scroll range.
 
+### 2026-11-21 — Trend design (PRD-CONV-TREND-DESIGN, `js/rz-trend.js` 3.0.0)
+
+- **Ink pen, colour only where abnormal (ISA-101).** Pen 1 is drawn in page ink; the pieces above H/below L are cut at the
+  limit (interpolated, so pieces meet on the line) and painted `--rz-pt-warn` / `--rz-pt-alarm`. The now dot wears the
+  header state. A 4 px state ribbon under the plot repeats time-in-state.
+- **One neutral band, hairline limits.** The normal range is one ink band at 5 %; HH/H/L/LL are solid hairlines with muted
+  labels; a limit outside the axis is an edge marker (`HH 40.0 ↑`). No coloured washes, no dashed limits, no coloured text
+  except the header value and state word.
+- **Axis fits the data.** Data ± 10 %, nice ticks (1/2/2.5/5 × 10ⁿ), labels with the decimals the step needs; one axis per
+  unit, a second unit gets its own panel below (never a dual axis). A gap > 2 steps is drawn dotted and muted.
+- **Compare.** At most two compare pens, slots from `RZTrend.slots()` (dark `#74a6f0`, `#626266`; light `#1f5fae`,
+  `#8a9099`), each ≥ 15 ΔE (OKLab × 100) from every state token and from each other; an end label carries identity.
+- **Less text.** Source, limits basis and time zone sit in the ⓘ tooltip (opens on hover with a mouse, on tap otherwise);
+  stats are one ink line; buttons are text (Compare · Table · CSV). Gate `test-conv-trend-ranges.mjs` D1–D13.
+
+### 2026-11-20 — Point status and trend (PRD-CONV-POINT-STATUS-TREND T0/T1, shared files)
+
+- **One source of limits (P-1).** Every operating limit is a row of `data/conv-limits.curated.json`
+  (`{ id, label, unit, lo_alarm, lo_warn, hi_warn, hi_alarm, deadband, nominal, basis, evidenceClass, source{ref, asOf},
+  migratedFrom }`, schema `data/conv-limits.schema.json`). `tools/build-conv-parameter-registry.mjs` copies the rows into
+  `data/conv-parameters.json` / `js/conv-parameters.js` as `limits`. A page reads `RZPointStatus.limits(id)`; it never types
+  a limit. Point ids are registry ids (`cooling.chws_c`) or, for a simulated tag, `<page>.<tag>.<quantity>`
+  (`cdu-mini-bms.TT-01.supply_c`). Basis order: a standard read at its clause (the row names the table and the date read),
+  else the engine design value ± a declared margin, else ASSUMED. A standard not read is ASSUMED.
+- **State = classify(value, limits, previous state), nothing else (P-2).** `js/conv/point-status.js` (`RZPointStatus`):
+  warn at `v > hi_warn`, alarm at `v > hi_alarm`; back to warn only below `hi_alarm − deadband`, to normal only below
+  `hi_warn − deadband` (ISA-18.2); low side mirrored; null bounds never invent a state. `apply(el, id, v)` writes
+  `data-pt-state` / `data-pt-dir` / `data-pt-value`, aria-label and tooltip only when they change.
+- **Colour on the number only (OD-1), never the only cue (P-4).** Tokens `--rz-pt-ok/-warn/-alarm` live once in
+  `css/conv-point.css` (dark `#3fb950 / #e8b563 / #ff6b5e`, light `#1a7f37 / #7a4800 / #b42318`, each ≥ 4.5:1). Warning
+  ▲ (▼ low), alarm ◆ + 1 px outline, state word in aria-label and tooltip. Flat view (`rz-hmi-sheet` shade mode flat)
+  keeps normal values in page ink.
+- **The trend tells the page's story (P-5).** `RZTrend.open(id, { value, state })` pins the last sample to the page value
+  and the header to the page state; bands and the H/HH/L/LL lines come from the registry row. Ranges 1H · 8H · 1D · 7D ·
+  30D (`RZConvHistory.RANGES`, 30D at a 30-min step), default 1D, remembered per session, keys 1–5; old `r=5m/1h/24h/7d`
+  links map to 1H/1H/1D/7D. Footer: min · max · mean · time in warning · time in alarm · excursions. ≤ 600 px: the house
+  sheet (`js/rz-sheet.js`, `onClose`) at 88 % height, sticky range bar, 44 px targets.
+- **A normal plant has a normal past (P-6).** A history def passes through `RZConvHistory.bounded(def, limits)`: amp is
+  capped so the 30-day series stays inside the normal band; a base already outside is an engine breach, left alone.
+- Gates: `test-conv-point-status-core.mjs` (Node), `test-conv-trend-ranges.mjs` (fixture
+  `tools/fixtures/conv-point-trend/`), `test-conv-point-coverage.mjs` (ratchet, `tools/conv-point-coverage-baseline.json`).
+  Pages adopt in T2 (sheets) and T3 (tiles, tables, modal rows).
+- **The numbers live in the database, with a labelled fallback (§5b, T1b 2026-11-21).** Supabase `conv_points` holds the
+  limits (all read, root write, every change in `audit_log`); `conv_point_samples` (5 min, 48 h) and `conv_point_rollup`
+  (30 min, 35 d) hold the history, written inside the database by pg_cron (`conv_sample_tick`, the SQL port of
+  `RZConvHistory.value`, equal to the digit). `RZPointStatus` reads `conv_points` after first paint (5-min sessionStorage
+  cache, rows that break the order law ignored) and falls back to the shipped registry. `RZTrend` reads
+  `conv_point_series` through `RZTrend.dbProvider` (header "Database (simulated, pg_cron)") and, when the database does not
+  answer within 4 s, draws the local model for every pen with "Database unreachable — local SIM history" and the source
+  "Local model (database unreachable)". One open never shows two sources. Pages outside the registry pass
+  `RZTrend.register(points, { provider })` and `RZPointStatus.define(id, fromSimple({...}))`; precedence database row >
+  `define()` > shipped registry (a database row never overrides a `define()` of a non-conv id). Limits are edited in rz-ops
+  → Point limits (root). Seed = `tools/build-conv-points-seed.mjs` from the curated limits + `data/conv-points.json`
+  (freshness gate). Gate `test-conv-points-sql.mjs` (local postgres:16). **Owner action:** run
+  `supabase/migrations/2026-11-20-conv-points.sql` once in the Supabase SQL editor
+  (`documentation/product-transformation/02-prds/PRD-CONV-POINT-STATUS-TREND/RUNBOOK-DB.md`); until then the fallback serves.
+
+### 2026-11-21 — How a page marks its numbers (PRD-CONV-POINT-STATUS-TREND T2/T3 pilot: chiller-plant, cdu-mini-bms)
+
+Every rendered number is exactly one of three things (P-3). A page says which with one attribute; it never types a limit
+or a state colour.
+
+- **Point** — `<span data-point="<id>" data-pt-label="TCS supply" [data-pt-unit] [data-pt-digits] [data-pt-cls="ENGINE"]>`.
+  `RZPointStatus.bindAll(host)` after the host is painted registers its trend (base = the number shown, amp bounded per
+  P-6), makes it a button (tabindex 0, role button, `data-trend`), and writes `data-pt-state` from the registry limits of
+  `<id>`: with limits it is coloured (ok green, warn amber ▲/▼, alarm red ◆), without limits it is Informational (page ink).
+  The value classified and pinned in the trend is the number AS SHOWN (`data-pt-value` = the text, P-5): call
+  `apply(el, id)` without a value, or with the rounded one, never the raw float.
+- **Constant** — `data-const` on the element or its card (a rating, a design value, an operator setpoint, a prose note
+  that quotes a band). Page ink, no trend; where the card has `data-basis-param` a click opens the basis drawer. A number
+  inside a basis card that IS a reading is a point: `rz-basis-drawer.js` stops its walk at `[data-trend]`, so the number
+  opens the trend and the rest of the card opens the basis.
+- **Sheet labels** (`js/rz-hmi-sheet.js`): a value item carries `point` and `label` (and `unit`) in the sheet model; the
+  sheet writes `data-point` the first time the label shows a digit, rewrites only the text node on later scans (the glyph
+  tspan stays) and calls `apply` only when the text changed — PERF1 holds. A per-unit reading of a limited quantity names
+  the registry row it inherits in `limitsOf` (`TT-101 CHWS` → `cooling.chws_c`); the page maps it with
+  `RZPointStatus.define(id, limits(row))` and again on `rz-point-limits` — a mapping, not a typed bound.
+- **A panel that repaints every tick** keeps its point elements: repaint through a shape check (`ptPaint` on
+  chiller-plant: when only the numbers changed, only their text nodes are written), or a rebuilt panel re-registers every
+  trend and drops the keyboard focus each scan.
+- **Specificity.** The state rules carry id weight (`:root:not(#rz-pt) [data-pt-state=…]`): a page value rule
+  (`.tile .v`, `.kv .v`, `.hmi-svg [data-role="value"]`, `[data-alarm]`) must never repaint a state. A normal point with
+  limits reserves its glyph's width (invisible `::after` / `tspan.rz-pt-g-off`), so nothing moves when it turns.
+  Hover = a 1 px underline; no glow, no fill. A child point gets `title=""` so a parent's native title does not stack on
+  the point tooltip.
+- **Limits migrated in the pilot:** chiller `LOOP_T2_WARNING_MAX / LOOP_T2_ALARM_MAX` (CHWR + 0.8 / + 1.5 K) became the
+  registry row `cooling.chwr_c`; cdu-mini-bms `TILES lo/hi` and `bandState()` are gone — the tile bar, its band text and
+  its state come from the `cdu-mini-bms.*` rows (TCS supply warn 37 / alarm 40 °C, OD-3). The clogged-filter override of
+  the loop-dP state is gone (P-2): the FILTER tile carries that alarm.
+- Gate `tools/test-conv-point-coverage.mjs`, STRICT pages (chiller-plant, cdu-mini-bms) at 1440 dark and 390 light:
+  PC1 unclassified = 0, PC2 state = classify(shown value, limits), PC3 painted in the token, PC4 glyph, PC5 the owner's
+  example on the real controls (In-Rack + Hot facility water → TCS 39 °C: amber ▲, trend header "▲ Warning high"),
+  PC6 a page has points. A page becomes STRICT when its T2/T3 migration lands.
+
 ### 2026-11-18 — equipment internals contract (modal v2 + chiller inside, PRD-CONV-EQUIPMENT-TRUTH E2)
 
 - **The modal draws the INSIDE, never the outside.** `RZConvModal.open(payload, { internal })` (v2.0.0, same API) shows,
@@ -736,3 +830,19 @@ Before release:
 
 References define terminology and design direction. This simulated cockpit does not claim
 certification, code compliance or authority-having-jurisdiction approval.
+
+### 2026-11-21 — fuel-system, water-system, fire-system carry points (PRD-CONV-POINT-STATUS-TREND T2/T3, second wave)
+
+The marking rules above hold unchanged; what the three pages add:
+
+- **A page's typed bounds became registry rows** (all ASSUMED, migrated from the page): water `evalThresholds()` and the
+  sheet alarm marks read `RZPointStatus.limits('water.*')` (raw tank, domestic tank, filter DP, TDS, UV, WUE); fire
+  `TANK_LOW_PCT / TANK_LL_PCT` read `fire.level_pct`; fuel PASS/FAIL of the 24 h SLA reads `fuel-system.sla_margin_hr`.
+  A threshold LINE ("Backwash > 0.80 bar") is a constant: neutral, its number comes from the same row.
+- **Per-set day tanks** (`fuel-system.DT-<set>.level_pct`) inherit `fuel-system.DT.level_pct` through `limitsOf` +
+  `PS.define` (`ptDefineUnits`, re-run on `rz-point-limits`); tables and rows that the page rebuilds every scan go
+  through `ptPaint` so the trends are registered once.
+- **A threshold line or record is not a reading:** alarm-list messages, scope-card text, rating lines and setpoints
+  (jockey / FP start pressures) are `data-const`. A number a page used to colour by its own band (`pf-*`, `.th.ok`,
+  `.metric-val.warn` by value) lost that colour: the state is the point's.
+- STRICT in `tools/test-conv-point-coverage.mjs`: chiller-plant, cdu-mini-bms, fuel-system, water-system, fire-system.

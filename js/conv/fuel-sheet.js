@@ -13,6 +13,9 @@
  * from the engine fleet (CONV_CALC.getFleet('genset', hallCode)), never from this file: build(units, hall) draws one
  * row per unit it is given, and select() makes that the sheet the page shows. Node ids are positional (gen1, dt1, xv1
  * ...) so the page logic is the same on every hall; the ISA tags are the fleet tags (GEN-A1, DT-GEN-A1, XV-A1).
+ *
+ * Points (PRD-CONV-POINT-STATUS-TREND T2): every value label that shows a number carries `point` + `label`; a per-unit day-tank
+ * level names the registry row its limits come from in `limitsOf` (the page maps the id onto the row, it never types a bound).
  */
 (function (root) {
   'use strict';
@@ -24,9 +27,9 @@
     return {
       nodes: [
         { id: 'fill', tag: 'TANKER FILL', sym: 'offSheet', x: 66, y: 150, size: 22, rot: 180, cls: 'fuel', label: 'Tanker fill point', tagAt: 'above',
-          values: [{ k: 'st', dx: -10, dy: 26, anchor: 'start', lod: 1 }, { k: 'q', dx: -10, dy: 40, anchor: 'start', lod: 1 }] },
+          values: [{ k: 'st', dx: -10, dy: 26, anchor: 'start', lod: 1 }, { k: 'q', dx: -10, dy: 40, anchor: 'start', lod: 1, point: 'fuel-system.fill.flow_lpm', label: 'Tanker fill rate', unit: 'L/min' }] },
         { id: 'ust', tag: 'UST-01', sym: 'tankStorage', x: 220, y: 330, size: 120, cls: 'fuel', label: 'Bulk storage tank (underground)', tagAt: 'left',
-          values: [{ k: 'pct', dx: -64, dy: 20, anchor: 'end', lod: 1 }, { k: 'use', dx: -64, dy: 34, anchor: 'end', lod: 1 }, { k: 'st', dx: -64, dy: 48, anchor: 'end', lod: 1 }] },
+          values: [{ k: 'pct', dx: -64, dy: 20, anchor: 'end', lod: 1, point: 'fuel.level_pct', label: 'UST-01 level' }, { k: 'use', dx: -64, dy: 34, anchor: 'end', lod: 1, point: 'fuel-system.usable_l', label: 'UST-01 usable fuel', unit: 'L' }, { k: 'st', dx: -64, dy: 48, anchor: 'end', lod: 1 }] },
         { id: 'ld101', tag: 'LD-101', sym: 'leakSensor', x: 120, y: 470, size: 22, label: 'UST interstitial leak detection', tagAt: 'left',
           values: [{ k: 'st', dx: 0, dy: 28, lod: 1 }] },
         { id: 'jsuc', sym: 'junction', x: 360, y: 375 },
@@ -37,10 +40,10 @@
         { id: 'cv101', sym: 'valveCheck', x: 500, y: 330, size: 20 },
         { id: 'cv102', sym: 'valveCheck', x: 500, y: 420, size: 20 },
         { id: 'jhd', sym: 'junction', x: 560, y: 330 },
-        { id: 'ft101', tag: 'FT-101', sym: 'flowMeter', x: 610, y: 330, size: 26, tagAt: 'below', values: [{ k: 'q', dx: 0, dy: 38, lod: 1 }] },
+        { id: 'ft101', tag: 'FT-101', sym: 'flowMeter', x: 610, y: 330, size: 26, tagAt: 'below', values: [{ k: 'q', dx: 0, dy: 38, lod: 1, point: 'fuel-system.FT-101.flow_lpm', label: 'FT-101 transfer flow', unit: 'L/min' }] },
         { id: 'jpt', sym: 'junction', x: 660, y: 330, dot: false },
         { id: 'pt101', tag: 'PT-101', sym: 'instField', x: 660, y: 280, size: 28, inst: 'PT', tagAt: 'above',
-          values: [{ k: 'p', dx: -18, dy: 4, anchor: 'end', lod: 1 }] },
+          values: [{ k: 'p', dx: -18, dy: 4, anchor: 'end', lod: 1, point: 'fuel-system.PT-101.pressure_bar', label: 'PT-101 transfer pressure', unit: 'bar' }] },
         { id: 'fpu-pf', tag: 'FPU-01 PF', sym: 'filterCartridge', x: 250, y: 560, size: 30, cls: 'fuel', label: 'Polisher pre-filter', tagAt: 'below' },
         { id: 'fpu-cs', tag: 'CS', sym: 'filterCartridge', x: 320, y: 560, size: 30, cls: 'fuel', label: 'Polisher coalescer / water separator', tagAt: 'below',
           values: [{ k: 'st', dx: 0, dy: -24, lod: 1 }] },
@@ -83,9 +86,9 @@
         { id: 'xv' + k, tag: 'XV-' + set, sym: 'valveSolenoid', x: XV_X, y: fy, size: 22, cls: 'fuel', label: 'Day-tank fill valve of ' + u.tag, tagAt: 'above',
           values: [{ k: 'st', dx: 0, dy: 23, lod: 1 }] },
         { id: 'dt' + k, tag: 'DT-' + u.tag, sym: 'tankStorage', x: DT_X, y: y, size: 48, cls: 'fuel', label: 'Day tank of ' + u.tag, tagAt: 'left',
-          values: [{ k: 'pct', dx: -30, dy: 18, anchor: 'end', lod: 1 }] },
+          values: [{ k: 'pct', dx: -30, dy: 18, anchor: 'end', lod: 1, point: 'fuel-system.DT-' + u.tag + '.level_pct', label: 'DT-' + u.tag + ' level', limitsOf: 'fuel-system.DT.level_pct' }] },
         { id: 'gen' + k, tag: u.tag, sym: 'gensetDiesel', x: GEN_X, y: y, size: 44, cls: 'fuel', label: 'Diesel genset ' + u.tag, tagAt: 'above',
-          values: [{ k: 'st', dx: 30, dy: -6, anchor: 'start', lod: 1 }, { k: 'ld', dx: 30, dy: 8, anchor: 'start', lod: 1 }, { k: 'q', dx: 30, dy: 22, anchor: 'start', lod: 1 }] }
+          values: [{ k: 'st', dx: 30, dy: -6, anchor: 'start', lod: 1 }, { k: 'ld', dx: 30, dy: 8, anchor: 'start', lod: 1, point: 'fuel-system.' + u.tag + '.output_kw', label: u.tag + ' output', unit: 'kW' }, { k: 'q', dx: 30, dy: 22, anchor: 'start', lod: 1, point: 'fuel-system.' + u.tag + '.fuel_lph', label: u.tag + ' fuel burn', unit: 'L/h' }] }
       );
       edges.push(
         { id: 'fs-dt-' + k + '-feed', from: 'j' + k, to: 'xv' + k + '.a', medium: 'fuel', flowOf: 'f' + k },

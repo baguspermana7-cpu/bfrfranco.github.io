@@ -343,6 +343,9 @@
                 render(target.getAttribute('data-basis-goto'));
                 return;
             }
+            /* a point inside a basis card (PRD-CONV-POINT-STATUS-TREND T3): the number opens its trend (js/rz-trend.js),
+               the rest of the card opens the basis */
+            if (target.hasAttribute && target.hasAttribute('data-trend')) return;
             if (target.hasAttribute && target.hasAttribute('data-basis-param')) {
                 /* v2.1.0 — a hook INSIDE a diagram opens the right-side inspector, never this
                    centre modal: a scrim over the topology is the doc-27 §3.2 P0 that

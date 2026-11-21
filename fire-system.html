@@ -102,14 +102,14 @@
     <script src="js/conv-engine.js?v=2.4.0"></script>
     <!-- v1.134.3 — generated parameter registry + the ONE shared basis drawer.
          Replaces provenance restated by hand; see js/rz-basis-drawer.js. -->
-    <script src="js/conv-parameters.js?v=20261120-89ea132a"></script>
+    <script src="js/conv-parameters.js?v=20261121-5508ceb7"></script>
     <!-- v1.134.25 — RZExplain, the site glossary engine. The cockpits were the only
          substantial pages carrying none of it, so terms an operator has to read
          (approach temperature, cycles of concentration, N+1, WUE) had nowhere to go.
          Loaded BEFORE the basis drawer, which wires the keys from the registry. -->
     <script src="js/rz-explain-db.js?v=20261115-9c8be43f" defer></script>
     <script src="js/rz-explain.js?v=20261103-f581e6ac" defer></script>
-    <script src="js/rz-basis-drawer.js?v=20261112-b6a9180c"></script>
+    <script src="js/rz-basis-drawer.js?v=20261120-1b2aa7f7"></script>
 <script src="js/rz-ask.js?v=20261113-42137266" data-rz-ask-index="data/explain/fire-system.json" defer></script>
     <!-- v1.42.5 — Semantic line model. Allows probe-line-model.mjs to audit
          the static SVG fire-water + N2 pipes tagged with data-rz-line +
@@ -120,14 +120,18 @@
     <script src="js/conv/hmi-depth.js?v=20261120-05f86b64"></script>
     <link rel="stylesheet" href="css/conv-vfx.css?v=20261118-5eed9b2f">
     <script src="js/conv/vfx.js?v=20261117-89056876"></script>
-    <script src="js/conv/history.js?v=20261117-1c72fb7f"></script>
-    <script src="js/rz-trend.js?v=20261117-e60cac7c"></script>
+    <script src="js/conv/history.js?v=20261120-8d390d7e"></script>
+    <script src="js/rz-trend.js?v=20261121-1300d194"></script>
+    <!-- PRD-CONV-POINT-STATUS-TREND T2/T3: every number shows its state from the limits registry and opens its trend -->
+    <script src="js/rz-sheet.js?v=20261120-3bf159cb" defer></script>
+    <link rel="stylesheet" href="css/conv-point.css?v=20261120-8daa6374">
+    <script src="js/conv/point-status.js?v=20261120-40be4933"></script>
     <script src="js/conv/sheet-truth.js?v=20261118-eaae14ee"></script>
     <script src="js/conv/payloads.js?v=20261120-86f5437d"></script>
-    <script src="js/conv/equipment-modal.js?v=20261120-9b42a9b2"></script>
+    <script src="js/conv/equipment-modal.js?v=20261120-6105f01f"></script>
     <script src="js/rz-eng-symbols.js?v=20261118-528d60ce"></script>
-    <script src="js/rz-hmi-sheet.js?v=20261118-c18dfefa"></script>
-    <script src="js/conv/fire-sheet.js?v=20261115-dd446f1a"></script>
+    <script src="js/rz-hmi-sheet.js?v=20261120-4c3244f4"></script>
+    <script src="js/conv/fire-sheet.js?v=20261120-667038b1"></script>
     <!-- v1.43.1 — Right-side inspector. Click any tagged fire-water / N2
          pipe to inspect medium / state / capacity / flow / sensor tabs. -->
     <!-- v1.43.4 — alarm state machine + color discipline (review §3.3 + §4.3). -->
@@ -438,7 +442,7 @@
 #basis-tag, .kbd-hint { color:#9aa3af !important; }
 #cookieAccept { background:#E8B563 !important; color:#16181d !important; }
 </style>
-    <script src="js/rz-version.js?v=20261120-7ea867d8" defer></script>
+    <script src="js/rz-version.js?v=20261121-ea6e94b5" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
 <style id="rz-skiplink-v1">
@@ -474,7 +478,7 @@
     <div class="flex flex-wrap justify-between items-center gap-3 mb-3 no-print" data-cv-toolrow>
         <div class="flex items-center gap-3">
             <h1 class="text-base font-bold text-white tracking-wide" data-cv="title">Fire Protection &amp; Suppression — BMS</h1>
-            <span class="text-[10px] text-slate-500 font-tech" id="basis-tag">Basis: UNAVAILABLE</span>
+            <span class="text-[10px] text-slate-500 font-tech" id="basis-tag" data-const>Basis: UNAVAILABLE</span>
         </div>
         <div class="flex flex-wrap gap-2 items-center"><span data-rz-ask-slot data-cv="cta" data-cv-rest="Get the answer" data-cv-win="Answer in seconds"></span>
             <a href="dc-conventional.html" class="ctrl-btn" data-cv="back">BACK</a>
@@ -498,8 +502,8 @@
              point-disablement/isolation register, so a rendered "0 disabled points" was an unearned all-clear
              on a fire panel. Rendered as the unavailable marker by bindBasis() until a real source exists. -->
         <span class="as-item">Disabled Pts <b id="as-disabled">—</b></span>
-        <span class="as-item">Tank <b id="as-tank">UNAVAILABLE</b></span>
-        <span class="as-item">Static <b id="as-press">UNAVAILABLE</b></span>
+        <span class="as-item">Tank <b id="as-tank" data-point="fire.level_pct" data-pt-label="Fire-water tank level" data-pt-unit="%" data-pt-digits="0">UNAVAILABLE</b></span>
+        <span class="as-item">Static <b id="as-press" data-point="fire.static_pressure_bar" data-pt-label="Fire main pressure" data-pt-unit="bar" data-pt-digits="1">UNAVAILABLE</b></span>
         <span class="as-item">Quality <b aria-describedby="rz-prov-fire-strip" id="as-quality">UNAVAILABLE</b></span>
         <span class="as-item">Scenario <b id="as-scenario">UNAVAILABLE</b></span>
         <span class="as-item">Rendered <b aria-describedby="rz-prov-fire-strip" id="as-updated">UNAVAILABLE</b></span>
@@ -525,15 +529,15 @@
              cannot be forgotten or edited away on one page. -->
         <div class="fire-scope-card finding is-unavailable" id="fire-reserve-finding">
           <span><strong class="finding-title" data-explain="conv-fire-reserve-finding">Fire-water reserve</strong>
-            <small id="fire-duration-shortfall">UNAVAILABLE — awaiting current fire-water basis.</small></span>
+            <small id="fire-duration-shortfall" data-const>UNAVAILABLE — awaiting current fire-water basis.</small></span>
         </div>
         <div class="fire-scope-card" id="fire-current-basis">
             <span class="scope-tag" data-explain="conv-fire-current-basis">CURRENT</span>
-            <span><strong id="fire-current-basis-value">UNAVAILABLE</strong></span>
+            <span><strong data-const id="fire-current-basis-value">UNAVAILABLE</strong></span>
         </div>
         <div class="fire-scope-card study" id="fire-study-basis">
             <span class="scope-tag" data-explain="conv-fire-study-basis">STUDY</span>
-            <span><strong>4 × 10 MW halls</strong></span>
+            <span><strong data-const>4 × 10 MW halls</strong></span>
         </div>
     </section>
 
@@ -572,14 +576,14 @@
             <div class="panel-title">Fire Pump Set</div>
             <div class="grid grid-cols-1 gap-2" id="pump-cards"></div>
             <div class="mt-3" style="border-top:1px solid var(--panel-line); padding-top:8px;">
-                <div class="metric-row"><span class="metric-label">Static pressure (actual)</span><span class="metric-val warn" id="m-static">UNAVAILABLE</span></div>
+                <div class="metric-row"><span class="metric-label">Static pressure (actual)</span><span class="metric-val warn" id="m-static" data-point="fire.static_pressure_bar" data-pt-label="Fire main pressure" data-pt-unit="bar" data-pt-digits="1">UNAVAILABLE</span></div>
                 <!-- v2.0.1 DEAD-BINDING FIX: these three rows were hand-typed copies of P_JOCKEY_ON/OFF,
                      P_FP1_ON/P_FP2_ON and P_LOW_ALM. The simulation acts on the constants, so a change to a
                      setpoint silently left the panel lying. Now rendered from the same constants in
                      bindBasis() — the displayed setpoint and the acted-on setpoint cannot diverge. -->
-                <div class="metric-row"><span class="metric-label">Jockey start / stop</span><span class="metric-val" id="m-sp-jockey" data-rz-authored-basis="Fire-pump start and stop pressures, the low-pressure alarm and the pump NAMEPLATE ratings are control setpoints and equipment specification. conv-engine.js models the fire-water DEMAND and the reserve that must cover it; it publishes no pump schedule and no pressure plane, so neither a rated duty printed from a datasheet nor a cut-in pressure set by the fire-protection design has an engine parameter to trace to. The reserve volume, the demand and the shortfall between them are engine-bound and stay in the denominator.">— bar</span></div>
-                <div class="metric-row"><span class="metric-label">FP-01 start / FP-02 start</span><span class="metric-val" id="m-sp-fp" data-rz-authored-basis="Fire-pump start and stop pressures, the low-pressure alarm and the pump NAMEPLATE ratings are control setpoints and equipment specification. conv-engine.js models the fire-water DEMAND and the reserve that must cover it; it publishes no pump schedule and no pressure plane, so neither a rated duty printed from a datasheet nor a cut-in pressure set by the fire-protection design has an engine parameter to trace to. The reserve volume, the demand and the shortfall between them are engine-bound and stay in the denominator.">— bar</span></div>
-                <div class="metric-row"><span class="metric-label">Low-pressure alarm</span><span class="metric-val" id="m-sp-lowalm" data-rz-authored-basis="Fire-pump start and stop pressures, the low-pressure alarm and the pump NAMEPLATE ratings are control setpoints and equipment specification. conv-engine.js models the fire-water DEMAND and the reserve that must cover it; it publishes no pump schedule and no pressure plane, so neither a rated duty printed from a datasheet nor a cut-in pressure set by the fire-protection design has an engine parameter to trace to. The reserve volume, the demand and the shortfall between them are engine-bound and stay in the denominator.">— bar</span></div>
+                <div class="metric-row"><span class="metric-label">Jockey start / stop</span><span class="metric-val" id="m-sp-jockey" data-const data-rz-authored-basis="Fire-pump start and stop pressures, the low-pressure alarm and the pump NAMEPLATE ratings are control setpoints and equipment specification. conv-engine.js models the fire-water DEMAND and the reserve that must cover it; it publishes no pump schedule and no pressure plane, so neither a rated duty printed from a datasheet nor a cut-in pressure set by the fire-protection design has an engine parameter to trace to. The reserve volume, the demand and the shortfall between them are engine-bound and stay in the denominator.">— bar</span></div>
+                <div class="metric-row"><span class="metric-label">FP-01 start / FP-02 start</span><span class="metric-val" id="m-sp-fp" data-const data-rz-authored-basis="Fire-pump start and stop pressures, the low-pressure alarm and the pump NAMEPLATE ratings are control setpoints and equipment specification. conv-engine.js models the fire-water DEMAND and the reserve that must cover it; it publishes no pump schedule and no pressure plane, so neither a rated duty printed from a datasheet nor a cut-in pressure set by the fire-protection design has an engine parameter to trace to. The reserve volume, the demand and the shortfall between them are engine-bound and stay in the denominator.">— bar</span></div>
+                <div class="metric-row"><span class="metric-label">Low-pressure alarm</span><span class="metric-val" id="m-sp-lowalm" data-const data-rz-authored-basis="Fire-pump start and stop pressures, the low-pressure alarm and the pump NAMEPLATE ratings are control setpoints and equipment specification. conv-engine.js models the fire-water DEMAND and the reserve that must cover it; it publishes no pump schedule and no pressure plane, so neither a rated duty printed from a datasheet nor a cut-in pressure set by the fire-protection design has an engine parameter to trace to. The reserve volume, the demand and the shortfall between them are engine-bound and stay in the denominator.">— bar</span></div>
                 <!-- v2.0.1 DEAD-BINDING FIX: "Healthy" was a hooked literal nothing ever assigned. The page
                      models no controller-power/supervisory input, and a comforting default on a fire panel is
                      the worst possible failure mode — render the unavailable marker instead (set in bindBasis). -->
@@ -590,12 +594,12 @@
         <!-- Water reserve & duration -->
         <div class="panel" data-rz-doc-section="fs-water" data-rz-doc-label="Water reserve and demand">
             <div class="panel-title">Water Reserve &amp; Demand</div>
-            <div class="metric-row"><span class="metric-label">Tank level</span><span class="metric-val warn" id="m-tank-pct" data-basis-param="fire.level_pct" tabindex="0" role="button" title="Tank level — click for basis">UNAVAILABLE</span></div>
-            <div class="metric-row"><span class="metric-label">Available volume</span><span class="metric-val warn" id="m-tank-vol" data-basis-param="fire.stored_m3" tabindex="0" role="button" title="Stored fire water — click for basis">UNAVAILABLE</span></div>
-            <div class="metric-row"><span class="metric-label">Fire pump demand</span><span class="metric-val warn" id="m-pump-demand" data-basis-param="fire.pump_demand_lpm" tabindex="0" role="button">UNAVAILABLE</span></div>
-            <div class="metric-row"><span class="metric-label" data-explain="conv-fire-duration">Available duration</span><span class="metric-val warn" id="m-duration">UNAVAILABLE</span></div>
-            <div class="metric-row"><span class="metric-label">Protected IT load (basis)</span><span class="metric-val warn" id="m-it-basis" data-basis-param="site.it_load_kw" tabindex="0" role="button">UNAVAILABLE</span></div>
-            <div class="metric-row"><span class="metric-label">Site rack-footprint proxy (non-sizing)</span><span class="metric-val warn" id="m-hall-vol" data-rz-authored-basis="A rack-footprint volume PROXY, labelled non-sizing on the row itself. It multiplies the engine rack count by two authored geometric assumptions - 1.2 square metres of floor per cabinet and 3.0 metres of clear height - that are local to this building and that conv-engine.js does not model. It exists to give an operator a sense of scale beside the gas-suppression figures and is explicitly not a basis for agent quantity.">UNAVAILABLE</span></div>
+            <div class="metric-row"><span class="metric-label">Tank level</span><span class="metric-val warn" id="m-tank-pct" data-point="fire.level_pct" data-pt-label="Fire-water tank level" data-pt-unit="%" data-pt-digits="0" data-basis-param="fire.level_pct" tabindex="0" role="button" title="Tank level — click for basis">UNAVAILABLE</span></div>
+            <div class="metric-row"><span class="metric-label">Available volume</span><span class="metric-val warn" id="m-tank-vol" data-point="fire.stored_m3" data-pt-label="Fire-water stored volume" data-pt-unit="m³" data-pt-digits="0" data-basis-param="fire.stored_m3" tabindex="0" role="button" title="Stored fire water — click for basis">UNAVAILABLE</span></div>
+            <div class="metric-row"><span class="metric-label">Fire pump demand</span><span class="metric-val warn" id="m-pump-demand" data-const data-basis-param="fire.pump_demand_lpm" tabindex="0" role="button">UNAVAILABLE</span></div>
+            <div class="metric-row"><span class="metric-label" data-explain="conv-fire-duration">Available duration</span><span class="metric-val warn" id="m-duration" data-point="fire.duration_min" data-pt-label="Fire-water duration at pump demand" data-pt-unit="min" data-pt-digits="0">UNAVAILABLE</span></div>
+            <div class="metric-row"><span class="metric-label">Protected IT load (basis)</span><span class="metric-val warn" id="m-it-basis" data-const data-basis-param="site.it_load_kw" tabindex="0" role="button">UNAVAILABLE</span></div>
+            <div class="metric-row"><span class="metric-label">Site rack-footprint proxy (non-sizing)</span><span class="metric-val warn" id="m-hall-vol" data-const data-rz-authored-basis="A rack-footprint volume PROXY, labelled non-sizing on the row itself. It multiplies the engine rack count by two authored geometric assumptions - 1.2 square metres of floor per cabinet and 3.0 metres of clear height - that are local to this building and that conv-engine.js does not model. It exists to give an operator a sense of scale beside the gas-suppression figures and is explicitly not a basis for agent quantity.">UNAVAILABLE</span></div>
             <div class="metric-row"><span class="metric-label">Pre-action zones</span><span class="metric-val warn" id="m-zones">UNAVAILABLE</span></div>
         </div>
 
@@ -603,7 +607,7 @@
         <div class="panel log-panel" data-rz-doc-section="fs-log" data-rz-doc-label="Alarm and event log">
             <div class="panel-title"><i class="fas fa-terminal mr-1"></i> Alarm &amp; Event Log</div>
             <div id="log-view" class="overflow-y-auto space-y-1 text-[11px] font-tech pr-1 leading-relaxed" style="max-height:160px;">
-                <p id="authority-log-entry" style="color:var(--st-warn)">Fire authority UNAVAILABLE</p>
+                <p id="authority-log-entry" data-const style="color:var(--st-warn)">Fire authority UNAVAILABLE</p>
             </div>
         </div>
       </div>
@@ -678,8 +682,11 @@
         // Fire reserve tank (fixed civil capacity) + thresholds
         var TANK_CAP_M3 = FIRE ? positiveNumber(FIRE.reserve_capacity_m3) : null;
         var FIRE_LEVEL_PCT = FIRE ? boundedPercent(FIRE.level_pct) : null;
-        var TANK_LOW_PCT  = 80;   // low alarm
-        var TANK_LL_PCT   = 60;   // low-low alarm
+        /* PRD-CONV-POINT-STATUS-TREND P-1: the tank-level bounds are the registry row fire.level_pct (this page types none) */
+        var PSF = window.RZPointStatus || null;
+        var TANK_LIM = PSF ? PSF.limits('fire.level_pct') : null;
+        var TANK_LOW_PCT = TANK_LIM && TANK_LIM.lo_warn != null ? TANK_LIM.lo_warn : -Infinity;    // low
+        var TANK_LL_PCT  = TANK_LIM && TANK_LIM.lo_alarm != null ? TANK_LIM.lo_alarm : -Infinity;  // low-low
         var PUMP_DEMAND_LPM = FIRE ? positiveNumber(FIRE.pump_demand_lpm) : null;
         var HAS_FIRE_RESERVE_BASIS = !!(TANK_CAP_M3 && FIRE_LEVEL_PCT !== null
             && PUMP_DEMAND_LPM && positiveNumber(FIRE.required_duration_min)
@@ -813,9 +820,9 @@
                declared here; the pump STATE beside them follows the simulation and carries no
                number. */
             return '<div class="pump-card"><div class="pc-tag">' + tag + '</div>' +
-                   '<div class="pc-name" data-rz-authored-basis="' + PUMP_SETPOINT_BASIS + '">' + name +
+                   '<div class="pc-name" data-const data-rz-authored-basis="' + PUMP_SETPOINT_BASIS + '">' + name +
                    '</div><span class="pc-state ' + cls + '">' + label + '</span>' +
-                   '<div class="metric-sub" style="margin-top:6px" data-rz-authored-basis="' +
+                   '<div class="metric-sub" style="margin-top:6px" data-const data-rz-authored-basis="' +
                    PUMP_SETPOINT_BASIS + '">' + sub + '</div></div>';
         }
 
@@ -853,12 +860,12 @@
             var duration = durationMin(pct);
 
             $('m-tank-pct').textContent = pctAvailable ? Math.round(pct) + '%' : UNAVAILABLE;
-            $('m-tank-pct').className = 'metric-val' + (!pctAvailable || pct <= TANK_LOW_PCT ? ' warn' : '');
+            $('m-tank-pct').className = 'metric-val' + (!pctAvailable ? ' warn' : '');   /* its state: RZPointStatus over fire.level_pct */
             $('m-tank-vol').textContent = vol !== null ? vol.toFixed(0) + ' m³ / ' + TANK_CAP_M3 + ' m³' : UNAVAILABLE;
             $('m-tank-vol').className = 'metric-val' + (vol === null ? ' warn' : '');
             var dEl = $('m-duration');
             dEl.textContent = duration !== null ? duration + ' min' : UNAVAILABLE;
-            dEl.className = 'metric-val' + (duration === null || pct <= TANK_LOW_PCT ? ' warn' : '');
+            dEl.className = 'metric-val' + (duration === null ? ' warn' : '');
 
             // make-up supply (deterministic): engages only when below LOW threshold, rate proportional to deficit (no PRNG)
             state.makeupRate = pctAvailable && pct <= TANK_LOW_PCT ? 8 + (TANK_LOW_PCT - pct) * 0.6 : 0;
@@ -873,7 +880,7 @@
                 return;
             }
             $('m-static').textContent = state.press.toFixed(1) + ' bar';
-            $('m-static').className = 'metric-val' + (state.press <= P_LOW_ALM ? ' alarm' : (state.press <= P_JOCKEY_ON ? ' warn' : ''));
+            $('m-static').className = 'metric-val';   /* its state: RZPointStatus over fire.static_pressure_bar */
             $('as-press').textContent = state.press.toFixed(1) + ' bar';
         }
 
@@ -1203,6 +1210,7 @@
             updateAlarmStrip();
             $('as-updated').textContent = HAS_FIRE_AUTHORITY
                 ? new Date().toLocaleTimeString('en-GB') : UNAVAILABLE;
+            if (PSF) PSF.bindAll(document.body);   /* the registry state of the HTML points (the sheet applies its own) */
         }
 
         /* ---- Static panel bindings from the single engine basis ---- */
@@ -1466,7 +1474,7 @@
         function installFireSeam() {
             if (!T || !firePoints) return;
             var tripped = {}, acked = {}, seedPct = state.tankPct;
-            function repaintAll() { updateTankUI(); refreshSheet(); }
+            function repaintAll() { updateTankUI(); refreshSheet(); if (PSF) PSF.bindAll(document.body); }
             T.seam({
                 points: function () { return firePoints.ids(); },
                 edgesOf: function (id) { return firePointEdges(id); },

@@ -455,7 +455,7 @@
     font-variant-numeric: tabular-nums slashed-zero;
 }
 </style>
-    <script src="js/rz-version.js?v=20261120-7ea867d8" defer></script>
+    <script src="js/rz-version.js?v=20261121-ea6e94b5" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- v1.24.0: bring EPMS onto the engine + BMS Shell. conv-engine.js loads
@@ -465,14 +465,14 @@
     <script src="js/conv-engine.js?v=2.4.0"></script>
     <!-- v1.134.3 — generated parameter registry + the ONE shared basis drawer.
          Replaces provenance restated by hand; see js/rz-basis-drawer.js. -->
-    <script src="js/conv-parameters.js?v=20261120-89ea132a"></script>
+    <script src="js/conv-parameters.js?v=20261121-5508ceb7"></script>
     <!-- v1.134.25 — RZExplain, the site glossary engine. The cockpits were the only
          substantial pages carrying none of it, so terms an operator has to read
          (approach temperature, cycles of concentration, N+1, WUE) had nowhere to go.
          Loaded BEFORE the basis drawer, which wires the keys from the registry. -->
     <script src="js/rz-explain-db.js?v=20261115-9c8be43f" defer></script>
     <script src="js/rz-explain.js?v=20261103-f581e6ac" defer></script>
-    <script src="js/rz-basis-drawer.js?v=20261112-b6a9180c"></script>
+    <script src="js/rz-basis-drawer.js?v=20261120-1b2aa7f7"></script>
 <script src="js/rz-ask.js?v=20261113-42137266" data-rz-ask-index="data/explain/EPMS_Telemetry.json" defer></script>
     <link rel="stylesheet" href="css/rz-bms-shell.css?v=20261031-32feec14">
     <link rel="stylesheet" href="css/rz-conv-alarm-workspace.css?v=20261031-adcaa40e">
@@ -503,19 +503,23 @@
 <link rel="stylesheet" href="css/conv-vfx.css?v=20261118-5eed9b2f">
 <link rel="stylesheet" href="css/conv-tcc.css?v=20261118-d0e76545">
 <script src="js/rz-eng-symbols.js?v=20261118-528d60ce"></script>
-<script src="js/rz-hmi-sheet.js?v=20261118-c18dfefa"></script>
+<script src="js/rz-hmi-sheet.js?v=20261120-4c3244f4"></script>
 <script src="js/conv/vfx.js?v=20261117-89056876"></script>
-<script src="js/conv/history.js?v=20261117-1c72fb7f"></script>
-<script src="js/rz-trend.js?v=20261117-e60cac7c"></script>
+<script src="js/conv/history.js?v=20261120-8d390d7e"></script>
+<script src="js/rz-trend.js?v=20261121-1300d194"></script>
+<!-- PRD-CONV-POINT-STATUS-TREND T2/T3: every number shows its state (registry limits) and opens its trend, or is a constant -->
+<script src="js/rz-sheet.js?v=20261120-3bf159cb" defer></script>
+<link rel="stylesheet" href="css/conv-point.css?v=20261120-8daa6374">
+<script src="js/conv/point-status.js?v=20261120-40be4933"></script>
 <script src="js/conv/sheet-truth.js?v=20261118-eaae14ee"></script>
 <script src="js/conv/payloads.js?v=20261120-86f5437d"></script>
-<script src="js/conv/equipment-modal.js?v=20261120-9b42a9b2"></script>
+<script src="js/conv/equipment-modal.js?v=20261120-6105f01f"></script>
 <script src="js/rz-inspector.js?v=20261117-bbb735d4" defer></script>
 <script src="js/conv/sld-topology.js?v=20261118-597640aa"></script>
 <script src="js/conv/tcc.js?v=20261118-4e103126"></script>
-<script src="js/conv/epms-sheet.js?v=20261118-db9d834f"></script>
+<script src="js/conv/epms-sheet.js?v=20261121-3f7ce5d7"></script>
 <script src="js/conv/epms-sim.js?v=20261120-7be9cf69"></script>
-<script src="js/conv/epms-lv.js?v=20261120-563d4b07"></script>
+<script src="js/conv/epms-lv.js?v=20261120-7e11b930"></script>
 <script src="js/conv/tcc-modal.js?v=20261118-e31d9000"></script>
 <style id="epms-sld-css">
 /* the view switch: its own class, so no page code or gate that selects .btn / .zoom-btn picks it up */
@@ -580,9 +584,9 @@ body:not([data-epms-view="sld"]) .epms-sld-only { display: none !important; }
      Sits ABOVE the SVG so it's the first read every time the page loads. -->
 <div id="epms-status-strip" role="status" aria-live="polite" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:8px 14px;background:#121316;border-bottom:1px solid #2a2d33;font-family:'JetBrains Mono','IBM Plex Sans',sans-serif;font-size:12px;color:#e2e8f0;font-variant-numeric:tabular-nums;">
     <span id="epms-state" style="font-weight:800;letter-spacing:.08em;color:#94a3b8;text-transform:uppercase;">EPMS AUTHORITY UNAVAILABLE</span>
-    <span style="color:#94a3b8;">Facility Load <b id="epms-fac" data-basis-param="site.facility_load_kw" tabindex="0" role="button" style="color:#94a3b8;">—</b><span style="color:#94a3b8;font-weight:400;"> MW</span></span>
-    <span style="color:#94a3b8;">IT Load <b id="epms-it" data-basis-param="site.it_load_kw" tabindex="0" role="button" style="color:#94a3b8;">—</b><span style="color:#94a3b8;font-weight:400;"> MW</span></span>
-    <span style="color:#94a3b8;">PUE <b id="epms-pue" data-basis-param="site.pue" tabindex="0" role="button" style="color:#94a3b8;">—</b></span>
+    <span style="color:#94a3b8;">Facility Load <b id="epms-fac" data-point="site.facility_load_kw" data-pt-label="Facility load" data-pt-unit="MW" data-pt-digits="2" data-pt-cls="ENGINE" data-basis-param="site.facility_load_kw" tabindex="0" role="button" style="color:#94a3b8;">—</b><span style="color:#94a3b8;font-weight:400;"> MW</span></span>
+    <span style="color:#94a3b8;">IT Load <b id="epms-it" data-point="site.it_load_kw" data-pt-label="IT load" data-pt-unit="MW" data-pt-digits="2" data-pt-cls="ENGINE" data-basis-param="site.it_load_kw" tabindex="0" role="button" style="color:#94a3b8;">—</b><span style="color:#94a3b8;font-weight:400;"> MW</span></span>
+    <span style="color:#94a3b8;">PUE <b id="epms-pue" data-point="site.pue" data-pt-label="PUE" data-pt-digits="2" data-pt-cls="ENGINE" data-basis-param="site.pue" tabindex="0" role="button" style="color:#94a3b8;">—</b></span>
     <!-- v1.132.1 STATIC-CLAIM REPAIR — these six cells were hardcoded words ("OK" / "Online" / "Standby" /
          "0" / "GOOD" / "Simulated") sitting beside three engine-bound numbers. They asserted a healthy plant
          no matter what the simulation was actually doing: trip every breaker and kill both utilities and the
@@ -590,19 +594,19 @@ body:not([data-epms-view="sld"]) .epms-sld-only { display: none !important; }
          breaker + energisation state in SIM for utility/UPS/gen/trips, snapshot.meta for data quality and
          scenario — and renders "—" (grey) when that source is missing, never a comforting default.
          Written by updateEpmsStatusStrip(); initial markup is deliberately "—", not a plausible value. -->
-    <span style="color:#94a3b8;">Utility <b id="epms-utility" style="color:#94a3b8;" title="Awaiting simulation state">—</b></span>
-    <span style="color:#94a3b8;">UPS A/B <b id="epms-ups" style="color:#94a3b8;" title="Awaiting simulation state">—</b></span>
-    <span style="color:#94a3b8;">Gen <b id="epms-gen" style="color:#94a3b8;" title="Awaiting simulation state">—</b></span>
-    <span class="epms-lv-only" style="color:#94a3b8;">Breakers <b id="epms-trips" style="color:#94a3b8;" title="Awaiting simulation state">—</b></span>
-    <span class="epms-sld-only" style="color:#94a3b8;">Breakers <b id="epms-sld-trips" style="color:#e2e8f0;" title="Open circuit breakers on E-S-101 (simulation)">—</b></span>
+    <span style="color:#94a3b8;">Utility <b id="epms-utility" data-const style="color:#94a3b8;" title="Awaiting simulation state">—</b></span>
+    <span style="color:#94a3b8;">UPS A/B <b id="epms-ups" data-const style="color:#94a3b8;" title="Awaiting simulation state">—</b></span>
+    <span style="color:#94a3b8;">Gen <b id="epms-gen" data-const style="color:#94a3b8;" title="Awaiting simulation state">—</b></span>
+    <span class="epms-lv-only" style="color:#94a3b8;">Breakers <b id="epms-trips" data-const style="color:#94a3b8;" title="Awaiting simulation state">—</b></span>
+    <span class="epms-sld-only" style="color:#94a3b8;">Breakers <b id="epms-sld-trips" data-const style="color:#e2e8f0;" title="Open circuit breakers on E-S-101 (simulation)">—</b></span>
     <span style="flex:1"></span>
     <!-- v1.134.11 — the UPS nameplate basis: module rating, modules per system and the load one
          system carries. All engine-published and rendered nowhere, so the single-line showed UPS
          loading with nothing saying what it was loaded against. -->
-    <span style="color:#94a3b8;font-size:11px;">UPS <b id="epms-ups-basis" data-basis-param="electrical.ups_module_kw_rated" tabindex="0" role="button" title="UPS module rating — click for basis" style="color:#94a3b8;">&mdash;</b></span>
-    <span style="color:#94a3b8;font-size:11px;">Modules <b id="epms-ups-modules" data-basis-param="electrical.ups_modules_per_system" tabindex="0" role="button" title="Modules per system — click for basis" style="color:#94a3b8;">&mdash;</b></span>
-    <span style="color:#94a3b8;font-size:11px;">System rating <b id="epms-ups-sys" data-basis-param="electrical.ups_system_rated_kw" tabindex="0" role="button" title="Rating of one UPS system — click for basis" style="color:#94a3b8;">&mdash;</b></span>
-    <span style="color:#94a3b8;font-size:11px;">System load <b id="epms-ups-load" data-basis-param="electrical.ups_system_kw" tabindex="0" role="button" title="Load one UPS system carries — click for basis" style="color:#94a3b8;">&mdash;</b></span>
+    <span style="color:#94a3b8;font-size:11px;">UPS <b id="epms-ups-basis" data-const data-basis-param="electrical.ups_module_kw_rated" tabindex="0" role="button" title="UPS module rating — click for basis" style="color:#94a3b8;">&mdash;</b></span>
+    <span style="color:#94a3b8;font-size:11px;">Modules <b id="epms-ups-modules" data-const data-basis-param="electrical.ups_modules_per_system" tabindex="0" role="button" title="Modules per system — click for basis" style="color:#94a3b8;">&mdash;</b></span>
+    <span style="color:#94a3b8;font-size:11px;">System rating <b id="epms-ups-sys" data-const data-basis-param="electrical.ups_system_rated_kw" tabindex="0" role="button" title="Rating of one UPS system — click for basis" style="color:#94a3b8;">&mdash;</b></span>
+    <span style="color:#94a3b8;font-size:11px;">System load <b id="epms-ups-load" data-point="electrical.ups_system_kw" data-pt-label="UPS system load (one system, normal)" data-pt-unit="kW" data-pt-cls="ENGINE" data-basis-param="electrical.ups_system_kw" tabindex="0" role="button" title="Load one UPS system carries — click for basis" style="color:#94a3b8;">&mdash;</b></span>
     <span style="color:#94a3b8;font-size:11px;">Data <b id="epms-dq" style="color:#94a3b8;" title="Awaiting engine snapshot">—</b></span>
     <span style="color:#94a3b8;font-size:11px;">Scenario <b id="epms-scn" style="color:#94a3b8;" title="Awaiting engine snapshot">—</b></span>
     <p class="rz-prov" id="rz-prov-epms-strip" data-rz-provenance="simulated" data-rz-prov-basis="single-line simulation on this page and conv-engine.js; system state, breakers, quality and scenario are not read from a site" style="flex-basis:100%;margin:0"><b>Simulated</b> · single-line simulation on this page and conv-engine.js; system state, breakers, quality and scenario are not read from a site</p>
@@ -640,6 +644,7 @@ body:not([data-epms-view="sld"]) .epms-sld-only { display: none !important; }
         var fEl = document.getElementById('epms-fac'); if(fEl) fEl.textContent = fac;
         var iEl = document.getElementById('epms-it');  if(iEl) iEl.textContent = it;
         var pEl = document.getElementById('epms-pue'); if(pEl) pEl.textContent = pue;
+        if(window.RZPointStatus && fac !== '—') window.RZPointStatus.bindAll(document.getElementById('epms-status-strip'));
     }
     if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bindEpmsStatus);
     else bindEpmsStatus();
@@ -699,9 +704,9 @@ body:not([data-epms-view="sld"]) .epms-sld-only { display: none !important; }
                 <div class="ctrl-title">Sources · E-S-101 simulation</div>
                 <ul class="epms-rail-list" id="epms-rail-sources"><li>UNAVAILABLE</li></ul>
                 <div class="ctrl-title epms-rail-gap">Generation</div>
-                <p class="epms-rail-line" id="epms-rail-gen">UNAVAILABLE</p>
+                <p class="epms-rail-line" id="epms-rail-gen" data-const>UNAVAILABLE</p>
                 <div class="ctrl-title epms-rail-gap">Breakers</div>
-                <p class="epms-rail-line" id="epms-rail-cb">UNAVAILABLE</p>
+                <p class="epms-rail-line" id="epms-rail-cb" data-const>UNAVAILABLE</p>
             </div>
             <div class="ctrl-box epms-lv-only" id="epms-lv-rail" aria-label="E-S-102 hall sources, UPS and generation">
                 <div class="ctrl-title">Hall <span id="epms-lv-rail-hall">—</span> · E-S-102</div>
@@ -743,7 +748,7 @@ body:not([data-epms-view="sld"]) .epms-sld-only { display: none !important; }
         <div class="status-box">
             <div>
                 <div class="status-label">Total Load</div>
-                <div class="status-value" id="val-total-load" data-basis-param="electrical.epms_total_kw" tabindex="0" role="button">—</div>
+                <div class="status-value" id="val-total-load" data-point="electrical.epms_total_kw" data-pt-label="Total load served" data-pt-unit="kW" data-pt-cls="ENGINE" data-basis-param="electrical.epms_total_kw" tabindex="0" role="button">—</div>
             </div>
         </div>
         <!-- v1.132.1 RULE-2 REPAIR — Power Factor and Frequency were random walks
@@ -766,19 +771,19 @@ body:not([data-epms-view="sld"]) .epms-sld-only { display: none !important; }
         <div class="status-box epms-lv-only">
             <div>
                 <div class="status-label">Breakers</div>
-                <div class="status-value" id="val-breakers" data-rz-authored-basis="Breaker position counts come from the SIMULATED single-line topology drawn on this page. conv-engine.js models loads, capacities, redundancy classes and the thermal chain; it publishes no switchgear schedule, so there is no parameter that could say how many devices exist or how many are closed. The loads those breakers carry ARE engine-bound and stay in the denominator - it is the device inventory that is authored here.">—</div>
+                <div class="status-value" id="val-breakers" data-const data-rz-authored-basis="Breaker position counts come from the SIMULATED single-line topology drawn on this page. conv-engine.js models loads, capacities, redundancy classes and the thermal chain; it publishes no switchgear schedule, so there is no parameter that could say how many devices exist or how many are closed. The loads those breakers carry ARE engine-bound and stay in the denominator - it is the device inventory that is authored here.">—</div>
             </div>
         </div>
         <div class="status-box epms-sld-only">
             <div>
                 <div class="status-label">Breakers</div>
-                <div class="status-value" id="val-sld-breakers" title="Closed / total circuit breakers on E-S-101" data-rz-authored-basis="Circuit-breaker positions on E-S-101 are the SIMULATED switching state of this page (closed / total), operated from the inspector; conv-engine.js publishes no breaker positions.">—</div>
+                <div class="status-value" id="val-sld-breakers" data-const title="Closed / total circuit breakers on E-S-101" data-rz-authored-basis="Circuit-breaker positions on E-S-101 are the SIMULATED switching state of this page (closed / total), operated from the inspector; conv-engine.js publishes no breaker positions.">—</div>
             </div>
         </div>
         <div class="status-box" id="box-alarms">
             <div>
                 <div class="status-label">Alarms</div>
-                <div class="status-value" id="val-alarms">—</div>
+                <div class="status-value" id="val-alarms" data-const>—</div>
             </div>
         </div>
         <div class="status-spacer"></div>
@@ -960,6 +965,8 @@ window.RZEpmsStatus = (function () {
             node.removeAttribute('aria-disabled'); node.style.pointerEvents = ''; node.style.opacity = '';
         });
         document.getElementById('val-timestamp').textContent = new Date().toLocaleTimeString();
+        /* PRD-CONV-POINT-STATUS-TREND T2: the strip and bar numbers are points (state from the registry, click opens the trend) */
+        if (window.RZPointStatus) [document.getElementById('epms-status-strip'), document.querySelector('.status-bar')].forEach(function (h) { if (h) window.RZPointStatus.bindAll(h); });
     }
     function data() { return last ? JSON.parse(JSON.stringify(last)) : null; }
     return { paint: paint, unavailable: unavailable, data: data };
@@ -1286,7 +1293,7 @@ function exportJSON() {
             o.state = devState(d);
             o.values.r = fv(rating(n));
             o.values.pw = fv(kw(d.kw) + ' · ' + amp(d.a));
-            o.values.ld = fv(n.tx === 'hv' ? 'load ' + d.pct.toFixed(1) + ' %' : kw(d.kw) + ' · ' + d.pct.toFixed(1) + ' %');
+            o.values.ld = fv(n.tx === 'hv' ? 'load ' + d.pct.toFixed(1) + ' %' : d.pct.toFixed(1) + ' % · ' + kw(d.kw));   /* the first number is the point: the loading, against electrical.tx_load_pct */
             return o;
         }
         if (n.load) {
@@ -1363,6 +1370,8 @@ function exportJSON() {
         });
         if (window.RZConvVfx) window.RZConvVfx.bind(host, SHEET, flow, rest);
         if (window.RZConvTruth && window.RZConvTruth.marks) window.RZConvTruth.marks(svg);
+        /* PRD-CONV-POINT-STATUS-TREND T3: a rating or count on the sheet is a constant (its basis one click away) */
+        window.RZEpmsSheets.markConstants(svg, SHEET.nodes);
     }
     /* the rail and the two breaker counters while the HV / MV view is shown: the solve, never the legacy LV drawing */
     function setText(id, html) { var el = document.getElementById(id); if (el) el.innerHTML = html; }
@@ -1371,7 +1380,9 @@ function exportJSON() {
         var row = function (id) {
             var n = BY[id], d = res.dev[id], st = d && d.energised ? (d.kw > 0.5 ? 'LIVE' : 'NO LOAD') : 'DEAD';
             var v = n.tx ? d.pct.toFixed(1) + ' %' : kw(d && d.kw);
-            return '<li data-rail="' + id + '"><span>' + n.tag + '</span><b>' + st + ' · ' + v + '</b></li>';
+            /* the reading in a rail row is a point: a transformer's loading against its limits, a source's kW informational */
+            var pa = d && d.energised ? ' data-point="epms-telemetry.' + id + (n.tx ? '.load_pct" data-pt-unit="%"' : '.power_kw" data-pt-unit="kW"') + ' data-pt-label="' + n.tag + (n.tx ? ' load' : ' power') + '"' : '';
+            return '<li data-rail="' + id + '"><span>' + n.tag + '</span><b' + pa + '>' + st + ' · ' + v + '</b></li>';
         };
         setText('epms-rail-sources', ['l1-src', 'l2-src', 'tx1', 'tx2'].map(row).join(''));
         setText('epms-rail-gen', '<b>' + E.genset_count + ' sets</b> · ' + E.genset_per_hall + ' per hall (N+1) · <b>' + (sim.gen ? 'RUNNING' : 'OFF') + '</b>');
@@ -1380,6 +1391,7 @@ function exportJSON() {
         setText('epms-rail-cb', '<b>' + closed + ' / ' + cbs.length + '</b> closed · <b>' + open + '</b> open');
         setText('epms-sld-trips', open + ' open');
         setText('val-sld-breakers', closed + ' / ' + cbs.length);
+        if (window.RZPointStatus) { var rl = document.getElementById('epms-sld-rail'); if (rl) window.RZPointStatus.bindAll(rl); }
     }
     function say(text, refused) {
         if (!msgEl) return;
@@ -1499,7 +1511,7 @@ function exportJSON() {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();
 </script>
-<script src="js/conv/epms-lv-view.js?v=20261120-95d75ff3"></script>
+<script src="js/conv/epms-lv-view.js?v=20261120-234a7b05"></script>
 <script src="js/rz-command-palette.js?v=20261111-5028a9f4" defer></script>
 </body>
 </html>

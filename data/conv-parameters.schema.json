@@ -26,6 +26,13 @@
       "items": {
         "$ref": "#/definitions/parameter"
       }
+    },
+    "limits": {
+      "description": "Operating limits per point id, copied from data/conv-limits.curated.json (PRD-CONV-POINT-STATUS-TREND §5).",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/limit"
+      }
     }
   },
   "definitions": {
@@ -193,6 +200,117 @@
           "description": "Why this parameter is not rendered. Required whenever display is 'internal', so an unrendered parameter is a stated decision rather than an oversight.",
           "type": "string",
           "minLength": 40
+        }
+      }
+    },
+    "limit": {
+      "type": "object",
+      "required": [
+        "id",
+        "label",
+        "unit",
+        "lo_alarm",
+        "lo_warn",
+        "hi_warn",
+        "hi_alarm",
+        "deadband",
+        "nominal",
+        "basis",
+        "evidenceClass",
+        "source"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)+$"
+        },
+        "label": {
+          "type": "string"
+        },
+        "unit": {
+          "type": "string"
+        },
+        "lo_alarm": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "lo_warn": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "hi_warn": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "hi_alarm": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "deadband": {
+          "type": "number"
+        },
+        "nominal": {
+          "type": "object",
+          "required": [
+            "value",
+            "ref"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "value": {
+              "type": "number"
+            },
+            "ref": {
+              "type": "string"
+            }
+          }
+        },
+        "basis": {
+          "type": "string"
+        },
+        "evidenceClass": {
+          "enum": [
+            "MEASURED",
+            "DERIVED",
+            "SIMULATED",
+            "ADOPTED",
+            "ASSUMED",
+            "VENDOR",
+            "STANDARD",
+            "UNAVAILABLE"
+          ]
+        },
+        "source": {
+          "type": "object",
+          "required": [
+            "ref",
+            "asOf"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "ref": {
+              "type": "string"
+            },
+            "section": {
+              "type": "string"
+            },
+            "asOf": {
+              "type": "string",
+              "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+            }
+          }
+        },
+        "migratedFrom": {
+          "type": "string"
         }
       }
     }

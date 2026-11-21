@@ -21,6 +21,11 @@
  *   RZChillerSheets.spec(CONV_CALC)    -> { chillers, primary, secondary, halls, cells, cdw } (fleet tags and states)
  *   RZChillerSheets.pid(spec) / cdw(spec) / unavailable(spec) -> RZHmiSheet sheet objects
  *   RZChillerSheets.fromEngine(CONV_CALC) -> { spec, pid, cdw, unavailable }  (also stored on RZChillerSheets.current)
+ *
+ * Points (PRD-CONV-POINT-STATUS-TREND T2): every value label that shows a number carries `point` (a registry id, or
+ * chiller-plant.<tag>.<quantity> for a per-unit reading) and a short `label`; a per-unit reading of a limited quantity
+ * names the registry row its limits come from in `limitsOf` (the page defines the per-unit point from that row, it never
+ * types a limit). Status words (RUN / STBY / CMD) are not points.
  */
 (function (root) {
   'use strict';
@@ -75,17 +80,17 @@
       { id: 'avs', tag: 'AV', sym: 'airVent', x: SX, y: 112, size: 22, tagAt: 'none' },
       { id: 'jhs', sym: 'junction', x: SX, y: 150, dot: false },
       { id: 'tths', tag: 'TT-CHWS', sym: 'instField', x: 290, y: 124, size: 22, inst: 'TT', tagAt: 'right',
-        values: [{ k: 't', dx: 14, dy: 18, anchor: 'start', lod: 1 }] },
+        values: [{ k: 't', dx: 14, dy: 18, anchor: 'start', lod: 1, point: 'cooling.chws_c', label: 'CHWS header' }] },
       { id: 'avr', tag: 'AV', sym: 'airVent', x: RX, y: 112, size: 22, tagAt: 'none' },
       { id: 'jhr', sym: 'junction', x: RX, y: 150, dot: false },
       { id: 'tthr', tag: 'TT-CHWR', sym: 'instField', x: 950, y: 124, size: 22, inst: 'TT', tagAt: 'left',
-        values: [{ k: 't', dx: -14, dy: 18, anchor: 'end', lod: 1 }] },
+        values: [{ k: 't', dx: -14, dy: 18, anchor: 'end', lod: 1, point: 'cooling.chwr_c', label: 'CHWR header' }] },
       { id: 'jds', sym: 'junction', x: SX, y: DEC_Y }, { id: 'jdr', sym: 'junction', x: RX, y: DEC_Y },
       { id: 'vdec', tag: 'DECOUPLER', sym: 'valveBalancing', x: 620, y: DEC_Y, size: 24, tagAt: 'above' },
       { id: 'jsl', sym: 'junction', x: SX, y: SEC_Y, dot: false }, { id: 'jsl2', sym: 'junction', x: 280, y: SEC_Y },
       { id: 'jsr', sym: 'junction', x: 400, y: SEC_Y },
       { id: 'sref', tag: 'CHWS · SECONDARY', sym: 'offSheet', x: 430, y: SEC_Y - 46, size: 20, rot: 90, tagAt: 'right',
-        values: [{ k: 'q', dx: 16, dy: 18, anchor: 'start', lod: 1 }] },
+        values: [{ k: 'q', dx: 16, dy: 18, anchor: 'start', lod: 1, point: 'cooling.flow_lps', label: 'IT-reference CHW flow' }] },
       { id: 'jret', sym: 'junction', x: RX, y: RET_Y, dot: false },
       { id: 'jet', sym: 'junction', x: RX, y: RET_Y - 80 },
       { id: 'et', tag: 'ET-01', sym: 'tankExpansion', x: 1050, y: RET_Y - 110, size: 30, tagAt: 'right' }
@@ -100,23 +105,24 @@
     ];
 
     chillers.forEach(function (c, i) {
-      var n = i + 1, y = TY[i], s = y + 18, t = tagNo(c.tag, i);
+      var n = i + 1, y = TY[i], s = y + 18, t = tagNo(c.tag, i), ctag = c.tag || ('CH-' + pad2(t)), pt = 'chiller-plant.' + ctag + '.';
       var pumps = trainPumps(sp.primary, t);
       if (!pumps.length) pumps = [{ tag: 'CHWP-' + pad2(t) + 'A', letter: 'a' }, { tag: 'CHWP-' + pad2(t) + 'B', letter: 'b' }];
       /* chiller and its condenser-water stubs (they continue on CH-M-102) */
       nodes.push({ id: 'ch' + n, tag: c.tag || ('CH-' + pad2(t)), sym: 'chillerWater', x: 560, y: y, size: 72, cls: 'chw-train', label: 'Water-cooled centrifugal chiller · train ' + t, tagAt: 'above',
-        values: [{ k: 'st', dx: -44, dy: 44, anchor: 'end', lod: 1 }, { k: 'kw', dx: -44, dy: 61, anchor: 'end', lod: 1 }, { k: 'q', dx: -44, dy: 78, anchor: 'end', lod: 1 }] });
+        values: [{ k: 'st', dx: -44, dy: 44, anchor: 'end', lod: 1 }, { k: 'kw', dx: -44, dy: 61, anchor: 'end', lod: 1, point: pt + 'comp_kw', label: ctag + ' compressor power' },
+          { k: 'q', dx: -44, dy: 78, anchor: 'end', lod: 1, point: pt + 'branch_flow_lps', label: ctag + ' branch flow (calc ref)' }] });
       nodes.push({ id: 'cdr' + n, tag: 'CDWR', sym: 'offSheet', x: 474, y: y - 18, size: 20, rot: 180, tagAt: 'above', label: 'Condenser water return to the cooling towers (CH-M-102)',
-        values: [{ k: 't', dx: -14, dy: 4, anchor: 'end', lod: 1 }] });
+        values: [{ k: 't', dx: -14, dy: 4, anchor: 'end', lod: 1, point: 'cooling.cdw_return_c', label: 'CDWR' }] });
       nodes.push({ id: 'cds' + n, tag: 'CDWS', sym: 'offSheet', x: 668, y: y - 18, size: 20, tagAt: 'above', label: 'Condenser water supply from the cooling towers (CH-M-102)',
-        values: [{ k: 't', dx: 14, dy: 4, anchor: 'start', lod: 1 }] });
+        values: [{ k: 't', dx: 14, dy: 4, anchor: 'start', lod: 1, point: 'cooling.cdw_supply_c', label: 'CDWS' }] });
       edges.push({ id: 'e-cdr' + n, from: 'ch' + n + '.cwOut', to: 'cdr' + n + '.port', medium: 'cw', flowOf: 'cw' + n });
       edges.push({ id: 'e-cds' + n, from: 'cds' + n + '.port', to: 'ch' + n + '.cwIn', medium: 'cw', flowOf: 'cw' + n });
       /* supply leg: evaporator -> TT-n01 -> isolation valve -> CHWS header */
       nodes.push({ id: 'vs' + n, sym: 'valveButterfly', x: 456, y: s, size: 22, tagAt: 'none' });
       nodes.push({ id: 'jts' + n, sym: 'junction', x: 370, y: s, dot: false });
       nodes.push({ id: 'tts' + n, tag: 'TT-' + t + '01', sym: 'instField', x: 370, y: s - 34, size: 22, inst: 'TT', tagAt: 'above',
-        values: [{ k: 't', dx: -14, dy: 4, anchor: 'end', lod: 1 }] });
+        values: [{ k: 't', dx: -14, dy: 4, anchor: 'end', lod: 1, point: pt + 'chws_c', label: 'TT-' + t + '01 CHWS ' + ctag, limitsOf: 'cooling.chws_c' }] });
       nodes.push({ id: 'js' + n, sym: 'junction', x: SX, y: s });
       edges.push({ id: 'e-s' + n + 'a', from: 'ch' + n + '.chwOut', to: 'vs' + n + '.b', medium: 'chw', flowOf: 't' + n });
       edges.push({ id: 'e-s' + n + 'b', from: 'vs' + n + '.a', to: 'jts' + n, medium: 'chw', flowOf: 't' + n });
@@ -127,7 +133,7 @@
       nodes.push({ id: 'vr' + n, sym: 'valveButterfly', x: 950, y: s, size: 22, tagAt: 'none' });
       nodes.push({ id: 'jtr' + n, sym: 'junction', x: 892, y: s, dot: false });
       nodes.push({ id: 'ttr' + n, tag: 'TT-' + t + '02', sym: 'instField', x: 892, y: s - 34, size: 22, inst: 'TT', tagAt: 'above',
-        values: [{ k: 't', dx: 14, dy: 4, anchor: 'start', lod: 1 }] });
+        values: [{ k: 't', dx: 14, dy: 4, anchor: 'start', lod: 1, point: pt + 'chwr_c', label: 'TT-' + t + '02 CHWR ' + ctag, limitsOf: 'cooling.chwr_c' }] });
       nodes.push({ id: 'jpr' + n, sym: 'junction', x: 840, y: s });
       nodes.push({ id: 'jpl' + n, sym: 'junction', x: 640, y: s });
       edges.push({ id: 'e-r' + n, from: 'jr' + n, to: 'vr' + n + '.b', medium: 'chw', flowOf: 't' + n, line: n === 1 ? 'CHWR' : undefined });
@@ -181,7 +187,8 @@
       nodes.push({ id: hs, sym: 'junction', x: x - 40, y: SEC_Y, dot: !last });
       nodes.push({ id: hr, sym: 'junction', x: x + 12, y: RET_Y, dot: i > 0 });
       nodes.push({ id: 'crah' + h, tag: 'CRAH-' + h, sym: 'coolingCoil', x: x, y: COIL_Y, size: 48, cls: 'chw-hall', label: 'Hall ' + h + ' CRAH bank · typical chilled-water coil of the hall fleet', tagAt: 'right',
-        values: [{ k: 'n', dx: -30, dy: -66, anchor: 'start', lod: 1 }, { k: 'it', dx: -30, dy: -49, anchor: 'start', lod: 1 }, { k: 'air', dx: -30, dy: -32, anchor: 'start', lod: 1 }] });
+        values: [{ k: 'n', dx: -30, dy: -66, anchor: 'start', lod: 1 }, { k: 'it', dx: -30, dy: -49, anchor: 'start', lod: 1, point: 'chiller-plant.hall-' + h + '.it_kw', label: 'Hall ' + h + ' IT load' },
+          { k: 'air', dx: -30, dy: -32, anchor: 'start', lod: 1, point: 'chiller-plant.CRAH-' + h + '.supply_air_c', label: 'CRAH-' + h + ' supply air (supply / return)', limitsOf: 'cooling.crah_supply_air_c' }] });
       edges.push({ id: 'e-hs' + h, from: prevS, to: hs, medium: 'chw', w: 'main', flowOf: 'hdr', line: i === 0 ? 'CHWS · HALLS' : undefined });
       edges.push({ id: 'e-c' + h + 's', from: hs, to: 'crah' + h + '.waterIn', via: [[x - 40, COIL_Y + 40], [x - 12, COIL_Y + 40]], medium: 'chw', flowOf: 'hall' + h });
       edges.push({ id: 'e-c' + h + 'r', from: 'crah' + h + '.waterOut', to: hr, medium: 'chw', flowOf: 'hall' + h });
@@ -219,13 +226,14 @@
     var lastX = X0 + CP * (cols - 1);
     var nodes = [
       { id: 'rin', tag: 'CDWR', sym: 'offSheet', x: 46, y: HR, size: 20, rot: 180, tagAt: 'above', label: 'Condenser water return from the chiller condensers (CH-M-101)',
-        values: [{ k: 'r', dx: -30, dy: 26, anchor: 'start', lod: 1 }, { k: 'q', dx: -30, dy: 42, anchor: 'start', lod: 1 }] },
+        values: [{ k: 'r', dx: -30, dy: 26, anchor: 'start', lod: 1, point: 'cooling.tower_rejection_kw_th', label: 'Heat rejected Σ running cells' },
+          { k: 'q', dx: -30, dy: 42, anchor: 'start', lod: 1, point: 'chiller-plant.CDW.flow_lps', label: 'CDW flow Σ running pumps' }] },
       { id: 'jrin', sym: 'junction', x: 100, y: HR, dot: false },
       { id: 'ttcr', tag: 'TT-CDWR', sym: 'instField', x: 100, y: HR - 50, size: 22, inst: 'TT', tagAt: 'right',
-        values: [{ k: 't', dx: 15, dy: 20, anchor: 'start', lod: 1 }] },
+        values: [{ k: 't', dx: 15, dy: 20, anchor: 'start', lod: 1, point: 'cooling.cdw_return_c', label: 'TT-CDWR' }] },
       { id: 'jcs0', sym: 'junction', x: 124, y: HS, dot: false },
       { id: 'ttcs', tag: 'TT-CDWS', sym: 'instField', x: 124, y: HS + 52, size: 22, inst: 'TT', tagAt: 'left',
-        values: [{ k: 't', dx: -15, dy: 20, anchor: 'end', lod: 1 }] }
+        values: [{ k: 't', dx: -15, dy: 20, anchor: 'end', lod: 1, point: 'cooling.cdw_supply_c', label: 'TT-CDWS' }] }
     ];
     var edges = [
       { id: 'e-rin', from: 'rin.port', to: 'jrin', medium: 'cw', w: 'main', flowOf: 'cdwr' },
@@ -239,7 +247,9 @@
         /* cell: hot water from the CDWR header into the distribution at the top, cold water out of the basin */
         nodes.push({ id: 'jr' + n, sym: 'junction', x: x + 40, y: HR, dot: i < cells.length - 1 });
         nodes.push({ id: 'ct' + n, tag: c.tag, sym: 'coolingTowerCell', x: x, y: TY2, size: 52, cls: 'cdw-cell', label: 'Induced-draft cooling tower cell ' + c.tag, tagAt: 'above',
-          values: [{ k: 'st', dx: -4, dy: 43, lod: 1 }, { k: 'q', dx: -4, dy: 59, lod: 1 }, { k: 'fan', dx: -4, dy: 75, lod: 1 }] });
+          values: [{ k: 'st', dx: -4, dy: 43, lod: 1, point: 'chiller-plant.' + c.tag + '.load_pct', label: c.tag + ' load' },
+            { k: 'q', dx: -4, dy: 59, lod: 1, point: 'chiller-plant.' + c.tag + '.rejection_kw_th', label: c.tag + ' heat rejected' },
+            { k: 'fan', dx: -4, dy: 75, lod: 1, point: 'chiller-plant.' + c.tag + '.fan_kw', label: c.tag + ' fan power' }] });
         nodes.push({ id: 'jb' + n, sym: 'junction', x: x + 40, y: HS });
         edges.push({ id: 'e-crh' + n, from: prevR, to: 'jr' + n, medium: 'cw', w: 'main', flowOf: 'cdwr', line: i === 0 ? 'CDWR' : undefined });
         edges.push({ id: 'e-ct' + n + 'i', from: 'jr' + n, to: 'ct' + n + '.hotIn', via: [[x + 40, TY2 - 13]], medium: 'cw', flowOf: 'ct' + n });
@@ -251,7 +261,7 @@
         var ch = (sp.chillers[i] && sp.chillers[i].tag) || ('CH-' + pad2(i + 1));
         nodes.push({ id: 'jp' + n, sym: 'junction', x: x, y: HS });
         nodes.push({ id: 'cp' + n, tag: p.tag, sym: 'pumpCentrifugal', x: x, y: PY, size: 30, rot: 90, cls: 'cdw-pump', label: 'Condenser-water pump ' + p.tag + ' · serves ' + ch, tagAt: 'right',
-          values: [{ k: 'st', dx: 16, dy: 20, anchor: 'start', lod: 1 }, { k: 'q', dx: 16, dy: 36, anchor: 'start', lod: 1 }] });
+          values: [{ k: 'st', dx: 16, dy: 20, anchor: 'start', lod: 1 }, { k: 'q', dx: 16, dy: 36, anchor: 'start', lod: 1, point: 'chiller-plant.' + p.tag + '.flow_lps', label: p.tag + ' flow' }] });
         nodes.push({ id: 'to' + n, tag: ch + ' COND', sym: 'offSheet', x: x, y: OY, size: 20, rot: 90, tagAt: 'below', label: 'Condenser water supply to ' + ch + ' (CH-M-101)' });
         edges.push({ id: 'e-cp' + n + 's', from: 'jp' + n, to: 'cp' + n + '.suction', medium: 'cw', flowOf: 'cp' + n });
         edges.push({ id: 'e-cp' + n + 'd', from: 'cp' + n + '.discharge', to: 'to' + n + '.port', medium: 'cw', flowOf: 'cp' + n });

@@ -151,7 +151,7 @@ Touch fires a false hover on tap. Ungated hover motion is a defect.
 | need | module | notes |
 |---|---|---|
 | toast / notification | `js/rz-toast.js` → `window.RZToast` | `show/ok/warn/fault/info`, dwell pauses on hover and focus, stack of 3 expressed as transforms, message is `textContent` and never `innerHTML` |
-| bottom sheet / drawer | `js/rz-sheet.js` → `window.RZSheet` | drag-to-dismiss with velocity, rubber-band upward, focus moved in, trapped, and returned to the opener; Escape closes |
+| bottom sheet / drawer | `js/rz-sheet.js` → `window.RZSheet` | drag-to-dismiss with velocity, rubber-band upward, focus moved in, trapped, and returned to the opener; Escape closes ; `onClose` runs once on every close path. The Conventional trend (`js/rz-trend.js`) uses it on a phone (≤ 600 px, 88 % height) and adds NO motion of its own: the desktop trend modal and its 1–5 range keys do not animate (§1 frequency gate) |
 
 **Why not sonner and vaul.** They are the references these are built against and
 the right answer in React. This site is zero-build vanilla, so the principles are

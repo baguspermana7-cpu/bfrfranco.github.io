@@ -31,7 +31,7 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.min.css?v=20261108-ff5c7268">
 <link rel="stylesheet" href="css/rz-cockpit-instrument.css?v=20261105-c3fa9df6"><!-- P23: the instrument register this page declares -->
-    <script src="js/rz-version.js?v=20261120-7ea867d8" defer></script>
+    <script src="js/rz-version.js?v=20261121-ea6e94b5" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <script type="application/ld+json">
@@ -113,6 +113,8 @@
         .tile .k{ font-family:var(--bm-mono); font-size:.54rem; letter-spacing:.07em; text-transform:uppercase; color:var(--bm-muted); }
         .tile .v{ font-family:var(--bm-mono); font-size:1.18rem; font-weight:700; color:var(--bm-text); line-height:1.15; margin-top:2px; font-variant-numeric:tabular-nums slashed-zero; font-feature-settings:'tnum' 1,'zero' 1; }
         .tile .v .u{ font-size:.62rem; color:var(--bm-muted); font-weight:500; margin-left:2px; }
+        /* a point's alarm outline (css/conv-point.css) hugs the number, not the tile width */
+        .tile .v[data-point]{ width:fit-content; }
         .tile .b{ font-family:var(--bm-mono); font-size:.52rem; color:var(--bm-muted); margin-top:1px; }
         /* status line replaces the old "band X" subtitle */
         .tile .st{ font-family:var(--bm-mono); font-size:.5rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; margin-top:3px; color:var(--bm-green); display:flex; justify-content:space-between; gap:4px; }
@@ -375,10 +377,10 @@
         <div class="bm-grid">
             <div class="panel">
                 <div class="panel-hd"><h3>Datahall installation layout — plan view</h3><span class="tag" id="layoutTag">in-row</span></div>
-                <div class="panel-bd"><div id="layoutBox"></div></div>
+                <div class="panel-bd"><div id="layoutBox" data-const></div></div>
             </div>
             <div class="panel">
-                <div class="panel-hd"><h3>Simulated parameters</h3><span class="tag" id="capTag"></span></div>
+                <div class="panel-hd"><h3>Simulated parameters</h3><span class="tag" id="capTag" data-const title="Rated capacity of the selected CDU type (TYPES table): a rating, not a reading"></span></div>
                 <div class="panel-bd">
                     <p class="tile-guide">How to read a tile: <span class="tg-tag">FT-01</span> instrument tag (matches the P&amp;ID) · big value &amp; unit · the bar shows the <b>normal band</b> (shaded) with a marker for the <b>current value</b> · the status line reads <b style="color:var(--bm-green)">NORMAL</b> / <b style="color:var(--bm-amber)">WARN</b> / <b style="color:var(--bm-red)">ALARM</b>. Click a tile for its trend &amp; reference.</p>
                     <div class="tiles" id="tiles"></div>
@@ -397,7 +399,7 @@
             <a href="cdu-comparison.html">↗ Deep comparison — issues, controls, after-sales &amp; TCO</a>
         </div>
 
-        <div class="bm-note">
+        <div class="bm-note" data-const>
             <b>Educational simulation — not a live feed.</b> Values are generated on-device from typical operating bands (see the <a href="cdu-checklist.html">CDU Checklist §01–§03</a> for the sourced parameter ranges, ASHRAE TC 9.9 W-classes and OCP cold-plate guidance). Parameter targets: secondary supply ~17–45 °C · ΔT ~8–12 °C · flow ~1.0–1.5 LPM/kW · dP ~0.5–3.0 bar · system pressure ~2–6 bar · pumps N+1 · leaks 0. Each injected fault maps to an <b>FMECA liquid-cooling fault mode</b> — leak → <b>F11.3</b> (manifold/hose leak), pump-fail → <b>F11.2</b> (CDU-pump failure), filter clog → <b>F11.5</b> (filter clogging) — catalogued with mechanisms, effects, corrective actions and RPN risk in the <a href="ai-engineering-maintenance.html#sec-knowledge-base">AI Engineering Maintenance FMECA knowledge base</a>. Confirm exact set-points and alarm limits against the specific CDU's manufacturer manual. Not procurement, safety, or engineering advice.
         </div>
     </div></main>
@@ -431,6 +433,14 @@
             </span>
         </div>
     </div>
+
+    <!-- PRD-CONV-POINT-STATUS-TREND T3: every number shows its state from the limits registry and opens its trend -->
+    <link rel="stylesheet" href="css/conv-point.css?v=20261120-8daa6374">
+    <script src="js/conv-parameters.js?v=20261121-5508ceb7"></script>
+    <script src="js/conv/history.js?v=20261120-8d390d7e"></script>
+    <script src="js/rz-sheet.js?v=20261120-3bf159cb" defer></script>
+    <script src="js/rz-trend.js?v=20261121-1300d194"></script>
+    <script src="js/conv/point-status.js?v=20261120-40be4933"></script>
 
     <footer class="footer footer-enhanced">
         <div class="container"><div class="footer-grid">
@@ -570,7 +580,11 @@
                  + '<line x1="'+(x-11)+'" y1="'+y+'" x2="'+(x+11)+'" y2="'+y+'" stroke="var(--bm-muted)" stroke-width=".5"/>'
                  + '<text class="sch-sub" x="'+x+'" y="'+(y-2.5)+'" text-anchor="middle">'+top+'</text>'
                  + '<text class="sch-sub" x="'+x+'" y="'+(y+7)+'" text-anchor="middle">'+tag+'</text>'
-                 + (valId?'<text class="sch-val" id="'+valId+'" x="'+x+'" y="'+(y+21)+'" text-anchor="middle"></text>':'')+'</g>'; }
+                 + (valId?'<text class="sch-val" id="'+valId+'"'+(PV_PT[valId]?' data-point="'+PV_PT[valId][0]+'" data-pt-label="'+PV_PT[valId][1]+'"':'')+' x="'+x+'" y="'+(y+21)+'" text-anchor="middle"></text>':'')+'</g>'; }
+        /* P&ID label -> its point (the same ids as the tiles; PDT-01 filter dP has no tile and no limits: Informational) */
+        var PV_PT={ 'pv-flow':['cdu-mini-bms.FT-01S.flow_lpm','TCS flow total'], 'pv-sysp':['cdu-mini-bms.PT-01.system_bar','System pressure'],
+            'pv-dp':['cdu-mini-bms.PDT-02.loop_dp_bar','Loop dP'], 'pv-fdp':['cdu-mini-bms.PDT-01.filter_dp_bar','Filter dP'], 'pv-sup':['cdu-mini-bms.TT-01.supply_c','TCS supply'],
+            'pv-ret':['cdu-mini-bms.TT-02.return_c','TCS return'], 'pv-level':['cdu-mini-bms.LT-01.level_pct','Reservoir level'], 'pv-atd':['cdu-mini-bms.TT-D.approach_c','HX approach'] };
 
         function pidSVG(t){
             var slow=curScen==='lowflow', fcls='flow '+(slow?'slow':'on'), pumpAon=curScen!=='pumpfail';
@@ -639,7 +653,7 @@
             // ===== leak rope + setpoint note + legend strip =====
             h+='<line x1="135" y1="322" x2="392" y2="322" stroke="var(--bm-muted)" stroke-width="1" stroke-dasharray="2 3"/><text class="sch-sub" x="138" y="319">leak rope LSH-01</text>';
             h+='<g class="leak-x'+(curScen==='leak'?' on':'')+'"><line x1="251" y1="315" x2="265" y2="329"/><line x1="265" y1="315" x2="251" y2="329"/></g>';
-            h+='<text class="sch-sub" x="8" y="352">SETPOINT — TCV-01 holds TT-01 = 18 °C (≥ dew point +3 °C) · P-01 VFD on ΔP (PDT-02) · N+1 auto-changeover</text>';
+            h+='<text class="sch-sub" x="8" y="352" data-const>SETPOINT — TCV-01 holds TT-01 = 18 °C (≥ dew point +3 °C) · P-01 VFD on ΔP (PDT-02) · N+1 auto-changeover</text>';
             // legend strip (bottom) — simple inline symbols, tight spacing
             h+='<g transform="translate(120,368)">'
              + '<path class="sch-eq" d="M2 -4 L9 1 L2 6 Z M16 -4 L9 1 L16 6 Z"/><text class="sch-sub" x="22" y="4">iso valve</text>'
@@ -653,37 +667,41 @@
         }
 
         /* ---------- live parameter compute + render ---------- */
-        // each tile carries its instrument tag + (lo,hi) alarm band so the UI can show
-        // a range bar + status instead of an ambiguous "band X" subtitle.
+        // each tile carries its instrument tag + its POINT id. The normal band (range bar, status line) and the state
+        // come from the limits registry through RZPointStatus (PRD-CONV-POINT-STATUS-TREND P-1/P-2): this page types
+        // no limit. pl = the short point name of the tooltip and the trend.
         var TILES=[
-            {k:'flow',tag:'FT-01',label:'Flow',unit:'LPM/kW',lo:1.0,hi:1.5,dec:2},
-            {k:'flowtot',tag:'FT-01Σ',label:'Flow total',unit:'LPM',dec:0,info:'= flow × capacity'},
-            {k:'supply',tag:'TT-01',label:'Supply T',unit:'°C',lo:17,hi:45,dec:1},
-            {k:'return',tag:'TT-02',label:'Return T',unit:'°C',dec:1,info:'= supply + ΔT'},
-            {k:'dT',tag:'ΔT-01',label:'ΔT',unit:'°C',lo:8,hi:12,dec:1},
-            {k:'dP',tag:'PDT-02',label:'Loop dP',unit:'bar',lo:0.5,hi:3.0,dec:2},
-            {k:'sysP',tag:'PT-01',label:'System press',unit:'bar',lo:2,hi:6,dec:2},
-            {k:'level',tag:'LT-01',label:'Reservoir level',unit:'%',lo:45,hi:70,dec:0},
+            {k:'flow',tag:'FT-01',label:'Flow',unit:'LPM/kW',dec:2,pt:'cdu-mini-bms.FT-01.flow_lpm_per_kw',pl:'TCS flow'},
+            {k:'flowtot',tag:'FT-01Σ',label:'Flow total',unit:'LPM',dec:0,info:'= flow × capacity',pt:'cdu-mini-bms.FT-01S.flow_lpm',pl:'TCS flow total'},
+            {k:'supply',tag:'TT-01',label:'Supply T',unit:'°C',dec:1,pt:'cdu-mini-bms.TT-01.supply_c',pl:'TCS supply'},
+            {k:'return',tag:'TT-02',label:'Return T',unit:'°C',dec:1,info:'= supply + ΔT',pt:'cdu-mini-bms.TT-02.return_c',pl:'TCS return'},
+            {k:'dT',tag:'ΔT-01',label:'ΔT',unit:'°C',dec:1,pt:'cdu-mini-bms.DT-01.delta_t_c',pl:'TCS ΔT'},
+            {k:'dP',tag:'PDT-02',label:'Loop dP',unit:'bar',dec:2,pt:'cdu-mini-bms.PDT-02.loop_dp_bar',pl:'Loop dP'},
+            {k:'sysP',tag:'PT-01',label:'System press',unit:'bar',dec:2,pt:'cdu-mini-bms.PT-01.system_bar',pl:'System pressure'},
+            {k:'level',tag:'LT-01',label:'Reservoir level',unit:'%',dec:0,pt:'cdu-mini-bms.LT-01.level_pct',pl:'Reservoir level'},
             {k:'pump',tag:'P-01',label:'Pumps',state:1,norm:'N+1 ready'},
             {k:'filter',tag:'PDT-01',label:'Filter',state:1,norm:'clean'},
             {k:'leak',tag:'LSH-01',label:'Leak detect',state:1,norm:'dry'},
-            {k:'atd',tag:'TT-Δ',label:'HX approach',unit:'°C',lo:3,hi:7,dec:1},
+            {k:'atd',tag:'TT-Δ',label:'HX approach',unit:'°C',dec:1,pt:'cdu-mini-bms.TT-D.approach_c',pl:'HX approach'},
             {k:'chem',tag:'AT-01',label:'Coolant',state:1,norm:'PG25 in-spec'}
         ];
         var TMETA={}; for(var _i=0;_i<TILES.length;_i++) TMETA[TILES[_i].k]=TILES[_i];
+        var PS=window.RZPointStatus||null;
+        function band(t){ var L=PS&&t.pt?PS.limits(t.pt):null; return L&&L.lo_warn!=null&&L.hi_warn!=null?{lo:L.lo_warn,hi:L.hi_warn,L:L}:null; }
+        for(var _j=0;_j<TILES.length;_j++){ var _b=band(TILES[_j]); if(_b){ TILES[_j].lo=_b.lo; TILES[_j].hi=_b.hi; TILES[_j].basis=_b.L.basis; } }
+        function ptAttrs(t){ return t.pt ? ' data-point="'+t.pt+'" data-pt-label="'+t.pl+'" data-pt-unit="'+t.unit+'" data-pt-digits="'+t.dec+'"' : ''; }
         function dispRange(lo,hi){ var span=(hi-lo)||1; return {lo:lo-span*0.35,hi:hi+span*0.35}; }
         function markPct(v,lo,hi){ var d=dispRange(lo,hi); var p=(v-d.lo)/(d.hi-d.lo); return Math.max(0,Math.min(1,p))*100; }
         function zoneCss(lo,hi){ var d=dispRange(lo,hi); var z0=(lo-d.lo)/(d.hi-d.lo)*100, z1=(hi-d.lo)/(d.hi-d.lo)*100; return 'left:'+z0.toFixed(1)+'%;width:'+(z1-z0).toFixed(1)+'%'; }
-        function bandState(v,lo,hi){ if(v<lo*0.9||v>hi*1.1) return 'alarm'; if(v<lo||v>hi) return 'warn'; return 'ok'; }
         function buildTiles(){
             var h=''; for(var i=0;i<TILES.length;i++){ var t=TILES[i];
                 var inner='<span class="led"></span><div class="th"><span class="tag">'+t.tag+'</span><span class="k">'+t.label+'</span></div>'
-                        + '<div class="v" id="val-'+t.k+'">–</div>';
+                        + '<div class="v" id="val-'+t.k+'"'+ptAttrs(t)+'>–</div>';
                 if(t.state){
                     inner+='<div class="st"><span id="sttxt-'+t.k+'">NORMAL</span><span class="rngtxt" id="rng-'+t.k+'">'+t.norm+'</span></div>';
                 } else {
                     if(t.lo!=null) inner+='<div class="bar"><span class="zone" style="'+zoneCss(t.lo,t.hi)+'"></span><span class="mark" id="mark-'+t.k+'" style="left:0%"></span></div>';
-                    inner+='<div class="st"><span id="sttxt-'+t.k+'">'+(t.info?'DERIVED':'NORMAL')+'</span><span class="rngtxt" id="rng-'+t.k+'">'+(t.info?t.info:(t.lo+'–'+t.hi+' '+t.unit))+'</span></div>';
+                    inner+='<div class="st"><span id="sttxt-'+t.k+'">'+(t.info?'DERIVED':'NORMAL')+'</span><span class="rngtxt" id="rng-'+t.k+'"'+(t.info?'':' data-const title="Normal band (warning limits) from the limits registry — '+String(t.basis||'').replace(/"/g,'&quot;')+'"')+'>'+(t.info?t.info:(t.lo+'–'+t.hi+' '+t.unit))+'</span></div>';
                     inner+='<svg class="spark" id="spark-'+t.k+'" viewBox="0 0 60 15" preserveAspectRatio="none"><polygon class="fillarea" points=""/><polyline points=""/></svg>';
                 }
                 h+='<div class="tile" id="tile-'+t.k+'" data-link="'+t.k+'">'+inner+'</div>';
@@ -692,12 +710,13 @@
         }
         function applyState(k,state){ var tl=document.getElementById('tile-'+k); if(tl) tl.className='tile'+(state==='warn'?' warn':state==='alarm'?' alarm':''); var sx=document.getElementById('sttxt-'+k); if(sx) sx.textContent=state==='alarm'?'ALARM':state==='warn'?'WARN':(TMETA[k].info?'DERIVED':'NORMAL'); }
         // numeric tile — sets value, range-marker position and status from the band
-        function setNum(k,v,unit){ var t=TMETA[k]; var el=document.getElementById('val-'+k); var txt=(t.dec>=0?v.toFixed(t.dec):Math.round(v))+'<span class="u">'+unit+'</span>'; if(el) el.innerHTML=txt;
-            var state = t.info ? 'ok' : bandState(v,t.lo,t.hi);
+        // the state is RZPointStatus over the registry limits of the number AS SHOWN (P-2, P-5); no limits = Informational
+        function setNum(k,v,unit){ var t=TMETA[k]; var el=document.getElementById('val-'+k); var txt=(t.dec>=0?v.toFixed(t.dec):Math.round(v))+'<span class="u">'+unit+'</span>'; if(el && el.innerHTML!==txt) el.innerHTML=txt;
+            var ev = PS && el && t.pt ? PS.apply(el, t.pt) : null, state = ev && (ev.state==='warn'||ev.state==='alarm') ? ev.state : 'ok';
             if(t.lo!=null){ var m=document.getElementById('mark-'+k); if(m) m.style.left=markPct(v,t.lo,t.hi).toFixed(1)+'%'; }
             applyState(k,state); return state; }
         // state tile — sets value text + explicit state + a short condition note
-        function setState(k,valHtml,state,note){ var el=document.getElementById('val-'+k); if(el) el.innerHTML=valHtml; var rg=document.getElementById('rng-'+k); if(rg&&note!=null) rg.textContent=note; applyState(k,state); return state; }
+        function setState(k,valHtml,state,note){ var el=document.getElementById('val-'+k); if(el) el.innerHTML=valHtml; if(PS&&el&&TMETA[k].pt) PS.apply(el, TMETA[k].pt); var rg=document.getElementById('rng-'+k); if(rg&&note!=null) rg.textContent=note; applyState(k,state); return state; }
         var SPARK_HIST={};
         function drawSpark(k,val){
             if(!SPARK_HIST[k]) SPARK_HIST[k]=[];
@@ -736,8 +755,8 @@
             states.supply=setNum('supply',supply,'°C');
             states.return=setNum('return',ret,'°C');
             states.dT=setNum('dT',dT,'°C');
-            // filter clog forces the loop-dP tile to alarm even if the number is mid-band
-            states.dP=setNum('dP',dP,'bar'); if(filterBad){ states.dP='alarm'; applyState('dP','alarm'); }
+            // P-2: the loop-dP state is its value against its limits only (the clogged filter raises its own FILTER tile)
+            states.dP=setNum('dP',dP,'bar');
             states.sysP=setNum('sysP',sysP,'bar');
             states.level=setNum('level',level,'%');
             states.atd = L2A ? setState('atd','n/a','ok','L2A — air reject') : setNum('atd',atd,'°C');
@@ -750,7 +769,8 @@
             drawSpark('flow',flow); drawSpark('flowtot',flowtot); drawSpark('supply',supply); drawSpark('return',ret);
             drawSpark('dT',dT); drawSpark('dP',dP); drawSpark('sysP',sysP); drawSpark('level',level); if(!L2A) drawSpark('atd',atd);
             // P&ID live labels (tagged instruments)
-            function st(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; }
+            // a P&ID label is a point too: only its text node is rewritten (the glyph tspan stays), then its state
+            function st(id,v){ var e=document.getElementById(id); if(!e) return; var tn=e.firstChild; if(tn&&tn.nodeType===3){ if(tn.nodeValue!==v) tn.nodeValue=v; } else e.insertBefore(document.createTextNode(v), e.firstChild); var p=e.getAttribute('data-point'); if(PS&&p) PS.apply(e,p); }
             st('pv-flow', Math.round(flowtot)+' LPM');           // FT-01
             st('pv-sysp', sysP.toFixed(1)+' bar');               // PT-01
             st('pv-dp', dP.toFixed(1)+' bar');                   // PDT-02 loop
@@ -759,7 +779,7 @@
             st('pv-ret', ret.toFixed(0)+'°C');                   // TT-02
             st('pv-level', Math.round(level)+'%');               // LT-01
             st('pv-pump', pumpA?'N+1':'P-01B');
-            var atdEl=document.getElementById('pv-atd'); if(atdEl) atdEl.textContent=(L2A?'—':atd.toFixed(0)+'°C');
+            st('pv-atd', L2A?'—':atd.toFixed(0)+'°C');           // TI-03 HX approach
             // light up the P&ID instruments that tripped, mirroring their tiles
             var pidEl=document.getElementById('pidBox');
             if(pidEl){ ['atd','flow','sysP','filter','dP','level'].forEach(function(k){
@@ -800,6 +820,7 @@
             document.getElementById('layoutBox').innerHTML=layoutSVG(t);
             document.getElementById('pidBox').innerHTML=pidSVG(t);
             compute();
+            if(PS) PS.bindAll(document.getElementById('main-content'));
         }
         function setPressed(seg,attr,val){ seg.querySelectorAll('button').forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute(attr)===val?'true':'false'); }); }
 
@@ -827,7 +848,11 @@
         pidBox.addEventListener('keydown',function(e){ var g=e.target.closest('.pid-inst'); if(g && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); selectLink(g.getAttribute('data-link'),false); } });
         pidBox.addEventListener('mouseover',function(e){ var g=e.target.closest('.pid-inst'); if(g){ var t=document.getElementById('tile-'+g.getAttribute('data-link')); if(t) t.classList.add('hoverhl'); } });
         pidBox.addEventListener('mouseout',function(e){ var g=e.target.closest('.pid-inst'); if(g){ var t=document.getElementById('tile-'+g.getAttribute('data-link')); if(t) t.classList.remove('hoverhl'); } });
-        tilesBox.addEventListener('click',function(e){ var t=e.target.closest('.tile[data-link]'); if(t){ var k=t.getAttribute('data-link'); selectLink(k,true); openTrend(k); } });
+        tilesBox.addEventListener('click',function(e){ var t=e.target.closest('.tile[data-link]'); if(!t) return; var k=t.getAttribute('data-link'); selectLink(k,true);
+            if(e.target.closest('[data-trend]')) return;   /* the number itself: js/rz-trend.js opens it */
+            var v=document.getElementById('val-'+k);
+            if(v && v.hasAttribute('data-trend') && window.RZTrend){ window.RZTrend.open(v.getAttribute('data-trend'), { trigger: v, value: parseFloat(v.getAttribute('data-pt-value')), state: { state: v.getAttribute('data-pt-state'), dir: v.getAttribute('data-pt-dir') } }); return; }
+            openTrend(k); });
         tilesBox.addEventListener('mouseover',function(e){ var t=e.target.closest('.tile[data-link]'); if(t){ var g=pidBox.querySelector('.pid-inst[data-link="'+t.getAttribute('data-link')+'"]'); if(g) g.classList.add('linked'); } });
         tilesBox.addEventListener('mouseout',function(e){ var t=e.target.closest('.tile[data-link]'); if(t){ var g=pidBox.querySelector('.pid-inst[data-link="'+t.getAttribute('data-link')+'"]'); if(g && !document.querySelector('.tile.linkhl[data-link="'+t.getAttribute('data-link')+'"]')) g.classList.remove('linked'); } });
         document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ if(window._tdOpenKey){ closeTrend(); } else { clearLink(); } } });
@@ -952,7 +977,7 @@
             var scale=1, tx=0, ty=0, drag=false, sx=0, sy=0, stx=0, sty=0;
             // zoom control cluster
             var ctl=document.createElement('div'); ctl.className='zoom-ctl';
-            ctl.innerHTML='<button type="button" data-z="out" aria-label="Zoom out">−</button><span class="zlvl">100%</span><button type="button" data-z="in" aria-label="Zoom in">+</button><button type="button" data-z="reset" aria-label="Reset view">⤢</button>';
+            ctl.innerHTML='<button type="button" data-z="out" aria-label="Zoom out">−</button><span class="zlvl" data-const>100%</span><button type="button" data-z="in" aria-label="Zoom in">+</button><button type="button" data-z="reset" aria-label="Reset view">⤢</button>';
             panel.appendChild(ctl);
             var lvl=ctl.querySelector('.zlvl');
             function clampPan(){

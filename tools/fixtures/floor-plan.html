@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Floor plan fixture</title>
+<script>
+/* theme before first paint: localStorage.theme (the gate primes it) or ?theme= */
+(function () {
+  var t = 'dark';
+  try { var q = /[?&]theme=(light|dark)/.exec(location.search); t = q ? q[1] : (localStorage.getItem('theme') === 'light' ? 'light' : 'dark'); } catch (e) {}
+  document.documentElement.setAttribute('data-theme', t);
+})();
+</script>
+<link rel="stylesheet" href="../../css/conv-point.css">
+<style>
+:root { --st-bg:#0b0c0e; --st-panel:#121316; --st-ink:#e8edf5; --st-muted:#9aa3b0; --st-line:rgba(255,255,255,.12); --st-accent:#e8b563; }
+[data-theme="light"] { --st-bg:#f5f7fa; --st-panel:#ffffff; --st-ink:#1b2430; --st-muted:#4b5563; --st-line:rgba(15,23,42,.16); --st-accent:#7a4800; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--st-bg); color: var(--st-ink); font: 13px/1.4 "IBM Plex Sans", system-ui, sans-serif; }
+body { padding: 16px; }
+h1 { margin: 0 0 10px; font-size: 14px; font-weight: 600; }
+.fp-stage { background: var(--st-panel); border: 1px solid var(--st-line); border-radius: 4px; padding: 10px 12px 12px; max-width: 1408px; margin: 0 auto; }
+.mode-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px; margin-bottom: 8px; }
+.mode-bar .seg { display: inline-flex; flex-wrap: wrap; gap: 0 2px; }
+.mode-btn { background: transparent; color: var(--st-ink); border: 0; border-bottom: 2px solid transparent; border-radius: 0; padding: 6px 10px; font: inherit; cursor: pointer; }
+.mode-btn:hover { border-bottom-color: var(--st-line); }
+.mode-btn.active { border-bottom-color: var(--st-accent); font-weight: 600; }
+.mode-btn:focus-visible { outline: 1.5px solid var(--st-accent); outline-offset: 1px; }
+.fp-body { display: flex; align-items: flex-start; gap: 14px; }
+.floor { flex: 1 1 auto; min-width: 0; }
+.fp-status { color: var(--st-muted); font-size: 11px; margin: 4px 0 0; }
+.fp-panel { flex: 0 0 280px; border: 1px solid var(--st-line); border-radius: 4px; padding: 10px; background: var(--st-panel); }
+.fp-panel[hidden] { display: none; }
+.fp-panel h2 { margin: 0 0 6px; font-size: 13px; font-weight: 600; }
+.rp-list { list-style: none; margin: 0 0 8px; padding: 0; }
+.rp-list .lh { color: var(--st-muted); font-size: 11px; margin: 4px 0; }
+.rp-item { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 44px; padding: 0 8px; background: transparent; color: var(--st-ink); border: 0; border-top: 1px solid var(--st-line); font: inherit; cursor: pointer; text-align: left; }
+.rp-item .v { font-family: "JetBrains Mono", "IBM Plex Mono", monospace; }
+.rp-close { min-height: 44px; min-width: 44px; background: transparent; color: var(--st-ink); border: 1px solid var(--st-line); border-radius: 3px; font: inherit; cursor: pointer; }
+.fp-picker { display: none; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+.row-chip { min-width: 44px; min-height: 44px; background: transparent; color: var(--st-ink); border: 1px solid var(--st-line); border-radius: 3px; font: 12px "JetBrains Mono", monospace; cursor: pointer; }
+.row-chip[aria-pressed="true"] { border-color: var(--st-accent); box-shadow: none; }
+@media (max-width: 600px) {
+  body { padding: 8px; }
+  .fp-body { flex-direction: column; align-items: stretch; }
+  .floor { width: 100%; }
+  .fp-panel { flex-basis: auto; width: 100%; }
+  .fp-picker { display: flex; }
+}
+</style>
+</head>
+<body>
+<h1>Data hall floor plan: fixture (FP1)</h1>
+<div class="fp-stage" id="fp-stage" data-rz-cockpit-root="floor-plan">
+  <div class="mode-bar">
+    <span class="seg" role="group" aria-label="Plan mode">
+      <button class="mode-btn" data-mode="power" aria-pressed="false" type="button">Power Density</button>
+      <button class="mode-btn active" data-mode="temp" aria-pressed="true" type="button">Rack-Inlet Temp</button>
+      <button class="mode-btn" data-mode="cooling-margin" aria-pressed="false" type="button">Cooling Margin</button>
+      <button class="mode-btn" data-mode="alarms" aria-pressed="false" type="button">Alarms</button>
+      <button class="mode-btn" data-mode="space" aria-pressed="false" type="button">Space</button>
+    </span>
+    <div class="legend" id="legend"></div>
+  </div>
+  <div class="fp-body">
+    <div class="floor" id="main-content" tabindex="-1"><div id="zone-field"></div></div>
+    <section class="fp-panel" id="row-panel" aria-label="Row detail" hidden></section>
+  </div>
+  <div class="fp-picker" id="row-picker" aria-label="Rows"></div>
+</div>
+<p class="fp-status" id="fp-status"></p>
+<script src="../../js/conv/floor-plan.js"></script>
+<script>
+(function () {
+  'use strict';
+  /* ---- the page's own model shape (datahall.html buildRackField / buildZoneField / crahUnits), same generator ---- */
+  var RACKS = 500, PER_ZONE = 20, ZONES = RACKS / PER_ZONE, RATING = 20, IT_KW = 7500, INLET_DESIGN = 25.4, DT = 11, RHO_CP = 1.2 * 1.006;
+  var CRAH_TOTAL = 58, CRAH_RUNNING = 57, ALLOW = [0.6, 0.3, 0, 0, 0, 0, 0, 0, 0.3, 0.6];
+  function hash01(i) { var x = (i + 1) * 2654435761 % 2147483647; x = (x ^ (x >> 13)) >>> 0; x = (x * 1274126177) >>> 0; return (x % 100000) / 100000; }
+  var avgUtil = (IT_KW / (RACKS * 0.92)) / RATING, SPREAD = Math.max(0.04, Math.min(0.25, 0.85 / avgUtil - 1));
+  var racks = [], i, z, sum = 0;
+  for (i = 0; i < RACKS; i++) { var occ = hash01(i) > 0.08; racks.push({ idx: i, occupied: occ, weight: occ ? (1 - SPREAD + hash01(i + 7777) * SPREAD * 2) : 0, kw: 0, util: 0 }); sum += racks[i].weight; }
+  var scale = IT_KW / sum, tot = 0;
+  racks.forEach(function (r) { r.kw = r.occupied ? Math.round(r.weight * scale * 100) / 100 : 0; r.util = r.kw / RATING; tot += r.kw; });
+  var resid = Math.round((IT_KW - tot) * 100) / 100, top = null;
+  racks.forEach(function (r) { if (r.occupied && (!top || r.kw > top.kw)) top = r; });
+  if (top && Math.abs(resid) > 0.001) { top.kw = Math.round((top.kw + resid) * 100) / 100; top.util = top.kw / RATING; }
+  var zones = [];
+  for (z = 0; z < ZONES; z++) {
+    var heat = 0, r2;
+    for (r2 = 0; r2 < PER_ZONE; r2++) heat += racks[z * PER_ZONE + r2].kw;
+    var inlet = Math.round((INLET_DESIGN + ((z * 7919) % 7 - 3) * 0.1) * 10) / 10, dT = heat / (RHO_CP * ((IT_KW / ZONES) / (RHO_CP * DT)));
+    zones.push({ z: z, heat: Math.round(heat * 10) / 10, rackInletC: inlet, hotAisleC: Math.round((inlet + dT) * 10) / 10 });
+  }
+  var crah = [];
+  for (i = 1; i <= CRAH_TOTAL; i++) crah.push({ n: i, tag: 'CRAH-A' + (i < 10 ? '0' + i : i), running: i <= CRAH_RUNNING, leavingAirC: 19.5 });
+  var model = {
+    racks: racks, zones: zones, crahUnits: crah, ratingKw: RATING, racksPerZone: PER_ZONE,
+    rackInletFor: function (gi) { var zn = zones[Math.floor(gi / PER_ZONE)]; return Math.round((zn.rackInletC + ALLOW[(gi % PER_ZONE) % 10]) * 10) / 10; }
+  };
+  function rackTag(idx) { var zz = Math.floor(idx / PER_ZONE), rr = idx % PER_ZONE; return 'A-' + String.fromCharCode(65 + zz) + (rr < 9 ? 'L0' + (rr + 1) : 'L' + (rr + 1)); }
+
+  /* ---- row panel: two flat lists of 10 with values, 44 px rows (PRD 3.5, 3.6) ---- */
+  var panel = document.getElementById('row-panel'), picker = document.getElementById('row-picker'), plan;
+  function openRow(zr) {
+    var zn = zones[zr], s = '';
+    panel.innerHTML = '';
+    var h = document.createElement('h2'); h.textContent = 'Row ' + String.fromCharCode(65 + zr) + ' · ' + zn.heat.toFixed(0) + ' kW'; panel.appendChild(h);
+    var meta = document.createElement('div'); meta.className = 'lh'; meta.textContent = 'inlet ' + zn.rackInletC.toFixed(1) + ' °C · hot aisle ' + zn.hotAisleC.toFixed(1) + ' °C'; panel.appendChild(meta);
+    [0, 1].forEach(function (line) {
+      var ul = document.createElement('ul'); ul.className = 'rp-list'; ul.setAttribute('data-line', line ? 'R' : 'L');
+      var lh = document.createElement('li'); lh.className = 'lh'; lh.textContent = line ? 'Line R' : 'Line L'; ul.appendChild(lh);
+      for (var q = 0; q < 10; q++) {
+        var gi = zr * PER_ZONE + line * 10 + q, rk = racks[gi], li = document.createElement('li'), b = document.createElement('button');
+        b.type = 'button'; b.className = 'rp-item'; b.setAttribute('data-idx', gi);
+        b.innerHTML = '<span></span><span class="v"></span>'; b.firstChild.textContent = rackTag(gi); b.lastChild.textContent = rk.occupied ? rk.kw.toFixed(1) + ' kW' : 'spare';
+        b.addEventListener('click', function () { var gx = +this.getAttribute('data-idx'); plan.select({ rack: gx }); window.__fp.last = { kind: 'panel-rack', id: gx }; });
+        li.appendChild(b); ul.appendChild(li);
+      }
+      panel.appendChild(ul);
+    });
+    var cl = document.createElement('button'); cl.type = 'button'; cl.className = 'rp-close'; cl.textContent = 'Close';
+    cl.addEventListener('click', function () { panel.hidden = true; plan.select(null); });
+    panel.appendChild(cl);
+    panel.hidden = false;
+    [].forEach.call(picker.children, function (c) { c.setAttribute('aria-pressed', c.getAttribute('data-z') == zr ? 'true' : 'false'); });
+  }
+  for (z = 0; z < ZONES; z++) {
+    var chip = document.createElement('button'); chip.type = 'button'; chip.className = 'row-chip'; chip.textContent = String.fromCharCode(65 + z); chip.setAttribute('data-z', z); chip.setAttribute('aria-pressed', 'false');
+    chip.addEventListener('click', function () { var zr = +this.getAttribute('data-z'); plan.select({ row: zr }); openRow(zr); });
+    picker.appendChild(chip);
+  }
+
+  /* ---- the same alarm philosophy count the status strip would show ---- */
+  function warnings() {
+    var n = 0, T = RZFloorPlan.DEFAULT_THRESHOLDS;
+    racks.forEach(function (r) { if (r.occupied && r.util > T.utilWarn) n++; });
+    zones.forEach(function (zn) { if (zn.rackInletC > T.inletMax) n++; });
+    return n;
+  }
+  window.__fp = { model: model, last: null, warnings: warnings };
+
+  var host = document.getElementById('zone-field');
+  var t0 = performance.now();
+  plan = RZFloorPlan.render(host, model, {
+    mode: 'temp', rackTag: rackTag,
+    onRack: function (idx) { window.__fp.last = { kind: 'rack', id: idx }; },
+    onCrah: function (n) { window.__fp.last = { kind: 'crah', id: n }; },
+    onRow: function (zr) { window.__fp.last = { kind: 'row', id: zr }; openRow(zr); }
+  });
+  var tRender = performance.now() - t0;
+  window.__fp.plan = plan;
+  window.__fp.renderMs = tRender;
+  window.setMode = function (m) {
+    plan.paint(m);
+    RZFloorPlan.legend(document.getElementById('legend'), m, RATING);
+    [].forEach.call(document.querySelectorAll('.mode-btn'), function (b) { var on = b.getAttribute('data-mode') === m; b.classList.toggle('active', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+  };
+  [].forEach.call(document.querySelectorAll('.mode-btn'), function (b) { b.addEventListener('click', function () { window.setMode(b.getAttribute('data-mode')); }); });
+  window.setMode('temp');
+  document.getElementById('fp-status').textContent = 'Status: NORMAL, ' + warnings() + ' warnings';
+  document.getElementById('fp-status').setAttribute('data-warn', String(warnings()));
+})();
+</script>
+</body>
+</html>

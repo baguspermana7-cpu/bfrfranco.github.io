@@ -231,7 +231,80 @@
   E('tie-a', 'ma-e', 'tie.line');
   E('tie-b', 'tie.load', 'mb-s');
 
+  /* ── points (PRD-CONV-POINT-STATUS-TREND T2/T3) ─────────────────────────────────────────────────────────────────
+     Every value label that shows a reading is a point: `point` (id <prefix>.<node>.<quantity>), `label` (what it is) and,
+     for a load %, `limitsOf` (the registry row its limits come from; the page defines the per-device point from that row,
+     it never types a bound). A rating, count or voltage (k r / u / bus / bb1 / bb2) is a constant: markConstants() tags it
+     data-const and, where the engine publishes the parameter, data-basis-param so a click opens its basis. The sheet keeps
+     the text format; the first number of a label is the point (the renderer reads that one). */
+  var QTY = { pw: ['power_kw', 'power', 'kW'], kw: ['power_kw', 'power', 'kW'], amp: ['current_a', 'current', 'A'], ld: ['load_pct', 'load', '%'] };
+  function points(list, prefix) {
+    list.forEach(function (n) {
+      (n.values || []).forEach(function (v) {
+        var q = QTY[v.k]; if (!q || v.point) return;
+        v.point = prefix + '.' + n.id + '.' + q[0];
+        v.label = (n.tag || n.id) + ' ' + q[1];
+        v.unit = q[2];
+        if (v.k === 'ld') v.limitsOf = n.ups ? 'electrical.ups_load_pct_normal' : (n.tx ? 'electrical.tx_load_pct' : undefined);
+      });
+    });
+    return list;
+  }
+  function basisOf(n, k) {
+    if (!n) return null;
+    if (k === 'bus' || k === 'bb1' || k === 'bb2') return k === 'bus' ? 'electrical.mv_voltage_kv' : 'electrical.hv_voltage_kv';   /* the first number of the label */
+    if (k === 'u') return 'electrical.genset_unit_kw';
+    if (k !== 'r') return null;
+    if (n.src === 'grid') return 'electrical.hv_voltage_kv';
+    if (n.tx === 'hv') return 'electrical.hv_tx_mva';
+    if (n.tx) return 'electrical.dist_tx_kva';
+    if (n.sym === 'resistor') return 'electrical.mv_ngr_ohm';
+    if (n.load === 'lvsb') return 'electrical.dist_tx_count';   /* label leads with × count */
+    if (n.board) return n.kv === 'mv' ? 'electrical.mv_voltage_kv' : 'electrical.lv_voltage_v';
+    if (n.ups) return 'electrical.ups_module_kw_rated';
+    if (n.src === 'gen') return 'electrical.genset_count';
+    return null;
+  }
+  function markConstants(svg, list) {
+    if (!svg) return 0;
+    var by = {}, n = 0; list.forEach(function (x) { by[x.id] = x; });
+    var els = svg.querySelectorAll('text[data-role="value"]:not([data-pt-id]), text[data-role="name"], text[data-role="label"], text.hmi-zone-label, text.hmi-area-label');
+    for (var i = 0; i < els.length; i++) {
+      var t = els[i];
+      if (t.hasAttribute('data-const') || !/\d/.test(t.textContent)) continue;
+      t.setAttribute('data-const', '');
+      var key = (t.getAttribute('data-val') || '').split(':'), p = basisOf(by[key[0]], key[1]);
+      if (p) { t.setAttribute('data-basis-param', p); t.setAttribute('tabindex', '0'); t.setAttribute('role', 'button'); }
+      n++;
+    }
+    return n;
+  }
+
+  /* a per-device load % takes its limits from the registry row its value names (limitsOf): defined from the shipped row, re-run
+     when the database rows arrive (rz-point-limits). A row that fails the order law leaves the point Informational. */
+  var DEF = [];
+  function defineLimits(list) {
+    if (list && DEF.indexOf(list) < 0) DEF.push(list);
+    var PS = root && root.RZPointStatus, rows = root && root.RZ_CONV_PARAMETERS && root.RZ_CONV_PARAMETERS.limits;
+    if (!PS || !rows) return;
+    DEF.forEach(function (l) {
+      l.forEach(function (n) {
+        (n.values || []).forEach(function (v) {
+          if (!v.point || !v.limitsOf) return;
+          var src = rows.filter(function (r) { return r.id === v.limitsOf; })[0]; if (!src) return;
+          var o = {}, k; for (k in src) if (Object.prototype.hasOwnProperty.call(src, k)) o[k] = src[k];
+          o.label = v.label; o.aliasOf = src.id;
+          try { PS.define(v.point, o); } catch (e) { /* stays Informational */ }
+        });
+      });
+    });
+  }
+  if (root && root.addEventListener) root.addEventListener('rz-point-limits', function () { defineLimits(); });
+
+  points(nodes, 'epms-telemetry');
+  defineLimits(nodes);
   root.RZEpmsSheets = {
+    points: points, markConstants: markConstants, defineLimits: defineLimits,
     sld: {
       id: 'e-s-101', no: 'E-S-101', title: 'HV / MV SINGLE-LINE · GIS · TRANSFORMERS · MAIN SWITCHGEAR', rev: 'A', basis: 'IEC 60617 · IEEE C37.2',
       svgId: 'epms-sld-svg', size: [1740, 1390], nodes: nodes, edges: edges,

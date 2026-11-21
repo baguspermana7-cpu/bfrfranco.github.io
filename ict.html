@@ -647,16 +647,22 @@
     <script src="js/rz-eng-symbols.js?v=20261118-528d60ce"></script>
     <!-- v1.134.3 — generated parameter registry + the ONE shared basis drawer.
          Replaces provenance restated by hand; see js/rz-basis-drawer.js. -->
-    <script src="js/conv-parameters.js?v=20261120-89ea132a"></script>
+    <script src="js/conv-parameters.js?v=20261121-5508ceb7"></script>
     <!-- v1.134.25 — RZExplain, the site glossary engine. The cockpits were the only
          substantial pages carrying none of it, so terms an operator has to read
          (approach temperature, cycles of concentration, N+1, WUE) had nowhere to go.
          Loaded BEFORE the basis drawer, which wires the keys from the registry. -->
     <script src="js/rz-explain-db.js?v=20261115-9c8be43f" defer></script>
     <script src="js/rz-explain.js?v=20261103-f581e6ac" defer></script>
-    <script src="js/rz-basis-drawer.js?v=20261112-b6a9180c"></script>
+    <script src="js/rz-basis-drawer.js?v=20261120-1b2aa7f7"></script>
 <script src="js/rz-ask.js?v=20261113-42137266" data-rz-ask-index="data/explain/ict.json" defer></script>
     <script src="js/conv-design-basis.js?v=20260920-debe07b1"></script>
+    <!-- PRD-CONV-POINT-STATUS-TREND T2/T3: every number shows its state (registry limits) and opens its trend, or is a constant -->
+    <script src="js/conv/history.js?v=20261120-8d390d7e"></script>
+    <script src="js/rz-sheet.js?v=20261120-3bf159cb" defer></script>
+    <script src="js/rz-trend.js?v=20261121-1300d194"></script>
+    <link rel="stylesheet" href="css/conv-point.css?v=20261120-8daa6374">
+    <script src="js/conv/point-status.js?v=20261120-40be4933"></script>
     <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
          Loaded for cross-page consistency; body does NOT carry rz-bms-shell
          class. Spec: standarization/BMS_SHELL.md ; conv/review/14 §8. -->
@@ -671,7 +677,7 @@
     <script src="js/conv/net-modal.js?v=20261118-34973a6a" defer></script>
     <script src="js/rz-telemetry-quality.js?v=20261113-8feb0dfd" defer></script>
     <script src="js/rz-provenance.js?v=20261111-6f1cd061" defer></script>
-    <script src="js/rz-version.js?v=20261120-7ea867d8" defer></script>
+    <script src="js/rz-version.js?v=20261121-ea6e94b5" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- v1.43.20 — instrument register (RZ Dark System v1). Chrome-only, dark-only, scoped. -->
@@ -708,7 +714,7 @@
             <span data-rz-ask-slot data-cv="cta" data-cv-rest="Get the answer" data-cv-win="Answer in seconds"></span>
             <h1 class="brand" data-cv="title">ICT Network Operations <span class="sub">— BKS01 Conventional DC</span></h1>
             <div class="top-spacer"></div>
-            <div class="meta-chip" title="Single engineering basis: conv-engine.js">Basis <b id="m-basis" data-basis-param="site.it_load_kw" tabindex="0" role="button">UNAVAILABLE</b></div>
+            <div class="meta-chip" title="Single engineering basis: conv-engine.js">Basis <b id="m-basis" data-const data-basis-param="site.it_load_kw" tabindex="0" role="button">UNAVAILABLE</b></div>
             <div class="meta-chip">Quality <b aria-describedby="rz-prov-ict-strip" id="m-quality">UNAVAILABLE</b></div>
             <button class="top-btn" id="btn-print" onclick="window.print()" title="Print this view">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z"/></svg>
@@ -726,11 +732,11 @@
         <div class="alarm-strip" id="alarmStrip">
             <div class="alarm-state"><span class="dot"></span><span id="as-state">UNAVAILABLE</span></div>
             <span class="alarm-sep"></span>
-            <div class="alarm-seg crit"><b id="as-crit">—</b> Critical</div>
-            <div class="alarm-seg warn"><b id="as-warn">—</b> Warning</div>
-            <div class="alarm-seg"><b id="as-stale">—</b> Stale Points</div>
+            <div class="alarm-seg crit"><b id="as-crit" data-const>—</b> Critical</div>
+            <div class="alarm-seg warn"><b id="as-warn" data-const>—</b> Warning</div>
+            <div class="alarm-seg"><b id="as-stale" data-const>—</b> Stale Points</div>
             <div class="right">
-                <div class="alarm-seg">Page open for <b aria-describedby="rz-prov-ict-strip" id="as-updated">UNAVAILABLE</b></div>
+                <div class="alarm-seg">Page open for <b aria-describedby="rz-prov-ict-strip" id="as-updated" data-const title="Time since this page loaded: a clock, not a plant reading">UNAVAILABLE</b></div>
                 <span class="alarm-sep"></span>
                 <div class="alarm-seg">Scenario <b id="as-scenario">UNAVAILABLE</b></div>
             </div>
@@ -769,38 +775,38 @@
                     <span class="nled"></span>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
                     <span class="nlabel">IT / Data Fabric</span>
-                    <span class="ncount" id="cnt-it">—</span>
+                    <span class="ncount" id="cnt-it" data-const>—</span>
                 </div>
                 <div class="nav-item" id="nav-bms" onclick="selectSegment('bms', this)">
                     <span class="nled"></span>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>
                     <span class="nlabel">BMS / OT Network</span>
-                    <span class="ncount" id="cnt-bms">—</span>
+                    <span class="ncount" id="cnt-bms" data-const>—</span>
                 </div>
                 <div class="nav-item" id="nav-sec" onclick="selectSegment('sec', this)">
                     <span class="nled"></span>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
                     <span class="nlabel">Security Systems</span>
-                    <span class="ncount" id="cnt-sec">—</span>
+                    <span class="ncount" id="cnt-sec" data-const>—</span>
                 </div>
                 <div class="nav-item" id="nav-mgmt" onclick="selectSegment('mgmt', this)">
                     <span class="nled"></span>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.6-2-3.4-2.4 1a7 7 0 0 0-1.7-1l-.4-2.6h-4l-.4 2.6a7 7 0 0 0-1.7 1l-2.4-1-2 3.4 2 1.6a7 7 0 0 0 0 2l-2 1.6 2 3.4 2.4-1a7 7 0 0 0 1.7 1l.4 2.6h4l.4-2.6a7 7 0 0 0 1.7-1l2.4 1 2-3.4-2-1.6c.1-.3.1-.7.1-1z"/></svg>
                     <span class="nlabel">Management / OOB</span>
-                    <span class="ncount" id="cnt-mgmt">—</span>
+                    <span class="ncount" id="cnt-mgmt" data-const>—</span>
                 </div>
                 <div class="nav-item" id="nav-wan" onclick="selectSegment('wan', this)">
                     <span class="nled"></span>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20a15 15 0 0 1 0-20z"/></svg>
                     <span class="nlabel">WAN / DC Interconnect</span>
-                    <span class="ncount" id="cnt-wan">—</span>
+                    <span class="ncount" id="cnt-wan" data-const>—</span>
                 </div>
                 <div class="nav-sep"></div>
                 <div class="nav-item" id="nav-mon" onclick="selectSegment('mon', this)">
                     <span class="nled"></span>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></svg>
                     <span class="nlabel">Monitoring (PRTG)</span>
-                    <span class="ncount" id="cnt-mon">—</span>
+                    <span class="ncount" id="cnt-mon" data-const>—</span>
                 </div>
                 <a href="dc-conventional.html" class="nav-back" aria-label="Back to DC Conventional dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg><span>Dashboard</span></a>
             </nav>
@@ -854,16 +860,16 @@
                 <div><div class="sb-lbl">Fabric</div><div class="sb-val" id="sb-sys-v">UNAVAILABLE</div></div>
             </div>
             <div class="sb-box">
-                <div data-rz-authored-basis="Aggregate traffic, core utilisation and the monitoring calc note restate the authored TRAFFIC_SCENARIO / NETWORK_CAPACITY_BASIS on this page; conv-engine.js has no network model."><div class="sb-lbl">Aggregate Traffic</div><div class="sb-val" id="sb-traffic">--</div></div>
+                <div data-rz-authored-basis="Aggregate traffic, core utilisation and the monitoring calc note restate the authored TRAFFIC_SCENARIO / NETWORK_CAPACITY_BASIS on this page; conv-engine.js has no network model."><div class="sb-lbl">Aggregate Traffic</div><div class="sb-val" id="sb-traffic" data-point="ict.core.offered_gbps" data-pt-label="Aggregate core traffic" data-pt-unit="Gbps" data-pt-digits="1">--</div></div>
             </div>
             <div class="sb-box">
-                <div><div class="sb-lbl">Core Util</div><div class="sb-val" id="sb-util" data-rz-authored-basis="Aggregate traffic, core utilisation and the monitoring calc note restate the authored TRAFFIC_SCENARIO / NETWORK_CAPACITY_BASIS on this page; conv-engine.js has no network model.">--</div></div>
+                <div><div class="sb-lbl">Core Util</div><div class="sb-val" id="sb-util" data-point="ict.util_pct" data-pt-label="Core utilisation (observed / usable)" data-pt-unit="%" data-pt-digits="1" data-rz-authored-basis="Aggregate traffic, core utilisation and the monitoring calc note restate the authored TRAFFIC_SCENARIO / NETWORK_CAPACITY_BASIS on this page; conv-engine.js has no network model.">--</div></div>
             </div>
             <div class="sb-box">
-                <div><div class="sb-lbl">Links Up</div><div class="sb-val" id="sb-links">--</div></div>
+                <div><div class="sb-lbl">Links Up</div><div class="sb-val" id="sb-links" data-const>--</div></div>
             </div>
             <div class="sb-box" id="sb-almbox">
-                <div><div class="sb-lbl">Net Alarms</div><div class="sb-val" id="sb-alarms">—</div></div>
+                <div><div class="sb-lbl">Net Alarms</div><div class="sb-val" id="sb-alarms" data-const>—</div></div>
             </div>
             <div class="sb-spacer"></div>
             <div class="sb-clock" id="sb-clock">--:--:--</div>
@@ -948,6 +954,42 @@
         var BMS_GATEWAYS  = 6;
 
         function round1(n) { return Math.round(n * 10) / 10; }
+        /* PRD-CONV-POINT-STATUS-TREND T2/T3 — every number on this page is a point (state from the limits registry, click /
+           Enter opens its trend) or a constant (data-const: a rating, a count, a design value; neutral). pt() / ptc() wrap one in
+           markup; PS.bindAll() registers the trend and applies the state after each render. A limit is never typed here. */
+        var PS = window.RZPointStatus;
+        function ptEsc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+        function pt(id, text, label, unit, digits) {
+            return '<span data-point="' + id + '" data-pt-label="' + ptEsc(label) + '"' + (unit ? ' data-pt-unit="' + ptEsc(unit) + '"' : '')
+                 + (digits != null ? ' data-pt-digits="' + digits + '"' : '') + '>' + text + '</span>';
+        }
+        function ptc(text, param, title) {
+            return '<span data-const' + (param ? ' data-basis-param=\"' + param + '\" tabindex="0" role="button"' : '')
+                 + (title ? ' title="' + ptEsc(title) + '"' : '') + '>' + text + '</span>';
+        }
+        /* a per-link reading of a limited quantity takes its limits from the registry row it names: the page maps an id onto a
+           row, it never types a bound. Re-run when the database rows arrive (rz-point-limits). */
+        var PT_ALIAS = {};
+        function ptAlias(id, src, label) { PT_ALIAS[id] = [src, label]; }
+        function ptDefineAliases() {
+            if (!PS) return;
+            Object.keys(PT_ALIAS).forEach(function (id) {
+                var L = window.RZ_CONV_PARAMETERS && (window.RZ_CONV_PARAMETERS.limits || []).filter(function (r) { return r.id === PT_ALIAS[id][0]; })[0];
+                if (!L) return;
+                var o = {}, k; for (k in L) if (Object.prototype.hasOwnProperty.call(L, k)) o[k] = L[k];
+                o.label = PT_ALIAS[id][1] || L.label; o.aliasOf = L.id;
+                try { PS.define(id, o); } catch (e) { /* a row that fails the order law stays undefined: the point reads Informational */ }
+            });
+        }
+        /* the band a note quotes comes from the registry row, so the page text and the colour cannot disagree */
+        function bandNote(id, u) {
+            var L = PS && PS.limits(id), p = [];
+            if (L && L.hi_warn != null) p.push('warn >' + L.hi_warn + u);
+            if (L && L.hi_alarm != null) p.push('alarm >' + L.hi_alarm + u);
+            return p.join(' · ');
+        }
+        function ptBind(root) { if (PS && root) PS.bindAll(root); }
+        window.addEventListener('rz-point-limits', ptDefineAliases);
         function pad(n) { return n < 10 ? '0' + n : '' + n; }
 
         /* ---- Link model (per doc-08 "Link Model") --------------------------
@@ -969,8 +1011,8 @@
                     { v: NETWORK_CAPACITY_BASIS.core.installedGbps, u: 'Gbps', l: 'Installed Core', note: 'physical aggregate · 2 x 40G', cls: 'ok' },
                     { v: NETWORK_CAPACITY_BASIS.core.usableGbps, u: 'Gbps', l: 'Usable Core', note: 'protected operating capacity', cls: 'ok' },
                     { v: NETWORK_CAPACITY_BASIS.core.survivableGbps, u: 'Gbps', l: 'N+1 Survivable', note: 'after loss of one edge path', cls: 'ok' },
-                    { v: CORE_OFFERED, u: 'Gbps', l: 'Observed Traffic', note: 'authored traffic scenario · independent of IT kW', cls: 'ok' },
-                    { v: CORE_UTIL, u: '%', l: 'Usable Utilization', note: 'observed / usable · warn >80%', cls: CORE_UTIL > 80 ? 'warn' : 'ok' },
+                    { v: CORE_OFFERED, u: 'Gbps', l: 'Observed Traffic', note: 'authored traffic scenario · independent of IT kW', cls: 'ok', pt: 'ict.core.offered_gbps' },
+                    { v: CORE_UTIL, u: '%', l: 'Usable Utilization', note: 'observed / usable · ' + bandNote('ict.util_pct', '%'), cls: utilClass(CORE_UTIL), pt: 'ict.util_pct' },
                     { v: TOR_COUNT, u: '', l: 'Access Switches', note: 'installed inventory · local failure domains', cls: 'ok' },
                     { v: STUDY_ACCESS_GROUPS === null ? 'UNAVAILABLE' : STUDY_ACCESS_GROUPS,
                       u: STUDY_ACCESS_GROUPS === null ? '' : 'groups/hall', l: '4-Hall Study Access',
@@ -1004,8 +1046,8 @@
                 caps: [
                     { v: BMS_GATEWAYS, u: '', l: 'OT Gateways', note: 'EPMS, Chiller, Datahall, Fire, Fuel, Water', cls: 'ok' },
                     { v: 1, u: 'Gbps', l: 'OT Trunk Cap', note: 'Isolated VLAN, no IT route', cls: 'ok' },
-                    { v: 4.2, u: '%', l: 'OT Trunk Util', note: 'Modbus/BACnet polling only', cls: 'ok' },
-                    { v: 0.9, u: 's', l: 'Poll Freshness', note: 'warn if stale telemetry >60s', cls: 'ok' }
+                    { v: 4.2, u: '%', l: 'OT Trunk Util', note: 'Modbus/BACnet polling only', cls: 'ok', pt: 'ict.bms.trunk_util_pct', limitsOf: 'ict.util_pct' },
+                    { v: 0.9, u: 's', l: 'Poll Freshness', note: 'stale telemetry · ' + bandNote('ict.poll_freshness_s', ' s'), cls: 'ok', pt: 'ict.poll_freshness_s' }
                 ],
                 links: [
                     ['BMS-GW-01 → EPMS-GW',     'Primary', 1, 0.018, 1.1, 0.00, 0.2, 'up',  'Single-path (OT)'],
@@ -1034,10 +1076,10 @@
                     { v: 48, u: '', l: 'Access Doors', note: 'biometric + card', cls: 'ok' },
                     { v: 24, u: '', l: 'Intrusion Zones', note: 'PIR + glass-break', cls: 'ok' },
                     { v: 10, u: 'Gbps', l: 'Camera Trunk Cap', note: 'dedicated VLAN', cls: 'ok' },
-                    { v: 34, u: '%', l: 'Trunk Util', note: 'H.265 streams', cls: 'ok' },
-                    { v: 14, u: 'd', l: 'VMS Retention', note: 'warn: target 30d', cls: 'warn' },
+                    { v: 34, u: '%', l: 'Trunk Util', note: 'H.265 streams', cls: 'ok', pt: 'ict.sec.trunk_util_pct', limitsOf: 'ict.util_pct' },
+                    { v: 14, u: 'd', l: 'VMS Retention', note: 'warn: target 30d', cls: 'warn', pt: 'ict.sec.vms_retention_d' },
                     { v: 192, u: 'TB', l: 'NVR Storage', note: '8× 24 TB RAID-6', cls: 'ok' },
-                    { v: 99.96, u: '%', l: 'Stream Uptime', note: '24h rolling', cls: 'ok' }
+                    { v: 99.96, u: '%', l: 'Stream Uptime', note: '24h rolling', cls: 'ok', pt: 'ict.sec.stream_uptime_pct' }
                 ],
                 // v1.41.6 — HMI widget data (CCTV grid + door status + intrusion zones)
                 hmi: {
@@ -1102,8 +1144,8 @@
                 caps: [
                     { v: 32, u: '', l: 'OOB Ports', note: 'console + iLO', cls: 'ok' },
                     { v: 1, u: 'Gbps', l: 'OOB Trunk Cap', note: 'isolated', cls: 'ok' },
-                    { v: 2.1, u: '%', l: 'OOB Util', note: 'admin only', cls: 'ok' },
-                    { v: 100, u: '%', l: 'iLO Reach', note: 'all hosts', cls: 'ok' }
+                    { v: 2.1, u: '%', l: 'OOB Util', note: 'admin only', cls: 'ok', pt: 'ict.mgmt.oob_util_pct', limitsOf: 'ict.util_pct' },
+                    { v: 100, u: '%', l: 'iLO Reach', note: 'all hosts', cls: 'ok', pt: 'ict.mgmt.ilo_reach_pct' }
                 ],
                 links: [
                     ['SW-MGMT-A → Jump-Host', 'Primary', 1, 0.02, 0.8, 0.00, 0.2, 'up',  'MFA gateway'],
@@ -1121,10 +1163,10 @@
                     { n: 'NTP Sync (Stratum-1)',s: 'ok',   v: 'Locked' }
                 ],
                 caps: [
-                    { v: TRAFFIC_SCENARIO.wanEgressGbps, u: 'Gbps', l: 'WAN Egress', note: 'independent authored traffic scenario', cls: 'ok' },
+                    { v: TRAFFIC_SCENARIO.wanEgressGbps, u: 'Gbps', l: 'WAN Egress', note: 'independent authored traffic scenario', cls: 'ok', pt: 'ict.wan.egress_gbps' },
                     { v: 20, u: 'Gbps', l: 'Transit Cap', note: 'ISP-1 + DCI', cls: 'ok' },
-                    { v: round1((TRAFFIC_SCENARIO.wanEgressGbps / 20) * 100), u: '%', l: 'Transit Util', note: 'observed / installed transit', cls: 'ok' },
-                    { v: 2.4, u: 'ms', l: 'BKS01↔SBY01', note: 'inter-DC RTT', cls: 'ok' }
+                    { v: round1((TRAFFIC_SCENARIO.wanEgressGbps / 20) * 100), u: '%', l: 'Transit Util', note: 'observed / installed transit', cls: 'ok', pt: 'ict.wan.transit_util_pct', limitsOf: 'ict.util_pct' },
+                    { v: 2.4, u: 'ms', l: 'BKS01↔SBY01', note: 'inter-DC RTT', cls: 'ok', pt: 'ict.wan.interdc_rtt_ms' }
                 ],
                 links: [
                     ['ISP-1 → RTR-BKS01',     'Primary', 10, round1(CORE_OFFERED * 0.4), 5.8, 0.01, 0.6, 'up',  'BGP dual-homed'],
@@ -1190,7 +1232,8 @@
         /* ---- Rendering ----------------------------------------------------- */
         var current = 'it';
 
-        function utilClass(p) { return p > 80 ? 'bad' : (p > 60 ? 'warn' : 'ok'); }
+        /* the card / bar class of a utilisation: the registry row ict.util_pct decides, never a number typed here */
+        function utilClass(p) { var s = PS ? PS.classify(p, PS.limits('ict.util_pct'), null) : 'ok'; return s === 'alarm' ? 'bad' : (s === 'warn' ? 'warn' : 'ok'); }
 
         /* v1.41.6 — Security HMI widget render: CCTV grid (16-cell live preview),
          * door list with status pills, intrusion-zone list with armed/disarmed/alarm,
@@ -1199,7 +1242,7 @@
             var h = '';
             h += '<div class="panel"><div class="panel-head">Security HMI &mdash; CCTV / Access Control / Intrusion'
                + '<span class="ph-meta">live operator view · per ISA 5.1 tags</span></div>'
-               + '<div class="panel-body"><div class="hmi-grid">';
+               + '<div class="panel-body"><div class="hmi-grid" data-const>';
 
             // CCTV mosaic
             h += '<div class="hmi-tile"><h5>CCTV Live Mosaic <span class="ht-meta">16 of '
@@ -1229,7 +1272,7 @@
             h += '</svg>';
             h += '<div class="hmi-row-stats">'
                + '<div class="hrs-cell"><div class="hrs-v">96</div><div class="hrs-l">Cams Online</div></div>'
-               + '<div class="hrs-cell"><div class="hrs-v">99.96%</div><div class="hrs-l">Uptime 24h</div></div>'
+               + '<div class="hrs-cell"><div class="hrs-v">' + pt('ict.sec.stream_uptime_pct', '99.96%', 'Stream uptime (24 h rolling)', '%', 2) + '</div><div class="hrs-l">Uptime 24h</div></div>'
                + '<div class="hrs-cell"><div class="hrs-v">192 TB</div><div class="hrs-l">VMS Storage</div></div>'
                + '</div></div>';
 
@@ -1521,8 +1564,8 @@
                     + '<rect x="' + x + '" y="' + y0 + '" width="' + nd.w + '" height="' + NODE_H + '" rx="3"/>'
                     + archGlyph(nd, x + 11, y0 + 14)
                     + '<text class="n-lbl" x="' + (x + 20) + '" y="' + (y0 + 18) + '">' + esc(nd.label) + '</text>'
-                    + '<text class="n-sub" x="' + (x + 8) + '" y="' + (y0 + 35) + '">' + esc(nd.sub) + '</text>'
-                    + '<text class="n-st" x="' + (x + nd.w - 8) + '" y="' + (y0 + 35) + '" text-anchor="end">' + esc(nd.stateText) + '</text>'
+                    + '<text class="n-sub"' + (/\d/.test(nd.sub) ? ' data-const' : '') + ' x="' + (x + 8) + '" y="' + (y0 + 35) + '">' + esc(nd.sub) + '</text>'
+                    + '<text class="n-st"' + (/\d/.test(nd.stateText) ? ' data-const' : '') + ' x="' + (x + nd.w - 8) + '" y="' + (y0 + 35) + '" text-anchor="end">' + esc(nd.stateText) + '</text>'
                     + '</g>';
             }
             svg += '</svg>';
@@ -1677,11 +1720,13 @@
                       + '<div class="panel-body"><div class="mon-grid">';
                 for (var m = 0; m < seg.mon.length; m++) {
                     var mc = seg.mon[m];
+                    var mid = 'ict.mon.' + String(mc.l).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+                    var mread = /\(s\)|%/.test(mc.l);   /* a reading (age, health) is a point; a count of sensors is a count */
                     html += '<div class="mon-card ' + mc.cls + '"><div class="mv">'
-                          + mc.v + '</div><div class="ml">' + mc.l + '</div></div>';
+                          + (mread ? pt(mid, mc.v, mc.l, /%/.test(mc.l) ? '%' : 's') : ptc(mc.v, null, mc.l + ': a count')) + '</div><div class="ml">' + mc.l + '</div></div>';
                 }
                 html += '</div></div></div>';
-                html += '<div class="calc-note"><b data-explain="conv-ict-stale">Stale rule</b> &middot; warn &gt; 60 s</div>';
+                html += '<div class="calc-note"><b data-explain="conv-ict-stale">Stale rule</b> &middot; <span data-const>' + bandNote('ict.poll_freshness_s', ' s').replace('>', '&gt;') + '</span></div>';
             } else {
                 // v1.41.6 — HMI widgets for Security tab (CCTV grid + door list + intrusion zones)
                 if (key === 'sec' && seg.hmi) {
@@ -1694,10 +1739,13 @@
                       + '<div class="panel-body"><div class="cap-grid">';
                 for (var c = 0; c < seg.caps.length; c++) {
                     var cc = seg.caps[c];
+                    if (cc.pt && cc.limitsOf) ptAlias(cc.pt, cc.limitsOf, cc.l);
+                    var ccv = cc.pt ? pt(cc.pt, cc.v, cc.l, cc.u)
+                            : (typeof cc.v === 'number' ? ptc(cc.v, null, cc.l + ': a rating, count or design value of this page (authored basis)') : cc.v);
                     html += '<div class="cap-card ' + cc.cls + '"><div class="cv">'
-                          + cc.v + (cc.u ? ' <small>' + cc.u + '</small>' : '')
+                          + ccv + (cc.u ? ' <small>' + cc.u + '</small>' : '')
                           + '</div><div class="cl">' + cc.l + '</div>'
-                          + '<div class="cnote">' + cc.note + '</div></div>';
+                          + '<div class="cnote" data-const>' + cc.note + '</div></div>';
                 }
                 html += '</div></div></div>';
 
@@ -1733,17 +1781,19 @@
                           + ' data-capacity="' + cap + ' Gbps"'
                           + ' data-current="' + (up ? traf.toFixed(2) + ' Gbps / ' + util + '%' : 'down') + '"'
                           + ' data-redundancy="' + _redun + '"';
+                    var lid = 'ict.' + key + '.l' + L + '.', ltag = String(lk[0]);
+                    ptAlias(lid + 'util_pct', 'ict.util_pct', ltag + ' utilisation');
                     html += '<tr class="linkrow" data-seg="' + key + '" data-i="' + L + '"' + _meta + '>'
                           + '<td class="tag">' + lk[0] + '</td>'
                           + '<td>' + lk[1] + '</td>'
-                          + '<td class="num">' + cap + '</td>'
-                          + '<td class="num">' + (up ? traf.toFixed(2) : '—') + '</td>'
+                          + '<td class="num">' + ptc(cap, null, ltag + ': link capacity (authored)') + '</td>'
+                          + '<td class="num">' + (up ? pt(lid + 'traffic_gbps', traf.toFixed(2), ltag + ' traffic', 'Gbps', 2) : '—') + '</td>'
                           + '<td><div class="util-cell">'
                           +   '<div class="util-bar"><div class="util-fill ' + uc + '" style="width:' + (up ? Math.min(100, util) : 0) + '%"></div></div>'
-                          +   '<span class="util-pct">' + (up ? util + '%' : '—') + '</span></div></td>'
-                          + '<td class="num">' + lat.toFixed(1) + '</td>'
-                          + '<td class="num">' + loss.toFixed(2) + '</td>'
-                          + '<td class="num">' + jit.toFixed(1) + '</td>'
+                          +   '<span class="util-pct">' + (up ? pt(lid + 'util_pct', util + '%', ltag + ' utilisation', '%', 1) : '—') + '</span></div></td>'
+                          + '<td class="num">' + pt(lid + 'lat_ms', lat.toFixed(1), ltag + ' latency', 'ms', 1) + '</td>'
+                          + '<td class="num">' + pt(lid + 'loss_pct', loss.toFixed(2), ltag + ' packet loss', '%', 2) + '</td>'
+                          + '<td class="num">' + pt(lid + 'jitter_ms', jit.toFixed(1), ltag + ' jitter', 'ms', 1) + '</td>'
                           + '<td><span class="stat-tag ' + st + '">' + stLabel + '</span></td>'
                           + '<td class="redun"><b>' + lk[8] + '</b></td></tr>';
                 }
@@ -1753,6 +1803,8 @@
             document.getElementById('canvas').innerHTML = html;
             if (window.RZExplain && window.RZExplain.attachExplicit) window.RZExplain.attachExplicit(document.getElementById('canvas'));
             bindArchitecture(key);
+            ptDefineAliases();
+            ptBind(document.getElementById('canvas'));
 
             // Wire row selection (and the matching edge on the architecture canvas)
             var rows = document.querySelectorAll('#canvas tr.linkrow');
@@ -1777,23 +1829,26 @@
             var cap = lk[2], traf = lk[3], lat = lk[4], loss = lk[5], jit = lk[6], st = lk[7];
             var up = (st === 'up');
             var util = up && cap > 0 ? round1((traf / cap) * 100) : 0;
-            var uc = util > 80 ? 'bad' : (util > 60 ? 'warn' : 'ok');
+            var lid = 'ict.' + segKey + '.l' + idx + '.', ltag = String(lk[0]);
+            ptAlias(lid + 'util_pct', 'ict.util_pct', ltag + ' utilisation');
+            ptDefineAliases();
             var stCls = st === 'up' ? 'ok' : (st === 'stby' ? '' : 'warn');
             document.getElementById('insp-title').textContent = seg.title;
             document.getElementById('insp-sub').textContent = lk[0];
             d.innerHTML =
                 '<h4>Link Detail</h4>'
               + kv('Tag', lk[0]) + kv('Role', lk[1])
-              + kv('Capacity', cap + ' Gbps')
-              + kv('Traffic', up ? traf.toFixed(2) + ' Gbps' : 'standby')
-              + kv('Utilization', (up ? util + ' %' : '—'), uc)
-              + kv('Latency', lat.toFixed(1) + ' ms')
-              + kv('Packet Loss', loss.toFixed(2) + ' %')
-              + kv('Jitter', jit.toFixed(1) + ' ms')
+              + kv('Capacity', ptc(cap + ' Gbps', null, ltag + ': link capacity (authored)'))
+              + kv('Traffic', up ? pt(lid + 'traffic_gbps', traf.toFixed(2), ltag + ' traffic', 'Gbps', 2) + ' Gbps' : 'standby')
+              + kv('Utilization', up ? pt(lid + 'util_pct', util + ' %', ltag + ' utilisation', '%', 1) : '—')
+              + kv('Latency', pt(lid + 'lat_ms', lat.toFixed(1), ltag + ' latency', 'ms', 1) + ' ms')
+              + kv('Packet Loss', pt(lid + 'loss_pct', loss.toFixed(2), ltag + ' packet loss', '%', 2) + ' %')
+              + kv('Jitter', pt(lid + 'jitter_ms', jit.toFixed(1), ltag + ' jitter', 'ms', 1) + ' ms')
               + kv('Status', st.toUpperCase(), stCls)
               + kv('Redundancy', lk[8])
               + kv('Source', 'Calculated (basis)')
-              + kv('Last Update', uptime() + ' ago');
+              + kv('Last Update', ptc(uptime(), null, 'Time since this page loaded: a clock, not a plant reading') + ' ago');
+            ptBind(d);
         }
 
         function kv(k, v, cls) {
@@ -1845,7 +1900,7 @@
                       + '<div class="alm-top"><span class="alm-sev">' + a.sev + '</span>'
                       + '<span class="alm-time">' + a.occurred + ' ' + a.started + '</span></div>'
                       + '<div class="alm-dev">' + a.dev + ' · ' + a.svc + '</div>'
-                      + '<div class="alm-msg">' + a.msg + '</div>'
+                      + '<div class="alm-msg" data-const>' + a.msg + '</div>'
                       + '<div class="alm-foot"><span class="alm-impact">Impact: '
                       + a.impact + '</span><span class="alm-ack '
                       + (a.ack ? 'yes">ACK' : 'no">UNACK') + '</span></div></div>';
@@ -1954,7 +2009,7 @@
             document.getElementById('sb-traffic').textContent = CORE_OFFERED.toFixed(1) + ' Gbps';
             var sbU = document.getElementById('sb-util');
             sbU.textContent = CORE_UTIL.toFixed(1) + ' %';
-            sbU.className = 'sb-val ' + (CORE_UTIL > 80 ? 'bad' : (CORE_UTIL > 60 ? 'warn' : 'ok'));
+            sbU.className = 'sb-val';   /* the colour is the point's state (registry ict.util_pct), never a class chosen here */
             // Count UP links across IT/data fabric segments
             var upN = 0, totN = 0;
             ['it', 'bms', 'sec', 'mgmt', 'wan'].forEach(function (k) {
@@ -2034,15 +2089,15 @@
             document.getElementById('m-basis').textContent = 'IT ' + (IT_KW / 1000).toFixed(2) + ' MW';
             document.getElementById('m-quality').textContent = DQ;
             var note = document.getElementById('calc-note');
+            /* every number in the note is a constant (a basis) or a point (the traffic scenario and its utilisation) */
             note.innerHTML =
-                '<b data-explain="conv-ict-bases">Bases</b> &middot; IT <b>' + IT_KW + ' kW</b> &middot; facility <b>'
-              + FAC_KW.toFixed(1) + ' kW</b> &middot; PUE <b>1.45</b> &middot; <b>' + RACK_EQ_8KW
-              + ' rack-equivalents @ 8 kW (not physical inventory)</b> &middot; net <b>'
-              + NETWORK_CAPACITY_BASIS.core.installedGbps + ' / '
-              + NETWORK_CAPACITY_BASIS.core.usableGbps + ' / '
-              + NETWORK_CAPACITY_BASIS.core.survivableGbps + ' Gbps</b> &middot; <b>'
-              + CORE_OFFERED.toFixed(1) + ' Gbps traffic scenario independent of IT power</b> (<b>'
-              + CORE_UTIL.toFixed(1) + '%</b> of usable)';
+                '<b data-explain="conv-ict-bases">Bases</b> &middot; IT ' + ptc('<b>' + IT_KW + ' kW</b>', 'site.it_load_kw') + ' &middot; facility '
+              + ptc('<b>' + FAC_KW.toFixed(1) + ' kW</b>', 'site.facility_load_kw') + ' &middot; PUE ' + ptc('<b>1.45</b>', 'site.pue') + ' &middot; '
+              + ptc('<b>' + RACK_EQ_8KW + ' rack-equivalents @ 8 kW (not physical inventory)</b>', null, 'Rack-equivalents at 8 kW each: a count derived from the IT load, not physical inventory') + ' &middot; net '
+              + ptc('<b>' + NETWORK_CAPACITY_BASIS.core.installedGbps + ' / ' + NETWORK_CAPACITY_BASIS.core.usableGbps + ' / '
+              + NETWORK_CAPACITY_BASIS.core.survivableGbps + ' Gbps</b>', null, 'Core capacity: installed / usable / N+1 survivable (NETWORK_CAPACITY_BASIS, authored)') + ' &middot; <b>'
+              + pt('ict.core.offered_gbps', CORE_OFFERED.toFixed(1) + ' Gbps', 'Aggregate core traffic', 'Gbps', 1) + ' traffic scenario independent of IT power</b> (<b>'
+              + pt('ict.util_pct', CORE_UTIL.toFixed(1) + '%', 'Core utilisation (observed / usable)', '%', 1) + '</b> of usable)';
             if (window.RZExplain && window.RZExplain.attachExplicit) window.RZExplain.attachExplicit(note);
         }
 
@@ -2100,6 +2155,9 @@
             renderAlarmList();
             tick();
             setInterval(tick, 1000);
+            ptDefineAliases();
+            ptBind(document.querySelector('.status-bar'));   /* sb-traffic and sb-util */
+            ['calc-note', 'canvas'].forEach(function (id) { ptBind(document.getElementById(id)); });
         }
 
         if (document.readyState === 'loading') {

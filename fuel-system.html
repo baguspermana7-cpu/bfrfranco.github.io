@@ -634,32 +634,36 @@
     <script src="js/rz-engine-versions.js?v=20261118-892678a4"></script>
     <link rel="stylesheet" href="css/rz-hmi.css?v=20261117-fe9b28c8">
     <script src="js/rz-eng-symbols.js?v=20261118-528d60ce"></script>
-    <script src="js/rz-hmi-sheet.js?v=20261118-c18dfefa"></script>
+    <script src="js/rz-hmi-sheet.js?v=20261120-4c3244f4"></script>
     <link rel="stylesheet" href="css/conv-hmi-depth.css?v=20261115-09997c8c">
     <script src="js/conv/hmi-depth.js?v=20261120-05f86b64"></script>
     <link rel="stylesheet" href="css/conv-vfx.css?v=20261118-5eed9b2f">
     <script src="js/conv/vfx.js?v=20261117-89056876"></script>
-    <script src="js/conv/history.js?v=20261117-1c72fb7f"></script>
-    <script src="js/rz-trend.js?v=20261117-e60cac7c"></script>
-    <script src="js/conv/fuel-sheet.js?v=20261120-c0253af9"></script>
+    <script src="js/conv/history.js?v=20261120-8d390d7e"></script>
+    <script src="js/rz-trend.js?v=20261121-1300d194"></script>
+    <script src="js/conv/fuel-sheet.js?v=20261120-183ab1ae"></script>
     <script src="js/conv/sheet-truth.js?v=20261118-eaae14ee"></script>
     <script src="js/conv/payloads.js?v=20261120-86f5437d"></script>
     <script src="js/conv/internals.js?v=20261118-271d125d"></script>
     <script src="js/conv/internals/genset.js?v=20261120-3f6f9c5b"></script>
-    <script src="js/conv/equipment-modal.js?v=20261120-9b42a9b2"></script>
+    <script src="js/conv/equipment-modal.js?v=20261120-6105f01f"></script>
     <script src="js/rz-inspector.js?v=20261117-bbb735d4" defer></script>
     <script src="js/conv-engine.js?v=2.4.0"></script>
     <script src="js/rz-line-model.js?v=20260920-c4511df5"></script>
     <!-- v1.134.3 — generated parameter registry + the ONE shared basis drawer.
          Replaces provenance restated by hand; see js/rz-basis-drawer.js. -->
-    <script src="js/conv-parameters.js?v=20261120-89ea132a"></script>
+    <script src="js/conv-parameters.js?v=20261121-5508ceb7"></script>
     <!-- v1.134.25 — RZExplain, the site glossary engine. The cockpits were the only
          substantial pages carrying none of it, so terms an operator has to read
          (approach temperature, cycles of concentration, N+1, WUE) had nowhere to go.
          Loaded BEFORE the basis drawer, which wires the keys from the registry. -->
     <script src="js/rz-explain-db.js?v=20261115-9c8be43f" defer></script>
     <script src="js/rz-explain.js?v=20261103-f581e6ac" defer></script>
-    <script src="js/rz-basis-drawer.js?v=20261112-b6a9180c"></script>
+    <script src="js/rz-basis-drawer.js?v=20261120-1b2aa7f7"></script>
+    <!-- PRD-CONV-POINT-STATUS-TREND T2/T3: every number shows its state from the limits registry and opens its trend -->
+    <script src="js/rz-sheet.js?v=20261120-3bf159cb" defer></script>
+    <link rel="stylesheet" href="css/conv-point.css?v=20261120-8daa6374">
+    <script src="js/conv/point-status.js?v=20261120-40be4933"></script>
 <script src="js/rz-ask.js?v=20261113-42137266" data-rz-ask-index="data/explain/fuel-system.json" defer></script>
     <!-- BMS Shell (v1.23.0+) — shared dark-operations console components.
          Loaded for cross-page consistency; body does NOT carry rz-bms-shell
@@ -670,7 +674,7 @@
     <script src="js/datahall-ai/alarm-query.js?v=20260920-4d06f77a" defer></script>
     <script src="js/conv-alarm-events.js?v=20260920-05aca3f2" defer></script>
     <script src="js/conv-alarm-workspace.js?v=20260920-a6e2efa0" defer></script>
-    <script src="js/rz-version.js?v=20261120-7ea867d8" defer></script>
+    <script src="js/rz-version.js?v=20261121-ea6e94b5" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
 <style id="rz-skiplink-v1">
@@ -722,7 +726,7 @@
             <div class="as-cell"><span class="as-dot r" id="as-dot-c"></span><span class="lbl">Critical</span><span class="num" id="as-crit">&mdash;</span></div>
             <div class="as-cell"><span class="as-dot y" id="as-dot-w"></span><span class="lbl">Warning</span><span class="num" id="as-warn">&mdash;</span></div>
             <div class="as-cell"><span class="lbl">Stale Pts</span><span class="num" id="as-stale">&mdash;</span></div>
-            <div class="as-cell"><span class="lbl">Since render</span><span class="num" aria-describedby="rz-prov-fuel-strip" id="as-upd">0s</span></div>
+            <div class="as-cell"><span class="lbl">Since render</span><span class="num" aria-describedby="rz-prov-fuel-strip" id="as-upd" data-const>0s</span></div>
             <div class="as-cell"><span class="lbl">Scenario</span><span class="num" id="as-scn">UNAVAILABLE</span></div>
         </div>
         <p class="rz-prov" id="rz-prov-fuel-strip" data-rz-provenance="simulated" data-rz-prov-basis="conv-engine.js bulk fuel model; day-tank levels are local simulated state; since render = seconds since the model last drew"><b>Simulated</b> · conv-engine.js bulk fuel model; day-tank levels are local simulated state; since render = seconds since the model last drew</p>
@@ -742,32 +746,32 @@
         <div class="kpi hero">
             <div class="k-tag calc">CALC</div>
             <div class="k-lbl"><i class="fas fa-hourglass-half"></i> Generator Autonomy</div>
-            <div><span class="k-val" id="kpi-autonomy" data-basis-param="fuel.autonomy_hr" tabindex="0" role="button">--</span><span class="k-unit">hr</span></div>
-            <div class="k-sub" id="kpi-autonomy-sub">usable L &divide; consumption L/hr</div>
+            <div><span class="k-val" id="kpi-autonomy" data-basis-param="fuel.autonomy_hr" data-point="fuel.autonomy_hr" data-pt-label="Generator autonomy" data-pt-unit="h" data-pt-digits="1" tabindex="0" role="button">--</span><span class="k-unit">hr</span></div>
+            <div class="k-sub" id="kpi-autonomy-sub" data-const>usable L &divide; consumption L/hr</div>
         </div>
         <div class="kpi">
             <div class="k-lbl"><i class="fas fa-oil-can"></i> Usable Fuel</div>
-            <div><span class="k-val" id="kpi-usable" data-basis-param="fuel.usable_l" tabindex="0" role="button">--</span><span class="k-unit">L</span></div>
-            <div class="k-sub" id="kpi-usable-sub">UNAVAILABLE &mdash; engine authority required</div>
+            <div><span class="k-val" id="kpi-usable" data-basis-param="fuel.usable_l" data-point="fuel-system.usable_l" data-pt-label="Usable fuel" data-pt-unit="L" data-pt-digits="0" tabindex="0" role="button">--</span><span class="k-unit">L</span></div>
+            <div class="k-sub" id="kpi-usable-sub" data-const>UNAVAILABLE &mdash; engine authority required</div>
         </div>
         <div class="kpi">
             <div class="k-lbl"><i class="fas fa-tint"></i> Consumption</div>
             <!-- v1.134.11 — the specific consumption was briefly hooked to the autonomy sub-line, which
                  reads "744,144 L / 15,503 L/hr": two numbers, neither of them the rate. The drawer
                  gate rejected it. It gets its own line under the consumption KPI. -->
-            <div><span class="k-val" id="kpi-consumption" data-basis-param="fuel.generator_consumption_lph" tabindex="0" role="button">--</span><span class="k-unit">L/hr</span></div>
+            <div><span class="k-val" id="kpi-consumption" data-const data-basis-param="fuel.generator_consumption_lph" tabindex="0" role="button">--</span><span class="k-unit">L/hr</span></div>
             <div class="k-sub">at current generator load</div>
-            <div class="k-sub" id="kpi-consumption-rate" data-basis-param="fuel.specific_consumption_l_per_kwh" tabindex="0" role="button" title="Specific fuel consumption — click for basis">&mdash;</div>
+            <div class="k-sub" id="kpi-consumption-rate" data-const data-basis-param="fuel.specific_consumption_l_per_kwh" tabindex="0" role="button" title="Specific fuel consumption — click for basis">&mdash;</div>
         </div>
         <div class="kpi">
             <div class="k-lbl"><i class="fas fa-bolt"></i> Generator Load</div>
-            <div><span class="k-val" id="kpi-genload" data-basis-param="site.facility_load_kw" tabindex="0" role="button">--</span><span class="k-unit">MW</span></div>
-            <div class="k-sub" id="kpi-genload-sub">facility load on gensets</div>
+            <div><span class="k-val" id="kpi-genload" data-const data-basis-param="site.facility_load_kw" tabindex="0" role="button">--</span><span class="k-unit">MW</span></div>
+            <div class="k-sub" id="kpi-genload-sub" data-const>facility load on gensets</div>
         </div>
         <div class="kpi">
             <div class="k-tag" id="kpi-np1-tag">UNAVAILABLE</div>
-            <div class="k-lbl"><i class="fas fa-shield-alt"></i> Margin over 24 h SLA</div>
-            <div><span class="k-val" id="kpi-np1">--</span><span class="k-unit">hr</span></div>
+            <div class="k-lbl"><i class="fas fa-shield-alt"></i> Margin over <span data-const>24 h</span> SLA</div>
+            <div><span class="k-val" id="kpi-np1" data-point="fuel-system.sla_margin_hr" data-pt-label="Autonomy margin over the 24 h SLA" data-pt-unit="h" data-pt-digits="1">--</span><span class="k-unit">hr</span></div>
             <div class="k-sub">holds with 1 genset down (same burn)</div>
         </div>
     </section>
@@ -775,11 +779,11 @@
     <section class="fuel-scope-strip" aria-label="Current and study fuel capacity basis">
         <div class="fuel-scope-card" id="fuel-current-basis">
             <span class="scope-tag" data-explain="conv-fuel-current-basis">CURRENT</span>
-            <span><strong id="fuel-current-basis-value">UNAVAILABLE</strong></span>
+            <span><strong id="fuel-current-basis-value" data-const>UNAVAILABLE</strong></span>
         </div>
         <div class="fuel-scope-card study" id="fuel-study-basis">
             <span class="scope-tag" data-explain="conv-fuel-study-basis">STUDY ONLY</span>
-            <span><strong>4 × 10 MW IT halls</strong></span>
+            <span><strong data-const>4 × 10 MW IT halls</strong></span>
         </div>
     </section>
 
@@ -795,9 +799,9 @@
                         <button type="button" class="fuel-seg-btn" data-fuel-mode="normal" aria-pressed="true">Normal</button>
                         <button type="button" class="fuel-seg-btn" data-fuel-mode="utility-loss" aria-pressed="false">Utility loss</button>
                     </div>
-                    <p class="fuel-hall-facts" id="fuel-hall-facts" aria-live="polite">UNAVAILABLE</p>
+                    <p class="fuel-hall-facts" id="fuel-hall-facts" aria-live="polite" data-const>UNAVAILABLE</p>
                 </div>
-                <p class="fuel-dt-basis" id="fuel-dt-basis" data-rz-authored-basis="Day-tank capacity is the page's assumed design basis: the set rating and engine specific consumption (fuel.specific_consumption_l_per_kwh) times DT_CAP_HR hours; the engine has no day-tank model, the info popover shows the arithmetic."><span data-basis-line>&mdash;</span><button type="button" class="fuel-info" popovertarget="fuel-dt-basis-pop" aria-label="Day-tank basis" title="Day-tank basis">i</button></p>
+                <p class="fuel-dt-basis" id="fuel-dt-basis" data-rz-authored-basis="Day-tank capacity is the page's assumed design basis: the set rating and engine specific consumption (fuel.specific_consumption_l_per_kwh) times DT_CAP_HR hours; the engine has no day-tank model, the info popover shows the arithmetic."><span data-basis-line data-const>&mdash;</span><button type="button" class="fuel-info" popovertarget="fuel-dt-basis-pop" aria-label="Day-tank basis" title="Day-tank basis">i</button></p>
                 <div class="fuel-pop" id="fuel-dt-basis-pop" popover role="note" aria-label="Day-tank basis">&mdash;</div>
                 <div class="pid-wrap">
                 <div id="fuel-sheet-host" class="fuel-sheet-host hmi-depth" data-theme="dark" data-rz-authored-basis="FU-M-101 · Every value drawn on this process diagram is either the engine's bulk-tank level, capacity and usable reserve (traced on the cards above) or SIMULATED local operating state — day-tank levels, pump flow and pressure, valve, genset and leak-point states — which conv-engine.js does not publish: it carries the fuel reserve, the burn rate and the autonomy figure, not a pump schedule, day-tank sizing, instrument readings or per-device state. Pipe sizes and instrument tags are page-authored design selections."></div>
@@ -810,21 +814,21 @@
                 <div class="panel-header"><span>Bulk Storage &mdash; UST-01</span><i class="fas fa-database ph-ic"></i></div>
                 <div class="ust-block">
                     <div class="ust-tank" id="tank-ust" tabindex="0" role="img" aria-label="Underground storage tank UST-01 level">
-                        <div class="ust-mark" style="top:10%;" id="ust-mark-overfill">&mdash;</div>
-                        <div class="ust-mark" style="top:40%;" id="ust-mark-low">&mdash;</div>
-                        <div class="ust-mark" style="top:70%;" id="ust-mark-lowlow">&mdash;</div>
+                        <div class="ust-mark" style="top:10%;" id="ust-mark-overfill" data-const>&mdash;</div>
+                        <div class="ust-mark" style="top:40%;" id="ust-mark-low" data-const>&mdash;</div>
+                        <div class="ust-mark" style="top:70%;" id="ust-mark-lowlow" data-const>&mdash;</div>
                         <div class="ust-liquid" id="liq-ust" style="height:0;"></div>
                     </div>
                     <div class="ust-meta">
-                        <div class="data-row"><span class="data-lbl">Level (LIT-101)</span><span><span class="data-val" id="val-ust-lvl" data-basis-param="fuel.level_pct" tabindex="0" role="button">&mdash;</span><span class="data-unit">%</span></span></div>
-                        <div class="data-row"><span class="data-lbl">Gross Volume</span><span><span class="data-val" id="val-ust-gross" data-rz-authored-basis="Current bulk-tank LEVEL is simulated state and the gross volume follows it: conv-engine.js publishes the tank capacity and the usable fraction that back the autonomy figure, both of which are traced on this page, but not where the level happens to sit at this instant. A simulated level dressed as a published quantity would be exactly the wrong-plane defect this programme removes.">&mdash;</span><span class="data-unit">L</span></span></div>
-                        <div class="data-row"><span class="data-lbl">Usable Reserve</span><span><span class="data-val" id="val-ust-usable">&mdash;</span><span class="data-unit">L</span></span></div>
+                        <div class="data-row"><span class="data-lbl">Level (LIT-101)</span><span><span class="data-val" id="val-ust-lvl" data-basis-param="fuel.level_pct" data-point="fuel.level_pct" data-pt-label="UST-01 level" data-pt-unit="%" data-pt-digits="1" tabindex="0" role="button">&mdash;</span><span class="data-unit">%</span></span></div>
+                        <div class="data-row"><span class="data-lbl">Gross Volume</span><span><span class="data-val" id="val-ust-gross" data-point="fuel-system.ust_gross_l" data-pt-label="UST-01 gross volume" data-pt-unit="L" data-pt-digits="0" data-rz-authored-basis="Current bulk-tank LEVEL is simulated state and the gross volume follows it: conv-engine.js publishes the tank capacity and the usable fraction that back the autonomy figure, both of which are traced on this page, but not where the level happens to sit at this instant. A simulated level dressed as a published quantity would be exactly the wrong-plane defect this programme removes.">&mdash;</span><span class="data-unit">L</span></span></div>
+                        <div class="data-row"><span class="data-lbl">Usable Reserve</span><span><span class="data-val" id="val-ust-usable" data-point="fuel-system.usable_l" data-pt-label="UST-01 usable fuel" data-pt-unit="L" data-pt-digits="0">&mdash;</span><span class="data-unit">L</span></span></div>
                         <div class="data-row"><span class="data-lbl">Tank Temp (TIT-101)</span><span><span class="data-val" id="val-ust-tmp">&mdash;</span><span class="data-unit">&deg;C</span></span></div>
                         <div class="data-row"><span class="data-lbl">Last Delivery</span><span><span class="data-val" style="font-size:0.7rem" title="No delivery-history source in the current simulation">&mdash;</span></span></div>
                     </div>
                 </div>
                 <div class="basis-note">
-                    <b data-explain="conv-fuel-inventory">Inventory basis</b> <span id="inv-basis-note">&mdash;</span>
+                    <b data-explain="conv-fuel-inventory">Inventory basis</b> <span id="inv-basis-note" data-const>&mdash;</span>
                 </div>
             </div>
 
@@ -840,7 +844,7 @@
                 <div class="panel-header"><span>Bulk Fill Point</span><i class="fas fa-truck ph-ic"></i></div>
                 <div class="data-row"><span class="data-lbl">Fill Coupling</span><span class="data-val" id="fill-status" style="font-size:0.72rem;color:var(--text-dim)">UNAVAILABLE</span></div>
                 <div class="data-row"><span class="data-lbl">Overfill Prevention</span><span class="data-val" id="fill-ofp" style="font-size:0.72rem">UNAVAILABLE</span></div>
-                <div class="data-row"><span class="data-lbl">Fill Rate</span><span><span class="data-val" id="fill-rate">&mdash;</span><span class="data-unit">L/min</span></span></div>
+                <div class="data-row"><span class="data-lbl">Fill Rate</span><span><span class="data-val" id="fill-rate" data-point="fuel-system.fill.flow_lpm" data-pt-label="Tanker fill rate" data-pt-unit="L/min" data-pt-digits="0">&mdash;</span><span class="data-unit">L/min</span></span></div>
                 <button onclick="toggleFilling()" class="btn full" id="btn-fill" style="margin-top:9px;" type="button" disabled><i class="fas fa-plug"></i> Connect Tanker Hose</button>
             </div>
         </div>
@@ -855,16 +859,16 @@
                             <div class="pump-ic" id="pump-ic"><i class="fas fa-fan"></i></div>
                             <div>
                                 <div style="font-size:0.82rem;font-weight:700;">P-101 &middot; Lead Transfer</div>
-                                <div style="font-size:0.66rem;color:var(--text-dim);" data-rz-authored-basis="Pump NAMEPLATE data (model and rated flow) is equipment specification, not a measurement. conv-engine.js publishes the fuel demand and the inventory that backs the autonomy figure; it does not carry a pump schedule, and a rated capacity printed from a datasheet is not a quantity an engine derives.">Viking L124A &middot; 180 L/min</div>
+                                <div style="font-size:0.66rem;color:var(--text-dim);" data-rz-authored-basis="Pump NAMEPLATE data (model and rated flow) is equipment specification, not a measurement. conv-engine.js publishes the fuel demand and the inventory that backs the autonomy figure; it does not carry a pump schedule, and a rated capacity printed from a datasheet is not a quantity an engine derives."><span data-const>Viking L124A &middot; 180 L/min</span></div>
                             </div>
                         </div>
                         <span class="mode-chip" id="pump-mode">UNAVAILABLE</span>
                     </div>
                     <div class="gi-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;">
-                        <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:2px;"><span class="data-lbl" style="font-size:0.64rem;">Current</span><span><span class="data-val" id="val-p1-amp">&mdash;</span><span class="data-unit">A</span></span></div>
-                        <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:2px;"><span class="data-lbl" style="font-size:0.64rem;">Disch Press</span><span><span class="data-val" id="val-p1-dp">&mdash;</span><span class="data-unit">bar</span></span></div>
-                        <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:2px;"><span class="data-lbl" style="font-size:0.64rem;">Flow</span><span><span class="data-val" id="val-p1-flow">&mdash;</span><span class="data-unit">L/min</span></span></div>
-                        <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:2px;"><span class="data-lbl" style="font-size:0.64rem;">Vibration</span><span><span class="data-val" id="val-p1-vib">&mdash;</span><span class="data-unit">mm/s</span></span></div>
+                        <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:2px;"><span class="data-lbl" style="font-size:0.64rem;">Current</span><span><span class="data-val" id="val-p1-amp" data-point="fuel-system.P-101.current_a" data-pt-label="P-101 motor current" data-pt-unit="A" data-pt-digits="1">&mdash;</span><span class="data-unit">A</span></span></div>
+                        <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:2px;"><span class="data-lbl" style="font-size:0.64rem;">Disch Press</span><span><span class="data-val" id="val-p1-dp" data-point="fuel-system.P-101.discharge_bar" data-pt-label="P-101 discharge pressure" data-pt-unit="bar" data-pt-digits="1">&mdash;</span><span class="data-unit">bar</span></span></div>
+                        <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:2px;"><span class="data-lbl" style="font-size:0.64rem;">Flow</span><span><span class="data-val" id="val-p1-flow" data-point="fuel-system.P-101.flow_lpm" data-pt-label="P-101 flow" data-pt-unit="L/min" data-pt-digits="0">&mdash;</span><span class="data-unit">L/min</span></span></div>
+                        <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:2px;"><span class="data-lbl" style="font-size:0.64rem;">Vibration</span><span><span class="data-val" id="val-p1-vib" data-point="fuel-system.P-101.vibration_mms" data-pt-label="P-101 vibration" data-pt-unit="mm/s" data-pt-digits="1">&mdash;</span><span class="data-unit">mm/s</span></span></div>
                         <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:2px;"><span class="data-lbl" style="font-size:0.64rem;">Run Hours</span><span><span class="data-val" id="val-p1-rh">&mdash;</span><span class="data-unit">h</span></span></div>
                         <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:2px;"><span class="data-lbl" style="font-size:0.64rem;">Starter</span><span class="data-val" id="val-p1-st" style="font-size:0.7rem;">&mdash;</span></div>
                     </div>
@@ -881,11 +885,11 @@
                         <span class="conditioning-line"></span>
                         <span class="conditioning-node">UST RETURN<small>conditioned fuel</small></span>
                     </div>
-                    <div class="conditioning-foot"><span id="polish-mode"><strong>UNAVAILABLE</strong> &middot; engine authority required</span><span id="polish-inst">DP &mdash; &middot; WIF &mdash;</span></div>
+                    <div class="conditioning-foot"><span id="polish-mode"><strong>UNAVAILABLE</strong> &middot; engine authority required</span><span id="polish-inst" data-const>DP &mdash; &middot; WIF &mdash;</span></div>
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:11px;">
-                    <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:3px;border:1px solid var(--border-soft);border-radius:6px;padding:9px;background:var(--panel-bg-2);"><span class="data-lbl" style="font-size:0.64rem;">Polisher Diff Press</span><span><span class="data-val" id="val-dp">&mdash;</span><span class="data-unit">bar</span></span></div>
-                    <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:3px;border:1px solid var(--border-soft);border-radius:6px;padding:9px;background:var(--panel-bg-2);"><span class="data-lbl" style="font-size:0.64rem;">Water-in-Fuel</span><span><span class="data-val" id="val-wif">&mdash;</span><span class="data-unit">ppm</span></span></div>
+                    <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:3px;border:1px solid var(--border-soft);border-radius:6px;padding:9px;background:var(--panel-bg-2);"><span class="data-lbl" style="font-size:0.64rem;">Polisher Diff Press</span><span><span class="data-val" id="val-dp" data-const>&mdash;</span><span class="data-unit">bar</span></span></div>
+                    <div class="data-row" style="flex-direction:column;align-items:flex-start;gap:3px;border:1px solid var(--border-soft);border-radius:6px;padding:9px;background:var(--panel-bg-2);"><span class="data-lbl" style="font-size:0.64rem;">Water-in-Fuel</span><span><span class="data-val" id="val-wif" data-const>&mdash;</span><span class="data-unit">ppm</span></span></div>
                 </div>
             </div>
 
@@ -925,12 +929,12 @@
             </div>
 
             <div class="panel">
-                <div class="panel-header"><span>UST Level Trend (1 h)</span><i class="fas fa-chart-line ph-ic"></i></div>
+                <div class="panel-header"><span>UST Level Trend <span data-const>(1 h)</span></span><i class="fas fa-chart-line ph-ic"></i></div>
                 <svg viewBox="0 0 200 56" preserveAspectRatio="none" style="width:100%;height:60px;background:var(--panel-bg-2);border:1px solid var(--border-soft);border-radius:5px;">
                     <line x1="0" y1="28" x2="200" y2="28" stroke="#243043" stroke-width="0.5" stroke-dasharray="3 3"/>
                     <polyline id="ust-trend" fill="none" stroke="var(--diesel-main)" stroke-width="1.6" points="0,15 200,15"/>
                 </svg>
-                <div class="data-row" style="margin-top:6px;"><span class="data-lbl" style="font-size:0.66rem;">Range</span><span class="data-val" style="font-size:0.68rem;color:var(--text-dim);" data-rz-authored-basis="The DAY-TANK inventory (levels, volumes and their fill setpoints) is simulated local state. conv-engine.js models the BULK fuel system - tank capacity, usable fraction, burn rate and the autonomy those produce - and publishes no day-tank schedule: how many day tanks exist, how large they are and at what level each refills are local design decisions no engine parameter carries. The bulk figures on this page are engine-bound and stay in the denominator.">80&ndash;90% &middot; 60 min</span></div>
+                <div class="data-row" style="margin-top:6px;"><span class="data-lbl" style="font-size:0.66rem;">Range</span><span class="data-val" style="font-size:0.68rem;color:var(--text-dim);" data-const data-rz-authored-basis="The DAY-TANK inventory (levels, volumes and their fill setpoints) is simulated local state. conv-engine.js models the BULK fuel system - tank capacity, usable fraction, burn rate and the autonomy those produce - and publishes no day-tank schedule: how many day tanks exist, how large they are and at what level each refills are local design decisions no engine parameter carries. The bulk figures on this page are engine-bound and stay in the denominator.">80&ndash;90% &middot; 60 min</span></div>
             </div>
         </div>
     </main>
@@ -1207,6 +1211,49 @@
 
         var $ = function (id) { return document.getElementById(id); };
 
+        /* ============================================================================
+         * PRD-CONV-POINT-STATUS-TREND T2/T3: every number on this page is a point (its state comes from the limits registry
+         * through RZPointStatus, a click / Enter opens its trend) or a constant (data-const: a rating, a design value, a
+         * count, a formula; neutral). This page types no limit and no state colour. pt() wraps a number in its point;
+         * ptPaint() repaints a rebuilt table and, when only the numbers changed, rewrites just their text (a rebuilt table
+         * would re-register every trend and drop the keyboard focus on each 1 s scan); ptSync() applies the registry state
+         * to the HTML points after a render (the sheet applies its own).
+         * ==========================================================================*/
+        function ptEsc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+        function pt(id, text, label, unit, digits) {
+            return '<span data-point="' + id + '" data-pt-label="' + ptEsc(label) + '"' + (unit ? ' data-pt-unit="' + ptEsc(unit) + '"' : '') +
+                (digits != null ? ' data-pt-digits="' + digits + '"' : '') + '>' + text + '</span>';
+        }
+        var PT_RE = /(<span data-point="[^"]*"[^>]*>)([^<]*)(<\/span>)/g;
+        function ptPaint(host, html) {
+            if (!host) return;
+            var shape = html.replace(PT_RE, '$1$3');
+            if (host.__ptShape === shape) {
+                var vals = []; html.replace(PT_RE, function (m, a, t) { vals.push(t); return m; });
+                host.querySelectorAll('span[data-point]').forEach(function (e, i) {
+                    if (vals[i] == null) return;
+                    var txt = vals[i].replace(/&amp;/g, '&');
+                    if (e.firstChild) { if (e.firstChild.nodeValue !== txt) e.firstChild.nodeValue = txt; } else e.textContent = txt;
+                });
+            } else { host.innerHTML = html; host.__ptShape = shape; }
+        }
+        function ptSync() {
+            var PS = window.RZPointStatus; if (!PS) return;
+            ['.kpi-strip', 'main.main-grid'].forEach(function (q) { var h = document.querySelector(q); if (h) PS.bindAll(h); });
+        }
+        /* a per-set day-tank level takes its limits from the registry row fuel-system.DT.level_pct: the page maps an id onto
+           the row, it never types a bound. Re-run when the database rows arrive (rz-point-limits). */
+        function ptDefineUnits() {
+            var PS = window.RZPointStatus; if (!PS || !window.RZ_CONV_PARAMETERS) return;
+            var src = 'fuel-system.DT.level_pct', L = (window.RZ_CONV_PARAMETERS.limits || []).find(function (r) { return r.id === src; });
+            if (!L) return;
+            HALLS.forEach(function (h) {
+                fleetRows(h.code).forEach(function (u) {
+                    try { PS.define('fuel-system.DT-' + u.tag + '.level_pct', Object.assign({}, L, { label: 'DT-' + u.tag + ' level', aliasOf: src })); } catch (e) { /* a row that fails the order law stays undefined: Informational */ }
+                });
+            });
+        }
+
         function buildTankTable() {
             var rows = [{ tag: 'UST-01', pct: state.ustPct, vol: usableL(state.ustPct), serves: 'Bulk &rarr; all ' + siteSetCount() + ' gensets', usable: true }];
             setsOf(state.hall).forEach(function (s) {
@@ -1215,7 +1262,7 @@
             var html = '';
             for (var i = 0; i < rows.length; i++) {
                 var r = rows[i];
-                var cls = r.pct < (r.usable ? 30 : DT_LOWLOW) ? 'pf-crit' : (r.pct < (r.usable ? 60 : DT_FILL_START) ? 'pf-warn' : 'pf-ok');
+                var pid = r.usable ? 'fuel.level_pct' : 'fuel-system.' + r.tag + '.level_pct';
                 var barW = Math.max(2, Math.min(100, r.pct));
                 /* v1.134.24 — the DAY-TANK rows carry simulated local state; the UST row above
                    them states the engine-bound bulk inventory and stays in the denominator. The
@@ -1224,13 +1271,13 @@
                     ? ' data-rz-authored-basis="' + DAY_TANK_BASIS + '"' : '';
                 html += '<tr' + rowBasis + '>' +
                     '<td class="tag">' + r.tag + '</td>' +
-                    '<td class="r ' + cls + '">' + fmt1(r.pct) + '%' +
+                    '<td class="r">' + pt(pid, fmt1(r.pct) + '%', r.tag + ' level', '%', 1) +
                         '<span class="mini-bar"><i style="width:' + barW + '%"></i></span></td>' +
-                    '<td class="r">' + grp(r.vol) + ' L</td>' +
+                    '<td class="r">' + pt(r.usable ? 'fuel-system.usable_l' : 'fuel-system.' + r.tag + '.volume_l', grp(r.vol) + ' L', r.tag + (r.usable ? ' usable fuel' : ' volume'), 'L', 0) + '</td>' +
                     '<td style="color:var(--text-dim);font-family:IBM Plex Sans,sans-serif;font-size:0.72rem;">' + r.serves + '</td>' +
                     '</tr>';
             }
-            $('tank-tbody').innerHTML = html;
+            ptPaint($('tank-tbody'), html);
         }
 
         var DAY_TANK_BASIS = 'Day-tank LEVELS and fill-valve states are simulated local state. How many day tanks exist and which set each serves come from the engine genset fleet (CONV_CALC.getFleet(\'genset\', hall), one tank per set); each tank\'s capacity is an ASSUMED design selection stated on this page: ' + DT_CAP_HR + ' h of that set\'s burn at its rating (rating x fuel.specific_consumption_l_per_kwh), fill opens below ' + DT_FILL_START + ' % on a running set and closes at ' + DT_FILL_STOP + ' %. The bulk figures on this page are engine-bound and stay in the denominator.';
@@ -1243,7 +1290,6 @@
                 '<span class="data-lbl">Day tank</span><span class="data-lbl">At rated</span><span class="data-lbl">Output</span></div></div>' : '';
             for (var i = 0; i < sets.length; i++) {
                 var g = sets[i], d = g.dayTank, run = g.state === 'running';
-                var dtCls = d.pct < DT_LOWLOW ? 'var(--crit)' : (d.pct < DT_FILL_START ? 'var(--warn)' : 'var(--text-primary)');
                 html += '<div class="gen-row' + (run ? ' running' : '') + '" data-gen-row="' + g.tag + '">' +
                     '<div><div class="dt-mini" role="img" aria-label="' + dtTag(g) + ' level" title="' + dtTag(g) + '"><i style="height:' + Math.max(0, Math.min(100, d.pct)) + '%"></i></div></div>' +
                     '<div class="gen-info">' +
@@ -1252,13 +1298,13 @@
                         '<div class="gi-grid">' +
                             /* day-tank level, volume and hours are simulated local state over the declared tank
                                basis; the OUTPUT cell is the engine hall load shared by the running sets. */
-                            '<div data-rz-authored-basis="' + DAY_TANK_BASIS + '" aria-label="Day tank level" title="Day tank level"><span class="data-val" style="color:' + dtCls + '">' + fmt1(d.pct) + ' %</span></div>' +
-                            '<div data-rz-authored-basis="' + DAY_TANK_BASIS + '" aria-label="Hours at rated burn" title="Hours at rated burn"><span class="data-val">' + fmt1(d.hoursAtRated) + ' h</span></div>' +
-                            '<div aria-label="Output" title="Output"><span class="data-val">' + grp(g.outputKw) + ' kW</span></div>' +
+                            '<div data-rz-authored-basis="' + DAY_TANK_BASIS + '" aria-label="Day tank level" title="Day tank level"><span class="data-val">' + pt('fuel-system.DT-' + g.tag + '.level_pct', fmt1(d.pct) + ' %', 'DT-' + g.tag + ' level', '%', 1) + '</span></div>' +
+                            '<div data-rz-authored-basis="' + DAY_TANK_BASIS + '" aria-label="Hours at rated burn" title="Hours at rated burn"><span class="data-val">' + pt('fuel-system.DT-' + g.tag + '.hours_at_rated', fmt1(d.hoursAtRated) + ' h', 'DT-' + g.tag + ' hours at rated burn', 'h', 1) + '</span></div>' +
+                            '<div aria-label="Output" title="Output"><span class="data-val">' + pt('fuel-system.' + g.tag + '.output_kw', grp(g.outputKw) + ' kW', g.tag + ' output', 'kW', 0) + '</span></div>' +
                         '</div>' +
                     '</div></div>';
             }
-            $('genset-rows').innerHTML = html;
+            ptPaint($('genset-rows'), html);
         }
 
         /* ---- KPI bind (the headline operator outputs) --------------- */
@@ -1865,6 +1911,7 @@
             renderAlarms(alarms);
             updateAlarmStrip(alarms);
             updateInterlockCards();
+            ptSync();
 
             state.lastUpdate = 0;
             $('as-upd').textContent = '0s';
@@ -2076,6 +2123,8 @@
         /* ---- Initial paint ------------------------------------------ */
         if (FUEL_AUTHORITY_AVAILABLE) {
             initHalls();
+            ptDefineUnits();
+            window.addEventListener('rz-point-limits', ptDefineUnits);
             renderHallBar();
             syncSelectors();
             setProcessControls(true);

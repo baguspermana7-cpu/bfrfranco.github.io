@@ -566,7 +566,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
         ]
     }
     </script>
-    <script src="js/rz-version.js?v=20261120-7ea867d8" defer></script>
+    <script src="js/rz-version.js?v=20261121-ea6e94b5" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- Conventional BMS single scenario engine — single source of truth for the
@@ -579,14 +579,14 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
     <script src="js/rz-engine-versions.js?v=20261118-892678a4"></script>
     <script src="js/conv-engine.js?v=2.4.0"></script>
     <!-- v1.134.2 — generated parameter registry + the shared basis drawer. -->
-    <script src="js/conv-parameters.js?v=20261120-89ea132a"></script>
+    <script src="js/conv-parameters.js?v=20261121-5508ceb7"></script>
     <!-- v1.134.25 — RZExplain, the site glossary engine. The cockpits were the only
          substantial pages carrying none of it, so terms an operator has to read
          (approach temperature, cycles of concentration, N+1, WUE) had nowhere to go.
          Loaded BEFORE the basis drawer, which wires the keys from the registry. -->
     <script src="js/rz-explain-db.js?v=20261115-9c8be43f" defer></script>
     <script src="js/rz-explain.js?v=20261103-f581e6ac" defer></script>
-    <script src="js/rz-basis-drawer.js?v=20261112-b6a9180c"></script>
+    <script src="js/rz-basis-drawer.js?v=20261120-1b2aa7f7"></script>
 <script src="js/rz-ask.js?v=20261113-42137266" data-rz-ask-index="data/explain/chiller-plant.json" defer></script>
     <!-- v1.42.4 — Semantic line + breaker model libraries. Foundation for
          review docs 27/28 §3.1 + 17/18 §3.2 cross-page adoption. Non-deferred
@@ -599,16 +599,22 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
     <link rel="stylesheet" href="css/conv-vfx.css?v=20261118-5eed9b2f">
     <script src="js/conv/hmi-depth.js?v=20261120-05f86b64"></script>
     <script src="js/rz-eng-symbols.js?v=20261118-528d60ce"></script>
-    <script src="js/rz-hmi-sheet.js?v=20261118-c18dfefa"></script>
-    <script src="js/conv/chiller-sheet.js?v=20261120-14d7baeb"></script>
+    <script src="js/rz-hmi-sheet.js?v=20261120-4c3244f4"></script>
+    <script src="js/conv/chiller-sheet.js?v=20261120-b01afb5b"></script>
     <script src="js/conv/sheet-truth.js?v=20261118-eaae14ee"></script>
     <script src="js/conv/payloads.js?v=20261120-86f5437d"></script>
     <script src="js/conv/internals.js?v=20261118-271d125d"></script>
     <script src="js/conv/internals/chiller.js?v=20261118-221272d9"></script>
-    <script src="js/conv/equipment-modal.js?v=20261120-9b42a9b2"></script>
+    <script src="js/conv/equipment-modal.js?v=20261120-6105f01f"></script>
     <script src="js/conv/vfx.js?v=20261117-89056876"></script>
-    <script src="js/conv/history.js?v=20261117-1c72fb7f"></script>
-    <script src="js/rz-trend.js?v=20261117-e60cac7c"></script>
+    <script src="js/conv/history.js?v=20261120-8d390d7e"></script>
+    <script src="js/rz-trend.js?v=20261121-1300d194"></script>
+    <!-- PRD-CONV-POINT-STATUS-TREND T2/T3: every number shows its state (registry limits) and opens its trend -->
+    <script src="js/rz-sheet.js?v=20261120-3bf159cb" defer></script>
+    <link rel="stylesheet" href="css/conv-point.css?v=20261120-8daa6374">
+    <!-- this cockpit is dark-only (no data-theme on <html>): the phone trend sheet (js/rz-sheet.js) must not take its light skin -->
+    <style>:root:not(#rz-chiller) .rz-sheet{--rz-sheet-bg:#16181d;--rz-sheet-ink:#e8ecf1;--rz-sheet-line:rgba(160,168,180,.4)}</style>
+    <script src="js/conv/point-status.js?v=20261120-40be4933"></script>
     <!-- v1.43.1 — Right-side inspector extended to chiller-plant. Click any
          tagged pipe to see Live/Capacity/Deps/Alarms/Trend/Maint tabs without
          occluding topology. Closes review doc-27 §3.2 P0 cross-page parity. -->
@@ -693,7 +699,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
         <button class="hall-btn" type="button" data-hall="D" aria-pressed="false">Hall D</button>
       </div>
     </div>
-    <div class="basis-card current" data-basis="current">
+    <div class="basis-card current" data-basis="current" data-const>
       <div class="basis-title" id="chillerHallLabel">Current site plant authority · selected Hall A demand</div>
       <!-- v2.0.0 BINDING REPAIR — static basis text that was never engine-bound; it kept claiming
            1.850 MW IT / 1.927 MW cooling after the campus migration. Written from CONV_CALC at runtime
@@ -704,7 +710,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
          governed study's basis (evaporative cooling tower, i.e. water-cooled centrifugal
          machines), so the mimic, the equipment tags and the efficiency figures all follow it.
          Plant COP and kW/RT are derived again rather than UNAVAILABLE. -->
-    <div class="basis-card study" data-basis="study">
+    <div class="basis-card study" data-basis="study" data-const>
       <div class="basis-title">Capacity study · 4 × 10 MW IT</div>
       <div class="basis-value"><span class="basis-guard">READ-ONLY PLANNING BASIS</span> · not connected to current controls or telemetry</div>
     </div>
@@ -717,8 +723,8 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
         <button class="hall-btn" type="button" data-chw-sheet-btn="ch-m-102" aria-pressed="false">CH-M-102 · Condenser water + towers</button>
       </div>
       <div class="legend">
-        <span class="chws" id="lgChws">Primary CHWS &mdash;</span>
-        <span class="chwr" id="lgChwr">Primary CHWR &mdash;</span>
+        <span class="chws" id="lgChws">Primary CHWS <span data-point="cooling.chws_c" data-pt-label="CHWS header" data-pt-cls="ENGINE">&mdash;</span></span>
+        <span class="chwr" id="lgChwr">Primary CHWR <span data-point="cooling.chwr_c" data-pt-label="CHWR header" data-pt-cls="ENGINE">&mdash;</span></span>
         <span class="sec">Secondary / condenser-water loop</span>
         <span class="run">Run</span>
         <span>Standby</span>
@@ -779,19 +785,19 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
 
         <div class="card">
           <h4>Primary CHW Header <span style="float:right;font-weight:400;color:#7f93ab">engine-bound</span></h4>
-          <div class="kv" data-basis-param="cooling.chws_c" tabindex="0" role="button" title="CHWS — click for basis"><div class="k">CHWS</div><div class="v" id="kChws">&mdash;</div></div>
-          <div class="kv" data-basis-param="cooling.chwr_c" tabindex="0" role="button" title="CHWR — click for basis"><div class="k">CHWR</div><div class="v" id="kChwr">&mdash;</div></div>
-          <div class="kv" data-basis-param="cooling.chw_delta_t" tabindex="0" role="button" title="CHW delta-T — click for basis"><div class="k">ΔT</div><div class="v" id="kDt">UNAVAILABLE</div></div>
-          <div class="kv" data-basis-param="cooling.flow_lps" tabindex="0" role="button" title="IT sensible-load CHW reference flow — click for basis"><div class="k">IT-reference Flow</div><div class="v" id="kFlow">&mdash;</div></div>
-          <div class="kv" data-basis-param="cooling.heat_rejection_kw" tabindex="0" role="button" title="Current evaporator duty — click for basis"><div class="k">Evaporator Duty</div><div class="v" id="kCool">UNAVAILABLE</div></div>
-          <div class="kv"><div class="k">Header DP</div><div class="v" id="kDp">UNAVAILABLE</div></div>
+          <div class="kv" data-basis-param="cooling.chws_c" tabindex="0" role="button" title="CHWS — click for basis"><div class="k">CHWS</div><div class="v" id="kChws" data-point="cooling.chws_c" data-pt-label="CHWS header" data-pt-cls="ENGINE">&mdash;</div></div>
+          <div class="kv" data-basis-param="cooling.chwr_c" tabindex="0" role="button" title="CHWR — click for basis"><div class="k">CHWR</div><div class="v" id="kChwr" data-point="cooling.chwr_c" data-pt-label="CHWR header" data-pt-cls="ENGINE">&mdash;</div></div>
+          <div class="kv" data-basis-param="cooling.chw_delta_t" tabindex="0" role="button" title="CHW delta-T — click for basis"><div class="k">ΔT</div><div class="v" id="kDt" data-point="cooling.chw_delta_t" data-pt-label="CHW ΔT" data-pt-unit="K" data-pt-cls="ENGINE">UNAVAILABLE</div></div>
+          <div class="kv" data-basis-param="cooling.flow_lps" tabindex="0" role="button" title="IT sensible-load CHW reference flow — click for basis"><div class="k">IT-reference Flow</div><div class="v" id="kFlow" data-point="cooling.flow_lps" data-pt-label="IT-reference CHW flow" data-pt-cls="ENGINE">&mdash;</div></div>
+          <div class="kv" data-basis-param="cooling.heat_rejection_kw" tabindex="0" role="button" title="Current evaporator duty — click for basis"><div class="k">Evaporator Duty</div><div class="v" id="kCool" data-point="chiller-plant.CHW.evap_duty_mw" data-pt-label="Evaporator duty" data-pt-unit="MW">UNAVAILABLE</div></div>
+          <div class="kv"><div class="k">Header DP</div><div class="v" id="kDp" data-point="chiller-plant.CHW.header_dp" data-pt-label="CHW header DP">UNAVAILABLE</div></div>
           <!-- v1.134.11 — the adopted machine type and the two assumptions that set the plant's
                efficiency and its heat rejection were engine-published and rendered nowhere. An
                operator could read COP 6.06 and never see what it rests on. -->
           <div class="kv" data-basis-param="cooling.chiller_type" tabindex="0" role="button" title="Chiller machine type — click for basis"><div class="k">Machine type</div><div class="v" id="kMachine">&mdash;</div></div>
-          <div class="kv" data-basis-param="cooling.chiller_specific_power_kw_e_per_kw_th" tabindex="0" role="button" title="Chiller specific power (ASSUMED) — click for basis"><div class="k">Specific power</div><div class="v" id="kSpecPwr">&mdash;</div></div>
-          <div class="kv" data-basis-param="cooling.cdw_range_k" tabindex="0" role="button" title="Cooling tower range (ASSUMED) — click for basis"><div class="k">Tower range</div><div class="v" id="kCdwRange">&mdash;</div></div>
-          <div class="kv" data-basis-param="cooling.chiller_design_duty_kw_th" tabindex="0" role="button" title="Plant design duty — click for basis"><div class="k">Design duty</div><div class="v" id="kDesignDuty">&mdash;</div></div>
+          <div class="kv" data-basis-param="cooling.chiller_specific_power_kw_e_per_kw_th" tabindex="0" role="button" title="Chiller specific power (ASSUMED) — click for basis"><div class="k">Specific power</div><div class="v" id="kSpecPwr" data-const>&mdash;</div></div>
+          <div class="kv" data-basis-param="cooling.cdw_range_k" tabindex="0" role="button" title="Cooling tower range (ASSUMED) — click for basis"><div class="k">Tower range</div><div class="v" id="kCdwRange" data-const>&mdash;</div></div>
+          <div class="kv" data-basis-param="cooling.chiller_design_duty_kw_th" tabindex="0" role="button" title="Plant design duty — click for basis"><div class="k">Design duty</div><div class="v" id="kDesignDuty" data-const>&mdash;</div></div>
         </div>
 
         <!-- v1.32.2 (CONV-ACC-03) — Design vs sanity flow reconciliation: doc-09
@@ -804,10 +810,10 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
              wrong by 16x. They are computed from the engine now. -->
         <div class="card">
           <h4>CHW Flow Reconciliation <span style="float:right;font-weight:400;color:#7f93ab">engine</span></h4>
-          <div class="kv" title="Reference flow using the IT sensible load only"><div class="k">IT sensible reference</div><div class="v" id="kFlowIt">&mdash;</div></div>
-          <div class="kv" title="Current plant-duty flow using IT plus UPS loss"><div class="k">Plant-duty reference</div><div class="v" id="kFlowHr">&mdash;</div></div>
-          <div class="kv" title="Plant-duty uplift above the IT-only reference"><div class="k">Δ (plant − IT ref)</div><div class="v" id="kFlowGap">&mdash;</div></div>
-          <div class="meta" data-explain="conv-chw-flow-ref"><b>943.0 L/s</b> IT ref · <b>982.3 L/s</b> evap duty · header flow UNAVAILABLE</div>
+          <div class="kv" title="Reference flow using the IT sensible load only"><div class="k">IT sensible reference</div><div class="v" id="kFlowIt" data-point="chiller-plant.CHW.flow_it_ref" data-pt-label="IT sensible reference flow" data-pt-cls="ENGINE">&mdash;</div></div>
+          <div class="kv" title="Current plant-duty flow using IT plus UPS loss"><div class="k">Plant-duty reference</div><div class="v" id="kFlowHr" data-point="chiller-plant.CHW.flow_duty_ref" data-pt-label="Plant-duty reference flow" data-pt-cls="ENGINE">&mdash;</div></div>
+          <div class="kv" title="Plant-duty uplift above the IT-only reference"><div class="k">Δ (plant − IT ref)</div><div class="v" id="kFlowGap" data-point="chiller-plant.CHW.flow_uplift_pct" data-pt-label="Plant-duty uplift over IT reference" data-pt-unit="%" data-pt-cls="ENGINE">&mdash;</div></div>
+          <div class="meta" data-explain="conv-chw-flow-ref"><b id="kFlowItB" data-point="chiller-plant.CHW.flow_it_ref" data-pt-label="IT sensible reference flow" data-pt-cls="ENGINE">&mdash;</b> IT ref · <b id="kFlowHrB" data-point="chiller-plant.CHW.flow_duty_ref" data-pt-label="Plant-duty reference flow" data-pt-cls="ENGINE">&mdash;</b> evap duty</div>
         </div>
 
         <div class="card" data-bms-mode-hide="overview">
@@ -830,15 +836,15 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
               </select>
             </div>
             <div class="field">
-              <label title="Secondary load-loop supply setpoint (CRAH/AHU side). It cannot go below the primary CHWS — a decoupled secondary loop has no cooling source of its own, so its floor is the primary header temperature and raising it adds decoupler bypass.">Secondary loop SP <span id="spChwsTxt">&mdash;</span></label>
+              <label title="Secondary load-loop supply setpoint (CRAH/AHU side). It cannot go below the primary CHWS — a decoupled secondary loop has no cooling source of its own, so its floor is the primary header temperature and raising it adds decoupler bypass.">Secondary loop SP <span id="spChwsTxt" data-const>&mdash;</span></label>
               <input id="spChws" type="range" step="0.1" aria-label="Secondary loop supply setpoint" />
             </div>
             <div class="field">
-              <label>DP SP <span id="spDpTxt">UNAVAILABLE</span></label>
+              <label>DP SP <span id="spDpTxt" data-const>UNAVAILABLE</span></label>
               <input id="spDp" type="range" min="60" max="140" step="1" value="90" aria-label="Sp Dp" />
             </div>
             <div class="field">
-              <label>Branch Ref SP (sim) <span id="spFlowTxt">UNAVAILABLE</span></label>
+              <label>Branch Ref SP (sim) <span id="spFlowTxt" data-const>UNAVAILABLE</span></label>
               <input id="spFlow" type="range" step="0.1" aria-label="Simulated per-loop reference-flow setpoint" />
             </div>
             <div class="field">
@@ -1119,8 +1125,11 @@ const LOOP_DT_GUIDE_MAX = CHW.dt != null ? CHW.dt + LOOP_DT_TOLERANCE_K : null;
    it sat exactly on CHWR. These bands stay deterministic and scale with the adopted basis. */
 const LOOP_FLOW_ALARM_MIN = LOOP_FLOW_DESIGN != null ? LOOP_FLOW_DESIGN * 0.60 : 10;
 const LOOP_FLOW_WARNING_MIN = LOOP_FLOW_DESIGN != null ? LOOP_FLOW_DESIGN * 0.80 : 14;
-const LOOP_T2_WARNING_MAX = CHW.chwr != null ? CHW.chwr + 0.8 : 23.2;
-const LOOP_T2_ALARM_MAX = CHW.chwr != null ? CHW.chwr + 1.5 : 24.0;
+/* PRD-CONV-POINT-STATUS-TREND P-1: the CHWR warning / alarm come from the limits registry (cooling.chwr_c, migrated from
+   the margins this page used to type); a page never types a limit. */
+const CHWR_LIMITS = window.RZPointStatus ? window.RZPointStatus.limits('cooling.chwr_c') : null;
+const LOOP_T2_WARNING_MAX = CHWR_LIMITS && CHWR_LIMITS.hi_warn != null ? CHWR_LIMITS.hi_warn : Infinity;
+const LOOP_T2_ALARM_MAX = CHWR_LIMITS && CHWR_LIMITS.hi_alarm != null ? CHWR_LIMITS.hi_alarm : Infinity;
 
 function engineFleet(kind, hall) {
   try {
@@ -1462,7 +1471,7 @@ function chwRead(n){
     } else if(/^tts/.test(n.id)){
       out.values = { t: chwVal(ok ? T(lp.t1) : CHW_UNAV) };
     } else if(/^ttr/.test(n.id)){
-      out.values = { t: chwVal(ok ? T(lp.t2) : CHW_UNAV, ok && lp.t2 > LOOP_T2_WARNING_MAX ? '2' : null) };
+      out.values = { t: chwVal(ok ? T(lp.t2) : CHW_UNAV) };   /* its state: RZPointStatus over cooling.chwr_c */
     } else {
       const isA = /^pa/.test(n.id), isB = /^pb/.test(n.id), run = isA ? m.runA : (isB ? m.runB : false), spd = isA ? lp.spdA : (isB ? lp.spdB : 0);
       /* W4 B2: command and feedback are two values; a mismatch marks the symbol (data-alarm + data-mismatch) */
@@ -1873,6 +1882,57 @@ function selectChwView(view){
  * the loop table is a real table that can be read and copied, and the duplicated
  * header cards are simply gone — the inspector on the right is their one home.
  * ==========================================================================*/
+/* ============================================================================
+ * PRD-CONV-POINT-STATUS-TREND T2/T3 — every number on this page is a point (state from the limits registry, click /
+ * Enter opens its trend) or a constant (data-const: a rating, design value or operator setpoint; neutral, its card
+ * opens the basis). pt() wraps a number in its point; ptPaint() repaints a panel and, when only the numbers changed,
+ * rewrites just their text (a rebuilt panel would re-register every trend and drop the keyboard focus on each 1.2 s
+ * tick); ptSync() applies the registry state to the HTML points after a repaint (the sheets apply their own).
+ * ==========================================================================*/
+function ptEsc(t){ return String(t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+function pt(id, text, label, unit, cls){
+  return `<span data-point="${id}" data-pt-label="${ptEsc(label)}"${unit ? ` data-pt-unit="${ptEsc(unit)}"` : ''}${cls ? ` data-pt-cls="${cls}"` : ''}>${text}</span>`;
+}
+function ptConst(text){ return `<span data-const>${text}</span>`; }
+const PT_RE = /(<span data-point="[^"]*"[^>]*>)([^<]*)(<\/span>)/g;
+function ptPaint(host, html){
+  if(!host) return;
+  const shape = html.replace(PT_RE, '$1$3');
+  if(host.__ptShape === shape){
+    const vals = []; html.replace(PT_RE, (m, a, t) => { vals.push(t); return m; });
+    host.querySelectorAll('span[data-point]').forEach((e, i) => { if(vals[i] != null && e.firstChild && e.firstChild.nodeValue !== vals[i]) e.firstChild.nodeValue = vals[i]; else if(vals[i] != null && !e.firstChild) e.textContent = vals[i]; });
+  } else { host.innerHTML = html; host.__ptShape = shape; }
+}
+function ptText(host, text){ const p = host && host.querySelector('[data-point]'); if(p){ if(p.textContent !== text) p.textContent = text; } else if(host) host.textContent = text; }
+const PT_HOSTS = ['#alarmStrip', '#supPanel', '.side-body', '#lgChws', '#lgChwr'];
+function ptSync(){
+  const PS = window.RZPointStatus; if(!PS) return;
+  PT_HOSTS.forEach((q) => document.querySelectorAll(q).forEach((h) => PS.bindAll(h)));
+}
+/* a per-unit reading of a limited quantity takes its limits from the registry row the sheet names (limitsOf): the page
+   maps an id onto a row, it never types a bound. Re-run when the database rows arrive (rz-point-limits). */
+function ptDefineUnits(){
+  const PS = window.RZPointStatus; if(!PS || !CHW_SHEETS) return;
+  const alias = {};
+  [CHW_SHEETS.pid, CHW_SHEETS.cdw].forEach((sh) => sh && sh.nodes.forEach((n) => (n.values || []).forEach((v) => { if(v.point && v.limitsOf) alias[v.point] = [v.limitsOf, v.label]; })));
+  /* the loop-summary rows read the same per-train quantities */
+  for(let i = 1; i <= 4; i++){ const t = 'chiller-plant.CH-' + String(i).padStart(2, '0') + '.'; alias[t + 'chws_c'] = alias[t + 'chws_c'] || ['cooling.chws_c']; alias[t + 'chwr_c'] = alias[t + 'chwr_c'] || ['cooling.chwr_c']; }
+  /* the registry holds °C; with the IP selector the page shows °F, so a temperature row is converted (not retyped) for
+     the points this page shows — the registry ids too, or 66 °F would read against a 20.9 °C limit */
+  ['cooling.chws_c', 'cooling.chwr_c', 'cooling.cdw_supply_c'].forEach((id) => { alias[id] = alias[id] || [id]; });
+  const ip = typeof ui !== 'undefined' && ui.unit === 'ip';
+  const f = (v) => v == null ? v : Math.round((v * 9 / 5 + 32) * 100) / 100;
+  Object.keys(alias).forEach((id) => {
+    /* the source is the shipped registry row, never limits(src): that may already be this page's converted define() */
+    const src = alias[id][0], L = window.RZ_CONV_PARAMETERS && (window.RZ_CONV_PARAMETERS.limits || []).find((r) => r.id === src);
+    if(!L) return;
+    const conv = ip && L.unit === '°C' ? { unit: '°F', lo_alarm: f(L.lo_alarm), lo_warn: f(L.lo_warn), hi_warn: f(L.hi_warn), hi_alarm: f(L.hi_alarm), deadband: L.deadband != null ? Math.round(L.deadband * 9 / 5 * 100) / 100 : L.deadband } : {};
+    try { PS.define(id, Object.assign({}, L, { label: alias[id][1] || L.label, aliasOf: src }, conv)); } catch(e) { /* a row that fails the order law stays undefined: the point reads Informational */ }
+  });
+}
+ptDefineUnits();
+window.addEventListener('rz-point-limits', ptDefineUnits);
+
 function renderSupervisory(){
   const host = $("supPanel");
   if(!host) return;
@@ -1923,23 +1983,23 @@ function renderSupervisory(){
        dropped it, which is a real regression: the figure is a calculated reference, not a
        meter reading, and an operator must be able to see that. */
     + row("IT reference flow",
-          `${conv.f(st.header.flow,u)} ${conv.fu(u)} <span style="color:#7f93ab">CALCULATED \u2022 NOT METERED</span>`)
-    + row("Input power", num(PLANT.inputKw!=null?Math.round(PLANT.inputKw).toLocaleString():null,"kW"))
-    + row("Duty", num(PLANT.dutyRt!=null?Math.round(PLANT.dutyRt).toLocaleString():null,"RT"))
-    + row("COP", num(PLANT.cop))
-    + row("kW / RT", num(PLANT.kwPerRt))
+          `${pt("cooling.flow_lps", `${conv.f(st.header.flow,u)} ${conv.fu(u)}`, "IT-reference CHW flow", conv.fu(u), "ENGINE")} <span style="color:#7f93ab">CALCULATED \u2022 NOT METERED</span>`)
+    + row("Input power", pt("chiller-plant.CHW.input_kw", num(PLANT.inputKw!=null?Math.round(PLANT.inputKw).toLocaleString():null,"kW"), "Chiller plant input power", "kW"))
+    + row("Duty", pt("chiller-plant.CHW.duty_rt", num(PLANT.dutyRt!=null?Math.round(PLANT.dutyRt).toLocaleString():null,"RT"), "Plant duty", "RT"))
+    + row("COP", pt("chiller-plant.CHW.cop", num(PLANT.cop), "Plant COP", ""))
+    + row("kW / RT", pt("chiller-plant.CHW.kw_per_rt", num(PLANT.kwPerRt), "Plant kW / RT", "kW/RT"))
     + `</div>`;
 
   const cap = `<div class="sp-card"><h5>Capacity &amp; status`
     + `<span class="sp-state ${redundant?"ok":"bad"}">${redundant?"N+1":"NO N+1"}</span></h5>`
     + row("Chillers", `${chRun==null?dash:chRun} / ${chTot==null?dash:chTot} running`)
-    + row("Demand", num(demandKw!=null?(demandKw/1000).toFixed(2):null,"MW"))
+    + row("Demand", pt("chiller-plant.CHW.evap_duty_mw", num(demandKw!=null?(demandKw/1000).toFixed(2):null,"MW"), "Evaporator duty", "MW"))
     /* The capacity figures keep the labels and the PRECISION the operator-regression gate
        fixed: the N+1 margin is 13.75 MW, and rounding it to 13.8 here threw away a digit the
        gate treats as material. A relabel is a UI decision; a lost digit is not. */
-    + row("Run cap", num(PLANT.capacityKw!=null?(PLANT.capacityKw/1000).toFixed(1):null,"MW"))
-    + row("N+1 cap", num(n1Kw!=null?(n1Kw/1000).toFixed(1):null,"MW"))
-    + row("N+1 margin", num(marginKw!=null?r2(marginKw/1000):null,"MW"),
+    + row("Run cap", pt("chiller-plant.CHW.run_cap_mw", num(PLANT.capacityKw!=null?(PLANT.capacityKw/1000).toFixed(1):null,"MW"), "Running chiller capacity", "MW"))
+    + row("N+1 cap", ptConst(num(n1Kw!=null?(n1Kw/1000).toFixed(1):null,"MW")))
+    + row("N+1 margin", pt("chiller-plant.CHW.n1_margin_mw", num(marginKw!=null?r2(marginKw/1000):null,"MW"), "N+1 capacity margin", "MW"),
           redundant?"":"sp-state bad")
     /* "4 / 4" beside "7 / 10 running" reads as a contradiction until you notice the
        denominators differ: this counts the DRAWN loops, the row above counts the plant. */
@@ -1948,9 +2008,9 @@ function renderSupervisory(){
     + `</div>`;
 
   const sp = `<div class="sp-card"><h5>Active setpoints<span>${ui.maint?"MAINT":"FREE-RUN"}</span></h5>`
-    + row("Secondary loop", st.sp.chws==null?dash:`${conv.t(st.sp.chws,u)}${conv.tu(u)}`)
-    + row("Header DP", `${conv.p(st.sp.dp,u)} ${conv.pu(u)}`)
-    + row("Per-loop flow", st.sp.flow==null?dash:`${conv.f(st.sp.flow,u)} ${conv.fu(u)}`)
+    + row("Secondary loop", ptConst(st.sp.chws==null?dash:`${conv.t(st.sp.chws,u)}${conv.tu(u)}`))
+    + row("Header DP", ptConst(`${conv.p(st.sp.dp,u)} ${conv.pu(u)}`))
+    + row("Per-loop flow", ptConst(st.sp.flow==null?dash:`${conv.f(st.sp.flow,u)} ${conv.fu(u)}`))
     + `</div>`;
 
   const sys = `<div class="sp-card"><h5>System<span>${ui.sim?"SIM":"LIVE"}</span></h5>`
@@ -1959,7 +2019,7 @@ function renderSupervisory(){
     + row("First-out", st.alarm.firstOut || "None")
     + row("Acknowledgement", ackTxt)
     + row("Forced points", String(forced), forced?"sp-state warn":"")
-    + row("Ambient", `${conv.t(ui.ambient,u)}${conv.tu(u)}`, "", AMBIENT_BASIS)
+    + row("Ambient", ptConst(`${conv.t(ui.ambient,u)}${conv.tu(u)}`), "", AMBIENT_BASIS)
     + row("Refrigerant", "R-1234ze(E)", "", REFRIGERANT_BASIS)
     + `</div>`;
 
@@ -1968,12 +2028,13 @@ function renderSupervisory(){
   const rows = st.loops.map((lp)=>{
     const m = loopMetrics(lp), e = evalLoop(lp);
     const cls = e.level==="ALARM"?"bad":(e.level==="WARNING"?"warn":"ok");
-    return `<tr><td>CH-${String(lp.id).padStart(2,"0")}</td>`
-      + `<td>${conv.f(lp.flow,u)}</td>`
-      + `<td>${conv.t(lp.t1,u)}</td><td>${conv.t(lp.t2,u)}</td>`
-      + `<td>${conv.p(Math.round((lp.dp1+lp.dp2)/2),u)}</td>`
+    const tg = `CH-${String(lp.id).padStart(2,"0")}`, pp = `chiller-plant.${tg}.`;
+    return `<tr><td>${tg}</td>`
+      + `<td>${pt(pp+"loop_flow", conv.f(lp.flow,u), tg+" loop flow", conv.fu(u))}</td>`
+      + `<td>${pt(pp+"chws_c", conv.t(lp.t1,u), tg+" secondary supply", conv.tu(u))}</td><td>${pt(pp+"chwr_c", conv.t(lp.t2,u), tg+" secondary return", conv.tu(u))}</td>`
+      + `<td>${pt(pp+"loop_dp", conv.p(Math.round((lp.dp1+lp.dp2)/2),u), tg+" DP avg", conv.pu(u))}</td>`
       + `<td>${lp.pumpA?"A":"B"}</td>`
-      + `<td>${r1(lp.t2-lp.t1)}</td>`
+      + `<td>${pt(pp+"delta_t", r1(lp.t2-lp.t1), tg+" ΔT", "K")}</td>`
       + `<td>${lp.comps.reduce((a,b)=>a+b,0)}/3</td>`
       + `<td class="sp-state ${cls}">${e.level}</td></tr>`;
   }).join("");
@@ -1983,7 +2044,7 @@ function renderSupervisory(){
     + `<th>Pump</th><th>&Delta;T</th><th>Comp</th><th>State</th></tr></thead>`
     + `<tbody data-rz-authored-basis="${AUTHORED_MECHANICAL_BASIS}">${rows}</tbody></table></div>`;
 
-  host.innerHTML = eff + cap + sp + sys + tbl;
+  ptPaint(host, eff + cap + sp + sys + tbl);
 }
 
 function renderAuthorityUnavailable(){
@@ -2039,8 +2100,8 @@ function renderKpi(){
   /* v1.134.0 — the P&ID legend used to carry "Primary CHWS 7.2°C" / "CHWR 14.8°C"
      as static markup that nothing ever overwrote, so the drawing kept showing the
      retired basis while the panels beside it showed the live one. Bind them. */
-  $("lgChws").textContent = `Primary CHWS ${conv.t(st.header.chws,ui.unit)}${conv.tu(ui.unit)}`;
-  $("lgChwr").textContent = `Primary CHWR ${conv.t(st.header.chwr,ui.unit)}${conv.tu(ui.unit)}`;
+  ptText($("lgChws"), `${conv.t(st.header.chws,ui.unit)}${conv.tu(ui.unit)}`);
+  ptText($("lgChwr"), `${conv.t(st.header.chwr,ui.unit)}${conv.tu(ui.unit)}`);
   $("kChwr").textContent = `${conv.t(st.header.chwr,ui.unit)} ${conv.tu(ui.unit)}`;
   $("kDt").textContent = `${ui.unit==="ip"?r1(st.header.dt*9/5):r1(st.header.dt)} ${conv.tu(ui.unit)}`;
   $("kFlow").textContent = `${conv.f(st.header.flow,ui.unit)} ${conv.fu(ui.unit)}`;
@@ -2056,6 +2117,8 @@ function renderKpi(){
     : ((CHW.coolingKw != null && CHW.dt) ? (CHW.coolingKw / (4.186 * CHW.dt)) : null);
   $("kFlowIt").textContent  = flowIt != null ? `${conv.f(r1(flowIt),ui.unit)} ${conv.fu(ui.unit)}` : "—";
   $("kFlowHr").textContent  = flowHr != null ? `${conv.f(r1(flowHr),ui.unit)} ${conv.fu(ui.unit)}` : "—";
+  $("kFlowItB").textContent = $("kFlowIt").textContent;
+  $("kFlowHrB").textContent = $("kFlowHr").textContent;
   $("kFlowGap").textContent = CHW.dutyUpliftPct != null
     ? `${CHW.dutyUpliftPct.toFixed(1)} %`
     : ((flowIt && flowHr) ? `${(((flowHr/flowIt)-1)*100).toFixed(1)} %` : "\u2014");
@@ -2096,10 +2159,11 @@ function renderAlarmStrip(){
   $("asRedund").textContent = `Loops ${online}/4 • ${red}`;
   // Primary CHW basis — engine-true figures (doc-04 acceptance criteria).
   const dtTxt = ui.unit==="ip"?r1(st.header.dt*9/5):r1(st.header.dt);
-  $("asChw").textContent = `CHWS ${conv.t(st.header.chws,ui.unit)}${conv.tu(ui.unit)} • CHWR ${conv.t(st.header.chwr,ui.unit)}${conv.tu(ui.unit)} • ΔT ${dtTxt} • IT-ref ${conv.f(st.header.flow,ui.unit)} ${conv.fu(ui.unit)}`;
-  $("asLoad").textContent = `Evaporator Duty ${r1(st.header.coolingKw/1000)} MW`;
+  ptPaint($("asChw"), `CHWS ${pt("cooling.chws_c", `${conv.t(st.header.chws,ui.unit)}${conv.tu(ui.unit)}`, "CHWS header", "", "ENGINE")} • CHWR ${pt("cooling.chwr_c", `${conv.t(st.header.chwr,ui.unit)}${conv.tu(ui.unit)}`, "CHWR header", "", "ENGINE")} • ΔT ${pt("cooling.chw_delta_t", String(dtTxt), "CHW ΔT", "K", "ENGINE")} • IT-ref ${pt("cooling.flow_lps", `${conv.f(st.header.flow,ui.unit)} ${conv.fu(ui.unit)}`, "IT-reference CHW flow", conv.fu(ui.unit), "ENGINE")}`);
+  ptPaint($("asLoad"), `Evaporator Duty ${pt("chiller-plant.CHW.evap_duty_mw", `${r1(st.header.coolingKw/1000)} MW`, "Evaporator duty", "MW")}`);
   const upS = Math.floor((Date.now()-ui.startTs)/1000);
-  $("asMeta").textContent = `Scenario: ${CHW.scenario} • Updated ${upS%60}s`;
+  /* the seconds counter is the simulation clock, not a plant value: a constant (no trend) */
+  ptPaint($("asMeta"), `Scenario: ${CHW.scenario} • Updated <span data-const>${upS%60}s</span>`);
 }
 
 function renderStatus(){
@@ -2376,6 +2440,7 @@ function renderAll(){
   renderStatus();
   renderSupervisory();
   renderHistory();
+  ptSync();
   if($("loopModal").classList.contains("show")) renderModal(ui.selected);
 }
 
@@ -2443,7 +2508,7 @@ function bind(){
     renderAll();
   });
 
-  $("unitSel").addEventListener("change", e=>{ ui.unit = e.target.value; renderAll(); });
+  $("unitSel").addEventListener("change", e=>{ ui.unit = e.target.value; ptDefineUnits(); renderAll(); });
   $("scSel").addEventListener("change", e=>applyScenario(e.target.value));
 
   $("spChws").addEventListener("input", e=>{ st.sp.chws = Number(e.target.value); $("scSel").value = "custom"; $("scLbl").textContent = "Custom"; renderAll(); });

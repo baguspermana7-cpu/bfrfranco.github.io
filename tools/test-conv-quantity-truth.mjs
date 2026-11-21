@@ -115,7 +115,9 @@ function sheetFacts() {
     .sort((a, b) => Number(/\d+$/.exec(a.getAttribute('data-node'))[0]) - Number(/\d+$/.exec(b.getAttribute('data-node'))[0]) || a.getAttribute('data-node').localeCompare(b.getAttribute('data-node')))
     .map((g) => { const id = g.getAttribute('data-node'), t = svg.querySelector('text[data-tag-of="' + id + '"]');
       return { id, tag: t ? t.textContent.trim() : null, state: g.getAttribute('data-state'), title: (g.querySelector('title') || {}).textContent || '' }; });
-  const val = (k) => { const t = svg.querySelector('[data-val="' + k + '"]'); return t ? t.textContent.trim() : null; };
+  /* a point's state glyph (tspan.rz-pt-g, aria-hidden, PRD-CONV-POINT-STATUS-TREND) is decoration, not the value */
+  const vtext = (t) => { let x = ''; t.childNodes.forEach((n) => { if (!(n.classList && n.classList.contains('rz-pt-g'))) x += n.textContent; }); return x.trim(); };
+  const val = (k) => { const t = svg.querySelector('[data-val="' + k + '"]'); return t ? vtext(t) : null; };
   const fleet = (k, h) => (C.getFleet(k, h) || []).map((u) => ({ tag: u.tag, state: u.state, flowLps: u.flowLps, rejectionKwTh: u.rejectionKwTh, chwFlowLps: u.chwFlowLps }));
   const halls = (C.listHalls() || []).map((h) => String(h.code));
   const tagged = [...svg.querySelectorAll('.hmi-node[data-node]')].map((g) => { const id = g.getAttribute('data-node'), t = svg.querySelector('text[data-tag-of="' + id + '"]');
@@ -125,7 +127,7 @@ function sheetFacts() {
     crah: halls.map((h) => ({ h, n: val('crah' + h + ':n'), present: !!svg.querySelector('.hmi-node[data-node="crah' + h + '"]'), sel: svg.querySelector('.hmi-node[data-node="crah' + h + '"]')?.hasAttribute('data-hall-selected') || false,
       fleet: fleet('crah', h).length, run: fleet('crah', h).filter((u) => u.state === 'running').length })),
     fleets: { chiller: fleet('chiller'), pri: fleet('chw_primary_pump'), sec: fleet('chw_secondary_pump'), ct: fleet('tower_cell'), cp: fleet('cdw_pump') },
-    vals: Object.fromEntries([...svg.querySelectorAll('[data-val]')].map((t) => [t.getAttribute('data-val'), t.textContent.trim()])),
+    vals: Object.fromEntries([...svg.querySelectorAll('[data-val]')].map((t) => [t.getAttribute('data-val'), vtext(t)])),
     cooling: C.snapshot && C.snapshot.cooling ? { rej: C.snapshot.cooling.tower_rejection_kw_th, cdws: C.snapshot.cooling.cdw_supply_c, cdwr: C.snapshot.cooling.cdw_return_c } : null,
     tagged, zones };
 }

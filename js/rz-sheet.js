@@ -41,6 +41,9 @@
  *   var s = RZSheet.open({ title:'Filters', content: nodeOrHTMLString })
  *   RZSheet.close()
  *   RZSheet.open({ content: el, dismissible:false })
+ *   RZSheet.open({ content: el, onClose: fn })  fn runs once as the sheet starts to close, by any path
+ *                                              (Esc, scrim, ×, drag, RZSheet.close()); js/rz-trend.js
+ *                                              restores its page state on it
  *
  * Guard: window.__rzSheet.
  * ==========================================================================*/
@@ -132,6 +135,7 @@
         if (!state || state.closing) return;
         state.closing = true;
         var s = state;
+        if (typeof s.onClose === 'function') { try { s.onClose(); } catch (err) { /* the caller's cleanup must not stop the exit */ } }
         s.sheet.classList.remove('rz-in', 'rz-dragging');
         s.sheet.style.transform = '';          /* let the class own the exit */
         s.scrim.classList.remove('rz-in');
@@ -204,6 +208,7 @@
             opener: document.activeElement,
             dismissible: opts.dismissible !== false,
             prevOverflow: document.documentElement.style.overflow,
+            onClose: opts.onClose,
             closing: false
         };
 

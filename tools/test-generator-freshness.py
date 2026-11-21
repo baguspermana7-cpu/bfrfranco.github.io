@@ -76,6 +76,7 @@ BUILDERS = [
     ("dist/rz-engine.mjs (P19 ESM build of rz-engine.js)", ["node", "tools/build-engine-esm.mjs", "--check"]),
     ("data/explain/*.json (P21 Ask-about-this-page index)", ["node", "tools/build-explain-index.mjs", "--check"]),
     ("search-index.json (P14 every public page)", ["python3", "tools/build-search-index.py", "--check"]),
+    ("conv_points seed in supabase/migrations/2026-11-20-conv-points.sql", ["node", "tools/build-conv-points-seed.mjs", "--check"]),
 ]
 
 

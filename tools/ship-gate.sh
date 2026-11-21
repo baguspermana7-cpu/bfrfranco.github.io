@@ -186,6 +186,13 @@ gate "Conventional fuel truth — FU-M-101 per hall: 8 sets + day tanks from get
 # four P&ID sheets was the same grey in every condition. The trend modal reads one deterministic history per point.
 gate "Conventional VFX core — state grammar, standby, flow speed, rotor, thermal ramp, deterministic" node --test tools/test-conv-vfx-core.mjs
 gate "Conventional history — deterministic series per point, stats, limits, CSV" node --test tools/test-conv-history.mjs
+# PRD-CONV-POINT-STATUS-TREND T0/T1 — every number shows its state and opens its trend: one limits registry
+# (data/conv-limits.curated.json -> data/conv-parameters.json limits), RZPointStatus (ISA-18.2 deadband), the trend's
+# 1H/8H/1D/7D/30D ranges, bands, state header, stats and phone sheet; the coverage ratchet keeps unclassified numbers falling.
+gate "Conventional point status core — classify thresholds + deadband, limits registry rows, normal past >= 99 % (P-6), planted defects" node --test tools/test-conv-point-status-core.mjs
+gate "Conventional trend ranges — open click/Enter/tap, 1H..30D window + stats, last point = page value, header state, bands = registry, keys 1-5, Esc, 390 sheet, contrast" node tools/test-conv-trend-ranges.mjs
+gate "Conventional point coverage — ratchet: unclassified numbers on the 9 cockpits only fall (tools/conv-point-coverage-baseline.json)" node tools/test-conv-point-coverage.mjs
+gate "Conventional points database — conv_points migration in the local postgres:16: parity with RZConvHistory 50 x 2000 min, rollup, retention, RLS + audit_log, RPC table choice, idempotent cron" node tools/test-conv-points-sql.mjs
 gate "Conventional TCC curves — IEC 60255 families, transformer damage/inrush, cable withstand, coordination" node --test tools/test-conv-tcc.mjs
 gate "Conventional SLD topology — energisation from breaker states, bus balance" node --test tools/test-conv-sld-topology.mjs
 gate "Conventional HV/MV basis — 150/20/0.4 kV ratings, fault levels, N-1 loading, graded TMS cross-checked with tcc.js" node --test tools/test-conv-electrical-hvmv.mjs

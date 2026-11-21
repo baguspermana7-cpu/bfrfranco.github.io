@@ -169,11 +169,11 @@ for (const W of [1440, 390]) {
   const t3c = await pg.evaluate(() => window.RZTrend.state().cursor);
   ok(t3c !== null && t3c < t3.cursor, `T3@${W} ArrowLeft moves the cursor back: ${t3.cursor} -> ${t3c}`);
   /* T4 range + CSV */
-  await pg.click('.rz-trend [data-range="5m"]'); await sleep(120);
+  await pg.click('.rz-trend [data-range="1H"]'); await sleep(120);   /* PRD-CONV-POINT-STATUS-TREND: 5m folded into 1H (60 one-minute samples) */
   await pg.click('.rz-trend [data-csv]'); await sleep(120);
   const t4 = await pg.evaluate(() => { const c = window.RZTrend.lastCsv || '', l = c.trim().split('\n'); return { range: window.RZTrend.state().range, lines: l.length, head: l[0] }; });
-  ok(t4.range === '5m' && t4.lines === 6 && /\(SIM/.test(t4.head) && /\[/.test(t4.head), `T4@${W} ` + JSON.stringify(t4));
-  await pg.click('.rz-trend [data-range="24h"]'); await sleep(150);
+  ok(t4.range === '1H' && t4.lines === 61 && /\(SIM/.test(t4.head) && /\[/.test(t4.head), `T4@${W} ` + JSON.stringify(t4));
+  await pg.click('.rz-trend [data-range="1D"]'); await sleep(150);
   const over = await pg.evaluate(() => { const p = document.querySelector('.rz-trend-panel'); return document.documentElement.scrollWidth > innerWidth + 1 || p.getBoundingClientRect().right > innerWidth + 1; });
   ok(!over, `T6@${W} horizontal overflow`);
   if (SHOTS) await pg.screenshot({ path: path.join(SHOTS, `trend-${W}.png`) });

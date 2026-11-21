@@ -483,6 +483,33 @@ const api = {
     const { error } = await client.from('feature_overrides').delete().eq('page_key', pageKey);
     return { error: friendly(error) };
   },
+  /* ── Conventional points (PRD-CONV-POINT-STATUS-TREND §5b): limits public read, root write; history via RPC ── */
+  async getConvPoints() {
+    if (!client) return { data: [], error: initError };
+    const { data, error } = await client.from('conv_points')
+      .select('id, label, unit, page, lo_alarm, lo_warn, hi_warn, hi_alarm, deadband, basis, evidence_class, source_ref, source_as_of, hist_base, hist_amp, hist_shape, hist_digits, updated_at')
+      .order('id');
+    return { data: data || [], error: friendly(error) };
+  },
+  /** Rows {t, v} (window <= 24 h) or {t, v_min, v_max, v_mean, n} (rollup). from / to: ISO strings. */
+  async convPointSeries(id, from, to) {
+    if (!client) return { data: [], error: initError };
+    const { data, error } = await client.rpc('conv_point_series', { p_id: id, p_from: from, p_to: to });
+    return { data: data || [], error: friendly(error) };
+  },
+  /** Root-only under RLS: a non-root update changes 0 rows, which is reported as a refusal. */
+  async setConvPointLimits(id, patch) {
+    if (!client) return { error: initError };
+    if (!(await this.getUser())) return { error: 'not signed in' };
+    const allowed = ['lo_alarm', 'lo_warn', 'hi_warn', 'hi_alarm', 'deadband', 'basis', 'evidence_class', 'source_ref', 'source_as_of'];
+    const clean = {};
+    allowed.forEach(function (k) { if (Object.prototype.hasOwnProperty.call(patch || {}, k)) clean[k] = patch[k]; });
+    const { data, error } = await client.from('conv_points').update(clean).eq('id', id)
+      .select('id, lo_alarm, lo_warn, hi_warn, hi_alarm, deadband, basis, evidence_class, updated_at');
+    if (error) return { error: friendly(error) };
+    if (!data || !data.length) return { error: 'Refused by the database: only a root account may change point limits.' };
+    return { data: data[0], error: null };
+  },
   /** Server answer to "is the signed-in user an educator?" (profiles.role or educator_allowlist). */
   async isEducator() {
     if (!client) return { data: false, error: initError };

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Point status fixture</title>
+<!-- Fixture for tools/test-conv-trend-ranges.mjs (PRD-CONV-POINT-STATUS-TREND T1): the shared files only, three points
+     ok / warn / alarm, because the nine cockpits are wired in T2/T3. Not a shipped page. -->
+<script>try { document.documentElement.setAttribute('data-theme', localStorage.getItem('theme') === 'light' ? 'light' : 'dark'); } catch (e) { document.documentElement.setAttribute('data-theme', 'dark'); }</script>
+<link rel="stylesheet" href="../../../css/conv-point.css">
+<style>
+  :root { --bg: #0b0c0e; --panel: #121316; --line: rgba(255, 255, 255, .12); --ink: #e8edf5; --mute: #9aa4b2; }
+  [data-theme="light"] { --bg: #f5f7fa; --panel: #ffffff; --line: rgba(15, 23, 42, .14); --ink: #1b2430; --mute: #4b5563; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 "IBM Plex Sans", system-ui, sans-serif; }
+  main { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
+  h1 { font-size: 16px; font-weight: 600; margin: 0 0 14px; }
+  .strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 4px; background: var(--panel); }
+  .tile { padding: 12px 14px; border-left: 1px solid var(--line); }
+  .tile:first-child { border-left: 0; }
+  .k { color: var(--mute); font-size: 12px; }
+  .v { font: 600 22px/1.2 "IBM Plex Mono", "JetBrains Mono", monospace; font-variant-numeric: tabular-nums; }
+  .u { color: var(--mute); font: 12px "IBM Plex Mono", monospace; margin-left: 4px; }
+  @media (max-width: 600px) { .strip { grid-template-columns: 1fr; } .tile { border-left: 0; border-top: 1px solid var(--line); } .tile:first-child { border-top: 0; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Point status — fixture</h1>
+  <div class="strip">
+    <div class="tile"><div class="k">White-space air</div><span class="v" id="p-ok" data-point="environment.avg_temp_c">22.4</span><span class="u">°C</span></div>
+    <div class="tile"><div class="k">TCS supply · TT-01</div><span class="v" id="p-warn" data-point="cdu-mini-bms.TT-01.supply_c" data-pt-label="TCS supply · TT-01">37.4</span><span class="u">°C</span></div>
+    <div class="tile"><div class="k">Fire main pressure</div><span class="v" id="p-alarm" data-point="fire.static_pressure_bar" data-pt-cls="ENGINE">8.20</span><span class="u">bar</span></div>
+  </div>
+</main>
+<script src="../../../js/conv-parameters.js"></script>
+<script src="../../../js/conv/history.js"></script>
+<script src="../../../js/conv/point-status.js"></script>
+<script src="../../../js/rz-sheet.js"></script>
+<script src="../../../js/rz-trend.js"></script>
+<script>RZPointStatus.bindAll(document); RZTrend.fromHash();</script>
+</body>
+</html>

@@ -10,7 +10,8 @@
  *   s.update(); s.trace(nodeId, 'up'|'down'|'both'); s.clearTrace(); s.fit(); s.destroy();
  *
  * Sheet JSON v1: { id, no, title, rev, basis, size:[w,h], nodes:[…], edges:[…], areas:[…], notes:[…] }
- *   node { id, tag, sym, x, y, size?, rot?, cls?, label?, tagAt? ('above'|'below'|'left'|'right'|'belowV'|'none'|'at' + tagXY:[dx,dy,anchor]), values?:[{k, dx, dy, anchor}], lod?, inst? }
+ *   node { id, tag, sym, x, y, size?, rot?, cls?, label?, tagAt? ('above'|'below'|'left'|'right'|'belowV'|'none'|'at' + tagXY:[dx,dy,anchor]), values?:[{k, dx, dy, anchor, point?, label?, unit?}], lod?, inst? }
+ *     value.point = a point id (PRD-CONV-POINT-STATUS-TREND): the label is coloured by RZPointStatus and opens its trend
  *   edge { id?, from:'node.port' | [x,y], to:'node.port' | [x,y], via?:[[x,y]…], medium, w?:'main'|'branch'|'signal'|'bus', line?, flowOf? }
  *   area { x, y, w, h, label, kind:'zone'|'box' }   note { x, y, text, role }
  * Geometry is the sheet's; symbols come from RZEngSymbols (one library); every number comes from opts.read.
@@ -211,7 +212,10 @@
         }
         (n.values || []).forEach(function (v, j) {
           var vx = v.dx != null ? n.x + v.dx : tx, vy = v.dy != null ? n.y + v.dy : ty + 10 * (j + 1);
-          textSvg += '<text data-role="value" data-lod="' + (v.lod || 2) + '" data-val="' + esc(n.id) + ':' + esc(v.k) + '" x="' + r1(vx) + '" y="' + r1(vy) + '" text-anchor="' + (v.anchor || anchor) + '">—</text>';
+          /* a value item with `point` is a point (PRD-CONV-POINT-STATUS-TREND T2): its id, name and unit ride on the label;
+             data-point itself is written by update() once the label first shows a number (js/conv/point-status.js) */
+          var pa = v.point ? ' data-pt-id="' + esc(v.point) + '"' + (v.label ? ' data-pt-label="' + esc(v.label) + '"' : '') + (v.unit ? ' data-pt-unit="' + esc(v.unit) + '"' : '') : '';
+          textSvg += '<text data-role="value" data-lod="' + (v.lod || 2) + '" data-val="' + esc(n.id) + ':' + esc(v.k) + '"' + pa + ' x="' + r1(vx) + '" y="' + r1(vy) + '" text-anchor="' + (v.anchor || anchor) + '">—</text>';
         });
       }
     });
@@ -380,7 +384,7 @@
     function setA(el, k, v) { if (v == null || v === false) { if (el.hasAttribute(k)) el.removeAttribute(k); } else if (el.getAttribute(k) !== String(v)) el.setAttribute(k, v); }
     function update() {
       if (!opts.read) return;
-      var E = els();
+      var E = els(), PS = root.RZPointStatus, unbound = false;
       sheet.nodes.forEach(function (n) {
         var d = opts.read(n) || {}, g = E.node[n.id];
         if (!g || g.__d === d) return;   // the same reading object as the last repaint: nothing on this node can have changed
@@ -404,10 +408,21 @@
         (n.values || []).forEach(function (v) {
           var t = E.val[n.id + ':' + v.k], dv = d.values && d.values[v.k];
           if (!t) return;
-          var tx = dv ? dv.text : '—'; if (t.textContent !== tx) t.textContent = tx;
+          var tx = dv ? dv.text : '—', pid = t.getAttribute('data-pt-id');
+          if (!pid) { if (t.textContent !== tx) t.textContent = tx; }
+          else if (t.__tx !== tx) {
+            /* a point keeps its glyph tspan: only the text node is rewritten, and the state only when the text changed */
+            t.__tx = tx;
+            var tn = t.firstChild; if (tn && tn.nodeType === 3) tn.nodeValue = tx; else t.insertBefore(doc.createTextNode(tx), t.firstChild);
+            if (PS) {
+              if (t.hasAttribute('data-point')) PS.apply(t, pid);
+              else if (/\d/.test(tx)) { t.setAttribute('data-point', pid); unbound = true; }
+            }
+          }
           setA(t, 'data-alarm', dv && dv.alarm ? dv.alarm : null);
         });
       });
+      if (unbound) PS.bindAll(svg);   /* registers the new points with RZTrend, makes them buttons, applies their state */
       graph.forEach(function (e) {
         if (!e.flowOf && !opts.flow) return;
         var f = opts.flow ? opts.flow(e, graph) : null;

@@ -109,12 +109,15 @@
   function trendAttr(r) {
     if (!r.trend || !root.RZTrend) return '';
     root.RZTrend.register([r.trend]);
-    return ' data-trend="' + esc(r.trend.id) + '" tabindex="0" role="button" aria-label="' + esc(r.label + ': open trend') + '"';
+    /* PRD-CONV-POINT-STATUS-TREND T3: a row with a trend is a point — RZPointStatus colours it from the registry limits of
+       its id (Informational, page ink, when the id has none) and writes its state into aria-label and the tooltip */
+    return ' data-trend="' + esc(r.trend.id) + '"' + (root.RZPointStatus ? ' data-point="' + esc(r.trend.id) + '" data-pt-label="' + esc(r.trend.label || r.label) + '"' : '') +
+      ' tabindex="0" role="button" aria-label="' + esc(r.label + ': open trend') + '"';
   }
   function cell(r) {
     var a;
     if (r.basis) a = ' data-basis-param="' + esc(r.basis) + '" tabindex="0" role="button" style="--rz-ev:' + evColor(ev(r.basis)) + '" title="' + esc(r.basis + ' · ' + ev(r.basis) + ' — open the basis') + '"';
-    else a = ' data-rz-authored-basis="' + esc(r.declared || '') + '"' + (r.sim ? ' data-rz-sim="1"' : '') + trendAttr(r) + ' style="--rz-ev:' + (r.sim ? '#b0678f' : '#8fa2b8') + '" title="' + esc(r.declared || '') + '"';
+    else a = ' data-rz-authored-basis="' + esc(r.declared || '') + '"' + (r.sim ? ' data-rz-sim="1"' : '') + trendAttr(r) + ' style="--rz-ev:' + (r.sim ? '#b0678f' : '#8fa2b8') + '"' + (r.trend && root.RZPointStatus ? '' : ' title="' + esc(r.declared || '') + '"');
     return '<span class="rz-cvm-v' + (r.nm ? ' is-nm' : '') + '"' + a + '>' + esc(r.text) + (r.unit ? ' ' + esc(r.unit) : '') + '</span>';
   }
   function rows(list) {
@@ -190,10 +193,12 @@
     var id = t.getAttribute('data-basis-param');
     if (root.RZBasisDrawer && typeof root.RZBasisDrawer.open === 'function') { close(); root.RZBasisDrawer.open(id); }
   }
+  function points() { if (root.RZPointStatus && el) root.RZPointStatus.bindAll(el.querySelector('.rz-cvm-panel') || el); }
   function render() {
     if (IN) { renderInt(); return; }
     var scroller = el.querySelector('.rz-cvm-panel'), top = scroller ? scroller.scrollTop : 0;
     var focusedBasis = doc.activeElement && el.contains(doc.activeElement) ? doc.activeElement.getAttribute('data-basis-param') : null;
+    var focusedTrend = doc.activeElement && el.contains(doc.activeElement) ? doc.activeElement.getAttribute('data-trend') : null;   /* a point row keeps focus across a repaint */
     var closeHad = doc.activeElement && doc.activeElement.classList && doc.activeElement.classList.contains('rz-cvm-close');
     el.querySelector('.rz-cvm-panel').classList.remove('is-int');
     el.querySelector('.rz-cvm-panel').innerHTML = body(current);
@@ -202,6 +207,8 @@
     el.querySelector('.rz-cvm-close').addEventListener('click', close);
     if (closeHad) el.querySelector('.rz-cvm-close').focus();
     else if (focusedBasis) { var again = el.querySelector('[data-basis-param="' + focusedBasis + '"]'); if (again) again.focus(); }
+    else if (focusedTrend) { var againT = el.querySelector('[data-trend="' + focusedTrend.replace(/"/g, '') + '"]'); if (againT) againT.focus(); }
+    points();
   }
 
   /* ── v2: the inside of the machine (js/conv/internals.js) ─────────────────────────────────────────────────── */
@@ -273,7 +280,7 @@
   /* focus survives a re-render: the element is found again by what it is, not by reference */
   function focusKey() {
     var a = doc.activeElement; if (!a || !el.contains(a)) return null;
-    var k = ['data-nav', 'data-unit', 'data-rz-cvm-bsel', 'data-basis-param', 'data-node'];
+    var k = ['data-nav', 'data-unit', 'data-rz-cvm-bsel', 'data-basis-param', 'data-trend', 'data-node'];
     for (var i = 0; i < k.length; i++) if (a.hasAttribute(k[i])) return '[' + k[i] + '="' + (a.getAttribute(k[i]) || '').replace(/"/g, '') + '"]';
     return a.classList && a.classList.contains('rz-cvm-close') ? '.rz-cvm-close' : null;
   }
@@ -289,6 +296,7 @@
         '<div class="rz-cvm-int rz-cvm-int-fleet">' + sec('Unit', '<div data-rz-cvm-detail aria-live="polite">' + fDet + '</div>', 'rz-cvm-int-detail') + '</div>' +
         '<div data-rz-cvm-lower>' + fLow + '</div>';
       panel.querySelector('[data-rz-cvm-top]').__html = fTop; panel.querySelector('[data-rz-cvm-detail]').__html = fDet; panel.querySelector('[data-rz-cvm-lower]').__html = fLow;
+      points();
       panel.scrollTop = top;
       refocus(fk);
       return;
@@ -309,6 +317,7 @@
       open: function (n) { selectBlock(n.id, false); }
     });
     paintInt(true);
+    points();
     panel.scrollTop = top;
     refocus(fk);
   }
@@ -339,6 +348,7 @@
     IN.block = b.id;
     var box = el.querySelector('[data-rz-cvm-detail]'); if (box) { box.__html = intDetail(); box.innerHTML = box.__html; }
     markBlock();
+    points();
     if (fromList) refocus('[data-rz-cvm-bsel]');
   }
   function go(i) {
@@ -357,6 +367,7 @@
     if (!(doc.activeElement && doc.activeElement.hasAttribute && doc.activeElement.hasAttribute('data-rz-cvm-bsel'))) put(box, intDetail());
     put(low, intLower());
     paintInt(false);
+    points();
     refocus(fk);
   }
   function setInert(on) {

@@ -78,7 +78,7 @@
     if (n.tx) {
       o.state = devState(d);
       o.values.r = fv(grp(E.dist_tx_kva) + ' kVA ' + E.mv_voltage_kv + ' / ' + (E.lv_voltage_v / 1000) + ' kV');
-      o.values.ld = fv(kw(d.kw / (n.units || 1)) + ' each · ' + d.pct.toFixed(1) + ' %');
+      o.values.ld = fv(d.pct.toFixed(1) + ' % · ' + kw(d.kw / (n.units || 1)) + ' each');   /* the first number is the point: the loading, against its limits */
       return o;
     }
     if (n.ups) {
@@ -87,7 +87,7 @@
       o.state = devState(d);
       if (n.sym === 'rectifier') { o.values.kw = fv(onBat ? 'input lost' : kw(d && d.kw)); return o; }
       o.values.st = fv(!(d && d.energised) ? 'OFF' : (onBat ? 'ON BATTERY' : 'ON MAINS'), onBat || !(d && d.energised) ? '1' : null);
-      o.values.ld = fv(kw(d && d.kw) + ' · ' + (100 * (d ? d.kw : 0) / bat.ratingKw).toFixed(1) + ' %');
+      o.values.ld = fv((100 * (d ? d.kw : 0) / bat.ratingKw).toFixed(1) + ' % · ' + kw(d && d.kw));   /* UPS load %: the point, against electrical.ups_load_pct_normal */
       o.values.r = fv(SH[cur].counts.modules + ' × ' + grp(E.ups_module_kw_rated) + ' kW');
       if (onBat) o.alarm = '1';
       return o;
@@ -200,16 +200,18 @@
     set('epms-lv-rail-hall', HALLS[cur]);
     set('epms-lv-rail-sources', S.nodes.filter(function (n) { return n.src === 'grid' || n.src === 'battery'; }).map(function (n) {
       var t = n.src === 'grid' ? (r.lost[n.id] ? (ST[cur].lost[n.id] ? 'OUT' : 'DEAD') : 'LIVE · ' + kw(r.raw.sources[n.id].kw)) : (r.batt[n.id] ? 'ON BATTERY' : 'FLOAT');
-      return '<li><span>' + esc(n.tag) + '</span><b>' + esc(t) + '</b></li>';
+      /* a live source's kW is a point; a state word (DEAD / OUT / FLOAT) is not */
+      return '<li><span>' + esc(n.tag) + '</span><b' + (/\d/.test(t) ? ' data-point="epms-telemetry.lv-' + HALLS[cur] + '.' + n.id + '.power_kw" data-pt-label="' + esc(n.tag) + ' power" data-pt-unit="kW"' : '') + '>' + esc(t) + '</b></li>';
     }).join(''));
     var hs = m.halls[cur];
+    var rl = doc.getElementById('epms-lv-rail-gen'); if (rl) rl.setAttribute('data-const', '');   /* counts of sets: a fleet size, not a reading */
     set('epms-lv-rail-gen', '<b>' + hs.gensets + ' sets</b> · ' + (hs.gensets - E.genset_spare_per_hall) + ' + ' + E.genset_spare_per_hall + ' · <b>' + (hs.running ? hs.running + ' running' : 'standby') + '</b>');
     var mine = m.alarms.filter(function (a) { return a.hall === HALLS[cur]; });
     set('epms-lv-rail-alarms', mine.length ? mine.slice(0, 8).map(function (a) { return '<li>' + esc(a.text.replace(/^Hall [A-D] · /, '')) + '</li>'; }).join('') +
       (mine.length > 8 ? '<li>+ ' + (mine.length - 8) + ' more</li>' : '') : '<li><span>none</span></li>');
     var site = doc.getElementById('epms-lv-site');
     if (site) {
-      site.textContent = 'Site ' + m.gensTotal + ' sets · hall ' + HALLS[cur] + ' ' + hs.gensets + ' · ' + kw(hs.served) + ' supplied';
+      site.innerHTML = 'Site <span data-const>' + m.gensTotal + ' sets</span> · hall ' + HALLS[cur] + ' <span data-const>' + hs.gensets + '</span> · <span data-point="epms-telemetry.lv-' + HALLS[cur] + '.served_kw" data-pt-label="Hall ' + HALLS[cur] + ' supplied load" data-pt-unit="kW">' + kw(hs.served) + '</span> supplied';
       site.title = 'Site: ' + m.gensTotal + ' gensets (' + HALLS.length + ' halls × ' + E.genset_per_hall + '), ' + kw(m.servedKw) + ' of ' + kw(m.demandKw) + ' supplied. ' +
         'Supply: ' + E.hv_voltage_kv + ' kV GIS → ' + E.mv_voltage_kv + ' kV (E-S-101) → hall rings → ' + E.lv_voltage_v + ' V.';
     }
@@ -219,6 +221,7 @@
     var m = model();
     if (window.RZEpmsStatus) window.RZEpmsStatus.paint(m);
     rail(m);
+    if (window.RZPointStatus) ['epms-lv-rail', 'epms-lv-site'].forEach(function (id) { var el = doc.getElementById(id); if (el) window.RZPointStatus.bindAll(el); });
   }
 
   /* ── drawing ─────────────────────────────────────────────────────────────────────────────────────────────────── */
@@ -233,6 +236,8 @@
     });
     if (window.RZConvVfx) window.RZConvVfx.bind(host, SH[cur], flow, rest);
     if (window.RZConvTruth && window.RZConvTruth.marks) window.RZConvTruth.marks(sheet.svg);
+    /* PRD-CONV-POINT-STATUS-TREND T3: a rating or count on the sheet is a constant (its basis one click away) */
+    if (window.RZEpmsSheets && window.RZEpmsSheets.markConstants) window.RZEpmsSheets.markConstants(sheet.svg, SH[cur].nodes);
   }
   var opener = null;
   function render() {

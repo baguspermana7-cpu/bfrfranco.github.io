@@ -25,6 +25,11 @@
  *       and opening User Activity writes no generated events into localStorage
  *   X2  a profile display_name carrying markup renders as text in the Users table
  *   C1  js/rz-cookie-consent.js is not loaded on the console; the clock does not run before login
+ *   PL1 Point limits (PRD-CONV-POINT-STATUS-TREND §5b): a non-root account sees no "Point limits" tab (login only)
+ *   PL2 root: the tab lists every stubbed conv_points row with its bounds
+ *   PL3 a valid edit is saved through rzSupa.setConvPointLimits(id, patch) with the typed bounds
+ *   PL4 a bound-order violation (H > HH) is refused on the page: no write, the reason shown
+ *   PL5 a database refusal (stubbed RLS: 0 rows) is shown, not swallowed
  *   V1  anti-vibecode: no translateY hover lift on .btn/.login-submit/.ua-cat-card, no backdrop blur on
  *       .modal-overlay, no gradient or glow on .btn-purple
  *
@@ -77,6 +82,11 @@ const AUDIT = [
   { id: 4, actor_id: 'p3', action: 'scenario_opened', target_type: 'scenario', target_id: 's2', meta: {}, created_at: ago(45) },
 ];
 // Expected dashboard numbers, derived here independently of the page.
+const PL_ROWS = [
+  { id: 'cdu-mini-bms.TT-01.supply_c', label: 'TCS supply temperature (CDU TT-01)', unit: '°C', lo_alarm: 15, lo_warn: 18, hi_warn: 37, hi_alarm: 40, deadband: 0.3, evidence_class: 'ASSUMED', basis: 'OD-3' },
+  { id: 'environment.avg_rh_pct', label: 'White-space average relative humidity', unit: '%', lo_alarm: null, lo_warn: 20, hi_warn: 80, hi_alarm: null, deadband: 0.6, evidence_class: 'ASSUMED', basis: '<b>markup</b>' },
+  { id: 'fire.static_pressure_bar', label: 'Fire main pressure', unit: 'bar', lo_alarm: 8.5, lo_warn: 10.5, hi_warn: 14, hi_alarm: 16, deadband: 0.1, evidence_class: 'ASSUMED', basis: 'NFPA 20' },
+];
 const TIERS = PROFILES.reduce((m, p) => (m[p.tier] = (m[p.tier] || 0) + 1, m), {});
 const MONTHS = Array.from({ length: 6 }, (_, i) => { const d = new Date(Date.UTC(NOW.getUTCFullYear(), NOW.getUTCMonth() - 5 + i, 1)); return d.toISOString().slice(0, 7); });
 const NEW_PER_MONTH = MONTHS.map(m => PROFILES.filter(p => p.created_at.slice(0, 7) === m).length);
@@ -94,7 +104,9 @@ function stub(user, tier, opts = {}) {
     listAuditLog:async()=>({data:A.map(r=>Object.assign({},r)),error:null}),
     listSubscribers:async()=>({data:[],error:null}),
     getFeatureOverrides:async()=>({data:[],error:null}),
-    listEducators:async()=>({data:[],error:null})};
+    listEducators:async()=>({data:[],error:null}),
+    getConvPoints:async()=>({data:${JSON.stringify(PL_ROWS)}.map(r=>Object.assign({},r)),error:null}),
+    setConvPointLimits:async(id,patch)=>{(window.__plCalls=window.__plCalls||[]).push([id,patch]);const e=${JSON.stringify(opts.pointWriteError || null)};return e?{error:e}:{data:Object.assign({id},patch),error:null};}};
     api.ready=Promise.resolve(api);window.rzSupa=api;window.dispatchEvent(new CustomEvent("rz-supa-ready",{detail:api}));`;
 }
 
@@ -156,11 +168,37 @@ try {
   law('E1a', r.errors.length === 0, `page errors: ${JSON.stringify(r.errors)}`); await r.page.close();
 
   r = await open({ user: { id: 'u1', email: 'someone@example.com' }, tier: 'pro', forged: true });
+  const plHidden = await r.page.evaluate(() => { const n = document.querySelector('.nav-item[data-section="pointlimits"]'); return !n || !n.offsetParent; });
+  law('PL1', plHidden && r.vis.login, `non-root: Point limits tab visible=${!plHidden}, login shown=${r.vis.login}`);
   law('A2', r.vis.login && !r.vis.main, `signed-in tier=pro (+forged root session) → ${JSON.stringify(r.vis)}`);
   law('E1b', r.errors.length === 0, `page errors: ${JSON.stringify(r.errors)}`); await r.page.close();
 
   r = await open({ user: ROOT_USER, tier: 'root' });
   law('A3', !r.vis.login && r.vis.main && r.vis.sidebar, `signed-in tier=root → ${JSON.stringify(r.vis)}`);
+  {
+    const pl = await r.page.evaluate(async () => {
+      const nav = document.querySelector('.nav-item[data-section="pointlimits"]'); if (!nav) return { visible: false, rows: [], b: 0 };
+      nav.click();
+      await new Promise((res) => setTimeout(res, 300));
+      const rows = [...document.querySelectorAll('#plTbody tr[data-pl]')].map((tr) => [tr.getAttribute('data-pl'), ...[...tr.querySelectorAll('input[data-k]')].slice(0, 5).map((i) => i.value)]);
+      return { visible: !!document.querySelector('#sec-pointlimits.active'), rows, b: document.querySelectorAll('#plTbody b').length };
+    });
+    if (SHOTS) await r.page.screenshot({ path: path.join(SHOTS, 'pl-1440.png') });
+    const want = PL_ROWS.map((x) => [x.id, ...['lo_alarm', 'lo_warn', 'hi_warn', 'hi_alarm', 'deadband'].map((k) => (x[k] === null ? '' : String(x[k])))]);
+    law('PL2', pl.visible && JSON.stringify(pl.rows) === JSON.stringify(want) && pl.b === 0, `root Point limits table ${JSON.stringify(pl.rows)} (want ${JSON.stringify(want)}), markup elements ${pl.b}`);
+    const edit = async (id, k, v) => r.page.evaluate(async (id, k, v) => {
+      const tr = document.querySelector(`#plTbody tr[data-pl="${id}"]`), inp = tr.querySelector(`[data-k="${k}"]`);
+      inp.value = v; window.__plCalls = []; tr.querySelector('button').click();
+      await new Promise((res) => setTimeout(res, 150));
+      return { calls: window.__plCalls, status: document.getElementById('plStatus').textContent };
+    }, id, k, v);
+    let e = pl.visible ? await edit(PL_ROWS[0].id, 'hi_warn', '36.5') : { calls: [], status: 'no Point limits tab' };
+    law('PL3', e.calls.length === 1 && e.calls[0][0] === PL_ROWS[0].id && e.calls[0][1].hi_warn === 36.5 && e.calls[0][1].hi_alarm === 40 && e.calls[0][1].lo_alarm === 15 && /^Saved/.test(e.status), `valid edit → ${JSON.stringify(e)}`);
+    e = pl.visible ? await edit(PL_ROWS[0].id, 'hi_warn', '45') : e;
+    law('PL4', e.calls.length === 0 && /hi_warn 45 must be ≤ hi_alarm 40/.test(e.status), `H 45 > HH 40 → ${JSON.stringify(e)}`);
+    if (pl.visible) await edit(PL_ROWS[0].id, 'hi_warn', '37');
+    await r.page.evaluate(() => showSection('dashboard'));   /* leave the console where the D laws expect it */
+  }
   law('E1c', r.errors.length === 0, `page errors: ${JSON.stringify(r.errors)}`);
   const xss = await r.page.evaluate(() => {
     window.__pwned = 0;
@@ -279,11 +317,26 @@ try {
     dash: /supabase/i.test(document.getElementById('sec-dashboard').innerText) && /timed out/.test(document.getElementById('sec-dashboard').innerText),
     users: /timed out/.test(document.getElementById('sec-users').innerText),
   }));
+  {
+    const rr = await open({ user: ROOT_USER, tier: 'root', opts: { pointWriteError: 'Refused by the database: only a root account may change point limits.' } });
+    const e = await rr.page.evaluate(async () => {
+      if (!document.getElementById('sec-pointlimits')) return { status: 'no Point limits tab', colour: '' };
+      showSection('pointlimits'); await new Promise((res) => setTimeout(res, 300));
+      const tr = document.querySelector('#plTbody tr[data-pl]'); tr.querySelector('[data-k="hi_warn"]').value = '36'; tr.querySelector('button').click();
+      await new Promise((res) => setTimeout(res, 150));
+      const st = document.getElementById('plStatus');
+      return { status: st.textContent, colour: st.style.borderLeftColor };
+    });
+    law('PL5', /Not saved .*Refused by the database/.test(e.status) && /248, 113, 113|f87171/.test(e.colour), `stubbed refusal → ${JSON.stringify(e)}`);
+    if (SHOTS) { await rr.page.screenshot({ path: path.join(SHOTS, 'pl-refused-1440.png') }); }
+    await rr.page.close();
+  }
   law('D4', d4.dash && d4.users, `profiles read fails → error shown on dashboard=${d4.dash}, users=${d4.users}`);
   law('E1e', r.errors.length === 0, `page errors: ${JSON.stringify(r.errors)}`);
   await r.page.close();
   r = await open({ user: ROOT_USER, tier: 'root', width: 390 });
   await shots(r.page, '390');
+  if (SHOTS) { await r.page.evaluate(() => { showSection('pointlimits'); window.scrollTo(0, 0); }); await new Promise((res) => setTimeout(res, 400)); await r.page.screenshot({ path: path.join(SHOTS, 'pl-390.png') }); await r.page.evaluate(() => showSection('dashboard')); }
   const widths = await r.page.evaluate(async () => {
     const out = {};
     for (const sec of document.querySelectorAll('.section')) {

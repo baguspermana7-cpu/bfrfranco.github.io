@@ -23,9 +23,9 @@
     /* make-up and reserve */
     { id: 'mains', tag: 'MAINS', sym: 'offSheet', x: 40, y: 250, size: 24, label: 'Town / landlord water make-up', tagAt: 'above' },
     { id: 'vmu', tag: 'V-MU', sym: 'valveGate', x: 110, y: 250, size: 24, tagAt: 'above' },
-    { id: 'ftmu', tag: 'FT-MU', sym: 'flowMeter', x: 170, y: 250, size: 24, tagAt: 'above', values: [{ k: 'q', dx: 0, dy: 26, lod: 1 }] },
+    { id: 'ftmu', tag: 'FT-MU', sym: 'flowMeter', x: 170, y: 250, size: 24, tagAt: 'above', values: [{ k: 'q', dx: 0, dy: 26, lod: 1, point: 'fire.FT-MU.flow_m3h', label: 'FT-MU town make-up flow', unit: 'm³/h' }] },
     { id: 'tank', tag: 'TK-FW-01', sym: 'tankStorage', x: 240, y: 380, size: 96, cls: 'fire-tank', label: 'Fire-water reserve tank', tagAt: 'left',
-      values: [{ k: 'lvl', dx: -56, dy: 18, anchor: 'end', lod: 1 }, { k: 'vol', dx: -56, dy: 30, anchor: 'end', lod: 1 }, { k: 'dur', dx: -56, dy: 42, anchor: 'end', lod: 1 }] },
+      values: [{ k: 'lvl', dx: -56, dy: 18, anchor: 'end', lod: 1, point: 'fire.level_pct', label: 'Fire-water tank level' }, { k: 'vol', dx: -56, dy: 30, anchor: 'end', lod: 1, point: 'fire.stored_m3', label: 'Fire-water stored volume', unit: 'm³' }, { k: 'dur', dx: -56, dy: 42, anchor: 'end', lod: 1, point: 'fire.duration_min', label: 'Fire-water duration at pump demand', unit: 'min' }] },
     { id: 'lt', tag: 'LT', sym: 'instField', x: 312, y: 350, size: 22, inst: 'LT', tagAt: 'none' },
     /* suction header junctions */
     { id: 'js0', sym: 'junction', x: 360, y: 416, dot: false },
@@ -33,15 +33,15 @@
     /* discharge header junctions */
     { id: 'jd1', sym: 'junction', x: 650, y: PY[0] }, { id: 'jd2', sym: 'junction', x: 650, y: PY[1] }, { id: 'jd3', sym: 'junction', x: 650, y: PY[2] },
     { id: 'jtop', sym: 'junction', x: 650, y: HDR_Y }, { id: 'jpt', sym: 'junction', x: 650, y: 330 },
-    { id: 'pt', tag: 'PT-01', sym: 'instField', x: 600, y: 330, size: 22, inst: 'PT', tagAt: 'left', values: [{ k: 'p', dx: -14, dy: 16, anchor: 'end', lod: 1 }] },
+    { id: 'pt', tag: 'PT-01', sym: 'instField', x: 600, y: 330, size: 22, inst: 'PT', tagAt: 'left', values: [{ k: 'p', dx: -14, dy: 16, anchor: 'end', lod: 1, point: 'fire.static_pressure_bar', label: 'PT-01 fire main pressure' }] },
     { id: 'riser', tag: 'FH / HR RISER', sym: 'offSheet', x: 650, y: 190, size: 24, rot: 270, tagAt: 'left' },
     /* test header */
-    { id: 'fe', tag: 'FE-01', sym: 'flowMeter', x: 590, y: 715, size: 24, rot: 180, tagAt: 'above', values: [{ k: 'q', dx: 0, dy: 26, lod: 1 }] },
+    { id: 'fe', tag: 'FE-01', sym: 'flowMeter', x: 590, y: 715, size: 24, rot: 180, tagAt: 'above', values: [{ k: 'q', dx: 0, dy: 26, lod: 1, point: 'fire.FE-01.flow_m3h', label: 'FE-01 fire pump discharge flow', unit: 'm³/h' }] },
     { id: 'vtest', tag: 'V-TEST', sym: 'valveGlobe', x: 520, y: 715, size: 24, tagAt: 'above' },
     { id: 'drain', tag: 'TEST · DRAIN', sym: 'drain', x: 460, y: 715, size: 22, tagAt: 'left' },
     /* N2 supervisory gas */
     { id: 'jn2h', sym: 'junction', x: 850, y: N2_Y, dot: false },
-    { id: 'n2', tag: 'N2-GEN-01', sym: 'compressor', x: 800, y: 580, size: 36, cls: 'fire-n2', label: 'Nitrogen generator · pre-action supervisory gas', tagAt: 'left', values: [{ k: 'p', dx: -22, dy: 16, anchor: 'end', lod: 1 }] }
+    { id: 'n2', tag: 'N2-GEN-01', sym: 'compressor', x: 800, y: 580, size: 36, cls: 'fire-n2', label: 'Nitrogen generator · pre-action supervisory gas', tagAt: 'left', values: [{ k: 'p', dx: -22, dy: 16, anchor: 'end', lod: 1, point: 'fire.N2-GEN-01.pressure_bar', label: 'N2-GEN-01 supervisory gas pressure', unit: 'bar' }] }
   ];
   var pumps = [
     { id: 'fp1', tag: 'FP-01', label: 'Main fire pump 1 · electric', size: 40 },

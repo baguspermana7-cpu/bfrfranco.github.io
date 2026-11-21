@@ -11,6 +11,50 @@ release sections rather than semver.
 
 ---
 
+## v3.82.0 — 2026-11-21 — Every BMS number shows its state and opens an instrument trend
+
+Owner: point colours (normal green, TCS 35 °C green / 37 °C amber / red above), "semua angka … saat di klik bisa keluar
+modal trendline dan ada tombol 1d, 7d", "Angka2 itu harus dimasukkan database", "Warna chart sangat ai design slop".
+PRD-CONV-POINT-STATUS-TREND (T0–T3, §5b, OD-8) and PRD-CONV-TREND-DESIGN.
+
+### Added
+- `js/conv/point-status.js` (`RZPointStatus`) + `css/conv-point.css`: one limits registry
+  (`data/conv-limits.curated.json` → `data/conv-parameters.json` `limits`, 33 rows), ISA-18.2 deadband, state on the
+  number (green / amber ▲▼ / red ◆ + outline), tooltip with the limits and their evidence class.
+- All nine Conventional cockpits (chiller-plant, cdu-mini-bms, fuel, water, fire, ict, EPMS, dc-conventional,
+  datahall): every visible number is a point (state + trend) or a declared constant; `test-conv-point-coverage.mjs`
+  holds all nine STRICT at 0 unclassified (1440 and 390) and plants an excursion on four pages (TCS 39 °C, TX-2 72.7 %,
+  rack inlet 29.1 °C, UST 98 %) to prove the state, the glyph and the trend header follow.
+- Database (§5b): limits from Supabase `conv_points` after first paint, history from the `conv_point_series` RPC
+  written by pg_cron; when the database is unreachable the trend says "Local model (database unreachable)" and never
+  mixes sources. Migration `supabase/migrations/2026-11-20-conv-points.sql` (seed 33 points) is run by the owner
+  (RUNBOOK-DB.md); until then the shipped registry and the local model are used.
+- `js/conv/floor-plan.js` (`RZFloorPlan`, PRD-CONV-DATAHALL-FLOOR FP1): oblique 2.5D data hall plan, colour = state,
+  height = load; fixture and gate `test-conv-floor-plan.mjs` (FL1–FL11). Not yet wired into `datahall.html` (FP2).
+- PRDs: PRD-CONV-TREND-DESIGN, PRD-CONV-DATAHALL-FLOOR, PRD-CONV-DATAHALL-SPACE (owner R182: the hall gets 11 % of the
+  screen today; laws SP1–SP10).
+
+### Changed
+- `js/rz-trend.js` 3.0.0 (PRD-CONV-TREND-DESIGN): ranges 1H · 8H · 1D · 7D · 30D (keys 1–5, remembered), local time
+  with the zone named; ink pen that turns amber / red only on the pieces past a limit; one neutral normal band; solid
+  hairline limits with muted HH/H/L/LL labels and edge markers; y axis fitted to the data with nice ticks; one axis per
+  unit; state ribbon and now dot; source, limits basis and zone in an ⓘ tooltip; one stats line; at most two compare
+  pens in validated slots. Phone = bottom sheet with 44 px controls.
+- `datahallAI.html`: asset cache tokens only (shared `js/rz-trend.js` / registry); no content change.
+
+### Fixed
+- Trend y labels printed 2.5-steps rounded to integers ("33" for 32.5); the info tooltip opened by itself in the
+  phone sheet and covered the range buttons. Both now held by laws D6 / D8 of `test-conv-trend-ranges.mjs`
+  (328 checks, 29 red on 2.2.0).
+- Basis drawer: four hooks named a parameter that was not the first number of their label. A JS string in `ict.html`
+  read as a hook; EPMS "BB1 150 kV" read as 1; "BUS A · 20 kV · 13.5 kA" pointed at the fault level;
+  "× 40 · 400 V" pointed at the voltage. Hooks now name the leading number, and `test-conv-basis-drawer` skips a
+  letter-led equipment tag (BB1, TX-2) before reading the value (96 hooks, 125 pairs agree).
+
+### Known
+- `audit-editorial-render` is red on origin/main b0fc64c3d as well (87 pages +2, navbar / footer values since the
+  v3.79.0 site bar); this release does not change it. Site-bar owner to re-baseline.
+
 ## v3.81.0 — 2026-11-21 — BMS plant sheets draw the real fleet (chiller, fuel, EPMS LV)
 
 Owner: "di BMS dulu selesaikan dan di polish". PRD-CONV-EQUIPMENT-TRUTH E3, fuel truth (F2/F5) and E5-EPMS.

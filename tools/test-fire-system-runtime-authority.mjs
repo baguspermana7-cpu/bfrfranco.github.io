@@ -166,7 +166,9 @@ async function readFireState(page) {
     ];
     /* FS-M-101 (js/conv/fire-sheet.js) — values, node states and pipe flow states read from the drawing */
     const svg = document.getElementById('fire-svg');
-    const val = (node, k) => svg?.querySelector(`[data-val="${node}:${k}"]`)?.textContent.trim() || '';
+    /* a point's state glyph (tspan.rz-pt-g, aria-hidden, PRD-CONV-POINT-STATUS-TREND) is decoration, not the value */
+    const vtext = (t) => { let x = ''; t.childNodes.forEach((n) => { if (!(n.classList && n.classList.contains('rz-pt-g'))) x += n.textContent; }); return x.trim(); };
+    const val = (node, k) => { const t = svg?.querySelector(`[data-val="${node}:${k}"]`); return t ? vtext(t) : ''; };
     const nodeState = (node) => svg?.querySelector(`.hmi-node[data-node="${node}"]`)?.getAttribute('data-state') || '';
     const flow = (edge) => svg?.querySelector(`path.hmi-edge[data-edge="${edge}"]`)?.getAttribute('data-flow') || '';
     const sheet = {

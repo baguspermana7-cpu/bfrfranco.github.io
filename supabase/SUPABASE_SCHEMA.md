@@ -42,6 +42,20 @@ a per-user row-count cap trigger (SECURITY DEFINER), and jsonb size CHECKs.
 | `subscriptions` | read own | **No client write** — Mayar webhook via `service_role`. `user_id → auth.users`. |
 | `payments` | read own | **No client write** — webhook via `service_role`. `subscription_id → subscriptions (on delete set null)`. |
 
+### Conventional points (migration `supabase/migrations/2026-11-20-conv-points.sql`, PRD-CONV-POINT-STATUS-TREND §5b)
+
+| Table | Rows | Read | Write |
+|---|---|---|---|
+| `conv_points` | one per point (19 today, from `data/conv-limits.curated.json` + `data/conv-points.json`) | **all (anon)** | **root only** (`is_root()`), check `lo_alarm ≤ lo_warn < hi_warn ≤ hi_alarm`; every insert/update/delete → `audit_log` (`conv_point_<op>`, old + new row) |
+| `conv_point_samples` | point × 5 min, kept 48 h | all | **no client write** — only the SECURITY DEFINER writer |
+| `conv_point_rollup` | point × 30 min (min/max/mean/n), kept 35 d | all | same |
+
+Writer: `conv_sample_tick(at)` (pg_cron job `conv-sample-tick`, `*/5 * * * *`) and `conv_backfill(days)`, both SECURITY
+DEFINER, EXECUTE revoked from public/anon/authenticated. Reader: `conv_point_series(id, from, to)` (STABLE, anon) —
+samples for a window ≤ 24 h, rollups otherwise, ≤ 35 d. Values = the SQL port of `RZConvHistory.value`
+(`conv_hist_hash/imul/noise/value`), proven equal by `tools/test-conv-points-sql.mjs`. Measured after the 30-day
+backfill: 38 323 rows, 6.24 MB. Owner runbook: `documentation/product-transformation/02-prds/PRD-CONV-POINT-STATUS-TREND/RUNBOOK-DB.md`.
+
 ### Functions
 
 | Function | Type | Guard |

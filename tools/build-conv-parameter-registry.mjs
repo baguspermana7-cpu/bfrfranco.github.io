@@ -35,6 +35,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 const ENGINE = join(ROOT, 'js', 'conv-engine.js');
 const CURATED = join(ROOT, 'data', 'conv-parameters.curated.json');
+/* PRD-CONV-POINT-STATUS-TREND §5: operating limits, hand-written, merged in as `limits` (one source, P-1). */
+const LIMITS = join(ROOT, 'data', 'conv-limits.curated.json');
 const OUT = join(ROOT, 'data', 'conv-parameters.json');
 /* Browser-loadable twin. This site is zero-build and ES5, and its cockpits are opened over
    file:// by some gates, where fetch() of a JSON file fails. A plain <script> that assigns a
@@ -376,11 +378,23 @@ export function buildRegistry() {
         parameters.push(record);
     }
 
+    /* Limits are copied, not computed: the rows are curated, ordered by id so a re-order in the curated file is no drift.
+       Bound ordering and the P-6 history check are proved by tools/test-conv-point-status-core.mjs. */
+    const limits = JSON.parse(readFileSync(LIMITS, 'utf8')).rows
+        .map((row) => ({ ...row }))
+        .sort((a, b) => a.id.localeCompare(b.id));
+    const seen = new Set();
+    for (const row of limits) {
+        if (seen.has(row.id)) throw new Error(`conv-limits.curated.json: duplicate id ${row.id}`);
+        seen.add(row.id);
+    }
+
     return {
         generatedBy: 'tools/build-conv-parameter-registry.mjs',
         engineVersion: String(live.snapshot.meta.version),
-        note: 'GENERATED — do not hand-edit. Curated metadata lives in data/conv-parameters.curated.json.',
+        note: 'GENERATED — do not hand-edit. Curated metadata lives in data/conv-parameters.curated.json; limits in data/conv-limits.curated.json.',
         parameters,
+        limits,
     };
 }
 

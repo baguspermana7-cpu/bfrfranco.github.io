@@ -200,6 +200,7 @@
     areas.push({ x: W - 440, y: 244, w: 424, h: 892, label: 'STREAM B', kind: 'zone' });
     areas.push({ x: 16, y: 1144, w: W - 32, h: 340, label: 'HALL GENERATION · ' + n + ' SETS (' + (n - e.genset_spare_per_hall) + ' + ' + e.genset_spare_per_hall + ')', kind: 'zone' });
     void gmin; void gmax;
+    if (root.RZEpmsSheets && root.RZEpmsSheets.points) { root.RZEpmsSheets.points(nodes, 'epms-telemetry.lv-' + H_); root.RZEpmsSheets.defineLimits(nodes); }   /* PRD-CONV-POINT-STATUS-TREND T2 */
     return {
       id: 'e-s-102-' + H_.toLowerCase(), no: 'E-S-102', title: 'LV DISTRIBUTION · TYPICAL HALL · HALL ' + H_, rev: 'A', basis: 'IEC 60617 · IEEE C37.2',
       svgId: 'epms-lv-svg', size: [W, H], minScale: 1.17, nodes: nodes, edges: edges, areas: areas, notes: notes, hall: h, hallCode: H_,
