@@ -226,6 +226,10 @@
       case 'ss': var u2 = S.ups && S.ups['UPS-' + L], us = u2 && (u2.state || u2); return us ? (us === 'bypass' ? 'closed' : 'open') : null;
       case 'mb': var u3 = S.ups && S.ups['UPS-' + L], ms = u3 && (u3.state || u3); return ms ? (ms === 'maintenance' ? 'closed' : 'open') : null;
       case 'qbw': return br('BR-BUSWAY');
+      /* the 20 kV bus off-sheet is live only while its utility is (PRD-ELECTRICAL-BMS E19: MSB-A read 395 V through a
+         utility A failure) */
+      case 'os-gen': var gp = S.sources && S.sources['SRC-GENSET-POOL']; return gp ? (gp.state === 'running' ? 'running' : gp.state === 'failed' ? 'fault' : 'standby') : null;
+      case 'os-mv': var src = S.sources && S.sources['SRC-UTILITY-' + L]; return src ? (src.state === 'online' ? 'running' : 'stopped') : null;
       default: return null;
     }
   }
@@ -396,7 +400,9 @@
       read: function (n) {
         var d = read(n, extra && extra.sheet), s0 = d.state, o = st[n.id];
         if (n.flowSrc) s0 = loopState(n.flowSrc, hallOfSheet(extra && extra.sheet));   // evidence from another sheet; the symbol itself shows nothing new
-        if (!o || o.state !== s0 || o.quality !== d.quality) { st[n.id] = { id: n.id, state: s0, quality: d.quality, sym: n.sym, cls: n.cls }; dirty = true; }
+        /* an off-sheet is drawn neutral, but the power walk needs to know whether the bus it stands for is live */
+        var src = n.sym === 'offSheet' ? elecState(n, extra && extra.sheet) : undefined;
+        if (!o || o.state !== s0 || o.quality !== d.quality || o.src !== src) { st[n.id] = { id: n.id, state: s0, src: src, quality: d.quality, sym: n.sym, cls: n.cls }; dirty = true; }
         st[n.id].speed = d.speed;
         return d;
       },   // the flow pass re-runs only when a state changed
@@ -549,13 +555,138 @@
     es.forEach(function (e) { e.target.classList.toggle('is-offscreen', !e.isIntersecting); });
   }) : null;
   function vfxBind(sheetId, host, so) {
-    if (!VFX[sheetId]) return;
+    if (!VFX[sheetId] && !/^dh-e-/.test(sheetId)) return;
     vfxOpts[sheetId] = so;
     if (vfxSeen) vfxSeen.observe(host);
     vfxApply(sheetId);
   }
+  /* PRD-ELECTRICAL-BMS E2 (owner R186: "Sempurnakan juga yg substation/electricalnya"): the electrical sheets speak the
+     state grammar of the EPMS and the cooling sheets, not feed identity hues. A conductor is energized (running) when it
+     is reached from a live source through items that pass power; an open or tripped switching device stops the walk
+     (its line side stays live). Sources: the utility intake, the 20 kV bus off-sheet, a running generator, a running
+     UPS rectifier / inverter and the battery (a UPS carries its load on battery; rectifier and inverter are not walked
+     THROUGH, so a battery never back-feeds the AC side). A dead conductor joined to a standby source rests (standby),
+     the rest is stopped. Built on the drawn geometry: an edge that ends on a point (a tee on a bus) joins the edge or
+     junction there. */
+  var SWITCHING = /^(cb|disconnector|quickDisconnect|isolator|switch|staticSwitch)/;
+  function edgePts(svg, id) {
+    var p = svg.querySelector('.hmi-edges > path.hmi-edge[data-edge="' + id + '"]:not(.hmi-flow)') || svg.querySelector('path.hmi-edge[data-edge="' + id + '"]:not(.hmi-flow)');
+    var n = p ? (p.getAttribute('d') || '').match(/-?\d+(?:\.\d+)?/g) : null, pts = [];
+    if (n) for (var i = 0; i + 1 < n.length; i += 2) pts.push([+n[i], +n[i + 1]]);
+    return pts;
+  }
+  function onSeg(pt, a, b) {
+    var t = 1.6, minx = Math.min(a[0], b[0]) - t, maxx = Math.max(a[0], b[0]) + t, miny = Math.min(a[1], b[1]) - t, maxy = Math.max(a[1], b[1]) + t;
+    if (pt[0] < minx || pt[0] > maxx || pt[1] < miny || pt[1] > maxy) return false;
+    var dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy) || 1;
+    return Math.abs((pt[0] - a[0]) * dy - (pt[1] - a[1]) * dx) / L <= t;
+  }
+  function elecMap(api, info) {
+    var svg = api.svg, nodes = {}, adj = {}, flow = {}, rest = {};
+    api.sheet.nodes.forEach(function (n) { nodes[n.id] = n; });
+    var power = info.graph.filter(function (e) { return !/^(signal|inst)$/.test(e.w) && !/^(signal)$/.test(e.m); });
+    info.graph.forEach(function (e) { if (power.indexOf(e) < 0) flow[e.id] = 'na'; });
+    var link = function (a, b) { (adj[a] = adj[a] || []).push(b); (adj[b] = adj[b] || []).push(a); };
+    var poly = {}; power.forEach(function (e) { poly[e.id] = edgePts(svg, e.id); });
+    var junctionAt = function (pt) {
+      for (var k in nodes) { var n = nodes[k]; if (n.sym === 'junction' && Math.abs(n.x - pt[0]) < 1.6 && Math.abs(n.y - pt[1]) < 1.6) return k; }
+      return null;
+    };
+    power.forEach(function (e) {
+      var P = poly[e.id], V = 'E:' + e.id;
+      [[e.a, P[0]], [e.b, P[P.length - 1]]].forEach(function (end) {
+        if (end[0]) { link(V, 'N:' + end[0]); return; }
+        if (!end[1]) return;
+        var j = junctionAt(end[1]); if (j) { link(V, 'N:' + j); return; }
+        power.forEach(function (o) {   // a tee onto another conductor
+          if (o === e) return; var Q = poly[o.id];
+          for (var i = 1; i < Q.length; i++) if (onSeg(end[1], Q[i - 1], Q[i])) { link(V, 'E:' + o.id); return; }
+        });
+      });
+    });
+    var st = info.st;
+    var stateOfN = function (id) { return st[id] && (st[id].state || st[id].src); };
+    var normallyOpen = function (n) { return /normally open/i.test(n.label || ''); };
+    var blocks = function (id) {
+      var n = nodes[id], s0 = stateOfN(id); if (!n) return false;
+      if (/^(rectifier|inverterIec|psuAcDc|atsIec)$/.test(n.sym)) return true;   // never walked through (one-way: converters; an ATS joins one source to its load, below)
+      if (/^(generatorIec|utilitySource|batteryIec)$/.test(n.sym)) return false;
+      if (s0 === 'fault' || s0 === 'stopped') return true;
+      if (SWITCHING.test(n.sym)) return s0 === 'open' || s0 === 'standby' || (!s0 || s0 === 'na') && normallyOpen(n);
+      return false;
+    };
+    var isSource = function (id) {
+      var n = nodes[id], s0 = stateOfN(id); if (!n) return false;
+      if (n.sym === 'utilitySource') return s0 !== 'fault' && s0 !== 'stopped' && s0 !== 'standby';
+      if (n.sym === 'generatorIec') return s0 === 'running';
+      if (n.sym === 'offSheet') return (/^os-mv/.test(id) && s0 !== 'stopped' && s0 !== 'fault') || (/^os-gen/.test(id) && s0 === 'running');
+      if (/^(rectifier|inverterIec|batteryIec)$/.test(n.sym)) return s0 === 'running' || (n.sym === 'batteryIec' && s0 !== 'fault');
+      return false;
+    };
+    var standbySource = function (id) {
+      var n = nodes[id], s0 = stateOfN(id); if (!n) return false;
+      return (n.sym === 'generatorIec' && s0 !== 'running' && s0 !== 'fault') || (n.sym === 'offSheet' && /^os-gen/.test(id) && s0 !== 'running' && s0 !== 'fault');
+    };
+    var walk = function (seed, stopAtBlock) {
+      var seen = {}, q = seed.slice(); seed.forEach(function (k) { seen[k] = true; });
+      while (q.length) {
+        var k = q.shift();
+        if (k.charAt(0) === 'N' && stopAtBlock && blocks(k.slice(2)) && seed.indexOf(k) < 0) continue;   // fed, but stops the walk
+        (adj[k] || []).forEach(function (m) { if (!seen[m]) { seen[m] = true; q.push(m); } });
+      }
+      return seen;
+    };
+    /* an ATS passes power one way, from the source it has selected to its load: never back into the other source (the
+       generator fed MSB-A backwards through ATS-A in a utility A failure). Its selected port is the one whose source
+       side is live; the normal source wins when both are */
+    var atsSeed = function (seen) {
+      var more = [];
+      Object.keys(nodes).forEach(function (k) {
+        var n = nodes[k]; if (n.sym !== 'atsIec' || stateOfN(k) === 'fault' || stateOfN(k) === 'stopped') return;
+        var es = power.filter(function (e) { return e.a === k || e.b === k; }), port = function (e) { return e.a === k ? e.pa : e.pb; };
+        var src = ['sourceA', 'sourceB'].filter(function (p) { return es.some(function (e) { return port(e) === p && seen['E:' + e.id]; }); })[0];
+        if (src) es.forEach(function (e) { if (port(e) === 'load' && !seen['E:' + e.id]) more.push('E:' + e.id); });
+      });
+      return more;
+    };
+    var walkAts = function (seed) {
+      var seen = walk(seed, true), more = atsSeed(seen);
+      while (more.length) { var m2 = walk(more, true); Object.keys(m2).forEach(function (x) { seen[x] = true; }); more = atsSeed(seen); }
+      return seen;
+    };
+    /* a converter feeds only its output side: rectifier the DC link, inverter the AC output, battery its DC bus (the
+       rectifier source lit its own AC input, so the UPS input read live in a utility failure) */
+    var OUT = { rectifier: 'dc', inverterIec: 'ac' };
+    var seedOf = function (k) {
+      var n = nodes[k], op = OUT[n.sym]; if (!op) return ['N:' + k];
+      return power.filter(function (e) { return (e.a === k && e.pa === op) || (e.b === k && e.pb === op); }).map(function (e) { return 'E:' + e.id; });
+    };
+    var live = walkAts([].concat.apply([], Object.keys(nodes).filter(isSource).map(seedOf)));
+    var held = walkAts(Object.keys(nodes).filter(standbySource).map(function (k) { return 'N:' + k; }));
+    power.forEach(function (e) {
+      var V = 'E:' + e.id;
+      flow[e.id] = live[V] ? 'running' : 'stopped';
+      if (!live[V] && held[V]) rest[e.id] = true;
+    });
+    return { flow: flow, rest: rest, mover: {}, st: st, graph: info.graph };
+  }
   function vfxApply(sheetId) {
     var V = win.RZConvVfx, api = sheets[sheetId], so = vfxOpts[sheetId], info = so && so.vfxInfo();
+    if (/^dh-e-/.test(sheetId)) {
+      if (!V || !api || !info) return;
+      var frameE = api.svg.closest('.hmi-frame'); if (!frameE) return;
+      var em = elecMap(api, info);
+      V.mount(frameE, { thermal: false });
+      V.apply(api.svg, { edges: em.graph,
+        flow: function (e) { var f = em.flow[e.id]; return f == null || f === 'na' ? null : f; },
+        rest: function (e) { return !!em.rest[e.id]; },
+        ratio: function () { return 1; },
+        temp: function () { return null; },
+        speed: function () { return null; } });
+      Array.prototype.forEach.call(api.svg.querySelectorAll('.hmi-node[data-state="na"][data-vstate]'), function (g) { g.removeAttribute('data-vstate'); });
+      if (api.volts) api.volts();   // bus voltages follow the painted state (a dead bus reads 0 V DEAD)
+      return;
+    }
     if (!V || !api || !info) return;
     var svg = api.svg, frame = svg.closest('.hmi-frame'); if (!frame) return;
     var snap = win.DCAI_CALC && win.DCAI_CALC.snapshot, pl = snap && snap.design && snap.design.planes;

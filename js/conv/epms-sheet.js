@@ -37,10 +37,15 @@
     return [{ k: 'st', dx: dx, dy: 15, anchor: a, lod: 1 }, { k: 'pw', dx: dx, dy: 27, anchor: a, lod: 1 }];
   }
 
+  /* PRD-ELECTRICAL-BMS E1 (v3.94): the sheet opens at its reading scale inside the stage at 1440 px, so the drawing is
+     ~1 300 units wide (was 1 690: eight feeders at a 100 pitch). Every x below hangs off these columns. */
   var BB1 = 470, BB2 = 500, MV = 950, bb1Taps = [], bb2Taps = [];
+  var LX = [160, 350], C1X = 425, C2X = 485, TXX = [640, 880], TIEX = 760, HVE = 990, RBBX = 1030;
+  var FP = 75, FA = [90, 90 + FP, 90 + 2 * FP, 90 + 3 * FP], GAX = 500, GBX = 990, FB = [GBX + 70, GBX + 70 + FP, GBX + 70 + 2 * FP, GBX + 70 + 3 * FP];
+  var MVE = FB[3] + 45, ZW = MVE + 40 - 16;
 
   /* ── 150 kV line bays ───────────────────────────────────────────────────────────────────────── */
-  [[1, 200], [2, 400]].forEach(function (b) {
+  [[1, LX[0]], [2, LX[1]]].forEach(function (b) {
     var k = b[0], x = b[1], p = 'l' + k + '-', T = '-L' + k;
     N({ id: p + 'src', tag: 'PLN LINE ' + k, sym: 'utilitySource', x: x, y: 84, size: 32, cls: 'epms', src: 'grid', kv: 'hv',
       label: 'PLN 150 kV incoming line ' + k + ' (cable sealing end)', tagAt: 'above',
@@ -81,7 +86,7 @@
   });
 
   /* ── bus coupler ─────────────────────────────────────────────────────────────────────────────── */
-  var C1 = 540, C2 = 600;
+  var C1 = C1X, C2 = C2X;
   N({ id: 'cp-ds1', tag: 'DS1-CP', sym: 'disconnector', x: C1, y: 545, size: SW, cls: 'epms', sw: 'ds', cb: 'cp-cb', kv: 'hv', label: 'Coupler disconnector BB1', tagAt: 'left' });
   N({ id: 'cp-ds2', tag: 'DS2-CP', sym: 'disconnector', x: C2, y: 545, size: SW, cls: 'epms', sw: 'ds', cb: 'cp-cb', kv: 'hv', label: 'Coupler disconnector BB2', tagAt: 'right' });
   N({ id: 'cp-cb', tag: 'CB-CP', sym: 'cbIec', x: C1, y: 600, size: SW, cls: 'epms', sw: 'cb', kv: 'hv', relay: 'cp-r', label: 'Bus coupler circuit breaker', tagAt: 'right',
@@ -94,15 +99,15 @@
   E('cp-d', 'cp-cb.load', 'cp-ds2.load', [[C1, 640], [C2, 640]]);
   sig('cp-sig', 'cp-r.input', [C1 - 8, 600]);
   bb1Taps.push(['bb1-cp', C1]); bb2Taps.push(['bb2-cp', C2]);
-  N({ id: 'bb-r', tag: 'R-BB', name: '87B', sym: 'protectionRelay', x: 1160, y: 485, size: 26, cls: 'epms', prot: null,
+  N({ id: 'bb-r', tag: 'R-BB', name: '87B', sym: 'protectionRelay', x: RBBX, y: 485, size: 26, cls: 'epms', prot: null,
     label: 'Busbar differential relay 87B (both busbars, all bay CTs)', tagAt: 'right',
-    values: [{ k: 'bb1', dx: -1096, dy: -19, anchor: 'start', lod: 1 }, { k: 'bb2', dx: -1096, dy: 11, anchor: 'start', lod: 1 }] });
+    values: [{ k: 'bb1', dx: 64 - RBBX, dy: -19, anchor: 'start', lod: 1 }, { k: 'bb2', dx: 64 - RBBX, dy: 11, anchor: 'start', lod: 1 }] });
   /* 87B measures both busbars through every bay CT; drawn as its taps onto BB1 and BB2 */
-  edges.push({ id: 'bb-sig1', from: 'bb-r.input', to: [1100, BB1], via: [[1100, 485]], medium: 'line', w: 'inst' },
-    { id: 'bb-sig2', from: [1100, 485], to: [1100, BB2], medium: 'line', w: 'inst' });
+  edges.push({ id: 'bb-sig1', from: 'bb-r.input', to: [HVE - 20, BB1], via: [[HVE - 20, 485]], medium: 'line', w: 'inst' },
+    { id: 'bb-sig2', from: [HVE - 20, 485], to: [HVE - 20, BB2], medium: 'line', w: 'inst' });
 
   /* ── transformer bays, 150/20 kV transformers, NGR, 20 kV incomers ──────────────────────────── */
-  [[1, 740, 'A'], [2, 1020, 'B']].forEach(function (b) {
+  [[1, TXX[0], 'A'], [2, TXX[1], 'B']].forEach(function (b) {
     var k = b[0], x = b[1], s = b[2], p = 't' + k + '-', i = 'i' + k + '-', T = '-T' + k;
     N({ id: p + 'ds1', tag: 'DS1' + T, sym: 'disconnector', x: x - 22, y: 545, size: SW, cls: 'epms', sw: 'ds', cb: p + 'cb', kv: 'hv',
       normal: k === 1 ? 'closed' : 'open', label: 'Transformer bay busbar disconnector to BB1', tagAt: 'left' });
@@ -124,7 +129,7 @@
       label: 'Standby earth-fault relay 51G on the NGR', tagAt: 'right' });
     N({ id: i + 'cb', tag: 'CB-IN' + k, sym: 'cbIec', x: x, y: 860, size: SW, cls: 'epms', sw: 'cb', kv: 'mv', role: 'incomer', relay: i + 'r',
       label: '20 kV incomer circuit breaker, section ' + s, tagAt: 'left',
-      values: cbVals('left').concat([k === 1 ? { k: 'bus', dx: 64 - x, dy: 82, anchor: 'start', lod: 1 } : { k: 'bus', dx: 1686 - x, dy: 82, anchor: 'end', lod: 1 }]) });
+      values: cbVals('left').concat([k === 1 ? { k: 'bus', dx: 64 - x, dy: 82, anchor: 'start', lod: 1 } : { k: 'bus', dx: MVE - 4 - x, dy: 82, anchor: 'end', lod: 1 }]) });
     N({ id: i + 'ct', tag: 'CT-IN' + k, sym: 'currentTransformer', x: x, y: 905, size: SW, cls: 'epms', label: '20 kV incomer current transformer', tagAt: 'left' });
     N({ id: i + 'r', tag: 'R-IN' + k, name: '50/51', sym: 'protectionRelay', x: x + 52, y: 905, size: 26, cls: 'epms', prot: 'incomer', cb: i + 'cb',
       label: '20 kV incomer overcurrent relay 50/51', tagAt: 'right' });
@@ -152,11 +157,11 @@
     pts.forEach(function (t) { N({ id: t[0], sym: 'junction', x: t[1], y: y }); });
     for (var j = 1; j < pts.length; j++) E(prefix + '-' + j, pts[j - 1][0], pts[j][0], null, { w: w || 'bus' });
   }
-  busbar('bb1', BB1, bb1Taps, 60, 1120);
-  busbar('bb2', BB2, bb2Taps, 60, 1120);
+  busbar('bb1', BB1, bb1Taps, 60, HVE);
+  busbar('bb2', BB2, bb2Taps, 60, HVE);
 
   /* ── 20 kV feeders, typical distribution unit, generator incomers ───────────────────────────── */
-  var HALLS = ['A', 'B', 'C', 'D'], mvA = [['ma-in', 740]], mvB = [['mb-in', 1020]];
+  var HALLS = ['A', 'B', 'C', 'D'], mvA = [['ma-in', TXX[0]]], mvB = [['mb-in', TXX[1]]];
   function feeder(s, h, x, typ) {
     var ls = s.toLowerCase(), p = 'f' + ls + (h + 1) + '-', H = HALLS[h], T = '-F' + s + (h + 1);
     N({ id: p + 'cb', tag: 'CB' + T, sym: 'cbIec', x: x, y: 995, size: SW, cls: 'epms', sw: 'cb', kv: 'mv', relay: p + 'r',
@@ -179,8 +184,11 @@
       return;
     }
     /* the typical 20/0.4 kV unit hangs from this feeder; the rest of the ring continues off-sheet beside it */
-    var side = s === 'A' ? -1 : 1, d = 'd' + ls + '-';
-    ring.x = x + side * 45; ring.y = 1140; N(ring);
+    /* the ring off-sheet steps toward the free span by the generator incomer (inward, it sat on the next feeder's
+       ring at the v3.94 feeder pitch) */
+    var side = s === 'A' ? -1 : 1, rs = -side, d = 'd' + ls + '-';
+    ring.values = [{ k: 'kw', dx: rs * 14, dy: 44, anchor: rs > 0 ? 'start' : 'end', lod: 1 }];   // clear of the unit's TX tag
+    ring.x = x + rs * 45; ring.y = 1140; N(ring);
     N({ id: p + 'j', sym: 'junction', x: x, y: 1110 });
     N({ id: d + 'tx', tag: 'TX-D' + s, sym: 'transformer2w', x: x, y: 1190, size: 40, cls: 'epms', tx: 'dist', kv: 'mv', hall: h,
       label: 'Distribution transformer, typical unit, stream ' + s, tagAt: s === 'A' ? 'right' : 'left',
@@ -193,16 +201,16 @@
       label: 'LV switchboard, typical (continues on the LV distribution view)', tagAt: 'below',
       values: [{ k: 'r', dx: 0, dy: 44, anchor: 'middle', lod: 1 }] });
     E(p + 'c', p + 'ct.load', p + 'j');
-    E(p + 'd', p + 'j', p + 'ld.port', [[x + side * 45, 1110]]);
+    E(p + 'd', p + 'j', p + 'ld.port', [[x + rs * 45, 1110]]);
     E(p + 'e', p + 'j', d + 'tx.hv');
     E(d + 'a', d + 'tx.lv', d + 'cb.line');
     E(d + 'b', d + 'cb.load', d + 'ld.port');
     sig(d + 'sig', d + 'r.input', [x - side * -8, 1260]);
   }
-  [110, 210, 310, 410].forEach(function (x, h) { feeder('A', h, x, h === 3); });
-  [1340, 1440, 1540, 1640].forEach(function (x, h) { feeder('B', h, x, h === 0); });
+  FA.forEach(function (x, h) { feeder('A', h, x, h === 3); });
+  FB.forEach(function (x, h) { feeder('B', h, x, h === 0); });
 
-  [['A', 600, 'left'], ['B', 1180, 'right']].forEach(function (g) {
+  [['A', GAX, 'left'], ['B', GBX, 'right']].forEach(function (g) {
     var s = g[0], x = g[1], id = 'g' + s.toLowerCase() + '-cb', tap = 'm' + s.toLowerCase() + '-gen';
     N({ id: id, tag: 'CB-G' + s, sym: 'cbIec', x: x, y: 995, size: SW, cls: 'epms', sw: 'cb', kv: 'mv', role: 'gen', normal: 'open',
       label: 'Generator bus incomer to section ' + s, tagAt: g[2], values: cbVals(g[2]) });
@@ -211,10 +219,10 @@
     E(id + '-a', tap, id + '.line');
     E(id + '-b', id + '.load', 'gbus-' + s.toLowerCase());
   });
-  N({ id: 'gbus-g', sym: 'junction', x: 880, y: 1100 });
-  N({ id: 'gen-cb', tag: 'CB-GEN', sym: 'cbIec', x: 880, y: 1160, size: SW, cls: 'epms', sw: 'cb', kv: 'mv', normal: 'open', role: 'genset',
+  N({ id: 'gbus-g', sym: 'junction', x: TIEX, y: 1100 });
+  N({ id: 'gen-cb', tag: 'CB-GEN', sym: 'cbIec', x: TIEX, y: 1160, size: SW, cls: 'epms', sw: 'cb', kv: 'mv', normal: 'open', role: 'genset',
     label: 'Generator bus breaker (genset block)', tagAt: 'right', values: cbVals('right') });
-  N({ id: 'gen', tag: 'GEN', name: 'DIESEL GENSETS', sym: 'generatorIec', x: 880, y: 1240, size: 40, rot: 180, cls: 'epms', src: 'gen', kv: 'mv',
+  N({ id: 'gen', tag: 'GEN', name: 'DIESEL GENSETS', sym: 'generatorIec', x: TIEX, y: 1240, size: 40, rot: 180, cls: 'epms', src: 'gen', kv: 'mv',
     label: 'Diesel genset block (synchronised generator bus)', tagAt: 'below',
     values: [{ k: 'r', dx: 0, dy: 54, anchor: 'middle', lod: 1 }, { k: 'u', dx: 0, dy: 66, anchor: 'middle', lod: 1 }] });
   E('gbus-1', 'gbus-a', 'gbus-g', null, { w: 'bus' });
@@ -223,11 +231,11 @@
   E('gen-b', 'gen-cb.load', 'gen.out');
 
   /* ── 20 kV bus sections and the normally open tie ───────────────────────────────────────────── */
-  N({ id: 'tie', tag: 'CB-TIE', sym: 'cbIec', x: 880, y: MV, size: SW, rot: 270, cls: 'epms', sw: 'cb', kv: 'mv', role: 'tie', normal: 'open',
+  N({ id: 'tie', tag: 'CB-TIE', sym: 'cbIec', x: TIEX, y: MV, size: SW, rot: 270, cls: 'epms', sw: 'cb', kv: 'mv', role: 'tie', normal: 'open',
     label: '20 kV bus-tie circuit breaker (normally open)', tagAt: 'above',
     values: [{ k: 'st', dx: 0, dy: 25, anchor: 'middle', lod: 1 }, { k: 'pw', dx: 0, dy: 37, anchor: 'middle', lod: 1 }] });
-  busbar('ma', MV, mvA, 60, 820);
-  busbar('mb', MV, mvB, 940, 1690);
+  busbar('ma', MV, mvA, 60, TIEX - 60);
+  busbar('mb', MV, mvB, TIEX + 60, MVE);
   E('tie-a', 'ma-e', 'tie.line');
   E('tie-b', 'tie.load', 'mb-s');
 
@@ -307,10 +315,10 @@
     points: points, markConstants: markConstants, defineLimits: defineLimits,
     sld: {
       id: 'e-s-101', no: 'E-S-101', title: 'HV / MV SINGLE-LINE · GIS · TRANSFORMERS · MAIN SWITCHGEAR', rev: 'A', basis: 'IEC 60617 · IEEE C37.2',
-      svgId: 'epms-sld-svg', size: [1740, 1390], nodes: nodes, edges: edges,
+      svgId: 'epms-sld-svg', size: [ZW + 32, 1390], nodes: nodes, edges: edges,
       areas: [
-        { x: 16, y: 16, w: 1708, h: 832, label: 'HV GIS SUBSTATION · DOUBLE BUSBAR · POWER TRANSFORMERS', kind: 'zone' },
-        { x: 16, y: 852, w: 1708, h: 522, label: 'MV MAIN SWITCHGEAR · GENERATION · TYPICAL LV UNIT', kind: 'zone' }
+        { x: 16, y: 16, w: ZW, h: 832, label: 'HV GIS SUBSTATION · DOUBLE BUSBAR · POWER TRANSFORMERS', kind: 'zone' },
+        { x: 16, y: 852, w: ZW, h: 522, label: 'MV MAIN SWITCHGEAR · GENERATION · TYPICAL LV UNIT', kind: 'zone' }
       ],
       notes: []
     }

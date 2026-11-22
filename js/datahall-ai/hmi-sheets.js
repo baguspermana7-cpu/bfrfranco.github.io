@@ -180,6 +180,20 @@
       if (++c >= o.cols) { c = 0; r++; }
     }
   }
+  /* inputs of RZElecVoltage.underLoad for one bus level, from the engine snapshot (§A6). 'hv' is the grid side (no
+     transformer drawn upstream), 'ups' the inverter output (regulated: no transformer drop) */
+  function busVolt(snap, level) {
+    var EV = (typeof window !== 'undefined' && window.RZElecVoltage) || null, A = EV ? EV.ASSUMED : null;
+    if (!A) return null;
+    var pf = A.pf.value, D = function (k) { return need(snap, 'distribution.' + k); };
+    if (level === 'hv') return { nominal: D('hv_intake_kv') * 1000, loading: 0, zPct: 0, pf: pf, xr: 0 };
+    if (level === 'ups') return { nominal: D('voltage_ll_v'), loading: 0, zPct: 0, pf: pf, xr: 0 };
+    if (level === 'mv') return { nominal: D('mv_kv') * 1000, loading: D('main_tx_loading_contingency_pct') / 200, zPct: D('main_tx_impedance_pct'), pf: pf, xr: A.xrMainTx.value };
+    var halls = hallsOf(snap), upsPerFeed = Math.ceil(need(snap, 'equipment.ups_frames_per_feed') / halls);
+    var pKw = upsPerFeed * need(snap, 'equipment.ups_frame_kw') * need(snap, 'equipment.ups_loading_pct') / 100 / 2;
+    var sKva = need(snap, 'equipment.unit_subs_per_feed_per_hall') * need(snap, 'equipment.unit_sub_kva');
+    return { nominal: D('voltage_ll_v'), loading: pKw / pf / sKva, zPct: A.zUnitSubPct.value, pf: pf, xr: A.xrUnitSub.value };
+  }
   function feed(s, f, snap) {
     var A = f.side === 'A', X = f.x, med = A ? 'feed_a' : 'feed_b', L = f.side, tx = need(snap, 'equipment.unit_subs_per_feed_per_hall');
     var halls = hallsOf(snap), upsPerFeed = Math.ceil(need(snap, 'equipment.ups_frames_per_feed') / halls), mx = X + 70;
@@ -192,7 +206,7 @@
     var rl = s.n({ id: 'rl-mv' + L, tag: '50/51', sym: 'protectionRelay', x: mx + 46, y: 128, size: 24, tagAt: 'none', inst: '50/51', label: 'Overcurrent relay (IEEE C37.2 50/51), MV feeder ' + L + '01' });
     var t1 = s.n({ id: 'tx' + L + '01', tag: 'TX-' + L + '01 … TX-' + L + pad(tx), name: 'UNIT SUBSTATION ×' + tx, rating: mva(kva) + ' · ' + kv + ' / ' + lvV, sym: 'transformer2w', x: mx, y: 186, size: 46, cls: 'sld-tx', eqId: L + '01', tagAt: 'right',
       label: 'Unit substation transformers ' + L + '01 … ' + L + pad(tx) + ' (one drawn, ' + tx + ' per feed per hall), ' + kv + ' kV / ' + lvV });
-    var cbLv = s.n({ id: 'cb-lv' + L, tag: 'Q-LV' + L + '01', name: 'LV INCOMER ACB', sym: 'cbDrawout', x: mx, y: 250, size: 32, tagAt: 'right', label: 'LV incomer ' + L + '01 (ACB)' });
+    var cbLv = s.n({ id: 'cb-lv' + L, tag: 'Q-LV' + L + '01', name: 'LV INCOMER ACB', brk: lvV + ' · ' + mva(kva * tx), sym: 'cbDrawout', x: mx, y: 250, size: 32, tagAt: 'right', label: 'LV incomer ' + L + '01 (ACB)' });
     s.chain([os + '.port', cbMv + '.line'], med, { w: 'main' });
     s.e(cbMv + '.load', ct + '.line', med, { w: 'main' }); s.e(ct + '.load', t1 + '.hv', med, { w: 'main', line: 'MV-' + L + '01 3×240 mm² Cu' });
     s.e(ct + '.secondary', rl + '.input', 'line', { w: 'signal' });
@@ -201,7 +215,10 @@
     var by = 300, bL = s.j('msb' + L + 'l', X + 10, by, false), bM = s.j('msb' + L + 'm', mx, by), bU = s.j('msb' + L + 'u', mx + 150, by), bR = s.j('msb' + L + 'r', X + 470, by, false);
     s.e(cbLv + '.load', bM, med, { w: 'main' });
     s.chain(A ? [bL, bM, bU, bR] : [bR, bU, bM, bL].reverse(), med, { w: 'bus' });
-    s.notes.push({ x: X + 14, y: by - 6, text: 'MSB-' + L + '01 · ' + lvV, role: 'tag' });
+    /* PRD-ELECTRICAL-BMS §A6: the bus shows its voltage under load (js/rz-elec-voltage.js): normal 2N share of the
+       hall's UPS input (failover loading / 2) over the feed's unit substations; impedance, cos φ and X/R are ASSUMED
+       there (the engine publishes none) with the source in RZElecVoltage.ASSUMED */
+    s.notes.push({ x: X + 14, y: by - 6, text: 'MSB-' + L + '01 · ', role: 'tag', at: bM, volt: busVolt(snap, 'msb') });
     // ATS: normal from the MSB, emergency from the generator bus
     var osG = s.n({ id: 'os-gen' + L, tag: 'GEN BUS', sym: 'offSheet', x: mx + 240, y: 330, size: 20, rot: 270, tagAt: 'right', label: 'Standby generator bus (sheet DH-E-003)' });
     var ats = s.n({ id: 'ats' + L, tag: 'ATS-' + L + '01', name: 'AUTO TRANSFER SW', sym: 'atsIec', x: mx + 162, y: 372, size: 36, cls: 'sld-msb', eqId: L + '01-ats', tagAt: 'right', label: 'Automatic transfer switch ' + L + '01 (CB-N + CB-E, interlocked)' });
@@ -210,28 +227,28 @@
     // UPS-01: input breaker, rectifier, DC link + battery, inverter, static bypass, maintenance bypass, output breaker
     var ux = mx + 150, jIn = s.j('ups' + L + 'in', ux, 420);
     s.e(ats + '.load', jIn, med, { w: 'main' });
-    var qi = s.n({ id: 'qi' + L, tag: 'Q1', sym: 'cbIec', x: ux, y: 456, size: 26, tagAt: 'left', lod: 3, label: 'UPS input breaker' });
+    var qi = s.n({ id: 'qi' + L, tag: 'Q1', brk: upsKw + ' kW · ' + lvV, sym: 'cbIec', x: ux, y: 456, size: 26, tagAt: 'left', lod: 3, label: 'UPS input breaker' });
     var rec = s.n({ id: 'rec' + L, tag: 'REC', name: 'RECTIFIER', sym: 'rectifier', x: ux, y: 504, size: 34, cls: 'sld-ups-' + L.toLowerCase(), eqId: L + '01', tagAt: 'left', label: 'UPS-' + L + '01 rectifier' });
     var jdc = s.j('dc' + L, ux, 548);
     var inv = s.n({ id: 'inv' + L, tag: 'INV', name: 'INVERTER', sym: 'inverterIec', x: ux, y: 592, size: 34, cls: 'sld-ups-' + L.toLowerCase(), eqId: L + '01', tagAt: 'left', label: 'UPS-' + L + '01 inverter',
       values: [{ k: 'ups', dx: -24, dy: 30, anchor: 'end', lod: 1 }] });
     var bat = s.n({ id: 'bat' + L, tag: 'BAT-' + L + '01', name: 'BATTERY', sym: 'batteryIec', x: ux + 70, y: 590, size: 32, cls: 'battery-' + L.toLowerCase(), eqId: L + '01', tagAt: 'right', label: 'Battery string ' + L + '01' });
-    var qb = s.n({ id: 'qb' + L, tag: 'QB', sym: 'cbIec', x: ux + 70, y: 548 - 0, size: 22, rot: 90, tagAt: 'above', lod: 3, label: 'Battery breaker' });
+    var qb = s.n({ id: 'qb' + L, tag: 'QB', brk: upsKw + ' kW DC', sym: 'cbIec', x: ux + 70, y: 548 - 0, size: 22, rot: 90, tagAt: 'above', lod: 3, label: 'Battery breaker' });
     s.e(jIn, qi + '.line', med); s.e(qi + '.load', rec + '.ac', med); s.e(rec + '.dc', jdc, 'dc'); s.e(jdc, inv + '.dc', 'dc');
     s.e(jdc, qb + '.line', 'dc'); s.e(qb + '.load', bat + '.pos', 'dc', { vfirst: false });
     var jOut = s.j('ups' + L + 'out', ux, 650);
-    var qo = s.n({ id: 'qo' + L, tag: 'Q2', sym: 'cbIec', x: ux, y: 628, size: 22, tagAt: 'left', lod: 3, label: 'UPS output breaker' });
+    var qo = s.n({ id: 'qo' + L, tag: 'Q2', brk: upsKw + ' kW · ' + lvV, sym: 'cbIec', x: ux, y: 628, size: 22, tagAt: 'left', lod: 3, label: 'UPS output breaker' });
     s.e(inv + '.ac', qo + '.line', med); s.e(qo + '.load', jOut, med);
     var sbx = ux - 70, ss = s.n({ id: 'ss' + L, tag: 'SS', name: 'STATIC BYPASS', sym: 'staticSwitch', x: sbx, y: 540, size: 32, tagAt: 'left', label: 'UPS-' + L + '01 static bypass' });
     s.e(jIn, ss + '.line', med, { via: [[sbx, 420]] }); s.e(ss + '.load', jOut, med, { via: [[sbx, 650]] });
-    var mbx = ux - 124, mb = s.n({ id: 'mb' + L, tag: 'Q3', sym: 'cbIec', x: mbx, y: 540, size: 26, tagAt: 'left', lod: 3, label: 'Maintenance bypass breaker (normally open)' });
+    var mbx = ux - 124, mb = s.n({ id: 'mb' + L, tag: 'Q3', brk: lvV + ' bypass', sym: 'cbIec', x: mbx, y: 540, size: 26, tagAt: 'left', lod: 3, label: 'Maintenance bypass breaker (normally open)' });
     s.e(jIn, mb + '.line', med, { via: [[mbx, 420]] }); s.e(mb + '.load', jOut, med, { via: [[mbx, 650]] });
     s.areas.push({ x: mbx - 34, y: 404, w: 250, h: 262, label: 'UPS-' + L + '01 … UPS-' + L + pad(upsPerFeed) + ' · ' + upsKw + ' kW ×' + upsPerFeed, kind: 'box' });
     // UPS output bus -> busway trunk -> tap-off -> rack PSU (the rack is drawn once, between the feeds)
     var oy = 700, oL = s.j('ob' + L + 'l', X + 10, oy, false), oM = s.j('ob' + L + 'm', ux, oy), oR = s.j('ob' + L + 'r', X + 470, oy, false);
     s.e(jOut, oM, med, { w: 'main' }); s.chain(A ? [oL, oM, oR] : [oR, oM, oL].reverse(), med, { w: 'bus' });
-    s.notes.push({ x: X + 14, y: oy - 6, text: 'UPS OUT ' + L + ' · ' + lvV, role: 'tag' });
-    var qbw = s.n({ id: 'qbw' + L, tag: 'Q-BW' + L, name: 'BUSWAY CB', sym: 'cbIec', x: ux, y: 736, size: 26, tagAt: 'right', label: 'Busway trunk breaker ' + L });
+    s.notes.push({ x: X + 14, y: oy - 6, text: 'UPS OUT ' + L + ' · ', role: 'tag', at: oM, volt: busVolt(snap, 'ups') });
+    var qbw = s.n({ id: 'qbw' + L, tag: 'Q-BW' + L, name: 'BUSWAY CB', brk: lvV + ' busway', sym: 'cbIec', x: ux, y: 736, size: 26, tagAt: 'right', label: 'Busway trunk breaker ' + L });
     var bw = s.j('bw' + L, ux, 790), tap = s.n({ id: 'tap' + L, tag: 'TAP-' + L + '07', name: 'TAP-OFF R07', sym: 'busTap', x: A ? ux + 120 : ux - 120, y: 822, size: 26, tagAt: 'right', label: 'Busway tap-off to rack R07, feed ' + L });
     s.e(oM, qbw + '.line', med, { w: 'main' }); s.e(qbw + '.load', bw, med, { w: 'bus', line: 'BUSWAY-' + L + ' ' + D('busway_trunk_a').toLocaleString('en-US') + ' A' });
     var bwEnd = s.j('bwe' + L, A ? X + 470 : X + 10, 790, false), bwt = s.j('bwt' + L, A ? ux + 120 : ux - 120, 790);
@@ -246,7 +263,8 @@
     var W = 1240, H = 1000, s = Sheet({ id: 'dh-e-1' + hp, no: 'DH-E-1' + hp, title: 'DH-' + hp + ' SLD FEED A/B', size: [W, H], svgId: 'elecDH' + hn + 'Svg', sheet: hn + '/' + halls });
     var a = feed(s, { side: 'A', x: 20 }, snap), b = feed(s, { side: 'B', x: 740 }, snap);
     // bus tie (normally open) between MSB-A01 and MSB-B01
-    var tie = s.n({ id: 'tie', tag: 'Q-TIE', sym: 'cbDrawout', x: 620, y: 300, size: 30, rot: 90, tagAt: 'above', label: 'Bus tie MSB-A01 / MSB-B01 (normally open)' });
+    var tieV = need(snap, 'distribution.voltage_ll_v');
+    var tie = s.n({ id: 'tie', tag: 'Q-TIE', brk: (tieV >= 1000 ? tieV / 1000 + ' kV' : tieV + ' V') + ' tie, NO', sym: 'cbDrawout', x: 620, y: 300, size: 30, rot: 90, tagAt: 'above', label: 'Bus tie MSB-A01 / MSB-B01 (normally open)' });
     s.e('msbAr', tie + '.line', 'power', { w: 'main' }); s.e(tie + '.load', 'msbBl', 'power', { w: 'main' });
     // the rack: one dual-corded PSU shelf group fed by both taps
     var psu = s.n({ id: 'psu-r07', tag: 'R07 PSU', sym: 'psuAcDc', x: 620, y: 900, size: 52, cls: 'sld-rack-psu', eqId: 'R07', tagAt: 'below',
@@ -470,7 +488,8 @@
     var feeders = need(snap, 'distribution.mv_feeders_per_hall_per_feed'), kaRated = need(snap, 'distribution.mv_board_ka_rating'), kaFault = need(snap, 'distribution.mv_fault_ka_per_section');
     // HV intake: every line bay drawn (4), duty count from the engine; double busbar at 150 kV
     var busY = 150, busA = s.j('hv-bus-l', 90, busY, false), busB = s.j('hv-bus-r', Math.max(90 + (lines - 1) * 150 + 60, 650 + (hallsOf(snap) - 2) * 78 + 20), busY, false);   // reaches the other halls' tee-offs
-    s.e(busA, busB, 'power', { w: 'bus', line: hvKv + ' kV BUS' });
+    s.e(busA, busB, 'power', { w: 'bus' });
+    s.notes.push({ x: 94, y: busY - 6, text: 'HV BUS · ', role: 'tag', at: busA, volt: busVolt(snap, 'hv') });
     for (var l = 1; l <= lines; l++) {
       var x = 120 + (l - 1) * 150, duty = l <= linesDuty;
       var u = s.n({ id: 'grid' + l, tag: 'LINE ' + l, sym: 'utilitySource', x: x, y: 40, size: 34, cls: 'sld-main-tx', eqId: 'L' + l, tagAt: 'right', standby: !duty, label: hvKv + ' kV incoming line ' + l + (duty ? ' (duty)' : ' (standby)') });
@@ -491,7 +510,8 @@
       s.e([x, busY], cb1 + '.line', 'power', { w: 'main' }); s.e(cb1 + '.load', tx + '.hv', 'power', { w: 'main' }); s.e(tx + '.lv', cb2 + '.line', med, { w: 'main', line: mvKv + ' kV' });
       s.j('hv-tx' + L, x, busY, true);
       var bl = s.j('mv-' + L + '-l', x - 60, mvY, false), br = s.j('mv-' + L + '-r', x + 60, mvY, false);
-      s.e(bl, br, med, { w: 'bus', line: 'MVB-' + L + '01 · ' + kaRated + ' kA' }); s.e(cb2 + '.load', [x, mvY], med, { w: 'main' }); s.j('mv-' + L + '-t', x, mvY, true);
+      s.e(bl, br, med, { w: 'bus', line: kaRated + ' kA' });
+      s.notes.push({ x: x - 58, y: mvY - 6, text: 'MVB-' + L + '01 · ', role: 'tag', at: bl, volt: busVolt(snap, 'mv') }); s.e(cb2 + '.load', [x, mvY], med, { w: 'main' }); s.j('mv-' + L + '-t', x, mvY, true);
       s.n({ id: 'pr-' + L, tag: '50/51', sym: 'protectionRelay', x: x + 40, y: 330, size: 18, tagAt: 'none', lod: 2, inst: '51', label: 'Incomer protection relay 50/51/87T, board ' + L });
       // feeders to the hall: one per MV feeder from the engine, each an off-sheet to DH-E-101
       for (var f = 1; f <= feeders; f++) {
@@ -499,7 +519,12 @@
         s.e([fx, mvY], fcb + '.line', med, { w: 'branch' }); s.j('mvt-' + L + f, fx, mvY, true);
         s.e(fcb + '.load', [fx, mvY + 70], med, { w: 'branch' });
       }
-      s.n({ id: 'os-e101' + L, tag: 'DH-E-101 ' + L, sym: 'offSheet', x: x, y: mvY + 92, size: 20, rot: 90, tagAt: 'below', label: 'Unit substations and UPS of DH-01, feed ' + L + ' (sheet DH-E-101)' });
+      /* PRD-ELECTRICAL-BMS E4: the feeders gather on one collector into the hall's off-sheet (it floated unwired), and the
+         incomer relay is tied to the breaker it trips (signal line, carries no power) */
+      if (feeders > 1) s.e([x - 48, mvY + 70], [x - 48 + (feeders - 1) * 24, mvY + 70], med, { w: 'branch' });
+      s.n({ id: 'os-e101' + L, tag: 'DH-E-101 ' + L, sym: 'offSheet', x: x, y: mvY + 92, size: 20, rot: 90, tagAt: 'below', hall: L === 'A' ? 'DH-01' : null, label: 'Unit substations and UPS of DH-01, feed ' + L + ' (sheet DH-E-101)' });
+      s.e([x, mvY + 70], 'os-e101' + L + '.port', med, { w: 'branch' });
+      s.e('pr-' + L, cb2, 'line', { w: 'signal' });
     });
     var tie = s.n({ id: 'mv-tie', tag: 'Q-TIE', sym: 'cbDrawout', x: 300, y: mvY, size: 26, rot: 90, tagAt: 'above', label: mvKv + ' kV bus tie A / B of DH-01 (normally open)' });
     s.e('mv-A-r', tie + '.line', 'power', { w: 'main' }); s.e(tie + '.load', 'mv-B-l', 'power', { w: 'main' });
@@ -510,8 +535,13 @@
     var txPer = Math.round(txN / halls);
     for (var h = 2; h <= halls; h++) {
       var ox = 650 + (h - 2) * 78;
-      s.n({ id: 'os-hall' + h, tag: 'DH-' + pad(h), name: 'TX-M' + pad((h - 1) * txPer + 1) + '/' + pad(h * txPer), sym: 'offSheet', x: ox, y: 330, size: 18, rot: 90, tagAt: 'below', label: 'Main transformers TX-M' + pad((h - 1) * txPer + 1) + ' … ' + pad(h * txPer) + ' (' + txMva + ' MVA) and the boards of DH-' + pad(h) + ' (sheet DH-E-1' + pad(h) + ')' });
-      s.e([ox, busY], 'os-hall' + h + '.port', 'power', { w: 'branch' }); s.j('hv-h' + h, ox, busY, true);
+      /* E4: every other hall is drawn as one bay like DH-01's, collapsed: tee-off -> HV breaker -> its transformer pair ->
+         the hall block (off-sheet to its own SLD). No cls on the pair: the transformer payload reads the sheet's hall
+         context, which here is DH-01 (HMI standard L3); the hall's own sheet opens its HMI. */
+      var hcb = s.n({ id: 'cb-h' + h, tag: 'CB-H' + pad(h), sym: 'cbIec', x: ox, y: 200, size: 20, tagAt: 'none', lod: 2, label: hvKv + ' kV breaker to the transformers of DH-' + pad(h) });
+      var htx = s.n({ id: 'tx-h' + h, tag: 'TX-M' + pad((h - 1) * txPer + 1) + '/' + pad(h * txPer), sym: 'transformer2w', x: ox, y: 262, size: 30, tagAt: 'none', label: 'Main transformers TX-M' + pad((h - 1) * txPer + 1) + ' … ' + pad(h * txPer) + ', ' + txMva + ' MVA each, ' + hvKv + ' / ' + mvKv + ' kV, DH-' + pad(h) });
+      s.n({ id: 'os-hall' + h, tag: 'DH-' + pad(h), name: 'TX-M' + pad((h - 1) * txPer + 1) + '/' + pad(h * txPer), sym: 'offSheet', x: ox, y: 330, size: 18, rot: 90, tagAt: 'below', hall: 'DH-' + pad(h), label: 'Main transformers TX-M' + pad((h - 1) * txPer + 1) + ' … ' + pad(h * txPer) + ' (' + txMva + ' MVA) and the boards of DH-' + pad(h) + ' (sheet DH-E-1' + pad(h) + ')' });
+      s.e([ox, busY], hcb + '.line', 'power', { w: 'branch' }); s.e(hcb + '.load', htx + '.hv', 'power', { w: 'branch' }); s.e(htx + '.lv', 'os-hall' + h + '.port', 'power', { w: 'branch' }); s.j('hv-h' + h, ox, busY, true);
     }
     // generation: paralleling switchgear at 20 kV, two sets drawn, the rest as a grid; gen bus to each board through a breaker
     var gY = 640, gbA = s.j('gen-bus-l', 120, gY, false), gbB = s.j('gen-bus-r', 1180, gY, false);
@@ -524,6 +554,8 @@
     }
     ['A', 'B'].forEach(function (L) { var x = txX[L] + 40, c = s.n({ id: 'cb-gen' + L, tag: '52GB', sym: 'cbDrawout', x: x, y: 560, size: 22, tagAt: 'none', lod: 2, label: 'Generator bus incomer to board ' + L + ' (closed on utility loss, ATS logic on DH-E-101)' }); s.e([x, mvY], c + '.line', 'power', { w: 'main' }); s.e(c + '.load', [x, gY], 'power', { w: 'main' }); s.j('gbt' + L, x, gY, true); s.j('mvg' + L, x, mvY, true); });
     s.n({ id: 'os-fuel', tag: 'DH-U-101', sym: 'offSheet', x: 1180, y: 760, size: 20, tagAt: 'below', label: 'Fuel farm, ' + need(snap, 'site.fuel_autonomy_h') + ' h autonomy (sheet DH-U-101)' });
+    s.e('os-fuel.port', 'gen2', 'fuel', { w: 'branch', line: 'FUEL' });   // E4: the fuel farm feeds the generator yard (it floated unwired)
+    s.crop = true;   // PRD-ELECTRICAL-BMS E1: the overview opens on its drawn content (no live reading at its edge)
     return finish(s);
   }
 

@@ -288,3 +288,29 @@
    shrinking it, as the legacy drawings did. The minimum width is set per sheet by the renderer (--hmi-min-w). */
 .hmi-frame .hmi-vp { overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
 .pn .bx .hmi-frame .hmi-vp > svg.hmi-svg, .ep .bx .hmi-frame .hmi-vp > svg.hmi-svg, .hmi-frame .hmi-vp > svg.hmi-svg { min-width: var(--hmi-min-w, 0) !important; }
+/* PRD-ELECTRICAL-BMS R190 "Whole": the whole sheet on screen, both axes; the floor above is lifted for this overview only
+   (the renderer sets the svg width from the stage height). Small labels drop by LOD. */
+.hmi-frame.is-fit-all .hmi-vp > svg.hmi-svg, .pn .bx .hmi-frame.is-fit-all .hmi-vp > svg.hmi-svg, .ep .bx .hmi-frame.is-fit-all .hmi-vp > svg.hmi-svg { min-width: 0 !important; margin: 0 auto; display: block; }
+/* the EPMS stage ends under the absolute 50 px status bar: Whole keeps the sheet above it */
+#epms-sld-view .hmi-frame, #epms-lv-view .hmi-frame { --hmi-fit-inset: 50px; }
+
+/* PRD-ELECTRICAL-BMS E3: breaker state glyph, lamp and value tag (IEC 60617 practice; colour only from the state tokens) */
+.hmi-svg .hmi-brk rect[data-brk-glyph] { fill: none; stroke: var(--hmi-text-2); stroke-width: 1.2; }
+.hmi-svg .hmi-brk rect[data-brk="closed"] { fill: var(--hmi-text-2); }
+.hmi-svg .hmi-brk rect[data-brk="tripped"] { fill: var(--vfx-alarm, #f85149); stroke: var(--vfx-alarm, #f85149); transform-box: fill-box; transform-origin: center; transform: rotate(45deg); }
+.hmi-svg .hmi-brk rect[data-brk="na"] { stroke-dasharray: 2 2; }
+.hmi-svg .hmi-brk circle[data-lamp] { fill: none; stroke: var(--hmi-text-3); stroke-width: 1; }
+.hmi-svg .hmi-brk circle[data-lamp-state="running"] { fill: var(--vfx-run, #3fb950); stroke: var(--vfx-run, #3fb950); }
+.hmi-svg .hmi-brk circle[data-lamp-state="alarm"] { fill: var(--vfx-alarm, #f85149); stroke: var(--vfx-alarm, #f85149); }
+.hmi-svg .hmi-brk-tag { font-size: 9px; }
+/* PRD-ELECTRICAL-BMS E2: on an electrical sheet in the State view the moving flow overlay takes the running ink (lifted
+   toward the text colour, as conv-live.css does for the fluids), never the feed-identity hue: a live bus reads green on
+   both cockpits. Feed A / B stays in the label and the bus tag. */
+.hmi-frame[data-vfx-mode]:not([data-vfx-mode="flat"]):not([data-vfx-mode="thermal"]) .hmi-svg .hmi-flow.m-power,
+.hmi-frame[data-vfx-mode]:not([data-vfx-mode="flat"]):not([data-vfx-mode="thermal"]) .hmi-svg .hmi-flow.m-feed_a,
+.hmi-frame[data-vfx-mode]:not([data-vfx-mode="flat"]):not([data-vfx-mode="thermal"]) .hmi-svg .hmi-flow.m-feed_b { stroke: color-mix(in oklch, var(--vfx-run, #3fb950) 55%, var(--hmi-text)); }
+/* PRD-ELECTRICAL-BMS E2: in the State view a direction arrow on a conductor is ink (it shows which way power goes; the
+   conductor itself carries the state), never the feed-identity hue, which read as a standby line on DC AI's incomer */
+.hmi-frame[data-vfx-mode]:not([data-vfx-mode="flat"]):not([data-vfx-mode="thermal"]) .hmi-svg .hmi-arrow.m-power,
+.hmi-frame[data-vfx-mode]:not([data-vfx-mode="flat"]):not([data-vfx-mode="thermal"]) .hmi-svg .hmi-arrow.m-feed_a,
+.hmi-frame[data-vfx-mode]:not([data-vfx-mode="flat"]):not([data-vfx-mode="thermal"]) .hmi-svg .hmi-arrow.m-feed_b { color: var(--hmi-text-2, var(--hmi-text)); }

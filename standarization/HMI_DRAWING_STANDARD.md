@@ -1,6 +1,6 @@
 # HMI drawing standard — datahallAI (and every later cockpit drawing)
 
-Status: v3.60.0 (2026-11-14). Owner decisions R128–R134 (redraw), R143 ("jadikan ke prod aja lgsung": the mock
+Status: v3.60.0 (2026-11-14); §4g electrical sheets v3.94.0 (2026-11-23). Owner decisions R128–R134 (redraw), R143 ("jadikan ke prod aja lgsung": the mock
 ships as-is, deep shading included; more detail continues in later releases). PRD: `documentation/prd/datahall-ai/PRD_DATAHALL_DRAWINGS.md`.
 Scenario work on top of these drawings: `documentation/prd/datahall-ai/PRD_CX_SCENARIOS.md` (not started).
 
@@ -231,6 +231,35 @@ Data Hall tab (F4, v3.92.0) through its adapter `js/datahall-ai/hall-iso.js` (be
     `rz.dcai.proj`.
   - Every number the 3D floor prints is hooked or declared for `test-dcai-coverage`.
   - Gate: `tools/test-dcai-hall-iso.mjs` D1–D7.
+
+## 4g. Electrical sheets (PRD-ELECTRICAL-BMS, owner R186/R190/R192/R193, v3.94.0)
+
+Applies to every single-line sheet: EPMS E-S-101 / E-S-102 and DC AI E-001 / E-101. PRD:
+`documentation/prd/PRD_ELECTRICAL_BMS.md`. Gates: `tools/test-electrical-bms.mjs` (E1-E5, E19 in `ship-gate.sh`),
+`tools/test-elec-voltage.mjs`.
+
+- **Fit on open.** At 1440 px a sheet opens at its reading scale and spans 90-102 % of its stage width (E1). A sheet
+  that cannot fit at the reading scale is relaid out, not shrunk under the 8.5 px label floor. EPMS E-S-101 is laid out
+  from named columns (`LX`, `TXX`, `FA`, `FB`, ... in `js/conv/epms-sheet.js`); move a column, never one node.
+- **Whole.** The `Whole` control shows the full sheet in both axes (`fitAll`, E1b); labels under the floor hide by
+  LOD. Fit returns to the reading scale.
+- **Crop** is opt-in (`sheet.crop === true`): the canvas shrinks to the drawn content plus 28 units. Only DC AI E-001
+  uses it; a sheet whose readings sit near its edge keeps its canvas.
+- **Stage and status bar.** No equipment tag the operator can see (inside the stage's scroll box) sits under the
+  status bar (E1).
+- **Breaker grammar (E3, E3c).** Every breaker carries an IEC state glyph (filled closed, hollow open), a lamp, and a
+  value tag with a number. The glyph and lamp are placed by `settleBrk()` clear of text and conductors; they never
+  cover a word. The breaker's rating line and last value line are its tag (`data-brk-tag-of`).
+- **State grammar (E2).** In State view flow overlays and arrows on electrical media use the running ink
+  (`--hmi-text-2`), never the feed hue.
+- **Bus voltages (E19).** A bus prints its voltage under load from `js/rz-elec-voltage.js`:
+  V = Vn (1 - loading Z% (cos φ R/Z + sin φ X/Z) / 100), states ±5 % warn, ±10 % alarm, `0 V DEAD` when no segment is
+  energised. Inputs come from the engine; constants the engine does not publish come from `RZElecVoltage.ASSUMED`,
+  each with its source text. An HV bus with no transformer upstream prints the engine nominal; a 20 kV section prints
+  the nominal first (the basis drawer explains a label's first number), then its value under load
+  (`BUS A · 20 kV nom · 19.69 kV · 13.5 kA`). Sheets repaint voltages through `api.volts()`.
+- **Power walk.** An ATS conducts one way, from the selected source to its load; a converter (rectifier, inverter)
+  seeds only its output port, so a generator never back-feeds the MSB and a rectifier never lights the UPS AC input.
 
 ## 4c. Repaint cost (v3.63.0, O11)
 

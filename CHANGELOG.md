@@ -11,6 +11,40 @@ release sections rather than semver.
 
 ---
 
+## v3.94.0 — 2026-11-23 — Electrical sheets fit the screen, show breaker state and bus voltages
+
+PRD-ELECTRICAL-BMS phases E1-E2 with amendment 2 (owner R186, R190, R192, R193). Standards:
+`standarization/HMI_DRAWING_STANDARD.md` §4g (new).
+
+Owner (R190): "yang telemetri epms tidak bisa fit to screen baik HV OR MV". Before this release the EPMS HV/MV sheet
+opened at 125 % of its stage width and the TX row sat under the status bar.
+
+#### Changed
+- EPMS E-S-101 (HV / MV single-line) is relaid out from named columns: the sheet is 1 340 units wide (was 1 740), so
+  at 1440 px it opens at its reading scale inside the stage. Feeder pitch 75, transformer bays at 640 / 880, generator
+  incomers beside the tie. Typical-unit ring off-sheets step inward, so their kW no longer sits on the TX tag.
+- Every electrical sheet (EPMS and DC AI) opens fitted to the stage width; `Whole` shows the full sheet in both axes.
+  DC AI E-001 crops its canvas to the drawn content.
+- State view: flow overlays and arrows on electrical media use the running ink, not the blue / orange feed hue.
+- DC AI power walk: an ATS conducts one way (source to load), and a rectifier or inverter seeds only its output. A
+  running generator no longer back-feeds the MSB through the ATS, and the rectifier no longer lights the UPS AC input.
+
+#### Added
+- Breakers carry an IEC state glyph (filled closed, hollow open), a lamp and a value tag with a number. Glyphs and
+  lamps are placed clear of text and conductors.
+- Bus voltages under load (R192, "parameter2 tegangan juga tampilkan"), from the new shared `js/rz-elec-voltage.js`
+  (transformer regulation, IEC 60076-1 Annex; ±5 % warn, ±10 % alarm; `0 V DEAD` when dead). EPMS: BUS A / BUS B read
+  e.g. `20 kV nom · 19.69 kV` from TX-1 / TX-2 load, BB1 / BB2 the 150 kV nominal. DC AI: HV bus, MV bus, MSB and UPS
+  output on E-001 and E-101. Constants the engines do not publish (X/R, unit-sub impedance) are named in
+  `RZElecVoltage.ASSUMED` with their sources.
+- Power factor and frequency on the EPMS status strip (R193, "masih kosong"): PF is the engine design power factor
+  (ASSUMED, not metered), frequency the PLN Grid Code nominal 50 Hz while a source is live. Tooltips say so.
+
+#### Gates
+- New `tools/test-elec-voltage.mjs` (W1-W8, hand-worked regulation examples) and `tools/test-electrical-bms.mjs`
+  E1-E5 + E19, both now in `tools/ship-gate.sh`. Planted faults: CB-IN1 opened on EPMS reads BUS A `0 V DEAD` with
+  BUS B live; `utility_a_fail` on DC AI reads MSB-A01 dead with the UPS output live.
+
 ## v3.93.0 — 2026-11-22 — The electrical plant opens up: transformers, UPS, breakers and relays
 
 Two phases of PRD-CONV-EQUIPMENT-INSIDE ship together (they were built as v3.92.0 and v3.93.0 while a peer release took

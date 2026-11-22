@@ -455,7 +455,7 @@
     font-variant-numeric: tabular-nums slashed-zero;
 }
 </style>
-    <script src="js/rz-version.js?v=20261122-859ee7ff" defer></script>
+    <script src="js/rz-version.js?v=20261122-b90f4198" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- v1.24.0: bring EPMS onto the engine + BMS Shell. conv-engine.js loads
@@ -465,7 +465,7 @@
     <script src="js/conv-engine.js?v=2.6.0"></script>
     <!-- v1.134.3 — generated parameter registry + the ONE shared basis drawer.
          Replaces provenance restated by hand; see js/rz-basis-drawer.js. -->
-    <script src="js/conv-parameters.js?v=20261122-7c74e65e"></script>
+    <script src="js/conv-parameters.js?v=20261122-b285ea9e"></script>
     <!-- v1.134.25 — RZExplain, the site glossary engine. The cockpits were the only
          substantial pages carrying none of it, so terms an operator has to read
          (approach temperature, cycles of concentration, N+1, WUE) had nowhere to go.
@@ -498,12 +498,13 @@
 <script src="js/rz-telemetry-quality.js?v=20261113-8feb0dfd" defer></script>
 <script src="js/rz-provenance.js?v=20261111-6f1cd061" defer></script>
 <!-- P5a (PRD-CONV-LIVING-PLANT §8.1-8.2): E-S-101 HV / MV single-line, drawn by the shared sheet renderer -->
-<link rel="stylesheet" href="css/rz-hmi.css?v=20261117-fe9b28c8">
+<link rel="stylesheet" href="css/rz-hmi.css?v=20261122-22fe4d4a">
 <link rel="stylesheet" href="css/conv-hmi-depth.css?v=20261115-09997c8c">
 <link rel="stylesheet" href="css/conv-vfx.css?v=20261118-5eed9b2f">
 <link rel="stylesheet" href="css/conv-tcc.css?v=20261118-d0e76545">
 <script src="js/rz-eng-symbols.js?v=20261118-528d60ce"></script>
-<script src="js/rz-hmi-sheet.js?v=20261120-4c3244f4"></script>
+<script src="js/rz-elec-voltage.js?v=20261122-84c5c299"></script>
+<script src="js/rz-hmi-sheet.js?v=20261122-353be1e7"></script>
 <script src="js/conv/vfx.js?v=20261117-89056876"></script>
 <script src="js/conv/history.js?v=20261120-8d390d7e"></script>
 <script src="js/rz-trend.js?v=20261122-98f6c100"></script>
@@ -527,7 +528,7 @@
 <script src="js/rz-inspector.js?v=20261117-bbb735d4" defer></script>
 <script src="js/conv/sld-topology.js?v=20261118-597640aa"></script>
 <script src="js/conv/tcc.js?v=20261118-4e103126"></script>
-<script src="js/conv/epms-sheet.js?v=20261121-3f7ce5d7"></script>
+<script src="js/conv/epms-sheet.js?v=20261122-e21e6338"></script>
 <script src="js/conv/epms-sim.js?v=20261122-3e7676e1"></script>
 <script src="js/conv/epms-lv.js?v=20261122-778c695b"></script>
 <script src="js/conv/tcc-modal.js?v=20261122-d14a6e1d"></script>
@@ -555,7 +556,7 @@
 .epms-sheet-host { min-width: 0; }
 /* E-S-102 opens at 1.17 x (sheet minScale): the 9 px name / line / legend roles are set to 9.5 here so no text on it
    renders under 11 px at any width (PRD-CONV-EQUIPMENT-TRUTH §7 legibility floor) */
-#epms-lv-svg [data-role="name"], #epms-lv-svg [data-role="line"], #epms-lv-svg [data-role="legend"], #epms-lv-svg [data-role="label"] { font-size: 9.5px; }
+#epms-lv-svg [data-role="name"], #epms-lv-svg [data-role="line"], #epms-lv-svg [data-role="legend"], #epms-lv-svg [data-role="label"], #epms-lv-svg .hmi-brk-tag { font-size: 9.5px; }
 /* one sidebar width on both views (it once shrank to whatever the wider drawing left over) */
 @media (min-width: 769px) { #epmsSidebar { flex: 0 0 240px; width: 240px; } }
 .epms-lv-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
@@ -764,21 +765,22 @@ body:not([data-epms-view="sld"]) .epms-sld-only { display: none !important; }
                 <div class="status-value" id="val-total-load" data-point="electrical.epms_total_kw" data-pt-label="Total load served" data-pt-unit="kW" data-pt-cls="ENGINE" data-basis-param="electrical.epms_total_kw" tabindex="0" role="button">—</div>
             </div>
         </div>
-        <!-- v1.132.1 RULE-2 REPAIR — Power Factor and Frequency were random walks
-             (0.92 + Math.random()*0.03 / 50.0 + (Math.random()-0.5)*0.1) refreshed every second, i.e.
-             invented electrical telemetry. conv-engine.js publishes NO power-factor and NO frequency:
-             there is nothing to bind to and nothing legitimate to substitute, so both read "—" (grey =
-             source missing, per the ACCURACY_VALIDATION colour grammar). No JS writes these cells. -->
+        <!-- v1.132.1 RULE-2 REPAIR — Power Factor and Frequency were random walks (invented telemetry). R193 (owner:
+             "itu tulisa power factor dan frequency masih kosong"): they now show what the basis CAN state, labelled as
+             such, never a random value: PF = the engine's design power factor at the 20 kV metering point
+             (electrical.power_factor_design, ASSUMED — the figure the engine sizes the transformers with); frequency =
+             the nominal of the live source (PLN grid or the isochronous genset governor), 0 Hz when no source is live.
+             Neither is metered; the tooltip says so. Written by RZEpmsStatus.paint(). -->
         <div class="status-box">
             <div>
                 <div class="status-label">Power Factor</div>
-                <div class="status-value" id="val-pf" style="color:#94a3b8;" title="UNAVAILABLE — not metered in the current basis">—</div>
+                <div class="status-value" id="val-pf" title="Design power factor (engine), not metered">—</div>
             </div>
         </div>
         <div class="status-box">
             <div>
                 <div class="status-label">Frequency</div>
-                <div class="status-value" id="val-freq" style="color:#94a3b8;" title="UNAVAILABLE — not metered in the current basis">—</div>
+                <div class="status-value" id="val-freq" data-const title="Nominal frequency of the live source, not metered">—</div>
             </div>
         </div>
         <div class="status-box epms-lv-only">
@@ -930,6 +932,8 @@ window.RZEpmsStatus = (function () {
             'epms-ups-sys', 'epms-ups-load', 'epms-dq', 'epms-scn'].forEach(function (id) {
             put(id, '—', DIM, 'UNAVAILABLE — governed EPMS basis did not validate');
         });
+        put('val-pf', '—', DIM, 'UNAVAILABLE — governed EPMS basis did not validate');
+        put('val-freq', '—', DIM, 'UNAVAILABLE — governed EPMS basis did not validate');
         ['val-system', 'val-total-load', 'val-breakers', 'val-alarms'].forEach(function (id) {
             var node = document.getElementById(id); if (!node) return;
             node.textContent = id === 'val-system' ? 'UNAVAILABLE' : '—';
@@ -943,6 +947,19 @@ window.RZEpmsStatus = (function () {
             node.style.pointerEvents = 'none';
             node.style.opacity = '0.45';
         });
+    }
+    /* R193: power factor and frequency from what the basis states (see the status-bar comment). PF: the engine's design
+       PF (ASSUMED). Frequency: PLN Grid Code nominal 50 Hz (normal band 49.5-50.5 Hz) while a hall ring is live from the
+       grid, the genset governor's isochronous 50 Hz on generation alone, 0 Hz when nothing is live. */
+    var F_NOM = 50;   // source: PLN Grid Code (Permen ESDM No. 20/2020), nominal system frequency 50 Hz. evidenceClass: STANDARD
+    function powerQuality(m, snap) {
+        var e = snap && snap.electrical, pf = e && isFinite(e.power_factor_design) ? e.power_factor_design : null;
+        put('val-pf', pf == null ? '—' : pf.toFixed(2), pf == null ? DIM : OK, pf == null ? 'UNAVAILABLE — the engine snapshot carries no design power factor'
+            : 'Design power factor ' + pf.toFixed(2) + ' at the 20 kV metering point (engine electrical.power_factor_design, ASSUMED). Not metered: the engine sizes the transformers with it.');
+        var live = m.ringsLive > 0, gen = m.gensRunning > 0;
+        put('val-freq', live || gen ? F_NOM.toFixed(2) + ' Hz' : '0 Hz', live || gen ? OK : BAD,
+            live ? 'Nominal ' + F_NOM + ' Hz of the PLN grid (Grid Code normal band 49.5-50.5 Hz)' + (gen ? '; ' + m.gensRunning + ' gensets running in parallel' : '') + '. Not metered.'
+                : gen ? 'Nominal ' + F_NOM + ' Hz held by the genset governors (isochronous), grid lost. Not metered.' : 'No live source: every 20 kV ring is dead and no genset runs');
     }
     var last = null;
     function paint(m) {
@@ -961,6 +978,7 @@ window.RZEpmsStatus = (function () {
             m.gensRunning + ' of ' + m.gensTotal + ' sets running');
         put('epms-trips', m.lvClosed + ' / ' + m.lvTotal + ' closed', DIM, 'Open breakers on E-S-102, hall ' + m.lvHall + ' (operator positions; trips are not modelled)');
         engineCells(snap);
+        powerQuality(m, snap);
         var total = document.getElementById('val-total-load');
         total.textContent = grp(m.servedKw) + ' kW';
         total.title = 'Load supplied ' + grp(m.servedKw) + ' kW of ' + grp(m.demandKw) + ' kW demand';
@@ -1290,6 +1308,20 @@ function exportJSON() {
         if (n.src === 'gen') return '× ' + E.genset_count + ' · ' + E.genset_per_hall + ' per hall (N+1)';
         return DASH;
     }
+    /* PRD-ELECTRICAL-BMS §A6 (E19): a bus shows its voltage under load (js/rz-elec-voltage.js) — dead when none of its
+       segments is energised; a 20 kV section takes the regulation of the transformer that feeds it (its own incomer, or
+       the other one through the tie) at that transformer's load. X/R is ASSUMED (RZElecVoltage.ASSUMED.xrMainTx). */
+    function segLive(prefix) { return Object.keys(res.edges).some(function (id) { return id.indexOf(prefix + '-') === 0 && res.edges[id].energised; }); }
+    function busVolt(level, k) {
+        var EV = window.RZElecVoltage; if (!EV) return null;
+        if (level === 'hv') return EV.underLoad({ nominal: E.hv_voltage_kv * 1000, loading: 0, zPct: 0, pf: E.power_factor_design, xr: 0, live: segLive(k) });
+        var own = 'i' + k + '-cb', other = 'i' + (k === 1 ? 2 : 1) + '-cb';
+        var src = sim.closed[own] && res.dev[own] && res.dev[own].energised ? k : (sim.closed.tie && sim.closed[other] && res.dev[other] && res.dev[other].energised ? (k === 1 ? 2 : 1) : k);
+        var tx = res.dev['tx' + src], loading = tx ? tx.kw / (E.hv_tx_mva * 1000 * E.power_factor_design) : 0;
+        return EV.underLoad({ nominal: E.mv_voltage_kv * 1000, loading: Math.max(0, Math.min(5, loading)), zPct: E.hv_tx_impedance_pct, pf: E.power_factor_design, xr: EV.ASSUMED.xrMainTx.value, live: segLive(k === 1 ? 'ma' : 'mb') });
+    }
+    function vText(r, fallback) { return r ? window.RZElecVoltage.label(r) : fallback; }
+    function hvText(k) { var r = busVolt('hv', k); return r && r.state === 'dead' ? window.RZElecVoltage.label(r) : E.hv_voltage_kv + ' kV'; }
     function read(n) {
         var o = { values: {} };
         if (!LIVE) {
@@ -1304,7 +1336,7 @@ function exportJSON() {
             o.values.pw = fv(kw(d && d.kw) + ' · ' + amp(d && d.a));
             o.values.kw = fv(kw(d && d.kw));
             o.values.amp = fv(amp(d && d.a));
-            if (n.role === 'incomer') o.values.bus = fv('BUS ' + (n.id === 'i1-cb' ? 'A' : 'B') + ' · ' + E.mv_voltage_kv + ' kV · ' + E.mv_fault_level_ka + ' kA');
+            if (n.role === 'incomer') { var bv = busVolt('mv', n.id === 'i1-cb' ? 1 : 2); o.values.bus = fv('BUS ' + (n.id === 'i1-cb' ? 'A' : 'B') + ' · ' + E.mv_voltage_kv + ' kV nom' + (bv ? ' · ' + vText(bv) : '') + ' · ' + E.mv_fault_level_ka + ' kA');   /* nominal first: the basis drawer explains the label's first number */ if (bv) o.values.bus.volt = bv; }
             return o;
         }
         if (n.tx) {
@@ -1335,7 +1367,7 @@ function exportJSON() {
         if (n.sym === 'protectionRelay') {
             var cb = n.cb ? res.dev[n.cb] : null;
             o.state = !n.cb || (cb && cb.energised) ? 'normal' : 'standby';
-            if (n.id === 'bb-r') { o.values.bb1 = fv('BB1 ' + E.hv_voltage_kv + ' kV'); o.values.bb2 = fv('BB2 ' + E.hv_voltage_kv + ' kV'); }
+            if (n.id === 'bb-r') { o.values.bb1 = fv('BB1 ' + hvText('bb1')); o.values.bb2 = fv('BB2 ' + hvText('bb2')); }
             return o;
         }
         if (n.sym === 'surgeArrester' || n.sym === 'voltageTransformer' || n.sym === 'currentTransformer') { o.state = devState(d); return o; }

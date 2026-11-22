@@ -141,6 +141,7 @@
       if (nodes[ref]) return ref;
       var i = ref.lastIndexOf('.'); return nodes[ref.slice(0, i)] ? ref.slice(0, i) : null;
     }
+    function endPort(ref) { var n = endNode(ref); return n && ref !== n ? ref.slice(n.length + 1) : null; }
     /* R147: symbol bodies are obstacles for the RZ diagram engine (js/rz-diagram-layout.js) — an edge without via
        points that would cross another symbol is re-routed orthogonally around it; box nodes (zones, slots, racks) are
        containers lines may pass through, so they are not obstacles. Without the engine the one-elbow route stands. */
@@ -177,7 +178,7 @@
           ? '<text data-role="line" data-lod="2" x="' + r1(lx) + '" y="' + r1(ly - 4) + '" text-anchor="middle">' + esc(e.line) + '</text>'
           : '<text data-role="line" data-lod="2" transform="translate(' + r1(lx - 4) + ' ' + r1(ly) + ') rotate(-90)" text-anchor="middle">' + esc(e.line) + '</text>';
       }
-      graph.push({ id: id, a: endNode(e.from), b: endNode(e.to), flowOf: e.flowOf, m: e.medium || 'line', w: e.w || 'branch' });
+      graph.push({ id: id, a: endNode(e.from), b: endNode(e.to), pa: endPort(e.from), pb: endPort(e.to), flowOf: e.flowOf, m: e.medium || 'line', w: e.w || 'branch' });
     });
     sheet.nodes.forEach(function (n) {
       if (n.sym === 'junction') { nodeSvg += '<circle class="hmi-junction" data-junction="' + esc(n.id) + '" cx="' + r1(n.x) + '" cy="' + r1(n.y) + '" r="' + (n.dot === false ? 0 : 2.2) + '"/>'; return; }
@@ -185,12 +186,15 @@
       var sz = n.size || 32, h = sz / 2, label = (n.tag ? n.tag + ' — ' : '') + (n.label || (L.META[n.sym] || {}).label || n.sym);
       nodeSvg += '<g class="hmi-node" data-node="' + esc(n.id) + '" data-sym="' + esc(n.sym) + '"' +
         (n.cls ? ' data-rz-equipment="' + esc(n.cls) + ':' + esc(n.eqId || n.id) + '"' : '') +
+        (n.hall ? ' data-hall-block="' + esc(n.hall) + '"' : '') +
         ' tabindex="0" role="button" aria-label="' + esc(label) + '">' +
         '<title>' + esc(label) + '</title>' +
         '<rect class="hmi-hit" x="' + r1(n.x - h - 2) + '" y="' + r1(n.y - h - 2) + '" width="' + (sz + 4) + '" height="' + (sz + 4) + '"/>' +
         withBody(L.use(n.sym, { x: n.x, y: n.y, size: sz, rot: n.rot || 0 })) +
         (n.inst ? '<text data-role="inst" x="' + n.x + '" y="' + r1(n.y - sz * 4 / 48 + (n.sym === 'instPanel' ? -1.5 : 2.6)) + '">' + esc(n.inst) + '</text>' : '') +
+        brkMarks(n, sz) +
         '</g>';
+      if (isBrk(n) && !(n.values && n.values.length) && !(n.rating && n.tag && n.tagAt !== 'none')) textSvg += brkTag(n, sz);   // a drawn reading or rating line IS the value tag
       if (n.tag && n.tagAt !== 'none') {
         var at = n.tagAt || 'below', tx = n.x, ty = n.y + h + 10, anchor = 'middle';
         if (at === 'above') ty = n.y - h - 4;
@@ -207,7 +211,7 @@
              chiller, the CDU by name, not by guessing from a symbol */
           var step = at === 'above' ? -12 : 12, ly = ty;   // 12: a 10 px tag over a 9 px name must not share a pixel row (geometry gate G1)
           if (n.name) { ly += step; textSvg += '<text data-role="name" data-name-of="' + esc(n.id) + '"' + (n.lod ? ' data-lod="' + n.lod + '"' : '') + ' x="' + r1(tx) + '" y="' + r1(ly) + '" text-anchor="' + anchor + '">' + esc(n.name) + '</text>'; }
-          if (n.rating) { ly += step; textSvg += '<text data-role="value" data-rating-of="' + esc(n.id) + '" x="' + r1(tx) + '" y="' + r1(ly) + '" text-anchor="' + anchor + '">' + esc(n.rating) + '</text>'; }
+          if (n.rating) { ly += step; textSvg += '<text data-role="value" data-rating-of="' + esc(n.id) + '"' + (isBrk(n) ? ' data-brk-tag-of="' + esc(n.id) + '"' : '') + ' x="' + r1(tx) + '" y="' + r1(ly) + '" text-anchor="' + anchor + '">' + esc(n.rating) + '</text>'; }
           if (n.values && n.values.length && (n.name || n.rating)) ty = ly;
         }
         (n.values || []).forEach(function (v, j) {
@@ -215,12 +219,20 @@
           /* a value item with `point` is a point (PRD-CONV-POINT-STATUS-TREND T2): its id, name and unit ride on the label;
              data-point itself is written by update() once the label first shows a number (js/conv/point-status.js) */
           var pa = v.point ? ' data-pt-id="' + esc(v.point) + '"' + (v.label ? ' data-pt-label="' + esc(v.label) + '"' : '') + (v.unit ? ' data-pt-unit="' + esc(v.unit) + '"' : '') : '';
+          if (isBrk(n) && j === n.values.length - 1) pa += ' data-brk-tag-of="' + esc(n.id) + '"';   // a breaker's own live reading line is its value tag
           textSvg += '<text data-role="value" data-lod="' + (v.lod || 2) + '" data-val="' + esc(n.id) + ':' + esc(v.k) + '"' + pa + ' x="' + r1(vx) + '" y="' + r1(vy) + '" text-anchor="' + (v.anchor || anchor) + '">—</text>';
         });
       }
     });
     (sheet.notes || []).forEach(function (t) {
-      textSvg += '<text data-role="' + (t.role || 'label') + '" x="' + t.x + '" y="' + t.y + '"' + (t.anchor ? ' text-anchor="' + t.anchor + '"' : '') + (t.lod ? ' data-lod="' + t.lod + '"' : '') + '>' + esc(t.text) + '</text>';
+      /* a bus tag with `volt` (PRD-ELECTRICAL-BMS §A6) shows its voltage under load from js/rz-elec-voltage.js; `at` names a
+         node on that bus, whose conductors' state turns it into "0 V DEAD" (volts() below) */
+      var vt = '', va = '';
+      if (t.volt && root.RZElecVoltage) {
+        vt = root.RZElecVoltage.label(root.RZElecVoltage.underLoad(t.volt));
+        va = ' data-volt="' + esc(JSON.stringify(t.volt)) + '" data-volt-at="' + esc(t.at || '') + '" data-volt-pre="' + esc(t.text) + '"';
+      }
+      textSvg += '<text data-role="' + (t.role || 'label') + '"' + va + ' x="' + t.x + '" y="' + t.y + '"' + (t.anchor ? ' text-anchor="' + t.anchor + '"' : '') + (t.lod ? ' data-lod="' + t.lod + '"' : '') + '>' + esc(t.text + vt) + '</text>';
     });
     // R149 loop legend: one stroke sample per medium with its loop name (FWS vs TCS vs CHW ...), top-right of the sheet
     var lg = '';
@@ -246,6 +258,7 @@
       (findable.length ? '<select class="hmi-find" data-find aria-label="Find equipment on ' + esc(sheet.no) + '"><option value="">Find…</option>' + findOpts + '</select>' : '') +
       '<button type="button" class="hmi-btn" data-z="out" aria-label="Zoom out" title="Zoom out">−</button>' +
       '<button type="button" class="hmi-btn" data-z="fit" aria-label="Fit to width" title="Fit to width">Fit</button>' +
+      '<button type="button" class="hmi-btn" data-z="all" aria-label="Whole sheet on screen" title="Whole sheet on screen">Whole</button>' +
       '<button type="button" class="hmi-btn" data-z="in" aria-label="Zoom in" title="Zoom in">+</button>' +
       '<button type="button" class="hmi-btn hmi-btn-shade" data-shade-btn aria-pressed="' + (shadeMode() === 'deep' ? 'true' : 'false') + '" aria-label="Shaded drawing (off = flat ISA-101 line work)" title="Shaded drawing (off = flat ISA-101 line work)">Shade</button></div>' +
       '<div class="hmi-vp" style="--hmi-min-w:' + Math.round(W * (sheet.minScale || 0.9)) + 'px">' +
@@ -258,6 +271,30 @@
     var svg = frame.querySelector('svg.hmi-svg'), vpRect = frame.querySelector('.hmi-mini .vp');
 
     /* ── zoom / pan through the viewBox (fit-to-width at 1×) ───────────────────────────────── */
+    /* PRD-ELECTRICAL-BMS R190: B is the drawn content (nodes, conductors, labels) plus a margin, measured once the sheet is
+       laid out. Fit, zoom and pan work inside B, so a sheet with an empty band never opens a third empty, and the
+       legibility floor (--hmi-min-w) applies to the content width, not the paper. Opt-in (sheet.crop === true): values
+       drawn as "—" widen after the first update, so a sheet whose readings sit at its edge keeps its paper. */
+    var B = { x: 0, y: 0, w: W, h: H }, cropped = false;
+    function measureCrop() {
+      if (cropped || sheet.crop !== true) return cropped;
+      var bb = null;
+      /* everything drawn counts (zones, notes, legend, title block too), so a crop only ever drops empty paper */
+      ['.hmi-areas', '.hmi-edges', '.hmi-lines', '.hmi-nodes', '.hmi-text', '[data-role="titleblock"]', '[data-role="legend"]'].forEach(function (sel) {
+        var g = svg.querySelector(sel), r; if (!g) return;
+        try { r = g.getBBox(); } catch (x) { return; }
+        if (!r || !(r.width || r.height)) return;
+        bb = bb ? { l: Math.min(bb.l, r.x), t: Math.min(bb.t, r.y), r: Math.max(bb.r, r.x + r.width), b: Math.max(bb.b, r.y + r.height) } : { l: r.x, t: r.y, r: r.x + r.width, b: r.y + r.height };
+      });
+      if (!bb) return false;
+      var pad = 28, x0 = Math.max(0, bb.l - pad), y0 = Math.max(0, bb.t - pad), x1 = Math.min(W, bb.r + pad), y1 = Math.min(H, bb.b + pad);
+      B = { x: x0, y: y0, w: x1 - x0, h: y1 - y0 }; cropped = true;
+      var cv = svg.querySelector('rect.hmi-canvas');   // the paper shrinks to the crop (an off-view canvas reads as clipped)
+      if (cv) { cv.setAttribute('x', r1(B.x)); cv.setAttribute('y', r1(B.y)); cv.setAttribute('width', r1(B.w)); cv.setAttribute('height', r1(B.h)); }
+      frame.querySelector('.hmi-vp').style.setProperty('--hmi-min-w', Math.round(B.w * (sheet.minScale || 0.9)) + 'px');
+      var mini = frame.querySelector('.hmi-mini svg'); if (mini) mini.setAttribute('viewBox', B.x + ' ' + B.y + ' ' + B.w + ' ' + B.h);
+      return true;
+    }
     var view = { x: 0, y: 0, w: W, h: H, z: 1 };
     /* while the view moves, the shading layers (filters, tube shadows / crests) are dropped and come back 180 ms after it
        stops: a zoom or pan re-rasterises the sheet every frame, and shadows are the first cost to shed (owner brief) */
@@ -288,13 +325,38 @@
     function zoomAt(f, cx, cy) {
       var z = Math.max(1, Math.min(6, view.z * f));
       if (z === view.z) return;
-      var nw = W / z, nh = H / z;
+      var nw = B.w / z, nh = B.h / z;
       cx = cx == null ? view.x + view.w / 2 : cx; cy = cy == null ? view.y + view.h / 2 : cy;
-      view.x = Math.max(0, Math.min(W - nw, cx - (cx - view.x) * (nw / view.w)));
-      view.y = Math.max(0, Math.min(H - nh, cy - (cy - view.y) * (nh / view.h)));
+      view.x = Math.max(B.x, Math.min(B.x + B.w - nw, cx - (cx - view.x) * (nw / view.w)));
+      view.y = Math.max(B.y, Math.min(B.y + B.h - nh, cy - (cy - view.y) * (nh / view.h)));
       view.w = nw; view.h = nh; view.z = z; apply();
     }
-    function fit() { view = { x: 0, y: 0, w: W, h: H, z: 1 }; apply(); }
+    function fit() { setAll(false); measureCrop(); view = { x: B.x, y: B.y, w: B.w, h: B.h, z: 1 }; apply(); }
+    /* "Whole" (owner R190: "tidak bisa fit to screen"): the content on screen in BOTH axes. The svg is sized to the
+       smaller of the frame width and the height left in its stage (above an overlay the page names with
+       --hmi-fit-inset, e.g. a sticky status bar); the legibility floor is lifted for this overview only, and the LOD
+       classes drop the small labels. Any zoom or Fit returns to the reading scale. */
+    function stageOf(el) {
+      for (var p = el.parentElement; p && p !== document.body; p = p.parentElement) {
+        var oy = getComputedStyle(p).overflowY; if ((oy === 'auto' || oy === 'scroll') && p.clientHeight) return p;
+      }
+      return null;
+    }
+    function setAll(on) {
+      frame.classList.toggle('is-fit-all', !!on);
+      if (!on) { svg.style.width = ''; frame.removeAttribute('data-fit'); return; }
+      frame.setAttribute('data-fit', 'all');
+    }
+    function fitAll() {
+      measureCrop(); setAll(true);
+      var vp = frame.querySelector('.hmi-vp'), st = stageOf(frame);
+      if (st) st.scrollTop += frame.getBoundingClientRect().top - st.getBoundingClientRect().top - 4;   // the sheet bar stays in view
+      var vr = vp.getBoundingClientRect(), inset = parseFloat(getComputedStyle(frame).getPropertyValue('--hmi-fit-inset')) || 0;
+      var bottom = Math.min(innerHeight, st ? st.getBoundingClientRect().bottom : innerHeight) - inset;
+      var availH = Math.max(120, bottom - vr.top - 4), availW = vp.clientWidth || vr.width;
+      svg.style.width = Math.floor(Math.min(availW, availH * B.w / B.h)) + 'px';
+      view = { x: B.x, y: B.y, w: B.w, h: B.h, z: 1 }; apply(); commit();
+    }
     function toSheet(ev) {
       var r = svg.getBoundingClientRect();
       return { x: view.x + (ev.clientX - r.left) / r.width * view.w, y: view.y + (ev.clientY - r.top) / r.height * view.h };
@@ -303,7 +365,8 @@
       var sb = ev.target.closest('[data-shade-btn]'); if (sb) { setShadeMode(sb.getAttribute('aria-pressed') === 'true' ? 'flat' : 'deep'); return; }
       var b = ev.target.closest('[data-z]'); if (!b) return;
       var z = b.getAttribute('data-z');
-      if (z === 'fit') fit(); else zoomAt(z === 'in' ? 1.5 : 1 / 1.5);
+      if (z === 'all') { fitAll(); return; }
+      if (z === 'fit') fit(); else { if (frame.classList.contains('is-fit-all')) setAll(false); zoomAt(z === 'in' ? 1.5 : 1 / 1.5); }
       commit();   // a button is one discrete step, not a gesture: its viewBox holds at once (conv B5 reads it right after the click)
     });
     svg.addEventListener('wheel', function (ev) {
@@ -320,7 +383,7 @@
       if (!drag) return;
       var r = svg.getBoundingClientRect(), dx = (ev.clientX - drag.x) / r.width * view.w, dy = (ev.clientY - drag.y) / r.height * view.h;
       if (Math.abs(ev.clientX - drag.x) + Math.abs(ev.clientY - drag.y) > 4) { drag.moved = true; frame.classList.add('is-panning'); }
-      view.x = Math.max(0, Math.min(W - view.w, drag.vx - dx)); view.y = Math.max(0, Math.min(H - view.h, drag.vy - dy)); apply();
+      view.x = Math.max(B.x, Math.min(B.x + B.w - view.w, drag.vx - dx)); view.y = Math.max(B.y, Math.min(B.y + B.h - view.h, drag.vy - dy)); apply();
     }
     function onPanEnd() { if (drag) { frame.classList.remove('is-panning'); setTimeout(function () { drag = null; }, 0); } }
     /* On window so a pan survives the pointer leaving the sheet; destroy() removes both (a closed modal kept its
@@ -391,6 +454,18 @@
         g.__d = d;
         var sym = g.__sym || (g.__sym = g.querySelector('[data-sym]'));
         if (d.state) { setA(g, 'data-state', d.state); if (sym) setA(sym, 'data-state', d.state); }
+        if (isBrk(n)) {
+          var gl = g.__gl || (g.__gl = g.querySelector('[data-brk-glyph]')), lp = g.__lp || (g.__lp = g.querySelector('[data-lamp]'));
+          var bs = BRK_GLYPH[d.state] || (d.state ? 'na' : 'na');
+          if (gl) setA(gl, 'data-brk', bs);
+          if (lp) setA(lp, 'data-lamp-state', BRK_LAMP[bs] || 'off');
+          var tg = g.__tg || (g.__tg = svg.querySelector('[data-brk-tag-of="' + n.id + '"]'));
+          if (tg && !tg.hasAttribute('data-val')) {   // a live reading line is written by the values pass below
+            var vv = d.values && Object.keys(d.values).map(function (k) { return d.values[k] && d.values[k].text; }).filter(function (t) { return t && /\d/.test(t); });
+            var tt = vv && vv.length ? vv.slice(0, 2).join(' · ') : (n.rating && tg.hasAttribute('data-rating-of') ? String(n.rating) : brkRating(n));
+            if (tg.textContent !== tt) tg.textContent = tt;
+          }
+        }
         setA(g, 'data-quality', d.quality || null);
         setA(g, 'data-alarm', d.alarm || null);
         /* alarm without colour (owner brief O5): a priority badge — diamond with the ISA priority digit — top-right of the
@@ -457,7 +532,7 @@
       var n = nodes[id]; if (!n) return;
       if (view.z < 2) zoomAt(2.5 / view.z, n.x, n.y);
       var w = view.w, h = view.h;
-      view.x = Math.max(0, Math.min(W - w, n.x - w / 2)); view.y = Math.max(0, Math.min(H - h, n.y - h / 2)); apply(); commit();
+      view.x = Math.max(B.x, Math.min(B.x + B.w - w, n.x - w / 2)); view.y = Math.max(B.y, Math.min(B.y + B.h - h, n.y - h / 2)); apply(); commit();
       // on a narrow frame the sheet scrolls inside its viewport: bring the item's column into view there too
       var vp = svg.parentElement, px = svg.clientWidth;
       if (vp && px && vp.scrollWidth > vp.clientWidth + 1) vp.scrollLeft = Math.max(0, (n.x - view.x) / view.w * px - vp.clientWidth / 2);
@@ -480,7 +555,59 @@
       var g = svg.querySelector('.hmi-node[data-node="' + id.replace(/"/g, '') + '"]');
       if (g) { g.setAttribute('data-selected', ''); g.focus({ preventScroll: true }); }
     });
-    var api = { sheet: sheet, svg: svg, frame: frame, update: update, trace: trace, clearTrace: clearTrace, fit: fit, zoom: zoomAt, focus: focusNode,
+    /* a breaker's glyph + lamp sit left of the symbol; where that covers a drawn word (a zone title, its own tag) they
+       move right, then above / below (either side), to the first place that covers none, else the one covering fewest */
+    function settleBrk() {
+      var words = [].slice.call(svg.querySelectorAll('text')).map(function (t) { try { return t.getBBox(); } catch (x) { return null; } })
+        .filter(function (r) { return r && r.width; });
+      /* straight conductors and signal runs count as well (a lamp parked on the 51 relay link on DC AI's incomers) */
+      [].slice.call(svg.querySelectorAll('path.hmi-edge:not(.hmi-flow)')).forEach(function (p) {
+        var r; try { r = p.getBBox(); } catch (x) { return; }
+        if (r && (r.width < 2 || r.height < 2)) words.push({ x: r.x - 1, y: r.y - 1, width: r.width + 2, height: r.height + 2 });
+      });
+      var hit = function (r) { var n = 0; words.forEach(function (w) { if (r.x < w.x + w.width && w.x < r.x + r.width && r.y < w.y + w.height && w.y < r.y + r.height) n++; }); return n; };
+      svg.querySelectorAll('g.hmi-brk[data-brk-flip]').forEach(function (g) {
+        g.removeAttribute('transform');
+        var r = g.getBBox(), dx = +g.getAttribute('data-brk-flip'), here = hit(r);
+        if (!here || !r.width) return;
+        var best = [0, 0, here];
+        [[dx, 0], [0, -18], [dx, -18], [0, 18], [dx, 18]].some(function (d) {
+          var n = hit({ x: r.x + d[0], y: r.y + d[1], width: r.width, height: r.height });
+          if (n < best[2]) best = [d[0], d[1], n];
+          return n === 0;
+        });
+        if (best[0] || best[1]) g.setAttribute('transform', 'translate(' + best[0] + ' ' + best[1] + ')');
+      });
+    }
+    function settle() {
+      if (!svg.clientWidth) return false;
+      settleBrk();
+      if (sheet.crop === true && measureCrop() && view.z <= 1.001 && !frame.classList.contains('is-fit-all')) fit();
+      return true;
+    }
+    /* settle once the sheet has a layout (a sheet mounted in a hidden tab settles on its first non-zero size), and
+       again once the web fonts are in, since they widen the labels after first paint */
+    if (!settle() && typeof ResizeObserver === 'function') {
+      var cropRo = new ResizeObserver(function () { if (settle()) cropRo.disconnect(); });
+      cropRo.observe(svg);
+    }
+    if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(function () { if (!svg.isConnected) return; cropped = false; settle(); });
+    /* repaint every bus voltage from the state its conductors were painted with: a bus with no running conductor is dead.
+       Called by the cockpit after it applies the state grammar (DC AI hmi-v2 vfxApply, EPMS). Before any state is
+       painted the design value stays. */
+    function volts() {
+      var V = root.RZElecVoltage; if (!V) return;
+      svg.querySelectorAll('text[data-volt]').forEach(function (t) {
+        var at = t.getAttribute('data-volt-at'), es = at ? [].slice.call(svg.querySelectorAll('path.hmi-edge[data-ends]:not(.hmi-flow)')).filter(function (p) { return p.getAttribute('data-ends').split('|').indexOf(at) >= 0; }) : [];
+        var painted = es.filter(function (p) { return p.hasAttribute('data-vstate'); });
+        var o = JSON.parse(t.getAttribute('data-volt'));
+        if (painted.length) o.live = painted.some(function (p) { return p.getAttribute('data-vstate') === 'running'; });
+        var r = V.underLoad(o), txt = t.getAttribute('data-volt-pre') + V.label(r);
+        setA(t, 'data-volt-state', r.state);
+        if (t.textContent !== txt) t.textContent = txt;
+      });
+    }
+    var api = { sheet: sheet, svg: svg, frame: frame, update: update, volts: volts, trace: trace, clearTrace: clearTrace, fit: fit, fitAll: fitAll, zoom: zoomAt, focus: focusNode,
       view: function () { return { x: view.x, y: view.y, w: view.w, h: view.h, z: view.z }; },
       node: function (id) { return nodes[id]; }, graph: graph, center: centerNode, destroy: function () {
         root.removeEventListener('pointermove', onPanMove); root.removeEventListener('pointerup', onPanEnd);
@@ -517,6 +644,34 @@
     return out;
   }
 
+  /* PRD-ELECTRICAL-BMS E3 (decision 2): a breaker reads its state without the word. IEC 60617 practice: a filled square =
+     closed, a hollow square = open, a diamond = tripped (data-brk); a lamp beside it (running / off / alarm, the state
+     colours of css/rz-hmi.css); a boxed value tag with the live reading, or the rating the sheet declares when the item
+     publishes none. Drawn for every symbol of the cb* family; the renderer sets data-brk / data-lamp-state on update. */
+  function isBrk(n) { return /^cb/.test(n.sym || ''); }
+  function brkMarks(n, sz) {
+    if (!isBrk(n)) return '';
+    var h = sz / 2, x = n.x - h - 11, y = n.y - h + 1;
+    return '<g class="hmi-brk" data-lod="0" aria-hidden="true" data-brk-flip="' + r1(sz + 15) + '"><rect data-brk-glyph data-brk="na" x="' + r1(x) + '" y="' + r1(y) + '" width="7" height="7"/>' +
+      '<circle data-lamp data-lamp-state="off" cx="' + r1(x + 3.5) + '" cy="' + r1(y + 15) + '" r="3"/></g>';
+  }
+  function brkRating(n) {
+    if (n.brk) return String(n.brk);   // the sheet's own value tag for a breaker that publishes no live reading (engine rating)
+    var m = /(\d+(?:[.,]\d+)?)\s*(MVA|kVA|kW|kA|kV|A|V)\b/.exec((n.rating || '') + ' ' + (n.label || ''));
+    return m ? m[1] + ' ' + m[2] : '—';
+  }
+  function brkTag(n, sz) {
+    /* on the side of the item's own tag, under its tag lines (the opposite side ran off the paper on DH-01's left
+       incomers); an item tagged above / below / not at all carries it to the right of the symbol */
+    var h = sz / 2, at = n.tagAt || 'below', side = at === 'left' || at === 'right' ? at : 'right';
+    var lines = (n.tag && at !== 'none' ? 1 : 0) + (n.name ? 1 : 0) + (n.rating ? 1 : 0);
+    var left = side === 'left', x = left ? n.x - h - 4 : n.x + h + 4, y = (at === 'left' || at === 'right') ? n.y + 3 + lines * 12 : n.y + 3, anchor = left ? 'end' : 'start';
+    if (at === 'above') { x = n.x; y = n.y - h - 4 - lines * 12; anchor = 'middle'; }        // stacked over its tag, clear of the conductor
+    else if (at === 'below') { x = n.x; y = n.y + h + 10 + lines * 12; anchor = 'middle'; }
+    return '<text class="hmi-brk-tag" data-role="value" data-brk-tag-of="' + esc(n.id) + '"' + (n.lod ? ' data-lod="' + n.lod + '"' : '') + ' x="' + r1(x) + '" y="' + r1(y) + '" text-anchor="' + anchor + '">' + esc(brkRating(n)) + '</text>';
+  }
+  var BRK_GLYPH = { closed: 'closed', running: 'closed', energized: 'closed', open: 'open', standby: 'open', stopped: 'open', off: 'open', fault: 'tripped', tripped: 'tripped', alarm: 'tripped' };
+  var BRK_LAMP = { closed: 'running', open: 'off', tripped: 'alarm' };
   function titleBlock(s, W, H) {
     var w = 250, h = 54, x = W - w - 6, y = H - h - 6;
     return '<g data-role="titleblock" transform="translate(' + x + ' ' + y + ')">' +
