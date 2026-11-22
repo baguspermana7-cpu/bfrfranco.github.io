@@ -193,9 +193,14 @@ for (const [file, id] of PAGES) {
 
     /* MO3 / MO6 press feedback */
     /* MO1 scrolled a point to the centre — of the window or of an inner scroller (fuel, water) */
+    /* the controls a page folds into the cockpit Details (PRD-COCKPIT-QUIET, SITE_CHROME §9a) are pressed there: open it
+       first, the way the point-coverage gate does (ict keeps every button one tap down) */
+    await pg.evaluate(() => window.RZConvShell && RZConvShell.setDetails && RZConvShell.setDetails(true, false));
     await pg.evaluate(() => { window.scrollTo(0, 0); document.querySelectorAll('*').forEach((e) => { if (e.scrollTop) e.scrollTop = 0; }); }); await sleep(250);
     const btns = await pg.evaluate(() => [...document.querySelectorAll('[data-rz-cockpit-root] button, [data-rz-cockpit-root] [role="button"]')]
       .filter((b) => { if (b instanceof SVGElement || b.closest('svg') || b.hasAttribute('data-point') || b.closest('.cv-cta') || b.disabled || b.getAttribute('aria-disabled') === 'true') return false;
+        /* a control below the fold (ict keeps its controls in the Details, far down) is scrolled to, the way a reader reaches it */
+        if (b.getClientRects().length) { const r0 = b.getBoundingClientRect(); if (r0.width >= 8 && r0.height >= 8 && (r0.bottom < 60 || r0.top > innerHeight - 4)) b.scrollIntoView({ block: 'center', behavior: 'instant' }); }
         const r = b.getBoundingClientRect(); if (r.width < 8 || r.height < 8 || r.bottom < 60 || r.top > innerHeight - 4 || r.left < 0 || r.right > innerWidth) return false;
         const c = getComputedStyle(b); if (c.visibility === 'hidden' || +c.opacity === 0 || c.transform !== 'none' || c.pointerEvents === 'none') return false;
         /* the press lands on the control itself, never on a number inside it (a tile's number opens its trend instead) */
@@ -212,7 +217,8 @@ for (const [file, id] of PAGES) {
       const settled = (i) => pg.evaluate(async (k) => { const e = document.querySelector(`[data-mo-btn="${k}"]`); if (!e) return;
         await Promise.race([Promise.all(e.getAnimations().map((a) => a.finished.catch(() => {}))), new Promise((r) => setTimeout(r, 1500))]); }, i);
       /* the spot is found again right before the press: an earlier press can change the layout (a mode button) */
-      const spot = await pg.evaluate((i) => { const e = document.querySelector(`[data-mo-btn="${i}"]`); if (!e || !e.getClientRects().length) return null; const r = e.getBoundingClientRect();
+      const spot = await pg.evaluate((i) => { const e = document.querySelector(`[data-mo-btn="${i}"]`); if (!e || !e.getClientRects().length) return null; let r = e.getBoundingClientRect();
+        if (r.bottom < 60 || r.top > innerHeight - 4) { e.scrollIntoView({ block: 'center', behavior: 'instant' }); r = e.getBoundingClientRect(); }
         for (const [fx, fy] of [[.5, .5], [.2, .3], [.8, .3], [.2, .75], [.8, .75], [.5, .2], [.5, .85]]) { const x = r.x + r.width * fx, y = r.y + r.height * fy, h = document.elementFromPoint(x, y);
           if (h && (h === e || e.contains(h)) && !h.closest('[data-point]') && y > 50 && y < innerHeight - 2) return { x, y }; }
         return null; }, b.i);

@@ -243,7 +243,9 @@ try {
     const bannerLayout = await page.evaluate(() => {
       const slot = document.querySelector('[data-rz-telemetry-banner-slot]');
       const banner = document.querySelector('.rz-tq-banner');
-      const header = slot?.closest('header') || slot?.previousElementSibling;
+      /* PRD-COCKPIT-QUIET (SITE_CHROME §9a): a slot in the shell state row sits under the cockpit bar */
+      const inRow = Boolean(slot?.closest('.cv-sub'));
+      const header = inRow ? document.querySelector('.cv-bar') : (slot?.closest('header') || slot?.previousElementSibling);
       const close = banner?.querySelector('.rz-tq-banner-close');
       const bannerRect = banner?.getBoundingClientRect();
       const headerRect = header?.getBoundingClientRect();
@@ -255,12 +257,14 @@ try {
         position: banner ? getComputedStyle(banner).position : '',
         withinViewport: Boolean(bannerRect && bannerRect.left >= 0 && bannerRect.right <= window.innerWidth),
         clearsHeader: Boolean(bannerRect && headerRect && (
-          slot?.hasAttribute('data-rz-telemetry-compact')
+          slot?.hasAttribute('data-rz-telemetry-compact') && !inRow
             ? bannerRect.top >= headerRect.top - 1 && bannerRect.bottom <= headerRect.bottom + 1
             : bannerRect.top >= headerRect.bottom - 1
         )),
-        closeTarget: Boolean(closeRect && closeRect.width >= 44 && closeRect.height >= 44),
-        closeFocusOutline: close ? parseFloat(getComputedStyle(close).outlineWidth) : 0,
+        /* in the state row the state is one word in flow, never over content: on a phone it has no dismiss */
+        closeTarget: Boolean(closeRect && closeRect.width >= 44 && closeRect.height >= 44)
+          || (inRow && Boolean(close) && getComputedStyle(close).display === 'none'),
+        closeFocusOutline: close && getComputedStyle(close).display === 'none' && inRow ? 2 : (close ? parseFloat(getComputedStyle(close).outlineWidth) : 0),
       };
     });
     assert.equal(bannerLayout.inDedicatedSlot, true, `${telemetryPage}: telemetry banner lacks an in-flow slot`);
@@ -307,6 +311,8 @@ try {
 
   await page.goto(`${origin}/EPMS_Telemetry.html`, { waitUntil: 'domcontentloaded', timeout: 30_000 });
   await page.waitForSelector('#epmsSidebarToggle', { timeout: 10_000 });
+  /* the page arrival (js/conv/motion.js, v3.84.0) lifts the panels 6 px for <= 600 ms: geometry is read at rest */
+  await page.evaluate(() => Promise.race([Promise.all(document.getAnimations().filter((a) => /^cvm-/.test(a.id || '')).map((a) => a.finished.catch(() => {}))), new Promise((r) => setTimeout(r, 2000))]));
   const epmsClosed = await page.evaluate(() => {
     const sidebar = document.getElementById('epmsSidebar');
     const toggle = document.getElementById('epmsSidebarToggle');

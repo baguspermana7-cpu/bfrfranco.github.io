@@ -446,7 +446,7 @@
 #basis-tag, .kbd-hint { color:#9aa3af !important; }
 #cookieAccept { background:#E8B563 !important; color:#16181d !important; }
 </style>
-    <script src="js/rz-version.js?v=20261122-0cd2d357" defer></script>
+    <script src="js/rz-version.js?v=20261122-5364dfb7" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
 <style id="rz-skiplink-v1">
@@ -464,7 +464,7 @@
   select, textarea { font-size: 16px !important; }
 }
 </style>
-<link rel="stylesheet" href="css/conv-shell.css?v=20261120-33ee363b">
+<link rel="stylesheet" href="css/conv-shell.css?v=20261121-1a01438a">
 </head>
 <body class="p-4" data-rz-data-mode="simulated">
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -479,7 +479,7 @@
     </div>
 
     <!-- ===== Header (E7a: Back, Portfolio, title and Ask live in the cockpit bar, js/conv/shell.js) ===== -->
-    <div class="flex flex-wrap justify-between items-center gap-3 mb-3 no-print" data-cv-toolrow>
+    <div class="flex flex-wrap justify-between items-center gap-3 mb-3 no-print" data-cv-toolrow data-cv="detail">
         <div class="flex items-center gap-3">
             <h1 class="text-base font-bold text-white tracking-wide" data-cv="title">Fire Protection &amp; Suppression — BMS</h1>
             <span class="text-[10px] text-slate-500 font-tech" id="basis-tag" data-dup="fire-current-basis" data-const>Basis: UNAVAILABLE</span>
@@ -491,12 +491,12 @@
             <button id="fireSystemTrig" type="button" class="ctrl-btn"><i class="fas fa-file-pdf mr-1"></i> EXPORT PDF</button>
         </div>
     </div>
-    <script src="js/conv/shell.js?v=20261119-fff76bfd"></script>
-    <div data-rz-telemetry-banner-slot></div>
+    <script src="js/conv/shell.js?v=20261121-76b03c2c"></script>
+    <div data-rz-telemetry-banner-slot data-cv="state" data-rz-telemetry-label="SIMULATED"></div>
 
     <!-- ===== Top Alarm Strip (alarm-first, doc-13 / doc-10) ===== -->
-    <div id="alarm-strip" class="alarm-strip state-warn mb-3" role="status" aria-live="polite">
-        <span class="as-banner" id="as-banner" style="color:var(--st-warn)">FIRE AUTHORITY UNAVAILABLE</span>
+    <div id="alarm-strip" class="alarm-strip state-warn mb-3" role="status" aria-live="polite" data-cv="detail">
+        <span class="as-banner" id="as-banner" data-cv="state" style="color:var(--st-warn)">FIRE AUTHORITY UNAVAILABLE</span>
         <span class="as-item"><span class="as-dot warn" id="as-dot-facp"></span>FACP <b aria-describedby="rz-prov-fire-strip" id="as-facp">UNAVAILABLE</b></span>
         <span class="as-item"><span class="as-dot warn" id="as-dot-vesda"></span>VESDA <b id="as-vesda">UNAVAILABLE</b></span>
         <span class="as-item"><span class="as-dot warn" id="as-dot-crit"></span>Critical <b id="as-crit">UNAVAILABLE</b></span>
@@ -517,7 +517,7 @@
     <!-- ===== v1.23.5 doc-14 §5: Fire-stages legend — visible reference of the 6-stage progression.
          Active stage is highlighted by setFireStageChip() whenever the simulation state changes.
          Calm by default (no red glow); only the active chip in stage 3+ gets the red treatment. -->
-    <div id="fire-stages-legend" class="fire-stages-legend mb-3" aria-label="Fire alarm stage progression legend" role="group" style="display:flex;flex-wrap:wrap;gap:6px;font-family:'JetBrains Mono','IBM Plex Sans',sans-serif;font-size:10px;letter-spacing:0.05em;text-transform:uppercase;padding:8px 10px;background:rgba(18,19,22,0.55);border:1px solid rgba(92,100,112,0.35);border-radius:6px;">
+    <div id="fire-stages-legend" class="fire-stages-legend mb-3" data-cv="detail" aria-label="Fire alarm stage progression legend" role="group" style="display:flex;flex-wrap:wrap;gap:6px;font-family:'JetBrains Mono','IBM Plex Sans',sans-serif;font-size:10px;letter-spacing:0.05em;text-transform:uppercase;padding:8px 10px;background:rgba(18,19,22,0.55);border:1px solid rgba(92,100,112,0.35);border-radius:6px;">
         <span data-stage="0" class="fs-chip" style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:4px;border:1px solid rgba(92,100,112,0.4);background:rgba(18,19,22,0.4);color:#94a3b8;font-weight:600;"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;"></span>0 · Normal</span>
         <span data-stage="1" class="fs-chip" style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:4px;border:1px solid rgba(92,100,112,0.4);background:rgba(18,19,22,0.4);color:#94a3b8;font-weight:600;"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;"></span>1 · VESDA Alert</span>
         <span data-stage="2" class="fs-chip" style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:4px;border:1px solid rgba(92,100,112,0.4);background:rgba(18,19,22,0.4);color:#94a3b8;font-weight:600;"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;"></span>2 · Smoke / Pre-alarm</span>
@@ -527,7 +527,7 @@
         <span data-stage="6" class="fs-chip" style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:4px;border:1px solid rgba(92,100,112,0.4);background:rgba(18,19,22,0.4);color:#94a3b8;font-weight:600;"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;"></span>6 · Discharged / Lockout</span>
     </div>
 
-    <section class="fire-scope-strip" aria-label="Current and study capacity basis">
+    <section class="fire-scope-strip" data-cv="detail" aria-label="Current and study capacity basis">
         <!-- v1.134.8 — an open, quantified finding: the installed fire-water reserve cannot
              meet the duration this drawing itself requires. Rendered from the engine so it
              cannot be forgotten or edited away on one page. -->

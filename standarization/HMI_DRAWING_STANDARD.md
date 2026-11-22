@@ -145,6 +145,38 @@ Click → `open(node)` → the L3 modal (`cdu` class draws its own sheet; other 
   rotor and discharge dashes, second signal per state, reduced motion and off-screen pause, Thermal = engine planes,
   Flat = grey, 390 px without overflow.
 
+## 4e. Chrome budget (PRD-COCKPIT-QUIET, owner R182 2026-11-21: "tulisan2 yg over ... saya bisa lihat di mimic ui nya ... Nggak perlu di tampilkan ... hirarki yg di hide/expand")
+
+The drawing is the page. Text above it in the drawing's column has three levels.
+
+- **L0, at rest:** the cockpit top bar, the sheet tabs, the view bar with its one legend, the drawing.
+- **L1, one tap:** a `<details data-cockpit-details>` (or a button with `aria-expanded`) holds strips that repeat the
+  drawing (a KPI strip, a ticker, basis or planning cards) and introductions. It is closed at rest, and on a phone
+  its summary is at least 44 px tall.
+- **L2, hover, focus or tap:** sentences that explain (what SIMULATED means, a scenario cause at NORMAL, how to read a
+  tile) go into a tooltip or the basis drawer.
+
+Rules:
+- A value drawn on the mimic is not repeated in chrome above it.
+- File names, code identifiers and definitions ("conv-engine.js scenario", "since render = …") never show.
+- A framed box never holds only empty space.
+- Nothing is deleted: ids and `data-basis-param` hooks stay in the DOM, so the coverage gates keep reading them.
+
+Budget, measured rendered by `tools/test-cockpit-quiet.mjs` at 1440 × 900 and 390 × 844:
+- the drawing starts at or above 220 px (1440) and 300 px (390);
+- at most 25 words above it in its column, not counting the L0 bar and tabs;
+- 0 repeated values, 0 developer prose, 0 empty framed boxes.
+
+Applied in v3.84.0:
+- `datahallAI.html`: the dashboard KPI strip is one tap down; the picture's callouts carry the numbers.
+- `cdu-mini-bms.html`: the hero is compact, with About ▾, and the cockpit comes first.
+
+Applied to the Conventional cockpits through the shared shell (`SITE_CHROME_STANDARD.md` §9a): chiller-plant,
+water-system, fire-system, fuel-system, EPMS_Telemetry, ict, and the dc-conventional hub (text laws only: its KPI strip
+is its content, R6). Measured at 1440 / 390: chiller 453/766 → 218/297 px, water 678/987 → 213/246, fire 440/840 →
+170/203, fuel 616/1508 → 218/291, EPMS 347/498 → 214/287, ict 458/972 → 213/282. datahall follows once the
+Conventional session's DATAHALL-SPACE release is on main (Q3).
+
 ## 4c. Repaint cost (v3.63.0, O11)
 
 A repaint is a function of the payload context key (tick, both scenarios, replay, fire workstation snapshot): `hmi-v2

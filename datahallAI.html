@@ -772,7 +772,7 @@ body[data-datahall-authority="unavailable"] #tabs,
 body[data-datahall-authority="unavailable"] .wrap{display:none !important}
 body[data-datahall-authority="unavailable"] .hdr-r>.dot,body[data-datahall-authority="unavailable"] [data-cv="clock"]>.dot{background:#64748b !important;box-shadow:none !important;animation:none !important}
 body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:none}
-</style>    <script src="js/rz-version.js?v=20261122-0cd2d357" defer></script>
+</style>    <script src="js/rz-version.js?v=20261122-5364dfb7" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <!-- v3.5.0 — hold the 8.5px legibility floor by SCALE, not by font size. Five of this page's
          fifteen diagrams were already clear; the dense ones (cooling P&ID, the four SLDs, the hall
@@ -868,7 +868,7 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
     <link rel="stylesheet" href="css/rz-cockpit-instrument.css?v=20261105-c3fa9df6">
     <!-- v2.11.0 — the one navigation language shared with the Conventional hub (owner comment 18) -->
     <link rel="stylesheet" href="css/rz-cockpit-nav.css?v=20260920-8e948f05">
-    <link rel="stylesheet" href="css/datahall-ai-operator.css?v=20261113-7e889627">
+    <link rel="stylesheet" href="css/datahall-ai-operator.css?v=20261121-e37b1b3b">
     <link rel="stylesheet" href="css/rz-design-studio.css?v=20260920-972eff8b">
     <script src="js/datahall-ai/operator-ui.js?v=20261013-6f8ad66d" defer></script>
     <script src="js/datahall-ai/equipment-inspector.js?v=20261116-b68cf3d6" defer></script>
@@ -890,7 +890,7 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
     <link rel="stylesheet" href="css/rz-hmi.css?v=20261117-fe9b28c8">
     <link rel="stylesheet" href="css/conv-vfx.css?v=20261118-5eed9b2f">
     <link rel="stylesheet" href="css/rz-dh-shell.css?v=20261120-a7d2ebad">
-    <link rel="stylesheet" href="css/conv-shell.css?v=20261120-33ee363b">
+    <link rel="stylesheet" href="css/conv-shell.css?v=20261121-1a01438a">
 </head><body class="locked" data-rz-data-mode="simulated" data-datahall-authority="unavailable" data-rz-inspector-dock="1">
 <a href="#main-content" class="skip-link">Skip to main content</a>
 
@@ -906,7 +906,7 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
 </div>
 <div class="hdr-r"><span data-rz-ask-slot></span><button class="dh-bod-trig" id="rzReplayTrig" type="button" aria-haspopup="dialog" aria-disabled="true" disabled title="Replay a recorded BMS trend file (CSV or JSON) in place of the simulation. The file stays in this browser; nothing is uploaded." data-core="js/datahall-ai/replay-core.js?v=20261114-8c19b6de" data-ui="js/datahall-ai/replay-ui.js?v=20261114-7381e72e" data-worker="js/datahall-ai/replay-worker.js?v=20261114-be3ddae2">Replay</button>&nbsp;<button class="dh-bod-trig" id="bodTrig" type="button" aria-haspopup="dialog" aria-disabled="true" disabled title="UNAVAILABLE until the current engine authority validates"><span aria-hidden="true">&#9432;</span> Basis of Design</button>&nbsp;<button class="dh-bod-trig" id="genDesignTrig" type="button" aria-haspopup="dialog" aria-disabled="true" disabled title="UNAVAILABLE until the current engine authority validates" data-cv="cta" data-cv-rest="Get my design" data-cv-win="Design ready in one click">Generate Design</button>&nbsp;<button class="dh-bod-trig" id="faqTrig" type="button" aria-haspopup="dialog" aria-disabled="true" disabled title="UNAVAILABLE until the current engine authority validates">FAQ</button>&nbsp;<button class="theme-toggle" id="themeToggle" title="Toggle theme" aria-label="Toggle theme" data-cv="theme"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button><span data-cv="clock"><span class="dot"></span>&nbsp;<span id="clk">--:--:--</span> WIB</span></div>
 </header>
-<script src="js/conv/shell.js?v=20261119-fff76bfd"></script>
+<script src="js/conv/shell.js?v=20261121-76b03c2c"></script>
 <div class="rz-replay-bar" id="rzReplayBar" role="region" aria-label="Replay controls" hidden data-rz-authored-basis="replay controls: the cursor time and sample index of a recorded file the reader loaded into this browser (PRD-P05), never engine quantities"><span class="rz-replay-tag">REPLAY</span><span class="rz-replay-file" id="replayFileName"></span><button class="rz-ops-button rz-ops-button--compact" id="replayPlay" type="button" aria-pressed="false">Play</button><label class="rz-replay-speed"><select id="replaySpeed" aria-label="Replay speed"><option value="1">1&times;</option><option value="10">10&times;</option><option value="60">60&times;</option></select></label><input type="range" id="replayScrub" min="0" max="0" step="1" value="0" aria-label="Replay time"><output id="replayTime" for="replayScrub">&mdash;</output><button class="rz-ops-button rz-ops-button--compact" id="replayExit" type="button" title="Leave replay and return to the seeded simulation">Exit replay</button></div>
 
 <div class="root-gate" id="rootGate">
@@ -1072,6 +1072,10 @@ Requested model/calculation versions and the complete locked schema must validat
      formula and the dependency edges MEASURED by perturbing the engine. Two cards have no
      registry id because the engine has no model for them, and they say so in writing rather
      than borrowing a neighbour's provenance. -->
+<!-- PRD-COCKPIT-QUIET Q2 (owner R182): the picture below already draws seven of these eight numbers, so the strip
+     rests closed one tap down (L1). Every card keeps its registry id and basis drawer. -->
+<details class="ai-kpi-details" data-cockpit-details>
+<summary class="ai-kpi-sum">Details <span class="ai-kpi-sum-n">8 numbers &middot; basis</span></summary>
 <div class="ai-kpi-strip" style="display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin-bottom:6px">
 <div class="k" data-basis-param="pue.design_day" tabindex="0" role="button" aria-label="PUE — click for basis" style="cursor:pointer"><div class="kl" title="Click for full basis drawer">PUE</div><div class="kv" style="color:var(--c)" id="dkPue">&#8212;</div><div class="ks" id="dkPueSub">design day &#183; derived</div></div>
 <div class="k" data-basis-param="wue.l_per_kwh" tabindex="0" role="button" aria-label="WUE — click for basis" style="cursor:pointer"><div class="kl" title="Click for full basis drawer">WUE</div><div class="kv" style="color:var(--t2)" id="dkWue">&#8212;</div><div class="ks" id="dkWueSub">L/kWh IT</div></div>
@@ -1082,8 +1086,9 @@ Requested model/calculation versions and the complete locked schema must validat
 <div class="k" tabindex="0" role="button" aria-label="Uptime — design intent, not a measurement" style="cursor:default" data-rz-authored-basis="Tier-IV design INTENT, not a measurement and not an engine quantity. A real availability figure comes from a logged outage record; this cockpit has no event source, so the number is authored on the page and declared here rather than dressed up as derived."><div class="kl" title="Design intent — no event log is bound to this cockpit">Uptime</div><div class="kv" style="color:var(--g)">99.99</div><div class="ks">% design intent</div></div>
 <div class="k" tabindex="0" role="button" aria-label="Active alarms — simulated state" style="cursor:default" data-rz-authored-basis="A simulated alarm count, not an engine quantity. The GB300 basis engine sizes plant; it does not model alarm state, and no SCADA or event source is bound to this page, so the NORMAL state is authored here and declared rather than implied."><div class="kl" title="Simulated state — no alarm engine is bound to this cockpit">Alarms</div><div class="kv" style="color:var(--g)" id="dkAlm">0</div><div class="ks">active &#183; simulated</div></div>
 </div>
+</details>
 <!-- Main Dashboard Area -->
-<div class="ai-dashboard-grid" style="display:grid;grid-template-columns:1fr 280px;gap:6px;height:calc(100% - 80px)">
+<div class="ai-dashboard-grid" style="display:grid;grid-template-columns:1fr 280px;gap:6px;height:calc(100% - 42px)">
 <!-- Left: DC Image with Callouts -->
 <div class="ai-dashboard-image" style="position:relative;background:var(--bg2);border:1px solid var(--bd);border-radius:4px;overflow:hidden">
 <img loading="lazy" src="assets/DashboardDC_80.jpg" alt="Data Center Facility" style="width:100%;height:100%;object-fit:cover;opacity:0.9" width="1600" height="873">

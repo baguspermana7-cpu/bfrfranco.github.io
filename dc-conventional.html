@@ -700,6 +700,9 @@ body[data-conv-authority="unavailable"] .stats-panel .stat-value {
 
 /* Header */
 [data-theme="light"] .header { background: #ffffff; box-shadow: none; }
+/* PRD-COCKPIT-QUIET: the shell took the title, PRD, Manual, CTA and back links; FAQ and Ask stay one row, unframed
+   (Q-L5), visible at rest (test-explain-ask B9) */
+.header[data-cv-toolrow] { background: transparent !important; border-bottom: 0; box-shadow: none; position: static; height: auto; min-height: 0; padding: 4px 16px; justify-content: flex-end; }
 [data-theme="light"] .header-title { color: var(--text-primary); }
 [data-theme="light"] .live-badge { background: rgba(100, 116, 139, 0.1); color: #475569; }
 [data-theme="light"] .status-dot { background: #64748b; }
@@ -918,7 +921,7 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
         ]
     }
     </script>
-    <script src="js/rz-version.js?v=20261122-0cd2d357" defer></script>
+    <script src="js/rz-version.js?v=20261122-5364dfb7" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- Conventional BMS single scenario engine — single source of truth for
@@ -969,7 +972,7 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
 </style>
 <script src="js/rz-telemetry-quality.js?v=20261113-8feb0dfd" defer></script>
 <script src="js/rz-provenance.js?v=20261111-6f1cd061" defer></script>
-<link rel="stylesheet" href="css/conv-shell.css?v=20261120-33ee363b">
+<link rel="stylesheet" href="css/conv-shell.css?v=20261121-1a01438a">
 </head>
 <body data-rz-data-mode="simulated">
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -999,8 +1002,8 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
         <span data-cv="clock"><span class="status-dot"></span><span id="clock">--:--:--</span> WIB</span>
     </div>
 </header>
-<script src="js/conv/shell.js?v=20261119-fff76bfd"></script>
-<div data-rz-telemetry-banner-slot></div>
+<script src="js/conv/shell.js?v=20261121-76b03c2c"></script>
+<div data-rz-telemetry-banner-slot data-cv="state" data-rz-telemetry-label="SIMULATED"></div>
 
 <div class="main-layout">
     <!-- Left Sidebar - Navigation Menu -->
@@ -1056,8 +1059,8 @@ div > a[href$="terms.html"], div > a[href$="privacy.html"]{text-decoration:under
         <!-- ALARM STRIP — operator-first, top of information hierarchy.
              Mirrors datahall.html canonical strip. Counts derived from
              window.CONV_CALC.snapshot (deterministic, no Math.random). -->
-        <div class="alarm-strip" id="alarmStrip" role="status" aria-live="polite" aria-label="System alarm status">
-            <div class="as-state unavailable" id="as-state">
+        <div class="alarm-strip" id="alarmStrip" data-cv="detail" role="status" aria-live="polite" aria-label="System alarm status">
+            <div class="as-state unavailable" id="as-state" data-cv="state">
                 <div class="as-dot"></div>
                 <div class="as-state-txt" id="as-state-txt">UNAVAILABLE</div>
             </div>

@@ -219,3 +219,38 @@ Owner, 2026-11-18: "This button combo is looking a bit flat. We don't need the l
   (`Get my design`), alarm slot empty at its width (alarms live in its Alarms & Events tab); `hmi-v2.js` keeps only the
   page's own tools (provenance banner, Ask, Replay, Docs) in a row under the bar, sticky at 48 px above 1480 px; the
   module tabs stick under it. The light-theme account letter is `#155e75` inside the bar (`css/rz-dh-shell.css`).
+
+### 9a. State row and Details (2026-11-21, PRD-COCKPIT-QUIET Q1, owner R182)
+
+Owner, on the chiller plant phone view: "tulisan2 yg over yg mana tidak berguna dan saya bisa lihat di mimic ui nya …
+Nggak perlu di tampilkan. Kan sudah aku bilang dibuat hirarki yg di hide/expand". The drawing is the page; everything
+else is one level down. PRD: `documentation/prd/PRD_COCKPIT_QUIET.md`.
+
+- **L0, one thin row under the bar** (`.cv-sub`, 32 px; 44 px at ≤ 600 px), built by `shell.js`: the state chip(s) a
+  page marks `data-cv="state"` (the telemetry banner slot, rendered as a one-word label `SIMULATED`, and the page's alarm
+  state word, e.g. `NORMAL`, `FACP NORMAL · …`), then **Details ▾** at the right. Fuel also rides its headline figure
+  there (Generator autonomy): the element is MOVED, never copied, so a `data-point` exists once.
+- **L1, the Details panel** (`#cvDetailsPanel`, closed at rest): everything a page marks `data-cv="detail"`, in document
+  order: the old tool row (`data-cv-toolrow`, unframed there: no fixed height, no border), the alarm/ticker strip, the
+  provenance line `p.rz-prov`, basis and capacity-study cards, KPI strips, a second legend. `data-cv="subtitle"` becomes
+  the bar title's tooltip and the first line of the panel. The control is a button with `aria-expanded` /
+  `aria-controls`; the open state is remembered per page in `localStorage` `rz.cv.details.<file>` (try/catch).
+  API: `RZConvShell.details(el)` adopts a node later; `RZConvShell.setDetails(open, remember)`.
+- **Nothing is deleted.** Every id, `data-point`, `data-basis-param`, `data-rz-telemetry-banner-slot` and `p.rz-prov`
+  stays in the DOM one tap away (proof: a static diff of the hooks against the release before, 0 missing on nine
+  pages). A gate that counts visible readings opens Details first (`test-conv-point-coverage.mjs`, like the datahall
+  disclosures); its floors are unchanged.
+- The row and the panel span the viewport like the bar (`fitRow`), whatever padding the page gives `<body>`; an
+  overflow gate sets them aside the way it sets the bar aside (`test-fire-system-runtime-authority.mjs`).
+- A state moved into the row announces on its own (`role=status`, `aria-live=polite`, law Q-L8b). The telemetry chip
+  in the row is in flow and never covers content, so on a phone it has no dismiss (`×` hidden); from 601 px the dismiss
+  is 28 px inside the 28 px row (`test-conv-alarm-runtime.mjs` accepts both).
+- Controls a gate or the owner needs at rest stay at L0: the hub keeps FAQ and Ask on one unframed row
+  (`test-explain-ask.mjs` B9: the Ask trigger is visible on every page).
+- Page code that resets a state element's `className` must not lose its row styling: the row CSS selects by position
+  (`.cv-sub > :not(.cv-details)`), never by a class the shell adds.
+- A page that sizes its drawing from the chrome above it (EPMS `--epms-context-height`) measures `.cv-bar` + `.cv-sub`
+  + the open panel, not the elements that moved into them.
+- Laws Q-L1…Q-L8 in `tools/test-cockpit-quiet.mjs` (drawing at ≤ 220 px / 300 px, ≤ 25 words above it, no value said
+  twice, no developer prose, no empty framed box, Details keyboard + reload memory, the row names the data mode and the
+  alarm state). The EPMS phone fold above is superseded: its provenance and status strip are in Details.

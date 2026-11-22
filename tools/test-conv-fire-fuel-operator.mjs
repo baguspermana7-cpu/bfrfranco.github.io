@@ -293,11 +293,13 @@ try {
 
   await fuel.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 });
   await new Promise((accept) => setTimeout(accept, 150));
+  // PRD-COCKPIT-QUIET: the KPI strip is in Details (open it to measure); Generator autonomy sits in the state row
+  await fuel.evaluate(() => { if (window.RZConvShell && RZConvShell.setDetails) RZConvShell.setDetails(true, false); });
   const fuelMobile = await fuel.evaluate(() => {
     window.scrollTo(9999, 0);
     const overflow = window.scrollX;
     window.scrollTo(0, 0);
-    const cards = Array.from(document.querySelectorAll('.kpi-strip .kpi')).map((card) => {
+    const cards = Array.from(document.querySelectorAll('.kpi-strip .kpi, .cv-sub .kpi')).map((card) => {
       const rect = card.getBoundingClientRect();
       return { left: rect.left, right: rect.right, width: rect.width };
     });

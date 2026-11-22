@@ -781,3 +781,21 @@
 .replay-map input[aria-invalid="true"] { border-color: var(--r); }
 .replay-why, .replay-more { font: 400 11px/1.4 "JetBrains Mono", monospace; color: var(--t3); }
 @media (max-width: 600px) { .rz-replay-bar { top: 0; } .rz-replay-file { max-width: 100%; flex-basis: 100%; } }
+
+/* PRD-COCKPIT-QUIET Q2 (owner R182): the dashboard KPI strip rests closed under one "Details" disclosure;
+   the picture's callouts carry the same numbers at rest. */
+.ai-kpi-details { margin: 0 0 6px; }
+.ai-kpi-details > summary {
+  display: flex; align-items: center; gap: 8px; min-height: 30px; padding: 0 10px; cursor: pointer;
+  list-style: none; border: 1px solid var(--rz-ops-line, var(--bd)); border-radius: 4px;
+  font: 600 11px/1 var(--rz-ops-mono, 'JetBrains Mono', monospace); letter-spacing: .04em; text-transform: uppercase;
+  color: var(--rz-ops-muted, var(--t2)); background: var(--rz-ops-surface, var(--bg2));
+}
+.ai-kpi-details > summary::-webkit-details-marker { display: none; }
+.ai-kpi-details > summary::after { content: '\25BE'; margin-left: auto; transition: transform var(--rz-dur-fast, 120ms) var(--rz-ease-out, ease-out); }
+.ai-kpi-details[open] > summary::after { transform: rotate(180deg); }
+.ai-kpi-details > summary:hover, .ai-kpi-details > summary:focus-visible { border-color: var(--rz-ops-line-strong, var(--bd)); color: var(--rz-ops-text, var(--t1)); }
+.ai-kpi-sum-n { text-transform: none; letter-spacing: 0; font-weight: 400; }
+.ai-kpi-details[open] > .ai-kpi-strip { margin-top: 6px; }
+@media (max-width: 600px) { .ai-kpi-details > summary { min-height: 44px; } }
+@media (prefers-reduced-motion: reduce) { .ai-kpi-details > summary::after { transition: none; } }

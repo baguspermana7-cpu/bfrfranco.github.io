@@ -215,7 +215,8 @@ try {
   assert.equal(ictState.quality, 'GOOD');
   assert.ok(ictState.ops.every((value) => value === 'OK'));
   assert.ok(ictState.gateways.every((value) => /Online$/.test(value)));
-  assert.match(ictState.telemetryBanner, /Simulated telemetry.*engine-derived basis/i);
+  // PRD-COCKPIT-QUIET: the ICT state row names the mode in one word (data-rz-telemetry-label); the state stays asserted below
+  assert.match(ictState.telemetryBanner, /^SIMULATED$|Simulated telemetry.*engine-derived basis/i);
   assert.equal(ictState.telemetryState, 'simulated');
   assert.match(ictState.canvas, /Capacity Summary/i);
   assert.deepEqual(healthyIct.errors, [], `current ICT page errors: ${healthyIct.errors.join(' | ')}`);

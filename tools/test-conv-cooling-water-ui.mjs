@@ -131,6 +131,8 @@ async function assertHallAndBasisContract(page, currentIds, hallLabelId) {
   assert.match(initial.study, /4\s*[×x]\s*10 MW/i);
   assert.match(initial.study, /READ[- ]ONLY|STUDY ONLY/i);
 
+  // PRD-COCKPIT-QUIET (SITE_CHROME §9a): the hall selector and basis cards are one tap down in Details
+  await page.evaluate(() => { if (window.RZConvShell && RZConvShell.setDetails) RZConvShell.setDetails(true, false); });
   await page.click('[data-hall="C"]');
   const selected = await page.evaluate((ids, labelId) => ({
     activeHall: document.body.dataset.activeHall,

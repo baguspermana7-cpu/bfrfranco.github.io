@@ -461,8 +461,10 @@
             .kpi-grid > .kpi, .kpi-grid > .kpi.hero { padding: 10px 14px !important; }  /* beats the generic mobile .hero padding */
             .kpi-grid > .kpi .th { display: flex; align-items: center; }
         }
+/* PRD-COCKPIT-QUIET R5: the P&ID subtitle is the title's tooltip (kept for screen readers) */
+.ws-sub-tip { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
 </style>
-    <script src="js/rz-version.js?v=20261122-0cd2d357" defer></script>
+    <script src="js/rz-version.js?v=20261122-5364dfb7" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
 <style id="rz-skiplink-v1">
@@ -480,14 +482,14 @@
   select, textarea { font-size: 16px !important; }
 }
 </style>
-<link rel="stylesheet" href="css/conv-shell.css?v=20261120-33ee363b">
+<link rel="stylesheet" href="css/conv-shell.css?v=20261121-1a01438a">
 </head>
 <body data-rz-data-mode="simulated">
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <div class="wrap" data-rz-cockpit-root="water-system">
 
     <!-- Top status bar: nav + brand -->
-    <div class="topbar no-print" data-cv-toolrow>
+    <div class="topbar no-print" data-cv-toolrow data-cv="detail">
         <a href="dc-conventional.html" class="nav-btn" data-cv="back">Back</a>
         <a href="index.html" class="nav-btn" data-cv="portfolio">Portfolio</a>
         <h1 class="brand" data-cv="title">Water Treatment &amp; Service<small>Conventional BMS &middot; Facility Operations</small></h1>
@@ -497,14 +499,14 @@
             <button class="zoom-btn" id="waterSystemTrig" type="button">Export PDF &mdash; choose sections</button>
         </div>
     </div>
-    <script src="js/conv/shell.js?v=20261119-fff76bfd"></script>
-    <div data-rz-telemetry-banner-slot></div>
+    <script src="js/conv/shell.js?v=20261121-76b03c2c"></script>
+    <div data-rz-telemetry-banner-slot data-cv="state" data-rz-telemetry-label="SIMULATED"></div>
 
     <a id="main-content" tabindex="-1" aria-hidden="true"></a>
 
     <!-- Alarm / safety state FIRST (doc-10 information hierarchy) -->
-    <div class="alarm-strip state-unavailable" id="alarmStrip">
-        <span class="alarm-state unavailable" id="alarmState">UNAVAILABLE</span>
+    <div class="alarm-strip state-unavailable" id="alarmStrip" data-cv="detail">
+        <span class="alarm-state unavailable" id="alarmState" data-cv="state">UNAVAILABLE</span>
         <span class="alarm-chip"><b class="crit" id="cntCrit">&mdash;</b> Critical</span>
         <span class="alarm-chip"><b class="warnv" id="cntWarn">&mdash;</b> Warning</span>
         <span class="alarm-chip"><b id="cntStale">&mdash;</b> Stale Points</span>
@@ -514,7 +516,7 @@
     </div>
     <p class="rz-prov" id="rz-prov-water-strip" data-quiet="#alarmStrip" data-rz-provenance="simulated" data-rz-prov-basis="conv-engine.js scenario; data quality = the model's own flag; page clock = your browser time"><b>Simulated</b> · conv-engine.js scenario; data quality = the model's own flag; page clock = your browser time</p>
 
-    <section class="ops-context" aria-label="Site water engineering basis">
+    <section class="ops-context" data-cv="detail" aria-label="Site water engineering basis">
         <div class="basis-card current" data-basis="current">
             <div class="basis-title" id="waterSiteLabel">Current engine basis · site-wide plant</div>
             <div class="basis-value" id="water-current-basis-value" data-quiet=".basis-card" data-const>Site scope · engine basis loading…</div>
@@ -527,7 +529,7 @@
 
     <!-- KPI strip — value | unit | threshold (doc-07 §"KPI Cards")
          v1.23.4 doc-14 §7: WUE is the visual hero (page-purpose KPI). -->
-    <div class="kpi-grid" data-rz-fact-list data-rz-doc-section="ws-kpi" data-rz-doc-label="Water KPI band — WUE, make-up, treatment flow, filter DP">
+    <div class="kpi-grid" data-cv="detail" data-rz-fact-list data-rz-doc-section="ws-kpi" data-rz-doc-label="Water KPI band — WUE, make-up, treatment flow, filter DP">
         <div class="kpi hero">
             <h3>Instant WUE</h3>
             <div class="v"><span id="kWue" data-basis-param="water.wue_l_per_kwh" data-point="water.wue_l_per_kwh" data-pt-label="Instant WUE" data-pt-unit="L/kWh" data-pt-digits="2" tabindex="0" role="button">&mdash;</span> <small>L/kWh</small></div>
@@ -559,7 +561,7 @@
     <div class="layout">
         <!-- Process flow (P&ID) -->
         <div class="panel" data-rz-doc-section="ws-pid" data-rz-doc-label="Water treatment and cooling-tower P&amp;ID">
-            <div class="panel-title">
+            <div class="panel-title" title="Raw &rarr; filtration &rarr; treatment &rarr; cooling makeup / domestic / blowdown">
                 Water Treatment Process Flow
                 <span class="sub" data-quiet=".panel-title">— raw &rarr; filtration &rarr; treatment &rarr; cooling makeup / domestic / blowdown</span>
             </div>
@@ -1259,8 +1261,8 @@
                 rows += alarmRow(level(tds, 'water.tds_ppm'),
                     'Treated TDS', Math.round(tds) + ' ppm (limit &lt; ' + nfmt(lim('water.tds_ppm', 'hi_alarm')) + ')');
                 rows += alarmRow(level(uvInt, 'water.uv_intensity_pct'),
-                    'UV-401', uvInt + '% intensity, lamp healthy');
-                rows += alarmRow('ok', 'Dosing DOS-302', 'cmd ON, run feedback OK');
+                    'UV-401', uvInt + '% intensity');   /* the state says healthy or not; "lamp healthy" was printed in warn too */
+                rows += alarmRow('ok', 'Dosing DOS-302', 'running');   /* OK already says the feedback is proven */
                 document.getElementById('alarmList').innerHTML = rows;
             }
 

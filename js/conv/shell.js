@@ -189,8 +189,74 @@
   fit();
   window.addEventListener('resize', fit);
   window.addEventListener('load', fit);
+  /* the state row and the Details panel span the viewport the same way (their own top margin is the page's) */
+  function fitRow(n) {
+    n.style.marginLeft = n.style.marginRight = '';
+    var r = n.getBoundingClientRect(), w = document.documentElement.clientWidth;
+    if (!r.width) return;
+    if (r.left) n.style.marginLeft = (-r.left) + 'px';
+    if (Math.round(w - r.right)) n.style.marginRight = (-(w - r.right)) + 'px';
+  }
   /* the alarm launcher (conv-alarm-workspace.js) and auth.js fill their slots after load: place them once more */
   window.addEventListener('load', function () { place(); setTimeout(place, 600); });
 
-  window.RZConvShell = { bar: bar, slot: slot, openMenu: openMenu, closeMenu: closeMenu };
+  /* ---- the state row and Details (PRD-COCKPIT-QUIET Q1a) ------------------------------------------------
+   * Owner, 2026-11-21: "Nggak perlu di tampilkan … dibuat hirarki yg di hide/expand." Under the bar sits ONE row:
+   * the telemetry state chip (the page's banner slot, marked data-cv="state", rendered compact) and a "Details"
+   * disclosure. Everything a page marks data-cv="detail" (tickers whose values are drawn on the mimic, basis cards,
+   * KPI strips, SIM / MAINT / Export rows, provenance prose) moves into the Details panel, closed at rest. Nothing is
+   * deleted: ids, data-point, data-basis-param and p.rz-prov stay in the DOM, one tap away. data-cv="subtitle"
+   * becomes the title's tooltip and the first line of the panel. Open state remembered per page. */
+  var sub = el('div', 'cv-sub', { 'data-cv-sub': '' });
+  var det = el('div', 'cv-details', { 'data-cockpit-details': '' });
+  var detBtn = el('button', 'cv-details__btn', { type: 'button', 'aria-expanded': 'false', 'aria-controls': 'cvDetailsPanel' });
+  detBtn.innerHTML = '<span class="cv-details__txt">Details</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 9 6 6 6-6"/></svg>';
+  var detPanel = el('div', 'cv-details__panel', { id: 'cvDetailsPanel', role: 'region', 'aria-label': 'Cockpit details' });
+  detPanel.hidden = true;
+  det.appendChild(detBtn);
+  sub.appendChild(det);
+  bar.parentNode.insertBefore(sub, bar.nextSibling);
+  bar.parentNode.insertBefore(detPanel, sub.nextSibling);
+  var detKey = 'rz.cv.details.' + location.pathname.replace(/^.*\//, '');
+  function setDetails(open, remember) {
+    detPanel.hidden = !open || !detPanel.children.length;
+    detBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    det.classList.toggle('is-open', open);
+    if (remember) { try { localStorage.setItem(detKey, open ? '1' : '0'); } catch (e) { /* storage blocked: state is per visit */ } }
+    if (open) fitRow(detPanel);
+    window.dispatchEvent(new Event('rz-layout-change'));
+  }
+  function fitRows() { fitRow(sub); if (!detPanel.hidden) fitRow(detPanel); }
+  window.addEventListener('resize', fitRows);
+  window.addEventListener('load', fitRows);
+  detBtn.addEventListener('click', function () { setDetails(detPanel.hidden, true); });
+  function placed(n) { return n.parentNode !== sub && n.parentNode !== detPanel; }
+  function adoptRow() {
+    adopt('state').filter(placed).forEach(function (n) {
+      n.setAttribute('data-rz-telemetry-compact', '');
+      n.classList.add('cv-state');
+      if (!n.hasAttribute('aria-live')) { n.setAttribute('role', 'status'); n.setAttribute('aria-live', 'polite'); }
+      sub.insertBefore(n, det);
+    });
+    adopt('subtitle').filter(placed).forEach(function (n) {
+      var t = slot.title.querySelector('.cv-title');
+      var txt = n.textContent.replace(/\s+/g, ' ').trim();
+      if (t && txt && !t.getAttribute('title')) t.setAttribute('title', txt);
+      n.classList.add('cv-details__sub');
+      detPanel.insertBefore(n, detPanel.firstChild);
+    });
+    adopt('detail').filter(placed).forEach(function (n) { n.classList.add('cv-detail'); detPanel.appendChild(n); });
+    sub.hidden = !detPanel.children.length && !sub.querySelector('.cv-state');
+    det.hidden = !detPanel.children.length;
+    if (det.classList.contains('is-open')) detPanel.hidden = !detPanel.children.length;
+  }
+  adoptRow();
+  var detOpen = false;
+  try { detOpen = localStorage.getItem(detKey) === '1'; } catch (e) { /* storage blocked */ }
+  setDetails(detOpen, false);
+  fitRows();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { adoptRow(); fitRows(); });
+  window.addEventListener('load', adoptRow);
+
+  window.RZConvShell = { bar: bar, slot: slot, openMenu: openMenu, closeMenu: closeMenu, details: function (n) { if (n) { n.setAttribute('data-cv', 'detail'); adoptRow(); } return detPanel; }, setDetails: setDetails };
 })();

@@ -286,3 +286,58 @@
 @media (max-width: 600px) {
   .cv-bar .cv-title { white-space: normal; display: -webkit-box !important; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; line-height: 1.15 !important; font-size: 12px !important; }
 }
+
+/* ---- state row + Details (PRD-COCKPIT-QUIET Q1a; HMI_DRAWING_STANDARD §4e chrome budget) -------------------
+   One thin row under the bar: the telemetry state chip and the Details disclosure. The panel holds what a page marks
+   data-cv="detail"; closed at rest. Same tokens as the bar, both themes. */
+.cv-sub, .cv-details__panel {
+  --cv-bg: #121316; --cv-line: rgba(255,255,255,.14); --cv-line-hi: rgba(255,255,255,.34);
+  --cv-ink: #e8edf5; --cv-muted: #a9b2bf; --cv-accent: #E8B563;
+}
+:root[data-theme="light"] .cv-sub, :root[data-theme="light"] .cv-details__panel {
+  --cv-bg: #ffffff; --cv-line: rgba(15,23,42,.16); --cv-line-hi: rgba(15,23,42,.42);
+  --cv-ink: #1f2329; --cv-muted: #4b5563; --cv-accent: #7A4800;
+}
+.cv-sub {
+  box-sizing: border-box; display: flex; align-items: center; gap: 8px; min-height: 32px; padding: 0 16px;
+  background: var(--cv-bg); border-bottom: 1px solid var(--cv-line); color: var(--cv-ink);
+  font: 400 12px/1.2 'IBM Plex Sans', system-ui, sans-serif;
+}
+.cv-sub[hidden], .cv-details[hidden], .cv-details__panel[hidden] { display: none !important; }
+.cv-sub > :not(.cv-details) { display: flex; align-items: center; min-width: 0; margin: 0; padding: 0; border: 0; background: none; }
+.cv-sub .rz-tq-banner { width: auto; max-width: 280px; height: 28px; min-height: 0; padding-left: 0; border-bottom: 0; font-size: 11px; white-space: nowrap; }
+.cv-sub .rz-tq-banner-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cv-sub .rz-tq-banner-close { min-height: 28px; min-width: 28px; flex-basis: 28px; }
+.cv-details { margin-left: auto; display: flex; align-items: center; }
+.cv-details__btn {
+  display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; cursor: pointer;
+  background: transparent; color: var(--cv-muted); border: 1px solid var(--cv-line); border-radius: 4px;
+  font: 500 12px/1 'IBM Plex Sans', system-ui, sans-serif;
+  transition: border-color var(--rz-dur-fast, 140ms) var(--rz-ease-out, ease-out), color var(--rz-dur-fast, 140ms) var(--rz-ease-out, ease-out);
+}
+.cv-details__btn:hover { border-color: var(--cv-line-hi); color: var(--cv-ink); }
+.cv-details__btn:focus-visible { outline: 2px solid var(--cv-accent); outline-offset: 2px; }
+.cv-details__btn svg { width: 14px; height: 14px; transition: transform var(--rz-dur-fast, 140ms) var(--rz-ease-out, ease-out); }
+.cv-details.is-open .cv-details__btn { color: var(--cv-ink); }
+.cv-details.is-open .cv-details__btn svg { transform: rotate(180deg); }
+.cv-details__panel {
+  box-sizing: border-box; display: flex; flex-direction: column; gap: 8px; padding: 8px 16px 10px;
+  background: var(--cv-bg); border-bottom: 1px solid var(--cv-line); color: var(--cv-ink);
+}
+.cv-details__panel > .cv-detail { margin-top: 0 !important; margin-bottom: 0 !important; max-width: none; }
+.cv-details__panel > .cv-details__sub { margin: 0; color: var(--cv-muted); font-size: 12px; white-space: normal; }
+/* a page's old tool row (data-cv-toolrow) lands here holding only its leftover controls: no frame, no fixed height (R3) */
+.cv-details__panel > [data-cv-toolrow] {
+  height: auto !important; min-height: 0 !important; padding: 0 !important; margin: 0 !important; border: 0 !important;
+  background: none !important; box-shadow: none !important; justify-content: flex-start !important; flex-wrap: wrap; gap: 8px;
+}
+.cv-details { flex: 0 0 auto; }
+@media (max-width: 600px) {
+  .cv-sub { min-height: 44px; padding: 0 8px; }
+  .cv-details__btn { height: 44px; }
+  .cv-sub .rz-tq-banner { height: 44px; }
+  .cv-sub .rz-tq-banner-close { min-height: 44px; min-width: 44px; flex-basis: 44px; }
+  .cv-details__panel { padding: 8px; }
+  .cv-sub .rz-tq-banner-close { display: none; }   /* the row is the banner's home; dismissing it on a phone only crowds Details */
+}
+@media (prefers-reduced-motion: reduce) { .cv-details__btn, .cv-details__btn svg { transition: none; } }

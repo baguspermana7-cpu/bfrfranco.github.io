@@ -569,7 +569,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
         ]
     }
     </script>
-    <script src="js/rz-version.js?v=20261122-0cd2d357" defer></script>
+    <script src="js/rz-version.js?v=20261122-5364dfb7" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- Conventional BMS single scenario engine — single source of truth for the
@@ -664,13 +664,13 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
   select, textarea { font-size: 16px !important; }
 }
 </style>
-<link rel="stylesheet" href="css/conv-shell.css?v=20261120-33ee363b">
+<link rel="stylesheet" href="css/conv-shell.css?v=20261121-1a01438a">
 </head>
 <body data-rz-data-mode="simulated" data-active-hall="A">
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <a id="main-content" tabindex="-1" aria-hidden="true"></a>
 <div class="shell" data-rz-cockpit-root="chiller-plant">
-  <header class="bar" data-cv-toolrow>
+  <header class="bar" data-cv-toolrow data-cv="detail">
     <div class="bar-left">
       <h1 class="title" data-cv="title">CHILLER PLANT SCADA HMI</h1>
       <div class="sub" data-quiet data-explain="conv-chw-pid" data-cv="scope">ISA-5.1 P&amp;ID · CHW primary header</div>
@@ -683,12 +683,12 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
       <button class="btn ghost" id="ackBtn">Ack Alarm</button>
     </div>
   </header>
-  <script src="js/conv/shell.js?v=20261119-fff76bfd"></script>
-  <div data-rz-telemetry-banner-slot></div>
+  <script src="js/conv/shell.js?v=20261121-76b03c2c"></script>
+  <div data-rz-telemetry-banner-slot data-cv="state" data-rz-telemetry-label="SIMULATED"></div>
 
   <!-- Top alarm strip — operator-first: state, counts, redundancy, basis (doc-10/13) -->
-  <div class="alarm-strip" id="alarmStrip">
-    <div class="as-state" id="asState"><span class="as-dot" id="asDot"></span><span id="asLevel">UNAVAILABLE</span></div>
+  <div class="alarm-strip" id="alarmStrip" data-cv="detail">
+    <div class="as-state" id="asState" data-cv="state"><span class="as-dot" id="asDot"></span><span id="asLevel">UNAVAILABLE</span></div>
     <div class="as-seg" id="asCounts">Authority UNAVAILABLE</div>
     <div class="as-seg" id="asRedund">Redundancy UNAVAILABLE</div>
     <div class="as-seg" id="asChw" data-dup="kChws">CHWS &mdash; • CHWR &mdash; • &Delta;T &mdash; • &mdash; L/s</div>
@@ -696,7 +696,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
     <div class="as-seg as-meta" id="asMeta">Scenario: UNAVAILABLE</div>
   </div>
 
-  <section class="ops-context" aria-label="Selected hall demand context and site plant engineering basis">
+  <section class="ops-context" data-cv="detail" aria-label="Selected hall demand context and site plant engineering basis">
     <div class="hall-selector">
       <span class="context-label" data-quiet=".hall-selector">Selected downstream demand · site telemetry unchanged</span>
       <div class="hall-controls" role="group" aria-label="Select data hall view">
@@ -1967,14 +1967,24 @@ function pt(id, text, label, unit, cls){
   return `<span data-point="${id}" data-pt-label="${ptEsc(label)}"${unit ? ` data-pt-unit="${ptEsc(unit)}"` : ''}${cls ? ` data-pt-cls="${cls}"` : ''}>${text}</span>`;
 }
 function ptConst(text){ return `<span data-const>${text}</span>`; }
-const PT_RE = /(<span data-point="[^"]*"[^>]*>)([^<]*)(<\/span>)/g;
+/* the live text of a card: a point's value and a constant's figure (ambient …) both change on the tick and are
+   updated in place; only a change of the card's words rebuilds it (a rebuild every tick replaced the node a closing
+   trend returns the focus to) */
+const PT_RE = /(<span data-(?:point="[^"]*"|const)[^>]*>)([^<]*)(<\/span>)/g;
 function ptPaint(host, html){
   if(!host) return;
   const shape = html.replace(PT_RE, '$1$3');
   if(host.__ptShape === shape){
     const vals = []; html.replace(PT_RE, (m, a, t) => { vals.push(t); return m; });
-    host.querySelectorAll('span[data-point]').forEach((e, i) => { if(vals[i] != null && e.firstChild && e.firstChild.nodeValue !== vals[i]) e.firstChild.nodeValue = vals[i]; else if(vals[i] != null && !e.firstChild) e.textContent = vals[i]; });
-  } else { host.innerHTML = html; host.__ptShape = shape; }
+    [...host.querySelectorAll('span[data-point], span[data-const]')].filter((e) => /^data-(point|const)$/.test(e.attributes[0] && e.attributes[0].name)).forEach((e, i) => { if(vals[i] != null && e.firstChild && e.firstChild.nodeValue !== vals[i]) e.firstChild.nodeValue = vals[i]; else if(vals[i] != null && !e.firstChild) e.textContent = vals[i]; });
+  } else {
+    /* a rebuild (the card's words changed: MAINT, SIM …) must not drop the number the reader is on: the focused point
+       is found again by its id and order and gets the focus back (a dropped focus lost the trend's return target) */
+    const a = document.activeElement, id = a && host.contains(a) && a.getAttribute('data-point');
+    const nth = id ? [...host.querySelectorAll('[data-point="' + id + '"]')].indexOf(a) : -1;
+    host.innerHTML = html; host.__ptShape = shape;
+    if (id) { const n = host.querySelectorAll('[data-point="' + id + '"]')[Math.max(0, nth)]; if (n) n.focus({ preventScroll: true }); }
+  }
 }
 function ptText(host, text){ const p = host && host.querySelector('[data-point]'); if(p){ if(p.textContent !== text) p.textContent = text; } else if(host) host.textContent = text; }
 const PT_HOSTS = ['#alarmStrip', '#supPanel', '.side-body', '#lgChws', '#lgChwr'];

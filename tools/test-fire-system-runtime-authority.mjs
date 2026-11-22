@@ -299,6 +299,7 @@ try {
      under the drawing so the drawing is shown whole at rest (test-conv-text-budget T3). */
   await fresh.setViewport({ width: 1920, height: 900, deviceScaleFactor: 1 });
   await new Promise((accept) => setTimeout(accept, 120));
+  await fresh.evaluate(() => { if (window.RZConvShell && RZConvShell.setDetails) RZConvShell.setDetails(true, false); });   // PRD-COCKPIT-QUIET: the scope strip is in Details
   const desktopColumns = await fresh.$eval('.fire-scope-strip', (node) => getComputedStyle(node).gridTemplateColumns);
   assert.equal(desktopColumns.trim().split(/\s+/).length, 3, 'scope strip must use three balanced desktop columns');
   const desktopLayout = await fresh.evaluate(() => {
@@ -384,11 +385,19 @@ try {
       /* the cockpit bar (js/conv/shell.js, v3.77.0) bleeds across the body margin to span the viewport on purpose;
          content the body clips is measured without it */
       bodyOverflow: (() => {
+        /* the state row and the Details panel (PRD-COCKPIT-QUIET, SITE_CHROME §9a) bleed the same way: the panel is
+           measured at its own width (its content still counts), the row is set aside like the bar */
         const bar = document.querySelector('.cv-bar');
-        const was = bar ? bar.style.display : '';
+        const sub = document.querySelector('.cv-sub');
+        const panel = document.getElementById('cvDetailsPanel');
+        const was = [bar?.style.display, sub?.style.display, panel?.style.marginLeft, panel?.style.marginRight];
         if (bar) bar.style.display = 'none';
+        if (sub) sub.style.display = 'none';
+        if (panel) panel.style.marginLeft = panel.style.marginRight = '0px';
         const value = Math.max(0, document.body.scrollWidth - document.body.clientWidth);
-        if (bar) bar.style.display = was;
+        if (bar) bar.style.display = was[0];
+        if (sub) sub.style.display = was[1];
+        if (panel) { panel.style.marginLeft = was[2]; panel.style.marginRight = was[3]; }
         return value;
       })(),
       mimic: (() => {

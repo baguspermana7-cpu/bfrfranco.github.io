@@ -183,6 +183,9 @@ for (const W of [1440, 390]) {
   }
   if (W === 1440) { await shot(pg, 'epms-sld-normal-1440.png', null); await shot(pg, 'epms-sld-normal-mv-1440.png', 'i1-ct'); }
   const chromeOf = () => pg.evaluate(() => {
+    /* PRD-COCKPIT-QUIET (SITE_CHROME §9a): the status strip with the legacy counters is in Details; open it so
+       "shown" means the page's own view logic, not the closed disclosure */
+    if (window.RZConvShell && RZConvShell.setDetails) RZConvShell.setDetails(true, false);
     const vis = (id) => { const e = document.getElementById(id); return !!(e && e.offsetParent !== null); };
     const txt = document.body.innerText;
     return { gen: /\bGEN C\b/.test(txt), util: /utility sources \(20kv\)/i.test(txt), legacyTrips: vis('epms-trips'), legacyBottom: vis('val-breakers'),

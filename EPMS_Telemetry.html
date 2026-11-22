@@ -455,7 +455,7 @@
     font-variant-numeric: tabular-nums slashed-zero;
 }
 </style>
-    <script src="js/rz-version.js?v=20261122-0cd2d357" defer></script>
+    <script src="js/rz-version.js?v=20261122-5364dfb7" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- v1.24.0: bring EPMS onto the engine + BMS Shell. conv-engine.js loads
@@ -543,6 +543,9 @@
 .epms-sld-msg { margin: 0; padding: 4px 8px; border: 1px solid #2a2d33; border-radius: 3px; color: #cbd5e1; font: 400 12px/1.4 'IBM Plex Sans', system-ui, sans-serif; }
 .epms-sld-msg b { font: 600 11px/1.4 'JetBrains Mono', ui-monospace, monospace; color: #E8B563; letter-spacing: .04em; }
 .epms-sld-msg[data-refused="1"] { border-color: #b45309; }
+/* PRD-COCKPIT-QUIET (L2): the resting instruction is for screen readers; the line shows once an
+   operation writes a result into it (the observer below drops data-idle) */
+.epms-sld-msg[data-idle] { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; padding: 0; }
 .epms-sheet-host { min-width: 0; }
 /* E-S-102 opens at 1.17 x (sheet minScale): the 9 px name / line / legend roles are set to 9.5 here so no text on it
    renders under 11 px at any width (PRD-CONV-EQUIPMENT-TRUTH §7 legibility floor) */
@@ -578,7 +581,7 @@ body:not([data-epms-view="sld"]) .epms-sld-only { display: none !important; }
   #rz-prov-epms-strip:focus-visible { outline: 2px solid #E8B563; outline-offset: 2px; }
 }
 </style>
-<link rel="stylesheet" href="css/conv-shell.css?v=20261120-33ee363b">
+<link rel="stylesheet" href="css/conv-shell.css?v=20261121-1a01438a">
 </head>
 <body data-rz-basis-authority="unavailable" data-rz-data-mode="simulated">
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -586,8 +589,8 @@ body:not([data-epms-view="sld"]) .epms-sld-only { display: none !important; }
 
 <!-- v1.24.0 doc-14 §2: Top engineering status strip (engine-bound) + visible line-status legend.
      Sits ABOVE the SVG so it's the first read every time the page loads. -->
-<div id="epms-status-strip" role="status" aria-live="polite" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:8px 14px;background:#121316;border-bottom:1px solid #2a2d33;font-family:'JetBrains Mono','IBM Plex Sans',sans-serif;font-size:12px;color:#e2e8f0;font-variant-numeric:tabular-nums;">
-    <span id="epms-state" style="font-weight:800;letter-spacing:.08em;color:#94a3b8;text-transform:uppercase;">EPMS AUTHORITY UNAVAILABLE</span>
+<div id="epms-status-strip" data-cv="detail" role="status" aria-live="polite" style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:8px 14px;background:#121316;border-bottom:1px solid #2a2d33;font-family:'JetBrains Mono','IBM Plex Sans',sans-serif;font-size:12px;color:#e2e8f0;font-variant-numeric:tabular-nums;">
+    <span id="epms-state" data-cv="state" style="font-weight:800;letter-spacing:.08em;color:#94a3b8;text-transform:uppercase;">EPMS AUTHORITY UNAVAILABLE</span>
     <span style="color:#94a3b8;">Facility Load <b id="epms-fac" data-point="site.facility_load_kw" data-pt-label="Facility load" data-pt-unit="MW" data-pt-digits="2" data-pt-cls="ENGINE" data-basis-param="site.facility_load_kw" tabindex="0" role="button" style="color:#94a3b8;">—</b><span style="color:#94a3b8;font-weight:400;"> MW</span></span>
     <span style="color:#94a3b8;">IT Load <b id="epms-it" data-point="site.it_load_kw" data-pt-label="IT load" data-pt-unit="MW" data-pt-digits="2" data-pt-cls="ENGINE" data-basis-param="site.it_load_kw" tabindex="0" role="button" style="color:#94a3b8;">—</b><span style="color:#94a3b8;font-weight:400;"> MW</span></span>
     <span style="color:#94a3b8;">PUE <b id="epms-pue" data-point="site.pue" data-pt-label="PUE" data-pt-digits="2" data-pt-cls="ENGINE" data-basis-param="site.pue" tabindex="0" role="button" style="color:#94a3b8;">—</b></span>
@@ -618,7 +621,7 @@ body:not([data-epms-view="sld"]) .epms-sld-only { display: none !important; }
 <style>/* PRD-Q06 T-5: the provenance line and banner added ~109 px of chrome; on phones the strip's rows sit 2 px apart (was 10)
    so the single-line still opens clear of the status bar. */
 @media (max-width:600px){#epms-status-strip{row-gap:2px!important;padding-top:4px!important;padding-bottom:4px!important;line-height:1.35}}</style>
-<div data-rz-telemetry-banner-slot style="min-height:45px"></div><!-- PRD-Q06 FR-4: height reserved so the first SLD fit already counts the banner (module is deferred) -->
+<div data-rz-telemetry-banner-slot data-cv="state" data-rz-telemetry-label="SIMULATED"></div><!-- PRD-COCKPIT-QUIET: the banner is the state chip in the cockpit state row (js/conv/shell.js); its height is the row's -->
 
 
 <script>
@@ -657,7 +660,7 @@ body:not([data-epms-view="sld"]) .epms-sld-only { display: none !important; }
 
 
 <div class="ui">
-    <div class="topbar pointer" data-cv-toolrow>
+    <div class="topbar pointer" data-cv-toolrow data-cockpit-l0>
         <a href="dc-conventional.html" class="epms-back-link" data-cv="back" style="display:flex; align-items:center; gap:8px; text-decoration:none; color:#94a3b8; font-size:12px; padding:6px 12px; border:1px solid #444; border-radius:4px; transition:color 0.2s, background-color 0.2s, border-color 0.2s, opacity 0.2s, box-shadow 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)';this.style.color='#fff'" onmouseout="this.style.background='transparent';this.style.color='#94a3b8'">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
             Back
@@ -676,7 +679,7 @@ body:not([data-epms-view="sld"]) .epms-sld-only { display: none !important; }
         </span>
         <h1 class="brand" data-cv="title">EPMS V1.0 - Telemetry</h1>
         <div style="flex:1"></div>
-        <div class="epms-export-group" style="display:flex; gap:8px; align-items:center;">
+        <div class="epms-export-group" data-cv="detail" style="display:flex; gap:8px; align-items:center;">
             <div class="export-dropdown">
                 <button class="export-btn" aria-disabled="true">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -700,7 +703,7 @@ body:not([data-epms-view="sld"]) .epms-sld-only { display: none !important; }
             </div>
         </div>
     </div>
-    <script src="js/conv/shell.js?v=20261119-fff76bfd"></script>
+    <script src="js/conv/shell.js?v=20261121-76b03c2c"></script>
         <div class="epms-main" data-rz-cockpit-root="epms">
         <div class="sidebar pointer" id="epmsSidebar">
             
@@ -722,12 +725,12 @@ body:not([data-epms-view="sld"]) .epms-sld-only { display: none !important; }
             </div>
         </div>
         <section id="epms-sld-view" class="epms-sld-view pointer" aria-label="E-S-101 HV / MV single-line">
-            <p class="epms-sld-msg" id="epms-sld-msg" role="status" aria-live="polite"><b>SIMULATION</b> Select a breaker or switch to operate it; the interlocks are enforced and every flow is re-solved.</p>
+            <p class="epms-sld-msg" id="epms-sld-msg" role="status" aria-live="polite" data-idle><b>SIMULATION</b> Select a breaker or switch to operate it; the interlocks are enforced and every flow is re-solved.</p>
             <div id="epms-sheet-host" class="epms-sheet-host hmi-depth" data-theme="dark" data-rz-authored-basis="E-S-101 · Ratings, voltages, fault levels, counts and protection settings on this single-line are conv-engine.js electrical.* values. Breaker and switch positions are SIMULATED (a page state operated from the inspector), and each kW / A / load % is the topology solve (js/conv/sld-topology.js) of the engine's adopted hall loads through those positions: a training simulation, not metering."></div>
         </section>
         <section id="epms-lv-view" class="epms-sld-view pointer" aria-label="E-S-102 LV distribution, typical hall" hidden>
             <div class="epms-lv-head">
-                <p class="epms-sld-msg" id="epms-lv-msg" role="status" aria-live="polite"><b>SIMULATION</b> Select an item, then Select and Execute to operate it.</p>
+                <p class="epms-sld-msg" id="epms-lv-msg" role="status" aria-live="polite" data-idle><b>SIMULATION</b> Select an item, then Select and Execute to operate it.</p>
                 <span class="epms-hall" role="group" aria-label="Hall shown on E-S-102">
                     <button type="button" class="epms-hall-btn" data-epms-hall="0" aria-pressed="true">Hall A</button>
                     <button type="button" class="epms-hall-btn" data-epms-hall="1" aria-pressed="false">Hall B</button>
@@ -833,23 +836,28 @@ const EPMS_RUNTIME_AUTHORITY_AVAILABLE = epmsRuntimeAuthorityAvailable();
 document.body.setAttribute('data-rz-basis-authority',
   EPMS_RUNTIME_AUTHORITY_AVAILABLE ? 'current' : 'unavailable');
 
-/* the context chrome above the drawing (cockpit bar, status strip, banner) sets where the drawing starts */
+/* the context chrome above the drawing (cockpit bar, its state row, the Details panel when open) sets where the
+   drawing starts. PRD-COCKPIT-QUIET: the status strip and the banner live in that row / panel now (js/conv/shell.js). */
+/* the resting operate-hint lines (data-idle) show once an operation writes a result into them */
+['epms-sld-msg', 'epms-lv-msg'].forEach(function (id) {
+    const m = document.getElementById(id);
+    if (!m || typeof MutationObserver !== 'function') return;
+    const mo = new MutationObserver(function () { m.removeAttribute('data-idle'); mo.disconnect(); });
+    mo.observe(m, { childList: true, characterData: true, subtree: true });
+});
 function syncEpmsContextHeight() {
-    const statusStrip = document.getElementById('epms-status-strip');
-    const bannerSlot = document.querySelector('[data-rz-telemetry-banner-slot]');
     const shellBar = document.querySelector('.cv-bar');
-    const contextHeight = Math.ceil(
-        (shellBar ? shellBar.getBoundingClientRect().height : 0)
-        + (statusStrip ? statusStrip.getBoundingClientRect().height : 0)
-        + (bannerSlot ? bannerSlot.getBoundingClientRect().height : 0)
-    );
+    const stateRow = document.querySelector('.cv-sub');
+    const details = document.getElementById('cvDetailsPanel');
+    const h = (n) => (n && !n.hidden ? n.getBoundingClientRect().height : 0);
+    const contextHeight = Math.ceil(h(shellBar) + h(stateRow) + h(details));
     document.documentElement.style.setProperty('--epms-context-height', contextHeight + 'px');
     return contextHeight;
 }
 syncEpmsContextHeight();
 if (typeof ResizeObserver === 'function') {
     const epmsChromeObserver = new ResizeObserver(syncEpmsContextHeight);
-    [document.getElementById('epms-status-strip'), document.querySelector('[data-rz-telemetry-banner-slot]'), document.querySelector('.cv-bar')]
+    [document.querySelector('.cv-bar'), document.querySelector('.cv-sub'), document.getElementById('cvDetailsPanel')]
         .forEach(function (node) { if (node) epmsChromeObserver.observe(node); });
 } else {
     window.addEventListener('resize', syncEpmsContextHeight);

@@ -161,6 +161,8 @@
     }
     .alarm-strip.has-warn .alarm-state { color: var(--st-warn); }
     .alarm-strip.has-crit .alarm-state { color: var(--st-bad); }
+    .alarm-state[data-sev="warn"] { color: var(--st-warn); }
+    .alarm-state[data-sev="crit"] { color: var(--st-bad); }
     .alarm-state .dot { width: 9px; height: 9px; border-radius: 50%; background: currentColor; box-shadow: 0 0 6px currentColor; }
     .alarm-seg { color: var(--text-dim); display: flex; align-items: center; gap: 5px; }
     .alarm-seg b { color: #fff; font-weight: 600; }
@@ -609,12 +611,16 @@
         .alarm-strip .right { margin-left: 0; width: 100%; flex-wrap: wrap; }
         .body-row { flex-direction: column; }
         .nav-rail {
-            width: 100%; flex-basis: auto; flex-direction: row; flex-wrap: wrap;
+            width: 100%; flex-basis: auto; flex-direction: row; flex-wrap: nowrap; overflow-x: auto;
             border-right: none; border-bottom: 1px solid var(--line);
         }
+        /* PRD-COCKPIT-QUIET: one scrolling row of segments on a phone; Back in the cockpit bar already leads to the dashboard */
+        .nav-rail .nav-back { display: none; }
+        /* the segment title repeats the selected segment tab right above it: kept for screen readers only */
+        .seg-head { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
         .nav-rail .nav-title { display: none; }
         .nav-item .nlabel, .nav-back span { display: inline; }
-        .nav-item, .nav-back { flex: 1 1 auto; min-width: 130px; min-height: 44px; }
+        .nav-item, .nav-back { flex: 0 0 auto; min-width: 0; min-height: 44px; white-space: nowrap; }
         .nav-sep { display: none; }
         .nav-back { margin-top: 0; }
         .canvas { overflow-y: visible; padding: 10px; }
@@ -681,7 +687,7 @@
     <script src="js/conv/net-modal.js?v=20261118-34973a6a" defer></script>
     <script src="js/rz-telemetry-quality.js?v=20261113-8feb0dfd" defer></script>
     <script src="js/rz-provenance.js?v=20261111-6f1cd061" defer></script>
-    <script src="js/rz-version.js?v=20261122-0cd2d357" defer></script>
+    <script src="js/rz-version.js?v=20261122-5364dfb7" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- v1.43.20 — instrument register (RZ Dark System v1). Chrome-only, dark-only, scoped. -->
@@ -698,7 +704,7 @@
   select, textarea { font-size: 16px !important; }
 }
 </style>
-<link rel="stylesheet" href="css/conv-shell.css?v=20261120-33ee363b">
+<link rel="stylesheet" href="css/conv-shell.css?v=20261121-1a01438a">
 </head>
 <body data-rz-data-mode="simulated">
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -706,7 +712,7 @@
 
     <div class="shell" data-rz-cockpit-root="ict">
         <!-- Topbar -->
-        <div class="topbar" data-cv-toolrow>
+        <div class="topbar" data-cv-toolrow data-cv="detail">
             <a href="dc-conventional.html" class="top-link" title="Back to Conventional DC dashboard" data-cv="back">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
                 Back
@@ -729,12 +735,12 @@
                 Export (n/a)
             </button>
         </div>
-        <script src="js/conv/shell.js?v=20261119-fff76bfd"></script>
-        <div data-rz-telemetry-banner-slot></div>
+        <script src="js/conv/shell.js?v=20261121-76b03c2c"></script>
+        <div data-rz-telemetry-banner-slot data-cv="state" data-rz-telemetry-label="SIMULATED"></div>
 
         <!-- Top alarm strip (information hierarchy #1) -->
-        <div class="alarm-strip" id="alarmStrip">
-            <div class="alarm-state"><span class="dot"></span><span id="as-state">UNAVAILABLE</span></div>
+        <div class="alarm-strip" id="alarmStrip" data-cv="detail">
+            <div class="alarm-state" data-cv="state"><span class="dot"></span><span id="as-state">UNAVAILABLE</span></div>
             <span class="alarm-sep"></span>
             <div class="alarm-seg crit"><b id="as-crit" data-const>—</b> Critical</div>
             <div class="alarm-seg warn"><b id="as-warn" data-const>—</b> Warning</div>
@@ -749,7 +755,7 @@
         <!-- v1.24.2 doc-14 §8: ICT-as-BMS-Operations summary strip + BMS/OT gateway health.
              ICT page must answer "Can operations still see and control the facility?", not just
              "is the IT network online?". Calm by default; only alarm states use red. -->
-        <div id="ict-ops-strip" role="status" aria-live="polite" style="display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:8px 14px;background:rgba(14,15,18,0.7);border-bottom:1px solid #2a2d33;font-family:'JetBrains Mono','IBM Plex Sans',sans-serif;font-size:12px;color:#cbd5e1;font-variant-numeric:tabular-nums;">
+        <div id="ict-ops-strip" data-cv="detail" role="status" aria-live="polite" style="display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:8px 14px;background:rgba(14,15,18,0.7);border-bottom:1px solid #2a2d33;font-family:'JetBrains Mono','IBM Plex Sans',sans-serif;font-size:12px;color:#cbd5e1;font-variant-numeric:tabular-nums;">
             <span style="color:#64748b;font-weight:700;letter-spacing:.06em;text-transform:uppercase;">ICT Ops</span>
             <span>WAN <b data-ict-ops-state aria-describedby="rz-prov-ict-strip" style="color:#94a3b8;">UNAVAILABLE</b></span>
             <span>BMS Fabric <b data-ict-ops-state aria-describedby="rz-prov-ict-strip" style="color:#94a3b8;">UNAVAILABLE</b></span>
@@ -761,7 +767,7 @@
 
         <!-- v1.24.2 doc-14 §8: BMS/OT-specific gateway health (EPMS / Chiller / Fire / Access-CCTV / Historian).
              Operator's first read for facility-control reachability. -->
-        <div id="ict-otgw" aria-label="BMS / OT gateway health" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:6px 14px;background:rgba(14,15,18,0.55);border-bottom:1px solid #2a2d33;font-family:'JetBrains Mono','IBM Plex Sans',sans-serif;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:#94a3b8;">
+        <div id="ict-otgw" data-cv="detail" aria-label="BMS / OT gateway health" style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:6px 14px;background:rgba(14,15,18,0.55);border-bottom:1px solid #2a2d33;font-family:'JetBrains Mono','IBM Plex Sans',sans-serif;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:#94a3b8;">
             <span style="font-weight:700;color:#64748b;">OT Gateways:</span>
             <span data-ict-gateway="EPMS" style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:2px;background:transparent;border:1px solid #475569;color:#94a3b8;font-weight:700;"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;"></span>EPMS · Unavailable</span>
             <span data-ict-gateway="Chiller" style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:2px;background:transparent;border:1px solid #475569;color:#94a3b8;font-weight:700;"><span style="width:6px;height:6px;border-radius:50%;background:currentColor;"></span>Chiller · Unavailable</span>
@@ -773,7 +779,7 @@
         <!-- Body -->
         <div class="body-row">
             <!-- Network-segment navigation -->
-            <nav class="nav-rail" aria-label="Network segments">
+            <nav class="nav-rail" aria-label="Network segments" data-cockpit-l0>
                 <div class="nav-title">Network Segments</div>
                 <div class="nav-item active" id="nav-it" onclick="selectSegment('it', this)">
                     <span class="nled"></span>
@@ -1584,7 +1590,7 @@
             var note = m.scenario.note ? '<div class="arch-scn-note"><b>SIMULATED SCENARIO · ' + esc(m.scenario.label) + ':</b> ' + esc(m.scenario.note) + ' The authored alarm register is not rewritten by a drawing scenario.</div>' : '';
             return '<div class="panel"><div class="panel-head">Network Architecture'
                 + '<span class="ph-meta" data-explain="conv-ict-arch">campus schematic</span></div>'
-                + '<div class="panel-body"><div class="arch-toolbar"><label for="arch-scenario">Scenario</label><select id="arch-scenario">' + opts + '</select>'
+                + '<div class="panel-body"><div class="arch-toolbar" data-cockpit-l0><label for="arch-scenario">Scenario</label><select id="arch-scenario">' + opts + '</select>'
                 + '<span class="legend"><span><i></i>up</span><span><i class="stby"></i>standby</span><span><i class="warn"></i>warning</span><span><i class="bad"></i>fault</span><span><i class="sel"></i>selected</span></span></div>'
                 + '<div class="arch-wrap">' + svg + '</div>' + note + renderCapacityNote(key) + '</div></div>';
         }
@@ -1713,7 +1719,8 @@
             var html = '';
             html += '<div class="seg-head"><h2 data-explain="conv-ict-seg-' + key + '">' + seg.title + '</h2></div>';
 
-            // Service health strip
+            // PRD-COCKPIT-QUIET R1: the drawing first; the service health strip (states the drawing also shows) under it
+            html += renderArchitecture(key);
             html += '<div class="svc-strip">';
             for (var i = 0; i < seg.services.length; i++) {
                 var sv = seg.services[i];
@@ -1721,7 +1728,6 @@
                       + sv.n + '</span><span class="sval">' + sv.v + '</span></div>';
             }
             html += '</div>';
-            html += renderArchitecture(key);
 
             if (key === 'mon') {
                 // Operationalised PRTG panel
@@ -2007,6 +2013,7 @@
             var state = document.getElementById('as-state');
             strip.className = 'alarm-strip' + (crit ? ' has-crit' : (warn ? ' has-warn' : ''));
             state.textContent = crit ? 'CRITICAL' : (warn ? 'ATTENTION' : 'NORMAL');
+            state.setAttribute('data-sev', crit ? 'crit' : (warn ? 'warn' : ''));
 
             // Bottom status bar
             document.getElementById('sb-alarms').textContent = crit + warn;

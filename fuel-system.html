@@ -366,6 +366,9 @@
            scrolls sideways on a phone) */
         .pid-wrap { container-type: inline-size; }
         #fuel-sheet-host .vfx-bar, #fuel-sheet-host .hmi-bar { max-width: 100cqw; flex-wrap: wrap; box-sizing: border-box; }
+        /* PRD-COCKPIT-QUIET: on a phone each bar is ONE row that scrolls sideways (every control still reachable), so the
+           drawing is not pushed below the fold by four wrapped rows of chrome */
+        @media (max-width: 600px) { #fuel-sheet-host .vfx-bar, #fuel-sheet-host .hmi-bar { flex-wrap: nowrap; overflow-x: auto; } #fuel-sheet-host .vfx-bar > *, #fuel-sheet-host .hmi-bar > * { flex: 0 0 auto; } #fuel-sheet-host .vfx-bar > .vfx-legend { flex: 1 1 0; min-width: 0; flex-wrap: nowrap; overflow-x: auto; white-space: nowrap; } }
 
         /* ---- INTERLOCK / SAFETY INDICATORS (first-class) ---- */
         .ilk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -630,6 +633,19 @@
         }
     [data-theme="dark"] #cookieAccept{background:#E8B563 !important;color:#16181d !important}
 #cookieAccept{background:#E8B563 !important;color:#16181d !important}
+/* PRD-COCKPIT-QUIET: generator autonomy is the page's headline number, so it rides in the cockpit state row (L0);
+   the rest of the KPI strip is in Details. One element, one data-point: it is moved, not copied. */
+.cv-sub .kpi.hero { display: flex; align-items: baseline; gap: 6px; min-height: 0; margin: 0; padding: 0 0 0 8px; border: 0; border-left: 1px solid var(--cv-line); border-radius: 0; background: none; box-shadow: none; }
+.cv-sub .kpi.hero .k-tag, .cv-sub .kpi.hero .k-sub, .cv-sub .kpi.hero .k-lbl i { display: none; }
+.cv-sub .kpi.hero .k-lbl { font-size: 11px; color: var(--cv-muted); text-transform: none; letter-spacing: 0; margin: 0; }
+.cv-sub .kpi.hero .k-val { font-size: 13px; }
+.cv-sub .kpi.hero .k-unit { font-size: 11px; }
+/* the sheet header below (FU-M-101 · DIESEL FUEL …) names the drawing; this panel title says it again: screen readers only */
+.fuel-pid-head { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; padding: 0; border: 0; }
+@media (max-width: 600px) { .cv-sub .kpi.hero .k-lbl { white-space: nowrap; } .cv-sub .kpi.hero .k-lbl .k-gen { display: none; } }
+/* the hall and mode selectors: 32 px faces on a pointer screen, 44 px on touch; one scrolling row on a phone */
+@media (min-width: 601px) { .fuel-hallbar .fuel-seg-btn { min-height: 32px; } .fuel-hallbar { margin-bottom: 2px; } }
+@media (max-width: 600px) { .fuel-hallbar { flex-wrap: nowrap; overflow-x: auto; gap: 8px; } .fuel-hallbar .fuel-seg { flex: 0 0 auto; } .fuel-hallbar .fuel-seg-btn { padding: 0 10px; } }
 </style>
     <script src="js/rz-engine-versions.js?v=20261118-892678a4"></script>
     <link rel="stylesheet" href="css/rz-hmi.css?v=20261117-fe9b28c8">
@@ -678,7 +694,7 @@
     <script src="js/datahall-ai/alarm-query.js?v=20260920-4d06f77a" defer></script>
     <script src="js/conv-alarm-events.js?v=20260920-05aca3f2" defer></script>
     <script src="js/conv-alarm-workspace.js?v=20260920-a6e2efa0" defer></script>
-    <script src="js/rz-version.js?v=20261122-0cd2d357" defer></script>
+    <script src="js/rz-version.js?v=20261122-5364dfb7" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
 <style id="rz-skiplink-v1">
@@ -698,7 +714,7 @@
 </style>
 <script src="js/rz-telemetry-quality.js?v=20261113-8feb0dfd" defer></script>
 <script src="js/rz-provenance.js?v=20261111-6f1cd061" defer></script>
-<link rel="stylesheet" href="css/conv-shell.css?v=20261120-33ee363b">
+<link rel="stylesheet" href="css/conv-shell.css?v=20261121-1a01438a">
 </head>
 <body data-rz-data-mode="simulated">
     <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -717,7 +733,7 @@
     </div>
 
     <!-- ============ 1. TOP STATUS / ALARM STRIP ============ -->
-    <header class="topbar" data-cv-toolrow>
+    <header class="topbar" data-cv-toolrow data-cv="detail">
         <div class="tb-brand">
             <h1 data-cv="title">Fuel System &mdash; Diesel &amp; Generator Autonomy</h1>
             <small data-quiet>UST-01 &middot; DT-GEN per set &middot; P-101 &middot; CONV-BMS-BKS-01</small>
@@ -725,7 +741,7 @@
 
         <div class="alarm-strip" id="alarm-strip" aria-live="polite">
             <div class="as-cell">
-                <span class="as-state unavailable" id="as-state">UNAVAILABLE</span>
+                <span class="as-state unavailable" id="as-state" data-cv="state">UNAVAILABLE</span>
             </div>
             <div class="as-cell"><span class="as-dot r" id="as-dot-c"></span><span class="lbl">Critical</span><span class="num" id="as-crit">&mdash;</span></div>
             <div class="as-cell"><span class="as-dot y" id="as-dot-w"></span><span class="lbl">Warning</span><span class="num" id="as-warn">&mdash;</span></div>
@@ -740,16 +756,16 @@
             <a href="dc-conventional.html" class="tb-link" data-cv="back">Back</a>
         </div>
     </header>
-    <script src="js/conv/shell.js?v=20261119-fff76bfd"></script>
-    <div data-rz-telemetry-banner-slot></div>
+    <script src="js/conv/shell.js?v=20261121-76b03c2c"></script>
+    <div data-rz-telemetry-banner-slot data-cv="state" data-rz-telemetry-label="SIMULATED"></div>
 
     <a id="main-content" tabindex="-1"></a>
 
     <!-- ============ 2. AUTONOMY KPI STRIP ============ -->
-    <section class="kpi-strip" aria-label="Fuel autonomy summary">
-        <div class="kpi hero">
+    <section class="kpi-strip" data-cv="detail" aria-label="Fuel autonomy summary">
+        <div class="kpi hero" data-cv="state">
             <div class="k-tag calc">CALC</div>
-            <div class="k-lbl"><i class="fas fa-hourglass-half"></i> Generator Autonomy</div>
+            <div class="k-lbl"><i class="fas fa-hourglass-half"></i> <span class="k-gen">Generator </span>Autonomy</div>
             <div><span class="k-val" id="kpi-autonomy" data-basis-param="fuel.autonomy_hr" data-point="fuel.autonomy_hr" data-pt-label="Generator autonomy" data-pt-unit="h" data-pt-digits="1" tabindex="0" role="button">--</span><span class="k-unit">hr</span></div>
             <div class="k-sub" id="kpi-autonomy-sub" data-quiet=".kpi" data-const>usable L &divide; consumption L/hr</div>
         </div>
@@ -780,7 +796,7 @@
         </div>
     </section>
 
-    <section class="fuel-scope-strip" aria-label="Current and study fuel capacity basis">
+    <section class="fuel-scope-strip" data-cv="detail" aria-label="Current and study fuel capacity basis">
         <div class="fuel-scope-card" id="fuel-current-basis">
             <span class="scope-tag" data-explain="conv-fuel-current-basis">CURRENT</span>
             <span><strong id="fuel-current-basis-value" data-const>UNAVAILABLE</strong></span>
@@ -796,16 +812,16 @@
 
         <!-- v2.7.0 — the process picture is the primary storytelling element (doc-14 §6, doc-19 §8) -->
         <div class="panel pid-panel">
-                <div class="panel-header"><span data-explain="conv-fuel-pid-legend">Fuel process &mdash; FU-M-101</span><i class="fas fa-project-diagram ph-ic"></i></div>
-                <div class="fuel-hallbar" id="fuel-hallbar">
+                <div class="panel-header fuel-pid-head"><span data-explain="conv-fuel-pid-legend">Fuel process &mdash; FU-M-101</span><i class="fas fa-project-diagram ph-ic"></i></div>
+                <div class="fuel-hallbar" id="fuel-hallbar" data-cockpit-l0>
                     <div class="fuel-seg" role="group" aria-label="Data hall shown on FU-M-101" id="fuel-hall-seg"></div>
                     <div class="fuel-seg" role="group" aria-label="Operating mode" id="fuel-mode-seg">
                         <button type="button" class="fuel-seg-btn" data-fuel-mode="normal" aria-pressed="true">Normal</button>
                         <button type="button" class="fuel-seg-btn" data-fuel-mode="utility-loss" aria-pressed="false">Utility loss</button>
                     </div>
-                    <p class="fuel-hall-facts" id="fuel-hall-facts" aria-live="polite" data-const>UNAVAILABLE</p>
+                    <p class="fuel-hall-facts" id="fuel-hall-facts" aria-live="polite" data-const data-cv="detail">UNAVAILABLE</p>
                 </div>
-                <p class="fuel-dt-basis" id="fuel-dt-basis" data-rz-authored-basis="Day-tank capacity is the page's assumed design basis: the set rating and engine specific consumption (fuel.specific_consumption_l_per_kwh) times DT_CAP_HR hours; the engine has no day-tank model, the info popover shows the arithmetic."><span data-basis-line data-const>&mdash;</span><button type="button" class="fuel-info" popovertarget="fuel-dt-basis-pop" aria-label="Day-tank basis" title="Day-tank basis">i</button></p>
+                <p class="fuel-dt-basis" id="fuel-dt-basis" data-cv="detail" data-rz-authored-basis="Day-tank capacity is the page's assumed design basis: the set rating and engine specific consumption (fuel.specific_consumption_l_per_kwh) times DT_CAP_HR hours; the engine has no day-tank model, the info popover shows the arithmetic."><span data-basis-line data-const>&mdash;</span><button type="button" class="fuel-info" popovertarget="fuel-dt-basis-pop" aria-label="Day-tank basis" title="Day-tank basis">i</button></p>
                 <div class="fuel-pop" id="fuel-dt-basis-pop" popover role="note" aria-label="Day-tank basis">&mdash;</div>
                 <div class="pid-wrap">
                 <div id="fuel-sheet-host" class="fuel-sheet-host hmi-depth" data-theme="dark" data-rz-authored-basis="FU-M-101 · Every value drawn on this process diagram is either the engine's bulk-tank level, capacity and usable reserve (traced on the cards above) or SIMULATED local operating state — day-tank levels, pump flow and pressure, valve, genset and leak-point states — which conv-engine.js does not publish: it carries the fuel reserve, the burn rate and the autonomy figure, not a pump schedule, day-tank sizing, instrument readings or per-device state. Pipe sizes and instrument tags are page-authored design selections."></div>

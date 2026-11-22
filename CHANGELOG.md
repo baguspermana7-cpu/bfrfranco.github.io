@@ -11,6 +11,73 @@ release sections rather than semver.
 
 ---
 
+## v3.88.0 — 2026-11-22 — The drawing is the page
+
+Owner (R182, on the chiller plant phone view): "tulisan2 yg over yg mana tidak berguna dan saya bisa lihat di mimic ui
+nya … Nggak perlu di tampilkan. Kan sudah aku bilang dibuat hirarki yg di hide/expand." PRD-COCKPIT-QUIET v2
+(`documentation/prd/PRD_COCKPIT_QUIET.md`), laws Q-L1…Q-L8.
+
+### Changed
+- `js/conv/shell.js` + `css/conv-shell.css`: one thin state row under the cockpit bar — the data mode (`SIMULATED`)
+  and the page's alarm state — and **Details ▾**. Everything a page marks `data-cv="detail"` (tool row, ticker strip,
+  provenance line, basis and capacity-study cards, KPI strips, a second legend) sits in the Details panel, closed at
+  rest, remembered per page. Nothing is deleted: every id, `data-point`, `data-basis-param` and `p.rz-prov` stays in
+  the DOM one tap away (static diff: 0 of 1,134 hooks missing on nine pages).
+- Seven Conventional cockpits, where the drawing now starts (1440 / 390 px): chiller-plant 453/766 → 218/297,
+  water-system 678/987 → 213/246, fire-system 440/840 → 170/203, fuel-system 616/1508 → 218/291 (Generator autonomy
+  stays in the state row), EPMS_Telemetry 347/498 → 214/287, ict 458/972 → 213/282; the dc-conventional hub keeps its
+  KPI strip and folds its alarm strip and provenance; its FAQ and Ask stay visible on one unframed row. Words above the drawing 112–186 → 0–19.
+- `ict.html`: the service strip sits under the network drawing; on a phone the segments are one scrolling row and
+  the segment title is for screen readers (the selected tab already says it).
+- `EPMS_Telemetry.html`: the resting "Select a breaker …" hint is read by screen readers and shows once an operation
+  writes a result; the drawing height counts the bar, the state row and the open Details panel.
+- `fuel-system.html`: hall and mode selectors 32 px on a pointer screen; on a phone the view and tool bars are one
+  scrolling row each.
+- `datahallAI.html` (DC AI): the eight-number KPI strip is one tap down (the picture's callouts carry them);
+  `cdu-mini-bms.html`: compact hero with About ▾, the cockpit first.
+
+### Gates
+- New `tools/test-cockpit-quiet.mjs` in the ship gate (9 pages × 1440 / 390): drawing ≤ 220 / 300 px, ≤ 25 words
+  above it, no value repeated above the drawing, no developer prose, no empty framed box, Details keyboard + reload
+  memory, the state row names the data mode and the alarm state. Red on the release before on every page; Q-L7/Q-L8
+  red on a planted mutation.
+- `tools/test-conv-point-coverage.mjs` opens Details before counting (as it already does for the datahall
+  disclosures); floors unchanged. The water hall, fire scope-strip, fuel KPI and fuel day-tank checks open Details
+  the same way before they read or click; the ICT authority check accepts the one-word state label.
+- Q-L8b: a state moved into the row still announces (`role=status`, `aria-live=polite`); red on the build before
+  the fix on chiller, fuel, ict and the hub.
+
+### Fixed (code review before release)
+- The state row never re-parents a node already placed (focus and open pickers survive `load`); an open Details
+  with nothing in it stays hidden; the ICT alarm word keeps its warn / critical colour outside its strip; a long
+  telemetry label ends in an ellipsis; on a phone the fuel legend scrolls inside its own strip.
+
+- Ported over v3.86.0 / v3.86.1 (the plant is seen running). Found by the motion and alarm gates on the port:
+  the chiller side panel rebuilt its cards whenever a word changed (MAINT, SIM) and dropped the number the reader had
+  focused, so a closing trend lost its return target. The rebuild now gives the focus back to the same point
+  (`ptPaint`, chiller-plant.html). The motion gate opens the cockpit Details before it presses the controls (ict keeps
+  every button one tap down) and scrolls to a control below the fold the way a reader reaches it; the EPMS fit
+  check reads the geometry after the page arrival has settled. The chiller side panel also rebuilt on EVERY tick:
+  the ambient figure sits in a constant span, which the card's shape did not strip, so each new reading replaced the
+  card and the number a closing trend returns to (focus fell to the page body). A constant's figure is now live
+  text updated in place, like a point (datahall.html already did this); v3.87.0 already sends the focus to the
+  replacement number, and this stops the rebuild itself.
+  The compact CDU hero was sized in rem on a page whose root is 18 px, so its new gap, title and padding landed off
+  the 4 px grid and the font steps (audit-editorial-render: cdu-mini-bms 615 -> 616). They are px on the scale now
+  (title 22 px, 16 px on a phone); the page reads 610.
+
+- Ported over v3.87.0 (Less text, nothing said twice), which reached the same eight pages first. Where both releases
+  marked one element (a provenance line, a subtitle, the chiller's second legend), v3.87.0's `data-quiet` / `data-dup`
+  stays: the text is hidden into its host's tooltip, so it is off the first screen either way.
+  With Q1's Details panel the water page's Active Alarms list rose onto the first screen: 204 words against the
+  v3.87.0 budget of 200 (test-conv-declutter DC1). Two of its rows repeated their state in words: the dosing row said
+  "cmd ON, run feedback OK" beside its OK, and the UV row said "lamp healthy" even while UV was in warn. They now read
+  "running" and "99.8% intensity", and the state carries the rest: 198 words, every number kept (point-coverage const
+  20, floor unchanged).
+
+### Standards
+- `SITE_CHROME_STANDARD.md` §9a, `HMI_DRAWING_STANDARD.md` §4e, `ANTI_VIBECODE_STANDARD.md` A35.
+
 ## v3.87.0 — 2026-11-22 — Less text, nothing said twice
 
 Owner (R185): "Sepertinya masih ada tulisan2 yg tidak perlu atau duplicate masih over." PRD-CONV-BMS-DECLUTTER.

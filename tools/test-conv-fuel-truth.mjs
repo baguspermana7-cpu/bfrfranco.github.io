@@ -205,6 +205,7 @@ function htmlTextLaws() {
    the scroll strip it sits in (it wraps, or its own strip scrolls); P2: the day-tank basis is one short line + an info control
    (keyboard and touch) holding the explanation; P3: the drawing starts under the view bar (no empty band) */
 function polishLaws() {
+  if (window.RZConvShell && RZConvShell.setDetails) RZConvShell.setDetails(true, false);
   const out = { code: [], clipped: [], basis: null, band: null };
   const CODE = /getFleet\(|CONV_CALC|\belectrical\.[a-z_]+|\bfuel\.[a-z_]+|\bhall\.facility|_count\b|_per_hall\b|_l_per_kwh\b/;
   for (const line of document.body.innerText.split('\n')) { const m = line.match(CODE); if (m) out.code.push('"' + line.trim().slice(0, 70) + '"'); }

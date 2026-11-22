@@ -31,7 +31,7 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.min.css?v=20261108-ff5c7268">
 <link rel="stylesheet" href="css/rz-cockpit-instrument.css?v=20261105-c3fa9df6"><!-- P23: the instrument register this page declares -->
-    <script src="js/rz-version.js?v=20261122-0cd2d357" defer></script>
+    <script src="js/rz-version.js?v=20261122-5364dfb7" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <script type="application/ld+json">
@@ -67,6 +67,26 @@
         .bm-hero p{ color:var(--bm-muted); max-width:80ch; line-height:1.6; font-size:.98rem; }
         .bm-hero .crumb{ font-family:var(--bm-mono); font-size:.72rem; color:var(--bm-muted); margin-top:.9rem; }
         .bm-hero .crumb a{ color:var(--bm-ui); }
+        /* PRD-COCKPIT-QUIET Q2: compact hero; the introduction is one tap down. Sizes in px on the design scale
+           (this page's root is 18 px, so a rem step lands off the 4 px grid: audit-editorial-render) */
+        .bm-hero{ padding:8px 1.5rem 8px; }
+        .bm-hero h1{ font-size:22px; margin:0 0 4px; }
+        .bm-about>summary{ display:inline-flex; align-items:center; gap:8px; min-height:32px; cursor:pointer; list-style:none;
+            font-family:var(--bm-mono); font-size:.72rem; color:var(--bm-muted); }
+        .bm-about>summary::-webkit-details-marker{ display:none; }
+        .bm-about>summary::after{ content:'\25BE'; transition:transform var(--rz-dur-fast,120ms) var(--rz-ease-out,ease-out); }
+        .bm-about[open]>summary::after{ transform:rotate(180deg); }
+        .bm-about>summary:hover,.bm-about>summary:focus-visible{ color:var(--bm-text, inherit); }
+        .bm-about[open]>p{ margin-top:.4rem; }
+        .bm-hero>.bm-wrap{ display:flex; flex-wrap:wrap; align-items:center; column-gap:16px; }
+        .bm-hero h1{ flex:1 1 100%; }
+        .bm-hero .bm-about{ order:2; flex:0 0 auto; }
+        .bm-hero .bm-about[open]{ order:4; flex-basis:100%; }
+        .bm-hero .bm-sim{ order:3; flex:0 1 auto; }
+        .tile-guide-d>summary{ cursor:pointer; font-family:var(--bm-mono); font-size:.72rem; color:var(--bm-muted); min-height:32px; display:flex; align-items:center; }
+        .tile-guide-d>summary:hover,.tile-guide-d>summary:focus-visible{ color:var(--bm-text); }
+        @media (max-width:600px){ .bm-hero{ padding:8px 1rem 4px; } .bm-hero h1{ font-size:16px; } .bm-about>summary{ min-height:44px; } }
+        @media (prefers-reduced-motion:reduce){ .bm-about>summary::after{ transition:none; } }
 
         .bm-wrap{ max-width:1280px; margin:0 auto; padding:0 1.2rem; }
         .bm-wrap[data-rz-telemetry-banner-slot] .rz-tq-banner{ padding-left:0; } /* PRD-Q06 FR-4: label on the page column */
@@ -292,7 +312,7 @@
         }
     </style>
 <script src="js/rz-telemetry-quality.js?v=20261113-8feb0dfd" defer></script>
-<link rel="stylesheet" href="css/conv-shell.css?v=20261120-33ee363b">
+<link rel="stylesheet" href="css/conv-shell.css?v=20261121-1a01438a">
 </head>
 <body data-rz-data-mode="simulated">
     <a href="#main-content" class="skip-link">Skip to content</a>
@@ -313,17 +333,21 @@
         <a href="compare-air-vs-liquid-cooling.html">Air vs Liquid</a>
         <a href="index.html#contact">Contact</a>
     </nav>
-    <script src="js/conv/shell.js?v=20261119-fff76bfd"></script>
+    <script src="js/conv/shell.js?v=20261121-76b03c2c"></script>
 
     <header class="bm-hero">
         <div class="bm-wrap">
-            <span class="bm-kick">CDU Mini-BMS · Instrument view</span>
             <h1>Layout, P&amp;ID &amp; simulated parameters — per CDU type</h1>
-            <p>A miniature building-management cockpit for liquid-cooling Coolant Distribution Units. Pick a CDU type to see where it sits in the datahall, how its piping &amp; instrumentation is arranged, and a simulated parameter feed. Inject a fault and watch the control logic respond — the same flow, pressure, temperature, pump-redundancy and leak signals a real CDU controller exposes to the BMS/DCIM.</p>
-            <div class="crumb"><a href="datacenter-solutions.html">DC Solutions</a> → <a href="cdu-hub.html">CDU Toolkit</a> → Mini-BMS · size a loop in the <a href="cdu-calculator.html">CDU Calculator</a></div>
+            <!-- PRD-COCKPIT-QUIET Q2 (owner R182): the cockpit comes first; the introduction rests one tap down. -->
+            <details class="bm-about" data-cockpit-details>
+                <summary>About</summary>
+                <p class="typedesc" id="typeDesc"></p>
+                <p>A miniature building-management cockpit for liquid-cooling Coolant Distribution Units. Pick a CDU type to see where it sits in the datahall, how its piping &amp; instrumentation is arranged, and a simulated parameter feed. Inject a fault and watch the control logic respond — the same flow, pressure, temperature, pump-redundancy and leak signals a real CDU controller exposes to the BMS/DCIM.</p>
+                <div class="crumb"><a href="datacenter-solutions.html">DC Solutions</a> → <a href="cdu-hub.html">CDU Toolkit</a> → Mini-BMS · size a loop in the <a href="cdu-calculator.html">CDU Calculator</a></div>
+            </details>
+            <div class="bm-sim" data-rz-telemetry-banner-slot data-rz-telemetry-compact data-rz-telemetry-label="SIMULATED · TYPICAL BANDS" title="Simulated parameters: typical operating bands, not a site feed."></div>
         </div>
     </header>
-    <div class="bm-wrap" data-rz-telemetry-banner-slot data-rz-telemetry-label="Simulated parameters — typical operating bands, not a site feed"></div>
 
     <div class="bm-controls">
         <div class="bm-wrap">
@@ -367,7 +391,6 @@
     </div>
 
     <main id="main-content"><div class="bm-wrap">
-        <p class="typedesc" id="typeDesc"></p>
 
         <div class="alarmbar ok" id="alarmBar" role="status" aria-live="polite">
             <span class="ab-ico" id="abIco">NORMAL</span>
@@ -382,7 +405,7 @@
             <div class="panel">
                 <div class="panel-hd"><h3>Simulated parameters</h3><span class="tag" id="capTag" data-const title="Rated capacity of the selected CDU type (TYPES table): a rating, not a reading"></span></div>
                 <div class="panel-bd">
-                    <p class="tile-guide">How to read a tile: <span class="tg-tag">FT-01</span> instrument tag (matches the P&amp;ID) · big value &amp; unit · the bar shows the <b>normal band</b> (shaded) with a marker for the <b>current value</b> · the status line reads <b style="color:var(--bm-green)">NORMAL</b> / <b style="color:var(--bm-amber)">WARN</b> / <b style="color:var(--bm-red)">ALARM</b>. Click a tile for its trend &amp; reference.</p>
+                    <details class="tile-guide-d"><summary>How to read a tile</summary><p class="tile-guide">How to read a tile: <span class="tg-tag">FT-01</span> instrument tag (matches the P&amp;ID) · big value &amp; unit · the bar shows the <b>normal band</b> (shaded) with a marker for the <b>current value</b> · the status line reads <b style="color:var(--bm-green)">NORMAL</b> / <b style="color:var(--bm-amber)">WARN</b> / <b style="color:var(--bm-red)">ALARM</b>. Click a tile for its trend &amp; reference.</p></details>
                     <div class="tiles" id="tiles"></div>
                 </div>
             </div>
@@ -801,10 +824,12 @@
             var cause=SCEN_CAUSE[curScen];
             if(worst==='ok' || !cause){
                 bar.className='alarmbar ok'; ico.textContent='NORMAL';
-                body.innerHTML='<b>All parameters nominal.</b> N+1 pumps healthy, loop dry, chemistry in-spec — every reading sits inside its alarm band.';
+                // PRD-COCKPIT-QUIET Q2: at rest the bar says the state; the explanation is its tooltip
+                body.innerHTML='<b>All parameters nominal.</b>';
+                bar.title='N+1 pumps healthy, loop dry, chemistry in-spec — every reading sits inside its alarm band.';
                 return;
             }
-            bar.className='alarmbar '+(worst==='alarm'?'alarm':'warn');
+            bar.className='alarmbar '+(worst==='alarm'?'alarm':'warn'); bar.removeAttribute('title');
             ico.textContent=worst==='alarm'?'ALARM':'WARN';
             // chips for each tripped tile
             var chips=''; for(var i=0;i<TILES.length;i++){ var k=TILES[i].k, sv=states[k]; if(sv==='warn'||sv==='alarm') chips+='<span class="ab-chip '+sv+'">'+TILES[i].tag+' '+TILES[i].label+'</span>'; }
