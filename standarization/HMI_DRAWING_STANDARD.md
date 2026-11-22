@@ -177,6 +177,52 @@ is its content, R6). Measured at 1440 / 390: chiller 453/766 → 218/297 px, wat
 170/203, fuel 616/1508 → 218/291, EPMS 347/498 → 214/287, ict 458/972 → 213/282. datahall follows once the
 Conventional session's DATAHALL-SPACE release is on main (Q3).
 
+## 4f. Floor graphics (PRD-DATAHALL-BMS-ISO, owner R185 2026-11-22: "Kenapa tampilan UIUX datahall jadi 3d jadi kayak bukan BMS")
+
+A floor graphic is a drawing of equipment in a room. It is not a chart of the equipment's numbers. The source is
+`js/conv/floor-plan.js` 2.0.0, with `js/conv/floor-plan-color.js` loaded first. `datahall.html` uses it now, and the DC AI
+Data Hall tab follows in F4.
+
+- **Two projections of one drawing.**
+  - **3D** is true isometric: both plan axes at 30°. It is the default on a stage 600 px wide or more.
+  - **Plan** is the top view. It is the default on a phone.
+  - The `.fp-proj` toggle has two buttons with `aria-pressed`. The choice is stored per page (`rz.dh.proj` on
+    datahall.html, wrapped in try/catch).
+  - Both projections keep the same ids, points, selection and mode. A switch rebuilds the geometry only.
+- **One height.**
+  - Every cabinet is drawn 42U tall (`CAB_H`). Its load is a value: the row tag, the tooltip and the row panel. Load is
+    never a height and never a colour step.
+  - A spare slot is its footprint outline on the floor.
+- **Grey body, green lamp.**
+  - Normal equipment has a neutral body (OKLCH C < 0.03) and a green status lamp. The lamp answers owner C8 (§4d).
+  - A warn or alarm cabinet or CRAH paints its whole body in `--rz-pt-warn` / `--rz-pt-alarm`, and its tag point carries
+    the ▲ / ◆ glyph from `RZPointStatus`.
+  - Selection is the amber ring.
+  - A point's text keeps its state colour, green when normal (`test-conv-point-coverage` PC3), as on every cockpit.
+- **Equipment detail.**
+  - Each cabinet has a door frame on its east face and a vent line on its roof.
+  - The hot-aisle containment is a translucent roof at cabinet height, with posts and end doors.
+  - The cold aisles have perforated tile seams.
+  - Each CRAH has a fan grille on the face toward the cabinets and a lamp on its roof.
+  - Only the north and west walls are drawn, so no wall hides the room.
+- **Value tags.**
+  - Each row has one boxed tag: the row letter and the row's point for the mode. Temp and Margin show the rack inlet
+    average `datahall.row.<R>.inlet_avg_c`, which aliases the rack-inlet limits. Other modes show the row heat.
+  - The hall has one CRAH tag: the running average leaving air → return air.
+  - In 3D a row tag stands in the screen column of its row's head, its foot above the roof line of the gallery
+    behind. A tag never covers a unit, so a click on equipment always reaches it (FX3), and it stays nearer its own
+    row than the next (B3).
+  - At most 30 numbers are visible on the plan (FL10).
+- **Air is the only motion.** It is the PRD-CONV-BMS-LIVE L4 paths: supply along every cold aisle, exhaust along every
+  containment roof. Speed follows row heat, and a stopped CRAH stops its supply. Air pauses off screen and does not move
+  under reduced motion.
+- **Painter's order.** Rows are drawn west to east. Within a row the order is the west line (north to south), the roof,
+  then the east line. Rows apart on the floor never overlap on the screen.
+- **Gate:** `tools/test-conv-floor-plan.mjs`.
+  - B1–B7 are added: grey normal, equal height, 30° axes and row letters, tags, air, phone Plan ≥ 8 px, and the toggle by
+    keyboard with memory and selection kept.
+  - Red on fcf6383bb (the v3.87.0 candidate it builds on): B1, B2, B3, B4, B6 and B7 fail. B5 is proven red by a constant-speed mutation.
+
 ## 4c. Repaint cost (v3.63.0, O11)
 
 A repaint is a function of the payload context key (tick, both scenarios, replay, fire workstation snapshot): `hmi-v2

@@ -8,6 +8,11 @@ and the row footers. The Air path view (`js/conv/air-section.js`) and the side p
 Related: PRD-CONV-POINT-STATUS-TREND (point state and trend on every number; the T3 branch makes the row footers
 points), PRD-CONV-TREND-DESIGN (same colour rules for the trend modal).
 
+> **Superseded in part (2026-11-22, v3.89.0)** by `documentation/prd/PRD_DATAHALL_BMS_ISO.md` (owner R185: "Kenapa
+> tampilan UIUX datahall jadi 3d jadi kayak bukan BMS"). P2 (height = load) and P3 (the oblique projection) are
+> replaced by equal-height equipment in true isometric 3D with a Plan toggle; every normal cabinet is grey with a
+> green status lamp, not green. FL3 and FL5 of `tools/test-conv-floor-plan.mjs` are rewritten accordingly.
+
 ## 0. The owner's words
 
 2026-11-21: "Floor plannya terlalu flat dan terlalu ai design slop warnanya gradiennya dll. Rancang detail dan

@@ -4,11 +4,13 @@
    FL1  0 stage elements paint a gradient (CSS background / border-image / SVG paint server)
    FL2  every cabinet top-face fill is one of the discrete state steps of the theme (none for spare), <= 9 distinct in any
         mode; the steps are OKLCH lightness steps of the state token (L per PRD 3.2, hue of the token)
-   FL3  default NORMAL scenario: in Power, Temp and Cooling-margin every occupied cabinet is in the ok (green) family
+   FL3  default NORMAL scenario: in Power, Temp and Cooling-margin no occupied cabinet reads warn or alarm (was: all green;
+        PRD-DATAHALL-BMS-ISO made normal grey, see B1)
    FL4  a planted 0.97 cabinet is alarm in Power mode and a 28 C inlet is warn in Temp mode (fixture seam only)
-   FL5  cabinet height in px is monotonic in kW (Spearman = 1); spare cabinets have height 0
+   FL5  spare cabinets have no front face (height 0). (Height monotonic in kW was retired by PRD-DATAHALL-BMS-ISO B2.)
    FL6  0 painted colours in the stage in the cyan family (OKLCH hue 180-245, chroma > 0.06)
-   FL7  no text is in a state token colour or a chromatic series colour, except a state word with a glyph
+   FL7  no text is in a state token colour or a chromatic series colour, except a state word with a glyph and a point
+        ([data-pt-state], whose colour is its state: test-conv-point-coverage PC3)
    FL8  no animation, glow (box-shadow blur, text-shadow, filter) on any stage element; only the process air paths
         (paths inside .fp-air running keyframes fp-air, PRD-CONV-BMS-LIVE L4) may move
    FL9  25 hot-aisle caps, the installed CRAH count, a floor slab and a wall of 2 edges
@@ -16,6 +18,18 @@
    FL11 390 px: no page-level sideways scroll; cabinet unit u >= 7 px in a scroller; row panel opens, 44 px targets
    FX1-FX5 (fixture seam): paint never changes the node tree; hover tooltip; click callbacks; keyboard arrows + Enter;
         selection is amber
+   PRD-DATAHALL-BMS-ISO (owner R185, 2026-11-22: the 3D floor must read like a BMS, not a bar chart):
+   B1  grey is normal: >= 95 % of occupied cabinets have neutral faces (OKLCH C < 0.03) in Power, Temp and Margin, and
+       every coloured cabinet is warn or alarm
+   B2  3D is the default at 1440; every occupied cabinet has the same front height (+-0.5 px); a load change moves no point
+   B3  true isometric: cabinet top edges at 30 +-1 deg; 25 row letters >= 11 px, each nearest a cabinet of its own row
+   B4  (datahall.html) a value tag per row with a numeric point, one CRAH tag with leaving + return air points, and a
+       tag point above its warn limit reads warn
+   B5  air: 2 supply paths per aisle line end, 1 exhaust per row; hotter row = faster (Spearman <= -0.9); all CRAH off
+       stops supply; reduced motion = 0 animated paths
+   B6  390: Plan by default, occupied cabinets >= 8 px, no page sideways scroll
+   B7  the 3D / Plan toggle: Enter and Space switch it, focus stays on the pressed button, the choice is stored and
+       survives a reload, the selected cabinet stays selected
    Usage: node tools/test-conv-floor-plan.mjs [--target=<url|file>] [--shots=<dir>] [--only=FL1,FL2] [--all]
    Default target = tools/fixtures/floor-plan.html. A datahall.html target is entered through the cockpit audit helper. */
 import puppeteer from 'puppeteer';
@@ -240,7 +254,9 @@ for (const theme of ['dark', 'light']) {
   for (const m of ['power', 'temp', 'cooling-margin']) {
     await setMode(pg, m); await sleep(SETTLE);
     const fam = await pg.evaluate((mm) => { const g = window.__g, c = { ok: 0, warn: 0, alarm: 0, neutral: 0, other: 0, n: 0 }; document.querySelectorAll('.floor .rack').forEach((rk) => { if (!g.occupied(rk)) return; c.n++; c[g.family(g.rgba(g.topFill(rk)))]++; }); return c; }, m);
-    check('FL3', fam.n > 400 && fam.ok === fam.n, `${T} ${m}: ${fam.n} occupied, ok ${fam.ok}, warn ${fam.warn}, alarm ${fam.alarm}, neutral ${fam.neutral}, other ${fam.other}`);
+    /* PRD-DATAHALL-BMS-ISO supersedes "every cabinet green": a normal hall is grey (B1). FL3 keeps its intent: no cabinet
+       of the default NORMAL scenario reads warn or alarm. */
+    check('FL3', fam.n > 400 && fam.warn === 0 && fam.alarm === 0 && fam.other === 0, `${T} ${m}: ${fam.n} occupied, ok ${fam.ok}, warn ${fam.warn}, alarm ${fam.alarm}, neutral ${fam.neutral}, other ${fam.other}`);
   }
   if (fixture) {
     const w = await pg.evaluate(() => window.__fp.warnings());
@@ -278,10 +294,9 @@ for (const theme of ['dark', 'light']) {
     return out;
   });
   const occ = hs.filter((x) => x.kw > 0), spare = hs.filter((x) => x.kw === 0);
-  const rho = spearman(occ.map((x) => x.kw), occ.map((x) => x.h));
-  check('FL5', rho >= 0.9999, `${T}: Spearman ${Number.isNaN(rho) ? 'undefined (all cabinet heights equal: flat cells)' : rho.toFixed(4)} over ${occ.length} occupied`);
+  /* PRD-DATAHALL-BMS-ISO supersedes "height = kW" (every cabinet is one height, B2); FL5 keeps the spare rule */
   check('FL5', spare.length > 0 && spare.every((x) => x.h === 0), `${T}: ${spare.filter((x) => x.h !== 0).length} of ${spare.length} spare cabinets have height > 0`);
-  info('FL5', `${T} rho ${Number.isNaN(rho) ? 'NaN' : rho.toFixed(4)}`);
+  info('FL5', `${T} ${occ.length} occupied, ${spare.length} spare`);
 
   /* FL6 / FL7 / FL8 on the stage with selection + hover present */
   const fl = await pg.evaluate(() => {
@@ -299,7 +314,8 @@ for (const theme of ['dark', 'light']) {
         if (c) {
           if (g.isCyan(c)) o.cyan.push(`${g.tag(e)} text ${g.textColor(e)}`);
           const chromatic = g.oklch(c).C > 0.06, isTok = tokens.some((k) => Math.abs(k.r - c.r) < 2 && Math.abs(k.g - c.g) < 2 && Math.abs(k.b - c.b) < 2);
-          if ((chromatic || isTok) && !/[▲▼◆]/.test(own)) o.text.push(`${g.tag(e)} "${t}" ${g.textColor(e)}`);
+          /* a point's colour is its state, governed by RZPointStatus and gated by test-conv-point-coverage PC3 */
+          if ((chromatic || isTok) && !/[▲▼◆]/.test(own) && !e.closest('[data-pt-state]')) o.text.push(`${g.tag(e)} "${t}" ${g.textColor(e)}`);
         }
       }
       ['', '::before', '::after'].forEach((ps) => {
@@ -332,6 +348,92 @@ for (const theme of ['dark', 'light']) {
   check('FL9', f9.crah > 0 && f9.crah === f9.crahExpected, `${T}: ${f9.crah} CRAH units, engine installed ${f9.crahExpected}`);
   check('FL9', f9.slab >= 1, `${T}: ${f9.slab} floor slab`);
   check('FL9', f9.wall >= 2, `${T}: ${f9.wall} wall edges (need 2)`);
+
+  /* ---------- PRD-DATAHALL-BMS-ISO B1-B5 (owner R185: "jadi kayak bukan BMS") ---------- */
+  await pg.evaluate(() => { window.__fp && window.__fp.plan.select(null); });
+  /* B1 grey is normal: per mode, every occupied cabinet's three faces; a chromatic face only on a warn / alarm cabinet */
+  for (const m of ['power', 'temp', 'cooling-margin']) {
+    await setMode(pg, m); await sleep(SETTLE);
+    const b1 = await pg.evaluate(() => {
+      const g = window.__g, o = { n: 0, neutral: 0, bad: [] };
+      document.querySelectorAll('.floor .rack, #zone-field .rack').forEach((rk) => {
+        if (!g.occupied(rk)) return;
+        o.n++;
+        const st = rk.getAttribute('data-state');
+        const faces = [...rk.querySelectorAll('.rk-top, .rk-front, .rk-side')].filter((f) => getComputedStyle(f).display !== 'none');
+        const chroma = faces.length ? Math.max(...faces.map((f) => { const c = g.rgba(getComputedStyle(f).fill); return c ? g.oklch(c).C : 1; })) : 1;
+        if (chroma < 0.03) o.neutral++;
+        else if (st !== 'warn' && st !== 'alarm') o.bad.push(o.bad.length < 3 ? `${rk.id} state ${st} chroma ${chroma.toFixed(3)}` : '');
+      });
+      return o;
+    });
+    check('B1', b1.n > 400 && b1.neutral / b1.n >= 0.95 && b1.bad.length === 0, `${T} ${m}: ${b1.neutral} of ${b1.n} occupied cabinets neutral (need >= 95 %), ${b1.bad.length} coloured but not warn/alarm, e.g. ${b1.bad.filter(Boolean).join(' | ')}`);
+  }
+  /* B2 equal height in 3D; B3 30 degree axes and a row letter at its row */
+  await setMode(pg, 'temp'); await sleep(SETTLE);
+  const b23 = await pg.evaluate(() => {
+    const root = document.querySelector('.fp-root'), o = { proj: root && root.getAttribute('data-proj') };
+    const hs = [];
+    document.querySelectorAll('.rack').forEach((rk) => { if (!window.__g.occupied(rk)) return; const f = rk.querySelector('.rk-front'); if (f && getComputedStyle(f).display !== 'none') hs.push(f.getBoundingClientRect().height); });
+    o.hMin = Math.min(...hs); o.hMax = Math.max(...hs); o.hn = hs.length;
+    const pts = (el) => (el.getAttribute('points') || '').trim().split(/\s+/).map((p) => p.split(',').map(Number));
+    const top = document.querySelector('.rack[data-idx="45"] .rk-top'), p = pts(top);
+    const ang = (a, b) => { const dx = b[0] - a[0], dy = b[1] - a[1]; return Math.abs(Math.atan2(Math.abs(dy), Math.abs(dx)) * 180 / Math.PI); };
+    o.angles = p.length >= 3 ? [ang(p[0], p[1]), ang(p[1], p[2])] : [];
+    /* a row letter sits at its row: the cabinet nearest to the letter belongs to that row */
+    const cab = [...document.querySelectorAll('.rack')].map((rk) => { const r = rk.querySelector('.rk-top').getBoundingClientRect(); return { z: Math.floor(+rk.getAttribute('data-idx') / 20), x: r.x + r.width / 2, y: r.y + r.height / 2 }; });
+    o.letters = [...document.querySelectorAll('.zone[data-z] .zone-head')].map((h) => {
+      const r = h.getBoundingClientRect(), cx = r.x + r.width / 2, cy = r.y + r.height / 2, z = +h.closest('.zone').getAttribute('data-z');
+      let best = null, bd = 1e9; cab.forEach((c) => { const d = Math.hypot(c.x - cx, c.y - cy); if (d < bd) { bd = d; best = c; } });
+      return { z, px: parseFloat(getComputedStyle(h).fontSize), near: best ? best.z : -1, d: Math.round(bd) };
+    });
+    return o;
+  });
+  check('B2', b23.proj === 'iso', `${T}: default projection at 1440 is ${b23.proj} (need iso)`);
+  check('B2', b23.hn > 400 && b23.hMax - b23.hMin <= 0.5, `${T}: occupied cabinet front heights ${b23.hMin.toFixed(1)}..${b23.hMax.toFixed(1)} px over ${b23.hn} (need equal +-0.5)`);
+  if (fixture) {
+    const b2g = await pg.evaluate(() => {
+      const mdl = window.__fp.model, i = mdl.racks.findIndex((r) => r.occupied), f = document.querySelector(`.rack[data-idx="${i}"] .rk-front`), before = f.getAttribute('points'), old = mdl.racks[i].kw;
+      mdl.racks[i].kw = old > 10 ? 2 : 19; window.setMode('power'); const after = f.getAttribute('points'); mdl.racks[i].kw = old; window.setMode('temp');
+      return { same: before === after };
+    });
+    check('B2', b2g.same, `${T}: a load change moved cabinet geometry (height still encodes kW)`);
+  }
+  check('B3', b23.angles.length === 2 && b23.angles.every((a) => Math.abs(a - 30) <= 1), `${T}: cabinet top edges at ${b23.angles.map((a) => a.toFixed(1)).join(' / ')} deg (need 30 +-1)`);
+  const badL = b23.letters.filter((l) => l.px < 11 || l.near !== l.z);
+  check('B3', b23.letters.length === 25 && badL.length === 0, `${T}: ${b23.letters.length} row letters, ${badL.length} under 11 px or nearest a cabinet of another row, e.g. ${JSON.stringify(badL.slice(0, 2))}`);
+  /* B4 value tags: every row tag carries a point with a number; one CRAH tag with leaving and return air points; a point
+     in warn shows its state on the tag (RZPointStatus.apply, the page's own chip) */
+  if (IS_PAGE) {
+    const b4 = await pg.evaluate(() => {
+      const g = window.__g, vis = (e) => g.rendered(e) && e.getBoundingClientRect().width > 1;
+      const rows = [...document.querySelectorAll('.zone[data-z] .fp-tag')].filter(vis).map((t) => [...t.querySelectorAll('[data-point]')].filter((p) => vis(p) && /\d/.test(p.textContent)).length);
+      const cr = document.querySelector('.fp-crah-tag'), crPts = cr && vis(cr) ? [...cr.querySelectorAll('[data-point]')].filter((p) => /\d/.test(p.textContent)).map((p) => p.getAttribute('data-point')) : [];
+      let chip = null; const p0 = document.querySelector('.zone[data-z] .fp-tag [data-point]');
+      if (p0 && window.RZPointStatus) { const id = p0.getAttribute('data-point'), v = parseFloat(p0.textContent); try { window.RZPointStatus.define(id, { lo_alarm: v - 30, lo_warn: v - 20, hi_warn: v - 1, hi_alarm: v + 30, deadband: 0.1 }); window.RZPointStatus.apply(p0, id, v); chip = p0.getAttribute('data-pt-state'); } catch (e) { chip = 'error ' + e.message; } }
+      return { rows, crPts, chip };
+    });
+    check('B4', b4.rows.length === 25 && b4.rows.every((n) => n >= 1), `${T}: ${b4.rows.length} visible row tags, points per tag ${JSON.stringify(b4.rows.slice(0, 6))}`);
+    check('B4', b4.crPts.length >= 2, `${T}: CRAH tag points ${JSON.stringify(b4.crPts)} (need leaving + return air)`);
+    check('B4', b4.chip === 'warn', `${T}: a row tag point above its warn limit reads state ${b4.chip}`);
+  } else na('B4', 'value tags are filled by the page (datahall.html target)');
+  /* B5 air: one supply path per aisle end, one exhaust per row; hotter rows move faster; a stopped gallery stops its supply */
+  if (fixture) {
+    const b5 = await pg.evaluate(() => {
+      const mdl = window.__fp.model, cold = document.querySelectorAll('.fp-air .air-cold').length, hot = [...document.querySelectorAll('.fp-air .air-hot')];
+      const sp = hot.filter((h) => !h.hasAttribute('data-off')).map((h) => ({ s: +h.getAttribute('data-air-s'), heat: mdl.zones[+h.getAttribute('data-z')].heat }));
+      const bands = +document.querySelector('.fp-root').getAttribute('data-bands');
+      const old = mdl.crahUnits.map((c) => c.running); mdl.crahUnits.forEach((c) => { c.running = false; }); window.setMode('temp');
+      const offAll = [...document.querySelectorAll('.fp-air .air-cold')].every((p) => p.hasAttribute('data-off'));
+      mdl.crahUnits.forEach((c, i) => { c.running = old[i]; }); window.setMode('temp');
+      const onAgain = [...document.querySelectorAll('.fp-air .air-cold')].filter((p) => !p.hasAttribute('data-off')).length;
+      return { cold, hot: hot.length, bands, sp, offAll, onAgain };
+    });
+    const rho = spearman(b5.sp.map((x) => x.heat), b5.sp.map((x) => x.s));
+    check('B5', b5.hot === 25 && b5.cold === 2 * (25 + b5.bands), `${T}: ${b5.cold} supply + ${b5.hot} exhaust paths over ${b5.bands} band(s)`);
+    check('B5', rho <= -0.9, `${T}: exhaust period vs row heat Spearman ${Number.isNaN(rho) ? 'undefined (constant speed)' : rho.toFixed(3)} (need <= -0.9: hotter = faster)`);
+    check('B5', b5.offAll && b5.onAgain > 0, `${T}: all CRAH off -> supply stopped ${b5.offAll}; back on -> ${b5.onAgain} running`);
+  } else na('B5', 'model seam only (fixture)');
 
   /* fixture seam: FX1-FX5 */
   if (fixture) {
@@ -438,14 +540,71 @@ for (const theme of ['dark', 'light']) {
   /* 0.01 px float tolerance: a row read while the panel's swap (PRD-CONV-BMS-MOTION M4) translates by a fraction measures 43.9999 */
   check('FL11', !!(f.panel && f.panel.items.length === 20 && f.panel.items.every((h) => h >= 44 - 0.01)), `${T}: row panel ${JSON.stringify(f.panel)} (20 rows of >= 44 px required)`);
   check('FL0', errs.length === 0, `${T} page errors: ${errs.slice(0, 3).join(' | ')}`);
+  /* B6 phone: the top view by default, cabinets at least 8 px, nothing sideways at page level */
+  const b6 = await pg.evaluate(() => {
+    const root = document.querySelector('.fp-root'), de = document.documentElement;
+    const sz = [...document.querySelectorAll('.rack')].filter((rk) => window.__g.occupied(rk)).map((rk) => { const r = rk.querySelector('.rk-top').getBoundingClientRect(); return Math.min(r.width, r.height); });
+    return { proj: root && root.getAttribute('data-proj'), min: Math.min(...sz), docW: de.scrollWidth, vw: innerWidth };
+  });
+  check('B6', b6.proj === 'plan', `${T}: default projection ${b6.proj} (need plan on a phone)`);
+  check('B6', b6.min >= 8, `${T}: smallest occupied cabinet ${b6.min.toFixed(1)} px (need >= 8)`);
+  check('B6', b6.docW <= b6.vw + 1, `${T}: page scrollWidth ${b6.docW} vs ${b6.vw}`);
   if (SHOTS) for (const m of MODES) { await pg.evaluate((mm) => { window.__fp && window.__fp.plan.select(null); const p = document.querySelector('#row-panel'); if (p) p.hidden = true; window.__g.setMode(mm); }, m); await sleep(150); const el = await pg.$('#fp-stage') || await pg.$('.floor'); await el.screenshot({ path: path.join(SHOTS, `${IS_PAGE ? 'dh' : 'fx'}-390-dark-${m}.png`) }); }
+  await pg.close();
+}
+
+/* ---------- B7: the 3D / Plan toggle by keyboard, remembered, selection kept; B5 reduced motion ---------- */
+{
+  const { pg, errs } = await openPage(1440, 'dark');
+  const T = '1440 dark';
+  const s0 = await pg.evaluate(() => {
+    const root = document.querySelector('.fp-root'), btns = [...document.querySelectorAll('.fp-proj button[data-proj]')];
+    window.RZFloorPlan.select({ rack: 45 });
+    return { key: root && root.getAttribute('data-proj-key'), n: btns.length, pressed: btns.map((b) => b.getAttribute('aria-pressed')) };
+  });
+  check('B7', s0.n === 2 && s0.key, `${T}: ${s0.n} projection buttons, memory key ${s0.key}`);
+  let s1 = { proj: null }, s2 = { proj: null };
+  if (s0.n === 2) {
+    await pg.focus('.fp-proj button[data-proj="plan"]');
+    await pg.keyboard.press('Enter'); await sleep(300);
+    s1 = await pg.evaluate((k) => {
+      const root = document.querySelector('.fp-root'), a = document.activeElement, rk = document.querySelector('.rack[data-idx="45"]');
+      return { proj: root.getAttribute('data-proj'), focus: a && a.getAttribute('data-proj'), pressed: document.querySelector('.fp-proj button[data-proj="plan"]').getAttribute('aria-pressed'), stored: (() => { try { return localStorage.getItem(k); } catch (e) { return 'err'; } })(), sel: !!(rk && rk.hasAttribute('data-sel')), ring: document.querySelector('.fp-ring-sel').getAttribute('display') };
+    }, s0.key);
+    check('B7', s1.proj === 'plan' && s1.focus === 'plan' && s1.pressed === 'true', `${T}: Enter on Plan -> ${JSON.stringify(s1)}`);
+    check('B7', s1.stored === 'plan', `${T}: stored ${s1.stored} under ${s0.key}`);
+    check('B7', s1.sel && s1.ring === null, `${T}: selected cabinet 45 after the switch: sel ${s1.sel}, ring display ${s1.ring}`);
+    await pg.focus('.fp-proj button[data-proj="iso"]');
+    await pg.keyboard.press('Space'); await sleep(300);
+    s2 = await pg.evaluate(() => ({ proj: document.querySelector('.fp-root').getAttribute('data-proj') }));
+    check('B7', s2.proj === 'iso', `${T}: Space on 3D -> ${s2.proj}`);
+    await pg.evaluate((k) => { try { localStorage.setItem(k, 'plan'); } catch (e) { /* storage blocked: the reload check reports it */ } }, s0.key);
+    await pg.reload({ waitUntil: 'load' });
+    if (IS_PAGE) { await enterAuthorizedAuditState(pg, 'datahall'); await sleep(2500); }
+    await pg.waitForFunction(() => document.querySelectorAll('.rack').length >= 400, { timeout: 60000 });
+    const s3 = await pg.evaluate((k) => { const p = document.querySelector('.fp-root').getAttribute('data-proj'); try { localStorage.removeItem(k); } catch (e) { /* nothing to clean */ } return p; }, s0.key);
+    check('B7', s3 === 'plan', `${T}: after reload with ${s0.key}=plan the projection is ${s3}`);
+  }
+  check('FL0', errs.length === 0, `${T} (toggle) page errors: ${errs.slice(0, 3).join(' | ')}`);
+  await pg.close();
+}
+{
+  const pg = await browser.newPage();
+  await pg.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+  await pg.setViewport({ width: 1440, height: 1000 });
+  await primeCockpitAuditDocument(pg, 'dark');
+  await pg.goto(URL_, { waitUntil: 'load', timeout: 120000 });
+  if (IS_PAGE) { await enterAuthorizedAuditState(pg, 'datahall'); await sleep(2500); }
+  await pg.waitForFunction(() => document.querySelectorAll('.rack').length >= 400, { timeout: 60000 });
+  const rm = await pg.evaluate(() => { const ps = [...document.querySelectorAll('.fp-air path')]; return { n: ps.length, moving: ps.filter((p) => getComputedStyle(p).animationName !== 'none').length }; });
+  check('B5', rm.n > 0 && rm.moving === 0, `reduced motion: ${rm.moving} of ${rm.n} air paths animated (need 0)`);
   await pg.close();
 }
 
 await browser.close();
 srv.close();
 
-const order = ['FL1', 'FL2', 'FL3', 'FL4', 'FL5', 'FL6', 'FL7', 'FL8', 'FL9', 'FL10', 'FL11', 'FX1', 'FX2', 'FX3', 'FX4', 'FX5', 'FL0'];
+const order = ['FL1', 'FL2', 'FL3', 'FL4', 'FL5', 'FL6', 'FL7', 'FL8', 'FL9', 'FL10', 'FL11', 'FX1', 'FX2', 'FX3', 'FX4', 'FX5', 'B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B7', 'FL0'];
 let failed = 0;
 console.log(`target: ${URL_}`);
 for (const id of order) {

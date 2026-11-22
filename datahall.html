@@ -495,7 +495,7 @@
          CRAH grid + all displayed values are unchanged. P1 datahall metadata. -->
     <script src="js/rz-telemetry-quality.js?v=20261113-8feb0dfd" defer></script>
     <script src="js/rz-provenance.js?v=20261111-6f1cd061" defer></script>
-    <script src="js/rz-version.js?v=20261122-5364dfb7" defer></script>
+    <script src="js/rz-version.js?v=20261122-86c27abd" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
 <style id="rz-skiplink-v1">
@@ -878,7 +878,8 @@
     <link rel="stylesheet" href="css/conv-motion.css?v=20261121-88ede45d">
     <link rel="stylesheet" href="css/conv-live.css?v=20261122-9e4f1c46">
     <script src="js/conv/history.js?v=20261120-8d390d7e"></script>
-    <script src="js/conv/floor-plan.js?v=20261121-a5f13c72"></script>
+    <script src="js/conv/floor-plan-color.js?v=20261122-7138898a"></script>
+    <script src="js/conv/floor-plan.js?v=20261122-4a5b38f1"></script>
     <script src="js/rz-sheet.js?v=20261121-67db3ea5" defer></script>
     <script src="js/rz-trend.js?v=20261122-98f6c100"></script>
     <script src="js/conv/point-status.js?v=20261121-9a98a915"></script>
@@ -1438,6 +1439,8 @@
         /* the min / avg / max / hottest rack inlets read the rack-inlet registry row (limitsOf): the page maps an id onto a
            row, it never types a bound. Re-run when the database rows arrive (rz-point-limits). */
         var PT_INLET_ALIAS = ['datahall.rack.inlet_min_c', 'datahall.rack.inlet_avg_c', 'datahall.rack.inlet_max_c', 'datahall.rack.inlet_hottest_c'];
+        /* the row value tags (PRD-DATAHALL-BMS-ISO) read the same rack-inlet registry row, so a hot row's tag shows its state */
+        'ABCDEFGHIJKLMNOPQRSTUVWXY'.split('').forEach(function (r) { PT_INLET_ALIAS.push('datahall.row.' + r + '.inlet_avg_c'); });
         function ptDefineAliases() {
             var PS = window.RZPointStatus, L = PS && PS.limits('datahall.rack.inlet_c');
             if (!L) return;
@@ -1773,7 +1776,8 @@
                 onRack: function (idx) { selectRack(idx); },
                 onCrah: function (n) { window.__inspectCrah(n); },
                 onRow: function (z) { window.__openRow(z); },
-                onBuild: function () { paintStrips(); syncPoints(); }
+                onBuild: function () { paintStrips(); syncPoints(); },
+                projKey: 'rz.dh.proj', tags: true
             });
             var rp = document.getElementById('row-picker');
             var ph = '';
@@ -1782,12 +1786,28 @@
             repaintRacks();
         }
         /* the row strips under the drawing carry the row kW; inlet / hot aisle / min-max-avg stay in the DOM for the readers and gates that trace them */
+        /* PRD-DATAHALL-BMS-ISO rule 3: each row's tag is a BMS value tag, one point per row in the mode's quantity (rack inlet
+           average in Temp / Margin, row heat otherwise); the CRAH tag carries the running units' leaving and return air. */
+        function rowTagHtml(z) {
+            var zn = zones[z], row = String.fromCharCode(65 + z), st = rowStats(z);
+            if ((currentMode === 'temp' || currentMode === 'cooling-margin') && st.n) return pt('datahall.row.' + row + '.inlet_avg_c', 'Row ' + row + ' rack inlet avg', '°C', 1, st.inlet.avg.toFixed(1));
+            return pt('datahall.row.' + row + '.heat_kw', 'Row ' + row + ' heat', 'kW', 0, zn.heat.toFixed(0));
+        }
+        function paintCrahTag() {
+            var host = fp && fp.crahTagEl && fp.crahTagEl();
+            if (!host) return;
+            var run = crahUnits.filter(function (u) { return u.running; });
+            if (!run.length) { ptPaint(host, 'CRAH all standby'); return; }
+            var la = run.reduce(function (s, u) { return s + u.leavingAirC; }, 0) / run.length, ra = run.reduce(function (s, u) { return s + u.returnAirC; }, 0) / run.length;
+            ptPaint(host, 'CRAH LA ' + pt('datahall.crah.leaving_air_avg_c', 'CRAH leaving air (running average)', '°C', 1, la.toFixed(1)) + ' \u2192 RA ' + pt('datahall.crah.return_air_avg_c', 'CRAH return air (running average)', '°C', 1, ra.toFixed(1)) + ' °C');
+        }
         function paintStrips() {
+            paintCrahTag();
             for (var z = 0; z < ZONES; z++) {
                 var strip = document.querySelector('#zone-field .zone[data-z="' + z + '"]');
                 if (!strip) continue;
                 var zn = zones[z], a = strip.querySelector('.zf-kw'), b = strip.querySelector('.zf-in'), c = strip.querySelector('.zf-hot'), d = strip.querySelector('.zf-stats');
-                if (a) a.textContent = zn.heat.toFixed(0);
+                if (a) { a.removeAttribute('title'); ptPaint(a, rowTagHtml(z)); }
                 if (b) b.textContent = zn.rackInletC.toFixed(1);
                 if (c) c.textContent = zn.hotAisleC.toFixed(1);
                 if (d) { d.setAttribute('data-rz-authored-basis', ROW_STATS_BASIS); d.innerHTML = rowStatsText(z); }

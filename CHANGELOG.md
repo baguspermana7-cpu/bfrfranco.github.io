@@ -11,6 +11,49 @@ release sections rather than semver.
 
 ---
 
+## v3.89.0 — 2026-11-22 — The hall reads like a BMS
+
+The owner (R185, 2026-11-22) wrote: "Kenapa tampilan UIUX datahall jadi 3d jadi kayak bukan BMS". The data hall floor of
+the Conventional cockpit (`datahall.html`) was 463 green blocks extruded by load. It read as a 3D bar chart, not a
+building-management graphic. PRD-DATAHALL-BMS-ISO (`documentation/prd/PRD_DATAHALL_BMS_ISO.md`) keeps the depth and
+draws equipment.
+
+- **True isometric 3D, or the top view.**
+  - Both plan axes are drawn at 30°. 3D is the default on a wide stage; on a phone the default is Plan, with cabinets of
+    at least 9 px swiped inside the stage.
+  - A `3D | Plan` toggle switches between them. It works by keyboard, is remembered per page (`rz.dh.proj`), and keeps
+    the selection.
+- **One height.** Every cabinet is drawn 42U tall. Its load is a value, never a height. A spare slot is its outline on
+  the floor.
+- **Grey body, green lamp.**
+  - Normal equipment is grey with a green status lamp (owner C8: colour by condition, not everything grey).
+  - A warning or alarm cabinet or CRAH turns its whole body orange or red. A number keeps its point-state colour.
+- **Equipment detail.**
+  - Each cabinet has a door frame and a roof vent.
+  - The hot-aisle containment has a translucent roof, posts and end doors.
+  - The cold aisles have perforated tiles.
+  - Each CRAH has a fan grille and a lamp.
+- **Value tags.**
+  - Each row has one boxed tag with its letter and its point: the rack inlet average in Temp and Margin, which shows ▲ / ◆
+    when out of limits, and the row heat otherwise.
+  - The hall has one CRAH tag: leaving air → return air.
+  - In 3D a row's tag stands above its head, clear of the CRAH gallery behind, so a click on a unit reaches the unit.
+- **Code.**
+  - `js/conv/floor-plan.js` is now 2.0.0.
+  - The OKLCH arithmetic moved to `js/conv/floor-plan-color.js`, which loads first.
+  - The air paths of v3.86 are kept, now projected in 3D.
+- **Gate.** `tools/test-conv-floor-plan.mjs` gains laws B1–B7.
+  - Red on fcf6383bb (the v3.88.0 tree before its port): B1, B2, B3, B4, B6 and B7.
+  - FL3 (every cabinet green) and FL5 (height = kW) encoded the superseded look. FL3 now reads "no warn or alarm in the
+    NORMAL scenario". FL5 keeps only its spare-cabinet rule.
+  - Mutation red proofs: a green normal fill fails B1, a load-scaled height fails B2, a constant air speed fails B5.
+  - No ratchet was re-recorded.
+  - `tools/test-operator-cockpit-regressions.mjs` asked a 25.x °C cabinet to render "on the green side of the ramp". Its
+    invariant (inside the envelope reads normal) is unchanged; it now reads a neutral body plus a green status lamp. Red
+    on the v3.88.0 floor (body rgb(109, 172, 112)), green here.
+- **Build time:** 96 → 123 ms median (controlled A/B, before the 463 status lamps; one run after them: 87.5 ms).
+- **Standard:** `standarization/HMI_DRAWING_STANDARD.md` §4f, Floor graphics.
+
 ## v3.88.0 — 2026-11-22 — The drawing is the page
 
 Owner (R182, on the chiller plant phone view): "tulisan2 yg over yg mana tidak berguna dan saya bisa lihat di mimic ui

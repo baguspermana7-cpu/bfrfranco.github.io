@@ -236,6 +236,8 @@ try {
       rackUnit: document.getElementById('zone-field')?.getAttribute('data-unit') || '',
       /* SELECTOR ONLY: a cabinet is an SVG group now; its colour is the fill of its top face (the claim below is unchanged) */
       rackFill: occupied ? getComputedStyle(occupied.querySelector('.rk-top')).fill : '',
+      /* PRD-DATAHALL-BMS-ISO (v3.89.0): normal equipment is a neutral body with a green status lamp */
+      rackLamp: occupied && occupied.querySelector('.rk-lamp') ? getComputedStyle(occupied.querySelector('.rk-lamp')).fill : '',
       balanceLabel: document.querySelector('#bb-balance')?.previousElementSibling?.textContent?.trim(),
       balance: document.getElementById('bb-balance')?.textContent?.trim(),
       balanceBasis: document.getElementById('bb-balsub')?.textContent?.trim(),
@@ -249,9 +251,15 @@ try {
      inlet is no longer one fixed green: it sits between the 25.4 C target stop and the 27 C warning
      stop. The invariant this pinned is semantic — inside the recommended envelope must read on the
      normal (green) side, never amber or red — so assert the channel order, not a literal swatch. */
+  /* v3.89.0 (PRD-DATAHALL-BMS-ISO, owner R185 "kayak bukan BMS") supersedes the ramp: a normal cabinet is a neutral
+     body (no hue, so never amber or red) with a green status lamp. The invariant is unchanged: inside the envelope
+     reads normal. */
   const rampRgb = (hall.rackFill.match(/\d+/g) || []).map(Number);
-  assert.ok(rampRgb.length === 3 && rampRgb[1] >= rampRgb[0] && rampRgb[1] > rampRgb[2],
-    `25.x C is inside 18-27 C and must render on the normal (green) side of the ramp, got ${hall.rackFill}`);
+  assert.ok(rampRgb.length === 3 && Math.max(...rampRgb) - Math.min(...rampRgb) <= 24,
+    `25.x C is inside 18-27 C and its cabinet body must read neutral (not amber or red), got ${hall.rackFill}`);
+  const lampRgb = (hall.rackLamp.match(/\d+/g) || []).map(Number);
+  assert.ok(lampRgb.length === 3 && lampRgb[1] > lampRgb[0] && lampRgb[1] > lampRgb[2],
+    `25.x C is inside 18-27 C and its status lamp must read green, got ${hall.rackLamp}`);
   assert.equal(hall.balanceLabel, 'Hall IT reconciliation');
   assert.equal(hall.balance, 'UNAVAILABLE', 'no hall EPMS submeter must fail closed');
   assert.match(hall.balanceBasis, /planning reference only/i);
