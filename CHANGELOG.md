@@ -11,6 +11,43 @@ release sections rather than semver.
 
 ---
 
+## v3.87.0 — 2026-11-22 — Less text, nothing said twice
+
+Owner (R185): "Sepertinya masih ada tulisan2 yg tidak perlu atau duplicate masih over." PRD-CONV-BMS-DECLUTTER.
+Measured on v3.86.1 (1440 × 900, first screen, words outside the drawing): chiller 239, fuel 201, water 249, fire 160,
+ICT 154, EPMS 192. Every sheet page showed "Simulated" three times. Several readings appeared twice on one screen.
+
+### Changed
+- New `js/conv/quiet.js` on the 8 Conventional pages. An element marked `[data-quiet]` is hidden and its text becomes a
+  line of its host's tooltip. When a script rewrites the element, the tooltip line follows. `[data-dup]` hides a
+  second copy of a reading. Both stay in the DOM, so `aria-describedby` and the provenance gate still read them
+  (`css/conv-live.css`).
+- The provenance sentence under each status strip is now the strip's tooltip. The banner still shows "Simulated".
+- Chiller: the CHWS/CHWR/ΔT/flow and duty readings leave the alarm strip (they stay in the Primary CHW header panel).
+  The second line-style legend above the sheet is hidden. The subtitle, the hall-selector caption and the
+  study-basis qualifier move to tooltips.
+- Fuel: the tag line and the five KPI sub-lines (formulas and qualifiers) move to tooltips.
+- Water: the basis-card values, three KPI sub-lines, the process-flow subtitle and the WUE formula note move to
+  tooltips. The second Instant WUE reading in the WUE panel is hidden.
+- Fire: the top "Basis: IT … racks" line is hidden; the CURRENT card shows the same.
+- EPMS: the strip's open-breaker count is hidden in the single-line view; the rail shows it.
+- Result (first screen words): chiller 194, fuel 151, water 197, fire 137, ICT 134, EPMS 169.
+
+### Gates
+- `tools/test-conv-declutter.mjs` DC1–DC5 (ship-gate): word budgets, provenance in a tooltip with "Simulated" still
+  shown, every quiet text in its host tooltip, every duplicate hidden while its reading stays shown, and the
+  tooltip follows a rewrite. On v3.86.1, 12 of 33 checks fail.
+- `tools/audit-conv-text.mjs`: measures first-screen words and repeated labels/readings (no verdict).
+
+### Fixed
+- `js/rz-trend.js`: closing a trend opened from a number that a panel rebuilds every tick (chiller CHW flow
+  reconciliation) sent focus to the page body. Focus now goes to the number's replacement (same `data-trend`).
+  `test-conv-motion` MO1 found it once the hidden strip readings stopped being the first number on the page. The test
+  now accepts the replacement and runs its keyboard step on it.
+- `tools/conv-point-coverage-baseline.json`: fuel `const` 27 → 22 and water 24 → 20, by hand with the reason recorded.
+  Those were the formula and qualifier sub-lines that are now tooltips.
+- `data/conv-parameters.json` rebuilt (read counts).
+
 ## v3.86.1 — 2026-11-22 — The chiller flow runs on its own layer
 
 PRD-CONV-BMS-LIVE follow-up. The v3.86.0 release gate (run after push) failed three checks on the chiller sheet: idle

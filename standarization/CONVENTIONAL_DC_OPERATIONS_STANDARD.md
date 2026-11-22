@@ -288,6 +288,13 @@ Before release:
     to `conv-<page>-*` RZExplain entries, never back onto the page. Units are written once (field
     attribute, legend chip, column key), not on every cell. Chiller T4 was a ratchet at 28 until
     the W2 redraw (CH-M-101) took it to 0; the ratchet table is now empty. Proven red on v3.59.0 (6 of 6 fail).
+23a. **First screen, said once (R185, PRD-CONV-BMS-DECLUTTER, `tools/test-conv-declutter.mjs`, ship gate).** First
+    screen at 1440 × 900, words outside the drawing: chiller <= 200, fuel <= 160, water <= 200, fire <= 145, ICT <= 140,
+    EPMS <= 180, datahall <= 310. A formula, qualifier or caption is marked `data-quiet` and read in its host's tooltip
+    (`js/conv/quiet.js` keeps the tooltip current when a script rewrites it). The strip provenance sentence is quiet:
+    it stays in the DOM for `aria-describedby` and PRD-Q06, and "Simulated" stays shown in the banner. A second copy
+    of a reading on the same screen carries `data-dup="<id of the copy that stays>"`. Never delete a quiet element
+    a script writes; mark it.
 24. **One reading, one place (W3 polish).** A KPI tile carries a number and at most a short qualifier; the
     explanation goes to its tooltip or basis drawer. A tile that repeats another tile's number is removed or
     replaced by a figure the operator does not already have: the fuel "N+1 scenario" tile printed the same

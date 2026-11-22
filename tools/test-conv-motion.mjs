@@ -167,9 +167,9 @@ for (const [file, id] of PAGES) {
       const x = document.querySelector('.rz-trend [data-close]');
       x.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, detail: 1 }));
       const mOut = motion(), out = Object.assign(read(), { props: mOut.props, dur: mOut.dur });
-      await settle(mOut); await new Promise((r) => setTimeout(r, 120)); const end = read(); const focus = document.activeElement === p;
+      await settle(mOut); await new Promise((r) => setTimeout(r, 120)); const end = read(); const a0 = document.activeElement; const focus = a0 === p || (!p.isConnected && !!a0 && a0.getAttribute('data-trend') === p.getAttribute('data-trend'));
       /* keyboard stays instant (MOTION_STANDARD §1): Enter on the focused number opens at rest, Escape hides at once */
-      p.focus(); p.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })); await f2();
+      const q = p.isConnected ? p : a0; q.focus(); q.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true })); await f2();
       const kin = Object.assign(read(), { props: motion().props });
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true })); await f2(); const kout = read();
       /* Enter on a number inside a basis tile opened the trend AND the tile's basis drawer (v3.82.0): Escape closed the

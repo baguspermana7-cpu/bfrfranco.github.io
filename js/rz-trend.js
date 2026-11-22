@@ -643,6 +643,13 @@
     }
     try { if (/^#trend=/.test(root.location.hash)) root.history.replaceState(null, '', root.location.pathname + root.location.search); } catch (e) { /* see draw() */ }
     var t = lastTrigger; lastTrigger = null;
+    /* a panel that rebuilds its HTML each tick replaced the number while the trend was open: focus its replacement
+       (same data-trend / data-point), never the page body (v3.87.0, test-conv-motion MO1) */
+    if (t && !t.isConnected && t.getAttribute) {
+      var key = t.getAttribute('data-trend') ? '[data-trend="' + t.getAttribute('data-trend') + '"]' : (t.getAttribute('data-point') ? '[data-point="' + t.getAttribute('data-point') + '"]' : null);
+      var alt = key ? [].slice.call(doc.querySelectorAll(key)).filter(function (n) { return n.getClientRects().length; })[0] : null;
+      if (alt) t = alt;
+    }
     if (t && t.isConnected && t.focus) { try { t.focus({ preventScroll: true }); } catch (e) { t.focus(); } }
   }
   function optsOf(t) {

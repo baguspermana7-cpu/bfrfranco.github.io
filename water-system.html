@@ -77,7 +77,7 @@
     <link rel="stylesheet" href="css/conv-vfx.css?v=20261118-5eed9b2f">
     <script src="js/conv/vfx.js?v=20261117-89056876"></script>
     <script src="js/conv/history.js?v=20261120-8d390d7e"></script>
-    <script src="js/rz-trend.js?v=20261121-1b095901"></script>
+    <script src="js/rz-trend.js?v=20261122-98f6c100"></script>
     <script src="js/conv/water-sheet.js?v=20261120-d53cd730"></script>
     <script src="js/conv/sheet-truth.js?v=20261118-eaae14ee"></script>
     <script src="js/conv/payloads.js?v=20261120-86f5437d"></script>
@@ -90,7 +90,7 @@
     <script src="js/conv-engine.js?v=2.4.0"></script>
     <!-- v1.134.3 — generated parameter registry + the ONE shared basis drawer.
          Replaces provenance restated by hand; see js/rz-basis-drawer.js. -->
-    <script src="js/conv-parameters.js?v=20261121-a2199c95"></script>
+    <script src="js/conv-parameters.js?v=20261122-39db9e4b"></script>
     <!-- v1.134.25 — RZExplain, the site glossary engine. The cockpits were the only
          substantial pages carrying none of it, so terms an operator has to read
          (approach temperature, cycles of concentration, N+1, WUE) had nowhere to go.
@@ -102,9 +102,10 @@
     <script src="js/rz-sheet.js?v=20261121-67db3ea5" defer></script>
     <link rel="stylesheet" href="css/conv-point.css?v=20261120-8daa6374">
     <link rel="stylesheet" href="css/conv-motion.css?v=20261121-88ede45d">
-    <link rel="stylesheet" href="css/conv-live.css?v=20261121-07a6a408">
+    <link rel="stylesheet" href="css/conv-live.css?v=20261122-9e4f1c46">
     <script src="js/conv/point-status.js?v=20261121-9a98a915"></script>
 <script src="js/conv/motion.js?v=20261121-f2d16763" defer></script>
+<script src="js/conv/quiet.js?v=20261122-cde28b5e" defer></script>
 <script src="js/rz-ask.js?v=20261113-42137266" data-rz-ask-index="data/explain/water-system.json" defer></script>
     <!-- v1.42.5 — Semantic line model. Allows probe-line-model.mjs to audit
          the static SVG pipes tagged with data-rz-line / data-from / data-to
@@ -461,7 +462,7 @@
             .kpi-grid > .kpi .th { display: flex; align-items: center; }
         }
 </style>
-    <script src="js/rz-version.js?v=20261121-a36f006f" defer></script>
+    <script src="js/rz-version.js?v=20261122-0cd2d357" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
 <style id="rz-skiplink-v1">
@@ -511,16 +512,16 @@
         <span class="alarm-chip">Scenario <b id="scenarioName">UNAVAILABLE</b></span>
         <span class="alarm-chip">Data Quality <b aria-describedby="rz-prov-water-strip" id="dataQuality">UNAVAILABLE</b></span>
     </div>
-    <p class="rz-prov" id="rz-prov-water-strip" data-rz-provenance="simulated" data-rz-prov-basis="conv-engine.js scenario; data quality = the model's own flag; page clock = your browser time"><b>Simulated</b> · conv-engine.js scenario; data quality = the model's own flag; page clock = your browser time</p>
+    <p class="rz-prov" id="rz-prov-water-strip" data-quiet="#alarmStrip" data-rz-provenance="simulated" data-rz-prov-basis="conv-engine.js scenario; data quality = the model's own flag; page clock = your browser time"><b>Simulated</b> · conv-engine.js scenario; data quality = the model's own flag; page clock = your browser time</p>
 
     <section class="ops-context" aria-label="Site water engineering basis">
         <div class="basis-card current" data-basis="current">
             <div class="basis-title" id="waterSiteLabel">Current engine basis · site-wide plant</div>
-            <div class="basis-value" id="water-current-basis-value" data-const>Site scope · engine basis loading…</div>
+            <div class="basis-value" id="water-current-basis-value" data-quiet=".basis-card" data-const>Site scope · engine basis loading…</div>
         </div>
         <div class="basis-card study" data-basis="study">
             <div class="basis-title" data-const>Site capacity study · 40 MW IT</div>
-            <div class="basis-value"><span class="basis-guard">READ-ONLY PLANNING BASIS</span> · no effect on current site pumps, flow, or WUE</div>
+            <div class="basis-value" data-quiet=".basis-card"><span class="basis-guard">READ-ONLY PLANNING BASIS</span> · no effect on current site pumps, flow, or WUE</div>
         </div>
     </section>
 
@@ -530,18 +531,18 @@
         <div class="kpi hero">
             <h3>Instant WUE</h3>
             <div class="v"><span id="kWue" data-basis-param="water.wue_l_per_kwh" data-point="water.wue_l_per_kwh" data-pt-label="Instant WUE" data-pt-unit="L/kWh" data-pt-digits="2" tabindex="0" role="button">&mdash;</span> <small>L/kWh</small></div>
-            <div class="th" id="kWueTh" data-const data-basis-param="water.wue_target_l_per_kwh"
+            <div class="th" id="kWueTh" data-quiet=".kpi" data-const data-basis-param="water.wue_target_l_per_kwh"
                  tabindex="0" role="button" title="WUE design target — click for basis">Target &middot; computed</div>
         </div>
         <div class="kpi">
             <h3>Cooling Makeup Flow</h3>
             <div class="v"><span id="kMakeup" data-basis-param="water.flow_lpm_for_wue" data-point="water.flow_lpm_for_wue" data-pt-label="Cooling makeup flow" data-pt-unit="L/min" data-pt-digits="1" data-pt-cls="ENGINE" tabindex="0" role="button">&mdash;</span> <small>L/min</small></div>
-            <div class="th" id="kMakeupTh" data-const>Site total &middot; derived from WUE &times; IT load</div>
+            <div class="th" id="kMakeupTh" data-quiet=".kpi" data-const>Site total &middot; derived from WUE &times; IT load</div>
         </div>
         <div class="kpi">
             <h3>Total Treatment Flow</h3>
             <div class="v"><span id="kTotal" data-point="water.total_treated_lpm" data-pt-label="Total treatment flow" data-pt-unit="L/min" data-pt-digits="1" data-pt-cls="ENGINE">&mdash;</span> <small>L/min</small></div>
-            <div class="th" id="kTotalTh" data-const>Site makeup + domestic/process</div>
+            <div class="th" id="kTotalTh" data-quiet=".kpi" data-const>Site makeup + domestic/process</div>
         </div>
         <div class="kpi">
             <h3>Filter DP</h3>
@@ -560,7 +561,7 @@
         <div class="panel" data-rz-doc-section="ws-pid" data-rz-doc-label="Water treatment and cooling-tower P&amp;ID">
             <div class="panel-title">
                 Water Treatment Process Flow
-                <span class="sub">— raw &rarr; filtration &rarr; treatment &rarr; cooling makeup / domestic / blowdown</span>
+                <span class="sub" data-quiet=".panel-title">— raw &rarr; filtration &rarr; treatment &rarr; cooling makeup / domestic / blowdown</span>
             </div>
             <div class="diagram-wrap">
             <div id="water-sheet-host" class="water-sheet-host hmi-depth" data-theme="dark" data-rz-authored-basis="WT-M-101 · The water treatment train and the cooling-tower cell — raw and domestic tank levels, basin level, filter differential pressure, line pressures, chlorine dosing and residual, UV intensity, treated TDS, pump role/state — are simulated plant state; tank and basin capacities are page-authored design selections (raw storage sized for four hours of the engine's total treated flow, 608 L/min → 146 m³ → 150 m³ nominal; domestic 30 m³). conv-engine.js models the site water BALANCE (WUE, cooling makeup, evaporation, blowdown, drift, domestic draw, treated total, condenser-water temperatures and heat rejection) — those values carry their registry hook and evidence mark on the drawing; everything else has no engine parameter to trace to."></div>
@@ -609,9 +610,9 @@
                 <div class="insp-row"><span class="k">IT Load · site</span><span class="vv unavailable" id="iIt" data-const data-basis-param="site.it_load_kw" tabindex="0" role="button">UNAVAILABLE</span></div>
                 <div class="insp-row"><span class="k" data-const>IT Energy · site (1 h)</span><span class="vv unavailable" id="iItE" data-const>UNAVAILABLE</span></div>
                 <div class="insp-row"><span class="k" data-const>WUE-incl water · site (1 h)</span><span class="vv unavailable" id="iWaterHr" data-point="water.makeup_l_per_h" data-pt-label="WUE-incl water, site, 1 h" data-pt-unit="L" data-pt-digits="0" data-pt-cls="ENGINE">UNAVAILABLE</span></div>
-                <div class="insp-row"><span class="k">Instant WUE · site</span><span class="vv unavailable" id="iWue" data-basis-param="water.wue_l_per_kwh" data-point="water.wue_l_per_kwh" data-pt-label="Instant WUE" data-pt-unit="L/kWh" data-pt-digits="2" tabindex="0" role="button">UNAVAILABLE</span></div>
+                <div class="insp-row" data-dup="kWue"><span class="k">Instant WUE · site</span><span class="vv unavailable" id="iWue" data-basis-param="water.wue_l_per_kwh" data-point="water.wue_l_per_kwh" data-pt-label="Instant WUE" data-pt-unit="L/kWh" data-pt-digits="2" tabindex="0" role="button">UNAVAILABLE</span></div>
                 <div class="insp-row"><span class="k" data-const>24 h WUE · historian</span><span class="vv unavailable" id="iWue24" data-const>UNAVAILABLE</span></div>
-                <div class="balance-note" id="balanceNote" data-explain="conv-water-wue-basis">WUE = water &divide; IT energy &middot; site</div>
+                <div class="balance-note" id="balanceNote" data-quiet=".panel" data-explain="conv-water-wue-basis">WUE = water &divide; IT energy &middot; site</div>
             </div>
 
             <div class="panel" data-rz-doc-section="ws-scope" data-rz-doc-label="Site water scope">
