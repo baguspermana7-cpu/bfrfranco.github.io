@@ -240,10 +240,23 @@
     if (window.RZEpmsSheets && window.RZEpmsSheets.markConstants) window.RZEpmsSheets.markConstants(sheet.svg, SH[cur].nodes);
   }
   var opener = null;
+  /* PRD-CONV-EQUIPMENT-INSIDE P4a: a transformer or any of the four symbols of a UPS opens its drawn inside with one click;
+     the units come from THIS hall's solve (js/conv/epms-internals.js), the clicked UPS part picks the block shown first */
+  var PART_BLOCK = { rec: 'conversion', inv: 'conversion', bat: 'battery', ss: 'bypass' };
+  function deepOpts(n) {
+    var I = window.RZEpmsInternals;
+    if (!LIVE || !I || !window.RZConvInternals) return null;
+    var h = cur, o = I.unitOf(n, SH[h], ST[h], RES[h]); if (!o) return null;
+    function now() { var x = I.unitOf(n, SH[h], ST[h], RES[h]); return x ? x.units : []; }
+    return { internal: { classKey: o.classKey, unit: o.index, block: o.focus ? PART_BLOCK[o.focus] : undefined, scope: 'E-S-102 · Hall ' + HALLS[h],
+      source: 'the E-S-102 simulation solve of hall ' + HALLS[h], message: function (u) { return lastMsg && u && lastMsg.indexOf(u.tag) >= 0 ? lastMsg : null; },
+      fleet: now, snapshot: function () { return C.snapshot; },
+      payloadFor: function (i) { var u = now()[i], id = u && (u.parts ? u.parts.inv : u.id); var nn = id ? byId(id) : null; return nn ? payload(nn) : null; } } };
+  }
   function render() {
     var T = window.RZConvTruth;
     if (!opener && T) {
-      var base = T.opener(payload, '#epms-lv-host');
+      var base = T.opener(payload, '#epms-lv-host', deepOpts);
       opener = function (n, api, el) {
         if (armed && armed.id !== n.id) { armed = null; say('Selection dropped: ' + n.tag + ' opened', false); }
         base(n, api, el);

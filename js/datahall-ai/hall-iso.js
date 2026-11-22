@@ -22,7 +22,7 @@
   var panel = doc.getElementById('p-hall'), svg = doc.getElementById('hSvg');
   if (!panel || !svg) return;
 
-  var geo = null, model = null, inst = null, host = null, bar = null, proj = null, timer = 0, sig = '';
+  var geo = null, model = null, inst = null, host = null, wrap = null, bar = null, proj = null, timer = 0, sig = '';
   function pad2(n) { return (n < 10 ? '0' : '') + n; }
   function stored() { try { var v = win.localStorage.getItem(KEY); return v === 'iso' || v === 'plan' ? v : null; } catch (e) { return null; } }
   function store(p) { try { win.localStorage.setItem(KEY, p); } catch (e) { /* storage blocked: the choice holds for this page */ } }
@@ -40,7 +40,8 @@
       '.dh-proj button[aria-pressed="true"]{color:var(--t1);background:var(--bg3)}',
       '.dh-proj button:focus-visible{outline:2px solid var(--c);outline-offset:-2px}',
       '@media (max-width:600px){.dh-proj button{height:40px;line-height:40px;min-width:56px}}',
-      '#hIso{display:none;margin:6px 0 0;background:var(--bg2);border:1px solid var(--bd);border-radius:4px;overflow:hidden}',
+      '#hIsoWrap{display:none;margin:6px 0 0}#p-hall[data-dh-proj="iso"] #hIsoWrap{display:block}',
+      '#hIso{display:none;box-sizing:content-box;background:var(--bg2);border:1px solid var(--bd);border-radius:4px;overflow:hidden}',
       '#p-hall[data-dh-proj="iso"] #hIso{display:block}',
       '#hSvg[data-dh-cropped] [data-dh-off]{display:none}',
       '#p-hall[data-dh-proj="iso"] #hallLayers,#p-hall[data-dh-proj="iso"] .hp-key{display:none}'
@@ -62,7 +63,10 @@
     /* DC AI traceability (test-dcai-coverage): every number the 3D floor prints comes from here */
     host.setAttribute('data-rz-authored-basis', 'row-pair heat = racks per pair x design rack kW (engine counts multiplied, not a reading); ' +
       'rack inlet and hot-aisle values are the plan\'s simulated aisle readouts, or the engine design supply / return air before the first readout');
-    svg.parentNode.insertBefore(host, svg.nextSibling);   /* right under the plan's header band; the layer bar follows */
+    /* the floor measures this wrapper, never #hIso itself: the renderer sets the host's width from what it measures, so
+       measuring the bordered host shrank it 2 px per resize, for ever, until the hall vanished (owner, 2026-11-22) */
+    wrap = doc.createElement('div'); wrap.id = 'hIsoWrap'; wrap.appendChild(host);
+    svg.parentNode.insertBefore(wrap, svg.nextSibling);   /* right under the plan's header band; the layer bar follows */
   }
 
   /* ---- the model the floor renderer reads ---- */
@@ -102,7 +106,7 @@
     if (inst && inst.destroy) inst.destroy();
     host.setAttribute('data-rz-hall', String(win.currentDH || 1));
     inst = win.RZFloorPlan.render(host, model, {
-      projection: 'iso', toggle: false, mode: 'temp', maxBands: 1, projKey: KEY,
+      projection: 'iso', toggle: false, mode: 'temp', maxBands: 1, projKey: KEY, measure: wrap,
       /* the whole hall in one screen on a wide stage; a phone keeps the minimum unit and pans inside the stage */
       height: function () { return Math.max(420, (win.innerHeight || 900) - 40); }, watchHeight: false,
       rackTag: function (i) { return model.racks[i].ref.replace('rack-unit:', ''); },

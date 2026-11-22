@@ -15,6 +15,8 @@
    D6  a 3D rack carries the plan's equipment reference (rack-unit:Rnn-kk), and a click on it opens the same HMI the
        plan opens
    D7  390: Plan by default; page scrollWidth <= viewport in Plan and in 3D; 0 page errors in every run
+   D8  the 3D floor holds its size for 6 s and follows a window narrowed and widened back (it once shrank 2 px per
+       resize round until it vanished: the renderer measured the bordered host it then resized)
    Usage: node tools/test-dcai-hall-iso.mjs [--shots=<dir>] */
 import fs from 'fs';
 import http from 'http';
@@ -202,6 +204,24 @@ for (const theme of ['dark', 'light']) {
   ok('D7', s1.isoShown && s1.docW <= s1.vw + 1, `${T}: 3D shown ${s1.isoShown}, page scrollWidth ${s1.docW} in ${s1.vw}`);
   if (SHOTS) await pg.screenshot({ path: path.join(SHOTS, 'dcai-iso-dark-390.png') });
   ok('D7', !pg.errors.length, `${T}: page errors ${pg.errors.slice(0, 2).join(' | ')}`);
+  await pg.close();
+}
+
+/* ---------- D8: the 3D floor holds its size (owner 2026-11-22: "bergerak membesar kemudian mengecil kemudian hilang").
+   The renderer sets the host width from what it measures; measuring the bordered host itself shrank it 2 px per
+   ResizeObserver round, for ever. Now: no change over 6 s, and a window narrowed and widened again restores it. ---------- */
+{
+  const T = '1440 dark D8';
+  const pg = await open(1440, 'dark', 'iso');
+  const size = () => pg.evaluate(() => { const h = document.getElementById('hIso'); if (!h) return null; const b = h.getBoundingClientRect(); return [Math.round(b.width), Math.round(b.height)]; });
+  const a = await size(); await wait(6000); const b = await size();
+  ok('D8', a && b && a[0] > 600 && Math.abs(a[0] - b[0]) <= 1 && Math.abs(a[1] - b[1]) <= 1, `${T}: 3D floor moved on its own: ${JSON.stringify(a)} -> ${JSON.stringify(b)} in 6 s`);
+  await pg.setViewport({ width: 1100, height: 1000 }); await wait(1500);
+  const n = await size();
+  await pg.setViewport({ width: 1440, height: 1000 }); await wait(1500);
+  const w = await size();
+  ok('D8', n && w && n[0] < b[0] && Math.abs(w[0] - b[0]) <= 2, `${T}: narrowed ${JSON.stringify(n)}, widened back ${JSON.stringify(w)}, need ${JSON.stringify(b)}`);
+  ok('D8', !pg.errors.length, `${T}: page errors ${pg.errors.slice(0, 2).join(' | ')}`);
   await pg.close();
 }
 

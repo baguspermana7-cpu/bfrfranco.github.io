@@ -1,7 +1,7 @@
 # PRD-CONV-EQUIPMENT-INSIDE — one click shows the process inside the equipment (owner R186)
 
-Status: P1 BUILT v3.90.0 (gates test-conv-equipment-inside IN1, test-conv-point-truth TR1); P2a BUILT v3.91.0 (engine 2.5.0 cycle, gate test-conv-chiller-cycle CY0–CY5); P2b P-h chart BUILT v3.91.0 (js/conv/ph-chart.js, gate test-conv-ph-chart PH1–PH6); P3 BUILT v3.91.0 for the CDW / secondary CHW pump, cooling-tower cell and CRAH (js/conv/internals/pump.js, tower.js, crah.js, gate test-conv-internals-p3 P3-1..P3-6; still open in P3: pump curve tab, valve %/Cv, expansion tank, psychrometric chart, primary CHW pump symbols open the loop inspector because their readings are the page's loop simulation); still open in P2: phase slugs on refrigerant lines (§5.3), compressor level 2 and surge map (§5.4), fault states (§5.6); P3–P7 open. Implemented drive rule (supersedes §5.4 text): speed = max(min speed, √(lift / rating lift), load), IGV = load / speed (centrifugal flow ∝ speed). Written 2026-11-22 for execution (owner rule: comments → PRD first; "Jangan tanya saya": the defaults of
-§13 stand unless the owner overrides them).
+Status: P1 BUILT v3.90.0 (gates test-conv-equipment-inside IN1, test-conv-point-truth TR1); P2a BUILT v3.91.0 (engine 2.5.0 cycle, gate test-conv-chiller-cycle CY0–CY5); P2b P-h chart BUILT v3.91.0 (js/conv/ph-chart.js, gate test-conv-ph-chart PH1–PH6); P3 BUILT v3.91.0 for the CDW / secondary CHW pump, cooling-tower cell and CRAH (js/conv/internals/pump.js, tower.js, crah.js, gate test-conv-internals-p3 P3-1..P3-6; still open in P3: pump curve tab, valve %/Cv, expansion tank, psychrometric chart, primary CHW pump symbols open the loop inspector because their readings are the page's loop simulation); still open in P2: phase slugs on refrigerant lines (§5.3), compressor level 2 and surge map (§5.4), fault states (§5.6); P4–P7 open. Implemented drive rule (supersedes §5.4 text): speed = max(min speed, √(lift / rating lift), load), IGV = load / speed (centrifugal flow ∝ speed). Written 2026-11-22 for execution (owner rule: comments → PRD first; "Jangan tanya saya": the defaults of
+§13 stand unless the owner overrides them). P4 PRD APPROVED 2026-11-22 (`P4-ELECTRICAL.md`: measured gaps G1–G6, engine 2.6.0 keys from Regulation (EU) 548/2014, laws EL0–EL8).
 Scope: the Conventional BMS pages `chiller-plant`, `water-system`, `fuel-system`, `fire-system`, `EPMS_Telemetry`,
 `datahall`, `ict`, `dc-conventional`. `datahallAI.html` and `js/datahall-ai/*` are out of scope (DC AI session).
 Builds on `PRD-CONV-EQUIPMENT-TRUTH` (2026-11-18, modal v2, `js/conv/internals.js`). Where they disagree, this one wins.
@@ -330,11 +330,11 @@ fail because the block does not exist).
 |---|---|---|
 | P1 | I1–I6 entry (click → modal INSIDE), deep link, inspector hand-off; TR1 one SIM store (fixes M6); IN gate | v3.90.0 |
 | P2 | chiller cycle engine block + R-134a tables + Phase view + P-h tab + compressor level 2; CY gates | v3.91.0 |
-| P3 | chiller plant rest: pumps (curve), tower cell, CRAH, valves, expansion tank | v3.90.0 |
-| P4 | electrical: UPS, transformer, breaker/relay, ATS/PDU | v3.91.0 |
-| P5 | fire classes | v3.92.0 |
-| P6 | water and fuel classes, genset extension | v3.93.0 |
-| P7 | data hall rack/CRAH, ICT devices; coverage IN2 at 100 % | v3.94.0 |
+| P3 | chiller plant rest: pumps, tower cell, CRAH (BUILT); pump curve tab, valves, expansion tank (open) | v3.91.0 |
+| P4 | electrical, detailed in `P4-ELECTRICAL.md`: P4a transformer + UPS (engine 2.6.0, UPS loss into the simulation), P4b breaker / relay / switchboard, P4c D3 classes + generator on EPMS | v3.92.0 – v3.94.0 |
+| P5 | fire classes | v3.95.0 |
+| P6 | water and fuel classes, genset extension | v3.96.0 |
+| P7 | data hall rack/CRAH, ICT devices; coverage IN2 at 100 % | v3.97.0 |
 
 Each release: full Conventional release gate, live screenshots of 3 classes, owner-facing summary.
 

@@ -5590,6 +5590,153 @@
       },
       "display": "internal",
       "displayReason": "Drawn inside the pump / CRAH equipment modal (PRD-CONV-EQUIPMENT-INSIDE P3); no cockpit reads it directly."
+    },
+    {
+      "id": "electrical.dist_tx_type",
+      "label": "Distribution transformer type",
+      "unit": "",
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (engine 2.6.0)",
+        "asOf": "2026-11-22",
+        "method": "Indoor cast-resin dry-type unit (IEC 60076-11) assumed with the plan E-1 rating; it selects Table I.2 of Regulation (EU) 548/2014. No vendor selection exists."
+      },
+      "display": "internal",
+      "displayReason": "Drawn inside the transformer / UPS equipment modal of EPMS_Telemetry (PRD-CONV-EQUIPMENT-INSIDE P4a); no cockpit reads it directly."
+    },
+    {
+      "id": "electrical.dist_tx_p0_w",
+      "label": "Distribution transformer no-load loss (EU Tier 2 maximum)",
+      "unit": "W",
+      "scope": "plant",
+      "evidenceClass": "STANDARD",
+      "source": {
+        "ref": "Regulation (EU) No 548/2014, Annex I (data/sources/eu-548-2014/README.md)",
+        "section": "Table I.2, 3 150 kVA, Tier 2 (1 July 2021), maximum no-load losses",
+        "asOf": "2026-11-22",
+        "method": "Regulatory maximum for a dry-type 3 150 kVA unit (Um <= 24 kV / <= 1.1 kV); no test report exists, so the loss is an upper bound."
+      },
+      "display": "internal",
+      "displayReason": "Drawn inside the transformer / UPS equipment modal of EPMS_Telemetry (PRD-CONV-EQUIPMENT-INSIDE P4a); no cockpit reads it directly."
+    },
+    {
+      "id": "electrical.dist_tx_pk_w",
+      "label": "Distribution transformer load loss (EU Tier 2 maximum)",
+      "unit": "W",
+      "scope": "plant",
+      "evidenceClass": "STANDARD",
+      "source": {
+        "ref": "Regulation (EU) No 548/2014, Annex I (data/sources/eu-548-2014/README.md)",
+        "section": "Table I.2, 3 150 kVA, Tier 2 (1 July 2021), maximum load losses",
+        "asOf": "2026-11-22",
+        "method": "Regulatory maximum at rated current; an upper bound."
+      },
+      "display": "internal",
+      "displayReason": "Drawn inside the transformer / UPS equipment modal of EPMS_Telemetry (PRD-CONV-EQUIPMENT-INSIDE P4a); no cockpit reads it directly."
+    },
+    {
+      "id": "electrical.hv_tx_pei_min",
+      "label": "Power transformer minimum Peak Efficiency Index (EU Tier 2)",
+      "unit": "",
+      "scope": "plant",
+      "evidenceClass": "STANDARD",
+      "source": {
+        "ref": "Regulation (EU) No 548/2014, Annex I (data/sources/eu-548-2014/README.md)",
+        "section": "Table I.7, liquid-immersed large power, 63 MVA, Tier 2",
+        "asOf": "2026-11-22",
+        "method": "Regulatory minimum PEI; the P0 / Pk split is not published, so TX-1/2 losses stay not modelled."
+      },
+      "display": "internal",
+      "displayReason": "Drawn inside the transformer / UPS equipment modal of EPMS_Telemetry (PRD-CONV-EQUIPMENT-INSIDE P4a); no cockpit reads it directly."
+    },
+    {
+      "id": "electrical.dist_tx_loss_kw_normal",
+      "label": "Distribution transformer loss at design load (upper bound)",
+      "unit": "kW",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "(P0 + Pk L^2) / 1000, L = design load fraction",
+      "deps": [
+        "electrical.dist_tx_p0_w",
+        "electrical.dist_tx_pk_w",
+        "electrical.dist_tx_load_pct_normal"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv() P4a keys",
+        "asOf": "2026-11-22",
+        "method": "IEC 60076-1 split of no-load and load loss, load loss with the square of the load; P0 / Pk are EU Tier 2 maxima."
+      },
+      "display": "internal",
+      "displayReason": "Drawn inside the transformer / UPS equipment modal of EPMS_Telemetry (PRD-CONV-EQUIPMENT-INSIDE P4a); no cockpit reads it directly.",
+      "formulaExpr": "( electrical.dist_tx_p0_w + electrical.dist_tx_pk_w * ( electrical.dist_tx_load_pct_normal / 100 ) * ( electrical.dist_tx_load_pct_normal / 100 ) ) / 1000"
+    },
+    {
+      "id": "electrical.dist_tx_eff_normal",
+      "label": "Distribution transformer efficiency at design load (lower bound)",
+      "unit": "",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "P / (P + loss), P = kVA L pf",
+      "deps": [
+        "electrical.dist_tx_kva",
+        "electrical.dist_tx_load_pct_normal",
+        "electrical.power_factor_design",
+        "electrical.dist_tx_loss_kw_normal"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv() P4a keys",
+        "asOf": "2026-11-22",
+        "method": "Definition of efficiency at the design load."
+      },
+      "display": "internal",
+      "displayReason": "Drawn inside the transformer / UPS equipment modal of EPMS_Telemetry (PRD-CONV-EQUIPMENT-INSIDE P4a); no cockpit reads it directly.",
+      "formulaExpr": "electrical.dist_tx_kva * electrical.dist_tx_load_pct_normal / 100 * electrical.power_factor_design / ( electrical.dist_tx_kva * electrical.dist_tx_load_pct_normal / 100 * electrical.power_factor_design + electrical.dist_tx_loss_kw_normal )"
+    },
+    {
+      "id": "electrical.ups_system_in_kw",
+      "label": "UPS system input power",
+      "unit": "kW",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "system output / eff",
+      "deps": [
+        "electrical.ups_system_kw",
+        "electrical.ups_efficiency"
+      ],
+      "formulaExpr": "electrical.ups_system_kw / electrical.ups_efficiency",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "snapshot electrical P4a keys",
+        "asOf": "2026-11-22",
+        "method": "Same rule as ups_loss_kw (input above output by the inverse efficiency)."
+      },
+      "display": "internal",
+      "displayReason": "Drawn inside the transformer / UPS equipment modal of EPMS_Telemetry (PRD-CONV-EQUIPMENT-INSIDE P4a); no cockpit reads it directly."
+    },
+    {
+      "id": "electrical.ups_system_loss_kw",
+      "label": "UPS system loss",
+      "unit": "kW",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "system output x (1/eff - 1)",
+      "deps": [
+        "electrical.ups_system_kw",
+        "electrical.ups_efficiency"
+      ],
+      "formulaExpr": "electrical.ups_system_kw * ( 1 / electrical.ups_efficiency - 1 )",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "snapshot electrical P4a keys",
+        "asOf": "2026-11-22",
+        "method": "Same rule as ups_loss_kw; systems x this = ups_loss_kw."
+      },
+      "display": "internal",
+      "displayReason": "Drawn inside the transformer / UPS equipment modal of EPMS_Telemetry (PRD-CONV-EQUIPMENT-INSIDE P4a); no cockpit reads it directly."
     }
   ]
 }

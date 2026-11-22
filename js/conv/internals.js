@@ -39,7 +39,7 @@
     var f = FMT[fmt] || FMT.text;
     if (f.d == null) return v == null || v === '' ? DASH : String(v);
     if (!isNum(v)) return DASH;
-    return v.toFixed(f.d) + (f.u ? ' ' + f.u : '');
+    return (f.x ? v * f.x : v).toFixed(f.d) + (f.u ? ' ' + f.u : '');   /* f.x: a display scale (a fraction shown as %) */
   }
 
   function register(classKey, def) { if (classKey && def) REG[classKey] = def; return def; }
@@ -75,7 +75,7 @@
         var raw = m[v.key], t = text(raw, v.fmt), nm = raw === NOT_MODELLED, idle = v.fleet && !m.running;
         /* a value is traced to its engine parameter only when that parameter IS this unit's value: a fleet-row number of a
            unit that does not run, a running-only reading shown as a dash and a value the engine does not model are declared */
-        var basis = nm || idle || t === DASH ? null : (v.basis || null);
+        var basis = nm || idle || t === DASH ? null : (typeof v.basis === 'function' ? v.basis(m) : v.basis || null);   /* P4b: a basis may depend on the unit (a breaker's fault level by its voltage class) */
         var declared = nm ? 'not modelled by conv-engine ' + ((snap && snap.meta && snap.meta.version) || '') + ': no parameter exists for this reading'
           : idle ? 'CONV_CALC.getFleet(\'' + classKey + '\') row of ' + (m.tag || 'this unit') + ' (' + m.state + ')'
           : t === DASH ? 'this reading exists only while the unit runs' : null;

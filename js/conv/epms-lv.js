@@ -41,7 +41,7 @@
   function basis(snap) {
     var b = Sim().basis(snap); if (!b) return null;
     var e = b.e, need = ['hall_facility_design_kw', 'genset_per_hall', 'ups_module_kw_rated', 'ups_modules_per_system', 'ups_system_count',
-      'mv_fault_level_ka', 'lv_fault_level_ka', 'dist_tx_impedance_pct', 'genset_spare_per_hall'];
+      'mv_fault_level_ka', 'lv_fault_level_ka', 'dist_tx_impedance_pct', 'genset_spare_per_hall', 'ups_efficiency'];
     for (var i = 0; i < need.length; i++) if (!isNum(e[need[i]])) return null;
     var halls = snap.campus.halls;
     if (!halls.every(function (h) { return isNum(h.it_load_kw) && isNum(h.facility_load_kw) && isNum(h.racks); })) return null;
@@ -55,7 +55,12 @@
     var streams = e.dist_tx_streams, units = e.dist_tx_per_stream_per_hall;
     var modules = e.ups_modules_per_system / b.halls.length;          /* a system's modules shared over the halls */
     var upsKw = modules * e.ups_module_kw_rated;
-    var itKw = hall.it_load_kw / streams, mechKw = (hall.facility_load_kw - hall.it_load_kw) / streams;
+    var itKw = hall.it_load_kw / streams;
+    /* 1.2.0 (P4a, G1): the UPS loss of this stream sits at the UPS: the inverter carries lossFrac = 1/eta - 1 and the
+       simulation books lossFrac x its output on the DC bus (rectifier input = output / eta, the engine's upsLossKw() rule).
+       The same kW leaves the mech load, which carried it until 1.1.0, so the normal stream total is equal */
+    var upsLossKw = itKw * (1 / e.ups_efficiency - 1);
+    var mechKw = (hall.facility_load_kw - hall.it_load_kw) / streams - upsLossKw;
     function N(o) { o.hall = h; nodes.push(o); return o; }
     function E(id, from, to, via, o) {
       var x = { id: id, from: from, to: to, medium: 'power', flowOf: 'p' };
@@ -124,7 +129,7 @@
         label: 'Battery breaker' });
       N({ id: u + 'bat', tag: 'BAT-' + T, sym: 'batteryIec', x: X(290), y: 840, size: 30, cls: 'epms', src: 'battery', kv: 'lv', ratingKw: upsKw, dcBus: u + 'dc', rec: u + 'rec', ss: u + 'ss', tagAt: 'below',
         label: 'Battery strings (autonomy not modelled)', values: [{ k: 'st', dx: 0, dy: 37, anchor: 'middle', lod: 1 }] });
-      N({ id: u + 'inv', tag: 'INV-' + T, sym: 'inverterIec', x: X(150), y: 790, size: 34, cls: 'epms', kv: 'lv', ups: true, tagAt: side,
+      N({ id: u + 'inv', tag: 'INV-' + T, sym: 'inverterIec', x: X(150), y: 790, size: 34, cls: 'epms', kv: 'lv', ups: true, tagAt: side, lossFrac: 1 / e.ups_efficiency - 1,
         label: 'UPS inverter', values: [{ k: 'st', dx: vd * 21, dy: 15, anchor: va, lod: 1 }, { k: 'ld', dx: vd * 21, dy: 27, anchor: va, lod: 1 }, { k: 'r', dx: vd * 21, dy: 39, anchor: va, lod: 1 }] });
       N({ id: u + 'co', tag: 'CB-UO' + T, sym: 'cbIec', x: X(150), y: 868, size: 26, cls: 'epms', sw: 'cb', kv: 'lv', tagAt: side,
         label: 'UPS output breaker', values: [{ k: 'st', dx: vd * 17, dy: 15, anchor: va, lod: 1 }] });
@@ -157,7 +162,7 @@
       N({ id: 'k' + ls + '-cb', tag: 'CB-M' + T, sym: 'cbIec', x: X(395), y: 590, size: 26, cls: 'epms', sw: 'cb', kv: 'lv', tagAt: L ? 'left' : 'right',
         label: 'Feeder to the mechanical and house boards', values: [{ k: 'st', dx: -vd * 17, dy: 15, anchor: L ? 'end' : 'start', lod: 1 }] });
       N({ id: 'k' + ls + '-ld', tag: 'MECH-' + T, name: 'mech + house', sym: 'offSheet', rot: 90, x: X(395), y: 670, size: 20, cls: 'epms', kv: 'lv',
-        load: 'mech', kw: mechKw, label: 'Mechanical, house and UPS-loss load of this stream (the solver books no losses)', tagAt: 'below',
+        load: 'mech', kw: mechKw, label: 'Mechanical and house load of this stream (the UPS loss is booked at the UPS)', tagAt: 'below',
         values: [{ k: 'kw', dx: 0, dy: 50, anchor: 'middle', lod: 1 }] });
       E('k' + ls + '-a', 'b' + ls + '-m', 'k' + ls + '-cb.line');
       E('k' + ls + '-b', 'k' + ls + '-cb.load', 'k' + ls + '-ld.port');
@@ -308,6 +313,8 @@
     var o = { servedKw: 0, demandKw: 0, itServedKw: 0, onBattery: Object.keys(res.batt).length, running: 0, cbClosed: 0, cbTotal: 0, offNormal: 0 };
     sheet.nodes.forEach(function (n) {
       if (n.load) { o.demandKw += n.kw; if (res.dev[n.id] && res.dev[n.id].energised) { o.servedKw += n.kw; if (n.load === 'it') o.itServedKw += n.kw; } }
+      /* 1.2.0: the UPS loss is load too (it left the mech load); the simulation books it only while the inverter passes power */
+      if (isNum(n.lossFrac) && res.dev[n.id] && isNum(res.dev[n.id].lossKw)) { o.demandKw += res.dev[n.id].lossKw; o.servedKw += res.dev[n.id].lossKw; }
       if (n.src === 'gen' && state.run && state.run[n.id]) o.running++;
       if (n.sw === 'cb') { o.cbTotal++; if (state.closed[n.id]) o.cbClosed++; }
       if (n.sw && !!state.closed[n.id] !== (n.normal !== 'open')) o.offNormal++;
@@ -317,7 +324,7 @@
   }
 
   var API = { build: build, basis: basis, normalState: normalState, solve: solve, operate: operate, command: command, alarms: alarms, summary: summary,
-    HALLS: HALLS, version: '1.0.0' };
+    HALLS: HALLS, version: '1.2.0' };
   if (root) root.RZEpmsLv = Object.freeze(API);
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
 })(typeof window !== 'undefined' ? window : null);

@@ -755,6 +755,16 @@
             dist_tx_kva: 3150,
             // source: IEC 60076-5 minimum impedance for 2,501-6,300 kVA. evidenceClass: 'STANDARD'
             dist_tx_impedance_pct: 7,
+            /* 2.6.0 (PRD-CONV-EQUIPMENT-INSIDE P4a): the distribution unit's losses. No vendor test report exists for
+             * the assumed unit, so the regulatory MAXIMA are used and every loss derived from them is an upper bound.
+             * source: ASSUMED indoor cast-resin unit (IEC 60076-11), with dist_tx_kva a plan E-1 assumption. evidenceClass: 'ASSUMED' */
+            dist_tx_type: 'dry',
+            // source: Regulation (EU) No 548/2014 Annex I Table I.2, 3 150 kVA, Tier 2 (1 July 2021), maximum no-load losses (data/sources/eu-548-2014). evidenceClass: 'STANDARD'
+            dist_tx_p0_w: 3420,
+            // source: Regulation (EU) No 548/2014 Annex I Table I.2, 3 150 kVA, Tier 2, maximum load losses (data/sources/eu-548-2014). evidenceClass: 'STANDARD'
+            dist_tx_pk_w: 22000,
+            // source: Regulation (EU) No 548/2014 Annex I Table I.7, liquid-immersed large power 63 MVA, Tier 2 minimum PEI 99,745 % (data/sources/eu-548-2014). evidenceClass: 'STANDARD'
+            hv_tx_pei_min: 0.99745,
             // source: 2N electrical topology — A and B streams. evidenceClass: 'ASSUMED'
             dist_tx_streams: 2,
             // source: ASSUMED LV distribution voltage. evidenceClass: 'ASSUMED'
@@ -884,7 +894,7 @@
             basis: 'Adopted project scenario — simulated, not measured telemetry',
             basis_doc: 'conv/review/09-engineering-basis-and-calculations.md',
             study_doc: 'js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)',
-            version: '2.5.0'
+            version: '2.6.0'
         }
     };
 
@@ -1035,6 +1045,10 @@
         var r1n = function (v) { return v === null ? null : round1(v); };
         var r2n = function (v) { return v === null ? null : round2(v); };
         var r3n = function (v) { return v === null ? null : Math.round(v * 1000) / 1000; };
+        var distL = hallKva / (distPerStream * e.dist_tx_streams * e.dist_tx_kva);
+        var distLossKw = (e.dist_tx_p0_w + e.dist_tx_pk_w * distL * distL) / 1000;
+        var distOutKw = e.dist_tx_kva * distL * e.power_factor_design;
+        var distEff = distOutKw / (distOutKw + distLossKw);
         return {
             demand_mva: r3n(demandMva),
             demand_design_mva: r3n(demandDesignMva),
@@ -1055,6 +1069,11 @@
             dist_tx_count: distTotal,
             dist_tx_load_pct_normal: round1(hallKva / (distPerStream * e.dist_tx_streams * e.dist_tx_kva) * 100),
             dist_tx_load_pct_contingency: round1(hallKva / (distPerStream * e.dist_tx_kva) * 100),
+            /* 2.6.0 (P4a, G6): the unit's loss and efficiency at the DESIGN load of dist_tx_load_pct_normal;
+               loss = P0 + Pk L^2 (IEC 60076-1 split, load loss with the square of the load), an upper bound because
+               P0 / Pk are EU Tier 2 maxima. A cockpit showing the present load applies P0 / Pk to its own L. */
+            dist_tx_loss_kw_normal: Math.round(distLossKw * 1000) / 1000,
+            dist_tx_eff_normal: Math.round(distEff * 100000) / 100000,
             dist_tx_fla_mv_a: round2(distMvFla),
             dist_tx_fla_lv_a: round1(distLvFla),
             lv_fault_level_ka: r2n(lvFaultKa),
@@ -1091,6 +1110,7 @@
         'hv_bus_count', 'hv_tx_count', 'hv_tx_impedance_pct',
         'mv_voltage_kv', 'mv_ngr_ohm', 'mv_bus_sections',
         'dist_tx_kva', 'dist_tx_impedance_pct', 'dist_tx_streams', 'lv_voltage_v',
+        'dist_tx_type', 'dist_tx_p0_w', 'dist_tx_pk_w', 'hv_tx_pei_min',
         'genset_unit_kw', 'genset_max_loading', 'genset_spare_per_hall',
         'pro_grading_margin_s', 'pro_feeder_pickup_x', 'pro_incomer_pickup_x', 'pro_hv_pickup_x',
         'pro_inst_x', 'pro_feeder_inst_s', 'pro_lv_isd_x', 'pro_lv_tsd_s', 'pro_lv_tr_s', 'pro_tms_step',
@@ -1678,6 +1698,10 @@
                 ups_modules_per_system: upsModulesPerSystem(m),
                 ups_system_count: m.electrical.ups_system_count,
                 ups_system_kw: round1(upsSystemKw(m)),
+                /* 2.6.0 (P4a): one system's input and loss by the same rule as upsLossKw() (output / eta), so the
+                   UPS inside can close its balance P_in - P_out = loss; systems x loss = ups_loss_kw. */
+                ups_system_in_kw: round1(upsSystemKw(m) / m.electrical.ups_efficiency),
+                ups_system_loss_kw: round1(upsSystemKw(m) * (1 / m.electrical.ups_efficiency - 1)),
                 ups_system_rated_kw: upsSystemRatedKw(m),
                 /* v1.134.23 — the two UPS LOADING figures the cockpit stats panel shows.
                    They were computed on dc-conventional.html from published terms; an earlier form

@@ -8,7 +8,8 @@
      E2  switching is select-before-operate: Select changes nothing, Execute operates, Execute without a selection is
          refused; after a ring incomer is opened the status, the alarm count and the load in kW follow the solve; a dead
          20 kV feeder on E-S-101 kills its hall ring on E-S-102 — never NORMAL with 0 alarms while a feed is dead.
-     E3  every device of E-S-102 (all four halls' tags) opens the inspector and RZConvModal with its ISA/IEC tag title.
+     E3  every device of E-S-102 (all four halls' tags) opens the inspector and RZConvModal with its ISA/IEC tag title;
+         a transformer or UPS symbol opens RZConvModal on its internal drawing with one click (P4a), titled by its unit.
      E4  after Fit every tag stays visible, rendered text >= 11 px, no two labels overlap, no horizontal page scroll,
          0 page errors — at 1440 and 390.
      E5  F21 the strip shows the UPS system RATING (modules × module rating) labelled rating and the LOAD labelled load;
@@ -93,7 +94,8 @@ async function clickNode(pg, id) {
 }
 const inspTitle = (pg) => pg.evaluate(() => { const a = document.querySelector('aside.rz-inspector.open [data-slot="id"]'); return a ? a.textContent.trim() : null; });
 async function action(pg, prefix) {
-  const sel = 'aside.rz-inspector.open [data-rz-action^="' + prefix + '"]';
+  /* P4b: a breaker opens the equipment modal, whose action footer carries the page's own operate buttons */
+  const sel = 'aside.rz-inspector.open [data-rz-action^="' + prefix + '"], .rz-cvm:not([hidden]) [data-rz-cvm-act^="' + prefix + '"]';
   if (!(await pg.$(sel))) { await sleep(500); if (!(await pg.$(sel))) return false; }
   await press(pg, sel); await sleep(350); return true;
 }
@@ -203,6 +205,24 @@ async function lawE3(pg, at, fail, all) {
     for (const id of list) {
       const ok = await clickNode(pg, id);
       if (!ok) { fail(`E3${at} hall ${'ABCD'[h]} device ${id} not drawn`); continue; }
+      /* P4a (PRD-CONV-EQUIPMENT-INSIDE): a transformer or a UPS symbol opens RZConvModal on its drawn inside with ONE
+         click, titled by its unit (a rectifier, inverter, battery or static switch opens its UPS: REC-AA -> UPS-AA) */
+      const deep = await pg.evaluate((i) => { const S = window.RZEpmsLvPage, I = window.RZEpmsInternals, g = document.querySelector('#epms-lv-host .hmi-node[data-node="' + i + '"]');
+        const sym = g && g.getAttribute('data-sym'), tag = S ? S.tagOf(i) : null;
+        if (!I || !tag) return null;
+        if (sym === 'transformer2w' || /^TX-/.test(tag)) return tag;
+        if (/^(REC|INV|BAT|SS)-/.test(tag) && /^u[a-z]-(rec|inv|bat|ss)$/.test(i)) return 'UPS-' + tag.replace(/^(REC|INV|BAT|SS)-/, '');
+        if (sym === 'cbIec' || sym === 'cbDrawout' || sym === 'protectionRelay') return tag;   /* P4b: breakers and relays open their inside too */
+        return null; }, id);
+      if (deep) {
+        let dm = null;
+        for (let k = 0; k < 8; k++) { await sleep(200); dm = await pg.evaluate(() => ({ open: !!(window.RZConvModal && window.RZConvModal.isOpen()), t: (document.getElementById('rz-cvm-title') || {}).textContent || '',
+          svg: !!document.querySelector('.rz-cvm:not([hidden]) [data-rz-cvm-int] svg.hmi-svg') })); if (dm.open) break; }
+        if (!dm.open || !dm.svg || !dm.t.includes(deep)) fail(`E3${at} hall ${'ABCD'[h]} ${id}: one click ${dm.open ? 'opened "' + dm.t + '"' + (dm.svg ? '' : ' without the drawing') : 'did not open the modal'} (want ${deep})`);
+        if (SHOTS && id === 'ua-inv' && h === 0) await pg.screenshot({ path: path.join(SHOTS, 'epms-lv-modal' + at.replace('@', '-') + '.png') });
+        await pg.keyboard.press('Escape'); await sleep(150); await pg.keyboard.press('Escape'); await sleep(100);
+        continue;
+      }
       let t = await inspTitle(pg);
       if (!t) { await pg.keyboard.press('Escape'); await sleep(300); await clickNode(pg, id); await sleep(300); t = await inspTitle(pg); }
       const want = await pg.evaluate((i) => { const S = window.RZEpmsLvPage; return S ? S.tagOf(i) : null; }, id);

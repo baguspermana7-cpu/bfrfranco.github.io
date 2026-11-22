@@ -15,7 +15,7 @@
 (function (root) {
   'use strict';
   if (!root || !root.document) return;
-  var doc = root.document, el = null, last = null, inerted = [];
+  var doc = root.document, el = null, last = null, inerted = [], lifted = false;
   var DASH = ['none', '7 3', '2 3', '10 3 2 3'], NSV = 'http://www.w3.org/2000/svg';
   var W = 640, H = 420, ML = 54, MR = 30, MT = 14, MB = 40;
 
@@ -138,6 +138,9 @@
       if (c === el || /^(SCRIPT|STYLE|LINK|TEMPLATE|NOSCRIPT)$/.test(c.tagName) || c.hasAttribute('inert')) return;
       c.setAttribute('inert', ''); inerted.push(c);
     });
+    /* opened above the equipment modal, which inerted the page (this element included) while it was hidden:
+       lift that inert for as long as this dialog is open, and give it back on close (test-conv-internals-p4b EB5c) */
+    lifted = el.hasAttribute('inert'); if (lifted) el.removeAttribute('inert');
     el.hidden = false;
     el.querySelector('.tcc-close').focus();
     return true;
@@ -145,6 +148,8 @@
   function close() {
     if (!el || el.hidden) return;
     el.hidden = true;
+    if (lifted && el.hasAttribute('data-rz-cvm-inert')) el.setAttribute('inert', '');   /* only while the modal still holds the page */
+    lifted = false;
     inerted.forEach(function (c) { c.removeAttribute('inert'); }); inerted = [];
     var t = last; last = null;
     if (t && t.isConnected && t.focus) { try { t.focus({ preventScroll: true }); } catch (e) { /* best effort */ } }

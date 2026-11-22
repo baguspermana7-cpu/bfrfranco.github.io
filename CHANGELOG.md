@@ -11,6 +11,135 @@ release sections rather than semver.
 
 ---
 
+## v3.93.0 — 2026-11-22 — The electrical plant opens up: transformers, UPS, breakers and relays
+
+Two phases of PRD-CONV-EQUIPMENT-INSIDE ship together (they were built as v3.92.0 and v3.93.0 while a peer release took
+v3.92.0): P4a, the transformer and the UPS, then P4b, breakers and relays.
+
+### P4a — The transformer and the UPS open up
+
+Owner (R186): a click on a block must show the process inside the machine. PRD-CONV-EQUIPMENT-INSIDE phase P4a
+(`P4-ELECTRICAL.md`) brings this to the electrical plant on EPMS_Telemetry. Before this release a click on a
+transformer or a UPS opened the side inspector, which lists values and draws nothing.
+
+#### Added
+- One click on TX-1 / TX-2, a distribution transformer (TX-DA / TX-DB, TX-AA / TX-AB) or any of the four UPS symbols
+  (rectifier, inverter, battery, static bypass) opens the equipment modal on the machine's inside.
+  - Transformer (`js/conv/internals/transformer.js`, classes `hv_tx` and `dist_tx`): upstream breaker, surge arrester,
+    windings and core, temperature sensors and relay (Buchholz on TX-1/2), cooling, neutral CT with the earthing
+    resistor or N-PE, downstream breaker.
+  - UPS (`js/conv/internals/ups.js`): input breaker, rectifier, DC bus, battery and its breaker, inverter, output
+    breaker, static bypass, maintenance bypass. The power path shows NORMAL, BATTERY or BYPASS from the simulation.
+    A click on the battery opens the battery block first, a click on the static switch the bypass block.
+- `js/conv/epms-internals.js` reads the units from the single-line's own solve. The drawing and the sheet print one
+  value per device.
+- Engine 2.6.0 (additive):
+  - `electrical.dist_tx_type` (dry, ASSUMED) and `dist_tx_p0_w` 3 420 W / `dist_tx_pk_w` 22 000 W, from Regulation
+    (EU) No 548/2014 Table I.2 (3 150 kVA, Tier 2 maxima).
+  - `hv_tx_pei_min` 99.745 %, from Table I.7 (63 MVA, Tier 2).
+  - `dist_tx_loss_kw_normal` / `dist_tx_eff_normal` at the design load.
+  - `ups_system_in_kw` / `ups_system_loss_kw`.
+  - The source rows are quoted in `data/sources/eu-548-2014/README.md`.
+  - The engine version pin moved to 2.6.0 on the eight Conventional pages.
+- Gate `tools/test-conv-internals-p4.mjs` EL0–EL6 (node and browser at 1440 and 390), in the Conventional release list.
+
+#### Changed
+- `js/conv/epms-lv.js` 1.2.0 / `js/conv/epms-sim.js` 1.2.0: the UPS rectifier now draws output / η (3 906 kW for 3 750 kW
+  out), as the engine's UPS loss says. Until now the simulation was lossless at the UPS and booked the loss inside the
+  mechanical load. The loss moved out of the mechanical load, so in the normal state the transformer load and every
+  stream total are unchanged. The loss follows what the inverter passes (the solve runs twice): on battery the battery
+  supplies it, and with the output breaker open or the load on bypass there is none.
+- The upstream breaker on a transformer drawing shows the breaker's own current, as the single-line does. On the ring
+  that is more than the unit's (CB-FA4 165.2 A, TX-DA 33.0 A); the unit's current has its own row.
+- A de-energised transformer shows no present-load loss or efficiency ("not modelled"), not its no-load loss.
+- Distribution-transformer losses are bounds and say so: "LOSS ≤" on the drawing, "≤" / "≥" in the rows. The loss at
+  the present load uses the simulated load of the unit (36.3 %). The engine's design-load pair uses 48.5 %, and its
+  rows say "at design load".
+
+#### Not modelled, and why
+- TX-1/2 losses: the regulation publishes only a PEI floor for 63 MVA. Splitting it into no-load and load loss needs a
+  ratio nobody has stated.
+- Transformer temperatures, tap position, Buchholz state, surge counter, neutral current: no thermal, tap or gas
+  model. The IEC 60076-7 thermal constants are not available to the engine.
+- UPS part-load efficiency, battery autonomy, state of charge, DC bus voltage, battery temperature, maintenance
+  bypass position: no battery or part-load model; the efficiency is the engine's flat 96 %.
+
+#### Proof
+- Red on c0dd01dbf: 20 of 25 node checks.
+  - The engine 2.6.0 keys were missing.
+  - The rectifier read 3 750 kW, the same as the inverter.
+- Four mutations each turned the gate red:
+  - a planted literal in `transformer.js`;
+  - the present-load loss taken from the design load;
+  - a wrong engine basis on a UPS row;
+  - a lossless rectifier.
+- A code review found four switching cases the normal state cannot show. Each now has a check that was red on the
+  first P4a build: output breaker open (156 kW of loss on an idle inverter), bypass (rectifier still drawing),
+  CB-UI + CB-UO open (drawing NORMAL, sheet ON BATTERY), TX-AA dead (3.42 kW loss), CB-FA4 drawn 33.0 A against 165.2 A.
+
+### Fixed in the port
+
+- The seven other Conventional cockpits load `js/conv-engine.js?v=2.6.0` again (the port had kept 2.5.0, so every
+  page but EPMS would have opened "Authority UNAVAILABLE"); `test-conv-engine-version-pins` red before, green after.
+- `tools/test-conv-datahall-air.mjs`, red since v3.89.0 (12 of 48): it assumed the old Plan projection and the Power
+  mode; it now pins Plan and presses Power as a reader does. 48 of 48.
+
+- `tools/test-conv-epms-sld.mjs` followed the P4b route: a breaker, switch or relay now opens its equipment modal, whose
+  action row carries the same page actions (`sim-open`/`sim-close`/`tcc`, select-before-operate kept). V7–V11 read that row
+  as well as the inspector: 13 of 92 checks red before, 122 of 122 after.
+- The equipment modal inerts every page element again, hidden ones included (`test-conv-equipment-modal` Q4 was red,
+  114 of 114); the time–current dialog lifts its own inert while it is open above the modal and gives it back on close.
+- DC AI Data Hall, 3D floor: it no longer shrinks by itself until it vanishes (owner: "bergerak membesar kemudian mengecil
+  kemudian hilang"). The floor renderer measured the bordered `#hIso` it then resized, losing 2 px per resize round;
+  it now measures a borderless wrapper. New law D8 in `tools/test-dcai-hall-iso.mjs` (6 s steady, follows a window
+  narrowed and widened back): 38/40 before, 40/40 after.
+
+### P4b — Breakers and relays open up, and are operated from inside
+
+Owner (R186): a click on a block must show the process inside the machine. PRD-CONV-EQUIPMENT-INSIDE phase P4b
+(`P4b-BREAKER-RELAY.md`) brings this to the switchgear and the protection on EPMS_Telemetry. Before this release a
+click on a breaker or a relay opened the side inspector, and the Select / Execute buttons lived only there.
+
+#### Added
+- **Circuit breaker inside** (`js/conv/internals/breaker.js`, class `breaker`): CT, main contacts in the arc chamber,
+  the trip unit or the relay that trips it, trip and close coils, spring mechanism, 52a/52b, the interlocked earthing
+  switch or disconnector (drawn only when the sheet has one), FROM and TO. All 129 breakers of E-S-101 and of
+  E-S-102 in the four halls open it with one click. Position, current and kW come from the page's own solve; the
+  fault level at the bus and the HV breaking capacity come from the engine; Ir / tr / Isd / tsd appear only on a
+  breaker an LSIG relay trips. Spring state, operation counter, contact wear and trip-coil supervision read
+  "not modelled".
+- **Protection relay inside** (`js/conv/internals/relay.js`, class `relay`): CT (and VT for 21) inputs, measuring
+  element, one block per ANSI function parsed from the relay name (IEEE C37.2), trip logic, the breaker it trips,
+  watchdog. All 28 relays open it. The graded chain shows its engine settings (R-FA1: Is 113.7 A, EI, TMS 1.08,
+  0.802 s, instantaneous 1 540.5 A); 87L, 21, 87T, 87B, 50BF, 51G and 50N/51N read "not modelled"; a setting the
+  element does not have reads a dash (an LSIG unit has no TMS).
+- **Operate from the modal**: the equipment modal gains an action footer with the page's own buttons (Select · Open,
+  Execute, Cancel, Time–current curves), dispatched to the same handler registry the inspector uses, so
+  select-before-operate and the interlocks stay the page's. The page's last message shows under the buttons and the
+  drawing refreshes at once.
+- `js/conv/epms-internals.js` 1.1.0: `breakerUnits()` (FROM / TO walk power edges only, skip earth switches, read a
+  busbar junction as "HV/MV/LV bus"; strips by voltage class and, on E-S-102, by stream, at most 14) and
+  `relayUnits()`.
+- `tools/test-conv-internals-p4b.mjs` EB0–EB8 (3 910 checks, 1440 + 390), in the ship gate.
+
+#### Fixed
+- The modal's source note on electrical units said "plant cooling values"; it now names the single-line solve.
+- A dialog opened from the modal (the time-current curves) now owns Escape: Escape closes it first and the modal
+  stays open and usable. Before, Escape closed the modal underneath.
+- A breaker tile in the unit strip showed "LOAD —"; it now reads its current or OPEN.
+- A TCC closed earlier stayed inert when it was opened again from a later modal session (no click worked); the modal
+  no longer inerts hidden dialogs.
+- The page's last operate message showed under every unit; it now shows only under the unit it names.
+- After Select the pressed button is replaced by Execute / Cancel; the keyboard focus now stays in the modal. A
+  handler that throws no longer skips the refresh.
+- The breaker's interrupting medium and the LV thermal-magnetic trip are labelled "typical" (they follow the voltage
+  class, not a per-breaker datum).
+
+#### Proof
+- Red on the P4a tree (0 of 129 breakers mapped, no relay class) and on six mutations: Ir taken from Isd, LSIG on any
+  relay, a CT named as FROM/TO, relay name split on " · " only, TMS shown on an LSIG unit, Escape not yielded, hidden TCC inerted, message not scoped, focus not kept.
+- Deferred to P4c: the switchboard class (EB7) and the `goto` navigation.
+
 ## v3.92.0 — 2026-11-22 — The AI hall in 3D, read like a BMS
 
 PRD-DATAHALL-BMS-ISO phase F4 (owner R185: "Kenapa tampilan UIUX datahall jadi 3d jadi kayak bukan BMS … floor plan dulu

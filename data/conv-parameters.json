@@ -1,6 +1,6 @@
 {
   "generatedBy": "tools/build-conv-parameter-registry.mjs",
-  "engineVersion": "2.5.0",
+  "engineVersion": "2.6.0",
   "note": "GENERATED — do not hand-edit. Curated metadata lives in data/conv-parameters.curated.json; limits in data/conv-limits.curated.json.",
   "parameters": [
     {
@@ -102,6 +102,7 @@
         "test-conv-epms-lv.mjs",
         "test-conv-epms-model.mjs",
         "test-conv-fuel-truth.mjs",
+        "test-conv-internals-p4.mjs",
         "test-conv-plant-internals.mjs",
         "test-conv-snapshot-binding.mjs",
         "test-datahall-ai-rack-density.mjs"
@@ -6466,6 +6467,55 @@
       }
     },
     {
+      "id": "electrical.dist_tx_eff_normal",
+      "label": "Distribution transformer efficiency at design load (lower bound)",
+      "unit": "",
+      "kind": "derived",
+      "value": 0.99411,
+      "formula": "P / (P + loss), P = kVA L pf",
+      "formulaExpr": "electrical.dist_tx_kva * electrical.dist_tx_load_pct_normal / 100 * electrical.power_factor_design / ( electrical.dist_tx_kva * electrical.dist_tx_load_pct_normal / 100 * electrical.power_factor_design + electrical.dist_tx_loss_kw_normal )",
+      "display": "internal",
+      "displayReason": "Drawn inside the transformer / UPS equipment modal of EPMS_Telemetry (PRD-CONV-EQUIPMENT-INSIDE P4a); no cockpit reads it directly.",
+      "deps": [
+        "electrical.dist_tx_kva",
+        "electrical.dist_tx_load_pct_normal",
+        "electrical.power_factor_design",
+        "electrical.dist_tx_loss_kw_normal"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "electrical.dist_tx_kva",
+        "electrical.dist_tx_p0_w",
+        "electrical.dist_tx_pk_w",
+        "electrical.dist_tx_streams",
+        "electrical.power_factor_design",
+        "site.pue"
+      ],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
+      "tests": [
+        "test-conv-internals-p4.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv() P4a keys",
+        "asOf": "2026-11-22",
+        "method": "Definition of efficiency at the design load."
+      }
+    },
+    {
       "id": "electrical.dist_tx_fla_lv_a",
       "label": "Distribution transformer FLA at 0.4 kV",
       "unit": "A",
@@ -6486,7 +6536,12 @@
         "electrical.dist_tx_kva",
         "electrical.lv_voltage_v"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-formula.mjs (formula evaluated)"
       ],
@@ -6519,7 +6574,12 @@
         "electrical.dist_tx_kva",
         "electrical.mv_voltage_kv"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-formula.mjs (formula evaluated)"
       ],
@@ -6548,7 +6608,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 1
+          "reads": 2
         }
       ],
       "tests": [
@@ -6580,13 +6640,14 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 3
+          "reads": 5
         }
       ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
         "test-conv-epms-lv.mjs",
         "test-conv-epms-sld.mjs",
+        "test-conv-internals-p4.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [],
@@ -6625,7 +6686,12 @@
         "electrical.power_factor_design",
         "site.pue"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
         "test-conv-formula.mjs (formula evaluated)"
@@ -6670,6 +6736,7 @@
       ],
       "consumers": [],
       "tests": [
+        "test-conv-internals-p4.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
       "docs": [],
@@ -6678,6 +6745,88 @@
         "section": "electricalHvMv()",
         "asOf": "2026-11-18",
         "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.dist_tx_loss_kw_normal",
+      "label": "Distribution transformer loss at design load (upper bound)",
+      "unit": "kW",
+      "kind": "derived",
+      "value": 8.585,
+      "formula": "(P0 + Pk L^2) / 1000, L = design load fraction",
+      "formulaExpr": "( electrical.dist_tx_p0_w + electrical.dist_tx_pk_w * ( electrical.dist_tx_load_pct_normal / 100 ) * ( electrical.dist_tx_load_pct_normal / 100 ) ) / 1000",
+      "display": "internal",
+      "displayReason": "Drawn inside the transformer / UPS equipment modal of EPMS_Telemetry (PRD-CONV-EQUIPMENT-INSIDE P4a); no cockpit reads it directly.",
+      "deps": [
+        "electrical.dist_tx_p0_w",
+        "electrical.dist_tx_pk_w",
+        "electrical.dist_tx_load_pct_normal"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "electrical.dist_tx_kva",
+        "electrical.dist_tx_p0_w",
+        "electrical.dist_tx_pk_w",
+        "electrical.dist_tx_streams",
+        "electrical.power_factor_design",
+        "site.pue"
+      ],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
+      "tests": [
+        "test-conv-internals-p4.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv() P4a keys",
+        "asOf": "2026-11-22",
+        "method": "IEC 60076-1 split of no-load and load loss, load loss with the square of the load; P0 / Pk are EU Tier 2 maxima."
+      }
+    },
+    {
+      "id": "electrical.dist_tx_p0_w",
+      "label": "Distribution transformer no-load loss (EU Tier 2 maximum)",
+      "unit": "W",
+      "kind": "authored",
+      "value": 3420,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Drawn inside the transformer / UPS equipment modal of EPMS_Telemetry (PRD-CONV-EQUIPMENT-INSIDE P4a); no cockpit reads it directly.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "STANDARD",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.dist_tx_p0_w"
+      ],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 2
+        }
+      ],
+      "tests": [
+        "test-conv-internals-p4.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "Regulation (EU) No 548/2014, Annex I (data/sources/eu-548-2014/README.md)",
+        "section": "Table I.2, 3 150 kVA, Tier 2 (1 July 2021), maximum no-load losses",
+        "asOf": "2026-11-22",
+        "method": "Regulatory maximum for a dry-type 3 150 kVA unit (Um <= 24 kV / <= 1.1 kV); no test report exists, so the loss is an upper bound."
       }
     },
     {
@@ -6721,6 +6870,40 @@
       }
     },
     {
+      "id": "electrical.dist_tx_pk_w",
+      "label": "Distribution transformer load loss (EU Tier 2 maximum)",
+      "unit": "W",
+      "kind": "authored",
+      "value": 22000,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Drawn inside the transformer / UPS equipment modal of EPMS_Telemetry (PRD-CONV-EQUIPMENT-INSIDE P4a); no cockpit reads it directly.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "STANDARD",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.dist_tx_pk_w"
+      ],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 2
+        }
+      ],
+      "tests": [
+        "test-conv-internals-p4.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "Regulation (EU) No 548/2014, Annex I (data/sources/eu-548-2014/README.md)",
+        "section": "Table I.2, 3 150 kVA, Tier 2 (1 July 2021), maximum load losses",
+        "asOf": "2026-11-22",
+        "method": "Regulatory maximum at rated current; an upper bound."
+      }
+    },
+    {
       "id": "electrical.dist_tx_streams",
       "label": "Distribution streams per hall",
       "unit": null,
@@ -6739,6 +6922,7 @@
       "consumers": [],
       "tests": [
         "test-conv-epms-model.mjs",
+        "test-conv-internals-p4.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [],
@@ -6798,6 +6982,32 @@
         "section": "electricalHvMv()",
         "asOf": "2026-11-18",
         "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.dist_tx_type",
+      "label": "Distribution transformer type",
+      "unit": "",
+      "kind": "authored",
+      "value": "dry",
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Drawn inside the transformer / UPS equipment modal of EPMS_Telemetry (PRD-CONV-EQUIPMENT-INSIDE P4a); no cockpit reads it directly.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [],
+      "consumers": [],
+      "tests": [
+        "test-conv-internals-p4.mjs"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (engine 2.6.0)",
+        "asOf": "2026-11-22",
+        "method": "Indoor cast-resin dry-type unit (IEC 60076-11) assumed with the plan E-1 rating; it selects Table I.2 of Regulation (EU) 548/2014. No vendor selection exists."
       }
     },
     {
@@ -7426,7 +7636,12 @@
         "electrical.power_factor_design",
         "site.pue"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
         "test-conv-formula.mjs (formula evaluated)"
@@ -7458,7 +7673,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 1
+          "reads": 2
         }
       ],
       "tests": [
@@ -7503,7 +7718,12 @@
         "electrical.power_factor_design",
         "site.pue"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
         "test-conv-epms-model.mjs",
@@ -7632,13 +7852,14 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 4
+          "reads": 6
         }
       ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
         "test-conv-epms-lv.mjs",
-        "test-conv-epms-sld.mjs"
+        "test-conv-epms-sld.mjs",
+        "test-conv-internals-p4.mjs"
       ],
       "docs": [],
       "source": {
@@ -7646,6 +7867,40 @@
         "section": "electricalHvMv()",
         "asOf": "2026-11-18",
         "method": "Derived in the engine from the authored HV/MV inputs. Protection values are declared training settings by the stated grading rule, not a relay study."
+      }
+    },
+    {
+      "id": "electrical.hv_tx_pei_min",
+      "label": "Power transformer minimum Peak Efficiency Index (EU Tier 2)",
+      "unit": "",
+      "kind": "authored",
+      "value": 0.99745,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Drawn inside the transformer / UPS equipment modal of EPMS_Telemetry (PRD-CONV-EQUIPMENT-INSIDE P4a); no cockpit reads it directly.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "STANDARD",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.hv_tx_pei_min"
+      ],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
+      "tests": [
+        "test-conv-internals-p4.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "Regulation (EU) No 548/2014, Annex I (data/sources/eu-548-2014/README.md)",
+        "section": "Table I.7, liquid-immersed large power, 63 MVA, Tier 2",
+        "asOf": "2026-11-22",
+        "method": "Regulatory minimum PEI; the P0 / Pk split is not published, so TX-1/2 losses stay not modelled."
       }
     },
     {
@@ -7704,7 +7959,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 5
+          "reads": 6
         }
       ],
       "tests": [
@@ -7758,7 +8013,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 1
+          "reads": 2
         }
       ],
       "tests": [
@@ -7791,7 +8046,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 2
+          "reads": 3
         }
       ],
       "tests": [
@@ -7890,7 +8145,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 1
+          "reads": 2
         }
       ],
       "tests": [
@@ -7936,7 +8191,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 4
+          "reads": 5
         }
       ],
       "tests": [
@@ -7970,7 +8225,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 1
+          "reads": 2
         }
       ],
       "tests": [
@@ -8014,7 +8269,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 1
+          "reads": 2
         }
       ],
       "tests": [
@@ -8046,7 +8301,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 11
+          "reads": 13
         }
       ],
       "tests": [
@@ -8108,12 +8363,17 @@
         {
           "page": "fuel-system.html",
           "reads": 1
+        },
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
         }
       ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
         "test-conv-epms-model.mjs",
         "test-conv-fuel-truth.mjs",
+        "test-conv-internals-p4.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [],
@@ -8210,7 +8470,12 @@
         "electrical.pro_inst_x",
         "site.pue"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
         "test-conv-formula.mjs (formula evaluated)"
@@ -9024,7 +9289,12 @@
         "electrical.dist_tx_kva",
         "electrical.lv_voltage_v"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 3
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
         "test-conv-epms-model.mjs",
@@ -9060,7 +9330,12 @@
         "electrical.lv_voltage_v",
         "electrical.pro_lv_isd_x"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
         "test-conv-formula.mjs (formula evaluated)"
@@ -9151,7 +9426,12 @@
       "dependsOnInputs": [
         "electrical.pro_lv_tr_s"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 2
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
@@ -9182,7 +9462,12 @@
       "dependsOnInputs": [
         "electrical.pro_lv_tsd_s"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
@@ -9275,9 +9560,14 @@
         {
           "page": "dc-conventional.html",
           "reads": 2
+        },
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
         }
       ],
       "tests": [
+        "test-conv-internals-p4.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [
@@ -9406,6 +9696,7 @@
       ],
       "tests": [
         "test-conv-calc.mjs",
+        "test-conv-internals-p4.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
       "docs": [
@@ -9491,7 +9782,7 @@
         },
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 5
+          "reads": 8
         }
       ],
       "tests": [
@@ -9521,7 +9812,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 6
+          "reads": 9
         }
       ],
       "tests": [
@@ -9592,6 +9883,10 @@
         {
           "page": "dc-conventional.html",
           "reads": 5
+        },
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
         }
       ],
       "tests": [
@@ -9629,6 +9924,7 @@
         }
       ],
       "tests": [
+        "test-conv-internals-p4.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [],
@@ -9637,6 +9933,44 @@
         "asOf": "2026-08-28",
         "section": "resilience.subsystems.electrical",
         "method": "2N implies two independent systems."
+      }
+    },
+    {
+      "id": "electrical.ups_system_in_kw",
+      "label": "UPS system input power",
+      "unit": "kW",
+      "kind": "derived",
+      "value": 15625,
+      "formula": "system output / eff",
+      "formulaExpr": "electrical.ups_system_kw / electrical.ups_efficiency",
+      "display": "internal",
+      "displayReason": "Drawn inside the transformer / UPS equipment modal of EPMS_Telemetry (PRD-CONV-EQUIPMENT-INSIDE P4a); no cockpit reads it directly.",
+      "deps": [
+        "electrical.ups_system_kw",
+        "electrical.ups_efficiency"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_load_kw",
+        "campus.halls.1.it_load_kw",
+        "campus.halls.2.it_load_kw",
+        "campus.halls.3.it_load_kw",
+        "electrical.ups_efficiency",
+        "electrical.ups_system_count"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-internals-p4.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "snapshot electrical P4a keys",
+        "asOf": "2026-11-22",
+        "method": "Same rule as ups_loss_kw (input above output by the inverse efficiency)."
       }
     },
     {
@@ -9669,6 +10003,7 @@
       ],
       "tests": [
         "test-conv-epms-lv.mjs",
+        "test-conv-internals-p4.mjs",
         "test-conv-formula.mjs (formula evaluated)",
         "test-conv-basis-drawer.mjs (drawer value vs EPMS_Telemetry.html)"
       ],
@@ -9676,6 +10011,44 @@
       "source": {
         "ref": "js/conv-engine.js",
         "asOf": "2026-08-28"
+      }
+    },
+    {
+      "id": "electrical.ups_system_loss_kw",
+      "label": "UPS system loss",
+      "unit": "kW",
+      "kind": "derived",
+      "value": 625,
+      "formula": "system output x (1/eff - 1)",
+      "formulaExpr": "electrical.ups_system_kw * ( 1 / electrical.ups_efficiency - 1 )",
+      "display": "internal",
+      "displayReason": "Drawn inside the transformer / UPS equipment modal of EPMS_Telemetry (PRD-CONV-EQUIPMENT-INSIDE P4a); no cockpit reads it directly.",
+      "deps": [
+        "electrical.ups_system_kw",
+        "electrical.ups_efficiency"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_load_kw",
+        "campus.halls.1.it_load_kw",
+        "campus.halls.2.it_load_kw",
+        "campus.halls.3.it_load_kw",
+        "electrical.ups_efficiency",
+        "electrical.ups_system_count"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-internals-p4.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "snapshot electrical P4a keys",
+        "asOf": "2026-11-22",
+        "method": "Same rule as ups_loss_kw; systems x this = ups_loss_kw."
       }
     },
     {
@@ -11124,6 +11497,8 @@
         "test-conv-hall-scope.mjs",
         "test-conv-internals-core.mjs",
         "test-conv-internals-p3.mjs",
+        "test-conv-internals-p4.mjs",
+        "test-conv-internals-p4b.mjs",
         "test-conv-parameter-registry.mjs",
         "test-conv-payloads.mjs",
         "test-conv-point-status-core.mjs",
@@ -11386,7 +11761,7 @@
       "label": "Engine version",
       "unit": null,
       "kind": "authored",
-      "value": "2.5.0",
+      "value": "2.6.0",
       "formula": null,
       "formulaNotExpressible": "The engine's own version string.",
       "deps": [],

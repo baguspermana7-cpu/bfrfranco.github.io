@@ -91,7 +91,10 @@ async function act(pg, node, action) {
   }, HOST, node);
   if (!pt) return 'no node ' + node;
   await pg.mouse.click(pt.x, pt.y); await sleep(300);
-  const sel = 'aside.rz-inspector.open [data-rz-action="' + action + '"]';
+  /* v3.93.0 (PRD-CONV-EQUIPMENT-INSIDE P4b): a breaker, switch or relay opens its equipment modal on one click; the same
+     page actions (same ids, same handlers, select-before-operate kept) sit in the modal's action row. Other symbols keep the
+     inspector. Either is the operator's one route, so accept whichever this click opened. */
+  const sel = 'aside.rz-inspector.open [data-rz-action="' + action + '"], .rz-cvm:not([hidden]) [data-rz-cvm-act="' + action + '"]';
   if (!(await pg.$(sel))) { await sleep(600); if (!(await pg.$(sel))) return 'no ' + action + ' button for ' + node; }
   await pg.click(sel); await sleep(350);
   return null;
@@ -294,7 +297,7 @@ for (const W of [1440, 390]) {
     if (SHOTS) await pg.screenshot({ path: path.join(SHOTS, `epms-tcc-${W}.png`) });
     await pg.keyboard.press('Escape'); await sleep(200);
     const back = await pg.evaluate(() => ({ closed: !document.querySelector('.tcc-modal:not([hidden])'),
-      focus: document.activeElement && document.activeElement.getAttribute('data-rz-action') }));
+      focus: document.activeElement && (document.activeElement.getAttribute('data-rz-action') || document.activeElement.getAttribute('data-rz-cvm-act')) }));   /* inspector or (v3.93.0) modal action row */
     ok(back.closed, `V11${at} Esc did not close the TCC modal`);
     ok(back.focus === 'tcc', `V11${at} focus returned to "${back.focus}", not the Time–current curves button`);
   }

@@ -14,6 +14,8 @@
       (seam) paints the inlet reading in the alarm colour
    D6 reduced motion: nothing animates, arrowheads remain
    D7 no reading overlaps another reading in the drawing; no page error; the page does not scroll sideways at 390
+   Since v3.89.0 (PRD-DATAHALL-BMS-ISO) the hall opens in 3D at >= 600 px and in the temperature mode; these laws are
+   about the top view and the row kW, so the test pins Plan (rz.dh.proj) and presses Power, as a reader does (v3.93.0).
    Usage: node tools/test-conv-datahall-air.mjs [--shots=<dir>] */
 import puppeteer from 'puppeteer';
 import http from 'node:http';
@@ -38,15 +40,22 @@ const fails = []; let checks = 0;
 const ok = (c, m) => { checks++; if (!c) fails.push(m); };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-async function open(W, reduced) {
+async function open(W, reduced, proj = 'plan') {
   const pg = await browser.newPage();
   const errs = []; pg.on('pageerror', (e) => errs.push(e.message));
   await pg.setViewport({ width: W, height: W > 800 ? 1000 : 844 });
   if (reduced) await pg.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
   await primeCockpitAuditDocument(pg, 'dark');
+  /* PRD-DATAHALL-BMS-ISO (v3.89.0) made 3D the default projection at >= 600 px; the row strip, row panel and air path
+     laws here are about the top view, so the test pins Plan the way a reader does: the remembered projection key */
+  if (proj) await pg.evaluateOnNewDocument((v) => { try { localStorage.setItem('rz.dh.proj', v); } catch (e) { /* blocked storage */ } }, proj);
   await pg.goto(ORIGIN + 'datahall.html', { waitUntil: 'networkidle0', timeout: 90000 });
   await enterAuthorizedAuditState(pg, 'datahall');
   await sleep(2000);
+  /* the row tag prints the value of the floor mode (v3.89.0: temperature by default, the row's mean inlet); the kW laws
+     below read the Power mode, chosen the way a reader chooses it */
+  await pg.evaluate(() => { const b = document.querySelector('.mode-btn[data-mode="power"]'); if (b && !b.disabled) b.click(); });
+  await sleep(400);
   return { pg, errs };
 }
 const motion = () => {

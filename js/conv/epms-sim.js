@@ -24,6 +24,12 @@
  *   kW are the engine's adopted hall facility loads split per stream (campus.halls[i].facility_load_kw / streams);
  *   the typical LV unit carries one stream's share divided by the units per stream. A = kW / (sqrt3 x kV x pf).
  *   Losses are not modelled (the topology solver's rule), so kW into every bus equals kW out.
+ *
+ *   1.2.0 (PRD-CONV-EQUIPMENT-INSIDE P4a, G1; additive): a two-terminal device may carry n.lossFrac, its own loss as a
+ *   fraction of the power it passes. solve() runs twice: pass one finds the kW through the device, pass two books
+ *   lossFrac x that kW as a load on its INPUT terminal. E-S-102 puts the UPS loss on its inverter (input = the DC bus), so
+ *   the rectifier draws output / eta on mains, the battery does on battery, and an inverter that passes nothing (output
+ *   breaker open, on bypass, dead) has no loss. dev[id].lossKw carries the booked kW.
  */
 (function (root) {
   'use strict';
@@ -96,13 +102,19 @@
     return A_PORT[port] ? id + ':a' : (B_PORT[port] ? id + ':b' : null);
   }
 
-  function model(sheet, state, b) {
+  function model(sheet, state, b, loss) {
     var by = index(sheet), nodes = [], branches = [], seen = {};
     function add(o) { if (!seen[o.id]) { seen[o.id] = 1; nodes.push(o); } }
     sheet.nodes.forEach(function (n) {
       if (TWO[n.sym]) {
         add({ id: n.id + ':a', kind: 'bus' }); add({ id: n.id + ':b', kind: 'bus' });
         branches.push({ id: 'dev:' + n.id, a: n.id + ':a', b: n.id + ':b', closed: n.sw ? !!state.closed[n.id] && !(state.blocked && state.blocked[n.id]) : !(state.blocked && state.blocked[n.id]) });
+        /* 1.2.0: a converter's own loss is a load on its input terminal, lossFrac x the kW it passed in pass one */
+        var lk = loss && isNum(n.lossFrac) && isNum(loss[n.id]) ? n.lossFrac * loss[n.id] : 0;
+        if (lk > 0) {
+          add({ id: n.id + ':loss', kind: 'load', kw: lk });
+          branches.push({ id: 'loss:' + n.id, a: n.id + ':a', b: n.id + ':loss', closed: true });
+        }
       } else if (n.src === 'grid') {
         add({ id: n.id, kind: 'source', ratingKw: isNum(n.ratingKw) ? n.ratingKw : b.e.hv_source_mva * 1000, available: !(state.lost && state.lost[n.id]) });
       } else if (n.src === 'gen' && n.unit) {
@@ -128,7 +140,13 @@
   }
 
   function solve(sheet, state, b) {
-    var by = index(sheet), m = model(sheet, state, b), r = Sld().solve(m), pf = b.e.power_factor_design;
+    var by = index(sheet), m = model(sheet, state, b), r = Sld().solve(m), pf = b.e.power_factor_design, passed = null;
+    sheet.nodes.forEach(function (n) {   /* 1.2.0 pass two: book each converter's loss on the kW it passed in pass one */
+      if (!TWO[n.sym] || !isNum(n.lossFrac)) return;
+      var br0 = r.branches['dev:' + n.id];
+      (passed = passed || {})[n.id] = br0 && br0.energised ? br0.kw : 0;
+    });
+    if (passed) { m = model(sheet, state, b, passed); r = Sld().solve(m); }
     var out = { edges: {}, dev: {}, raw: r, model: m };
     sheet.edges.forEach(function (e) {
       var br = r.branches[e.id];
@@ -140,6 +158,8 @@
         var br = r.branches['dev:' + n.id], na = r.nodes[n.id + ':a'], nb = r.nodes[n.id + ':b'];
         d = { energised: !!(na && na.energised) || !!(nb && nb.energised), lineLive: !!(na && na.energised), loadLive: !!(nb && nb.energised),
           kw: br && br.energised ? br.kw : 0 };
+        var ln = r.nodes[n.id + ':loss'];
+        if (isNum(n.lossFrac)) d.lossKw = ln && ln.energised ? m.nodes.filter(function (x) { return x.id === n.id + ':loss'; })[0].kw : 0;
       } else if (r.nodes[n.id]) {
         var lk = n.load ? loadKw(n, b) : 0, live = r.nodes[n.id].energised;
         d = { energised: live, kw: n.load ? (live ? lk : 0) : (r.sources[n.id] ? r.sources[n.id].kw : 0) };
@@ -234,7 +254,7 @@
   }
 
   var API = { normalState: normalState, basis: basis, model: model, solve: solve, operate: operate, chain: chain, coordination: coordination,
-    loadKw: loadKw, amps: amps, version: '1.1.0' };
+    loadKw: loadKw, amps: amps, version: '1.2.0' };
   if (root) root.RZEpmsSim = Object.freeze(API);
   if (typeof module !== 'undefined' && module.exports) module.exports = API;
 })(typeof window !== 'undefined' ? window : null);

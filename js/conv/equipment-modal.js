@@ -45,6 +45,10 @@
     '.rz-cvm-close{flex:none;min-width:44px;min-height:44px;border:1px solid var(--cvm-line);background:transparent;color:var(--cvm-text);border-radius:4px;cursor:pointer;font-size:18px}' +
     '.rz-cvm-close:focus-visible,.rz-cvm-v[data-basis-param]:focus-visible{outline:2px solid var(--cvm-acc);outline-offset:2px}' +
     '.rz-cvm-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;padding:14px 16px}' +
+    '.rz-cvm-acts{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:14px 16px 0}' +
+    '.rz-cvm-act{min-height:44px;padding:0 14px;border:1px solid var(--cvm-line);background:transparent;color:var(--cvm-text);border-radius:4px;cursor:pointer;font:600 12px/1 JetBrains Mono,monospace}' +
+    '.rz-cvm-act[aria-disabled="true"]{opacity:.5;cursor:not-allowed}' +
+    '.rz-cvm-msg{flex:1 1 100%;margin:0;color:var(--cvm-mute);font-size:12px}' +
     '@media (max-width:720px){.rz-cvm-grid{grid-template-columns:minmax(0,1fr)}}' +
     '.rz-cvm-sec{background:var(--cvm-panel);border:1px solid var(--cvm-line);border-radius:4px;padding:10px 12px;min-width:0}' +
     '.rz-cvm-sec h3{margin:0 0 6px;font:600 10.5px/1.3 IBM Plex Sans,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--cvm-mute)}' +
@@ -177,6 +181,7 @@
   function onKey(e) {
     if (!el || el.hidden) return;
     if (root.RZTrend && root.RZTrend.isOpen()) return;   /* the trend modal sits above this one and owns the keyboard */
+    if (el.hasAttribute('inert')) return;   /* P4b: another dialog (the TCC opened from an action) made this one inert: it owns the keyboard */
     if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(); return; }
     if (IN && (e.key === 'ArrowLeft' || e.key === 'ArrowRight') && e.target && e.target.closest && e.target.closest('.rz-cvm-nav,.rz-cvm-fleet')) {
       e.preventDefault(); step(e.key === 'ArrowLeft' ? -1 : 1); return;
@@ -221,7 +226,7 @@
   function pctText(v) { var R = R_(); return R ? R.text(v, 'pct') : (typeof v === 'number' && isFinite(v) ? v.toFixed(1) + ' %' : '—'); }
   function titleOf() { return IN.fleetOnly ? opts.internal.title : R_().get(opts.internal.classKey).title; }
   function R_() { return root.RZConvInternals; }
-  function unitNo(u, i) { var m = /(\d+)$/.exec((u && u.tag) || ''); return m ? m[1] : ('0' + (i + 1)).slice(-2); }
+  function unitNo(u, i) { if (u && u.cell) return u.cell; var m = /(\d+)$/.exec((u && u.tag) || ''); return m ? m[1] : ('0' + (i + 1)).slice(-2); }   /* P4b: a unit may name its own cell (CB-UIAA -> UIAA) */
   function vstateOf(u) { var s = u && u.state; return s === 'running' ? 'running' : s === 'standby' ? 'standby' : (s === 'fault' || s === 'trip') ? 'alarm' : 'stopped'; }
   function wordOf(u) { var s = (u && u.state) || ''; return s === 'running' ? 'RUN' : s === 'standby' ? 'STBY' : s.toUpperCase() || '—'; }
   function readFleet() {
@@ -236,14 +241,14 @@
     var chip = vs === 'alarm' ? 'is-alarm' : 'is-normal';
     return '<div class="rz-cvm-head"><div><div class="rz-cvm-kind">' + esc(title) + ' · ' + esc(opts.internal.scope || (current && current.label) || '') + '</div>' +
         '<h2 class="rz-cvm-title" id="rz-cvm-title">' + esc(u.tag + ' — ' + title) + '</h2>' +
-        '<span class="rz-cvm-chip ' + chip + '" data-rz-cvm-state="' + esc(u.state) + '">' + esc(String(u.state).toUpperCase() + ' · LOAD ' + pctText(u.loadPct)) + '</span></div>' +
+        '<span class="rz-cvm-chip ' + chip + '" data-rz-cvm-state="' + esc(u.state) + '">' + esc(String(u.state).toUpperCase() + ' · ' + (u.readout || 'LOAD ' + pctText(u.loadPct))) + '</span></div>' +
         '<div class="rz-cvm-tools"><div class="rz-cvm-nav" role="group" aria-label="Unit navigator: ' + n + ' units">' +
           '<button type="button" data-nav="-1" aria-label="Previous unit">◂</button>' +
           '<span class="rz-cvm-nav-n" aria-live="polite" data-rz-cvm-navn>' + esc(unitNo(u, IN.i)) + ' of ' + n + '</span>' +
           '<button type="button" data-nav="1" aria-label="Next unit">▸</button></div>' +
         '<button type="button" class="rz-cvm-close" aria-label="Close equipment detail">×</button></div></div>' +
       '<div class="rz-cvm-fleet" role="group" aria-label="Fleet: ' + n + ' units, one cell per unit">' + IN.fleet.map(function (f, i) {
-        var load = pctText(f.loadPct);
+        var load = f.readout || pctText(f.loadPct);   /* P4b: a unit with no load % (a breaker) reads its own quantity */
         return '<button type="button" class="rz-cvm-cell" data-unit="' + i + '" data-vstate="' + vstateOf(f) + '" aria-pressed="' + (i === IN.i ? 'true' : 'false') + '"' +
           ' aria-label="' + esc(f.tag + ', ' + f.state + ', load ' + load) + '">' +
           '<span class="rz-cvm-cell-row"><span>' + esc(unitNo(f, i)) + '</span><span class="rz-cvm-cell-st">' + esc(wordOf(f)) + '</span></span>' +
@@ -271,9 +276,35 @@
   function intLower() {
     var I = opts.internal, p = typeof I.payloadFor === 'function' ? I.payloadFor(IN.i) : (IN.i === Number(I.unit) ? current : null);
     var src = '<p class="rz-cvm-note" style="padding:0 16px 14px">' + (IN.fleetOnly ? 'Unit' : 'Internal drawing') + ': engine ' + esc((IN.snap.meta && IN.snap.meta.version) || '—') +
-      ' fleet row ' + esc(IN.unit.tag) + ' and plant cooling values; a value the engine does not model reads “not modelled”.</p>';
+      (I.source ? ' and ' + esc(I.source) + ' for ' + esc(IN.unit.tag) : ' fleet row ' + esc(IN.unit.tag) + ' and plant cooling values') + '; a value the engine does not model reads “not modelled”.</p>';   /* P4b M13: EPMS units come from the single-line solve */
     if (!p) return '<p class="rz-cvm-lower-note">' + esc(IN.unit.tag) + ' has no symbol on the plant drawing yet, so it has no plant-sheet readings; its values are the engine fleet row shown above.</p>' + src;
-    return '<div class="rz-cvm-grid">' + sections(p, false) + '</div>' + provenance(p) + src;
+    return acts(p) + '<div class="rz-cvm-grid">' + sections(p, false) + '</div>' + provenance(p) + src;
+  }
+  /* P4b (PRD-CONV-EQUIPMENT-INSIDE, P4b-BREAKER-RELAY.md §6): the page's own operate buttons, from the payload's custom
+     list, dispatched to the SAME handler registry the inspector uses; the page keeps every rule (select-before-operate,
+     interlocks). The page's last message (opts.internal.message()) shows under them, so a refusal is read in the modal. */
+  function acts(p) {
+    var c = (p && p.actions && p.actions.custom) || [], I = opts.internal, msg = typeof I.message === 'function' ? I.message(IN.unit) : null;   /* the page returns its last message only when it names this unit */
+    if (!c.length && !msg) return '';
+    return '<div class="rz-cvm-acts" data-rz-cvm-acts>' + c.map(function (a) {
+      return '<button type="button" class="rz-cvm-act" data-rz-cvm-act="' + esc(a.id) + '"' + (a.disabled ? ' aria-disabled="true"' : '') + (a.title ? ' title="' + esc(a.title) + '"' : '') + '>' + esc(a.label) + '</button>';
+    }).join('') + (msg ? '<p class="rz-cvm-msg" role="status" data-rz-cvm-msg>' + esc(msg) + '</p>' : '') + '</div>';
+  }
+  function act(id, btn) {
+    var I = opts.internal, p = typeof I.payloadFor === 'function' ? I.payloadFor(IN.i) : null, a = null;
+    ((p && p.actions && p.actions.custom) || []).forEach(function (x) { if (x.id === id) a = x; });
+    if (!a || a.disabled) return;
+    var fn = (root.RZDatahallAIInspectorActions || {})[a.handler];
+    if (typeof fn !== 'function') return;
+    try { fn.apply(null, [p, btn].concat(a.args || [])); }
+    catch (err) { if (root.console) root.console.error('RZConvModal action ' + a.handler + ' failed', err); }
+    finally {
+      if (IN) refreshInt();   /* the drawing follows the operation now, not at the next 4 s tick */
+      /* the pressed button may be gone (Select becomes Execute / Cancel): keep the keyboard inside the modal */
+      if (IN && !el.hasAttribute('inert') && (!doc.activeElement || !el.contains(doc.activeElement))) {
+        var f = el.querySelector('[data-rz-cvm-act]') || el.querySelector('.rz-cvm-close'); if (f) { try { f.focus({ preventScroll: true }); } catch (e2) { f.focus(); } }
+      }
+    }
   }
   function mediaKey(def) {
     return (def.media || []).map(function (m) { return '<span><i style="--sw:var(--hmi-m-' + esc(m[0].replace(/_/g, '-')) + ')" aria-hidden="true"></i>' + esc(m[1]) + '</span>'; }).join('');
@@ -281,7 +312,7 @@
   /* focus survives a re-render: the element is found again by what it is, not by reference */
   function focusKey() {
     var a = doc.activeElement; if (!a || !el.contains(a)) return null;
-    var k = ['data-nav', 'data-unit', 'data-rz-cvm-bsel', 'data-basis-param', 'data-trend', 'data-node'];
+    var k = ['data-nav', 'data-unit', 'data-rz-cvm-bsel', 'data-basis-param', 'data-trend', 'data-node', 'data-rz-cvm-act'];
     for (var i = 0; i < k.length; i++) if (a.hasAttribute(k[i])) return '[' + k[i] + '="' + (a.getAttribute(k[i]) || '').replace(/"/g, '') + '"]';
     return a.classList && a.classList.contains('rz-cvm-close') ? '.rz-cvm-close' : null;
   }
@@ -377,7 +408,8 @@
   }
   function setInert(on) {
     if (on) {
-      inerted = Array.prototype.slice.call(doc.body.children).filter(function (c) { return c !== el && !c.hasAttribute('inert') && c.tagName !== 'SCRIPT' && c.tagName !== 'STYLE'; });
+      /* a hidden dialog (a TCC closed earlier) is left alone: when an action shows it above this modal it must take input */
+      inerted = Array.prototype.slice.call(doc.body.children).filter(function (c) { return c !== el && !c.hasAttribute('inert') && c.tagName !== 'SCRIPT' && c.tagName !== 'STYLE'; });   /* Q4: every sibling, hidden ones too; a dialog that later opens ABOVE (the TCC) lifts its own inert */
       inerted.forEach(function (c) { c.setAttribute('inert', ''); c.setAttribute('data-rz-cvm-inert', '1'); });
     } else { inerted.forEach(function (c) { c.removeAttribute('inert'); c.removeAttribute('data-rz-cvm-inert'); }); inerted = []; }
   }
@@ -393,6 +425,7 @@
         if (IN && e.target.closest) {
           var nv = e.target.closest('[data-nav]'); if (nv) { step(Number(nv.getAttribute('data-nav'))); return; }
           var uc = e.target.closest('[data-unit]'); if (uc) { go(Number(uc.getAttribute('data-unit'))); return; }
+          var ab = e.target.closest('[data-rz-cvm-act]'); if (ab && el.contains(ab)) { act(ab.getAttribute('data-rz-cvm-act'), ab); return; }
         }
         var b = e.target.closest && e.target.closest('[data-basis-param]');
         if (b && el.contains(b)) basis(b);

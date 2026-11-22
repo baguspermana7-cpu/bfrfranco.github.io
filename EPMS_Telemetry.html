@@ -455,17 +455,17 @@
     font-variant-numeric: tabular-nums slashed-zero;
 }
 </style>
-    <script src="js/rz-version.js?v=20261122-0b7cced3" defer></script>
+    <script src="js/rz-version.js?v=20261122-859ee7ff" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- v1.24.0: bring EPMS onto the engine + BMS Shell. conv-engine.js loads
          non-deferred so window.CONV_CALC exists when the status strip renders.
          Spec: conv/review/14 §2 ; standarization/BMS_SHELL.md -->
-    <script src="js/rz-engine-versions.js?v=20261122-d832b982"></script>
-    <script src="js/conv-engine.js?v=2.5.0"></script>
+    <script src="js/rz-engine-versions.js?v=20261122-61d1051b"></script>
+    <script src="js/conv-engine.js?v=2.6.0"></script>
     <!-- v1.134.3 — generated parameter registry + the ONE shared basis drawer.
          Replaces provenance restated by hand; see js/rz-basis-drawer.js. -->
-    <script src="js/conv-parameters.js?v=20261122-36178096"></script>
+    <script src="js/conv-parameters.js?v=20261122-7c74e65e"></script>
     <!-- v1.134.25 — RZExplain, the site glossary engine. The cockpits were the only
          substantial pages carrying none of it, so terms an operator has to read
          (approach temperature, cycles of concentration, N+1, WUE) had nowhere to go.
@@ -517,14 +517,20 @@
 <script src="js/conv/quiet.js?v=20261122-cde28b5e" defer></script>
 <script src="js/conv/sheet-truth.js?v=20261122-14958672"></script>
 <script src="js/conv/payloads.js?v=20261122-013d4c62"></script>
-<script src="js/conv/equipment-modal.js?v=20261122-51d130b9"></script>
+<script src="js/conv/equipment-modal.js?v=20261122-a3797451"></script>
+<script src="js/conv/internals.js?v=20261122-c5b4f338"></script>
+<script src="js/conv/internals/transformer.js?v=20261122-93d1d76f"></script>
+<script src="js/conv/internals/ups.js?v=20261122-46029a8d"></script>
+<script src="js/conv/internals/breaker.js?v=20261122-5c2402bb"></script>
+<script src="js/conv/internals/relay.js?v=20261122-4a225dc3"></script>
+<script src="js/conv/epms-internals.js?v=20261122-63e5efca"></script>
 <script src="js/rz-inspector.js?v=20261117-bbb735d4" defer></script>
 <script src="js/conv/sld-topology.js?v=20261118-597640aa"></script>
 <script src="js/conv/tcc.js?v=20261118-4e103126"></script>
 <script src="js/conv/epms-sheet.js?v=20261121-3f7ce5d7"></script>
-<script src="js/conv/epms-sim.js?v=20261120-7be9cf69"></script>
-<script src="js/conv/epms-lv.js?v=20261120-7e11b930"></script>
-<script src="js/conv/tcc-modal.js?v=20261118-e31d9000"></script>
+<script src="js/conv/epms-sim.js?v=20261122-3e7676e1"></script>
+<script src="js/conv/epms-lv.js?v=20261122-778c695b"></script>
+<script src="js/conv/tcc-modal.js?v=20261122-d14a6e1d"></script>
 <style id="epms-sld-css">
 /* the view switch: its own class, so no page code or gate that selects .btn / .zoom-btn picks it up */
 .epms-view { display: inline-flex; flex: 0 0 auto; }
@@ -1484,9 +1490,21 @@ function exportJSON() {
         prov.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
     })();
 
+    /* PRD-CONV-EQUIPMENT-INSIDE P4a: a transformer opens on its drawn inside with one click, its numbers read from THIS
+       sheet's solve (js/conv/epms-internals.js), so the drawing and the single-line show one value per device */
+    function deepOpts(n) {
+        var I = window.RZEpmsInternals;
+        if (!LIVE || !I || !window.RZConvInternals) return null;
+        var o = I.unitOf(n, SHEET, sim, res); if (!o) return null;
+        return { internal: { classKey: o.classKey, unit: o.index, scope: 'E-S-101', source: 'the E-S-101 simulation solve',
+            message: function (u) { return lastMsg && u && lastMsg.indexOf(u.tag) >= 0 ? lastMsg : null; },
+            fleet: function () { var x = I.unitOf(n, SHEET, sim, res); return x ? x.units : []; },
+            snapshot: function () { return window.CONV_CALC.snapshot; },
+            payloadFor: function (i) { var x = I.unitOf(n, SHEET, sim, res), u = x && x.units[i]; return u && BY[u.id] ? payload(BY[u.id]) : null; } } };
+    }
     function start() {
         var T = window.RZConvTruth;
-        var open = T ? T.opener(payload, '#epms-sheet-host') : null;
+        var open = T ? T.opener(payload, '#epms-sheet-host', deepOpts) : null;
         sheet = window.RZHmiSheet.render(host, SHEET, { read: read, flow: flow, open: open });
         if (!sheet) return;
         /* the shared shading gradients live in ONE document-level <defs> that takes the page theme; this cockpit is dark
@@ -1523,7 +1541,7 @@ function exportJSON() {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();
 </script>
-<script src="js/conv/epms-lv-view.js?v=20261120-234a7b05"></script>
+<script src="js/conv/epms-lv-view.js?v=20261122-3f2227d3"></script>
 <script src="js/rz-command-palette.js?v=20261111-5028a9f4" defer></script>
 </body>
 </html>
