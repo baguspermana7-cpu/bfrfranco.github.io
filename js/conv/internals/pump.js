@@ -65,9 +65,9 @@
 
   /* per engine family: the medium of its water and the key stems of its engine values */
   var KINDS = {
-    cdw_pump: { title: 'Condenser-water pump', medium: 'cw', water: 'Condenser water', stem: 'cdw_pump_', head: 'cdw_head_m', no: 'CDW pump' },
-    chw_primary_pump: { title: 'Primary chilled-water pump', medium: 'chw', water: 'Chilled water', stem: 'chw_primary_pump_', head: 'chw_primary_head_m', no: 'Primary CHW pump' },
-    chw_secondary_pump: { title: 'Secondary chilled-water pump', medium: 'chw', water: 'Chilled water', stem: 'chw_secondary_pump_', head: 'chw_secondary_head_m', no: 'Secondary CHW pump' }
+    cdw_pump: { title: 'Condenser-water pump', medium: 'cw', water: 'Condenser water', stem: 'cdw_pump_', speedKey: 'cooling.cdw_pump_speed_pct', ctrl: { label: 'Static lift (open tower circuit)', fmt: 'metre', key: 'cdw_static_head_m', basis: 'cooling.cdw_static_head_m' }, hzKey: 'cooling.cdw_pump_hz', head: 'cdw_head_m', no: 'CDW pump' },
+    chw_primary_pump: { title: 'Primary chilled-water pump', medium: 'chw', water: 'Chilled water', stem: 'chw_primary_pump_', speedKey: 'cooling.chw_primary_pump_speed_pct', hzKey: 'cooling.chw_primary_pump_hz', head: 'chw_primary_head_m', no: 'Primary CHW pump' },
+    chw_secondary_pump: { title: 'Secondary chilled-water pump', medium: 'chw', water: 'Chilled water', stem: 'chw_secondary_pump_', speedKey: 'cooling.chw_secondary_pump_speed_pct', ctrl: { label: 'Loop DP setpoint', fmt: 'kpad', key: 'chw_secondary_dp_setpoint_kpa', basis: 'cooling.chw_secondary_dp_setpoint_kpa' }, hzKey: 'cooling.chw_secondary_pump_hz', head: 'chw_secondary_head_m', no: 'Secondary CHW pump' }
   };
 
   function make(kind) {
@@ -82,8 +82,9 @@
       function only(v) { return run ? v : null; }
       return {
         state: u.state, tag: u.tag, n: u.n, running: run,
-        flow: u.flowLps, kwE: u.kwE, speedPct: u.speedPct, headM: only(u.headM),
+        flow: u.flowLps, kwE: u.kwE, speedPct: u.speedPct, hz: u.hz, headM: only(u.headM),
         dpKpa: only(c[K.stem + 'dp_kpa']), hydKw: only(c[K.stem + 'hydraulic_kw']), shaftKw: only(c[K.stem + 'shaft_kw']),
+        minSpd: c.pump_min_speed_pct, shutoff: c.pump_shutoff_head_ratio, ctrl: K.ctrl ? c[K.ctrl.key] : null,
         eff: c.pump_efficiency, motorEff: c.pump_motor_efficiency, vfdEff: c.pump_vfd_efficiency,
         iv: 'OPEN', check: run ? 'OPEN' : 'CLOSED',
         suctionP: NM, sealLeak: NM, bearingT: NM, vibration: NM
@@ -121,9 +122,13 @@
         values: [{ label: 'Electrical input', key: 'kwE', fmt: 'kwe', basis: C + K.stem + 'kw_e', fleet: true },
           { label: 'Motor efficiency', key: 'motorEff', fmt: 'frac', basis: C + 'pump_motor_efficiency' }] },
       { id: 'vfd', node: 'vfd', name: 'Variable-frequency drive', standard: 'IEC 61800-9-2',
-        role: ['Sets the motor speed, so the pump makes only the head the loop needs.', 'At the design point it runs at full speed.'],
-        values: [{ label: 'Speed', key: 'speedPct', fmt: 'pct', basis: C + 'pump_speed_pct', fleet: true },
-          { label: 'Drive efficiency', key: 'vfdEff', fmt: 'frac', basis: C + 'pump_vfd_efficiency' }] },
+        role: ['Sets the motor speed, so the pump makes only the head the loop needs.', 'Its speed is where the pump curve meets the loop\'s system curve.'],
+        values: [{ label: 'Speed', key: 'speedPct', fmt: 'pct', basis: K.speedKey, fleet: true },
+          { label: 'Frequency', key: 'hz', fmt: 'hz', basis: K.hzKey, fleet: true },
+          { label: 'Minimum speed', key: 'minSpd', fmt: 'pct', basis: 'cooling.pump_min_speed_pct' },
+          { label: 'Shut-off head / design head', key: 'shutoff', fmt: 'ratio', basis: 'cooling.pump_shutoff_head_ratio' }]
+          .concat(K.ctrl ? [{ label: K.ctrl.label, key: 'ctrl', fmt: K.ctrl.fmt, basis: K.ctrl.basis }] : [])
+          .concat([{ label: 'Drive efficiency', key: 'vfdEff', fmt: 'frac', basis: C + 'pump_vfd_efficiency' }]) },
       { id: 'check', node: 'ck', name: 'Discharge check valve', standard: 'ISO 10628-2',
         role: ['Stops reverse flow through a pump that is stopped.', 'Open while the pump runs.'],
         values: [{ label: 'Position', key: 'check', fmt: 'text' }] },

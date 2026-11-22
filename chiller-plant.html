@@ -569,7 +569,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
         ]
     }
     </script>
-    <script src="js/rz-version.js?v=20261123-c8be1f99" defer></script>
+    <script src="js/rz-version.js?v=20261122-70a93bea" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- Conventional BMS single scenario engine — single source of truth for the
@@ -579,10 +579,10 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
          window.CONV_CALC exists before the inline SCADA script runs.
          Basis: conv/review/09-engineering-basis-and-calculations.md ;
          CHW-relabel decision: conv/review/04-chiller-plant-review.md -->
-    <script src="js/rz-engine-versions.js?v=20261122-61d1051b"></script>
-    <script src="js/conv-engine.js?v=2.6.0"></script>
+    <script src="js/rz-engine-versions.js?v=20261122-2f5e01b3"></script>
+    <script src="js/conv-engine.js?v=2.7.0"></script>
     <!-- v1.134.2 — generated parameter registry + the shared basis drawer. -->
-    <script src="js/conv-parameters.js?v=20261122-b285ea9e"></script>
+    <script src="js/conv-parameters.js?v=20261122-e5d46ca8"></script>
     <!-- v1.134.25 — RZExplain, the site glossary engine. The cockpits were the only
          substantial pages carrying none of it, so terms an operator has to read
          (approach temperature, cycles of concentration, N+1, WUE) had nowhere to go.
@@ -605,12 +605,12 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
     <script src="js/rz-hmi-sheet.js?v=20261122-353be1e7"></script>
     <script src="js/conv/chiller-sheet.js?v=20261120-b01afb5b"></script>
     <script src="js/conv/sheet-truth.js?v=20261122-14958672"></script>
-    <script src="js/conv/payloads.js?v=20261122-013d4c62"></script>
-    <script src="js/conv/internals.js?v=20261122-c5b4f338"></script>
+    <script src="js/conv/payloads.js?v=20261122-e3076b8a"></script>
+    <script src="js/conv/internals.js?v=20261122-76f7138e"></script>
     <script src="js/conv/internals/chiller.js?v=20261122-fa129bdf"></script>
-    <script src="js/conv/internals/pump.js?v=20261122-cae7b02e"></script>
-    <script src="js/conv/internals/tower.js?v=20261122-29847389"></script>
-    <script src="js/conv/internals/crah.js?v=20261122-bb43ec07"></script>
+    <script src="js/conv/internals/pump.js?v=20261123-d1fdb7d3"></script>
+    <script src="js/conv/internals/tower.js?v=20261122-5e5dd76d"></script>
+    <script src="js/conv/internals/crah.js?v=20261122-069758c5"></script>
     <script src="js/conv/ph-chart.js?v=20261122-8681e578"></script>
     <script src="js/conv/equipment-modal.js?v=20261122-a3797451"></script>
     <script src="js/conv/vfx.js?v=20261117-89056876"></script>
@@ -1148,9 +1148,11 @@ function engineFleet(kind, hall) {
     return Array.isArray(f) ? f : [];
   } catch (e) { return []; }
 }
+/* engine 2.7.0: drive frequency base (IEC 60196, PLN 50 Hz) — Hz = base x speed */
+const CHW_FBASE = (window.CONV_CALC && window.CONV_CALC.snapshot.cooling && window.CONV_CALC.snapshot.cooling.motor_base_frequency_hz) || 50;
 const LOOP_SEEDS = [
-  { dp1: 97, dp2: 73, spd: 85, comps: [1, 1, 1] }, { dp1: 87, dp2: 68, spd: 57, comps: [1, 0, 1] },
-  { dp1: 65, dp2: 90, spd: 77, comps: [1, 1, 1] }, { dp1: 87, dp2: 75, spd: 78, comps: [1, 0, 1] }
+  { dp1: 97, dp2: 73, comps: [1, 1, 1] }, { dp1: 87, dp2: 68, comps: [1, 0, 1] },
+  { dp1: 65, dp2: 90, comps: [1, 1, 1] }, { dp1: 87, dp2: 75, comps: [1, 0, 1] }
 ];
 function seedLoops() {
   const pri = engineFleet('chw_primary_pump');
@@ -1159,11 +1161,14 @@ function seedLoops() {
     const sd = LOOP_SEEDS[i % LOOP_SEEDS.length], run = u.state === 'running';
     const tt = (/(\d+)$/.exec(u.tag || '') || [0, String(i + 1)])[1];
     const pumpA = !runs('CHWP-' + tt + 'B');   /* A is duty unless the engine runs B */
+    /* engine 2.7.0: the duty pump's operating speed (pump curve x branch system curve), never an authored seed */
+    const duty = pri.find((p) => p.tag === 'CHWP-' + tt + (pumpA ? 'A' : 'B'));
+    const spd = run && duty && isFinite(duty.speedPct) ? duty.speedPct : 0;
     /* ref = the engine's per-unit point the NORMAL simulation holds to (E3 Q3/Q4): branch flow = the unit's
        chwFlowLps, dp around its seed, never a free random walk across the warning limits */
     return { id: i + 1, tag: u.tag, standby: !run, flow: 0, dp1: sd.dp1, dp2: sd.dp2, t1: 0, t2: 0, pumpA: pumpA,
-      ref: { flow: run && u.chwFlowLps != null && isFinite(u.chwFlowLps) ? u.chwFlowLps : null, dp1: sd.dp1, dp2: sd.dp2 },
-      spdA: run && pumpA ? sd.spd : 0, spdB: run && !pumpA ? sd.spd : 0, comps: run ? sd.comps.slice() : [0, 0, 0] };
+      ref: { flow: run && u.chwFlowLps != null && isFinite(u.chwFlowLps) ? u.chwFlowLps : null, dp1: sd.dp1, dp2: sd.dp2, spd: spd },
+      spdA: run && pumpA ? spd : 0, spdB: run && !pumpA ? spd : 0, comps: run ? sd.comps.slice() : [0, 0, 0] };
   });
 }
 function rescaleLoopsToEngine(loops) {
@@ -1365,8 +1370,11 @@ function loopMetrics(loop){
 
   const ampA = runA ? Math.round(18 + loop.spdA*0.9) : 0;
   const ampB = runB ? Math.round(18 + loop.spdB*0.9) : 0;
-  const headA = runA ? r1(11.8 + loop.spdA*0.17) : 0;
-  const headB = runB ? r1(11.8 + loop.spdB*0.17) : 0;
+  /* engine 2.7.0: a primary branch has no setpoint, so its head follows speed squared from the design head
+     (homologous, PRD-CONV-OPS-DEPTH 01 §6.1); the old 11.8 + 0.17 x speed line was authored */
+  const hdP = (window.CONV_CALC && window.CONV_CALC.snapshot.cooling) ? window.CONV_CALC.snapshot.cooling.chw_primary_head_m : null;
+  const headA = runA && hdP != null ? r1(hdP * Math.pow(loop.spdA / 100, 2)) : 0;
+  const headB = runB && hdP != null ? r1(hdP * Math.pow(loop.spdB / 100, 2)) : 0;
   const vibA = runA ? r1(1.2 + (100-loop.spdA)*0.028) : r1(0.6);
   const vibB = runB ? r1(1.2 + (100-loop.spdB)*0.028) : r1(0.6);
 
@@ -1492,7 +1500,7 @@ function chwRead(n){
       out.values = !ok ? { cmd: chwVal('—'), st: chwVal(CHW_UNAV) } : {
         cmd: chwVal(pc === 'on' ? 'CMD ON' : 'CMD OFF', mm ? '2' : null),
         st: chwVal(pf === 'on' ? 'RUN' : 'STOP', mm ? '2' : null) };
-      out.rows = ok ? [['Mode', run ? 'Duty' : 'Standby'], ['Speed', Math.round(spd) + ' %'], ['Head', (isA ? m.headA : (isB ? m.headB : 0)) + ' m'], ['Current', (isA ? m.ampA : (isB ? m.ampB : 0)) + ' A']] : [['Mode', CHW_UNAV]];
+      out.rows = ok ? [['Mode', run ? 'Duty' : 'Standby'], ['Speed', run ? r1(spd) + ' % · ' + (spd * CHW_FBASE / 100).toFixed(1) + ' Hz' : '0 %', ui.maint ? null : 'engine'], ['Head', (isA ? m.headA : (isB ? m.headB : 0)) + ' m'], ['Current', 'not modelled'], ['Vibration', 'not modelled']] : [['Mode', CHW_UNAV]];
     }
     return out;
   }
@@ -1505,7 +1513,7 @@ function chwRead(n){
     out.values = { st: chwVal(!ok ? CHW_UNAV : (duty ? 'DUTY' : 'STBY')) };
     /* P3: speed is the engine's (the drawing inside the modal prints the same), motor current is modelled by neither */
     if(ok && u) out.rows = [['Mode', duty ? 'Duty' : 'Standby'], ['Flow', duty ? conv.f(u.flowLps, ui.unit) + ' ' + conv.fu(ui.unit) : '—'], ['Motor', duty ? u.kwE + ' kWe' : '—'], ['Head', u.headM + ' m'],
-      ['Speed', duty ? u.speedPct + ' %' : '0 %'], ['Current', 'not modelled'], ['Vibration', 'not modelled']];
+      ['Speed', duty ? u.speedPct + ' % · ' + u.hz.toFixed(1) + ' Hz' : '0 %', 'engine'], ['Current', 'not modelled'], ['Vibration', 'not modelled']];
   } else if(n.id === 'sref'){
     out.values = { q: chwVal(ok ? `IT-REFERENCE FLOW ${chwPointText('sref:q')}` : CHW_UNAV) };
   } else if(/^crah[A-Z]+$/.test(n.id)){
@@ -1540,7 +1548,7 @@ function chwRead(n){
       q: chwVal(run ? `${Math.round(u.rejectionKwTh).toLocaleString('en-US')} kWth` : '—'),
       fan: chwVal(run ? `FAN ${Math.round(u.fanKw)} kW` : '—') };
     if(ok && u) out.rows = [['State', run ? 'Running' : 'Standby'], ['Heat rejected', run ? Math.round(u.rejectionKwTh).toLocaleString('en-US') + ' kWth' : '—'],
-      ['Rated', Math.round(u.ratedKwTh).toLocaleString('en-US') + ' kWth'], ['Fan speed', run ? u.fanSpeedPct.toFixed(1) + ' %' : '—'], ['CDW in / out', T(PLANT.cdwr) + ' / ' + T(PLANT.cdws)],
+      ['Rated', Math.round(u.ratedKwTh).toLocaleString('en-US') + ' kWth'], ['Fan speed', run ? u.fanSpeedPct.toFixed(1) + ' % · ' + u.hz.toFixed(1) + ' Hz' : '—'], ['CDW in / out', T(PLANT.cdwr) + ' / ' + T(PLANT.cdws)],
       ['Basin level', 'not modelled'], ['Fan vibration', 'not modelled']];
   } else if(/^cp\d+$/.test(n.id)){
     const u = chwFleetUnit('cdw_pump', Number(n.id.slice(2))), run = !!(u && u.state === 'running');
@@ -1549,7 +1557,7 @@ function chwRead(n){
       st: chwVal(run ? 'RUN' : 'STBY'), q: chwVal(run ? `${conv.f(u.flowLps, ui.unit)} ${conv.fu(ui.unit)}` : '—') };
     /* P3: speed is the engine's (the drawing inside the modal prints the same), motor current is modelled by neither */
     if(ok && u) out.rows = [['Mode', run ? 'Duty' : 'Standby'], ['Flow', run ? conv.f(u.flowLps, ui.unit) + ' ' + conv.fu(ui.unit) : '—'], ['Motor', run ? u.kwE + ' kWe' : '—'], ['Head', u.headM + ' m'],
-      ['Speed', run ? u.speedPct + ' %' : '0 %'], ['Current', 'not modelled'], ['Vibration', 'not modelled']];
+      ['Speed', run ? u.speedPct + ' % · ' + u.hz.toFixed(1) + ' Hz' : '0 %', 'engine'], ['Current', 'not modelled'], ['Vibration', 'not modelled']];
   }
   return out;
 }
@@ -1727,7 +1735,7 @@ function chwBuild(n) {
 const CHW_FLEET_ROWS = {
   crah: (u) => [['State', u.state], ['Load', u.loadPct + ' %'], ['Sensible duty', u.dutyKw + ' kW'], ['Rated sensible', u.sensibleKw + ' kW'], ['CHW flow', u.chwFlowLps + ' L/s'], ['Fan speed', u.fanSpeedPct + ' %']],
   tower_cell: (u) => [['State', u.state], ['Load', u.loadPct + ' %'], ['Heat rejected', u.rejectionKwTh + ' kWth'], ['Rated', u.ratedKwTh + ' kWth'], ['CDW flow', u.cdwFlowLps + ' L/s'], ['Fan', u.fanSpeedPct + ' % · ' + u.fanKw + ' kW']],
-  cdw_pump: (u) => [['State', u.state], ['Flow', u.flowLps + ' L/s'], ['Motor', u.kwE + ' kWe'], ['Speed', u.speedPct + ' %'], ['Head', u.headM + ' m']]
+  cdw_pump: (u) => [['State', u.state], ['Flow', u.flowLps + ' L/s'], ['Motor', u.kwE + ' kWe'], ['Speed', u.speedPct + ' %'], ['Frequency', u.hz + ' Hz'], ['Head', u.headM + ' m']]
 };
 function chwFleetOpts(kind, title, scope, unit, hall, bankId) {
   /* PRD-CONV-EQUIPMENT-INSIDE P3: a class with a drawn inside (js/conv/internals/pump.js, tower.js, crah.js) opens on its
@@ -1817,10 +1825,12 @@ function chwVfx(){
     speed: function(id){
       var m = /^p([a-rt-z])(\d+)$/.exec(id);
       if(m){ var lp = st.loops[Number(m[2]) - 1]; return lp ? (m[1] === 'a' ? lp.spdA : (m[1] === 'b' ? lp.spdB : 0)) : null; }
-      /* secondary pumps publish no drive speed: a duty pump's rotor follows the secondary flow as a share of design */
+      /* engine 2.7.0: a duty secondary pump turns at the engine's operating speed (pump curve x loop curve at the
+         remote DP setpoint), the same number its tooltip and modal read */
       var s = /^ps(\d+)$/.exec(id);
-      if(s){ var su = chwFleetUnit('chw_secondary_pump', Number(s[1])); if(!su || su.state !== 'running') return 0; }
-      return (s && CHW.flow) ? Math.min(100, 100 * st.header.flow / CHW.flow) : null;
+      if(!s) return null;
+      var su = chwFleetUnit('chw_secondary_pump', Number(s[1]));
+      return su && su.state === 'running' ? su.speedPct : 0;
     } });
 }
 /* E3: the hall selector marks that hall's CRAH bank on CH-M-101 */
@@ -2359,10 +2369,10 @@ function renderModal(loopId){
     ["DPS1", `${conv.p(lp.dp1,ui.unit)} ${conv.pu(ui.unit)}`],
     ["DPS2", `${conv.p(lp.dp2,ui.unit)} ${conv.pu(ui.unit)}`],
     ["Pump Active", lp.pumpA?"A (RUN)":"B (RUN)"],
-    ["Pump A Speed / Amp", `${Math.round(lp.spdA)}% / ${mtx.ampA} A`],
-    ["Pump B Speed / Amp", `${Math.round(lp.spdB)}% / ${mtx.ampB} A`],
-    ["Pump A Head / Vib", `${hA} / ${mtx.vibA} mm/s`],
-    ["Pump B Head / Vib", `${hB} / ${mtx.vibB} mm/s`],
+    ["Pump A Speed", `${r1(lp.spdA)} % · ${(lp.spdA * CHW_FBASE / 100).toFixed(1)} Hz`],
+    ["Pump B Speed", `${r1(lp.spdB)} % · ${(lp.spdB * CHW_FBASE / 100).toFixed(1)} Hz`],
+    ["Pump A Head", hA],
+    ["Pump B Head", hB],
     ["Suction / Discharge", `${conv.p(mtx.suction,ui.unit)} / ${conv.p(mtx.discharge,ui.unit)} ${conv.pu(ui.unit)}`],
     ["Superheat / Subcool", `${sh} / ${sc} ${tU}`],
     ["Cond Sat / Evap Sat", `${conv.t(mtx.condSat,ui.unit)} / ${conv.t(mtx.evapSat,ui.unit)} ${conv.tu(ui.unit)}`],
@@ -2454,7 +2464,8 @@ function stepProcess(){
     if(ui.maint){
       const tf = st.sp.flow + r(-0.4,0.4);
       lp.flow = r1(clamp(lp.flow + (tf-lp.flow)*0.28 + r(-0.2,0.2), 0, LOOP_FLOW_MAX));
-      const sv = clamp((lp.flow/LOOP_FLOW_MAX)*100 + r(-4,4), 0, 100);
+      /* a dedicated branch is homologous (PRD-CONV-OPS-DEPTH 01 §6.1): speed moves with flow from the engine point */
+      const sv = lp.ref && lp.ref.spd && lp.ref.flow ? r1(clamp(lp.ref.spd * lp.flow / lp.ref.flow, 0, 100)) : 0;
       if(lp.pumpA){ lp.spdA = sv; lp.spdB = 0; } else { lp.spdB = sv; lp.spdA = 0; }
       lp.dp1 = Math.round(clamp(lp.dp1 + (st.sp.dp-lp.dp1)*0.22 + r(-2,2), 45, 150));
       lp.dp2 = Math.round(clamp(lp.dp2 + (st.sp.dp-lp.dp2)*0.22 + r(-2,2), 45, 150));
@@ -2471,8 +2482,10 @@ function stepProcess(){
       /* E3: the floor keeps a healthy duty pump under the 2.5 mm/s changeover threshold (vib = 1.2 + (100 - spd)
          x 0.028 crosses it below 53.6 %), so the duty pump stays the one the engine's unit-state table names; the
          old 42 % floor let a random walk swap pumps, the false first-out the comment above rules out */
-      if(lp.pumpA){ lp.spdA = clamp(lp.spdA + r(-8,8), 55, 92); lp.spdB = 0; }
-      else { lp.spdB = clamp(lp.spdB + r(-8,8), 55, 92); lp.spdA = 0; }
+      /* engine 2.7.0: the duty pump runs at the engine's operating speed (it was a 55-92 % random walk) */
+      const es = lp.ref && lp.ref.spd ? lp.ref.spd : 0;
+      if(lp.pumpA){ lp.spdA = es; lp.spdB = 0; }
+      else { lp.spdB = es; lp.spdA = 0; }
       const rd1 = lp.ref ? lp.ref.dp1 : 90, rd2 = lp.ref ? lp.ref.dp2 : 80;
       lp.dp1 = Math.round(clamp(lp.dp1 + (rd1 - lp.dp1) * 0.3 + r(-3,3), 54, 115));
       lp.dp2 = Math.round(clamp(lp.dp2 + (rd2 - lp.dp2) * 0.3 + r(-3,3), 54, 115));

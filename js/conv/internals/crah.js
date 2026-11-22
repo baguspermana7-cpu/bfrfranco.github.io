@@ -69,7 +69,7 @@
     function only(v) { return run ? v : null; }
     return {
       state: u.state, tag: u.tag, n: u.n, running: run,
-      duty: u.dutyKw, loadPct: u.loadPct, rated: u.sensibleKw, chwFlow: u.chwFlowLps, fanSpd: only(u.fanSpeedPct),
+      duty: u.dutyKw, loadPct: u.loadPct, rated: u.sensibleKw, chwFlow: u.chwFlowLps, fanSpd: only(u.fanSpeedPct), fanHz: only(u.hz),
       airflow: only(c.crah_unit_airflow_m3_s), supplyT: only(c.crah_supply_air_c), returnT: only(c.crah_return_air_c),
       airDt: only(c.airside_delta_t_k), chwsT: only(c.chws_c), chwrT: only(c.chwr_c),
       mode: run ? 'RUN' : 'STANDBY',
@@ -107,6 +107,7 @@
     { id: 'fans', node: 'fan', name: 'EC fans', standard: 'ISO 10628-2 · IEC 60034-30-2',
       role: ['Move the air through the filter and coil to the cold aisle.', 'Airflow = duty / (air density × cp × air ΔT).'],
       values: [{ label: 'Fan speed', key: 'fanSpd', fmt: 'pct', basis: C + 'crah_fan_speed_pct', fleet: true },
+        { label: 'Frequency', key: 'fanHz', fmt: 'hz', basis: 'cooling.crah_fan_hz', fleet: true },
         { label: 'Airflow', key: 'airflow', fmt: 'm3s', basis: C + 'crah_unit_airflow_m3_s' },
         { label: 'Air ΔT', key: 'airDt', fmt: 'k', basis: C + 'airside_delta_t_k' },
         { label: 'Fan power', key: 'fanKw', fmt: 'text' }] },

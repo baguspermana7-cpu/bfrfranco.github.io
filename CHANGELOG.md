@@ -11,6 +11,44 @@ release sections rather than semver.
 
 ---
 
+## v3.95.0 — 2026-11-23 — Every pump runs at the speed its curve and its loop agree on
+
+Owner R188/R189 ("cwp itu speednya berapa", "speed CRAH"), PRD-CONV-OPS-DEPTH 01 phase P1. Conventional engine 2.6.0 → 2.7.0.
+
+### Added
+- **Operating speed and drive frequency of every pump** (`js/conv-engine.js` 2.7.0). Each pump class runs where its curve
+  `H = n²·H0 − b·q²` (H0 = 1.2 × design head, ASSUMED, Hydraulic Institute 1.1–1.3) meets its loop curve
+  `H = Hsp + (Hd − Hsp)·(Q/QD)²`. The frequency is `Hz = 50 × n` (IEC 60196, PLN 50 Hz).
+  - Primary pumps sit on a dedicated branch with no setpoint, so speed = branch flow / rated branch flow: **89.3 % · 44.6 Hz**.
+  - Secondary pumps use the 90 kPa remote DP setpoint (the page's default): **98.7 % · 49.3 Hz**, the PRD's worked example.
+  - Condenser pumps use a 4 m static lift (ASSUMED): **90.8 % · 45.4 Hz**.
+  - Never below the 30 % minimum VFD speed (ASSUMED).
+  New keys: `chw_primary_pump_speed_pct/_hz`, `chw_secondary_pump_speed_pct/_hz`, `cdw_pump_speed_pct/_hz`,
+  `tower_fan_hz`, `crah_fan_hz`. New inputs: `motor_base_frequency_hz`, `pump_shutoff_head_ratio`, `pump_min_speed_pct`,
+  `cdw_static_head_m`, `chw_secondary_dp_setpoint_kpa`. Fleet units gain `hz`; a pump's `speedPct` is now its operating speed.
+  `pump_speed_pct` keeps its 2.6.0 meaning, the design speed (100). `CONV_CALC.secondaryPumpSpeedAt(dpKpa)` gives the
+  secondary speed at any setpoint (monotone: 98.5 % at 60 kPa, 98.9 % at 140 kPa).
+- Pump modal (CHW primary, secondary, CDW): the drive block shows **Speed** and **Frequency**, each with its engine
+  key as basis. Tooltips print `89.3 % · 44.6 Hz`; the tower cell tooltip shows the fan Hz.
+- Gate `tools/test-conv-pump-speed.mjs` (81 checks, wired in `tools/ship-gate.sh`). It is red on 2.6.0
+  ("OD-CP-03 chw_primary_pump: no published speed / Hz").
+
+### Fixed
+- Primary pump speed on `chiller-plant.html` was invented: seeds of 85/57/77/78 % plus a 55–92 % random walk in NORMAL.
+  It now shows the engine's operating speed. Under a maintenance setpoint it follows flow homologously from that
+  point, with no random term. Secondary rotors turn at the engine speed; they used to turn at header flow / design.
+- The primary pump's head, motor current and vibration were authored lines (11.8 + 0.17 × speed m, 18 + 0.9 × speed A,
+  1.2 + 0.028 × (100 − speed) mm/s). Head now follows the engine: design head × n² on a branch with no setpoint, so
+  12.0 m (118 kPa) at 89.3 %. Current and vibration read "not modelled" in the tooltip, inspector and modal. The modal's
+  Speed reading names the engine as its source (no SIM chip) and agrees with the tooltip to 0.1 %
+  (`test-conv-point-truth` TR1 and `test-conv-internals-p3` P3-6 now compare to 0.1 %).
+
+### Changed
+- `?v=2.7.0` engine pins on the 8 Conventional cockpits, and `RZ_ENGINE_VERSIONS.conv` = 2.7.0.
+- Every new engine number has a registry entry: Hz keys and the CRAH design coil flow carry a formula the formula gate evaluates; the pump speeds state why they have none (a square root over the pump curve); the five new inputs cite their source and evidence class.
+- The equipment modal shows what the speed solve uses: tower and CRAH fans gain a Frequency row; the pump drive block shows minimum speed, shut-off head ratio and, per loop, the DP setpoint (secondary) or the static lift (condenser water).
+- `tools/test-conv-plant-internals.mjs` L7 asserts the operating speed and Hz in place of the constant 100.
+
 ## v3.94.1 — 2026-11-23 — DC AI site buses read live in normal operation
 
 #### Fixed

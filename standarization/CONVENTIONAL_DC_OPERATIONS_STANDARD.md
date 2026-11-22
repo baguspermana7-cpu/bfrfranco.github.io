@@ -348,6 +348,16 @@ Before release:
 
 ## 10. Change and lesson ledger
 
+### 2026-11-23 — pump speed is solved, not typed (PRD-CONV-OPS-DEPTH 01 P1, engine 2.7.0)
+
+- **A speed is where two curves meet.** The engine solves pump curve against system curve for each pump class
+  (`pumpSpeedFraction`), and the frequency is `motor_base_frequency_hz × n`. A page never types a pump or fan speed and
+  never random-walks one. It reads the fleet unit's `speedPct` / `hz`; under a page setpoint it calls
+  `CONV_CALC.secondaryPumpSpeedAt(dp)`.
+- **More pumps sharing one loop save nothing.** The secondary pumps share one system curve, so total Q·H is fixed
+  (OD-CP-06). Only dedicated branches (primary, CDW, tower fans) gain from more units running.
+- **Gate:** `tools/test-conv-pump-speed.mjs`.
+
 ### 2026-11-20 — quantity truth on the chiller plant sheets (CH-M-101 + CH-M-102, PRD-CONV-EQUIPMENT-TRUTH E3)
 
 - **The sheet holds no count.** `js/conv/chiller-sheet.js` builds both sheets from `CONV_CALC.getFleet()`

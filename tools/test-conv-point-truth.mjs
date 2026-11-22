@@ -40,21 +40,24 @@ try {
     const r = await pg.evaluate((id) => {
       const rows = chwRead({ id }).rows, g = (k) => { const x = rows.find((q) => q[0] === k); return x ? parseFloat(String(x[1])) : null; };
       const a = document.querySelector('aside.rz-inspector.open');
-      return { tip: { spd: g('Speed'), amp: g('Current'), head: g('Head') }, insp: a ? a.innerText.replace(/\s+/g, ' ') : '' };
+      const ct = rows.find((q) => q[0] === 'Current');
+      return { tip: { spd: g('Speed'), amp: g('Current'), ampText: ct ? String(ct[1]) : null, head: g('Head') }, insp: a ? a.innerText.replace(/\s+/g, ' ') : '' };
     }, id);
     const ins = { spd: num(SPD, r.insp), amp: num(AMP, r.insp), head: num(HEAD, r.insp) };
-    ok(ins.spd !== null && Math.round(r.tip.spd) === ins.spd, `TR1a ${id}: speed tooltip ${r.tip.spd} % vs inspector ${ins.spd} %`);
-    ok(ins.amp !== null && Math.round(r.tip.amp) === ins.amp, `TR1a ${id}: current tooltip ${r.tip.amp} A vs inspector ${ins.amp} A`);
+    /* engine 2.7.0: speed is the engine's operating speed to 0.1 %; motor current is modelled by nobody, so every view
+       says "not modelled" (it was an authored 18 + 0.9 x speed line) */
+    ok(ins.spd !== null && Math.abs(r.tip.spd - ins.spd) <= 0.05, `TR1a ${id}: speed tooltip ${r.tip.spd} % vs inspector ${ins.spd} %`);
+    ok(r.tip.ampText === 'not modelled' && /Motor current\s*not modelled/i.test(r.insp), `TR1a ${id}: current tooltip "${r.tip.ampText}", inspector not "not modelled"`);
     ok(ins.head !== null && Math.abs(r.tip.head * 9.80665 - ins.head) <= 1, `TR1c ${id}: head tooltip ${r.tip.head} m (${(r.tip.head * 9.80665).toFixed(0)} kPa) vs inspector ${ins.head} kPa`);
     await pg.keyboard.press('Escape'); await sleep(250);
     await pg.mouse.click(pt.x, pt.y, { clickCount: 2 }); await sleep(700);
     const m = await pg.evaluate(() => { const x = document.querySelector('.rz-cvm:not([hidden])'); return x ? x.innerText.replace(/\s+/g, ' ') : ''; });
     const mo = { spd: num(SPD, m), amp: num(AMP, m) };
-    ok(mo.spd !== null && mo.spd === ins.spd && mo.amp === ins.amp, `TR1b ${id}: modal ${mo.spd} % / ${mo.amp} A vs inspector ${ins.spd} % / ${ins.amp} A`);
-    console.log(`  ${id.padEnd(5)} tooltip ${Math.round(r.tip.spd)} % / ${Math.round(r.tip.amp)} A · inspector ${ins.spd} % / ${ins.amp} A / ${ins.head} kPa · modal ${mo.spd} % / ${mo.amp} A`);
+    ok(mo.spd !== null && mo.spd === ins.spd && /Motor current\s*not modelled/i.test(m), `TR1b ${id}: modal ${mo.spd} % / current "${mo.amp}" vs inspector ${ins.spd} %`);
+    console.log(`  ${id.padEnd(5)} tooltip ${r.tip.spd} % / ${r.tip.ampText} · inspector ${ins.spd} % / ${ins.head} kPa · modal ${mo.spd} %`);
     await pg.keyboard.press('Escape'); await sleep(300);
   }
   ok(errs.length === 0, 'page errors: ' + errs.slice(0, 2).join(' | '));
 } finally { await browser.close(); srv.close(); }
 if (fails.length) { fails.forEach((f) => console.log('  ✗ ' + f)); console.log(`CONV POINT TRUTH — FAIL (${fails.length} of ${checks})`); process.exit(1); }
-console.log(`CONV POINT TRUTH — PASS (${checks} checks: CHW pump speed, current and head equal in tooltip, inspector and modal)`);
+console.log(`CONV POINT TRUTH — PASS (${checks} checks: CHW pump speed (engine 2.7.0) and head equal in tooltip, inspector and modal; motor current not modelled in all three)`);

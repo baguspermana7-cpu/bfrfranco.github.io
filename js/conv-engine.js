@@ -674,6 +674,18 @@
              * it IS the design point, so speed is 100 %; no part-speed operation is modelled.
              * evidenceClass: 'ADOPTED' */
             pump_speed_pct: 100,
+            /* 2.7.0 (PRD-CONV-OPS-DEPTH 01 P1): the OPERATING speed of each pump class follows from its pump curve
+             * meeting its system curve; pump_speed_pct above stays the DESIGN speed (its 2.6.0 meaning).
+             * source: IEC 60196 standard frequencies, 50 Hz the Indonesian grid (PLN). evidenceClass: 'ADOPTED' */
+            motor_base_frequency_hz: 50,
+            // source: ASSUMED shut-off head / design head of a centrifugal pump (Hydraulic Institute typical 1.1-1.3). evidenceClass: 'ASSUMED'
+            pump_shutoff_head_ratio: 1.2,
+            // source: ASSUMED minimum VFD speed of a pump motor (motor cooling, manufacturer typical 25-30 %). evidenceClass: 'ASSUMED'
+            pump_min_speed_pct: 30,
+            // source: ASSUMED static lift of the open cooling-tower circuit (basin to distributor), part of cdw_head_m. evidenceClass: 'ASSUMED'
+            cdw_static_head_m: 4,
+            // source: ASSUMED remote DP setpoint of the secondary loop = the chiller-plant page's default setpoint (60-140 kPa slider). evidenceClass: 'ASSUMED'
+            chw_secondary_dp_setpoint_kpa: 90,
             // source: PRD OD-4 — one duty + one standby primary pump per chiller train. evidenceClass: 'ADOPTED'
             chw_primary_pumps_per_train: 2,
             // source: ASSUMED primary (evaporator) loop head, m. evidenceClass: 'ASSUMED'
@@ -894,7 +906,7 @@
             basis: 'Adopted project scenario — simulated, not measured telemetry',
             basis_doc: 'conv/review/09-engineering-basis-and-calculations.md',
             study_doc: 'js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)',
-            version: '2.6.0'
+            version: '2.7.0'
         }
     };
 
@@ -1284,6 +1296,21 @@
         return c.water_density_kg_m3 * c.gravity_m_s2 * (flowLps / 1000) * headM / 1000;
     }
     /* Electrical input kW = hydraulic / pump eff / (motor eff x VFD eff). */
+    /* 2.7.0 — operating speed of a variable-speed centrifugal pump (PRD-CONV-OPS-DEPTH 01 §6.1).
+     * Pump curve  H(q, n) = n^2 H0 - b q^2,  H0 = r Hd,  b = (H0 - Hd) / qd^2  (n = 1 at the design point);
+     * system     Hsys(Q) = Hsp + (Hd - Hsp) (Q / QD)^2.
+     * Equal:      n = sqrt((Hsys + (H0 - Hd) xp^2) / H0),  xp = q / qd (this pump), xs = Q / QD (the system).
+     * A dedicated branch with no setpoint (primary: Hsp = 0, xs = xp) gives n = xp exactly (homologous).
+     * Never below the minimum VFD speed. Returns a fraction, or null for no flow. */
+    function pumpSpeedFraction(c, xp, xs, headDesignM, headSetM) {
+        if (xp === null || xs === null || !(xp > 0)) return null;
+        var h0 = c.pump_shutoff_head_ratio * headDesignM;
+        var hsys = headSetM + (headDesignM - headSetM) * xs * xs;
+        var n = Math.sqrt((hsys + (h0 - headDesignM) * xp * xp) / h0);
+        return Math.max(c.pump_min_speed_pct / 100, n);
+    }
+    function kpaToHeadM(c, kpa) { return kpa * 1000 / (c.water_density_kg_m3 * c.gravity_m_s2); }
+
     function pumpElectricalKw(c, flowLps, headM) {
         return pumpHydraulicKw(c, flowLps, headM) / c.pump_efficiency
             / (c.pump_motor_efficiency * c.pump_vfd_efficiency);
@@ -1332,6 +1359,17 @@
         var secDuty = Math.ceil(dutyFlow / c.chw_secondary_unit_flow_lps);
         var secCount = secDuty + c.pump_standby_per_header;
         var secFlow = secDuty ? dutyFlow / secDuty : null;
+        /* 2.7.0 — operating speeds. Design flow of one chiller branch = the chiller's rated duty at the design CHW
+         * delta-T (primary) and its rated heat rejection at the CDW range (condenser). */
+        var priDesignFlow = c.chiller_unit_kw_th / (cp * chwDeltaT(m));
+        var cdwDesignFlow = c.chiller_unit_kw_th * (1 + sp) / (cp * c.cdw_range_k);
+        var priX = unitChwFlow === null ? null : unitChwFlow / priDesignFlow;
+        var cdwX = unitCdwFlow === null ? null : unitCdwFlow / cdwDesignFlow;
+        var secXp = secFlow === null ? null : secFlow / c.chw_secondary_unit_flow_lps;
+        var secXs = secDuty ? dutyFlow / (secDuty * c.chw_secondary_unit_flow_lps) : null;
+        var priSpeed = pumpSpeedFraction(c, priX, priX, c.chw_primary_head_m, 0);
+        var secSpeed = pumpSpeedFraction(c, secXp, secXs, c.chw_secondary_head_m, kpaToHeadM(c, c.chw_secondary_dp_setpoint_kpa));
+        var cdwSpeed = pumpSpeedFraction(c, cdwX, cdwX, c.cdw_head_m, c.cdw_static_head_m);
         var priKw = unitChwFlow === null ? null : pumpElectricalKw(c, unitChwFlow, c.chw_primary_head_m);
         var secKw = secFlow === null ? null : pumpElectricalKw(c, secFlow, c.chw_secondary_head_m);
         var cdwKw = unitCdwFlow === null ? null : pumpElectricalKw(c, unitCdwFlow, c.cdw_head_m);
@@ -1374,7 +1412,8 @@
             cellLoad: cellLoad, approach: c.cdw_supply_c - c.tower_design_wet_bulb_c,
             fanKw: fanKw, fanFleet: fanFleet,
             crahDuty: crahDuty, crahLoad: crahLoad, crahChw: crahChw,
-            mechInput: mechInput, mechHeadroom: mechHeadroom
+            mechInput: mechInput, mechHeadroom: mechHeadroom,
+            priSpeed: priSpeed, secSpeed: secSpeed, cdwSpeed: cdwSpeed, secXp: secXp, secXs: secXs
         };
     }
 
@@ -1385,7 +1424,9 @@
         'water_density_kg_m3', 'gravity_m_s2', 'pump_efficiency', 'pump_motor_efficiency',
         'pump_vfd_efficiency', 'pump_speed_pct', 'chw_primary_pumps_per_train', 'chw_primary_head_m',
         'chw_secondary_head_m', 'cdw_head_m', 'chw_secondary_unit_flow_lps', 'pump_standby_per_header',
-        'tower_design_wet_bulb_c', 'tower_fan_motor_kw', 'tower_standby_cells'
+        'tower_design_wet_bulb_c', 'tower_fan_motor_kw', 'tower_standby_cells',
+        /* 2.7.0 */ 'motor_base_frequency_hz', 'pump_shutoff_head_ratio', 'pump_min_speed_pct', 'cdw_static_head_m',
+        'chw_secondary_dp_setpoint_kpa'
     ];
     function withPlantInternals(m, base) {
         var out = {}, key, i;
@@ -1494,6 +1535,18 @@
             crah_unit_airflow_m3_s: p.crahDuty === null ? null : r2n(p.crahDuty / (cc.air_density_kg_m3 * cc.air_cp_kj_kg_k * cc.airside_delta_t_k))
         };
         for (key in pumpKeys) { if (Object.prototype.hasOwnProperty.call(pumpKeys, key)) derived[key] = pumpKeys[key]; }
+        /* ADDITIVE (2.7.0) — operating speed and drive frequency (PRD-CONV-OPS-DEPTH 01 P1): Hz = f_base x n */
+        var fb = cc.motor_base_frequency_hz;
+        var pct = function (n) { return n === null ? null : round1(n * 100); };
+        var hz = function (n) { return n === null ? null : round2(fb * n); };
+        var speedKeys = {
+            chw_primary_pump_speed_pct: pct(p.priSpeed), chw_primary_pump_hz: hz(p.priSpeed),
+            chw_secondary_pump_speed_pct: pct(p.secSpeed), chw_secondary_pump_hz: hz(p.secSpeed),
+            cdw_pump_speed_pct: pct(p.cdwSpeed), cdw_pump_hz: hz(p.cdwSpeed),
+            tower_fan_hz: p.cellLoad === null ? null : round2(fb * p.cellLoad / 100),
+            crah_fan_hz: p.crahLoad === null ? null : round2(fb * p.crahLoad / 100)
+        };
+        for (key in speedKeys) { if (Object.prototype.hasOwnProperty.call(speedKeys, key)) derived[key] = speedKeys[key]; }
         for (key in derived) { if (Object.prototype.hasOwnProperty.call(derived, key)) out[key] = derived[key]; }
         return out;
     }
@@ -1541,35 +1594,35 @@
                 for (j = 0; j < perTrain; j++) {
                     n += 1;
                     out.push(unit(n, 'CHWP-' + pad2(t) + String.fromCharCode(65 + j), j === 0 && t <= run, 100, {
-                        flowLps: r2(p.unitChwFlow), kwE: r2(p.priKw), speedPct: c.pump_speed_pct
+                        flowLps: r2(p.unitChwFlow), kwE: r2(p.priKw), speedPct: round1(p.priSpeed * 100), hz: round2(c.motor_base_frequency_hz * p.priSpeed)
                     }, { headM: c.chw_primary_head_m }));
                 }
             }
         } else if (kind === 'chw_secondary_pump') {
             for (i = 1; i <= p.secCount; i++) {
                 out.push(unit(i, 'CHWP-S' + i, i <= p.secDuty, r2(p.secFlow / c.chw_secondary_unit_flow_lps * 100), {
-                    flowLps: r2(p.secFlow), kwE: r2(p.secKw), speedPct: c.pump_speed_pct
+                    flowLps: r2(p.secFlow), kwE: r2(p.secKw), speedPct: round1(p.secSpeed * 100), hz: round2(c.motor_base_frequency_hz * p.secSpeed)
                 }, { headM: c.chw_secondary_head_m, ratedFlowLps: c.chw_secondary_unit_flow_lps }));
             }
         } else if (kind === 'cdw_pump') {
             run = chillersRunning(m);
             for (i = 1; i <= p.cdwCount; i++) {
                 out.push(unit(i, 'CDWP-' + pad2(i), i <= run, 100, {
-                    flowLps: r2(p.unitCdwFlow), kwE: r2(p.cdwKw), speedPct: c.pump_speed_pct
+                    flowLps: r2(p.unitCdwFlow), kwE: r2(p.cdwKw), speedPct: round1(p.cdwSpeed * 100), hz: round2(c.motor_base_frequency_hz * p.cdwSpeed)
                 }, { headM: c.cdw_head_m }));
             }
         } else if (kind === 'tower_cell') {
             for (i = 1; i <= p.cellCount; i++) {
                 out.push(unit(i, 'CT-' + pad2(i), i <= p.cellRunning, r2(p.cellLoad), {
                     rejectionKwTh: r2(p.unitCond), cdwFlowLps: r2(p.unitCdwFlow),
-                    fanSpeedPct: r2(p.cellLoad), fanKw: r2(p.fanKw)
+                    fanSpeedPct: r2(p.cellLoad), fanKw: r2(p.fanKw), hz: round2(c.motor_base_frequency_hz * p.cellLoad / 100)
                 }, { ratedKwTh: round1(p.cellRated), fanMotorKw: c.tower_fan_motor_kw }));
             }
         } else if (kind === 'crah') {
             run = crahRequired(m);
             for (i = 1; i <= run + 1; i++) {
                 out.push(unit(i, 'CRAH-' + hall.code + pad2(i), i <= run, r2(p.crahLoad), {
-                    dutyKw: r2(p.crahDuty), chwFlowLps: r2(p.crahChw), fanSpeedPct: r2(p.crahLoad)
+                    dutyKw: r2(p.crahDuty), chwFlowLps: r2(p.crahChw), fanSpeedPct: r2(p.crahLoad), hz: round2(c.motor_base_frequency_hz * p.crahLoad / 100)
                 }, { sensibleKw: c.crah_unit_sensible_kw }));
             }
         } else if (kind === 'genset') {
@@ -1992,6 +2045,14 @@
         fleetKinds: FLEET_KINDS,
         getFleet: function (kind, hallCode, m) { return fleet(m || CONV_MODEL, kind, hallCode); },
         refrigerantSatKpa: refrigerantSatKpa,
+        /* engine 2.7.0 — the secondary pumps' operating speed at a remote DP setpoint (kPa), same duty flow and pump
+         * count as the solve: the page's setpoint slider reads speed and Hz through this, never its own formula */
+        secondaryPumpSpeedAt: function (dpKpa, m) {
+            var mm = m || CONV_MODEL, c = mm.cooling, p = plantInternals(mm);
+            if (!(dpKpa >= 0)) return null;
+            var n = pumpSpeedFraction(c, p.secXp, p.secXs, c.chw_secondary_head_m, kpaToHeadM(c, dpKpa));
+            return n === null ? null : { speedPct: round1(n * 100), hz: round2(c.motor_base_frequency_hz * n), dpKpa: dpKpa };
+        },
         r134aSatTable: R134A_SAT_TABLE,
         /* engine 2.5.0 — R-134a properties (NIST rows) and the cycle at any saturation pair */
         r134a: { sat: r134aSat, vap: r134aVap,

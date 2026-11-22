@@ -104,7 +104,7 @@ test('V0 engine publishes the plant-internals family (>= 2.4.0)', () => {
     const [maj, min] = String(snap.meta.version).split('.').map(Number);
     assert.ok(maj > 2 || (maj === 2 && min >= 4), `engine ${snap.meta.version} predates the plant internals`);
     assert.equal(c.chiller_refrigerant, 'R-134a');
-    assert.equal(c.pump_speed_pct, 100, 'duty point = design point: speed 100 %');
+    assert.equal(c.pump_speed_pct, 100, 'pump_speed_pct keeps its 2.6.0 meaning: the DESIGN speed');
     assert.deepEqual(JSON.parse(JSON.stringify(calc.r134aSatTable)).map((r) => [r.t_c, r.p_bar_abs]), TABLE,
         'the engine copy of the R-134a table differs from the published values');
 });
@@ -211,7 +211,10 @@ test('L7 pump and fan sanity', () => {
         const u = calc.getFleet(kind)[0];
         near(u.kwE, rho * g * u.flowLps / 1000 * u.headM / 1000 / eta, 0.01, `${kind} P = rho g Q H / eta`);
         near(c[key], u.kwE, 0.05, `${kind} fleet row = published per-pump kW`);
-        assert.equal(u.speedPct, 100);
+        /* 2.7.0: the operating speed is where the pump curve meets the system curve, Hz = 50 x n (OD-CP-03) */
+        assert.ok(u.speedPct > 0 && u.speedPct <= 100, `${kind} speed ${u.speedPct} in (0, 100]`);
+        near(u.hz, c.motor_base_frequency_hz * u.speedPct / 100, 0.06, `${kind} Hz = f_base x n`);
+        near(u.speedPct, c[kind + '_speed_pct'], 0.05, `${kind} fleet speed = published speed`);
     }
     /* power is linear in flow (fixed head) and in head (fixed flow) on a recomputed model */
     const base = JSON.parse(JSON.stringify(calc.model));

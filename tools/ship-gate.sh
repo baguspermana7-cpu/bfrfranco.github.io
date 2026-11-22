@@ -210,6 +210,7 @@ gate "Conventional TCC curves — IEC 60255 families, transformer damage/inrush,
 gate "Conventional SLD topology — energisation from breaker states, bus balance" node --test tools/test-conv-sld-topology.mjs
 gate "Conventional HV/MV basis — 150/20/0.4 kV ratings, fault levels, N-1 loading, graded TMS cross-checked with tcc.js" node --test tools/test-conv-electrical-hvmv.mjs
 gate "Conventional plant internals — chiller cycle (R-134a fit), pump fleet, tower cells, CRAH per unit, fleet tables: energy/flow balances, headroom >= 0, red proofs" node --test tools/test-conv-plant-internals.mjs
+gate "Conventional pump speed (PRD-CONV-OPS-DEPTH 01 P1, engine 2.7.0) — 35 pumps at the speed where pump curve meets system curve, Hz = 50 x n, primary homologous, secondary 98.7 % at 90 kPa and monotone in the setpoint, fan Hz" node tools/test-conv-pump-speed.mjs
 gate "Conventional E-S-101 model — normal state, model builder, engine flows, bus balance, interlock truth table, N-1 tie transfer, coordinated chain" node --test tools/test-conv-epms-model.mjs
 gate "Conventional E-S-101 single-line — default view, 150 kV tags, ANSI relays, engine labels, flows, interlocks in the UI, section loss + tie, TCC modal (1440 + 390)" node tools/test-conv-epms-sld.mjs
 gate "Conventional E-S-102 LV distribution — no legacy drawing, gensets per hall = getFleet, select-before-operate, status follows the solve, every device opens its modal, fit legibility, F21 F23 F24, planted defects red (1440 + 390)" node tools/test-conv-epms-lv.mjs

@@ -73,7 +73,7 @@
       state: u.state, tag: u.tag, n: u.n, running: run,
       rej: u.rejectionKwTh, rated: u.ratedKwTh, loadPct: u.loadPct, flow: u.cdwFlowLps,
       hotT: only(c.cdw_return_c), coldT: only(c.cdw_supply_c), range: only(c.cdw_range_k), approach: only(c.tower_approach_k),
-      wb: c.tower_design_wet_bulb_c, fanSpd: only(u.fanSpeedPct), fanKw: u.fanKw, fanRated: u.fanMotorKw, fanVib: NM,
+      wb: c.tower_design_wet_bulb_c, fanSpd: only(u.fanSpeedPct), fanHz: only(u.hz), fanKw: u.fanKw, fanRated: u.fanMotorKw, fanVib: NM,
       makeup: NM, blowdown: NM, evaporation: NM, basinLevel: NM
     };
   }
@@ -118,6 +118,7 @@
     { id: 'drive', node: 'fvfd', name: 'Fan motor and VFD', standard: 'IEC 61800-9-2 · IEC 60034-30-1',
       role: ['Sets the fan speed from the condenser-water supply temperature.', 'At the design point the speed equals the cell load.'],
       values: [{ label: 'Speed', key: 'fanSpd', fmt: 'pct', basis: C + 'tower_fan_speed_pct', fleet: true },
+        { label: 'Frequency', key: 'fanHz', fmt: 'hz', basis: 'cooling.tower_fan_hz', fleet: true },
         { label: 'Input', key: 'fanKw', fmt: 'kwe', basis: C + 'tower_fan_kw', fleet: true }] },
     { id: 'wet-bulb', node: 'wb', name: 'Ambient wet bulb', standard: 'ASHRAE Fundamentals ch. 1',
       role: ['The lowest temperature evaporation can cool the water to.', 'Approach = cold water − wet bulb.'],

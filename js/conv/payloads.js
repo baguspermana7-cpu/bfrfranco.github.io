@@ -461,7 +461,10 @@
       if (rows[i] && rows[i][0] === a[0]) {
         /* the page says it does not model this reading: the payload says so too, never a seeded wave (P3) */
         if (/not modelled/i.test(String(rows[i][1]))) return 'NM';
-        var x = parseFloat(String(rows[i][1]).replace(/,/g, '')); return isNum(x) ? x * a[1] : null;
+        var x = parseFloat(String(rows[i][1]).replace(/,/g, ''));
+        /* a row the page marks 'engine' prints an engine value (2.7.0 pump speed): the payload says so, not SIM */
+        if (isNum(x) && rows[i][2] === 'engine') return { eng: x * a[1] };
+        return isNum(x) ? x * a[1] : null;
       }
     }
     return null;
@@ -484,6 +487,8 @@
            the hover tooltip), the payload shows THAT value, so tooltip, inspector and modal agree at the same tick;
            the seeded wave is only for a reading the page does not simulate */
         var pv = pageRow(ctx, spec.label);
+        if (pv && isNum(pv.eng)) return { label: spec.label, text: fmt(pv.eng, 1), unit: spec.unit || '', quality: 'derived',
+          declared: 'engine operating value (CONV_CALC fleet unit): pump curve x system curve, the same number as the symbol tooltip' };
         if (pv === 'NM') return { label: spec.label, text: 'not modelled', unit: '', quality: 'state', declared: 'the page plant simulation does not model this reading and the engine does not publish it' };
         if (isNum(pv)) return { label: spec.label, text: fmt(pv, spec.digits), unit: spec.unit || '', quality: 'simulated', sim: true,
           declared: SIMD.replace('seeded deterministic training signal (period and phase from the point id)', 'the page plant simulation (same value as the symbol tooltip)'),

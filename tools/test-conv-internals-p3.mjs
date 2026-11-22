@@ -149,7 +149,7 @@ if (!argv.includes('--node-only')) {
         ok(s.over.length === 0, `P3-5 ${T}: overlapping text ${s.over.slice(0, 4).join(' | ')}`);
         ok(s.outside.length === 0, `P3-5 ${T}: text outside the drawing ${s.outside.slice(0, 4).join(' | ')}`);
         for (const lbl of (/pump/.test(cls) ? ['Motor current', 'Vibration (ISO 10816)'] : cls === 'tower_cell' ? ['Basin level', 'Fan vibration'] : [])) ok(s.rows[lbl] !== undefined && /not modelled$/.test(s.rows[lbl]), `P3-6 ${T}: reading "${lbl}" = ${s.rows[lbl]}`);
-        if (/pump/.test(cls) && s.state === 'running') ok(s.rows.Speed !== undefined && new RegExp('(^|\\s)' + Math.round(s.speed) + '\\s*%').test(s.rows.Speed), `P3-6 ${T}: reading Speed ${s.rows.Speed}, engine ${s.speed}`);
+        if (/pump/.test(cls) && s.state === 'running') ok(s.rows.Speed !== undefined && new RegExp('(^|\\s)' + s.speed.toFixed(1).replace('.', '\\.') + '\\s*%').test(s.rows.Speed), `P3-6 ${T}: reading Speed ${s.rows.Speed}, engine ${s.speed}`);
       }
       ok(errs.length === 0, `P3-6 ${T}: page errors ${errs.slice(0, 2).join(' | ')}`);
       await pg.close();

@@ -408,3 +408,13 @@ Open questions for the owner (taste/scope only)
 1. Default policy: switch the adopted scenario to **standby-running** (all 10 units, or n+1 only) now, which changes `chillers_running` from 7 to 8 or 10 across 33 files and several gates, or keep `lead-lag` as the default and show standby-running as a selectable mode first? (Recommendation: selectable first, adopt as default after P5 gates are green.)
 2. Thermal buffer tank: what ride-through target (minutes) and therefore volume (15 min = 884 m³, 5 min = 295 m³ at today's heat load) should the Basis of Design carry? The engine will not invent it.
 3. ACC: treat it as a plant-level design-basis alternative with its own sheet CH-M-103 (shown when `heatRejectionType` is `dry-cooler` or `hybrid`), or as a per-train option in a hybrid plant, or leave it out of this release? (Recommendation: plant-level alternative, P6, default off.)
+
+## 11. Delivery notes
+
+- **P1 (v3.95.0, engine 2.7.0).** Speed, Hz and setpoint keys shipped; gate `tools/test-conv-pump-speed.mjs`.
+  - **Correction to OD-CP-04.** The rated branch flow is the chiller's rated duty at the design delta-T
+    (5 000 kWth / (cp·ΔT)), not today's flow. Primary speed is therefore 89.3 % today (unit duty 4 464 / 5 000), not
+    100 %. The "87.5 % at 8 of 10" figure assumed today = design. The law now asserts speed = q / q_design,
+    homologous on a recomputed model.
+  - **Deferred.** Electrical kW stays at the design head (`*_kw_e` keeps its 2.6.0 meaning, OD-CP-15). The
+    system-curve kW comes with the P3 DP reset. Lod-1 speed tags on the sheet move to P2, with the rotor overlay.

@@ -5737,6 +5737,209 @@
       },
       "display": "internal",
       "displayReason": "Drawn inside the transformer / UPS equipment modal of EPMS_Telemetry (PRD-CONV-EQUIPMENT-INSIDE P4a); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.chw_primary_pump_hz",
+      "label": "CHW primary pump drive frequency",
+      "unit": "Hz",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "motor base frequency x speed / 100",
+      "deps": [
+        "cooling.motor_base_frequency_hz",
+        "cooling.chw_primary_pump_speed_pct"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "section": "plantInternals()",
+        "method": "VFD output frequency at the operating speed (50 Hz base)."
+      },
+      "formulaExpr": "cooling.motor_base_frequency_hz * cooling.chw_primary_pump_speed_pct / 100"
+    },
+    {
+      "id": "cooling.chw_secondary_pump_hz",
+      "label": "CHW secondary pump drive frequency",
+      "unit": "Hz",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "motor base frequency x speed / 100",
+      "deps": [
+        "cooling.motor_base_frequency_hz",
+        "cooling.chw_secondary_pump_speed_pct"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "section": "plantInternals()",
+        "method": "VFD output frequency at the operating speed (50 Hz base)."
+      },
+      "formulaExpr": "cooling.motor_base_frequency_hz * cooling.chw_secondary_pump_speed_pct / 100"
+    },
+    {
+      "id": "cooling.cdw_pump_hz",
+      "label": "CDW pump drive frequency",
+      "unit": "Hz",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "motor base frequency x speed / 100",
+      "deps": [
+        "cooling.motor_base_frequency_hz",
+        "cooling.cdw_pump_speed_pct"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "section": "plantInternals()",
+        "method": "VFD output frequency at the operating speed (50 Hz base)."
+      },
+      "formulaExpr": "cooling.motor_base_frequency_hz * cooling.cdw_pump_speed_pct / 100"
+    },
+    {
+      "id": "cooling.chw_primary_pump_speed_pct",
+      "label": "CHW primary pump operating speed",
+      "unit": "%",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "affinity-law solve on the pump curve",
+      "deps": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "section": "plantInternals()",
+        "method": "Operating speed from the system curve and the pump curve."
+      },
+      "formulaNotExpressible": "Affinity-law operating point on the pump curve: n = sqrt((Hsys + (H0 - Hd) x xp^2) / H0), H0 = shut-off ratio x design head (PRD-CONV-OPS-DEPTH 01 §6.1). A square root over the pump curve; the evaluator has no sqrt and the design head per loop is internal."
+    },
+    {
+      "id": "cooling.chw_secondary_pump_speed_pct",
+      "label": "CHW secondary pump operating speed",
+      "unit": "%",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "affinity-law solve on the pump curve",
+      "deps": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "section": "plantInternals()",
+        "method": "Operating speed from the system curve and the pump curve."
+      },
+      "formulaNotExpressible": "Affinity-law operating point on the pump curve: n = sqrt((Hsys + (H0 - Hd) x xp^2) / H0), H0 = shut-off ratio x design head (PRD-CONV-OPS-DEPTH 01 §6.1). A square root over the pump curve; the evaluator has no sqrt and the design head per loop is internal."
+    },
+    {
+      "id": "cooling.cdw_pump_speed_pct",
+      "label": "CDW pump operating speed",
+      "unit": "%",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "affinity-law solve on the pump curve",
+      "deps": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "section": "plantInternals()",
+        "method": "Operating speed from the system curve and the pump curve."
+      },
+      "formulaNotExpressible": "Affinity-law operating point on the pump curve: n = sqrt((Hsys + (H0 - Hd) x xp^2) / H0), H0 = shut-off ratio x design head (PRD-CONV-OPS-DEPTH 01 §6.1). A square root over the pump curve; the evaluator has no sqrt and the design head per loop is internal."
+    },
+    {
+      "id": "cooling.tower_fan_hz",
+      "label": "Tower fan drive frequency",
+      "unit": "Hz",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "motor base frequency x fan speed / 100",
+      "deps": [
+        "cooling.motor_base_frequency_hz",
+        "cooling.tower_fan_speed_pct"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "section": "plantInternals()",
+        "method": "VFD output frequency at the fan speed."
+      },
+      "formulaExpr": "cooling.motor_base_frequency_hz * cooling.tower_fan_speed_pct / 100"
+    },
+    {
+      "id": "cooling.crah_fan_hz",
+      "label": "CRAH fan drive frequency",
+      "unit": "Hz",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "motor base frequency x fan speed / 100",
+      "deps": [
+        "cooling.motor_base_frequency_hz",
+        "cooling.crah_fan_speed_pct"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "section": "plantInternals()",
+        "method": "EC/VFD fan frequency at the fan speed."
+      },
+      "formulaExpr": "cooling.motor_base_frequency_hz * cooling.crah_fan_speed_pct / 100"
+    },
+    {
+      "id": "cooling.motor_base_frequency_hz",
+      "label": "Motor base frequency",
+      "unit": "Hz",
+      "scope": "plant",
+      "evidenceClass": "ADOPTED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "method": "IEC 60196 standard frequencies, 50 Hz the Indonesian grid (PLN)."
+      }
+    },
+    {
+      "id": "cooling.pump_shutoff_head_ratio",
+      "label": "Pump shut-off head / design head",
+      "unit": null,
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "method": "shut-off head / design head of a centrifugal pump (Hydraulic Institute typical 1.1-1.3)."
+      }
+    },
+    {
+      "id": "cooling.pump_min_speed_pct",
+      "label": "Pump minimum speed",
+      "unit": "%",
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "method": "minimum VFD speed of a pump motor (motor cooling, manufacturer typical 25-30 %)."
+      }
+    },
+    {
+      "id": "cooling.cdw_static_head_m",
+      "label": "CDW open-circuit static lift",
+      "unit": "m",
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "method": "static lift of the open cooling-tower circuit (basin to distributor), part of cdw_head_m."
+      }
+    },
+    {
+      "id": "cooling.chw_secondary_dp_setpoint_kpa",
+      "label": "Secondary loop DP setpoint",
+      "unit": "kPa",
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "method": "remote DP setpoint of the secondary loop = the chiller-plant page's default setpoint (60-140 kPa slider)."
+      }
     }
   ]
 }
