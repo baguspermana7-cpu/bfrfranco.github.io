@@ -93,13 +93,22 @@ for (const page of PAGES) {
   const uniq = [...byTag.values()].slice(0, 80);
   M.unique = byTag.size; M.clicked = uniq.length;
   for (const c of uniq) {
-    const before = await pg.evaluate((s) => document.querySelectorAll(s).length, OPEN_SEL);
+    const before = await pg.evaluate((s) => [...document.querySelectorAll(s)].filter((e) => e.getClientRects().length).length, OPEN_SEL);
     const pt = await pg.evaluate((i) => { const g = document.querySelector('[data-probe-eq="' + i + '"]'); if (!g) return null; g.scrollIntoView({ block: 'center' }); const b = g.querySelector('.b, rect, circle, path, polygon') || g; const r = b.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, c.i);
     const ok = !!pt; if (pt) await pg.mouse.click(pt.x, pt.y);
     await new Promise((r) => setTimeout(r, 350));
-    const after = await pg.evaluate((s) => document.querySelectorAll(s).length, OPEN_SEL);
+    const after = await pg.evaluate((s) => [...document.querySelectorAll(s)].filter((e) => e.getClientRects().length).length, OPEN_SEL);
     const opened = ok && after > before;
-    const insp = await pg.evaluate(async () => { const a = document.querySelector('aside.rz-inspector.open, .rz-inspector.open'); if (!a) return null;
+    const insp = await pg.evaluate(async () => {
+      /* R186: a machine whose inside is drawn opens the equipment modal on one click; the modal lays the same payload
+         out as sections, so a section with content counts as a tab with content */
+      const m = document.querySelector('.rz-cvm:not([hidden])');
+      if (m && !document.querySelector('aside.rz-inspector.open, .rz-inspector.open')) {
+        const secs = [...m.querySelectorAll('section.rz-cvm-sec')];
+        const live = secs[0] ? secs[0].querySelectorAll('tr, li, [class*="row"]').length : 0;
+        return { tabs: Math.min(6, secs.filter((x) => x.querySelectorAll('tr, li, [class*="row"], [data-basis-param]').length >= 1).length), live, basis: m.querySelectorAll('[data-basis-param]').length };
+      }
+      const a = document.querySelector('aside.rz-inspector.open, .rz-inspector.open'); if (!a) return null;
       const res = { tabs: 0, live: 0, basis: 0 };
       for (const t of a.querySelectorAll('[role=tab]')) { t.click(); await new Promise((r) => setTimeout(r, 50));
         const body = a.querySelector('[role=tabpanel]:not([hidden])') || a;

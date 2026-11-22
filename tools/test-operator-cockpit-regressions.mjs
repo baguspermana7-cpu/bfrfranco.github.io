@@ -344,13 +344,14 @@ try {
      diagnostics — only the count is read from the engine fleet instead of the typed 4 of the four-loop drawing. */
   assert.ok(chiller.chillerFleet >= 1, 'engine chiller fleet must be readable');
   assert.equal(chiller.refrigeration.length, chiller.chillerFleet, 'all visible chillers must publish refrigeration diagnostics');
+  /* v3.91.0 (engine 2.5.0): the plant runs at its own lift, so COP 9.73 / 0.36 kW/RT; 0.58 kW/RT is the AHRI rating */
   assert.deepEqual(chiller.plantAuthority, {
-    cop: 6.06,
-    kwPerRt: 0.58,
+    cop: 9.73,
+    kwPerRt: 0.36,
     capacityKw: 35_000,
     n1CapacityKw: 45_000,
-    copTrend: 6.06,
-    kwPerRtTrend: 0.58,
+    copTrend: 9.73,
+    kwPerRtTrend: 0.36,
   }, 'P&ID trends and capacity block must use the validated engine authority');
   assert.match(chiller.loopText, /IT[- ]REFERENCE FLOW/i,
     'the IT-reference flow must remain readable somewhere on the operator surface');

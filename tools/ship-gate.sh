@@ -171,6 +171,11 @@ gate "Conventional formulas — declared arithmetic actually holds" node tools/t
 gate "Conventional geometry — collisions, clipping, arrangement" node tools/test-conv-geometry.mjs
 gate "Conventional text budget — no prose at rest, words within budget, drawings reachable" node tools/test-conv-text-budget.mjs
 gate "Conventional declutter — first-screen words, provenance in a tooltip, quiet text in its host tooltip, duplicates hidden (DC1-DC5)" node tools/test-conv-declutter.mjs
+gate "Conventional equipment inside — one click opens the drawn inside of a machine, keyboard, focus return; no inside = inspector (IN1)" node tools/test-conv-equipment-inside.mjs
+gate "Conventional point truth — one point, one value: CHW pump speed/current/head equal in tooltip, inspector and modal (TR1)" node tools/test-conv-point-truth.mjs
+gate "Conventional chiller cycle — R-134a two-stage cycle from NIST rows: second-source data, energy closure, physical states, independent solver, perturbations (CY0-CY5)" node --test tools/test-conv-chiller-cycle.mjs
+gate "Conventional P-h chart — the chiller modal draws the running unit's cycle from the engine: points on their axes, table, keyboard, standby none (PH1-PH6)" node tools/test-conv-ph-chart.mjs
+gate "Conventional equipment insides P3 — CDW / secondary CHW pump, tower cell, CRAH drawn from the engine: hand-checked pump power and airflow, one click opens each, values = read(), no overlap, readings agree (P3-1..P3-6)" node tools/test-conv-internals-p3.mjs
 gate "Conventional HMI sheets — no text struck by a pipe, a zone border or a foreign body or outline (W3, C1-C5)" node tools/test-conv-sheet-text-clear.mjs
 gate "Conventional HMI sheets — flow, values and states follow evidence and quality; cmd/fb apart; marks without colour; every asset opens (W4 B1-B6)" node tools/test-conv-bms-truth.mjs
 gate "Conventional HMI sheets — alarm reaches its mark <= 250 ms, motion stops off screen; frame budgets reported (W4 B7)" node tools/test-conv-sheet-perf.mjs

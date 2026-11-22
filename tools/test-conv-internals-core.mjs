@@ -127,12 +127,18 @@ test('K5 no digit in chiller.js outside geometry, comments and standards; value 
   for (const n of def.sheet(fleet[0]).nodes) for (const v of n.values || []) assert.ok(rd[n.id] && rd[n.id].values[v.k], `${n.id}:${v.k} has no read() value`);
 });
 
-test('K6 not-modelled readings are the text "not modelled"', () => {
+test('K6 not-modelled readings are the text "not modelled"; cycle readings (engine 2.5.0) carry their engine basis', () => {
   for (const u of fleet) {
     const m = R.model('chiller', u, snap);
-    for (const k of ['superheat', 'subcooling', 'igvPos', 'oilPress', 'dischargeT']) assert.equal(m[k], R.NOT_MODELLED, `${u.tag} ${k}`);
-    const d = R.detail('chiller', 'evaporator', u, snap), sh = d.rows.find((r) => r.key === 'superheat');
-    assert.equal(sh.text, 'not modelled'); assert.equal(sh.basis, null);
+    for (const k of ['oilPress', 'oilTemp', 'exvPos', 'reliefSet', 'purgeState']) assert.equal(m[k], R.NOT_MODELLED, `${u.tag} ${k}`);
+    const d = R.detail('chiller', 'compressor', u, snap), oil = R.detail('chiller', 'oil', u, snap);
+    const sh = R.detail('chiller', 'evaporator', u, snap).rows.find((r) => r.key === 'superheat');
+    if (u.state === 'running') assert.equal(sh.basis, 'cooling.chiller_superheat_k', `${u.tag} superheat basis`);
+    if (u.state === 'running') {
+      for (const k of ['superheat', 'subcooling', 'dischargeT', 'interPress', 'speedPct', 'igvPos']) assert.equal(typeof m[k], 'number', `${u.tag} ${k}`);
+      assert.equal(d.rows.find((r) => r.key === 'dischargeT').basis, 'cooling.chiller_discharge_c');
+    }
+    if (oil && oil.rows) { const o = oil.rows.find((r) => r.key === 'oilPress'); if (o) { assert.equal(o.text, 'not modelled'); assert.equal(o.basis, null); } }
   }
 });
 

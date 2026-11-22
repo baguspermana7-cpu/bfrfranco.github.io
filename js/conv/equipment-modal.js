@@ -79,6 +79,7 @@
     '.rz-cvm-cell[data-vstate="stopped"] .rz-cvm-cell-bar{background:repeating-linear-gradient(90deg,var(--vfx-stop,#8b93a1) 0 4px,transparent 4px 8px)}' +
     '.rz-cvm-int{display:grid;grid-template-columns:minmax(0,62fr) minmax(0,38fr);gap:12px;padding:12px 16px 0}' +
     '@media (max-width:900px){.rz-cvm-int{grid-template-columns:minmax(0,1fr)}}' +
+    '.rz-cvm-cycle{padding:12px 16px 0}' +
     '.rz-cvm-int.rz-cvm-int-fleet{grid-template-columns:minmax(0,1fr)}' +
     '@media (max-width:640px){.rz-cvm-panel.is-int .rz-cvm-head{flex-wrap:wrap;position:static}.rz-cvm-panel.is-int .rz-cvm-head > div:first-child{flex:1 1 100%}' +
       '.rz-cvm-panel.is-int .rz-cvm-tools{flex:1 1 100%;justify-content:space-between}}' +
@@ -303,11 +304,14 @@
     }
     var def = R.get(I.classKey);
     var hTop = intTop(), hDet = intDetail(), hLow = intLower();
+    /* PRD-CONV-EQUIPMENT-INSIDE §5.5: the class's cycle on a P-h chart, only while the unit runs */
+    var cyc = typeof def.cycle === 'function' && root.RZConvPh ? def.cycle(IN.unit, IN.snap) : null;
     panel.innerHTML = '<div data-rz-cvm-top>' + hTop + '</div>' +
       '<div class="rz-cvm-int">' +
         sec('Internal drawing', '<div class="rz-cvm-int-host hmi-host hmi-depth" data-rz-cvm-int data-theme="' + (doc.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark') + '"></div><div class="rz-cvm-media" aria-label="Media">' + mediaKey(def) + '</div>', 'rz-cvm-int-draw') +
         sec('Block detail', '<div data-rz-cvm-detail aria-live="polite">' + hDet + '</div>', 'rz-cvm-int-detail') +
-      '</div><div data-rz-cvm-lower>' + hLow + '</div>';
+      '</div>' + (cyc ? '<div class="rz-cvm-cycle">' + sec('Refrigeration cycle (P-h)', root.RZConvPh.markup()) + '</div>' : '') +
+      '<div data-rz-cvm-lower>' + hLow + '</div>';
     panel.querySelector('[data-rz-cvm-top]').__html = hTop; panel.querySelector('[data-rz-cvm-detail]').__html = hDet; panel.querySelector('[data-rz-cvm-lower]').__html = hLow;
     var host = panel.querySelector('[data-rz-cvm-int]'), sh = def.sheet(IN.unit);
     IN.sheetObj = sh;
@@ -317,6 +321,7 @@
       open: function (n) { selectBlock(n.id, false); }
     });
     paintInt(true);
+    if (cyc) root.RZConvPh.draw(panel.querySelector('[data-rz-ph]'), root.CONV_CALC, cyc);
     points();
     panel.scrollTop = top;
     refocus(fk);

@@ -74,9 +74,10 @@ async function openCh1(pg, W) {
     const g = document.querySelector('#chw-sheet-host .hmi-node[data-node="ch1"]'); g.scrollIntoView({ block: 'center', inline: 'center' });
     const b = g.querySelector('.b') || g; const r = b.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
   });
-  await pg.mouse.click(pt.x, pt.y); await sleep(300);
-  if (W >= 800) { await pg.mouse.click(pt.x, pt.y, { clickCount: 2 }); await sleep(400); }
+  await pg.mouse.click(pt.x, pt.y); await sleep(400);
   let open = await pg.evaluate(() => !!document.querySelector('.rz-cvm:not([hidden])'));
+  /* R186: one click opens the inside; the double-click is the fallback of a page without that wiring */
+  if (!open && W >= 800) { await pg.mouse.click(pt.x, pt.y, { clickCount: 2 }); await sleep(400); open = await pg.evaluate(() => !!document.querySelector('.rz-cvm:not([hidden])')); }
   let opener = 'symbol';
   if (!open) {
     const btn = await pg.$('aside.rz-inspector.open [data-rz-open-hmi]');
@@ -141,16 +142,18 @@ function valueLaws(i) {
     'evap:p': 'P ' + c.chiller_evap_sat_kpa_abs.toFixed(0) + ' kPa(a)', 'cond:p': 'P ' + c.chiller_cond_sat_kpa_abs.toFixed(0) + ' kPa(a)',
     'ucp:cop': 'COP ' + (u.dutyKwTh / u.inputKwE).toFixed(2), 'ucp:lift': 'LIFT ' + f1(c.chiller_lift_k) + ' K', 'ucp:pr': 'PR ' + c.chiller_pressure_ratio.toFixed(3),
     'ucp:carnot': 'CARNOT ' + c.chiller_carnot_fraction.toFixed(3),
-    'evap:sh': 'SH not modelled', 'cond:sc': 'SC not modelled', 'igv:pos': 'POS not modelled', 'op:p': 'P not modelled', 'cp:td': 'TD not modelled'
+    /* engine 2.5.0 refrigeration cycle (PRD-CONV-EQUIPMENT-INSIDE P2) */
+    'evap:sh': 'SH ' + f1(c.chiller_superheat_k) + ' K', 'cond:sc': 'SC ' + f1(c.chiller_subcool_k) + ' K', 'igv:pos': 'POS ' + f1(c.chiller_igv_pct) + ' %',
+    'cp:td': 'TD ' + f1(c.chiller_discharge_c) + ' °C', 'op:p': 'P not modelled'
   } : {
     'evap:duty': '0.0 kWth', 'cp:kw': '0.0 kWe', 'chws:q': '0.0 L/s', 'chws:t': '—', 'chwr:t': '—', 'evap:sat': 'SAT —', 'cond:sat': 'SAT —', 'ucp:cop': 'COP —',
-    'ucp:lift': 'LIFT —', 'evap:sh': 'SH not modelled', 'cp:td': 'TD not modelled'
+    'ucp:lift': 'LIFT —', 'evap:sh': 'SH —', 'cp:td': 'TD —', 'op:p': 'P not modelled'
   };
   Object.keys(want).forEach((k) => { const [id, v] = k.split(':'); if (tx(id, v) !== want[k]) bad.push('recomputed ' + k + ' want "' + want[k] + '" shows "' + tx(id, v) + '"'); });
   let balance = null;
   if (run) { const e = num(tx('evap', 'duty')), w = num(tx('cp', 'kw')), q = num(tx('cond', 'duty')); balance = Math.abs(e + w - q) / q; }
   /* "not modelled" readings must never be a number */
-  ['evap:sh', 'cond:sc', 'igv:pos', 'op:p', 'cp:td'].forEach((k) => { const [id, v] = k.split(':'); if (/\d/.test(tx(id, v))) bad.push(k + ' is a number: "' + tx(id, v) + '"'); });
+  ['op:p'].forEach((k) => { const [id, v] = k.split(':'); if (/\d/.test(tx(id, v))) bad.push(k + ' is a number: "' + tx(id, v) + '"'); });
   return { n, bad, balance, state: u.state };
 }
 

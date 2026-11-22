@@ -295,6 +295,9 @@ Before release:
     it stays in the DOM for `aria-describedby` and PRD-Q06, and "Simulated" stays shown in the banner. A second copy
     of a reading on the same screen carries `data-dup="<id of the copy that stays>"`. Never delete a quiet element
     a script writes; mark it.
+23b. **One click opens the machine (R186, PRD-CONV-EQUIPMENT-INSIDE, `tools/test-conv-equipment-inside.mjs` + `tools/test-conv-point-truth.mjs`, ship gate).** A machine whose inside is drawn (`RZConvInternals.has(class)`) opens the equipment modal on that drawing with one click or Enter; the side inspector serves only what has no inside. A reading the page simulates is shown with the page value in every view (tooltip, inspector, modal); a view never seeds its own value for it. A new class gets its inside through `js/conv/internals/<class>.js`, then the gate case.
+23c. **The chiller runs its refrigeration cycle (R186 P2, conv-engine 2.5.0, `tools/test-conv-chiller-cycle.mjs` CY0-CY5, ship gate).** R-134a properties come only from the NIST WebBook rows in `data/sources/nist-r134a/`, copied into the engine by `tools/build-conv-r134a.mjs` (`--check` in the gate; linear interpolation, null outside the rows, superheat carried relative to each isobar's own saturation). The authored 0.58 kW/RT is the AHRI 550/590 RATING; the engine fits the isentropic efficiency that reproduces it at the rating saturations and re-solves the same machine at the plant's lift, so a submittal still replaces one number. Every reading in the chiller drawing is either an engine key with its basis or the text "not modelled" (oil, EXV position, relief, purge, hot-gas bypass: transient or vendor-specific). A new cycle reading needs: an engine key, its curated registry row, a CY assertion, then the drawing. A second solver (`tools/lib/r134a-cycle-check.mjs`, raw NIST files, no shared code) must agree. The chiller modal draws the running unit's cycle on a P-h chart (`js/conv/ph-chart.js`, `tools/test-conv-ph-chart.mjs`): log P, linear h, dome and isotherms from the engine's own rows, segments in the drawing's refrigerant tokens, a table view; a standby unit shows none.
+23d. **Pumps, tower cells and CRAHs show their inside (R186 P3, `tools/test-conv-internals-p3.mjs` P3-1..P3-6, ship gate).** One click on a CDW pump, a secondary CHW pump, a tower cell or a CRAH opens its internal drawing (`js/conv/internals/pump.js`, `tower.js`, `crah.js`). Pump hydraulic power = ρ g Q H, shaft = hydraulic / pump η, ΔP = ρ g H (engine keys `cooling.<service>_pump_*`); shaft / (motor η × VFD η) must equal the published kW_e. CRAH airflow = duty / (ρ cp ΔT_air) with ASHRAE dry-air values. Tower evaporation, make-up and blowdown are not drawn per cell while the water balance is WUE-based. A reading the plant does not model says "not modelled" in the drawing AND in the modal's plant readings; a seeded wave never stands beside it.
 24. **One reading, one place (W3 polish).** A KPI tile carries a number and at most a short qualifier; the
     explanation goes to its tooltip or basis drawer. A tile that repeats another tile's number is removed or
     replaced by a figure the operator does not already have: the fuel "N+1 scenario" tile printed the same
@@ -576,13 +579,14 @@ or a state colour.
   ceil(982.3 / 250) = 4 duty + 1 standby, equal share 245.6 L/s, 30 m; condenser: one per chiller (10 / 7) at the unit
   CDW flow, 25 m. kW_e = ρ g Q H / η_pump / (η_motor × η_VFD) = 28.0 / 98.0 / 82.6 kW per pump; fleet 1,166.4 kW.
   Speed is 100 %: the model has one operating point and it is the design point (affinity laws not exercised).
-- **Towers.** One cell per chiller, 0 standby (10 / 7); cell rated = 5,000 × (1 + specific power) = 5,824.5 kW_th, load
+- **Towers.** One cell per chiller, 0 standby (10 / 7); cell rated = 5,000 × (1 + specific power) = 5,514.0 kW_th (engine 2.5.0), load
   89.3 %, approach 32 − 27 = 5.0 K; fan speed = cell load, fan kW = 55 × speed³ = 39.15 kW, fleet 274.0 kW.
 - **CRAH.** Unit duty = hall IT load / running = 7,500 / 58 = 129.31 kW (99.5 %), fan speed = load % (constant air
   ΔT), unit CHW flow 4.06 L/s. No valve position.
-- **Mechanical check.** Chillers 5,153.4 + pumps 1,166.4 + tower fans 274.0 = 6,593.9 kW_e against the PUE-implied
-  non-IT load 13,500 − UPS loss 1,250 = 12,250 kW: headroom 5,656.1 kW (≥ 0, gated). CRAH fans, lighting and controls
-  are not in the 6,593.9.
+- **Mechanical check (engine 2.5.0).** Chillers 3,212.5 + pumps 1,135.6 + tower fans 274.0 = 4,622.1 kW_e against the
+  PUE-implied non-IT load 13,500 − UPS loss 1,250 = 12,250 kW: headroom 7,627.9 kW (≥ 0, gated). CRAH fans, lighting and
+  controls are not in the 4,622.1. Until 2.4.0 the chillers were 5,153.4 kW (the AHRI rating figure applied at this
+  plant's smaller lift); see item 23c.
 - **Two existing quantities disagree (reported, not changed — additive release).** `cooling.flow_per_machine_lps`
   (134.7 L/s) divides the IT-only `flow_lps` (943.0), while the machines carry `heat_rejection_kw` (IT + UPS loss) =
   `plant_duty_flow_lps` 982.3 L/s; the new unit evaporator flow uses the duty (140.3 L/s). The CRAH coils, sized on

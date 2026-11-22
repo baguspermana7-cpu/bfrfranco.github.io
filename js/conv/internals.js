@@ -31,7 +31,7 @@
   var FMT = {
     kwth: { d: 1, u: 'kWth' }, kwe: { d: 1, u: 'kWe' }, temp: { d: 1, u: '°C' }, flow: { d: 1, u: 'L/s' },
     kpa: { d: 0, u: 'kPa(a)' }, kpag: { d: 0, u: 'kPa(g)' }, k: { d: 1, u: 'K' }, pct: { d: 1, u: '%' },
-    ratio: { d: 3, u: '' }, cop: { d: 2, u: '' }, frac: { d: 3, u: '' }, text: { d: null, u: '' }
+    ratio: { d: 3, u: '' }, cop: { d: 2, u: '' }, frac: { d: 3, u: '' }, kgs: { d: 1, u: 'kg/s' }, text: { d: null, u: '' }
   };
   function isNum(v) { return typeof v === 'number' && isFinite(v); }
   function text(v, fmt) {

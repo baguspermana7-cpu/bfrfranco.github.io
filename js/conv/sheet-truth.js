@@ -183,6 +183,11 @@
     }
     return function (n, api, el) {
       last.n = n;
+      /* R186 (PRD-CONV-EQUIPMENT-INSIDE I1): a machine whose inside is drawn opens on that drawing with ONE click (or
+         Enter); the side inspector stays for what has no inside yet (lines, instruments, classes not drawn) */
+      var x = more ? more(n) : null;
+      if (x && x.internal && root.RZConvInternals && root.RZConvInternals.has(x.internal.classKey) &&
+          deep(build, n, el, el, function () { return x; })) return;
       if (!root.RZInspector || typeof root.RZInspector.openPayload !== 'function') return;
       var payload = build(n); if (!payload) return;
       root.RZInspector.openPayload(payload, { trigger: el,

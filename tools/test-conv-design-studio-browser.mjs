@@ -190,7 +190,9 @@ function assertThermalAndCarbonBasis(html, label) {
     `${label}: evaporator duty must keep its own thermal plane`);
   assert.match(text, /Plant-duty CHW reference.{0,220}982\.3\s*L\/s/i,
     `${label}: plant-duty flow must remain a calculated reference`);
-  assert.match(text, /Condenser \/ tower rejection.{0,220}36[ ,]?403\.4\s*kW/i,
+  /* v3.91.0 (engine 2.5.0): chiller input at this plant's lift is 0.36 kW/RT, not the 0.58 AHRI rating, so the tower
+     rejects 31 250 + 3 212.5 = 34 462.5 kW (was 36 403.4 at the rating) */
+  assert.match(text, /Condenser \/ tower rejection.{0,220}34[ ,]?462\.5\s*kW/i,
     `${label}: tower rejection must include chiller electrical input`);
   assert.match(text, /measured header flow\s+UNAVAILABLE/i,
     `${label}: generated document must not present a calculated reference as metered flow`);

@@ -403,17 +403,35 @@
     },
     {
       "id": "cooling.chiller_specific_power_kw_e_per_kw_th",
-      "label": "Chiller specific power",
+      "label": "Chiller specific power (operating)",
       "unit": "kW_e/kW_th",
       "scope": "plant",
-      "evidenceClass": "ASSUMED",
-      "explainKey": "cop",
+      "evidenceClass": "DERIVED",
+      "formula": "compressor input per kW of duty at the plant saturations, with the isentropic efficiency that reproduces the rated specific power at AHRI rating",
+      "deps": [
+        "cooling.cdw_range_k",
+        "cooling.cdw_supply_c",
+        "cooling.chiller_cond_approach_k",
+        "cooling.chiller_evap_approach_k",
+        "cooling.chiller_motor_efficiency",
+        "cooling.chiller_rated_specific_power_kw_e_per_kw_th",
+        "cooling.chiller_rating_cdw_gpm_per_ton",
+        "cooling.chiller_rating_cdw_supply_c",
+        "cooling.chiller_rating_chws_c",
+        "cooling.chiller_superheat_k",
+        "cooling.chiller_vfd_efficiency",
+        "cooling.chw_coil_approach_k",
+        "cooling.rack_inlet_target_c",
+        "cooling.supply_path_mixing_k"
+      ],
+      "formulaNotExpressible": "Solved by the engine's two-stage cycle (property interpolation and a bisection on isentropic efficiency), not an arithmetic expression over registered scalars.",
       "source": {
         "ref": "js/conv-engine.js",
-        "section": "cooling",
-        "asOf": "2026-08-29",
-        "method": "0.58 kW/RT is mid-band for a water-cooled centrifugal at design; 1 RT = 3.517 kW_th. A vendor submittal replaces exactly this number and everything downstream re-derives."
-      }
+        "section": "chillerCycle() / withPlantInternals()",
+        "asOf": "2026-11-22",
+        "method": "Solved in the engine (engine 2.5.0, PRD-CONV-EQUIPMENT-INSIDE §5.2) from NIST WebBook R-134a rows (data/sources/nist-r134a) at the plant saturations; a consistent simulation, not a vendor selection."
+      },
+      "explainKey": "cop"
     },
     {
       "id": "cooling.chiller_type",
@@ -4766,6 +4784,812 @@
       "formulaExpr": "site.non_it_load_kw - electrical.ups_loss_kw - cooling.mech_plant_input_kw",
       "display": "internal",
       "displayReason": "Published for the plant internals basis (PRD-CONV-EQUIPMENT-TRUTH §6.2-6.5); drawn by the equipment modal, phase E2+ — no cockpit reads it yet."
+    },
+    {
+      "id": "cooling.chiller_rated_specific_power_kw_e_per_kw_th",
+      "label": "Chiller rated specific power (AHRI 550/590)",
+      "unit": "kW_e/kW_th",
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.cooling (refrigeration cycle basis, engine 2.5.0)",
+        "asOf": "2026-11-22",
+        "method": "0.58 kW/RT is mid-band for a water-cooled centrifugal at the AHRI 550/590 standard rating point; 1 RT = 3.517 kW_th. A vendor submittal replaces exactly this number; the operating specific power is re-derived from it through the cycle."
+      },
+      "explainKey": "cop",
+      "display": "internal",
+      "displayReason": "The rating figure; the cockpits show the operating specific power (cooling.chiller_specific_power_kw_e_per_kw_th) derived from it."
+    },
+    {
+      "id": "cooling.chiller_rating_chws_c",
+      "label": "AHRI rating leaving chilled water",
+      "unit": "°C",
+      "scope": "plant",
+      "evidenceClass": "STANDARD",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.cooling (refrigeration cycle basis, engine 2.5.0)",
+        "asOf": "2026-11-22",
+        "method": "AHRI 550/590 standard rating condition: leaving chilled water 44.0 °F (6.7 °C)."
+      },
+      "display": "internal",
+      "displayReason": "Refrigeration-cycle figure drawn inside the chiller equipment modal (PRD-CONV-EQUIPMENT-INSIDE P2); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.chiller_rating_cdw_supply_c",
+      "label": "AHRI rating entering condenser water",
+      "unit": "°C",
+      "scope": "plant",
+      "evidenceClass": "STANDARD",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.cooling (refrigeration cycle basis, engine 2.5.0)",
+        "asOf": "2026-11-22",
+        "method": "AHRI 550/590 standard rating condition: entering condenser water 85.0 °F (29.4 °C)."
+      },
+      "display": "internal",
+      "displayReason": "Refrigeration-cycle figure drawn inside the chiller equipment modal (PRD-CONV-EQUIPMENT-INSIDE P2); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.chiller_rating_cdw_gpm_per_ton",
+      "label": "AHRI rating condenser water flow",
+      "unit": "gpm/ton",
+      "scope": "plant",
+      "evidenceClass": "STANDARD",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.cooling (refrigeration cycle basis, engine 2.5.0)",
+        "asOf": "2026-11-22",
+        "method": "AHRI 550/590 standard rating condition: condenser water flow 3.0 gpm per ton of refrigeration."
+      },
+      "display": "internal",
+      "displayReason": "Refrigeration-cycle figure drawn inside the chiller equipment modal (PRD-CONV-EQUIPMENT-INSIDE P2); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.chiller_superheat_k",
+      "label": "Suction superheat",
+      "unit": "K",
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.cooling (refrigeration cycle basis, engine 2.5.0)",
+        "asOf": "2026-11-22",
+        "method": "Flooded evaporator leaving superheat, 0.5-1.0 K typical; training design value, no chiller rating sheet exists for this site."
+      },
+      "display": "internal",
+      "displayReason": "Refrigeration-cycle figure drawn inside the chiller equipment modal (PRD-CONV-EQUIPMENT-INSIDE P2); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.chiller_subcool_k",
+      "label": "Condenser liquid subcooling",
+      "unit": "K",
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.cooling (refrigeration cycle basis, engine 2.5.0)",
+        "asOf": "2026-11-22",
+        "method": "Shell-and-tube condenser leaving subcooling, 2-5 K typical; training design value."
+      },
+      "display": "internal",
+      "displayReason": "Refrigeration-cycle figure drawn inside the chiller equipment modal (PRD-CONV-EQUIPMENT-INSIDE P2); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.chiller_motor_efficiency",
+      "label": "Compressor motor efficiency",
+      "unit": "fraction",
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.cooling (refrigeration cycle basis, engine 2.5.0)",
+        "asOf": "2026-11-22",
+        "method": "Hermetic compressor motor at this size, IEC 60034-30-1 IE3 band; training design value."
+      },
+      "display": "internal",
+      "displayReason": "Refrigeration-cycle figure drawn inside the chiller equipment modal (PRD-CONV-EQUIPMENT-INSIDE P2); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.chiller_vfd_efficiency",
+      "label": "Compressor VFD efficiency",
+      "unit": "fraction",
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.cooling (refrigeration cycle basis, engine 2.5.0)",
+        "asOf": "2026-11-22",
+        "method": "Low-voltage drive at full load, IEC 61800-9-2 IE2 band; training design value."
+      },
+      "display": "internal",
+      "displayReason": "Refrigeration-cycle figure drawn inside the chiller equipment modal (PRD-CONV-EQUIPMENT-INSIDE P2); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.chiller_min_speed_pct",
+      "label": "Compressor minimum speed",
+      "unit": "%",
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.cooling (refrigeration cycle basis, engine 2.5.0)",
+        "asOf": "2026-11-22",
+        "method": "Lowest speed a VSD centrifugal holds before surge/head limits; training design value."
+      },
+      "display": "internal",
+      "displayReason": "Refrigeration-cycle figure drawn inside the chiller equipment modal (PRD-CONV-EQUIPMENT-INSIDE P2); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.chiller_rating_evap_sat_c",
+      "label": "Evaporator saturation at rating",
+      "unit": "°C",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "rating CHWS - evaporator approach",
+      "deps": [
+        "cooling.chiller_rating_chws_c",
+        "cooling.chiller_evap_approach_k"
+      ],
+      "formulaExpr": "cooling.chiller_rating_chws_c - cooling.chiller_evap_approach_k",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "chillerCycle() / withPlantInternals()",
+        "asOf": "2026-11-22",
+        "method": "Rating-point saturation from the AHRI conditions and the engine's own approaches. Solved in the engine (engine 2.5.0, PRD-CONV-EQUIPMENT-INSIDE §5.2) from NIST WebBook R-134a rows (data/sources/nist-r134a) at the plant saturations; a consistent simulation, not a vendor selection."
+      },
+      "display": "internal",
+      "displayReason": "Refrigeration-cycle figure drawn inside the chiller equipment modal (PRD-CONV-EQUIPMENT-INSIDE P2); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.chiller_rating_cond_sat_c",
+      "label": "Condenser saturation at rating",
+      "unit": "°C",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "rating CDW supply + rating range (12000 x (1 + rated specific power) / (500 x gpm/ton) F) + condenser approach",
+      "deps": [
+        "cooling.chiller_rating_cdw_supply_c",
+        "cooling.chiller_rated_specific_power_kw_e_per_kw_th",
+        "cooling.chiller_rating_cdw_gpm_per_ton",
+        "cooling.chiller_cond_approach_k"
+      ],
+      "formulaExpr": "cooling.chiller_rating_cdw_supply_c + 12000 * (1 + cooling.chiller_rated_specific_power_kw_e_per_kw_th) / (500 * cooling.chiller_rating_cdw_gpm_per_ton) * 5 / 9 + cooling.chiller_cond_approach_k",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "chillerCycle() / withPlantInternals()",
+        "asOf": "2026-11-22",
+        "method": "Rating-point saturation from the AHRI conditions and the engine's own approaches. Solved in the engine (engine 2.5.0, PRD-CONV-EQUIPMENT-INSIDE §5.2) from NIST WebBook R-134a rows (data/sources/nist-r134a) at the plant saturations; a consistent simulation, not a vendor selection."
+      },
+      "display": "internal",
+      "displayReason": "Refrigeration-cycle figure drawn inside the chiller equipment modal (PRD-CONV-EQUIPMENT-INSIDE P2); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.chiller_rating_lift_k",
+      "label": "Refrigeration lift at rating",
+      "unit": "K",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "rating condenser saturation - rating evaporator saturation",
+      "deps": [
+        "cooling.chiller_rating_cond_sat_c",
+        "cooling.chiller_rating_evap_sat_c"
+      ],
+      "formulaExpr": "cooling.chiller_rating_cond_sat_c - cooling.chiller_rating_evap_sat_c",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "chillerCycle() / withPlantInternals()",
+        "asOf": "2026-11-22",
+        "method": "Rating-point saturation from the AHRI conditions and the engine's own approaches. Solved in the engine (engine 2.5.0, PRD-CONV-EQUIPMENT-INSIDE §5.2) from NIST WebBook R-134a rows (data/sources/nist-r134a) at the plant saturations; a consistent simulation, not a vendor selection."
+      },
+      "display": "internal",
+      "displayReason": "Refrigeration-cycle figure drawn inside the chiller equipment modal (PRD-CONV-EQUIPMENT-INSIDE P2); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.chiller_eta_is",
+      "label": "Compressor isentropic efficiency (rating fit)",
+      "unit": "fraction",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "isentropic efficiency (both stages) at which the cycle at the AHRI rating saturations uses exactly the rated specific power",
+      "deps": [
+        "cooling.chiller_cond_approach_k",
+        "cooling.chiller_evap_approach_k",
+        "cooling.chiller_motor_efficiency",
+        "cooling.chiller_rated_specific_power_kw_e_per_kw_th",
+        "cooling.chiller_rating_cdw_gpm_per_ton",
+        "cooling.chiller_rating_cdw_supply_c",
+        "cooling.chiller_rating_chws_c",
+        "cooling.chiller_subcool_k",
+        "cooling.chiller_vfd_efficiency"
+      ],
+      "formulaNotExpressible": "Solved by the engine's two-stage cycle (property interpolation and a bisection on isentropic efficiency), not an arithmetic expression over registered scalars.",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "chillerCycle() / withPlantInternals()",
+        "asOf": "2026-11-22",
+        "method": "Solved in the engine (engine 2.5.0, PRD-CONV-EQUIPMENT-INSIDE §5.2) from NIST WebBook R-134a rows (data/sources/nist-r134a) at the plant saturations; a consistent simulation, not a vendor selection."
+      },
+      "display": "internal",
+      "displayReason": "Refrigeration-cycle figure drawn inside the chiller equipment modal (PRD-CONV-EQUIPMENT-INSIDE P2); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.chiller_int_sat_kpa_abs",
+      "label": "Economiser (intermediate) pressure",
+      "unit": "kPa(a)",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "sqrt(P_evap x P_cond), equal stage pressure ratio",
+      "deps": [
+        "cooling.cdw_range_k",
+        "cooling.cdw_supply_c",
+        "cooling.chiller_cond_approach_k",
+        "cooling.chiller_evap_approach_k",
+        "cooling.chw_coil_approach_k",
+        "cooling.rack_inlet_target_c",
+        "cooling.supply_path_mixing_k"
+      ],
+      "formulaNotExpressible": "Solved by the engine's two-stage cycle (property interpolation and a bisection on isentropic efficiency), not an arithmetic expression over registered scalars.",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "chillerCycle() / withPlantInternals()",
+        "asOf": "2026-11-22",
+        "method": "Solved in the engine (engine 2.5.0, PRD-CONV-EQUIPMENT-INSIDE §5.2) from NIST WebBook R-134a rows (data/sources/nist-r134a) at the plant saturations; a consistent simulation, not a vendor selection."
+      },
+      "display": "internal",
+      "displayReason": "Refrigeration-cycle figure drawn inside the chiller equipment modal (PRD-CONV-EQUIPMENT-INSIDE P2); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.chiller_int_sat_c",
+      "label": "Economiser saturation temperature",
+      "unit": "°C",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "saturation temperature at the intermediate pressure",
+      "deps": [
+        "cooling.cdw_range_k",
+        "cooling.cdw_supply_c",
+        "cooling.chiller_cond_approach_k",
+        "cooling.chiller_evap_approach_k",
+        "cooling.chw_coil_approach_k",
+        "cooling.rack_inlet_target_c",
+        "cooling.supply_path_mixing_k"
+      ],
+      "formulaNotExpressible": "Solved by the engine's two-stage cycle (property interpolation and a bisection on isentropic efficiency), not an arithmetic expression over registered scalars.",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "chillerCycle() / withPlantInternals()",
+        "asOf": "2026-11-22",
+        "method": "Solved in the engine (engine 2.5.0, PRD-CONV-EQUIPMENT-INSIDE §5.2) from NIST WebBook R-134a rows (data/sources/nist-r134a) at the plant saturations; a consistent simulation, not a vendor selection."
+      },
+      "display": "internal",
+      "displayReason": "Refrigeration-cycle figure drawn inside the chiller equipment modal (PRD-CONV-EQUIPMENT-INSIDE P2); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.chiller_flash_fraction",
+      "label": "Economiser flash fraction",
+      "unit": "fraction",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "(h5 - hf_int) / (hg_int - hf_int)",
+      "deps": [
+        "cooling.cdw_range_k",
+        "cooling.cdw_supply_c",
+        "cooling.chiller_cond_approach_k",
+        "cooling.chiller_evap_approach_k",
+        "cooling.chiller_subcool_k",
+        "cooling.chw_coil_approach_k",
+        "cooling.rack_inlet_target_c",
+        "cooling.supply_path_mixing_k"
+      ],
+      "formulaNotExpressible": "Solved by the engine's two-stage cycle (property interpolation and a bisection on isentropic efficiency), not an arithmetic expression over registered scalars.",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "chillerCycle() / withPlantInternals()",
+        "asOf": "2026-11-22",
+        "method": "Solved in the engine (engine 2.5.0, PRD-CONV-EQUIPMENT-INSIDE §5.2) from NIST WebBook R-134a rows (data/sources/nist-r134a) at the plant saturations; a consistent simulation, not a vendor selection."
+      },
+      "display": "internal",
+      "displayReason": "Refrigeration-cycle figure drawn inside the chiller equipment modal (PRD-CONV-EQUIPMENT-INSIDE P2); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.chiller_discharge_c",
+      "label": "Compressor discharge temperature",
+      "unit": "°C",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "vapour temperature at P_cond and the stage-2 discharge enthalpy",
+      "deps": [
+        "cooling.cdw_range_k",
+        "cooling.cdw_supply_c",
+        "cooling.chiller_cond_approach_k",
+        "cooling.chiller_evap_approach_k",
+        "cooling.chiller_motor_efficiency",
+        "cooling.chiller_rated_specific_power_kw_e_per_kw_th",
+        "cooling.chiller_rating_cdw_gpm_per_ton",
+        "cooling.chiller_rating_cdw_supply_c",
+        "cooling.chiller_rating_chws_c",
+        "cooling.chiller_subcool_k",
+        "cooling.chiller_superheat_k",
+        "cooling.chiller_vfd_efficiency",
+        "cooling.chw_coil_approach_k",
+        "cooling.rack_inlet_target_c",
+        "cooling.supply_path_mixing_k"
+      ],
+      "formulaNotExpressible": "Solved by the engine's two-stage cycle (property interpolation and a bisection on isentropic efficiency), not an arithmetic expression over registered scalars.",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "chillerCycle() / withPlantInternals()",
+        "asOf": "2026-11-22",
+        "method": "Solved in the engine (engine 2.5.0, PRD-CONV-EQUIPMENT-INSIDE §5.2) from NIST WebBook R-134a rows (data/sources/nist-r134a) at the plant saturations; a consistent simulation, not a vendor selection."
+      },
+      "display": "internal",
+      "displayReason": "Refrigeration-cycle figure drawn inside the chiller equipment modal (PRD-CONV-EQUIPMENT-INSIDE P2); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.chiller_unit_ref_flow_evap_kg_s",
+      "label": "Refrigerant flow through the evaporator (per unit)",
+      "unit": "kg/s",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "unit duty / (h1 - h8)",
+      "deps": [
+        "cooling.cdw_range_k",
+        "cooling.cdw_supply_c",
+        "cooling.chiller_cond_approach_k",
+        "cooling.chiller_evap_approach_k",
+        "cooling.chiller_superheat_k",
+        "cooling.chiller_unit_kw_th",
+        "cooling.chw_coil_approach_k",
+        "cooling.rack_inlet_target_c",
+        "cooling.supply_path_mixing_k",
+        "electrical.ups_efficiency"
+      ],
+      "formulaNotExpressible": "Solved by the engine's two-stage cycle (property interpolation and a bisection on isentropic efficiency), not an arithmetic expression over registered scalars.",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "chillerCycle() / withPlantInternals()",
+        "asOf": "2026-11-22",
+        "method": "Solved in the engine (engine 2.5.0, PRD-CONV-EQUIPMENT-INSIDE §5.2) from NIST WebBook R-134a rows (data/sources/nist-r134a) at the plant saturations; a consistent simulation, not a vendor selection."
+      },
+      "display": "internal",
+      "displayReason": "Refrigeration-cycle figure drawn inside the chiller equipment modal (PRD-CONV-EQUIPMENT-INSIDE P2); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.chiller_unit_ref_flow_cond_kg_s",
+      "label": "Refrigerant flow through the condenser (per unit)",
+      "unit": "kg/s",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "evaporator flow / (1 - flash fraction)",
+      "deps": [
+        "cooling.cdw_range_k",
+        "cooling.cdw_supply_c",
+        "cooling.chiller_cond_approach_k",
+        "cooling.chiller_evap_approach_k",
+        "cooling.chiller_subcool_k",
+        "cooling.chiller_superheat_k",
+        "cooling.chiller_unit_kw_th",
+        "cooling.chw_coil_approach_k",
+        "cooling.rack_inlet_target_c",
+        "cooling.supply_path_mixing_k",
+        "electrical.ups_efficiency"
+      ],
+      "formulaNotExpressible": "Solved by the engine's two-stage cycle (property interpolation and a bisection on isentropic efficiency), not an arithmetic expression over registered scalars.",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "chillerCycle() / withPlantInternals()",
+        "asOf": "2026-11-22",
+        "method": "Solved in the engine (engine 2.5.0, PRD-CONV-EQUIPMENT-INSIDE §5.2) from NIST WebBook R-134a rows (data/sources/nist-r134a) at the plant saturations; a consistent simulation, not a vendor selection."
+      },
+      "display": "internal",
+      "displayReason": "Refrigeration-cycle figure drawn inside the chiller equipment modal (PRD-CONV-EQUIPMENT-INSIDE P2); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.chiller_unit_shaft_kw",
+      "label": "Compressor shaft power (per unit)",
+      "unit": "kW",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "m_e (h2 - h1) + m_c (h4 - h3)",
+      "deps": [
+        "cooling.cdw_range_k",
+        "cooling.cdw_supply_c",
+        "cooling.chiller_cond_approach_k",
+        "cooling.chiller_evap_approach_k",
+        "cooling.chiller_motor_efficiency",
+        "cooling.chiller_rated_specific_power_kw_e_per_kw_th",
+        "cooling.chiller_rating_cdw_gpm_per_ton",
+        "cooling.chiller_rating_cdw_supply_c",
+        "cooling.chiller_rating_chws_c",
+        "cooling.chiller_subcool_k",
+        "cooling.chiller_unit_kw_th",
+        "cooling.chiller_vfd_efficiency",
+        "cooling.chw_coil_approach_k",
+        "cooling.rack_inlet_target_c",
+        "cooling.supply_path_mixing_k",
+        "electrical.ups_efficiency"
+      ],
+      "formulaNotExpressible": "Solved by the engine's two-stage cycle (property interpolation and a bisection on isentropic efficiency), not an arithmetic expression over registered scalars.",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "chillerCycle() / withPlantInternals()",
+        "asOf": "2026-11-22",
+        "method": "Solved in the engine (engine 2.5.0, PRD-CONV-EQUIPMENT-INSIDE §5.2) from NIST WebBook R-134a rows (data/sources/nist-r134a) at the plant saturations; a consistent simulation, not a vendor selection."
+      },
+      "display": "internal",
+      "displayReason": "Refrigeration-cycle figure drawn inside the chiller equipment modal (PRD-CONV-EQUIPMENT-INSIDE P2); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.chiller_cycle_condenser_kw_th",
+      "label": "Cycle condenser duty (per unit, before drive losses)",
+      "unit": "kW_th",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "m_c (h4 - h5) = unit duty + shaft power",
+      "deps": [
+        "cooling.cdw_range_k",
+        "cooling.cdw_supply_c",
+        "cooling.chiller_cond_approach_k",
+        "cooling.chiller_evap_approach_k",
+        "cooling.chiller_motor_efficiency",
+        "cooling.chiller_rated_specific_power_kw_e_per_kw_th",
+        "cooling.chiller_rating_cdw_gpm_per_ton",
+        "cooling.chiller_rating_cdw_supply_c",
+        "cooling.chiller_rating_chws_c",
+        "cooling.chiller_unit_kw_th",
+        "cooling.chiller_vfd_efficiency",
+        "cooling.chw_coil_approach_k",
+        "cooling.rack_inlet_target_c",
+        "cooling.supply_path_mixing_k",
+        "electrical.ups_efficiency"
+      ],
+      "formulaNotExpressible": "Solved by the engine's two-stage cycle (property interpolation and a bisection on isentropic efficiency), not an arithmetic expression over registered scalars.",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "chillerCycle() / withPlantInternals()",
+        "asOf": "2026-11-22",
+        "method": "Solved in the engine (engine 2.5.0, PRD-CONV-EQUIPMENT-INSIDE §5.2) from NIST WebBook R-134a rows (data/sources/nist-r134a) at the plant saturations; a consistent simulation, not a vendor selection."
+      },
+      "display": "internal",
+      "displayReason": "Refrigeration-cycle figure drawn inside the chiller equipment modal (PRD-CONV-EQUIPMENT-INSIDE P2); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.chiller_speed_pct",
+      "label": "Compressor speed",
+      "unit": "%",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "max(minimum speed, sqrt(lift / rating lift), unit load), capped at 100 %",
+      "deps": [
+        "cooling.cdw_supply_c",
+        "cooling.chiller_unit_kw_th",
+        "electrical.ups_efficiency"
+      ],
+      "formulaNotExpressible": "Solved by the engine's two-stage cycle (property interpolation and a bisection on isentropic efficiency), not an arithmetic expression over registered scalars.",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "chillerCycle() / withPlantInternals()",
+        "asOf": "2026-11-22",
+        "method": "Solved in the engine (engine 2.5.0, PRD-CONV-EQUIPMENT-INSIDE §5.2) from NIST WebBook R-134a rows (data/sources/nist-r134a) at the plant saturations; a consistent simulation, not a vendor selection."
+      },
+      "display": "internal",
+      "displayReason": "Refrigeration-cycle figure drawn inside the chiller equipment modal (PRD-CONV-EQUIPMENT-INSIDE P2); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.chiller_igv_pct",
+      "label": "Inlet guide vane position",
+      "unit": "%",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "unit load / speed, clamped 20-100 %",
+      "deps": [
+        "cooling.cdw_supply_c"
+      ],
+      "formulaNotExpressible": "Solved by the engine's two-stage cycle (property interpolation and a bisection on isentropic efficiency), not an arithmetic expression over registered scalars.",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "chillerCycle() / withPlantInternals()",
+        "asOf": "2026-11-22",
+        "method": "Solved in the engine (engine 2.5.0, PRD-CONV-EQUIPMENT-INSIDE §5.2) from NIST WebBook R-134a rows (data/sources/nist-r134a) at the plant saturations; a consistent simulation, not a vendor selection."
+      },
+      "display": "internal",
+      "displayReason": "Refrigeration-cycle figure drawn inside the chiller equipment modal (PRD-CONV-EQUIPMENT-INSIDE P2); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.chiller_cycle_points",
+      "label": "Refrigeration cycle state points 1-8",
+      "unit": "table",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "eight state points (t, p, h, s, x) of the two-stage economised cycle",
+      "deps": [
+        "cooling.cdw_range_k",
+        "cooling.cdw_supply_c",
+        "cooling.chiller_cond_approach_k",
+        "cooling.chiller_evap_approach_k",
+        "cooling.chiller_motor_efficiency",
+        "cooling.chiller_rated_specific_power_kw_e_per_kw_th",
+        "cooling.chiller_rating_cdw_gpm_per_ton",
+        "cooling.chiller_rating_cdw_supply_c",
+        "cooling.chiller_rating_chws_c",
+        "cooling.chiller_subcool_k",
+        "cooling.chiller_superheat_k",
+        "cooling.chiller_vfd_efficiency",
+        "cooling.chw_coil_approach_k",
+        "cooling.rack_inlet_target_c",
+        "cooling.supply_path_mixing_k"
+      ],
+      "formulaNotExpressible": "Solved by the engine's two-stage cycle (property interpolation and a bisection on isentropic efficiency), not an arithmetic expression over registered scalars.",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "chillerCycle() / withPlantInternals()",
+        "asOf": "2026-11-22",
+        "method": "Solved in the engine (engine 2.5.0, PRD-CONV-EQUIPMENT-INSIDE §5.2) from NIST WebBook R-134a rows (data/sources/nist-r134a) at the plant saturations; a consistent simulation, not a vendor selection."
+      },
+      "display": "internal",
+      "displayReason": "Refrigeration-cycle figure drawn inside the chiller equipment modal (PRD-CONV-EQUIPMENT-INSIDE P2); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.air_density_kg_m3",
+      "label": "Air density",
+      "unit": "kg/m3",
+      "scope": "plant",
+      "evidenceClass": "STANDARD",
+      "source": {
+        "ref": "ASHRAE Handbook — Fundamentals (2021), ch. 1 Psychrometrics",
+        "section": "dry air at 20 °C, 101.325 kPa",
+        "asOf": "2026-11-22",
+        "method": "Standard property of dry air at sea-level pressure; used to turn a CRAH sensible duty into an airflow."
+      },
+      "display": "internal",
+      "displayReason": "Drawn inside the pump / CRAH equipment modal (PRD-CONV-EQUIPMENT-INSIDE P3); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.air_cp_kj_kg_k",
+      "label": "Air specific heat",
+      "unit": "kJ/(kg K)",
+      "scope": "plant",
+      "evidenceClass": "STANDARD",
+      "source": {
+        "ref": "ASHRAE Handbook — Fundamentals (2021), ch. 1 Psychrometrics",
+        "section": "dry air at 20 °C, 101.325 kPa",
+        "asOf": "2026-11-22",
+        "method": "Standard property of dry air at sea-level pressure; used to turn a CRAH sensible duty into an airflow."
+      },
+      "display": "internal",
+      "displayReason": "Drawn inside the pump / CRAH equipment modal (PRD-CONV-EQUIPMENT-INSIDE P3); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.crah_unit_airflow_m3_s",
+      "label": "CRAH unit airflow",
+      "unit": "m3/s",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "duty / (air density x air cp x air dT)",
+      "deps": [
+        "cooling.crah_unit_duty_kw",
+        "cooling.air_density_kg_m3",
+        "cooling.air_cp_kj_kg_k",
+        "cooling.airside_delta_t_k"
+      ],
+      "formulaExpr": "cooling.crah_unit_duty_kw / (cooling.air_density_kg_m3 * cooling.air_cp_kj_kg_k * cooling.airside_delta_t_k)",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals() P3 keys",
+        "asOf": "2026-11-22",
+        "method": "Derived in the engine (plantInternals(), engine 2.5.0) from published engine quantities; a consistent simulation, not a vendor rating."
+      },
+      "display": "internal",
+      "displayReason": "Drawn inside the pump / CRAH equipment modal (PRD-CONV-EQUIPMENT-INSIDE P3); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.chw_primary_pump_hydraulic_kw",
+      "label": "Primary CHW pump hydraulic power",
+      "unit": "kW",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "rho g Q H / 1000, Q in m3/s",
+      "deps": [
+        "cooling.water_density_kg_m3",
+        "cooling.gravity_m_s2",
+        "cooling.chw_primary_pump_flow_lps",
+        "cooling.chw_primary_head_m"
+      ],
+      "formulaExpr": "cooling.water_density_kg_m3 * cooling.gravity_m_s2 * cooling.chw_primary_pump_flow_lps / 1000 * cooling.chw_primary_head_m / 1000",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals() P3 keys",
+        "asOf": "2026-11-22",
+        "method": "Derived in the engine (plantInternals(), engine 2.5.0) from published engine quantities; a consistent simulation, not a vendor rating."
+      },
+      "display": "internal",
+      "displayReason": "Drawn inside the pump / CRAH equipment modal (PRD-CONV-EQUIPMENT-INSIDE P3); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.chw_primary_pump_shaft_kw",
+      "label": "Primary CHW pump shaft power",
+      "unit": "kW",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "hydraulic power / pump efficiency",
+      "deps": [
+        "cooling.water_density_kg_m3",
+        "cooling.gravity_m_s2",
+        "cooling.chw_primary_pump_flow_lps",
+        "cooling.chw_primary_head_m",
+        "cooling.pump_efficiency"
+      ],
+      "formulaExpr": "cooling.water_density_kg_m3 * cooling.gravity_m_s2 * cooling.chw_primary_pump_flow_lps / 1000 * cooling.chw_primary_head_m / 1000 / cooling.pump_efficiency",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals() P3 keys",
+        "asOf": "2026-11-22",
+        "method": "Derived in the engine (plantInternals(), engine 2.5.0) from published engine quantities; a consistent simulation, not a vendor rating."
+      },
+      "display": "internal",
+      "displayReason": "Drawn inside the pump / CRAH equipment modal (PRD-CONV-EQUIPMENT-INSIDE P3); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.chw_primary_pump_dp_kpa",
+      "label": "Primary CHW pump differential pressure",
+      "unit": "kPa",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "rho g H / 1000",
+      "deps": [
+        "cooling.water_density_kg_m3",
+        "cooling.gravity_m_s2",
+        "cooling.chw_primary_head_m"
+      ],
+      "formulaExpr": "cooling.water_density_kg_m3 * cooling.gravity_m_s2 * cooling.chw_primary_head_m / 1000",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals() P3 keys",
+        "asOf": "2026-11-22",
+        "method": "Derived in the engine (plantInternals(), engine 2.5.0) from published engine quantities; a consistent simulation, not a vendor rating."
+      },
+      "display": "internal",
+      "displayReason": "Drawn inside the pump / CRAH equipment modal (PRD-CONV-EQUIPMENT-INSIDE P3); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.chw_secondary_pump_hydraulic_kw",
+      "label": "Secondary CHW pump hydraulic power",
+      "unit": "kW",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "rho g Q H / 1000, Q in m3/s",
+      "deps": [
+        "cooling.water_density_kg_m3",
+        "cooling.gravity_m_s2",
+        "cooling.chw_secondary_pump_flow_lps",
+        "cooling.chw_secondary_head_m"
+      ],
+      "formulaExpr": "cooling.water_density_kg_m3 * cooling.gravity_m_s2 * cooling.chw_secondary_pump_flow_lps / 1000 * cooling.chw_secondary_head_m / 1000",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals() P3 keys",
+        "asOf": "2026-11-22",
+        "method": "Derived in the engine (plantInternals(), engine 2.5.0) from published engine quantities; a consistent simulation, not a vendor rating."
+      },
+      "display": "internal",
+      "displayReason": "Drawn inside the pump / CRAH equipment modal (PRD-CONV-EQUIPMENT-INSIDE P3); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.chw_secondary_pump_shaft_kw",
+      "label": "Secondary CHW pump shaft power",
+      "unit": "kW",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "hydraulic power / pump efficiency",
+      "deps": [
+        "cooling.water_density_kg_m3",
+        "cooling.gravity_m_s2",
+        "cooling.chw_secondary_pump_flow_lps",
+        "cooling.chw_secondary_head_m",
+        "cooling.pump_efficiency"
+      ],
+      "formulaExpr": "cooling.water_density_kg_m3 * cooling.gravity_m_s2 * cooling.chw_secondary_pump_flow_lps / 1000 * cooling.chw_secondary_head_m / 1000 / cooling.pump_efficiency",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals() P3 keys",
+        "asOf": "2026-11-22",
+        "method": "Derived in the engine (plantInternals(), engine 2.5.0) from published engine quantities; a consistent simulation, not a vendor rating."
+      },
+      "display": "internal",
+      "displayReason": "Drawn inside the pump / CRAH equipment modal (PRD-CONV-EQUIPMENT-INSIDE P3); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.chw_secondary_pump_dp_kpa",
+      "label": "Secondary CHW pump differential pressure",
+      "unit": "kPa",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "rho g H / 1000",
+      "deps": [
+        "cooling.water_density_kg_m3",
+        "cooling.gravity_m_s2",
+        "cooling.chw_secondary_head_m"
+      ],
+      "formulaExpr": "cooling.water_density_kg_m3 * cooling.gravity_m_s2 * cooling.chw_secondary_head_m / 1000",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals() P3 keys",
+        "asOf": "2026-11-22",
+        "method": "Derived in the engine (plantInternals(), engine 2.5.0) from published engine quantities; a consistent simulation, not a vendor rating."
+      },
+      "display": "internal",
+      "displayReason": "Drawn inside the pump / CRAH equipment modal (PRD-CONV-EQUIPMENT-INSIDE P3); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.cdw_pump_hydraulic_kw",
+      "label": "Condenser-water pump hydraulic power",
+      "unit": "kW",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "rho g Q H / 1000, Q in m3/s",
+      "deps": [
+        "cooling.water_density_kg_m3",
+        "cooling.gravity_m_s2",
+        "cooling.cdw_pump_flow_lps",
+        "cooling.cdw_head_m"
+      ],
+      "formulaExpr": "cooling.water_density_kg_m3 * cooling.gravity_m_s2 * cooling.cdw_pump_flow_lps / 1000 * cooling.cdw_head_m / 1000",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals() P3 keys",
+        "asOf": "2026-11-22",
+        "method": "Derived in the engine (plantInternals(), engine 2.5.0) from published engine quantities; a consistent simulation, not a vendor rating."
+      },
+      "display": "internal",
+      "displayReason": "Drawn inside the pump / CRAH equipment modal (PRD-CONV-EQUIPMENT-INSIDE P3); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.cdw_pump_shaft_kw",
+      "label": "Condenser-water pump shaft power",
+      "unit": "kW",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "hydraulic power / pump efficiency",
+      "deps": [
+        "cooling.water_density_kg_m3",
+        "cooling.gravity_m_s2",
+        "cooling.cdw_pump_flow_lps",
+        "cooling.cdw_head_m",
+        "cooling.pump_efficiency"
+      ],
+      "formulaExpr": "cooling.water_density_kg_m3 * cooling.gravity_m_s2 * cooling.cdw_pump_flow_lps / 1000 * cooling.cdw_head_m / 1000 / cooling.pump_efficiency",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals() P3 keys",
+        "asOf": "2026-11-22",
+        "method": "Derived in the engine (plantInternals(), engine 2.5.0) from published engine quantities; a consistent simulation, not a vendor rating."
+      },
+      "display": "internal",
+      "displayReason": "Drawn inside the pump / CRAH equipment modal (PRD-CONV-EQUIPMENT-INSIDE P3); no cockpit reads it directly."
+    },
+    {
+      "id": "cooling.cdw_pump_dp_kpa",
+      "label": "Condenser-water pump differential pressure",
+      "unit": "kPa",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "rho g H / 1000",
+      "deps": [
+        "cooling.water_density_kg_m3",
+        "cooling.gravity_m_s2",
+        "cooling.cdw_head_m"
+      ],
+      "formulaExpr": "cooling.water_density_kg_m3 * cooling.gravity_m_s2 * cooling.cdw_head_m / 1000",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals() P3 keys",
+        "asOf": "2026-11-22",
+        "method": "Derived in the engine (plantInternals(), engine 2.5.0) from published engine quantities; a consistent simulation, not a vendor rating."
+      },
+      "display": "internal",
+      "displayReason": "Drawn inside the pump / CRAH equipment modal (PRD-CONV-EQUIPMENT-INSIDE P3); no cockpit reads it directly."
     }
   ]
 }

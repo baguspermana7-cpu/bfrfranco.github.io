@@ -71,13 +71,15 @@ for (const [page, host] of PAGES) {
         return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
       }, host, it.id);
       await pg.mouse.click(pt.x, pt.y); await sleep(250);
-      let q1 = await pg.evaluate(() => !!document.querySelector('aside.rz-inspector.open [data-rz-open-hmi]'));
+      /* R186: a machine whose inside is drawn opens the modal on that drawing with one click (no inspector step) */
+      const direct = await pg.evaluate(() => !!document.querySelector('.rz-cvm:not([hidden]) [data-rz-cvm-int]') && !document.querySelector('aside.rz-inspector.open'));
+      let q1 = direct || await pg.evaluate(() => !!document.querySelector('aside.rz-inspector.open [data-rz-open-hmi]'));
       if (!q1) { await sleep(700); q1 = await pg.evaluate(() => !!document.querySelector('aside.rz-inspector.open [data-rz-open-hmi]')); if (q1) console.log(where + ' slow open (>250 ms)'); }
       if (!q1) {
         const why = await pg.evaluate((x, y) => { const h = document.elementFromPoint(x, y); const a = document.querySelector('aside.rz-inspector'); const sel = document.querySelector('.hmi-node.is-selected'); return (h ? h.tagName : 'none') + ' sel=' + (sel ? sel.getAttribute('data-node') : '-') + ' insp=' + (a ? a.className : '-') + ' sx=' + scrollX + ' sy=' + Math.round(scrollY); }, pt.x, pt.y);
         fails.push(where + ' Q1 inspector without Open equipment HMI (hit ' + why + ')'); await pg.keyboard.press('Escape'); continue;
       }
-      await pg.click('aside.rz-inspector.open [data-rz-open-hmi]'); await sleep(250);
+      if (!direct) { await pg.click('aside.rz-inspector.open [data-rz-open-hmi]'); await sleep(250); }
       const s = await pg.evaluate(() => {
         const m = document.querySelector('.rz-cvm:not([hidden])'); if (!m) return null;
         const panel = m.querySelector('.rz-cvm-panel');
@@ -98,10 +100,10 @@ for (const [page, host] of PAGES) {
       for (let i = 0; i < 3; i++) { await pg.keyboard.down('Shift'); await pg.keyboard.press('Tab'); await pg.keyboard.up('Shift'); if (!(await pg.evaluate(() => document.querySelector('.rz-cvm').contains(document.activeElement)))) escaped = true; }
       if (escaped) fails.push(where + ' Q3 focus left the modal');
       await pg.keyboard.press('Escape'); await sleep(150);
-      const q5 = await pg.evaluate(() => ({ closed: !!document.querySelector('.rz-cvm[hidden]'), back: !!(document.activeElement && document.activeElement.hasAttribute('data-rz-open-hmi')),
+      const q5 = await pg.evaluate(() => ({ closed: !!document.querySelector('.rz-cvm[hidden]'), back: !!(document.activeElement && (document.activeElement.hasAttribute('data-rz-open-hmi') || !!document.activeElement.closest('.hmi-node'))),
         timers: window.RZConvModal.timers(), inertLeft: document.querySelectorAll('body > [data-rz-cvm-inert], body > [inert]').length }));
       if (!q5.closed) fails.push(where + ' Q5 Esc did not close');
-      if (!q5.back) fails.push(where + ' Q5 focus did not return to the Open HMI button');
+      if (!q5.back) fails.push(where + ' Q5 focus did not return to the Open HMI button (or, opened in one click, to the symbol)');
       if (q5.timers) fails.push(where + ' Q5 timer still live after close');
       if (q5.inertLeft) fails.push(where + ' Q5 page left inert');
       await pg.keyboard.press('Escape'); await sleep(120);

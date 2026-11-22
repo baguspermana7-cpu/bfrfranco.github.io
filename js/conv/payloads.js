@@ -452,6 +452,20 @@
     if (cls === 'ENGINE') d.ref = base;
     return d;
   }
+  /* a class reading that the page's tooltip rows also print, under the page's own label (factor = unit conversion:
+     a pump head printed in m of water is the same reading as a differential head in kPa) */
+  var PAGE_ROW = { 'Speed': ['Speed', 1], 'Motor current': ['Current', 1], 'Differential head': ['Head', 9.80665], 'Vibration (ISO 10816)': ['Vibration', 1], 'Basin level': ['Basin level', 1], 'Fan vibration': ['Fan vibration', 1] };
+  function pageRow(ctx, label) {
+    var a = PAGE_ROW[label], rows = ctx.rows; if (!a || !rows) return null;
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i] && rows[i][0] === a[0]) {
+        /* the page says it does not model this reading: the payload says so too, never a seeded wave (P3) */
+        if (/not modelled/i.test(String(rows[i][1]))) return 'NM';
+        var x = parseFloat(String(rows[i][1]).replace(/,/g, '')); return isNum(x) ? x * a[1] : null;
+      }
+    }
+    return null;
+  }
   function rowOf(spec, ctx) {
     var p, v;
     switch (spec.k) {
@@ -466,6 +480,14 @@
           declared: SIMD + '; anchored on the engine value ' + spec.id,
           trend: p && isNum(p.value) ? trendDef(ctx, spec, p.value, unitOf(p), 'ENGINE') : null };
       case 'S':
+        /* TR1 (PRD-CONV-EQUIPMENT-INSIDE §4): when the page's own plant simulation prints this reading (read().rows,
+           the hover tooltip), the payload shows THAT value, so tooltip, inspector and modal agree at the same tick;
+           the seeded wave is only for a reading the page does not simulate */
+        var pv = pageRow(ctx, spec.label);
+        if (pv === 'NM') return { label: spec.label, text: 'not modelled', unit: '', quality: 'state', declared: 'the page plant simulation does not model this reading and the engine does not publish it' };
+        if (isNum(pv)) return { label: spec.label, text: fmt(pv, spec.digits), unit: spec.unit || '', quality: 'simulated', sim: true,
+          declared: SIMD.replace('seeded deterministic training signal (period and phase from the point id)', 'the page plant simulation (same value as the symbol tooltip)'),
+          trend: spec.amp ? trendDef(ctx, spec, pv, spec.unit || '', 'SIM') : null };
         v = spec.amp ? wave(ctx.id + ':' + spec.label, ctx.tick, spec.base, spec.amp, spec.period) : spec.base;
         return { label: spec.label, text: fmt(v, spec.digits), unit: spec.unit || '', quality: 'simulated', sim: true, declared: SIMD,
           trend: spec.amp ? trendDef(ctx, spec, spec.base, spec.unit || '', 'SIM') : null };
@@ -531,8 +553,8 @@
   function build(o) {
     var n = o.node || {}, page = o.page || o.classId || 'conv', cls = classOf(page, n.sym, n);
     var reg = registry(), tick = isNum(o.tick) ? o.tick : 0, id = n.id || 'x', tag = n.tag || id;
-    var ctx = { id: page + ':' + id, tick: tick, tag: tag };
     var r = o.read || {}, values = r.values || {}, live = [], alarms = [];
+    var ctx = { id: page + ':' + id, tick: tick, tag: tag, rows: Array.isArray(r.rows) ? r.rows : null };
     var qualityWord = { good: 'measured', stale: 'stale', bad: 'bad', nodata: 'no data' };
     /* 1. the sheet's own state rows (what the drawing prints), each with its point quality */
     Object.keys(values).forEach(function (k) {

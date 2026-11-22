@@ -123,8 +123,15 @@
       cop: run && u.inputKwE ? u.dutyKwTh / u.inputKwE : null,   // COP = evaporator duty / compressor input of this unit
       carnotCop: only(c.chiller_carnot_cop), carnotFraction: only(c.chiller_carnot_fraction),
       refrigerant: c.chiller_refrigerant, evapApproach: c.chiller_evap_approach_k, condApproach: c.chiller_cond_approach_k,
-      superheat: NM, subcooling: NM, igvPos: NM, oilPress: NM, oilTemp: NM, dischargeT: NM, speedPct: NM, interPress: NM, hgbvPos: NM,
-      exvPos: NM, reliefSet: NM, purgeState: NM
+      /* engine 2.5.0 refrigeration cycle (PRD-CONV-EQUIPMENT-INSIDE §5.2): authored superheat / subcooling, the rest
+         solved from NIST R-134a rows at this plant's saturations; null on a unit that does not run */
+      superheat: only(c.chiller_superheat_k), subcooling: only(c.chiller_subcool_k),
+      dischargeT: only(c.chiller_discharge_c), interPress: only(c.chiller_int_sat_kpa_abs), interSatC: only(c.chiller_int_sat_c),
+      flash: only(c.chiller_flash_fraction), etaIs: only(c.chiller_eta_is), shaftKw: only(c.chiller_unit_shaft_kw),
+      refFlow: only(c.chiller_unit_ref_flow_evap_kg_s), refFlowCond: only(c.chiller_unit_ref_flow_cond_kg_s),
+      speedPct: only(c.chiller_speed_pct), igvPos: only(c.chiller_igv_pct),
+      points: run ? c.chiller_cycle_points : null,
+      hgbvPos: NM, oilPress: NM, oilTemp: NM, exvPos: NM, reliefSet: NM, purgeState: NM
     };
   }
   var RUN_NODES = { cond: true, evap: true, cp: true, mtr: true, vfd: true, eco: true, os: true, op: true, oc: true, igv: true, exv: true };
@@ -171,22 +178,25 @@
         { label: 'Saturation temperature', key: 'evapSatC', fmt: 'temp', basis: B + 'chiller_evap_sat_c' },
         { label: 'Saturation pressure', key: 'evapSatKpa', fmt: 'kpa', basis: B + 'chiller_evap_sat_kpa_abs' },
         { label: 'Approach (design)', key: 'evapApproach', fmt: 'k', basis: B + 'chiller_evap_approach_k' },
-        { label: 'Suction superheat', key: 'superheat', fmt: 'k' }] },
+        { label: 'Suction superheat', key: 'superheat', fmt: 'k', basis: B + 'chiller_superheat_k' },
+        { label: 'Refrigerant flow', key: 'refFlow', fmt: 'kgs', basis: B + 'chiller_unit_ref_flow_evap_kg_s' }] },
     { id: 'compressor', node: 'cp', name: 'Compressor — two-stage centrifugal', standard: 'ISO 10628-2',
       role: ['Draws low-pressure vapour from the evaporator and raises it to condensing pressure.', 'Its electrical input is the work the cycle needs to move the heat uphill.'],
       values: [{ label: 'Input', key: 'compKw', fmt: 'kwe', basis: B + 'chiller_input_per_machine_kw_e', fleet: true },
         { label: 'Load', key: 'loadPct', fmt: 'pct', basis: B + 'chiller_part_load_pct', fleet: true },
         { label: 'Pressure ratio', key: 'pr', fmt: 'ratio', basis: B + 'chiller_pressure_ratio' },
-        { label: 'Discharge temperature', key: 'dischargeT', fmt: 'temp' }] },
+        { label: 'Discharge temperature', key: 'dischargeT', fmt: 'temp', basis: B + 'chiller_discharge_c' },
+        { label: 'Shaft power', key: 'shaftKw', fmt: 'kwe', basis: B + 'chiller_unit_shaft_kw' },
+        { label: 'Isentropic efficiency (rating fit)', key: 'etaIs', fmt: 'frac', basis: B + 'chiller_eta_is' }] },
     { id: 'igv', node: 'igv', name: 'Inlet guide vanes', standard: 'ISO 14617-8',
       role: ['Pre-swirl the vapour entering the first impeller to throttle capacity at part load.', 'Driven by the unit control panel from the leaving chilled-water error.'],
-      values: [{ label: 'Position', key: 'igvPos', fmt: 'pct' }, { label: 'Load it serves', key: 'loadPct', fmt: 'pct', basis: B + 'chiller_part_load_pct', fleet: true }] },
+      values: [{ label: 'Position', key: 'igvPos', fmt: 'pct', basis: B + 'chiller_igv_pct' }, { label: 'Load it serves', key: 'loadPct', fmt: 'pct', basis: B + 'chiller_part_load_pct', fleet: true }] },
     { id: 'motor', node: 'mtr', name: 'Motor — hermetic, refrigerant-cooled', standard: 'IEC 60617-6',
       role: ['Turns the compressor shaft through the speed-increasing gear.', 'Its electrical input is the compressor input the plant meters.'],
-      values: [{ label: 'Input at the terminals', key: 'compKw', fmt: 'kwe', basis: B + 'chiller_input_per_machine_kw_e', fleet: true }, { label: 'Speed', key: 'speedPct', fmt: 'pct' }] },
+      values: [{ label: 'Input at the terminals', key: 'compKw', fmt: 'kwe', basis: B + 'chiller_input_per_machine_kw_e', fleet: true }, { label: 'Speed', key: 'speedPct', fmt: 'pct', basis: B + 'chiller_speed_pct' }] },
     { id: 'vfd', node: 'vfd', name: 'Variable-frequency drive', standard: 'IEC 60617-6',
       role: ['Sets motor speed so the compressor makes only the lift the plant needs.', 'Works with the guide vanes: speed first, vanes at low load.'],
-      values: [{ label: 'Speed', key: 'speedPct', fmt: 'pct' }, { label: 'Output', key: 'compKw', fmt: 'kwe', basis: B + 'chiller_input_per_machine_kw_e', fleet: true }] },
+      values: [{ label: 'Speed', key: 'speedPct', fmt: 'pct', basis: B + 'chiller_speed_pct' }, { label: 'Output', key: 'compKw', fmt: 'kwe', basis: B + 'chiller_input_per_machine_kw_e', fleet: true }] },
     { id: 'condenser', node: 'cond', name: 'Condenser — shell-and-tube', standard: 'ISO 10628-2 · AHRI 550/590 rating basis',
       role: ['Hot vapour from the compressor condenses on tubes carrying condenser water.', 'It rejects the evaporator duty plus the compressor work to the towers.'],
       values: [{ label: 'Duty', key: 'condDuty', fmt: 'kwth', basis: B + 'chiller_unit_condenser_duty_kw_th', fleet: true },
@@ -195,10 +205,13 @@
         { label: 'Saturation temperature', key: 'condSatC', fmt: 'temp', basis: B + 'chiller_cond_sat_c' },
         { label: 'Saturation pressure', key: 'condSatKpa', fmt: 'kpa', basis: B + 'chiller_cond_sat_kpa_abs' },
         { label: 'Approach (design)', key: 'condApproach', fmt: 'k', basis: B + 'chiller_cond_approach_k' },
-        { label: 'Liquid subcooling', key: 'subcooling', fmt: 'k' }] },
+        { label: 'Liquid subcooling', key: 'subcooling', fmt: 'k', basis: B + 'chiller_subcool_k' },
+        { label: 'Refrigerant flow', key: 'refFlowCond', fmt: 'kgs', basis: B + 'chiller_unit_ref_flow_cond_kg_s' }] },
     { id: 'economiser', node: 'eco', name: 'Economiser — flash tank', standard: 'ISO 10628-2',
       role: ['Liquid from the condenser flashes to an intermediate pressure; the flash gas goes to the interstage.', 'The colder liquid left behind carries more cooling per kilogram to the evaporator.'],
-      values: [{ label: 'Intermediate pressure', key: 'interPress', fmt: 'kpa' }] },
+      values: [{ label: 'Intermediate pressure', key: 'interPress', fmt: 'kpa', basis: B + 'chiller_int_sat_kpa_abs' },
+        { label: 'Intermediate saturation', key: 'interSatC', fmt: 'temp', basis: B + 'chiller_int_sat_c' },
+        { label: 'Flash fraction', key: 'flash', fmt: 'frac', basis: B + 'chiller_flash_fraction' }] },
     { id: 'exv', node: 'exv', name: 'Electronic expansion valve', standard: 'ISO 10628-2 · ISA-5.1',
       role: ['Meters liquid into the evaporator and drops it to evaporating pressure.', 'Holds the evaporator liquid level the flooded shell needs.'],
       values: [{ label: 'Downstream saturation', key: 'evapSatC', fmt: 'temp', basis: B + 'chiller_evap_sat_c' }, { label: 'Opening', key: 'exvPos', fmt: 'pct' }] },
@@ -246,5 +259,7 @@
 
   R.register('chiller', { title: 'Water-cooled centrifugal chiller', sheet: sheet, model: model, nodeState: nodeState, flow: flow,
     tempKey: TEMP_KEY, tempRange: ['evapSatC', 'condSatC'], nodeValues: NODE_VALUES, blocks: BLOCKS, nodeBlock: NODE_BLOCK,
-    media: MEDIA, defaultBlock: 'compressor' });
+    media: MEDIA, defaultBlock: 'compressor',
+    /* the P-h chart (js/conv/ph-chart.js) draws the cycle of a running unit from these plant cooling values */
+    cycle: function (u, s) { return u.state === 'running' && s && s.cooling && s.cooling.chiller_cycle_points ? s.cooling : null; } });
 })(typeof window !== 'undefined' ? window : null);

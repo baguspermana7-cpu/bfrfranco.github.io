@@ -29,6 +29,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
+import * as CYC from './lib/r134a-cycle-check.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const SOURCE = readFileSync(join(ROOT, 'js', 'conv-engine.js'), 'utf8');
@@ -68,7 +69,12 @@ function tableKpa(tC) {
 
 /* ── the hand calculation, from the AUTHORED inputs only ───────────────────── */
 const H = (() => {
-    const it = 30000, itDesign = 40000, pue = 1.45, eta = 0.96, unit = 5000, sp = 0.16491, cp = 4.186;
+    const it = 30000, itDesign = 40000, pue = 1.45, eta = 0.96, unit = 5000, cp = 4.186;
+    /* engine 2.5.0: specific power at the plant's own lift, from the rated 0.58 kW/RT through the R-134a cycle
+     * (independent solver on the raw NIST files: eta fitted at the AHRI rating saturations, then reused) */
+    const de = 0.96 * 0.97, spRated = 0.16491, rangeR = 12000 * (1 + spRated) / (500 * 3.0) * 5 / 9;
+    const etaR = CYC.solveEta(6.7 - 1.5, 29.4 + rangeR + 1.5, spRated * de, 0.8, 3.0);
+    const sp = CYC.cycle({ Te: 25.4 - 6.0 - 1.5, Tc: 32 + 5 + 1.5, eta: etaR, sh: 0.8, sc: 3.0 }).w / de;
     const dT = 7.6, chws = 25.4 - 0 - 6.0, cdwS = 32, range = 5, apE = 1.5, apC = 1.5;
     const rho = 1000, g = 9.80665, ep = 0.80, em = 0.95, ev = 0.97;
     const hPri = 15, hSec = 30, hCdw = 25, secUnit = 250, standby = 1, wb = 27, fan = 55, crahKw = 130, halls = 4;
@@ -127,12 +133,14 @@ test('V1 expected values (hand calculation from the authored inputs)', () => {
         ['tower_fan_speed_pct', H.load, 0.05], ['tower_fan_kw', H.fanKw, 0.005], ['tower_fan_fleet_kw', H.fanKw * H.running, 0.05],
         ['crah_unit_duty_kw', H.crahDuty, 0.005], ['crah_unit_load_pct', H.crahDuty / 130 * 100, 0.05],
         ['crah_fan_speed_pct', H.crahDuty / 130 * 100, 0.05], ['crah_unit_chw_flow_lps', H.crahChw, 0.005],
-        ['mech_plant_input_kw', H.mech, 0.05], ['mech_plant_headroom_kw', H.headroom, 0.05],
+        /* 0.5 kW: the specific power comes from a second cycle solver (interpolation in its own coordinates), which
+         * agrees with the engine to ~5e-5 relative; times 31 MW of duty that is ~0.2 kW (2.5.0) */
+        ['mech_plant_input_kw', H.mech, 0.5], ['mech_plant_headroom_kw', H.headroom, 0.5],
     ];
     for (const [id, expected, tol] of rows) near(c[id], expected, tol, id);
-    /* the round numbers worked by hand before the engine was changed */
-    for (const [id, v, t] of [['chiller_unit_duty_kw_th', 4464.3, 0.05], ['chiller_unit_condenser_duty_kw_th', 5200.5, 0.05],
-        ['chiller_unit_cdw_flow_lps', 248.5, 0.05], ['chiller_evap_sat_c', 17.9, 0], ['chiller_cond_sat_c', 38.5, 0],
+    /* the round numbers worked by hand before the engine was changed (condenser duty + CDW flow re-worked for 2.5.0: 4464.3 + 458.9 kW input = 4923.2; / (4.186 x 5) = 235.2 L/s) */
+    for (const [id, v, t] of [['chiller_unit_duty_kw_th', 4464.3, 0.05], ['chiller_unit_condenser_duty_kw_th', 4923.2, 0.1],
+        ['chiller_unit_cdw_flow_lps', 235.2, 0.05], ['chiller_evap_sat_c', 17.9, 0], ['chiller_cond_sat_c', 38.5, 0],
         ['chiller_lift_k', 20.6, 0], ['chiller_carnot_cop', 14.13, 0.01], ['tower_approach_k', 5, 0]]) near(c[id], v, t, `hand ${id}`);
     /* reuse, not a second name: the unit load is the plant part load, the cycle COP is plant_cop */
     near(H.unitDuty / 5000 * 100, c.chiller_part_load_pct, 0.05, 'unit load % = chiller_part_load_pct');

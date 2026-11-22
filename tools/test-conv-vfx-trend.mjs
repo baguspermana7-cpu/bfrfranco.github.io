@@ -16,7 +16,7 @@
    T2 adding a series draws two pens; the table lists both with units
    T3 a click on the plot sets a cursor; its readout lies inside the series min..max; ArrowLeft moves it back
    T4 range buttons change the window; CSV has 1 header + one row per sample and names the unit and SIM
-   T5 Esc closes the trend first, the inspector stays; focus returns to the reading; nothing left inert
+   T5 Esc closes the trend first, the inspector (or the equipment modal it was opened from) stays; focus returns to the reading; nothing left inert
    T6 390 px: no horizontal overflow of the page or the panel
    Usage: node tools/test-conv-vfx-trend.mjs [--shots=<dir>] */
 import puppeteer from 'puppeteer';
@@ -147,8 +147,9 @@ for (const W of [1440, 390]) {
   await pg.evaluate(() => { window.RZTrend.now = () => 1795000000000; });
   const pt = await pg.evaluate((H) => { const g = document.querySelector(H + ' .hmi-node[data-node="ch1"]'); g.scrollIntoView({ block: 'center', inline: 'center' }); const b = (g.querySelector('.b') || g).getBoundingClientRect(); return { x: b.left + b.width / 2, y: b.top + b.height / 2 }; }, HOST);
   await pg.mouse.click(pt.x, pt.y); await sleep(350);
-  const cell = await pg.$('aside.rz-inspector.open [data-trend]');
-  ok(!!cell, `T1@${W} no reading with a trend in the inspector`);
+  /* R186: CH-01 now opens its equipment modal on one click; a reading with a trend there opens the same trend */
+  const cell = await pg.$('aside.rz-inspector.open [data-trend], .rz-cvm:not([hidden]) [data-trend]');
+  ok(!!cell, `T1@${W} no reading with a trend in the inspector or the equipment modal`);
   if (!cell) { await pg.close(); continue; }
   const id = await pg.evaluate((e) => e.getAttribute('data-trend'), cell);
   await cell.click(); await sleep(250);
@@ -182,7 +183,7 @@ for (const W of [1440, 390]) {
   /* T5 Esc */
   const inspBefore = await pg.evaluate(() => !!document.querySelector('aside.rz-inspector.open'));
   await pg.keyboard.press('Escape'); await sleep(200);
-  const t5 = await pg.evaluate(() => ({ trend: window.RZTrend.isOpen(), insp: !!document.querySelector('aside.rz-inspector.open'), inert: document.querySelectorAll('[data-rz-trend-inert]').length, back: !!(document.activeElement && document.activeElement.hasAttribute('data-trend')) }));
+  const t5 = await pg.evaluate(() => ({ trend: window.RZTrend.isOpen(), insp: !!document.querySelector('aside.rz-inspector.open, .rz-cvm:not([hidden])'), inert: document.querySelectorAll('[data-rz-trend-inert]').length, back: !!(document.activeElement && document.activeElement.hasAttribute('data-trend')) }));
   ok(!t5.trend && t5.insp && t5.inert === 0 && t5.back, `T5@${W} ` + JSON.stringify({ ...t5, inspBefore }));
   ok(pg.__errs.length === 0, `page errors @${W}: ` + pg.__errs[0]);
   await pg.close();

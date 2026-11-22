@@ -11,6 +11,118 @@ release sections rather than semver.
 
 ---
 
+## v3.91.0 — 2026-11-22 — The chiller runs its own cycle
+
+Owner (R186): open chiller 1 and see the process inside, evaporator, compressor, condenser, expansion valve.
+PRD-CONV-EQUIPMENT-INSIDE phase P2. The drawing was there. Most readings inside it said "not modelled" because the
+engine never solved the refrigeration cycle.
+
+### Changed
+- `js/conv-engine.js` 2.5.0 solves the R-134a two-stage economised cycle of each running chiller. It returns eight
+  state points (t, p, h, s, x), the economiser pressure and flash fraction, both refrigerant flows, shaft power,
+  discharge temperature, compressor speed and guide-vane position. Properties are NIST WebBook rows; nothing is fitted.
+- The 0.58 kW/RT figure is now what it always was: the AHRI 550/590 RATING (lift 30.9 K). Until 2.4.0 it was applied
+  at this plant's warm-water lift (17.9 to 38.5 °C, 20.6 K). The same machine there needs 0.36 kW/RT, so chiller input
+  falls from 5,153.4 to 3,212.5 kW and COP rises from 6.06 to 9.73. Tower rejection is 34,462.5 kW, CDW flow 235.2 L/s
+  per unit, mechanical plant 4,622.1 kW, headroom 7,627.9 kW. PUE is an input and does not move.
+- `js/conv/internals/chiller.js`: superheat, subcooling, discharge temperature, shaft power, refrigerant flows,
+  economiser pressure and flash fraction, speed and IGV position now show engine values with their basis. Oil, EXV
+  position, relief, purge and hot-gas bypass still say "not modelled". They are transient or vendor data.
+- Manuals (chiller plant, data hall) and CONVENTIONAL_DC_OPERATIONS_STANDARD (mechanical check, item 23c) carry the
+  new numbers.
+
+### Added
+- `data/sources/nist-r134a/` holds the raw NIST tables and their request. `tools/build-conv-r134a.mjs` writes the
+  engine's property block; `--check` fails a stale block.
+- `tools/test-conv-chiller-cycle.mjs` (CY0-CY5, ship gate) checks five things:
+  - the NIST rows against the ASHRAE table and anchors;
+  - energy closure (duty + shaft = cycle condenser, drive losses = the rest);
+  - physical states;
+  - an independent second solver on the raw files (`tools/lib/r134a-cycle-check.mjs`);
+  - the direction of CDW and CHWS perturbations.
+
+  It is red on the v3.90.0 tree (6 of 6). Four seeded engine mutations each turned it red: subcooling dropped, economiser mix
+  dropped, absolute-T isobar interpolation, m_c = m_e.
+- 26 curated registry rows for the cycle basis and results.
+- A "Refrigeration cycle (P-h)" section in the chiller modal (`js/conv/ph-chart.js`, PRD §5.5, phase P2b). It draws
+  the running unit's eight state points over the R-134a dome and 10 K isotherms. h is linear, P is logarithmic, and
+  segments use the drawing's refrigerant colours. Each point is focusable. A table of the points sits under the
+  chart. A standby unit shows no chart.
+- `tools/test-conv-ph-chart.mjs` (PH1-PH6, ship gate) checks the chart at 1440 and 390:
+  - every drawn point sits where the rendered axes put the engine's h and P, within 1.5 px;
+  - the table equals the engine;
+  - the points have keyboard names;
+  - a standby unit has no chart;
+  - the chart fits at 390 with no sideways scroll.
+
+  It is red on v3.87.0 (no chart). A linear-P mutation turned 8 checks red.
+- Phase P3: one click on a condenser-water pump, a secondary chilled-water pump, a cooling-tower cell or a CRAH now
+  opens its inside, not the fleet table. `js/conv/internals/pump.js` (one drawing, registered for the three pump
+  families), `tower.js` and `crah.js` follow the chiller's contract: geometry and key names only, every value from the
+  fleet row or `snapshot.cooling`, "not modelled" for the rest.
+  - Pump: suction valve, Y-strainer, centrifugal pump, check valve, discharge valve, pressure indicators, motor, VFD.
+    It shows flow, head, differential pressure, hydraulic and shaft power, efficiency, motor input and speed.
+  - Tower cell: fill and basin, fan, motor, VFD, wet bulb, make-up and blowdown valves. It shows heat rejected, load,
+    range, approach, water temperatures and fan speed and power.
+  - CRAH: filter, chilled-water coil, EC fans, two-way valve, controller. It shows duty, CHW flow and temperatures,
+    supply and return air and airflow.
+- Engine 2.5.0 publishes the values the drawings needed: per-pump hydraulic power (rho g Q H), shaft power
+  (hydraulic / pump efficiency) and differential pressure (rho g H) for the three pump services, and the CRAH unit
+  airflow (duty / (rho cp dT_air)). Air density 1.204 kg/m3 and cp 1.006 kJ/(kg K) are ASHRAE standard dry-air values.
+  Twelve curated registry rows, 314 parameters in all.
+- `tools/test-conv-internals-p3.mjs` (P3-1 to P3-6, ship gate) checks:
+  - every block row against its engine basis, and the not-modelled list;
+  - no number literal outside the geometry block;
+  - the pump power and airflow, recomputed by hand. Shaft / (motor x VFD efficiency) equals the published 78.2 kWe;
+  - one click opens each drawing at 1440 and 390;
+  - every drawn value equals `read()`, and no text overlaps;
+  - the modal readings agree with the drawing.
+
+  It is red on v3.91.0-P2 page wiring (4 of 4 clicks open no drawing). A planted literal turned P3-1b red. Its first
+  run found a VFD label over its speed and a readings row the check misread.
+
+### Not modelled, and why
+- Tower make-up, blowdown and evaporation are not drawn per cell. The engine's water balance comes from the site WUE
+  (447.8 L/min). The heat each cell rejects would evaporate about 860 L/min at h_fg. A per-cell share of the WUE figure
+  would not belong to the cell. The gap is recorded in the PRD.
+- Pump motor current, vibration, seal and bearing readings, the tower basin level, CRAH valve position, fan power and
+  filter pressure drop are not modelled. The modal's plant readings used to show a seeded wave for current, vibration
+  and basin level. They now say "not modelled", the same as the drawing. Pump speed in the readings is the engine's.
+
+### Fixed
+- `tools/test-conv-plant-internals.mjs` V1 computes the operating specific power by hand through the independent
+  solver. `tools/test-conv-internals-core.mjs` K6 now requires an engine basis on the cycle readings and "not modelled"
+  on the rest.
+
+## v3.90.0 — 2026-11-22 — One click opens the machine
+
+Owner (R186): "Saat block di klik itu harus ada diagram dari equipment itu ya. Misal saya klik chiller 1 ya keluarnya
+proses di dalamnya terlihat evap-compressor-condensor-expansion valve dll." PRD-CONV-EQUIPMENT-INSIDE phase P1.
+
+### Changed
+- `js/conv/sheet-truth.js`: one click (or Enter) on a machine whose inside is drawn (`RZConvInternals.has`, today the
+  chiller and the genset) opens the equipment modal straight on its internal drawing. Before, a click opened the side
+  inspector and the drawing sat behind its "Open equipment HMI" button. Everything without a drawn inside (pumps,
+  valves, lines, instruments) still opens the inspector, so nothing half-built is shown.
+
+### Fixed
+- One point, one value: a CHW pump showed 59 % / 71 A in its tooltip, 75 % / 91 A in the inspector and 81 % / 95 A in
+  the modal at the same moment, because the inspector and the modal seeded their own simulation. `js/conv/payloads.js`
+  now takes Speed, Motor current and Differential head (m × 9.80665 = kPa) from the page's own plant simulation (the
+  rows the tooltip prints) when the page has them; the seeded wave stays only for readings the page does not simulate.
+
+### Added
+- `tools/test-conv-equipment-inside.mjs` (IN1, ship gate): one click and Enter open the inside of CH-01 and G-01 at 1440
+  and 390 with >= 8 blocks, no inspector, Escape returns focus to the symbol; a pump still opens the inspector. Red on
+  v3.87.0 (18 of 34).
+- `tools/test-conv-point-truth.mjs` (TR1, ship gate): for every duty CHW pump, tooltip = inspector = modal for speed and
+  current, head in both units. Red on v3.87.0 (12 of 18).
+- `documentation/product-transformation/02-prds/PRD-CONV-EQUIPMENT-INSIDE/PRD.md`: the full plan (every class, the
+  chiller refrigeration cycle with state points and a P-h diagram, laws, seven phases).
+- Gates that clicked a chiller expecting the inspector now accept the modal opened in one click
+  (`test-conv-equipment-modal` Q1/Q5, `test-conv-depth`, which also counts only visible dialogs, `test-conv-vfx-trend`
+  T1/T5, `test-conv-internals-render`).
+
 ## v3.89.0 — 2026-11-22 — The hall reads like a BMS
 
 The owner (R185, 2026-11-22) wrote: "Kenapa tampilan UIUX datahall jadi 3d jadi kayak bukan BMS". The data hall floor of
