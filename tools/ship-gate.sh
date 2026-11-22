@@ -122,6 +122,7 @@ gate "DC AI HMI drawings — H0 ratchet, H1 paint, H2 library, H4 names, H5 text
 gate "DC AI living plant (A1) — Cooling & Piping state colour, motion bound to pump speed, standby, pump-failure perturbation, Thermal/Flat, reduced motion, off-screen pause" node tools/test-dh-vfx.mjs
 gate "DC AI point limits (B1) — every band sourced, relative to the engine setpoint, ordered, design point normal" node tools/test-dcai-points.mjs
 gate "DC AI Data Hall tab (B5a) — compact KPI grid on a phone, hall selector one line and reachable, one severity word, title contrast, no sideways scroll" node tools/test-dh-hall.mjs
+gate "DC AI Data Hall 3D / Plan (PRD-DATAHALL-BMS-ISO F4) — 3D default at 1440, engine counts drawn, grey normal + green lamp, planted alarm red, equal height and 30 deg, plan HMI on a click, toggle stored, Plan on a phone" node tools/test-dcai-hall-iso.mjs
 gate "Cockpit quiet (PRD-COCKPIT-QUIET Q0) — the drawing starts in the first screen, <= 25 words above it, no value said twice, no developer prose, no empty box; the 7 Conventional pages join when Q1 ships" node tools/test-cockpit-quiet.mjs --only=chiller-plant,water-system,fire-system,fuel-system,EPMS_Telemetry,ict,cdu-mini-bms,datahallAI,dc-conventional
 gate "DC AI operator truth — one state model, no state without evidence, flow only with evidence, quality on values, alarm badge without colour, reduced motion (O1-O5, O8; BMS master prompt)" node tools/test-dh-operator.mjs
 gate "DC AI operator UI — markup contract" node tools/test-datahall-ai-operator-ui.mjs

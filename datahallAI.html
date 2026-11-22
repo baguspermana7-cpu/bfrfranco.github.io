@@ -772,7 +772,7 @@ body[data-datahall-authority="unavailable"] #tabs,
 body[data-datahall-authority="unavailable"] .wrap{display:none !important}
 body[data-datahall-authority="unavailable"] .hdr-r>.dot,body[data-datahall-authority="unavailable"] [data-cv="clock"]>.dot{background:#64748b !important;box-shadow:none !important;animation:none !important}
 body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:none}
-</style>    <script src="js/rz-version.js?v=20261122-03a6cecf" defer></script>
+</style>    <script src="js/rz-version.js?v=20261122-0b7cced3" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <!-- v3.5.0 — hold the 8.5px legibility floor by SCALE, not by font size. Five of this page's
          fifteen diagrams were already clear; the dense ones (cooling P&ID, the four SLDs, the hall
@@ -873,6 +873,9 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
     <script src="js/datahall-ai/operator-ui.js?v=20261013-6f8ad66d" defer></script>
     <script src="js/datahall-ai/equipment-inspector.js?v=20261116-b68cf3d6" defer></script>
     <script src="js/datahall-ai/hall-interact.js?v=20261013-77877697" defer></script>
+    <script src="js/conv/floor-plan-color.js?v=20261122-7138898a" defer></script>
+    <script src="js/conv/floor-plan.js?v=20261122-59d1681e" defer></script>
+    <script src="js/datahall-ai/hall-iso.js?v=20261122-2bc27b32" defer></script>
     <script src="js/datahall-ai/fire-workstation.js?v=20261116-0546e949" defer></script>
 <style id="rz-skiplink-v1">
 .skip-link{position:absolute;top:-50px;left:0;background:#1a1d23;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 4px 0;transition:top .2s ease}
@@ -891,6 +894,7 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
     <link rel="stylesheet" href="css/conv-vfx.css?v=20261118-5eed9b2f">
     <link rel="stylesheet" href="css/rz-dh-shell.css?v=20261120-a7d2ebad">
     <link rel="stylesheet" href="css/conv-shell.css?v=20261121-1a01438a">
+    <link rel="stylesheet" href="css/conv-point.css?v=20261120-8daa6374">
 </head><body class="locked" data-rz-data-mode="simulated" data-datahall-authority="unavailable" data-rz-inspector-dock="1">
 <a href="#main-content" class="skip-link">Skip to main content</a>
 
@@ -3607,6 +3611,9 @@ s+=tx(HX1+8,Y(1.45)-6,'CHW','var(--b)',9,'start',1,bo('chwSupplyC',{nomark:true}
 window.__hallZones={racks:X(Lm*.3),cdu:X(Lm*.5),crah:X(Lm*.8),vb:VB_W,hx0:HX0,hy0:HY0b,ppm:SC,lm:Lm,wm:Wm};
 hc.innerHTML=s;
 hallApplyLayers();
+/* PRD-DATAHALL-BMS-ISO F4: the 3D floor (js/datahall-ai/hall-iso.js) draws the same hall from these engine reads */
+window.__hallIsoGeo={rows:rows,perRow:perRow,kwRack:kwRack,crahInst:crahInst,crahAct:crahAct,cduInst:cduInst,cduRun:cduRun,sp:SENS_PTS,supplyC:bn('airSupplyC'),returnC:bn('airReturnC')};
+if(window.RZHallIso)window.RZHallIso.update(window.__hallIsoGeo);
 }
 /* Layers are a VIEW of one drawing, so the state survives a re-render (hall switch, engine tick). */
 const HP_LAYERS={thermal:true,air:true,liquid:true,leak:true,overhead:false};

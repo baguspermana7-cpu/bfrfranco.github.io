@@ -11,6 +11,39 @@ release sections rather than semver.
 
 ---
 
+## v3.92.0 — 2026-11-22 — The AI hall in 3D, read like a BMS
+
+PRD-DATAHALL-BMS-ISO phase F4 (owner R185: "Kenapa tampilan UIUX datahall jadi 3d jadi kayak bukan BMS … floor plan dulu
+bentuknya 3d tapi sekarang flat"). v3.89.0 gave the Conventional data hall a 3D floor drawn like a BMS graphic. The DC AI
+Data Hall tab (`datahallAI.html`) was still a flat plan. It now has the same floor and the same `3D | Plan` switch.
+
+- **One renderer, an adapter.**
+  - `js/datahall-ai/hall-iso.js` (new) turns the hall's engine counts into the model `js/conv/floor-plan.js` draws.
+    The counts are rows, racks per row, rack kW, fan-wall modules installed / active and CDUs installed / running.
+  - The 3D floor holds 20 rows as 10 contained pairs, one hot-aisle roof per pair, the north and south fan-wall
+    galleries, and the CDU line between the rack field and the south gallery. Standby units are drawn as outlines.
+  - Temperatures are the aisle readouts the plan already draws (cold aisle = rack inlet). Before the first readout,
+    the engine's design supply and return air stand in. The adapter does no engine arithmetic.
+- **Same rules as the Conventional hall.**
+  - A normal rack is grey with a green lamp. Only a warn or alarm rack wears its state colour.
+  - Every rack is the same height. Both plan axes are drawn at 30°.
+- **Same HMI on a click.** Each 3D rack and unit carries the plan's equipment reference (`rack-unit:Rnn-kk`, `crah:nn`,
+  `cdu:n`), so a click opens the HMI the plan opens.
+- **Plan is the engineering drawing, unchanged.** In 3D the plan keeps only its header (hall line and the IT, liquid
+  and air cards). Its layer bar and key, which describe the plan, are hidden. Plan elements below the header are taken
+  out of the render, not clipped at the frame, so `test-conv-geometry` G2 stays at 0 clipped (it counted 3,084 before
+  this was fixed).
+- **The switch.** 3D is the default on a stage of 600 px or more; Plan is the default on a phone. The choice is stored
+  under `rz.dcai.proj`.
+- **`js/conv/floor-plan.js` 2.1.0.**
+  - The line length follows `model.racksPerZone`.
+  - `model.cduUnits` adds a CDU line.
+  - `racks[i].ref` and `unit.ref` become `data-rz-equipment`.
+  - `opts.toggle: false` hands the switch to the page; `opts.zoneHead` sets the row tag's head.
+  - The Conventional hall's drawing is unchanged: its geometry is still `GEO`, 10 cabinets a line.
+- **Gate.** `tools/test-dcai-hall-iso.mjs` (new), laws D1–D7. Red on 7f7608e7a: 29 of 30 failed; the only pass was
+  page width at 390. It is green on this release (37/37).
+
 ## v3.91.0 — 2026-11-22 — The chiller runs its own cycle
 
 Owner (R186): open chiller 1 and see the process inside, evaporator, compressor, condenser, expansion valve.

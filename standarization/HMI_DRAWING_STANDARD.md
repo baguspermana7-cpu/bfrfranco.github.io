@@ -180,8 +180,8 @@ Conventional session's DATAHALL-SPACE release is on main (Q3).
 ## 4f. Floor graphics (PRD-DATAHALL-BMS-ISO, owner R185 2026-11-22: "Kenapa tampilan UIUX datahall jadi 3d jadi kayak bukan BMS")
 
 A floor graphic is a drawing of equipment in a room. It is not a chart of the equipment's numbers. The source is
-`js/conv/floor-plan.js` 2.0.0, with `js/conv/floor-plan-color.js` loaded first. `datahall.html` uses it now, and the DC AI
-Data Hall tab follows in F4.
+`js/conv/floor-plan.js` 2.1.0, with `js/conv/floor-plan-color.js` loaded first. `datahall.html` uses it, and so does the DC AI
+Data Hall tab (F4, v3.92.0) through its adapter `js/datahall-ai/hall-iso.js` (below).
 
 - **Two projections of one drawing.**
   - **3D** is true isometric: both plan axes at 30°. It is the default on a stage 600 px wide or more.
@@ -222,6 +222,15 @@ Data Hall tab follows in F4.
   - B1–B7 are added: grey normal, equal height, 30° axes and row letters, tags, air, phone Plan ≥ 8 px, and the toggle by
     keyboard with memory and selection kept.
   - Red on fcf6383bb (the v3.87.0 candidate it builds on): B1, B2, B3, B4, B6 and B7 fail. B5 is proven red by a constant-speed mutation.
+- **Another page's hall goes through an adapter, never a copy (F4).**
+  - The adapter turns the page's engine counts into the renderer's model. `racksPerZone` sets the line length.
+    `cduUnits` adds a CDU line between the cabinets and the south gallery (no fan). `racks[i].ref` and `unit.ref`
+    become `data-rz-equipment`, so the page's own click opens its HMI.
+  - The page may own the switch (`opts.toggle: false`). On DC AI, Plan is the page's engineering drawing (`#hSvg`),
+    kept whole. In 3D that drawing keeps only its header band, and its layer bar and key are hidden. The stored key is
+    `rz.dcai.proj`.
+  - Every number the 3D floor prints is hooked or declared for `test-dcai-coverage`.
+  - Gate: `tools/test-dcai-hall-iso.mjs` D1–D7.
 
 ## 4c. Repaint cost (v3.63.0, O11)
 

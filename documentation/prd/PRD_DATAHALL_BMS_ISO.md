@@ -201,3 +201,28 @@ Red proofs by mutation: a green normal fill fails B1 (0 of 463 cabinets neutral)
 (front heights 39.2 to 41.2 px); a constant air speed fails B5.
 
 No ratchet was re-recorded.
+
+## F4 as built (v3.92.0, 2026-11-22)
+
+**Geometry adapter.** `js/datahall-ai/hall-iso.js` turns renderHall's engine reads into the model `js/conv/floor-plan.js`
+already draws. There is no second renderer.
+
+| DC AI hall | floor-plan model |
+|---|---|
+| 20 rows × 22 racks | 10 zones (contained pairs) × 44 racks (`racksPerZone` 44, so 22 cabinets a line) |
+| fan-wall modules, installed / active | `crahUnits`: north gallery first, then south; the last ones are standby |
+| CDUs, installed / running | `cduUnits`: a CDU line between the rack field and the south gallery (renderer 2.1.0) |
+| aisle readouts `#C<pair><pt>t`, `#H<pair><pt>t` | `rackInletFor(idx)` and `zones[].rackInletC` / `hotAisleC`; engine supply / return air until the first readout |
+| `rack-unit:Rnn-kk`, `crah:nn`, `cdu:n` | `racks[i].ref`, `unit.ref`, written as `data-rz-equipment`: a click opens the plan's HMI |
+
+**Plan.** Plan is the existing engineering drawing (`#hSvg`), unchanged. In 3D its viewBox is cut to the header band
+(y ≤ 136); what lies below it is taken out of the render (`data-dh-off`), so nothing paints past the
+frame. The layer bar and the key are hidden.
+
+**The switch.**
+- Two buttons in `.dh-proj`, stored under `rz.dcai.proj`.
+- 3D at 600 px or more, Plan below that.
+
+**Gate.**
+- `tools/test-dcai-hall-iso.mjs`, laws D1–D7.
+- Red on 7f7608e7a: 29 of 30 checks failed.
