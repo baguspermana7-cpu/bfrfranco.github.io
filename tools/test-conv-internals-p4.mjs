@@ -77,13 +77,19 @@ const num = (t) => parseFloat(String(t).replace(/,/g, ''));
 const decimals = (t) => { const m = /\.(\d+)/.exec(String(t).split(' ')[0]); return m ? m[1].length : 0; };
 const NM_ROWS = { hv_tx: ['Losses', 'Winding temperature', 'Buchholz', 'Cooling state', 'Tap position', 'Surge counter', 'Neutral current'],
   dist_tx: ['Winding temperature', 'Cooling state', 'Off-circuit tap', 'Surge counter', 'Neutral current'],
-  ups: ['Part-load efficiency', 'Autonomy', 'State of charge', 'DC bus voltage', 'Battery temperature', 'Maintenance bypass'] };
+  ups: ['Part-load efficiency', 'Autonomy', 'State of charge', 'DC bus voltage', 'Battery temperature', 'Maintenance bypass'],
+  /* E18 (v3.100.0): the floor PDU has its own class; the engine publishes its rating and loading, not its impedance,
+     currents, losses or output voltage */
+  pdu: ['Impedance', 'Losses', 'Full-load current, primary', 'Full-load current, secondary', 'Fault level, secondary', 'Winding temperature',
+    'Cooling state', 'Off-circuit tap', 'Surge counter', 'Neutral current'] };
 const e101 = window.RZEpmsSheets.sld, st101 = SIMV.normalState(e101), r101 = SIMV.solve(e101, st101, SIMV.basis(C.snapshot));
 const st102 = LV.normalState(sh);
 const UNITS = { hv_tx: I.txUnits(e101, st101, r101).filter((u) => u.classKey === 'hv_tx'),
-  dist_tx: I.txUnits(e101, st101, r101).filter((u) => u.classKey === 'dist_tx').concat(I.txUnits(sh, st102, res)),
-  ups: I.upsUnits(sh, st102, res) };
-ok(UNITS.hv_tx.length === 2 && UNITS.dist_tx.length === 4 && UNITS.ups.length === 2, `EL3 adapter units hv ${UNITS.hv_tx.length} / dist ${UNITS.dist_tx.length} / ups ${UNITS.ups.length}, expected 2 / 4 / 2`);
+  dist_tx: I.txUnits(e101, st101, r101).filter((u) => u.classKey === 'dist_tx').concat(I.txUnits(sh, st102, res).filter((u) => u.classKey === 'dist_tx')),
+  ups: I.upsUnits(sh, st102, res),
+  pdu: I.txUnits(sh, st102, res).filter((u) => u.classKey === 'pdu') };
+ok(UNITS.hv_tx.length === 2 && UNITS.dist_tx.length === 4 && UNITS.ups.length === 2 && UNITS.pdu.length === 2,
+  `EL3 adapter units hv ${UNITS.hv_tx.length} / dist ${UNITS.dist_tx.length} / ups ${UNITS.ups.length} / pdu ${UNITS.pdu.length}, expected 2 / 4 / 2 / 2`);
 for (const k of Object.keys(UNITS)) {
   ok(R.has(k), `EL1 ${k}: not registered`); if (!R.has(k)) continue;
   for (const u of UNITS[k]) for (const b of R.get(k).blocks) {

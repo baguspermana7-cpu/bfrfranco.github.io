@@ -296,6 +296,63 @@ const textPx = (sels) => {
   });
   return out;
 };
+/* E6 (full): the 3D equipment view, read from the drawn svg. Counts per class, neutral bodies, lamps, one front height per
+   class, 30° axes, no caption over a unit. `want` maps a class to its expected count. */
+const isoOf = (sel, want, sheetSel) => {
+  const host = document.querySelector(sel); if (!host) return null;
+  const units = [...host.querySelectorAll('.el-iso-unit')], out = { counts: {}, lacks: [] };
+  units.forEach((u) => { const k = u.getAttribute('data-el-cls'); out.counts[k] = (out.counts[k] || 0) + 1; });
+  Object.keys(want).forEach((k) => { if (out.counts[k] !== want[k]) out.lacks.push(k + ' ' + out.counts[k] + ' drawn, ' + want[k] + ' expected'); });
+  const rgb = (c) => (c.match(/\d+(\.\d+)?/g) || []).slice(0, 3).map(Number);
+  let faces = 0, tinted = 0;
+  host.querySelectorAll('.el-iso-unit polygon').forEach((p) => { const [r, g, b] = rgb(getComputedStyle(p).fill); faces++; if (Math.max(r, g, b) - Math.min(r, g, b) > 16) tinted++;   /* chroma over 16 / 255 reads as a colour, the graphite greys sit at 6-10 */ });
+  if (!faces || (faces - tinted) / faces < 0.95) out.lacks.push(`bodies ${faces - tinted} of ${faces} neutral`);
+  let run = 0;
+  host.querySelectorAll('.el-iso-lamp').forEach((l) => {
+    const st = l.getAttribute('data-lamp-state'), f = getComputedStyle(l).fill, [r, g, b] = rgb(f);
+    if (st === 'running') { run++; if (!(g > r + 40 && g > b + 20)) out.lacks.push('running lamp not green: ' + f); }
+    else if (st !== 'alarm' && st !== 'warn' && f !== 'none') out.lacks.push(st + ' lamp filled: ' + f);
+  });
+  if (!run) out.lacks.push('no running lamp');
+  const P = (q) => (q.getAttribute('points') || '').trim().split(/\s+/).map((v) => v.split(',').map(Number));
+  const heights = {};
+  units.forEach((u) => {
+    const fr = P(u.querySelector('[data-face="front"]')), tp = P(u.querySelector('[data-face="top"]')), k = u.getAttribute('data-el-cls');
+    (heights[k] = heights[k] || new Set()).add((fr[3][1] - fr[0][1]).toFixed(2));
+    const slope = (tp[1][1] - tp[0][1]) / (tp[1][0] - tp[0][0]);
+    if (Math.abs(slope - Math.tan(Math.PI / 6)) > 0.01) out.lacks.push('axis not 30°: ' + u.getAttribute('data-tag') + ' slope ' + slope.toFixed(3));
+  });
+  Object.keys(heights).forEach((k) => { if (heights[k].size !== 1) out.lacks.push(k + ' front heights ' + [...heights[k]].join('/')); });
+  host.querySelectorAll('.el-iso-caption').forEach((t) => {
+    const r = t.getBoundingClientRect();   /* a caption runs down at 30°: sample its line and ask what is painted under each point */
+    for (let i = 1; i < 12; i++) { const x = r.left + (r.width * i) / 12, y = r.top + (r.height * i) / 12;
+      const hit = document.elementsFromPoint(x, y).find((n) => n.closest && n.closest('.el-iso-unit'));
+      if (hit) { out.lacks.push('caption "' + t.textContent + '" over ' + hit.closest('.el-iso-unit').getAttribute('data-tag')); break; } }
+  });
+  /* accuracy: each unit names a symbol the one-line really draws, its lamp is that symbol's state (independent map
+     of the sheet's data-state), a shared symbol says so and the number of units sharing it is what it claims */
+  if (sheetSel) {
+    const sheet = document.querySelector(sheetSel), MAP = { running: 'running', closed: 'running', energized: 'running', standby: 'standby',
+      open: 'stopped', stopped: 'stopped', deenergized: 'stopped', alarm: 'alarm', trip: 'alarm', tripped: 'alarm', warn: 'warn', warning: 'warn' };
+    const share = {};
+    units.forEach((u) => { const n = u.getAttribute('data-node'); if (n) share[n] = (share[n] || 0) + 1; });
+    let checked = 0;
+    units.forEach((u) => {
+      const n = u.getAttribute('data-node'), lamp = u.querySelector('.el-iso-lamp').getAttribute('data-lamp-state'), rep = +u.getAttribute('data-rep'), lab = u.getAttribute('aria-label') || '';
+      if (!n) { if (lamp !== 'nodata' || u.hasAttribute('tabindex')) out.lacks.push(u.getAttribute('data-tag') + ': no symbol but lamp ' + lamp); return; }
+      const g = sheet && sheet.querySelector('.hmi-node[data-node="' + n + '"]');
+      if (!g) { out.lacks.push(u.getAttribute('data-tag') + ' points at ' + n + ', not drawn on the one-line'); return; }
+      const want = MAP[g.getAttribute('data-state')] || 'nodata';
+      if (lamp !== want) out.lacks.push(`${u.getAttribute('data-tag')} lamp ${lamp}, one-line ${n} is ${g.getAttribute('data-state')}`);
+      if (rep > 1 && !new RegExp('one symbol for ' + rep + ' units').test(lab)) out.lacks.push(u.getAttribute('data-tag') + ' shares ' + n + ' but does not say so');
+      if (rep > share[n]) out.lacks.push(`${n}: claims ${rep} units, ${share[n]} drawn`);
+      checked++;
+    });
+    out.lampChecked = checked;
+  }
+  out.lacks = out.lacks.slice(0, 8);
+  return out;
+};
 const switchOf = () => {
   const g = document.querySelector('.el-proj'); if (!g) return null;
   return [...g.querySelectorAll('button')].map((b) => [b.getAttribute('data-proj'), b.getAttribute('aria-pressed')]);
@@ -374,6 +431,34 @@ const run = { epms: {}, dcai: {} };
     await pe.evaluate(() => { const x = document.querySelector('.epms-view-btn[data-epms-view="hv"], .epms-view-btn[data-epms-view="sld"]'); if (x) x.click(); }); await sleep(800);
   }
   if (want('E6')) { const s = await pe.evaluate(switchOf); ok(s && s.length === 2 && JSON.stringify(s) === JSON.stringify([['iso', 'false'], ['line', 'true']]), `E6 EPMS@1440 no 3D | One-line switch with One-line pressed: ${JSON.stringify(s)}`); }
+  if (want('E6')) {
+    const e = await pe.evaluate(() => window.CONV_CALC.snapshot.electrical);
+    const mv = await pe.evaluate(() => window.RZEpmsSheets.sld.nodes.filter((n) => n.sw === 'cb' && n.kv === 'mv').length);
+    const wantC = { gis: e.hv_line_bays + e.hv_tx_bays + (e.hv_bus_count - 1), tx: e.hv_tx_count, mv, gen: e.genset_count };
+    await pe.evaluate(() => { const b = document.querySelector('#epms-proj [data-proj="iso"]'); if (b) b.click(); }); await sleep(800);
+    const iso = await pe.evaluate(isoOf, '#epms-iso-host', wantC, '#epms-sheet-host');
+    ok(iso && iso.lacks.length === 0 && iso.lampChecked > 0, `E6 EPMS 3D: ${iso ? iso.lampChecked + ' lamps checked ' + JSON.stringify(iso.counts) + ' ' + iso.lacks.join('; ') : 'no 3D view'}`);
+    /* a unit opens the same equipment view as its symbol */
+    const opened = await pe.evaluate(async () => {
+      const u = document.querySelector('#epms-iso-host .el-iso-unit[data-el-cls="gis"]'); if (!u) return null;
+      const tag = u.getAttribute('data-tag'); u.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((r) => setTimeout(r, 1200));
+      const d = [...document.querySelectorAll('[role="dialog"]')].find((x) => { const r = x.getBoundingClientRect(); return r.width > 200 && r.height > 200 && x.textContent.includes(tag); });
+      const res = { tag, open: !!d };
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await new Promise((r) => setTimeout(r, 400));
+      return res;
+    });
+    ok(opened && opened.open, `E6 EPMS 3D: selecting ${opened ? opened.tag : 'a GIS bay'} does not open its equipment view`);
+    /* keyboard: arrow keys move between the two buttons and the choice is stored */
+    await pe.evaluate(() => document.querySelector('#epms-proj [data-proj="iso"]').focus()); await pe.keyboard.press('ArrowRight'); await sleep(300);
+    const kb = await pe.evaluate(() => [document.activeElement && document.activeElement.getAttribute('data-proj'), document.querySelector('#epms-proj [data-proj="line"]').getAttribute('aria-pressed'), localStorage.getItem('rz.epms.proj'), document.getElementById('epms-iso-view').hidden]);
+    ok(kb[0] === 'line' && kb[1] === 'true' && kb[2] === 'line' && kb[3] === true, `E6 EPMS keyboard: ArrowRight should move to One-line, press it, store it and hide 3D: ${JSON.stringify(kb)}`);
+    await pe.keyboard.press('ArrowLeft'); await sleep(300);
+    await pe.reload({ waitUntil: 'networkidle0' }); await enterAuthorizedAuditState(pe, 'epms'); await sleep(2500);
+    const st = await pe.evaluate(() => [document.querySelector('#epms-proj [data-proj="iso"]') && document.querySelector('#epms-proj [data-proj="iso"]').getAttribute('aria-pressed'), !document.getElementById('epms-iso-view').hidden]);
+    ok(st[0] === 'true' && st[1] === true, `E6 EPMS stored choice: after a reload 3D should still be shown: ${JSON.stringify(st)}`);
+    await pe.evaluate(() => { localStorage.removeItem('rz.epms.proj'); });
+  }
   ok(pe.errors.length === 0, `EPMS@1440 page errors: ${pe.errors.slice(0, 2).join(' | ')}`);
   await pe.close();
 
@@ -405,6 +490,28 @@ const run = { epms: {}, dcai: {} };
   if (want('E10')) { const r = await pd.evaluate(relaysOf, DC_OV); ok(r && r.n >= 2 && r.miss.length === 0 && r.healthy === r.n, `E10 DC AI overview@1440 normal operation: ${r ? r.healthy : '?'} of ${r ? r.n : '?'} relay lamps healthy ${r ? JSON.stringify(r.miss.slice(0, 4)) : ''}`); }
   if (want('E3')) { const b = await pd.evaluate(breakersOf, DC_OV); ok(b && b.cover.length === 0, `E3c DC AI overview@1440 breaker glyphs / lamps cover ${b ? b.cover.length : '?'} words: ${b ? JSON.stringify(b.cover.slice(0, 5)) : ''}`); }
   if (want('E6')) { const s = await pd.evaluate(switchOf); ok(s && s.length === 2 && JSON.stringify(s) === JSON.stringify([['iso', 'false'], ['line', 'true']]), `E6 DC AI@1440 no 3D | One-line switch with One-line pressed: ${JSON.stringify(s)}`); }
+  if (want('E6')) {
+    const e = await pd.evaluate(() => { const s = window.DCAI_CALC.snapshot; return { d: s.distribution, q: s.equipment }; });
+    const mv = await pd.evaluate(() => [...document.querySelectorAll('.hmi-host[data-hmi-sheet="dh-e-001"] .hmi-node[data-node]')].filter((g) => /^cb-(mv|f)[A-Z]\d*$|^mv-tie$/.test(g.getAttribute('data-node'))).length);
+    const wantC = { gis: e.d.hv_switchyard_bays, tx: e.d.hv_transformer_bays, mv, gen: e.q.gensets_installed };
+    await pd.evaluate(() => { const b = document.querySelector('#elecProj [data-proj="iso"]'); if (b) b.click(); }); await sleep(800);
+    const iso = await pd.evaluate(isoOf, '#elecIsoHost', wantC, '.hmi-host[data-hmi-sheet="dh-e-001"]');
+    ok(iso && iso.lacks.length === 0 && iso.lampChecked > 0, `E6 DC AI 3D: ${iso ? iso.lampChecked : 0} lamps checked, want ${JSON.stringify(wantC)} got ${iso ? JSON.stringify(iso.counts) + ' ' + iso.lacks.join('; ') : 'no 3D view'}`);
+    const opened = await pd.evaluate(async () => {
+      const u = document.querySelector('#elecIsoHost .el-iso-unit[data-el-cls="tx"]'); if (!u) return null;
+      const node = u.getAttribute('data-node'); u.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      await new Promise((r) => setTimeout(r, 1200));
+      const d = [...document.querySelectorAll('[role="dialog"], .dh-insp, .rz-insp')].find((x) => { const r = x.getBoundingClientRect(); return r.width > 200 && r.height > 150; });
+      const res = { node, open: !!d, text: d ? d.textContent.replace(/\s+/g, ' ').slice(0, 80) : '' };
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })); await new Promise((r) => setTimeout(r, 400));
+      return res;
+    });
+    ok(opened && opened.open, `E6 DC AI 3D: selecting a transformer (${opened ? opened.node : '?'}) does not open its equipment view`);
+    await pd.evaluate(() => document.querySelector('#elecProj [data-proj="iso"]').focus()); await pd.keyboard.press('ArrowRight'); await sleep(300);
+    const kb = await pd.evaluate(() => [document.activeElement && document.activeElement.getAttribute('data-proj'), localStorage.getItem('rz.dcai.elec.proj'), document.getElementById('elecIsoView').hidden]);
+    ok(kb[0] === 'line' && kb[1] === 'line' && kb[2] === true, `E6 DC AI keyboard: ArrowRight should move to One-line, store it and hide 3D: ${JSON.stringify(kb)}`);
+    await pd.evaluate(() => localStorage.removeItem('rz.dcai.elec.proj'));
+  }
   if (want('E3') || want('E2') || want('E19') || want('E15')) {
     await dcHall1(pd);
     if (want('E15')) { const u = await pd.evaluate(unclickableOf, DC_H1); ok(u && u.bare.length === 0, `E15 DC AI DH-01: ${u ? u.bare.length : '?'} of ${u ? u.n : '?'} drawn items are not equipment: ${JSON.stringify((u || { bare: [] }).bare.slice(0, 8))}`); }

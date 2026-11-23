@@ -148,6 +148,7 @@ async function lawE1(pg, at, fail) {
        racks per PDU, and the PDUs of a stream must carry every rack of the hall; an older engine keeps the hall total. */
     if (r.perPdu && r.pdus) {
       if (!r.txt.toUpperCase().includes('× ' + r.perPdu + ' RACKS PER PDU')) fail(`E1${at} hall ${r.code}: no "× ${r.perPdu} racks per PDU"`);
+      if (!r.txt.toUpperCase().includes('× ' + r.racks + ' RACKS')) fail(`E1${at} hall ${r.code}: no hall total "× ${r.racks} racks"`);
       if (r.pdus * r.perPdu < r.racks) fail(`E1${at} hall ${r.code}: ${r.pdus} PDUs × ${r.perPdu} racks < ${r.racks} hall racks`);
     } else if (!r.txt.toUpperCase().includes('× ' + r.racks + ' RACKS')) fail(`E1${at} hall ${r.code}: no "× ${r.racks} racks"`);
     if (r.hallTags.length) fail(`E1${at} hall ${r.code}: tags not rebound: ${r.hallTags.join(', ')}`);

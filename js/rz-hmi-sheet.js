@@ -627,10 +627,27 @@
         p.setAttribute('d', d);
       });
     }
+    /* PRD-ELECTRICAL-BMS E7 (phone): on a narrow screen (css/rz-hmi.css, max-width 600 px) the sheet's floor width is the one
+       at which its smallest shown label renders at PHONE_LABEL_PX; the frame pans it. Measured from the sheet's own text, so
+       no page types a scale. "Whole" still lifts every floor for the overview. */
+    var PHONE_LABEL_PX = 11;
+    function phoneFloor() {
+      /* only where css/rz-hmi.css reads it (max-width 600 px): a desktop sheet skips the per-label style reads */
+      if (!(root.matchMedia && root.matchMedia('(max-width: 600px)').matches)) return;
+      var min = Infinity, ts = svg.querySelectorAll('text');
+      for (var i = 0; i < ts.length; i++) {
+        if (!ts[i].textContent.trim()) continue;
+        var cs = getComputedStyle(ts[i]); if (cs.display === 'none' || cs.visibility === 'hidden') continue;
+        var fs = parseFloat(cs.fontSize); if (fs > 0 && fs < min) min = fs;
+      }
+      if (min === Infinity) return;
+      frame.querySelector('.hmi-vp').style.setProperty('--hmi-phone-w', Math.ceil(B.w * PHONE_LABEL_PX / min) + 1 + 'px');
+    }
     function settle() {
       if (!svg.clientWidth) return false;
       settleBrk(); relinkKeys();
       if (sheet.crop === true && measureCrop() && view.z <= 1.001 && !frame.classList.contains('is-fit-all')) fit();
+      phoneFloor();
       return true;
     }
     /* settle once the sheet has a layout (a sheet mounted in a hidden tab settles on its first non-zero size), and
@@ -640,6 +657,9 @@
       cropRo.observe(svg);
     }
     if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(function () { if (!svg.isConnected) return; cropped = false; settle(); });
+    /* a window narrowed to a phone after the first settle measures its phone floor then */
+    var phoneMq = root.matchMedia ? root.matchMedia('(max-width: 600px)') : null;
+    if (phoneMq) { var onPhone = function () { if (svg.isConnected && phoneMq.matches) phoneFloor(); }; if (phoneMq.addEventListener) phoneMq.addEventListener('change', onPhone); else if (phoneMq.addListener) phoneMq.addListener(onPhone); }
     /* repaint every bus voltage from the state its conductors were painted with: a bus with no running conductor is dead.
        Called by the cockpit after it applies the state grammar (DC AI hmi-v2 vfxApply, EPMS). Before any state is
        painted the design value stays. */

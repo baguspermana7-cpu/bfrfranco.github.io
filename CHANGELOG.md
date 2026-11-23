@@ -11,6 +11,22 @@ release sections rather than semver.
 
 ---
 
+## v3.102.0 — 2026-11-23
+
+Electrical cockpits: a 3D equipment view beside the one-line, phone labels at 11 px, and the floor PDU gets its own equipment view (PRD-ELECTRICAL-BMS E6, E7; owner R186).
+
+### Added
+- **3D | One-line switch on EPMS and the DC AI electrical tab.** 3D draws the site as isometric equipment on true 30° axes: HV GIS bays, power transformers, the MV switchroom and the generator yard. Counts come from the engine (EPMS 5 GIS bays, 2 transformers, 32 gensets; DC AI 20 bays, 16 transformers, 171 gensets) and the MV line-up from the one-line. Bodies are neutral grey; only the lamp is coloured, and it is the state the one-line shows for the symbol that unit stands for, so the two views cannot disagree. On DC AI the map is exact: the four line bays to Q1–Q4, hall 1 to CB-TA/B and TX-MA01/MB01, halls 2–8 to their one breaker and transformer symbol, gensets to the DUTY and STANDBY symbols; a unit sharing a symbol says "one symbol for N units", and a unit the one-line does not draw shows NO DATA and cannot be selected. The view is labelled a schematic arrangement, not to scale. Selecting a unit opens the same equipment view as its symbol. One-line stays the default; arrow keys move between the two; the choice is remembered per page. Shared module `js/rz-el-iso.js`.
+- **Phone floor on every HMI sheet.** Under 600 px a sheet keeps its smallest label at 11 px and pans inside its frame; the page never scrolls sideways.
+
+### Fixed
+- **Floor PDU opened as a 3,150 kVA distribution transformer.** The PDU on E-S-102 now has its own class: IN CB / OUT CB, rating, PDUs per stream, racks per PDU, loading in normal and with one stream out, all from the engine; impedance, losses, currents and fault level read "not modelled" (regression from v3.100.0, internals gate EL3).
+- **LV rack row lost the hall total.** The racks label reads `× 44 racks per PDU · A cord of × 500 racks` again (secondary-authority gate).
+
+### Gates
+- `tools/test-electrical-bms.mjs` E6 (lamp = the one-line symbol's state for every unit, shared symbols named — red first on 32 EPMS gensets drawn off while the one-line showed standby; counts, neutral bodies, lamps, one front height per class, 30° axes, captions clear of units, unit opens its modal, keyboard, stored choice) and E7 (labels ≥ 11 px at 390, scrollWidth 390, 0 errors), both cockpits.
+
+
 ## v3.101.0 — 2026-11-23 — DC AI floor gets lenses, a legend and honest standby lamps
 
 PRD-DCAI-HALL-DEPTH Amendment 1, phase A2 (owner: "3dnya masih jelek banyak parameter, animasi state, indikasi banyak yg belum ada").

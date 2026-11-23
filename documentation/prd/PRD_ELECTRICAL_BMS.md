@@ -225,3 +225,19 @@ Decision 11. **Every voltage level shows its voltage.**
 - **Simulation:** a planted overload or a lost parallel transformer lowers the derived voltage, and the warn or alarm follows the limits.
 
 Law E19: every bus and every transformer secondary shows a voltage with a unit. The value equals the regulation formula on the engine inputs (± 0.1 %). A dead bus reads DEAD. A planted 2N→N loss moves the downstream voltage in the predicted direction, and its point state follows the ±5/±10 % limits. Red today: no voltage on any bus tag.
+
+## A7. Delivered E6 and E7 (v3.102.0)
+
+- **E6.** `js/rz-el-iso.js` plus a page spec: EPMS (`EPMS_Telemetry.html` `mountIso()`) and DC AI (`js/datahall-ai/el-iso.js`).
+  Counts drawn: EPMS 5 GIS / 2 TX / 14 MV / 32 gensets; DC AI 20 GIS / 16 TX / 13 MV / 171 gensets, all equal to the
+  engine (MV = the one-line line-up). Each unit stands for the DH-E-001 symbol that draws it: line bays `cb-hv1..4`,
+  hall 1 `cb-txA/B` + `tx-mainA/B`, halls 2–8 `cb-hN` + `tx-hN` (one symbol per hall, shared by its two feeds), duty
+  gensets `gen1`, standby `gen2`. The lamp is that symbol's `data-state` (EPMS too: owner R195 "Harus sangat accurate"
+  found the EPMS gensets drawn off from the solve while the one-line showed standby); a shared symbol is named in the
+  unit label ("one symbol for N units"); a unit with no symbol is NO DATA and not selectable. The view says it is a
+  schematic arrangement, not to scale. Law checks: lamp = symbol state for every unit (red first on the gensets), counts, ≥ 95 % neutral faces (chroma ≤ 16),
+  running lamps green and other lamps unfilled, one front height per class, top-edge slope tan 30°, no caption over a
+  unit (painted-element sampling), a unit opens its modal, ArrowRight moves to One-line and stores it, 3D survives a
+  reload (EPMS).
+- **E7.** `rz-hmi-sheet.js` `phoneFloor()`; the 3D view has its own floor (`--el-iso-phone-w`).
+

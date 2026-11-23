@@ -310,6 +310,22 @@ Applies to every single-line sheet: EPMS E-S-101 / E-S-102 and DC AI E-001 / E-1
   (`BUS A · 20 kV nom · 19.69 kV · 13.5 kA`). Sheets repaint voltages through `api.volts()`.
 - **Power walk.** An ATS conducts one way, from the selected source to its load; a converter (rectifier, inverter)
   seeds only its output port, so a generator never back-feeds the MSB and a rectifier never lights the UPS AC input.
+- **3D equipment view (E6, v3.102.0).** `js/rz-el-iso.js` (`RZElIso.mount` + `projSwitch`) draws the site as isometric
+  boxes on true 30° axes (x' = (x − y)·cos 30°, y' = (x + y)·sin 30° − z, the floor renderer's projection). The page says
+  only what stands where; counts come from the engine (EPMS: `hv_line_bays + hv_tx_bays + hv_bus_count − 1` GIS bays,
+  `hv_tx_count`, `genset_count`; DC AI: `hv_switchyard_bays`, `hv_transformer_bays`, `gensets_installed`) or, for the MV
+  line-up, from the one-line. Bodies are the neutral sheet greys; colour only on the lamp (running green, warn amber,
+  alarm red, standby hollow cyan stroke, else hollow grey); one front height per class. Each unit stands for one
+  one-line symbol: its lamp is that symbol's state and selecting it clicks that symbol, so the same modal opens. Zone
+  captions run along the plate front edge at 30° on open floor, never over a unit. The `.el-proj` switch (3D |
+  One-line, One-line by default, arrow keys, stored per page in localStorage) sits beside the sheet switch; choosing a
+  sheet or hall tab returns to One-line. Phone: the drawing keeps an 11 px caption and pans, opened at its middle.
+- **Phone floor (E7, v3.102.0).** Under 600 px every HMI sheet takes `min-width = sheet width × 11 / smallest rendered
+  label px` (`--hmi-phone-w`, measured in `settle()`), so no label renders under 11 px; the frame pans inside, the
+  page never scrolls sideways.
+- **Floor PDU class (v3.102.0).** A `transformer2w` with `tx: 'pdu'` opens the PDU internal (IN CB / OUT CB, rating,
+  PDUs per stream, racks per PDU, loading normal and one stream out from the engine); impedance, losses, currents and
+  fault level are "not modelled", never a borrowed distribution-transformer row.
 
 ## 4c. Repaint cost (v3.63.0, O11)
 

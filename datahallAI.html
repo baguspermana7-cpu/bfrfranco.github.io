@@ -129,6 +129,7 @@ body>.rz-manual-link,.scroll-top-btn{display:none!important}
 @media (max-width:900px){.net-tabs .nt{min-height:44px}}
 .elec-tabs{display:flex;gap:2px;padding:4px 6px;background:var(--bg3);border:1px solid var(--bd);border-radius:6px;margin-bottom:4px}
 .elec-tabs .et{font-family:'JetBrains Mono';font-size:10px;font-weight:500;padding:5px 12px;border:1px solid transparent;background:0;color:var(--t3);cursor:pointer;border-radius:4px;transition:color .2s, background-color .2s, border-color .2s, opacity .2s}
+#p-elec > .ep[data-iso-hidden]{display:none!important}.elec-tabs .el-proj{margin-left:auto;order:99}@media(max-width:600px){.elec-tabs .el-proj{margin-left:0;order:-1}}.el-iso-note{font-size:11px;color:var(--t3);margin:4px 0 6px}
 .elec-tabs .et:hover{color:var(--t1);background:rgba(255,255,255,.03)}
 .elec-tabs .et.on{background:rgba(245,158,11,.1);color:var(--o);border:1px solid rgba(245,158,11,.25)}
 .ep{display:none}.ep.on{display:block}
@@ -772,7 +773,7 @@ body[data-datahall-authority="unavailable"] #tabs,
 body[data-datahall-authority="unavailable"] .wrap{display:none !important}
 body[data-datahall-authority="unavailable"] .hdr-r>.dot,body[data-datahall-authority="unavailable"] [data-cv="clock"]>.dot{background:#64748b !important;box-shadow:none !important;animation:none !important}
 body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:none}
-</style>    <script src="js/rz-version.js?v=20261123-8304d544" defer></script>
+</style>    <script src="js/rz-version.js?v=20261123-7920cfb4" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <!-- v3.5.0 — hold the 8.5px legibility floor by SCALE, not by font size. Five of this page's
          fifteen diagrams were already clear; the dense ones (cooling P&ID, the four SLDs, the hall
@@ -890,7 +891,7 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
   select, textarea { font-size: 16px !important; }
 }
 </style>
-    <link rel="stylesheet" href="css/rz-hmi.css?v=20261123-f7ffd2f0">
+    <link rel="stylesheet" href="css/rz-hmi.css?v=20261123-6abace97">
     <link rel="stylesheet" href="css/conv-vfx.css?v=20261118-5eed9b2f">
     <link rel="stylesheet" href="css/rz-dh-shell.css?v=20261120-a7d2ebad">
     <link rel="stylesheet" href="css/conv-shell.css?v=20261121-1a01438a">
@@ -1300,7 +1301,12 @@ Requested model/calculation versions and the complete locked schema must validat
 <div class="elec-tabs" id="elecTabs">
 <button class="et on" data-ep="overview">Overview</button>
 <button class="et" data-ep="dh01">DH-01</button>
+<span id="elecProj" class="el-proj"></span>
 </div>
+<section id="elecIsoView" class="el-iso-view" aria-label="3D equipment view of the site" hidden>
+<p class="el-iso-note">3D shows what stands in each area, as a schematic arrangement, not to scale. Counts are the engine's; each lamp is the state of the single-line symbol the unit stands for (hall 1 drawn in full, halls 2–8 and the generators one symbol per group), and selecting a unit opens that symbol's equipment view. The single-line stays the authority.</p>
+<div id="elecIsoHost"></div>
+</section>
 <div class="ep on" id="ep-overview">
 <div class="bx"><h3>Facility Electrical SLD</h3><div class="dh-primary-q" style="font-size:10px;color:var(--t3);margin:2px 0 4px;font-style:italic;letter-spacing:.03em;">Primary read: <span style="color:var(--t2);">what is energized, what is loaded, what is at risk of trip?</span></div><div class="su" id="elecOvSu" data-basis-param="compute.racks_per_hall" data-basis-params="compute.racks_per_hall distribution.transformers_per_hall_per_feed equipment.transformer_unit_mva equipment.gensets_installed equipment.generator_unit_kw distribution.ups_frames_per_hall_per_feed equipment.ups_frame_kw distribution.busway_trunk_a geometry.rack_groups_per_hall geometry.racks_per_group compute.racks_facility power.total_it_mw distribution.hv_intake_kv distribution.main_tx_total distribution.main_tx_mva distribution.mv_kv" tabindex="0" role="button" style="cursor:pointer"></div>
 <svg id="elecOvSvg" role="group" aria-label="Electrical single-line overview" viewBox="0 0 1200 1600" preserveAspectRatio="xMidYMid meet" style="width:100%" xmlns="http://www.w3.org/2000/svg"><g id="elecOvC"></g></svg></div>
@@ -15777,8 +15783,10 @@ if(faqBtn){ faqBtn.addEventListener('click',openFaqDialog); }
     <!-- HMI drawing layer (R128-R134, R143): symbol library, sheet renderer, datahallAI sheets, mount + payload binding -->
     <script src="js/rz-eng-symbols.js?v=20261118-528d60ce"></script>
     <script src="js/rz-elec-voltage.js?v=20261122-84c5c299"></script>
-    <script src="js/rz-hmi-sheet.js?v=20261123-ec6663b0"></script>
+    <script src="js/rz-hmi-sheet.js?v=20261123-02b8ef09"></script>
     <script src="js/datahall-ai/hmi-sheets.js?v=20261123-b8fbd76b"></script>
     <script src="js/conv/vfx.js?v=20261123-3fd25115"></script>
     <script src="js/datahall-ai/hmi-v2.js?v=20261123-7ce12335"></script>
+    <script src="js/rz-el-iso.js?v=20261123-243f32ae"></script>
+    <script src="js/datahall-ai/el-iso.js?v=20261123-97534f31"></script>
 </body></html>

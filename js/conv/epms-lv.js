@@ -162,7 +162,7 @@
           pdu: true, tx: 'pdu', units: pdus, tagAt: side,
           label: 'Power distribution unit ' + grp(e.pdu_kva_rated) + ' kVA (transformer + panel), typical of ' + pdus + ' on the ' + s + ' stream',
           values: [{ k: 'r', dx: vd * 24, dy: 27, anchor: va, lod: 1 }, { k: 'ld', dx: vd * 24, dy: 39, anchor: va, lod: 1 }] });
-        N({ id: 'p' + ls + '-ld', tag: 'RACKS-' + T, name: '× ' + e.racks_per_pdu + ' racks per PDU · ' + s + ' cord', sym: 'offSheet', rot: 90, x: X(150), y: 1076, size: 20, cls: 'epms', kv: 'lv',
+        N({ id: 'p' + ls + '-ld', tag: 'RACKS-' + T, name: '× ' + e.racks_per_pdu + ' racks per PDU · ' + s + ' cord of × ' + grp(hall.racks) + ' racks', sym: 'offSheet', rot: 90, x: X(150), y: 1076, size: 20, cls: 'epms', kv: 'lv',
           load: 'it', kw: itKw, tagAt: 'below',
           label: 'Racks of one PDU (' + e.racks_per_pdu + '), ' + s + ' cord; the hall is ' + (e.rows_per_hall ? e.rows_per_hall + ' rows of ' + e.racks_per_row : grp(hall.racks) + ' racks') + ', ' + grp(hall.racks) + ' racks',
           values: [{ k: 'kw', dx: 0, dy: 44, anchor: 'middle', lod: 1 }] });

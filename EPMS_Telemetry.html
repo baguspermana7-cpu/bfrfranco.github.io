@@ -455,7 +455,7 @@
     font-variant-numeric: tabular-nums slashed-zero;
 }
 </style>
-    <script src="js/rz-version.js?v=20261123-8304d544" defer></script>
+    <script src="js/rz-version.js?v=20261123-7920cfb4" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- v1.24.0: bring EPMS onto the engine + BMS Shell. conv-engine.js loads
@@ -465,7 +465,7 @@
     <script src="js/conv-engine.js?v=2.9.0"></script>
     <!-- v1.134.3 — generated parameter registry + the ONE shared basis drawer.
          Replaces provenance restated by hand; see js/rz-basis-drawer.js. -->
-    <script src="js/conv-parameters.js?v=20261123-360b07e7"></script>
+    <script src="js/conv-parameters.js?v=20261123-9b1e21e3"></script>
     <!-- v1.134.25 — RZExplain, the site glossary engine. The cockpits were the only
          substantial pages carrying none of it, so terms an operator has to read
          (approach temperature, cycles of concentration, N+1, WUE) had nowhere to go.
@@ -498,13 +498,13 @@
 <script src="js/rz-telemetry-quality.js?v=20261113-8feb0dfd" defer></script>
 <script src="js/rz-provenance.js?v=20261111-6f1cd061" defer></script>
 <!-- P5a (PRD-CONV-LIVING-PLANT §8.1-8.2): E-S-101 HV / MV single-line, drawn by the shared sheet renderer -->
-<link rel="stylesheet" href="css/rz-hmi.css?v=20261123-f7ffd2f0">
+<link rel="stylesheet" href="css/rz-hmi.css?v=20261123-6abace97">
 <link rel="stylesheet" href="css/conv-hmi-depth.css?v=20261115-09997c8c">
 <link rel="stylesheet" href="css/conv-vfx.css?v=20261118-5eed9b2f">
 <link rel="stylesheet" href="css/conv-tcc.css?v=20261118-d0e76545">
 <script src="js/rz-eng-symbols.js?v=20261118-528d60ce"></script>
 <script src="js/rz-elec-voltage.js?v=20261122-84c5c299"></script>
-<script src="js/rz-hmi-sheet.js?v=20261123-ec6663b0"></script>
+<script src="js/rz-hmi-sheet.js?v=20261123-02b8ef09"></script>
 <script src="js/conv/vfx.js?v=20261123-3fd25115"></script>
 <script src="js/conv/history.js?v=20261120-8d390d7e"></script>
 <script src="js/rz-trend.js?v=20261122-98f6c100"></script>
@@ -520,17 +520,18 @@
 <script src="js/conv/payloads.js?v=20261123-2552c75e"></script>
 <script src="js/conv/equipment-modal.js?v=20261122-a3797451"></script>
 <script src="js/conv/internals.js?v=20261122-76f7138e"></script>
-<script src="js/conv/internals/transformer.js?v=20261122-93d1d76f"></script>
+<script src="js/conv/internals/transformer.js?v=20261123-3f6abdcf"></script>
 <script src="js/conv/internals/ups.js?v=20261122-46029a8d"></script>
 <script src="js/conv/internals/breaker.js?v=20261122-5c2402bb"></script>
 <script src="js/conv/internals/relay.js?v=20261122-4a225dc3"></script>
-<script src="js/conv/epms-internals.js?v=20261122-63e5efca"></script>
+<script src="js/conv/epms-internals.js?v=20261123-606b23ed"></script>
 <script src="js/rz-inspector.js?v=20261117-bbb735d4" defer></script>
 <script src="js/conv/sld-topology.js?v=20261118-597640aa"></script>
 <script src="js/conv/tcc.js?v=20261118-4e103126"></script>
+<script src="js/rz-el-iso.js?v=20261123-243f32ae"></script>
 <script src="js/conv/epms-sheet.js?v=20261123-aa54a4a4"></script>
 <script src="js/conv/epms-sim.js?v=20261123-4cc44954"></script>
-<script src="js/conv/epms-lv.js?v=20261123-877f147c"></script>
+<script src="js/conv/epms-lv.js?v=20261123-1098d6ea"></script>
 <script src="js/conv/tcc-modal.js?v=20261122-d14a6e1d"></script>
 <style id="epms-sld-css">
 /* the view switch: its own class, so no page code or gate that selects .btn / .zoom-btn picks it up */
@@ -684,6 +685,7 @@ body:not([data-epms-view="sld"]) .epms-sld-only { display: none !important; }
             <button type="button" class="epms-view-btn" data-epms-view="sld" aria-pressed="true" aria-controls="epms-sld-view">HV / MV<span class="epms-long"> single-line</span></button>
             <button type="button" class="epms-view-btn" data-epms-view="lv" aria-pressed="false" aria-controls="epms-lv-view">LV<span class="epms-long"> distribution</span></button>
         </span>
+        <span id="epms-proj" class="el-proj" data-theme="dark"></span>
         <h1 class="brand" data-cv="title">EPMS V1.0 - Telemetry</h1>
         <div style="flex:1"></div>
         <div class="epms-export-group" data-cv="detail" style="display:flex; gap:8px; align-items:center;">
@@ -734,6 +736,10 @@ body:not([data-epms-view="sld"]) .epms-sld-only { display: none !important; }
         <section id="epms-sld-view" class="epms-sld-view pointer" aria-label="E-S-101 HV / MV single-line">
             <p class="epms-sld-msg" id="epms-sld-msg" role="status" aria-live="polite" data-idle><b>SIMULATION</b> Select a breaker or switch to operate it; the interlocks are enforced and every flow is re-solved.</p>
             <div id="epms-sheet-host" class="epms-sheet-host hmi-depth" data-theme="dark" data-rz-authored-basis="E-S-101 · Ratings, voltages, fault levels, counts and protection settings on this single-line are conv-engine.js electrical.* values. Breaker and switch positions are SIMULATED (a page state operated from the inspector), and each kW / A / load % is the topology solve (js/conv/sld-topology.js) of the engine's adopted hall loads through those positions: a training simulation, not metering."></div>
+        </section>
+        <section id="epms-iso-view" class="epms-sld-view" aria-label="3D equipment view: substation, MV switchroom and generator yard" hidden>
+            <p class="epms-sld-msg">3D shows what stands in each area, as a schematic arrangement, not to scale. Counts are the engine's; each lamp is the state of the single-line symbol the unit stands for, and selecting a unit opens that symbol's equipment view. The single-line stays the authority.</p>
+            <div id="epms-iso-host" class="epms-iso-host" data-theme="dark"></div>
         </section>
         <section id="epms-lv-view" class="epms-sld-view pointer" aria-label="E-S-102 LV distribution, typical hall" hidden>
             <div class="epms-lv-head">
@@ -1465,8 +1471,10 @@ function exportJSON() {
         return out;
     }
     var sheet = null;
+    var ISO = null, PROJ = null;
     function paint() {
         sheet.update();
+        if (ISO) ISO.refresh();
         var svg = sheet.svg;
         SHEET.nodes.forEach(function (n) {
             if (!n.sw) return;
@@ -1548,7 +1556,52 @@ function exportJSON() {
         window.RZConvTccModal.open(tccSpec(n), { trigger: btn, theme: 'dark' });   /* this cockpit is dark only */
     };
 
+    /* PRD-ELECTRICAL-BMS E6: the 3D equipment view. Counts from the engine (GIS bays, power transformers, gensets) and
+       from the one-line (the MV line-up); each unit stands for one device of E-S-101, its lamp is that device's solved
+       state, and selecting it opens the same equipment view as the symbol (the one-line's own click). */
+    function mountIso() {
+        var hostIso = document.getElementById('epms-iso-host'), sw = document.getElementById('epms-proj');
+        if (!window.RZElIso || !hostIso || !sw || !E) return;
+        var by = {}; SHEET.nodes.forEach(function (n) { by[n.id] = n; });
+        var unit = function (id) { return { node: id, tag: (by[id] && by[id].tag) || id, rep: 1 }; };
+        var lines = SHEET.nodes.filter(function (n) { return n.sw === 'cb' && n.kv === 'hv'; }).map(function (n) { return unit(n.id); });
+        var gisN = E.hv_line_bays + E.hv_tx_bays + (E.hv_bus_count - 1);
+        var txs = SHEET.nodes.filter(function (n) { return n.tx === 'hv'; }).slice(0, E.hv_tx_count).map(function (n) { return unit(n.id); });
+        var mv = SHEET.nodes.filter(function (n) { return n.sw === 'cb' && n.kv === 'mv'; }).map(function (n) { return unit(n.id); });
+        var fleet = [];   /* the site fleet, hall by hall (getFleet is per hall) */
+        if (window.CONV_CALC && window.CONV_CALC.getFleet) 'ABCD'.slice(0, Math.round(E.genset_count / E.genset_per_hall)).split('').forEach(function (h) { fleet = fleet.concat(window.CONV_CALC.getFleet('genset', h) || []); });
+        var gens = []; for (var i = 0; i < E.genset_count; i++) gens.push({ node: by.gen ? 'gen' : null, tag: (fleet[i] && fleet[i].tag) || ('GEN-' + (i + 1)), rep: E.genset_count });
+        /* one unit per bay the engine counts; a bay the one-line does not draw keeps no symbol (NO DATA), never a borrowed one */
+        var gisUnits = []; for (var b = 0; b < gisN; b++) gisUnits.push(lines[b] || { node: null, tag: 'HV GIS bay ' + (b + 1), rep: 1 });
+        var spec = { label: 'E-S-101 in 3D: HV GIS, power transformers, 20 kV switchroom, generator yard. Schematic arrangement, not to scale.',
+            zones: [
+                { id: 'gis', label: 'HV GIS BAYS', cls: 'gis', at: [0, 0], cols: gisN, size: [12, 16, 24], gap: [4, 6], units: gisUnits },
+                { id: 'tx', label: 'POWER TRANSFORMERS', cls: 'tx', at: [166, 0], cols: E.hv_tx_count, size: [24, 20, 20], gap: [12, 6], units: txs },
+                { id: 'mv', label: '20 KV SWITCHROOM', cls: 'mv', at: [0, 52], cols: mv.length, size: [9, 12, 22], gap: [2, 6], units: mv },
+                { id: 'gen', label: 'GENERATOR YARD', cls: 'gen', at: [0, 104], cols: Math.round(E.genset_count / E.genset_per_hall), size: [22, 10, 12], gap: [6, 8], units: gens }
+            ],
+            symbolOf: function (id) { return (by[id] && by[id].tag) || id; },
+            /* the lamp is what the single-line shows for that symbol (its data-state), so the two views never disagree */
+            stateOf: function (id) {
+                var g = LIVE && host.querySelector('.hmi-node[data-node="' + id + '"]'), st = g && g.getAttribute('data-state');
+                return ({ running: 'running', energized: 'running', closed: 'running', standby: 'standby', open: 'stopped', stopped: 'stopped',
+                    deenergized: 'stopped', alarm: 'alarm', trip: 'alarm', tripped: 'alarm', warn: 'warn', warning: 'warn' })[st] || 'nodata';
+            },
+            open: function (id) {
+                var g = host.querySelector('.hmi-node[data-node="' + id + '"]');
+                if (g) g.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+            } };
+        ISO = window.RZElIso.mount(hostIso, spec);
+        PROJ = window.RZElIso.projSwitch(sw, 'rz.epms.proj', function (p) {
+            var iso = p === 'iso', isoView = document.getElementById('epms-iso-view'), lvPanel = document.getElementById('epms-lv-view');
+            document.body.setAttribute('data-el-proj', p);
+            if (isoView) isoView.hidden = !iso;
+            if (iso) { if (panel) panel.hidden = true; if (lvPanel) lvPanel.hidden = true; ISO.refresh(); ISO.centre(); }
+            else { var v = document.body.getAttribute('data-epms-view') === 'lv' ? 'lv' : 'sld'; if (panel) panel.hidden = v === 'lv'; if (lvPanel) lvPanel.hidden = v !== 'lv'; if (v === 'sld' && sheet) sheet.fit(); }
+        });
+    }
     function setView(v) {
+        if (PROJ && PROJ.get() === 'iso') { PROJ.set('line', true); }
         var sld = v !== 'lv', lvPanel = document.getElementById('epms-lv-view');
         if (panel) panel.hidden = !sld;
         if (lvPanel) lvPanel.hidden = sld;
@@ -1604,6 +1657,7 @@ function exportJSON() {
         paint();
         chrome();
         setView('sld');
+        mountIso();
         if (!LIVE) say('EPMS authority unavailable — the single-line is drawn without states, flows or switching.', true);
         /* read-only handle for the gates: the solved state, never a way to change it */
         window.RZEpmsPage = Object.freeze({

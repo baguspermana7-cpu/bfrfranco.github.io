@@ -4,7 +4,7 @@
  * transformer or a UPS: the drawing and the single-line read one solve, so one device shows one value (law TR1 / EL3).
  * Pure and deterministic (no clock, no random, no DOM); Node-tested by tools/test-conv-internals-p4.mjs.
  *
- *   classOf(node)                         'hv_tx' | 'dist_tx' | 'ups' | null — the internals class a sheet node opens
+ *   classOf(node)                         'hv_tx' | 'dist_tx' | 'pdu' | 'ups' | null — the internals class a sheet node opens
  *   txUnits(sheet, state, res)            [{ id, tag, classKey, state, kw, a, pct, units, upA, up, down, upState, downState }]
  *                                         every transformer of the sheet in drawing order; up / down are the nearest
  *                                         switching devices on each side (through CTs and junctions)
@@ -23,7 +23,7 @@
 
   function classOf(n) {
     if (!n) return null;
-    if (n.sym === 'transformer2w') return n.tx === 'hv' ? 'hv_tx' : 'dist_tx';
+    if (n.sym === 'transformer2w') return n.tx === 'hv' ? 'hv_tx' : n.tx === 'pdu' ? 'pdu' : 'dist_tx';   /* E18: the floor PDU has its own class */
     /* the four symbols of one UPS: rectifier / inverter (n.ups), the battery on its DC bus, the static bypass */
     if (UPS_PART[n.sym] && (n.ups || n.dcBus || n.sw === 'ss')) return 'ups';
     if (n.sym === 'cbIec' || n.sym === 'cbDrawout') return 'breaker';

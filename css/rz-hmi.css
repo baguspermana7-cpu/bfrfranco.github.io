@@ -288,6 +288,11 @@
    shrinking it, as the legacy drawings did. The minimum width is set per sheet by the renderer (--hmi-min-w). */
 .hmi-frame .hmi-vp { overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
 .pn .bx .hmi-frame .hmi-vp > svg.hmi-svg, .ep .bx .hmi-frame .hmi-vp > svg.hmi-svg, .hmi-frame .hmi-vp > svg.hmi-svg { min-width: var(--hmi-min-w, 0) !important; }
+/* PRD-ELECTRICAL-BMS E7: on a phone the floor is the larger of the sheet's floor and the width at which its smallest label
+   renders 11 px (--hmi-phone-w, measured by the renderer); the frame pans. */
+@media (max-width: 600px) {
+  .pn .bx .hmi-frame .hmi-vp > svg.hmi-svg, .ep .bx .hmi-frame .hmi-vp > svg.hmi-svg, .hmi-frame .hmi-vp > svg.hmi-svg { min-width: max(var(--hmi-min-w, 0px), var(--hmi-phone-w, 0px)) !important; }
+}
 /* PRD-ELECTRICAL-BMS R190 "Whole": the whole sheet on screen, both axes; the floor above is lifted for this overview only
    (the renderer sets the svg width from the stage height). Small labels drop by LOD. */
 .hmi-frame.is-fit-all .hmi-vp > svg.hmi-svg, .pn .bx .hmi-frame.is-fit-all .hmi-vp > svg.hmi-svg, .ep .bx .hmi-frame.is-fit-all .hmi-vp > svg.hmi-svg { min-width: 0 !important; margin: 0 auto; display: block; }
@@ -324,3 +329,33 @@
 .hmi-frame[data-vfx-mode]:not([data-vfx-mode="flat"]):not([data-vfx-mode="thermal"]) .hmi-svg .hmi-arrow.m-power,
 .hmi-frame[data-vfx-mode]:not([data-vfx-mode="flat"]):not([data-vfx-mode="thermal"]) .hmi-svg .hmi-arrow.m-feed_a,
 .hmi-frame[data-vfx-mode]:not([data-vfx-mode="flat"]):not([data-vfx-mode="thermal"]) .hmi-svg .hmi-arrow.m-feed_b { color: var(--hmi-text-2, var(--hmi-text)); }
+
+/* PRD-ELECTRICAL-BMS E6 — the 3D | One-line switch and the 3D equipment view (js/rz-el-iso.js). Bodies are the neutral
+   panel greys of the sheet; colour only on the lamp, from the state tokens. */
+.el-proj { display: inline-flex; }
+.el-proj button { min-height: 32px; padding: 4px 10px; background: transparent; border: 1px solid var(--hmi-frame, #444); color: var(--hmi-text-2, #9aa3af);
+  font: 500 12px/1 'IBM Plex Sans', system-ui, sans-serif; cursor: pointer; transition: color var(--rz-dur-fast, 120ms) var(--rz-ease-out, ease-out), border-color var(--rz-dur-fast, 120ms) var(--rz-ease-out, ease-out); }
+.el-proj button + button { border-left: 0; }
+.el-proj button:first-child { border-radius: 4px 0 0 4px; } .el-proj button:last-child { border-radius: 0 4px 4px 0; }
+.el-proj button[aria-pressed="true"] { color: var(--hmi-text, #e2e8f0); border-color: #E8B563; box-shadow: inset 0 -2px 0 #E8B563; }
+.el-proj button:focus-visible { outline: 2px solid #E8B563; outline-offset: 1px; }
+@media (max-width: 600px) { .el-proj button { min-height: 40px; min-width: 44px; } }
+.el-iso { overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; background: var(--hmi-bg); border: 1px solid var(--hmi-frame); border-radius: 2px; }
+.el-iso-svg { display: block; width: 100%; height: auto; max-height: var(--el-iso-max-h, 72vh); }
+@media (max-width: 600px) { .el-iso-svg { min-width: var(--el-iso-phone-w, 0px); max-height: none; } }
+.el-iso-plate { fill: var(--hmi-bg-2); stroke: var(--hmi-line-2); stroke-width: 0.4; stroke-dasharray: 2 2; }
+.el-iso-top { fill: var(--hmi-fill-run-2); }
+.el-iso-l { fill: var(--hmi-fill-run); }
+.el-iso-r { fill: var(--hmi-bg-2); }
+.el-iso-unit polygon { stroke: var(--hmi-line-2); stroke-width: 0.35; stroke-linejoin: round; }
+.el-iso-unit { cursor: pointer; outline: none; }
+.el-iso-unit:hover polygon { stroke: var(--hmi-text-2); }
+.el-iso-unit:focus-visible polygon { stroke: #E8B563; stroke-width: 0.8; }
+.el-iso-lamp { fill: none; stroke: var(--hmi-text-3); stroke-width: 0.5; }
+.el-iso-lamp[data-lamp-state="running"] { fill: var(--vfx-run, #3fb950); stroke: var(--vfx-run, #3fb950); }
+.el-iso-lamp[data-lamp-state="warn"] { fill: var(--vfx-warn, #e8b563); stroke: var(--vfx-warn, #e8b563); }
+.el-iso-lamp[data-lamp-state="alarm"] { fill: var(--vfx-alarm, #f85149); stroke: var(--vfx-alarm, #f85149); }
+.el-iso-lamp[data-lamp-state="standby"] { stroke: var(--vfx-stby, #7fa6b8); }
+.el-iso-lamp[data-lamp-state="nodata"] { stroke-dasharray: 0.9 0.7; }
+.el-iso-unit[role="img"] { cursor: default; }
+.el-iso-caption { fill: var(--hmi-text-2); font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace; letter-spacing: 0.02em; }
