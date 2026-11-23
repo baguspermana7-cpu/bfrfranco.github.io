@@ -151,6 +151,12 @@
     '@keyframes fp-air{to{stroke-dashoffset:-16}}',
     '@media (prefers-reduced-motion:no-preference){.fp-air path{animation:fp-air 1.4s linear infinite}}',
     '.fp-root.fp-offscreen .fp-air path{animation-play-state:paused}',
+    /* rotors (opts.rotors): physical, at the unit's own speed; still when standby or 0 %, off screen, or reduced motion */
+    '.fp-rotor{fill:none;stroke:var(--fp-surface);stroke-width:1;stroke-linecap:round;transform-box:view-box;pointer-events:none}',
+    '.crah-cell.stby .fp-rotor{stroke:var(--fp-ink);stroke-opacity:.35}',
+    '@keyframes fp-rot{to{transform:rotate(360deg)}}',
+    '@media (prefers-reduced-motion:no-preference){.fp-rotor[data-turning="1"]{animation:fp-rot 1s linear infinite}}',
+    '.fp-root.fp-offscreen .fp-rotor{animation-play-state:paused}',
     '.fp-ring-sel{stroke:var(--fp-accent);stroke-width:1.5}',
     '.fp-ring-hover{stroke:var(--fp-ink);stroke-width:1}',
     '.fp-ring-row{stroke:var(--fp-accent);stroke-width:1.5}',
@@ -396,12 +402,22 @@
           var fan = [], rr = Math.min(bw, G.gD, hh) * 0.3, a;
           for (a = 0; a < 20; a++) fan.push(iso ? [bx + bw / 2 + rr * Math.cos(a * Math.PI / 10), y0 + G.gD, hh * 0.5 + rr * Math.sin(a * Math.PI / 10)] : [bx + bw / 2 + rr * Math.cos(a * Math.PI / 10), y0 + G.gD / 2 + rr * Math.sin(a * Math.PI / 10), hh]);
           if (kind === 'crah') el('polygon', { 'class': 'cr-fan', points: pts(fan, band) }, cg);   /* a CDU has no fan */
+          /* opts.rotors (DC AI, PRD-DCAI-HALL-DEPTH A4 §7.1), top view only: three blades on the fan (fan-wall module) or on a
+             pump circle (CDU), turned by a CSS animation whose period paint() sets from the unit's speed; no JS loop */
+          var rot = null;
+          if (opts.rotors && !iso) {
+            var rc = XY(bx + bw / 2, y0 + G.gD / 2, hh, band), re = XY(bx + bw / 2 + rr, y0 + G.gD / 2, hh, band), rp = Math.max(1, Math.abs(re[0] - rc[0]) * 0.9), bl = '', ang;
+            if (kind !== 'crah') el('circle', { 'class': 'cr-fan cr-pump', cx: rc[0].toFixed(2), cy: rc[1].toFixed(2), r: (rp / 0.9).toFixed(2) }, cg);
+            for (ang = 0; ang < 3; ang++) bl += 'M' + rc[0].toFixed(2) + ' ' + rc[1].toFixed(2) + 'L' + (rc[0] + rp * Math.cos(ang * 2.0944 - 1.5708)).toFixed(2) + ' ' + (rc[1] + rp * Math.sin(ang * 2.0944 - 1.5708)).toFixed(2);
+            rot = el('path', { 'class': 'fp-rotor', d: bl }, cg);
+            rot.style.transformOrigin = rc[0].toFixed(2) + 'px ' + rc[1].toFixed(2) + 'px';
+          }
           /* status lamp: a small square on the roof's south-east corner, filled by paint() */
           var lamp = el('polygon', { 'class': 'cr-lamp', points: pts([[bx + bw - 0.45, y0 + G.gD - 0.45, hh], [bx + bw - 0.15, y0 + G.gD - 0.45, hh], [bx + bw - 0.15, y0 + G.gD - 0.15, hh], [bx + bw - 0.45, y0 + G.gD - 0.15, hh]], band) }, cg);
           var tp = XY(bx + bw / 2, y0 + G.gD, 0, band);
           var tx = el('text', { 'class': 'cr-n', x: tp[0].toFixed(1), y: (tp[1] + 9).toFixed(1), 'text-anchor': 'middle' }, cg);
           tx.textContent = String(nn);
-          crahEls.push({ g: cg, p: cell3, lamp: lamp, n: nn, u: cu, top: bp.top, gal: name, band: band, i: q, cx: bx + bw / 2 });
+          crahEls.push({ g: cg, p: cell3, lamp: lamp, rot: rot, n: nn, u: cu, top: bp.top, gal: name, band: band, i: q, cx: bx + bw / 2 });
         }
       }
       var wrapN = side(ids.top, 'north');
@@ -586,6 +602,13 @@
           setAttr(ch.p.top, 'fill', 'var(--fp-' + st + '-t1)'); setAttr(ch.p.front, 'fill', f.front); setAttr(ch.p.side, 'fill', f.side);
           setAttr(ch.lamp, 'data-lamp', st === 'neutral' ? 'run' : st);
         } else { setAttr(ch.p.top, 'fill', 'none'); setAttr(ch.p.front, 'fill', 'none'); setAttr(ch.p.side, 'fill', 'none'); setAttr(ch.lamp, 'data-lamp', opts.stbyLamp ? 'stby' : 'off'); }
+        /* rotor period = T_ref / (speed / 100): T_ref 1.0 s for a fan, 0.8 s for a pump (§7.1); still at 0 % or standby */
+        if (ch.rot) {
+          var sp = run ? ch.u.rotorPct : 0, per = sp > 0 ? (ch.u.rotorRefS || 1) / (sp / 100) : 0;
+          setAttr(ch.rot, 'data-turning', per > 0 ? '1' : '0');
+          var pd = per > 0 ? per.toFixed(3) + 's' : '';
+          if (ch.rot.style.animationDuration !== pd) ch.rot.style.animationDuration = pd;
+        }
       }
       host.setAttribute('data-unit', { power: 'kW', temp: '°C', 'cooling-margin': 'K', alarms: '%' }[mode] || '');
       root.setAttribute('data-mode', mode);

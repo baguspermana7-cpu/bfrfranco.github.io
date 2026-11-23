@@ -1,6 +1,6 @@
 # PRD-DCAI-HALL-DEPTH — Amendment 1: Flat 2D (default), a 3D worth reading, every unit with its operating state
 
-Status: A0–A1 SHIPPED v3.99.0 (gate `test-dcai-hall-views.mjs` V1–V3, F1, F2, D1); A2 v3.101.0 (L1, S0, T1; F2 kept); A3 engine keys, tooltips and table v3.102.0 (A1 + `test-dcai-unit-ops` U1–U4); A4–A6 in build · Author: Claude (Opus 5.5) for the owner · Date: 2026-11-23
+Status: A0–A1 SHIPPED v3.99.0 (gate `test-dcai-hall-views.mjs` V1–V3, F1, F2, D1); A2 v3.101.0 (L1, S0, T1; F2 kept); A3 engine keys, tooltips and table + A4 rotors v3.102.0 (A1, M1, M2 + `test-dcai-unit-ops` U1–U4); A5–A6 in build · Author: Claude (Opus 5.5) for the owner · Date: 2026-11-23
 Parent: `PRD.md` in this folder (census B1–B15, parameter catalogue §5, control relations §6, laws HD-*, phases P0–P5).
 This amendment does NOT repeat the parent. It changes the **views**, adds the **display placement** of the parent's
 parameters per view, the **state and animation grammar**, the **indicators**, and the laws and phases that prove them.
@@ -345,7 +345,7 @@ cannot be made red on today's tree is rewritten until it can (or dropped).
 | A1 ✔ v3.99.0 | View switch (2D · 3D · Drawing), `rz.dcai.view`, default 2D, `?view=`, stage-first layout with the summary line; 2D = `floor-plan.js` plan projection with today's paint | HV-V1–V3, HV-F1 | peer: `hall-iso.js`, `datahallAI.html`; me: `floor-plan.js` only if the plan projection needs a fix |
 | A2 ✔ v3.101.0 | Lens bar + legend in 2D and 3D (map to existing modes); lamp states §8.1 incl. standby; 3D tones and heights; label collision → tooltip | HV-L1, HV-S0, HV-F2, HV-T1 | shared `floor-plan.js` (behind options so the Conventional hall is unchanged) |
 | A3 ◐ v3.102.0 (engine keys + tooltip + table; chips → A5, D7) | Parameter binding §6 (engine keys ENG/ENG+ from the parent's P-phases), chips per lens, `[data-point]` + trend, table view, determinism | HV-P1, HV-P2, HV-D1, HV-A1 | peer (engine keys, payloads); me (binding layer if the peer hands it over) |
-| A4 | Motion layer §7 (rotors, pump rotors, header dashes, air arrows, stems), off-screen stop, reduced motion, perf budget | HV-M1, HV-M2, HV-S1 | shared |
+| A4 ◐ v3.102.0 (rotors M1, M2; header dashes, air arrows, stems → A5) | Motion layer §7 (rotors, pump rotors, header dashes, air arrows, stems), off-screen stop, reduced motion, perf budget | HV-M1, HV-M2, HV-S1 | shared |
 | A5 | Indicators §8 (flags, counts, inspector/sheet), scenarios §7.3 | HV-I1, HV-S1 | peer |
 | A6 | Release: full DC AI + Conventional gate sets, live check, screenshots read at 1440/390 both themes, CHANGELOG, standards (`DIAGRAM_ENGINE_STANDARD`, `MOTION_STANDARD` rotor rule, `UIUX_AUDIT_LEDGER` rows V1–V12) | HV-R1 + all | both |
 
@@ -392,4 +392,9 @@ and R2. Each phase ships only on a green full gate.
   legible. That chip is scheduled in A5 with the flags, and HV-P1 stays out of the gate line until then.
 - D8 (A3). N+1 becomes an authored count (`equipment.crah.redundantUnits`, `equipment.cdu.redundantUnits` = 1,
   ADOPTED from the "N+1 per hall" rule). Before, the literal `+ 1` was repeated in six engine expressions.
+- D9 (A4, measured). Rotors use one CSS keyframe in place of a JS 10 Hz loop: the browser pauses them when the floor
+  is hidden, and no tick repaints the sheet. They appear in 2D only. The budget in §7.2 is relative: 2D adds +4 % CPU
+  over the same floor without rotors. The absolute 1.5 s per 5 s cannot be met by the cockpit page at all. It
+  measures 3.9 s with every rotor off and 4.8 s on the Drawing view in headless Chrome, so that line is reported
+  here and not gated.
 

@@ -156,9 +156,11 @@
     var o = (geo && geo.ops) || {}, on = u.running !== false;
     if (u.kind === 'crah') {
       u.ops = { kw: on ? o.crahKw : 0, airM3h: on ? o.crahAir : 0, fanPct: on ? o.crahFan : 0, supplyC: on ? geo.supplyC : null };
+      u.rotorPct = u.ops.fanPct; u.rotorRefS = 1.0;   /* §7.1: fan rotor T_ref 1.0 s at 100 % */
       u.lines = ['fan ' + f1(u.ops.fanPct) + ' % · ' + f0(u.ops.airM3h) + ' of ' + f0(o.crahAirRated) + ' m³/h', 'duty ' + f0(u.ops.kw) + ' kWth' + (on ? ' · supply ' + f1(geo.supplyC) + ' °C' : '')];
     } else {
       u.ops = { kw: on ? o.cduKw : 0, loadPct: on ? o.cduLoad : 0, lpm: on ? o.cduLpm : 0, pumpPct: on ? o.cduPump : 0 };
+      u.rotorPct = u.ops.pumpPct; u.rotorRefS = 0.8;  /* §7.1: pump rotor T_ref 0.8 s at 100 % */
       u.lines = ['duty ' + f0(u.ops.kw) + ' of ' + f0(o.cduRated) + ' kWth (' + f1(u.ops.loadPct) + ' %)', 'TCS ' + f0(u.ops.lpm) + ' of ' + f0(o.cduLpmRated) + ' L/min · pump ' + f1(u.ops.pumpPct) + ' %'];
     }
     return u;
@@ -187,7 +189,7 @@
       /* the whole hall on the first screen, both axes, at every width: the stage takes what is left of the viewport below
          its own top (HV-F1); fitAll lets the unit shrink below the plan's label floor (labels live in tooltips) */
       height: function () { var t = wrap.getBoundingClientRect().top + (win.pageYOffset || 0); return Math.max(260, (win.innerHeight || 900) - bottomInset() - t - 12); },
-      watchHeight: false, fitAll: true, tagFit: true, stbyLamp: true,
+      watchHeight: false, fitAll: true, tagFit: true, stbyLamp: true, rotors: true,
       rackTag: function (i) { return model.racks[i].ref.replace('rack-unit:', ''); },
       zoneTag: function (z) { return 'Rows R' + pad2(2 * z + 1) + ' and R' + pad2(2 * z + 2) + ', one contained hot aisle'; },
       zoneHead: function (z) { return 'R' + pad2(2 * z + 1) + '/' + pad2(2 * z + 2); },

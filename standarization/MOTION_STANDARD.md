@@ -246,6 +246,19 @@ thing that runs, its speed is a process value, and it stops off screen and under
 - Never: glow, blur, drop shadow, particles without a process value, a moving mark on a stopped line.
 - Gate: `tools/test-conv-live.mjs`. Styles: `css/conv-live.css` (after `conv-vfx.css` and `conv-motion.css`).
 
+## DC AI hall floor rotors (PRD-DCAI-HALL-DEPTH A4, v3.102.0)
+
+- One rotor per fan-wall module and per CDU, in the 2D top view only. In 3D the fan sits on a projected face, where a
+  screen-space rotation would be false. Rotors are opt-in: `floor-plan.js` `opts.rotors`, so the Conventional hall
+  is unchanged.
+- Period = T_ref / (speed / 100). T_ref is 1.0 s for a fan and 0.8 s for a pump. Speed is the engine's
+  `crah_fan_speed_pct` or `cdu_pump_speed_pct` (dcai-engine 1.7.0). A rotor whose quantity changes changes its period.
+- Standby or 0 % means still (`data-turning="0"`). Reduced motion means every rotor is still. The Drawing view and
+  another cockpit tab hide the floor, so 0 animations run. An off-screen floor pauses (`.fp-offscreen`).
+- One CSS keyframe (`fp-rot`). No JS loop and no per-tick repaint. Measured at 1440: +0.15 s main-thread time per
+  5 s idle over the same floor without rotors (3.86 → 4.01 s).
+- Gate: `test-dcai-hall-views` M1 (one rotor per unit, period within 1 % of T_ref / speed, standby still) and M2.
+
 ## Homepage choreography (owner R102–R104, 2026-11-09, v3.35.5)
 
 "Animasi motionnya sangat2 kurang payah. Cari inspirasi" / "klik cards lgsung flip … flipnya kaku". Built after the

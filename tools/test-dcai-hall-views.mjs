@@ -18,7 +18,9 @@
           CDU row prints the engine's operating point (A3: fan %, m³/h, load %, pump %; standby rows 0, as many as the engine's)
    HV-V3  a switch 2D -> 3D -> Drawing -> 2D keeps the selected rack and the paint mode; RZHallIso.update runs 0 times
    HV-T1  3D tones: slab/body contrast >= 1.25 and body/top >= 1.1 in both themes (computed fills).
-   Later phases add: HV-P2 (A3), HV-M1/M2 (A4), HV-S1/HV-I1 (A5).
+   HV-M1  2D rotors: one per fan-wall module and CDU, period = T_ref / engine speed (fan 1.0 s, pump 0.8 s), standby still.
+   HV-M2  reduced motion, the Drawing view and another cockpit tab leave 0 running rotor animations.
+   Later phases add: HV-P2, HV-S1/HV-I1 (A5).
    Usage: node tools/test-dcai-hall-views.mjs [--shots=<dir>] [--only=V1,F1] */
 import fs from 'fs';
 import http from 'http';
@@ -189,6 +191,44 @@ for (const W of [1440, 390]) {
     ok('HV-D1', s.floorText === s2.floorText, `two loads drew different floor text (${s.floorText.length} vs ${s2.floorText.length} chars; first diff at ${[...s.floorText].findIndex((ch, i) => ch !== s2.floorText[i])})`);
     await pg2.close();
   } else await pg.close();
+}
+/* HV-M1 / HV-M2 (A4 §7): rotors turn at the unit's own speed (period = T_ref / speed: fan 1.0 s, pump 0.8 s), standby is
+   still; reduced motion stills every rotor; the Drawing view and another cockpit tab leave 0 running rotor animations */
+for (const W of [1440, 390]) {
+  if (ONLY.size && !ONLY.has('HV-M1') && !ONLY.has('HV-M2')) break;
+  const pg = await open(W);
+  const rot = () => pg.evaluate(() => {
+    const E = window.DCAI_CALC && window.DCAI_CALC.snapshot.equipment, cells = [...document.querySelectorAll('#hIso .crah-cell')];
+    const one = (c) => { const r = c.querySelector('.fp-rotor'); if (!r) return null; const cs = getComputedStyle(r);
+      return { kind: c.getAttribute('data-kind'), stby: c.classList.contains('stby'), name: cs.animationName, dur: parseFloat(cs.animationDuration),
+        running: r.getAnimations().filter((a) => a.playState === 'running').length }; };
+    const rs = cells.map(one);
+    return { cells: cells.length, rotors: rs.filter(Boolean).length, fan: E && E.crah_fan_speed_pct, pump: E && E.cdu_pump_speed_pct, rs: rs.filter(Boolean) };
+  });
+  const a = await rot();
+  const wantFan = 1 / (a.fan / 100), wantPump = 0.8 / (a.pump / 100);
+  const run = a.rs.filter((r) => !r.stby), stb = a.rs.filter((r) => r.stby);
+  ok('HV-M1', a.cells >= 145 && a.rotors === a.cells, `${W}: ${a.rotors} rotors on ${a.cells} fan-wall modules + CDUs`);
+  ok('HV-M1', run.length > 0 && run.every((r) => r.name === 'fp-rot' && Math.abs(r.dur - (r.kind === 'crah' ? wantFan : wantPump)) <= 0.01 * (r.kind === 'crah' ? wantFan : wantPump)),
+    `${W}: running rotor periods ${[...new Set(run.map((r) => r.kind + ' ' + r.name + ' ' + r.dur))].join(', ')} want fan ${wantFan.toFixed(3)} s, pump ${wantPump.toFixed(3)} s`);
+  ok('HV-M1', stb.length > 0 && stb.every((r) => r.name === 'none' && r.running === 0), `${W}: standby rotors ${JSON.stringify(stb.slice(0, 2))} must stand still`);
+  /* another cockpit tab: the hall panel is hidden, so no rotor may keep running (the cockpit does not scroll the floor away) */
+  await pg.evaluate(() => { const b = document.querySelector('#tabs [data-t="dash"]') || [...document.querySelectorAll('#tabs [data-t]')].find((x) => x.getAttribute('data-t') !== 'hall'); if (b) b.click(); });
+  await wait(600);
+  const off = await rot();
+  ok('HV-M2', off.rs.every((r) => r.running === 0), `${W}: another tab open, ${off.rs.filter((r) => r.running).length} rotors still running`);
+  await pg.evaluate(() => { const b = document.querySelector('#tabs [data-t="hall"]'); if (b) b.click(); }); await wait(800);
+  await pg.evaluate(() => { const b = document.querySelector('#p-hall .dh-proj [data-view="drawing"]'); if (b) b.click(); });
+  await wait(500);
+  const dr = await rot();
+  ok('HV-M2', dr.rs.every((r) => r.running === 0), `${W}: Drawing view ${dr.rs.filter((r) => r.running).length} rotors still running`);
+  await pg.evaluate(() => { const b = document.querySelector('#p-hall .dh-proj [data-view="flat"]'); if (b) b.click(); });
+  await pg.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+  await wait(500);
+  const rm = await rot();
+  ok('HV-M2', rm.rotors > 0 && rm.rs.every((r) => r.name === 'none' && r.running === 0), `${W}: reduced motion ${rm.rs.filter((r) => r.name !== 'none').length} rotors animated`);
+  ok('HV-M2', pg.errors.length === 0, `${W}: page errors ${pg.errors.slice(0, 2).join(' | ')}`);
+  await pg.close();
 }
 /* HV-T1 (A2): the 3D floor wears three tones in both themes — slab (darkest on a dark page), equipment body, equipment top —
    measured as WCAG contrast of the COMPUTED fills (the slab composited over the stage background at its fill-opacity) */
