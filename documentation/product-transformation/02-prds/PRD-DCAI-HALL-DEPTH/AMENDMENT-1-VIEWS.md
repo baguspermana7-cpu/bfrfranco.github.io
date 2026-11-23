@@ -1,6 +1,6 @@
 # PRD-DCAI-HALL-DEPTH — Amendment 1: Flat 2D (default), a 3D worth reading, every unit with its operating state
 
-Status: A0–A1 SHIPPED v3.99.0 (gate `test-dcai-hall-views.mjs` V1–V3, F1, F2, D1); A2 v3.101.0 (L1, S0, T1; F2 kept); A3 engine keys, tooltips and table + A4 rotors v3.103.0 (A1, M1, M2 + `test-dcai-unit-ops` U1–U4); A5–A6 in build · Author: Claude (Opus 5.5) for the owner · Date: 2026-11-23
+Status: A0–A1 SHIPPED v3.99.0 (gate `test-dcai-hall-views.mjs` V1–V3, F1, F2, D1); A2 v3.101.0 (L1, S0, T1; F2 kept); A3 engine keys, tooltips and table + A4 rotors v3.103.0 (A1, M1, M2 + `test-dcai-unit-ops` U1–U4); A5a scenario states and flags v3.104.0 (S1, I1, Amendment 3); A5b–A6 in build · Author: Claude (Opus 5.5) for the owner · Date: 2026-11-23
 Parent: `PRD.md` in this folder (census B1–B15, parameter catalogue §5, control relations §6, laws HD-*, phases P0–P5).
 This amendment does NOT repeat the parent. It changes the **views**, adds the **display placement** of the parent's
 parameters per view, the **state and animation grammar**, the **indicators**, and the laws and phases that prove them.
@@ -346,7 +346,7 @@ cannot be made red on today's tree is rewritten until it can (or dropped).
 | A2 ✔ v3.101.0 | Lens bar + legend in 2D and 3D (map to existing modes); lamp states §8.1 incl. standby; 3D tones and heights; label collision → tooltip | HV-L1, HV-S0, HV-F2, HV-T1 | shared `floor-plan.js` (behind options so the Conventional hall is unchanged) |
 | A3 ◐ v3.103.0 (engine keys + tooltip + table; chips → A5, D7) | Parameter binding §6 (engine keys ENG/ENG+ from the parent's P-phases), chips per lens, `[data-point]` + trend, table view, determinism | HV-P1, HV-P2, HV-D1, HV-A1 | peer (engine keys, payloads); me (binding layer if the peer hands it over) |
 | A4 ◐ v3.103.0 (rotors M1, M2; header dashes, air arrows, stems → A5) | Motion layer §7 (rotors, pump rotors, header dashes, air arrows, stems), off-screen stop, reduced motion, perf budget | HV-M1, HV-M2, HV-S1 | shared |
-| A5 | Indicators §8 (flags, counts, inspector/sheet), scenarios §7.3 | HV-I1, HV-S1 | peer |
+| A5 ◐ v3.104.0 (A5a scenario states + flags, Amendment 3; strip counts, inspector → A5b) | Indicators §8 (flags, counts, inspector/sheet), scenarios §7.3 | HV-I1, HV-S1 | me |
 | A6 | Release: full DC AI + Conventional gate sets, live check, screenshots read at 1440/390 both themes, CHANGELOG, standards (`DIAGRAM_ENGINE_STANDARD`, `MOTION_STANDARD` rotor rule, `UIUX_AUDIT_LEDGER` rows V1–V12) | HV-R1 + all | both |
 
 The "owner of files" column was the proposal; §13 records the decision (this session builds every phase).

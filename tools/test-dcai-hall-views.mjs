@@ -22,7 +22,9 @@
    HV-G2  one placement: every fan-wall module and CDU body on the floor = its Drawing-view body (±0.05 m).
    HV-M1  2D rotors: one per fan-wall module and CDU, period = T_ref / engine speed (fan 1.0 s, pump 0.8 s), standby still.
    HV-M2  reduced motion, the Drawing view and another cockpit tab leave 0 running rotor animations.
-   Later phases add: HV-P2, HV-S1/HV-I1 (A5).
+   HV-S1  each cooling scenario changes exactly the units its HMI payloads name (A5a, Amendment 3); rotors keep their period.
+   HV-I1  alarmed units carry flags (<= 8 + "+n"), each naming its point, inside the stage, clear of heads and each other.
+   Later phases add: HV-P2, status-strip counts (A5b).
    Usage: node tools/test-dcai-hall-views.mjs [--shots=<dir>] [--only=V1,F1] */
 import fs from 'fs';
 import http from 'http';
@@ -312,6 +314,64 @@ for (const W of [1440, 390]) {
   const rm = await rot();
   ok('HV-M2', rm.rotors > 0 && rm.rs.every((r) => r.name === 'none' && r.running === 0), `${W}: reduced motion ${rm.rs.filter((r) => r.name !== 'none').length} rotors animated`);
   ok('HV-M2', pg.errors.length === 0, `${W}: page errors ${pg.errors.slice(0, 2).join(' | ')}`);
+  await pg.close();
+}
+/* HV-S1 / HV-I1 (Amendment 3, A5a): each cooling scenario changes on the floor exactly the units whose HMI payload says so
+   (computed here from RZDatahallAIHmiPayloads with the PRD D2 severity mapping, independent of the floor code); rotor
+   periods keep their normal values (D3); alarmed units carry flags (<= 8, + "+n" = every alarmed unit), inside the
+   stage, clear of each other and of the row heads; normal shows none */
+for (const W of [1440, 390]) {
+  if (ONLY.size && !ONLY.has('HV-S1') && !ONLY.has('HV-I1')) break;
+  const pg = await open(W);
+  const look = (sc) => pg.evaluate(async (sc) => {
+    const sel = document.getElementById('coolingScenario'); sel.value = sc; sel.dispatchEvent(new Event('change', { bubbles: true }));
+    await new Promise((r) => setTimeout(r, 900));
+    const P = window.RZDatahallAIHmiPayloads, ctx = P.buildContext(window, { hall: window.currentDH || 1, noTrend: true });
+    const sevOf = (p) => { const al = p.tabs.alarms || []; if (al.some((a) => a.severity === 'critical')) return 'alarm';
+      return al.length || (p.statusChip && p.statusChip.state === 'fault') ? 'warn' : null; };
+    const want = {}, root = document.querySelector('#hIso .fp-root');
+    const floor = {};
+    for (const u of root.querySelectorAll('[data-rz-equipment]')) {
+      const ref = u.getAttribute('data-rz-equipment'), st = u.getAttribute('data-state');
+      if (st === 'warn' || st === 'alarm') floor[ref] = st;
+      let m = /^(crah|cdu):(\d+)$/.exec(ref), s = null;
+      if (m) s = sevOf(P.payload(m[1], m[2], ctx));
+      else if ((m = /^rack-unit:R(\d\d)-\d\d$/.exec(ref))) { const p = P.payload('rack-unit', 'R' + m[1] + '-01', ctx); s = p.state('manifold') === 'wet' ? 'alarm' : sevOf(p); }
+      if (s) want[ref] = s;
+    }
+    const vis = (el) => el.getClientRects().length > 0 && getComputedStyle(el).visibility !== 'hidden';
+    const bx = (el) => { const b = el.getBoundingClientRect(); return { l: b.left, t: b.top, r: b.right, b: b.bottom }; };
+    const flags = [...document.querySelectorAll('#hIsoWrap .dh-flag')].filter(vis).map((f) => ({ txt: f.textContent.trim(), n: +f.getAttribute('data-units'), point: f.getAttribute('data-point'), ...bx(f) }));
+    const more = [...document.querySelectorAll('#hIsoWrap .dh-flag-more')].filter(vis).map((f) => +f.getAttribute('data-n'))[0] || 0;
+    const heads = [...root.querySelectorAll('.zone-head')].filter(vis).map(bx), stage = bx(root);
+    const cut = (a, b) => Math.min(a.r, b.r) - Math.max(a.l, b.l) > 1 && Math.min(a.b, b.b) - Math.max(a.t, b.t) > 1;
+    const rot = [...root.querySelectorAll('.crah-cell .fp-rotor')].map((r) => r.style.animationDuration).join('|');
+    const text = [...root.querySelectorAll('text')].map((t) => t.textContent.trim()).join('|');
+    return { want, floor, flags, more, rot, text,
+      outside: flags.filter((f) => f.l < stage.l - 1 || f.t < stage.t - 1 || f.r > stage.r + 1 || f.b > stage.b + 1).length,
+      overlap: flags.filter((f, i) => flags.some((g, j) => j > i && cut(f, g))).length + flags.filter((f) => heads.some((h) => cut(f, h))).length };
+  }, sc);
+  const base = await look('normal');
+  for (const sc of ['normal', 'cdu-pump-fail', 'chiller-trip', 'leak-z07']) {
+    const r = sc === 'normal' ? base : await look(sc);
+    const wk = Object.keys(r.want).sort(), fk = Object.keys(r.floor).sort();
+    const diff = wk.filter((k) => r.floor[k] !== r.want[k]).concat(fk.filter((k) => !r.want[k]));
+    ok('HV-S1', diff.length === 0, `${W} ${sc}: floor state differs from the payloads on ${diff.length} units (${diff.slice(0, 4).map((k) => k + ' floor ' + r.floor[k] + ' want ' + r.want[k]).join(', ')})`);
+    if (sc === 'normal' || sc === 'chiller-trip') ok('HV-S1', wk.length === 0 && fk.length === 0, `${W} ${sc}: ${fk.length} units in warn/alarm, want 0`);
+    if (sc === 'cdu-pump-fail' || sc === 'leak-z07') ok('HV-S1', wk.length > 0, `${W} ${sc}: the payloads raise nothing (scenario not wired?)`);
+    if (sc === 'chiller-trip') ok('HV-S1', r.text === base.text, `${W} chiller-trip: floor text changed against normal`);
+    ok('HV-S1', r.rot === base.rot, `${W} ${sc}: rotor periods changed against normal`);
+    const alarmed = fk.length, onFlags = r.flags.reduce((s, f) => s + f.n, 0);
+    if (!alarmed) ok('HV-I1', r.flags.length === 0 && r.more === 0, `${W} ${sc}: ${r.flags.length} flags with nothing alarmed`);
+    else {
+      ok('HV-I1', r.flags.length >= 1 && r.flags.length <= 8, `${W} ${sc}: ${r.flags.length} flags, want 1..8`);
+      ok('HV-I1', onFlags + r.more === alarmed, `${W} ${sc}: flags count ${onFlags} + more ${r.more}, alarmed units ${alarmed}`);
+      ok('HV-I1', r.flags.every((f) => f.point && f.txt.includes(f.point)), `${W} ${sc}: a flag without its point (${r.flags.map((f) => f.txt).join(' / ')})`);
+      ok('HV-I1', r.outside === 0 && r.overlap === 0, `${W} ${sc}: flags outside the stage ${r.outside}, overlapping ${r.overlap}`);
+    }
+    if (SHOTS && sc !== 'normal') await pg.screenshot({ path: path.join(SHOTS, `hv-${sc}-${W}.png`) });
+  }
+  ok('HV-S1', pg.errors.length === 0, `${W}: page errors ${pg.errors.slice(0, 2).join(' | ')}`);
   await pg.close();
 }
 /* HV-T1 (A2): the 3D floor wears three tones in both themes — slab (darkest on a dark page), equipment body, equipment top —

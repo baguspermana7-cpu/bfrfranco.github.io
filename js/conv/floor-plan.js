@@ -226,8 +226,16 @@
     T = T || DEFAULT_T;
     var rk = model.racks[idx];
     if (!rk.occupied) return { state: 'spare', step: -1, v: 0, text: mode === 'space' ? 'spare' : '—' };
-    var u = utilOf(model, rk), t = model.rackInletFor(idx), r, a, b;
+    var u = utilOf(model, rk), t = model.rackInletFor(idx), r;
     if (mode === 'space') return { state: 'neutral', step: 1, v: u, text: 'IT' };
+    r = classifyMode(mode, model, rk, idx, T, u, t);
+    /* rk.status (DC AI, PRD-DCAI-HALL-DEPTH Amendment 3 D5): an alarm the unit's HMI payload raises outranks the lens
+       state in every lens but Layout; the lens value stays the text. The Conventional model sets no status. */
+    if ((rk.status === 'warn' || rk.status === 'alarm') && RANK[rk.status] > (RANK[r.state] || 0)) return { state: rk.status, step: 2, v: r.v, text: r.text };
+    return r;
+  }
+  function classifyMode(mode, model, rk, idx, T, u, t) {
+    var r, a, b;
     if (mode === 'power') { r = powerState(u, T, false); return { state: r.s, step: third(r.f), v: u, text: rk.kw.toFixed(1) }; }
     if (mode === 'temp') { r = inletState(t, T); return { state: r.s, step: third(r.f), v: t, text: t.toFixed(1) }; }
     if (mode === 'cooling-margin') {
@@ -590,7 +598,7 @@
     /* ---- paint: attributes and existing text only ---- */
     inst.paint = function (mode) {
       mode = MODES.indexOf(mode) >= 0 ? mode : 'temp';
-      inst.mode = mode;
+      inst.mode = mode; tipKey = '';   /* a repaint may change a unit's state: the next hover rebuilds its tooltip */
       var i, r, c, e, f, bp, ch, res = [];
       for (i = 0; i < model.racks.length; i++) {
         r = classify(mode, model, i, T); res[i] = r;
@@ -706,6 +714,7 @@
             html('div', '', tip, 'inlet ' + model.rackInletFor(i).toFixed(1) + ' °C');
           }
           html('div', '', tip, STATE_WORD[r.state]);
+          if (rk.note) html('div', '', tip, rk.note);
           html('div', 'tp-hint', tip, 'Click for detail');
         } else {
           var n = +target.getAttribute('data-crah'), cu = null, q;

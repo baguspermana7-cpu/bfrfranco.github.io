@@ -70,6 +70,12 @@
       '#hIso .fp-root[data-proj="plan"] .zone-head{display:table;width:auto;min-width:20px;padding:1px 3px;margin:0 auto}',
       /* HV-F2b: on a phone a row pair is ~37 px wide; the head '01/02' at 10 px keeps >= 3 px of air to its neighbour */
       '@media (max-width:600px){#hIso .fp-root[data-proj="plan"] .zone-head{font-size:10px;letter-spacing:-.02em;padding:1px 0;min-width:0}}',
+      /* Amendment 3 D4: flags, ink on the panel with a 1 px state hairline and the state glyph; no wash, no motion */
+      '#hIso{position:relative}.dh-flags{position:absolute;inset:0;pointer-events:none}',
+      '.dh-flag,.dh-flag-more{position:absolute;white-space:nowrap;padding:1px 5px;border:1px solid var(--rz-pt-warn,#d97706);border-radius:2px;background:var(--bg2);color:var(--t1);font:600 11px/16px "IBM Plex Mono",ui-monospace,monospace}',
+      '.dh-flag[data-sev="alarm"]{border-color:var(--rz-pt-alarm,#dc2626)}',
+      '.dh-flag-more{right:6px;top:6px;border-color:var(--bd);color:var(--t2)}',
+      '@media (max-width:600px){.dh-flag,.dh-flag-more{font-size:10px;line-height:14px;padding:0 3px}}',
       '#hIsoWrap{display:none;margin:0}#p-hall:not([data-dh-view="drawing"]) #hIsoWrap{display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px 16px}',
       '#hIso{display:none;box-sizing:content-box;background:var(--bg2);border:1px solid var(--bd);border-radius:4px;overflow:hidden}',
       '#p-hall:not([data-dh-view="drawing"]) #hIso{display:block}',
@@ -171,6 +177,93 @@
       }
     };
     readSensors();
+    unitStates();
+  }
+
+  /* PRD-DCAI-HALL-DEPTH Amendment 3 (A5a): what the cooling scenario did to each unit, read from the SAME HMI payload a
+     click opens (one source, law HV-S1); the floor holds no state rule of its own. D2: a critical alarm or a wet rack
+     manifold is red (alarm); any other active alarm or a fault chip is amber (warn). Rotors are untouched (D3: a
+     standby pump takes duty at the same speed; the leak auto-shutoff is armed, not tripped). ~30 ms, once per change. */
+  function sevOf(p) {
+    var al = (p && p.tabs && p.tabs.alarms) || [], i;
+    for (i = 0; i < al.length; i++) if (al[i].severity === 'critical') return 'alarm';
+    return al.length || (p && p.statusChip && p.statusChip.state === 'fault') ? 'warn' : null;
+  }
+  function unitStates() {
+    if (!model) return;
+    var P = win.RZDatahallAIHmiPayloads, ctx = null, i, rows = {};
+    try { ctx = P && P.buildContext ? P.buildContext(win, { hall: win.currentDH || 1, noTrend: true }) : null; } catch (e) { ctx = null; }
+    function pay(cls, id) { try { return ctx ? P.payload(cls, id, ctx) : null; } catch (e) { return null; } }
+    model.crahUnits.concat(model.cduUnits).forEach(function (u) {
+      var m = /^(crah|cdu):(\d+)$/.exec(u.ref), p = m ? pay(m[1], m[2]) : null, s = sevOf(p), al = p && p.tabs && p.tabs.alarms && p.tabs.alarms[0];
+      u.status = s; u.point = s ? (al ? al.point : 'STATE') : null;
+      u.note = s ? (al ? al.point + ' · ' + al.message : (p.statusChip && p.statusChip.label) || '') : null;
+      if (u.baseLines == null) u.baseLines = u.lines.slice();
+      u.lines = u.note ? u.baseLines.concat([(s === 'alarm' ? '◆ ' : '▲ ') + u.note]) : u.baseLines.slice();
+    });
+    for (i = 0; i < model.racks.length; i++) {
+      var rk = model.racks[i], mm = /^rack-unit:R(\d\d)-/.exec(rk.ref), row = mm ? mm[1] : null;
+      if (row && !(row in rows)) {
+        var p = pay('rack-unit', 'R' + row + '-01'), wet = p && p.state && p.state('manifold') === 'wet', s2 = wet ? 'alarm' : sevOf(p);
+        rows[row] = s2 ? { s: s2, point: wet ? 'manifold' : ((p.tabs.alarms[0] || {}).point || 'STATE'), note: wet ? 'manifold wet (cooling scenario leak zone)' : ((p.tabs.alarms[0] || {}).message || '') } : null;
+      }
+      var st = row ? rows[row] : null;
+      rk.status = st ? st.s : null; rk.point = st ? st.point : null; rk.note = st ? (st.s === 'alarm' ? '◆ ' : '▲ ') + st.note : null;
+    }
+  }
+  /* D4: flags group neighbouring units with one point and severity (a rack row, the CDU line, one gallery); <= 8 flags,
+     red first then the larger group; the units left over are counted on a "+n" chip at the stage corner */
+  var flagBox = null;
+  function groups() {
+    var g = {}, out = [], k;
+    function add(key, sev, point, tag, ref, note) { if (!g[key]) { g[key] = { sev: sev, point: point, tags: [], refs: [], note: note }; out.push(g[key]); } g[key].tags.push(tag); g[key].refs.push(ref); }
+    model.racks.forEach(function (rk) { if (rk.status) { var row = rk.ref.replace(/^rack-unit:(R\d\d)-.*$/, '$1'); add('r' + row + rk.point + rk.status, rk.status, rk.point, rk.ref.replace('rack-unit:', ''), rk.ref, rk.point === 'manifold' ? 'wet' : ''); g['r' + row + rk.point + rk.status].row = row; } });
+    var mods = geo.m && geo.m.modsPer;
+    model.crahUnits.forEach(function (u, i) { if (u.status) add('f' + (mods && i >= mods ? 's' : 'n') + u.point + u.status, u.status, u.point, u.tag, u.ref, 'fault'); });
+    model.cduUnits.forEach(function (u) { if (u.status) add('c' + u.point + u.status, u.status, u.point, u.tag, u.ref, 'fault'); });
+    for (k = 0; k < out.length; k++) out[k].tags.sort(function (a, b) { return a.localeCompare(b, 'en', { numeric: true }); });
+    for (k = 0; k < out.length; k++) out[k].label = (out[k].sev === 'alarm' ? '◆ ' : '▲ ') + (out[k].row ? 'Row ' + out[k].row + (out[k].tags.length > 1 ? ' ×' + out[k].tags.length : '') : out[k].tags.length > 1 ? out[k].tags[0] + '…' + out[k].tags[out[k].tags.length - 1] + ' ×' + out[k].tags.length : out[k].tags[0]) +
+      ' · ' + out[k].point + (out[k].note ? ' ' + out[k].note : '');
+    return out.sort(function (a, b) { return (a.sev === b.sev ? 0 : (a.sev === 'alarm' ? -1 : 1)) || b.refs.length - a.refs.length; });
+  }
+  function drawFlags() {
+    if (!wrap || !host) return;
+    if (!flagBox) { flagBox = doc.createElement('div'); flagBox.className = 'dh-flags'; flagBox.setAttribute('aria-live', 'polite'); }
+    if (flagBox.parentNode !== host) host.appendChild(flagBox);
+    flagBox.innerHTML = '';
+    var root = host.querySelector('.fp-root');
+    if (!model || !root || view === 'drawing') return;
+    var gs = groups(); if (!gs.length) return;
+    var hb0 = host.getBoundingClientRect(), hb = { left: hb0.left + host.clientLeft, top: hb0.top + host.clientTop }, sb = root.getBoundingClientRect(), placed = [], left = 0, i;
+    var stage = { l: sb.left - hb.left + 2, t: sb.top - hb.top + 2, r: sb.right - hb.left - 2, b: sb.bottom - hb.top - 2 };
+    [].forEach.call(root.querySelectorAll('.zone-head'), function (h) { var b = h.getBoundingClientRect(); if (b.width) placed.push({ l: b.left - hb.left, t: b.top - hb.top, r: b.right - hb.left, b: b.bottom - hb.top }); });
+    function cut(a, b) { return Math.min(a.r, b.r) - Math.max(a.l, b.l) > 0 && Math.min(a.b, b.b) - Math.max(a.t, b.t) > 0; }
+    /* the "+n" chip first, so no flag lands on it */
+    var more = doc.createElement('span'); more.className = 'dh-flag-more'; more.textContent = '+000'; flagBox.appendChild(more);
+    var mb = more.getBoundingClientRect(); placed.push({ l: mb.left - hb.left, t: mb.top - hb.top, r: mb.right - hb.left, b: mb.bottom - hb.top });
+    var shown = 0;
+    for (i = 0; i < gs.length; i++) {
+      var g = gs[i];
+      if (shown >= 8) { left += g.refs.length; continue; }
+      var mid = host.querySelector('[data-rz-equipment="' + g.refs[Math.floor(g.refs.length / 2)] + '"]'), ab = mid && mid.getBoundingClientRect();
+      if (!ab || !ab.width) { left += g.refs.length; continue; }
+      var f = doc.createElement('span'); f.className = 'dh-flag'; f.setAttribute('data-sev', g.sev); f.setAttribute('data-point', g.point); f.setAttribute('data-units', String(g.refs.length));
+      f.textContent = g.label; f.title = g.label + ' — open a unit for its HMI'; flagBox.appendChild(f);
+      var w = f.offsetWidth, h = f.offsetHeight, a = { l: ab.left - hb.left, t: ab.top - hb.top, r: ab.right - hb.left, b: ab.bottom - hb.top }, cx = (a.l + a.r) / 2, cy = (a.t + a.b) / 2;
+      var cand = [[cx - w / 2, a.t - h - 4], [cx - w / 2, a.b + 4], [a.r + 4, cy - h / 2], [a.l - w - 4, cy - h / 2], [cx - w / 2, a.t - 2 * h - 8], [cx - w / 2, a.b + h + 8]], best = null, c, j;
+      for (c = 0; c < cand.length && !best; c++) {
+        var x = Math.min(Math.max(cand[c][0], stage.l), stage.r - w), y = cand[c][1];
+        var bx = { l: x, t: y, r: x + w, b: y + h };
+        if (y < stage.t || y + h > stage.b || x < stage.l) continue;
+        for (j = 0; j < placed.length && !cut(bx, placed[j]); j++) { /* scan */ }
+        if (j === placed.length) best = bx;
+      }
+      if (!best) { flagBox.removeChild(f); left += g.refs.length; continue; }
+      f.style.left = best.l + 'px'; f.style.top = best.t + 'px'; placed.push(best); shown++;
+    }
+    if (left) {
+      more.textContent = '+' + left; more.setAttribute('data-n', String(left)); more.title = left + ' more alarmed units without a flag (see Show as table)';
+    } else more.parentNode.removeChild(more);
   }
   /* the operating point of one unit (PRD-DCAI-HALL-DEPTH A3 §6): a running unit carries its share of the hall load, as the
      engine publishes it; a standby unit carries nothing. Values only from the engine; a missing key prints as a dash. */
@@ -232,7 +325,7 @@
     });
     if (keepMode && keepMode !== inst.mode) inst.paint(keepMode);
     if (keepSel && sameHall) inst.select(keepSel);
-    drawLegend();
+    drawLegend(); drawFlags();
     if (tableBox && tableBox.open) unitTable();
   }
 
@@ -256,9 +349,10 @@
     var tb = doc.createElement('tbody'), i, rows = [];
     function row(a, b, c) { var tr = doc.createElement('tr'), th = doc.createElement('th'); th.scope = 'row'; th.textContent = a; tr.appendChild(th);
       [b, c].forEach(function (x) { var td = doc.createElement('td'); td.textContent = x; tr.appendChild(td); }); rows.push(tr); }
-    for (i = 0; i < model.racks.length; i++) row(model.racks[i].ref.replace('rack-unit:', 'Rack '), 'running', f1(model.racks[i].kw) + ' kW · inlet ' + f1(model.rackInletFor(i)) + ' °C');
-    model.crahUnits.forEach(function (u) { row(u.tag, u.running === false ? 'standby' : 'running', u.lines.join(' · ')); });
-    model.cduUnits.forEach(function (u) { row(u.tag, u.running === false ? 'standby' : 'running', u.lines.join(' · ')); });
+    for (i = 0; i < model.racks.length; i++) row(model.racks[i].ref.replace('rack-unit:', 'Rack '), model.racks[i].status ? (model.racks[i].status === 'alarm' ? 'alarm: ' : 'warning: ') + model.racks[i].note.slice(2) : 'running', f1(model.racks[i].kw) + ' kW · inlet ' + f1(model.rackInletFor(i)) + ' °C');
+    function word(u) { return u.status ? (u.status === 'alarm' ? 'alarm: ' : 'warning: ') + u.note : (u.running === false ? 'standby' : 'running'); }
+    model.crahUnits.forEach(function (u) { row(u.tag, word(u), (u.baseLines || u.lines).join(' · ')); });
+    model.cduUnits.forEach(function (u) { row(u.tag, word(u), (u.baseLines || u.lines).join(' · ')); });
     rows.forEach(function (r) { tb.appendChild(r); });
     t.appendChild(tb); tableBox.appendChild(t);
   }
@@ -267,7 +361,7 @@
     lens = l;
     if (user) { try { win.localStorage.setItem(LENS_KEY, l); } catch (e) { /* storage blocked */ } }
     if (lensBar) [].forEach.call(lensBar.querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-lens') === l ? 'true' : 'false'); });
-    if (inst) { inst.paint(lensMode(l)); drawLegend(); }
+    if (inst) { inst.paint(lensMode(l)); drawLegend(); drawFlags(); }
   }
 
   function set(v, user) {
@@ -276,7 +370,7 @@
     view = v;
     panel.setAttribute('data-dh-view', v);
     if (bar) [].forEach.call(bar.querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-view') === v ? 'true' : 'false'); });
-    if (v !== 'drawing') { if (!inst || sig !== key()) { render(); sig = key(); } else inst.paint(inst.mode); tick(); }
+    if (v !== 'drawing') { if (!inst || sig !== key()) { render(); sig = key(); } else { inst.paint(inst.mode); drawFlags(); } tick(); }
     else stop();
   }
   /* the floor is rebuilt when the hall or the projection changes; a switch between 2D and 3D redraws, never re-runs the engine */
@@ -314,6 +408,15 @@
   }
   function stop() { if (timer) { win.clearInterval(timer); timer = 0; } }
 
+  /* a cooling scenario change repaints the floor states and flags (never re-runs the engine) */
+  doc.addEventListener('change', function (ev) {
+    if (!ev.target || ev.target.id !== 'coolingScenario' || !model) return;
+    unitStates();
+    if (inst && view !== 'drawing') { inst.paint(inst.mode); drawFlags(); }
+    if (tableBox && tableBox.open) unitTable();
+  }, true);
+  /* a resize redraws the floor; the flags follow it */
+  win.addEventListener('resize', function () { win.setTimeout(drawFlags, 260); });
   win.RZHallIso = {
     version: '2.0.0',
     /* renderHall calls this after every plan build, with the engine counts it read */

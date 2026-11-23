@@ -259,8 +259,15 @@ Data Hall tab (F4, v3.92.0) through its adapter `js/datahall-ai/hall-iso.js` (be
     serves. `HALL_PLACE` in datahallAI.html is the one source; the Drawing view and `hall-iso.js` (`unit.box`) both read
     it. Gate HV-G2 compares the floor body of every unit to its Drawing body (±0.05 m).
   - 2D rotors turn at the engine's fan and pump speed (A4; rule in `MOTION_STANDARD.md` "DC AI hall floor rotors").
+  - The floor shows what the cooling scenario did (Amendment 3, A5a). Each unit's state is read from the HMI payload
+    that opens when the unit is clicked (`RZDatahallAIHmiPayloads`), so the floor holds no state rule of its own.
+    - A critical alarm, or a rack manifold that is wet, is red. Any other active alarm or fault chip is amber.
+    - Rotors keep their speed, because a standby pump takes duty at the same speed.
+    - Flags group neighbouring units that share a point: a rack row, the CDU line or one gallery. Each flag is ink with
+      a 1 px state hairline and the state glyph.
+    - A floor shows at most 8 flags. A "+n" chip counts the alarmed units that have no flag. Gates HV-S1 and HV-I1.
   - Every number the 3D floor prints is hooked or declared for `test-dcai-coverage`.
-  - Gate: `tools/test-dcai-hall-iso.mjs` D1–D8, `tools/test-dcai-hall-views.mjs` V1–V3, F1, F2, D1, L1, S0, T1, A1, M1, M2, G1, G2,
+  - Gate: `tools/test-dcai-hall-iso.mjs` D1–D8, `tools/test-dcai-hall-views.mjs` V1–V3, F1, F2, D1, L1, S0, T1, A1, M1, M2, G1, G2, S1, I1,
     and `tools/test-dcai-unit-ops.mjs` U1–U4.
 
 ## 4g. Electrical sheets (PRD-ELECTRICAL-BMS, owner R186/R190/R192/R193, v3.94.0)
