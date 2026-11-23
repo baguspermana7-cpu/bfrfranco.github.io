@@ -4,7 +4,7 @@ Owner, 2026-11-23: "Continue improve more" (standing: "animasi state, indikasi b
 accurate dan valid dan comprehensive"). Amendment 1 §7.3 and §8 asked for this, and its law table carried HV-S1 and HV-I1
 as "A5".
 
-Status: A5a (S1, I1), D6 (M3) and A5b (I2, I3) built and gated in the v3.104.0 candidate. Red before green: S1/I1 4 of 36, M3 6 of 12, I2/I3 8 of 19.
+Status: A5a (S1, I1), D6 (M3), A5b (I2, I3), D7 (U1) and D8 (P2) built and gated in the v3.104.0 candidate. Red before green: S1/I1 4 of 36, M3 6 of 12, I2/I3 8 of 19, U1 4 of 4 (+ 2 of 8 tags cut by the stage), P2 9 of 12.
 
 ## 1 · What is wrong (measured on v3.103.0 candidate 5b8c2c33b, 1440 × 900, 2D)
 
@@ -50,6 +50,23 @@ scenario change and never per tick.
   only in a tooltip. That holds in 2D and 3D, at 1440 and at 390, so a reader cannot tell kW from W or from a count.
   With `opts.footText(zone)` (DC AI) the foot reads `6,248 kW`. Below 600 px it reads `6.2 MW`, which keeps the
   ≥ 3 px gap HV-F2b measures. The Conventional hall passes no formatter and is unchanged.
+- **D8 — One operating point, floor and HMI (Amendment 1 §10, law HV-P2).** Measured on cf7eeb031, the HMI of a
+  running unit contradicted the floor that opens it:
+
+  | Value | Floor (dcai-engine 1.7.0) | HMI |
+  |---|---|---|
+  | Fan-wall fan speed | 99.7 % | 75–82 %, simulated around a typed 75 % ± 8 |
+  | Fan-wall airflow per unit | 54,136 m³/h, the duty share | 55,325 m³/h, `design.flows.crah_air_m3s` / installed |
+  | CDU pump | 98.9 % | 1,440 rpm, simulated around a 1,450 rpm nominal |
+
+  The HMI now reads the engine:
+  - `fan_pct` comes from `equipment.crah_fan_speed_pct`, and its trend is anchored on it.
+  - `unit_air_m3h` comes from `equipment.crah_airflow_unit_m3h`. A `rated_air_m3h` row adds the module rating.
+  - `pump_rpm` = `equipment.cdu_pump_speed_pct` × the 1,450 rpm pump nameplate (DECLARED). The DH-M-103 sheet rotor,
+    which reads rpm / 1,450, therefore turns at the floor's speed.
+  - Fan % and pump rpm stay telemetry points (VFD feedback): ±0.5 % and ±5 rpm around the engine value, and `—` under a
+    replay with no sample (law O4b of `test-dh-operator`).
+  - The old design-flow share stays, renamed `Design airflow share (installed)`.
 - Not in this phase (A5b): status-strip counts per view equal to the alarm list (HV-I1 second half), the 8.3 inspector,
   and the MAN and STALE lamp variants.
 
@@ -73,6 +90,10 @@ scenario change and never per tick.
   - Every visible row-pair foot on the 2D and 3D floor, at 1440 and at 390, ends in a unit (`kW` or `MW`).
   - Its value equals racks per pair × the engine rack kW, within one display step.
   - This law is red on 5b8c2c33b.
+- **HV-P2.**
+  - For 3 running fan-wall modules and 3 running CDUs, the floor's fan %, airflow, pump % and TCS L/min equal the HMI
+    payload's, within the telemetry band plus the display step.
+  - Red on cf7eeb031: 9 of 12 values differ.
 - HV-F1, F2, G1, G2, M1, M2 and A1 stay green.
 
 ## 4 · Risks

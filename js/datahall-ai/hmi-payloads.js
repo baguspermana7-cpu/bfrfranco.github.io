@@ -278,7 +278,10 @@
     } else {
       b.E('live', 'flow_lpm', 'TCS flow', 'cduFlowPerUnitLpm', 'L/min', { digits: 0 });
       b.E('live', 'duty_kwth', 'Heat transferred', 'cduDutyPerUnit', 'kWth', { digits: 0 });
-      b.S('live', 'pump_rpm', 'Pump speed', { value: 1450, text: '1450 rpm nominal' }, 40, 'rpm', { digits: 0 });
+      /* D8: the engine's pump speed % over the 1,450 rpm pump nameplate (declared), so this HMI, its DH-M-103 rotor
+         (rpm / 1,450) and the floor rotor all turn at one speed; it was a simulated 1,450 rpm +/- 40.
+         It stays a telemetry point (VFD feedback, +/- 5 rpm around the engine), so a replay with no sample prints '—'. */
+      b.S('live', 'pump_rpm', 'Pump speed', { field: 'cduPumpPct' }, 5, 'rpm', { digits: 0, scale: 14.5 });
       b.S('live', 'pump_amps', 'Pump current', { value: 42, text: '42 A nameplate' }, 3, 'A', { digits: 1 });
     }
     b.S('live', 'dp_bar', 'Differential pressure', { value: 1.8, text: '1.8 bar design ΔP' }, 0.25, 'bar', { digits: 2 });
@@ -426,7 +429,10 @@
       b.D('live', 'fan_pct', 'Fan speed', '0 %', SBC, 0);
     } else {
       b.E('live', 'duty_kwth', 'Unit duty', 'crahPerUnit', 'kWth', { digits: 0 });
-      b.S('live', 'fan_pct', 'Fan speed', { value: 75, text: '75 % design speed' }, 8, '%', { digits: 0, min: 0, max: 100 });
+      /* v3.104.0 (PRD-DCAI-HALL-DEPTH Amendment 3 D8): the engine's fan speed (fan law: unit airflow / rated airflow), the
+         same number the floor's rotor turns at (a telemetry point: +/- 0.5 % around it, '—' under a replay with no sample);
+         it was a simulated 75 % +/- 8 that contradicted the floor */
+      b.S('live', 'fan_pct', 'Fan speed', { field: 'crahFanPct' }, 0.5, '%', { digits: 1, min: 0, max: 100 });
     }
     b.S('live', 'supply_rh', 'Supply RH', { value: 45, text: '45 % RH setpoint' }, 5, '%', { digits: 0, min: 0, max: 100 });
     b.ST('live', 'unit_state', 'Unit', st, COOL_REASON); b.chip(st === 'run' ? 'RUN' : 'STANDBY', st === 'run' ? 'normal' : 'standby');
@@ -434,10 +440,14 @@
     b.E('capacity', 'duty_per_hall', 'Duty units per hall', 'crahActive', '', { digits: 0 });
     b.E('capacity', 'installed_per_hall', 'Installed per hall', 'crahInstalled', '', { digits: 0 });
     b.E('capacity', 'air_hall_kwth', 'Hall air heat', 'airHeat', 'kWth', { digits: 0 });
+    /* D8: airflow per running unit is the engine's duty share (equipment.crah_airflow_unit_m3h), with the module rating
+       beside it; the design-flow share over installed units (a different basis) printed a second number under one label */
+    b.E('capacity', 'unit_air_m3h', 'Airflow per unit', 'crahAirUnitM3h', 'm³/h', { digits: 0 });
+    b.E('capacity', 'rated_air_m3h', 'Rated airflow', 'crahRatedAirM3h', 'm³/h', { digits: 0 });
     var airPer = ctx.snapshot.design && ctx.snapshot.design.flows && finite(ctx.snapshot.design.flows.crah_air_m3s) && finite(A.crahInstalled) && finite(A.halls) && A.crahInstalled > 0 ? ctx.snapshot.design.flows.crah_air_m3s / (A.crahInstalled * A.halls) * 3600 : null;
-    b.D('capacity', 'unit_air_m3h', 'Airflow per unit', airPer == null ? '—' : fmt(airPer, 0) + ' m³/h', IDENT('design.flows.crah_air_m3s over equipment.crah_installed_facility'), airPer);
+    b.D('capacity', 'design_air_m3h', 'Design airflow share (installed)', airPer == null ? '—' : fmt(airPer, 0) + ' m³/h', IDENT('design.flows.crah_air_m3s over equipment.crah_installed_facility'), airPer);
     b.dep('upstream', 'chiller:1', 'Chiller plant (CHW)'); b.dep('downstream', 'room:dh' + pad2(b.hall), 'Hall air path');
-    b.trend('fan_pct', 'Fan speed', '%', { value: 75 }, 8, { digits: 0 });
+    b.trend('fan_pct', 'Fan speed', '%', { field: 'crahFanPct' }, 0.5, { digits: 1 });
     b.S('maint', 'filter_dp', 'Filter ΔP', { value: 120, text: '120 Pa clean filter' }, 25, 'Pa', { digits: 0, min: 0 });
     b.tier2('crah', [String(id)]);
   });
@@ -1323,7 +1333,7 @@
     };
   }
 
-  var API = { version: '2.14.0', CLASSES: Object.freeze(classList()), COOLING_SCENARIOS: COOLING_SCENARIOS, payload: payload, safePayload: safePayload, stubPayload: stubPayload, points: points, classList: classList, buildContext: buildContext };
+  var API = { version: '2.15.0', CLASSES: Object.freeze(classList()), COOLING_SCENARIOS: COOLING_SCENARIOS, payload: payload, safePayload: safePayload, stubPayload: stubPayload, points: points, classList: classList, buildContext: buildContext };
   if (root) { root.RZDatahallAIHmiPayloads = API; }
   if (typeof module !== 'undefined' && module.exports) { module.exports = API; }
 })(typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : this));

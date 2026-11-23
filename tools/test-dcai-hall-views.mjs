@@ -28,7 +28,7 @@
    HV-I2  the status strips move by exactly the scenario's payload alarms (critical -> Critical, else -> Warning) (A5b).
    HV-I3  the Alarms workspace journals each payload alarm active, then returned when the scenario clears it (A5b).
    HV-U1  every row-pair foot ends in its unit and equals racks per pair x rack kW (Amendment 3 D7).
-   Later phases add: HV-P2.
+   HV-P2  a running unit's fan %, airflow, pump speed and TCS flow are one number on the floor and in its HMI (Amendment 3 D8).
    Usage: node tools/test-dcai-hall-views.mjs [--shots=<dir>] [--only=V1,F1] */
 import fs from 'fs';
 import http from 'http';
@@ -444,6 +444,31 @@ for (const W of [1440, 390]) {
     ok('HV-U1', r.cut.length === 0, `${W} ${v}: row tags cut by the stage edge: ${r.cut.join(', ')}`);
     ok('HV-U1', r.feet.length >= 10 && bad.length === 0, `${W} ${v}: ${bad.length} of ${r.feet.length} row-pair feet without a unit or off the engine ${r.want} kW (${bad.slice(0, 3).join(' / ')})`);
   }
+  await pg.close();
+}
+/* HV-P2 (Amendment 1 §10 "one source"): a running unit's operating point is ONE number on the floor (tooltip / table)
+   and in its HMI: fan-wall fan %, airflow per unit; CDU pump speed (the HMI's rpm over the 1,450 rpm nameplate); telemetry points within their declared band */
+for (const W of [1440]) {
+  if (ONLY.size && !ONLY.has('HV-P2')) break;
+  const pg = await open(W);
+  const r = await pg.evaluate(() => {
+    const P = window.RZDatahallAIHmiPayloads, ctx = P.buildContext(window, { hall: window.currentDH || 1, noTrend: true });
+    const m = window.RZHallIso.model(), out = [];
+    const run = (us) => us.filter((u) => u.running !== false);
+    for (const u of run(m.crahUnits).slice(0, 3)) {
+      const p = P.payload('crah', u.ref.split(':')[1], ctx);
+      out.push(['fan % ' + u.tag, u.ops.fanPct, p.n('fan_pct'), 0.55]); /* telemetry band 0.5 % + display step */
+      out.push(['airflow m3/h ' + u.tag, u.ops.airM3h, p.n('unit_air_m3h'), 0.5]);
+    }
+    for (const u of run(m.cduUnits).slice(0, 3)) {
+      const p = P.payload('cdu', u.ref.split(':')[1], ctx), rpm = p.n('pump_rpm');
+      out.push(['pump % ' + u.tag, u.ops.pumpPct, rpm == null ? null : rpm / 1450 * 100, 0.4]); /* band 5 rpm = 0.34 % + step */
+      out.push(['TCS L/min ' + u.tag, u.ops.lpm, p.n('flow_lpm'), 0.5]);
+    }
+    return out;
+  });
+  const bad = r.filter(([, a, b, tol]) => !(Number.isFinite(a) && Number.isFinite(b) && Math.abs(a - b) <= tol));
+  ok('HV-P2', r.length >= 12 && bad.length === 0, `${W}: ${bad.length} of ${r.length} operating values differ floor vs HMI (${bad.slice(0, 4).map(([k, a, b]) => k + ' floor ' + (a == null ? a : a.toFixed(2)) + ' hmi ' + (b == null ? b : b.toFixed(2))).join('; ')})`);
   await pg.close();
 }
 /* HV-M3 (Amendment 3 D6, Amendment 1 §7.1): the air paths show and move only in the Thermal and Cooling lenses */

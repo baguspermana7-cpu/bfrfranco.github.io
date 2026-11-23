@@ -271,6 +271,9 @@ Data Hall tab (F4, v3.92.0) through its adapter `js/datahall-ai/hall-iso.js` (be
     - The status strip adds them, with critical counted as Critical and any other severity as Warning.
     - The Alarms workspace journals each alarm `active_unack` when raised and `returned_unack` when cleared, through
       `appendEvents`. Gates HV-I2 and HV-I3.
+  - A running unit has one operating point (Amendment 3 D8, gate HV-P2).
+    - Its fan %, airflow, pump speed and TCS flow on the floor equal its HMI.
+    - Telemetry points scatter only within their declared band around the engine.
   - Every number on the floor carries its unit (Amendment 3 D7).
     - The row-pair foot reads `6,248 kW`, set through `opts.footText`.
     - On a phone it stacks `6.2` over `MW` in a 46 px strip (`opts.stripH`).
@@ -278,7 +281,7 @@ Data Hall tab (F4, v3.92.0) through its adapter `js/datahall-ai/hall-iso.js` (be
   - Air paths show and move only in the Thermal and Cooling lenses (`opts.airModes`, Amendment 3 D6). Status,
     Power and Layout draw no air. Gate HV-M3.
   - Every number the 3D floor prints is hooked or declared for `test-dcai-coverage`.
-  - Gate: `tools/test-dcai-hall-iso.mjs` D1–D8, `tools/test-dcai-hall-views.mjs` V1–V3, F1, F2, D1, L1, S0, T1, A1, M1, M2, G1, G2, S1, I1, M3, I2, I3, U1,
+  - Gate: `tools/test-dcai-hall-iso.mjs` D1–D8, `tools/test-dcai-hall-views.mjs` V1–V3, F1, F2, D1, L1, S0, T1, A1, M1, M2, G1, G2, S1, I1, M3, I2, I3, U1, P2,
     and `tools/test-dcai-unit-ops.mjs` U1–U4.
 
 ## 4g. Electrical sheets (PRD-ELECTRICAL-BMS, owner R186/R190/R192/R193, v3.94.0)
