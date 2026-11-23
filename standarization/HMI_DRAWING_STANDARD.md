@@ -235,8 +235,20 @@ Data Hall tab (F4, v3.92.0) through its adapter `js/datahall-ai/hall-iso.js` (be
     any fixed or earlier bar covering the bottom. `fitAll` lets the unit shrink below the label floor; `tagFit` hides
     a tag that overlaps a shown one or crosses the stage edge. Both are options: the Conventional hall is unchanged.
   - The selected rack and the lens survive a switch between 2D and 3D on the same hall.
+  - One lens bar serves 2D and 3D (A2, v3.101.0): Status · Thermal · Cooling · Power · Layout, stored in
+    `rz.dcai.lens`, each one `floor-plan.js` paint mode (`alarms`, `temp`, `cooling-margin`, `power`, `space`).
+    Status is the default. The lens legend sits in a column beside the stage, never inside it: `#hIso` clips, and
+    a legend under the floor pushed the stage off the first screen. The legend must be SEEN (topmost at its centre).
+  - Power colours a rack only against a published rating: the rack's installed power shelves
+    (`power.shelf_installed_kw`). The rack design kW is the load, never the rating (rating = load paints 100 % red).
+  - A standby fan-wall module or CDU has a hollow grey lamp (`data-lamp="stby"`, `opts.stbyLamp`), never green and
+    never blank. The count equals the engine's installed − duty.
+  - 3D wears three tones in both themes: slab, body (front face) and top. WCAG contrast slab/body ≥ 1.25 and
+    body/top ≥ 1.1, measured on the computed fills.
+  - On a phone the summary line and the view switch share one row (the full summary is the tooltip), and the lens bar
+    is the second row, so the stage still starts ≤ 260 px below the tab bar.
   - Every number the 3D floor prints is hooked or declared for `test-dcai-coverage`.
-  - Gate: `tools/test-dcai-hall-iso.mjs` D1–D8 and `tools/test-dcai-hall-views.mjs` V1–V3, F1, F2, D1.
+  - Gate: `tools/test-dcai-hall-iso.mjs` D1–D8 and `tools/test-dcai-hall-views.mjs` V1–V3, F1, F2, D1, L1, S0, T1.
 
 ## 4g. Electrical sheets (PRD-ELECTRICAL-BMS, owner R186/R190/R192/R193, v3.94.0)
 

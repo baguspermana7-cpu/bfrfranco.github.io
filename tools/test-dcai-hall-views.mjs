@@ -16,7 +16,8 @@
           tree: the 3D floor already shows no sensor noise; the KPI-strip part (GPU % 88 vs 92) joins in A3)
    HV-A1  "Show as table" lists every unit of the floor (racks + modules + CDUs) with its state
    HV-V3  a switch 2D -> 3D -> Drawing -> 2D keeps the selected rack and the paint mode; RZHallIso.update runs 0 times
-   Later phases add: HV-T1 (A2), HV-P2 (A3), HV-M1/M2 (A4), HV-S1/HV-I1 (A5).
+   HV-T1  3D tones: slab/body contrast >= 1.25 and body/top >= 1.1 in both themes (computed fills).
+   Later phases add: HV-P2 (A3), HV-M1/M2 (A4), HV-S1/HV-I1 (A5).
    Usage: node tools/test-dcai-hall-views.mjs [--shots=<dir>] [--only=V1,F1] */
 import fs from 'fs';
 import http from 'http';
@@ -94,7 +95,11 @@ const read = (pg) => pg.evaluate(() => {
     if (w > 1 && h > 1 && w * h > 1) over.push(a.s + ' × ' + b.s);
   }
   const lenses = [...panel.querySelectorAll('[data-lens]')].map((b) => b.getAttribute('data-lens'));
-  const legend = vis(root) && [...root.querySelectorAll('[class*=legend]')].some(vis);
+  /* the legend is SEEN: its centre is the topmost element there (a clipped or covered legend is no legend) */
+  const legend = vis(root) && [...document.querySelectorAll('#hIsoWrap [class*=legend]')].some((e) => {
+    if (!vis(e)) return false; const b = e.getBoundingClientRect(); if (b.width < 20 || b.height < 8) return false;
+    const t = document.elementFromPoint(b.left + Math.min(20, b.width / 2), b.top + b.height / 2); return !!t && e.contains(t);
+  });
   const head = panel.textContent;
   const m1 = /(\d+)\s*fan-wall modules\s*\((\d+)\s*duty/.exec(head), m2 = /(\d+)\s*CDU\s*\((\d+)\s*duty/.exec(head);
   const stbyWant = m1 && m2 ? (m1[1] - m1[2]) + (m2[1] - m2[2]) : null;
@@ -164,6 +169,34 @@ for (const W of [1440, 390]) {
     ok('HV-D1', s.floorText === s2.floorText, `two loads drew different floor text (${s.floorText.length} vs ${s2.floorText.length} chars; first diff at ${[...s.floorText].findIndex((ch, i) => ch !== s2.floorText[i])})`);
     await pg2.close();
   } else await pg.close();
+}
+/* HV-T1 (A2): the 3D floor wears three tones in both themes — slab (darkest on a dark page), equipment body, equipment top —
+   measured as WCAG contrast of the COMPUTED fills (the slab composited over the stage background at its fill-opacity) */
+for (const theme of ['dark', 'light']) {
+  if (ONLY.size && !ONLY.has('HV-T1')) break;
+  const pg = await open(1440);
+  await pg.evaluate((t) => { if (window.RZChrome && window.RZChrome.set) window.RZChrome.set(t); else document.documentElement.setAttribute('data-theme', t); }, theme);
+  await pg.evaluate(() => { const b = document.querySelector('#p-hall .dh-proj [data-view="iso"]'); if (b) b.click(); });
+  await wait(1200);
+  const t = await pg.evaluate(() => {
+    const rgb = (c) => { const m = /rgba?\(([^)]+)\)/.exec(c || ''); return m ? m[1].split(',').map(Number) : null; };
+    const lum = (c) => { const f = (v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]); };
+    const cr = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+    const root = document.querySelector('#hIso .fp-root'), slab = root && root.querySelector('.fp-slab');
+    const rk = root && [...root.querySelectorAll('.rack[data-state="neutral"], .rack[data-state="ok"]')][0];
+    if (!slab || !rk) return { err: 'no slab or rack', proj: root && root.getAttribute('data-proj') };
+    let bgEl = document.getElementById('hIso'), bg = rgb(getComputedStyle(bgEl).backgroundColor);
+    while (bg && bg.length === 4 && bg[3] === 0 && bgEl.parentElement) { bgEl = bgEl.parentElement; bg = rgb(getComputedStyle(bgEl).backgroundColor); }
+    const cs = getComputedStyle(slab), sf = rgb(cs.fill), a = (+cs.fillOpacity) * (sf[3] != null ? sf[3] : 1);
+    const slabC = [0, 1, 2].map((i) => sf[i] * a + bg[i] * (1 - a));
+    const body = rgb(getComputedStyle(rk.querySelector('.rk-front')).fill), top = rgb(getComputedStyle(rk.querySelector('.rk-top')).fill);
+    return { proj: root.getAttribute('data-proj'), slab: slabC.map(Math.round), body, top, slabBody: +cr(slabC, body).toFixed(2), bodyTop: +cr(body, top).toFixed(2) };
+  });
+  ok('HV-T1', !t.err && t.proj === 'iso', `${theme}: 3D floor not measurable (${JSON.stringify(t)})`);
+  ok('HV-T1', !t.err && t.slabBody >= 1.25, `${theme}: slab/body contrast ${t.slabBody} (slab ${t.slab}, body ${t.body}), want >= 1.25`);
+  ok('HV-T1', !t.err && t.bodyTop >= 1.1, `${theme}: body/top contrast ${t.bodyTop} (body ${t.body}, top ${t.top}), want >= 1.1`);
+  if (SHOTS) await pg.screenshot({ path: path.join(SHOTS, `hv-3d-${theme}-1440.png`) });
+  await pg.close();
 }
 /* HV-D1 static: no Math.random reachable from the view code */
 for (const f of ['js/datahall-ai/hall-iso.js', 'js/conv/floor-plan.js']) {

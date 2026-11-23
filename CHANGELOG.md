@@ -11,6 +11,27 @@ release sections rather than semver.
 
 ---
 
+## v3.101.0 — 2026-11-23 — DC AI floor gets lenses, a legend and honest standby lamps
+
+PRD-DCAI-HALL-DEPTH Amendment 1, phase A2 (owner: "3dnya masih jelek banyak parameter, animasi state, indikasi banyak yg belum ada").
+
+- **Lens bar.** The DC AI Data Hall 2D and 3D floors share one lens bar: Status · Thermal · Cooling · Power · Layout.
+  The choice is stored in `rz.dcai.lens`, and Status is the default. Each lens is one paint mode of the shared
+  floor renderer, so the Conventional hall is unchanged.
+- **Legend you can see.** The legend for the active lens sits in a column beside the stage, with run and standby
+  lamp keys. The gate now proves the legend is the topmost element at its centre. A legend clipped by the stage, or
+  one that pushed the floor off the first screen, does not pass.
+- **Standby lamps.** Standby fan-wall modules and CDUs show a hollow grey lamp (`data-lamp="stby"`) instead of no
+  lamp. There are 2 at design, equal to the engine's installed − duty.
+- **Power lens rated honestly.** A rack is coloured against its installed power shelves (`power.shelf_installed_kw`).
+  The old rating was the rack load itself, so every rack read 100 % (alarm red).
+- **3D tones proven.** Slab, body and top are three tones in both themes, with measured contrast: dark 2.79 / 1.65,
+  light 1.85 / 1.39 (law ≥ 1.25 / ≥ 1.1).
+- **Phone.** The summary and the view switch share row one, with the full summary in the tooltip. The lens bar is
+  row two. The floor still starts ≤ 260 px below the tabs.
+- Gate: `test-dcai-hall-views.mjs` adds L1, S0 and T1 to the ship-gate line. L1 and S0 were red on v3.99.0 (6 of
+  8). T1 was red on a body = top mutation (contrast 1.00).
+
 ## v3.100.0 — 2026-11-23 — EPMS power flows at its load, switching sweeps downstream, LV reaches the rack
 
 Owner requests R190 ("sempurnakan systemnya sld … animasinya") and R191 ("LV itu gambarannya sampai PDU/PDC kemudian ke

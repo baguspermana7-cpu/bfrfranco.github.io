@@ -25,6 +25,13 @@
   var panel = doc.getElementById('p-hall'), svg = doc.getElementById('hSvg');
   if (!panel || !svg) return;
 
+  /* PRD-DCAI-HALL-DEPTH A2 §4.3: one lens bar for 2D and 3D, each lens one floor-plan paint mode */
+  var LENS_KEY = 'rz.dcai.lens', LENSES = [['status', 'Status', 'alarms', 'Lamps and alarms only'], ['thermal', 'Thermal', 'temp', 'Rack inlet against the ASHRAE A1 limit'],
+    ['cooling', 'Cooling', 'cooling-margin', 'Cooling margin per rack; fan-wall and CDU run / standby'], ['power', 'Power', 'power', 'Rack kW against its rating'],
+    ['layout', 'Layout', 'space', 'Occupied and spare positions']];
+  function lensMode(l) { for (var i = 0; i < LENSES.length; i++) if (LENSES[i][0] === l) return LENSES[i][2]; return 'alarms'; }
+  function lensStored() { try { var v = win.localStorage.getItem(LENS_KEY); return lensMode(v) && LENSES.some(function (d) { return d[0] === v; }) ? v : null; } catch (e) { return null; } }
+  var lens = lensStored() || 'status', lensBar = null, legendBox = null;
   var lastHall = '', geo = null, model = null, inst = null, host = null, wrap = null, bar = null, sum = null, view = null, timer = 0, sig = '';
   function pad2(n) { return (n < 10 ? '0' : '') + n; }
   function stored() { try { var v = win.localStorage.getItem(KEY); return VIEWS.indexOf(v) >= 0 ? v : null; } catch (e) { return null; } }
@@ -42,14 +49,20 @@
       '.dh-sum{min-width:0;color:var(--t2);font:500 12px/1.3 "IBM Plex Mono",ui-monospace,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
       '.dh-sum b{color:var(--t1);font-weight:600}',
       '#p-hall[data-dh-view="drawing"] .dh-sum{visibility:hidden}',
-      '@media (max-width:600px){.dh-proj{flex-wrap:wrap;gap:6px}.dh-sum{flex:1 1 100%;white-space:normal}.dh-proj [role=group]{margin-left:auto}}',
+      /* a phone: summary (one line, full text in its tooltip) and the view switch share row one, the lens bar is row two */
+      '@media (max-width:600px){.dh-proj{flex-wrap:wrap;gap:6px}.dh-sum{flex:1 1 0;order:1}.dh-proj [role=group]{order:2;margin-left:auto}}',
       '.dh-proj [role=group]{display:inline-flex;border:1px solid var(--bd);border-radius:4px;overflow:hidden}',
       '.dh-proj button{appearance:none;margin:0;min-width:48px;height:26px;padding:0 12px;border:0;background:transparent;color:var(--t2);font:600 11px/26px "IBM Plex Sans",system-ui,sans-serif;letter-spacing:.04em;cursor:pointer}',
       '.dh-proj button+button{border-left:1px solid var(--bd)}',
       '.dh-proj button[aria-pressed="true"]{color:var(--t1);background:var(--bg3)}',
+      '.dh-proj [role=toolbar]{display:inline-flex;margin-left:auto;border:1px solid var(--bd);border-radius:4px;overflow:hidden}',
+      '#p-hall[data-dh-view="drawing"] .dh-proj [role=toolbar]{visibility:hidden}',
+      /* the lens legend: one column beside the stage (the floor is height-bound, the room to its right is free) */
+      '#hIsoWrap .dh-legend{flex-direction:column;align-items:flex-start;gap:6px;padding-top:4px}',
+      '@media (max-width:600px){.dh-proj [role=toolbar]{order:3;flex:1 1 100%;margin-left:0}.dh-proj [role=toolbar] button{flex:1 1 0;min-width:0;padding:0 4px}}',
       '.dh-proj button:focus-visible{outline:2px solid var(--c);outline-offset:-2px}',
       '@media (max-width:600px){.dh-proj button{height:40px;line-height:40px;min-width:56px}}',
-      '#hIsoWrap{display:none;margin:0}#p-hall:not([data-dh-view="drawing"]) #hIsoWrap{display:block}',
+      '#hIsoWrap{display:none;margin:0}#p-hall:not([data-dh-view="drawing"]) #hIsoWrap{display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px 16px}',
       '#hIso{display:none;box-sizing:content-box;background:var(--bg2);border:1px solid var(--bd);border-radius:4px;overflow:hidden}',
       '#p-hall:not([data-dh-view="drawing"]) #hIso{display:block}',
       /* 2D / 3D: the drawing, its legibility note, layer bar and key speak of the drawing — out of the way */
@@ -67,6 +80,14 @@
     bar = doc.createElement('div'); bar.className = 'dh-proj';
     sum = doc.createElement('div'); sum.className = 'dh-sum'; sum.title = 'Hall totals from the engine; the full cards are on the Drawing view';
     bar.appendChild(sum);
+    /* the lens bar (role toolbar, so the view switch stays the panel's one role=group) */
+    lensBar = doc.createElement('div'); lensBar.setAttribute('role', 'toolbar'); lensBar.setAttribute('aria-label', 'Floor lens'); bar.appendChild(lensBar);
+    LENSES.forEach(function (d) {
+      var b = doc.createElement('button'); b.type = 'button'; b.setAttribute('data-lens', d[0]); b.textContent = d[1]; b.title = d[3];
+      b.setAttribute('aria-pressed', d[0] === lens ? 'true' : 'false');
+      b.addEventListener('click', function () { setLens(d[0], true); });
+      lensBar.appendChild(b);
+    });
     var g = doc.createElement('div'); g.setAttribute('role', 'group'); g.setAttribute('aria-label', 'Hall view'); bar.appendChild(g);
     [['flat', '2D', 'Top view of the floor, one symbol per unit'], ['iso', '3D', 'Isometric floor'],
      ['drawing', 'Drawing', 'Engineering drawing with every layer, sensor and dimension']].forEach(function (d) {
@@ -108,7 +129,9 @@
     for (i = 1; i <= G.crahInst; i++) crah.push({ n: i, tag: 'CRAH-' + pad2(i), running: G.crahAct == null || i <= G.crahAct, ref: 'crah:' + pad2(i) });
     for (i = 1; i <= G.cduInst; i++) cdu.push({ n: 1000 + i, tag: 'CDU-' + pad2(i), running: G.cduRun == null || i <= G.cduRun, ref: 'cdu:' + i });
     model = {
-      racks: racks, zones: zones, crahUnits: crah, cduUnits: cdu, racksPerZone: perZone, ratingKw: G.kwRack,
+      racks: racks, zones: zones, crahUnits: crah, cduUnits: cdu, racksPerZone: perZone,
+      /* Power lens: rack kW against the rack's installed power-shelf rating (engine power.shelf_installed_kw); no rating, no colour */
+      ratingKw: G.rackRatedKw || 0,
       rackInletFor: function (idx) {
         var zz = Math.floor(idx / perZone), j = (idx % perZone) % G.perRow, si = Math.min(G.sp - 1, Math.floor(j * G.sp / G.perRow));
         var v = num('C' + zz + si + 't'); return v != null ? v : zones[zz].rackInletC;
@@ -136,11 +159,11 @@
     if (inst && inst.destroy) inst.destroy();
     host.setAttribute('data-rz-hall', String(win.currentDH || 1));
     inst = win.RZFloorPlan.render(host, model, {
-      projection: view === 'flat' ? 'plan' : 'iso', toggle: false, mode: 'temp', maxBands: 1, projKey: 'rz.dcai.fp', measure: wrap,
+      projection: view === 'flat' ? 'plan' : 'iso', toggle: false, mode: lensMode(lens), maxBands: 1, projKey: 'rz.dcai.fp', measure: wrap,
       /* the whole hall on the first screen, both axes, at every width: the stage takes what is left of the viewport below
          its own top (HV-F1); fitAll lets the unit shrink below the plan's label floor (labels live in tooltips) */
       height: function () { var t = wrap.getBoundingClientRect().top + (win.pageYOffset || 0); return Math.max(260, (win.innerHeight || 900) - bottomInset() - t - 12); },
-      watchHeight: false, fitAll: true, tagFit: true,
+      watchHeight: false, fitAll: true, tagFit: true, stbyLamp: true,
       rackTag: function (i) { return model.racks[i].ref.replace('rack-unit:', ''); },
       zoneTag: function (z) { return 'Rows R' + pad2(2 * z + 1) + ' and R' + pad2(2 * z + 2) + ', one contained hot aisle'; },
       zoneHead: function (z) { return 'R' + pad2(2 * z + 1) + '/' + pad2(2 * z + 2); },
@@ -148,6 +171,27 @@
     });
     if (keepMode && keepMode !== inst.mode) inst.paint(keepMode);
     if (keepSel && sameHall) inst.select(keepSel);
+    drawLegend();
+  }
+
+  /* the legend of the lens, beside the floor (HV-L1); run / standby lamps on every lens but Layout */
+  function drawLegend() {
+    if (!wrap || !win.RZFloorPlan) return;
+    if (!legendBox) { legendBox = doc.createElement('div'); legendBox.setAttribute('aria-label', 'Lens legend'); wrap.appendChild(legendBox); }
+    win.RZFloorPlan.legend(legendBox, lensMode(lens));
+    if (lens !== 'layout') [['run', 'run'], ['stby', 'standby']].forEach(function (d) {
+      var it = doc.createElement('span'); it.className = 'lg-item';
+      var sw = doc.createElement('span'); sw.className = 'fp-sw'; sw.setAttribute('data-state', d[0]); it.appendChild(sw);
+      it.appendChild(doc.createTextNode(d[1])); legendBox.appendChild(it);
+    });
+    legendBox.className = 'fp-legend dh-legend';
+  }
+  function setLens(l, user) {
+    if (!LENSES.some(function (d) { return d[0] === l; })) return;
+    lens = l;
+    if (user) { try { win.localStorage.setItem(LENS_KEY, l); } catch (e) { /* storage blocked */ } }
+    if (lensBar) [].forEach.call(lensBar.querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-lens') === l ? 'true' : 'false'); });
+    if (inst) { inst.paint(lensMode(l)); drawLegend(); }
   }
 
   function set(v, user) {
@@ -160,7 +204,7 @@
     else stop();
   }
   /* the floor is rebuilt when the hall or the projection changes; a switch between 2D and 3D redraws, never re-runs the engine */
-  function key() { return geo ? [geo.rows, geo.perRow, geo.crahInst, geo.crahAct, geo.cduInst, geo.cduRun, geo.kwRack, win.currentDH, view].join('|') : ''; }
+  function key() { return geo ? [geo.rows, geo.perRow, geo.crahInst, geo.crahAct, geo.cduInst, geo.cduRun, geo.kwRack, geo.rackRatedKw, win.currentDH, view].join('|') : ''; }
   /* whatever covers the bottom of the viewport and is not the floor's own column — a fixed or sticky bar, or on a phone
      the hall sidebar that precedes the main column in the DOM but is laid over its bottom (flex order) — leaves the
      floor less height: measure it, never assume it. Content that merely FOLLOWS the floor in the flow is not a cover
@@ -181,6 +225,7 @@
     if (!sum || !geo) return;
     sum.innerHTML = 'IT <b>' + grp(geo.itKw) + ' kW</b> · Liquid <b>' + grp(geo.liqKw) + ' kWth</b>' + (geo.liqPct != null ? ' (' + grp(geo.liqPct) + ' %)' : '') +
       ' · Air <b>' + grp(geo.airKw) + ' kWth</b>';
+    sum.title = sum.textContent + ' (engine design values; the full cards are on the Drawing view)';
   }
 
   /* live: the aisle readouts move every few seconds; paint() writes attributes only */
@@ -198,7 +243,7 @@
     /* renderHall calls this after every plan build, with the engine counts it read */
     update: function (g) {
       if (!g || !(g.rows > 0) || !(g.perRow > 0) || g.rows % 2) return;
-      geo = { rows: g.rows, perRow: g.perRow, kwRack: g.kwRack || 0, crahInst: g.crahInst || 0, crahAct: g.crahAct, cduInst: g.cduInst || 0, cduRun: g.cduRun, sp: g.sp || 3, supplyC: g.supplyC, returnC: g.returnC,
+      geo = { rows: g.rows, perRow: g.perRow, kwRack: g.kwRack || 0, rackRatedKw: g.rackRatedKw, crahInst: g.crahInst || 0, crahAct: g.crahAct, cduInst: g.cduInst || 0, cduRun: g.cduRun, sp: g.sp || 3, supplyC: g.supplyC, returnC: g.returnC,
         itKw: g.itKw, liqKw: g.liqKw, liqPct: g.liqPct, airKw: g.airKw };
       ui(); summary();
       var changed = sig !== key();

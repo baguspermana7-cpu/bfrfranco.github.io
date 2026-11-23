@@ -120,6 +120,9 @@
     '.fp-perf{fill:none;stroke:var(--fp-ink);stroke-opacity:.16;stroke-width:1}',
     '.cr-lamp,.rk-lamp{stroke:none;fill:none;pointer-events:none}.cr-lamp[data-lamp="run"],.rk-lamp[data-lamp="run"]{fill:var(--rz-pt-ok)}',
     '.cr-lamp[data-lamp="warn"],.rk-lamp[data-lamp="warn"]{fill:var(--rz-pt-warn)}.cr-lamp[data-lamp="alarm"],.rk-lamp[data-lamp="alarm"]{fill:var(--rz-pt-alarm)}',
+    /* opts.stbyLamp (DC AI, PRD-DCAI-HALL-DEPTH A2 / HV-S0): a standby unit's lamp is a hollow grey ring, never green */
+    '.cr-lamp[data-lamp="stby"]{fill:none;stroke:var(--fp-muted);stroke-width:1px;vector-effect:non-scaling-stroke}',
+    '.fp-sw[data-state="stby"]{background:transparent;border-color:var(--fp-muted);border-radius:50%}.fp-sw[data-state="run"]{background:var(--rz-pt-ok);border-radius:50%}',
     '.fp-proj{position:absolute;z-index:3;top:4px;left:4px;display:inline-flex;border:1px solid var(--fp-ink);border-color:color-mix(in srgb,var(--fp-ink) 24%,transparent);border-radius:3px;background:var(--fp-surface)}',
     '.fp-proj-btn{appearance:none;margin:0;min-width:44px;height:24px;padding:0 10px;border:0;border-radius:0;background:transparent;color:var(--fp-muted);font:600 11px/24px "IBM Plex Sans",system-ui,sans-serif;cursor:pointer}',
     '.fp-proj-btn+.fp-proj-btn{border-left:1px solid var(--fp-ink);border-left-color:color-mix(in srgb,var(--fp-ink) 24%,transparent)}',
@@ -582,7 +585,7 @@
           f = fillFor(st);
           setAttr(ch.p.top, 'fill', 'var(--fp-' + st + '-t1)'); setAttr(ch.p.front, 'fill', f.front); setAttr(ch.p.side, 'fill', f.side);
           setAttr(ch.lamp, 'data-lamp', st === 'neutral' ? 'run' : st);
-        } else { setAttr(ch.p.top, 'fill', 'none'); setAttr(ch.p.front, 'fill', 'none'); setAttr(ch.p.side, 'fill', 'none'); setAttr(ch.lamp, 'data-lamp', 'off'); }
+        } else { setAttr(ch.p.top, 'fill', 'none'); setAttr(ch.p.front, 'fill', 'none'); setAttr(ch.p.side, 'fill', 'none'); setAttr(ch.lamp, 'data-lamp', opts.stbyLamp ? 'stby' : 'off'); }
       }
       host.setAttribute('data-unit', { power: 'kW', temp: '°C', 'cooling-margin': 'K', alarms: '%' }[mode] || '');
       root.setAttribute('data-mode', mode);
