@@ -2,19 +2,19 @@
 /* test-dcai-hall-iso.mjs — STRICT. PRD-DATAHALL-BMS-ISO F4: the DC AI Data Hall tab (datahallAI.html) gets the same
    3D / Plan floor as the Conventional data hall, through a geometry adapter (js/datahall-ai/hall-iso.js) over the one
    renderer (js/conv/floor-plan.js). Plan is the existing engineering drawing (#hSvg), unchanged. Signed in, real browser.
-   D1  1440: 3D is the default — the isometric floor (#hIso .fp-root[data-proj=iso]) is shown and the plan drawing is
-       not (#hSvg keeps only its header band, the plan's layer bar is hidden); a
-       3D | Plan toggle of two buttons with aria-pressed
+   D1  1440: 2D is the default (PRD-DCAI-HALL-DEPTH Amendment 1) — the floor (#hIso .fp-root[data-proj=plan]) is shown
+       and the drawing (#hSvg + its layer bar) is not; a 2D | 3D | Drawing switch of three buttons with aria-pressed.
+       D2-D4 and D6 read the 3D floor, opened with the stored view 'iso'
    D2  the 3D floor draws the engine's hall: racks = racksPerHall, fan-wall modules = crahInstalled (standby =
        installed - active), CDUs = cduInstalled (standby = installed - running), one hot-aisle roof per row pair
    D3  grey is normal: >= 95 % of racks have neutral faces (OKLCH C < 0.03) and a green lamp; a planted hot inlet turns
        that rack's faces red (alarm) and only that rack leaves the neutral set
    D4  true isometric: every rack front has the same height (+-0.5 px); rack top edges at 30 +-1 deg
-   D5  the toggle: Enter on Plan shows #hSvg and hides the 3D floor, the choice is stored (rz.dcai.proj) and survives a
-       reload; Space on 3D brings 3D back
+   D5  the switch: Enter on Drawing shows #hSvg and hides the floor, the choice is stored (rz.dcai.view) and survives
+       a reload; Space on 3D brings the 3D floor back
    D6  a 3D rack carries the plan's equipment reference (rack-unit:Rnn-kk), and a click on it opens the same HMI the
        plan opens
-   D7  390: Plan by default; page scrollWidth <= viewport in Plan and in 3D; 0 page errors in every run
+   D7  390: 2D by default; page scrollWidth <= viewport in Plan and in 3D; 0 page errors in every run
    D8  the 3D floor holds its size for 6 s and follows a window narrowed and widened back (it once shrank 2 px per
        resize round until it vanished: the renderer measured the bordered host it then resized)
    Usage: node tools/test-dcai-hall-iso.mjs [--shots=<dir>] */
@@ -41,7 +41,7 @@ if (SHOTS) fs.mkdirSync(SHOTS, { recursive: true });
 const fails = []; let checks = 0;
 const ok = (id, c, m) => { checks++; if (!c) fails.push(id + ' ' + m); };
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-const KEY = 'rz.dcai.proj';
+const KEY = 'rz.dcai.view';
 
 async function open(width, theme, proj) {
   const pg = await browser.newPage();
@@ -77,12 +77,12 @@ async function enter(pg) {
 const state = (pg) => pg.evaluate((key) => {
   const vis = (el) => !!el && el.getClientRects().length > 0 && getComputedStyle(el).visibility !== 'hidden';
   const iso = document.querySelector('#hIso .fp-root'), plan = document.getElementById('hSvg');
-  const btns = [...document.querySelectorAll('.dh-proj [data-proj]')];
+  const btns = [...document.querySelectorAll('.dh-proj [data-view]')];
   const bn = (k) => { const v = window.DHE ? window.DHE[k] : null; return typeof v === 'number' && isFinite(v) ? v : null; };   /* the page's engine snapshot */
   let stored = null; try { stored = localStorage.getItem(key); } catch (e) { /* none */ }
   return {
-    isoShown: vis(iso), planShown: vis(plan) && +(plan.getAttribute('viewBox') || '0 0 0 0').split(/\s+/)[3] > 400 && vis(document.getElementById('hallLayers')), isoProj: iso ? iso.getAttribute('data-proj') : null,
-    btns: btns.map((b) => ({ p: b.getAttribute('data-proj'), pressed: b.getAttribute('aria-pressed') })),
+    isoShown: vis(iso), planShown: vis(plan) && vis(document.getElementById('hallLayers')), isoProj: iso ? iso.getAttribute('data-proj') : null,
+    btns: btns.map((b) => ({ p: b.getAttribute('data-view'), pressed: b.getAttribute('aria-pressed') })),
     stored, vw: innerWidth, docW: document.documentElement.scrollWidth,
     racksHall: bn('racksPerHall'), crahInst: bn('crahInstalled'), crahAct: bn('crahActive'), cduInst: bn('cduInstalled'), cduRun: bn('cduRunning'),
     pairs: bn('rackRows') != null ? bn('rackRows') / 2 : null
@@ -127,10 +127,17 @@ const measure = (pg) => pg.evaluate(() => {
 /* ---------- 1440, both themes ---------- */
 for (const theme of ['dark', 'light']) {
   const T = `1440 ${theme}`;
-  const pg = await open(1440, theme);
+  {
+    const p0 = await open(1440, theme);
+    const s0 = await state(p0);
+    ok('D1', s0.isoShown && s0.isoProj === 'plan' && !s0.planShown, `${T}: default floor shown ${s0.isoShown} (proj ${s0.isoProj}), drawing shown ${s0.planShown} (need the 2D floor only)`);
+    ok('D1', s0.btns.length === 3 && s0.btns.map((b) => b.p + ':' + b.pressed).join(' ') === 'flat:true iso:false drawing:false', `${T}: switch ${JSON.stringify(s0.btns)}`);
+    ok('D7', !p0.errors.length, `${T} 2D: page errors ${p0.errors.slice(0, 2).join(' | ')}`);
+    await p0.close();
+  }
+  const pg = await open(1440, theme, 'iso');
   const s = await state(pg);
-  ok('D1', s.isoShown && s.isoProj === 'iso' && !s.planShown, `${T}: 3D shown ${s.isoShown} (proj ${s.isoProj}), plan shown ${s.planShown} (need 3D only)`);
-  ok('D1', s.btns.length === 2 && s.btns.some((b) => b.p === 'iso' && b.pressed === 'true') && s.btns.some((b) => b.p === 'plan' && b.pressed === 'false'), `${T}: toggle ${JSON.stringify(s.btns)}`);
+  ok('D1', s.isoShown && s.isoProj === 'iso' && !s.planShown, `${T}: stored 3D: floor ${s.isoShown} (proj ${s.isoProj}), drawing ${s.planShown}`);
   const m = await measure(pg);
   ok('D2', s.racksHall > 0 && m.n === s.racksHall, `${T}: ${m.n} racks drawn, engine racksPerHall ${s.racksHall}`);
   ok('D2', s.crahInst > 0 && m.crah === s.crahInst && m.crahStby === s.crahInst - s.crahAct, `${T}: ${m.crah} fan-wall modules (${m.crahStby} standby), engine ${s.crahInst} installed / ${s.crahAct} active`);
@@ -177,17 +184,17 @@ for (const theme of ['dark', 'light']) {
   }
   /* D5 toggle by keyboard, stored, survives a reload */
   await pg.keyboard.press('Escape');
-  await pg.focus('.dh-proj [data-proj="plan"]').catch(() => {});
+  await pg.focus('.dh-proj [data-view="drawing"]').catch(() => {});
   await pg.keyboard.press('Enter'); await wait(600);
   const s1 = await state(pg);
-  ok('D5', s1.planShown && !s1.isoShown && s1.stored === 'plan', `${T}: Enter on Plan -> plan ${s1.planShown}, 3D ${s1.isoShown}, stored ${s1.stored}`);
+  ok('D5', s1.planShown && !s1.isoShown && s1.stored === 'drawing', `${T}: Enter on Drawing -> drawing ${s1.planShown}, floor ${s1.isoShown}, stored ${s1.stored}`);
   await pg.reload({ waitUntil: 'networkidle2', timeout: 90000 }); await wait(800); await enter(pg);
   const s2 = await state(pg);
-  ok('D5', s2.planShown && !s2.isoShown, `${T}: after reload plan ${s2.planShown}, 3D ${s2.isoShown} (stored ${s2.stored})`);
-  await pg.focus('.dh-proj [data-proj="iso"]').catch(() => {});
+  ok('D5', s2.planShown && !s2.isoShown, `${T}: after reload drawing ${s2.planShown}, 3D ${s2.isoShown} (stored ${s2.stored})`);
+  await pg.focus('.dh-proj [data-view="iso"]').catch(() => {});
   await pg.keyboard.press('Space'); await wait(1200);
   const s3 = await state(pg);
-  ok('D5', s3.isoShown && !s3.planShown && s3.stored === 'iso', `${T}: Space on 3D -> 3D ${s3.isoShown}, plan ${s3.planShown}, stored ${s3.stored}`);
+  ok('D5', s3.isoShown && s3.isoProj === 'iso' && !s3.planShown && s3.stored === 'iso', `${T}: Space on 3D -> 3D ${s3.isoShown} (proj ${s3.isoProj}), drawing ${s3.planShown}, stored ${s3.stored}`);
   ok('D7', !pg.errors.length, `${T}: page errors ${pg.errors.slice(0, 2).join(' | ')}`);
   await pg.close();
 }
@@ -197,9 +204,12 @@ for (const theme of ['dark', 'light']) {
   const T = '390 dark';
   const pg = await open(390, 'dark');
   const s = await state(pg);
-  ok('D7', s.planShown && !s.isoShown, `${T}: default plan ${s.planShown}, 3D ${s.isoShown} (need Plan on a phone)`);
-  ok('D7', s.docW <= s.vw + 1, `${T}: Plan: page scrollWidth ${s.docW} in ${s.vw}`);
-  await pg.evaluate(() => { const b = document.querySelector('.dh-proj [data-proj="iso"]'); if (b) b.click(); }); await wait(1500);
+  ok('D7', s.isoShown && s.isoProj === 'plan' && !s.planShown, `${T}: default 2D floor ${s.isoShown} (proj ${s.isoProj}), drawing ${s.planShown} (need 2D on a phone)`);
+  ok('D7', s.docW <= s.vw + 1, `${T}: 2D: page scrollWidth ${s.docW} in ${s.vw}`);
+  await pg.evaluate(() => { const b = document.querySelector('.dh-proj [data-view="drawing"]'); if (b) b.click(); }); await wait(1200);
+  const sd = await state(pg);
+  ok('D7', sd.planShown && sd.docW <= sd.vw + 1, `${T}: Drawing shown ${sd.planShown}, page scrollWidth ${sd.docW} in ${sd.vw}`);
+  await pg.evaluate(() => { const b = document.querySelector('.dh-proj [data-view="iso"]'); if (b) b.click(); }); await wait(1500);
   const s1 = await state(pg);
   ok('D7', s1.isoShown && s1.docW <= s1.vw + 1, `${T}: 3D shown ${s1.isoShown}, page scrollWidth ${s1.docW} in ${s1.vw}`);
   if (SHOTS) await pg.screenshot({ path: path.join(SHOTS, 'dcai-iso-dark-390.png') });
@@ -208,6 +218,7 @@ for (const theme of ['dark', 'light']) {
 }
 
 /* ---------- D8: the 3D floor holds its size (owner 2026-11-22: "bergerak membesar kemudian mengecil kemudian hilang").
+   The window keeps its height (900) while it narrows: since A1 the floor also fits the viewport height.
    The renderer sets the host width from what it measures; measuring the bordered host itself shrank it 2 px per
    ResizeObserver round, for ever. Now: no change over 6 s, and a window narrowed and widened again restores it. ---------- */
 {
@@ -216,9 +227,9 @@ for (const theme of ['dark', 'light']) {
   const size = () => pg.evaluate(() => { const h = document.getElementById('hIso'); if (!h) return null; const b = h.getBoundingClientRect(); return [Math.round(b.width), Math.round(b.height)]; });
   const a = await size(); await wait(6000); const b = await size();
   ok('D8', a && b && a[0] > 600 && Math.abs(a[0] - b[0]) <= 1 && Math.abs(a[1] - b[1]) <= 1, `${T}: 3D floor moved on its own: ${JSON.stringify(a)} -> ${JSON.stringify(b)} in 6 s`);
-  await pg.setViewport({ width: 1100, height: 1000 }); await wait(1500);
+  await pg.setViewport({ width: 760, height: 900 }); await wait(1500);
   const n = await size();
-  await pg.setViewport({ width: 1440, height: 1000 }); await wait(1500);
+  await pg.setViewport({ width: 1440, height: 900 }); await wait(1500);
   const w = await size();
   ok('D8', n && w && n[0] < b[0] && Math.abs(w[0] - b[0]) <= 2, `${T}: narrowed ${JSON.stringify(n)}, widened back ${JSON.stringify(w)}, need ${JSON.stringify(b)}`);
   ok('D8', !pg.errors.length, `${T}: page errors ${pg.errors.slice(0, 2).join(' | ')}`);
@@ -226,6 +237,6 @@ for (const theme of ['dark', 'light']) {
 }
 
 await browser.close(); srv.close();
-console.log(`DC AI hall 3D / Plan (PRD-DATAHALL-BMS-ISO F4): ${checks - fails.length}/${checks} checks`);
+console.log(`DC AI hall 2D / 3D / Drawing (PRD-DATAHALL-BMS-ISO F4 + PRD-DCAI-HALL-DEPTH A1): ${checks - fails.length}/${checks} checks`);
 fails.forEach((f) => console.log('  FAIL ' + f));
 process.exit(fails.length ? 1 : 0);

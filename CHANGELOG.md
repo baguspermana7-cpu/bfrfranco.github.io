@@ -11,6 +11,52 @@ release sections rather than semver.
 
 ---
 
+## v3.99.0 — 2026-11-23 — DC AI hall opens flat: 2D · 3D · Drawing; floor PDUs counted by the engine
+
+Owner request 2026-11-23 ("button flat 2d nya belum ada … default ia 2d"), PRD-DCAI-HALL-DEPTH Amendment 1, phase A1. Conventional engine 2.8.0 → 2.9.0 (E18 PDU keys for the peer's LV sheet).
+
+### Added
+- **A 2D · 3D · Drawing switch on the DC AI Data Hall tab** (`js/datahall-ai/hall-iso.js` 2.0.0).
+  - 2D is the default. It is the same floor as 3D, drawn by `js/conv/floor-plan.js` in its plan projection.
+  - Drawing is the engineering drawing (`#hSvg`) as before.
+  - Arrow keys move between the three buttons. The choice is stored in `rz.dcai.view`. `?view=flat|iso|drawing`
+    wins over it, and the old `rz.dcai.proj` key is removed.
+  - One summary line above the floor shows IT kW, liquid kWth with its capture share, and air kWth. All three are
+    engine values (`itHall`, `liquidHeat`, `liquidCapturePct`, `airHeat`).
+- **Floor PDU keys for the LV sheet** (`js/conv-engine.js` 2.9.0, PRD-ELECTRICAL-BMS E18, owner R191).
+  - Authored inputs: `pdu_kva_rated` 300 kVA (ASSUMED, no submittal), `pdu_power_factor` 0.95 (ASSUMED),
+    `pdu_max_loading_pct` 80 % (NFPA 70 §215.3 / §210.20(A), continuous load), and `racks_per_row` 20 (the authored
+    Conventional floor).
+  - Derived: `pdu_per_hall_per_stream` = ceil(hall IT design kW / (kVA × pf × loading)) = **44**. Under 2N, one stream
+    alone carries the hall.
+  - Loading is **39.9 %** with both streams in service and **79.7 %** on one stream. `rows_per_hall` is **25** and
+    `racks_per_pdu` is **12**.
+  - Ten registry rows are added (357 parameters). The new derived rows have a `formulaExpr`, and
+    `test-conv-formula` evaluates them.
+  - Gate `tools/test-conv-pdu-keys.mjs` (21 checks). It fails 11 of 21 on engine 2.8.0.
+  - The pins on the 8 Conventional pages are now `conv-engine.js?v=2.9.0`.
+- Gate `tools/test-dcai-hall-views.mjs` V1–V3, F1, F2, D1 (28 checks) in `ship-gate.sh`.
+  - It fails 9 checks on the v3.97.0 tree.
+  - V3 is also red with the keep logic removed.
+
+### Changed
+- **The floor fits the first screen at 1440 and 390.**
+  - The stage height is the viewport below the switch bar, less any fixed or earlier bar that covers the bottom.
+    On a phone that bar is the cockpit sidebar.
+  - `floor-plan.js` gains two opt-in options. `fitAll` lets the unit shrink below the label floor. `tagFit` hides
+    a tag that overlaps one already shown, or that crosses the stage edge.
+  - The Conventional hall does not use either option and is unchanged (`test-conv-datahall-space` 43 pass).
+- The selected rack and the lens stay when you switch between 2D and 3D on the same hall. The floor is not
+  rebuilt for the switch (`RZHallIso.update` count 0).
+- In 2D and 3D, the drawing's layer bar, key and legibility note are hidden. They show again in Drawing.
+- On a phone, the KPI strip is one scrolling row, and the switch bar wraps.
+- The DC AI gates that read `#hSvg` open the Drawing view first (`tools/lib/cockpit-tabs.mjs` `reveal`). `test-dh-hall`
+  loads `?view=drawing`. `test-dcai-hall-iso` is ported to the three-button model (D1–D8).
+
+Standards: `HMI_DRAWING_STANDARD.md` §4f (adapter bullet), `UIUX_AUDIT_LEDGER.md` row DCAI-A1.
+
+---
+
 ## v3.98.0 — 2026-11-23 — Trapped keys are drawn and enforced
 
 Owner R191 ("tidak ada indikasi castell key untuk trapped key"), PRD-ELECTRICAL-BMS §A5 decision 8, law E16. Gate:

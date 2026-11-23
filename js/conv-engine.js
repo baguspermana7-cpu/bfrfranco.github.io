@@ -792,6 +792,16 @@
             genset_max_loading: 0.8,
             // source: ASSUMED N+1 per hall block (plan E-1). evidenceClass: 'ASSUMED'
             genset_spare_per_hall: 1,
+            /* 2.9.0 (PRD-ELECTRICAL-BMS E18, owner R191): LV below the distribution transformer — floor PDU per
+             * stream per hall. No PDU submittal exists for this site. */
+            // source: ASSUMED floor-standing PDU unit rating (no submittal). evidenceClass: 'ASSUMED'
+            pdu_kva_rated: 300,
+            // source: ASSUMED IT load power factor at the PDU output. evidenceClass: 'ASSUMED'
+            pdu_power_factor: 0.95,
+            // source: NFPA 70 §215.3 / §210.20(A) — a continuous load at most 80 % of the overcurrent device rating. evidenceClass: 'STANDARD'
+            pdu_max_loading_pct: 80,
+            // source: datahall.html authored floor layout, AUTHORED_RACKS_PER_ZONE = 20 cabinets per row. evidenceClass: 'ADOPTED'
+            racks_per_row: 20,
             // source: PRD §8.2 OD-5 — numerical-relay grading margin. evidenceClass: 'ASSUMED'
             pro_grading_margin_s: 0.3,
             // source: ASSUMED training pickup multiples of the protected FLA. evidenceClass: 'ASSUMED'
@@ -911,7 +921,7 @@
             basis: 'Adopted project scenario — simulated, not measured telemetry',
             basis_doc: 'conv/review/09-engineering-basis-and-calculations.md',
             study_doc: 'js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)',
-            version: '2.8.0'
+            version: '2.9.0'
         }
     };
 
@@ -1000,6 +1010,9 @@
         /* Per-hall design facility load; counts are summed hall by hall. */
         var halls = m.campus.halls, hallKwMax = 0, distTotal = 0, gensetTotal = 0;
         var distPerStream = 0, gensetPerHall = 0;
+        /* 2.9.0 (E18): 2N — each stream's PDUs carry the whole hall IT design load alone. */
+        var pduKw = e.pdu_kva_rated * e.pdu_power_factor * e.pdu_max_loading_pct / 100;
+        var itKwMax = 0, pduPerStream = 0, pduRacks = 0;
         var unitGenKw = e.genset_unit_kw * e.genset_max_loading;
         var n1MarginMin = null;
         for (var h = 0; h < halls.length; h++) {
@@ -1011,7 +1024,13 @@
             gensetTotal += gens;
             if (hallKw > hallKwMax) { hallKwMax = hallKw; distPerStream = perStream; gensetPerHall = gens; }
             if (n1MarginMin === null || margin < n1MarginMin) n1MarginMin = margin;
+            if (halls[h].it_design_kw > itKwMax) {
+                itKwMax = halls[h].it_design_kw;
+                pduPerStream = Math.ceil(itKwMax / pduKw);
+                pduRacks = halls[h].racks;
+            }
         }
+        var rowsPerHall = pduRacks % e.racks_per_row === 0 ? pduRacks / e.racks_per_row : null;
         var hallKva = hallKwMax / pf;
         var distMvFla = e.dist_tx_kva / (SQRT3 * e.mv_voltage_kv);
         var distLvFla = e.dist_tx_kva * 1000 / (SQRT3 * e.lv_voltage_v);
@@ -1095,6 +1114,12 @@
             dist_tx_fla_lv_a: round1(distLvFla),
             lv_fault_level_ka: r2n(lvFaultKa),
             dist_tx_through_fault_mv_a: r1n(throughMvA),
+            pdu_kw_usable: round1(pduKw),
+            pdu_per_hall_per_stream: pduPerStream,
+            pdu_load_pct_normal: round1(itKwMax / e.dist_tx_streams / (pduPerStream * e.pdu_kva_rated * e.pdu_power_factor) * 100),
+            pdu_load_pct_contingency: round1(itKwMax / (pduPerStream * e.pdu_kva_rated * e.pdu_power_factor) * 100),
+            rows_per_hall: rowsPerHall,
+            racks_per_pdu: Math.ceil(pduRacks / pduPerStream),
             genset_per_hall: gensetPerHall,
             genset_count: gensetTotal,
             genset_n1_margin_pct: n1MarginMin === null ? null : round1(n1MarginMin),
@@ -1129,6 +1154,7 @@
         'dist_tx_kva', 'dist_tx_impedance_pct', 'dist_tx_streams', 'lv_voltage_v',
         'dist_tx_type', 'dist_tx_p0_w', 'dist_tx_pk_w', 'hv_tx_pei_min',
         'genset_unit_kw', 'genset_max_loading', 'genset_spare_per_hall',
+        'pdu_kva_rated', 'pdu_power_factor', 'pdu_max_loading_pct', 'racks_per_row',
         'pro_grading_margin_s', 'pro_feeder_pickup_x', 'pro_incomer_pickup_x', 'pro_hv_pickup_x',
         'pro_inst_x', 'pro_feeder_inst_s', 'pro_lv_isd_x', 'pro_lv_tsd_s', 'pro_lv_tr_s', 'pro_tms_step',
         'pro_tms_max', 'pro_feeder_curve', 'pro_incomer_curve', 'pro_hv_curve',

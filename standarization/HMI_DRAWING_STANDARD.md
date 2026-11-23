@@ -226,11 +226,17 @@ Data Hall tab (F4, v3.92.0) through its adapter `js/datahall-ai/hall-iso.js` (be
   - The adapter turns the page's engine counts into the renderer's model. `racksPerZone` sets the line length.
     `cduUnits` adds a CDU line between the cabinets and the south gallery (no fan). `racks[i].ref` and `unit.ref`
     become `data-rz-equipment`, so the page's own click opens its HMI.
-  - The page may own the switch (`opts.toggle: false`). On DC AI, Plan is the page's engineering drawing (`#hSvg`),
-    kept whole. In 3D that drawing keeps only its header band, and its layer bar and key are hidden. The stored key is
-    `rz.dcai.proj`.
+  - The page may own the switch (`opts.toggle: false`). On DC AI the switch is three buttons, **2D · 3D · Drawing**
+    (PRD-DCAI-HALL-DEPTH Amendment 1, v3.99.0). 2D is the default; it is the same floor in `floor-plan.js`'s plan
+    projection. Drawing is the page's engineering drawing (`#hSvg`), kept whole. In 2D and 3D that drawing keeps only
+    its header band, and its layer bar, key and legibility note are hidden. The stored key is `rz.dcai.view`
+    (`flat` | `iso` | `drawing`); `?view=` wins over it; the old key `rz.dcai.proj` is removed on load.
+  - 2D and 3D open with the floor on the first screen: the stage height is the viewport below the switch bar minus
+    any fixed or earlier bar covering the bottom. `fitAll` lets the unit shrink below the label floor; `tagFit` hides
+    a tag that overlaps a shown one or crosses the stage edge. Both are options: the Conventional hall is unchanged.
+  - The selected rack and the lens survive a switch between 2D and 3D on the same hall.
   - Every number the 3D floor prints is hooked or declared for `test-dcai-coverage`.
-  - Gate: `tools/test-dcai-hall-iso.mjs` D1–D7.
+  - Gate: `tools/test-dcai-hall-iso.mjs` D1–D8 and `tools/test-dcai-hall-views.mjs` V1–V3, F1, F2, D1.
 
 ## 4g. Electrical sheets (PRD-ELECTRICAL-BMS, owner R186/R190/R192/R193, v3.94.0)
 

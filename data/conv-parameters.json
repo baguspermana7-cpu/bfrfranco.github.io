@@ -1,6 +1,6 @@
 {
   "generatedBy": "tools/build-conv-parameter-registry.mjs",
-  "engineVersion": "2.8.0",
+  "engineVersion": "2.9.0",
   "note": "GENERATED — do not hand-edit. Curated metadata lives in data/conv-parameters.curated.json; limits in data/conv-limits.curated.json.",
   "parameters": [
     {
@@ -7882,6 +7882,7 @@
       "tests": [
         "test-conv-epms-model.mjs",
         "test-conv-internals-p4.mjs",
+        "test-conv-pdu-keys.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [],
@@ -9303,6 +9304,252 @@
       }
     },
     {
+      "id": "electrical.pdu_kva_rated",
+      "label": "Floor PDU rating",
+      "unit": "kVA",
+      "kind": "authored",
+      "value": 300,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for E-S-102 (PRD-ELECTRICAL-BMS E18, owner R191: LV drawn down to PDU → rack); the sheet reads it through js/conv/payloads.js or js/conv/epms-sheet.js, not a page-level read the registry greps.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.pdu_kva_rated"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-pdu-keys.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (LV below the distribution transformer, engine 2.9.0)",
+        "asOf": "2026-11-23",
+        "method": "Floor-standing PDU unit rating. Training design value for the simulated plant; no PDU submittal or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.pdu_kw_usable",
+      "label": "Usable PDU capacity",
+      "unit": "kW",
+      "kind": "derived",
+      "value": 228,
+      "formula": "kVA x pf x maximum loading",
+      "formulaExpr": "electrical.pdu_kva_rated * electrical.pdu_power_factor * electrical.pdu_max_loading_pct / 100",
+      "display": "internal",
+      "displayReason": "Published for E-S-102 (PRD-ELECTRICAL-BMS E18, owner R191: LV drawn down to PDU → rack); the sheet reads it through js/conv/payloads.js or js/conv/epms-sheet.js, not a page-level read the registry greps.",
+      "deps": [
+        "electrical.pdu_kva_rated",
+        "electrical.pdu_power_factor",
+        "electrical.pdu_max_loading_pct"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.pdu_kva_rated",
+        "electrical.pdu_max_loading_pct",
+        "electrical.pdu_power_factor"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-pdu-keys.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-23",
+        "method": "Derived in the engine from the authored PDU inputs."
+      }
+    },
+    {
+      "id": "electrical.pdu_load_pct_contingency",
+      "label": "PDU loading, one stream carries the hall",
+      "unit": "%",
+      "kind": "derived",
+      "value": 79.7,
+      "formula": "hall IT design kW / (PDUs x kVA x pf)",
+      "formulaExpr": "hall.it_design_kw / ( electrical.pdu_per_hall_per_stream * electrical.pdu_kva_rated * electrical.pdu_power_factor ) * 100",
+      "display": "internal",
+      "displayReason": "Published for E-S-102 (PRD-ELECTRICAL-BMS E18, owner R191: LV drawn down to PDU → rack); the sheet reads it through js/conv/payloads.js or js/conv/epms-sheet.js, not a page-level read the registry greps.",
+      "deps": [
+        "hall.it_design_kw",
+        "electrical.pdu_per_hall_per_stream",
+        "electrical.pdu_kva_rated",
+        "electrical.pdu_power_factor"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "electrical.pdu_kva_rated",
+        "electrical.pdu_max_loading_pct",
+        "electrical.pdu_power_factor"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-pdu-keys.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-23",
+        "method": "Derived in the engine; at most the maximum continuous loading by construction."
+      }
+    },
+    {
+      "id": "electrical.pdu_load_pct_normal",
+      "label": "PDU loading, both streams in service",
+      "unit": "%",
+      "kind": "derived",
+      "value": 39.9,
+      "formula": "hall IT design kW / streams / (PDUs x kVA x pf)",
+      "formulaExpr": "hall.it_design_kw / electrical.dist_tx_streams / ( electrical.pdu_per_hall_per_stream * electrical.pdu_kva_rated * electrical.pdu_power_factor ) * 100",
+      "display": "internal",
+      "displayReason": "Published for E-S-102 (PRD-ELECTRICAL-BMS E18, owner R191: LV drawn down to PDU → rack); the sheet reads it through js/conv/payloads.js or js/conv/epms-sheet.js, not a page-level read the registry greps.",
+      "deps": [
+        "hall.it_design_kw",
+        "electrical.dist_tx_streams",
+        "electrical.pdu_per_hall_per_stream",
+        "electrical.pdu_kva_rated",
+        "electrical.pdu_power_factor"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "electrical.dist_tx_streams",
+        "electrical.pdu_kva_rated",
+        "electrical.pdu_max_loading_pct",
+        "electrical.pdu_power_factor"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-pdu-keys.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-23",
+        "method": "Derived in the engine at the hall design IT load."
+      }
+    },
+    {
+      "id": "electrical.pdu_max_loading_pct",
+      "label": "PDU maximum continuous loading",
+      "unit": "%",
+      "kind": "authored",
+      "value": 80,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for E-S-102 (PRD-ELECTRICAL-BMS E18, owner R191: LV drawn down to PDU → rack); the sheet reads it through js/conv/payloads.js or js/conv/epms-sheet.js, not a page-level read the registry greps.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "STANDARD",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.pdu_max_loading_pct"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-pdu-keys.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "NFPA 70 (National Electrical Code)",
+        "section": "§215.3 / §210.20(A)",
+        "asOf": "2026-11-23",
+        "method": "A continuous load is at most 80 % of the rating of its overcurrent device (the device is sized at 125 % of the continuous load)."
+      }
+    },
+    {
+      "id": "electrical.pdu_per_hall_per_stream",
+      "label": "Floor PDUs per stream per hall",
+      "unit": null,
+      "kind": "derived",
+      "value": 44,
+      "formula": "ceil(hall IT design kW / usable PDU kW): 2N, one stream alone carries the hall",
+      "formulaExpr": "ceil( hall.it_design_kw / electrical.pdu_kw_usable )",
+      "display": "internal",
+      "displayReason": "Published for E-S-102 (PRD-ELECTRICAL-BMS E18, owner R191: LV drawn down to PDU → rack); the sheet reads it through js/conv/payloads.js or js/conv/epms-sheet.js, not a page-level read the registry greps.",
+      "deps": [
+        "hall.it_design_kw",
+        "electrical.pdu_kw_usable"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "electrical.pdu_kva_rated",
+        "electrical.pdu_max_loading_pct",
+        "electrical.pdu_power_factor"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-pdu-keys.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-23",
+        "method": "Derived in the engine; the largest hall governs, as for the distribution transformers."
+      }
+    },
+    {
+      "id": "electrical.pdu_power_factor",
+      "label": "IT load power factor at the PDU",
+      "unit": null,
+      "kind": "authored",
+      "value": 0.95,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for E-S-102 (PRD-ELECTRICAL-BMS E18, owner R191: LV drawn down to PDU → rack); the sheet reads it through js/conv/payloads.js or js/conv/epms-sheet.js, not a page-level read the registry greps.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.pdu_power_factor"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-pdu-keys.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "MODEL.electrical (LV below the distribution transformer, engine 2.9.0)",
+        "asOf": "2026-11-23",
+        "method": "Assumed power factor of the IT load at the PDU output; no measured PDU power factor exists."
+      }
+    },
+    {
       "id": "electrical.power_factor_design",
       "label": "Design power factor",
       "unit": null,
@@ -10499,6 +10746,109 @@
         "section": "MODEL.electrical (HV/MV basis, engine 2.3.0)",
         "asOf": "2026-11-18",
         "method": "Time-multiplier setting resolution. Training design value for the simulated plant; no utility letter, test certificate or vendor selection exists."
+      }
+    },
+    {
+      "id": "electrical.racks_per_pdu",
+      "label": "Cabinets per PDU (per stream)",
+      "unit": null,
+      "kind": "derived",
+      "value": 12,
+      "formula": "ceil(hall racks / PDUs per stream)",
+      "formulaExpr": "ceil( hall.racks / electrical.pdu_per_hall_per_stream )",
+      "display": "internal",
+      "displayReason": "Published for E-S-102 (PRD-ELECTRICAL-BMS E18, owner R191: LV drawn down to PDU → rack); the sheet reads it through js/conv/payloads.js or js/conv/epms-sheet.js, not a page-level read the registry greps.",
+      "deps": [
+        "hall.racks",
+        "electrical.pdu_per_hall_per_stream"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_design_kw",
+        "campus.halls.0.racks",
+        "campus.halls.1.it_design_kw",
+        "campus.halls.2.it_design_kw",
+        "campus.halls.3.it_design_kw",
+        "electrical.pdu_kva_rated",
+        "electrical.pdu_max_loading_pct",
+        "electrical.pdu_power_factor"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-pdu-keys.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-23",
+        "method": "Derived in the engine; each cabinet has one PDU on each stream."
+      }
+    },
+    {
+      "id": "electrical.racks_per_row",
+      "label": "Cabinets per row",
+      "unit": null,
+      "kind": "authored",
+      "value": 20,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Published for E-S-102 (PRD-ELECTRICAL-BMS E18, owner R191: LV drawn down to PDU → rack); the sheet reads it through js/conv/payloads.js or js/conv/epms-sheet.js, not a page-level read the registry greps.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.racks_per_row"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-pdu-keys.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "datahall.html",
+        "section": "AUTHORED_RACKS_PER_ZONE",
+        "asOf": "2026-11-23",
+        "method": "The authored floor layout of the Conventional data hall: 20 cabinets per row; the row count is derived from the engine rack count."
+      }
+    },
+    {
+      "id": "electrical.rows_per_hall",
+      "label": "Cabinet rows per hall",
+      "unit": null,
+      "kind": "derived",
+      "value": 25,
+      "formula": "hall racks / cabinets per row",
+      "formulaExpr": "hall.racks / electrical.racks_per_row",
+      "display": "internal",
+      "displayReason": "Published for E-S-102 (PRD-ELECTRICAL-BMS E18, owner R191: LV drawn down to PDU → rack); the sheet reads it through js/conv/payloads.js or js/conv/epms-sheet.js, not a page-level read the registry greps.",
+      "deps": [
+        "hall.racks",
+        "electrical.racks_per_row"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.racks",
+        "electrical.racks_per_row"
+      ],
+      "consumers": [],
+      "tests": [
+        "test-conv-pdu-keys.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "electricalHvMv()",
+        "asOf": "2026-11-23",
+        "method": "Derived in the engine; null when the rack count does not divide into whole rows."
       }
     },
     {
@@ -12354,6 +12704,7 @@
         "test-conv-document-parity.mjs",
         "test-conv-epms-lv.mjs",
         "test-conv-floor-plan.mjs",
+        "test-conv-pdu-keys.mjs",
         "test-conv-snapshot-binding.mjs",
         "test-datahall-ai-electrical-live.mjs",
         "test-datahall-ai-electrical-topology.mjs",
@@ -12720,7 +13071,7 @@
       "label": "Engine version",
       "unit": null,
       "kind": "authored",
-      "value": "2.8.0",
+      "value": "2.9.0",
       "formula": null,
       "formulaNotExpressible": "The engine's own version string.",
       "deps": [],
@@ -12770,6 +13121,7 @@
         "test-conv-electrical-hvmv.mjs",
         "test-conv-engine-version-pins.mjs",
         "test-conv-parameter-registry.mjs",
+        "test-conv-pdu-keys.mjs",
         "test-conv-plant-internals.mjs",
         "test-conv-secondary-authority.mjs",
         "test-conv-sheet-perf.mjs",

@@ -270,6 +270,24 @@
         side: pts([[x0 + w, y0, 0], [x0 + w, y0 + d, 0], [x0 + w, y0 + d, h], [x0 + w, y0, h]], b)
       };
     }
+    /* opts.tagFit (DC AI, PRD-DCAI-HALL-DEPTH A1/HV-F2): a row tag (head + value) that would overlap a tag already
+       shown is hidden — its value stays in the row's tooltip — so no two tags ever overlap, in either projection;
+       default unchanged (every tag shown) */
+    function fitTags() {
+      if (!opts.tagFit) return;
+      var shown = [], box = root.getBoundingClientRect();
+      for (var z = 0; z < zoneEls.length; z++) {
+        var t = zoneEls[z]; if (!t) continue;
+        t.style.visibility = '';
+        var r = null;   /* the ink of the tag (head + value), not the column-wide box the top view gives it */
+        [].forEach.call(t.querySelectorAll('.zone-head,.zone-foot'), function (c) { var q = c.getBoundingClientRect(); if (!q.width) return;
+          r = r ? { left: Math.min(r.left, q.left), right: Math.max(r.right, q.right), top: Math.min(r.top, q.top), bottom: Math.max(r.bottom, q.bottom) } : q; });
+        if (!r) continue;
+        if (r.left < box.left || r.right > box.right) { t.style.visibility = 'hidden'; continue; }   /* cut by the stage edge */
+        if (shown.some(function (q) { return r.left < q.right + 2 && r.right > q.left - 2 && r.top < q.bottom + 1 && r.bottom > q.top - 1; })) { t.style.visibility = 'hidden'; continue; }
+        shown.push(r);
+      }
+    }
     function rowsIn(b) { return Math.min(kRows, Z - b * kRows); }
     function slabW(b) { return rowsIn(b) * G.rowW + 1.0; }
     function spans(k) { var sw = k * G.rowW + 1.0; return isIso() ? { x: (sw + G.slabY) * ISO_C, y: (sw + G.slabY) * ISO_S + G.wall + 0.3 } : { x: sw, y: G.slabY }; }
@@ -282,7 +300,9 @@
       var Hh = typeof opts.height === 'function' ? opts.height() : opts.height;
       var bounded = Hh != null && isFinite(Hh) && Hh > 0;
       var maxB = Math.max(1, Math.min(3, opts.maxBands != null ? opts.maxBands : (Hh != null ? 3 : 1)));
-      var uMin = Math.max(opts.minUnit || U_MIN, isIso() ? 0 : U_MIN_PLAN), best = null, b, kk, sp, fitW, fitH, uu, strip = isIso() ? STRIP_ISO : STRIP_H;
+      /* opts.fitAll (DC AI 2D/3D, PRD-DCAI-HALL-DEPTH A1): the whole hall fits the stage on both axes, so the legibility
+         floor of the plan's per-rack labels does not apply (those labels move to tooltips); default unchanged */
+      var uMin = opts.fitAll ? (opts.minUnit || 2) : Math.max(opts.minUnit || U_MIN, isIso() ? 0 : U_MIN_PLAN), best = null, b, kk, sp, fitW, fitH, uu, strip = isIso() ? STRIP_ISO : STRIP_H;
       topPx = W < 600 ? TOP_H_PHONE : TOP_H;
       for (b = 1; b <= maxB; b++) {
         kk = Math.ceil(Z / b); sp = spans(kk);
@@ -493,6 +513,7 @@
       applyTheme();
       wire(strips);
       inst.paint(inst.mode);
+      fitTags();
       if (inst.sel) inst.select(inst.sel);
       if (hadFocus) { try { svg.focus({ preventScroll: true }); } catch (e) { svg.focus(); } showCursor(); }
       if (projFocus) { var pb = root.querySelector('.fp-proj-btn[data-proj="' + projFocus + '"]'); if (pb) pb.focus(); }

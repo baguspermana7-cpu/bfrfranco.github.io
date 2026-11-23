@@ -4,7 +4,8 @@
    Phase A0 writes every law that can be measured on today's page; the rest arrive with their phase (named below).
    HV-V1  one view switch of three buttons 2D · 3D · Drawing (in that order), each a <button aria-pressed>
    HV-V2  nothing stored -> 2D at 1440 and at 390; the old key rz.dcai.proj is gone after load
-   HV-F1  the floor is on the first screen and whole: stage top <= 200 px (1440) / <= 260 px (390) and every unit
+   HV-F1  the floor is on the first screen and whole: stage top <= 200 px (1440) / <= 260 px (390) below the module
+          tab bar (#tabs) and every unit
           (rack, fan-wall module, CDU: [data-rz-equipment] in #hIso) lies inside the stage rect
    HV-F2  no two visible floor labels overlap (box intersection > 1 px²)
    HV-L1  a lens bar Status / Thermal / Cooling / Power / Layout ([data-lens]) and a visible legend for the lens
@@ -14,7 +15,8 @@
    HV-D1  two loads of the same state draw the same floor text; no Math.random in the view code (green on the A0
           tree: the 3D floor already shows no sensor noise; the KPI-strip part (GPU % 88 vs 92) joins in A3)
    HV-A1  "Show as table" lists every unit of the floor (racks + modules + CDUs) with its state
-   Later phases add: HV-V3 (A1), HV-T1 (A2), HV-P2 (A3), HV-M1/M2 (A4), HV-S1/HV-I1 (A5).
+   HV-V3  a switch 2D -> 3D -> Drawing -> 2D keeps the selected rack and the paint mode; RZHallIso.update runs 0 times
+   Later phases add: HV-T1 (A2), HV-P2 (A3), HV-M1/M2 (A4), HV-S1/HV-I1 (A5).
    Usage: node tools/test-dcai-hall-views.mjs [--shots=<dir>] [--only=V1,F1] */
 import fs from 'fs';
 import http from 'http';
@@ -77,9 +79,12 @@ const read = (pg) => pg.evaluate(() => {
   const panel = document.getElementById('p-hall');
   const group = [...panel.querySelectorAll('[role=group]')].find((g) => g.querySelectorAll('button[aria-pressed]').length >= 2);
   const btns = group ? [...group.querySelectorAll('button[aria-pressed]')].map((b) => ({ t: b.textContent.trim(), p: b.getAttribute('aria-pressed') })) : [];
+  const btnsVisible = group ? [...group.querySelectorAll('button[aria-pressed]')].filter((b) => { const r = b.getBoundingClientRect(); return r.left >= 0 && r.right <= innerWidth && r.width > 0; }).length : 0;
   const root = document.querySelector('#hIso .fp-root');
-  const stage = vis(root) ? box(root) : null;
+  const stage = vis(root) ? box(root) : null, tabsB = document.getElementById('tabs').getBoundingClientRect().bottom;
   const units = vis(root) ? [...root.querySelectorAll('[data-rz-equipment]')].filter(vis).map(box) : [];
+  /* nothing fixed or sticky lies over the floor: the topmost element at the stage's bottom corners and centre is the floor */
+  const covered = stage ? [[stage.l + 4, stage.b - 3], [(stage.l + stage.r) / 2, stage.b - 3], [stage.r - 4, stage.b - 3]].filter(([x, y]) => y < innerHeight && !(root.contains(document.elementFromPoint(x, y)))).length : -1;
   const outside = stage ? units.filter((u) => u.l < stage.l - 1 || u.t < stage.t - 1 || u.r > stage.r + 1 || u.b > stage.b + 1).length : -1;
   const labels = vis(root) ? [...root.querySelectorAll('text, .fp-tag, [class*=tag]')].filter((e) => vis(e) && e.textContent.trim() && !e.closest('text:not(:scope)'))
     .map((e) => ({ s: e.textContent.trim().slice(0, 24), ...box(e) })).filter((b) => b.r - b.l > 0 && b.b - b.t > 0) : [];
@@ -97,8 +102,8 @@ const read = (pg) => pg.evaluate(() => {
   const plant = vis(root) ? [...root.querySelectorAll('[data-rz-equipment^="crah"], [data-rz-equipment^="cdu"]')] : [];
   const plantWithValue = plant.filter((u) => [...u.querySelectorAll('[data-point]')].some((p) => vis(p) && /\d\s*(%|kWth|kW|L\/min|°C|m³\/h)/.test(p.textContent))).length;
   const floorText = vis(root) ? [...root.querySelectorAll('text')].map((t) => t.textContent.trim()).filter(Boolean).join('|') : '';
-  return { btns, stage, units: units.length, outside, labels: labels.length, over, lenses, legend, stbyWant, stby, plant: plant.length, plantWithValue, floorText,
-    oldKey: localStorage.getItem('rz.dcai.proj'), scrollW: document.documentElement.scrollWidth, vw: innerWidth };
+  return { btns, btnsVisible, stage, tabsB, covered, units: units.length, outside, labels: labels.length, over, lenses, legend, stbyWant, stby, plant: plant.length, plantWithValue, floorText,
+    oldKey: localStorage.getItem('rz.dcai.proj'), scrollW: document.documentElement.scrollWidth, vw: innerWidth, vh: innerHeight };
 });
 
 const LENSES = ['status', 'thermal', 'cooling', 'power', 'layout'];
@@ -111,7 +116,10 @@ for (const W of [1440, 390]) {
   ok('HV-V2', on.length === 1 && on[0] === '2D', `${W}: pressed on first load ${JSON.stringify(on)}, want 2D`);
   ok('HV-V2', s.oldKey == null, `${W}: old key rz.dcai.proj still stored (${s.oldKey})`);
   const topMax = W < 500 ? 260 : 200;
-  ok('HV-F1', !!s.stage && s.stage.t <= topMax, `${W}: floor stage top ${s.stage ? Math.round(s.stage.t) : 'none'} px, want <= ${topMax}`);
+  ok('HV-F1', !!s.stage && s.stage.t - s.tabsB <= topMax, `${W}: floor stage top ${s.stage ? Math.round(s.stage.t - s.tabsB) : 'none'} px below the tab bar, want <= ${topMax}`);
+  ok('HV-F1', !!s.stage && s.stage.b <= s.vh + 1, `${W}: floor stage bottom ${s.stage ? Math.round(s.stage.b) : 'none'} px, below the first screen (${s.vh})`);
+  ok('HV-F1', s.covered === 0, `${W}: ${s.covered} of 3 points on the floor's bottom edge lie under another element`);
+  ok('HV-V1', s.btnsVisible === 3, `${W}: ${s.btnsVisible} of 3 view buttons fully inside the viewport`);
   ok('HV-F1', !!s.stage && s.units >= 585 && s.outside === 0, `${W}: ${s.outside} of ${s.units} units outside the stage (want 0 of >= 585)`);
   ok('HV-F2', s.labels > 0 && s.over.length === 0, `${W}: ${s.over.length} label overlaps of ${s.labels}: ${s.over.slice(0, 3).join(' | ')}`);
   ok('HV-L1', LENSES.every((l) => s.lenses.includes(l)), `${W}: lenses ${JSON.stringify(s.lenses)}, want ${LENSES.join('/')}`);
@@ -129,6 +137,25 @@ for (const W of [1440, 390]) {
     return new Promise((r) => setTimeout(() => { const t = document.querySelector('#p-hall table[data-hall-units]'); r(t ? t.tBodies[0].rows.length : -1); }, 400));
   });
   ok('HV-A1', tbl != null && tbl >= 585, `${W}: "Show as table" ${tbl == null ? 'absent' : tbl + ' rows'} (want >= 585)`);
+  if (W === 1440) {
+    /* HV-V3: a switch keeps the selected unit and the paint mode, and never re-runs the hall (RZHallIso.update).
+       The selection is made the operator's way on the floor: focus, an arrow, Enter (a click opens the HMI). */
+    const selIdx = () => pg.evaluate(() => { const r = document.querySelector('#hIso .rack[data-sel="1"]'); return r ? +r.getAttribute('data-idx') : null; });
+    const click = (v) => pg.evaluate((v) => { const b = document.querySelector('#p-hall .dh-proj [data-view="' + v + '"]'); if (b) b.click(); return !!b; }, v);
+    await pg.evaluate(() => { const H = window.RZHallIso; window.__v3u = 0; if (H) { const u0 = H.update; H.update = function () { window.__v3u++; return u0.apply(this, arguments); }; } });
+    await click('flat'); await wait(400);
+    await pg.evaluate(() => { const s = document.querySelector('#hIso svg.fp-svg'); if (s) s.focus(); });
+    for (const k of ['ArrowRight', 'ArrowRight', 'ArrowDown', 'Enter']) { await pg.keyboard.press(k); await wait(120); }
+    const sel0 = await selIdx(), mode0 = await pg.evaluate(() => document.querySelector('#hIso .fp-root').getAttribute('data-mode'));
+    await click('iso'); await wait(900);
+    const sel1 = await selIdx(), p1 = await pg.evaluate(() => { const r = document.querySelector('#hIso .fp-root'); return [r.getAttribute('data-proj'), r.getAttribute('data-mode')]; });
+    await click('drawing'); await wait(300); await click('flat'); await wait(900);
+    const sel2 = await selIdx(), updates = await pg.evaluate(() => window.__v3u);
+    const v3 = { sel0, sel1, sel2, proj1: p1[0], mode0, mode1: p1[1], updates };
+    ok('HV-V3', v3.sel0 != null && v3.sel1 === v3.sel0 && v3.sel2 === v3.sel0, `selected rack across 2D -> 3D -> Drawing -> 2D: ${JSON.stringify(v3)}`);
+    ok('HV-V3', v3.proj1 === 'iso' && v3.mode1 === v3.mode0, `paint mode across the switch: ${v3.mode0} -> ${v3.mode1} (3D ${v3.proj1})`);
+    ok('HV-V3', v3.updates === 0, `the switch re-ran the hall ${v3.updates} times (RZHallIso.update), want 0`);
+  }
   ok('HV-V1', s.scrollW <= s.vw + 1, `${W}: page scrolls sideways (${s.scrollW} > ${s.vw})`);
   ok('HV-V1', pg.errors.length === 0, `${W}: page errors ${pg.errors.slice(0, 2).join(' | ')}`);
   if (W === 1440) {

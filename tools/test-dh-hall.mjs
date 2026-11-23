@@ -52,7 +52,7 @@ async function open(width, theme) {
   await pg.evaluateOnNewDocument((entries, theme) => {
     try { localStorage.setItem('theme', theme); localStorage.setItem('rz_cookie_consent', 'declined'); entries.forEach(([k, v]) => localStorage.setItem(k, v)); } catch (x) { /* no storage */ }
   }, signedInStorage({ email: 'educator@resistancezero.com', tier: 'pro', role: 'educator' }), theme);
-  await pg.goto(ORIGIN + 'datahallAI.html', { waitUntil: 'networkidle2', timeout: 90000 });
+  await pg.goto(ORIGIN + 'datahallAI.html?view=drawing'   /* A1: these laws read the Drawing view */, { waitUntil: 'networkidle2', timeout: 90000 });
   await pg.waitForNavigation({ waitUntil: 'networkidle2', timeout: 8000 }).catch(() => {});
   await wait(800);
   await enterAuthorizedAuditState(pg, 'dc-ai');

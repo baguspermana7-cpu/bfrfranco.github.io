@@ -4,13 +4,16 @@
  * draws for the Conventional hall, so both cockpits share one BMS floor (grey is normal, a green lamp per cabinet, state
  * colour only on warn / alarm, equal-height cabinets, true isometric 30 deg).
  *
- *   3D    the isometric floor in #hIso: 20 rows of racks as 10 contained pairs (one hot-aisle roof each), the north and
- *         south fan-wall galleries, the CDU line between the rack field and the south gallery
- *   Plan  the engineering drawing #hSvg, unchanged (every layer, sensor and dimension)
+ *   2D       the same floor drawn top-down (the renderer's plan projection) — the DEFAULT at every width
+ *            (PRD-DCAI-HALL-DEPTH Amendment 1, owner 2026-11-23: "button flat 2d … default ia 2d")
+ *   3D       the isometric floor in #hIso: 20 rows of racks as 10 contained pairs (one hot-aisle roof each), the north
+ *            and south fan-wall galleries, the CDU line between the rack field and the south gallery
+ *   Drawing  the engineering drawing #hSvg, unchanged (every layer, sensor and dimension); it was called "Plan"
  *
- * In 3D the plan keeps only its header (hall line, IT / liquid / air cards): its viewBox is cut to that band, and the
- * plan's layer bar and key, which speak of the plan, are hidden. The switch is two buttons (aria-pressed) stored under
- * rz.dcai.proj; with nothing stored, 3D on a stage of 600 px or more, Plan on a phone.
+ * In 2D and 3D the floor gets the screen: the drawing (with its IT / liquid / air cards, layer bar and key) is hidden and
+ * one summary line beside the switch carries the hall totals. The switch is three buttons (aria-pressed) stored under
+ * rz.dcai.view; nothing stored means 2D; ?view=flat|iso|drawing opens a view without storing it. The old key
+ * rz.dcai.proj is removed, so every visitor lands on 2D once.
  *
  * No engine arithmetic here: counts come from renderHall's own engine reads (RZHallIso.update), temperatures from the
  * aisle readouts the plan already draws (#C<pair><point>t cold, #H<pair><point>t hot). Every rack and unit carries the
@@ -18,13 +21,15 @@
  */
 (function () {
   'use strict';
-  var doc = document, win = window, KEY = 'rz.dcai.proj', HEAD_VB = 136, PLAN_VB = null;
+  var doc = document, win = window, KEY = 'rz.dcai.view', OLD_KEY = 'rz.dcai.proj', VIEWS = ['flat', 'iso', 'drawing'];
   var panel = doc.getElementById('p-hall'), svg = doc.getElementById('hSvg');
   if (!panel || !svg) return;
 
-  var geo = null, model = null, inst = null, host = null, wrap = null, bar = null, proj = null, timer = 0, sig = '';
+  var lastHall = '', geo = null, model = null, inst = null, host = null, wrap = null, bar = null, sum = null, view = null, timer = 0, sig = '';
   function pad2(n) { return (n < 10 ? '0' : '') + n; }
-  function stored() { try { var v = win.localStorage.getItem(KEY); return v === 'iso' || v === 'plan' ? v : null; } catch (e) { return null; } }
+  function stored() { try { var v = win.localStorage.getItem(KEY); return VIEWS.indexOf(v) >= 0 ? v : null; } catch (e) { return null; } }
+  function fromUrl() { var m = /[?&]view=(flat|iso|drawing)(?:&|$)/.exec(win.location.search || ''); return m ? m[1] : null; }
+  try { win.localStorage.removeItem(OLD_KEY); } catch (e) { /* storage blocked */ }
   function store(p) { try { win.localStorage.setItem(KEY, p); } catch (e) { /* storage blocked: the choice holds for this page */ } }
   function num(id) { var el = doc.getElementById(id), v = el ? parseFloat(el.textContent) : NaN; return isFinite(v) ? v : null; }
 
@@ -33,18 +38,26 @@
     if (doc.getElementById('dh-proj-css')) return;
     var st = doc.createElement('style'); st.id = 'dh-proj-css';
     st.textContent = [
-      '.dh-proj{display:flex;justify-content:flex-end;margin:0 0 6px}',
+      '.dh-proj{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 6px}',
+      '.dh-sum{min-width:0;color:var(--t2);font:500 12px/1.3 "IBM Plex Mono",ui-monospace,monospace;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+      '.dh-sum b{color:var(--t1);font-weight:600}',
+      '#p-hall[data-dh-view="drawing"] .dh-sum{visibility:hidden}',
+      '@media (max-width:600px){.dh-proj{flex-wrap:wrap;gap:6px}.dh-sum{flex:1 1 100%;white-space:normal}.dh-proj [role=group]{margin-left:auto}}',
       '.dh-proj [role=group]{display:inline-flex;border:1px solid var(--bd);border-radius:4px;overflow:hidden}',
       '.dh-proj button{appearance:none;margin:0;min-width:48px;height:26px;padding:0 12px;border:0;background:transparent;color:var(--t2);font:600 11px/26px "IBM Plex Sans",system-ui,sans-serif;letter-spacing:.04em;cursor:pointer}',
       '.dh-proj button+button{border-left:1px solid var(--bd)}',
       '.dh-proj button[aria-pressed="true"]{color:var(--t1);background:var(--bg3)}',
       '.dh-proj button:focus-visible{outline:2px solid var(--c);outline-offset:-2px}',
       '@media (max-width:600px){.dh-proj button{height:40px;line-height:40px;min-width:56px}}',
-      '#hIsoWrap{display:none;margin:6px 0 0}#p-hall[data-dh-proj="iso"] #hIsoWrap{display:block}',
+      '#hIsoWrap{display:none;margin:0}#p-hall:not([data-dh-view="drawing"]) #hIsoWrap{display:block}',
       '#hIso{display:none;box-sizing:content-box;background:var(--bg2);border:1px solid var(--bd);border-radius:4px;overflow:hidden}',
-      '#p-hall[data-dh-proj="iso"] #hIso{display:block}',
-      '#hSvg[data-dh-cropped] [data-dh-off]{display:none}',
-      '#p-hall[data-dh-proj="iso"] #hallLayers,#p-hall[data-dh-proj="iso"] .hp-key{display:none}'
+      '#p-hall:not([data-dh-view="drawing"]) #hIso{display:block}',
+      /* 2D / 3D: the drawing, its legibility note, layer bar and key speak of the drawing — out of the way */
+      '#p-hall[data-dh-view] .dh-draw-hide{display:none!important}',
+      '#p-hall[data-dh-view="drawing"] .dh-draw-hide{display:revert!important}',
+      '#p-hall[data-dh-view]:not([data-dh-view="drawing"]) [data-rz-legible-note]{display:none!important}',
+      /* a phone: the KPI strip is one row that scrolls inside itself, so the floor starts on the first screen (HV-F1) */
+      '@media (max-width:600px){#p-hall[data-dh-view] > .kpi{display:flex;flex-direction:row;flex-wrap:nowrap;grid-template-columns:none;overflow-x:auto;gap:6px;scrollbar-width:thin}#p-hall[data-dh-view] > .kpi > .k{flex:0 0 104px}}'
     ].join('\n');
     doc.head.appendChild(st);
   }
@@ -52,13 +65,26 @@
     if (host) return;
     css();
     bar = doc.createElement('div'); bar.className = 'dh-proj';
+    sum = doc.createElement('div'); sum.className = 'dh-sum'; sum.title = 'Hall totals from the engine; the full cards are on the Drawing view';
+    bar.appendChild(sum);
     var g = doc.createElement('div'); g.setAttribute('role', 'group'); g.setAttribute('aria-label', 'Hall view'); bar.appendChild(g);
-    [['iso', '3D', 'Isometric 3D view of the hall'], ['plan', 'Plan', 'Engineering plan at one scale']].forEach(function (d) {
-      var b = doc.createElement('button'); b.type = 'button'; b.setAttribute('data-proj', d[0]); b.textContent = d[1]; b.title = d[2];
+    [['flat', '2D', 'Top view of the floor, one symbol per unit'], ['iso', '3D', 'Isometric floor'],
+     ['drawing', 'Drawing', 'Engineering drawing with every layer, sensor and dimension']].forEach(function (d) {
+      var b = doc.createElement('button'); b.type = 'button'; b.setAttribute('data-view', d[0]); b.textContent = d[1]; b.title = d[2];
       b.addEventListener('click', function () { set(d[0], true); });
       g.appendChild(b);
     });
-    svg.parentNode.insertBefore(bar, svg);
+    /* keyboard: Left / Right move between the three (one key = one view, no animation) */
+    g.addEventListener('keydown', function (e) {
+      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      var bs = [].slice.call(g.querySelectorAll('button')), i = bs.indexOf(doc.activeElement);
+      if (i < 0) return;
+      e.preventDefault(); i = (i + (e.key === 'ArrowRight' ? 1 : bs.length - 1)) % bs.length; bs[i].focus(); set(bs[i].getAttribute('data-view'), true);
+    });
+    /* the drawing and everything that speaks only of it */
+    var pane = svg.closest('[data-rz-legible-pane]') || svg;
+    [pane, doc.getElementById('hallLayers')].concat([].slice.call(panel.querySelectorAll('.hp-key'))).forEach(function (el) { if (el) el.classList.add('dh-draw-hide'); });
+    pane.parentNode.insertBefore(bar, pane);
     host = doc.createElement('div'); host.id = 'hIso'; host.setAttribute('data-rz-hall', String(win.currentDH || 1));
     /* DC AI traceability (test-dcai-coverage): every number the 3D floor prints comes from here */
     host.setAttribute('data-rz-authored-basis', 'row-pair heat = racks per pair x design rack kW (engine counts multiplied, not a reading); ' +
@@ -66,7 +92,7 @@
     /* the floor measures this wrapper, never #hIso itself: the renderer sets the host's width from what it measures, so
        measuring the bordered host shrank it 2 px per resize, for ever, until the hall vanished (owner, 2026-11-22) */
     wrap = doc.createElement('div'); wrap.id = 'hIsoWrap'; wrap.appendChild(host);
-    svg.parentNode.insertBefore(wrap, svg.nextSibling);   /* right under the plan's header band; the layer bar follows */
+    bar.parentNode.insertBefore(wrap, bar.nextSibling);   /* right under the switch: the floor is the first thing below it */
   }
 
   /* ---- the model the floor renderer reads ---- */
@@ -103,89 +129,86 @@
 
   function render() {
     if (!geo || !host || !win.RZFloorPlan) return;
+    /* HV-V3: a switch between 2D and 3D keeps the selected unit and the paint mode (one model, two projections) */
+    var hallKey = geo ? [geo.rows, geo.perRow, geo.crahInst, geo.cduInst, win.currentDH].join('|') : '';
+    var sameHall = !!inst && hallKey === lastHall, keepSel = inst ? inst.sel : null, keepMode = inst ? inst.mode : null;
+    lastHall = hallKey;
     if (inst && inst.destroy) inst.destroy();
     host.setAttribute('data-rz-hall', String(win.currentDH || 1));
     inst = win.RZFloorPlan.render(host, model, {
-      projection: 'iso', toggle: false, mode: 'temp', maxBands: 1, projKey: KEY, measure: wrap,
-      /* the whole hall in one screen on a wide stage; a phone keeps the minimum unit and pans inside the stage */
-      height: function () { return Math.max(420, (win.innerHeight || 900) - 40); }, watchHeight: false,
+      projection: view === 'flat' ? 'plan' : 'iso', toggle: false, mode: 'temp', maxBands: 1, projKey: 'rz.dcai.fp', measure: wrap,
+      /* the whole hall on the first screen, both axes, at every width: the stage takes what is left of the viewport below
+         its own top (HV-F1); fitAll lets the unit shrink below the plan's label floor (labels live in tooltips) */
+      height: function () { var t = wrap.getBoundingClientRect().top + (win.pageYOffset || 0); return Math.max(260, (win.innerHeight || 900) - bottomInset() - t - 12); },
+      watchHeight: false, fitAll: true, tagFit: true,
       rackTag: function (i) { return model.racks[i].ref.replace('rack-unit:', ''); },
       zoneTag: function (z) { return 'Rows R' + pad2(2 * z + 1) + ' and R' + pad2(2 * z + 2) + ', one contained hot aisle'; },
       zoneHead: function (z) { return 'R' + pad2(2 * z + 1) + '/' + pad2(2 * z + 2); },
       crahTag: function (n, c) { return (c && c.tag) || ('CRAH-' + pad2(n)); }
     });
+    if (keepMode && keepMode !== inst.mode) inst.paint(keepMode);
+    if (keepSel && sameHall) inst.select(keepSel);
   }
 
-  function cropPlan(on) {
-    if (on) {
-      if (PLAN_VB == null) PLAN_VB = svg.getAttribute('viewBox');
-      var w = (svg.getAttribute('viewBox') || '0 0 1200 804').split(/\s+/)[2] || '1200';
-      svg.setAttribute('viewBox', '0 0 ' + w + ' ' + HEAD_VB);
-      svg.setAttribute('data-dh-cropped', '1');
-      hideBelow();
-    } else if (svg.getAttribute('data-dh-cropped')) {
-      svg.removeAttribute('data-dh-cropped');
-      showAll();
-      if (PLAN_VB) svg.setAttribute('viewBox', PLAN_VB);
-    }
-  }
-  /* the cut plan must not paint past its frame (test-conv-geometry G2): what lies below the header band is
-     taken out of the render, not clipped. Measured on screen, so a hidden tab waits until the plan has a size. */
-  var OFF = 'data-dh-off', ro = null;
-  function showAll() { [].forEach.call(svg.querySelectorAll('[' + OFF + ']'), function (el) { el.removeAttribute(OFF); }); }
-  function hideBelow() {
-    var frame = svg.getBoundingClientRect();
-    if (!frame.height) {
-      if (!ro && win.ResizeObserver) { ro = new win.ResizeObserver(function () { if (svg.getBoundingClientRect().height && svg.getAttribute('data-dh-cropped')) { ro.disconnect(); ro = null; hideBelow(); } }); ro.observe(svg); }
-      return;
-    }
-    showAll();
-    var els = svg.querySelectorAll('text,rect,circle,ellipse,path,line,polyline,polygon,image,use'), i, b;
-    for (i = 0; i < els.length; i++) {
-      b = els[i].getBoundingClientRect();
-      if ((b.width || b.height) && (b.bottom > frame.bottom + 0.5 || b.top < frame.top - 0.5)) els[i].setAttribute(OFF, '');
-    }
-  }
-
-  function set(p, user) {
-    if (p !== 'iso' && p !== 'plan') return;
-    if (user) store(p);
-    proj = p;
-    panel.setAttribute('data-dh-proj', p);
-    if (bar) [].forEach.call(bar.querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-proj') === p ? 'true' : 'false'); });
-    cropPlan(p === 'iso');
-    if (p === 'iso') { if (!inst || sig !== key()) { render(); sig = key(); } else inst.paint(inst.mode); tick(); }
+  function set(v, user) {
+    if (VIEWS.indexOf(v) < 0) return;
+    if (user) store(v);
+    view = v;
+    panel.setAttribute('data-dh-view', v);
+    if (bar) [].forEach.call(bar.querySelectorAll('button'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-view') === v ? 'true' : 'false'); });
+    if (v !== 'drawing') { if (!inst || sig !== key()) { render(); sig = key(); } else inst.paint(inst.mode); tick(); }
     else stop();
   }
-  function key() { return geo ? [geo.rows, geo.perRow, geo.crahInst, geo.crahAct, geo.cduInst, geo.cduRun, geo.kwRack, win.currentDH].join('|') : ''; }
+  /* the floor is rebuilt when the hall or the projection changes; a switch between 2D and 3D redraws, never re-runs the engine */
+  function key() { return geo ? [geo.rows, geo.perRow, geo.crahInst, geo.crahAct, geo.cduInst, geo.cduRun, geo.kwRack, win.currentDH, view].join('|') : ''; }
+  /* whatever covers the bottom of the viewport and is not the floor's own column — a fixed or sticky bar, or on a phone
+     the hall sidebar that precedes the main column in the DOM but is laid over its bottom (flex order) — leaves the
+     floor less height: measure it, never assume it. Content that merely FOLLOWS the floor in the flow is not a cover
+     (counting it fed back: a shorter floor uncovered more of it, 900 -> 884 px after one resize round). */
+  function bottomInset() {
+    var vh = win.innerHeight || 0, el = doc.elementFromPoint((win.innerWidth || 0) / 2, vh - 2), top = null, cover = false;
+    if (!el || wrap.contains(el)) return 0;
+    for (; el && el !== doc.body; el = el.parentElement) {
+      if (el.contains(wrap)) break;
+      var pos = win.getComputedStyle(el).position;
+      if (pos === 'fixed' || pos === 'sticky' || (wrap.compareDocumentPosition(el) & 2 /* PRECEDING */)) cover = true;
+      top = el.getBoundingClientRect().top;
+    }
+    return cover && top != null ? Math.max(0, vh - top) : 0;
+  }
+  function grp(v) { return v == null || !isFinite(v) ? '—' : Math.round(v).toLocaleString('en-US'); }
+  function summary() {
+    if (!sum || !geo) return;
+    sum.innerHTML = 'IT <b>' + grp(geo.itKw) + ' kW</b> · Liquid <b>' + grp(geo.liqKw) + ' kWth</b>' + (geo.liqPct != null ? ' (' + grp(geo.liqPct) + ' %)' : '') +
+      ' · Air <b>' + grp(geo.airKw) + ' kWth</b>';
+  }
 
   /* live: the aisle readouts move every few seconds; paint() writes attributes only */
   function tick() {
     stop();
     timer = win.setInterval(function () {
-      if (doc.hidden || proj !== 'iso' || !inst) return;
+      if (doc.hidden || view === 'drawing' || !inst) return;
       readSensors(); inst.paint(inst.mode);
     }, 3000);
   }
   function stop() { if (timer) { win.clearInterval(timer); timer = 0; } }
 
   win.RZHallIso = {
-    version: '1.0.0',
+    version: '2.0.0',
     /* renderHall calls this after every plan build, with the engine counts it read */
     update: function (g) {
       if (!g || !(g.rows > 0) || !(g.perRow > 0) || g.rows % 2) return;
-      geo = { rows: g.rows, perRow: g.perRow, kwRack: g.kwRack || 0, crahInst: g.crahInst || 0, crahAct: g.crahAct, cduInst: g.cduInst || 0, cduRun: g.cduRun, sp: g.sp || 3, supplyC: g.supplyC, returnC: g.returnC };
-      PLAN_VB = svg.getAttribute('viewBox');   /* renderHall has just set the plan's own viewBox */
-      svg.removeAttribute('data-dh-cropped');
-      ui();
+      geo = { rows: g.rows, perRow: g.perRow, kwRack: g.kwRack || 0, crahInst: g.crahInst || 0, crahAct: g.crahAct, cduInst: g.cduInst || 0, cduRun: g.cduRun, sp: g.sp || 3, supplyC: g.supplyC, returnC: g.returnC,
+        itKw: g.itKw, liqKw: g.liqKw, liqPct: g.liqPct, airKw: g.airKw };
+      ui(); summary();
       var changed = sig !== key();
       if (changed || !model) build(); else readSensors();
-      var want = proj || stored() || ((panel.clientWidth || win.innerWidth) < 600 ? 'plan' : 'iso');
+      var want = view || fromUrl() || stored() || 'flat';
       if (changed) { sig = ''; }
       set(want, false);
     },
-    projection: function () { return proj; },
-    setProjection: function (p) { set(p, true); },
+    view: function () { return view; },
+    setView: function (v) { set(v, true); },
     model: function () { return model; },
     repaint: function () { if (inst) inst.paint(inst.mode); }
   };

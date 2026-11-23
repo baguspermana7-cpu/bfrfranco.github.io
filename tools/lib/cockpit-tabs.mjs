@@ -60,7 +60,9 @@ export const TAB_SETS = Object.freeze({
               reveal: { click: '#bldgSvg [data-floor="f5"]', expect: '#floorDetail' } },
             { tab: 'over', selector: '#floorSvg', label: 'floor plan — roof',
               reveal: { click: '#bldgSvg [data-floor="roof"]', expect: '#floorDetail' } },
-            { tab: 'hall', selector: '#hSvg', label: 'data hall' },
+            /* PRD-DCAI-HALL-DEPTH A1: the hall opens on its 2D floor; the engineering drawing is the Drawing view */
+            { tab: 'hall', selector: '#hSvg', label: 'data hall',
+              reveal: { click: '#p-hall .dh-proj [data-view="drawing"]', expect: '#hSvg' } },
             { tab: 'rack', selector: '#hmiRackSvg', label: 'rack architecture' },
             { tab: 'cool', selector: '#hmiCoolSvg', label: 'cooling P&ID' },
             { tab: 'elec', sub: 'overview', selector: '#hmiElecOvSvg', label: 'electrical overview' },
