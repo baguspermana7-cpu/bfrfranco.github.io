@@ -204,7 +204,14 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
 .legend .warn{border-color:rgba(182,141,73,.65);color:#e3c88f}
 .legend .alarm{border-color:rgba(187,93,93,.7);color:#ecb7b7}
 .chw-sheet-host{display:block}
-/* E3 PERF: rotors stepped by the 3 Hz chwMotionClock; flow runs on its own layer (see chwMotionClock) */
+/* E3 PERF: the sheet's own flow and rotor animations stay paused; both move as copies on thin layers (see chwMotionClock) */
+#chw-sheet-host svg.chw-rotor-lifted .vfx-rotor[data-spin]{visibility:hidden}
+#chw-sheet-host .chw-rotor-layer{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:hidden;z-index:1}
+#chw-sheet-host .chw-rotor-copy{position:absolute;will-change:transform;animation-name:chw-rotor-turn;animation-timing-function:linear;animation-iteration-count:infinite}
+#chw-sheet-host .chw-rotor-copy svg{display:block;overflow:visible}
+#chw-sheet-host.is-offscreen .chw-rotor-copy{animation-play-state:paused!important}
+@keyframes chw-rotor-turn{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){#chw-sheet-host .chw-rotor-copy{animation-name:none}}
 @media (prefers-reduced-motion: no-preference){
   #chw-sheet-host .hmi-svg .hmi-flow[data-flow="running"],#chw-sheet-host .hmi-svg .vfx-rotor[data-spin]{animation-play-state:paused}
 }
@@ -569,7 +576,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
         ]
     }
     </script>
-    <script src="js/rz-version.js?v=20261123-237f03c8" defer></script>
+    <script src="js/rz-version.js?v=20261123-ecc58766" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- Conventional BMS single scenario engine — single source of truth for the
@@ -579,10 +586,10 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
          window.CONV_CALC exists before the inline SCADA script runs.
          Basis: conv/review/09-engineering-basis-and-calculations.md ;
          CHW-relabel decision: conv/review/04-chiller-plant-review.md -->
-    <script src="js/rz-engine-versions.js?v=20261122-2f5e01b3"></script>
-    <script src="js/conv-engine.js?v=2.7.0"></script>
+    <script src="js/rz-engine-versions.js?v=20261123-402c03b6"></script>
+    <script src="js/conv-engine.js?v=2.8.0"></script>
     <!-- v1.134.2 — generated parameter registry + the shared basis drawer. -->
-    <script src="js/conv-parameters.js?v=20261122-e5d46ca8"></script>
+    <script src="js/conv-parameters.js?v=20261123-3e2b5971"></script>
     <!-- v1.134.25 — RZExplain, the site glossary engine. The cockpits were the only
          substantial pages carrying none of it, so terms an operator has to read
          (approach temperature, cycles of concentration, N+1, WUE) had nowhere to go.
@@ -603,9 +610,9 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
     <script src="js/conv/hmi-depth.js?v=20261120-05f86b64"></script>
     <script src="js/rz-eng-symbols.js?v=20261118-528d60ce"></script>
     <script src="js/rz-hmi-sheet.js?v=20261123-0ec4d4a5"></script>
-    <script src="js/conv/chiller-sheet.js?v=20261120-b01afb5b"></script>
+    <script src="js/conv/chiller-sheet.js?v=20261123-92962423"></script>
     <script src="js/conv/sheet-truth.js?v=20261122-14958672"></script>
-    <script src="js/conv/payloads.js?v=20261122-e3076b8a"></script>
+    <script src="js/conv/payloads.js?v=20261123-2552c75e"></script>
     <script src="js/conv/internals.js?v=20261122-76f7138e"></script>
     <script src="js/conv/internals/chiller.js?v=20261122-fa129bdf"></script>
     <script src="js/conv/internals/pump.js?v=20261123-d1fdb7d3"></script>
@@ -613,7 +620,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
     <script src="js/conv/internals/crah.js?v=20261122-069758c5"></script>
     <script src="js/conv/ph-chart.js?v=20261122-8681e578"></script>
     <script src="js/conv/equipment-modal.js?v=20261122-a3797451"></script>
-    <script src="js/conv/vfx.js?v=20261117-89056876"></script>
+    <script src="js/conv/vfx.js?v=20261123-3fd25115"></script>
     <script src="js/conv/history.js?v=20261120-8d390d7e"></script>
     <script src="js/rz-trend.js?v=20261122-98f6c100"></script>
     <!-- PRD-CONV-POINT-STATUS-TREND T2/T3: every number shows its state (registry limits) and opens its trend -->
@@ -844,6 +851,8 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
                 <option value="balanced">Balanced</option>
                 <option value="high">High Load</option>
                 <option value="degraded">Degraded Drill</option>
+                <option value="lowload">Low-load Drill (40 %)</option>
+                <option value="cold">Cold-weather Drill (WB 8 °C)</option>
               </select>
             </div>
             <div class="field">
@@ -1536,6 +1545,30 @@ function chwRead(n){
     out.rows = ok ? [['Heat rejected · Σ ' + cells.length + ' running cells', Math.round(rej).toLocaleString('en-US') + ' kWth'],
       ['Engine tower rejection', ES && ES.cooling ? Math.round(ES.cooling.tower_rejection_kw_th).toLocaleString('en-US') + ' kWth' : '—'],
       ['CDW flow · Σ ' + pumps.length + ' running pumps', conv.f(q, ui.unit) + ' ' + conv.fu(ui.unit)]] : [['Status', CHW_UNAV]];
+  } else if(/^pv[A-Z]+$/.test(n.id) || n.id === 'mv01' || n.id === 'tv01'){
+    /* PRD-CONV-OPS-DEPTH 01 P3 (engine 2.8.0): the plant's valves, each opening a steady-state relation of the solve */
+    const CR = ok ? (engineSnap() || {}).cooling : null, n1 = (v) => (v == null || !isFinite(v)) ? '—' : Number(v).toFixed(1);
+    if(!CR){ out.values = { op: chwVal(CHW_UNAV) }; out.rows = [['Status', CHW_UNAV]]; }
+    else if(n.id === 'mv01'){
+      const dr = ui.scenario === 'lowload' && window.CONV_CALC && CONV_CALC.bypassAtLoad ? CONV_CALC.bypassAtLoad(0.4) : null;
+      const open = dr ? dr.openPct : CR.chw_bypass_open_pct;
+      out.state = open > 0 ? 'running' : 'stopped';
+      out.values = { op: chwVal(open > 0 ? `${n1(open)} %` : 'CLOSED') };
+      out.rows = (dr ? [['Drill', 'load flow at 40 % (' + n1(dr.qLoadLps) + ' L/s) with today\'s chillers running']] : []).concat([['Opening', n1(open) + ' %'], ['Bypass flow', n1(dr ? dr.flowLps : CR.chw_bypass_flow_lps) + ' L/s'], ['Minimum plant flow', n1(CR.chw_min_plant_flow_lps) + ' L/s (running chillers × ' + CR.chiller_min_evap_flow_pct + ' % evaporator minimum)'],
+        ['Rule', 'opens only when the load flow falls below the minimum'], ['Decoupler flow', n1(CR.chw_decoupler_flow_lps) + ' L/s']]);
+    } else if(n.id === 'tv01'){
+      const dr = ui.scenario === 'cold' && window.CONV_CALC && CONV_CALC.towerBypassAt ? CONV_CALC.towerBypassAt(8) : null;
+      const b = dr ? dr.xPct : CR.cdw_bypass_x_pct;
+      out.state = 'running';
+      out.values = { op: chwVal(`B ${n1(b)} %`) };
+      out.rows = (dr ? [['Drill', 'wet bulb 8 °C, towers leaving ' + n1(dr.tColdC) + ' °C']] : []).concat([['Port A (to the cells)', n1(100 - b) + ' %'], ['Port B (bypass)', n1(b) + ' %'], ['Entering condenser water', n1(dr ? dr.tEcwC : CR.cdw_entering_c) + ' °C'],
+        ['Chiller minimum ECWT', n1(CR.chiller_min_ecwt_c) + ' °C (ASSUMED)'], ['Balancing valve Kv set', Math.round(CR.cdw_balance_kv_set).toLocaleString('en-US') + ' m³/h·bar^-½ at ' + n1(CR.cdw_bypass_design_flow_lps) + ' L/s']]);
+    } else {
+      const open = CR.crah_valve_open_pct;
+      out.state = 'running';
+      out.values = { op: chwVal(`${n1(open)} %`) };
+      out.rows = [['Opening', n1(open) + ' % (pressure independent: flow ∝ opening)'], ['Coil flow', n1(CR.crah_unit_chw_flow_lps) + ' L/s of ' + n1(CR.crah_design_coil_flow_lps) + ' L/s design']];
+    }
   } else if(n.id === 'ttcr'){
     out.values = { t: chwVal(ok && PLANT.cdwr != null ? T(PLANT.cdwr) : CHW_UNAV) };
   } else if(n.id === 'ttcs'){
@@ -1646,12 +1679,17 @@ var CHW_POINTS = {}, CHW_POINT_EDGES = {}, CHW_SHARED_EDGES = {}, CHW_PUMP_EDGES
   }
   CHW_POINTS['sref:q'] = { unit: 'L/s', digits: 1, label: 'Secondary IT-reference flow (st.header.flow)' };
   CHW_POINT_EDGES['sref:q'] = ['e-sec0', 'e-sec0b', 'e-hrEt', 'e-hrDec'];
+  /* P3: MV-01's bypass leg carries the engine's bypass flow (0 at today's load, bypassAtLoad(0.4) in the low-load drill) */
+  CHW_POINTS['bypass:q'] = { unit: 'L/s', digits: 1, label: 'MV-01 minimum-flow bypass' };
+  CHW_POINT_EDGES['bypass:q'] = ['e-bp1', 'e-bp2'];
   CHW_HALLS.forEach(function (h, k) {
     CHW_POINTS['hall' + h + ':q'] = { unit: 'L/s', digits: 1, label: 'Hall ' + h + ' CRAH supply (IT-reference share)' };
-    CHW_POINT_EDGES['hall' + h + ':q'] = ['e-c' + h + 's', 'e-c' + h + 'r'];
+    /* r2: the return leg past the bank's PICV; s2 only on the last hall, whose supply leg MV-01's tee splits (P3) */
+    CHW_POINT_EDGES['hall' + h + ':q'] = ['e-c' + h + 's', 'e-c' + h + 'r', 'e-c' + h + 'r2'].concat(k === CHW_HALLS.length - 1 ? ['e-c' + h + 's2'] : []);
     /* hall supply header: e-hsA feeds A-D, e-hsD feeds D; hall return: e-hrB carries A, e-hrD2 carries A-D */
     CHW_SHARED_EDGES['e-hs' + h] = CHW_HALLS.slice(k).map(function (x) { return 'hall' + x + ':q'; });
     if (k > 0) CHW_SHARED_EDGES['e-hr' + h] = CHW_HALLS.slice(0, k).map(function (x) { return 'hall' + x + ':q'; });
+    if (k > 0) CHW_SHARED_EDGES['e-hr' + h + 'b'] = CHW_SHARED_EDGES['e-hr' + h].slice();   /* the return header past MV-01's tee */
   });
   CHW_SHARED_EDGES['e-hrRet'] = CHW_HALLS.map(function (x) { return 'hall' + x + ':q'; });
   /* the primary pumps the sheet draws (CHWP-nnA / B …, from the engine's primary fleet) */
@@ -1693,6 +1731,9 @@ function chwSeedPoints() {
     else chwSeedPoint(id, lp.flow);
   });
   chwSeedPoint('sref:q', st.header.flow);
+  (function () { var E = window.CONV_CALC, CR = E && E.snapshot && E.snapshot.cooling;
+    var dr = ui.scenario === 'lowload' && E && E.bypassAtLoad ? E.bypassAtLoad(0.4) : null;
+    chwSeedPoint('bypass:q', dr ? dr.flowLps : (CR ? CR.chw_bypass_flow_lps : null)); })();
   CHW_HALLS.forEach(function (h) { chwSeedPoint('hall' + h + ':q', st.header.flow != null ? st.header.flow / CHW_HALLS.length : null); });
 }
 function chwLoopRec(lp) { return chwPoints ? chwPoints.get('ch' + lp.id + ':q') : null; }
@@ -1801,7 +1842,11 @@ function chwVfx(){
         if(e.flowOf === 'cdwr' || /^e-ct\d+i$/.test(e.id)) return PLANT.cdwr;
         return PLANT.cdws;
       },
-      speed: function(id){ var m = /^cp(\d+)$/.exec(id); if(!m) return null; var u = chwFleetUnit('cdw_pump', Number(m[1])); return u && u.state === 'running' ? u.speedPct : 0; } });
+      speed: function(id){
+        /* engine 2.7.0: CDW pumps at their operating speed, tower fans at the fleet cell's fan speed (P2) */
+        var t = /^ct(\d+)$/.exec(id);
+        if(t){ var c = chwFleetUnit('tower_cell', Number(t[1])); return c && c.state === 'running' ? c.fanSpeedPct : 0; }
+        var m = /^cp(\d+)$/.exec(id); if(!m) return null; var u = chwFleetUnit('cdw_pump', Number(m[1])); return u && u.state === 'running' ? u.speedPct : 0; } });
     return;
   }
   function val(pid){ var r = chwPoints ? chwPoints.get(pid) : null; return r && r.quality === 'good' ? r.value : null; }
@@ -1818,8 +1863,8 @@ function chwVfx(){
       if(!CHW_AUTHORITY_AVAILABLE) return null;
       /* supply side: chiller outlet legs, supply headers, secondary pumps, CRAH supply drops;
          return side: CRAH returns, return headers, the pump branches and the leg into each evaporator */
-      if(/^e-(s\d|hs|sec|avs|c[A-Z]+s$)/.test(e.id)) return st.header.chws;
-      if(/^e-(r\d|hr|ev\d|p[a-rt-z]\d|avr|et$|c[A-Z]+r$)/.test(e.id)) return st.header.chwr;
+      if(/^e-(s\d|hs|sec|avs|bp\d|c[A-Z]+s2?$)/.test(e.id)) return st.header.chws;   /* bp: the DP bypass passes supply water (P3) */
+      if(/^e-(r\d|hr|ev\d|p[a-rt-z]\d|avr|et$|c[A-Z]+r2?$)/.test(e.id)) return st.header.chwr;   /* r2: PICV to the return header (P3) */
       return null;
     },
     speed: function(id){
@@ -1883,7 +1928,11 @@ function drawPid(){
   var host = document.getElementById('chw-sheet-host');
   if(!host) return;
   var NS = 'http://www.w3.org/2000/svg';
-  var svg = null, ov = null, mo = null, ro = null, seen = null, io = null, fo = null, oio = null, inView = new Set(), queued = false;
+  var svg = null, ov = null, rv = null, mo = null, ro = null, fo = null, oio = null, inView = new Set(), queued = false;
+  /* PRD-CONV-OPS-DEPTH 01 P2 (OD-CP-23): rotors left the 3 Hz clock. At 1 s a turn a 3 Hz step is 120 degrees, so a
+     faster rotor read as slower or backwards (wagon wheel). Each running rotor is copied onto its own thin layer (rv) and
+     turned at 10 Hz there; the sheet's rotor keeps its paused CSS animation (gates read its duration) but is hidden. */
+  var REDUCED = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   /* copy after the sheet's own repaint has reached the screen (an alarm mark must not wait for the copy) */
   function later(){ if(queued) return; queued = true; setTimeout(function(){ queued = false; sync(); }, 120); }
   var COPY = ['stroke', 'stroke-width', 'stroke-dasharray', 'stroke-linecap', 'opacity'];
@@ -1899,6 +1948,31 @@ function drawPid(){
     ov.setAttribute('viewBox', svg.getAttribute('viewBox') || '');
     ov.setAttribute('preserveAspectRatio', svg.getAttribute('preserveAspectRatio') || 'xMidYMid meet');
     ov.style.transform = svg.style.transform; ov.style.transformOrigin = svg.style.transformOrigin;
+    if(rv) syncRotors();   /* pan / zoom / resize moves the sheet rotors: move their copies */
+  }
+  /* each spinning rotor gets an HTML copy over its hidden sheet rotor, turned by a CSS transform animation: transform on
+     an HTML layer runs on the compositor, so the main thread does no work per frame (a script-stepped SVG layer cost
+     ~1.3 s of main-thread time per 5 s idle, measured A/B, PERF1) */
+  function syncRotors(){
+    if(!svg || !rv || REDUCED) return;
+    var src = svg.querySelectorAll('.vfx-rotor[data-spin]'), pr = rv.getBoundingClientRect();
+    while(rv.children.length > src.length) rv.removeChild(rv.lastChild);
+    for(var i = 0; i < src.length; i++){
+      var a = src[i], o = rv.children[i];
+      if(!o){ o = document.createElement('div'); o.className = 'chw-rotor-copy';
+        o.innerHTML = '<svg viewBox="-1 -1 2 2" width="100%" height="100%"><circle r="0.86" fill="none"></circle></svg>'; rv.appendChild(o); }
+      var cs = getComputedStyle(a), b = a.getBoundingClientRect(), c = o.firstChild.firstChild;
+      var rr = parseFloat(a.getAttribute('r')) || 1, sw = parseFloat(cs.getPropertyValue('stroke-width')) || 1, k = 0.86 / rr;
+      /* three equal blades, 120 degrees apart (OD-CP-23) */
+      var third = 2 * Math.PI * 0.86 / 3;
+      var st = 'stroke:' + cs.getPropertyValue('stroke') + ';stroke-width:' + (sw * k).toFixed(3) + ';opacity:' + cs.getPropertyValue('opacity')
+        + ';stroke-dasharray:' + (third / 2).toFixed(3) + ' ' + (third / 2).toFixed(3);
+      if(c.getAttribute('style') !== st) c.setAttribute('style', st);
+      var sec = parseFloat(cs.animationDuration) || 0;
+      var box = 'left:' + (b.left - pr.left).toFixed(1) + 'px;top:' + (b.top - pr.top).toFixed(1) + 'px;width:' + b.width.toFixed(1) + 'px;height:' + b.height.toFixed(1)
+        + 'px;animation-duration:' + (sec > 0 ? sec : 1) + 's;animation-play-state:' + (sec > 0 ? 'running' : 'paused');
+      if(o.getAttribute('style') !== box) o.setAttribute('style', box);
+    }
   }
   function sync(){
     if(!svg || !ov) return;
@@ -1917,19 +1991,27 @@ function drawPid(){
       var dur = parseFloat(cs.animationDuration) || 0, run = cs.animationName !== 'none' && dur > 0 && st.indexOf('display:none') < 0;
       motion[i] = run ? (/reverse/.test(cs.animationDirection) ? -dur : dur) : 0;
     }
+    syncRotors();
   }
   function mount(){
     var cur = host.querySelector('svg.hmi-svg');
     if(cur === svg) return;
-    if(mo) mo.disconnect(); if(ro) ro.disconnect(); if(io) io.disconnect(); if(fo) fo.disconnect(); if(oio) oio.disconnect();
+    if(mo) mo.disconnect(); if(ro) ro.disconnect(); if(fo) fo.disconnect(); if(oio) oio.disconnect();
     if(ov && ov.parentNode) ov.parentNode.removeChild(ov);
-    svg = cur; ov = null; seen = new Set();
+    if(rv && rv.parentNode) rv.parentNode.removeChild(rv);
+    svg = cur; ov = null; rv = null;
     if(!svg) return;
     ov = document.createElementNS(NS, 'svg');
     ov.setAttribute('class', 'chw-flow-layer'); ov.setAttribute('aria-hidden', 'true');
     var par = svg.parentNode; if(getComputedStyle(par).position === 'static') par.style.position = 'relative';
     par.insertBefore(ov, svg.nextSibling);
     svg.classList.add('chw-flow-lifted');
+    if(!REDUCED){
+      rv = document.createElement('div');
+      rv.className = 'chw-rotor-layer'; rv.setAttribute('aria-hidden', 'true');
+      par.insertBefore(rv, ov.nextSibling);
+      svg.classList.add('chw-rotor-lifted');
+    }
     place(); sync();
     inView = new Set();
     if(typeof IntersectionObserver === 'function'){
@@ -1938,17 +2020,14 @@ function drawPid(){
       Array.prototype.forEach.call(ov.children, function(c){ oio.observe(c); });
     } else for(var q = 0; q < ov.children.length; q++) inView.add(q);
     /* the flow lines change only when js/conv/vfx.js repaints them: copy then, not on a timer */
-    fo = new MutationObserver(function(rs){ for(var r = 0; r < rs.length; r++){ var t = rs[r].target; if(t.classList && t.classList.contains('hmi-flow')){ later(); return; } } });
-    fo.observe(svg, { subtree: true, attributes: true, attributeFilter: ['class', 'style', 'data-flow', 'data-vstate', 'data-vmove', 'd'] });
+    fo = new MutationObserver(function(rs){ for(var r = 0; r < rs.length; r++){ var t = rs[r].target; if(t.classList && (t.classList.contains('hmi-flow') || t.classList.contains('vfx-rotor'))){ later(); return; } } });
+    fo.observe(svg, { subtree: true, attributes: true, attributeFilter: ['class', 'style', 'data-flow', 'data-vstate', 'data-vmove', 'd', 'data-spin'] });
     mo = new MutationObserver(function(){ place(); });
     mo.observe(svg, { attributes: true, attributeFilter: ['viewBox', 'style'] });
     var frame = svg.closest('.hmi-frame');
     if(frame) new MutationObserver(later).observe(frame, { attributes: true, attributeFilter: ['data-vfx-mode'] });
     if(typeof ResizeObserver === 'function'){ ro = new ResizeObserver(place); ro.observe(svg); }
-    if(typeof IntersectionObserver === 'function'){
-      io = new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting) seen.add(e.target); else seen.delete(e.target); }); });
-      svg.querySelectorAll('.vfx-rotor').forEach(function(el){ io.observe(el); });
-    } else seen = null;
+
   }
   setInterval(function(){ if(!document.hidden) mount(); }, 500);   /* a redrawn sheet is a new svg: mount it */
   setInterval(function(){                         /* the flow layer: 24 Hz step of the copies in view (a thin layer) */
@@ -1956,14 +2035,7 @@ function drawPid(){
     var t = performance.now() / 1000, kids = ov.children;   /* the dash offset is written directly: no style or animation work */
     inView.forEach(function(k){ var o = kids[k], m = motion[k]; if(o && m) o.setAttribute('stroke-dashoffset', (-16 * ((t / m) % 1)).toFixed(2)); });
   }, 42);
-  setInterval(function(){                         /* rotors: 3 Hz step (each step repaints the sheet) */
-    if(document.hidden || host.classList.contains('is-offscreen')) return;
-    mount();
-    if(!svg) return;
-    var d = '-' + (performance.now() / 1000).toFixed(2) + 's';
-    var els = seen ? Array.from(seen) : svg.querySelectorAll('.vfx-rotor');
-    for(var i = 0; i < els.length; i++){ var el = els[i]; if(el.isConnected && el.hasAttribute('data-spin')) el.style.animationDelay = d; }
-  }, 333);
+  setInterval(function(){ if(!document.hidden) mount(); }, 100);   /* rotors: a redrawn sheet is a new svg, re-copy at once (P2, OD-CP-23) */
 })();
 
 function selectChwView(view){
@@ -2557,13 +2629,17 @@ function renderAll(){
 
 function applyScenario(v){
   ui.scenario = v;
-  $("scLbl").textContent = v === "custom" ? "Custom" : (v === "balanced" ? "Balanced" : (v === "high" ? "High Load" : "Degraded"));
+  $("scLbl").textContent = ({ custom: "Custom", balanced: "Balanced", high: "High Load", degraded: "Degraded", lowload: "Low load 40 %", cold: "Cold weather" })[v] || "Custom";
   if(v === "balanced"){
     st.sp.chws = (CHW.chws != null ? CHW.chws : null); st.sp.dp = 90; st.sp.flow = LOOP_FLOW_DESIGN != null ? r1(LOOP_FLOW_DESIGN) : null; ui.maint = true; ui.forced.clear();
   }else if(v === "high"){
     /* High load: operator holds the secondary at the primary header (no bypass)
        to maximise coil capacity. Authored 17.4 C was below the primary. */
     st.sp.chws = (CHW.chws != null ? CHW.chws : null); st.sp.dp = 112; st.sp.flow = LOOP_FLOW_DESIGN != null ? r1(LOOP_FLOW_DESIGN * 1.1) : null; ui.maint = true; ui.forced.clear();
+  }else if(v === "lowload" || v === "cold"){
+    /* PRD-CONV-OPS-DEPTH 01 P3 drills: the setpoints stay balanced; MV-01 (low load) and TV-01 (cold weather) read
+       the engine's own off-design solve, CONV_CALC.bypassAtLoad(0.4) and towerBypassAt(8) */
+    st.sp.chws = (CHW.chws != null ? CHW.chws : null); st.sp.dp = 90; st.sp.flow = LOOP_FLOW_DESIGN != null ? r1(LOOP_FLOW_DESIGN) : null; ui.maint = true; ui.forced.clear();
   }else if(v === "degraded"){
     /* Degraded: reduced primary flow forces decoupler bypass, so the secondary
        supply drifts ABOVE the header. Expressed as an offset, not a literal. */

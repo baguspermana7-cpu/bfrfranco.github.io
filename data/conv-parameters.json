@@ -1,6 +1,6 @@
 {
   "generatedBy": "tools/build-conv-parameter-registry.mjs",
-  "engineVersion": "2.7.0",
+  "engineVersion": "2.8.0",
   "note": "GENERATED — do not hand-edit. Curated metadata lives in data/conv-parameters.curated.json; limits in data/conv-limits.curated.json.",
   "parameters": [
     {
@@ -566,6 +566,167 @@
       }
     },
     {
+      "id": "cooling.cdw_balance_kv_set",
+      "label": "Tower bypass balancing valve Kv",
+      "unit": "m3/h/bar^0.5",
+      "kind": "derived",
+      "value": 10600,
+      "formula": "Q[m3/h] x sqrt(1 / dP[bar]) at the static lift",
+      "formulaNotExpressible": "A square root (Kv = Q / sqrt(dP)); the evaluator accepts + - * / and ceil only. Checked in tools/test-conv-plant-valves.mjs OD-CP-11.",
+      "deps": [
+        "cooling.cdw_bypass_design_flow_lps",
+        "cooling.cdw_static_head_m"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "cooling.cdw_range_k",
+        "cooling.cdw_static_head_m",
+        "cooling.cdw_supply_c",
+        "cooling.chiller_cond_approach_k",
+        "cooling.chiller_evap_approach_k",
+        "cooling.chiller_motor_efficiency",
+        "cooling.chiller_rated_specific_power_kw_e_per_kw_th",
+        "cooling.chiller_rating_cdw_gpm_per_ton",
+        "cooling.chiller_rating_cdw_supply_c",
+        "cooling.chiller_rating_chws_c",
+        "cooling.chiller_unit_kw_th",
+        "cooling.chiller_vfd_efficiency",
+        "cooling.chw_coil_approach_k",
+        "cooling.gravity_m_s2",
+        "cooling.rack_inlet_target_c",
+        "cooling.supply_path_mixing_k",
+        "cooling.water_cp_kj_per_kg_k",
+        "cooling.water_density_kg_m3",
+        "electrical.ups_efficiency"
+      ],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 1
+        }
+      ],
+      "tests": [
+        "test-conv-plant-valves.mjs"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "section": "plantInternals()",
+        "method": "IEC 60534-2-1 Kv at rho_rel = 1."
+      }
+    },
+    {
+      "id": "cooling.cdw_bypass_design_flow_lps",
+      "label": "Tower bypass design flow",
+      "unit": "L/s",
+      "kind": "derived",
+      "value": 1844.1,
+      "formula": "running chillers x rated condenser flow",
+      "formulaNotExpressible": "Rated condenser flow uses the rated heat of compression ratio (1 + 1/COP at rating), an internal of the solve not published as a scalar.",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "cooling.cdw_range_k",
+        "cooling.cdw_supply_c",
+        "cooling.chiller_cond_approach_k",
+        "cooling.chiller_evap_approach_k",
+        "cooling.chiller_motor_efficiency",
+        "cooling.chiller_rated_specific_power_kw_e_per_kw_th",
+        "cooling.chiller_rating_cdw_gpm_per_ton",
+        "cooling.chiller_rating_cdw_supply_c",
+        "cooling.chiller_rating_chws_c",
+        "cooling.chiller_unit_kw_th",
+        "cooling.chiller_vfd_efficiency",
+        "cooling.chw_coil_approach_k",
+        "cooling.rack_inlet_target_c",
+        "cooling.supply_path_mixing_k",
+        "cooling.water_cp_kj_per_kg_k",
+        "electrical.ups_efficiency"
+      ],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 1
+        }
+      ],
+      "tests": [
+        "test-conv-plant-valves.mjs"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "section": "plantInternals()",
+        "method": "Full condenser flow the 3-way valve can divert."
+      }
+    },
+    {
+      "id": "cooling.cdw_bypass_x_pct",
+      "label": "Tower 3-way bypass share (B port)",
+      "unit": "%",
+      "kind": "authored",
+      "value": 0,
+      "formula": "clamp((min ECWT - tower leaving) / (return - tower leaving)) x 100",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "SIMULATED",
+      "explainKey": null,
+      "dependsOnInputs": [],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 1
+        }
+      ],
+      "tests": [
+        "test-conv-plant-valves.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "section": "plantInternals() valveKeys",
+        "method": "Zero at the design wet bulb; swept 0-30 C by towerBypassAt() in OD-CP-10."
+      }
+    },
+    {
+      "id": "cooling.cdw_entering_c",
+      "label": "Condenser water entering the chillers",
+      "unit": "°C",
+      "kind": "authored",
+      "value": 32,
+      "formula": "mix of tower leaving and bypassed return",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "SIMULATED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "cooling.cdw_supply_c"
+      ],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 1
+        }
+      ],
+      "tests": [
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "section": "plantInternals() valveKeys",
+        "method": "Equals the tower leaving temperature while the bypass is shut (OD-CP-10)."
+      }
+    },
+    {
       "id": "cooling.cdw_fleet_kw_e",
       "label": "Condenser-water pump fleet input",
       "unit": "kW_e",
@@ -1083,6 +1244,7 @@
         }
       ],
       "tests": [
+        "test-conv-plant-valves.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)",
         "test-conv-basis-drawer.mjs (drawer value vs chiller-plant.html)"
       ],
@@ -1157,6 +1319,7 @@
         }
       ],
       "tests": [
+        "test-conv-plant-valves.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [],
@@ -2251,6 +2414,67 @@
         "section": "plantInternals()",
         "asOf": "2026-11-18",
         "method": "Derived in the engine (plantInternals(), engine 2.4.0) from published engine quantities and the authored internals basis; a consistent simulation, not a vendor rating."
+      }
+    },
+    {
+      "id": "cooling.chiller_min_ecwt_c",
+      "label": "Chiller minimum entering condenser water",
+      "unit": "°C",
+      "kind": "authored",
+      "value": 15,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "cooling.chiller_min_ecwt_c"
+      ],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 1
+        }
+      ],
+      "tests": [
+        "test-conv-plant-valves.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "method": "minimum entering condenser-water temperature of the chillers (manufacturer limit; AHRI 550/590 rates at 29.4 C and allows relief)."
+      }
+    },
+    {
+      "id": "cooling.chiller_min_evap_flow_pct",
+      "label": "Chiller minimum evaporator flow",
+      "unit": "%",
+      "kind": "authored",
+      "value": 40,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "cooling.chiller_min_evap_flow_pct"
+      ],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 1
+        }
+      ],
+      "tests": [
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "method": "minimum evaporator flow of a centrifugal chiller, % of design (manufacturer data-sheet range 30-50 %)."
       }
     },
     {
@@ -3509,6 +3733,66 @@
       }
     },
     {
+      "id": "cooling.chw_bypass_flow_lps",
+      "label": "DP bypass (MV-01) flow",
+      "unit": "L/s",
+      "kind": "authored",
+      "value": 0,
+      "formula": "max(0, minimum plant flow - load flow)",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "SIMULATED",
+      "explainKey": null,
+      "dependsOnInputs": [],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 2
+        }
+      ],
+      "tests": [
+        "test-conv-plant-valves.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "section": "plantInternals() valveKeys",
+        "method": "Zero at the adopted load: the load flow exceeds the minimum. Swept in tools/test-conv-plant-valves.mjs OD-CP-08."
+      }
+    },
+    {
+      "id": "cooling.chw_bypass_open_pct",
+      "label": "DP bypass (MV-01) opening",
+      "unit": "%",
+      "kind": "authored",
+      "value": 0,
+      "formula": "bypass flow / minimum plant flow x 100",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "SIMULATED",
+      "explainKey": null,
+      "dependsOnInputs": [],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 1
+        }
+      ],
+      "tests": [
+        "test-conv-plant-valves.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "section": "plantInternals() valveKeys",
+        "method": "Closed at the adopted load. Swept by bypassAtLoad() in OD-CP-08."
+      }
+    },
+    {
       "id": "cooling.chw_coil_approach_k",
       "label": "CHW coil approach",
       "unit": "K",
@@ -3544,6 +3828,36 @@
       }
     },
     {
+      "id": "cooling.chw_decoupler_flow_lps",
+      "label": "Decoupler flow",
+      "unit": "L/s",
+      "kind": "authored",
+      "value": 0,
+      "formula": "sum primary flow - sum secondary flow",
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "SIMULATED",
+      "explainKey": null,
+      "dependsOnInputs": [],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 1
+        }
+      ],
+      "tests": [
+        "test-conv-plant-valves.mjs",
+        "test-conv-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "section": "plantInternals() valveKeys",
+        "method": "Zero at the adopted point (OD-CP-09)."
+      }
+    },
+    {
       "id": "cooling.chw_delta_t",
       "label": "CHW delta-T",
       "unit": "K",
@@ -3574,6 +3888,7 @@
       ],
       "tests": [
         "test-conv-calc.mjs",
+        "test-conv-plant-valves.mjs",
         "test-conv-basis-drawer.mjs (drawer value vs datahall.html)"
       ],
       "docs": [],
@@ -3582,6 +3897,48 @@
         "asOf": "2026-08-28",
         "section": "line 83",
         "method": "Carried unchanged from the prior basis so plant flow and duty arithmetic are unchanged."
+      }
+    },
+    {
+      "id": "cooling.chw_min_plant_flow_lps",
+      "label": "Minimum plant CHW flow",
+      "unit": "L/s",
+      "kind": "derived",
+      "value": 440.1,
+      "formula": "running chillers x minimum evaporator flow share x rated evaporator flow",
+      "formulaExpr": "cooling.chillers_running * cooling.chiller_min_evap_flow_pct / 100 * cooling.chiller_unit_kw_th / (cooling.water_cp_kj_per_kg_k * cooling.chw_delta_t)",
+      "deps": [
+        "cooling.chillers_running",
+        "cooling.chiller_min_evap_flow_pct",
+        "cooling.chiller_unit_kw_th",
+        "cooling.water_cp_kj_per_kg_k",
+        "cooling.chw_delta_t"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "cooling.chiller_min_evap_flow_pct",
+        "cooling.chiller_unit_kw_th",
+        "cooling.chw_delta_t_k",
+        "cooling.water_cp_kj_per_kg_k",
+        "electrical.ups_efficiency"
+      ],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 1
+        }
+      ],
+      "tests": [
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "section": "plantInternals()",
+        "method": "Flow the DP bypass must hold through the running chillers."
       }
     },
     {
@@ -4262,6 +4619,7 @@
       "consumers": [],
       "tests": [
         "test-conv-plant-internals.mjs",
+        "test-conv-plant-valves.mjs",
         "test-conv-pump-speed.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
@@ -4734,6 +5092,45 @@
       }
     },
     {
+      "id": "cooling.crah_design_coil_flow_lps",
+      "label": "CRAH coil design water flow",
+      "unit": "L/s",
+      "kind": "derived",
+      "value": 4.09,
+      "formula": "rated sensible / (cp x CHW dT)",
+      "formulaExpr": "cooling.crah_unit_sensible_kw / (cooling.water_cp_kj_per_kg_k * cooling.chw_delta_t)",
+      "deps": [
+        "cooling.crah_unit_sensible_kw",
+        "cooling.water_cp_kj_per_kg_k",
+        "cooling.chw_delta_t"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "cooling.chw_delta_t_k",
+        "cooling.crah_unit_sensible_kw",
+        "cooling.water_cp_kj_per_kg_k"
+      ],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 1
+        }
+      ],
+      "tests": [
+        "test-conv-plant-valves.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "section": "plantInternals()",
+        "method": "Coil flow at the rated duty."
+      }
+    },
+    {
       "id": "cooling.crah_fan_hz",
       "label": "CRAH fan drive frequency",
       "unit": "Hz",
@@ -5127,8 +5524,14 @@
         "cooling.crah_unit_sensible_kw",
         "cooling.water_cp_kj_per_kg_k"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 1
+        }
+      ],
       "tests": [
+        "test-conv-plant-valves.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
       "docs": [],
@@ -5166,6 +5569,7 @@
       ],
       "consumers": [],
       "tests": [
+        "test-conv-plant-valves.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
       "docs": [],
@@ -5238,6 +5642,7 @@
         }
       ],
       "tests": [
+        "test-conv-plant-valves.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [],
@@ -5245,6 +5650,48 @@
         "ref": "js/conv-engine.js",
         "asOf": "2026-09-05",
         "method": "No vendor selection has been made. Was authored on datahall.html, where it sized the whole fleet and nothing in the registry could explain any of the results."
+      }
+    },
+    {
+      "id": "cooling.crah_valve_open_pct",
+      "label": "CRAH PICV opening",
+      "unit": "%",
+      "kind": "derived",
+      "value": 99.5,
+      "formula": "coil flow / design coil flow x 100 (= duty / rated at one dT)",
+      "formulaExpr": "cooling.crah_unit_duty_kw / cooling.crah_unit_sensible_kw * 100",
+      "deps": [
+        "cooling.crah_unit_duty_kw",
+        "cooling.crah_unit_sensible_kw"
+      ],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "campus.halls.0.it_load_kw",
+        "campus.halls.1.it_load_kw",
+        "campus.halls.2.it_load_kw",
+        "campus.halls.3.it_load_kw",
+        "cooling.crah_unit_sensible_kw"
+      ],
+      "consumers": [
+        {
+          "page": "chiller-plant.html",
+          "reads": 1
+        }
+      ],
+      "tests": [
+        "test-conv-plant-valves.mjs",
+        "test-conv-formula.mjs (formula evaluated)"
+      ],
+      "docs": [
+        "standarization/CONVENTIONAL_DC_OPERATIONS_STANDARD.md"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "section": "plantInternals()",
+        "method": "Pressure-independent valve: flow proportional to opening."
       }
     },
     {
@@ -5400,6 +5847,7 @@
       "tests": [
         "test-conv-internals-p3.mjs",
         "test-conv-plant-internals.mjs",
+        "test-conv-plant-valves.mjs",
         "test-conv-pump-speed.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
       ],
@@ -6810,6 +7258,7 @@
         }
       ],
       "tests": [
+        "test-conv-plant-valves.mjs",
         "test-conv-pump-speed.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)",
         "test-conv-basis-drawer.mjs (drawer value vs datahall.html)"
@@ -6841,6 +7290,7 @@
       "tests": [
         "test-conv-internals-p3.mjs",
         "test-conv-plant-internals.mjs",
+        "test-conv-plant-valves.mjs",
         "test-conv-pump-speed.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
       ],
@@ -11982,7 +12432,7 @@
         },
         {
           "page": "chiller-plant.html",
-          "reads": 10
+          "reads": 9
         },
         {
           "page": "water-system.html",
@@ -12192,7 +12642,7 @@
         },
         {
           "page": "chiller-plant.html",
-          "reads": 6
+          "reads": 9
         },
         {
           "page": "water-system.html",
@@ -12270,7 +12720,7 @@
       "label": "Engine version",
       "unit": null,
       "kind": "authored",
-      "value": "2.7.0",
+      "value": "2.8.0",
       "formula": null,
       "formulaNotExpressible": "The engine's own version string.",
       "deps": [],

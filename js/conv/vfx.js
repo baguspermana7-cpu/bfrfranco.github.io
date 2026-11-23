@@ -84,6 +84,17 @@
   function setS(el, k, v) { if (el.style.getPropertyValue(k) !== (v || '')) { if (v) el.style.setProperty(k, v); else el.style.removeProperty(k); } }
   function endsOf(p) { return (p.getAttribute('data-ends') || '|').split('|'); }
 
+  /* a tower cell's fan sits in its stack (symbol units: hub at 24,3 of the 48-unit box), a pump's rotor inside its
+     casing circle; both are the same broken ring, turned by CSS on the compositor (PRD-CONV-OPS-DEPTH 01 P2) */
+  function fanRotor(g) {
+    var r = g.querySelector('.vfx-rotor'); if (r) return r;
+    var b = g.querySelector('path.b'); if (!b) return null;
+    r = root.document.createElementNS(NS, 'circle');
+    r.setAttribute('class', 'vfx-rotor vfx-fan'); r.setAttribute('aria-hidden', 'true');
+    r.setAttribute('cx', '24'); r.setAttribute('cy', '3'); r.setAttribute('r', '4.5');
+    b.parentNode.insertBefore(r, b.nextSibling);
+    return r;
+  }
   function rotor(g) {
     var r = g.querySelector('.vfx-rotor'); if (r) return r;
     var b = g.querySelector('circle.b'); if (!b) return null;
@@ -105,8 +116,9 @@
       /* a symbol that carries no state of its own (junction, vent, connector) takes none */
       setA(g, 'data-vstate', g.getAttribute('data-state') == null && !g.getAttribute('data-alarm') ? null : st);
       worst[id] = g.hasAttribute('data-mismatch') ? 'm' : g.getAttribute('data-alarm');
-      if (g.querySelector('circle.b') && /pump/i.test(g.getAttribute('data-sym') || g.getAttribute('class') || '')) {
-        var rt = rotor(g), sec = st === 'running' || st === 'warning' ? rotorSeconds(o.speed ? o.speed(id) : null) : null;
+      var sym = g.getAttribute('data-sym') || g.getAttribute('class') || '', fan = /coolingTowerCell/.test(sym);
+      if (fan || (g.querySelector('circle.b') && /pump/i.test(sym))) {
+        var rt = fan ? fanRotor(g) : rotor(g), sec = st === 'running' || st === 'warning' ? rotorSeconds(o.speed ? o.speed(id) : null) : null;
         if (rt) { setA(rt, 'data-spin', sec ? '1' : null); setS(rt, 'animation-duration', sec ? sec + 's' : ''); }
       }
     });

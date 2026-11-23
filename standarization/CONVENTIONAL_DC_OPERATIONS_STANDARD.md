@@ -358,6 +358,16 @@ Before release:
   (OD-CP-06). Only dedicated branches (primary, CDW, tower fans) gain from more units running.
 - **Gate:** `tools/test-conv-pump-speed.mjs`.
 
+### 2026-11-23 — valves open by the solve (PRD-CONV-OPS-DEPTH 01 P3, engine 2.8.0)
+
+- **A valve's opening is a relation, not a number.** PICV = coil flow / design coil flow; the DP bypass opens only when
+  the load flow falls below the running chillers' minimum evaporator flow (Q_bp = Q_min − Q_load); the tower 3-way
+  bypass mixes return water in only to hold the chillers' minimum entering condenser water. A page reads
+  `cooling.crah_valve_open_pct`, `chw_bypass_open_pct`, `cdw_bypass_x_pct`, never types one.
+- **Off-design is the engine's too.** A drill calls `CONV_CALC.bypassAtLoad(frac)` / `towerBypassAt(wb)` and labels
+  what it changed; it never scales a page number.
+- **Gate:** `tools/test-conv-plant-valves.mjs`.
+
 ### 2026-11-20 — quantity truth on the chiller plant sheets (CH-M-101 + CH-M-102, PRD-CONV-EQUIPMENT-TRUTH E3)
 
 - **The sheet holds no count.** `js/conv/chiller-sheet.js` builds both sheets from `CONV_CALC.getFleet()`

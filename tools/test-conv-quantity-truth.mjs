@@ -422,7 +422,9 @@ async function perfOf(origin, label) {
      on the display clock — yet the running lines still carry their motion and their phase advances between samples */
   const anim = await pg.evaluate(async () => {
     const host = document.querySelector('#chw-sheet-host'); if (!host) return null;
-    const all = host.getAnimations({ subtree: true });
+    /* a rotor copy (.chw-rotor-copy, an HTML element animating transform only) runs on the compositor, not the display
+       clock of the main thread; test-conv-plant-rotors OD-CP-23 asserts that shape, so it is the one exemption here */
+    const all = host.getAnimations({ subtree: true }).filter((a) => !(a.effect && a.effect.target && a.effect.target.classList.contains('chw-rotor-copy')));
     /* PRD-CONV-BMS-LIVE: the running flow is drawn on its own thin layer over the sheet (.chw-flow-copy, offset stepped
        by script); the sheet's own lines are hidden. Phase is read where the motion is drawn. */
     const lay = [...host.querySelectorAll('svg.chw-flow-layer .chw-flow-copy')].filter((e) => getComputedStyle(e).display !== 'none');

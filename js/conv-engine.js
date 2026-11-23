@@ -686,6 +686,11 @@
             cdw_static_head_m: 4,
             // source: ASSUMED remote DP setpoint of the secondary loop = the chiller-plant page's default setpoint (60-140 kPa slider). evidenceClass: 'ASSUMED'
             chw_secondary_dp_setpoint_kpa: 90,
+            /* 2.8.0 (PRD-CONV-OPS-DEPTH 01 P3): minimum-flow and condenser-water limits behind the bypass valves.
+             * source: ASSUMED minimum evaporator flow of a centrifugal chiller, % of design (manufacturer data-sheet range 30-50 %). evidenceClass: 'ASSUMED' */
+            chiller_min_evap_flow_pct: 40,
+            // source: ASSUMED minimum entering condenser-water temperature of the chillers (manufacturer limit; AHRI 550/590 rates at 29.4 C and allows relief). evidenceClass: 'ASSUMED'
+            chiller_min_ecwt_c: 15,
             // source: PRD OD-4 — one duty + one standby primary pump per chiller train. evidenceClass: 'ADOPTED'
             chw_primary_pumps_per_train: 2,
             // source: ASSUMED primary (evaporator) loop head, m. evidenceClass: 'ASSUMED'
@@ -906,7 +911,7 @@
             basis: 'Adopted project scenario — simulated, not measured telemetry',
             basis_doc: 'conv/review/09-engineering-basis-and-calculations.md',
             study_doc: 'js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)',
-            version: '2.7.0'
+            version: '2.8.0'
         }
     };
 
@@ -1309,6 +1314,15 @@
         var n = Math.sqrt((hsys + (h0 - headDesignM) * xp * xp) / h0);
         return Math.max(c.pump_min_speed_pct / 100, n);
     }
+    /* 2.8.0 — tower bypass (3-way TV-01, B port to the condenser return): the mixed entering condenser temperature
+     * T_ecw = x T_return + (1 - x) T_cold is held at or above chiller_min_ecwt_c, so
+     * x = clamp((T_min - T_cold) / (T_return - T_cold), 0, 1). T_cold = wet-bulb + tower approach. */
+    function towerBypass(c, wbC) {
+        var approach = c.cdw_supply_c - c.tower_design_wet_bulb_c;
+        var tCold = wbC + approach, tRet = tCold + c.cdw_range_k;
+        var x = Math.min(1, Math.max(0, (c.chiller_min_ecwt_c - tCold) / (tRet - tCold)));
+        return { x: x, tCold: tCold, tRet: tRet, tEcw: x * tRet + (1 - x) * tCold };
+    }
     function kpaToHeadM(c, kpa) { return kpa * 1000 / (c.water_density_kg_m3 * c.gravity_m_s2); }
 
     function pumpElectricalKw(c, flowLps, headM) {
@@ -1413,7 +1427,8 @@
             fanKw: fanKw, fanFleet: fanFleet,
             crahDuty: crahDuty, crahLoad: crahLoad, crahChw: crahChw,
             mechInput: mechInput, mechHeadroom: mechHeadroom,
-            priSpeed: priSpeed, secSpeed: secSpeed, cdwSpeed: cdwSpeed, secXp: secXp, secXs: secXs
+            priSpeed: priSpeed, secSpeed: secSpeed, cdwSpeed: cdwSpeed, secXp: secXp, secXs: secXs,
+            dutyFlow: dutyFlow, running: running, priDesignFlow: priDesignFlow, cdwDesignFlow: cdwDesignFlow
         };
     }
 
@@ -1426,7 +1441,8 @@
         'chw_secondary_head_m', 'cdw_head_m', 'chw_secondary_unit_flow_lps', 'pump_standby_per_header',
         'tower_design_wet_bulb_c', 'tower_fan_motor_kw', 'tower_standby_cells',
         /* 2.7.0 */ 'motor_base_frequency_hz', 'pump_shutoff_head_ratio', 'pump_min_speed_pct', 'cdw_static_head_m',
-        'chw_secondary_dp_setpoint_kpa'
+        'chw_secondary_dp_setpoint_kpa',
+        /* 2.8.0 */ 'chiller_min_evap_flow_pct', 'chiller_min_ecwt_c'
     ];
     function withPlantInternals(m, base) {
         var out = {}, key, i;
@@ -1547,6 +1563,31 @@
             crah_fan_hz: p.crahLoad === null ? null : round2(fb * p.crahLoad / 100)
         };
         for (key in speedKeys) { if (Object.prototype.hasOwnProperty.call(speedKeys, key)) derived[key] = speedKeys[key]; }
+        /* ADDITIVE (2.8.0) — the plant's valves (PRD-CONV-OPS-DEPTH 01 P3, §6.2-6.3)
+         * PICV on a CRAH coil: pressure-independent, flow proportional to opening, so opening = coil flow / design coil flow.
+         * DP bypass MV-01: opens only when the load flow falls below the running chillers' minimum evaporator flow;
+         *   Q_bp = max(0, Q_min - Q_load); the valve is sized to pass the whole minimum flow at zero load, so opening = Q_bp / Q_min.
+         * Decoupler: sum primary - sum secondary (0 when both carry the duty flow).
+         * TV-01 tower bypass and its balancing valve: Kv = Q [m3/h] x sqrt(1 / dP [bar]) (IEC 60534-2-1, rho_rel = 1),
+         *   sized for the full condenser flow at the static lift it replaces. */
+        var crahDesignFlow = cc.crah_unit_sensible_kw / (cc.water_cp_kj_per_kg_k * chwDeltaT(m));
+        var qMin = p.running * cc.chiller_min_evap_flow_pct / 100 * p.priDesignFlow;
+        var qBp = Math.max(0, qMin - p.dutyFlow), qBpCap = qMin;
+        var tb = towerBypass(cc, cc.tower_design_wet_bulb_c);
+        var qCdwDesign = p.running * p.cdwDesignFlow, dpLegBar = cc.water_density_kg_m3 * cc.gravity_m_s2 * cc.cdw_static_head_m / 1e5;
+        var valveKeys = {
+            crah_valve_open_pct: p.crahChw === null ? null : round1(p.crahChw / crahDesignFlow * 100),
+            crah_design_coil_flow_lps: round2(crahDesignFlow),
+            chw_min_plant_flow_lps: round1(qMin),
+            chw_bypass_flow_lps: round1(qBp),
+            chw_bypass_open_pct: round1(Math.min(100, qBp / qBpCap * 100)),
+            chw_decoupler_flow_lps: p.unitChwFlow === null || p.secFlow === null ? null : round1(p.running * p.unitChwFlow - p.secDuty * p.secFlow),
+            cdw_bypass_x_pct: round1(tb.x * 100),
+            cdw_entering_c: round2(tb.tEcw),
+            cdw_bypass_design_flow_lps: round1(qCdwDesign),
+            cdw_balance_kv_set: dpLegBar > 0 ? round1(qCdwDesign * 3.6 * Math.sqrt(1 / dpLegBar)) : null
+        };
+        for (key in valveKeys) { if (Object.prototype.hasOwnProperty.call(valveKeys, key)) derived[key] = valveKeys[key]; }
         for (key in derived) { if (Object.prototype.hasOwnProperty.call(derived, key)) out[key] = derived[key]; }
         return out;
     }
@@ -2052,6 +2093,21 @@
             if (!(dpKpa >= 0)) return null;
             var n = pumpSpeedFraction(c, p.secXp, p.secXs, c.chw_secondary_head_m, kpaToHeadM(c, dpKpa));
             return n === null ? null : { speedPct: round1(n * 100), hz: round2(c.motor_base_frequency_hz * n), dpKpa: dpKpa };
+        },
+        /* engine 2.8.0 — the tower bypass at any wet-bulb (the page's cold-weather drill): B-port share and the mixed ECWT */
+        towerBypassAt: function (wbC, m) {
+            if (typeof wbC !== 'number' || !isFinite(wbC)) return null;
+            var t = towerBypass((m || CONV_MODEL).cooling, wbC);
+            return { xPct: round1(t.x * 100), aPct: round1(100 - t.x * 100), tColdC: round2(t.tCold), tEcwC: round2(t.tEcw) };
+        },
+        /* engine 2.8.0 — the DP bypass at a fraction of today's load flow with today's chillers still running (the page's
+         * low-load drill: the moment before the sequence stages a chiller off) */
+        bypassAtLoad: function (loadFrac, m) {
+            var mm = m || CONV_MODEL, c = mm.cooling, p = plantInternals(mm);
+            if (!(loadFrac >= 0)) return null;
+            var qMin = p.running * c.chiller_min_evap_flow_pct / 100 * p.priDesignFlow, qLoad = p.dutyFlow * loadFrac;
+            var qBp = Math.max(0, qMin - qLoad);
+            return { flowLps: round1(qBp), openPct: qMin > 0 ? round1(Math.min(100, qBp / qMin * 100)) : 0, qMinLps: round1(qMin), qLoadLps: round1(qLoad) };
         },
         r134aSatTable: R134A_SAT_TABLE,
         /* engine 2.5.0 — R-134a properties (NIST rows) and the cycle at any saturation pair */

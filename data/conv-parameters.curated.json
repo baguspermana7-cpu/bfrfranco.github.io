@@ -5882,6 +5882,172 @@
       "formulaExpr": "cooling.motor_base_frequency_hz * cooling.crah_fan_speed_pct / 100"
     },
     {
+      "id": "cooling.crah_design_coil_flow_lps",
+      "label": "CRAH coil design water flow",
+      "unit": "L/s",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "rated sensible / (cp x CHW dT)",
+      "deps": [
+        "cooling.crah_unit_sensible_kw",
+        "cooling.water_cp_kj_per_kg_k",
+        "cooling.chw_delta_t"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "section": "plantInternals()",
+        "method": "Coil flow at the rated duty."
+      },
+      "formulaExpr": "cooling.crah_unit_sensible_kw / (cooling.water_cp_kj_per_kg_k * cooling.chw_delta_t)"
+    },
+    {
+      "id": "cooling.crah_valve_open_pct",
+      "label": "CRAH PICV opening",
+      "unit": "%",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "coil flow / design coil flow x 100 (= duty / rated at one dT)",
+      "deps": [
+        "cooling.crah_unit_duty_kw",
+        "cooling.crah_unit_sensible_kw"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "section": "plantInternals()",
+        "method": "Pressure-independent valve: flow proportional to opening."
+      },
+      "formulaExpr": "cooling.crah_unit_duty_kw / cooling.crah_unit_sensible_kw * 100"
+    },
+    {
+      "id": "cooling.chw_min_plant_flow_lps",
+      "label": "Minimum plant CHW flow",
+      "unit": "L/s",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "running chillers x minimum evaporator flow share x rated evaporator flow",
+      "deps": [
+        "cooling.chillers_running",
+        "cooling.chiller_min_evap_flow_pct",
+        "cooling.chiller_unit_kw_th",
+        "cooling.water_cp_kj_per_kg_k",
+        "cooling.chw_delta_t"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "section": "plantInternals()",
+        "method": "Flow the DP bypass must hold through the running chillers."
+      },
+      "formulaExpr": "cooling.chillers_running * cooling.chiller_min_evap_flow_pct / 100 * cooling.chiller_unit_kw_th / (cooling.water_cp_kj_per_kg_k * cooling.chw_delta_t)"
+    },
+    {
+      "id": "cooling.cdw_bypass_design_flow_lps",
+      "label": "Tower bypass design flow",
+      "unit": "L/s",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "running chillers x rated condenser flow",
+      "deps": [],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "section": "plantInternals()",
+        "method": "Full condenser flow the 3-way valve can divert."
+      },
+      "formulaNotExpressible": "Rated condenser flow uses the rated heat of compression ratio (1 + 1/COP at rating), an internal of the solve not published as a scalar."
+    },
+    {
+      "id": "cooling.cdw_balance_kv_set",
+      "label": "Tower bypass balancing valve Kv",
+      "unit": "m3/h/bar^0.5",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "Q[m3/h] x sqrt(1 / dP[bar]) at the static lift",
+      "deps": [
+        "cooling.cdw_bypass_design_flow_lps",
+        "cooling.cdw_static_head_m"
+      ],
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "section": "plantInternals()",
+        "method": "IEC 60534-2-1 Kv at rho_rel = 1."
+      },
+      "formulaNotExpressible": "A square root (Kv = Q / sqrt(dP)); the evaluator accepts + - * / and ceil only. Checked in tools/test-conv-plant-valves.mjs OD-CP-11."
+    },
+    {
+      "id": "cooling.chw_bypass_flow_lps",
+      "label": "DP bypass (MV-01) flow",
+      "unit": "L/s",
+      "scope": "plant",
+      "evidenceClass": "SIMULATED",
+      "formula": "max(0, minimum plant flow - load flow)",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "section": "plantInternals() valveKeys",
+        "method": "Zero at the adopted load: the load flow exceeds the minimum. Swept in tools/test-conv-plant-valves.mjs OD-CP-08."
+      }
+    },
+    {
+      "id": "cooling.chw_bypass_open_pct",
+      "label": "DP bypass (MV-01) opening",
+      "unit": "%",
+      "scope": "plant",
+      "evidenceClass": "SIMULATED",
+      "formula": "bypass flow / minimum plant flow x 100",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "section": "plantInternals() valveKeys",
+        "method": "Closed at the adopted load. Swept by bypassAtLoad() in OD-CP-08."
+      }
+    },
+    {
+      "id": "cooling.chw_decoupler_flow_lps",
+      "label": "Decoupler flow",
+      "unit": "L/s",
+      "scope": "plant",
+      "evidenceClass": "SIMULATED",
+      "formula": "sum primary flow - sum secondary flow",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "section": "plantInternals() valveKeys",
+        "method": "Zero at the adopted point (OD-CP-09)."
+      }
+    },
+    {
+      "id": "cooling.cdw_bypass_x_pct",
+      "label": "Tower 3-way bypass share (B port)",
+      "unit": "%",
+      "scope": "plant",
+      "evidenceClass": "SIMULATED",
+      "formula": "clamp((min ECWT - tower leaving) / (return - tower leaving)) x 100",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "section": "plantInternals() valveKeys",
+        "method": "Zero at the design wet bulb; swept 0-30 C by towerBypassAt() in OD-CP-10."
+      }
+    },
+    {
+      "id": "cooling.cdw_entering_c",
+      "label": "Condenser water entering the chillers",
+      "unit": "°C",
+      "scope": "plant",
+      "evidenceClass": "SIMULATED",
+      "formula": "mix of tower leaving and bypassed return",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "section": "plantInternals() valveKeys",
+        "method": "Equals the tower leaving temperature while the bypass is shut (OD-CP-10)."
+      }
+    },
+    {
       "id": "cooling.motor_base_frequency_hz",
       "label": "Motor base frequency",
       "unit": "Hz",
@@ -5939,6 +6105,30 @@
         "ref": "js/conv-engine.js",
         "asOf": "2026-11-23",
         "method": "remote DP setpoint of the secondary loop = the chiller-plant page's default setpoint (60-140 kPa slider)."
+      }
+    },
+    {
+      "id": "cooling.chiller_min_evap_flow_pct",
+      "label": "Chiller minimum evaporator flow",
+      "unit": "%",
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "method": "minimum evaporator flow of a centrifugal chiller, % of design (manufacturer data-sheet range 30-50 %)."
+      }
+    },
+    {
+      "id": "cooling.chiller_min_ecwt_c",
+      "label": "Chiller minimum entering condenser water",
+      "unit": "°C",
+      "scope": "plant",
+      "evidenceClass": "ASSUMED",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "asOf": "2026-11-23",
+        "method": "minimum entering condenser-water temperature of the chillers (manufacturer limit; AHRI 550/590 rates at 29.4 C and allows relief)."
       }
     }
   ]

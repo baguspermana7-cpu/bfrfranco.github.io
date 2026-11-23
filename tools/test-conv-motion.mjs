@@ -29,7 +29,7 @@ const ONLY = arg('only') ? arg('only').split(',') : null;
 const PAGES = [['dc-conventional', 'dc-conventional'], ['datahall', 'datahall'], ['chiller-plant', 'chiller-plant'], ['fuel-system', 'fuel-system'],
   ['water-system', 'water-system'], ['fire-system', 'fire-system'], ['ict', 'ict'], ['EPMS_Telemetry', 'epms']]
   .filter(([f]) => !arg('page') || f === arg('page'));
-const LOOPS_ALLOWED = new Set(['hmi-march', 'vfx-turn', 'fp-air', 'conv-live-flow', 'as-march']);   /* process-bound motion: js/conv/vfx.js (v3.83.0), data-hall air and ict traffic (PRD-CONV-BMS-LIVE, gated by test-conv-live LV4) */
+const LOOPS_ALLOWED = new Set(['hmi-march', 'vfx-turn', 'fp-air', 'conv-live-flow', 'as-march', 'chw-rotor-turn']);   /* process-bound motion: js/conv/vfx.js (v3.83.0), data-hall air and ict traffic (PRD-CONV-BMS-LIVE, gated by test-conv-live LV4), chiller rotor copies on the compositor (PRD-CONV-OPS-DEPTH 01 P2, period gated by test-conv-plant-rotors OD-CP-23/24) */
 
 const fails = []; let passes = 0;
 const ok = (c, law, msg) => { if (ONLY && !ONLY.includes(law)) return; if (c) passes++; else fails.push(`${law} ${msg}`); };

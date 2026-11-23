@@ -190,9 +190,30 @@
         values: [{ k: 'n', dx: -30, dy: -66, anchor: 'start', lod: 1 }, { k: 'it', dx: -30, dy: -49, anchor: 'start', lod: 1, point: 'chiller-plant.hall-' + h + '.it_kw', label: 'Hall ' + h + ' IT load' },
           { k: 'air', dx: -30, dy: -32, anchor: 'start', lod: 1, point: 'chiller-plant.CRAH-' + h + '.supply_air_c', label: 'CRAH-' + h + ' supply air (supply / return)', limitsOf: 'cooling.crah_supply_air_c' }] });
       edges.push({ id: 'e-hs' + h, from: prevS, to: hs, medium: 'chw', w: 'main', flowOf: 'hdr', line: i === 0 ? 'CHWS · HALLS' : undefined });
-      edges.push({ id: 'e-c' + h + 's', from: hs, to: 'crah' + h + '.waterIn', via: [[x - 40, COIL_Y + 40], [x - 12, COIL_Y + 40]], medium: 'chw', flowOf: 'hall' + h });
-      edges.push({ id: 'e-c' + h + 'r', from: 'crah' + h + '.waterOut', to: hr, medium: 'chw', flowOf: 'hall' + h });
-      if (prevR) edges.push({ id: 'e-hr' + h, from: prevR, to: hr, medium: 'chw', w: 'main', flowOf: 'hdr' });
+      /* PRD-CONV-OPS-DEPTH 01 P3: the bank's pressure-independent control valve on its return leg; opening = coil flow share */
+      nodes.push({ id: 'pv' + h, tag: 'PICV-' + h, sym: 'valveControlMotor', x: x + 12, y: COIL_Y + 50, size: 20, rot: 90, tagAt: 'right',   /* values render only with a tag (rz-hmi-sheet) */
+        label: 'Hall ' + h + ' CRAH bank pressure-independent control valve',
+        values: [{ k: 'op', dx: 14, dy: 20, anchor: 'start', lod: 1, point: 'cooling.crah_valve_open_pct', label: 'PICV-' + h + ' opening' }] });
+      if (last) {
+        /* MV-01: the minimum-flow bypass from the end of the supply header to the return header */
+        nodes.push({ id: 'jbs', sym: 'junction', x: x - 40, y: COIL_Y + 40 });
+        nodes.push({ id: 'mv01', tag: 'MV-01', sym: 'valveControlMotor', x: x - 40, y: COIL_Y + 100, size: 22, rot: 90, tagAt: 'left',
+          label: 'Minimum-flow bypass valve: opens when the load flow falls below the running chillers\' minimum evaporator flow',
+          values: [{ k: 'op', dx: -14, dy: 18, anchor: 'end', lod: 1, point: 'cooling.chw_bypass_open_pct', label: 'MV-01 opening' }] });
+        nodes.push({ id: 'jbr', sym: 'junction', x: x - 40, y: RET_Y });
+        edges.push({ id: 'e-c' + h + 's', from: hs, to: 'jbs', medium: 'chw', flowOf: 'hall' + h });
+        edges.push({ id: 'e-c' + h + 's2', from: 'jbs', to: 'crah' + h + '.waterIn', via: [[x - 12, COIL_Y + 40]], medium: 'chw', flowOf: 'hall' + h });
+        edges.push({ id: 'e-bp1', from: 'jbs', to: 'mv01.a', medium: 'chw', flowOf: 'bypass' });
+        edges.push({ id: 'e-bp2', from: 'mv01.b', to: 'jbr', medium: 'chw', flowOf: 'bypass' });
+      } else {
+        edges.push({ id: 'e-c' + h + 's', from: hs, to: 'crah' + h + '.waterIn', via: [[x - 40, COIL_Y + 40], [x - 12, COIL_Y + 40]], medium: 'chw', flowOf: 'hall' + h });
+      }
+      edges.push({ id: 'e-c' + h + 'r', from: 'crah' + h + '.waterOut', to: 'pv' + h + '.a', medium: 'chw', flowOf: 'hall' + h });
+      edges.push({ id: 'e-c' + h + 'r2', from: 'pv' + h + '.b', to: hr, medium: 'chw', flowOf: 'hall' + h });
+      if (prevR && last) {
+        edges.push({ id: 'e-hr' + h, from: prevR, to: 'jbr', medium: 'chw', w: 'main', flowOf: 'hdr' });
+        edges.push({ id: 'e-hr' + h + 'b', from: 'jbr', to: hr, medium: 'chw', w: 'main', flowOf: 'hdr' });
+      } else if (prevR) edges.push({ id: 'e-hr' + h, from: prevR, to: hr, medium: 'chw', w: 'main', flowOf: 'hdr' });
       prevS = hs; prevR = hr;
     });
     edges.push({ id: 'e-hrRet', from: prevR, to: 'jret', medium: 'chw', w: 'main', flowOf: 'hdr', line: 'CHWR · HALLS' });
@@ -269,6 +290,19 @@
         prevS = 'jp' + n;
       }
       if (c) { edges.push({ id: 'e-cs' + n + 'b', from: prevS, to: 'jb' + n, medium: 'cw', w: 'main', flowOf: 'cdws' }); prevS = 'jb' + n; }
+    }
+    /* PRD-CONV-OPS-DEPTH 01 P3: TV-01, the 3-way tower bypass at the end of the CDWR header. Port b (through) feeds
+       the cells, port c sends water straight to the CDWS header so the entering condenser water stays above the
+       chillers' minimum when the towers make it too cold (B share from the engine) */
+    if (cells.length) {
+      var tvx = lastX + 58;   /* tag centred above stays inside the tower zone's right border (lastX + 78) */
+      nodes.push({ id: 'tv01', tag: 'TV-01', sym: 'valve3WayMotor', x: tvx, y: HR, size: 24, tagAt: 'above',
+        label: 'Three-way tower bypass valve (A to the cells, B to the CDWS header)',
+        values: [{ k: 'op', dx: -22, dy: -8, anchor: 'end', lod: 1, point: 'cooling.cdw_bypass_x_pct', label: 'TV-01 bypass (B port)' }] });   /* above the header, clear of CT-10's riser */
+      nodes.push({ id: 'jtv', sym: 'junction', x: tvx, y: HS });
+      edges.push({ id: 'e-tv0', from: prevR, to: 'tv01.a', medium: 'cw', w: 'main', flowOf: 'cdwr' });
+      edges.push({ id: 'e-tvb', from: 'tv01.c', to: 'jtv', medium: 'cw', flowOf: 'tvb' });
+      edges.push({ id: 'e-tvs', from: 'jtv', to: prevS, medium: 'cw', flowOf: 'tvb' });
     }
     var H = OY + 64;
     return {

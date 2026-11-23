@@ -11,6 +11,41 @@ release sections rather than semver.
 
 ---
 
+## v3.97.0 — 2026-11-23 — Valves open by the solve, tower fans turn at their speed
+
+Owner R188/R189, PRD-CONV-OPS-DEPTH 01 phases P2 and P3. Conventional engine 2.7.0 → 2.8.0.
+
+### Added
+- **Control valves on the chilled-water sheet, each opened by the engine** (`js/conv-engine.js` 2.8.0, `js/conv/chiller-sheet.js`).
+  - PICV on every CRAH bank (PV-A … PV-D): opening = coil duty / rated duty, **99.5 %** at the adopted load.
+  - DP bypass MV-01 at the last hall: Q_bp = max(0, Q_min − Q_load), Q_min = running chillers × minimum evaporator flow;
+    opening = Q_bp / Q_min. **CLOSED** at 89 % load, **10.7 % (47.1 L/s)** in the new Low-load Drill (40 %).
+  - Tower 3-way TV-01: bypass share x = clamp((T_min − T_cold)/(T_ret − T_cold)) keeps the entering condenser water at the
+    chiller's minimum. **0 %** at the adopted wet bulb, **B 40 %, ECWT 15 °C** in the new Cold-weather Drill (WB 8 °C).
+  - `CONV_CALC.bypassAtLoad(frac)` and `towerBypassAt(wb)`; keys `crah_valve_open_pct`, `crah_design_coil_flow_lps`,
+    `chw_min_plant_flow_lps`, `chw_bypass_*`, `chw_decoupler`, `cdw_bypass_x_pct`, `cdw_entering_c`,
+    `cdw_bypass_design_flow_lps`, `cdw_balance_kv_set` (SIMULATED, sourced in `data/conv-parameters.curated.json`).
+  - The scenario list gains `Low-load Drill (40 %)` and `Cold-weather Drill (WB 8 °C)` with balanced setpoints.
+- **A fan rotor on every cooling-tower cell** (`js/conv/vfx.js`): turns at the cell's engine fan speed, still on standby.
+- Gates `tools/test-conv-plant-valves.mjs` (OD-CP-07 … 11, 142 checks, red on 2.7.0) and
+  `tools/test-conv-plant-rotors.mjs` (OD-CP-20/23/24/26/29, 136 checks, red before P2).
+
+### Changed
+- **Rotors turn on the compositor.** Each spinning rotor is an HTML copy over its hidden sheet rotor, turned by one
+  transform-only CSS animation (`chw-rotor-turn`), three blades 120° apart. A script-stepped SVG layer cost about 1.3 s of
+  main-thread time per 5 s idle (measured A/B); now the page idles at 1.1 s against main's 1.2 s
+  (`test-conv-quantity-truth` PERF1). Off screen paused; reduced motion still.
+- Thermal view colours the new legs: PICV return legs and the last hall's supply leg on the return/supply side, the
+  DP bypass as supply water.
+- `pump_min_flow_pct` removed from the engine; the bypass capacity is the minimum plant flow itself.
+
+### Docs
+- PRD-CONV-OPS-DEPTH 01 §11 P2/P3 notes; `CONVENTIONAL_DC_OPERATIONS_STANDARD` "valves open by the solve"; ledger R188-P3.
+- **PRD-DCAI-HALL-DEPTH Amendment 1** (owner 2026-11-23: Flat 2D button, default 2D, 3D quality, ops parameters, state
+  animation, indicators): views 2D · 3D · Drawing, lenses, per-unit parameters, motion and lamp grammar, laws HV-*,
+  phases A0–A6. Gate `tools/test-dcai-hall-views.mjs` (phase A0) written and proven red on today's page (20 of 29);
+  not yet in the ship gate — it joins with phase A1.
+
 ## v3.96.0 — 2026-11-23 — Every relay reads its function, every drawn item opens, UPS modules count
 
 Owner R190/R191 ("pastikan itu misal ada DS1-CP itu clickable semua", "ups paralel … qty disesuaikan"), PRD-ELECTRICAL-BMS

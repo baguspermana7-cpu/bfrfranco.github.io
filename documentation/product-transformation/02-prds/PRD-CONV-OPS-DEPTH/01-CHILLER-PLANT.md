@@ -418,3 +418,25 @@ Open questions for the owner (taste/scope only)
     homologous on a recomputed model.
   - **Deferred.** Electrical kW stays at the design head (`*_kw_e` keeps its 2.6.0 meaning, OD-CP-15). The
     system-curve kW comes with the P3 DP reset. Lod-1 speed tags on the sheet move to P2, with the rotor overlay.
+- **P3 (v3.97.0, engine 2.8.0).** Valve keys and two off-design solves shipped; gate `tools/test-conv-plant-valves.mjs`
+  (142 checks, red on 2.7.0).
+  - **Drawn.** PICV-A..D on each CRAH bank return leg (opening = coil duty / rated, 99.5 % today), MV-01 minimum-flow
+    bypass at the end of the hall headers (CLOSED today), TV-01 3-way tower bypass at the end of the CDWR header
+    (B 0 % today). Values bind to the registry points; MV-01's leg carries the engine's bypass flow.
+  - **Drills.** Scenario `Low-load Drill (40 %)` reads `CONV_CALC.bypassAtLoad(0.4)` (MV-01 10.7 %, 47.1 L/s);
+    `Cold-weather Drill (WB 8 °C)` reads `towerBypassAt(8)` (B 40 %, ECWT held at 15 °C). Other values stay at today's
+    load and say so in the drill row.
+  - **Correction to OD-CP-08.** The bypass is sized for the whole minimum flow at zero load, so opening =
+    Q_bp / Q_min (100 % at zero load), not Q_bp / (pump rated × min-flow %). `pump_min_flow_pct` was dropped as unused.
+  - **Deferred.** OD-CP-11 balancing table (Kv is in TV-01's tooltip and asserted in node) and OD-CP-25 stem fill
+    move to P2, with the rotor overlay. The decoupler sign flip in the Degraded Drill (OD-CP-09 U-case) waits for the
+    page drill to drive the engine's primary flow.
+- **P2 rotors (v3.97.0, with P3).** Gate `tools/test-conv-plant-rotors.mjs` (135 checks, red before: no tower fan rotor).
+  - **OD-CP-20.** Every tower cell carries a fan rotor in its stack (`js/conv/vfx.js` `fanRotor`); running cells spin,
+    standby cells do not.
+  - **OD-CP-23 fixed.** Rotors left the page's 3 Hz clock (120 degrees a step at 1 s a turn: wagon wheel, and every step
+    repainted the sheet). Each spinning rotor is copied onto its own thin layer (`svg.chw-rotor-layer`) and turned at
+    10 Hz there (three blades, 120 degrees apart); the sheet rotor keeps its paused CSS animation, hidden.
+  - **OD-CP-24.** Period = 100 / speed s from the engine fleet (tower `fanSpeedPct`, pump `speedPct`).
+  - **OD-CP-26.** Reduced motion builds no rotor layer; `animation-name: none` on every rotor; values stay.
+  - **Deferred.** OD-CP-21 chiller tags (load, role badge, kW/RT, lift) and the tower header N of M / approach / range.

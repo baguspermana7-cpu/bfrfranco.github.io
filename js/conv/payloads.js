@@ -156,6 +156,13 @@
       al: [D('Out of range', 'signal < 3.8 mA or > 20.5 mA → BAD quality'), D('High CDW supply', '> design + 1.5 K → stage a cell')],
       tr: { label: 'Process value', id: 'cooling.cdw_supply_c', amp: 0.15, digits: 1 }, m: 'cal',
       g: 'CDW supply above design raises every chiller lift: check that the running cells match the running chillers before adjusting setpoints.' },
+    /* engine 2.8.0 (PRD-CONV-OPS-DEPTH 01 P3): TV-01, the tower 3-way bypass; every live row is an engine value */
+    'condenser:valve3WayMotor': { name: 'Tower bypass valve (3-way, TV-01)', role: 'Sends part of the condenser return past the cells so the chillers never see water colder than their minimum',
+      live: [B('Port B (bypass)', 'cooling.cdw_bypass_x_pct', 1), B('Entering condenser water', 'cooling.cdw_entering_c', 1), B('Tower leaving water', 'cooling.cdw_supply_c', 1), B('Condenser return', 'cooling.cdw_return_c', 1)],
+      cap: [B('Chiller minimum ECWT', 'cooling.chiller_min_ecwt_c', 1), B('Bypass design flow', 'cooling.cdw_bypass_design_flow_lps', 1), D('Fail position', 'port A open (all water to the cells)')],
+      al: [D('Low entering condenser water', '< chiller minimum ECWT'), D('Position deviation', 'command and feedback disagree > 10 % for 60 s')],
+      tr: { label: 'Port B (bypass)', id: 'cooling.cdw_bypass_x_pct', amp: 0, digits: 1 }, m: 'a180valve',
+      g: 'Bypass open on a warm day means the wet bulb or the approach reading is wrong: the valve should sit at port A unless the towers run cold.' },
     /* fire */
     'fire:pumpCentrifugal': { name: 'Fire pump', role: 'Pressurises the sprinkler and pre-action risers on demand',
       live: [S('Discharge pressure', 'bar', 9.8, 0.2, 1), S('Suction pressure', 'bar', 1.4, 0.05, 2), S('Driver current', 'A', 0, 0, 0)],
