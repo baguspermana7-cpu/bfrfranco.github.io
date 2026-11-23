@@ -4,7 +4,7 @@ Owner, 2026-11-23: "Continue improve more" (standing: "animasi state, indikasi b
 accurate dan valid dan comprehensive"). Amendment 1 §7.3 and §8 asked for this, and its law table carried HV-S1 and HV-I1
 as "A5".
 
-Status: in build (v3.104.0 candidate).
+Status: A5a (S1, I1), D6 (M3) and A5b (I2, I3) built and gated in the v3.104.0 candidate. Red before green: S1/I1 4 of 36, M3 6 of 12, I2/I3 8 of 19.
 
 ## 1 · What is wrong (measured on v3.103.0 candidate 5b8c2c33b, 1440 × 900, 2D)
 
@@ -46,6 +46,10 @@ scenario change and never per tick.
   and animated in Status at 1440 and 390 (cold aisles from both galleries, hot-aisle roofs, across the corridor and the CDU line). In Status,
   Power and Layout they carried no reading and moved all the time. With `opts.airModes` (DC AI: Thermal, Cooling),
   the air layer is shown and animated in those lenses only. The Conventional hall passes no list and is unchanged.
+- **D7 — Every number on the floor carries its unit.** The row-pair foot reads `6248`: 44 racks × 142 kW, with the unit
+  only in a tooltip. That holds in 2D and 3D, at 1440 and at 390, so a reader cannot tell kW from W or from a count.
+  With `opts.footText(zone)` (DC AI) the foot reads `6,248 kW`. Below 600 px it reads `6.2 MW`, which keeps the
+  ≥ 3 px gap HV-F2b measures. The Conventional hall passes no formatter and is unchanged.
 - Not in this phase (A5b): status-strip counts per view equal to the alarm list (HV-I1 second half), the 8.3 inspector,
   and the MAN and STALE lamp variants.
 
@@ -65,6 +69,10 @@ scenario change and never per tick.
   - In Status, Power and Layout there are 0 visible air paths and 0 running air animations.
   - In Thermal and Cooling, air paths are visible and each visible path runs one animation; under reduced motion, none runs.
   - This law is red on 5b8c2c33b: 31 paths in Status, Power and Layout (6 of 12).
+- **HV-U1.**
+  - Every visible row-pair foot on the 2D and 3D floor, at 1440 and at 390, ends in a unit (`kW` or `MW`).
+  - Its value equals racks per pair × the engine rack kW, within one display step.
+  - This law is red on 5b8c2c33b.
 - HV-F1, F2, G1, G2, M1, M2 and A1 stay green.
 
 ## 4 · Risks
@@ -89,13 +97,15 @@ HMI and the tooltip, but never the alarm count. An operator sees red racks next 
 ### Design
 
 - **B1 — One set.** `RZHallIso.alarms()` returns the payload alarms of the current hall under the current cooling
-  scenario. These are the alarms of the CDU and fan-wall payloads, the leak payload's `LEAK-Zxx` alarms, and one
-  `MANIFOLD` alarm per wet rack row. Each is an alarm-list record (tag, point, severity, message, `scenario`). The floor
+  scenario. These are the alarms of the CDU and fan-wall payloads, and the leak payload's `LEAK-Zxx` alarms. A wet row is
+  the same event as its leak zone, so it raises no second alarm. Each is an alarm-list record (tag, point, severity, message, `scenario`). The floor
   flags are drawn from the same set.
 - **B2 — The strip adds them.** In `rules()`, a critical alarm adds to Critical, and any other severity adds to Warning
   (the D2 mapping). The doc-22 rule counts stay as they are.
-- **B3 — The list shows them.** The Alarms & Events list prepends the set as active, unacknowledged rows with quality
-  `simulated` and the scenario id, and removes them when the scenario changes back. The recorded fixtures stay.
+- **B3 — The list journals them.** The Alarms & Events workspace is append-only: the fire workstation already logs
+  into it through `RZDatahallAIAlarmWorkspace.appendEvents`. A scenario change appends, for each new alarm, an
+  `active_unack` record (quality `simulated`, `scenario` = the cooling scenario). For each alarm the change clears, it
+  appends a `returned_unack` record, as an alarm journal does. The recorded fixtures stay.
 - **B4 — Count once.** A row raises one alarm. Fifty-four CDUs with a pump-1 fault are 54 alarms in the list and in
   Warning, because ISA-18.2 counts one alarm per point. On the floor they are one flag.
 
@@ -103,8 +113,9 @@ HMI and the tooltip, but never the alarm count. An operator sees red racks next 
 
 - **HV-I2.** For each scenario, (strip Critical, Warning) − (normal's) = (critical, other) of `RZHallIso.alarms()`,
   on the Data Hall strip and on the Alarms & Events strip. normal and chiller-trip add 0.
-- **HV-I3.** The Alarms & Events list holds every alarm of the set: same tag, point and severity. After the switch back
-  to normal, none of them remain.
+- **HV-I3.** The Alarms & Events workspace holds an `active_unack` record for every alarm of the set: same tag, point
+  and severity. After the switch back to normal, each of those alarms has a later `returned_unack` record, and none is
+  active.
 
 Owner of the files: `datahallAI.html` `rules()` (shared page; built after the peer's 3.102.0 lands) and
 `js/datahall-ai/alarm-query.js` (list).

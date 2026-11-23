@@ -25,7 +25,10 @@
    HV-S1  each cooling scenario changes exactly the units its HMI payloads name (A5a, Amendment 3); rotors keep their period.
    HV-I1  alarmed units carry flags (<= 8 + "+n"), each naming its point, inside the stage, clear of heads and each other.
    HV-M3  air paths show and move only in the Thermal and Cooling lenses (Amendment 3 D6).
-   Later phases add: HV-P2, status-strip counts (A5b).
+   HV-I2  the status strips move by exactly the scenario's payload alarms (critical -> Critical, else -> Warning) (A5b).
+   HV-I3  the Alarms workspace journals each payload alarm active, then returned when the scenario clears it (A5b).
+   HV-U1  every row-pair foot ends in its unit and equals racks per pair x rack kW (Amendment 3 D7).
+   Later phases add: HV-P2.
    Usage: node tools/test-dcai-hall-views.mjs [--shots=<dir>] [--only=V1,F1] */
 import fs from 'fs';
 import http from 'http';
@@ -373,6 +376,69 @@ for (const W of [1440, 390]) {
     if (SHOTS && sc !== 'normal') await pg.screenshot({ path: path.join(SHOTS, `hv-${sc}-${W}.png`) });
   }
   ok('HV-S1', pg.errors.length === 0, `${W}: page errors ${pg.errors.slice(0, 2).join(' | ')}`);
+  await pg.close();
+}
+/* HV-I2 / HV-I3 (Amendment 3 A5b): one alarm count. The scenario's payload alarms (CDU + fan-wall payloads + the leak
+   payload, computed here) move the status strip by exactly their count (critical -> Critical, else -> Warning) on the
+   Data Hall and the Alarms & Events strips, and the Alarms workspace journals each one active, then returned */
+for (const W of [1440]) {
+  if (ONLY.size && !ONLY.has('HV-I2') && !ONLY.has('HV-I3')) break;
+  const pg = await open(W);
+  const look = (sc) => pg.evaluate(async (sc) => {
+    const sel = document.getElementById('coolingScenario'); sel.value = sc; sel.dispatchEvent(new Event('change', { bubbles: true }));
+    await new Promise((r) => setTimeout(r, 900));
+    const P = window.RZDatahallAIHmiPayloads, ctx = P.buildContext(window, { hall: window.currentDH || 1, noTrend: true });
+    const want = [];
+    const take = (p) => (p.tabs.alarms || []).forEach((a) => want.push({ tag: a.tag, point: a.point, severity: a.severity }));
+    document.querySelectorAll('#hIso [data-rz-equipment^="crah:"], #hIso [data-rz-equipment^="cdu:"]').forEach((u) => { const m = /^(crah|cdu):(\d+)$/.exec(u.getAttribute('data-rz-equipment')); take(P.payload(m[1], m[2], ctx)); });
+    take(P.payload('leak', '1', ctx));
+    const num = (bar, k) => { const m = new RegExp(k + '\\s*(\\d+)').exec(bar ? bar.textContent : ''); return m ? +m[1] : null; };
+    const hb = document.querySelector('#p-hall .dh-alarmbar');
+    const hall = { c: num(hb, 'Critical'), w: num(hb, 'Warning') };
+    const t = document.querySelector('#tabs [data-t="alarms"]'); if (t) t.click(); await new Promise((r) => setTimeout(r, 600));
+    const ab = document.querySelector('#p-alarms .dh-alarmbar');
+    const alm = { c: num(ab, 'Critical'), w: num(ab, 'Warning') };
+    const h = document.querySelector('#tabs [data-t="hall"]'); if (h) h.click(); await new Promise((r) => setTimeout(r, 600));
+    const W2 = window.RZDatahallAIAlarmWorkspace, ev = W2 ? W2.events() : [];
+    return { want, hall, alm, ev: ev.map((e) => ({ tag: e.tag, point: e.point, severity: e.severity, lifecycle: e.lifecycle, scenario: e.scenario, seq: e.sequence })) };
+  }, sc);
+  const base = await look('normal');
+  const latest = (ev, a) => ev.filter((e) => e.tag === a.tag && e.point === a.point && e.scenario !== 'normal').sort((x, y) => x.seq - y.seq).pop();
+  let lastSet = [];
+  for (const sc of ['cdu-pump-fail', 'normal', 'leak-z07', 'chiller-trip']) {
+    const r = await look(sc);
+    const crit = r.want.filter((a) => a.severity === 'critical').length, other = r.want.length - crit;
+    for (const [nm, bar, b0] of [['Data Hall', r.hall, base.hall], ['Alarms', r.alm, base.alm]]) {
+      ok('HV-I2', bar.c != null && bar.c - b0.c === crit && bar.w - b0.w === other, `${W} ${sc} ${nm} strip: Critical ${b0.c}->${bar.c}, Warning ${b0.w}->${bar.w}; payload alarms ${crit} critical + ${other} other`);
+    }
+    if (sc === 'cdu-pump-fail' || sc === 'leak-z07') ok('HV-I2', r.want.length > 0, `${W} ${sc}: no payload alarms (scenario not wired?)`);
+    const miss = r.want.filter((a) => { const e = latest(r.ev, a); return !e || e.lifecycle !== 'active_unack' || e.severity !== a.severity || e.scenario !== sc; });
+    ok('HV-I3', miss.length === 0, `${W} ${sc}: ${miss.length} of ${r.want.length} payload alarms not journalled active (${miss.slice(0, 3).map((a) => a.tag + ' ' + a.point).join(', ')})`);
+    const cleared = lastSet.filter((a) => !r.want.some((b) => b.tag === a.tag && b.point === a.point));
+    const stillActive = cleared.filter((a) => { const e = latest(r.ev, a); return !e || e.lifecycle !== 'returned_unack'; });
+    ok('HV-I3', stillActive.length === 0, `${W} ${sc}: ${stillActive.length} of ${cleared.length} cleared alarms without a later returned_unack record`);
+    lastSet = r.want;
+  }
+  ok('HV-I2', pg.errors.length === 0, `${W}: page errors ${pg.errors.slice(0, 2).join(' | ')}`);
+  await pg.close();
+}
+/* HV-U1 (Amendment 3 D7): every row-pair foot on the 2D and 3D floor ends in its unit and equals racks per pair x the
+   engine rack kW (within one display step) */
+for (const W of [1440, 390]) {
+  if (ONLY.size && !ONLY.has('HV-U1')) break;
+  const pg = await open(W);
+  for (const v of ['flat', 'iso']) {
+    const r = await pg.evaluate(async (v) => {
+      const b = document.querySelector('#p-hall .dh-proj [data-view="' + v + '"]'); if (b) b.click();
+      await new Promise((res) => setTimeout(res, 900));
+      const m = window.RZHallIso && window.RZHallIso.model(), want = m ? m.racksPerZone * m.racks[0].kw : null;
+      const feet = [...document.querySelectorAll('#hIso .zone-foot')].filter((f) => f.getClientRects().length > 0).map((f) => f.textContent.replace(/\s+/g, ' ').trim());
+      return { want, feet };
+    }, v);
+    const parse = (t) => { const x = /([\d.,]+)\s*(kW|MW)\b/.exec(t); return x ? parseFloat(x[1].replace(/,/g, '')) * (x[2] === 'MW' ? 1000 : 1) : null; };
+    const bad = r.feet.filter((t) => { const k = parse(t); return k == null || Math.abs(k - r.want) > (/MW/.test(t) ? 50 : 0.5); });
+    ok('HV-U1', r.feet.length >= 10 && bad.length === 0, `${W} ${v}: ${bad.length} of ${r.feet.length} row-pair feet without a unit or off the engine ${r.want} kW (${bad.slice(0, 3).join(' / ')})`);
+  }
   await pg.close();
 }
 /* HV-M3 (Amendment 3 D6, Amendment 1 §7.1): the air paths show and move only in the Thermal and Cooling lenses */

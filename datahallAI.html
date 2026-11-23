@@ -12778,6 +12778,10 @@ function rules(){
      isolation is a warning; maintenance = isolated points — all from the workstation snapshot, never a roll */
   var FW=window.RZDatahallAIFireWorkstation, F=FW&&FW.summary?FW.summary():null, m=0;
   if(F){ if(/ALARM|DISCHARGED|LOCKOUT/.test(F.fire)||/ACTIVE/.test(F.epo)||/WET/.test(F.leak))c++; w+=F.impairedZones.length+F.expiredIsolations.length; m=F.maint; }
+  /* PRD-DCAI-HALL-DEPTH Amendment 3 A5b: the cooling scenario's payload alarms of this hall, the same set the floor
+     flags and the Alarms workspace journals (critical -> Critical, any other severity -> Warning) */
+  var HI=window.RZHallIso, SA=HI&&HI.alarms?HI.alarms():[];
+  for(var si=0;si<SA.length;si++){ if(SA[si].severity==='critical')c++; else w++; }
   return {crit:c, warn:w, maint:m, stale:stale, comms:true};
 }
 function fmtState(a){
@@ -12853,6 +12857,8 @@ function paintBMSHealth(){
   var clr=byId('bmsAlmCleared'); if(clr)clr.textContent=(a.maint)+' cleared';
 }
 paintBMSHealth();
+/* A5b: a cooling-scenario change repaints every strip at once (hidden ones too: the next tab opens current) */
+document.addEventListener('rz-hall-alarms',function(){ for(var i=0;i<bars.length;i++)paint(bars[i]); });
 setInterval(function(){
   for(var i=0;i<bars.length;i++){ if(bars[i].offsetParent!==null)paint(bars[i]); }
   /* v3.11.7 — the three counters paintBMSHealth() writes are inside #p-bms. The bar loop above

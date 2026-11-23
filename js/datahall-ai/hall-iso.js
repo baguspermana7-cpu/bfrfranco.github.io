@@ -189,13 +189,18 @@
     for (i = 0; i < al.length; i++) if (al[i].severity === 'critical') return 'alarm';
     return al.length || (p && p.statusChip && p.statusChip.state === 'fault') ? 'warn' : null;
   }
+  /* A5b B1: the hall's scenario alarms — every alarm of the CDU and fan-wall payloads plus the leak payload's zones (a
+     wet rack row is that same leak event, never a second alarm). The strip counts them, the workspace journals them. */
+  var hallAlarms = [], journalled = {}, journalSeq = 0, pendingJournal = [];
   function unitStates() {
     if (!model) return;
-    var P = win.RZDatahallAIHmiPayloads, ctx = null, i, rows = {};
+    var P = win.RZDatahallAIHmiPayloads, ctx = null, i, rows = {}, set = [], seen = {};
+    function collect(p) { ((p && p.tabs && p.tabs.alarms) || []).forEach(function (a) { var k = a.tag + '|' + a.point; if (!seen[k]) { seen[k] = true; set.push(a); } }); }
     try { ctx = P && P.buildContext ? P.buildContext(win, { hall: win.currentDH || 1, noTrend: true }) : null; } catch (e) { ctx = null; }
     function pay(cls, id) { try { return ctx ? P.payload(cls, id, ctx) : null; } catch (e) { return null; } }
     model.crahUnits.concat(model.cduUnits).forEach(function (u) {
       var m = /^(crah|cdu):(\d+)$/.exec(u.ref), p = m ? pay(m[1], m[2]) : null, s = sevOf(p), al = p && p.tabs && p.tabs.alarms && p.tabs.alarms[0];
+      collect(p);
       u.status = s; u.point = s ? (al ? al.point : 'STATE') : null;
       u.note = s ? (al ? al.point + ' · ' + al.message : (p.statusChip && p.statusChip.label) || '') : null;
       if (u.baseLines == null) u.baseLines = u.lines.slice();
@@ -210,6 +215,33 @@
       var st = row ? rows[row] : null;
       rk.status = st ? st.s : null; rk.point = st ? st.point : null; rk.note = st ? (st.s === 'alarm' ? '◆ ' : '▲ ') + st.note : null;
     }
+    collect(pay('leak', '1'));
+    hallAlarms = set;
+    journal();
+    try { doc.dispatchEvent(new CustomEvent('rz-hall-alarms', { detail: { count: set.length } })); } catch (e) { /* old engine: no event */ }
+  }
+  /* A5b B3: the Alarms workspace is append-only (the fire workstation's pattern). A new alarm is journalled active, an
+     alarm the scenario clears is journalled returned; its scenario is the one that raised it. */
+  function journal() {
+    var scen = (doc.getElementById('coolingScenario') || {}).value || 'normal', now = {}, recs = [], k, hall = 'DH-' + pad2(win.currentDH || 1), t = new Date().toISOString();
+    function rec(a, active, sc) {
+      journalSeq++;
+      return { id: 'SCN-' + Date.now().toString(36) + '-' + journalSeq, timestamp: t, sequence: 1000000 + journalSeq, tag: String(a.tag), point: String(a.point),
+        location: hall + '/' + a.tag, system: a.system || 'cooling', severity: a.severity || 'high', lifecycle: active ? 'active_unack' : 'returned_unack',
+        kind: 'discrete', quality: 'simulated', event: active ? 'alarm' : 'return-to-normal', action: active ? 'acknowledge' : 'acknowledge-return',
+        scenario: sc, operator: 'system', message: active ? String(a.message) : 'Returned to normal: ' + a.message, incidentId: 'SCN-' + sc,
+        previousState: active ? 'normal' : 'alarm', currentState: active ? 'alarm' : 'normal' };
+    }
+    hallAlarms.forEach(function (a) { var key = a.tag + '|' + a.point; now[key] = true; if (!journalled[key]) { journalled[key] = { a: a, sc: scen }; recs.push(rec(a, true, scen)); } });
+    for (k in journalled) if (Object.prototype.hasOwnProperty.call(journalled, k) && !now[k]) { recs.push(rec(journalled[k].a, false, journalled[k].sc)); delete journalled[k]; }
+    pendingJournal = pendingJournal.concat(recs);
+    flushJournal();
+  }
+  function flushJournal() {
+    var W = win.RZDatahallAIAlarmWorkspace;
+    if (!pendingJournal.length || !W || !W.appendEvents) return;
+    try { W.appendEvents(pendingJournal); pendingJournal = []; }
+    catch (e) { if (!/unavailable/.test(e.message)) { if (win.console) win.console.warn('[hall-iso] ' + e.message); pendingJournal = []; } }
   }
   /* D4: flags group neighbouring units with one point and severity (a rack row, the CDU line, one gallery); <= 8 flags,
      red first then the larger group; the units left over are counted on a "+n" chip at the stage corner */
@@ -439,6 +471,8 @@
     view: function () { return view; },
     setView: function (v) { set(v, true); },
     model: function () { return model; },
+    /* A5b: the hall's scenario alarms as alarm records (tag, point, severity, message, system); read by the status strip */
+    alarms: function () { flushJournal(); return hallAlarms.map(function (a) { return { tag: a.tag, point: a.point, severity: a.severity, message: a.message, system: a.system }; }); },
     repaint: function () { if (inst) inst.paint(inst.mode); }
   };
   /* renderHall ran before this deferred script: draw what it left */
