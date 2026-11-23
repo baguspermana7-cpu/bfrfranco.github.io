@@ -209,6 +209,7 @@
     return {
       id: 'e-s-102-' + H_.toLowerCase(), no: 'E-S-102', title: 'LV DISTRIBUTION · TYPICAL HALL · HALL ' + H_, rev: 'A', basis: 'IEC 60617 · IEEE C37.2',
       svgId: 'epms-lv-svg', size: [W, H], minScale: 1.17, nodes: nodes, edges: edges, areas: areas, notes: notes, hall: h, hallCode: H_,
+      keys: root.RZEpmsSheets && root.RZEpmsSheets.keysFrom ? root.RZEpmsSheets.keysFrom(nodes) : [],
       counts: { gensets: n, units: units, modules: modules, racks: hall.racks }
     };
   }

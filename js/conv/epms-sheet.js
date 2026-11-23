@@ -309,13 +309,29 @@
   }
   if (root && root.addEventListener) root.addEventListener('rz-point-limits', function () { defineLimits(); });
 
+  /* PRD-ELECTRICAL-BMS decision 8, E16: Castell-type trapped-key groups, derived from the sheet's own interlock data
+     (no per-device code). A key is trapped in a closed member and released only when that member opens.
+       hub group  — an earthing switch and the disconnectors it needs open: the switch closes only when every
+                    disconnector is open; a disconnector closes only when the switch is open (key exchange box)
+       n-of-m     — m breakers, n keys: at most n closed (two 20 kV incomers + tie = 2 of 3; ring vs generator
+                    incomer of one LV section = 1 of 2) */
+  function keysFrom(list) {
+    var out = [], by = {}, k = 0;
+    list.forEach(function (n) { by[n.id] = n; });
+    list.forEach(function (n) { if (n.sw === 'es' && n.ds && n.ds.length) out.push({ id: 'K' + (++k), hub: n.id, members: [n.id].concat(n.ds.filter(function (d) { return by[d]; })), rule: 'earthing switch ' + n.tag + ' against its disconnectors' }); });
+    var inc = list.filter(function (n) { return n.role === 'incomer'; }), tie = list.filter(function (n) { return n.role === 'tie'; });
+    if (inc.length === 2 && tie.length === 1) out.push({ id: 'K' + (++k), n: 2, members: [inc[0].id, inc[1].id, tie[0].id], rule: '2-out-of-3: 2 keys for 3 locks, never both incomers and the tie closed (no paralleling of the two supplies)' });
+    list.forEach(function (n) { if (n.role === 'hgen' && n.incomer && by[n.incomer]) out.push({ id: 'K' + (++k), n: 1, members: [n.incomer, n.id], rule: '1 key: the ring incomer or the generator incomer, never both' }); });
+    return out;
+  }
+
   points(nodes, 'epms-telemetry');
   defineLimits(nodes);
   root.RZEpmsSheets = {
-    points: points, markConstants: markConstants, defineLimits: defineLimits,
+    points: points, markConstants: markConstants, defineLimits: defineLimits, keysFrom: keysFrom,
     sld: {
       id: 'e-s-101', no: 'E-S-101', title: 'HV / MV SINGLE-LINE · GIS · TRANSFORMERS · MAIN SWITCHGEAR', rev: 'A', basis: 'IEC 60617 · IEEE C37.2',
-      svgId: 'epms-sld-svg', size: [ZW + 32, 1390], nodes: nodes, edges: edges,
+      svgId: 'epms-sld-svg', size: [ZW + 32, 1390], nodes: nodes, edges: edges, keys: keysFrom(nodes),
       areas: [
         { x: 16, y: 16, w: ZW, h: 832, label: 'HV GIS SUBSTATION · DOUBLE BUSBAR · POWER TRANSFORMERS', kind: 'zone' },
         { x: 16, y: 852, w: ZW, h: 522, label: 'MV MAIN SWITCHGEAR · GENERATION · TYPICAL LV UNIT', kind: 'zone' }

@@ -155,6 +155,20 @@ const upsOf = (sel) => {
     return { s, n, txt: txt.slice(0, 160), lacks: want.filter((w) => !txt.includes(w)), stack: inv.querySelectorAll('[data-stack]').length };
   });
 };
+/* E16: every trapped-key group of the sheet draws its key on each member and one dashed link line */
+const keysOf = (sel, sheetVar) => {
+  const host = document.querySelector(sel), S = sheetVar.split('.').reduce((o, k) => o && o[k], window);
+  if (!host || !S) return null;
+  const groups = S.keys || [], bad = [];
+  groups.forEach((g) => {
+    g.members.forEach((m) => { const k = host.querySelector('.hmi-node[data-node="' + m + '"] .hmi-key[data-key="' + g.id + '"]'); if (!k || !/K\d/.test(k.textContent)) bad.push(g.id + ' no glyph on ' + m); });
+    /* a group within 520 units draws its dashed link (a real path, not the placeholder); a wider one is matched by number */
+    const P = g.members.map((m) => S.nodes.find((n) => n.id === m)).filter(Boolean), sp = Math.max(Math.max(...P.map((q) => q.x)) - Math.min(...P.map((q) => q.x)), Math.max(...P.map((q) => q.y)) - Math.min(...P.map((q) => q.y)));
+    const L = host.querySelector('[data-key-link="' + g.id + '"]');
+    if (sp <= 520 && !(L && L.getAttribute('d') && L.getAttribute('d').length > 12)) bad.push(g.id + ' no link line');
+  });
+  return { n: groups.length, bad };
+};
 /* E14: a long power conductor says what it is — a run over 400 sheet units carries its own line label (a bus is
    exempt: it is named by its bus tag, E19) */
 const longRunsOf = (sel) => {
@@ -288,6 +302,18 @@ const run = { epms: {}, dcai: {} };
     const mv = (t) => { const m = /^BUS [AB] · 20 kV nom · (\d+\.\d+) kV · /.exec(t || ''); return m ? +m[1] : null; };
     ok(v.slice(0, 2).every((t) => { const x = mv(t); return x !== null && x < 20 && x > 18; }) && /^BB1 150 kV$/.test(v[2]) && /^BB2 150 kV$/.test(v[3]),
       `E19 EPMS: 20 kV sections show their voltage under load (18-20 kV), BB1 / BB2 150 kV: ${JSON.stringify(v)}`);
+  }
+  if (want('E16')) {
+    const k = await pe.evaluate(keysOf, EPMS_HV, 'RZEpmsSheets.sld');
+    ok(k && k.n >= 3 && k.bad.length === 0, `E16 EPMS HV/MV: ${k ? k.n : '?'} key groups (want ≥ 3: two line earthing, the 20 kV 2-of-3), ${k ? k.bad.length : '?'} gaps: ${JSON.stringify((k || { bad: [] }).bad.slice(0, 6))}`);
+    /* planted: close ES-L1 while DSL-L1 holds the key -> refused naming the key, ES-L1 stays open */
+    await pe.keyboard.press('Escape');
+    const p2 = await pe.evaluate((H) => { const g = document.querySelector(H + ' .hmi-node[data-node="l1-es"]'); if (!g) return null; g.scrollIntoView({ block: 'center', inline: 'center' }); const r = (g.querySelector('.hmi-hit') || g).getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, EPMS_HV);
+    let msg = '', kmod = '';
+    if (p2) { await pe.mouse.click(p2.x, p2.y); await sleep(500); const s2 = 'aside.rz-inspector.open [data-rz-action="sim-close"], .rz-cvm:not([hidden]) [data-rz-cvm-act="sim-close"]'; if (await pe.$(s2)) { await pe.click(s2); await sleep(600); } msg = await pe.evaluate(() => (document.getElementById('epms-sld-msg') || {}).textContent || ''); kmod = await pe.evaluate(() => [...document.querySelectorAll('aside.rz-inspector.open, .rz-cvm:not([hidden])')].map((x) => x.textContent).join(' ').replace(/\s+/g, ' ')); await pe.keyboard.press('Escape'); await sleep(150); await pe.keyboard.press('Escape'); }
+    const es = await pe.evaluate(brkState, EPMS_HV, 'l1-es');
+    ok(/Key K\d+\s*trapped in DSL-L1/.test(kmod), `E16 EPMS: the ES-L1 modal states where its key is: ${(kmod.match(/Key K\d+[^—]{0,60}/) || ['none'])[0]}`);
+    ok(/\bK\d+ trapped in DSL-L1\b/.test(msg) && es && es.state !== 'closed', `E16 EPMS planted: closing ES-L1 with DSL-L1 closed is refused by its key and ES-L1 stays open: msg "${msg.replace(/\s+/g, ' ').slice(0, 160)}", ES state ${es && es.state}`);
   }
   if (want('E3') || want('E19')) {
     const b = await pe.evaluate(breakersOf, EPMS_HV);

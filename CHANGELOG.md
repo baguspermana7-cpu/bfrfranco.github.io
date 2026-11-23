@@ -11,6 +11,29 @@ release sections rather than semver.
 
 ---
 
+## v3.98.0 — 2026-11-23 — Trapped keys are drawn and enforced
+
+Owner R191 ("tidak ada indikasi castell key untuk trapped key"), PRD-ELECTRICAL-BMS §A5 decision 8, law E16. Gate:
+`tools/test-electrical-bms.mjs` E16 (red on the old tree: 0 key groups, a refusal without a key), wired into
+`tools/ship-gate.sh`.
+
+### Added
+- **Castell-type trapped keys on EPMS E-S-101 and E-S-102.** Key groups come from the sheet's own interlock data
+  (`RZEpmsSheets.keysFrom`, no per-device code):
+  - each 150 kV line earthing switch against its line and busbar disconnectors (key exchange: K1, K2);
+  - the two 20 kV incomers and the bus tie, 2 keys for 3 locks (2-out-of-3);
+  - on each LV hall sheet, the ring incomer against the generator incomer of its section (1 key), and the hall
+    incomers against the hall tie.
+- Every member carries a key glyph with its number: filled where the key is trapped (that device is closed), hollow
+  where it is free. Members of a compact group are joined by a dashed orthogonal link; a group spread across the
+  sheet is matched by its number, as on a key diagram.
+- **The simulation enforces the keys.** Closing a device whose key is trapped elsewhere is refused and names the key:
+  "K1 trapped in DSL-L1, DS1-L1: ES-L1 cannot close without its key". The modal lists each key of the device and where
+  it is now.
+
+### Changed
+- `standarization/HMI_DRAWING_STANDARD.md` §4g: trapped-key grammar.
+
 ## v3.97.0 — 2026-11-23 — Valves open by the solve, tower fans turn at their speed
 
 Owner R188/R189, PRD-CONV-OPS-DEPTH 01 phases P2 and P3. Conventional engine 2.7.0 → 2.8.0.

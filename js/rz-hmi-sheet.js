@@ -130,8 +130,20 @@
     if (!L || !L.use) { host.textContent = 'Symbol library not loaded'; return null; }
     var W = sheet.size[0], H = sheet.size[1], nodes = {}, i;
     sheet.nodes.forEach(function (n) { nodes[n.id] = n; });
+    var KEYOF = {};   // E16: node id -> trapped-key groups it is a member of
+    (sheet.keys || []).forEach(function (g) { g.members.forEach(function (m) { (KEYOF[m] = KEYOF[m] || []).push(g); }); });
 
     var edgesSvg = '', flowSvg = '', arrowSvg = '', lineSvg = '', nodeSvg = '', textSvg = '', areaSvg = '', graph = [], shadowSvg = '', hiSvg = '';
+    var keySvg = '';
+    (sheet.keys || []).forEach(function (g) {
+      var pts = g.members.map(function (m) { return nodes[m]; }).filter(Boolean);
+      if (pts.length < 2) return;
+      /* drawn as a trunk with short spurs once the glyphs have settled (relinkKeys); a group spread over more than
+         520 units is matched by its key number alone, as on a Castell key diagram */
+      var xs = pts.map(function (q) { return q.x; }), ys = pts.map(function (q) { return q.y; });
+      if (Math.max(Math.max.apply(null, xs) - Math.min.apply(null, xs), Math.max.apply(null, ys) - Math.min.apply(null, ys)) > 520) return;
+      keySvg += '<path class="hmi-key-link" data-key-link="' + esc(g.id) + '" data-members="' + esc(g.members.join(' ')) + '" data-lod="1" d="M0 0"><title>' + esc(g.id + ' mechanical key link — ' + g.rule) + '</title></path>';
+    });
     (sheet.areas || []).forEach(function (a) {
       areaSvg += '<rect class="' + (a.kind === 'box' ? 'hmi-box' : 'hmi-zone') + '" x="' + a.x + '" y="' + a.y + '" width="' + a.w + '" height="' + a.h + '"/>';
       if (a.label) areaSvg += '<text class="hmi-area-label" data-role="tag" x="' + (a.x + 6) + '" y="' + (a.y + 12) + '">' + esc(a.label) + '</text>';
@@ -193,7 +205,7 @@
         stackMarks(n, sz) +
         withBody(L.use(n.sym, { x: n.x, y: n.y, size: sz, rot: n.rot || 0 })) +
         (relayAnsi(n) ? '<text data-role="inst" data-const="IEEE C37.2 device function number" x="' + n.x + '" y="' + r1(n.y - sz * 4 / 48 + (n.sym === 'instPanel' ? -1.5 : 2.6)) + '">' + esc(relayAnsi(n)) + '</text>' : '') +
-        brkMarks(n, sz) + relayMarks(n, sz) +
+        brkMarks(n, sz) + relayMarks(n, sz) + keyMarks(n, sz, KEYOF[n.id]) +
         '</g>';
       if (isBrk(n) && !(n.values && n.values.length) && !(n.rating && n.tag && n.tagAt !== 'none')) textSvg += brkTag(n, sz);   // a drawn reading or rating line IS the value tag
       if (n.tag && n.tagAt !== 'none') {
@@ -266,7 +278,7 @@
       '<svg class="hmi-svg lod-1" xmlns="' + NS + '" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(sheet.no + ' ' + sheet.title) + '" id="' + esc(sheet.svgId || ('hmi-' + sheet.id)) + '"' +
         ' data-rz-authored-basis="' + esc('HMI sheet ' + sheet.no + ': counts, ratings and design temperatures come from the DC AI engine snapshot (' + (sheet.basis || 'engine') + ') through js/datahall-ai/hmi-sheets.js; live values and states from the equipment payload (hmi-payloads.js)') + '">' +
       '<rect class="hmi-canvas" x="0" y="0" width="' + W + '" height="' + H + '"/><g class="hmi-areas">' + areaSvg + '</g><g class="hmi-edges"><g class="hmi-edge-shadows">' + shadowSvg + '</g>' + edgesSvg + '<g class="hmi-edge-his">' + hiSvg + '</g>' + flowSvg + arrowSvg + '</g><g class="hmi-lines">' + lineSvg + '</g>' +
-      '<g class="hmi-nodes">' + nodeSvg + '</g><g class="hmi-text">' + textSvg + '</g>' + tb + '</svg>' + '</div>' +
+      '<g class="hmi-keys" aria-hidden="true">' + keySvg + '</g><g class="hmi-nodes">' + nodeSvg + '</g><g class="hmi-text">' + textSvg + '</g>' + tb + '</svg>' + '</div>' +
       '<div class="hmi-mini" aria-hidden="true"><svg viewBox="0 0 ' + W + ' ' + H + '"><rect x="0" y="0" width="' + W + '" height="' + H + '" fill="none" stroke="currentColor" stroke-width="4"/><rect class="vp" x="0" y="0" width="' + W + '" height="' + H + '"/></svg></div>';
     host.appendChild(frame);
     var svg = frame.querySelector('svg.hmi-svg'), vpRect = frame.querySelector('.hmi-mini .vp');
@@ -502,6 +514,17 @@
           setA(t, 'data-alarm', dv && dv.alarm ? dv.alarm : null);
         });
       });
+      /* E16: key state — filled where its device is closed (the key is trapped there), hollow where it is free */
+      (sheet.keys || []).forEach(function (g) {
+        var shut = function (m) { var q = E.node[m]; return !!q && /^(closed|running|energized)$/.test(q.getAttribute('data-state') || ''); };
+        var held = g.members.filter(shut).map(function (m) { return nodes[m] ? nodes[m].tag || m : m; });
+        g.members.forEach(function (m) {
+          var k = E.node[m] && E.node[m].querySelector('.hmi-key[data-key="' + g.id + '"]'); if (!k) return;
+          setA(k, 'data-key-state', shut(m) ? 'held' : 'free');
+          var t = k.querySelector('title'), txt = g.id + ' — ' + (held.length ? 'trapped in ' + held.join(', ') : 'free') + ' · ' + g.rule;
+          if (t && t.textContent !== txt) t.textContent = txt;
+        });
+      });
       if (unbound) PS.bindAll(svg);   /* registers the new points with RZTrend, makes them buttons, applies their state */
       graph.forEach(function (e) {
         if (!e.flowOf && !opts.flow) return;
@@ -563,30 +586,50 @@
     /* a breaker's glyph + lamp sit left of the symbol; where that covers a drawn word (a zone title, its own tag) they
        move right, then above / below (either side), to the first place that covers none, else the one covering fewest */
     function settleBrk() {
-      var words = [].slice.call(svg.querySelectorAll('text')).map(function (t) { try { return t.getBBox(); } catch (x) { return null; } })
+      var words = [].slice.call(svg.querySelectorAll('text')).filter(function (t) { return !t.closest('.hmi-key'); }).map(function (t) { try { return t.getBBox(); } catch (x) { return null; } })
         .filter(function (r) { return r && r.width; });
       /* straight conductors and signal runs count as well (a lamp parked on the 51 relay link on DC AI's incomers) */
       [].slice.call(svg.querySelectorAll('path.hmi-edge:not(.hmi-flow)')).forEach(function (p) {
         var r; try { r = p.getBBox(); } catch (x) { return; }
         if (r && (r.width < 2 || r.height < 2)) words.push({ x: r.x - 1, y: r.y - 1, width: r.width + 2, height: r.height + 2 });
       });
-      var hit = function (r) { var n = 0; words.forEach(function (w) { if (r.x < w.x + w.width && w.x < r.x + r.width && r.y < w.y + w.height && w.y < r.y + r.height) n++; }); return n; };
-      svg.querySelectorAll('g.hmi-brk[data-brk-flip], g.hmi-relay[data-alt]').forEach(function (g) {
+      /* a key glyph also keeps off breaker glyphs and lamps (they settle first, so their final place is known) */
+      var marks = [];
+      var hit = function (r, extra) { var n = 0; (extra ? words.concat(marks) : words).forEach(function (w) { if (r.x < w.x + w.width && w.x < r.x + r.width && r.y < w.y + w.height && w.y < r.y + r.height) n++; }); return n; };
+      [].slice.call(svg.querySelectorAll('g.hmi-brk[data-brk-flip], g.hmi-relay[data-alt]')).concat([].slice.call(svg.querySelectorAll('g.hmi-key[data-alt]'))).forEach(function (g) {
         g.removeAttribute('transform');
-        var r = g.getBBox(), dx = +g.getAttribute('data-brk-flip'), here = hit(r);
+        var isKey = g.classList.contains('hmi-key');
+        if (isKey && !marks.length) svg.querySelectorAll('g.hmi-brk, g.hmi-relay').forEach(function (b) { try { var q = b.getBBox(), t = b.transform && b.transform.baseVal.consolidate(); marks.push({ x: q.x + (t ? t.matrix.e : 0), y: q.y + (t ? t.matrix.f : 0), width: q.width, height: q.height }); } catch (x) { /* not laid out */ } });
+        var r = g.getBBox(), dx = +g.getAttribute('data-brk-flip'), here = hit(r, isKey);
         if (!here || !r.width) return;
         var best = [0, 0, here], alt = g.hasAttribute('data-alt') ? JSON.parse(g.getAttribute('data-alt')) : [[dx, 0], [0, -18], [dx, -18], [0, 18], [dx, 18]];
         alt.some(function (d) {
-          var n = hit({ x: r.x + d[0], y: r.y + d[1], width: r.width, height: r.height });
+          var n = hit({ x: r.x + d[0], y: r.y + d[1], width: r.width, height: r.height }, isKey);
           if (n < best[2]) best = [d[0], d[1], n];
           return n === 0;
         });
         if (best[0] || best[1]) g.setAttribute('transform', 'translate(' + best[0] + ' ' + best[1] + ')');
       });
     }
+    /* E16: the dashed key link runs from glyph to glyph after they settle: a trunk along the longer side, spurs to each */
+    function relinkKeys() {
+      svg.querySelectorAll('path.hmi-key-link[data-members]').forEach(function (p) {
+        var id = p.getAttribute('data-key-link'), c = p.getAttribute('data-members').split(' ').map(function (m) {
+          var k = svg.querySelector('.hmi-node[data-node="' + m + '"] .hmi-key[data-key="' + id + '"] circle'); if (!k) return null;
+          var r = k.getBBox(), g = k.closest('.hmi-key'), t = g.transform && g.transform.baseVal.consolidate(), q = k.parentNode.transform.baseVal.consolidate();
+          return [r.x + r.width / 2 + (t ? t.matrix.e : 0) + (q ? q.matrix.e : 0), r.y + r.height / 2 + (t ? t.matrix.f : 0) + (q ? q.matrix.f : 0)];
+        }).filter(Boolean);
+        if (c.length < 2) return;
+        var xs = c.map(function (v) { return v[0]; }), ys = c.map(function (v) { return v[1]; });
+        var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs), y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys), d;
+        if (x1 - x0 >= y1 - y0) { var ty = y0 - 7; d = 'M' + r1(x0) + ' ' + r1(ty) + ' H' + r1(x1) + c.map(function (v) { return ' M' + r1(v[0]) + ' ' + r1(ty) + ' V' + r1(v[1] - 2.4); }).join(''); }
+        else { var tx = x0 - 9; d = 'M' + r1(tx) + ' ' + r1(y0) + ' V' + r1(y1) + c.map(function (v) { return ' M' + r1(tx) + ' ' + r1(v[1]) + ' H' + r1(v[0] - 2.4); }).join(''); }
+        p.setAttribute('d', d);
+      });
+    }
     function settle() {
       if (!svg.clientWidth) return false;
-      settleBrk();
+      settleBrk(); relinkKeys();
       if (sheet.crop === true && measureCrop() && view.z <= 1.001 && !frame.classList.contains('is-fit-all')) fit();
       return true;
     }
@@ -692,6 +735,18 @@
     var d = n.stackDir || -1, o = '';
     for (var k = 2; k >= 1; k--) o += '<rect data-stack="' + k + '" x="' + r1(n.x - sz / 2 + d * 5 * k) + '" y="' + r1(n.y - sz / 2 - 5 * k) + '" width="' + sz + '" height="' + sz + '" rx="1.5"/>';
     return '<g class="hmi-stack" aria-hidden="true">' + o + '</g>';
+  }
+  /* E16: a Castell-type key beside each interlocked device (IEC 60617 mechanical interlock): bow, shaft, bit, and the key
+     number. Hollow = the key is free of this device, filled = trapped in it (this device is closed). */
+  function keyMarks(n, sz, groups) {
+    if (!groups || !groups.length) return '';
+    var x0 = n.x - sz / 2 - 16, y0 = n.y - sz / 2 + 1;
+    return groups.map(function (g, i) {
+      var y = y0 + i * 13, alt = [[sz + 32, 0], [0, sz + 6], [sz + 32, sz + 6], [0, -12], [-14, 0]];
+      return '<g class="hmi-key" data-key="' + esc(g.id) + '" data-key-state="free" data-lod="0" data-alt="' + JSON.stringify(alt.map(function (d) { return [r1(d[0]), r1(d[1])]; })) + '">' +
+        '<title>' + esc(g.id + ' — ' + g.rule) + '</title><g transform="translate(' + r1(x0) + ' ' + r1(y) + ')">' +
+        '<circle cx="-4" cy="0" r="2.4"/><path d="M-1.6 0 H5 M3 0 V2 M5 0 V2.4"/><text x="7" y="3">' + esc(g.id) + '</text></g></g>';
+    }).join('');
   }
   function relayMarks(n, sz) {
     if (n.sym !== 'protectionRelay') return '';

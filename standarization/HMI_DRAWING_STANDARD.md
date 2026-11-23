@@ -257,6 +257,12 @@ Applies to every single-line sheet: EPMS E-S-101 / E-S-102 and DC AI E-001 / E-1
 - **Every drawn item opens (E15).** Every node except a junction dot carries `data-rz-equipment`. A DC AI electrical
   item with no plant class gets `sld-item:<sheet>~<node>` (hmi-sheets.js `finish()`): its inspector names the drawing
   tag, the state the sheet paints, and "not modelled" for values. Never an item that opens nothing.
+- **Trapped keys are drawn and enforced (E16).** Castell-type key groups come from the sheet's interlock data
+  (`RZEpmsSheets.keysFrom`): an earthing switch against its disconnectors (key exchange), the 20 kV incomers + tie
+  (2 keys for 3 locks, 2-out-of-3), ring vs generator incomer of one LV section (1 key). Each member carries a key
+  glyph with its number (filled = trapped in this closed device, hollow = free) and the group a dashed orthogonal
+  link (only within 520 units; wider groups are matched by number). The simulation refuses a close whose key is
+  trapped elsewhere and names it ("K1 trapped in DSL-L1"); the modal lists each key and where it is.
 - **Parallel units are a stack (E17).** N identical units in parallel (UPS rectifier/inverter modules) draw two offset
   outlines behind the symbol (`stack: N`), the name `× N · <redundancy>`, and the value `N × <module kW>`, all from the
   engine (`ups_modules_per_system / halls`, `ups_module_kw_rated`, `ups_redundancy`).

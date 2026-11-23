@@ -182,6 +182,14 @@
     function no(reason) { return { ok: false, reason: reason, state: state }; }
     if (!n || !n.sw) return no((n ? tagOf(by, id) : id) + ' is not a switching device');
     if (!!C[id] === !!close) return no(tagOf(by, id) + ' is already ' + (close ? 'closed' : 'open'));
+    /* E16: trapped keys first — a device whose key is held by another closed device cannot close (Castell) */
+    if (close) for (var gi = 0; gi < (sheet.keys || []).length; gi++) {
+      var g = sheet.keys[gi]; if (g.members.indexOf(id) < 0) continue;
+      var held = g.members.filter(function (m) { return m !== id && C[m]; });
+      var block = g.hub ? (id === g.hub ? held : (C[g.hub] ? [g.hub] : [])) : (held.length >= g.n ? held : []);
+      var bt = block.map(function (m) { return tagOf(by, m); });
+      if (block.length) return no(g.id + ' trapped in ' + (bt.length > 1 ? bt.slice(0, -1).join(', ') + ' and ' + bt[bt.length - 1] : bt[0]) + ': ' + n.tag + ' cannot close without its key (' + g.rule + ')');
+    }
     if (n.sw === 'ds') {
       if (C[n.cb]) return no(n.tag + ' can move only with its breaker ' + tagOf(by, n.cb) + ' open, and ' + tagOf(by, n.cb) + ' is closed');
       if (close) {
