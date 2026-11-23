@@ -563,6 +563,16 @@
           zoneEls[z] = zd;
         }
       }
+      /* 3D: a tag that would run past the stage's right edge slides left along its own screen row, staying wholly on the
+         floor (HV-U1: the last row's tag was cut once its value carried a unit) */
+      if (iso) {
+        var cwid = canvas.clientWidth || root.clientWidth || 0;
+        for (z = 0; z < zoneEls.length && cwid; z++) {
+          var ze = zoneEls[z]; if (!ze) continue;
+          var zl = parseFloat(ze.style.left) || 0, zw = ze.offsetWidth;
+          if (zw && zl + zw > cwid - 4) ze.style.left = Math.max(4, Math.round(cwid - 4 - zw)) + 'px';
+        }
+      }
       tip = html('div', 'fp-tip', root); tip.hidden = true; tip.setAttribute('role', 'tooltip');
       host.setAttribute('data-fp-host', '1');
       applyTheme();

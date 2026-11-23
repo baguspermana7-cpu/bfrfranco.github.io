@@ -433,10 +433,15 @@ for (const W of [1440, 390]) {
       await new Promise((res) => setTimeout(res, 900));
       const m = window.RZHallIso && window.RZHallIso.model(), want = m ? m.racksPerZone * m.racks[0].kw : null;
       const feet = [...document.querySelectorAll('#hIso .zone-foot .zf-kw')].filter((f) => f.getClientRects().length > 0).map((f) => f.textContent.replace(/\s+/g, ' ').trim());
-      return { want, feet };
+      /* every row tag lies wholly inside the stage (a tag cut by the stage edge is a tag nobody reads) */
+      const st = document.querySelector('#hIso .fp-root').getBoundingClientRect();
+      const cut = [...document.querySelectorAll('#hIso .zone')].filter((z) => { const b = z.getBoundingClientRect(); return b.width && (b.left < st.left - 0.5 || b.right > st.right + 0.5 || b.top < st.top - 0.5 || b.bottom > st.bottom + 0.5); })
+        .map((z) => (z.querySelector('.zone-head') || z).textContent.trim());
+      return { want, feet, cut };
     }, v);
     const parse = (t) => { const x = /([\d.,]+)\s*(kW|MW)\b/.exec(t); return x ? parseFloat(x[1].replace(/,/g, '')) * (x[2] === 'MW' ? 1000 : 1) : null; };
     const bad = r.feet.filter((t) => { const k = parse(t); return k == null || Math.abs(k - r.want) > (/MW/.test(t) ? 50 : 0.5); });
+    ok('HV-U1', r.cut.length === 0, `${W} ${v}: row tags cut by the stage edge: ${r.cut.join(', ')}`);
     ok('HV-U1', r.feet.length >= 10 && bad.length === 0, `${W} ${v}: ${bad.length} of ${r.feet.length} row-pair feet without a unit or off the engine ${r.want} kW (${bad.slice(0, 3).join(' / ')})`);
   }
   await pg.close();
