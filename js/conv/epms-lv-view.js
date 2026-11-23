@@ -75,6 +75,12 @@
       if (!live) o.alarm = '1';
       return o;
     }
+    if (n.pdu) {   /* E18: a typical PDU, rating and loading from the engine (electrical.pdu_kva_rated, pdu_per_hall_per_stream) */
+      o.state = devState(d);
+      o.values.r = fv(SH[cur].counts.pdus + ' × ' + grp(E.pdu_kva_rated) + ' kVA');
+      o.values.ld = fv(d.pct.toFixed(1) + ' % · ' + kw(d.kw / (n.units || 1)) + ' each');
+      return o;
+    }
     if (n.tx) {
       o.state = devState(d);
       o.values.r = fv(grp(E.dist_tx_kva) + ' kVA ' + E.mv_voltage_kv + ' / ' + (E.lv_voltage_v / 1000) + ' kV');

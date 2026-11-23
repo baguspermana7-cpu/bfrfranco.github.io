@@ -2751,9 +2751,7 @@
         "section": "MODEL.electrical (LV below the distribution transformer, engine 2.9.0)",
         "asOf": "2026-11-23",
         "method": "Floor-standing PDU unit rating. Training design value for the simulated plant; no PDU submittal or vendor selection exists."
-      },
-      "display": "internal",
-      "displayReason": "Published for E-S-102 (PRD-ELECTRICAL-BMS E18, owner R191: LV drawn down to PDU → rack); the sheet reads it through js/conv/payloads.js or js/conv/epms-sheet.js, not a page-level read the registry greps."
+      }
     },
     {
       "id": "electrical.pdu_power_factor",
@@ -2796,9 +2794,7 @@
         "section": "AUTHORED_RACKS_PER_ZONE",
         "asOf": "2026-11-23",
         "method": "The authored floor layout of the Conventional data hall: 20 cabinets per row; the row count is derived from the engine rack count."
-      },
-      "display": "internal",
-      "displayReason": "Published for E-S-102 (PRD-ELECTRICAL-BMS E18, owner R191: LV drawn down to PDU → rack); the sheet reads it through js/conv/payloads.js or js/conv/epms-sheet.js, not a page-level read the registry greps."
+      }
     },
     {
       "id": "electrical.pdu_kw_usable",
@@ -2839,9 +2835,7 @@
         "asOf": "2026-11-23",
         "method": "Derived in the engine; the largest hall governs, as for the distribution transformers."
       },
-      "formulaExpr": "ceil( hall.it_design_kw / electrical.pdu_kw_usable )",
-      "display": "internal",
-      "displayReason": "Published for E-S-102 (PRD-ELECTRICAL-BMS E18, owner R191: LV drawn down to PDU → rack); the sheet reads it through js/conv/payloads.js or js/conv/epms-sheet.js, not a page-level read the registry greps."
+      "formulaExpr": "ceil( hall.it_design_kw / electrical.pdu_kw_usable )"
     },
     {
       "id": "electrical.pdu_load_pct_normal",
@@ -2907,9 +2901,7 @@
         "asOf": "2026-11-23",
         "method": "Derived in the engine; null when the rack count does not divide into whole rows."
       },
-      "formulaExpr": "hall.racks / electrical.racks_per_row",
-      "display": "internal",
-      "displayReason": "Published for E-S-102 (PRD-ELECTRICAL-BMS E18, owner R191: LV drawn down to PDU → rack); the sheet reads it through js/conv/payloads.js or js/conv/epms-sheet.js, not a page-level read the registry greps."
+      "formulaExpr": "hall.racks / electrical.racks_per_row"
     },
     {
       "id": "electrical.racks_per_pdu",
@@ -2928,9 +2920,7 @@
         "asOf": "2026-11-23",
         "method": "Derived in the engine; each cabinet has one PDU on each stream."
       },
-      "formulaExpr": "ceil( hall.racks / electrical.pdu_per_hall_per_stream )",
-      "display": "internal",
-      "displayReason": "Published for E-S-102 (PRD-ELECTRICAL-BMS E18, owner R191: LV drawn down to PDU → rack); the sheet reads it through js/conv/payloads.js or js/conv/epms-sheet.js, not a page-level read the registry greps."
+      "formulaExpr": "ceil( hall.racks / electrical.pdu_per_hall_per_stream )"
     },
     {
       "id": "electrical.dist_tx_load_pct_normal",

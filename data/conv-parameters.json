@@ -94,7 +94,7 @@
         },
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 2
+          "reads": 12
         }
       ],
       "tests": [
@@ -7410,7 +7410,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 2
+          "reads": 3
         }
       ],
       "tests": [
@@ -7599,7 +7599,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 5
+          "reads": 8
         }
       ],
       "tests": [
@@ -7815,7 +7815,12 @@
         "electrical.power_factor_design",
         "site.pue"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 2
+        }
+      ],
       "tests": [
         "test-conv-epms-lv.mjs",
         "test-conv-formula.mjs (formula evaluated)"
@@ -7878,7 +7883,12 @@
       "dependsOnInputs": [
         "electrical.dist_tx_streams"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 2
+        }
+      ],
       "tests": [
         "test-conv-epms-model.mjs",
         "test-conv-internals-p4.mjs",
@@ -8088,7 +8098,7 @@
         },
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 4
+          "reads": 6
         }
       ],
       "tests": [
@@ -8124,7 +8134,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 1
+          "reads": 4
         }
       ],
       "tests": [
@@ -8210,7 +8220,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 2
+          "reads": 3
         }
       ],
       "tests": [
@@ -8249,6 +8259,10 @@
         {
           "page": "fuel-system.html",
           "reads": 3
+        },
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 4
         }
       ],
       "tests": [
@@ -8283,7 +8297,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 1
+          "reads": 4
         }
       ],
       "tests": [
@@ -8350,7 +8364,12 @@
         "campus.halls.3.it_design_kw",
         "site.pue"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 2
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
         "test-conv-formula.mjs (formula evaluated)"
@@ -8473,7 +8492,12 @@
         "electrical.hv_fault_level_ka",
         "electrical.hv_voltage_kv"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-formula.mjs (formula evaluated)"
       ],
@@ -8812,7 +8836,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 7
+          "reads": 11
         }
       ],
       "tests": [
@@ -8919,7 +8943,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 6
+          "reads": 12
         }
       ],
       "tests": [
@@ -8973,7 +8997,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 2
+          "reads": 5
         }
       ],
       "tests": [
@@ -9006,7 +9030,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 3
+          "reads": 10
         }
       ],
       "tests": [
@@ -9151,7 +9175,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 5
+          "reads": 9
         }
       ],
       "tests": [
@@ -9185,7 +9209,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 2
+          "reads": 3
         }
       ],
       "tests": [
@@ -9261,7 +9285,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 14
+          "reads": 25
         }
       ],
       "tests": [
@@ -9310,8 +9334,6 @@
       "kind": "authored",
       "value": 300,
       "formula": null,
-      "display": "internal",
-      "displayReason": "Published for E-S-102 (PRD-ELECTRICAL-BMS E18, owner R191: LV drawn down to PDU → rack); the sheet reads it through js/conv/payloads.js or js/conv/epms-sheet.js, not a page-level read the registry greps.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ASSUMED",
@@ -9319,7 +9341,12 @@
       "dependsOnInputs": [
         "electrical.pdu_kva_rated"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 5
+        }
+      ],
       "tests": [
         "test-conv-pdu-keys.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
@@ -9489,8 +9516,6 @@
       "value": 44,
       "formula": "ceil(hall IT design kW / usable PDU kW): 2N, one stream alone carries the hall",
       "formulaExpr": "ceil( hall.it_design_kw / electrical.pdu_kw_usable )",
-      "display": "internal",
-      "displayReason": "Published for E-S-102 (PRD-ELECTRICAL-BMS E18, owner R191: LV drawn down to PDU → rack); the sheet reads it through js/conv/payloads.js or js/conv/epms-sheet.js, not a page-level read the registry greps.",
       "deps": [
         "hall.it_design_kw",
         "electrical.pdu_kw_usable"
@@ -9507,8 +9532,14 @@
         "electrical.pdu_max_loading_pct",
         "electrical.pdu_power_factor"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 3
+        }
+      ],
       "tests": [
+        "test-conv-epms-lv.mjs",
         "test-conv-pdu-keys.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
@@ -9536,7 +9567,12 @@
       "dependsOnInputs": [
         "electrical.pdu_power_factor"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-pdu-keys.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
@@ -9572,7 +9608,7 @@
         },
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 8
+          "reads": 10
         }
       ],
       "tests": [
@@ -9604,7 +9640,12 @@
       "evidenceClass": "ASSUMED",
       "explainKey": null,
       "dependsOnInputs": [],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 2
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
         "test-conv-epms-model.mjs"
@@ -9679,7 +9720,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 1
+          "reads": 2
         }
       ],
       "tests": [
@@ -9710,7 +9751,12 @@
       "dependsOnInputs": [
         "electrical.pro_feeder_inst_s"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
@@ -9745,7 +9791,12 @@
         "electrical.mv_voltage_kv",
         "electrical.pro_feeder_pickup_x"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
         "test-conv-epms-model.mjs",
@@ -9934,7 +9985,12 @@
         "electrical.pro_lv_tr_s",
         "electrical.pro_tms_step"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
         "test-conv-epms-model.mjs"
@@ -9963,7 +10019,12 @@
       "dependsOnInputs": [
         "electrical.pro_grading_margin_s"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
         "test-conv-epms-model.mjs",
@@ -9994,7 +10055,12 @@
       "evidenceClass": "ASSUMED",
       "explainKey": null,
       "dependsOnInputs": [],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 2
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs"
       ],
@@ -10076,7 +10142,12 @@
         "electrical.pro_hv_pickup_x",
         "site.pue"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
         "test-conv-epms-model.mjs",
@@ -10192,7 +10263,12 @@
         "electrical.pro_incomer_pickup_x",
         "electrical.pro_tms_step"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs"
       ],
@@ -10218,7 +10294,12 @@
       "evidenceClass": "ASSUMED",
       "explainKey": null,
       "dependsOnInputs": [],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 2
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs"
       ],
@@ -10257,7 +10338,12 @@
         "electrical.pro_incomer_pickup_x",
         "site.pue"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
         "test-conv-formula.mjs (formula evaluated)"
@@ -10370,7 +10456,12 @@
         "electrical.pro_incomer_pickup_x",
         "electrical.pro_tms_step"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-electrical-hvmv.mjs",
         "test-conv-epms-model.mjs"
@@ -10498,7 +10589,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 3
+          "reads": 4
         }
       ],
       "tests": [
@@ -10539,7 +10630,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 1
+          "reads": 2
         }
       ],
       "tests": [
@@ -10635,7 +10726,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 2
+          "reads": 3
         }
       ],
       "tests": [
@@ -10671,7 +10762,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 1
+          "reads": 2
         }
       ],
       "tests": [
@@ -10756,8 +10847,6 @@
       "value": 12,
       "formula": "ceil(hall racks / PDUs per stream)",
       "formulaExpr": "ceil( hall.racks / electrical.pdu_per_hall_per_stream )",
-      "display": "internal",
-      "displayReason": "Published for E-S-102 (PRD-ELECTRICAL-BMS E18, owner R191: LV drawn down to PDU → rack); the sheet reads it through js/conv/payloads.js or js/conv/epms-sheet.js, not a page-level read the registry greps.",
       "deps": [
         "hall.racks",
         "electrical.pdu_per_hall_per_stream"
@@ -10775,8 +10864,14 @@
         "electrical.pdu_max_loading_pct",
         "electrical.pdu_power_factor"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 3
+        }
+      ],
       "tests": [
+        "test-conv-epms-lv.mjs",
         "test-conv-pdu-keys.mjs",
         "test-conv-formula.mjs (formula evaluated)"
       ],
@@ -10795,8 +10890,6 @@
       "kind": "authored",
       "value": 20,
       "formula": null,
-      "display": "internal",
-      "displayReason": "Published for E-S-102 (PRD-ELECTRICAL-BMS E18, owner R191: LV drawn down to PDU → rack); the sheet reads it through js/conv/payloads.js or js/conv/epms-sheet.js, not a page-level read the registry greps.",
       "deps": [],
       "scope": "plant",
       "evidenceClass": "ADOPTED",
@@ -10804,7 +10897,12 @@
       "dependsOnInputs": [
         "electrical.racks_per_row"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 1
+        }
+      ],
       "tests": [
         "test-conv-pdu-keys.mjs",
         "test-conv-parameter-registry.mjs (provenance + evidence class)"
@@ -10825,8 +10923,6 @@
       "value": 25,
       "formula": "hall racks / cabinets per row",
       "formulaExpr": "hall.racks / electrical.racks_per_row",
-      "display": "internal",
-      "displayReason": "Published for E-S-102 (PRD-ELECTRICAL-BMS E18, owner R191: LV drawn down to PDU → rack); the sheet reads it through js/conv/payloads.js or js/conv/epms-sheet.js, not a page-level read the registry greps.",
       "deps": [
         "hall.racks",
         "electrical.racks_per_row"
@@ -10838,7 +10934,12 @@
         "campus.halls.0.racks",
         "electrical.racks_per_row"
       ],
-      "consumers": [],
+      "consumers": [
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 2
+        }
+      ],
       "tests": [
         "test-conv-pdu-keys.mjs",
         "test-conv-formula.mjs (formula evaluated)"
@@ -10872,7 +10973,7 @@
         },
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 1
+          "reads": 3
         }
       ],
       "tests": [
@@ -10920,6 +11021,10 @@
         {
           "page": "dc-conventional.html",
           "reads": 6
+        },
+        {
+          "page": "EPMS_Telemetry.html",
+          "reads": 2
         }
       ],
       "tests": [
@@ -11091,7 +11196,7 @@
         },
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 8
+          "reads": 11
         }
       ],
       "tests": [
@@ -11121,7 +11226,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 9
+          "reads": 12
         }
       ],
       "tests": [
@@ -11161,7 +11266,7 @@
       "consumers": [
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 6
+          "reads": 7
         }
       ],
       "tests": [
@@ -11195,7 +11300,7 @@
         },
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 1
+          "reads": 3
         }
       ],
       "tests": [
@@ -12695,7 +12800,7 @@
         },
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 1
+          "reads": 10
         }
       ],
       "tests": [
@@ -12795,7 +12900,7 @@
         },
         {
           "page": "EPMS_Telemetry.html",
-          "reads": 1
+          "reads": 4
         }
       ],
       "tests": [

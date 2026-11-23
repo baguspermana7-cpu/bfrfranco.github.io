@@ -97,6 +97,8 @@ async function act(pg, node, action) {
   const sel = 'aside.rz-inspector.open [data-rz-action="' + action + '"], .rz-cvm:not([hidden]) [data-rz-cvm-act="' + action + '"]';
   if (!(await pg.$(sel))) { await sleep(600); if (!(await pg.$(sel))) return 'no ' + action + ' button for ' + node; }
   await pg.click(sel); await sleep(350);
+  /* E12: a switching operation sweeps downstream hop by hop (<= 2 s); read the sheet once the sweep has landed */
+  await pg.waitForFunction((H) => !document.querySelector(H + '[data-sweeping], ' + H + ' [data-sweeping]'), { timeout: 4000 }, HOST).catch(() => {});
   return null;
 }
 

@@ -56,6 +56,7 @@
     var modules = e.ups_modules_per_system / b.halls.length;          /* a system's modules shared over the halls */
     var upsKw = modules * e.ups_module_kw_rated;
     var itKw = hall.it_load_kw / streams;
+    var pdus = e.pdu_per_hall_per_stream > 0 && e.pdu_kva_rated > 0 && e.racks_per_pdu > 0 ? e.pdu_per_hall_per_stream : 0;   /* E18: conv-engine >= 2.9.0 */
     /* 1.2.0 (P4a, G1): the UPS loss of this stream sits at the UPS: the inverter carries lossFrac = 1/eta - 1 and the
        simulation books lossFrac x its output on the DC bus (rectifier input = output / eta, the engine's upsLossKw() rule).
        The same kW leaves the mech load, which carried it until 1.1.0, so the normal stream total is equal */
@@ -150,14 +151,34 @@
       /* the tap for the UPS sits on the LV board right under the LV main: one more junction on that bus */
       E('b' + ls + '-ud', 'b' + ls + '-in', 'b' + ls + '-u', null, { w: 'bus' });
       N({ id: 'b' + ls + '-u', sym: 'junction', x: X(150), y: 552, dot: false });
-      /* rack PDU / RPP board (A or B cord of every rack) */
-      N({ id: 'p' + ls + '-cb', tag: 'CB-RPP' + T, sym: 'cbIec', x: X(150), y: 966, size: 26, cls: 'epms', sw: 'cb', kv: 'lv', tagAt: side,
-        label: 'Feeder to the rack PDU / RPP boards', values: [{ k: 'st', dx: vd * 17, dy: 15, anchor: va, lod: 1 }] });
-      N({ id: 'p' + ls + '-ld', tag: 'RPP-' + T, name: '× ' + grp(hall.racks) + ' racks · ' + s + ' cord', sym: 'offSheet', rot: 90, x: X(150), y: 1046, size: 20, cls: 'epms', kv: 'lv',
-        load: 'it', kw: itKw, label: 'Rack PDU / RPP boards, ' + s + ' cord of every rack (board count not modelled)', tagAt: 'below',
-        values: [{ k: 'kw', dx: 0, dy: 50, anchor: 'middle', lod: 1 }] });
-      E(u + 'm', u + 'ob', 'p' + ls + '-cb.line');
-      E(u + 'n', 'p' + ls + '-cb.load', 'p' + ls + '-ld.port');
+      /* E18 (R191): the critical bus goes down to the rack. UPS output -> PDU feeder -> PDU (typical of
+         electrical.pdu_per_hall_per_stream, each pdu_kva_rated with its own transformer and panel) -> the racks of one
+         PDU (racks_per_pdu, in rows of racks_per_row). The counts are the engine's; an engine without them (before
+         conv-engine 2.9.0) keeps the single RPP feeder and says the board count is not modelled. */
+      if (pdus) {
+        N({ id: 'p' + ls + '-cb', tag: 'CB-PDU' + T, sym: 'cbIec', x: X(150), y: 966, size: 26, cls: 'epms', sw: 'cb', kv: 'lv', tagAt: side,
+          label: 'PDU feeder, typical (' + pdus + ' per stream)', values: [{ k: 'st', dx: vd * 17, dy: 15, anchor: va, lod: 1 }] });
+        N({ id: 'q' + ls + '-pdu', tag: 'PDU-' + T, name: '× ' + pdus, sym: 'transformer2w', x: X(150), y: 1020, size: 34, cls: 'epms', kv: 'lv',
+          pdu: true, tx: 'pdu', units: pdus, tagAt: side,
+          label: 'Power distribution unit ' + grp(e.pdu_kva_rated) + ' kVA (transformer + panel), typical of ' + pdus + ' on the ' + s + ' stream',
+          values: [{ k: 'r', dx: vd * 24, dy: 27, anchor: va, lod: 1 }, { k: 'ld', dx: vd * 24, dy: 39, anchor: va, lod: 1 }] });
+        N({ id: 'p' + ls + '-ld', tag: 'RACKS-' + T, name: '× ' + e.racks_per_pdu + ' racks per PDU · ' + s + ' cord', sym: 'offSheet', rot: 90, x: X(150), y: 1076, size: 20, cls: 'epms', kv: 'lv',
+          load: 'it', kw: itKw, tagAt: 'below',
+          label: 'Racks of one PDU (' + e.racks_per_pdu + '), ' + s + ' cord; the hall is ' + (e.rows_per_hall ? e.rows_per_hall + ' rows of ' + e.racks_per_row : grp(hall.racks) + ' racks') + ', ' + grp(hall.racks) + ' racks',
+          values: [{ k: 'kw', dx: 0, dy: 44, anchor: 'middle', lod: 1 }] });
+        E(u + 'm', u + 'ob', 'p' + ls + '-cb.line');
+        E(u + 'n', 'p' + ls + '-cb.load', 'q' + ls + '-pdu.hv');
+        E(u + 'o', 'q' + ls + '-pdu.lv', 'p' + ls + '-ld.port');
+      } else {
+        /* rack PDU / RPP board (A or B cord of every rack) */
+        N({ id: 'p' + ls + '-cb', tag: 'CB-RPP' + T, sym: 'cbIec', x: X(150), y: 966, size: 26, cls: 'epms', sw: 'cb', kv: 'lv', tagAt: side,
+          label: 'Feeder to the rack PDU / RPP boards', values: [{ k: 'st', dx: vd * 17, dy: 15, anchor: va, lod: 1 }] });
+        N({ id: 'p' + ls + '-ld', tag: 'RPP-' + T, name: '× ' + grp(hall.racks) + ' racks · ' + s + ' cord', sym: 'offSheet', rot: 90, x: X(150), y: 1046, size: 20, cls: 'epms', kv: 'lv',
+          load: 'it', kw: itKw, label: 'Rack PDU / RPP boards, ' + s + ' cord of every rack (board count not modelled)', tagAt: 'below',
+          values: [{ k: 'kw', dx: 0, dy: 50, anchor: 'middle', lod: 1 }] });
+        E(u + 'm', u + 'ob', 'p' + ls + '-cb.line');
+        E(u + 'n', 'p' + ls + '-cb.load', 'p' + ls + '-ld.port');
+      }
       /* mechanical and house load of this stream */
       N({ id: 'k' + ls + '-cb', tag: 'CB-M' + T, sym: 'cbIec', x: X(395), y: 590, size: 26, cls: 'epms', sw: 'cb', kv: 'lv', tagAt: L ? 'left' : 'right',
         label: 'Feeder to the mechanical and house boards', values: [{ k: 'st', dx: -vd * 17, dy: 15, anchor: L ? 'end' : 'start', lod: 1 }] });
@@ -210,7 +231,7 @@
       id: 'e-s-102-' + H_.toLowerCase(), no: 'E-S-102', title: 'LV DISTRIBUTION · TYPICAL HALL · HALL ' + H_, rev: 'A', basis: 'IEC 60617 · IEEE C37.2',
       svgId: 'epms-lv-svg', size: [W, H], minScale: 1.17, nodes: nodes, edges: edges, areas: areas, notes: notes, hall: h, hallCode: H_,
       keys: root.RZEpmsSheets && root.RZEpmsSheets.keysFrom ? root.RZEpmsSheets.keysFrom(nodes) : [],
-      counts: { gensets: n, units: units, modules: modules, racks: hall.racks }
+      counts: { gensets: n, units: units, modules: modules, racks: hall.racks, pdus: pdus }
     };
   }
 

@@ -262,8 +262,10 @@ export function buildRegistry() {
 
     /* PRD-CONV-EQUIPMENT-TRUTH E2: an equipment internal drawing (js/conv/internals/<class>.js) prints engine values in
        the page's equipment modal, so the class files a page loads are read as part of that page. Only that folder: the
-       shared modules a page loads are not a page reading a parameter. */
-    const internalsOf = (html) => [...html.matchAll(/<script[^>]+src="(js\/conv\/internals\/[\w-]+\.js)/g)]
+       shared modules a page loads are not a page reading a parameter.
+       PRD-ELECTRICAL-BMS E18: the EPMS sheet builders (js/conv/epms-<sheet>.js) draw engine values on the EPMS page the
+       same way, so they are part of the page that loads them. */
+    const internalsOf = (html) => [...html.matchAll(/<script[^>]+src="(js\/conv\/(?:internals\/[\w-]+|epms-[\w-]+)\.js)/g)]
         .map((m) => readFileSync(join(ROOT, m[1]), 'utf8')).join('\n');
     const pageSources = COCKPITS.map((page) => { const html = readFileSync(join(ROOT, page), 'utf8'); return { page, text: html + '\n' + internalsOf(html) }; });
     /* v1.134.25 — DOC ANCHORS. Plan B2 asked that every parameter have at least one doc anchor

@@ -511,7 +511,7 @@ gate "provenance — L1 L3 L5 + unit U1-U14 (PRD-Q06)" node tools/test-provenanc
 gate "elec voltage — W1-W8 bus voltage under load (PRD-ELECTRICAL-BMS E19 core)" node tools/test-elec-voltage.mjs
 # E6 (3D view) and E7 (phone legibility) join when their phases ship (PRD-ELECTRICAL-BMS §A4)
 gate "electrical BMS — E1-E5 + E10 + E19: fit, state grammar, breakers, relays, bus voltages, EPMS + DC AI" \
-  node tools/test-electrical-bms.mjs --only=E1,E2,E3,E4,E5,E10,E14,E15,E16,E17,E19
+  node tools/test-electrical-bms.mjs --only=E1,E2,E3,E4,E5,E10,E11,E12,E14,E15,E16,E17,E18,E19
 
 # Engine-files byte-identical guard (locked since v1.32.x accuracy review)
 echo

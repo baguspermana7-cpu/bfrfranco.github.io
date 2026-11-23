@@ -11,6 +11,51 @@ release sections rather than semver.
 
 ---
 
+## v3.100.0 — 2026-11-23 — EPMS power flows at its load, switching sweeps downstream, LV reaches the rack
+
+Owner requests R190 ("sempurnakan systemnya sld … animasinya") and R191 ("LV itu gambarannya sampai PDU/PDC kemudian ke
+Rack"), PRD-ELECTRICAL-BMS amendment 2, laws E11, E12 and E18.
+
+### Added
+- **Flow speed follows the load (E11, `EPMS_Telemetry.html`).**
+  - Each running power edge's dash period comes from `RZConvVfx.dashSeconds(ratio)`.
+  - The ratio is edge kW over the capacity of the plant the edge belongs to, all from the engine: main transformer
+    `hv_tx_mva × pf`, hall `hall_facility_design_kw`, generator `genset_unit_kw`.
+  - Before, every conductor marched at one constant 0.5 s. Now a planted 2N → N transfer visibly speeds up the path
+    that takes the load: its period is ≥ 30 % shorter.
+- **Switching sweeps downstream (E12).**
+  - After a breaker operation the changed edges take their new state hop by hop from the operated device: ≤ 300 ms a
+    hop, all within 2 s. The hops are breadth-first over the energised topology.
+  - With reduced motion the whole change lands at once.
+  - The host carries `data-sweeping` while a sweep runs, so a reader (and the SLD gate) waits for the landed state.
+- **LV drawn down to the PDU and the racks (E18, `js/conv/epms-lv.js`, `js/conv/epms-lv-view.js`,
+  `js/conv/epms-sim.js`).**
+  - Each critical stream runs UPS output → PDU feeder breaker (typical) → PDU → racks of one PDU.
+  - The PDU shows `× 44`, `44 × 300 kVA`, and its loading `% · kW each`. The racks show `× 12 racks per PDU`.
+  - All counts are the engine's (conv-engine 2.9.0): `pdu_per_hall_per_stream`, `pdu_kva_rated`, `racks_per_pdu`,
+    `rows_per_hall`, `racks_per_row`.
+  - The sim loads each PDU as stream kW / (N × kVA × pf). An engine without these keys keeps the single RPP feeder.
+
+### Changed
+- **The five PDU parameters are rendered, not internal** (`data/conv-parameters.curated.json`).
+  - The registry builder now reads the EPMS sheet modules a page loads (`js/conv/epms-*.js`) as part of that page, as
+    it already did for the equipment internals.
+  - R8: 185 rendered, 172 internal with a reason.
+- `tools/ship-gate.sh` runs E11, E12 and E18. `standarization/HMI_DRAWING_STANDARD.md` §4g gains the E11, E12 and E18
+  rules.
+
+### Fixed
+- **The EPMS model gate reads the key interlock** (`tools/test-conv-epms-model.mjs` M4). Since v3.98.0 (E16) the
+  trapped key refuses first, so the four refusals (ES-L1, DSL-L1, CB-TIE, CB-IN1) now expect the key message that
+  names where the key is trapped. The gate was red on main since v3.98.0; it is 8/8 again.
+- The LV PDU and racks labels stay inside their stream zone and clear of each other (geometry back to its baseline 84).
+
+### Deferred
+- **Relay trip flash (A3).** The EPMS simulation has no trip model, so it cannot cause a trip. The PRD and the standard
+  say so; nothing is animated that the simulation cannot cause.
+
+---
+
 ## v3.99.0 — 2026-11-23 — DC AI hall opens flat: 2D · 3D · Drawing; floor PDUs counted by the engine
 
 Owner request 2026-11-23 ("button flat 2d nya belum ada … default ia 2d"), PRD-DCAI-HALL-DEPTH Amendment 1, phase A1. Conventional engine 2.8.0 → 2.9.0 (E18 PDU keys for the peer's LV sheet).

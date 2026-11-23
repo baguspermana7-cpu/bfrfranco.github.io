@@ -455,7 +455,7 @@
     font-variant-numeric: tabular-nums slashed-zero;
 }
 </style>
-    <script src="js/rz-version.js?v=20261123-885d5d4c" defer></script>
+    <script src="js/rz-version.js?v=20261123-3215591f" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- v1.24.0: bring EPMS onto the engine + BMS Shell. conv-engine.js loads
@@ -465,7 +465,7 @@
     <script src="js/conv-engine.js?v=2.9.0"></script>
     <!-- v1.134.3 — generated parameter registry + the ONE shared basis drawer.
          Replaces provenance restated by hand; see js/rz-basis-drawer.js. -->
-    <script src="js/conv-parameters.js?v=20261123-390e6134"></script>
+    <script src="js/conv-parameters.js?v=20261123-360b07e7"></script>
     <!-- v1.134.25 — RZExplain, the site glossary engine. The cockpits were the only
          substantial pages carrying none of it, so terms an operator has to read
          (approach temperature, cycles of concentration, N+1, WUE) had nowhere to go.
@@ -529,8 +529,8 @@
 <script src="js/conv/sld-topology.js?v=20261118-597640aa"></script>
 <script src="js/conv/tcc.js?v=20261118-4e103126"></script>
 <script src="js/conv/epms-sheet.js?v=20261123-aa54a4a4"></script>
-<script src="js/conv/epms-sim.js?v=20261123-89809660"></script>
-<script src="js/conv/epms-lv.js?v=20261123-0853ff9d"></script>
+<script src="js/conv/epms-sim.js?v=20261123-4cc44954"></script>
+<script src="js/conv/epms-lv.js?v=20261123-877f147c"></script>
 <script src="js/conv/tcc-modal.js?v=20261122-d14a6e1d"></script>
 <style id="epms-sld-css">
 /* the view switch: its own class, so no page code or gate that selects .btn / .zoom-btn picks it up */
@@ -1373,12 +1373,62 @@ function exportJSON() {
         if (n.sym === 'surgeArrester' || n.sym === 'voltageTransformer' || n.sym === 'currentTransformer') { o.state = devState(d); return o; }
         return o;
     }
+    /* E12 (A2): after a switching operation the new energisation sweeps downstream from the operated device, one
+       topological hop every SWEEP_MS (all within 2 s); an edge the sweep has not reached yet keeps its old state.
+       Reduced motion: the whole change at once. */
+    var SWEEP_MS = 300, sweepPrev = null, sweepSeen = null, sweepTimers = [];
+    function edgeOf(e) { return sweepPrev && !sweepSeen[e.id] && sweepPrev[e.id] ? sweepPrev[e.id] : res.edges[e.id]; }
+    function hopsFrom(id) {
+        var adj = {}, nodeOf = function (x) { return String(x).split('.')[0]; };
+        SHEET.edges.forEach(function (e) { if (!e.flowOf) return; var a = nodeOf(e.from), b = nodeOf(e.to); (adj[a] = adj[a] || []).push([e.id, b]); (adj[b] = adj[b] || []).push([e.id, a]); });
+        var hop = {}, seen = {}, q = [[id, 0]]; seen[id] = 1;
+        while (q.length) { var c = q.shift(); (adj[c[0]] || []).forEach(function (x) { if (hop[x[0]] == null) hop[x[0]] = c[1]; if (!seen[x[1]]) { seen[x[1]] = 1; q.push([x[1], c[1] + 1]); } }); }
+        return hop;
+    }
+    function sweep(id, prev) {
+        sweepTimers.forEach(clearTimeout); sweepTimers = [];
+        var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var changed = SHEET.edges.filter(function (e) { var a = prev[e.id], b = res.edges[e.id]; return a && b && (!!(a.energised && a.kw > 0.5) !== !!(b.energised && b.kw > 0.5)); });
+        if (reduce || !changed.length) { sweepPrev = null; host.removeAttribute('data-sweeping'); paint(); return; }
+        host.setAttribute('data-sweeping', '');   /* readers (gates, assistive summaries) wait for the landed state */
+        var hop = hopsFrom(id), max = 0; changed.forEach(function (e) { max = Math.max(max, hop[e.id] || 0); });
+        var step = Math.min(SWEEP_MS, 2000 / Math.max(1, max));
+        sweepPrev = prev; sweepSeen = {};
+        SHEET.edges.forEach(function (e) { if (changed.indexOf(e) < 0) sweepSeen[e.id] = 1; });
+        var svg = sheet.svg; changed.forEach(function (e) { svg.querySelectorAll('[data-edge="' + e.id + '"],[data-edge-flow="' + e.id + '"]').forEach(function (p) { p.setAttribute('data-sweep-hop', hop[e.id] || 0); }); });
+        paint();
+        for (var k = 0; k <= max; k++) (function (k) {
+            sweepTimers.push(setTimeout(function () {
+                changed.forEach(function (e) { if ((hop[e.id] || 0) === k) sweepSeen[e.id] = 1; });
+                if (k === max) { sweepPrev = null; host.removeAttribute('data-sweeping'); }
+                paint();
+            }, Math.round(k * step)));
+        })(k);
+    }
     function flow(e) {
         if (!e.flowOf) return null;
         if (!LIVE) return 'unavailable';
         if (e.flowOf === 'n') return 'stopped';
-        var r = res.edges[e.id];
+        var r = edgeOf(e);
         return r && r.energised && r.kw > 0.5 ? 'running' : 'stopped';
+    }
+    /* E11: load ratio of an edge = its flow now / the capacity of the plant it belongs to, from the engine:
+       a 150 kV branch and the 20 kV incomers / bus the main transformer (hv_tx_mva × power factor), a hall feeder the
+       hall facility design (hall_facility_design_kw, each stream rated for the whole hall in 2N), a generator its set.
+       RZConvVfx.dashSeconds turns it into a dash period (2.0 m/s at ratio 1): in 2N normal every branch runs near a
+       third of its rating; when a section is lost, the surviving path carries double and visibly moves faster. */
+    var NB = {}; SHEET.nodes.forEach(function (n) { NB[n.id] = n; });
+    function capKw(e) {
+        var E_ = B && B.e; if (!E_) return null;
+        var pf = E_.power_factor_design || 0.95, ids = [e.from, e.to].map(function (x) { return String(x).split('.')[0]; });
+        var ns = ids.map(function (k) { return NB[k]; }).filter(Boolean);
+        if (ns.some(function (n) { return n.src === 'gen'; })) return E_.genset_unit_kw || null;
+        if (ns.some(function (n) { return n.hall != null || n.tx === 'dist'; })) return E_.hall_facility_design_kw || null;
+        return E_.hv_tx_mva ? E_.hv_tx_mva * 1000 * pf : null;
+    }
+    function flowRatio(e) {
+        var r = LIVE && res.edges[e.id], c = capKw(e);
+        return r && r.energised && c ? r.kw / c : null;
     }
     function rest(e) { return !!(LIVE && e.flowOf === 'p' && res.edges[e.id] && res.edges[e.id].energised); }
 
@@ -1423,7 +1473,11 @@ function exportJSON() {
             var g = svg.querySelector('.hmi-node[data-node="' + n.id + '"]'); if (!g) return;
             if (LIVE) g.setAttribute('data-pos', sim.closed[n.id] ? 'closed' : 'open'); else g.removeAttribute('data-pos');
         });
-        if (window.RZConvVfx) window.RZConvVfx.bind(host, SHEET, flow, rest);
+        if (window.RZConvVfx) {
+            window.RZConvVfx.bind(host, SHEET, flow, rest);
+            var vs = host.querySelector('svg.hmi-svg');   /* E11: the same pass again with each edge's load ratio, so its dash speed follows its load */
+            if (vs) window.RZConvVfx.apply(vs, { edges: SHEET.edges, flow: flow, rest: rest, ratio: flowRatio });
+        }
         if (window.RZConvTruth && window.RZConvTruth.marks) window.RZConvTruth.marks(svg);
         /* PRD-CONV-POINT-STATUS-TREND T3: a rating or count on the sheet is a constant (its basis one click away) */
         window.RZEpmsSheets.markConstants(svg, SHEET.nodes);
@@ -1457,7 +1511,7 @@ function exportJSON() {
         var n = BY[id]; if (!LIVE || !n || !n.sw) return null;
         var r = SIM.operate(SHEET, sim, id, !sim.closed[id], B);
         ops++;
-        if (r.ok) { sim = r.state; res = SIM.solve(SHEET, sim, B); paint(); chrome(); lastMsg = r.reason + '; flows re-solved'; say(lastMsg, false);
+        if (r.ok) { var prevEdges = res.edges; sim = r.state; res = SIM.solve(SHEET, sim, B); sweep(id, prevEdges); chrome(); lastMsg = r.reason + '; flows re-solved'; say(lastMsg, false);
             document.dispatchEvent(new CustomEvent('rz-epms-change', { detail: { sheet: 'E-S-101', id: id } })); }
         else { lastMsg = 'REFUSED — ' + r.reason; say(lastMsg, true); }
         return r;
@@ -1578,7 +1632,7 @@ function exportJSON() {
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();
 </script>
-<script src="js/conv/epms-lv-view.js?v=20261122-3f2227d3"></script>
+<script src="js/conv/epms-lv-view.js?v=20261123-b82c246a"></script>
 <script src="js/rz-command-palette.js?v=20261111-5028a9f4" defer></script>
 </body>
 </html>

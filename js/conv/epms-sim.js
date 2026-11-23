@@ -170,6 +170,7 @@
       } else return;
       d.a = amps(d.kw, kv, pf);
       if (n.tx === 'hv') d.pct = 100 * d.kw / (b.e.hv_tx_mva * 1000 * pf);
+      if (n.tx === 'pdu') d.pct = 100 * d.kw / ((n.units || 1) * b.e.pdu_kva_rated * (b.e.pdu_power_factor || pf));   /* E18: a typical PDU drawn for N */
       if (n.tx === 'dist') d.pct = 100 * d.kw / ((n.units || 1) * b.e.dist_tx_kva * pf);   /* units: a typical drawn for N in parallel */
       out.dev[n.id] = d;
     });

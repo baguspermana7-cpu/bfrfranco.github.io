@@ -143,6 +143,25 @@ async function clickKinds(pg, sel, tagAlways = true) {
   return { n: pick.length, bad };
 }
 /* E17: each stream's UPS shows its parallel module count, rating and redundancy, equal to the engine */
+/* E18: the critical bus is drawn down to the PDU and its racks, with the engine's counts (conv-engine >= 2.9.0) */
+const pduOf = (sel) => {
+  const e = window.CONV_CALC && window.CONV_CALC.snapshot && window.CONV_CALC.snapshot.electrical; const host = document.querySelector(sel);
+  if (!e || !host) return null;
+  const g = (x) => Math.round(x).toLocaleString('en-US');
+  return ['a', 'b'].map((s) => {
+    const txt = (id) => { const n = host.querySelector('.hmi-node[data-node="' + id + '"]'); return n ? [n, ...host.querySelectorAll('[data-name-of="' + id + '"], [data-val^="' + id + ':"]')].map((x) => x.textContent).join(' | ').replace(/\s+/g, ' ') : null; };
+    const pdu = txt('q' + s + '-pdu'), rk = txt('p' + s + '-ld');
+    const lacks = [];
+    if (!pdu) lacks.push('no PDU node'); else {
+      ['× ' + e.pdu_per_hall_per_stream, e.pdu_per_hall_per_stream + ' × ' + g(e.pdu_kva_rated) + ' kVA'].forEach((w) => { if (pdu.indexOf(w) < 0) lacks.push('PDU lacks "' + w + '"'); });
+      if (!/\d+\.\d % · /.test(pdu)) lacks.push('PDU shows no loading %');
+    }
+    if (!rk || rk.indexOf('× ' + e.racks_per_pdu + ' racks per PDU') < 0) lacks.push('racks node lacks "× ' + e.racks_per_pdu + ' racks per PDU"');
+    const path = ['u' + s + '-m', 'u' + s + '-n', 'u' + s + '-o'].every((id) => host.querySelector('[data-edge="' + id + '"]'));
+    if (!path) lacks.push('UPS -> CB-PDU -> PDU -> racks not connected');
+    return { s, lacks };
+  });
+};
 const upsOf = (sel) => {
   const e = window.CONV_CALC && window.CONV_CALC.snapshot && window.CONV_CALC.snapshot.electrical; const host = document.querySelector(sel);
   if (!e || !host) return null;
@@ -168,6 +187,15 @@ const keysOf = (sel, sheetVar) => {
     if (sp <= 520 && !(L && L.getAttribute('d') && L.getAttribute('d').length > 12)) bad.push(g.id + ' no link line');
   });
   return { n: groups.length, bad };
+};
+/* E11: the dash of a running power edge moves at a speed set by its load ratio (RZConvVfx.dashSeconds), not one constant */
+const incDash = (sel) => { const p = document.querySelector(sel + ' path[data-edge-flow="i2-a"]'); return p ? parseFloat(getComputedStyle(p).animationDuration) || 0 : null; };
+const dashOf = (sel) => {
+  const host = document.querySelector(sel); if (!host) return null;
+  const run = [...host.querySelectorAll('.hmi-flow[data-flow="running"]')];
+  const dur = run.map((p) => parseFloat(getComputedStyle(p).animationDuration) || 0).filter((d) => d > 0);
+  const stop = [...host.querySelectorAll('.hmi-flow[data-flow="stopped"]')].filter((p) => getComputedStyle(p).animationName !== 'none').length;
+  return { n: run.length, distinct: [...new Set(dur.map((d) => d.toFixed(3)))].length, min: Math.min(...dur), max: Math.max(...dur), stopMoving: stop };
 };
 /* E14: a long power conductor says what it is — a run over 400 sheet units carries its own line label (a bus is
    exempt: it is named by its bus tag, E19) */
@@ -303,6 +331,7 @@ const run = { epms: {}, dcai: {} };
     ok(v.slice(0, 2).every((t) => { const x = mv(t); return x !== null && x < 20 && x > 18; }) && /^BB1 150 kV$/.test(v[2]) && /^BB2 150 kV$/.test(v[3]),
       `E19 EPMS: 20 kV sections show their voltage under load (18-20 kV), BB1 / BB2 150 kV: ${JSON.stringify(v)}`);
   }
+  if (want('E11')) { const d = await pe.evaluate(dashOf, EPMS_HV); ok(d && d.n >= 10 && d.stopMoving === 0 && d.max > d.min, `E11 EPMS HV/MV: running power dashes take their period from load / capacity (not one constant), stopped ones do not move: ${JSON.stringify(d)}`); }
   if (want('E16')) {
     const k = await pe.evaluate(keysOf, EPMS_HV, 'RZEpmsSheets.sld');
     ok(k && k.n >= 3 && k.bad.length === 0, `E16 EPMS HV/MV: ${k ? k.n : '?'} key groups (want ≥ 3: two line earthing, the 20 kV 2-of-3), ${k ? k.bad.length : '?'} gaps: ${JSON.stringify((k || { bad: [] }).bad.slice(0, 6))}`);
@@ -315,10 +344,11 @@ const run = { epms: {}, dcai: {} };
     ok(/Key K\d+\s*trapped in DSL-L1/.test(kmod), `E16 EPMS: the ES-L1 modal states where its key is: ${(kmod.match(/Key K\d+[^—]{0,60}/) || ['none'])[0]}`);
     ok(/\bK\d+ trapped in DSL-L1\b/.test(msg) && es && es.state !== 'closed', `E16 EPMS planted: closing ES-L1 with DSL-L1 closed is refused by its key and ES-L1 stays open: msg "${msg.replace(/\s+/g, ' ').slice(0, 160)}", ES state ${es && es.state}`);
   }
-  if (want('E3') || want('E19')) {
+  if (want('E3') || want('E19') || want('E11')) {
     const b = await pe.evaluate(breakersOf, EPMS_HV);
     ok(b && b.cover.length === 0, `E3c EPMS HV/MV@1440 breaker glyphs / lamps cover ${b ? b.cover.length : '?'} words: ${b ? JSON.stringify(b.cover.slice(0, 5)) : ''}`);
     ok(b && b.n > 0 && b.miss.length === 0, `E3 EPMS HV/MV@1440 ${b ? b.miss.length : '?'} of ${b ? b.n : '?'} breakers lack a state glyph, a lamp or a value tag with a number: ${b ? b.miss.slice(0, 4).join(', ') : ''}`);
+    const inc0 = await pe.evaluate(incDash, EPMS_HV);
     /* planted: open CB-IN1 from its inspector */
     await pe.keyboard.press('Escape');
     const pt = await pe.evaluate((H) => { const g = document.querySelector(H + ' .hmi-node[data-node="i1-cb"]'); if (!g) return null; g.scrollIntoView({ block: 'center', inline: 'center' }); const r = (g.querySelector('.hmi-hit') || g).getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, EPMS_HV);
@@ -326,9 +356,18 @@ const run = { epms: {}, dcai: {} };
     const st = await pe.evaluate(brkState, EPMS_HV, 'i1-cb');
     ok(st && st.glyph === 'open', `E3 EPMS planted: CB-IN1 opened, its glyph reads ${st ? st.glyph : 'no node'} (want open; node state ${st && st.state})`);
     if (want('E19')) { const v = await epmsBus(); ok(/^BUS A · 20 kV nom · 0 V DEAD · /.test(v[0] || '') && /^BUS B · 20 kV nom · \d+\.\d+ kV · /.test(v[1] || ''), `E19 EPMS planted: CB-IN1 open with the tie open, BUS A reads DEAD, BUS B stays live: ${JSON.stringify(v.slice(0, 2))}`); }
+    if (want('E11')) {
+      /* then close the tie: CB-IN2 carries both sections, its dash must run ≥ 30 % faster */
+      await pe.keyboard.press('Escape'); await sleep(150); await pe.keyboard.press('Escape');
+      const pt3 = await pe.evaluate((H) => { const g = document.querySelector(H + ' .hmi-node[data-node="tie"]'); if (!g) return null; g.scrollIntoView({ block: 'center', inline: 'center' }); const r = (g.querySelector('.hmi-hit') || g).getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, EPMS_HV);
+      if (pt3) { await pe.mouse.click(pt3.x, pt3.y); await sleep(500); const s3 = 'aside.rz-inspector.open [data-rz-action="sim-close"], .rz-cvm:not([hidden]) [data-rz-cvm-act="sim-close"]'; if (await pe.$(s3)) { await pe.click(s3); await sleep(800); } }
+      const inc1 = await pe.evaluate(incDash, EPMS_HV);
+      ok(inc0 > 0 && inc1 > 0 && inc1 <= 0.7 * inc0, `E11 EPMS planted: CB-IN1 open, tie closed — CB-IN2 carries both sections and its dash runs ≥ 30 % faster: period ${inc0} s -> ${inc1} s`);
+    }
   }
-  if (want('E14') || want('E15') || want('E17')) {
+  if (want('E14') || want('E15') || want('E17') || want('E18')) {
     await pe.evaluate(() => { const x = document.querySelector('.epms-view-btn[data-epms-view="lv"]'); if (x) x.click(); }); await sleep(1500);
+    if (want('E18')) { const u = await pe.evaluate(pduOf, EPMS_LV); ok(Array.isArray(u) && u.every((x) => x.lacks.length === 0), `E18 EPMS LV: both streams drawn UPS -> PDU feeder -> PDU -> racks with the engine counts: ${JSON.stringify(u)}`); }
     if (want('E17')) { const u = await pe.evaluate(upsOf, EPMS_LV); ok(Array.isArray(u) && u.every((x) => x.lacks && x.lacks.length === 0 && x.stack >= 2), `E17 EPMS LV: each stream's UPS names × N modules, N × rating and the redundancy, drawn as a stack: ${JSON.stringify(u)}`); }
     if (want('E15')) { const u = await pe.evaluate(unclickableOf, EPMS_LV); ok(u && u.bare.length === 0, `E15 EPMS LV: ${u ? u.bare.length : '?'} of ${u ? u.n : '?'} drawn items are not equipment: ${JSON.stringify((u || { bare: [] }).bare.slice(0, 8))}`); }
     const b = await pe.evaluate(longRunsOf, EPMS_LV); ok(b && b.length === 0, `E14 EPMS LV: ${b ? b.length : '?'} power runs over 400 units carry no label: ${JSON.stringify((b || []).slice(0, 6))}`);
@@ -414,6 +453,40 @@ if (want('E2')) {
     const a = th === 'light' ? run.tokenLight : run.epms[th] && run.epms[th].run[0], b = run.dcai[th] && run.dcai[th].run[0];
     ok(a && a === b, `E2 ${th}: running ink differs from ${th === 'light' ? 'the --vfx-run token (EPMS is dark-only)' : 'the EPMS'} (${a} vs DC AI ${b})`);
   }
+}
+
+/* ---- E12: switching sweeps downstream (PRD-ELECTRICAL-BMS A2) ---- */
+if (want('E12')) {
+  const watch = (H) => {
+    window.__sw = []; const t0 = performance.now();
+    const mo = new MutationObserver((ms) => ms.forEach((m) => { const p = m.target; if (p.matches && p.matches('path[data-edge-flow]')) window.__sw.push({ e: p.getAttribute('data-edge-flow'), f: p.getAttribute('data-flow') || p.getAttribute('data-vmove'), hop: +(p.getAttribute('data-sweep-hop') || 0), t: performance.now() - t0 }); }));
+    mo.observe(document.querySelector(H), { subtree: true, attributes: true, attributeFilter: ['data-flow', 'data-vmove'] });
+    window.__swStop = () => mo.disconnect();
+  };
+  const openT1 = async (pg) => {
+    const pt = await pg.evaluate((H) => { const g = document.querySelector(H + ' .hmi-node[data-node="t1-cb"]'); if (!g) return null; g.scrollIntoView({ block: 'center', inline: 'center' }); const r = (g.querySelector('.hmi-hit') || g).getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, EPMS_HV);
+    if (!pt) return false;
+    await pg.mouse.click(pt.x, pt.y); await sleep(500);
+    const s = 'aside.rz-inspector.open [data-rz-action="sim-open"], .rz-cvm:not([hidden]) [data-rz-cvm-act="sim-open"]';
+    if (!(await pg.$(s))) return false;
+    await pg.evaluate(watch, EPMS_HV); await pg.click(s); await sleep(2600);
+    return pg.evaluate(() => { window.__swStop(); const first = {}; window.__sw.forEach((x) => { if (first[x.e] == null) first[x.e] = x; }); return Object.values(first); });
+  };
+  const summary = (ch) => {
+    const byHop = {}; ch.forEach((x) => { (byHop[x.hop] = byHop[x.hop] || []).push(x.t); });
+    const hops = Object.keys(byHop).map(Number).sort((a, b) => a - b), mean = hops.map((h) => byHop[h].reduce((a, b) => a + b, 0) / byHop[h].length);
+    const span = ch.length ? Math.max(...ch.map((x) => x.t)) - Math.min(...ch.map((x) => x.t)) : 0;
+    return { edges: ch.length, hops: hops.length, ordered: mean.every((m, i) => !i || m > mean[i - 1]), spanMs: Math.round(span) };
+  };
+  const pe = await openEpms(1440, 'dark');
+  const a = summary((await openT1(pe)) || []);
+  ok(a.edges >= 3 && a.hops >= 2 && a.ordered && a.spanMs >= 150 && a.spanMs <= 2000, `E12 EPMS: opening CB-T1 de-energises downstream hop by hop (≥ 2 hops in topological order, spread 150–2000 ms): ${JSON.stringify(a)}`);
+  ok(pe.errors.length === 0, `E12 EPMS page errors: ${pe.errors.join(' | ')}`);
+  await pe.close();
+  const pr = await openEpms(1440, 'dark'); await pr.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+  const b = summary((await openT1(pr)) || []);
+  ok(b.edges >= 3 && b.spanMs <= 60, `E12 EPMS reduced motion: the whole change lands at once: ${JSON.stringify(b)}`);
+  await pr.close();
 }
 
 /* ---- 390: E7 ---- */

@@ -269,6 +269,19 @@ Applies to every single-line sheet: EPMS E-S-101 / E-S-102 and DC AI E-001 / E-1
   glyph with its number (filled = trapped in this closed device, hollow = free) and the group a dashed orthogonal
   link (only within 520 units; wider groups are matched by number). The simulation refuses a close whose key is
   trapped elsewhere and names it ("K1 trapped in DSL-L1"); the modal lists each key and where it is.
+- **Flow speed is the load (E11).** A running power edge's dash period comes from `RZConvVfx.dashSeconds(ratio)`, with
+  ratio = edge kW / the capacity of the plant it belongs to, from the engine (main transformer `hv_tx_mva × pf`, hall
+  `hall_facility_design_kw`, generator `genset_unit_kw`). Pass it as `ratio` to `RZConvVfx.apply`; never one constant
+  march for every conductor. A transfer that doubles a path's load visibly speeds it up (gate: ≥ 30 % shorter period).
+- **Switching sweeps downstream (E12).** After an operation the changed edges take their new state hop by hop from the
+  operated device (≤ 300 ms a hop, all inside 2 s), each tagged `data-sweep-hop`; with reduced motion the whole change
+  lands at once. A relay trip flash (A3) waits for a trip model: the EPMS solve has none, and no trip is animated that
+  the simulation cannot cause.
+- **LV goes down to the rack (E18).** Each critical stream is drawn UPS output → PDU feeder breaker (typical) → PDU
+  (`transformer2w`, name `× N`, value `N × <kVA> kVA` and loading `<%> · <kW> each`) → the racks of one PDU (`× <n> racks
+  per PDU · <stream> cord`). N, the rating and the racks per PDU are the engine's (`pdu_per_hall_per_stream`,
+  `pdu_kva_rated`, `racks_per_pdu`, conv-engine ≥ 2.9.0); an engine without them keeps the single RPP feeder. The PDU
+  loading is the stream's kW over N × kVA × pf, so a stream that takes the whole hall shows it.
 - **Parallel units are a stack (E17).** N identical units in parallel (UPS rectifier/inverter modules) draw two offset
   outlines behind the symbol (`stack: N`), the name `× N · <redundancy>`, and the value `N × <module kW>`, all from the
   engine (`ups_modules_per_system / halls`, `ups_module_kw_rated`, `ups_redundancy`).

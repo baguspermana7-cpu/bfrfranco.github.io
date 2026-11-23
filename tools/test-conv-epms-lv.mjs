@@ -137,14 +137,19 @@ async function lawE1(pg, at, fail) {
       const drawn = [...document.querySelectorAll(H + ' text[data-tag-of^="gs"]:not([data-tag-of$="-cb"])')].map((t) => t.textContent.trim());
       const txt = document.querySelector(H).textContent;
       return { code, fleet, drawn, per: e.genset_per_hall, spare: e.genset_spare_per_hall, units: e.dist_tx_per_stream_per_hall,
-        racks: C.snapshot.campus.halls[hh].racks, txt, title: (document.querySelector(H + ' .hmi-title, ' + H + ' [data-role="title"]') || {}).textContent || '',
+        racks: C.snapshot.campus.halls[hh].racks, perPdu: e.racks_per_pdu || 0, pdus: e.pdu_per_hall_per_stream || 0, txt, title: (document.querySelector(H + ' .hmi-title, ' + H + ' [data-role="title"]') || {}).textContent || '',
         hallTags: ['TX-' + code + 'A', 'TX-' + code + 'B', 'CB-R' + code + 'A', 'LVMSB-' + code + 'A', 'UPS-' + code + 'A'].filter((t) => !txt.includes(t)) };
     }, HOST, h);
     if (JSON.stringify(r.drawn) !== JSON.stringify(r.fleet) || r.fleet.length !== r.per)
       fail(`E1${at} hall ${r.code}: drawn gensets ${r.drawn.join(',')} ≠ getFleet ${r.fleet.join(',')} (genset_per_hall ${r.per})`);
     if (!r.txt.includes(r.per + ' SETS (' + (r.per - r.spare) + ' + ' + r.spare + ')')) fail(`E1${at} hall ${r.code}: no "${r.per} SETS (${r.per - r.spare} + ${r.spare})" label`);
     if (!r.txt.includes('× ' + r.units)) fail(`E1${at} hall ${r.code}: no "× ${r.units}" transformer count`);
-    if (!r.txt.toUpperCase().includes('× ' + r.racks + ' RACKS')) fail(`E1${at} hall ${r.code}: no "× ${r.racks} racks"`);
+    /* E18 (conv-engine >= 2.9.0): the stream is drawn down to one typical PDU and its racks, so the count on the sheet is
+       racks per PDU, and the PDUs of a stream must carry every rack of the hall; an older engine keeps the hall total. */
+    if (r.perPdu && r.pdus) {
+      if (!r.txt.toUpperCase().includes('× ' + r.perPdu + ' RACKS PER PDU')) fail(`E1${at} hall ${r.code}: no "× ${r.perPdu} racks per PDU"`);
+      if (r.pdus * r.perPdu < r.racks) fail(`E1${at} hall ${r.code}: ${r.pdus} PDUs × ${r.perPdu} racks < ${r.racks} hall racks`);
+    } else if (!r.txt.toUpperCase().includes('× ' + r.racks + ' RACKS')) fail(`E1${at} hall ${r.code}: no "× ${r.racks} racks"`);
     if (r.hallTags.length) fail(`E1${at} hall ${r.code}: tags not rebound: ${r.hallTags.join(', ')}`);
     if (!r.txt.includes('HALL ' + r.code)) fail(`E1${at} hall ${r.code}: sheet title does not name the hall`);
   }

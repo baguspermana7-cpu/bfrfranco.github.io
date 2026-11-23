@@ -84,16 +84,17 @@ test('M4 interlock truth table', () => {
   refused(op(n0, 'l1-ds1', false), /DS1-L1 can move only with its breaker CB-L1 open/);
   let s = op(n0, 'l1-cb', false); assert.ok(s.ok, 'a breaker opens freely');
   const ds = op(s.state, 'l1-ds1', false); assert.ok(ds.ok, 'the disconnector moves once its breaker is open: ' + ds.reason);
-  refused(op(s.state, 'l1-es', true), /ES-L1 can close only with its disconnectors open; DSL-L1, DS1-L1 closed/);
+  /* since E16 (v3.98.0) the trapped key is the governing interlock: K1 sits in DSL-L1 and DS1-L1 while they are closed */
+  refused(op(s.state, 'l1-es', true), /K1 trapped in DSL-L1 and DS1-L1: ES-L1 cannot close without its key/);
   let iso = op(s.state, 'l1-dsl', false).state; iso = op(iso, 'l1-ds1', false).state;
   const esl = op(iso, 'l1-es', true);
   assert.ok(esl.ok, 'ES-L1 closes once CB-L1, DSL-L1 and both busbar disconnectors isolate it: ' + esl.reason);
-  refused(op(esl.state, 'l1-dsl', true), /DSL-L1 cannot close while the earthing switch ES-L1 is closed/);
+  refused(op(esl.state, 'l1-dsl', true), /K1 trapped in ES-L1: DSL-L1 cannot close without its key/);
   refused(op(esl.state, 'l1-cb', true), /CB-L1 cannot close onto a circuit earthed by ES-L1/);
-  refused(op(n0, 'tie', true), /2-out-of-3: CB-TIE closes only when one incomer is open; CB-IN1 and CB-IN2 are both closed/);
+  refused(op(n0, 'tie', true), /K3 trapped in CB-IN1 and CB-IN2: CB-TIE cannot close without its key \(2-out-of-3/);
   const a = op(n0, 'i1-cb', false).state, t = op(a, 'tie', true);
   assert.ok(t.ok, 'tie closes with one incomer open');
-  refused(op(t.state, 'i1-cb', true), /2-out-of-3: CB-IN1 cannot close while CB-TIE and the other incomer are closed/);
+  refused(op(t.state, 'i1-cb', true), /K3 trapped in CB-IN2 and CB-TIE: CB-IN1 cannot close without its key \(2-out-of-3/);
   refused(op(n0, 'ga-cb', true), /25 sync-check window; the gensets are off/);
   refused(op(n0, 'tie', false), /CB-TIE is already open/);
   refused(op(n0, 'l1-j1', true), /is not a switching device/);
