@@ -11,6 +11,46 @@ release sections rather than semver.
 
 ---
 
+## v3.104.0 — 2026-11-24 — The DC AI floor shows what the cooling scenario did; Conventional pumps draw power at their operating head
+
+PRD-DCAI-HALL-DEPTH Amendment 3 (A5a, D6, A5b, D7, D8) and PRD-CONV-OPS-DEPTH 01 Amendment E1 (owner: "Continue
+improve more"; "animasi state, indikasi banyak yg belum ada").
+
+- **The floor follows the scenario (A5a).** The floor reads each CDU, fan-wall module and rack row from the HMI
+  payload that opens on click. The floor has no state rule of its own.
+  - Under `cdu-pump-fail`, the 54 duty CDUs turn amber.
+  - Under `leak-z07`, row R07 turns red.
+  - Under `chiller-trip`, nothing on the floor changes, because the chiller is outside the hall.
+  - Flags group neighbouring units: at most 8 flags, plus a "+n" chip for units without a flag. A flag has no fill and no motion.
+- **Air only where the lens asks (D6).** Air paths are drawn and animated only in Thermal and Cooling. Before, 31
+  paths moved in Status, Power and Layout.
+- **One alarm count (A5b).** Scenario alarms now add to the status strip on Data Hall and on Alarms & Events.
+  They are also journalled as `active_unack`, and as `returned_unack` when they clear.
+- **Every floor number carries its unit (D7).** A row-pair foot reads `6,248 kW`, or `6.2 MW` below 600 px. The unit
+  stacks under the value on a phone. In 3D, the last row tags slide back onto the stage.
+- **One operating point, floor and HMI (D8).** A unit's HMI now reads the engine values the floor draws:
+  - fan-wall fan speed 99.7 %, airflow per unit, and a rated airflow row;
+  - CDU pump rpm = speed × the 1,450 rpm nameplate.
+  These remain telemetry points: under a replay with no sample they read `—`.
+- **conv-engine 2.10.0 — pump power at the operating head (E1).** Pump kWe = ρ g q H_op / η, where
+  H_op = H_sp + (H_d − H_sp)·x_s² is the loop's system curve at its flow:
+  - primary: H_sp = 0;
+  - secondary: H_sp = the remote DP setpoint;
+  - condenser: H_sp = the 4 m static lift.
+
+  Effects:
+  - The DP setpoint now moves secondary power: 381.5 / 382.5 / 383.4 kW at 70 / 90 / 110 kPa.
+  - The pump fleet falls from 1,135.6 to 993.0 kW. `site.pue` is unchanged, because it is an input.
+  - New keys `*_pump_head_op_m` and `*_pump_dp_op_kpa`, the fleet field `headOpM`, and `pumpOperatingHeadM()`.
+  - `secondaryPumpSpeedAt(dp)` adds `headOpM`, `kwE` and `fleetKwE`.
+  - The pump modal, the chiller-plant tooltips and the CDW trend read the operating head: CDWP-01 shows 20.7 m and
+    203.4 kPa instead of 25 m and 245 kPa. The design head stays as a rating row.
+  - The engine pin moves to 2.10.0 on the 8 Conventional pages.
+- **Gates.**
+  - `test-dcai-hall-views` gains S1, I1, M3, I2, I3, U1 and P2. Each was red on the old tree.
+  - The new `test-conv-pump-affinity.mjs` (E1a–E1g, 25 checks) was red 14 of 18 on 2.9.0.
+  - `test-conv-plant-internals` and `test-conv-internals-p3` now hand-check at H_op.
+
 ## v3.103.0 — 2026-11-24 — DC AI floor drawn to scale; every fan-wall module and CDU states its operating point and turns at its speed
 
 PRD-DCAI-HALL-DEPTH Amendment 1: phases A3 (engine part) and A4 (rotors), plus decision D10, the floor to scale, and Amendment 2, one placement for every view (owner: "banyak parameter ... ops parameter"; "Arrangement harus accurate dan valid dan comprehensive").
