@@ -71,3 +71,40 @@ scenario change and never per tick.
 
 - **R1 — The CDU pump fault is class-wide.** The payload faults pump 1 of every duty CDU, so the floor shows 54 amber CDUs; one flag carries them. If the owner meant one CDU, the change belongs to the payload (`COOLING_SCENARIOS`), and the floor follows it with no edit.
 - **R2 — Changing the scenario costs ≤ 50 ms.** That is once per change, never per tick.
+
+## 5 · Phase A5b — one alarm count for the floor, the strip and the alarm list
+
+### Measured on e73d166db + 4db4d943b (1440, signed in, 2026-11-23)
+
+| Scenario | Floor (A5a) | Status strip on Data Hall and on Alarms & Events | Alarms & Events list |
+|---|---|---|---|
+| normal | 0 flags | Critical 1 · Warning 0 | 6 rows, `LEAK-Z07` absent |
+| cdu-pump-fail | 1 flag, 54 CDUs amber | Critical 1 · Warning 0 (unchanged) | 6 rows (unchanged) |
+| leak-z07 | 1 flag, 22 racks red | Critical 1 · Warning 0 (unchanged) | 6 rows, `LEAK-Z07` absent |
+
+The strip counts are produced by the page's doc-22 rules: rack inlet, margin, UPS load, TCS ΔT and the fire workstation. The
+list holds recorded fixtures. Neither reads `#coolingScenario`. A scenario therefore reaches the floor, the unit
+HMI and the tooltip, but never the alarm count. An operator sees red racks next to an unchanged strip.
+
+### Design
+
+- **B1 — One set.** `RZHallIso.alarms()` returns the payload alarms of the current hall under the current cooling
+  scenario. These are the alarms of the CDU and fan-wall payloads, the leak payload's `LEAK-Zxx` alarms, and one
+  `MANIFOLD` alarm per wet rack row. Each is an alarm-list record (tag, point, severity, message, `scenario`). The floor
+  flags are drawn from the same set.
+- **B2 — The strip adds them.** In `rules()`, a critical alarm adds to Critical, and any other severity adds to Warning
+  (the D2 mapping). The doc-22 rule counts stay as they are.
+- **B3 — The list shows them.** The Alarms & Events list prepends the set as active, unacknowledged rows with quality
+  `simulated` and the scenario id, and removes them when the scenario changes back. The recorded fixtures stay.
+- **B4 — Count once.** A row raises one alarm. Fifty-four CDUs with a pump-1 fault are 54 alarms in the list and in
+  Warning, because ISA-18.2 counts one alarm per point. On the floor they are one flag.
+
+### Laws (each red on the tree above)
+
+- **HV-I2.** For each scenario, (strip Critical, Warning) − (normal's) = (critical, other) of `RZHallIso.alarms()`,
+  on the Data Hall strip and on the Alarms & Events strip. normal and chiller-trip add 0.
+- **HV-I3.** The Alarms & Events list holds every alarm of the set: same tag, point and severity. After the switch back
+  to normal, none of them remain.
+
+Owner of the files: `datahallAI.html` `rules()` (shared page; built after the peer's 3.102.0 lands) and
+`js/datahall-ai/alarm-query.js` (list).
