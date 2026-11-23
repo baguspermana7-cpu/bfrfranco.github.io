@@ -122,15 +122,15 @@
       N({ id: u + 'ci', tag: 'CB-UI' + T, sym: 'cbIec', x: X(150), y: 590, size: 26, cls: 'epms', sw: 'cb', kv: 'lv', tagAt: side,
         label: 'UPS input breaker', values: [{ k: 'st', dx: vd * 17, dy: 15, anchor: va, lod: 1 }] });
       N({ id: u + 'j', sym: 'junction', x: X(150), y: 634 });
-      N({ id: u + 'rec', tag: 'REC-' + T, sym: 'rectifier', x: X(150), y: 680, size: 34, cls: 'epms', kv: 'lv', ups: true, tagAt: side,
-        label: 'UPS rectifier / charger', values: [{ k: 'kw', dx: vd * 21, dy: 15, anchor: va, lod: 1 }] });
+      N({ id: u + 'rec', tag: 'REC-' + T, name: '× ' + modules, stack: modules, stackDir: -vd, sym: 'rectifier', x: X(150), y: 680, size: 34, cls: 'epms', kv: 'lv', ups: true, tagAt: side,
+        label: 'UPS rectifier / charger', values: [{ k: 'kw', dx: vd * 21, dy: 27, anchor: va, lod: 1 }] });
       N({ id: u + 'dc', sym: 'junction', x: X(150), y: 730 });
       N({ id: u + 'cbb', tag: 'CB-BAT' + T, sym: 'cbIec', x: X(290), y: 770, size: 24, cls: 'epms', sw: 'cb', kv: 'lv', tagAt: L ? 'left' : 'right',
         label: 'Battery breaker' });
       N({ id: u + 'bat', tag: 'BAT-' + T, sym: 'batteryIec', x: X(290), y: 840, size: 30, cls: 'epms', src: 'battery', kv: 'lv', ratingKw: upsKw, dcBus: u + 'dc', rec: u + 'rec', ss: u + 'ss', tagAt: 'below',
         label: 'Battery strings (autonomy not modelled)', values: [{ k: 'st', dx: 0, dy: 37, anchor: 'middle', lod: 1 }] });
-      N({ id: u + 'inv', tag: 'INV-' + T, sym: 'inverterIec', x: X(150), y: 790, size: 34, cls: 'epms', kv: 'lv', ups: true, tagAt: side, lossFrac: 1 / e.ups_efficiency - 1,
-        label: 'UPS inverter', values: [{ k: 'st', dx: vd * 21, dy: 15, anchor: va, lod: 1 }, { k: 'ld', dx: vd * 21, dy: 27, anchor: va, lod: 1 }, { k: 'r', dx: vd * 21, dy: 39, anchor: va, lod: 1 }] });
+      N({ id: u + 'inv', tag: 'INV-' + T, name: '× ' + modules + ' · ' + e.ups_redundancy, stack: modules, stackDir: -vd, sym: 'inverterIec', x: X(150), y: 790, size: 34, cls: 'epms', kv: 'lv', ups: true, tagAt: side, lossFrac: 1 / e.ups_efficiency - 1,
+        label: 'UPS inverter, typical of ' + modules + ' parallel modules (' + e.ups_redundancy + ' with the other stream)', values: [{ k: 'st', dx: vd * 21, dy: 27, anchor: va, lod: 1 }, { k: 'ld', dx: vd * 21, dy: 39, anchor: va, lod: 1 }, { k: 'r', dx: vd * 21, dy: 51, anchor: va, lod: 1 }] });
       N({ id: u + 'co', tag: 'CB-UO' + T, sym: 'cbIec', x: X(150), y: 868, size: 26, cls: 'epms', sw: 'cb', kv: 'lv', tagAt: side,
         label: 'UPS output breaker', values: [{ k: 'st', dx: vd * 17, dy: 15, anchor: va, lod: 1 }] });
       N({ id: u + 'ss', tag: 'SS-' + T, sym: 'staticSwitch', x: X(70), y: 760, size: 30, cls: 'epms', sw: 'ss', normal: 'open', kv: 'lv', tagAt: side,
@@ -171,7 +171,7 @@
       N({ id: 'g' + ls + '-cb', tag: 'CB-G' + T, sym: 'cbIec', x: X(455), y: 1220, size: 28, cls: 'epms', sw: 'cb', kv: 'mv', role: 'hgen', normal: 'open', section: 'm' + ls + '-in',
         incomer: 'r' + ls + '-cb', label: 'Generator incomer to section ' + s + ' (normally open)', tagAt: L ? 'left' : 'right',
         values: [{ k: 'st', dx: -vd * 18, dy: 15, anchor: L ? 'end' : 'start', lod: 1 }, { k: 'pw', dx: -vd * 18, dy: 27, anchor: L ? 'end' : 'start', lod: 1 }] });
-      E('g' + ls + '-a', 'm' + ls + '-g', 'g' + ls + '-cb.line');
+      E('g' + ls + '-a', 'm' + ls + '-g', 'g' + ls + '-cb.line', null, { line: 'GEN INCOMER ' + s + ' · 20 kV · normally open', lineLod: 1 });   // E14: a 1 000-unit run names itself
       E('g' + ls + '-b', 'g' + ls + '-cb.load', 'gb-' + ls);
       mvTaps[s].push(['m' + ls + '-g', X(455)]);
     });

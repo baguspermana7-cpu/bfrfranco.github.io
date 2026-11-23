@@ -34,7 +34,19 @@
   /* the fabric port class from the engine (compute.cx8_bandwidth_pbs over cx8_nics_facility = the published ConnectX-8 /
      Quantum-X800 port speed) — the network sheets printed a literal 400G against the modal's 800 Gb/s */
   function portG(snap) { return Math.round(need(snap, 'compute.cx8_bandwidth_pbs') * 1e6 / need(snap, 'compute.cx8_nics_facility')) + 'G'; }
-  function finish(s) { delete s.n; delete s.j; delete s.e; delete s.chain; return s; }
+  /* PRD-ELECTRICAL-BMS E15 (owner R191 "clickable semua"): on an electrical sheet every drawn item opens. An item with
+     no class of its own becomes 'sld-item:<sheet>~<node>' — the inspector names it by its drawing tag and states what
+     the sheet models of it (its switching state) and that nothing else is modelled. Junction dots are the exception. */
+  var ITEMS = root.RZDhSldItems = root.RZDhSldItems || {};
+  function finish(s) {
+    delete s.n; delete s.j; delete s.e; delete s.chain;
+    if (/^dh-e-/.test(s.id)) s.nodes.forEach(function (n) {
+      if (n.cls || n.sym === 'junction') return;
+      n.cls = 'sld-item'; n.eqId = s.id + '~' + n.id;
+      ITEMS[n.eqId] = { tag: n.tag || n.id.toUpperCase(), label: n.label || '', sym: n.sym, sheet: s.no, node: n.id, sheetId: s.id };
+    });
+    return s;
+  }
 
   /* ── one CDU drawn in full: primary (HTW) side, plate HX, secondary pumps duty+standby, TCS out/in ──────────── */
   function cduDetail(s, o) {

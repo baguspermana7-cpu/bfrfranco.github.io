@@ -115,6 +115,74 @@ const barOf = (sel) => {
   }).map((t) => t.textContent.trim());
   return { bar: true, stageBottom: Math.round(Math.min(stage.bottom, innerHeight)), barTop: Math.round(s.top), under };
 };
+/* E15: every drawn item (junctions excepted) is equipment the page can open */
+const unclickableOf = (sel) => {
+  const host = document.querySelector(sel); if (!host) return null;
+  const all = [...host.querySelectorAll('.hmi-node[data-node]')].filter((g) => g.getAttribute('data-sym') !== 'junction');
+  return { n: all.length, bare: all.filter((g) => !g.hasAttribute('data-rz-equipment')).map((g) => g.getAttribute('data-node') + ':' + g.getAttribute('data-sym')) };
+};
+/* one node per symbol kind: click it, then the inspector or the equipment modal names its tag */
+async function clickKinds(pg, sel, tagAlways = true) {
+  const pick = await pg.evaluate((H) => {
+    const seen = {}, out = [];
+    document.querySelectorAll(H + ' .hmi-node[data-node]').forEach((g) => { const k = g.getAttribute('data-sym'); if (k === 'junction' || seen[k]) return; seen[k] = 1; out.push([g.getAttribute('data-node'), k, (g.getAttribute('aria-label') || '').split(' — ')[0], /^sld-item:/.test(g.getAttribute('data-rz-equipment') || '')]); });
+    return out;
+  }, sel);
+  const bad = [];
+  for (const [id, sym, tag, generic] of pick) {
+    await pg.keyboard.press('Escape'); await sleep(120); await pg.keyboard.press('Escape'); await sleep(120);
+    const pt = await pg.evaluate((H, i) => { const g = document.querySelector(H + ' .hmi-node[data-node="' + i + '"]'); g.scrollIntoView({ block: 'center', inline: 'center' }); const r = (g.querySelector('.hmi-hit') || g).getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }, sel, id);
+    await pg.mouse.click(pt.x, pt.y); await sleep(600);
+    const t = await pg.evaluate(() => [...document.querySelectorAll('aside.rz-inspector.open, .rz-cvm:not([hidden]), .hmi-modal-back:not([hidden]), .dh-modal-host:not([hidden]), .eq-hmi:not([hidden])')].filter((x) => x.getClientRects().length).map((x) => x.textContent).join(' ').replace(/\s+/g, ' ').slice(0, 600));
+    /* a class with its own mimic may title it by the plant it shows (Q-INA opens the 20 kV board); a generic item and
+       every EPMS item name the drawing tag */
+    if (!t.trim()) bad.push(id + ':' + sym + ' opened nothing');
+    else if ((tagAlways || generic) && (!tag || !t.includes(tag))) bad.push(id + ':' + sym + ' opened without its tag ' + tag);
+  }
+  await pg.keyboard.press('Escape'); await sleep(120); await pg.keyboard.press('Escape');
+  return { n: pick.length, bad };
+}
+/* E17: each stream's UPS shows its parallel module count, rating and redundancy, equal to the engine */
+const upsOf = (sel) => {
+  const e = window.CONV_CALC && window.CONV_CALC.snapshot && window.CONV_CALC.snapshot.electrical; const host = document.querySelector(sel);
+  if (!e || !host) return null;
+  const halls = (window.CONV_CALC.snapshot.campus || {}).halls || [], n = e.ups_modules_per_system / (halls.length || 1);
+  const g = (x) => Math.round(x).toLocaleString('en-US');
+  return ['a', 'b'].map((s) => {
+    const inv = host.querySelector('.hmi-node[data-node="u' + s + '-inv"]'); if (!inv) return { s, miss: 'no inverter' };
+    const id = 'u' + s + '-inv', txt = [inv, ...host.querySelectorAll('[data-name-of="' + id + '"], [data-val^="' + id + ':"]')].map((x) => x.textContent).join(' | ').replace(/\s+/g, ' ');
+    const want = ['× ' + n, n + ' × ' + g(e.ups_module_kw_rated) + ' kW', e.ups_redundancy];
+    return { s, n, txt: txt.slice(0, 160), lacks: want.filter((w) => !txt.includes(w)), stack: inv.querySelectorAll('[data-stack]').length };
+  });
+};
+/* E14: a long power conductor says what it is — a run over 400 sheet units carries its own line label (a bus is
+   exempt: it is named by its bus tag, E19) */
+const longRunsOf = (sel) => {
+  const host = document.querySelector(sel); if (!host) return null;
+  const svg = host.querySelector('svg.hmi-svg'), bare = [];
+  svg.querySelectorAll(['m-power', 'm-feed_a', 'm-feed_b', 'm-dc'].map((m) => 'path.hmi-edge.' + m + '[data-edge]:not(.hmi-flow):not(.w-inst):not(.w-signal):not(.w-bus)').join(', ')).forEach((p) => {
+    let r; try { r = p.getBBox(); } catch (x) { return; }
+    const len = Math.max(r.width, r.height), id = p.getAttribute('data-edge');
+    const t = svg.querySelector('text[data-line-of="' + CSS.escape(id) + '"]'), shown = t && getComputedStyle(t).display !== 'none' && t.getClientRects().length > 0;
+    if (len > 400 && !shown) bare.push(id + ' ' + Math.round(len) + (t ? ' (label hidden at this zoom)' : ''));
+  });
+  return bare;
+};
+/* E10: a relay shows its IEEE C37.2 function inside its box and a lamp that follows its state */
+const relaysOf = (sel) => {
+  const host = document.querySelector(sel); if (!host) return null;
+  const LAMP = { normal: 'healthy', energized: 'healthy', running: 'healthy', 'picked-up': 'warn', warning: 'warn', tripped: 'alarm', fault: 'alarm', alarm: 'alarm' };
+  const miss = [];
+  const rs = [...host.querySelectorAll('.hmi-node[data-sym="protectionRelay"]')];
+  rs.forEach((g) => {
+    const id = g.getAttribute('data-node'), inst = g.querySelector('text[data-role="inst"]'), lamp = g.querySelector('.hmi-relay [data-lamp]');
+    if (!inst || !/^\d{2}/.test(inst.textContent.trim())) miss.push(id + ': no ANSI number in the box');
+    if (!lamp) { miss.push(id + ': no lamp'); return; }
+    const want = LAMP[g.getAttribute('data-state')] || 'off', got = lamp.getAttribute('data-lamp-state');
+    if (got !== want) miss.push(id + ': lamp ' + got + ' for state ' + g.getAttribute('data-state') + ' (want ' + want + ')');
+  });
+  return { n: rs.length, miss, healthy: rs.filter((g) => { const l = g.querySelector('.hmi-relay [data-lamp]'); return l && l.getAttribute('data-lamp-state') === 'healthy'; }).length };
+};
 const POWER = 'path.hmi-edge[data-edge]:not(.hmi-flow):not(.w-inst):not(.w-signal)';
 const strokesOf = (sel, POWER) => {
   const host = document.querySelector(sel); if (!host) return null;
@@ -208,6 +276,12 @@ const run = { epms: {}, dcai: {} };
     await pe.evaluate((sel) => { const b = document.querySelector(sel + ' [data-z="fit"]'); if (b) b.click(); }, EPMS_HV); await sleep(300);
   }
   if (want('E2')) run.epms.dark = await pe.evaluate(strokesOf, EPMS_HV, POWER);
+  if (want('E15')) {
+    const u = await pe.evaluate(unclickableOf, EPMS_HV); ok(u && u.bare.length === 0, `E15 EPMS HV/MV: ${u ? u.bare.length : '?'} of ${u ? u.n : '?'} drawn items are not equipment: ${JSON.stringify((u || { bare: [] }).bare.slice(0, 8))}`);
+    const k = await clickKinds(pe, EPMS_HV); ok(k.bad.length === 0, `E15 EPMS HV/MV: ${k.bad.length} of ${k.n} kinds do not open with their tag: ${JSON.stringify(k.bad.slice(0, 8))}`);
+  }
+  if (want('E14')) { const b = await pe.evaluate(longRunsOf, EPMS_HV); ok(b && b.length === 0, `E14 EPMS HV/MV: ${b ? b.length : '?'} power runs over 400 units carry no label: ${JSON.stringify((b || []).slice(0, 6))}`); }
+  if (want('E10')) { const r = await pe.evaluate(relaysOf, EPMS_HV); ok(r && r.n >= 10 && r.miss.length === 0 && r.healthy >= 10, `E10 EPMS HV/MV@1440 ${r ? r.miss.length : '?'} of ${r ? r.n : '?'} relays lack an ANSI number, a lamp or a lamp that follows the state: ${r ? JSON.stringify(r.miss.slice(0, 4)) : ''}`); }
   const epmsBus = () => pe.evaluate((H) => ['i1-cb:bus', 'i2-cb:bus', 'bb-r:bb1', 'bb-r:bb2'].map((k) => { const t = document.querySelector(H + ' [data-val="' + k + '"]'); return t ? t.textContent.trim() : null; }), EPMS_HV);
   if (want('E19')) {
     const v = await epmsBus();
@@ -226,6 +300,13 @@ const run = { epms: {}, dcai: {} };
     const st = await pe.evaluate(brkState, EPMS_HV, 'i1-cb');
     ok(st && st.glyph === 'open', `E3 EPMS planted: CB-IN1 opened, its glyph reads ${st ? st.glyph : 'no node'} (want open; node state ${st && st.state})`);
     if (want('E19')) { const v = await epmsBus(); ok(/^BUS A · 20 kV nom · 0 V DEAD · /.test(v[0] || '') && /^BUS B · 20 kV nom · \d+\.\d+ kV · /.test(v[1] || ''), `E19 EPMS planted: CB-IN1 open with the tie open, BUS A reads DEAD, BUS B stays live: ${JSON.stringify(v.slice(0, 2))}`); }
+  }
+  if (want('E14') || want('E15') || want('E17')) {
+    await pe.evaluate(() => { const x = document.querySelector('.epms-view-btn[data-epms-view="lv"]'); if (x) x.click(); }); await sleep(1500);
+    if (want('E17')) { const u = await pe.evaluate(upsOf, EPMS_LV); ok(Array.isArray(u) && u.every((x) => x.lacks && x.lacks.length === 0 && x.stack >= 2), `E17 EPMS LV: each stream's UPS names × N modules, N × rating and the redundancy, drawn as a stack: ${JSON.stringify(u)}`); }
+    if (want('E15')) { const u = await pe.evaluate(unclickableOf, EPMS_LV); ok(u && u.bare.length === 0, `E15 EPMS LV: ${u ? u.bare.length : '?'} of ${u ? u.n : '?'} drawn items are not equipment: ${JSON.stringify((u || { bare: [] }).bare.slice(0, 8))}`); }
+    const b = await pe.evaluate(longRunsOf, EPMS_LV); ok(b && b.length === 0, `E14 EPMS LV: ${b ? b.length : '?'} power runs over 400 units carry no label: ${JSON.stringify((b || []).slice(0, 6))}`);
+    await pe.evaluate(() => { const x = document.querySelector('.epms-view-btn[data-epms-view="hv"], .epms-view-btn[data-epms-view="sld"]'); if (x) x.click(); }); await sleep(800);
   }
   if (want('E6')) { const s = await pe.evaluate(switchOf); ok(s && s.length === 2 && JSON.stringify(s) === JSON.stringify([['iso', 'false'], ['line', 'true']]), `E6 EPMS@1440 no 3D | One-line switch with One-line pressed: ${JSON.stringify(s)}`); }
   ok(pe.errors.length === 0, `EPMS@1440 page errors: ${pe.errors.slice(0, 2).join(' | ')}`);
@@ -251,10 +332,17 @@ const run = { epms: {}, dcai: {} };
   }
   if (want('E2')) run.dcai.dark = await pd.evaluate(strokesOf, DC_OV, POWER);
   if (want('E19')) { const v = await pd.evaluate(voltsOf, DC_OV); ok(v && v.n === 3 && v.bad.length === 0, `E19 DC AI overview: ${v ? v.n : '?'} bus voltages (want 3: HV, MVB-A, MVB-B) ${v ? JSON.stringify(v.bad.length ? v.bad : v.list) : ''}`);  ok(v && v.dead.length === 0, `E19 DC AI overview, normal 2N operation: a fed bus reads dead: ${v ? JSON.stringify(v.dead) : '?'}`); }
+  if (want('E15')) {
+    const u = await pd.evaluate(unclickableOf, DC_OV); ok(u && u.bare.length === 0, `E15 DC AI overview: ${u ? u.bare.length : '?'} of ${u ? u.n : '?'} drawn items are not equipment: ${JSON.stringify((u || { bare: [] }).bare.slice(0, 8))}`);
+    const k = await clickKinds(pd, DC_OV, false); ok(k.bad.length === 0, `E15 DC AI overview: ${k.bad.length} of ${k.n} kinds do not open with their tag: ${JSON.stringify(k.bad.slice(0, 8))}`);
+  }
+  if (want('E14')) { const b = await pd.evaluate(longRunsOf, DC_OV); ok(b && b.length === 0, `E14 DC AI overview: ${b ? b.length : '?'} power runs over 400 units carry no label: ${JSON.stringify((b || []).slice(0, 6))}`); }
+  if (want('E10')) { const r = await pd.evaluate(relaysOf, DC_OV); ok(r && r.n >= 2 && r.miss.length === 0 && r.healthy === r.n, `E10 DC AI overview@1440 normal operation: ${r ? r.healthy : '?'} of ${r ? r.n : '?'} relay lamps healthy ${r ? JSON.stringify(r.miss.slice(0, 4)) : ''}`); }
   if (want('E3')) { const b = await pd.evaluate(breakersOf, DC_OV); ok(b && b.cover.length === 0, `E3c DC AI overview@1440 breaker glyphs / lamps cover ${b ? b.cover.length : '?'} words: ${b ? JSON.stringify(b.cover.slice(0, 5)) : ''}`); }
   if (want('E6')) { const s = await pd.evaluate(switchOf); ok(s && s.length === 2 && JSON.stringify(s) === JSON.stringify([['iso', 'false'], ['line', 'true']]), `E6 DC AI@1440 no 3D | One-line switch with One-line pressed: ${JSON.stringify(s)}`); }
-  if (want('E3') || want('E2') || want('E19')) {
+  if (want('E3') || want('E2') || want('E19') || want('E15')) {
     await dcHall1(pd);
+    if (want('E15')) { const u = await pd.evaluate(unclickableOf, DC_H1); ok(u && u.bare.length === 0, `E15 DC AI DH-01: ${u ? u.bare.length : '?'} of ${u ? u.n : '?'} drawn items are not equipment: ${JSON.stringify((u || { bare: [] }).bare.slice(0, 8))}`); }
     if (want('E19')) {
       const v = await pd.evaluate(voltsOf, DC_H1);
       ok(v && v.n === 4 && v.bad.length === 0, `E19 DC AI DH-01: ${v ? v.n : '?'} bus voltages (want 4: MSB A/B, UPS OUT A/B) ${v ? JSON.stringify(v.bad.length ? v.bad : v.list) : ''}`);

@@ -212,12 +212,16 @@
     if (!m) { if (n.id === 'mv-tie' || n.id === 'tie') return 'open'; if (/^gen\d$/.test(n.id)) { var g = S.sources && S.sources['SRC-GENSET-POOL']; return g ? (g.state === 'running' ? 'running' : g.state === 'failed' ? 'fault' : 'standby') : null; } return null; }
     k = m[1]; L = m[2];
     var br = function (id) { var v = S.breakers && S.breakers[id + '-' + L]; return v ? BRK[v] || 'na' : null; };
+    /* PRD-ELECTRICAL-BMS E10: a protection relay is healthy while it supervises its bay, tripped when its breaker tripped */
+    var relay = function (id) { var b = br(id); return b ? (/^(fault|tripped|alarm)$/.test(b) ? 'tripped' : 'normal') : null; };
     if (sheet === 'dh-e-001') {
+      if (k === 'pr-') return relay('BR-MV-INCOMER');
       if (k === 'cb-mv') return br('BR-MV-INCOMER'); if (k === 'cb-tx') return br('BR-HV-TX'); if (k === 'tx-main') return edgeTo('MAIN-TX-' + L);
       return null;
     }
     switch (k) {
       case 'cb-mv': return br('BR-TX');
+      case 'rl-mv': case 'pr-': return relay('BR-TX');
       case 'tx': return edgeTo('TX-' + L);
       case 'cb-lv': return br('BR-MSB');
       case 'ats': var a = S.ats && S.ats['ATS-' + L]; return a ? ATSW[a.state] || 'na' : null;

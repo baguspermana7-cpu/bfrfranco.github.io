@@ -175,8 +175,8 @@
         var seg = longest(pts), horiz = Math.abs(seg[1].y - seg[0].y) < 0.5;
         var lx = (seg[0].x + seg[1].x) / 2, ly = (seg[0].y + seg[1].y) / 2;
         lineSvg += horiz
-          ? '<text data-role="line" data-lod="2" x="' + r1(lx) + '" y="' + r1(ly - 4) + '" text-anchor="middle">' + esc(e.line) + '</text>'
-          : '<text data-role="line" data-lod="2" transform="translate(' + r1(lx - 4) + ' ' + r1(ly) + ') rotate(-90)" text-anchor="middle">' + esc(e.line) + '</text>';
+          ? '<text data-role="line" data-line-of="' + esc(id) + '" data-lod="' + (e.lineLod || 2) + '" x="' + r1(lx) + '" y="' + r1(ly - 4) + '" text-anchor="middle">' + esc(e.line) + '</text>'
+          : '<text data-role="line" data-line-of="' + esc(id) + '" data-lod="' + (e.lineLod || 2) + '" transform="translate(' + r1(lx - 4) + ' ' + r1(ly) + ') rotate(-90)" text-anchor="middle">' + esc(e.line) + '</text>';
       }
       graph.push({ id: id, a: endNode(e.from), b: endNode(e.to), pa: endPort(e.from), pb: endPort(e.to), flowOf: e.flowOf, m: e.medium || 'line', w: e.w || 'branch' });
     });
@@ -190,9 +190,10 @@
         ' tabindex="0" role="button" aria-label="' + esc(label) + '">' +
         '<title>' + esc(label) + '</title>' +
         '<rect class="hmi-hit" x="' + r1(n.x - h - 2) + '" y="' + r1(n.y - h - 2) + '" width="' + (sz + 4) + '" height="' + (sz + 4) + '"/>' +
+        stackMarks(n, sz) +
         withBody(L.use(n.sym, { x: n.x, y: n.y, size: sz, rot: n.rot || 0 })) +
-        (n.inst ? '<text data-role="inst" x="' + n.x + '" y="' + r1(n.y - sz * 4 / 48 + (n.sym === 'instPanel' ? -1.5 : 2.6)) + '">' + esc(n.inst) + '</text>' : '') +
-        brkMarks(n, sz) +
+        (relayAnsi(n) ? '<text data-role="inst" data-const="IEEE C37.2 device function number" x="' + n.x + '" y="' + r1(n.y - sz * 4 / 48 + (n.sym === 'instPanel' ? -1.5 : 2.6)) + '">' + esc(relayAnsi(n)) + '</text>' : '') +
+        brkMarks(n, sz) + relayMarks(n, sz) +
         '</g>';
       if (isBrk(n) && !(n.values && n.values.length) && !(n.rating && n.tag && n.tagAt !== 'none')) textSvg += brkTag(n, sz);   // a drawn reading or rating line IS the value tag
       if (n.tag && n.tagAt !== 'none') {
@@ -454,6 +455,10 @@
         g.__d = d;
         var sym = g.__sym || (g.__sym = g.querySelector('[data-sym]'));
         if (d.state) { setA(g, 'data-state', d.state); if (sym) setA(sym, 'data-state', d.state); }
+        if (n.sym === 'protectionRelay') {
+          var rl = g.__rl || (g.__rl = g.querySelector('.hmi-relay [data-lamp]'));
+          if (rl) setA(rl, 'data-lamp-state', RELAY_LAMP[d.state] || 'off');
+        }
         if (isBrk(n)) {
           var gl = g.__gl || (g.__gl = g.querySelector('[data-brk-glyph]')), lp = g.__lp || (g.__lp = g.querySelector('[data-lamp]'));
           var bs = BRK_GLYPH[d.state] || (d.state ? 'na' : 'na');
@@ -566,12 +571,12 @@
         if (r && (r.width < 2 || r.height < 2)) words.push({ x: r.x - 1, y: r.y - 1, width: r.width + 2, height: r.height + 2 });
       });
       var hit = function (r) { var n = 0; words.forEach(function (w) { if (r.x < w.x + w.width && w.x < r.x + r.width && r.y < w.y + w.height && w.y < r.y + r.height) n++; }); return n; };
-      svg.querySelectorAll('g.hmi-brk[data-brk-flip]').forEach(function (g) {
+      svg.querySelectorAll('g.hmi-brk[data-brk-flip], g.hmi-relay[data-alt]').forEach(function (g) {
         g.removeAttribute('transform');
         var r = g.getBBox(), dx = +g.getAttribute('data-brk-flip'), here = hit(r);
         if (!here || !r.width) return;
-        var best = [0, 0, here];
-        [[dx, 0], [0, -18], [dx, -18], [0, 18], [dx, 18]].some(function (d) {
+        var best = [0, 0, here], alt = g.hasAttribute('data-alt') ? JSON.parse(g.getAttribute('data-alt')) : [[dx, 0], [0, -18], [dx, -18], [0, 18], [dx, 18]];
+        alt.some(function (d) {
           var n = hit({ x: r.x + d[0], y: r.y + d[1], width: r.width, height: r.height });
           if (n < best[2]) best = [d[0], d[1], n];
           return n === 0;
@@ -670,6 +675,30 @@
     else if (at === 'below') { x = n.x; y = n.y + h + 10 + lines * 12; anchor = 'middle'; }
     return '<text class="hmi-brk-tag" data-role="value" data-brk-tag-of="' + esc(n.id) + '"' + (n.lod ? ' data-lod="' + n.lod + '"' : '') + ' x="' + r1(x) + '" y="' + r1(y) + '" text-anchor="' + anchor + '">' + esc(brkRating(n)) + '</text>';
   }
+  /* PRD-ELECTRICAL-BMS E10: a relay shows its IEEE C37.2 function inside its box (the sheet's inst, else the first
+     function of its name: "87L · 21" -> 87L, "50/51 50N/51N" -> 51) and a lamp over the box that follows its state:
+     healthy (running ink), picked-up (warning), tripped (alarm, latched by the state the sheet reports) */
+  function relayAnsi(n) {
+    if (n.inst || n.sym !== 'protectionRelay') return n.inst || '';
+    var f = String(n.name || '').split(/ · |\s+/)[0] || '';
+    if (f.length > 4 && f.indexOf('/') > 0) f = f.slice(f.lastIndexOf('/') + 1);
+    if (f === 'LSIG') return '51';   // an LV trip unit (long/short/instantaneous/ground) is the 51 time-overcurrent function; its name keeps LSIG
+    return /^\d{2}/.test(f) ? f : '';
+  }
+  /* PRD-ELECTRICAL-BMS E17: N identical units in parallel (UPS modules) draw as a stack of two offset outlines behind the
+     symbol; the count itself is the "× N" name, same rule as a transformer "× 5" */
+  function stackMarks(n, sz) {
+    if (!(n.stack > 1)) return '';
+    var d = n.stackDir || -1, o = '';
+    for (var k = 2; k >= 1; k--) o += '<rect data-stack="' + k + '" x="' + r1(n.x - sz / 2 + d * 5 * k) + '" y="' + r1(n.y - sz / 2 - 5 * k) + '" width="' + sz + '" height="' + sz + '" rx="1.5"/>';
+    return '<g class="hmi-stack" aria-hidden="true">' + o + '</g>';
+  }
+  function relayMarks(n, sz) {
+    if (n.sym !== 'protectionRelay') return '';
+    var bx = sz / 3 + 6, by = sz * 14 / 48 + 4.5;   // other seats: under the box, left of it, right of it, further up
+    return '<g class="hmi-relay" data-lod="0" aria-hidden="true" data-alt="' + JSON.stringify([[0, 2 * by], [-bx, by], [bx, by], [0, -5]].map(function (d) { return [r1(d[0]), r1(d[1])]; })) + '"><circle data-lamp data-lamp-state="off" cx="' + r1(n.x) + '" cy="' + r1(n.y - sz * 14 / 48 - 4.5) + '" r="2.5"/></g>';
+  }
+  var RELAY_LAMP = { normal: 'healthy', energized: 'healthy', running: 'healthy', 'picked-up': 'warn', warning: 'warn', tripped: 'alarm', fault: 'alarm', alarm: 'alarm' };
   var BRK_GLYPH = { closed: 'closed', running: 'closed', energized: 'closed', open: 'open', standby: 'open', stopped: 'open', off: 'open', fault: 'tripped', tripped: 'tripped', alarm: 'tripped' };
   var BRK_LAMP = { closed: 'running', open: 'off', tripped: 'alarm' };
   function titleBlock(s, W, H) {

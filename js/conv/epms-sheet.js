@@ -124,7 +124,7 @@
       values: [{ k: 'r', dx: -26, dy: 15, anchor: 'end', lod: 1 }, { k: 'pw', dx: -26, dy: 27, anchor: 'end', lod: 1 }, { k: 'ld', dx: -26, dy: 39, anchor: 'end', lod: 1 }] });
     N({ id: p + 'ngr', tag: 'NGR-' + k, sym: 'resistor', x: x + 50, y: 785, size: SW, cls: 'epms', label: 'Neutral earthing resistor, 20 kV star point', tagAt: 'left',
       values: [{ k: 'r', dx: 26, dy: 27, anchor: 'start', lod: 1 }] });
-    N({ id: p + 'pe', sym: 'earth', x: x + 50, y: 818, size: 24 });
+    N({ id: p + 'pe', tag: 'PE-' + k, sym: 'earth', x: x + 50, y: 818, size: 24, cls: 'epms', tagAt: 'none', label: 'Earth electrode of NGR-' + k + ' (substation earth grid)' });   // E15: clickable like every drawn item
     N({ id: p + 'rg', tag: 'R-NG' + k, name: '51G', sym: 'protectionRelay', x: x + 95, y: 785, size: 26, cls: 'epms', prot: null, cb: i + 'cb',
       label: 'Standby earth-fault relay 51G on the NGR', tagAt: 'right' });
     N({ id: i + 'cb', tag: 'CB-IN' + k, sym: 'cbIec', x: x, y: 860, size: SW, cls: 'epms', sw: 'cb', kv: 'mv', role: 'incomer', relay: i + 'r',

@@ -11,6 +11,27 @@ release sections rather than semver.
 
 ---
 
+## v3.96.0 — 2026-11-23 — Every relay reads its function, every drawn item opens, UPS modules count
+
+Owner R190/R191 ("pastikan itu misal ada DS1-CP itu clickable semua", "ups paralel … qty disesuaikan"), PRD-ELECTRICAL-BMS
+§A2 E10/E14 and §A5 E15/E17. Gates: `tools/test-electrical-bms.mjs` E10, E14, E15, E17 (each red on the old tree), wired
+into `tools/ship-gate.sh`.
+
+### Added
+- **Relay grammar (E10).** Every protection relay box carries its IEEE C37.2 function number (87T, 50/51, 87B, 51G …; an LV
+  LSIG trip unit reads 51, its name keeps LSIG) and a hollow state lamp: grey healthy, amber picked-up, red tripped. The
+  lamp follows the breaker it protects, on EPMS (E-S-101, E-S-102) and the DC AI one-lines.
+- **Long runs name themselves (E14).** An electrical conductor longer than 400 sheet units carries a visible line label:
+  the LV generator incomers now read "GEN INCOMER A · 20 kV · normally open".
+- **Every drawn item opens (E15).** DC AI one-line items with no plant class (line disconnectors, line breakers, VTs,
+  relays, off-sheets …) open an inspector titled by their drawing tag, with the state the sheet paints and "not
+  modelled" for values (`sld-item` class). The EPMS NGR earth electrodes open too.
+- **UPS modules from the engine (E17).** Each stream's rectifier and inverter draw as a stack, named "× 8 · 2N", with
+  "8 × 1,250 kW" (engine `ups_modules_per_system` over the halls, `ups_module_kw_rated`, `ups_redundancy`).
+
+### Changed
+- `standarization/HMI_DRAWING_STANDARD.md` §4g: relay grammar, long-run labels, every item opens, parallel-unit stacks.
+
 ## v3.95.0 — 2026-11-23 — Every pump runs at the speed its curve and its loop agree on
 
 Owner R188/R189 ("cwp itu speednya berapa", "speed CRAH"), PRD-CONV-OPS-DEPTH 01 phase P1. Conventional engine 2.6.0 → 2.7.0.

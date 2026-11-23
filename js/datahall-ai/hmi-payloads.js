@@ -709,6 +709,20 @@
     b.dep('downstream', 'site-genset-yard:1', 'Genset yard');
     b.trend('level_pct', 'Tank level', '%', { value: 95 }, 1, { digits: 1 });
   });
+  /* PRD-ELECTRICAL-BMS E15: a drawn item with no plant model of its own (disconnector, line breaker, VT, relay,
+     off-sheet …). Its drawing tag and description come from the sheet (js/datahall-ai/hmi-sheets.js finish()), its
+     state from the state the sheet paints; no value is invented — the rest says "not modelled". */
+  var SLD_ITEM = 'drawing item of the electrical one-line (js/datahall-ai/hmi-sheets.js); the engine models no quantity of it (PRD-ELECTRICAL-BMS decision 7)';
+  def('sld-item', { kind: 'engine', label: 'One-line item', system: 'electrical' }, function (b, ctx, id) {
+    var R = (typeof window !== 'undefined' && window.RZDhSldItems) || {}, it = R[id] || { tag: String(id || ''), label: '', sheet: '' };
+    b.title = it.tag + (it.label ? ' — ' + it.label : '');
+    var g = typeof document !== 'undefined' && it.sheetId ? document.querySelector('.hmi-host[data-hmi-sheet="' + it.sheetId + '"] .hmi-node[data-node="' + it.node + '"]') : null;
+    var st = g && g.getAttribute('data-state'); if (!st || st === 'na' || st === 'unknown') st = null;   // 'na' = the sheet paints no state for it
+    b.ST('live', 'state', 'State on the sheet', st || 'not modelled', st ? SCEN_REASON : SLD_ITEM);
+    b.D('live', 'drawing', 'Drawing', it.sheet || '—', SLD_ITEM);
+    b.D('capacity', 'values', 'Measured values', 'not modelled', SLD_ITEM);
+    b.chip(st ? String(st).toUpperCase() : 'NOT MODELLED', st === 'running' || st === 'closed' || st === 'energized' || st === 'normal' ? 'normal' : 'standby');
+  });
   def('sld-rmu', { kind: 'engine', label: 'Ring main unit', system: 'electrical', tier2: 'mimic' }, function (b, ctx) {
     b.title = 'RMU-' + b.hall + ' — ' + hallTag(b.hall);
     var ea = feedEdgeState(ctx, 'A', 'RMU'), eb = feedEdgeState(ctx, 'B', 'RMU');

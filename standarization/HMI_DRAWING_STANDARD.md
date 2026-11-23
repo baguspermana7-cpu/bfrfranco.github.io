@@ -250,6 +250,19 @@ Applies to every single-line sheet: EPMS E-S-101 / E-S-102 and DC AI E-001 / E-1
 - **Breaker grammar (E3, E3c).** Every breaker carries an IEC state glyph (filled closed, hollow open), a lamp, and a
   value tag with a number. The glyph and lamp are placed by `settleBrk()` clear of text and conductors; they never
   cover a word. The breaker's rating line and last value line are its tag (`data-brk-tag-of`).
+- **Relay grammar (E10).** Every protection relay shows its IEEE C37.2 function inside its box (the sheet's `inst`,
+  else the first function of its name: `87L · 21` -> 87L, `50/51 50N/51N` -> 51) and a lamp over the box: healthy
+  (grey ink) while it supervises its bay, picked-up (warning), tripped (alarm) when its breaker tripped. The lamp is
+  placed by `settleBrk()` like a breaker lamp.
+- **Every drawn item opens (E15).** Every node except a junction dot carries `data-rz-equipment`. A DC AI electrical
+  item with no plant class gets `sld-item:<sheet>~<node>` (hmi-sheets.js `finish()`): its inspector names the drawing
+  tag, the state the sheet paints, and "not modelled" for values. Never an item that opens nothing.
+- **Parallel units are a stack (E17).** N identical units in parallel (UPS rectifier/inverter modules) draw two offset
+  outlines behind the symbol (`stack: N`), the name `× N · <redundancy>`, and the value `N × <module kW>`, all from the
+  engine (`ups_modules_per_system / halls`, `ups_module_kw_rated`, `ups_redundancy`).
+- **Long runs name themselves (E14).** An electrical conductor (power, feed A/B, DC) longer than 400 sheet units
+  carries its own line label (`line`, linked by `data-line-of`), visible at the opening zoom (`lineLod: 1`). A bus is
+  exempt: its bus tag names it (E19). An LV trip unit (LSIG) shows `51` in its relay box; the name keeps LSIG.
 - **State grammar (E2).** In State view flow overlays and arrows on electrical media use the running ink
   (`--hmi-text-2`), never the feed hue.
 - **Bus voltages (E19).** A bus prints its voltage under load from `js/rz-elec-voltage.js`:
