@@ -19,6 +19,7 @@
    HV-V3  a switch 2D -> 3D -> Drawing -> 2D keeps the selected rack and the paint mode; RZHallIso.update runs 0 times
    HV-T1  3D tones: slab/body contrast >= 1.25 and body/top >= 1.1 in both themes (computed fills).
    HV-G1  2D floor to scale: slab, rack tops, row faces, galleries and CDU line at the engine's metres.
+   HV-G2  one placement: every fan-wall module and CDU body on the floor = its Drawing-view body (±0.05 m).
    HV-M1  2D rotors: one per fan-wall module and CDU, period = T_ref / engine speed (fan 1.0 s, pump 0.8 s), standby still.
    HV-M2  reduced motion, the Drawing view and another cockpit tab leave 0 running rotor animations.
    Later phases add: HV-P2, HV-S1/HV-I1 (A5).
@@ -131,6 +132,17 @@ for (const W of [1440, 390]) {
   ok('HV-V1', s.btnsVisible === 3, `${W}: ${s.btnsVisible} of 3 view buttons fully inside the viewport`);
   ok('HV-F1', !!s.stage && s.units >= 585 && s.outside === 0, `${W}: ${s.outside} of ${s.units} units outside the stage (want 0 of >= 585)`);
   ok('HV-F2', s.labels > 0 && s.over.length === 0, `${W}: ${s.over.length} label overlaps of ${s.labels}: ${s.over.slice(0, 3).join(' | ')}`);
+  /* F2b: the row-pair heads are judged by their INK (a Range over the text), not their 20 px box: text overflowing its box
+     once read 'R01/02R03/04' at 390 with every box apart */
+  const gaps = await pg.evaluate(() => [...document.querySelectorAll('#hIso .zone-head')].filter((e) => { const cs = getComputedStyle(e), z = e.closest('.zone'); return cs.visibility !== 'hidden' && +cs.opacity > 0 && !(z && (getComputedStyle(z).visibility === 'hidden' || +getComputedStyle(z).opacity === 0 || z.hidden)); }).map((e) => { const r = document.createRange(); r.selectNodeContents(e); const b = r.getBoundingClientRect(); return [b.left, b.right]; })
+    .filter((b) => b[1] > b[0]).sort((a, b) => a[0] - b[0]).map((b, i, A) => i ? b[0] - A[i - 1][1] : null).slice(1));
+  const minGap = Math.min(...gaps);
+  /* a head is centred on its row pair: ink centre within 2 px of the hot aisle's centre */
+  const off = await pg.evaluate(() => { const hs = [...document.querySelectorAll('#hIso .zone-head')], hot = [...document.querySelectorAll('#hIso .cap-top, #hIso .fp-aisle-hot')];
+    return hs.map((e) => { const r = document.createRange(); r.selectNodeContents(e); const b = r.getBoundingClientRect(), q = e.getBoundingClientRect(); return Math.abs((b.left + b.right) / 2 - (q.left + q.right) / 2); }); });
+  ok('HV-F2', off.length >= 10 && Math.max(...off) <= 2, `${W}: row-pair head ink off its own box centre by up to ${Math.max(...off).toFixed(1)} px (text overflowing a fixed box drifts right of its pair)`);
+  /* every pair keeps its head at 390 too: 10 heads, not every other one */
+  ok('HV-F2', gaps.length >= 9 && minGap >= 3, `${W}: row-pair heads ${gaps.length}, closest ink gap ${minGap.toFixed(1)} px (want >= 3)`);
   ok('HV-L1', LENSES.every((l) => s.lenses.includes(l)), `${W}: lenses ${JSON.stringify(s.lenses)}, want ${LENSES.join('/')}`);
   ok('HV-L1', s.legend, `${W}: no visible legend on the floor`);
   ok('HV-S0', s.stbyWant != null && s.stby === s.stbyWant, `${W}: standby lamps ${s.stby}, engine standby ${s.stbyWant}`);
@@ -225,10 +237,42 @@ for (const W of [1440, 390]) {
   const want = []; for (let p = 0; p < G.rows / 2; p++) { const p0 = p * 2 * (G.rd + G.ca + G.ha); want.push(p0 + G.ca, p0 + G.ca + G.rd + 2 * G.ha); }
   ok('HV-G1', r.xs.length === G.rows && r.xs.every((x, i) => near(x, want[i], 0.05)), `${W}: row west faces ${r.xs.slice(0, 4).join(', ')}… want ${want.slice(0, 4).map((v) => v.toFixed(2)).join(', ')}…`);
   const fieldEnd = G.gd + G.per * G.rp;
-  ok('HV-G1', r.N && near(r.N.y0, 0, 0.05) && near(r.N.y1, G.gd, 0.05), `${W}: north gallery ${r.N && r.N.y0.toFixed(2)}–${r.N && r.N.y1.toFixed(2)} m want 0–${G.gd}`);
-  ok('HV-G1', r.C && near(r.C.y0, fieldEnd + G.xa, 0.05) && near(r.C.y1, fieldEnd + G.xa + G.cd, 0.05), `${W}: CDU line ${r.C && r.C.y0.toFixed(2)}–${r.C && r.C.y1.toFixed(2)} m want ${(fieldEnd + G.xa).toFixed(2)}–${(fieldEnd + G.xa + G.cd).toFixed(2)}`);
-  ok('HV-G1', r.S && near(r.S.y0, G.W - G.gd, 0.05) && near(r.S.y1, G.W, 0.05), `${W}: south gallery ${r.S && r.S.y0.toFixed(2)}–${r.S && r.S.y1.toFixed(2)} m want ${G.W - G.gd}–${G.W} (on the south wall)`);
+  /* Amendment 2: bodies, not allotments — each inside its strip, a fan-wall body on the hall face of its gallery */
+  const inn = (e, a, b) => e && e.y0 >= a - 0.05 && e.y1 <= b + 0.05;
+  ok('HV-G1', inn(r.N, 0, G.gd) && near(r.N.y1, G.gd, 0.05) && r.N.y1 - r.N.y0 < G.gd - 0.5, `${W}: north fan-wall bodies ${r.N && r.N.y0.toFixed(2)}–${r.N && r.N.y1.toFixed(2)} m want inside 0–${G.gd}, on the hall face, thinner than the gallery`);
+  ok('HV-G1', inn(r.C, fieldEnd + G.xa, fieldEnd + G.xa + G.cd) && r.C.y1 - r.C.y0 < G.cd - 0.5, `${W}: CDU bodies ${r.C && r.C.y0.toFixed(2)}–${r.C && r.C.y1.toFixed(2)} m want inside the CDU line ${(fieldEnd + G.xa).toFixed(2)}–${(fieldEnd + G.xa + G.cd).toFixed(2)}`);
+  ok('HV-G1', inn(r.S, G.W - G.gd, G.W) && near(r.S.y0, G.W - G.gd, 0.05) && r.S.y1 - r.S.y0 < G.gd - 0.5, `${W}: south fan-wall bodies ${r.S && r.S.y0.toFixed(2)}–${r.S && r.S.y1.toFixed(2)} m want inside ${G.W - G.gd}–${G.W}, on the hall face`);
   ok('HV-G1', r.N.n === G.mods && r.S.n === G.mods && near(r.N.pitch, G.mp, 0.03) && near(r.S.pitch, G.mp, 0.03), `${W}: modules ${r.N.n} / ${r.S.n} at ${r.N.pitch.toFixed(3)} m want ${G.mods} at ${G.mp.toFixed(3)} m`);
+  await pg.close();
+}
+
+/* HV-G2 (Amendment 2 P1/P2, owner "sangat tidak proportional positioning dan sizenya"): ONE placement. For every
+   fan-wall module and CDU, its 2D floor body (metres, from the drawn SVG) equals its Drawing-view body (metres, from the
+   Drawing's own rect through __hallZones hx0 / hy0 / ppm) within 0.05 m on x, y, w and d. */
+for (const W of [1440, 390]) {
+  if (ONLY.size && !ONLY.has('HV-G2')) break;
+  const pg = await open(W);
+  const floor = await pg.evaluate(() => {
+    const g = window.DCAI_CALC.snapshot.geometry, svg = document.querySelector('#hIso svg.fp-svg') || document.querySelector('#hIso svg'), sl = svg.querySelector('.fp-slab').getBBox(), u = sl.width / g.hall_length_m, o = {};
+    for (const c of svg.querySelectorAll('.crah-cell[data-rz-equipment]')) { const b = c.querySelector('.cr-top').getBBox(); o[c.getAttribute('data-rz-equipment')] = [(b.x - sl.x) / u, (b.y - sl.y) / u, b.width / u, b.height / u]; }
+    return o;
+  });
+  await pg.evaluate(() => { const b = document.querySelector('#p-hall .dh-proj [data-view="drawing"]'); if (b) b.click(); });
+  await wait(800);
+  const draw = await pg.evaluate(() => {
+    const Z = window.__hallZones, o = {};
+    for (const gEl of document.querySelectorAll('[data-rz-equipment^="crah:"], [data-rz-equipment^="cdu:"]')) {
+      if (gEl.closest('#hIso')) continue;
+      const r = gEl.querySelector('rect.hp-cab'); if (!r) continue;
+      const v = (a) => +r.getAttribute(a);
+      o[gEl.getAttribute('data-rz-equipment')] = [(v('x') - Z.hx0) / Z.ppm, (v('y') - Z.hy0) / Z.ppm, v('width') / Z.ppm, v('height') / Z.ppm];
+    }
+    return o;
+  });
+  const ids = Object.keys(floor), bad = [];
+  for (const id of ids) { const a = floor[id], b = draw[id]; if (!b || a.some((x, i) => Math.abs(x - b[i]) > 0.05)) bad.push(id + ' floor ' + a.map((x) => x.toFixed(2)).join('/') + ' drawing ' + (b ? b.map((x) => x.toFixed(2)).join('/') : 'absent')); }
+  ok('HV-G2', ids.length >= 145 && Object.keys(draw).length >= 145, `${W}: ${ids.length} floor units, ${Object.keys(draw).length} Drawing units`);
+  ok('HV-G2', bad.length === 0, `${W}: ${bad.length} of ${ids.length} units placed differently from the Drawing view: ${bad.slice(0, 3).join(' | ')}`);
   await pg.close();
 }
 

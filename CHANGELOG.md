@@ -13,7 +13,7 @@ release sections rather than semver.
 
 ## v3.103.0 — 2026-11-23 — DC AI floor drawn to scale; every fan-wall module and CDU states its operating point and turns at its speed
 
-PRD-DCAI-HALL-DEPTH Amendment 1: phases A3 (engine part) and A4 (rotors), plus decision D10, the floor to scale (owner: "banyak parameter ... ops parameter"; "Arrangement harus accurate dan valid dan comprehensive").
+PRD-DCAI-HALL-DEPTH Amendment 1: phases A3 (engine part) and A4 (rotors), plus decision D10, the floor to scale, and Amendment 2, one placement for every view (owner: "banyak parameter ... ops parameter"; "Arrangement harus accurate dan valid dan comprehensive").
 
 - **Engine 1.7.0 publishes one running unit's operating point.** For a fan-wall module: airflow 54,136 of a rated
   54,274 m³/h at the design air ΔT, so fan speed is 99.7 % by the fan law. For a CDU: duty 983 of 1,000 kWth
@@ -40,6 +40,13 @@ PRD-DCAI-HALL-DEPTH Amendment 1: phases A3 (engine part) and A4 (rotors), plus d
   corridor and the 3.9 m CDU line follow the rack field, and the 3.3 m the width leaves lies before the south
   gallery. The schematic had drawn a 35 × 41 hall with 1.6-unit galleries. `test-dcai-hall-views` G1 measures
   every length on the drawn floor and was red 14 of 14 on the schematic.
+- **Units at their real size and place (Amendment 2, owner: "sangat tidak proportional positioning dan sizenya").**
+  A fan-wall module was drawn as its whole 1.38 × 3 m allotment, 5.7 racks big. It is now its 1.0 m body on the hall
+  face of the gallery. A CDU was 1.13 × 3.9 m, spread evenly over the hall. It is now a 0.9 × 1.9 m cabinet, and 5 or 6
+  stand together under the row pair they serve. Both are placed exactly as the Drawing view places them, from one
+  `HALL_PLACE`. The row-pair heads are centred on their pair and all 10 stay at 390 px. `test-dcai-hall-views` G2
+  compares every one of the 145 units with the Drawing within 0.05 m and was red 145 of 145 on the allotment boxes.
+
 ## v3.102.0 — 2026-11-23
 
 Electrical cockpits: a 3D equipment view beside the one-line, phone labels at 11 px, and the floor PDU gets its own equipment view (PRD-ELECTRICAL-BMS E6, E7; owner R186).

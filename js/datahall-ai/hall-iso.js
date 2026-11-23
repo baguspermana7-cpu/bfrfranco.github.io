@@ -66,6 +66,10 @@
       '@media (max-width:600px){.dh-proj [role=toolbar]{order:3;flex:1 1 100%;margin-left:0}.dh-proj [role=toolbar] button{flex:1 1 0;min-width:0;padding:0 4px}}',
       '.dh-proj button:focus-visible{outline:2px solid var(--c);outline-offset:-2px}',
       '@media (max-width:600px){.dh-proj button{height:40px;line-height:40px;min-width:56px}}',
+      /* HV-F2: the head shrink-wraps its text and centres on its row pair (a fixed 20 px box let 'R01/02' run off to the right) */
+      '#hIso .fp-root[data-proj="plan"] .zone-head{display:table;width:auto;min-width:20px;padding:1px 3px;margin:0 auto}',
+      /* HV-F2b: on a phone a row pair is ~37 px wide; the head '01/02' at 10 px keeps >= 3 px of air to its neighbour */
+      '@media (max-width:600px){#hIso .fp-root[data-proj="plan"] .zone-head{font-size:10px;letter-spacing:-.02em;padding:1px 0;min-width:0}}',
       '#hIsoWrap{display:none;margin:0}#p-hall:not([data-dh-view="drawing"]) #hIsoWrap{display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px 16px}',
       '#hIso{display:none;box-sizing:content-box;background:var(--bg2);border:1px solid var(--bd);border-radius:4px;overflow:hidden}',
       '#p-hall:not([data-dh-view="drawing"]) #hIso{display:block}',
@@ -125,6 +129,25 @@
     wrap.parentNode.insertBefore(tableBox, wrap.nextSibling);
   }
 
+  /* Amendment 2 P2: each unit's body in metres, by the same formulas the Drawing view uses (law HV-G2 compares the two):
+     fan-wall modules, north gallery first, at the module pitch, the body on the hall face of the gallery; CDUs grouped
+     under the containment pair they serve (the first pairs take one more when the count does not divide), centred on it */
+  function placeUnits(crah, cdu, pairs) {
+    var M = geo.m, P = M && M.place, i, k, n, p;
+    if (!P) return;
+    var pitchFw = M.hallLength / M.modsPer, rowPitch = M.rackDepth + M.coldAisle + M.hotAisle;
+    var yC1 = M.galleryDepth + geo.perRow * M.rackPitch + M.crossAisle, yS0 = M.hallWidth - M.galleryDepth;
+    for (i = 0; i < crah.length; i++) {
+      var north = i < M.modsPer, q = north ? i : i - M.modsPer;
+      crah[i].box = { x: q * pitchFw + pitchFw * (1 - P.fanFill) / 2, w: pitchFw * P.fanFill, y: north ? M.galleryDepth - P.fanD : yS0, d: P.fanD };
+    }
+    var base = Math.floor(cdu.length / pairs), extra = cdu.length % pairs;
+    for (p = 0, n = 0; p < pairs; p++) {
+      var cnt = base + (p < extra ? 1 : 0), x0 = p * 2 * rowPitch + rowPitch - cnt * P.cduPitch / 2;
+      for (k = 0; k < cnt && n < cdu.length; k++, n++) cdu[n].box = { x: x0 + k * P.cduPitch, w: P.cduW, y: yC1 + P.cduOff, d: P.cduD };
+    }
+  }
+
   /* ---- the model the floor renderer reads ---- */
   function build() {
     var G = geo, perZone = 2 * G.perRow, Z = G.rows / 2, racks = [], zones = [], crah = [], cdu = [], i, z;
@@ -137,6 +160,7 @@
     for (z = 0; z < Z; z++) zones.push({ z: z, heat: perZone * G.kwRack, rackInletC: 0, hotAisleC: 0 });
     for (i = 1; i <= G.crahInst; i++) crah.push(withOps({ n: i, tag: 'CRAH-' + pad2(i), running: G.crahAct == null || i <= G.crahAct, ref: 'crah:' + pad2(i), kind: 'crah' }));
     for (i = 1; i <= G.cduInst; i++) cdu.push(withOps({ n: 1000 + i, tag: 'CDU-' + pad2(i), running: G.cduRun == null || i <= G.cduRun, ref: 'cdu:' + i, kind: 'cdu' }));
+    placeUnits(crah, cdu, Z);
     model = {
       racks: racks, zones: zones, crahUnits: crah, cduUnits: cdu, racksPerZone: perZone,
       /* Power lens: rack kW against the rack's installed power-shelf rating (engine power.shelf_installed_kw); no rating, no colour */
@@ -180,6 +204,10 @@
     var k = ['rackPitch', 'rackDepth', 'coldAisle', 'hotAisle', 'crossAisle', 'cduDepth', 'galleryDepth', 'hallWidth', 'hallLength'], o = {}, i;
     if (!m) return null;
     for (i = 0; i < k.length; i++) { if (!(typeof m[k[i]] === 'number' && isFinite(m[k[i]]) && m[k[i]] > 0)) return null; o[k[i]] = m[k[i]]; }
+    /* Amendment 2 P1: the Drawing view's unit placement (HALL_PLACE); without it the units fill their allotments */
+    var pk = ['fanFill', 'fanD', 'cduW', 'cduD', 'cduOff', 'cduPitch'], pl = m.place, ok = pl && m.modsPer > 0;
+    for (i = 0; ok && i < pk.length; i++) ok = typeof pl[pk[i]] === 'number' && isFinite(pl[pk[i]]) && pl[pk[i]] > 0;
+    if (ok) { o.modsPer = m.modsPer; o.place = {}; for (i = 0; i < pk.length; i++) o.place[pk[i]] = pl[pk[i]]; }
     return o;
   }
   function render() {
@@ -198,7 +226,8 @@
       watchHeight: false, fitAll: true, tagFit: true, stbyLamp: true, rotors: true, geo: geo.m || null,
       rackTag: function (i) { return model.racks[i].ref.replace('rack-unit:', ''); },
       zoneTag: function (z) { return 'Rows R' + pad2(2 * z + 1) + ' and R' + pad2(2 * z + 2) + ', one contained hot aisle'; },
-      zoneHead: function (z) { return 'R' + pad2(2 * z + 1) + '/' + pad2(2 * z + 2); },
+      /* a phone gives a row pair about 34 px: 'R01/02' (6 chars) would touch its neighbour, '01/02' keeps a gap; the full name stays in the tooltip */
+      zoneHead: function (z) { return ((win.innerWidth || 1440) < 600 ? '' : 'R') + pad2(2 * z + 1) + '/' + pad2(2 * z + 2); },
       crahTag: function (n, c) { return (c && c.tag) || ('CRAH-' + pad2(n)); }
     });
     if (keepMode && keepMode !== inst.mode) inst.paint(keepMode);

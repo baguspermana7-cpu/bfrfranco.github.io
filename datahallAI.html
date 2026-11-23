@@ -875,8 +875,8 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
     <script src="js/datahall-ai/equipment-inspector.js?v=20261116-b68cf3d6" defer></script>
     <script src="js/datahall-ai/hall-interact.js?v=20261013-77877697" defer></script>
     <script src="js/conv/floor-plan-color.js?v=20261122-7138898a" defer></script>
-    <script src="js/conv/floor-plan.js?v=20261123-133ab287" defer></script>
-    <script src="js/datahall-ai/hall-iso.js?v=20261123-7b9795c6" defer></script>
+    <script src="js/conv/floor-plan.js?v=20261123-c429367a" defer></script>
+    <script src="js/datahall-ai/hall-iso.js?v=20261123-58374383" defer></script>
     <script src="js/datahall-ai/fire-workstation.js?v=20261116-0546e949" defer></script>
 <style id="rz-skiplink-v1">
 .skip-link{position:absolute;top:-50px;left:0;background:#1a1d23;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 4px 0;transition:top .2s ease}
@@ -3532,16 +3532,21 @@ s+=`<g class="hp-ly hp-ly-overhead"><g class="cable-click" data-rz-equipment="ca
 [['var(--o)',3.9],['var(--g)',4.15],['var(--b)',4.4]].forEach(([c,yy])=>{s+=L(X(.6),Y(yF1+yy),X(Lm-.6),Y(yF1+yy),c,3,' stroke-opacity=".4"');});
 s+='</g></g>';
 
+/* PRD-DCAI-HALL-DEPTH Amendment 2 P1: THE placement of a unit body, shared by this Drawing and the 2D / 3D floor
+   (window.__hallIsoGeo.m.place). Drawing allotments of the unit class, not engine quantities: a fan-wall module is a
+   1.0 m body on the hall face of its gallery, 0.86 of the module pitch wide; a CDU is a 0.9 x 1.9 m cabinet, 1.0 m into
+   the CDU line, 0.95 m apart, grouped under the containment pair it serves. */
+const HALL_PLACE={fanFill:.86,fanD:1.0,cduW:.9,cduD:1.9,cduOff:1.0,cduPitch:.95};
 /* ===== CDU LINE — the CDUs stand at the row ends, a pair's worth under each containment pair == */
 const cduN=(cduInst!=null&&cduInst>0)?cduInst:0;
 const base=Math.floor(cduN/pairs),extra=cduN%pairs;
-const uy0=Y(yC1+1.0),uh=M(1.9),uw=M(.9);
+const uy0=Y(yC1+HALL_PLACE.cduOff),uh=M(HALL_PLACE.cduD),uw=M(HALL_PLACE.cduW);
 const hwS=Y(yC1+3.2),hwR=Y(yC1+3.55);                      /* HTW primary supply / return behind the CDUs */
 let n=0,cg='',cl='<g class="hp-ly hp-ly-liquid">';
 cl+=L(X(.4),hwS,X(Lm),hwS,'var(--g)',2.6,' stroke-dasharray="8 5"').replace('/>','>'+anim('0;26',flowDur)+'</line>');
 cl+=L(X(.4),hwR,X(Lm),hwR,'var(--g)',1.8,' stroke-opacity=".6" stroke-dasharray="4 4"');
-for(let p=0;p<pairs;p++){const cnt=base+(p<extra?1:0),pw=cnt*.95,x0m=pairM(p)+pitchM-pw/2;const first=n+1;
-for(let k=0;k<cnt;k++){n++;const xm=x0m+k*.95,x=X(xm),on=(cduRun!=null)?n<=cduRun:true,c=on?'var(--c)':'var(--t3)',lbl='CDU-'+pad2(n);
+for(let p=0;p<pairs;p++){const cnt=base+(p<extra?1:0),pw=cnt*HALL_PLACE.cduPitch,x0m=pairM(p)+pitchM-pw/2;const first=n+1;
+for(let k=0;k<cnt;k++){n++;const xm=x0m+k*HALL_PLACE.cduPitch,x=X(xm),on=(cduRun!=null)?n<=cduRun:true,c=on?'var(--c)':'var(--t3)',lbl='CDU-'+pad2(n);
 /* secondary: up to the corridor headers; primary: down to the HTW header */
 cl+=L((x+uw*.3).toFixed(1),uy0,(x+uw*.3).toFixed(1),hS,'var(--c)',1,' stroke-opacity=".55"')+L((x+uw*.7).toFixed(1),uy0,(x+uw*.7).toFixed(1),hR,'var(--o)',1,' stroke-opacity=".55"');
 cl+=L((x+uw/2).toFixed(1),(uy0+uh).toFixed(1),(x+uw/2).toFixed(1),hwS,'var(--g)',1,' stroke-opacity=".7"');
@@ -3572,10 +3577,10 @@ s+=late;
 /* ===== FAN-WALL GALLERIES — the air plant is the two long walls ============================== */
 let fw='',fc='<g class="hp-ly hp-ly-liquid">';const pitchFw=Lm/modsPer;let crahN=0;
 for(let g=0;g<galN&&g<2;g++){const north=g===0;
-const fy0=north?Y(gD-1.0):Y(yS0),fhh=M(1.0),coilY=north?Y(gD-1.2):Y(yS0+1.2),chwY=north?Y(1.45):Y(Wm-1.45);
+const fy0=north?Y(gD-HALL_PLACE.fanD):Y(yS0),fhh=M(HALL_PLACE.fanD),coilY=north?Y(gD-1.2):Y(yS0+1.2),chwY=north?Y(1.45):Y(Wm-1.45);
 fc+=L(X(.4),chwY,X(Lm),chwY,'var(--b)',2,' stroke-dasharray="5 4" opacity=".8"');
 for(let k=0;k<modsPer&&crahInst!=null&&crahN<crahInst;k++){crahN++;
-const xm=k*pitchFw+pitchFw*.07,w=M(pitchFw*.86),x=X(xm),on=(crahAct!=null)?crahN<=crahAct:true,c=on?'var(--b)':'var(--t3)',id=pad2(crahN);
+const xm=k*pitchFw+pitchFw*(1-HALL_PLACE.fanFill)/2,w=M(pitchFw*HALL_PLACE.fanFill),x=X(xm),on=(crahAct!=null)?crahN<=crahAct:true,c=on?'var(--b)':'var(--t3)',id=pad2(crahN);
 fc+=L((x+w/2).toFixed(1),chwY,(x+w/2).toFixed(1),coilY,'var(--b)',.8,' stroke-opacity=".5"');
 fw+=`<g class="crah-unit crah-click hp-crah" data-crah="CRAH-${id}" data-rz-equipment="crah:${id}" tabindex="0" role="button" data-tip="FAN-WALL MODULE CRAH-${id} · ${north?'north':'south'} gallery · ${on?'DUTY':'STANDBY'} · ${em(bn('crahRating'))} kW rated, ${em(bn('crahPerUnit'))} kW duty each · draws the hot aisles back from the ceiling plenum, discharges ${em(bn('airSupplyC'))} °C into the cold aisles · CHW coil · click: CRAH HMI">`;
 fw+=`<rect x="${x.toFixed(1)}" y="${fy0}" width="${w.toFixed(1)}" height="${fhh}" rx="1.2" class="hp-cab" stroke="${c}" stroke-width="${on?1:.8}" ${on?'':'stroke-dasharray="3 2"'}/>`;
@@ -3621,7 +3626,7 @@ window.__hallZones={racks:X(Lm*.3),cdu:X(Lm*.5),crah:X(Lm*.8),vb:VB_W,hx0:HX0,hy
 hc.innerHTML=s;
 hallApplyLayers();
 /* PRD-DATAHALL-BMS-ISO F4: the 3D floor (js/datahall-ai/hall-iso.js) draws the same hall from these engine reads */
-window.__hallIsoGeo={rows:rows,perRow:perRow,m:{rackPitch:rackWM,rackDepth:rackDM,coldAisle:coldM,hotAisle:hotM,crossAisle:xaM,cduDepth:cduD,galleryDepth:gD,hallWidth:Wm,hallLength:Lm},kwRack:kwRack,crahInst:crahInst,crahAct:crahAct,cduInst:cduInst,cduRun:cduRun,sp:SENS_PTS,supplyC:bn('airSupplyC'),returnC:bn('airReturnC'),rackRatedKw:bn('shelfInstalledKw'),crahKw:bn('crahPerUnit'),crahAir:bn('crahAirUnitM3h'),crahAirRated:bn('crahRatedAirM3h'),crahFan:bn('crahFanPct'),cduKw:bn('cduDutyPerUnit'),cduRated:bn('cduRating'),cduLoad:bn('cduLoadPct'),cduLpm:bn('cduFlowPerUnitLpm'),cduLpmRated:bn('cduRatedLpm'),cduPump:bn('cduPumpPct'),rowKw:bn('rowItKw'),buswayPct:bn('buswayLoadPct'),itKw:bn('itHall'),liqKw:bn('liquidHeat'),liqPct:bn('liquidCapturePct'),airKw:bn('airHeat')};
+window.__hallIsoGeo={rows:rows,perRow:perRow,m:{rackPitch:rackWM,rackDepth:rackDM,coldAisle:coldM,hotAisle:hotM,crossAisle:xaM,cduDepth:cduD,galleryDepth:gD,hallWidth:Wm,hallLength:Lm,modsPer:modsPer,place:HALL_PLACE},kwRack:kwRack,crahInst:crahInst,crahAct:crahAct,cduInst:cduInst,cduRun:cduRun,sp:SENS_PTS,supplyC:bn('airSupplyC'),returnC:bn('airReturnC'),rackRatedKw:bn('shelfInstalledKw'),crahKw:bn('crahPerUnit'),crahAir:bn('crahAirUnitM3h'),crahAirRated:bn('crahRatedAirM3h'),crahFan:bn('crahFanPct'),cduKw:bn('cduDutyPerUnit'),cduRated:bn('cduRating'),cduLoad:bn('cduLoadPct'),cduLpm:bn('cduFlowPerUnitLpm'),cduLpmRated:bn('cduRatedLpm'),cduPump:bn('cduPumpPct'),rowKw:bn('rowItKw'),buswayPct:bn('buswayLoadPct'),itKw:bn('itHall'),liqKw:bn('liquidHeat'),liqPct:bn('liquidCapturePct'),airKw:bn('airHeat')};
 if(window.RZHallIso)window.RZHallIso.update(window.__hallIsoGeo);
 }
 /* Layers are a VIEW of one drawing, so the state survives a re-render (hall switch, engine tick). */

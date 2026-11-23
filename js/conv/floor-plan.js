@@ -415,26 +415,29 @@
         var gg = el('g', { 'class': 'fp-crah-band', 'data-gallery': name, 'data-band': band }, wrap), cnt = to - from, slot = (slabW(band) - G.pad) / Math.max(1, cnt);
         for (var q = 0; q < cnt; q++) {
           var cu = list[from + q], nn = cu.n != null ? cu.n : from + q + 1, bx = G.pad / 2 + q * slot + 0.12, bw = slot - 0.24, hh = G.crahH;
-          var cg = el('g', { 'class': 'crah-cell', 'data-crah': nn, 'data-kind': kind, id: 'fp-cr-' + nn }, gg), bp = boxPts(bx, y0, bw, gD, hh, band);
+          /* Amendment 2 P2 (opts.geo): the unit's own body in metres from the page (unit.box), not its allotment */
+          var uy = y0, ud = gD;
+          if (G.metric && cu.box) { bx = cu.box.x; bw = cu.box.w; uy = cu.box.y; ud = cu.box.d; }
+          var cg = el('g', { 'class': 'crah-cell', 'data-crah': nn, 'data-kind': kind, id: 'fp-cr-' + nn }, gg), bp = boxPts(bx, uy, bw, ud, hh, band);
           if (cu.ref) cg.setAttribute('data-rz-equipment', cu.ref);
           var cell3 = { side: el('polygon', { 'class': 'cr-side', points: bp.side }, cg), front: el('polygon', { 'class': 'cr-front', points: bp.front }, cg), top: el('polygon', { 'class': 'cr-top', points: bp.top }, cg) };
           /* fan grille: on the face toward the cabinets in 3D (the south face), on the roof in the top view */
-          var fan = [], rr = Math.min(bw, gD, hh) * 0.3, a;
-          for (a = 0; a < 20; a++) fan.push(iso ? [bx + bw / 2 + rr * Math.cos(a * Math.PI / 10), y0 + gD, hh * 0.5 + rr * Math.sin(a * Math.PI / 10)] : [bx + bw / 2 + rr * Math.cos(a * Math.PI / 10), y0 + gD / 2 + rr * Math.sin(a * Math.PI / 10), hh]);
+          var fan = [], rr = Math.min(bw, ud, hh) * 0.3, a;
+          for (a = 0; a < 20; a++) fan.push(iso ? [bx + bw / 2 + rr * Math.cos(a * Math.PI / 10), uy + ud, hh * 0.5 + rr * Math.sin(a * Math.PI / 10)] : [bx + bw / 2 + rr * Math.cos(a * Math.PI / 10), uy + ud / 2 + rr * Math.sin(a * Math.PI / 10), hh]);
           if (kind === 'crah') el('polygon', { 'class': 'cr-fan', points: pts(fan, band) }, cg);   /* a CDU has no fan */
           /* opts.rotors (DC AI, PRD-DCAI-HALL-DEPTH A4 §7.1), top view only: three blades on the fan (fan-wall module) or on a
              pump circle (CDU), turned by a CSS animation whose period paint() sets from the unit's speed; no JS loop */
           var rot = null;
           if (opts.rotors && !iso) {
-            var rc = XY(bx + bw / 2, y0 + gD / 2, hh, band), re = XY(bx + bw / 2 + rr, y0 + gD / 2, hh, band), rp = Math.max(1, Math.abs(re[0] - rc[0]) * 0.9), bl = '', ang;
+            var rc = XY(bx + bw / 2, uy + ud / 2, hh, band), re = XY(bx + bw / 2 + rr, uy + ud / 2, hh, band), rp = Math.max(1, Math.abs(re[0] - rc[0]) * 0.9), bl = '', ang;
             if (kind !== 'crah') el('circle', { 'class': 'cr-fan cr-pump', cx: rc[0].toFixed(2), cy: rc[1].toFixed(2), r: (rp / 0.9).toFixed(2) }, cg);
             for (ang = 0; ang < 3; ang++) bl += 'M' + rc[0].toFixed(2) + ' ' + rc[1].toFixed(2) + 'L' + (rc[0] + rp * Math.cos(ang * 2.0944 - 1.5708)).toFixed(2) + ' ' + (rc[1] + rp * Math.sin(ang * 2.0944 - 1.5708)).toFixed(2);
             rot = el('path', { 'class': 'fp-rotor', d: bl }, cg);
             rot.style.transformOrigin = rc[0].toFixed(2) + 'px ' + rc[1].toFixed(2) + 'px';
           }
           /* status lamp: a small square on the roof's south-east corner, filled by paint() */
-          var lamp = el('polygon', { 'class': 'cr-lamp', points: pts([[bx + bw - 0.45, y0 + gD - 0.45, hh], [bx + bw - 0.15, y0 + gD - 0.45, hh], [bx + bw - 0.15, y0 + gD - 0.15, hh], [bx + bw - 0.45, y0 + gD - 0.15, hh]], band) }, cg);
-          var tp = XY(bx + bw / 2, y0 + gD, 0, band);
+          var lamp = el('polygon', { 'class': 'cr-lamp', points: pts([[bx + bw - 0.45, uy + ud - 0.45, hh], [bx + bw - 0.15, uy + ud - 0.45, hh], [bx + bw - 0.15, uy + ud - 0.15, hh], [bx + bw - 0.45, uy + ud - 0.15, hh]], band) }, cg);
+          var tp = XY(bx + bw / 2, uy + ud, 0, band);
           var tx = el('text', { 'class': 'cr-n', x: tp[0].toFixed(1), y: (tp[1] + 9).toFixed(1), 'text-anchor': 'middle' }, cg);
           tx.textContent = String(nn);
           crahEls.push({ g: cg, p: cell3, lamp: lamp, rot: rot, n: nn, u: cu, top: bp.top, gal: name, band: band, i: q, cx: bx + bw / 2 });
