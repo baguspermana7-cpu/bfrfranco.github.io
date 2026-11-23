@@ -440,3 +440,28 @@ Open questions for the owner (taste/scope only)
   - **OD-CP-24.** Period = 100 / speed s from the engine fleet (tower `fanSpeedPct`, pump `speedPct`).
   - **OD-CP-26.** Reduced motion builds no rotor layer; `animation-name: none` on every rotor; values stay.
   - **Deferred.** OD-CP-21 chiller tags (load, role badge, kW/RT, lift) and the tower header N of M / approach / range.
+
+## 12. Amendment E1 — pump power at the operating head (found 2026-11-24, conv-engine 2.9.0)
+
+**Measured.** `recompute` with `cooling.chw_secondary_dp_setpoint_kpa` at 70, 90 and 110 kPa:
+
+| DP setpoint | Speed | Pump kWe | Fleet kWe | Shaft kW |
+|---|---|---|---|---|
+| 70 kPa | 98.6 % | 98 | 392 | 90.31 |
+| 90 kPa | 98.7 % | 98 | 392 | 90.31 |
+| 110 kPa | 98.8 % | 98 | 392 | 90.31 |
+
+The speed follows the setpoint through `pumpSpeedFraction`, but power does not move. The cause is in `conv-engine.js` ~1414: `pumpElectricalKw(c, secFlow, c.chw_secondary_head_m)` uses the design head H_d. §6.1 specifies the operating head H_sys. The setpoint what-if (PRD-SETPOINT-SIM P2) therefore shows only speed and Hz, and labels power "follows the design duty point".
+
+**Change (conv-engine 2.10.0, additive).**
+- Pump electrical kW = ρ g q H_sys / (η_p η_m η_v), with H_sys = H_sp + (H_d − H_sp)·x_s² of the same loop. This covers secondary, CDW (H_sp = static lift) and primary (H_sp = 0, so H_sys = H_d·x²).
+- New field `chw_secondary_pump_head_op_m` (and the CDW / primary equivalents) shows the head used.
+- `pumpElectricalKw` keeps its signature. Only the head argument changes.
+
+**Laws (gate `test-conv-calc` + a new `test-conv-pump-affinity.mjs`).**
+- **E1a.** Raising the DP setpoint raises secondary fleet kWe, and lowering it lowers fleet kWe. Red on 2.9.0: 392 at all three setpoints.
+- **E1b.** At design flow and H_sp = H_d·(design), power equals today's figure within 0.5 %. This anchors the design point.
+- **E1c.** Fleet hydraulic power stays independent of the number of duty pumps at one system curve (§6.1 worked example).
+- **E1d.** `site.pue` is a model input. No pump change moves it. The what-if says so and never shows a PUE delta.
+
+**Release.** Engine version pins move on all 8 Conventional pages and on datahallAI's module. Run the full conv release gate. Then PRD-SETPOINT-SIM P2 can show the kW delta.
