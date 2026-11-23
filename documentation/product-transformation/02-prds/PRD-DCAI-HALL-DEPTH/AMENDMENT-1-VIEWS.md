@@ -397,4 +397,13 @@ and R2. Each phase ships only on a green full gate.
   over the same floor without rotors. The absolute 1.5 s per 5 s cannot be met by the cockpit page at all. It
   measures 3.9 s with every rotor off and 4.8 s on the Drawing view in headless Chrome, so that line is reported
   here and not gated.
+- D10 (owner 2026-11-23, "Arrangement harus accurate dan valid dan comprehensive"). The 2D and 3D floor stops being a
+  schematic and draws the hall to scale, 1 unit = 1 m. Every length comes from the engine geometry, the same reads the
+  Drawing view uses. The rack is 1.2 m deep with a 0.6 m pitch, 22 per row. A pair of rows is cold/2 | rack |
+  contained hot aisle of 2 x 0.7 m | rack | cold/2, which is 2 x the 3.1 m row pitch, and 10 pairs fill the 62 m.
+  North to south: the fan-wall gallery (3 m, on the north wall), the 13.2 m rack field, the 4.6 m service corridor,
+  the 3.9 m CDU line, the 3.3 m the width leaves, then the fan-wall gallery (3 m, on the south wall). Each gallery
+  holds 45 modules at 1.378 m. Equipment boxes are the engine's allotments: the 3 m gallery and the 3.9 m CDU line.
+  The engine has no unit-body size, so none is drawn. The Conventional hall keeps its schematic (`opts.geo` absent).
+  Law HV-G1 measures all of it on the drawn SVG at 1440 and 390. It was red 14 of 14 on the schematic.
 

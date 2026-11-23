@@ -40,17 +40,36 @@
   /* PRD-DATAHALL-BMS-ISO: true isometric (30 deg) or a top view of the same plan. iso: X = (x - y) cos30 u,
      Y = (x + y) sin30 u - h u; plan: X = x u, Y = y u. Every cabinet is one height (CAB_H, ~42U); load is a value, never a height. */
   var ISO_C = Math.cos(Math.PI / 6), ISO_S = 0.5, CAB_H = 2.0;
-  var GEO = { rowW: 3.4, cabW: 1, hot: 0.8, cold: 0.6, kd: 1.5, nY0: 0.6, gD: 1.6, gap: 0.7, perLine: 10, wall: 2, capH: CAB_H, crahH: 1.6 };
+  var GEO = { rowW: 3.4, cabW: 1, hot: 0.8, cold: 0.6, kd: 1.5, nY0: 0.6, gD: 1.6, gap: 0.7, perLine: 10, wall: 2, capH: CAB_H, crahH: 1.6, ox: 0.5, pad: 1.0 };
   GEO.cabY0 = GEO.nY0 + GEO.gD + GEO.gap;                       // 2.9
   GEO.cabY1 = GEO.cabY0 + GEO.perLine * GEO.kd;                 // 17.9
   GEO.sY0 = GEO.cabY1 + GEO.gap;                                // 18.6
   GEO.slabY = GEO.sY0 + GEO.gD + 0.6;                           // 20.8
   /* one drawing's geometry: GEO for the Conventional hall (10 cabinets a line); another page's hall changes the line length
      and may add a CDU line between the cabinets and the south gallery (PRD-DATAHALL-BMS-ISO F4, the DC AI adapter) */
-  function geoFor(perLine, cduLine) {
+  function geoFor(perLine, cduLine, m) {
     var g = {}, k;
     for (k in GEO) g[k] = GEO[k];
     g.perLine = perLine;
+    if (m) {
+      /* opts.geo (DC AI, PRD-DCAI-HALL-DEPTH arrangement law HV-G1): the hall to scale, one unit = 1 m, every length from
+         the engine's geometry. Across a row pair: cabinet depth, the shared hot aisle, cabinet depth, the cold aisle.
+         North to south: gallery, the rack line, the service corridor, the CDU line, gallery, then whatever the hall
+         width leaves (the engine places no equipment there). */
+      /* The engine allows each row its rack depth + one cold-aisle share + one hot-aisle share (row pitch 3.1 m). Drawn
+         as the alternating pattern that allowance pays for: two rows back to back around one contained hot aisle of two
+         hot shares, pairs separated by a cold aisle of two cold shares, half a cold aisle at each end wall. */
+      g.cabW = m.rackDepth; g.hot = 2 * m.hotAisle; g.cold = 2 * m.coldAisle; g.rowW = 2 * (m.rackDepth + m.hotAisle + m.coldAisle);
+      g.ox = m.coldAisle; g.pad = 0;
+      g.kd = m.rackPitch; g.gD = m.galleryDepth; g.cduD = m.cduDepth; g.nY0 = 0; g.gap = 0;
+      g.cabY0 = g.gD; g.cabY1 = g.cabY0 + perLine * g.kd;
+      g.cduY0 = g.cabY1 + m.crossAisle;
+      /* the south gallery stands on the south wall; whatever the width leaves (the engine places nothing there) lies
+         between the CDU line and that gallery */
+      g.slabY = Math.max(g.cduY0 + m.cduDepth + g.gD, m.hallWidth || 0); g.sY0 = g.slabY - g.gD;
+      g.metric = true;
+      return g;
+    }
     g.cabY1 = g.cabY0 + perLine * g.kd;
     if (cduLine) { g.cduY0 = g.cabY1 + 2 * g.gap; g.sY0 = g.cduY0 + g.gD + g.gap; } else g.sY0 = g.cabY1 + g.gap;
     g.slabY = g.sY0 + g.gD + 0.6;
@@ -242,7 +261,7 @@
     for (k in DEFAULT_T) T[k] = DEFAULT_T[k];
     if (opts.thresholds) for (k in opts.thresholds) T[k] = opts.thresholds[k];
     var perZone = model.racksPerZone || 20, Z = Math.floor(model.racks.length / perZone), perLine = perZone / 2;
-    var cdus = model.cduUnits || [], G = geoFor(perLine, cdus.length > 0);
+    var cdus = model.cduUnits || [], G = geoFor(perLine, cdus.length > 0, opts.geo);
     var inst = { model: model, mode: opts.mode || 'temp', host: host, sel: null, u: 0, bands: 1 };
     var u, ox, topPx, wallPx, bodyPx, pitch, nb = 1, kRows = Z, root, scroll, canvas, svg, tip, ringSel, ringHover, ringRow, rackEls = [], crahEls = [], zoneEls = [], cache = [], cursor = null, airEls = [], crahTagEl = null;
     var ids = opts.ids || { top: 'crah-top', bottom: 'crah-bottom' };
@@ -269,7 +288,7 @@
     function pts(a, b) { var s = [], i; for (i = 0; i < a.length; i++) s.push(P(a[i][0], a[i][1], a[i][2], b)); return s.join(' '); }
     function cell(idx) {
       var z = Math.floor(idx / perZone), r = idx % perZone, line = r < perLine ? 0 : 1, b = Math.floor(z / kRows), zl = z - b * kRows;
-      return { z: z, b: b, zl: zl, line: line, j: r % perLine, x0: 0.5 + zl * G.rowW + (line ? G.cabW + G.hot : 0), y0: G.cabY0 + (r % perLine) * G.kd };
+      return { z: z, b: b, zl: zl, line: line, j: r % perLine, x0: G.ox + zl * G.rowW + (line ? G.cabW + G.hot : 0), y0: G.cabY0 + (r % perLine) * G.kd };
     }
     /* the three faces a viewer from the south-east sees: top, south (front) and east (side) */
     function boxPts(x0, y0, w, d, h, b) {
@@ -298,8 +317,8 @@
       }
     }
     function rowsIn(b) { return Math.min(kRows, Z - b * kRows); }
-    function slabW(b) { return rowsIn(b) * G.rowW + 1.0; }
-    function spans(k) { var sw = k * G.rowW + 1.0; return isIso() ? { x: (sw + G.slabY) * ISO_C, y: (sw + G.slabY) * ISO_S + G.wall + 0.3 } : { x: sw, y: G.slabY }; }
+    function slabW(b) { return rowsIn(b) * G.rowW + G.pad; }
+    function spans(k) { var sw = k * G.rowW + G.pad; return isIso() ? { x: (sw + G.slabY) * ISO_C, y: (sw + G.slabY) * ISO_S + G.wall + 0.3 } : { x: sw, y: G.slabY }; }
 
     /* PRD-CONV-DATAHALL-SPACE 3.1: pick 1, 2 or 3 bands so the unit u = min(fit to the width, fit to the height) is the
        largest. Height is bounded only when the page says so (opts.height). Below the minimum unit one band scrolls sideways
@@ -326,7 +345,7 @@
       ox = PAD;
       sp = spans(kRows);
       wallPx = isIso() ? Math.ceil(G.wall * u) + 2 : 4;
-      bodyPx = Math.ceil((isIso() ? (kRows * G.rowW + 1.0 + G.slabY) * ISO_S + 0.3 : G.slabY) * u) + 2;
+      bodyPx = Math.ceil((isIso() ? (kRows * G.rowW + G.pad + G.slabY) * ISO_S + 0.3 : G.slabY) * u) + 2;
       pitch = wallPx + bodyPx + strip + 6;
       inst.u = u; inst.bands = nb;
     }
@@ -354,7 +373,7 @@
       if (opts.tags) { crahTagEl = html('div', 'fp-crah-tag num', root); crahTagEl.setAttribute('aria-label', 'CRAH air temperatures'); }
       scroll = html('div', 'fp-scroll', root);
       canvas = html('div', 'fp-canvas', scroll); canvas.style.width = svgW + 'px'; canvas.style.height = svgH + 'px';
-      for (i = 0; i < kRows; i += 5) { var sn = html('span', 'fp-snap', canvas); sn.style.left = Math.max(0, Math.floor(XY(0.5 + i * G.rowW, iso ? G.slabY : G.cabY0, 0, 0)[0] - 6)) + 'px'; }
+      for (i = 0; i < kRows; i += 5) { var sn = html('span', 'fp-snap', canvas); sn.style.left = Math.max(0, Math.floor(XY(G.ox + i * G.rowW, iso ? G.slabY : G.cabY0, 0, 0)[0] - 6)) + 'px'; }
       svg = el('svg', { 'class': 'fp-svg', width: svgW, height: svgH, viewBox: '0 0 ' + svgW + ' ' + svgH, role: 'group', tabindex: '0',
         'aria-label': 'Data hall floor plan, ' + (iso ? 'isometric 3D view' : 'top view') + '. Arrow keys move between cabinets and CRAH units, Enter opens the focused one.' }, canvas);
 
@@ -366,10 +385,10 @@
         for (x = 2; x < wS; x += 2) d += 'M' + P(x, 0, 0, b) + 'L' + P(x, G.slabY, 0, b);
         for (y = 2; y < G.slabY; y += 2) d += 'M' + P(0, y, 0, b) + 'L' + P(wS, y, 0, b);
         el('path', { 'class': 'fp-tiles', d: d }, g);
-        for (z = b * kRows; z < b * kRows + rowsIn(b); z++) { var ha = 0.5 + (z - b * kRows) * G.rowW + G.cabW; da += 'M' + P(ha, G.cabY0, 0, b) + 'L' + P(ha + G.hot, G.cabY0, 0, b) + 'L' + P(ha + G.hot, G.cabY1, 0, b) + 'L' + P(ha, G.cabY1, 0, b) + 'Z'; }
+        for (z = b * kRows; z < b * kRows + rowsIn(b); z++) { var ha = G.ox + (z - b * kRows) * G.rowW + G.cabW; da += 'M' + P(ha, G.cabY0, 0, b) + 'L' + P(ha + G.hot, G.cabY0, 0, b) + 'L' + P(ha + G.hot, G.cabY1, 0, b) + 'L' + P(ha, G.cabY1, 0, b) + 'Z'; }
         el('path', { 'class': 'fp-aisle-hot', d: da }, g);
         for (k = 0; k <= rowsIn(b); k++) {   /* perforated tiles: one seam per cabinet depth along each cold aisle */
-          var xa0 = 0.5 + k * G.rowW - G.cold + 0.05, xa1 = xa0 + G.cold - 0.1;
+          var xa0 = G.ox + k * G.rowW - G.cold + 0.05; if (G.metric) xa0 = Math.max(0.05, xa0); var xa1 = G.ox + k * G.rowW - 0.05; if (G.metric) xa1 = Math.min(slabW(b) - 0.05, xa1);
           for (y = G.cabY0; y <= G.cabY1 + 1e-6; y += G.kd) dp += 'M' + P(xa0, y, 0, b) + 'L' + P(xa1, y, 0, b);
           dp += 'M' + P(xa0, G.cabY0, 0, b) + 'L' + P(xa0, G.cabY1, 0, b) + 'M' + P(xa1, G.cabY0, 0, b) + 'L' + P(xa1, G.cabY1, 0, b);
         }
@@ -392,29 +411,30 @@
       }
       function gallery(wrap, name, from, to, y0, band, list, kind) {
         list = list || units; kind = kind || 'crah';
-        var gg = el('g', { 'class': 'fp-crah-band', 'data-gallery': name, 'data-band': band }, wrap), cnt = to - from, slot = (slabW(band) - 1.0) / Math.max(1, cnt);
+        var gD = kind === 'cdu' && G.cduD ? G.cduD : G.gD;   /* metric (opts.geo): the CDU line has its own depth */
+        var gg = el('g', { 'class': 'fp-crah-band', 'data-gallery': name, 'data-band': band }, wrap), cnt = to - from, slot = (slabW(band) - G.pad) / Math.max(1, cnt);
         for (var q = 0; q < cnt; q++) {
-          var cu = list[from + q], nn = cu.n != null ? cu.n : from + q + 1, bx = 0.5 + q * slot + 0.12, bw = slot - 0.24, hh = G.crahH;
-          var cg = el('g', { 'class': 'crah-cell', 'data-crah': nn, 'data-kind': kind, id: 'fp-cr-' + nn }, gg), bp = boxPts(bx, y0, bw, G.gD, hh, band);
+          var cu = list[from + q], nn = cu.n != null ? cu.n : from + q + 1, bx = G.pad / 2 + q * slot + 0.12, bw = slot - 0.24, hh = G.crahH;
+          var cg = el('g', { 'class': 'crah-cell', 'data-crah': nn, 'data-kind': kind, id: 'fp-cr-' + nn }, gg), bp = boxPts(bx, y0, bw, gD, hh, band);
           if (cu.ref) cg.setAttribute('data-rz-equipment', cu.ref);
           var cell3 = { side: el('polygon', { 'class': 'cr-side', points: bp.side }, cg), front: el('polygon', { 'class': 'cr-front', points: bp.front }, cg), top: el('polygon', { 'class': 'cr-top', points: bp.top }, cg) };
           /* fan grille: on the face toward the cabinets in 3D (the south face), on the roof in the top view */
-          var fan = [], rr = Math.min(bw, G.gD, hh) * 0.3, a;
-          for (a = 0; a < 20; a++) fan.push(iso ? [bx + bw / 2 + rr * Math.cos(a * Math.PI / 10), y0 + G.gD, hh * 0.5 + rr * Math.sin(a * Math.PI / 10)] : [bx + bw / 2 + rr * Math.cos(a * Math.PI / 10), y0 + G.gD / 2 + rr * Math.sin(a * Math.PI / 10), hh]);
+          var fan = [], rr = Math.min(bw, gD, hh) * 0.3, a;
+          for (a = 0; a < 20; a++) fan.push(iso ? [bx + bw / 2 + rr * Math.cos(a * Math.PI / 10), y0 + gD, hh * 0.5 + rr * Math.sin(a * Math.PI / 10)] : [bx + bw / 2 + rr * Math.cos(a * Math.PI / 10), y0 + gD / 2 + rr * Math.sin(a * Math.PI / 10), hh]);
           if (kind === 'crah') el('polygon', { 'class': 'cr-fan', points: pts(fan, band) }, cg);   /* a CDU has no fan */
           /* opts.rotors (DC AI, PRD-DCAI-HALL-DEPTH A4 §7.1), top view only: three blades on the fan (fan-wall module) or on a
              pump circle (CDU), turned by a CSS animation whose period paint() sets from the unit's speed; no JS loop */
           var rot = null;
           if (opts.rotors && !iso) {
-            var rc = XY(bx + bw / 2, y0 + G.gD / 2, hh, band), re = XY(bx + bw / 2 + rr, y0 + G.gD / 2, hh, band), rp = Math.max(1, Math.abs(re[0] - rc[0]) * 0.9), bl = '', ang;
+            var rc = XY(bx + bw / 2, y0 + gD / 2, hh, band), re = XY(bx + bw / 2 + rr, y0 + gD / 2, hh, band), rp = Math.max(1, Math.abs(re[0] - rc[0]) * 0.9), bl = '', ang;
             if (kind !== 'crah') el('circle', { 'class': 'cr-fan cr-pump', cx: rc[0].toFixed(2), cy: rc[1].toFixed(2), r: (rp / 0.9).toFixed(2) }, cg);
             for (ang = 0; ang < 3; ang++) bl += 'M' + rc[0].toFixed(2) + ' ' + rc[1].toFixed(2) + 'L' + (rc[0] + rp * Math.cos(ang * 2.0944 - 1.5708)).toFixed(2) + ' ' + (rc[1] + rp * Math.sin(ang * 2.0944 - 1.5708)).toFixed(2);
             rot = el('path', { 'class': 'fp-rotor', d: bl }, cg);
             rot.style.transformOrigin = rc[0].toFixed(2) + 'px ' + rc[1].toFixed(2) + 'px';
           }
           /* status lamp: a small square on the roof's south-east corner, filled by paint() */
-          var lamp = el('polygon', { 'class': 'cr-lamp', points: pts([[bx + bw - 0.45, y0 + G.gD - 0.45, hh], [bx + bw - 0.15, y0 + G.gD - 0.45, hh], [bx + bw - 0.15, y0 + G.gD - 0.15, hh], [bx + bw - 0.45, y0 + G.gD - 0.15, hh]], band) }, cg);
-          var tp = XY(bx + bw / 2, y0 + G.gD, 0, band);
+          var lamp = el('polygon', { 'class': 'cr-lamp', points: pts([[bx + bw - 0.45, y0 + gD - 0.45, hh], [bx + bw - 0.15, y0 + gD - 0.45, hh], [bx + bw - 0.15, y0 + gD - 0.15, hh], [bx + bw - 0.45, y0 + gD - 0.15, hh]], band) }, cg);
+          var tp = XY(bx + bw / 2, y0 + gD, 0, band);
           var tx = el('text', { 'class': 'cr-n', x: tp[0].toFixed(1), y: (tp[1] + 9).toFixed(1), 'text-anchor': 'middle' }, cg);
           tx.textContent = String(nn);
           crahEls.push({ g: cg, p: cell3, lamp: lamp, rot: rot, n: nn, u: cu, top: bp.top, gal: name, band: band, i: q, cx: bx + bw / 2 });
@@ -453,7 +473,7 @@
         b = Math.floor(z / kRows);
         for (j = 0; j < perLine; j++) drawRack(z * perZone + j);
         /* hot-aisle containment: a translucent roof at cabinet height with its north posts */
-        var zl = z - b * kRows, xa = 0.5 + zl * G.rowW + G.cabW - 0.04, xb = 0.5 + zl * G.rowW + G.cabW + G.hot + 0.04;
+        var zl = z - b * kRows, xa = G.ox + zl * G.rowW + G.cabW - 0.04, xb = G.ox + zl * G.rowW + G.cabW + G.hot + 0.04;
         var cg2 = el('g', { 'class': 'hot-cap', 'data-z': z }, field);
         el('polygon', { 'class': 'cap-top', points: pts([[xa, G.cabY0, G.capH], [xb, G.cabY0, G.capH], [xb, G.cabY1, G.capH], [xa, G.cabY1, G.capH]], b) }, cg2);
         el('path', { 'class': 'cap-post', d: 'M' + P(xa, G.cabY0, G.capH, b) + 'L' + P(xa, G.cabY0, 0, b) + 'M' + P(xb, G.cabY0, G.capH, b) + 'L' + P(xb, G.cabY0, 0, b) }, cg2);
@@ -462,7 +482,7 @@
       var doors = el('g', { 'class': 'fp-doors' }, svg);
       for (z = 0; z < Z; z++) {
         b = Math.floor(z / kRows);
-        var zl2 = z - b * kRows, da2 = 0.5 + zl2 * G.rowW + G.cabW - 0.04, db = 0.5 + zl2 * G.rowW + G.cabW + G.hot + 0.04, dm = (da2 + db) / 2;
+        var zl2 = z - b * kRows, da2 = G.ox + zl2 * G.rowW + G.cabW - 0.04, db = G.ox + zl2 * G.rowW + G.cabW + G.hot + 0.04, dm = (da2 + db) / 2;
         el('polygon', { 'class': 'hot-door', 'data-z': z, points: pts([[da2, G.cabY1, 0], [db, G.cabY1, 0], [db, G.cabY1, G.capH], [da2, G.cabY1, G.capH]], b) }, doors);
         if (iso) el('path', { 'class': 'hot-door', d: 'M' + P(dm, G.cabY1, 0, b) + 'L' + P(dm, G.cabY1, G.capH, b) }, doors);
       }
@@ -481,7 +501,7 @@
       for (b = 0; b < nb; b++) {
         var r0 = b * kRows, rn = rowsIn(b);
         for (k = 0; k <= rn; k++) {
-          var xc = 0.5 + k * G.rowW - G.cold / 2, rows = [];
+          var xc = Math.min(Math.max(0.1, G.ox + k * G.rowW - G.cold / 2), slabW(b) - 0.1), rows = [];
           if (k > 0) rows.push(r0 + k - 1); if (k < rn) rows.push(r0 + k);
           airEls.push({ kind: 'cold', end: 'north', band: b, x: xc, rows: rows,
             el: el('path', { 'class': 'air-cold', 'data-air': 'cold', d: 'M' + P(xc, G.nY0 + G.gD, AIR_H, b) + 'L' + P(xc, yMid, AIR_H, b) }, air) });
@@ -489,7 +509,7 @@
             el: el('path', { 'class': 'air-cold', 'data-air': 'cold', d: 'M' + P(xc, G.sY0, AIR_H, b) + 'L' + P(xc, yMid, AIR_H, b) }, air) });
         }
         for (k = 0; k < rn; k++) {
-          var xh = 0.5 + k * G.rowW + G.cabW + G.hot / 2, hH = iso ? G.capH + 0.15 : 0;
+          var xh = G.ox + k * G.rowW + G.cabW + G.hot / 2, hH = iso ? G.capH + 0.15 : 0;
           airEls.push({ kind: 'hot', band: b, x: xh, rows: [r0 + k],
             el: el('path', { 'class': 'air-hot', 'data-air': 'hot', 'data-z': r0 + k,
               d: 'M' + P(xh, yMid, hH, b) + 'L' + P(xh, G.cabY0, hH, b) + 'M' + P(xh, yMid, hH, b) + 'L' + P(xh, G.cabY1, hH, b) }, air) });
@@ -511,7 +531,7 @@
       for (b = 0; b < nb; b++) {
         var strip = html('div', 'zone-strip', canvas); strip.style.top = (iso ? 0 : topPx + b * pitch + wallPx + bodyPx) + 'px'; strips.push(strip);
         for (z = b * kRows; z < b * kRows + rowsIn(b); z++) {
-          var zn = model.zones[z], zx = 0.5 + (z - b * kRows) * G.rowW + 1.4, cw = G.rowW * u, zp = iso ? XY(zx, G.cabY0, CAB_H, b) : XY(zx, G.slabY, 0, b);
+          var zn = model.zones[z], zx = G.ox + (z - b * kRows) * G.rowW + G.cabW + G.hot / 2, cw = G.rowW * u, zp = iso ? XY(zx, G.cabY0, CAB_H, b) : XY(zx, G.slabY, 0, b);
           var zd = html('div', 'zone', strip); zd.setAttribute('data-z', z);
           /* 3D: the tag stands in the screen column of its row's head, its foot 2.15 u above the head's roof: clear of
              the north CRAH gallery behind (whose roof edge rises 1.9 u above the head in that column), so it hides no
@@ -649,7 +669,7 @@
       if (sel.crah != null) { for (var i = 0; i < crahEls.length; i++) if (crahEls[i].n === sel.crah) return crahEls[i].top; }
       return null;
     }
-    function rowPts(z) { var b = Math.floor(z / kRows), x0 = 0.5 + (z - b * kRows) * G.rowW - 0.1, h = isIso() ? CAB_H + 0.02 : 0; return pts([[x0, G.cabY0 - 0.15, h], [x0 + 2.9, G.cabY0 - 0.15, h], [x0 + 2.9, G.cabY1 + 0.15, h], [x0, G.cabY1 + 0.15, h]], b); }
+    function rowPts(z) { var b = Math.floor(z / kRows), x0 = G.ox + (z - b * kRows) * G.rowW - 0.1, xw = 2 * G.cabW + G.hot + 0.2, h = isIso() ? CAB_H + 0.02 : 0; return pts([[x0, G.cabY0 - 0.15, h], [x0 + xw, G.cabY0 - 0.15, h], [x0 + xw, G.cabY1 + 0.15, h], [x0, G.cabY1 + 0.15, h]], b); }
     function refreshRings() {
       var s = inst.sel, p;
       for (var i = 0; i < model.racks.length; i++) if (rackEls[i]) { rackEls[i].g.removeAttribute('data-sel'); rackEls[i].g.classList.remove('sel'); }
@@ -720,7 +740,7 @@
     }
     function colOf(idx) { var c = rackEls[idx].c; return c.z * 2 + c.line; }
     function idxOf(col, j) { return Math.floor(col / 2) * perZone + (col % 2) * perLine + j; }
-    function centerOfCol(col) { return 0.5 + (Math.floor(col / 2) % kRows) * G.rowW + (col % 2 ? G.cabW + G.hot : 0) + G.cabW / 2; }
+    function centerOfCol(col) { return G.ox + (Math.floor(col / 2) % kRows) * G.rowW + (col % 2 ? G.cabW + G.hot : 0) + G.cabW / 2; }
     function bandOfCol(col) { return Math.floor(Math.floor(col / 2) / kRows); }
     function nearestCrah(gal, x, band) {
       var best = -1, bd = 1e9, i, dd;

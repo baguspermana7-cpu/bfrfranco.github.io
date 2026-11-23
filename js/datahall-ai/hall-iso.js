@@ -176,6 +176,12 @@
     }
   }
 
+  function metric(m) {
+    var k = ['rackPitch', 'rackDepth', 'coldAisle', 'hotAisle', 'crossAisle', 'cduDepth', 'galleryDepth', 'hallWidth', 'hallLength'], o = {}, i;
+    if (!m) return null;
+    for (i = 0; i < k.length; i++) { if (!(typeof m[k[i]] === 'number' && isFinite(m[k[i]]) && m[k[i]] > 0)) return null; o[k[i]] = m[k[i]]; }
+    return o;
+  }
   function render() {
     if (!geo || !host || !win.RZFloorPlan) return;
     /* HV-V3: a switch between 2D and 3D keeps the selected unit and the paint mode (one model, two projections) */
@@ -189,7 +195,7 @@
       /* the whole hall on the first screen, both axes, at every width: the stage takes what is left of the viewport below
          its own top (HV-F1); fitAll lets the unit shrink below the plan's label floor (labels live in tooltips) */
       height: function () { var t = wrap.getBoundingClientRect().top + (win.pageYOffset || 0); return Math.max(260, (win.innerHeight || 900) - bottomInset() - t - 12); },
-      watchHeight: false, fitAll: true, tagFit: true, stbyLamp: true, rotors: true,
+      watchHeight: false, fitAll: true, tagFit: true, stbyLamp: true, rotors: true, geo: geo.m || null,
       rackTag: function (i) { return model.racks[i].ref.replace('rack-unit:', ''); },
       zoneTag: function (z) { return 'Rows R' + pad2(2 * z + 1) + ' and R' + pad2(2 * z + 2) + ', one contained hot aisle'; },
       zoneHead: function (z) { return 'R' + pad2(2 * z + 1) + '/' + pad2(2 * z + 2); },
@@ -245,7 +251,7 @@
     else stop();
   }
   /* the floor is rebuilt when the hall or the projection changes; a switch between 2D and 3D redraws, never re-runs the engine */
-  function key() { return geo ? [geo.rows, geo.perRow, geo.crahInst, geo.crahAct, geo.cduInst, geo.cduRun, geo.kwRack, geo.rackRatedKw, geo.ops && geo.ops.crahFan, geo.ops && geo.ops.cduLoad, win.currentDH, view].join('|') : ''; }
+  function key() { return geo ? [geo.rows, geo.perRow, geo.crahInst, geo.crahAct, geo.cduInst, geo.cduRun, geo.kwRack, geo.rackRatedKw, geo.ops && geo.ops.crahFan, geo.ops && geo.ops.cduLoad, geo.m ? JSON.stringify(geo.m) : '', win.currentDH, view].join('|') : ''; }
   /* whatever covers the bottom of the viewport and is not the floor's own column — a fixed or sticky bar, or on a phone
      the hall sidebar that precedes the main column in the DOM but is laid over its bottom (flex order) — leaves the
      floor less height: measure it, never assume it. Content that merely FOLLOWS the floor in the flow is not a cover
@@ -288,7 +294,9 @@
         itKw: g.itKw, liqKw: g.liqKw, liqPct: g.liqPct, airKw: g.airKw,
         /* PRD-DCAI-HALL-DEPTH A3: one running unit's operating point from the engine (1.7.0); standby units read 0 */
         ops: { crahKw: g.crahKw, crahAir: g.crahAir, crahAirRated: g.crahAirRated, crahFan: g.crahFan, cduKw: g.cduKw, cduRated: g.cduRated,
-          cduLoad: g.cduLoad, cduLpm: g.cduLpm, cduLpmRated: g.cduLpmRated, cduPump: g.cduPump, rowKw: g.rowKw, buswayPct: g.buswayPct } };
+          cduLoad: g.cduLoad, cduLpm: g.cduLpm, cduLpmRated: g.cduLpmRated, cduPump: g.cduPump, rowKw: g.rowKw, buswayPct: g.buswayPct },
+        /* the hall to scale (HV-G1): every length from the engine geometry, or none at all (the schematic stays) */
+        m: metric(g.m) };
       ui(); summary();
       var changed = sig !== key();
       if (changed || !model) build(); else readSensors();

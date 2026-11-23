@@ -18,6 +18,7 @@
           CDU row prints the engine's operating point (A3: fan %, m³/h, load %, pump %; standby rows 0, as many as the engine's)
    HV-V3  a switch 2D -> 3D -> Drawing -> 2D keeps the selected rack and the paint mode; RZHallIso.update runs 0 times
    HV-T1  3D tones: slab/body contrast >= 1.25 and body/top >= 1.1 in both themes (computed fills).
+   HV-G1  2D floor to scale: slab, rack tops, row faces, galleries and CDU line at the engine's metres.
    HV-M1  2D rotors: one per fan-wall module and CDU, period = T_ref / engine speed (fan 1.0 s, pump 0.8 s), standby still.
    HV-M2  reduced motion, the Drawing view and another cockpit tab leave 0 running rotor animations.
    Later phases add: HV-P2, HV-S1/HV-I1 (A5).
@@ -192,6 +193,45 @@ for (const W of [1440, 390]) {
     await pg2.close();
   } else await pg.close();
 }
+/* HV-G1 (owner 2026-11-23 "arrangement harus accurate dan valid dan comprehensive"): the 2D floor is the hall TO SCALE.
+   Measured on the drawn SVG in the top view, with u = slab width / engine hall length:
+   slab = hall length x width; a rack top = rack depth x rack pitch; the 20 rows sit where the Drawing view puts them
+   (pair = cold/2 | rack | 2 x hot share | rack | cold/2 = 2 x row pitch); north gallery on the north wall, CDU line after
+   the rack field + service corridor, south gallery on the south wall, each at its engine depth; modules per gallery and
+   their pitch = the engine's. Every expected length is read from DCAI_CALC.snapshot.geometry, never typed here. */
+for (const W of [1440, 390]) {
+  if (ONLY.size && !ONLY.has('HV-G1')) break;
+  const pg = await open(W);
+  const r = await pg.evaluate(() => {
+    const S = window.DCAI_CALC && window.DCAI_CALC.snapshot, g = S && S.geometry;
+    const svg = document.querySelector('#hIso svg.fp-svg') || document.querySelector('#hIso svg'), slab = svg && svg.querySelector('.fp-slab');
+    if (!g || !slab) return { err: 'no geometry or slab' };
+    const bb = (e) => { const b = e.getBBox(); return { x: b.x, y: b.y, w: b.width, h: b.height }; };
+    const sb = bb(slab), u = sb.w / g.hall_length_m, m = (v) => v / u;
+    const racks = [...svg.querySelectorAll('.rk-top')].map(bb);
+    const xs = [...new Set(racks.map((b) => +m(b.x - sb.x).toFixed(2)))].sort((a, b) => a - b);
+    const cells = (sel) => [...svg.querySelectorAll(sel)].map((e) => bb(e.querySelector('.cr-top')));
+    const N = cells('[data-gallery="north"] .crah-cell'), C = cells('[data-gallery="cdu"] .crah-cell'), Sg = cells('[data-gallery="south"] .crah-cell');
+    const ext = (a) => a.length ? { y0: m(Math.min(...a.map((b) => b.y)) - sb.y), y1: m(Math.max(...a.map((b) => b.y + b.h)) - sb.y), n: a.length,
+      pitch: a.length > 1 ? m((Math.max(...a.map((b) => b.x)) - Math.min(...a.map((b) => b.x))) / (a.length - 1)) : 0 } : null;
+    return { g: { L: g.hall_length_m, W: g.hall_width_m, rp: g.rack_pitch_m, rd: g.rack_depth_m, ca: g.cold_aisle_m, ha: g.hot_aisle_m, xa: g.cross_aisle_m,
+        cd: g.cdu_line_depth_m, rows: g.rack_rows, per: g.racks_per_row, mods: g.fan_wall_modules_per_gallery, mp: g.fan_wall_module_pitch_m, gd: g.air_plant_m2 / (g.fan_wall_galleries * g.hall_length_m) },
+      aspect: sb.w / sb.h, rackW: m(racks[0].w), rackH: m(racks[0].h), nRacks: racks.length, xs, N: ext(N), C: ext(C), S: ext(Sg) };
+  });
+  if (r.err) { ok('HV-G1', false, `${W}: ${r.err}`); await pg.close(); continue; }
+  const G = r.g, near = (a, b, tol) => Math.abs(a - b) <= tol;
+  ok('HV-G1', near(r.aspect, G.L / G.W, 0.005 * G.L / G.W), `${W}: slab aspect ${r.aspect.toFixed(3)} want ${G.L} / ${G.W} m`);
+  ok('HV-G1', r.nRacks === G.rows * G.per && near(r.rackW, G.rd, 0.03) && near(r.rackH, G.rp, 0.03), `${W}: ${r.nRacks} racks, top ${r.rackW.toFixed(2)} x ${r.rackH.toFixed(2)} m want ${G.rd} x ${G.rp}`);
+  const want = []; for (let p = 0; p < G.rows / 2; p++) { const p0 = p * 2 * (G.rd + G.ca + G.ha); want.push(p0 + G.ca, p0 + G.ca + G.rd + 2 * G.ha); }
+  ok('HV-G1', r.xs.length === G.rows && r.xs.every((x, i) => near(x, want[i], 0.05)), `${W}: row west faces ${r.xs.slice(0, 4).join(', ')}… want ${want.slice(0, 4).map((v) => v.toFixed(2)).join(', ')}…`);
+  const fieldEnd = G.gd + G.per * G.rp;
+  ok('HV-G1', r.N && near(r.N.y0, 0, 0.05) && near(r.N.y1, G.gd, 0.05), `${W}: north gallery ${r.N && r.N.y0.toFixed(2)}–${r.N && r.N.y1.toFixed(2)} m want 0–${G.gd}`);
+  ok('HV-G1', r.C && near(r.C.y0, fieldEnd + G.xa, 0.05) && near(r.C.y1, fieldEnd + G.xa + G.cd, 0.05), `${W}: CDU line ${r.C && r.C.y0.toFixed(2)}–${r.C && r.C.y1.toFixed(2)} m want ${(fieldEnd + G.xa).toFixed(2)}–${(fieldEnd + G.xa + G.cd).toFixed(2)}`);
+  ok('HV-G1', r.S && near(r.S.y0, G.W - G.gd, 0.05) && near(r.S.y1, G.W, 0.05), `${W}: south gallery ${r.S && r.S.y0.toFixed(2)}–${r.S && r.S.y1.toFixed(2)} m want ${G.W - G.gd}–${G.W} (on the south wall)`);
+  ok('HV-G1', r.N.n === G.mods && r.S.n === G.mods && near(r.N.pitch, G.mp, 0.03) && near(r.S.pitch, G.mp, 0.03), `${W}: modules ${r.N.n} / ${r.S.n} at ${r.N.pitch.toFixed(3)} m want ${G.mods} at ${G.mp.toFixed(3)} m`);
+  await pg.close();
+}
+
 /* HV-M1 / HV-M2 (A4 §7): rotors turn at the unit's own speed (period = T_ref / speed: fan 1.0 s, pump 0.8 s), standby is
    still; reduced motion stills every rotor; the Drawing view and another cockpit tab leave 0 running rotor animations */
 for (const W of [1440, 390]) {

@@ -251,9 +251,12 @@ Data Hall tab (F4, v3.92.0) through its adapter `js/datahall-ai/hall-iso.js` (be
     tooltip (`unit.lines`, opt-in in `floor-plan.js`) and in "Show as table" (`table[data-hall-units]`, one row per
     rack, module and CDU). Standby units read 0. The floor never computes a value. No per-unit chip appears at the
     fitted zoom, where the module pitch is narrower than a chip (PRD D7).
+  - The DC AI floor is the hall to scale (`floor-plan.js` `opts.geo`, 1 unit = 1 m, engine geometry only).
+    Galleries stand on the north and south walls. The rack field, service corridor and CDU line follow the width
+    stack, and the spare lies before the south gallery, as in the Drawing view. Gate HV-G1.
   - 2D rotors turn at the engine's fan and pump speed (A4; rule in `MOTION_STANDARD.md` "DC AI hall floor rotors").
   - Every number the 3D floor prints is hooked or declared for `test-dcai-coverage`.
-  - Gate: `tools/test-dcai-hall-iso.mjs` D1–D8, `tools/test-dcai-hall-views.mjs` V1–V3, F1, F2, D1, L1, S0, T1, A1, M1, M2,
+  - Gate: `tools/test-dcai-hall-iso.mjs` D1–D8, `tools/test-dcai-hall-views.mjs` V1–V3, F1, F2, D1, L1, S0, T1, A1, M1, M2, G1,
     and `tools/test-dcai-unit-ops.mjs` U1–U4.
 
 ## 4g. Electrical sheets (PRD-ELECTRICAL-BMS, owner R186/R190/R192/R193, v3.94.0)
