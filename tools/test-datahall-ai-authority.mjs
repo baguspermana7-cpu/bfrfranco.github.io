@@ -11,7 +11,8 @@ const PAGE_SOURCE = await readFile(resolve(ROOT, 'datahallAI.html'), 'utf8');
 const MODEL_SOURCE = await readFile(resolve(ROOT, 'js/dcai-model.js'), 'utf8');
 const CALC_SOURCE = await readFile(resolve(ROOT, 'js/dcai-engine.js'), 'utf8');
 const REGISTRY_SOURCE = await readFile(resolve(ROOT, 'js/dcai-parameters.js'), 'utf8');
-const ASSET_VERSION = '1.6.0';
+/* the engine declares its own version (dcai-engine.js meta.version); the page must load that one, never a pinned copy */
+const ASSET_VERSION = DCAI_ENGINE.snapshot.meta.version;
 const SPEC_VERSION = 'gb300-500mw-2026-09-06';
 const EXPECTED_SNAPSHOT = DCAI_ENGINE.snapshot;
 const CORE_ACTION_IDS = Object.freeze([
