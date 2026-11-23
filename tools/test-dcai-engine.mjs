@@ -56,7 +56,7 @@ const S = C.snapshot;
 /* ── 0. sources and hygiene ─────────────────────────────────────────────── */
 ok(!/Math\.random/.test(ENGINE_SRC) && !/Math\.random/.test(MODEL_SRC), 'no Math.random in model or engine');
 ok(Object.isFrozen(S) && Object.isFrozen(S.design) && Object.isFrozen(M.thermal), 'snapshot and model are deep-frozen');
-ok(S.meta.version === '1.6.0' && S.meta.spec_version === M.specVersion, 'meta carries version and spec_version');
+ok(S.meta.version === '1.7.0' && S.meta.spec_version === M.specVersion, 'meta carries version and spec_version');
 ok(!/MEASURED/.test(MODEL_SRC.replace(/nothing may claim MEASURED[^\n]*/,'')), 'nothing in the model claims MEASURED');
 {
   /* every numeric leaf in the model has a `// source:` line within the 6 lines above it */

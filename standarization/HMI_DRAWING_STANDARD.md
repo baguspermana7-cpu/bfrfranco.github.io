@@ -247,8 +247,13 @@ Data Hall tab (F4, v3.92.0) through its adapter `js/datahall-ai/hall-iso.js` (be
     body/top ≥ 1.1, measured on the computed fills.
   - On a phone the summary line and the view switch share one row (the full summary is the tooltip), and the lens bar
     is the second row, so the stage still starts ≤ 260 px below the tab bar.
+  - A fan-wall module or CDU shows the engine's operating point for one running unit (dcai-engine 1.7.0, A3) in its
+    tooltip (`unit.lines`, opt-in in `floor-plan.js`) and in "Show as table" (`table[data-hall-units]`, one row per
+    rack, module and CDU). Standby units read 0. The floor never computes a value. No per-unit chip appears at the
+    fitted zoom, where the module pitch is narrower than a chip (PRD D7).
   - Every number the 3D floor prints is hooked or declared for `test-dcai-coverage`.
-  - Gate: `tools/test-dcai-hall-iso.mjs` D1–D8 and `tools/test-dcai-hall-views.mjs` V1–V3, F1, F2, D1, L1, S0, T1.
+  - Gate: `tools/test-dcai-hall-iso.mjs` D1–D8, `tools/test-dcai-hall-views.mjs` V1–V3, F1, F2, D1, L1, S0, T1, A1,
+    and `tools/test-dcai-unit-ops.mjs` U1–U4.
 
 ## 4g. Electrical sheets (PRD-ELECTRICAL-BMS, owner R186/R190/R192/R193, v3.94.0)
 

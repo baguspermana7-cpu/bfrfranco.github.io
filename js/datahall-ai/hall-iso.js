@@ -31,7 +31,7 @@
     ['layout', 'Layout', 'space', 'Occupied and spare positions']];
   function lensMode(l) { for (var i = 0; i < LENSES.length; i++) if (LENSES[i][0] === l) return LENSES[i][2]; return 'alarms'; }
   function lensStored() { try { var v = win.localStorage.getItem(LENS_KEY); return lensMode(v) && LENSES.some(function (d) { return d[0] === v; }) ? v : null; } catch (e) { return null; } }
-  var lens = lensStored() || 'status', lensBar = null, legendBox = null;
+  var lens = lensStored() || 'status', lensBar = null, legendBox = null, tableBox = null;
   var lastHall = '', geo = null, model = null, inst = null, host = null, wrap = null, bar = null, sum = null, view = null, timer = 0, sig = '';
   function pad2(n) { return (n < 10 ? '0' : '') + n; }
   function stored() { try { var v = win.localStorage.getItem(KEY); return VIEWS.indexOf(v) >= 0 ? v : null; } catch (e) { return null; } }
@@ -58,6 +58,10 @@
       '.dh-proj [role=toolbar]{display:inline-flex;margin-left:auto;border:1px solid var(--bd);border-radius:4px;overflow:hidden}',
       '#p-hall[data-dh-view="drawing"] .dh-proj [role=toolbar]{visibility:hidden}',
       /* the lens legend: one column beside the stage (the floor is height-bound, the room to its right is free) */
+      '#p-hall[data-dh-view="drawing"] .dh-units{display:none}.dh-units{margin:6px 0 0;font:12px/1.4 "IBM Plex Sans",system-ui,sans-serif;color:var(--t2)}',
+      '.dh-units summary{cursor:pointer;color:var(--t2);padding:4px 0}.dh-units summary:focus-visible{outline:2px solid var(--c);outline-offset:2px}',
+      '.dh-units table{width:100%;border-collapse:collapse;font:11px/1.4 "IBM Plex Mono",ui-monospace,monospace}.dh-units caption{text-align:left;color:var(--t3);padding:2px 0}',
+      '.dh-units th,.dh-units td{text-align:left;padding:2px 8px 2px 0;border-bottom:1px solid var(--bd);color:var(--t1);font-weight:400}',
       '#hIsoWrap .dh-legend{flex-direction:column;align-items:flex-start;gap:6px;padding-top:4px}',
       '@media (max-width:600px){.dh-proj [role=toolbar]{order:3;flex:1 1 100%;margin-left:0}.dh-proj [role=toolbar] button{flex:1 1 0;min-width:0;padding:0 4px}}',
       '.dh-proj button:focus-visible{outline:2px solid var(--c);outline-offset:-2px}',
@@ -114,6 +118,11 @@
        measuring the bordered host shrank it 2 px per resize, for ever, until the hall vanished (owner, 2026-11-22) */
     wrap = doc.createElement('div'); wrap.id = 'hIsoWrap'; wrap.appendChild(host);
     bar.parentNode.insertBefore(wrap, bar.nextSibling);   /* right under the switch: the floor is the first thing below it */
+    /* HV-A1: every unit of the floor as rows (racks, fan-wall modules, CDUs), built when opened */
+    tableBox = doc.createElement('details'); tableBox.className = 'dh-units';
+    var smy = doc.createElement('summary'); smy.textContent = 'Show as table'; tableBox.appendChild(smy);
+    tableBox.addEventListener('toggle', function () { if (tableBox.open) unitTable(); });
+    wrap.parentNode.insertBefore(tableBox, wrap.nextSibling);
   }
 
   /* ---- the model the floor renderer reads ---- */
@@ -126,8 +135,8 @@
       racks.push({ idx: i, occupied: true, kw: G.kwRack, ref: 'rack-unit:R' + pad2(2 * z + line + 1) + '-' + pad2(G.perRow - j) });
     }
     for (z = 0; z < Z; z++) zones.push({ z: z, heat: perZone * G.kwRack, rackInletC: 0, hotAisleC: 0 });
-    for (i = 1; i <= G.crahInst; i++) crah.push({ n: i, tag: 'CRAH-' + pad2(i), running: G.crahAct == null || i <= G.crahAct, ref: 'crah:' + pad2(i) });
-    for (i = 1; i <= G.cduInst; i++) cdu.push({ n: 1000 + i, tag: 'CDU-' + pad2(i), running: G.cduRun == null || i <= G.cduRun, ref: 'cdu:' + i });
+    for (i = 1; i <= G.crahInst; i++) crah.push(withOps({ n: i, tag: 'CRAH-' + pad2(i), running: G.crahAct == null || i <= G.crahAct, ref: 'crah:' + pad2(i), kind: 'crah' }));
+    for (i = 1; i <= G.cduInst; i++) cdu.push(withOps({ n: 1000 + i, tag: 'CDU-' + pad2(i), running: G.cduRun == null || i <= G.cduRun, ref: 'cdu:' + i, kind: 'cdu' }));
     model = {
       racks: racks, zones: zones, crahUnits: crah, cduUnits: cdu, racksPerZone: perZone,
       /* Power lens: rack kW against the rack's installed power-shelf rating (engine power.shelf_installed_kw); no rating, no colour */
@@ -138,6 +147,21 @@
       }
     };
     readSensors();
+  }
+  /* the operating point of one unit (PRD-DCAI-HALL-DEPTH A3 §6): a running unit carries its share of the hall load, as the
+     engine publishes it; a standby unit carries nothing. Values only from the engine; a missing key prints as a dash. */
+  function f0(v) { return v == null || !isFinite(v) ? '—' : Math.round(v).toLocaleString('en-US'); }
+  function f1(v) { return v == null || !isFinite(v) ? '—' : v.toFixed(1); }
+  function withOps(u) {
+    var o = (geo && geo.ops) || {}, on = u.running !== false;
+    if (u.kind === 'crah') {
+      u.ops = { kw: on ? o.crahKw : 0, airM3h: on ? o.crahAir : 0, fanPct: on ? o.crahFan : 0, supplyC: on ? geo.supplyC : null };
+      u.lines = ['fan ' + f1(u.ops.fanPct) + ' % · ' + f0(u.ops.airM3h) + ' of ' + f0(o.crahAirRated) + ' m³/h', 'duty ' + f0(u.ops.kw) + ' kWth' + (on ? ' · supply ' + f1(geo.supplyC) + ' °C' : '')];
+    } else {
+      u.ops = { kw: on ? o.cduKw : 0, loadPct: on ? o.cduLoad : 0, lpm: on ? o.cduLpm : 0, pumpPct: on ? o.cduPump : 0 };
+      u.lines = ['duty ' + f0(u.ops.kw) + ' of ' + f0(o.cduRated) + ' kWth (' + f1(u.ops.loadPct) + ' %)', 'TCS ' + f0(u.ops.lpm) + ' of ' + f0(o.cduLpmRated) + ' L/min · pump ' + f1(u.ops.pumpPct) + ' %'];
+    }
+    return u;
   }
   function readSensors() {   /* the zone values the row tags and air speed read: the plan's own aisle readouts */
     if (!model) return;
@@ -172,6 +196,7 @@
     if (keepMode && keepMode !== inst.mode) inst.paint(keepMode);
     if (keepSel && sameHall) inst.select(keepSel);
     drawLegend();
+    if (tableBox && tableBox.open) unitTable();
   }
 
   /* the legend of the lens, beside the floor (HV-L1); run / standby lamps on every lens but Layout */
@@ -185,6 +210,20 @@
       it.appendChild(doc.createTextNode(d[1])); legendBox.appendChild(it);
     });
     legendBox.className = 'fp-legend dh-legend';
+  }
+  function unitTable() {
+    if (!model || !tableBox) return;
+    var old = tableBox.querySelector('table'); if (old) old.parentNode.removeChild(old);
+    var t = doc.createElement('table'); t.setAttribute('data-hall-units', String(win.currentDH || 1));
+    t.innerHTML = '<caption>Units on the floor of this hall (engine design point)</caption><thead><tr><th scope="col">Unit</th><th scope="col">State</th><th scope="col">Operating point</th></tr></thead>';
+    var tb = doc.createElement('tbody'), i, rows = [];
+    function row(a, b, c) { var tr = doc.createElement('tr'), th = doc.createElement('th'); th.scope = 'row'; th.textContent = a; tr.appendChild(th);
+      [b, c].forEach(function (x) { var td = doc.createElement('td'); td.textContent = x; tr.appendChild(td); }); rows.push(tr); }
+    for (i = 0; i < model.racks.length; i++) row(model.racks[i].ref.replace('rack-unit:', 'Rack '), 'running', f1(model.racks[i].kw) + ' kW · inlet ' + f1(model.rackInletFor(i)) + ' °C');
+    model.crahUnits.forEach(function (u) { row(u.tag, u.running === false ? 'standby' : 'running', u.lines.join(' · ')); });
+    model.cduUnits.forEach(function (u) { row(u.tag, u.running === false ? 'standby' : 'running', u.lines.join(' · ')); });
+    rows.forEach(function (r) { tb.appendChild(r); });
+    t.appendChild(tb); tableBox.appendChild(t);
   }
   function setLens(l, user) {
     if (!LENSES.some(function (d) { return d[0] === l; })) return;
@@ -204,7 +243,7 @@
     else stop();
   }
   /* the floor is rebuilt when the hall or the projection changes; a switch between 2D and 3D redraws, never re-runs the engine */
-  function key() { return geo ? [geo.rows, geo.perRow, geo.crahInst, geo.crahAct, geo.cduInst, geo.cduRun, geo.kwRack, geo.rackRatedKw, win.currentDH, view].join('|') : ''; }
+  function key() { return geo ? [geo.rows, geo.perRow, geo.crahInst, geo.crahAct, geo.cduInst, geo.cduRun, geo.kwRack, geo.rackRatedKw, geo.ops && geo.ops.crahFan, geo.ops && geo.ops.cduLoad, win.currentDH, view].join('|') : ''; }
   /* whatever covers the bottom of the viewport and is not the floor's own column — a fixed or sticky bar, or on a phone
      the hall sidebar that precedes the main column in the DOM but is laid over its bottom (flex order) — leaves the
      floor less height: measure it, never assume it. Content that merely FOLLOWS the floor in the flow is not a cover
@@ -244,7 +283,10 @@
     update: function (g) {
       if (!g || !(g.rows > 0) || !(g.perRow > 0) || g.rows % 2) return;
       geo = { rows: g.rows, perRow: g.perRow, kwRack: g.kwRack || 0, rackRatedKw: g.rackRatedKw, crahInst: g.crahInst || 0, crahAct: g.crahAct, cduInst: g.cduInst || 0, cduRun: g.cduRun, sp: g.sp || 3, supplyC: g.supplyC, returnC: g.returnC,
-        itKw: g.itKw, liqKw: g.liqKw, liqPct: g.liqPct, airKw: g.airKw };
+        itKw: g.itKw, liqKw: g.liqKw, liqPct: g.liqPct, airKw: g.airKw,
+        /* PRD-DCAI-HALL-DEPTH A3: one running unit's operating point from the engine (1.7.0); standby units read 0 */
+        ops: { crahKw: g.crahKw, crahAir: g.crahAir, crahAirRated: g.crahAirRated, crahFan: g.crahFan, cduKw: g.cduKw, cduRated: g.cduRated,
+          cduLoad: g.cduLoad, cduLpm: g.cduLpm, cduLpmRated: g.cduLpmRated, cduPump: g.cduPump, rowKw: g.rowKw, buswayPct: g.buswayPct } };
       ui(); summary();
       var changed = sig !== key();
       if (changed || !model) build(); else readSensors();

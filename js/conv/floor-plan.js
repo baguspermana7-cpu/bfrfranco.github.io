@@ -666,6 +666,8 @@
           for (q = 0; q < crahEls.length; q++) if (crahEls[q].n === n) cu = crahEls[q].u;
           html('div', '', tip, crahTag(n, cu)).style.fontWeight = '600';
           html('div', '', tip, cu && cu.running === false ? 'standby' : 'running' + (cu && cu.leavingAirC != null ? ' · leaving air ' + cu.leavingAirC.toFixed(1) + ' °C' : ''));
+          /* unit.lines (DC AI, PRD-DCAI-HALL-DEPTH A3): the adapter's operating-point lines, already formatted with units */
+          if (cu && cu.lines) for (q = 0; q < cu.lines.length; q++) html('div', '', tip, cu.lines[q]);
           html('div', 'tp-hint', tip, 'Click for detail');
         }
         tipKey = key;

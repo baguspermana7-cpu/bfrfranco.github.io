@@ -1,6 +1,6 @@
 {
   "generatedBy": "tools/build-dcai-parameter-registry.mjs",
-  "engineVersion": "1.6.0",
+  "engineVersion": "1.7.0",
   "note": "GENERATED — do not hand-edit. Curated metadata lives in data/dcai-parameters.curated.json; authored-leaf provenance is read from js/dcai-model.js.",
   "parameters": [
     {
@@ -3733,6 +3733,7 @@
       ],
       "tests": [
         "test-dcai-engine.mjs",
+        "test-dcai-unit-ops.mjs",
         "test-dcai-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [],
@@ -3803,7 +3804,8 @@
         }
       ],
       "tests": [
-        "test-dcai-engine.mjs"
+        "test-dcai-engine.mjs",
+        "test-dcai-unit-ops.mjs"
       ],
       "docs": []
     },
@@ -5727,7 +5729,8 @@
         }
       ],
       "tests": [
-        "test-dcai-engine.mjs"
+        "test-dcai-engine.mjs",
+        "test-dcai-unit-ops.mjs"
       ],
       "docs": [
         "manual/datahallai.html",
@@ -5760,7 +5763,8 @@
         }
       ],
       "tests": [
-        "test-dcai-engine.mjs"
+        "test-dcai-engine.mjs",
+        "test-dcai-unit-ops.mjs"
       ],
       "docs": []
     },
@@ -5822,7 +5826,8 @@
         }
       ],
       "tests": [
-        "test-dcai-engine.mjs"
+        "test-dcai-engine.mjs",
+        "test-dcai-unit-ops.mjs"
       ],
       "docs": []
     },
@@ -5838,6 +5843,7 @@
       "evidenceClass": "DERIVED",
       "explainKey": null,
       "dependsOnInputs": [
+        "equipment.cdu.redundantUnits",
         "equipment.cdu.unitKwTh",
         "facility.halls",
         "facility.rackItKw",
@@ -5872,6 +5878,7 @@
       "evidenceClass": "DERIVED",
       "explainKey": null,
       "dependsOnInputs": [
+        "equipment.cdu.redundantUnits",
         "equipment.cdu.unitKwTh",
         "facility.rackItKw",
         "facility.racksPerHall",
@@ -5885,12 +5892,43 @@
         }
       ],
       "tests": [
-        "test-dcai-engine.mjs"
+        "test-dcai-engine.mjs",
+        "test-dcai-unit-ops.mjs"
       ],
       "docs": [
         "standarization/ACCURACY_VALIDATION.md",
         "standarization/HMI_DRAWING_STANDARD.md"
       ]
+    },
+    {
+      "id": "equipment.cdu_load_pct",
+      "label": "Load of one running CDU",
+      "unit": "%",
+      "kind": "derived",
+      "value": 98.34814814814816,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "equipment.cdu.unitKwTh",
+        "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-unit-ops.mjs"
+      ],
+      "docs": []
     },
     {
       "id": "equipment.cdu_model",
@@ -5950,6 +5988,99 @@
         "test-dcai-engine.mjs"
       ],
       "docs": []
+    },
+    {
+      "id": "equipment.cdu_pump_speed_pct",
+      "label": "Pump speed of one running CDU (flow ∝ speed)",
+      "unit": "%",
+      "kind": "derived",
+      "value": 98.89205444761,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "equipment.cdu.publishedLpmPerKw",
+        "equipment.cdu.unitKwTh",
+        "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "hydraulics.tcsFluidCpKjPerKgK",
+        "hydraulics.tcsFluidRhoKgPerM3",
+        "thermal.tcsDeltaTK"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-unit-ops.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "equipment.cdu_rated_flow_lpm",
+      "label": "CDU rated TCS flow (published L/min per kW)",
+      "unit": "L/min",
+      "kind": "derived",
+      "value": 1500,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "equipment.cdu.publishedLpmPerKw",
+        "equipment.cdu.unitKwTh"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-unit-ops.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "equipment.cdu_standby_per_hall",
+      "label": "CDUs in standby per hall",
+      "unit": "count",
+      "kind": "authored",
+      "value": 1,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "equipment.cdu.redundantUnits"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-unit-ops.mjs",
+        "test-dcai-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js equipment.cdu.redundantUnits",
+        "method": "the N+1 rule above as a count — one standby CDU per hall. ADOPTED",
+        "asOf": "2026-09-06"
+      }
     },
     {
       "id": "equipment.cdu_unit_kwth",
@@ -6135,6 +6266,47 @@
       ]
     },
     {
+      "id": "equipment.crah_airflow_unit_m3h",
+      "label": "Airflow of one running fan-wall module",
+      "unit": "m³/h",
+      "kind": "derived",
+      "value": 54135.570039422775,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.auxFractionOfIt",
+        "equipment.crah.unitKwTh",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "fabric.oobKw",
+        "fabric.oobPerRack",
+        "fabric.storageMgmtFraction",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "geometry.airCpKjKgK",
+        "geometry.airDensityKgM3",
+        "thermal.airsideDeltaTK"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-unit-ops.mjs"
+      ],
+      "docs": []
+    },
+    {
       "id": "equipment.crah_duty_per_hall",
       "label": "crah duty per hall",
       "unit": null,
@@ -6167,7 +6339,8 @@
         }
       ],
       "tests": [
-        "test-dcai-engine.mjs"
+        "test-dcai-engine.mjs",
+        "test-dcai-unit-ops.mjs"
       ],
       "docs": []
     },
@@ -6210,6 +6383,44 @@
       "docs": []
     },
     {
+      "id": "equipment.crah_fan_speed_pct",
+      "label": "Fan speed of one running fan-wall module (fan law)",
+      "unit": "%",
+      "kind": "derived",
+      "value": 99.74478779763643,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.auxFractionOfIt",
+        "equipment.crah.unitKwTh",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "fabric.oobKw",
+        "fabric.oobPerRack",
+        "fabric.storageMgmtFraction",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.halls",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-unit-ops.mjs"
+      ],
+      "docs": []
+    },
+    {
       "id": "equipment.crah_installed_facility",
       "label": "crah installed facility",
       "unit": null,
@@ -6222,6 +6433,7 @@
       "explainKey": null,
       "dependsOnInputs": [
         "electrical.auxFractionOfIt",
+        "equipment.crah.redundantUnits",
         "equipment.crah.unitKwTh",
         "equipment.transformer.distributionEfficiency",
         "equipment.ups.efficiency",
@@ -6262,6 +6474,7 @@
       "explainKey": null,
       "dependsOnInputs": [
         "electrical.auxFractionOfIt",
+        "equipment.crah.redundantUnits",
         "equipment.crah.unitKwTh",
         "equipment.transformer.distributionEfficiency",
         "equipment.ups.efficiency",
@@ -6282,9 +6495,71 @@
         }
       ],
       "tests": [
-        "test-dcai-engine.mjs"
+        "test-dcai-engine.mjs",
+        "test-dcai-unit-ops.mjs"
       ],
       "docs": []
+    },
+    {
+      "id": "equipment.crah_rated_airflow_m3h",
+      "label": "Fan-wall module rated airflow (at the design air ΔT)",
+      "unit": "m³/h",
+      "kind": "derived",
+      "value": 54274.084124830406,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "equipment.crah.unitKwTh",
+        "geometry.airCpKjKgK",
+        "geometry.airDensityKgM3",
+        "thermal.airsideDeltaTK"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-unit-ops.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "equipment.crah_standby_per_hall",
+      "label": "Fan-wall modules in standby per hall",
+      "unit": "count",
+      "kind": "authored",
+      "value": 1,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "ADOPTED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "equipment.crah.redundantUnits"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-unit-ops.mjs",
+        "test-dcai-parameter-registry.mjs (provenance + evidence class)"
+      ],
+      "docs": [],
+      "source": {
+        "ref": "js/dcai-model.js equipment.crah.redundantUnits",
+        "method": "the N+1 rule above as a count — one standby fan-wall module per hall. ADOPTED",
+        "asOf": "2026-09-06"
+      }
     },
     {
       "id": "equipment.crah_unit_kwth",
@@ -7601,6 +7876,7 @@
       "evidenceClass": "DERIVED",
       "explainKey": null,
       "dependsOnInputs": [
+        "equipment.cdu.redundantUnits",
         "equipment.cdu.unitKwTh",
         "facility.rackItKw",
         "facility.racksPerHall",
@@ -7931,6 +8207,7 @@
       "explainKey": null,
       "dependsOnInputs": [
         "electrical.auxFractionOfIt",
+        "equipment.crah.redundantUnits",
         "equipment.crah.unitKwTh",
         "equipment.transformer.distributionEfficiency",
         "equipment.ups.efficiency",
@@ -7969,6 +8246,7 @@
       "explainKey": null,
       "dependsOnInputs": [
         "electrical.auxFractionOfIt",
+        "equipment.crah.redundantUnits",
         "equipment.crah.unitKwTh",
         "equipment.transformer.distributionEfficiency",
         "equipment.ups.efficiency",
@@ -8036,6 +8314,7 @@
       "evidenceClass": "DERIVED",
       "explainKey": null,
       "dependsOnInputs": [
+        "equipment.cdu.redundantUnits",
         "equipment.cdu.unitKwTh",
         "facility.rackItKw",
         "facility.racksPerHall",
@@ -8070,6 +8349,7 @@
       "evidenceClass": "DERIVED",
       "explainKey": null,
       "dependsOnInputs": [
+        "equipment.cdu.redundantUnits",
         "equipment.cdu.unitKwTh",
         "facility.rackItKw",
         "facility.racksPerHall",
@@ -8109,6 +8389,7 @@
       "evidenceClass": "DERIVED",
       "explainKey": null,
       "dependsOnInputs": [
+        "equipment.cdu.redundantUnits",
         "equipment.cdu.unitKwTh",
         "facility.rackItKw",
         "facility.racksPerHall",
@@ -9040,7 +9321,8 @@
         }
       ],
       "tests": [
-        "test-dcai-engine.mjs"
+        "test-dcai-engine.mjs",
+        "test-dcai-unit-ops.mjs"
       ],
       "docs": [
         "manual/datahallai.html",
@@ -9423,7 +9705,7 @@
       "label": "version",
       "unit": null,
       "kind": "authored",
-      "value": "1.6.0",
+      "value": "1.7.0",
       "formula": null,
       "deps": [],
       "scope": "meta",
@@ -9441,6 +9723,7 @@
         "test-dcai-engine-version-pin.mjs",
         "test-dcai-engine.mjs",
         "test-dcai-parameter-registry.mjs",
+        "test-dcai-unit-ops.mjs",
         "test-dcai-parameter-registry.mjs (semantic check)"
       ],
       "docs": [

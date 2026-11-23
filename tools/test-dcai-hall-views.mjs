@@ -14,7 +14,8 @@
           page's own header: "90 fan-wall modules (89 duty + 1)", "55 CDU (54 duty + 1)")
    HV-D1  two loads of the same state draw the same floor text; no Math.random in the view code (green on the A0
           tree: the 3D floor already shows no sensor noise; the KPI-strip part (GPU % 88 vs 92) joins in A3)
-   HV-A1  "Show as table" lists every unit of the floor (racks + modules + CDUs) with its state
+   HV-A1  "Show as table" lists every unit of the floor (racks + modules + CDUs) with its state, and each fan-wall module and
+          CDU row prints the engine's operating point (A3: fan %, m³/h, load %, pump %; standby rows 0, as many as the engine's)
    HV-V3  a switch 2D -> 3D -> Drawing -> 2D keeps the selected rack and the paint mode; RZHallIso.update runs 0 times
    HV-T1  3D tones: slab/body contrast >= 1.25 and body/top >= 1.1 in both themes (computed fills).
    Later phases add: HV-P2 (A3), HV-M1/M2 (A4), HV-S1/HV-I1 (A5).
@@ -142,6 +143,25 @@ for (const W of [1440, 390]) {
     return new Promise((r) => setTimeout(() => { const t = document.querySelector('#p-hall table[data-hall-units]'); r(t ? t.tBodies[0].rows.length : -1); }, 400));
   });
   ok('HV-A1', tbl != null && tbl >= 585, `${W}: "Show as table" ${tbl == null ? 'absent' : tbl + ' rows'} (want >= 585)`);
+  /* A3: the operating point a row prints is the engine's (one running unit's share; a standby unit 0), never a page number */
+  const opr = await pg.evaluate(() => {
+    const E = window.DCAI_CALC && window.DCAI_CALC.snapshot && window.DCAI_CALC.snapshot.equipment, t = document.querySelector('#p-hall table[data-hall-units]');
+    if (!E || !t) return null;
+    const rows = [...t.tBodies[0].rows].map((r) => [...r.cells].map((c) => c.textContent));
+    const crah = rows.filter((r) => /^CRAH-/.test(r[0])), cdu = rows.filter((r) => /^CDU-/.test(r[0]));
+    const fan = E.crah_fan_speed_pct.toFixed(1) + ' %', air = Math.round(E.crah_airflow_unit_m3h).toLocaleString('en-US') + ' of ', load = '(' + E.cdu_load_pct.toFixed(1) + ' %)', pump = 'pump ' + E.cdu_pump_speed_pct.toFixed(1) + ' %';
+    const run = (r) => r[1] === 'running', stb = (r) => r[1] === 'standby';
+    return {
+      crah: crah.length, cdu: cdu.length, crahStby: crah.filter(stb).length, cduStby: cdu.filter(stb).length,
+      wantCrahStby: E.crah_standby_per_hall, wantCduStby: E.cdu_standby_per_hall,
+      crahOk: crah.filter(run).every((r) => r[2].includes('fan ' + fan) && r[2].includes(air)), crahStbyZero: crah.filter(stb).every((r) => r[2].startsWith('fan 0.0 %')),
+      cduOk: cdu.filter(run).every((r) => r[2].includes(load) && r[2].includes(pump)), cduStbyZero: cdu.filter(stb).every((r) => r[2].includes('(0.0 %)') && r[2].includes('pump 0.0 %')),
+      sample: (crah[0] || []).concat(cdu[cdu.length - 1] || []).join(' | ')
+    };
+  });
+  ok('HV-A1', !!opr && opr.crahOk && opr.cduOk, `${W}: table operating points differ from the engine (${opr ? opr.sample : 'no engine or table'})`);
+  ok('HV-A1', !!opr && opr.crahStby === opr.wantCrahStby && opr.cduStby === opr.wantCduStby && opr.crahStbyZero && opr.cduStbyZero,
+    `${W}: standby rows ${opr && [opr.crahStby, opr.cduStby]} want ${opr && [opr.wantCrahStby, opr.wantCduStby]}, standby carries 0: ${opr && [opr.crahStbyZero, opr.cduStbyZero]}`);
   if (W === 1440) {
     /* HV-V3: a switch keeps the selected unit and the paint mode, and never re-runs the hall (RZHallIso.update).
        The selection is made the operator's way on the floor: focus, an arrow, Enter (a click opens the HMI). */

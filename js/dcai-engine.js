@@ -378,21 +378,33 @@
     var transformers = unitSubsPerFeed * 2 * f.halls;
     var gensetsDuty = ceilCount(worst ? worst.electrical.facility_kwe : design.electrical.facility_kwe, eq.generator.unitKw);
     var battery_kwh = div(div(totalIt_kwe * eq.ups.runtimeMin, 60), eq.ups.usableDoD * eq.ups.inverterEfficiency);
+    var crahAirDtK = design.planes.p11_air_return_c - design.planes.p09_air_supply_c;   /* the air dT a CRAH is rated at */
     var equipment = {
       cdu_unit_kwth: eq.cdu.unitKwTh,
       cdu_model: eq.cdu.model,
       cdu_duty_per_hall: cduDutyHall,
-      cdu_installed_per_hall: cduDutyHall + 1,
-      cdu_installed_facility: (cduDutyHall + 1) * f.halls,
+      cdu_installed_per_hall: cduDutyHall + eq.cdu.redundantUnits,
+      cdu_installed_facility: (cduDutyHall + eq.cdu.redundantUnits) * f.halls,
       cdu_flow_check_m3h: div(design.flows.tcs_m3h, f.halls),
       cdu_published_flow_m3h: div(liquidHeatHall_kwth * eq.cdu.publishedLpmPerKw * 60, 1000),
       crah_unit_kwth: eq.crah.unitKwTh,
       crah_duty_per_hall: crahDutyHall,
-      crah_installed_per_hall: crahDutyHall + 1,
-      crah_installed_facility: (crahDutyHall + 1) * f.halls,
+      crah_installed_per_hall: crahDutyHall + eq.crah.redundantUnits,
+      crah_installed_facility: (crahDutyHall + eq.crah.redundantUnits) * f.halls,
       crah_duty_per_unit_kwth: div(airHeatHall_kwth, crahDutyHall),          /* what one running CRAH carries */
       cdu_duty_per_unit_kwth: div(liquidHeatHall_kwth, cduDutyHall),          /* what one running CDU carries */
       cdu_flow_per_unit_lpm: div(design.flows.tcs_hall_lpm, cduDutyHall),
+      /* PRD-DCAI-HALL-DEPTH A3: the operating point of ONE running unit, so the floor never computes a value.
+         Duty units share the hall load equally; a standby unit carries nothing (0 % fan, 0 L/min). */
+      crah_standby_per_hall: eq.crah.redundantUnits,
+      crah_rated_airflow_m3h: div(eq.crah.unitKwTh, geo.airDensityKgM3 * geo.airCpKjKgK * crahAirDtK, 'CRAH rated airflow') * 3600,
+      crah_airflow_unit_m3h: div(airHeatHall_kwth, geo.airDensityKgM3 * geo.airCpKjKgK * crahAirDtK * crahDutyHall, 'CRAH unit airflow') * 3600,
+      /* fan law: flow is proportional to speed, so speed % = unit airflow / rated airflow at the same air dT */
+      crah_fan_speed_pct: div(div(airHeatHall_kwth, crahDutyHall), eq.crah.unitKwTh) * 100,
+      cdu_standby_per_hall: eq.cdu.redundantUnits,
+      cdu_load_pct: div(div(liquidHeatHall_kwth, cduDutyHall), eq.cdu.unitKwTh) * 100,
+      cdu_rated_flow_lpm: eq.cdu.unitKwTh * eq.cdu.publishedLpmPerKw,
+      cdu_pump_speed_pct: div(div(design.flows.tcs_hall_lpm, cduDutyHall), eq.cdu.unitKwTh * eq.cdu.publishedLpmPerKw) * 100,
       chiller_unit_kwth: eq.chiller.unitKwTh,
       chillers_running_design: chillersDesign,
       chillers_running_worst_bin: chillersWorst,
@@ -465,12 +477,12 @@
     var rowPitchM = geo.rackDepthM + geo.coldAisleM + geo.hotAisleM;
     var rackFieldM2 = f.racksPerHall * geo.rackPitchM * rowPitchM;
     var crossAisleM2 = geo.crossAisleM * geo.lengthM;
-    var cduGalleryM2 = (cduDutyHall + 1) * geo.cduServiceM2;
+    var cduGalleryM2 = (cduDutyHall + eq.cdu.redundantUnits) * geo.cduServiceM2;
     /* v3.21.7 — the air plant is two CHW fan-wall galleries, one along each long wall, so its
        floor is gallery depth x hall length x galleries and its frontage is the two long walls.
        Each installed air unit is one module of a gallery, at the pitch the wall gives it. */
     var airPlantM2 = geo.fanWallGalleries * geo.lengthM * geo.airPlantDepthM;
-    var fanWallModulesPerGallery = Math.ceil((crahDutyHall + 1) / geo.fanWallGalleries);
+    var fanWallModulesPerGallery = Math.ceil((crahDutyHall + eq.crah.redundantUnits) / geo.fanWallGalleries);
     /* the plan closes across the WIDTH too: north gallery + one row length + service corridor +
        CDU line + south gallery must fit in the hall width; the rows must fit in the length */
     var rowLengthM = div(f.racksPerHall, geo.rows, 'racks per row') * geo.rackPitchM;
@@ -760,7 +772,7 @@
     return deepFreeze({
       meta: {
         engine: 'dcai-engine.js',
-        version: '1.6.0',   /* v3.21.16: the campus arrangement — roads, setback, bands and the site area as a product of lengths. // was 1.5.0 — v3.21.9: the site branch — electrical wing, plate, roof share and yards from the engine counts. // was 1.4.0 — v3.21.7: one bank of 20 rows between two fan-wall galleries; the width and length stack checks. // was 1.3.0 — v3.7.0: the HV side of the main transformer is published — primary current, impedance and the switchyard bay count */
+        version: '1.7.0',   /* v3.102.0 (PRD-DCAI-HALL-DEPTH A3): one running unit's operating point — fan-wall airflow, rated airflow and fan speed %, CDU load %, rated flow and pump speed %, standby counts. // was 1.6.0 — v3.21.16: the campus arrangement — roads, setback, bands and the site area as a product of lengths. // was 1.5.0 — v3.21.9: the site branch — electrical wing, plate, roof share and yards from the engine counts. // was 1.4.0 — v3.21.7: one bank of 20 rows between two fan-wall galleries; the width and length stack checks. // was 1.3.0 — v3.7.0: the HV side of the main transformer is published — primary current, impedance and the switchyard bay count */
         spec_version: m.specVersion,
         authority: m.authority,
         evidence_class: 'SIMULATED/ADOPTED',

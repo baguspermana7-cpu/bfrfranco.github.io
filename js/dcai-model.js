@@ -262,13 +262,17 @@
         model: 'CoolIT CHx1000 (row CDU)',
         unitKwTh: 1000,
         publishedLpmPerKw: 1.5,
-        redundancy: 'N+1 per hall'
+        redundancy: 'N+1 per hall',
+        // source: the N+1 rule above as a count — one standby CDU per hall. ADOPTED
+        redundantUnits: 1
       },
       crah: {
         // source: no vendor selection. 200 kW sensible is a large-frame CRAH class. ASSUMED
         model: 'Large-frame CRAH, CHW coil',
         unitKwTh: 200,
-        redundancy: 'N+1 per hall'
+        redundancy: 'N+1 per hall',
+        // source: the N+1 rule above as a count — one standby fan-wall module per hall. ADOPTED
+        redundantUnits: 1
       },
       chiller: {
         // source: 4,000 kW class water-cooled centrifugal (Carrier 19DV range tops at
