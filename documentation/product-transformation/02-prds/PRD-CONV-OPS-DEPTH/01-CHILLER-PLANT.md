@@ -460,7 +460,7 @@ The speed follows the setpoint through `pumpSpeedFraction`, but power does not m
 
 **Laws (gate `test-conv-calc` + a new `test-conv-pump-affinity.mjs`).**
 - **E1a.** Raising the DP setpoint raises secondary fleet kWe, and lowering it lowers fleet kWe. Red on 2.9.0: 392 at all three setpoints.
-- **E1b.** At design flow and H_sp = H_d·(design), power equals today's figure within 0.5 %. This anchors the design point.
+- **E1b.** At design flow (x_s = 1), H_sys = H_d, so power equals the 2.9.0 figure within 0.5 %. This anchors the design point.
 - **E1c.** Fleet hydraulic power stays independent of the number of duty pumps at one system curve (§6.1 worked example).
 - **E1d.** `site.pue` is a model input. No pump change moves it. The what-if says so and never shows a PUE delta.
 
