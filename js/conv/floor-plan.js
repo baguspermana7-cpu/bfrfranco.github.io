@@ -279,6 +279,8 @@
     var rackTag = opts.rackTag || function (i) { return 'R-' + i; };
     var zoneTag = opts.zoneTag || function (z) { return 'Row ' + String.fromCharCode(65 + z); };
     var zoneHead = opts.zoneHead || function (z) { return String.fromCharCode(65 + z); };
+    /* opts.stripH (DC AI, Amendment 3 D7): a taller top-view tag strip when the foot stacks its unit (number or function) */
+    function stripH() { var h = typeof opts.stripH === 'function' ? opts.stripH() : opts.stripH; return h > 0 ? h : STRIP_H; }
     var crahTag = opts.crahTag || function (n, c) { return (c && c.tag) || ('CRAH-' + n); };
 
     /* PRD-DATAHALL-BMS-ISO: the projection. A stored choice wins; otherwise 3D (iso) on a wide stage, the top view (plan) on a
@@ -340,7 +342,7 @@
       var maxB = Math.max(1, Math.min(3, opts.maxBands != null ? opts.maxBands : (Hh != null ? 3 : 1)));
       /* opts.fitAll (DC AI 2D/3D, PRD-DCAI-HALL-DEPTH A1): the whole hall fits the stage on both axes, so the legibility
          floor of the plan's per-rack labels does not apply (those labels move to tooltips); default unchanged */
-      var uMin = opts.fitAll ? (opts.minUnit || 2) : Math.max(opts.minUnit || U_MIN, isIso() ? 0 : U_MIN_PLAN), best = null, b, kk, sp, fitW, fitH, uu, strip = isIso() ? STRIP_ISO : STRIP_H;
+      var uMin = opts.fitAll ? (opts.minUnit || 2) : Math.max(opts.minUnit || U_MIN, isIso() ? 0 : U_MIN_PLAN), best = null, b, kk, sp, fitW, fitH, uu, strip = isIso() ? STRIP_ISO : stripH();
       topPx = W < 600 ? TOP_H_PHONE : TOP_H;
       for (b = 1; b <= maxB; b++) {
         kk = Math.ceil(Z / b); sp = spans(kk);
@@ -542,7 +544,7 @@
          3D: each tag at the row's south end, along the slab's front edge. */
       var strips = [];
       for (b = 0; b < nb; b++) {
-        var strip = html('div', 'zone-strip', canvas); strip.style.top = (iso ? 0 : topPx + b * pitch + wallPx + bodyPx) + 'px'; strips.push(strip);
+        var strip = html('div', 'zone-strip', canvas); if (!iso && stripH() !== STRIP_H) strip.style.height = stripH() + 'px'; strip.style.top = (iso ? 0 : topPx + b * pitch + wallPx + bodyPx) + 'px'; strips.push(strip);
         for (z = b * kRows; z < b * kRows + rowsIn(b); z++) {
           var zn = model.zones[z], zx = G.ox + (z - b * kRows) * G.rowW + G.cabW + G.hot / 2, cw = G.rowW * u, zp = iso ? XY(zx, G.cabY0, CAB_H, b) : XY(zx, G.slabY, 0, b);
           var zd = html('div', 'zone', strip); zd.setAttribute('data-z', z);
@@ -553,7 +555,8 @@
           else { zd.style.left = Math.round(zp[0] - cw / 2) + 'px'; zd.style.width = Math.round(cw) + 'px'; }
           var zh = html('span', 'zone-head', zd, zoneHead(z)); zh.title = zoneTag(z);
           var zf = html('span', 'zone-foot fp-tag num', zd);
-          html('span', 'zf-kw', zf, zn.heat.toFixed(0)).title = 'row heat, kW';
+          /* opts.footText (DC AI, Amendment 3 D7): the value with its unit on the floor; the Conventional page fills it itself */
+          html('span', 'zf-kw', zf, opts.footText ? opts.footText(zn, z) : zn.heat.toFixed(0)).title = 'row heat, kW';
           html('span', 'zf-in sr-only', zf, zn.rackInletC.toFixed(1));
           html('span', 'zf-hot sr-only', zf, zn.hotAisleC.toFixed(1));
           html('span', 'zf-stats sr-only', zf, '');

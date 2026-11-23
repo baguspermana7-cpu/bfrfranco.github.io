@@ -432,7 +432,7 @@ for (const W of [1440, 390]) {
       const b = document.querySelector('#p-hall .dh-proj [data-view="' + v + '"]'); if (b) b.click();
       await new Promise((res) => setTimeout(res, 900));
       const m = window.RZHallIso && window.RZHallIso.model(), want = m ? m.racksPerZone * m.racks[0].kw : null;
-      const feet = [...document.querySelectorAll('#hIso .zone-foot')].filter((f) => f.getClientRects().length > 0).map((f) => f.textContent.replace(/\s+/g, ' ').trim());
+      const feet = [...document.querySelectorAll('#hIso .zone-foot .zf-kw')].filter((f) => f.getClientRects().length > 0).map((f) => f.textContent.replace(/\s+/g, ' ').trim());
       return { want, feet };
     }, v);
     const parse = (t) => { const x = /([\d.,]+)\s*(kW|MW)\b/.exec(t); return x ? parseFloat(x[1].replace(/,/g, '')) * (x[2] === 'MW' ? 1000 : 1) : null; };

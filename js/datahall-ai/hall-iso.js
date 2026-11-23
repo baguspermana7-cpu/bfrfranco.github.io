@@ -70,6 +70,8 @@
       '#hIso .fp-root[data-proj="plan"] .zone-head{display:table;width:auto;min-width:20px;padding:1px 3px;margin:0 auto}',
       /* HV-F2b: on a phone a row pair is ~37 px wide; the head '01/02' at 10 px keeps >= 3 px of air to its neighbour */
       '@media (max-width:600px){#hIso .fp-root[data-proj="plan"] .zone-head{font-size:10px;letter-spacing:-.02em;padding:1px 0;min-width:0}}',
+      /* D7: on a phone the row-pair foot stacks its unit under the value ('6.2' over 'MW'), three characters wide */
+      '@media (max-width:600px){#hIso .fp-root[data-proj="plan"] .zone-foot{font-size:10px;letter-spacing:-.02em;padding:1px 0}#hIso .fp-root[data-proj="plan"] .zf-kw{display:inline-block;width:3.2ch;white-space:normal;text-align:center;line-height:1.1}}',
       /* Amendment 3 D4: flags, ink on the panel with a 1 px state hairline and the state glyph; no wash, no motion */
       '#hIso{position:relative}.dh-flags{position:absolute;inset:0;pointer-events:none}',
       '.dh-flag,.dh-flag-more{position:absolute;white-space:nowrap;padding:1px 5px;border:1px solid var(--rz-pt-warn,#d97706);border-radius:2px;background:var(--bg2);color:var(--t1);font:600 11px/16px "IBM Plex Mono",ui-monospace,monospace}',
@@ -353,6 +355,9 @@
       zoneTag: function (z) { return 'Rows R' + pad2(2 * z + 1) + ' and R' + pad2(2 * z + 2) + ', one contained hot aisle'; },
       /* a phone gives a row pair about 34 px: 'R01/02' (6 chars) would touch its neighbour, '01/02' keeps a gap; the full name stays in the tooltip */
       zoneHead: function (z) { return ((win.innerWidth || 1440) < 600 ? '' : 'R') + pad2(2 * z + 1) + '/' + pad2(2 * z + 2); },
+      /* D7: the row-pair heat with its unit; a phone (~37 px per pair) gets MW to one decimal, keeping HV-F2b's gap */
+      stripH: function () { return (win.innerWidth || 1440) < 600 ? 46 : 0; },
+      footText: function (zn) { var kw = zn.heat || 0; return (win.innerWidth || 1440) < 600 ? (kw / 1000).toFixed(1) + ' MW' : Math.round(kw).toLocaleString('en-US') + ' kW'; },
       crahTag: function (n, c) { return (c && c.tag) || ('CRAH-' + pad2(n)); }
     });
     if (keepMode && keepMode !== inst.mode) inst.paint(keepMode);
