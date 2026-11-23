@@ -13,7 +13,7 @@
  *   L4 COP = duty / input, on the plant and on one unit;
  *   L5 0 < Carnot fraction < 1;
  *   L6 pressure fit within 1 % of the R-134a table over 0-50 C, monotonic, P_cond > P_evap;
- *   L7 pump sanity: P = rho g Q H / eta at every pump, power linear in flow and in head on a
+ *   L7 pump sanity: P = rho g Q H_op / eta at every pump (2.10.0: H_op on the system curve), power linear in flow and in head on a
  *      recomputed model, tower fan on the cube law, secondary duty count is the smallest that
  *      carries the duty flow;
  *   L8 mechanical headroom >= 0 (plant input inside the PUE-implied non-IT load);
@@ -87,7 +87,13 @@ const H = (() => {
     const carnot = (evap + 273.15) / lift, cop = 1 / sp;
     const kwE = (q, h) => rho * g * (q / 1000) * h / 1000 / ep / (em * ev);
     const secDuty = Math.ceil(dutyFlow / secUnit), secFlow = dutyFlow / secDuty;
-    const pri = kwE(unitChw, hPri), sec = kwE(secFlow, hSec), cdw = kwE(unitCdw, hCdw);
+    /* engine 2.10.0 (Amendment E1): each pump works at its system curve, H_op = H_sp + (H_d - H_sp) x_s^2. Primary
+     * branch H_sp = 0, x = branch flow / (unit rating / cp dT); secondary H_sp = the 90 kPa remote DP setpoint,
+     * x_s = duty flow / (duty pumps x 250 L/s); condenser H_sp = 4 m static lift, x = flow / (rating (1 + sp) / cp range) */
+    const hOp = (hd, hsp, x) => hsp + (hd - hsp) * x * x, dpSet = 90, hStatic = 4;
+    const xPri = unitChw / (unit / (cp * dT)), xSec = dutyFlow / (secDuty * secUnit), xCdw = unitCdw / (unit * (1 + sp) / (cp * range));
+    const pri = kwE(unitChw, hOp(hPri, 0, xPri)), sec = kwE(secFlow, hOp(hSec, dpSet * 1000 / (rho * g), xSec)),
+        cdw = kwE(unitCdw, hOp(hCdw, hStatic, xCdw));
     const pumps = pri * running + sec * secDuty + cdw * running;
     const rated = unit * (1 + sp), load = unitCond / rated * 100, fanKw = fan * (load / 100) ** 3;
     const hallIt = it / halls, crahRun = Math.ceil(hallIt / crahKw), crahDuty = hallIt / crahRun;
@@ -209,20 +215,23 @@ test('L7 pump and fan sanity', () => {
     const rho = c.water_density_kg_m3, g = c.gravity_m_s2, eta = c.pump_efficiency * c.pump_motor_efficiency * c.pump_vfd_efficiency;
     for (const [kind, key] of [['chw_primary_pump', 'chw_primary_pump_kw_e'], ['chw_secondary_pump', 'chw_secondary_pump_kw_e'], ['cdw_pump', 'cdw_pump_kw_e']]) {
         const u = calc.getFleet(kind)[0];
-        near(u.kwE, rho * g * u.flowLps / 1000 * u.headM / 1000 / eta, 0.01, `${kind} P = rho g Q H / eta`);
+        near(u.kwE, rho * g * u.flowLps / 1000 * u.headOpM / 1000 / eta, 0.01, `${kind} P = rho g Q H_op / eta`);
+        assert.ok(u.headOpM > 0 && u.headOpM <= u.headM, `${kind} H_op ${u.headOpM} in (0, H_d ${u.headM}]`);
         near(c[key], u.kwE, 0.05, `${kind} fleet row = published per-pump kW`);
         /* 2.7.0: the operating speed is where the pump curve meets the system curve, Hz = 50 x n (OD-CP-03) */
         assert.ok(u.speedPct > 0 && u.speedPct <= 100, `${kind} speed ${u.speedPct} in (0, 100]`);
         near(u.hz, c.motor_base_frequency_hz * u.speedPct / 100, 0.06, `${kind} Hz = f_base x n`);
         near(u.speedPct, c[kind + '_speed_pct'], 0.05, `${kind} fleet speed = published speed`);
     }
-    /* power is linear in flow (fixed head) and in head (fixed flow) on a recomputed model */
+    /* power is linear in the system curve's head (fixed flow) and follows q x H_op on a recomputed model */
     const base = JSON.parse(JSON.stringify(calc.model));
-    const twice = JSON.parse(JSON.stringify(base)); twice.cooling.cdw_head_m *= 2;
+    const twice = JSON.parse(JSON.stringify(base)); twice.cooling.cdw_head_m *= 2; twice.cooling.cdw_static_head_m *= 2; /* 2.10.0: the whole system curve doubles */
     near(calc.recompute(twice).cooling.cdw_pump_kw_e, 2 * c.cdw_pump_kw_e, 0.11, 'CDW pump kW doubles with head');
     const peak = JSON.parse(JSON.stringify(base)); peak.campus.halls.forEach((h) => { h.it_load_kw = 9000; });
     const p = calc.recompute(peak).cooling;
-    near(p.cdw_pump_kw_e / c.cdw_pump_kw_e, p.cdw_pump_flow_lps / c.cdw_pump_flow_lps, 0.002, 'CDW pump kW scales with flow');
+    /* 2.10.0: P = rho g q H_op(q) / eta, so the ratio is (q2 H_op2) / (q1 H_op1), the affinity product, not q2 / q1 */
+    near(p.cdw_pump_kw_e / c.cdw_pump_kw_e, (p.cdw_pump_flow_lps * p.cdw_pump_head_op_m) / (c.cdw_pump_flow_lps * c.cdw_pump_head_op_m), 0.003, 'CDW pump kW scales with q x H_op');
+    assert.ok(p.cdw_pump_head_op_m > c.cdw_pump_head_op_m, 'more flow, higher operating head on the system curve');
     /* tower fan on the cube law */
     near(c.tower_fan_kw, c.tower_fan_motor_kw * (c.tower_fan_speed_pct / 100) ** 3, 0.07, 'fan cube law (speed published to 0.1 %)');
     assert.ok(c.tower_fan_kw < c.tower_fan_motor_kw, 'fan above its motor rating');

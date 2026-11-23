@@ -921,7 +921,7 @@
             basis: 'Adopted project scenario — simulated, not measured telemetry',
             basis_doc: 'conv/review/09-engineering-basis-and-calculations.md',
             study_doc: 'js/conv-design-basis.js STUDY_INPUT (conv-four-hall-air-study-2026-08-27)',
-            version: '2.9.0'
+            version: '2.10.0'
         }
     };
 
@@ -1350,6 +1350,13 @@
         return { x: x, tCold: tCold, tRet: tRet, tEcw: x * tRet + (1 - x) * tCold };
     }
     function kpaToHeadM(c, kpa) { return kpa * 1000 / (c.water_density_kg_m3 * c.gravity_m_s2); }
+    /* 2.10.0 — the head a pump delivers at its operating point is the system curve at that flow (PRD-CONV-OPS-DEPTH 01
+     * §6.1, Amendment E1): H_sys = H_sp + (H_d - H_sp) x_s^2. Primary branch H_sp = 0 (so H_d x^2), condenser H_sp = the
+     * static lift, secondary H_sp = the remote DP setpoint. At design flow (x_s = 1) it is H_d, the 2.9.0 figure. */
+    function pumpOperatingHeadM(headDesignM, headSetM, xs) {
+        if (xs === null || !(xs >= 0)) return null;
+        return headSetM + (headDesignM - headSetM) * xs * xs;
+    }
 
     function pumpElectricalKw(c, flowLps, headM) {
         return pumpHydraulicKw(c, flowLps, headM) / c.pump_efficiency
@@ -1410,9 +1417,13 @@
         var priSpeed = pumpSpeedFraction(c, priX, priX, c.chw_primary_head_m, 0);
         var secSpeed = pumpSpeedFraction(c, secXp, secXs, c.chw_secondary_head_m, kpaToHeadM(c, c.chw_secondary_dp_setpoint_kpa));
         var cdwSpeed = pumpSpeedFraction(c, cdwX, cdwX, c.cdw_head_m, c.cdw_static_head_m);
-        var priKw = unitChwFlow === null ? null : pumpElectricalKw(c, unitChwFlow, c.chw_primary_head_m);
-        var secKw = secFlow === null ? null : pumpElectricalKw(c, secFlow, c.chw_secondary_head_m);
-        var cdwKw = unitCdwFlow === null ? null : pumpElectricalKw(c, unitCdwFlow, c.cdw_head_m);
+        /* 2.10.0 — power at the operating head of each loop, not the design head (Amendment E1) */
+        var priHeadOp = pumpOperatingHeadM(c.chw_primary_head_m, 0, priX);
+        var secHeadOp = pumpOperatingHeadM(c.chw_secondary_head_m, kpaToHeadM(c, c.chw_secondary_dp_setpoint_kpa), secXs);
+        var cdwHeadOp = pumpOperatingHeadM(c.cdw_head_m, c.cdw_static_head_m, cdwX);
+        var priKw = unitChwFlow === null ? null : pumpElectricalKw(c, unitChwFlow, priHeadOp);
+        var secKw = secFlow === null ? null : pumpElectricalKw(c, secFlow, secHeadOp);
+        var cdwKw = unitCdwFlow === null ? null : pumpElectricalKw(c, unitCdwFlow, cdwHeadOp);
         var priFleet = priKw === null ? null : priKw * running;
         var secFleet = secKw === null ? null : secKw * secDuty;
         var cdwFleet = cdwKw === null ? null : cdwKw * running;
@@ -1446,6 +1457,7 @@
             priCount: priCount, priRunning: running, secDuty: secDuty, secCount: secCount,
             secFlow: secFlow, cdwCount: total, cdwRunning: running,
             priKw: priKw, secKw: secKw, cdwKw: cdwKw,
+            priHeadOp: priHeadOp, secHeadOp: secHeadOp, cdwHeadOp: cdwHeadOp,
             unitChwFlowP: unitChwFlow, secFlowP: secFlow, unitCdwFlowP: unitCdwFlow,
             priFleet: priFleet, secFleet: secFleet, cdwFleet: cdwFleet, pumpFleet: pumpFleet,
             cellCount: total + c.tower_standby_cells, cellRunning: running, cellRated: cellRated,
@@ -1561,18 +1573,21 @@
         for (key in cycleKeys) { if (Object.prototype.hasOwnProperty.call(cycleKeys, key)) derived[key] = cycleKeys[key]; }
         /* ADDITIVE (2.5.0) — inside the pumps and the CRAH (PRD-CONV-EQUIPMENT-INSIDE P3): hydraulic power rho g Q H,
          * shaft power = hydraulic / pump efficiency, differential pressure rho g H; CRAH airflow = duty / (rho cp dT_air) */
-        var hyd = function (q, h) { return q === null ? null : pumpHydraulicKw(cc, q, h); };
+        var hyd = function (q, h) { return q === null || h === null ? null : pumpHydraulicKw(cc, q, h); };
         var dpk = function (h) { return cc.water_density_kg_m3 * cc.gravity_m_s2 * h / 1000; };
         var pumpKeys = {
             air_density_kg_m3: cc.air_density_kg_m3, air_cp_kj_kg_k: cc.air_cp_kj_kg_k,
-            chw_primary_pump_hydraulic_kw: r2n(hyd(p.unitChwFlowP, cc.chw_primary_head_m)),
-            chw_primary_pump_shaft_kw: r2n(hyd(p.unitChwFlowP, cc.chw_primary_head_m) === null ? null : hyd(p.unitChwFlowP, cc.chw_primary_head_m) / cc.pump_efficiency),
+            chw_primary_pump_hydraulic_kw: r2n(hyd(p.unitChwFlowP, p.priHeadOp)),
+            chw_primary_pump_shaft_kw: r2n(hyd(p.unitChwFlowP, p.priHeadOp) === null ? null : hyd(p.unitChwFlowP, p.priHeadOp) / cc.pump_efficiency),
+            chw_primary_pump_head_op_m: r2n(p.priHeadOp),
             chw_primary_pump_dp_kpa: round1(dpk(cc.chw_primary_head_m)),
-            chw_secondary_pump_hydraulic_kw: r2n(hyd(p.secFlowP, cc.chw_secondary_head_m)),
-            chw_secondary_pump_shaft_kw: r2n(hyd(p.secFlowP, cc.chw_secondary_head_m) === null ? null : hyd(p.secFlowP, cc.chw_secondary_head_m) / cc.pump_efficiency),
+            chw_secondary_pump_hydraulic_kw: r2n(hyd(p.secFlowP, p.secHeadOp)),
+            chw_secondary_pump_shaft_kw: r2n(hyd(p.secFlowP, p.secHeadOp) === null ? null : hyd(p.secFlowP, p.secHeadOp) / cc.pump_efficiency),
+            chw_secondary_pump_head_op_m: r2n(p.secHeadOp),
             chw_secondary_pump_dp_kpa: round1(dpk(cc.chw_secondary_head_m)),
-            cdw_pump_hydraulic_kw: r2n(hyd(p.unitCdwFlowP, cc.cdw_head_m)),
-            cdw_pump_shaft_kw: r2n(hyd(p.unitCdwFlowP, cc.cdw_head_m) === null ? null : hyd(p.unitCdwFlowP, cc.cdw_head_m) / cc.pump_efficiency),
+            cdw_pump_hydraulic_kw: r2n(hyd(p.unitCdwFlowP, p.cdwHeadOp)),
+            cdw_pump_shaft_kw: r2n(hyd(p.unitCdwFlowP, p.cdwHeadOp) === null ? null : hyd(p.unitCdwFlowP, p.cdwHeadOp) / cc.pump_efficiency),
+            cdw_pump_head_op_m: r2n(p.cdwHeadOp),
             cdw_pump_dp_kpa: round1(dpk(cc.cdw_head_m)),
             crah_unit_airflow_m3_s: p.crahDuty === null ? null : r2n(p.crahDuty / (cc.air_density_kg_m3 * cc.air_cp_kj_kg_k * cc.airside_delta_t_k))
         };
@@ -1661,21 +1676,21 @@
                 for (j = 0; j < perTrain; j++) {
                     n += 1;
                     out.push(unit(n, 'CHWP-' + pad2(t) + String.fromCharCode(65 + j), j === 0 && t <= run, 100, {
-                        flowLps: r2(p.unitChwFlow), kwE: r2(p.priKw), speedPct: round1(p.priSpeed * 100), hz: round2(c.motor_base_frequency_hz * p.priSpeed)
+                        flowLps: r2(p.unitChwFlow), kwE: r2(p.priKw), headOpM: r2(p.priHeadOp), speedPct: round1(p.priSpeed * 100), hz: round2(c.motor_base_frequency_hz * p.priSpeed)
                     }, { headM: c.chw_primary_head_m }));
                 }
             }
         } else if (kind === 'chw_secondary_pump') {
             for (i = 1; i <= p.secCount; i++) {
                 out.push(unit(i, 'CHWP-S' + i, i <= p.secDuty, r2(p.secFlow / c.chw_secondary_unit_flow_lps * 100), {
-                    flowLps: r2(p.secFlow), kwE: r2(p.secKw), speedPct: round1(p.secSpeed * 100), hz: round2(c.motor_base_frequency_hz * p.secSpeed)
+                    flowLps: r2(p.secFlow), kwE: r2(p.secKw), headOpM: r2(p.secHeadOp), speedPct: round1(p.secSpeed * 100), hz: round2(c.motor_base_frequency_hz * p.secSpeed)
                 }, { headM: c.chw_secondary_head_m, ratedFlowLps: c.chw_secondary_unit_flow_lps }));
             }
         } else if (kind === 'cdw_pump') {
             run = chillersRunning(m);
             for (i = 1; i <= p.cdwCount; i++) {
                 out.push(unit(i, 'CDWP-' + pad2(i), i <= run, 100, {
-                    flowLps: r2(p.unitCdwFlow), kwE: r2(p.cdwKw), speedPct: round1(p.cdwSpeed * 100), hz: round2(c.motor_base_frequency_hz * p.cdwSpeed)
+                    flowLps: r2(p.unitCdwFlow), kwE: r2(p.cdwKw), headOpM: r2(p.cdwHeadOp), speedPct: round1(p.cdwSpeed * 100), hz: round2(c.motor_base_frequency_hz * p.cdwSpeed)
                 }, { headM: c.cdw_head_m }));
             }
         } else if (kind === 'tower_cell') {
@@ -2113,12 +2128,17 @@
         getFleet: function (kind, hallCode, m) { return fleet(m || CONV_MODEL, kind, hallCode); },
         refrigerantSatKpa: refrigerantSatKpa,
         /* engine 2.7.0 — the secondary pumps' operating speed at a remote DP setpoint (kPa), same duty flow and pump
-         * count as the solve: the page's setpoint slider reads speed and Hz through this, never its own formula */
+         * count as the solve: the page's setpoint slider reads speed and Hz through this, never its own formula.
+         * 2.10.0 adds the operating head and the pump / fleet kWe at that setpoint (Amendment E1). */
         secondaryPumpSpeedAt: function (dpKpa, m) {
             var mm = m || CONV_MODEL, c = mm.cooling, p = plantInternals(mm);
             if (!(dpKpa >= 0)) return null;
-            var n = pumpSpeedFraction(c, p.secXp, p.secXs, c.chw_secondary_head_m, kpaToHeadM(c, dpKpa));
-            return n === null ? null : { speedPct: round1(n * 100), hz: round2(c.motor_base_frequency_hz * n), dpKpa: dpKpa };
+            var hsp = kpaToHeadM(c, dpKpa), n = pumpSpeedFraction(c, p.secXp, p.secXs, c.chw_secondary_head_m, hsp);
+            if (n === null) return null;
+            /* 2.10.0 (Amendment E1): the power at that setpoint, on the same system curve as the solve */
+            var hOp = pumpOperatingHeadM(c.chw_secondary_head_m, hsp, p.secXs), kw = pumpElectricalKw(c, p.secFlow, hOp);
+            return { speedPct: round1(n * 100), hz: round2(c.motor_base_frequency_hz * n), dpKpa: dpKpa,
+                headOpM: round2(hOp), kwE: round1(kw), fleetKwE: round1(kw * p.secDuty) };
         },
         /* engine 2.8.0 — the tower bypass at any wet-bulb (the page's cold-weather drill): B-port share and the mixed ECWT */
         towerBypassAt: function (wbC, m) {
@@ -2135,6 +2155,8 @@
             var qBp = Math.max(0, qMin - qLoad);
             return { flowLps: round1(qBp), openPct: qMin > 0 ? round1(Math.min(100, qBp / qMin * 100)) : 0, qMinLps: round1(qMin), qLoadLps: round1(qLoad) };
         },
+        /* engine 2.10.0 — the system curve: head at a flow fraction x_s of design for a loop with setpoint head H_sp */
+        pumpOperatingHeadM: pumpOperatingHeadM,
         r134aSatTable: R134A_SAT_TABLE,
         /* engine 2.5.0 — R-134a properties (NIST rows) and the cycle at any saturation pair */
         r134a: { sat: r134aSat, vap: r134aVap,

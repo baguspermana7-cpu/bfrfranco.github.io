@@ -465,3 +465,29 @@ The speed follows the setpoint through `pumpSpeedFraction`, but power does not m
 - **E1d.** `site.pue` is a model input. No pump change moves it. The what-if says so and never shows a PUE delta.
 
 **Release.** Engine version pins move on all 8 Conventional pages and on datahallAI's module. Run the full conv release gate. Then PRD-SETPOINT-SIM P2 can show the kW delta.
+
+**Status (2026-11-24): built in conv-engine 2.10.0, gate `test-conv-pump-affinity.mjs` 25/25, red on 2.9.0 (14 of 18).**
+
+| Measured on 2.10.0 | 70 kPa | 90 kPa | 110 kPa |
+|---|---|---|---|
+| Secondary H_op (m) | 29.20 | 29.27 | 29.34 |
+| Secondary pump kWe | 95.4 | 95.6 | 95.8 |
+| Secondary fleet kWe (4 duty) | 381.5 | 382.5 | 383.4 |
+
+At the adopted point the loops run below design flow, so every head drops onto its system curve:
+
+| Loop | x_s | H_d → H_op (m) | kWe per pump, 2.9.0 → 2.10.0 |
+|---|---|---|---|
+| Primary (H_sp = 0) | 0.893 | 15 → 11.96 | 28.0 → 22.3 |
+| Secondary (H_sp = 9.18 m) | 0.982 | 30 → 29.27 | 98.0 → 95.6 |
+| Condenser (H_sp = 4 m) | 0.908 | 25 → 20.74 | 78.2 → 64.9 |
+
+Pump fleet input 1,135.6 → 993.0 kW. Mechanical plant input 4,622.1 → 4,479.5 kW, headroom 7,627.9 → 7,770.5 kW.
+`site.pue` is unchanged (an input). The secondary moves only ±1 kW across 70–110 kPa because it already runs at
+x_s = 0.98: the setpoint is a small share of a 30 m loop. That is the honest answer the what-if now gives.
+
+- Fleet rows carry `headOpM` (operating) next to `headM` (design rating). `*_pump_dp_kpa` stays the design rating.
+- `secondaryPumpSpeedAt(dp)` adds `headOpM`, `kwE` and `fleetKwE` at that setpoint (law E1g: equal to a full solve).
+- Laws re-derived, not loosened: `test-conv-plant-internals` V1 hand calculation and L7 use H_op (doubling the whole
+  system curve doubles power; a flow change scales power by q·H_op), `test-conv-internals-p3` P3-2 hydraulic and shaft
+  use the fleet row's H_op.

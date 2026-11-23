@@ -82,8 +82,9 @@ for (const [k, hall] of CLASSES) {
 /* P3-2 hand checks */
 const rho = c.water_density_kg_m3, g = c.gravity_m_s2;
 for (const [svc, fleetKey, head] of [['cdw', 'cdw_pump', 'cdw_head_m'], ['chw_primary', 'chw_primary_pump', 'chw_primary_head_m'], ['chw_secondary', 'chw_secondary_pump', 'chw_secondary_head_m']]) {
-  const u = C.getFleet(fleetKey).find((x) => x.state === 'running'), Q = u.flowLps / 1000, H = c[head];
-  const hyd = rho * g * Q * H / 1000, shaft = hyd / c.pump_efficiency, dp = rho * g * H / 1000;
+  const u = C.getFleet(fleetKey).find((x) => x.state === 'running'), Q = u.flowLps / 1000, H = c[head], Hop = u.headOpM;
+  /* engine 2.10.0: power at the operating head on the system curve; dP stays the design rating of the pump */
+  const hyd = rho * g * Q * Hop / 1000, shaft = hyd / c.pump_efficiency, dp = rho * g * H / 1000;
   ok(Math.abs(c[svc + '_pump_hydraulic_kw'] - hyd) <= 0.05, `P3-2 ${svc}: hydraulic ${c[svc + '_pump_hydraulic_kw']} vs rho g Q H ${hyd.toFixed(2)}`);
   ok(Math.abs(c[svc + '_pump_shaft_kw'] - shaft) <= 0.05, `P3-2 ${svc}: shaft ${c[svc + '_pump_shaft_kw']} vs ${shaft.toFixed(2)}`);
   ok(Math.abs(c[svc + '_pump_dp_kpa'] - dp) <= 0.05, `P3-2 ${svc}: dP ${c[svc + '_pump_dp_kpa']} vs ${dp.toFixed(2)}`);
