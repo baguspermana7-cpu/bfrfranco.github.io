@@ -246,7 +246,7 @@ thing that runs, its speed is a process value, and it stops off screen and under
 - Never: glow, blur, drop shadow, particles without a process value, a moving mark on a stopped line.
 - Gate: `tools/test-conv-live.mjs`. Styles: `css/conv-live.css` (after `conv-vfx.css` and `conv-motion.css`).
 
-## DC AI hall floor rotors (PRD-DCAI-HALL-DEPTH A4, v3.102.0)
+## DC AI hall floor rotors (PRD-DCAI-HALL-DEPTH A4, v3.103.0)
 
 - One rotor per fan-wall module and per CDU, in the 2D top view only. In 3D the fan sits on a projected face, where a
   screen-space rotation would be false. Rotors are opt-in: `floor-plan.js` `opts.rotors`, so the Conventional hall

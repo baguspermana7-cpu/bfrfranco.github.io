@@ -772,7 +772,7 @@
     return deepFreeze({
       meta: {
         engine: 'dcai-engine.js',
-        version: '1.7.0',   /* v3.102.0 (PRD-DCAI-HALL-DEPTH A3): one running unit's operating point — fan-wall airflow, rated airflow and fan speed %, CDU load %, rated flow and pump speed %, standby counts. // was 1.6.0 — v3.21.16: the campus arrangement — roads, setback, bands and the site area as a product of lengths. // was 1.5.0 — v3.21.9: the site branch — electrical wing, plate, roof share and yards from the engine counts. // was 1.4.0 — v3.21.7: one bank of 20 rows between two fan-wall galleries; the width and length stack checks. // was 1.3.0 — v3.7.0: the HV side of the main transformer is published — primary current, impedance and the switchyard bay count */
+        version: '1.7.0',   /* v3.103.0 (PRD-DCAI-HALL-DEPTH A3): one running unit's operating point — fan-wall airflow, rated airflow and fan speed %, CDU load %, rated flow and pump speed %, standby counts. // was 1.6.0 — v3.21.16: the campus arrangement — roads, setback, bands and the site area as a product of lengths. // was 1.5.0 — v3.21.9: the site branch — electrical wing, plate, roof share and yards from the engine counts. // was 1.4.0 — v3.21.7: one bank of 20 rows between two fan-wall galleries; the width and length stack checks. // was 1.3.0 — v3.7.0: the HV side of the main transformer is published — primary current, impedance and the switchyard bay count */
         spec_version: m.specVersion,
         authority: m.authority,
         evidence_class: 'SIMULATED/ADOPTED',
