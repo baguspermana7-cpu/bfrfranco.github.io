@@ -11,6 +11,19 @@ release sections rather than semver.
 
 ---
 
+## v3.94.1 — 2026-11-23 — DC AI site buses read live in normal operation
+
+#### Fixed
+- DC AI E-001: the HV bus and the 20 kV boards MVB-A01 / MVB-B01 read `0 V DEAD` and drew grey in normal 2N
+  operation (seen on live v3.94.0). Each bus is one conductor between its end junctions; the feeders land on dotted tap
+  junctions along its run, which the power walk (`elecMap`, `js/datahall-ai/hmi-v2.js`) never joined to the bus. A
+  connection dot on a conductor's run now joins that conductor, so the buses energise from their lines and print
+  their voltage under load.
+
+#### Gates
+- `tools/test-electrical-bms.mjs` E19: in normal operation no fed bus on the overview or DH-01 reads dead (red on
+  v3.94.0: HV BUS, MVB-A01, MVB-B01).
+
 ## v3.94.0 — 2026-11-23 — Electrical sheets fit the screen, show breaker state and bus voltages
 
 PRD-ELECTRICAL-BMS phases E1-E2 with amendment 2 (owner R186, R190, R192, R193). Standards:

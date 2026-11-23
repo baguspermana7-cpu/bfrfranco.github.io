@@ -168,7 +168,7 @@ const voltsOf = (sel) => {
     if (/^(MSB|UPS OUT)/.test(x.pre) && o.nominal !== D('voltage_ll_v')) bad.push(x.pre + ' nominal not distribution.voltage_ll_v');
     if (/^HV/.test(x.pre) && o.nominal !== D('hv_intake_kv') * 1000) bad.push(x.pre + ' nominal not distribution.hv_intake_kv');
   });
-  return { n: tags.length, bad, list: tags.map((x) => x.txt) };
+  return { n: tags.length, bad, list: tags.map((x) => x.txt), dead: tags.filter((x) => x.st === 'dead').map((x) => x.txt) };
 };
 const brkState = (sel, id) => {
   const host = document.querySelector(sel), g = host && host.querySelector('.hmi-node[data-node="' + id + '"]'); if (!g) return null;
@@ -250,7 +250,7 @@ const run = { epms: {}, dcai: {} };
     ok(s && s.w >= 240 && s.txt > 20 && !s.clip, `E5 DC AI@1440x900 energized-path summary ${s ? s.w : '?'} px wide, ${s ? s.txt : '?'} chars, clipped ${s && s.clip} (want >= 240 px, text, not clipped)`);
   }
   if (want('E2')) run.dcai.dark = await pd.evaluate(strokesOf, DC_OV, POWER);
-  if (want('E19')) { const v = await pd.evaluate(voltsOf, DC_OV); ok(v && v.n === 3 && v.bad.length === 0, `E19 DC AI overview: ${v ? v.n : '?'} bus voltages (want 3: HV, MVB-A, MVB-B) ${v ? JSON.stringify(v.bad.length ? v.bad : v.list) : ''}`); }
+  if (want('E19')) { const v = await pd.evaluate(voltsOf, DC_OV); ok(v && v.n === 3 && v.bad.length === 0, `E19 DC AI overview: ${v ? v.n : '?'} bus voltages (want 3: HV, MVB-A, MVB-B) ${v ? JSON.stringify(v.bad.length ? v.bad : v.list) : ''}`);  ok(v && v.dead.length === 0, `E19 DC AI overview, normal 2N operation: a fed bus reads dead: ${v ? JSON.stringify(v.dead) : '?'}`); }
   if (want('E3')) { const b = await pd.evaluate(breakersOf, DC_OV); ok(b && b.cover.length === 0, `E3c DC AI overview@1440 breaker glyphs / lamps cover ${b ? b.cover.length : '?'} words: ${b ? JSON.stringify(b.cover.slice(0, 5)) : ''}`); }
   if (want('E6')) { const s = await pd.evaluate(switchOf); ok(s && s.length === 2 && JSON.stringify(s) === JSON.stringify([['iso', 'false'], ['line', 'true']]), `E6 DC AI@1440 no 3D | One-line switch with One-line pressed: ${JSON.stringify(s)}`); }
   if (want('E3') || want('E2') || want('E19')) {
@@ -258,6 +258,7 @@ const run = { epms: {}, dcai: {} };
     if (want('E19')) {
       const v = await pd.evaluate(voltsOf, DC_H1);
       ok(v && v.n === 4 && v.bad.length === 0, `E19 DC AI DH-01: ${v ? v.n : '?'} bus voltages (want 4: MSB A/B, UPS OUT A/B) ${v ? JSON.stringify(v.bad.length ? v.bad : v.list) : ''}`);
+      ok(v && v.dead.length === 0, `E19 DC AI DH-01, normal 2N operation: a fed bus reads dead: ${v ? JSON.stringify(v.dead) : '?'}`);
       await pd.evaluate(() => { const s = document.getElementById('electricalScenario'); s.disabled = false; s.value = 'utility_a_fail'; s.dispatchEvent(new Event('change', { bubbles: true })); const V = window.RZDhHmiV2; if (V) Object.keys(V.sheets).forEach((k) => V.sheets[k] && V.sheets[k].update()); });
       await sleep(900);
       const d = await pd.evaluate(voltsOf, DC_H1);

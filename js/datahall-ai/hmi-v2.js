@@ -604,6 +604,12 @@
         });
       });
     });
+    /* a connection dot drawn on a conductor's run (a feeder tapping the HV or MV bus) joins that conductor: the bus is
+       one edge between its end junctions, so without this its taps never reach it and the bus reads dead (E19, v3.94.1) */
+    Object.keys(nodes).forEach(function (k) {
+      var n = nodes[k]; if (n.sym !== 'junction' || !n.dot) return;
+      power.forEach(function (o) { var Q = poly[o.id]; if (!Q) return; for (var i = 1; i < Q.length; i++) if (onSeg([n.x, n.y], Q[i - 1], Q[i])) { link('E:' + o.id, 'N:' + k); return; } });
+    });
     var st = info.st;
     var stateOfN = function (id) { return st[id] && (st[id].state || st[id].src); };
     var normallyOpen = function (n) { return /normally open/i.test(n.label || ''); };
