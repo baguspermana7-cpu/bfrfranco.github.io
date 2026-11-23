@@ -1520,8 +1520,9 @@ function chwRead(n){
     const u = chwFleetUnit('chw_secondary_pump', Number(n.id.slice(2))), duty = !!(u && u.state === 'running');
     out.state = !ok ? null : (duty ? 'running' : 'standby');
     out.values = { st: chwVal(!ok ? CHW_UNAV : (duty ? 'DUTY' : 'STBY')) };
-    /* P3: speed is the engine's (the drawing inside the modal prints the same), motor current is modelled by neither */
-    if(ok && u) out.rows = [['Mode', duty ? 'Duty' : 'Standby'], ['Flow', duty ? conv.f(u.flowLps, ui.unit) + ' ' + conv.fu(ui.unit) : '—'], ['Motor', duty ? u.kwE + ' kWe' : '—'], ['Head', u.headM + ' m'],
+    /* P3: speed is the engine's (the drawing inside the modal prints the same), motor current is modelled by neither.
+       conv-engine 2.10.0: head is the operating head on the system curve (0 when standing by), as the primary rows */
+    if(ok && u) out.rows = [['Mode', duty ? 'Duty' : 'Standby'], ['Flow', duty ? conv.f(u.flowLps, ui.unit) + ' ' + conv.fu(ui.unit) : '—'], ['Motor', duty ? u.kwE + ' kWe' : '—'], ['Head', (duty ? u.headOpM : 0) + ' m', 'engine'],
       ['Speed', duty ? u.speedPct + ' % · ' + u.hz.toFixed(1) + ' Hz' : '0 %', 'engine'], ['Current', 'not modelled'], ['Vibration', 'not modelled']];
   } else if(n.id === 'sref'){
     out.values = { q: chwVal(ok ? `IT-REFERENCE FLOW ${chwPointText('sref:q')}` : CHW_UNAV) };
@@ -1589,7 +1590,7 @@ function chwRead(n){
     out.values = !ok || !u ? { st: chwVal(CHW_UNAV), q: chwVal('—') } : {
       st: chwVal(run ? 'RUN' : 'STBY'), q: chwVal(run ? `${conv.f(u.flowLps, ui.unit)} ${conv.fu(ui.unit)}` : '—') };
     /* P3: speed is the engine's (the drawing inside the modal prints the same), motor current is modelled by neither */
-    if(ok && u) out.rows = [['Mode', run ? 'Duty' : 'Standby'], ['Flow', run ? conv.f(u.flowLps, ui.unit) + ' ' + conv.fu(ui.unit) : '—'], ['Motor', run ? u.kwE + ' kWe' : '—'], ['Head', u.headM + ' m'],
+    if(ok && u) out.rows = [['Mode', run ? 'Duty' : 'Standby'], ['Flow', run ? conv.f(u.flowLps, ui.unit) + ' ' + conv.fu(ui.unit) : '—'], ['Motor', run ? u.kwE + ' kWe' : '—'], ['Head', (run ? u.headOpM : 0) + ' m', 'engine'],
       ['Speed', run ? u.speedPct + ' % · ' + u.hz.toFixed(1) + ' Hz' : '0 %', 'engine'], ['Current', 'not modelled'], ['Vibration', 'not modelled']];
   }
   return out;
@@ -1776,7 +1777,7 @@ function chwBuild(n) {
 const CHW_FLEET_ROWS = {
   crah: (u) => [['State', u.state], ['Load', u.loadPct + ' %'], ['Sensible duty', u.dutyKw + ' kW'], ['Rated sensible', u.sensibleKw + ' kW'], ['CHW flow', u.chwFlowLps + ' L/s'], ['Fan speed', u.fanSpeedPct + ' %']],
   tower_cell: (u) => [['State', u.state], ['Load', u.loadPct + ' %'], ['Heat rejected', u.rejectionKwTh + ' kWth'], ['Rated', u.ratedKwTh + ' kWth'], ['CDW flow', u.cdwFlowLps + ' L/s'], ['Fan', u.fanSpeedPct + ' % · ' + u.fanKw + ' kW']],
-  cdw_pump: (u) => [['State', u.state], ['Flow', u.flowLps + ' L/s'], ['Motor', u.kwE + ' kWe'], ['Speed', u.speedPct + ' %'], ['Frequency', u.hz + ' Hz'], ['Head', u.headM + ' m']]
+  cdw_pump: (u) => [['State', u.state], ['Flow', u.flowLps + ' L/s'], ['Motor', u.kwE + ' kWe'], ['Speed', u.speedPct + ' %'], ['Frequency', u.hz + ' Hz'], ['Head', (u.state === 'running' ? u.headOpM : 0) + ' m'], ['Design head', u.headM + ' m']]
 };
 function chwFleetOpts(kind, title, scope, unit, hall, bankId) {
   /* PRD-CONV-EQUIPMENT-INSIDE P3: a class with a drawn inside (js/conv/internals/pump.js, tower.js, crah.js) opens on its

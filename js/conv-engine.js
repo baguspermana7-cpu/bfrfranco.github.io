@@ -1580,14 +1580,17 @@
             chw_primary_pump_hydraulic_kw: r2n(hyd(p.unitChwFlowP, p.priHeadOp)),
             chw_primary_pump_shaft_kw: r2n(hyd(p.unitChwFlowP, p.priHeadOp) === null ? null : hyd(p.unitChwFlowP, p.priHeadOp) / cc.pump_efficiency),
             chw_primary_pump_head_op_m: r2n(p.priHeadOp),
+            chw_primary_pump_dp_op_kpa: p.priHeadOp === null ? null : round1(dpk(p.priHeadOp)),
             chw_primary_pump_dp_kpa: round1(dpk(cc.chw_primary_head_m)),
             chw_secondary_pump_hydraulic_kw: r2n(hyd(p.secFlowP, p.secHeadOp)),
             chw_secondary_pump_shaft_kw: r2n(hyd(p.secFlowP, p.secHeadOp) === null ? null : hyd(p.secFlowP, p.secHeadOp) / cc.pump_efficiency),
             chw_secondary_pump_head_op_m: r2n(p.secHeadOp),
+            chw_secondary_pump_dp_op_kpa: p.secHeadOp === null ? null : round1(dpk(p.secHeadOp)),
             chw_secondary_pump_dp_kpa: round1(dpk(cc.chw_secondary_head_m)),
             cdw_pump_hydraulic_kw: r2n(hyd(p.unitCdwFlowP, p.cdwHeadOp)),
             cdw_pump_shaft_kw: r2n(hyd(p.unitCdwFlowP, p.cdwHeadOp) === null ? null : hyd(p.unitCdwFlowP, p.cdwHeadOp) / cc.pump_efficiency),
             cdw_pump_head_op_m: r2n(p.cdwHeadOp),
+            cdw_pump_dp_op_kpa: p.cdwHeadOp === null ? null : round1(dpk(p.cdwHeadOp)),
             cdw_pump_dp_kpa: round1(dpk(cc.cdw_head_m)),
             crah_unit_airflow_m3_s: p.crahDuty === null ? null : r2n(p.crahDuty / (cc.air_density_kg_m3 * cc.air_cp_kj_kg_k * cc.airside_delta_t_k))
         };

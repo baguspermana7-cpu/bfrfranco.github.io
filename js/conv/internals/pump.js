@@ -82,8 +82,8 @@
       function only(v) { return run ? v : null; }
       return {
         state: u.state, tag: u.tag, n: u.n, running: run,
-        flow: u.flowLps, kwE: u.kwE, speedPct: u.speedPct, hz: u.hz, headM: only(u.headM),
-        dpKpa: only(c[K.stem + 'dp_kpa']), hydKw: only(c[K.stem + 'hydraulic_kw']), shaftKw: only(c[K.stem + 'shaft_kw']),
+        flow: u.flowLps, kwE: u.kwE, speedPct: u.speedPct, hz: u.hz, headM: only(u.headOpM), headD: u.headM,
+        dpKpa: only(c[K.stem + 'dp_op_kpa']), dpD: c[K.stem + 'dp_kpa'], hydKw: only(c[K.stem + 'hydraulic_kw']), shaftKw: only(c[K.stem + 'shaft_kw']),
         minSpd: c.pump_min_speed_pct, shutoff: c.pump_shutoff_head_ratio, ctrl: K.ctrl ? c[K.ctrl.key] : null,
         eff: c.pump_efficiency, motorEff: c.pump_motor_efficiency, vfdEff: c.pump_vfd_efficiency,
         iv: 'OPEN', check: run ? 'OPEN' : 'CLOSED',
@@ -108,10 +108,12 @@
     };
     var BLOCKS = [
       { id: 'pump', node: 'pmp', name: 'Centrifugal pump — impeller and volute', standard: 'ISO 9906 · ISO 10628-2',
-        role: ['The impeller adds head to the ' + K.water.toLowerCase() + ' at the flow the loop asks for.', 'Hydraulic power is flow × head; the rest of the shaft power is lost in the pump.'],
+        role: ['The impeller adds head to the ' + K.water.toLowerCase() + ' at the flow the loop asks for: the loop\'s system curve at that flow, below the design head at part flow.', 'Hydraulic power is flow × that head; the rest of the shaft power is lost in the pump.'],
         values: [{ label: 'Flow', key: 'flow', fmt: 'flow', basis: C + K.stem + 'flow_lps', fleet: true },
-          { label: 'Head', key: 'headM', fmt: 'metre', basis: C + K.head },
-          { label: 'Differential pressure', key: 'dpKpa', fmt: 'kpad', basis: C + K.stem + 'dp_kpa' },
+          { label: 'Head', key: 'headM', fmt: 'metre', basis: C + K.stem + 'head_op_m' },
+          { label: 'Differential pressure', key: 'dpKpa', fmt: 'kpad', basis: C + K.stem + 'dp_op_kpa' },
+          { label: 'Design head', key: 'headD', fmt: 'metre', basis: C + K.head },
+          { label: 'Design differential pressure', key: 'dpD', fmt: 'kpad', basis: C + K.stem + 'dp_kpa' },
           { label: 'Hydraulic power', key: 'hydKw', fmt: 'kwm', basis: C + K.stem + 'hydraulic_kw' },
           { label: 'Shaft power', key: 'shaftKw', fmt: 'kwm', basis: C + K.stem + 'shaft_kw' },
           { label: 'Pump efficiency', key: 'eff', fmt: 'frac', basis: C + 'pump_efficiency' },
@@ -140,7 +142,7 @@
         values: [{ label: 'Suction pressure', key: 'suctionP', fmt: 'text' }] },
       { id: 'gauges', node: 'pi2', name: 'Pressure indicators', standard: 'ISA-5.1',
         role: ['Show suction and discharge pressure; their difference is the pump head.', 'Only the difference is modelled.'],
-        values: [{ label: 'Differential pressure', key: 'dpKpa', fmt: 'kpad', basis: C + K.stem + 'dp_kpa' },
+        values: [{ label: 'Differential pressure', key: 'dpKpa', fmt: 'kpad', basis: C + K.stem + 'dp_op_kpa' },
           { label: 'Suction pressure', key: 'suctionP', fmt: 'text' }] }
     ];
     var NODE_BLOCK = { iv2: 'isolation', pi1: 'gauges', mcc: 'vfd', hdr: 'isolation' };

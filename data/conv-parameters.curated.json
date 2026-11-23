@@ -5619,15 +5619,13 @@
       "unit": "m",
       "scope": "plant",
       "evidenceClass": "DERIVED",
-      "formula": "H_op = H_sp + (H_d - H_sp) x_s^2 — the system curve at the operating flow; H_sp = 0 (dedicated branch), x_s = branch flow / (chiller rating / cp dT); equals the design head at design flow",
+      "formula": "H_op = H_sp + (H_d - H_sp) x_s^2 — the system curve at the operating flow; H_sp = 0 (dedicated branch), x_s = branch flow / rated branch flow = unit duty / unit rating; equals the design head at design flow",
       "deps": [
+        "cooling.chiller_unit_duty_kw_th",
         "cooling.chiller_unit_kw_th",
-        "cooling.chw_delta_t",
-        "cooling.chw_primary_head_m",
-        "cooling.chw_primary_pump_flow_lps",
-        "cooling.water_cp_kj_per_kg_k"
+        "cooling.chw_primary_head_m"
       ],
-      "formulaExpr": "cooling.chw_primary_head_m * (cooling.chw_primary_pump_flow_lps * cooling.water_cp_kj_per_kg_k * cooling.chw_delta_t / cooling.chiller_unit_kw_th) * (cooling.chw_primary_pump_flow_lps * cooling.water_cp_kj_per_kg_k * cooling.chw_delta_t / cooling.chiller_unit_kw_th)",
+      "formulaExpr": "cooling.chw_primary_head_m * (cooling.chiller_unit_duty_kw_th / cooling.chiller_unit_kw_th) * (cooling.chiller_unit_duty_kw_th / cooling.chiller_unit_kw_th)",
       "source": {
         "ref": "js/conv-engine.js",
         "section": "pumpOperatingHeadM() / plantInternals()",
@@ -5636,6 +5634,28 @@
       },
       "display": "internal",
       "displayReason": "Carried by the pump fleet row (headOpM) and used for the pump's hydraulic, shaft and electrical power; drawn inside the pump modal."
+    },
+    {
+      "id": "cooling.chw_primary_pump_dp_op_kpa",
+      "label": "Chilled-water primary pump differential pressure at the operating point",
+      "unit": "kPa",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "rho g H_op / 1000 — what the suction and discharge gauges read across the running pump",
+      "deps": [
+        "cooling.chw_primary_pump_head_op_m",
+        "cooling.gravity_m_s2",
+        "cooling.water_density_kg_m3"
+      ],
+      "formulaExpr": "cooling.water_density_kg_m3 * cooling.gravity_m_s2 * cooling.chw_primary_pump_head_op_m / 1000",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals() P3 keys",
+        "asOf": "2026-11-24",
+        "method": "Derived in the engine (engine 2.10.0, Amendment E1) from the operating head; a consistent simulation, not a gauge reading."
+      },
+      "display": "internal",
+      "displayReason": "Drawn on the pump's pressure indicators inside the pump modal."
     },
     {
       "id": "cooling.chw_primary_pump_dp_kpa",
@@ -5733,6 +5753,28 @@
       "displayReason": "Carried by the pump fleet row (headOpM) and used for the pump's hydraulic, shaft and electrical power; drawn inside the pump modal."
     },
     {
+      "id": "cooling.chw_secondary_pump_dp_op_kpa",
+      "label": "Chilled-water secondary pump differential pressure at the operating point",
+      "unit": "kPa",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "rho g H_op / 1000 — what the suction and discharge gauges read across the running pump",
+      "deps": [
+        "cooling.chw_secondary_pump_head_op_m",
+        "cooling.gravity_m_s2",
+        "cooling.water_density_kg_m3"
+      ],
+      "formulaExpr": "cooling.water_density_kg_m3 * cooling.gravity_m_s2 * cooling.chw_secondary_pump_head_op_m / 1000",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals() P3 keys",
+        "asOf": "2026-11-24",
+        "method": "Derived in the engine (engine 2.10.0, Amendment E1) from the operating head; a consistent simulation, not a gauge reading."
+      },
+      "display": "internal",
+      "displayReason": "Drawn on the pump's pressure indicators inside the pump modal."
+    },
+    {
       "id": "cooling.chw_secondary_pump_dp_kpa",
       "label": "Secondary CHW pump differential pressure",
       "unit": "kPa",
@@ -5807,17 +5849,14 @@
       "unit": "m",
       "scope": "plant",
       "evidenceClass": "DERIVED",
-      "formula": "H_op = H_sp + (H_d - H_sp) x_s^2 — the system curve at the operating flow; H_sp = the static lift cdw_static_head_m, x_s = flow / (chiller rating (1 + sp) / cp range); equals the design head at design flow",
+      "formula": "H_op = H_sp + (H_d - H_sp) x_s^2 — the system curve at the operating flow; H_sp = the static lift cdw_static_head_m, x_s = flow / rated flow = unit duty / unit rating (the specific power cancels: both flows carry the same 1 + sp); equals the design head at design flow",
       "deps": [
         "cooling.cdw_head_m",
-        "cooling.cdw_pump_flow_lps",
-        "cooling.cdw_range_k",
         "cooling.cdw_static_head_m",
-        "cooling.chiller_specific_power_kw_e_per_kw_th",
-        "cooling.chiller_unit_kw_th",
-        "cooling.water_cp_kj_per_kg_k"
+        "cooling.chiller_unit_duty_kw_th",
+        "cooling.chiller_unit_kw_th"
       ],
-      "formulaExpr": "cooling.cdw_static_head_m + (cooling.cdw_head_m - cooling.cdw_static_head_m) * (cooling.cdw_pump_flow_lps * cooling.water_cp_kj_per_kg_k * cooling.cdw_range_k / (cooling.chiller_unit_kw_th * (1 + cooling.chiller_specific_power_kw_e_per_kw_th))) * (cooling.cdw_pump_flow_lps * cooling.water_cp_kj_per_kg_k * cooling.cdw_range_k / (cooling.chiller_unit_kw_th * (1 + cooling.chiller_specific_power_kw_e_per_kw_th)))",
+      "formulaExpr": "cooling.cdw_static_head_m + (cooling.cdw_head_m - cooling.cdw_static_head_m) * (cooling.chiller_unit_duty_kw_th / cooling.chiller_unit_kw_th) * (cooling.chiller_unit_duty_kw_th / cooling.chiller_unit_kw_th)",
       "source": {
         "ref": "js/conv-engine.js",
         "section": "pumpOperatingHeadM() / plantInternals()",
@@ -5826,6 +5865,28 @@
       },
       "display": "internal",
       "displayReason": "Carried by the pump fleet row (headOpM) and used for the pump's hydraulic, shaft and electrical power; drawn inside the pump modal."
+    },
+    {
+      "id": "cooling.cdw_pump_dp_op_kpa",
+      "label": "Condenser-water pump differential pressure at the operating point",
+      "unit": "kPa",
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "formula": "rho g H_op / 1000 — what the suction and discharge gauges read across the running pump",
+      "deps": [
+        "cooling.cdw_pump_head_op_m",
+        "cooling.gravity_m_s2",
+        "cooling.water_density_kg_m3"
+      ],
+      "formulaExpr": "cooling.water_density_kg_m3 * cooling.gravity_m_s2 * cooling.cdw_pump_head_op_m / 1000",
+      "source": {
+        "ref": "js/conv-engine.js",
+        "section": "plantInternals() P3 keys",
+        "asOf": "2026-11-24",
+        "method": "Derived in the engine (engine 2.10.0, Amendment E1) from the operating head; a consistent simulation, not a gauge reading."
+      },
+      "display": "internal",
+      "displayReason": "Drawn on the pump's pressure indicators inside the pump modal."
     },
     {
       "id": "cooling.cdw_pump_dp_kpa",
