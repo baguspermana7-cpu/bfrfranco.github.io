@@ -11,7 +11,7 @@ release sections rather than semver.
 
 ---
 
-## v3.103.0 — 2026-11-23 — DC AI floor drawn to scale; every fan-wall module and CDU states its operating point and turns at its speed
+## v3.103.0 — 2026-11-24 — DC AI floor drawn to scale; every fan-wall module and CDU states its operating point and turns at its speed
 
 PRD-DCAI-HALL-DEPTH Amendment 1: phases A3 (engine part) and A4 (rotors), plus decision D10, the floor to scale, and Amendment 2, one placement for every view (owner: "banyak parameter ... ops parameter"; "Arrangement harus accurate dan valid dan comprehensive").
 
