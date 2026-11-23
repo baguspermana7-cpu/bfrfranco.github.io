@@ -266,8 +266,10 @@ Data Hall tab (F4, v3.92.0) through its adapter `js/datahall-ai/hall-iso.js` (be
     - Flags group neighbouring units that share a point: a rack row, the CDU line or one gallery. Each flag is ink with
       a 1 px state hairline and the state glyph.
     - A floor shows at most 8 flags. A "+n" chip counts the alarmed units that have no flag. Gates HV-S1 and HV-I1.
+  - Air paths show and move only in the Thermal and Cooling lenses (`opts.airModes`, Amendment 3 D6). Status,
+    Power and Layout draw no air. Gate HV-M3.
   - Every number the 3D floor prints is hooked or declared for `test-dcai-coverage`.
-  - Gate: `tools/test-dcai-hall-iso.mjs` D1–D8, `tools/test-dcai-hall-views.mjs` V1–V3, F1, F2, D1, L1, S0, T1, A1, M1, M2, G1, G2, S1, I1,
+  - Gate: `tools/test-dcai-hall-iso.mjs` D1–D8, `tools/test-dcai-hall-views.mjs` V1–V3, F1, F2, D1, L1, S0, T1, A1, M1, M2, G1, G2, S1, I1, M3,
     and `tools/test-dcai-unit-ops.mjs` U1–U4.
 
 ## 4g. Electrical sheets (PRD-ELECTRICAL-BMS, owner R186/R190/R192/R193, v3.94.0)

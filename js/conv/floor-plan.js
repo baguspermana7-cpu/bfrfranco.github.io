@@ -167,6 +167,8 @@
     '.fp-air .air-cold{stroke:var(--fp-air-cold)}',
     '.fp-air .air-hot[data-t="1"]{stroke:var(--fp-air-h1)}.fp-air .air-hot[data-t="2"]{stroke:var(--fp-air-h2)}.fp-air .air-hot[data-t="3"]{stroke:var(--fp-air-h3)}',
     '.fp-air path[data-off]{display:none}',
+    /* opts.airModes (DC AI, PRD-DCAI-HALL-DEPTH Amendment 3 D6): the air shows and moves only in the lenses that read it */
+    '.fp-root[data-air="0"] .fp-air{display:none}.fp-root[data-air="0"] .fp-air path{animation:none}',
     '@keyframes fp-air{to{stroke-dashoffset:-16}}',
     '@media (prefers-reduced-motion:no-preference){.fp-air path{animation:fp-air 1.4s linear infinite}}',
     '.fp-root.fp-offscreen .fp-air path{animation-play-state:paused}',
@@ -643,6 +645,7 @@
       }
       host.setAttribute('data-unit', { power: 'kW', temp: '°C', 'cooling-margin': 'K', alarms: '%' }[mode] || '');
       root.setAttribute('data-mode', mode);
+      root.setAttribute('data-air', !opts.airModes || opts.airModes.indexOf(mode) >= 0 ? '1' : '0');
       paintAir();
       if (inst.sel) refreshRings();
     };

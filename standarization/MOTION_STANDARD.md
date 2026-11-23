@@ -258,6 +258,10 @@ thing that runs, its speed is a process value, and it stops off screen and under
 - One CSS keyframe (`fp-rot`). No JS loop and no per-tick repaint. Measured at 1440: +0.15 s main-thread time per
   5 s idle over the same floor without rotors (3.86 → 4.01 s).
 - Gate: `test-dcai-hall-views` M1 (one rotor per unit, period within 1 % of T_ref / speed, standby still) and M2.
+- Air paths (v3.104.0, Amendment 3 D6) move only in the lenses that read them: Thermal and Cooling
+  (`opts.airModes`). Status, Power and Layout draw no air, so no animation runs there. Gate HV-M3.
+- An alarm never moves anything (Amendment 3 D3). A unit in warning or alarm changes colour and gains a flag. Its rotor
+  keeps the engine speed.
 
 ## Homepage choreography (owner R102–R104, 2026-11-09, v3.35.5)
 

@@ -42,6 +42,10 @@ scenario change and never per tick.
   - The tooltip adds the alarm line.
   - The "Show as table" State column reads `warning: PUMP-1 …` or `alarm: manifold wet` instead of `running`.
   - The rack override applies in every lens except Layout, because an alarm must be visible whichever lens is chosen.
+- **D6 — Air only where the lens asks (Amendment 1 §7.1).** The 2D and 3D floor drew its air paths in every lens: 31 visible
+  and animated in Status at 1440 and 390 (cold aisles from both galleries, hot-aisle roofs, across the corridor and the CDU line). In Status,
+  Power and Layout they carried no reading and moved all the time. With `opts.airModes` (DC AI: Thermal, Cooling),
+  the air layer is shown and animated in those lenses only. The Conventional hall passes no list and is unchanged.
 - Not in this phase (A5b): status-strip counts per view equal to the alarm list (HV-I1 second half), the 8.3 inspector,
   and the MAN and STALE lamp variants.
 
@@ -57,6 +61,10 @@ scenario change and never per tick.
   - Every flag names its point.
   - Flags lie inside the stage and do not overlap each other or a row head.
   - normal shows 0 flags.
+- **HV-M3.**
+  - In Status, Power and Layout there are 0 visible air paths and 0 running air animations.
+  - In Thermal and Cooling, air paths are visible and each visible path runs one animation; under reduced motion, none runs.
+  - This law is red on 5b8c2c33b: 31 paths in Status, Power and Layout (6 of 12).
 - HV-F1, F2, G1, G2, M1, M2 and A1 stay green.
 
 ## 4 · Risks

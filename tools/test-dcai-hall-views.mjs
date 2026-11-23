@@ -24,6 +24,7 @@
    HV-M2  reduced motion, the Drawing view and another cockpit tab leave 0 running rotor animations.
    HV-S1  each cooling scenario changes exactly the units its HMI payloads name (A5a, Amendment 3); rotors keep their period.
    HV-I1  alarmed units carry flags (<= 8 + "+n"), each naming its point, inside the stage, clear of heads and each other.
+   HV-M3  air paths show and move only in the Thermal and Cooling lenses (Amendment 3 D6).
    Later phases add: HV-P2, status-strip counts (A5b).
    Usage: node tools/test-dcai-hall-views.mjs [--shots=<dir>] [--only=V1,F1] */
 import fs from 'fs';
@@ -372,6 +373,23 @@ for (const W of [1440, 390]) {
     if (SHOTS && sc !== 'normal') await pg.screenshot({ path: path.join(SHOTS, `hv-${sc}-${W}.png`) });
   }
   ok('HV-S1', pg.errors.length === 0, `${W}: page errors ${pg.errors.slice(0, 2).join(' | ')}`);
+  await pg.close();
+}
+/* HV-M3 (Amendment 3 D6, Amendment 1 §7.1): the air paths show and move only in the Thermal and Cooling lenses */
+for (const W of [1440, 390]) {
+  if (ONLY.size && !ONLY.has('HV-M3')) break;
+  const pg = await open(W);
+  const air = (lens) => pg.evaluate(async (lens) => {
+    const b = document.querySelector('#p-hall [data-lens="' + lens + '"]'); if (b) b.click();
+    await new Promise((r) => setTimeout(r, 400));
+    const ps = [...document.querySelectorAll('#hIso .fp-air path')].filter((p) => p.getClientRects().length > 0 && getComputedStyle(p).display !== 'none' && getComputedStyle(p.parentNode).display !== 'none');
+    const run = [...document.querySelectorAll('#hIso .fp-air path')].reduce((n, p) => n + p.getAnimations().filter((a) => a.playState === 'running').length, 0);
+    return { vis: ps.length, run };
+  }, lens);
+  for (const lens of ['status', 'power', 'layout']) { const a = await air(lens); ok('HV-M3', a.vis === 0 && a.run === 0, `${W} ${lens}: ${a.vis} air paths visible, ${a.run} running, want 0`); }
+  for (const lens of ['thermal', 'cooling']) { const a = await air(lens); ok('HV-M3', a.vis > 0 && a.run === a.vis, `${W} ${lens}: ${a.vis} air paths visible, ${a.run} running`); }
+  await pg.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+  const rm = await air('cooling'); ok('HV-M3', rm.vis > 0 && rm.run === 0, `${W} cooling reduced motion: ${rm.run} running`);
   await pg.close();
 }
 /* HV-T1 (A2): the 3D floor wears three tones in both themes — slab (darkest on a dark page), equipment body, equipment top —
