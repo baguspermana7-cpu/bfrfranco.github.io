@@ -11,6 +11,35 @@ release sections rather than semver.
 
 ---
 
+## v3.103.0 — 2026-11-23 — DC AI floor drawn to scale; every fan-wall module and CDU states its operating point and turns at its speed
+
+PRD-DCAI-HALL-DEPTH Amendment 1: phases A3 (engine part) and A4 (rotors), plus decision D10, the floor to scale (owner: "banyak parameter ... ops parameter"; "Arrangement harus accurate dan valid dan comprehensive").
+
+- **Engine 1.7.0 publishes one running unit's operating point.** For a fan-wall module: airflow 54,136 of a rated
+  54,274 m³/h at the design air ΔT, so fan speed is 99.7 % by the fan law. For a CDU: duty 983 of 1,000 kWth
+  (98.3 %), and TCS flow 1,483 of the published 1,500 L/min (1.5 L/min per kW), so pump speed is 98.9 %. Duty units
+  share the hall load equally. A standby unit carries nothing.
+- **N+1 is an authored count.** `equipment.crah.redundantUnits` and `equipment.cdu.redundantUnits` are 1 (ADOPTED).
+  The six `+ 1` literals in the engine now read from them.
+- **Floor.** Hovering a fan-wall module or CDU shows these values. "Show as table" under the floor lists all 585
+  units (440 racks, 90 modules, 55 CDUs) with state and operating point. Standby rows read 0.
+- No per-unit chips at the fitted zoom. The module pitch, about 9.5 px at 1440, is narrower than a chip. A
+  gallery-level chip comes with A5 (PRD D7).
+- Gates: the new `test-dcai-unit-ops.mjs` U1–U4 was red 18 of 18 on engine 1.6.0.
+  `test-dcai-hall-views` A1 now checks every module and CDU row against the engine snapshot. It was red on a
+  fan-99 % mutation. The engine pin moves to 1.7.0 on the four pages that load it.
+- **Fans and pumps turn at their speed (A4).** In 2D every fan-wall module and CDU has a three-blade rotor. One turn
+  takes 1.0 s ÷ the fan speed for a fan and 0.8 s ÷ the pump speed for a pump (1.003 s and 0.809 s at design).
+  Standby units are still. Reduced motion stills them all, and the Drawing view or another tab leaves none running.
+  The rotors use one CSS keyframe with no script loop. The cost is +4 % main-thread time on an idle floor.
+  `test-dcai-hall-views` M1 and M2 were red 8 of 14 with rotors off.
+- **The floor is the hall, to scale.** The 2D and 3D DC AI floor no longer reuses the Conventional schematic. It
+  draws the 62 × 31 m hall from the engine geometry, the same values the Drawing view reads. Racks are 1.2 m deep
+  at 0.6 m, and each pair of rows shares a contained hot aisle of 1.4 m, with 10 pairs filling the 62 m. Fan-wall
+  galleries are 3 m deep on the north and south walls, with 45 modules each at 1.378 m. The 4.6 m service
+  corridor and the 3.9 m CDU line follow the rack field, and the 3.3 m the width leaves lies before the south
+  gallery. The schematic had drawn a 35 × 41 hall with 1.6-unit galleries. `test-dcai-hall-views` G1 measures
+  every length on the drawn floor and was red 14 of 14 on the schematic.
 ## v3.102.0 — 2026-11-23
 
 Electrical cockpits: a 3D equipment view beside the one-line, phone labels at 11 px, and the floor PDU gets its own equipment view (PRD-ELECTRICAL-BMS E6, E7; owner R186).
