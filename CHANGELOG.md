@@ -11,6 +11,28 @@ release sections rather than semver.
 
 ---
 
+## v3.106.0 — 2026-11-24 — A floor flag opens the alarms it stands for; pump trends sit on their loop's operating head
+
+PRD-DCAI-HALL-DEPTH Amendment 4 (A5c) and PRD-CONV-OPS-DEPTH 01 Amendment E2 (owner: "Continue improve more").
+
+- **A flag opens its alarms (A5c).** Each flag on the DC AI Data Hall floor is now a button that names its alarm point.
+  Activating it opens Alarms & Events on Saved view Active, that point, and the current hall:
+  - the CDU flag under `cdu-pump-fail` opens 54 `PUMP-1` records;
+  - the wet-row flag under `leak-z07` opens 1 `LEAK-Z07` / `ROPE` record (22 racks, one alarm);
+  - the "+n" chip opens the hall's active alarms.
+  Focus moves to the result count. A 2 px focus outline marks the flag; a padded hit area keeps it ≥ 24 px at 390.
+- **Active counts current state (A5c).** The journal is append-only, so a scenario switched off and on again kept the
+  old active record: Active counted 108 for 54. Active now counts a record only when it is the latest of its tag and
+  point, in the list and in the summary metric.
+- **Pump trend on the operating head (E2).** The chiller-plant pump modal trend drew a fixed 245 kPa reference under a
+  117 kPa (primary) or 287 kPa (secondary) reading. It now anchors on `cooling.chw_primary_pump_dp_op_kpa`, or the
+  secondary key for the `chw-sec` pumps. A standing-by pump trends flat 0 and says so. The primary Head row carries the
+  engine mark outside the maintenance simulation.
+- **Gates.**
+  - New `test-dcai-flag-list.mjs` (HV-L1–L3, 62 checks at 1440 and 390, each scenario run twice): red 48 of 62 on
+    v3.104.0.
+  - `test-conv-payloads` gains P9 (each loop's pump trend = its registry operating dp; standby flat 0): red on v3.104.0.
+
 ## v3.105.0 — 2026-11-24 — Every setpoint visible, simulated, and its sequence of operations walkable
 
 PRD-SETPOINT-SIM P0–P3 (owner R187: "semuanya pasti ada settingan baik itu thresold atau set point … bisa di
