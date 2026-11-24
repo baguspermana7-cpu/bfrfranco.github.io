@@ -1,0 +1,202 @@
+{
+  "classKey": "chiller",
+  "title": "Chiller plant — sequence of operations",
+  "note": "PRD-SETPOINT-SIM P3. Curated. A threshold is never typed here: a condition names a limit of the conv limits registry (limit), an engine parameter (param) or a value the engine derives (derived); tools/build-sequences.mjs resolves it. A delay or hysteresis that no source states is ASSUMED and says why.",
+  "basis": {
+    "ref": "ASHRAE Guideline 36-2021, chilled-water plant sequences (developed under ASHRAE RP-1711)",
+    "use": "the structure: modes with entry, ordered actions and exit; staging on capacity and on supply-temperature error; failsafe staging on a trip",
+    "evidenceClass": "STANDARD",
+    "limits": "the numbers come from this plant's engine and limits registry, not from the guideline"
+  },
+  "fleet": {
+    "noun": "chillers", "unitLabel": "kW",
+    "running": "cooling.chillers_running", "total": "cooling.chillers_total", "unit": "cooling.chiller_unit_kw_th",
+    "load": { "minus": ["cooling.chiller_n1_capacity_kw_th", "cooling.chiller_n1_margin_kw_th"] },
+    "pv": { "label": "CHW supply", "short": "rises", "ok": "at setpoint" }
+  },
+  "plant": "primary-secondary chilled water with a decoupler; one primary pump per running chiller train; one condenser pump per chiller (js/conv-engine.js hydronic fleet); N+1 chillers",
+  "modes": [
+    {
+      "id": "normal",
+      "label": "Normal — lead/lag staging",
+      "kind": "normal",
+      "entry": [{ "text": "plant enabled and every running chiller proven (CHW and CDW flow proven, no fault)" }],
+      "actions": [
+        "run the fewest chillers that carry the load: n = ceil(load / unit rating), the engine's own rule",
+        "hold CHW supply at its setpoint (each running chiller's own controller)",
+        "rotate the lead chiller by run hours (lead/lag)"
+      ],
+      "exit": [
+        { "to": "stage_up", "derived": "demand_pct", "op": ">", "value": 100, "text": "load above the running capacity" },
+        { "to": "stage_up", "limit": "cooling.chws_c", "band": "hi_warn", "op": ">=", "delay_s": 900, "text": "CHW supply above its high warning" },
+        { "to": "stage_down", "derived": "part_load_n_minus_1_pct", "op": "<=", "value": 90, "delay_s": 900, "text": "one fewer chiller would carry the load" },
+        { "to": "chiller_trip", "event": "a running chiller trips" },
+        { "to": "loss_cdw", "event": "a condenser pump trips or its flow switch opens" },
+        { "to": "low_evap_flow", "param": "cooling.chiller_min_evap_flow_pct", "op": "<", "text": "evaporator flow below the minimum (% of design)" },
+        { "to": "low_ecwt", "param": "cooling.chiller_min_ecwt_c", "op": "<", "text": "entering condenser water below the minimum" },
+        { "to": "high_cond", "limit": "cooling.cdw_supply_c", "band": "hi_warn", "op": ">=", "delay_s": 300, "text": "condenser water supply above its high warning" },
+        { "to": "power_fail", "event": "supply to the chiller plant lost" }
+      ],
+      "assumed": {
+        "delay_s 900": "15 min staging delay: common practice to avoid short-cycling; no source in this repo states it",
+        "value 90": "10 % hysteresis below full load so a stage-down does not stage straight back up; no source in this repo states it",
+        "delay_s 300": "5 min confirmation of a high condenser water temperature; no source in this repo states it"
+      }
+    },
+    {
+      "id": "stage_up",
+      "label": "Stage up — start the next chiller",
+      "kind": "transition",
+      "entry": [{ "text": "from Normal (capacity or CHWS error) or from a trip (immediately, no delay)" }],
+      "actions": [
+        "select the lag chiller with the fewest run hours that is available",
+        "open its CHW and CDW isolation valves",
+        "start its primary pump and its condenser pump",
+        "prove CHW and CDW flow on both flow switches",
+        "start the chiller and load it (soft-load ramp)"
+      ],
+      "exit": [{ "to": "normal", "event": "the new chiller is proven running" }]
+    },
+    {
+      "id": "stage_down",
+      "label": "Stage down — stop one chiller",
+      "kind": "transition",
+      "entry": [{ "text": "from Normal when one fewer chiller carries the load" }],
+      "actions": [
+        "unload and stop the lag chiller with the most run hours",
+        "after its pump-down delay, stop its primary and condenser pumps",
+        "close its CHW and CDW isolation valves"
+      ],
+      "exit": [{ "to": "normal", "event": "the chiller is stopped and isolated" }]
+    },
+    {
+      "id": "chiller_trip",
+      "label": "Chiller trip — failsafe stage up",
+      "kind": "protection",
+      "entry": [{ "event": "a running chiller trips on its own safety (fault)" }],
+      "actions": [
+        "lock out the tripped chiller and raise an alarm",
+        "stage up the next available chiller at once (no staging delay)",
+        "the remaining chillers carry the load until it is proven; CHW supply rises while capacity is short"
+      ],
+      "exit": [{ "to": "stage_up", "event": "standby chiller start commanded" }]
+    },
+    {
+      "id": "loss_cdw",
+      "label": "Loss of condenser water",
+      "kind": "protection",
+      "entry": [{ "event": "a condenser pump trips or the condenser flow switch opens" }],
+      "actions": [
+        "the chiller on that pump trips on its condenser flow switch (one condenser pump per chiller)",
+        "raise an alarm on the pump and on the chiller"
+      ],
+      "exit": [{ "to": "chiller_trip", "event": "chiller tripped on condenser flow" }]
+    },
+    {
+      "id": "low_evap_flow",
+      "label": "Low evaporator flow — minimum-flow bypass",
+      "kind": "protection",
+      "entry": [{ "param": "cooling.chiller_min_evap_flow_pct", "op": "<", "text": "evaporator flow below the minimum (% of design)" }],
+      "actions": [
+        "open the minimum-flow bypass until each running evaporator sees its minimum flow (the engine's DP bypass: Q_bp = Q_min - Q_load)",
+        "if the flow switch still opens, the chiller trips on its own low-flow safety"
+      ],
+      "exit": [
+        { "to": "normal", "event": "evaporator flow at or above the minimum" },
+        { "to": "chiller_trip", "event": "chiller tripped on low flow" }
+      ]
+    },
+    {
+      "id": "low_ecwt",
+      "label": "Low entering condenser water — tower bypass",
+      "kind": "protection",
+      "entry": [{ "param": "cooling.chiller_min_ecwt_c", "op": "<", "text": "entering condenser water below the minimum" }],
+      "actions": [
+        "slow the tower fans to minimum speed",
+        "modulate the tower 3-way bypass to hold entering condenser water at the minimum (the engine's tower 3-way valve)"
+      ],
+      "exit": [{ "to": "normal", "event": "entering condenser water at or above the minimum" }]
+    },
+    {
+      "id": "high_cond",
+      "label": "High condenser water — unload",
+      "kind": "protection",
+      "entry": [{ "limit": "cooling.cdw_supply_c", "band": "hi_warn", "op": ">=", "delay_s": 300 }],
+      "actions": [
+        "run every available tower cell, fans at full speed",
+        "close the tower 3-way bypass",
+        "limit chiller demand so condenser pressure stays below the high-pressure cutout"
+      ],
+      "exit": [
+        { "to": "normal", "limit": "cooling.cdw_supply_c", "band": "hi_warn", "op": "<", "delay_s": 300 },
+        { "to": "emergency", "limit": "cooling.chws_c", "band": "hi_alarm", "op": ">=", "delay_s": 60 }
+      ],
+      "assumed": { "delay_s 60": "1 min confirmation of a CHW supply high alarm; no source in this repo states it" }
+    },
+    {
+      "id": "power_fail",
+      "label": "Power failure — staggered restart",
+      "kind": "emergency",
+      "entry": [{ "event": "supply to the chiller plant lost (utility lost before the standby supply takes the load)" }],
+      "actions": [
+        "every chiller stops; CHW supply rises while no chiller runs",
+        "on the return of supply, prove CHW and CDW flow, then restart the chillers one at a time",
+        "wait the restart stagger between two chiller starts so the supply is not hit by every compressor inrush at once"
+      ],
+      "exit": [{ "to": "normal", "event": "the chillers the load needs are proven running" }],
+      "stagger_s": 120,
+      "notModelled": "whether the CHW pumps ride through on UPS, and the chiller's own rapid-restart time, are not modelled in this plant",
+      "assumed": { "stagger_s 120": "2 min between chiller starts; no source in this repo states it" }
+    },
+    {
+      "id": "emergency",
+      "label": "Emergency cooling — all available chillers",
+      "kind": "emergency",
+      "entry": [
+        { "limit": "cooling.chws_c", "band": "hi_alarm", "op": ">=", "delay_s": 60 },
+        { "derived": "available_capacity_margin", "op": "<", "value": 0, "text": "the chillers still available cannot carry the load" }
+      ],
+      "actions": [
+        "start every available chiller and its pumps",
+        "suspend stage-down",
+        "hold the CHW supply setpoint at design; no upward reset",
+        "alarm to the operator; exit only on an operator reset"
+      ],
+      "exit": [{ "to": "normal", "limit": "cooling.chws_c", "band": "hi_warn", "op": "<", "delay_s": 900, "text": "CHW supply back below its high warning, then an operator reset" }],
+      "notModelled": "thermal storage: this plant has none in the engine, so there is no TES discharge step"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "chiller_trip",
+      "label": "One running chiller trips",
+      "steps": [
+        { "mode": "normal", "do": {} },
+        { "mode": "chiller_trip", "do": { "running": -1, "available": -1 } },
+        { "mode": "stage_up", "do": {} },
+        { "mode": "normal", "do": { "running": 1 } }
+      ]
+    },
+    {
+      "id": "loss_cdw",
+      "label": "A condenser pump trips",
+      "steps": [
+        { "mode": "normal", "do": {} },
+        { "mode": "loss_cdw", "do": {} },
+        { "mode": "chiller_trip", "do": { "running": -1, "available": -1 } },
+        { "mode": "stage_up", "do": {} },
+        { "mode": "normal", "do": { "running": 1 } }
+      ]
+    },
+    {
+      "id": "power_fail",
+      "label": "Plant supply lost",
+      "steps": [
+        { "mode": "normal", "do": {} },
+        { "mode": "power_fail", "do": { "running": "zero" } },
+        { "mode": "power_fail", "do": { "restart": "all" } },
+        { "mode": "normal", "do": {} }
+      ]
+    }
+  ]
+}

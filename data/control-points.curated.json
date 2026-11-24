@@ -1,0 +1,202 @@
+{
+  "description": "Curated control rows for data/control-points.json (PRD-SETPOINT-SIM B1). HAND-WRITTEN and reviewed. tools/build-control-registry.mjs reads it. A setpoint here names the engine parameter that holds it; its value, source and evidence class come from the engine registry, never from this file. `adjustable` exists only with a written basis.",
+  "convSetpoints": [
+    {
+      "id": "conv.chiller-plant.chws_sp",
+      "equipment": "chiller",
+      "label": "Chilled water supply setpoint",
+      "param": "cooling.chws_c",
+      "pv": [
+        "cooling.chws_c"
+      ],
+      "classKey": "chiller",
+      "role": "setpoint",
+      "control": "leaving chilled water temperature held by the chiller capacity control; the engine derives it from the CRAH supply air less the coil approach",
+      "drivers": [
+        "cooling.rack_inlet_target_c",
+        "cooling.chw_coil_approach_k"
+      ],
+      "adjustable": null,
+      "adjustableNote": "derived: it moves when its drivers move (rack-inlet target, coil approach), never on its own"
+    },
+    {
+      "id": "conv.datahall.crah_supply_air_sp",
+      "equipment": "crah",
+      "label": "CRAH supply air setpoint",
+      "param": "cooling.crah_supply_air_c",
+      "pv": [
+        "cooling.crah_supply_air_c"
+      ],
+      "classKey": "crah",
+      "role": "setpoint",
+      "control": "supply air temperature held by the CRAH chilled-water valve; the engine sets it equal to the rack-inlet target (no bypass or recirculation modelled)",
+      "drivers": [
+        "cooling.rack_inlet_target_c"
+      ],
+      "adjustable": null,
+      "adjustableNote": "derived from the rack-inlet target"
+    },
+    {
+      "id": "conv.datahall.rack_inlet_sp",
+      "equipment": "crah",
+      "label": "Rack inlet temperature target",
+      "param": "cooling.rack_inlet_target_c",
+      "pv": [
+        "datahall.rack.inlet_c"
+      ],
+      "classKey": "crah",
+      "role": "setpoint",
+      "control": "the cold-aisle condition the air system is designed and reset to",
+      "adjustable": {
+        "min": 18,
+        "max": 27,
+        "step": 0.1,
+        "basis": "ASHRAE TC9.9 Thermal Guidelines (5th ed.), class A1 recommended envelope 18–27 °C",
+        "stepBasis": "0.1 K, the resolution the engine parameter is stated in (25.4 °C)"
+      },
+      "whatIf": [
+        {
+          "path": "cooling.chws_c",
+          "label": "CHW supply temperature",
+          "unit": "°C"
+        },
+        {
+          "path": "cooling.chiller_lift_k",
+          "label": "Chiller lift",
+          "unit": "K"
+        },
+        {
+          "path": "cooling.chiller_input_kw_e",
+          "label": "Chiller input power (fleet)",
+          "unit": "kW"
+        },
+        {
+          "path": "cooling.plant_cop",
+          "label": "Plant COP",
+          "unit": ""
+        },
+        {
+          "path": "cooling.plant_kw_per_rt",
+          "label": "Plant kW/RT",
+          "unit": "kW/RT"
+        },
+        {
+          "path": "cooling.cdw_fleet_kw_e",
+          "label": "Condenser-water pumps (fleet)",
+          "unit": "kW"
+        },
+        {
+          "path": "cooling.mech_plant_input_kw",
+          "label": "Mechanical plant input",
+          "unit": "kW"
+        }
+      ],
+      "whatIfNote": "Steady state of the engine: the rack inlet target resets the CRAH supply air and the CHW supply that follow it. PUE is a model input (site.pue) in this engine, so no setpoint moves it. Dynamics (how fast the plant gets there) are not modelled."
+    },
+    {
+      "id": "conv.chiller-plant.cdw_supply_sp",
+      "equipment": "cooling-tower",
+      "label": "Condenser water supply setpoint",
+      "param": "cooling.cdw_supply_c",
+      "pv": [
+        "cooling.cdw_supply_c"
+      ],
+      "classKey": "tower_cell",
+      "role": "setpoint",
+      "control": "tower leaving water temperature held by the tower fan speed",
+      "adjustable": null,
+      "adjustableNote": "no floor is declared yet: the lowest reachable value is the design wet-bulb plus the tower approach, and the chiller's minimum lift; adjustable when both are in the engine"
+    },
+    {
+      "id": "conv.chiller-plant.chw_dp_sp",
+      "equipment": "chw-pump",
+      "label": "Secondary loop differential pressure setpoint",
+      "param": "cooling.chw_secondary_dp_setpoint_kpa",
+      "pv": [
+        "chiller-plant.CHW.header_dp"
+      ],
+      "classKey": "chw_secondary_pump",
+      "role": "setpoint",
+      "control": "remote differential pressure held by the secondary pump speed",
+      "adjustable": {
+        "min": 60,
+        "max": 140,
+        "step": 5,
+        "basis": "the chiller-plant page's DP setpoint range (60–140 kPa), the range the engine parameter states as its source"
+      },
+      "whatIf": [
+        {
+          "path": "cooling.chw_secondary_pump_speed_pct",
+          "label": "Secondary pump speed",
+          "unit": "%"
+        },
+        {
+          "path": "cooling.chw_secondary_pump_hz",
+          "label": "Secondary pump drive frequency",
+          "unit": "Hz"
+        },
+        {
+          "path": "cooling.chw_secondary_pump_kw_e",
+          "label": "Secondary pump input power, each",
+          "unit": "kW"
+        },
+        {
+          "path": "cooling.chw_secondary_fleet_kw_e",
+          "label": "Secondary pump input power, running fleet",
+          "unit": "kW"
+        }
+      ],
+      "whatIfNote": "Steady state of the engine: the pump speed its curve needs to hold this differential pressure, and the input power at that operating head (engine 2.10.0). The loop flow is set by the load, not by this setpoint, so the power moves little. PUE is a model input and does not move. Dynamics are not modelled."
+    }
+  ],
+  "dcaiValueEvidence": {
+    "note": "A DC AI point record that TYPES its reference value (sp.value in js/datahall-ai/points.js) has no source for that number of its own: it is ASSUMED unless listed here with the reason.",
+    "sld-mv-sub/bus_kv": {
+      "evidenceClass": "STANDARD",
+      "why": "20 kV is the nominal system voltage (IEC 60038 / SPLN 1)"
+    },
+    "sld-rmu/bus_kv": {
+      "evidenceClass": "STANDARD",
+      "why": "20 kV is the nominal system voltage (IEC 60038 / SPLN 1)"
+    },
+    "sld-mv-sub/frequency": {
+      "evidenceClass": "STANDARD",
+      "why": "50 Hz is the nominal frequency of the PLN grid (Grid Code Jawa-Madura-Bali)"
+    },
+    "rack-busbar/vdc": {
+      "evidenceClass": "DESIGN",
+      "why": "48 VDC is the shelf output voltage of the rack power design"
+    },
+    "chem/ph": {
+      "evidenceClass": "DESIGN",
+      "why": "the page's own control window 8.2–8.8; 8.5 is its centre"
+    }
+  },
+  "dcaiPlaneController": {
+    "note": "Which DC AI point class HOLDS each engine design plane (its controller acts on it). On that class the plane is a setpoint; on every other class that reads the same plane it is a reference, with heldBy naming the controller. A plane with no controller among the DC AI point classes is a reference everywhere.",
+    "p07_tcs_supply_c": {
+      "heldBy": "cdu",
+      "why": "the CDU holds TCS supply with its HX control valve"
+    },
+    "p02_dry_cooler_leaving_c": {
+      "heldBy": "dry-cooler",
+      "why": "the dry cooler holds its leaving water with fan speed"
+    },
+    "p12_chw_supply_c": {
+      "heldBy": "chiller",
+      "why": "the chiller holds leaving chilled water with its capacity control"
+    },
+    "p09_air_supply_c": {
+      "heldBy": "crah",
+      "why": "the CRAH holds supply air with its chilled-water valve"
+    }
+  },
+  "dcaiTypedSetpoints": {
+    "note": "DC AI point records whose typed value IS a control setpoint (a controller holds it); every other typed value is a reference (nameplate, nominal, design value).",
+    "crah/supply_rh": "humidity setpoint of the CRAH humidifier / dehumidification control",
+    "chem/ph": "pH control point of the dosing controller",
+    "chem/conductivity": "conductivity setpoint of the blowdown controller",
+    "chem/orp": "ORP control point of the biocide dosing",
+    "chem/inhibitor_ppm": "inhibitor residual target of the dosing controller"
+  }
+}

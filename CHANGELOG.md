@@ -11,6 +11,38 @@ release sections rather than semver.
 
 ---
 
+## v3.105.0 — 2026-11-24 — Every setpoint visible, simulated, and its sequence of operations walkable
+
+PRD-SETPOINT-SIM P0–P3 (owner R187: "semuanya pasti ada settingan baik itu thresold atau set point … bisa di
+simulate … emergency mode logicnya seperti apa"; R196 "Harus sangat accurate"). Standard:
+`standarization/CONTROL_SETPOINT_STANDARD.md`.
+
+- **One control registry (P0).** `data/control-points.json` is built by `tools/build-control-registry.mjs` from the
+  conv limits registry, the DC AI point records and `data/control-points.curated.json`: 99 rows (14 setpoints,
+  42 reference values, 84 with limits, 10 monitored only). Every value names its source and evidence class. A page
+  never types a setpoint; the browser twin is `js/rz-control-points.js`.
+- **Setpoints visible (P1).**
+  - The point tooltip shows the SP or reference value beside the live value.
+  - The trend draws the SP as one dashed line at the registry value.
+  - The Conventional equipment modal has a **Setpoints & limits** block: SP, live PV, error, limits, deadband, delay and source.
+- **What-if (P2).**
+  - Each adjustable setpoint has a slider in the modal. Moving it recomputes the engine (`CONV_CALC.recompute`) and shows the outputs before and after. Example: rack inlet +1 K moves the plant COP from 9.73 to 10.27.
+  - The CHW differential-pressure setpoint now lists secondary pump input power, each and for the fleet, from engine 2.10.0: 95.3 / 95.6 / 96.2 kW each at 60 / 90 / 140 kPa.
+  - Every value is labelled SIMULATED. Reset restores live. Nothing is saved.
+  - The note states what the engine does not move (PUE is a model input) and that the dynamics are not modelled.
+- **Sequences of operations (P3).** `data/sequences/*.json` covers four equipment classes. `tools/build-sequences.mjs` resolves each one into `js/rz-sequences.js`.
+  - The four classes:
+    - chiller: 10 modes, including chiller trip, loss of condenser water, low evaporator flow, high condenser water, power failure with a staggered restart, and emergency;
+    - CHW secondary pump: 5 modes;
+    - tower cell: 5 modes;
+    - CRAH: 3 modes.
+  - Every threshold comes from the limits registry, the engine or the control registry. A delay, hysteresis or stagger that no source states is labelled ASSUMED with its reason. What the plant does not model is stated (no thermal storage, no UPS ride-through).
+  - The modal shows the mode graph with RZDiagram. **Simulate** walks a scenario step by step: running units, available units, capacity, part load, shortfall, and the direction the process value moves.
+- **Gates.**
+  - `tools/test-control-registry.mjs` (C1–C13). C13 now requires every listed what-if output to move across the adjustable range (red plant `RZ_CR_PLANT=still`).
+  - `tools/test-sequences.mjs` (Q1–Q5, 462 checks; red plants `typed` and `orphan`).
+  - `tools/test-setpoint-sim.mjs` (S1–S7, browser; red plant `no-sequence`).
+
 ## v3.104.0 — 2026-11-24 — The DC AI floor shows what the cooling scenario did; Conventional pumps draw power at their operating head
 
 PRD-DCAI-HALL-DEPTH Amendment 3 (A5a, D6, A5b, D7, D8) and PRD-CONV-OPS-DEPTH 01 Amendment E1 (owner: "Continue

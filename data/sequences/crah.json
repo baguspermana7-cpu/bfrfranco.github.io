@@ -1,0 +1,72 @@
+{
+  "classKey": "crah",
+  "title": "CRAH units — sequence of operations",
+  "note": "PRD-SETPOINT-SIM P3. Curated; thresholds resolved by tools/build-sequences.mjs (see chiller.json).",
+  "basis": {
+    "ref": "ASHRAE Guideline 36-2021, computer-room air handler sequences",
+    "use": "the structure: the CHW valve holds the supply air setpoint, fans follow the load, standby start on a unit failure",
+    "evidenceClass": "STANDARD",
+    "limits": "the numbers come from this plant's engine, limits registry and control registry, not from the guideline"
+  },
+  "fleet": {
+    "noun": "CRAHs in one hall", "unitLabel": "kW",
+    "running": "cooling.crah_running", "total": "cooling.crah_installed", "unit": "cooling.crah_unit_sensible_kw",
+    "load": { "product": ["cooling.crah_running", "cooling.crah_unit_duty_kw"] },
+    "pv": { "label": "Rack inlet", "short": "rises", "ok": "at setpoint" }
+  },
+  "plant": "per hall: the fewest CRAHs that carry the hall load plus one standby (N+1, js/conv-engine.js crah_installed = crah_required + 1); a unit's rating is its sensible capacity",
+  "modes": [
+    {
+      "id": "normal",
+      "label": "Normal — supply air control",
+      "kind": "normal",
+      "entry": [{ "text": "hall cooling enabled and the duty CRAHs proven (airflow proven, no fault)" }],
+      "actions": [
+        "each CRAH's CHW valve holds its supply air at the setpoint",
+        "fan speed follows the hall load (the engine's fan speed = unit duty share of the rating)",
+        "rotate the standby unit by run hours"
+      ],
+      "exit": [
+        { "to": "crah_trip", "event": "a running CRAH fails (fan, airflow or controller fault)" },
+        { "to": "high_inlet", "limit": "datahall.rack.inlet_c", "band": "hi_warn", "op": ">=", "delay_s": 300 },
+        { "to": "high_inlet", "setpoint": "conv.datahall.crah_supply_air_sp", "op": ">", "delay_s": 300, "text": "supply air above its setpoint with the CHW valve fully open" }
+      ],
+      "assumed": { "delay_s 300": "5 min confirmation before acting on a high air temperature; no source in this repo states it" }
+    },
+    {
+      "id": "crah_trip",
+      "label": "CRAH failure — standby start",
+      "kind": "protection",
+      "entry": [{ "event": "a running CRAH fails" }],
+      "actions": [
+        "lock out the failed unit and raise an alarm",
+        "start the standby CRAH at once",
+        "the remaining fans run to full speed; rack inlet rises while sensible capacity is short"
+      ],
+      "exit": [{ "to": "normal", "event": "the standby CRAH is proven running" }]
+    },
+    {
+      "id": "high_inlet",
+      "label": "High rack inlet — all units",
+      "kind": "protection",
+      "entry": [{ "limit": "datahall.rack.inlet_c", "band": "hi_warn", "op": ">=", "delay_s": 300 }],
+      "actions": [
+        "start the standby CRAH",
+        "every fan to full speed, every CHW valve fully open",
+        "alarm to the operator; check the CHW supply (chiller plant sequence)"
+      ],
+      "exit": [{ "to": "normal", "limit": "datahall.rack.inlet_c", "band": "hi_warn", "op": "<", "delay_s": 300 }]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "crah_trip",
+      "label": "One running CRAH fails",
+      "steps": [
+        { "mode": "normal", "do": {} },
+        { "mode": "crah_trip", "do": { "running": -1, "available": -1 } },
+        { "mode": "normal", "do": { "running": 1 } }
+      ]
+    }
+  ]
+}

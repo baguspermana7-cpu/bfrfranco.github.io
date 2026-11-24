@@ -206,6 +206,9 @@ gate "Conventional history — deterministic series per point, stats, limits, CS
 # 1H/8H/1D/7D/30D ranges, bands, state header, stats and phone sheet; the coverage ratchet keeps unclassified numbers falling.
 gate "Conventional point status core — classify thresholds + deadband, limits registry rows, normal past >= 99 % (P-6), planted defects" node --test tools/test-conv-point-status-core.mjs
 gate "Conventional trend ranges — open click/Enter/tap, 1H..30D window + stats, last point = page value, header state, bands = registry, keys 1-5, Esc, 390 sheet, contrast" node tools/test-conv-trend-ranges.mjs
+gate "Conventional control registry — C1-C13: setpoint vs reference, sources, pv bound on a page, browser twin fresh, modal class" node tools/test-control-registry.mjs
+gate "Conventional sequences — Q1-Q5: chiller, CHW secondary pump, tower cell and CRAH modes with entry/actions/exit, graph closed, no typed threshold, assumed delays listed, scenario walk, twin fresh" node tools/test-sequences.mjs
+gate "Conventional setpoints shown — S2 tooltip = registry, S3 trend SP line, S4 modal Setpoints & limits, S5 what-if = Node recompute, S7 sequence walk, S9 no page errors" node tools/test-setpoint-sim.mjs
 gate "Conventional point coverage — ratchet: unclassified numbers on the 9 cockpits only fall (tools/conv-point-coverage-baseline.json)" node tools/test-conv-point-coverage.mjs
 gate "Conventional points database — conv_points migration in the local postgres:16: parity with RZConvHistory 50 x 2000 min, rollup, retention, RLS + audit_log, RPC table choice, idempotent cron" node tools/test-conv-points-sql.mjs
 gate "Conventional TCC curves — IEC 60255 families, transformer damage/inrush, cable withstand, coordination" node --test tools/test-conv-tcc.mjs

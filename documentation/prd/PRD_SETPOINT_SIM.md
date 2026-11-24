@@ -116,3 +116,113 @@ Rules:
 ## Verification
 
 Each phase: `tools/test-setpoint-sim.mjs` red on main with quoted fails, then green; guards `run-conv-release-gates.sh` and the DC AI ship-gate set. After push: live shots at 1440 and 390, dark and light, of a modal with Setpoints and a what-if, a trend SP line and a chiller sequence simulation, looked at and sent.
+
+## B6. P0 delivered (2026-11-23, owner R196 "Continue improve", R195 "Harus sangat accurate")
+
+- `tools/build-control-registry.mjs` writes `data/control-points.json` (99 rows): the 33 conv limit bands, the 61 DC AI
+  point classes, and 5 conv setpoints held by engine parameters (`data/control-points.curated.json`).
+- **Setpoint vs reference (accuracy rule added in P0).** A value is a *setpoint* only on the equipment whose controller
+  holds it: CDU for TCS supply, dry cooler for its leaving water, chiller for CHW supply, CRAH for supply air and RH,
+  the dosing and blowdown controllers for water chemistry, and the five conv parameters (CHWS, CRAH supply air, rack inlet
+  target, CDW supply, secondary DP). The same plane read downstream (TCS supply at a manifold or rack) is a *reference*
+  with `heldBy` naming the controller; nameplate current, nominal voltage, design head and normal winding temperature are
+  references. Result: 14 setpoints, 42 reference values, 84 bands, 10 monitored only. The UI writes "SP" only for a
+  setpoint and "Ref" for a reference.
+- A conv band's `nominal` stays a nominal; a DC AI value typed in `points.js` is ASSUMED unless the curated file says
+  why it is a standard or design value (20 kV, 50 Hz, 48 VDC, pH 8.5).
+- `adjustable` only with a written basis: rack inlet 18–27 °C (ASHRAE A1), secondary DP 60–140 kPa (the page range).
+  CHWS and CRAH supply air are derived (they move with their drivers); CDW supply waits for a declared floor.
+- Gate `tools/test-control-registry.mjs` C1–C9 (546 checks): red with no file, red on a planted value / range / role, and
+  C9 red on the first classification (TCS supply called a setpoint on five classes).
+- The browser law S1 (every counted number on screen has a row) is P1, when the values show their SP or Ref.
+
+
+## B7. P1 delivered (2026-11-24)
+
+- Each curated Conventional setpoint names the live points it governs (`sp.pv`) and the modal class that shows it
+  (`sp.classKey`). The builder writes the browser twin `js/rz-control-points.js` (`spOf`, `tipFor`, `forClass`).
+- Tooltip: `RZPointStatus.tooltipText` appends `SP 19.4 °C · <name> · <evidence>`. Trend: the pen's reference line
+  is the SP, labelled in muted ink, moved off any limit label (rz-trend `refLab`). Both hooks are null-safe, and
+  peer 8a agreed to both edits.
+- Modal "Setpoints & limits" (chiller, CRAH, tower cell, secondary CHW pump): SP, Live, Error, alarm band,
+  adjustable range, evidence, what holds it.
+  - Live is the page's own value. Where the page does not show the point, it is the engine snapshot value, and
+    the cell's title says which. Example: the CRAH supply air on chiller-plant shows 25.4 °C from the engine.
+  - The rack inlet is shown on datahall only, so on chiller-plant its Live cell is "—".
+  - On a phone the table keeps 4 columns; the rest is in the row tooltip.
+- Laws (red first):
+  - C10–C12 (registry gate, 585 checks): before P1 the 5 setpoints named no pv and there was no twin (7 fails).
+  - S2/S3/S4 (`tools/test-setpoint-sim.mjs`, 44 checks): with no twin served, every law fails (28 fails).
+  - L13 (`test-conv-trend-ranges`, 331 checks): with plant `refstack` the label lands on "H 37.0".
+- Standard: `standarization/CONTROL_SETPOINT_STANDARD.md`.
+- Not yet: DC AI cockpit display of its 14 setpoints (the DC AI inspector, P1b); SP sliders and the what-if
+  recompute (P2).
+
+## B8. P2 delivered, part 1: what-if in the modal (2026-11-24)
+
+- **Slider:** every adjustable setpoint (rack inlet 18–27 °C, CHW secondary DP 60–140 kPa) has a slider in the
+  equipment modal's "Setpoints & limits" section. Moving it recomputes the engine on a copy of the model with that one
+  parameter changed (`CONV_CALC.recompute`), and the modal shows the outputs the registry lists: Engine now,
+  SIMULATED, Change. Reset puts the SP back. Nothing is stored. Gate S5 compares every simulated value with a direct
+  Node recompute (± 0.1 %).
+- **Measured response, rack inlet 25.4 → 26.4 °C:**
+
+  | Output | Now | Simulated |
+  |---|---|---|
+  | CHWS | 19.4 °C | 20.4 °C |
+  | Lift | 20.6 K | 19.6 K |
+  | Chiller input | 3212.5 kW | 3043 kW |
+  | Plant COP | 9.73 | 10.27 |
+  | Mechanical plant input | 4622.1 kW | 4449.9 kW |
+
+- **What the engine does not move, said in the note instead of shown as a change:**
+  - PUE is a model input (`site.pue` 1.45).
+  - Secondary pump power stayed at the design duty point in engine 2.9. Engine 2.10.0 (peer 8a, v3.104.0) computes it
+    at the operating head, so the DP setpoint what-if now lists pump input power, each and fleet: 95.3 / 95.6 / 96.2 kW
+    each at 60 / 90 / 140 kPa. Law C13 now requires every listed output to move across the adjustable range.
+- **Registry fix:** the rack inlet step was 0.5 K from 18 °C, so SP 25.4 was off the grid and a slider snapped it to
+  25.5. The step is now 0.1 K, the resolution of the engine parameter. Law C5 now fails any SP or max off its grid
+  (red first: "SP 25.4 or max 27 is not on the step grid 18 + k·0.5").
+- **Law C13:** what-if outputs appear only on an adjustable setpoint. Each output is an engine number, and one step
+  moves at least one of them. Red: listing the pump kW fails "moves none of its what-if outputs".
+- **Red first:** S5 failed with "no what-if slider" on the CRAH and secondary-pump modals before the code existed.
+- **Not yet in P2:**
+  - FOPDT response preview. No τ/θ has a written source, so the modal says "dynamics not modelled" (S6, honest form).
+  - Migration of the chiller-plant page sliders.
+
+## B9. P3 delivered, part 1: chiller sequence of operations (2026-11-24)
+
+- `data/sequences/chiller.json`: 10 modes (Normal lead/lag, Stage up, Stage down, Chiller trip, Loss of condenser
+  water, Low evaporator flow, Low entering condenser water, High condenser water, Power failure, Emergency cooling),
+  each with entry, ordered actions and exit; 3 scenarios (one chiller trips, a condenser pump trips, plant supply lost).
+  Structure from ASHRAE Guideline 36-2021 (RP-1711). Plant facts from the engine: one condenser pump per chiller (so a
+  condenser pump trip trips its chiller), primary-secondary with a decoupler, N+1, DP bypass at the minimum evaporator
+  flow, tower 3-way holding the minimum ECWT.
+- Thresholds resolved, never typed: CHWS H 20.9 / HH 22.4 °C and CDW supply H 33.5 °C from the limits registry
+  (ASSUMED there), minimum evaporator flow 40 % and minimum ECWT 15 °C from the engine (ASSUMED there). Unsourced delays
+  (900 s staging, 300 s CDW confirmation, 60 s CHWS HH confirmation), the 90 % stage-down hysteresis and the 120 s restart
+  stagger are listed as assumed with a reason and shown "(assumed)".
+- Scenario walk on the engine's plant (load 31,250 kW, 7 of 10 × 5,000 kW): a trip leaves 6 running, capacity short
+  1,250 kW, CHWS rises until the standby is proven; power failure restarts 7 chillers, the last at +720 s from the return
+  of supply. Part load is capped at 100 %: a chiller cannot run above its rating, the remainder is "capacity short".
+- Not modelled, said so: thermal storage (none in this plant), pump ride-through on UPS, rapid-restart time, how fast
+  CHWS rises.
+- Modal: `js/conv/sequence-view.js` (RZConvSequence) after "Setpoints & limits" on chiller-plant.html; the path drawn
+  through RZDiagram at its own size (the 10-mode list stays text: the figure budget is 9 nodes).
+- Gates: `tools/test-sequences.mjs` Q1–Q5 (243 checks; red: no twin → Q5, `RZ_SEQ_PLANT=typed` → Q3,
+  `orphan` → Q2); `tools/test-setpoint-sim.mjs` S7 (128 checks with S2–S5; red: `RZ_SP_PLANT=no-sequence` → S7). S4's
+  Live read now takes cell and page value in one tick and allows the cell 2 s to follow a live point (the header DP
+  moves every tick; a 25 s longer run read them a tick apart).
+- Part 1b, same day: the builder is generic over a `fleet` (running / total / unit rating / load read from engine keys the
+  JSON names, plus the PV that answers a shortfall). Added `chw_secondary_pump.json` (5 modes; header DP held at the
+  registry setpoint 90 kPa, a new condition kind `setpoint` resolved from data/control-points.json; a trip leaves 3 of
+  4 duty pumps, 232.4 L/s short of 982.4 L/s at design flow, header DP falls until the standby runs) and
+  `tower_cell.json` (5 modes; one cell per chiller, no standby cells; a fan trip leaves 6 × 5,514 kW = 33,084 kW against
+  34,462.5 kW, 1,378.5 kW short, CDW supply rises until an idle cell runs; whether the cells share one header is not
+  stated by the engine and is said so). Q-gate 400 checks; S4/S7 now open the tower cell on the CH-M-102 sheet
+  (176 checks).
+- `crah.json` (3 modes; per hall 58 duty + 1 standby × 130 kW sensible against 7,500 kW; a failure leaves 7,410 kW,
+  90 kW short, rack inlet rises until the standby runs; supply air setpoint 25.4 °C and rack inlet H 27 °C from the
+  registries). Q-gate 462 checks, S-gate 194.
+- Remaining for P3: Simulate driving the PV trends; sequences for genset/ATS, UPS and the DC AI CDU /
+  free-cooling switchover (P4).

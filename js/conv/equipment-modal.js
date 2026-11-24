@@ -102,7 +102,16 @@
     '.rz-cvm-bd-role{margin:8px 0;font-size:13px}' +
     '.rz-cvm-bsel{width:100%;min-height:44px;margin:0 0 8px;padding:0 8px;border:1px solid var(--cvm-line);border-radius:4px;background:var(--cvm-bg);color:var(--cvm-text);font:400 13px IBM Plex Sans,system-ui,sans-serif}' +
     '.rz-cvm-v.is-nm{color:var(--cvm-mute);font-style:italic}' +
-    '.rz-cvm-lower-note{margin:12px 16px 0;color:var(--cvm-mute);font-size:13px}';
+    '.rz-cvm-lower-note{margin:12px 16px 0;color:var(--cvm-mute);font-size:13px}' +
+    '.rz-cvm-sp-wrap{overflow-x:auto;max-width:100%}.rz-cvm-sp{border-collapse:collapse;font-size:12px;min-width:100%}' +
+    '.rz-cvm-sp th,.rz-cvm-sp td{padding:6px 10px;border-bottom:1px solid var(--cvm-line);text-align:left;white-space:nowrap;font-weight:400}' +
+    '.rz-cvm-sp thead th{color:var(--cvm-mute);font-size:11px}.rz-cvm-sp td[data-k="sp"],.rz-cvm-sp td[data-k="pv"],.rz-cvm-sp td[data-k="err"]{font-family:"IBM Plex Mono","JetBrains Mono",monospace}' +
+    '.rz-cvm-sp td[data-k="ctl"]{white-space:normal;min-width:220px;color:var(--cvm-mute)}' +
+    '.rz-cvm-wi{margin-top:16px;padding-top:12px;border-top:1px solid var(--cvm-line)}.rz-cvm-wi-ctl{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin-bottom:8px}' +
+    '.rz-cvm-wi-ctl label{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;font-size:12px;color:var(--cvm-text)}.rz-cvm-wi-ctl input[type="range"]{width:220px;max-width:100%;min-height:44px;accent-color:var(--cvm-acc)}' +
+    '.rz-cvm-wi-ctl output{font:12px/1.2 JetBrains Mono,monospace;color:var(--cvm-text)}.rz-cvm-wi-ctl button{min-height:44px;padding:0 14px;border:1px solid var(--cvm-line);background:transparent;color:var(--cvm-text);border-radius:4px;cursor:pointer;font:600 12px/1 JetBrains Mono,monospace}' +
+    '.rz-cvm-wi-t td{font-family:JetBrains Mono,monospace}.rz-cvm-wi-t td[data-k="now"]{color:var(--cvm-mute)}.rz-cvm-wi-t thead th:nth-child(3){color:var(--cvm-text)}' +
+    '@media (max-width:600px){.rz-cvm-sp [data-k="band"],.rz-cvm-sp [data-k="adj"],.rz-cvm-sp [data-k="ev"],.rz-cvm-sp [data-k="ctl"]{display:none}.rz-cvm-sp th[scope="row"]{white-space:normal}.rz-cvm-wi-t{font-size:11px}.rz-cvm-wi-t th,.rz-cvm-wi-t td{padding:6px 4px;white-space:normal}.rz-cvm-wi-ctl input[type="range"]{width:100%}}';
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function css() {
@@ -163,6 +172,103 @@
     return '<p class="rz-cvm-note" style="padding:0 16px 14px">engine ' + esc(p.provenance.engineVersion) + ' · tick ' + esc(p.provenance.tick) + ' · ' + esc(p.provenance.counts.derived) + ' engine · ' + esc(p.provenance.counts.simulated) + ' simulated · ' + esc(p.provenance.counts.state) + ' declared</p>';
   }
   /* the payload sections; v1 opens with the drawn symbol, v2 (internal drawing above) leaves it out (P-1) */
+  /* PRD-SETPOINT-SIM P1: the setpoints this class of equipment holds, from the control registry (js/rz-control-points.js):
+     the SP, the live value of the point it governs (as the page shows it), the error, the alarm band of that point, the
+     adjustable range or why it is fixed, the evidence class and what holds it. No registry or no row = no section. */
+  function spBlock(classKey) {
+    var C = root.RZControlPoints, list = C && C.forClass ? C.forClass(classKey) : [];
+    if (!list.length) return '';
+    var PS = root.RZPointStatus;
+    var body = list.map(function (r) {
+      var pv = r.pv[0], L = PS && pv ? PS.limits(pv) : null, u = r.unit ? ' ' + r.unit : '';
+      var band = L ? ['lo_alarm', 'lo_warn', 'hi_warn', 'hi_alarm'].map(function (k) { return typeof L[k] === 'number' ? ({ lo_alarm: 'LL ', lo_warn: 'L ', hi_warn: 'H ', hi_alarm: 'HH ' })[k] + L[k] : null; }).filter(Boolean).join(' · ') : 'no band';
+      var adj = r.adjustable ? r.adjustable.min + '–' + r.adjustable.max + u + ' (step ' + r.adjustable.step + ')' : 'fixed: ' + (r.note || 'design value');
+      return '<tr data-sp-row="' + esc(r.id) + '" data-sp-pv="' + esc(pv || '') + '" data-sp="' + r.value + '" data-sp-unit="' + esc(r.unit) + '" title="' + esc('Alarm band ' + band + ' · ' + adj + ' · ' + r.ev + (r.control ? ' · ' + r.control : '')) + '"><th scope="row">' + esc(r.label) + '</th>' +
+        '<td data-k="sp">' + esc(C.fmt(r.value, r.unit) + u) + '</td>' +
+        '<td data-k="pv">—</td><td data-k="err">—</td>' +
+        '<td data-k="band">' + esc(band) + '</td><td data-k="adj">' + esc(adj) + '</td>' +
+        '<td data-k="ev">' + esc(r.ev) + '</td><td data-k="ctl">' + esc(r.control || '—') + '</td></tr>';
+    }).join('');
+    var wi = list.filter(function (r) { return r.adjustable && r.whatIf && r.param; }).map(wiBlock).join('');
+    return sec('Setpoints & limits', '<div class="rz-cvm-sp-wrap"><table class="rz-cvm-sp" data-rz-cvm-sp><thead><tr><th scope="col">Setpoint</th><th scope="col">SP</th><th scope="col">Live</th><th scope="col">Error</th><th scope="col" data-k="band">Alarm band</th><th scope="col" data-k="adj">Adjustable</th><th scope="col" data-k="ev">Evidence</th><th scope="col" data-k="ctl">Held by</th></tr></thead><tbody>' + body + '</tbody></table></div>' + wi, 'rz-cvm-sp-sec');
+  }
+  /* PRD-SETPOINT-SIM P2 what-if: a slider inside the registry's adjustable range recomputes the engine
+     (CONV_CALC.recompute on a copy of the model with that one parameter changed) and shows the steady-state outputs the
+     registry lists for it: engine now, SIMULATED, difference. Nothing is stored; Reset puts the SP back. */
+  function wiBlock(r) {
+    var a = r.adjustable, u = r.unit ? ' ' + r.unit : '';
+    var rows = r.whatIf.map(function (w) {
+      return '<tr data-wi-path="' + esc(w.path) + '" data-wi-unit="' + esc(w.unit) + '" data-wi-now="" data-wi-sim=""><th scope="row">' + esc(w.label) + '</th><td data-k="now">—</td><td data-k="sim">—</td><td data-k="d">—</td></tr>';
+    }).join('');
+    return '<div class="rz-cvm-wi" data-rz-cvm-whatif="' + esc(r.id) + '" data-wi-param="' + esc(r.param) + '" data-wi-sp="' + r.value + '" data-wi-unit="' + esc(r.unit) + '">' +
+      '<div class="rz-cvm-wi-ctl"><label><span>What-if · ' + esc(r.label) + '</span><input type="range" min="' + a.min + '" max="' + a.max + '" step="' + a.step + '" value="' + r.value + '" aria-label="' + esc('Simulate ' + r.label + ', ' + a.min + ' to ' + a.max + u) + '"></label>' +
+      '<output data-wi-out>' + esc('SP ' + root.RZControlPoints.fmt(r.value, r.unit) + u) + '</output><button type="button" data-wi-reset>Reset</button></div>' +
+      '<div class="rz-cvm-sp-wrap"><table class="rz-cvm-sp rz-cvm-wi-t"><thead><tr><th scope="col">Output (steady state)</th><th scope="col">Engine now</th><th scope="col">SIMULATED</th><th scope="col">Change</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+      '<p class="rz-cvm-note">' + esc(r.whatIfNote || '') + '</p></div>';
+  }
+  function wiRun(param, v) {
+    var E = root.CONV_CALC; if (!E || typeof E.recompute !== 'function' || !E.model) return null;
+    var m = JSON.parse(JSON.stringify(E.model)), k = String(param).split('.'), o = m;
+    for (var i = 0; i < k.length - 1; i++) { o = o && o[k[i]]; }
+    if (!o || typeof o[k[k.length - 1]] !== 'number') return null;
+    if (v !== null) o[k[k.length - 1]] = v;
+    return E.recompute(m);
+  }
+  function wiGet(s, p) { var k = p.split('.'), o = s; for (var i = 0; o != null && i < k.length; i++) o = o[k[i]]; return typeof o === 'number' && isFinite(o) ? o : NaN; }
+  function wiDec(n) { var s = String(n), i = s.indexOf('.'); return i < 0 ? 0 : s.length - i - 1; }
+  function wiShow(n, u) { return isFinite(n) ? String(n) + (u ? ' ' + u : '') : '—'; }
+  function wiBind() {
+    var C = root.RZControlPoints, boxes = el ? el.querySelectorAll('[data-rz-cvm-whatif]') : [];
+    for (var b = 0; b < boxes.length; b++) (function (box) {
+      if (box.getAttribute('data-wi-bound')) return;
+      box.setAttribute('data-wi-bound', '1');
+      var param = box.getAttribute('data-wi-param'), sp = +box.getAttribute('data-wi-sp'), un = box.getAttribute('data-wi-unit'), u = un ? ' ' + un : '';
+      var s = box.querySelector('input[type="range"]'), out = box.querySelector('[data-wi-out]'), trs = box.querySelectorAll('tr[data-wi-path]');
+      var s0 = wiRun(param, null);
+      for (var i = 0; i < trs.length; i++) { var n0 = s0 ? wiGet(s0, trs[i].getAttribute('data-wi-path')) : NaN; trs[i].setAttribute('data-wi-now', isFinite(n0) ? String(n0) : ''); trs[i].querySelector('[data-k="now"]').textContent = wiShow(n0, trs[i].getAttribute('data-wi-unit')); }
+      function clear() {
+        out.textContent = 'SP ' + C.fmt(sp, un) + u; box.removeAttribute('data-wi-active');
+        for (var i = 0; i < trs.length; i++) { trs[i].setAttribute('data-wi-sim', ''); trs[i].querySelector('[data-k="sim"]').textContent = '—'; trs[i].querySelector('[data-k="d"]').textContent = '—'; }
+      }
+      function run() {
+        var v = +s.value; if (!isFinite(v) || v === sp) { clear(); return; }
+        var s1 = wiRun(param, v); if (!s1) { clear(); return; }
+        out.textContent = 'SP\u2032 ' + C.fmt(v, un) + u + ' (SIMULATED)'; box.setAttribute('data-wi-active', '1');
+        for (var i = 0; i < trs.length; i++) {
+          var tr = trs[i], un2 = tr.getAttribute('data-wi-unit'), n0 = +tr.getAttribute('data-wi-now'), n1 = wiGet(s1, tr.getAttribute('data-wi-path'));
+          tr.setAttribute('data-wi-sim', isFinite(n1) ? String(n1) : '');
+          tr.querySelector('[data-k="sim"]').textContent = wiShow(n1, un2);
+          var d = n1 - n0, dp = Math.max(wiDec(n0), wiDec(n1));
+          tr.querySelector('[data-k="d"]').textContent = isFinite(d) ? (d > 0 ? '+' : d < 0 ? '\u2212' : '') + Math.abs(d).toFixed(dp) + (un2 ? ' ' + un2 : '') : '—';
+        }
+      }
+      s.addEventListener('input', run);
+      box.querySelector('[data-wi-reset]').addEventListener('click', function () { s.value = String(sp); clear(); });
+    })(boxes[b]);
+  }
+  /* the Live and Error cells read the point as shown anywhere in the document (the page or this modal, after points()
+     bound it); a point shown nowhere stays "—" with the reason in its title */
+  function engineOf(id) {
+    var S = root.CONV_CALC && root.CONV_CALC.snapshot, parts = String(id).split('.'), o = S;
+    for (var i = 0; o != null && i < parts.length; i++) o = o[parts[i]];
+    return typeof o === 'number' && isFinite(o) ? o : NaN;
+  }
+  /* PRD-SETPOINT-SIM P3: the class's sequence of operations (js/conv/sequence-view.js) when the page loads one */
+  function seqBlock(classKey) { return root.RZConvSequence ? root.RZConvSequence.block(classKey) : ''; }
+  function spLive() {
+    if (el && root.RZConvSequence) root.RZConvSequence.bind(el);
+    var C = root.RZControlPoints; if (!el || !C) return;
+    wiBind();
+    var trs = el.querySelectorAll('tr[data-sp-row]');
+    for (var i = 0; i < trs.length; i++) {
+      var tr = trs[i], pv = tr.getAttribute('data-sp-pv'), sp = +tr.getAttribute('data-sp'), un = tr.getAttribute('data-sp-unit'), u = un ? ' ' + un : '';
+      var node = pv ? doc.querySelector('[data-point="' + pv + '"][data-pt-value]') : null, raw = node ? node.getAttribute('data-pt-value') : '', v = raw !== '' && raw !== null ? +raw : NaN, src = 'the value this page shows';
+      if (!isFinite(v) && pv) { v = engineOf(pv); src = 'the engine value (this page does not show the point)'; }
+      var pc = tr.querySelector('[data-k="pv"]'), ec = tr.querySelector('[data-k="err"]');
+      if (isFinite(v)) { pc.textContent = C.fmt(v, un) + u; ec.textContent = (v - sp >= 0 ? '+' : '') + (v - sp).toFixed(1) + u; pc.setAttribute('title', src); pc.setAttribute('data-src', node && src.indexOf('page') > 0 ? 'page' : 'engine'); }
+      else { pc.textContent = '—'; ec.textContent = '—'; pc.setAttribute('title', 'not shown on this page and not an engine value'); pc.removeAttribute('data-src'); }
+    }
+  }
   function sections(p, withMimic) {
     var t = p.tabs, live = t.live.filter(function (r) { return r.label !== 'Role'; });
     var trend = t.trend;
@@ -176,7 +282,7 @@
         sec('Maintenance', rows(t.maint), 'rz-cvm-wide');
   }
   function focusables() {
-    return Array.prototype.slice.call(el.querySelectorAll('button,select,[tabindex="0"],a[href]')).filter(function (x) { return x.offsetParent !== null; });
+    return Array.prototype.slice.call(el.querySelectorAll('button,select,input,[tabindex="0"],a[href]')).filter(function (x) { return x.offsetParent !== null; });
   }
   function onKey(e) {
     if (!el || el.hidden) return;
@@ -199,7 +305,7 @@
     var id = t.getAttribute('data-basis-param');
     if (root.RZBasisDrawer && typeof root.RZBasisDrawer.open === 'function') { close(); root.RZBasisDrawer.open(id); }
   }
-  function points() { if (root.RZPointStatus && el) root.RZPointStatus.bindAll(el.querySelector('.rz-cvm-panel') || el); }
+  function points() { if (root.RZPointStatus && el) root.RZPointStatus.bindAll(el.querySelector('.rz-cvm-panel') || el); spLive(); }
   function render() {
     if (IN) { renderInt(); return; }
     var scroller = el.querySelector('.rz-cvm-panel'), top = scroller ? scroller.scrollTop : 0;
@@ -326,6 +432,7 @@
       var fTop = intTop(), fDet = intDetail(), fLow = intLower();
       panel.innerHTML = '<div data-rz-cvm-top>' + fTop + '</div>' +
         '<div class="rz-cvm-int rz-cvm-int-fleet">' + sec('Unit', '<div data-rz-cvm-detail aria-live="polite">' + fDet + '</div>', 'rz-cvm-int-detail') + '</div>' +
+        spBlock(opts.internal.classKey) + seqBlock(opts.internal.classKey) +
         '<div data-rz-cvm-lower>' + fLow + '</div>';
       panel.querySelector('[data-rz-cvm-top]').__html = fTop; panel.querySelector('[data-rz-cvm-detail]').__html = fDet; panel.querySelector('[data-rz-cvm-lower]').__html = fLow;
       points();
@@ -341,7 +448,7 @@
       '<div class="rz-cvm-int">' +
         sec('Internal drawing', '<div class="rz-cvm-int-host hmi-host hmi-depth" data-rz-cvm-int data-theme="' + (doc.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark') + '"></div><div class="rz-cvm-media" aria-label="Media">' + mediaKey(def) + '</div>', 'rz-cvm-int-draw') +
         sec('Block detail', '<div data-rz-cvm-detail aria-live="polite">' + hDet + '</div>', 'rz-cvm-int-detail') +
-      '</div>' + (cyc ? '<div class="rz-cvm-cycle">' + sec('Refrigeration cycle (P-h)', root.RZConvPh.markup()) + '</div>' : '') +
+      '</div>' + spBlock(I.classKey) + seqBlock(I.classKey) + (cyc ? '<div class="rz-cvm-cycle">' + sec('Refrigeration cycle (P-h)', root.RZConvPh.markup()) + '</div>' : '') +
       '<div data-rz-cvm-lower>' + hLow + '</div>';
     panel.querySelector('[data-rz-cvm-top]').__html = hTop; panel.querySelector('[data-rz-cvm-detail]').__html = hDet; panel.querySelector('[data-rz-cvm-lower]').__html = hLow;
     var host = panel.querySelector('[data-rz-cvm-int]'), sh = def.sheet(IN.unit);
@@ -358,6 +465,7 @@
     refocus(fk);
   }
   function paintInt(first) {
+    spLive();   /* PRD-SETPOINT-SIM P1: the Live / Error cells follow the repaint */
     var V = root.RZConvVfx, R = R_(), I = opts.internal, host = el.querySelector('[data-rz-cvm-int]');
     if (!IN.sheet || !host) return;
     IN.sheet.update();

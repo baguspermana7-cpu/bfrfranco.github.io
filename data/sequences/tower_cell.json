@@ -1,0 +1,85 @@
+{
+  "classKey": "tower_cell",
+  "title": "Cooling tower cells — sequence of operations",
+  "note": "PRD-SETPOINT-SIM P3. Curated; thresholds resolved by tools/build-sequences.mjs (see chiller.json).",
+  "basis": {
+    "ref": "ASHRAE Guideline 36-2021, chilled-water plant sequences (developed under ASHRAE RP-1711)",
+    "use": "the structure: tower fans hold the condenser water supply setpoint, cells follow the chillers, minimum entering condenser water protection",
+    "evidenceClass": "STANDARD",
+    "limits": "the numbers come from this plant's engine, limits registry and control registry, not from the guideline"
+  },
+  "fleet": {
+    "noun": "cells", "unitLabel": "kW",
+    "running": "cooling.tower_cells_running", "total": "cooling.tower_cell_count", "unit": "cooling.tower_cell_rated_kw_th",
+    "load": { "key": "cooling.tower_rejection_kw_th" },
+    "pv": { "label": "CDW supply", "short": "rises", "ok": "at setpoint" }
+  },
+  "plant": "one induced-draft cell per chiller, no standby cells (js/conv-engine.js tower_standby_cells 0); a cell's rating is its heat rejection at full fan speed at the design wet bulb and approach",
+  "modes": [
+    {
+      "id": "normal",
+      "label": "Normal — fans hold CDW supply",
+      "kind": "normal",
+      "entry": [{ "text": "condenser water loop enabled and the cells of the running chillers proven" }],
+      "actions": [
+        "run one cell per running chiller",
+        "the fan speed (VSD) holds the condenser water supply at its setpoint"
+      ],
+      "exit": [
+        { "to": "follow_chiller", "event": "a chiller starts or stops" },
+        { "to": "cell_trip", "event": "a running cell's fan trips" },
+        { "to": "high_cdw", "limit": "cooling.cdw_supply_c", "band": "hi_warn", "op": ">=", "delay_s": 300 },
+        { "to": "low_ecwt", "param": "cooling.chiller_min_ecwt_c", "op": "<", "text": "entering condenser water below the chillers' minimum" }
+      ],
+      "assumed": { "delay_s 300": "5 min confirmation of a high condenser water temperature; no source in this repo states it" }
+    },
+    {
+      "id": "follow_chiller",
+      "label": "Follow the chillers",
+      "kind": "transition",
+      "entry": [{ "text": "a chiller starts or stops" }],
+      "actions": ["open (or close) the isolation valves of its cell", "start (or stop) the cell fan"],
+      "exit": [{ "to": "normal", "event": "the cell count equals the running chillers" }]
+    },
+    {
+      "id": "cell_trip",
+      "label": "Cell fan trip — start an idle cell",
+      "kind": "protection",
+      "entry": [{ "event": "a running cell's fan trips (VSD fault, vibration or motor protection)" }],
+      "actions": [
+        "lock out the tripped cell, close its isolation valves, raise an alarm",
+        "the remaining fans run to full speed; CDW supply rises while rejection is short",
+        "open the valves of an idle cell and start its fan"
+      ],
+      "exit": [{ "to": "normal", "event": "the idle cell is proven running" }],
+      "notModelled": "whether the cells share one condenser water header is not stated by the engine; starting an idle cell for another chiller assumes they do"
+    },
+    {
+      "id": "high_cdw",
+      "label": "High condenser water — all cells",
+      "kind": "protection",
+      "entry": [{ "limit": "cooling.cdw_supply_c", "band": "hi_warn", "op": ">=", "delay_s": 300 }],
+      "actions": ["run every available cell, fans at full speed", "close the tower 3-way bypass"],
+      "exit": [{ "to": "normal", "limit": "cooling.cdw_supply_c", "band": "hi_warn", "op": "<", "delay_s": 300 }]
+    },
+    {
+      "id": "low_ecwt",
+      "label": "Low entering condenser water — bypass",
+      "kind": "protection",
+      "entry": [{ "param": "cooling.chiller_min_ecwt_c", "op": "<", "text": "entering condenser water below the chillers' minimum" }],
+      "actions": ["fans to minimum speed, then off", "the tower 3-way bypass holds the minimum entering condenser water"],
+      "exit": [{ "to": "normal", "param": "cooling.chiller_min_ecwt_c", "op": ">=", "text": "entering condenser water at or above the minimum" }]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "cell_trip",
+      "label": "One running cell's fan trips",
+      "steps": [
+        { "mode": "normal", "do": {} },
+        { "mode": "cell_trip", "do": { "running": -1, "available": -1 } },
+        { "mode": "normal", "do": { "running": 1 } }
+      ]
+    }
+  ]
+}

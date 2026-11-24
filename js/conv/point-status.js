@@ -212,6 +212,9 @@
       if (a) parts.push('alarm ' + a + (unit ? ' ' + unit : ''));
       parts.push('limits ' + L.evidenceClass);
     }
+    /* PRD-SETPOINT-SIM P1: the setpoint this point is held to (js/rz-control-points.js); absent module = no line */
+    var C = root && root.RZControlPoints, ct = C && C.tipFor ? C.tipFor(id, unit) : null;
+    if (ct) parts.push(ct);
     parts.push('Click for trend');
     return parts.join(' · ');
   }
@@ -293,6 +296,9 @@
       cls: el.getAttribute('data-pt-cls') === 'ENGINE' ? 'ENGINE' : 'SIM', group: el.getAttribute('data-pt-group') || 'Points'
     };
     if (def.cls === 'ENGINE') def.ref = base;
+    /* PRD-SETPOINT-SIM P1: a point held to a setpoint draws it as the trend's dashed reference line, labelled SP */
+    var C = root && root.RZControlPoints, sp = C && C.spOf ? C.spOf(id) : null;
+    if (sp) { var cp = {}; for (var k in def) cp[k] = def[k]; cp.ref = sp.value; cp.refLabel = sp.label; def = cp; }
     T.register([H && H.bounded && L ? H.bounded(def, L) : def]);
   }
   var bound = false;

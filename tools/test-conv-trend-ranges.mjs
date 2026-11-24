@@ -60,6 +60,7 @@ const PLANTS = {
   mix: ['js/rz-trend.js', 'var prov = openDown ? null : providerFor(p.id);', 'var prov = providerFor(p.id);'],
   nobucket: ['js/rz-trend.js', 'if (d.bucket && d.pts.length) s +=', 'if (false) s +='],
   nodblimits: ['js/conv/point-status.js', "setDbRows(res.data, 'database');", ''],
+  refstack: ['js/rz-trend.js', 'while (busy(ly) && n < 12)', 'while (false && n < 12)'],
 };
 if (PLANT && !PLANTS[PLANT]) { console.error(`unknown plant ${PLANT}: ${Object.keys(PLANTS).join(', ')}`); process.exit(2); }
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json' };
@@ -459,6 +460,32 @@ for (const [width, theme] of [[1440, 'dark'], [1440, 'light'], [390, 'dark']]) {
     ok(/GMT\+7/.test(a.read) && !/UTC/.test(a.read), 'L12', `${rg} read line names the viewer's zone: "${a.read}"`);
     await pg.keyboard.press('Escape'); await sleep(300);
   }
+  await pg.close();
+}
+
+/* L13 (PRD-SETPOINT-SIM P1): a reference line's label ("SP 26.0") is muted ink in the right gutter and its box meets no
+   limit label's box — planted at the H limit value, the worst case, where the naive spot is the H label's own row */
+{
+  const pg = await browser.newPage();
+  await pg.evaluateOnNewDocument(() => { try { localStorage.setItem('theme', 'dark'); sessionStorage.clear(); } catch (e) { /* none */ } });
+  await pg.setViewport({ width: 1440, height: 900, deviceScaleFactor: 1 });
+  await pg.goto(O + FIX, { waitUntil: 'load' });
+  await pg.evaluate((c) => { window.RZTrend.now = () => c; }, CLOCK);
+  const r = await pg.evaluate((src) => {
+    const L = window.RZPointStatus.limits(src), sp = L.hi_warn;
+    window.RZPointStatus.define('test.sp_at_h', { lo_alarm: L.lo_alarm, lo_warn: L.lo_warn, hi_warn: L.hi_warn, hi_alarm: L.hi_alarm, deadband: L.deadband, basis: 'gate fixture', evidenceClass: 'ASSUMED', source: { ref: 'tools/test-conv-trend-ranges.mjs' } });
+    window.RZTrend.register([{ id: 'test.sp_at_h', label: 'SP at H', unit: L.unit || '°C', base: sp - 0.4, amp: 0.3, digits: 1, shape: 'load', cls: 'SIM', group: 'Points', ref: sp, refLabel: 'SP ' + sp.toFixed(1) }]);
+    window.RZTrend.open('test.sp_at_h', { range: '1H' });
+    const lab = document.querySelector('.rz-trend-plot [data-ref-label="test.sp_at_h"]');
+    if (!lab) return { lab: null };
+    const box = (e) => { const b = e.getBBox(); return [b.x, b.y, b.x + b.width, b.y + b.height]; };
+    const B = box(lab), hit = [...document.querySelectorAll('.rz-trend-plot text.llab')].filter((t) => { const o = box(t); return o[0] < B[2] && B[0] < o[2] && o[1] < B[3] && B[1] < o[3]; }).map((t) => t.textContent);
+    const ll = document.querySelector('.rz-trend-plot text.llab');
+    return { lab: lab.textContent, hit, fill: getComputedStyle(lab).fill, mute: ll ? getComputedStyle(ll).fill : null, want: 'SP ' + sp.toFixed(1) };
+  }, PTS.warn.id);
+  ok(r.lab === r.want, 'L13', `reference label "${r.lab}" (want "${r.want}")`);
+  ok(r.lab && r.hit.length === 0, 'L13', `reference label box meets limit label(s) ${JSON.stringify(r.hit)}`);
+  ok(r.lab && r.fill === r.mute, 'L13', `reference label fill ${r.fill} is not the muted label ink ${r.mute}`);
   await pg.close();
 }
 

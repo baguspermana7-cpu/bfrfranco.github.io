@@ -1,0 +1,94 @@
+{
+  "classKey": "chw_secondary_pump",
+  "title": "CHW secondary pumps — sequence of operations",
+  "note": "PRD-SETPOINT-SIM P3. Curated; thresholds resolved by tools/build-sequences.mjs (see chiller.json).",
+  "basis": {
+    "ref": "ASHRAE Guideline 36-2021, chilled-water plant sequences (developed under ASHRAE RP-1711)",
+    "use": "the structure: variable-speed secondary pumps hold a differential-pressure setpoint, lead/lag staging on flow, standby start on a trip",
+    "evidenceClass": "STANDARD",
+    "limits": "the numbers come from this plant's engine and control registry, not from the guideline"
+  },
+  "fleet": {
+    "noun": "pumps", "unitLabel": "L/s",
+    "running": "cooling.chw_secondary_pumps_running", "total": "cooling.chw_secondary_pump_count", "unit": "cooling.chw_secondary_unit_flow_lps",
+    "load": { "product": ["cooling.chw_secondary_pumps_running", "cooling.chw_secondary_pump_flow_lps"] },
+    "pv": { "label": "Header DP", "short": "falls", "ok": "at setpoint" }
+  },
+  "plant": "variable-speed secondary pumps on one header, duty pumps sharing the plant flow equally plus one standby per header (js/conv-engine.js hydronic fleet)",
+  "modes": [
+    {
+      "id": "normal",
+      "label": "Normal — DP control",
+      "kind": "normal",
+      "entry": [{ "text": "secondary loop enabled and every duty pump proven" }],
+      "actions": [
+        "run the fewest pumps that carry the flow at their design flow: n = ceil(flow / unit design flow), the engine's own rule",
+        "the pump speed (VSD) holds the header differential pressure at its setpoint",
+        "rotate the lead pump by run hours"
+      ],
+      "exit": [
+        { "to": "stage_up", "derived": "demand_pct", "op": ">", "value": 100, "text": "flow above the running pumps' design flow" },
+        { "to": "stage_down", "derived": "part_load_n_minus_1_pct", "op": "<=", "value": 90, "delay_s": 600, "text": "one fewer pump would carry the flow" },
+        { "to": "pump_trip", "event": "a running pump trips" },
+        { "to": "low_dp", "setpoint": "conv.chiller-plant.chw_dp_sp", "op": "<", "delay_s": 120, "text": "header DP below its setpoint with every duty pump at full speed" }
+      ],
+      "assumed": {
+        "value 90": "10 % hysteresis below the design flow so a stage-down does not stage straight back up; no source in this repo states it",
+        "delay_s 600": "10 min pump staging delay against short-cycling; no source in this repo states it",
+        "delay_s 120": "2 min confirmation of a low header DP; no source in this repo states it"
+      }
+    },
+    {
+      "id": "stage_up",
+      "label": "Stage up — start the next pump",
+      "kind": "transition",
+      "entry": [{ "text": "from Normal (flow above design) or from a trip or a low DP (at once)" }],
+      "actions": [
+        "start the lag pump with the fewest run hours",
+        "ramp it to the speed of the running pumps",
+        "prove it running (flow or DP switch)"
+      ],
+      "exit": [{ "to": "normal", "event": "the new pump is proven running" }]
+    },
+    {
+      "id": "stage_down",
+      "label": "Stage down — stop one pump",
+      "kind": "transition",
+      "entry": [{ "text": "from Normal when one fewer pump carries the flow" }],
+      "actions": ["ramp the lag pump down and stop it", "the remaining pumps speed up to hold the DP setpoint"],
+      "exit": [{ "to": "normal", "event": "the pump is stopped" }]
+    },
+    {
+      "id": "pump_trip",
+      "label": "Pump trip — standby start",
+      "kind": "protection",
+      "entry": [{ "event": "a running pump trips (VSD fault or motor protection)" }],
+      "actions": [
+        "lock out the tripped pump and raise an alarm",
+        "start the standby pump at once (no staging delay)",
+        "the remaining pumps run to full speed; header DP falls below its setpoint while flow is short"
+      ],
+      "exit": [{ "to": "stage_up", "event": "standby pump start commanded" }]
+    },
+    {
+      "id": "low_dp",
+      "label": "Low header DP — start the standby",
+      "kind": "protection",
+      "entry": [{ "setpoint": "conv.chiller-plant.chw_dp_sp", "op": "<", "delay_s": 120, "text": "header DP below its setpoint with every duty pump at full speed" }],
+      "actions": ["raise an alarm", "start the standby pump"],
+      "exit": [{ "to": "stage_up", "event": "standby pump start commanded" }]
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "pump_trip",
+      "label": "One running pump trips",
+      "steps": [
+        { "mode": "normal", "do": {} },
+        { "mode": "pump_trip", "do": { "running": -1, "available": -1 } },
+        { "mode": "stage_up", "do": {} },
+        { "mode": "normal", "do": { "running": 1 } }
+      ]
+    }
+  ]
+}

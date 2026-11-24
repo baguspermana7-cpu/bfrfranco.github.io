@@ -110,7 +110,7 @@
     '.rz-trend-plot .band{stroke:none}.rz-trend-plot .band-ok{fill:var(--tr-text);fill-opacity:.05}' +
     '.rz-trend-plot .base{stroke:var(--tr-line)}' +
     '.rz-trend-plot .lline{stroke:var(--tr-text);stroke-width:1;stroke-opacity:.35;vector-effect:non-scaling-stroke}.rz-trend-plot .lline.alarm{stroke-opacity:.6}' +
-    '.rz-trend-plot .llab,.rz-trend-plot .endlab{fill:var(--tr-mute);font:10px "IBM Plex Mono","JetBrains Mono",monospace}' +
+    '.rz-trend-plot .llab,.rz-trend-plot .endlab,.rz-trend-plot .ref-lab{fill:var(--tr-mute);font:10px "IBM Plex Mono","JetBrains Mono",monospace}' +
     '.rz-trend-plot .cur{stroke:var(--tr-mute);stroke-opacity:.7}' +
     '.rz-trend-stats{margin:8px 0 0;color:var(--tr-mute);font-size:12px;line-height:1.6}' +
     '.rz-trend-stats b{font:500 12.5px "IBM Plex Mono","JetBrains Mono",monospace;font-variant-numeric:tabular-nums;color:var(--tr-text);white-space:nowrap}' +
@@ -329,6 +329,16 @@
     });
     return s;
   }
+  /* the reference line's label (PRD-SETPOINT-SIM P1: "SP 19.4"), muted ink in the right gutter beside the limit labels;
+     it moves by one label row (11 px) away from the plot's middle until its row is free of every label already drawn */
+  function refLab(drawn, p, y, a) {
+    var taken = [], re = /<text class="(?:llab|ref-lab)[^"]*"[^>]*? y="(-?[\d.]+)"/g, m;
+    while ((m = re.exec(drawn))) taken.push(+m[1]);
+    var ly = y + 3.5, dir = ly < (a.top + a.bot) / 2 ? -1 : 1, n = 0;
+    function busy(v) { for (var i = 0; i < taken.length; i++) if (Math.abs(taken[i] - v) < 11) return true; return false; }
+    while (busy(ly) && n < 12) { ly += dir * 11; n++; if (ly < a.top + 8 || ly > a.bot - 2) { dir = -dir; ly = y + 3.5; } }
+    return '<text class="ref-lab" data-ref-label="' + esc(p.id) + '" x="' + (W - PAD.r + 5) + '" y="' + ly.toFixed(1) + '">' + esc(p.refLabel) + '</text>';
+  }
   /* a pen split where it crosses a limit (interpolated, so the pieces meet ON the line) and coloured by the state of
      each piece; a gap of more than two steps is drawn dotted and muted, never as a straight cliff (G12) */
   function segments(pts, L, step) {
@@ -398,6 +408,7 @@
     data.forEach(function (d) {
       var a = ax[d.p.unit || ''], pp = function (q, key) { return X(q.t).toFixed(1) + ',' + Y(q[key || 'v'], a).toFixed(1); };
       if (isNum(d.p.ref)) s += '<line class="ref" data-ref="' + esc(d.p.id) + '" x1="' + PAD.l + '" x2="' + (W - PAD.r) + '" y1="' + Y(d.p.ref, a) + '" y2="' + Y(d.p.ref, a) + '"/>';
+      if (isNum(d.p.ref) && d.p.refLabel) s += refLab(s, d.p, Y(d.p.ref, a), a);
       if (d.i === 0 && !L0) ['hi', 'lo'].forEach(function (Lk) { if (isNum(d.p[Lk]) && d.p[Lk] >= a.lo && d.p[Lk] <= a.hi) s += '<line class="lim" data-limit="' + Lk + '" x1="' + PAD.l + '" x2="' + (W - PAD.r) + '" y1="' + Y(d.p[Lk], a) + '" y2="' + Y(d.p[Lk], a) + '"/>'; });
       if (d.bucket && d.pts.length) s += '<polygon class="pen-band" data-pen-band="' + esc(d.p.id) + '" style="fill:' + colour(d.i) + '" points="' +
         d.pts.map(function (q) { return pp(q, 'max'); }).concat(d.pts.slice().reverse().map(function (q) { return pp(q, 'min'); })).join(' ') + '"/>';
