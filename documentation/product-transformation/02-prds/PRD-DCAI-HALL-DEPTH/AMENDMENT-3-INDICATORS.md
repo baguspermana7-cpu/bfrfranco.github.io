@@ -4,7 +4,7 @@ Owner, 2026-11-23: "Continue improve more" (standing: "animasi state, indikasi b
 accurate dan valid dan comprehensive"). Amendment 1 §7.3 and §8 asked for this, and its law table carried HV-S1 and HV-I1
 as "A5".
 
-Status: A5a (S1, I1), D6 (M3), A5b (I2, I3), D7 (U1) and D8 (P2) built and gated in the v3.104.0 candidate. Red before green: S1/I1 4 of 36, M3 6 of 12, I2/I3 8 of 19, U1 4 of 4 (+ 2 of 8 tags cut by the stage), P2 9 of 12.
+Status: A5a (S1, I1), D6 (M3), A5b (I2, I3), D7 (U1) and D8 (P2) built and gated in the v3.104.0 candidate. A5c (flag opens its alarms) in Amendment 4. Red before green: S1/I1 4 of 36, M3 6 of 12, I2/I3 8 of 19, U1 4 of 4 (+ 2 of 8 tags cut by the stage), P2 9 of 12.
 
 ## 1 · What is wrong (measured on v3.103.0 candidate 5b8c2c33b, 1440 × 900, 2D)
 

@@ -77,6 +77,11 @@
       '.dh-flag,.dh-flag-more{position:absolute;white-space:nowrap;padding:1px 5px;border:1px solid var(--rz-pt-warn,#d97706);border-radius:2px;background:var(--bg2);color:var(--t1);font:600 11px/16px "IBM Plex Mono",ui-monospace,monospace}',
       '.dh-flag[data-sev="alarm"]{border-color:var(--rz-pt-alarm,#dc2626)}',
       '.dh-flag-more{right:6px;top:6px;border-color:var(--bd);color:var(--t2)}',
+      /* A5c: a flag is a button that opens the alarms it stands for; the hit area grows outside the hairline box, so the
+         placed box (and the overlap laws) stay as drawn */
+      'button.dh-flag,button.dh-flag-more{pointer-events:auto;cursor:pointer;margin:0;text-align:left}',
+      'button.dh-flag::before,button.dh-flag-more::before{content:"";position:absolute;inset:-5px -2px}',
+      'button.dh-flag:focus-visible,button.dh-flag-more:focus-visible{outline:2px solid var(--t1);outline-offset:2px}',
       '@media (max-width:600px){.dh-flag,.dh-flag-more{font-size:10px;line-height:14px;padding:0 3px}}',
       '#hIsoWrap{display:none;margin:0}#p-hall:not([data-dh-view="drawing"]) #hIsoWrap{display:flex;flex-wrap:wrap;align-items:flex-start;gap:8px 16px}',
       '#hIso{display:none;box-sizing:content-box;background:var(--bg2);border:1px solid var(--bd);border-radius:4px;overflow:hidden}',
@@ -260,6 +265,32 @@
       ' · ' + out[k].point + (out[k].note ? ' ' + out[k].note : '');
     return out.sort(function (a, b) { return (a.sev === b.sev ? 0 : (a.sev === 'alarm' ? -1 : 1)) || b.refs.length - a.refs.length; });
   }
+  /* A5c: the alarm records a flag stands for, from the same set that drew it. A wet row is its leak zone's event
+     (LEAK-Zrr, A5b B1); every other group is its units' alarms of the group's point. */
+  function alarmsOf(g) {
+    if (g.point === 'manifold') {
+      var zone = 'LEAK-Z' + String(g.tags[0] || '').replace(/^R(\d\d).*$/, '$1');
+      return hallAlarms.filter(function (a) { return a.tag === zone; });
+    }
+    return hallAlarms.filter(function (a) { return a.point === g.point && g.tags.indexOf(a.tag) >= 0; });
+  }
+  /* opens Alarms & Events on the active alarms of this hall, narrowed to one point when given (Amendment 4 C2, C3) */
+  function openAlarms(point) {
+    var hall = 'DH-' + pad2(win.currentDH || 1), tab = doc.querySelector('#tabs [data-t="alarms"]');
+    if (tab) tab.click();
+    var tries = 0;
+    (function apply() {
+      var form = doc.getElementById('alarmFilterForm'), view = doc.getElementById('alarmSavedView');
+      if (!form || !view) { if (++tries < 40) win.setTimeout(apply, 50); return; }
+      form.reset();
+      view.value = 'active';
+      doc.getElementById('alarmPoint').value = point || '';
+      doc.getElementById('alarmText').value = hall + '/';
+      view.dispatchEvent(new Event('change', { bubbles: true }));
+      var n = doc.getElementById('alarmResultCount');
+      if (n) { n.setAttribute('tabindex', '-1'); n.focus(); }
+    })();
+  }
   function drawFlags() {
     if (!wrap || !host) return;
     if (!flagBox) { flagBox = doc.createElement('div'); flagBox.className = 'dh-flags'; flagBox.setAttribute('aria-live', 'polite'); }
@@ -273,7 +304,8 @@
     [].forEach.call(root.querySelectorAll('.zone-head'), function (h) { var b = h.getBoundingClientRect(); if (b.width) placed.push({ l: b.left - hb.left, t: b.top - hb.top, r: b.right - hb.left, b: b.bottom - hb.top }); });
     function cut(a, b) { return Math.min(a.r, b.r) - Math.max(a.l, b.l) > 0 && Math.min(a.b, b.b) - Math.max(a.t, b.t) > 0; }
     /* the "+n" chip first, so no flag lands on it */
-    var more = doc.createElement('span'); more.className = 'dh-flag-more'; more.textContent = '+000'; flagBox.appendChild(more);
+    var more = doc.createElement('button'); more.type = 'button'; more.className = 'dh-flag-more';
+    more.addEventListener('click', function () { openAlarms(''); }); more.textContent = '+000'; flagBox.appendChild(more);
     var mb = more.getBoundingClientRect(); placed.push({ l: mb.left - hb.left, t: mb.top - hb.top, r: mb.right - hb.left, b: mb.bottom - hb.top });
     var shown = 0;
     for (i = 0; i < gs.length; i++) {
@@ -281,8 +313,15 @@
       if (shown >= 8) { left += g.refs.length; continue; }
       var mid = host.querySelector('[data-rz-equipment="' + g.refs[Math.floor(g.refs.length / 2)] + '"]'), ab = mid && mid.getBoundingClientRect();
       if (!ab || !ab.width) { left += g.refs.length; continue; }
-      var f = doc.createElement('span'); f.className = 'dh-flag'; f.setAttribute('data-sev', g.sev); f.setAttribute('data-point', g.point); f.setAttribute('data-units', String(g.refs.length));
-      f.textContent = g.label; f.title = g.label + ' — open a unit for its HMI'; flagBox.appendChild(f);
+      var recs = alarmsOf(g), ap = recs.length ? recs[0].point : null;
+      var f = doc.createElement(ap ? 'button' : 'span'); f.className = 'dh-flag'; f.setAttribute('data-sev', g.sev); f.setAttribute('data-point', g.point); f.setAttribute('data-units', String(g.refs.length));
+      f.textContent = g.label; flagBox.appendChild(f);
+      if (ap) {
+        f.type = 'button'; f.setAttribute('data-alarm-point', ap); f.setAttribute('data-alarms', String(recs.length));
+        f.setAttribute('aria-label', g.label + ' — ' + recs.length + (recs.length === 1 ? ' alarm' : ' alarms') + ' ' + ap + ', open in Alarms & Events');
+        f.title = g.label + ' — ' + recs.length + (recs.length === 1 ? ' alarm' : ' alarms') + ' · open in Alarms & Events';
+        f.addEventListener('click', (function (pt) { return function () { openAlarms(pt); }; })(ap));
+      } else f.title = g.label + ' — open a unit for its HMI';
       var w = f.offsetWidth, h = f.offsetHeight, a = { l: ab.left - hb.left, t: ab.top - hb.top, r: ab.right - hb.left, b: ab.bottom - hb.top }, cx = (a.l + a.r) / 2, cy = (a.t + a.b) / 2;
       var cand = [[cx - w / 2, a.t - h - 4], [cx - w / 2, a.b + 4], [a.r + 4, cy - h / 2], [a.l - w - 4, cy - h / 2], [cx - w / 2, a.t - 2 * h - 8], [cx - w / 2, a.b + h + 8]], best = null, c, j;
       for (c = 0; c < cand.length && !best; c++) {
@@ -296,7 +335,7 @@
       f.style.left = best.l + 'px'; f.style.top = best.t + 'px'; placed.push(best); shown++;
     }
     if (left) {
-      more.textContent = '+' + left; more.setAttribute('data-n', String(left)); more.title = left + ' more alarmed units without a flag (see Show as table)';
+      more.textContent = '+' + left; more.setAttribute('data-n', String(left)); more.title = left + ' more alarmed units without a flag — open the active alarms of this hall'; more.setAttribute('aria-label', more.title);
     } else more.parentNode.removeChild(more);
   }
   /* the operating point of one unit (PRD-DCAI-HALL-DEPTH A3 §6): a running unit carries its share of the hall load, as the

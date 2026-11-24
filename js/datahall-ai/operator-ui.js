@@ -167,7 +167,7 @@
 
   function renderAlarmSummary(records, firstOut) {
     var critical = records.filter(function (item) { return item.severity === 'critical'; }).length;
-    var active = records.filter(function (item) { return item.lifecycle.indexOf('active_') === 0; }).length;
+    var active = activeNow(records).length;
     var simulated = records.filter(function (item) { return item.quality === 'simulated'; }).length;
     text('alarmResultCount', records.length);
     text('alarmCriticalCount', critical);
@@ -180,6 +180,21 @@
     var lookup = Object.create(null);
     ids.forEach(function (id) { lookup[id] = true; });
     return lookup;
+  }
+
+  /* Amendment 4 (A5c): the journal is append-only, so a cleared alarm keeps its old active_* record. An alarm is active
+     only when its latest record for the same tag and point is active (ISA-18.2 state, not history). */
+  function latestByPoint() {
+    var last = {};
+    alarmEvents.forEach(function (e) {
+      var k = e.tag + '|' + e.point, o = typeof e.sequence === 'number' ? e.sequence : Date.parse(e.timestamp);
+      if (!last[k] || o >= last[k].o) { last[k] = { o: o, id: e.id }; }
+    });
+    return last;
+  }
+  function activeNow(records) {
+    var last = latestByPoint();
+    return records.filter(function (e) { var l = last[e.tag + '|' + e.point]; return e.lifecycle.indexOf('active_') === 0 && l && l.id === e.id; });
   }
 
   function alarmQuerySnapshot(filter) {
@@ -238,9 +253,11 @@
     try {
       var filter = buildAlarmFilter();
       var snapshot = alarmQuerySnapshot(filter);
-      var records = firstOutOnly ? snapshot.firstOut : snapshot.result.records;
+      var current = trimmed('alarmSavedView') === 'active';
+      var all = current ? activeNow(snapshot.result.records) : snapshot.result.records;
+      var records = firstOutOnly ? snapshot.firstOut : all;
       renderAlarmRows(records, snapshot.firstIds);
-      renderAlarmSummary(snapshot.result.records, snapshot.firstOut);
+      renderAlarmSummary(all, snapshot.firstOut);
       setAlarmQueryState('ready');
     } catch (error) {
       renderAlarmError(error);
