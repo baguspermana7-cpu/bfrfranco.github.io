@@ -1515,7 +1515,7 @@ function chwRead(n){
       out.values = !ok ? { cmd: chwVal('—'), st: chwVal(CHW_UNAV) } : {
         cmd: chwVal(pc === 'on' ? 'CMD ON' : 'CMD OFF', mm ? '2' : null),
         st: chwVal(pf === 'on' ? 'RUN' : 'STOP', mm ? '2' : null) };
-      out.rows = ok ? [['Mode', run ? 'Duty' : 'Standby'], ['Speed', run ? r1(spd) + ' % · ' + (spd * CHW_FBASE / 100).toFixed(1) + ' Hz' : '0 %', ui.maint ? null : 'engine'], ['Head', (isA ? m.headA : (isB ? m.headB : 0)) + ' m'], ['Current', 'not modelled'], ['Vibration', 'not modelled']] : [['Mode', CHW_UNAV]];
+      out.rows = ok ? [['Mode', run ? 'Duty' : 'Standby'], ['Speed', run ? r1(spd) + ' % · ' + (spd * CHW_FBASE / 100).toFixed(1) + ' Hz' : '0 %', ui.maint ? null : 'engine'], ['Head', (isA ? m.headA : (isB ? m.headB : 0)) + ' m', ui.maint ? null : 'engine'], ['Current', 'not modelled'], ['Vibration', 'not modelled']] : [['Mode', CHW_UNAV]];
     }
     return out;
   }

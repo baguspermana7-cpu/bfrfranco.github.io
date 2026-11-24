@@ -117,7 +117,9 @@
       live: [S('Speed', '%', 78, 4, 0), S('Motor current', 'A', 96, 5, 0), S('Differential head', 'kPa', 245, 9, 0), S('Vibration (ISO 10816)', 'mm/s', 1.8, 0.3, 1)],
       cap: [B('Loop ΔT (design)', 'cooling.chw_delta_t', 1), B('Chiller duty served', 'cooling.chiller_unit_kw_th', 0), D('Arrangement', 'duty / standby per chiller'), D('Permissive', 'suction valve open + no VFD fault')],
       al: [D('Command / feedback mismatch', 'run command without run feedback for 10 s'), D('High vibration', '> 4.5 mm/s (ISO 10816 zone C)'), D('VFD trip', 'drive fault input')],
-      tr: { label: 'Differential head', unit: 'kPa', base: 245, amp: 9, digits: 0 }, m: 'a180pump',
+      /* Amendment E2 (engine 2.10.0): the trend anchors on the operating dp of the pump's own loop, picked by its sheet class */
+      tr: { label: 'Differential head', id: 'cooling.chw_primary_pump_dp_op_kpa', amp: 3, digits: 0 }, m: 'a180pump',
+      trBy: { 'chw-sec': 'cooling.chw_secondary_pump_dp_op_kpa' },
       g: 'A command without feedback means the motor did not start: check the VFD and the standby takes over. Rising vibration at steady speed points to bearing wear or cavitation.' },
     'chiller:instField': { name: 'Temperature transmitter', role: 'Measures loop water temperature for control and alarms',
       live: [SB('Process value', 'cooling.chws_c', 0.15, 1), D('Range', '0–50 °C, 4–20 mA'), D('Signal quality', 'good (simulated loop)')],
@@ -445,6 +447,12 @@
   }
   function classOf(page, sym, n) {
     var cls = CLASSES[page + ':' + sym] || CLASSES[sym] || null, out, k;
+    if (cls && cls.trBy && n && cls.trBy[n.cls]) {
+      out = {};
+      for (k in cls) if (Object.prototype.hasOwnProperty.call(cls, k)) out[k] = cls[k];
+      out.tr = { label: cls.tr.label, id: cls.trBy[n.cls], amp: cls.tr.amp, digits: cls.tr.digits };
+      return out;
+    }
     if (!cls || !onReturn(page, n)) return cls;
     out = {};
     for (k in cls) if (Object.prototype.hasOwnProperty.call(cls, k)) out[k] = cls[k];
@@ -510,19 +518,24 @@
 
   function trendOf(cls, ctx) {
     var t = cls.tr; if (!t) return null;
-    var p = t.id ? param(t.id) : null, base = p && isNum(p.value) ? p.value : t.base;
+    var p = t.id ? param(t.id) : null, base = p && isNum(p.value) ? p.value : t.base, amp = t.amp;
+    /* a pump the page shows standing by prints Head 0 m from the engine: its differential head trends a flat 0 (E2) */
+    var pv = t.label === 'Differential head' ? pageRow(ctx, 'Differential head') : null, sb = pv === 0 || !!(pv && pv.eng === 0);
+    if (sb) { base = 0; amp = 0; }
     if (!isNum(base)) return null;
     var series = [], d = isNum(t.digits) ? t.digits : 1, f = Math.pow(10, d + 2);   /* stored finer than printed: the line stays smooth */
-    for (var i = 0; i < 60; i++) series.push(Math.round(wave(ctx.id + ':trend', ctx.tick - 59 + i, base, t.amp, 23) * f) / f);
+    for (var i = 0; i < 60; i++) series.push(Math.round(wave(ctx.id + ':trend', ctx.tick - 59 + i, base, amp, 23) * f) / f);
     var mn = Math.min.apply(null, series), mx = Math.max.apply(null, series), unit = p ? unitOf(p) : (t.unit || '');
     var rows = [
       { label: 'Minimum (60 ticks)', text: fmt(mn, d), unit: unit, quality: 'simulated', sim: true, declared: SIMD },
       { label: 'Maximum (60 ticks)', text: fmt(mx, d), unit: unit, quality: 'simulated', sim: true, declared: SIMD }
     ];
-    if (p) rows.unshift({ label: 'Engine plane (reference line)', text: fmt(p.value, d), unit: unit, quality: 'derived', basis: t.id });
+    if (sb) rows.unshift({ label: 'Standing by (reference line)', text: fmt(0, d), unit: unit, quality: 'derived',
+      declared: 'the page shows this pump standing by (Head 0 m): no differential head; the duty pumps run at ' + fmt(p ? p.value : t.base, d) + ' ' + unit });
+    else if (p) rows.unshift({ label: 'Engine plane (reference line)', text: fmt(p.value, d), unit: unit, quality: 'derived', basis: t.id });
     else rows.unshift({ label: 'Declared normal (reference line)', text: fmt(base, d), unit: unit, quality: 'declared', declared: DECL });
     return { label: t.label + ' (simulated)', unit: unit, series: series, ref: base, rows: rows,
-      declared: 'SIMULATED 60-tick series, seeded from the point id; the dashed line is ' + (p ? 'the engine value ' + t.id : 'the declared normal value') };
+      declared: 'SIMULATED 60-tick series, seeded from the point id; the dashed line is ' + (sb ? 'zero: the pump stands by' : p ? 'the engine value ' + t.id : 'the declared normal value') };
   }
 
   var DAY = 86400000, FIXTURE_EPOCH = Date.UTC(2026, 9, 1);

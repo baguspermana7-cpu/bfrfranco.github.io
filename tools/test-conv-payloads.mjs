@@ -124,3 +124,28 @@ test('P9 a chilled-water return transmitter reads the return temperature, a supp
     }
   }
 });
+
+/* P9 (PRD-CONV-OPS-DEPTH 01 §12 Amendment E2, engine 2.10.0): the differential-head trend of every chilled- and
+   condenser-water pump is anchored on the operating dp of its own loop (primary, secondary, condenser), never on a
+   typed 245 kPa; a pump the page shows standing by (Head 0 m, engine) trends a flat 0 kPa */
+test('P9 pump differential-head trend follows the engine operating dp of its loop; standby trends 0', () => {
+  const key = { 'chw-train': 'cooling.chw_primary_pump_dp_op_kpa', 'chw-sec': 'cooling.chw_secondary_pump_dp_op_kpa', 'cdw-pump': 'cooling.cdw_pump_dp_op_kpa' };
+  const seen = new Set();
+  for (const page of ['chiller', 'condenser']) {
+    const sh = sheets[page];
+    for (const n of sh.nodes.filter((x) => x.sym === 'pumpCentrifugal' && key[x.cls])) {
+      const want = IDX[key[n.cls]].value;
+      const run = P.build({ page, node: n, read: { values: {}, rows: [['Head', (want / 9.80665).toFixed(2) + ' m', 'engine']] }, edges: sh.edges, nodes: sh.nodes, tick: 7 });
+      assert.equal(run.tabs.trend.ref, want, `${n.tag} (${n.cls}) running trend reference ${run.tabs.trend.ref} vs ${key[n.cls]} ${want}`);
+      /* Head 0 m with the 'engine' mark (engine plane) and without it (the page's maintenance simulation): both stand by */
+      for (const head of [['Head', '0 m', 'engine'], ['Head', '0 m']]) {
+        const sb = P.build({ page, node: n, read: { values: {}, rows: [['Mode', 'Standby'], head] }, edges: sh.edges, nodes: sh.nodes, tick: 7 });
+        assert.equal(sb.tabs.trend.ref, 0, `${n.tag} standby trend reference (${head.length})`);
+        assert.ok(sb.tabs.trend.series.every((v) => v === 0), `${n.tag} standby trend is flat 0: ${sb.tabs.trend.series.slice(0, 3)}`);
+        assert.ok(!sb.tabs.trend.rows.some((r) => /Engine plane/.test(r.label)), `${n.tag} standby trend does not print the duty plane as its reference`);
+      }
+      seen.add(n.cls);
+    }
+  }
+  assert.deepEqual([...seen].sort(), ['cdw-pump', 'chw-sec', 'chw-train'], 'every loop has a pump checked');
+});

@@ -491,3 +491,31 @@ x_s = 0.98: the setpoint is a small share of a 30 m loop. That is the honest ans
 - Laws re-derived, not loosened: `test-conv-plant-internals` V1 hand calculation and L7 use H_op (doubling the whole
   system curve doubles power; a flow change scales power by q·H_op), `test-conv-internals-p3` P3-2 hydraulic and shaft
   use the fleet row's H_op.
+
+## 13. Amendment E2 — the pump trend shows the operating dp of its own loop (found 2026-11-24, v3.104.0)
+
+Measured on 110084672 (chiller-plant.html, 1440, the equipment modal of each pump):
+
+| Pump | Differential head reading | Trend reference line | Should be |
+|---|---|---|---|
+| CHWP-01A primary, duty | 118 kPa (marked SIM) | 245 kPa, typed | 117.3 kPa, `cooling.chw_primary_pump_dp_op_kpa` |
+| CHWP-01B primary, standby | 0 kPa | 245 kPa, typed | 0 kPa: a standing pump has no head |
+| secondary pump 1, duty | 287.0 kPa (engine) | 245 kPa, typed | 287 kPa, `cooling.chw_secondary_pump_dp_op_kpa` |
+| secondary pump 5, standby | 0.0 kPa | 245 kPa, typed | 0 kPa |
+
+The condenser pump trend was anchored on `cooling.cdw_pump_dp_op_kpa` in v3.104.0; the two chilled-water classes kept the
+typed 245 kPa, so the trend contradicted the reading above it by up to 170 kPa.
+
+- **E2a.** The `chiller:pumpCentrifugal` trend anchors on the primary operating dp; a node of sheet class `chw-sec` anchors on
+  the secondary one (`trBy`, picked in `classOf`). Amplitude 3 kPa (the reading band), not 9.
+- **E2b.** A pump the page shows standing by (its Head row reads 0 m) trends a flat 0 kPa, and the first trend row reads
+  "Standing by (reference line) 0 kPa", not the duty plane.
+- **E2c.** The primary Head row carries the `engine` mark outside the maintenance simulation, as Speed does: it is
+  H_d·n² with n the engine speed, which is the engine H_op of a dedicated primary branch (H_sp = 0).
+
+Law P9 (`tools/test-conv-payloads.mjs`): every loop (primary, secondary, condenser) has a pump checked; a duty pump's trend
+reference equals the registry value of its loop's `*_dp_op_kpa`; a standby pump, with and without the `engine` mark, trends
+flat 0 and never prints the duty plane. Red on 110084672 (`245 vs 117.3`).
+
+Status: built in the v3.105.x candidate. Browser, 1440: CHWP-01A 117.7 kPa engine / ref 117; CHWP-01B 0 / no plane;
+secondary 1 287.0 / ref 287; secondary 5 0.0 / no plane; 0 page errors.
