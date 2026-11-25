@@ -1309,7 +1309,46 @@
         },
         "control": "the CDU holds TCS supply with its HX control valve",
         "heldBy": null,
-        "adjustable": null
+        "adjustable": {
+          "min": 30,
+          "max": 45,
+          "step": 0.5,
+          "basis": "upper 45 °C: ASHRAE TC9.9 liquid cooling class W45 (facility water ≤ 45 °C); lower 30 °C: dew-point margin, ASSUMED"
+        },
+        "param": "thermal.tcsSupplyC",
+        "whatIf": [
+          {
+            "path": "design.planes.p04_free_cooling_margin_k",
+            "label": "Free-cooling margin at design ambient",
+            "unit": "K"
+          },
+          {
+            "path": "pue.free_cooling_cliff_ambient_c",
+            "label": "Ambient where liquid free cooling ends",
+            "unit": "°C"
+          },
+          {
+            "path": "pue.free_cooling_hours",
+            "label": "Free-cooling hours a year (shaped bins, ASSUMED)",
+            "unit": "h"
+          },
+          {
+            "path": "design.electrical.chiller_liquid_kwe",
+            "label": "Liquid-path chillers at design",
+            "unit": "kWe"
+          },
+          {
+            "path": "design.electrical.cooling_kwe",
+            "label": "Cooling power at design",
+            "unit": "kWe"
+          },
+          {
+            "path": "pue.annual_bin_weighted",
+            "label": "Annual PUE (bin weighted)",
+            "unit": ""
+          }
+        ],
+        "whatIfNote": "Steady state of the DC AI engine at the design point (design ambient 34 °C, shaped weather bins ASSUMED, not a TMY file); dynamics not modelled; nothing is saved."
       },
       "limits": {
         "hi_warn": 41,
@@ -1636,7 +1675,41 @@
         },
         "control": "the CRAH holds supply air with its chilled-water valve",
         "heldBy": null,
-        "adjustable": null
+        "adjustable": {
+          "min": 18,
+          "max": 27,
+          "step": 0.5,
+          "basis": "ASHRAE TC9.9 Thermal Guidelines (5th ed.), class A1 recommended inlet 18–27 °C; contained aisle, rack inlet = supply air"
+        },
+        "param": "thermal.airSupplyC",
+        "whatIf": [
+          {
+            "path": "design.planes.p12_chw_supply_c",
+            "label": "CHW supply temperature",
+            "unit": "°C"
+          },
+          {
+            "path": "design.planes.p18_cop_air_path",
+            "label": "Air-path chiller COP",
+            "unit": ""
+          },
+          {
+            "path": "design.electrical.chiller_air_kwe",
+            "label": "Air-path chillers at design",
+            "unit": "kWe"
+          },
+          {
+            "path": "design.electrical.cooling_kwe",
+            "label": "Cooling power at design",
+            "unit": "kWe"
+          },
+          {
+            "path": "pue.annual_bin_weighted",
+            "label": "Annual PUE (bin weighted)",
+            "unit": ""
+          }
+        ],
+        "whatIfNote": "Steady state of the DC AI engine at the design point (design ambient 34 °C, shaped weather bins ASSUMED, not a TMY file); dynamics not modelled; nothing is saved."
       },
       "limits": {
         "lo_alarm": 15,

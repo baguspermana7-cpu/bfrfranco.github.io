@@ -312,5 +312,87 @@
     "chem/conductivity": "conductivity setpoint of the blowdown controller",
     "chem/orp": "ORP control point of the biocide dosing",
     "chem/inhibitor_ppm": "inhibitor residual target of the dosing controller"
+  },
+  "dcaiAdjustable": {
+    "note": "PRD-SETPOINT-SIM §C P6. DC AI setpoints an operator can move, keyed by point id; the what-if is DCAI_CALC.compute on a copy of the model with param changed.",
+    "cdu/tcs_supply_c": {
+      "param": "thermal.tcsSupplyC",
+      "adjustable": {
+        "min": 30,
+        "max": 45,
+        "step": 0.5,
+        "basis": "upper 45 °C: ASHRAE TC9.9 liquid cooling class W45 (facility water ≤ 45 °C); lower 30 °C: dew-point margin, ASSUMED"
+      },
+      "whatIf": [
+        {
+          "path": "design.planes.p04_free_cooling_margin_k",
+          "label": "Free-cooling margin at design ambient",
+          "unit": "K"
+        },
+        {
+          "path": "pue.free_cooling_cliff_ambient_c",
+          "label": "Ambient where liquid free cooling ends",
+          "unit": "°C"
+        },
+        {
+          "path": "pue.free_cooling_hours",
+          "label": "Free-cooling hours a year (shaped bins, ASSUMED)",
+          "unit": "h"
+        },
+        {
+          "path": "design.electrical.chiller_liquid_kwe",
+          "label": "Liquid-path chillers at design",
+          "unit": "kWe"
+        },
+        {
+          "path": "design.electrical.cooling_kwe",
+          "label": "Cooling power at design",
+          "unit": "kWe"
+        },
+        {
+          "path": "pue.annual_bin_weighted",
+          "label": "Annual PUE (bin weighted)",
+          "unit": ""
+        }
+      ],
+      "whatIfNote": "Steady state of the DC AI engine at the design point (design ambient 34 °C, shaped weather bins ASSUMED, not a TMY file); dynamics not modelled; nothing is saved."
+    },
+    "crah/air_supply_c": {
+      "param": "thermal.airSupplyC",
+      "adjustable": {
+        "min": 18,
+        "max": 27,
+        "step": 0.5,
+        "basis": "ASHRAE TC9.9 Thermal Guidelines (5th ed.), class A1 recommended inlet 18–27 °C; contained aisle, rack inlet = supply air"
+      },
+      "whatIf": [
+        {
+          "path": "design.planes.p12_chw_supply_c",
+          "label": "CHW supply temperature",
+          "unit": "°C"
+        },
+        {
+          "path": "design.planes.p18_cop_air_path",
+          "label": "Air-path chiller COP",
+          "unit": ""
+        },
+        {
+          "path": "design.electrical.chiller_air_kwe",
+          "label": "Air-path chillers at design",
+          "unit": "kWe"
+        },
+        {
+          "path": "design.electrical.cooling_kwe",
+          "label": "Cooling power at design",
+          "unit": "kWe"
+        },
+        {
+          "path": "pue.annual_bin_weighted",
+          "label": "Annual PUE (bin weighted)",
+          "unit": ""
+        }
+      ],
+      "whatIfNote": "Steady state of the DC AI engine at the design point (design ambient 34 °C, shaped weather bins ASSUMED, not a TMY file); dynamics not modelled; nothing is saved."
+    }
   }
 }

@@ -14,6 +14,8 @@
  *   C6 a conv sp never comes from a limits row's `nominal` (a nominal is the middle of a band, not a setpoint)
  *   C7 freshness: the file equals what the builder writes now
  *   C9 one controller per DC AI plane: setpoint on exactly the holding class, every other reader a reference naming it
+ *   C13-DC the CDU TCS supply and fan-wall supply-air setpoints are adjustable; what-if = DCAI_CALC.compute of a copy
+ *   C12-DC the twin's forClass('dcai:<cls>') = the DC AI rows with a value for that class (PV = point id)
  *   C14 only js/rz-sp-block.js writes the Setpoints & limits markup (one implementation, §C4)
  *   C8 sp.role is 'setpoint' (a controller holds it: conv rows name it) or 'reference' (nameplate, nominal, design value)
  */
@@ -117,6 +119,29 @@ for (const r of rows.filter((x) => x.cockpit === 'conv' && x.sp)) {
   }
 }
 
+/* C13-DC (PRD-SETPOINT-SIM §C P6): the DC AI setpoints an operator can move (TCS supply at the CDU, supply air at the fan
+   wall) are adjustable with a written basis, and every listed what-if output moves across the range in a direct
+   DCAI_CALC.compute of a copy of the model (the live model is never touched) */
+{
+  const D = require(path.join(ROOT, 'js/dcai-engine.js'));
+  const get = (o, p) => p.split('.').reduce((x, k) => (x == null ? x : x[k]), o);
+  const before = JSON.stringify(D.model);
+  const at = (param, v) => { const m = JSON.parse(JSON.stringify(D.model)), k = param.split('.'); k.slice(0, -1).reduce((x, y) => x[y], m)[k[k.length - 1]] = v; return D.compute(m); };
+  for (const id of ['dcai.cdu/tcs_supply_c', 'dcai.crah/air_supply_c']) {
+    const r = rows.find((x) => x.id === id), sp = r && r.sp, a = sp && sp.adjustable;
+    ok(!!a && !!sp.param && Array.isArray(sp.whatIf) && sp.whatIf.length >= 3, `C13-DC ${id} is not adjustable with a param and >= 3 what-if outputs`);
+    if (!a || !sp.param || !sp.whatIf) continue;
+    ok(get(D.model, sp.param) === sp.value, `C13-DC ${id} param ${sp.param} = ${get(D.model, sp.param)} in the model, registry SP ${sp.value}`);
+    ok(/dynamics[^.]*not modelled/i.test(sp.whatIfNote || ''), `C13-DC ${id} what-if note does not say the dynamics are not modelled`);
+    const lo = at(sp.param, a.min), hi = at(sp.param, a.max), s0 = D.snapshot;
+    for (const w of sp.whatIf) {
+      ok(!!w.label && typeof w.unit === 'string' && typeof get(s0, w.path) === 'number', `C13-DC ${id} what-if ${w.path}: label, unit and a number in the snapshot`);
+      ok(get(lo, w.path) !== get(hi, w.path), `C13-DC ${id} what-if ${w.path} does not move between ${a.min} and ${a.max}`);
+    }
+  }
+  ok(JSON.stringify(D.model) === before, 'C13-DC a what-if recompute changed the live DC AI model');
+}
+
 /* C11 the browser twin js/rz-control-points.js is generated, fresh, and answers spOf / tipFor from the registry */
 const TWIN = path.join(ROOT, 'js/rz-control-points.js');
 try {
@@ -158,6 +183,20 @@ try {
     }
   }
 } catch (e) { ok(false, 'C7/C11 builder does not load: ' + e.message); }
+/* C12-DC the twin gives the DC AI inspector (P5) every DC AI row with a value for a class under 'dcai:<cls>', setpoints
+   and references alike, with the point id as its PV and heldBy on a reference */
+try {
+  const sb = { window: {} }; sb.window.window = sb.window;
+  new Function('window', fs.readFileSync(path.join(ROOT, 'js/rz-control-points.js'), 'utf8'))(sb.window);
+  const C = sb.window.RZControlPoints, want = {};
+  rows.filter((x) => x.cockpit === 'dcai' && x.sp).forEach((x) => (want[x.equipment] = want[x.equipment] || []).push(x));
+  for (const cls of Object.keys(want)) {
+    const got = C.forClass('dcai:' + cls);
+    ok(got.map((g) => g.id).sort().join(',') === want[cls].map((x) => x.id).sort().join(','), `C12-DC forClass(dcai:${cls}) = [${got.map((g) => g.id)}]`);
+    for (const g of got) { const x = want[cls].find((y) => y.id === g.id);
+      ok(!!x && g.value === x.sp.value && g.role === x.sp.role && g.pv[0] === x.id.slice(5) && (x.sp.role !== 'reference' || g.heldBy === x.sp.heldBy) && g.adjustable === (x.sp.adjustable ? g.adjustable : null), `C12-DC ${g.id} twin ${JSON.stringify({ v: g.value, role: g.role, pv: g.pv, heldBy: g.heldBy })}`); }
+  }
+} catch (e) { ok(false, 'C12-DC twin does not load: ' + e.message); }
 /* C14 one implementation (PRD-SETPOINT-SIM §C1/§C4): only js/rz-sp-block.js writes the Setpoints & limits markup; a
    host (conv modal, DC AI inspector) frames and binds it, never re-renders it */
 {
