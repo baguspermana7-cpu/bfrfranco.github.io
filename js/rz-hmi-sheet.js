@@ -177,7 +177,7 @@
       }
       var dAttr = pathD(pts);
       if (e.w !== 'signal' && e.w !== 'inst') shadowSvg += '<path class="hmi-edge-shadow ' + w + '" data-edge-shadow="' + esc(id) + '" d="' + dAttr + '"/>';
-      edgesSvg += '<path class="hmi-edge ' + m + ' ' + w + '" data-edge="' + esc(id) + '" data-ends="' + esc((na || '') + '|' + (nb || '')) + '"' + routed + ' data-flow="running" d="' + dAttr + '"/>';
+      edgesSvg += '<path class="hmi-edge ' + m + ' ' + w + '" data-edge="' + esc(id) + '" data-ends="' + esc((na || '') + '|' + (nb || '')) + '"' + routed + (e.loop ? ' data-loop="' + esc(e.loop) + '"' : '') + ' data-flow="running" d="' + dAttr + '"/>';
       if (e.w !== 'signal' && e.w !== 'inst') {
         hiSvg += '<path class="hmi-edge-hi ' + w + '" data-edge-hi="' + esc(id) + '" d="' + dAttr + '"/>';
         flowSvg += '<path class="hmi-edge hmi-flow ' + m + '" data-edge-flow="' + esc(id) + '" data-flow="running" d="' + pathD(pts) + '"/>';
@@ -196,7 +196,7 @@
       if (n.sym === 'junction') { nodeSvg += '<circle class="hmi-junction" data-junction="' + esc(n.id) + '" cx="' + r1(n.x) + '" cy="' + r1(n.y) + '" r="' + (n.dot === false ? 0 : 2.2) + '"/>'; return; }
       if (n.box) { nodeSvg += boxNode(n); return; }
       var sz = n.size || 32, h = sz / 2, label = (n.tag ? n.tag + ' — ' : '') + (n.label || (L.META[n.sym] || {}).label || n.sym);
-      nodeSvg += '<g class="hmi-node" data-node="' + esc(n.id) + '" data-sym="' + esc(n.sym) + '"' +
+      nodeSvg += '<g class="hmi-node" data-node="' + esc(n.id) + '" data-sym="' + esc(n.sym) + '"' + (n.loop ? ' data-loop="' + esc(n.loop) + '"' : '') +
         (n.cls ? ' data-rz-equipment="' + esc(n.cls) + ':' + esc(n.eqId || n.id) + '"' : '') +
         (n.hall ? ' data-hall-block="' + esc(n.hall) + '"' : '') +
         ' tabindex="0" role="button" aria-label="' + esc(label) + '">' +
@@ -232,6 +232,7 @@
           /* a value item with `point` is a point (PRD-CONV-POINT-STATUS-TREND T2): its id, name and unit ride on the label;
              data-point itself is written by update() once the label first shows a number (js/conv/point-status.js) */
           var pa = v.point ? ' data-pt-id="' + esc(v.point) + '"' + (v.label ? ' data-pt-label="' + esc(v.label) + '"' : '') + (v.unit ? ' data-pt-unit="' + esc(v.unit) + '"' : '') : '';
+          if (!v.point && v.const) pa += ' data-const="' + esc(v.const) + '"';   // a setting, not a process reading (point-coverage gate)
           if (isBrk(n) && j === n.values.length - 1) pa += ' data-brk-tag-of="' + esc(n.id) + '"';   // a breaker's own live reading line is its value tag
           textSvg += '<text data-role="value" data-lod="' + (v.lod || 2) + '" data-val="' + esc(n.id) + ':' + esc(v.k) + '"' + pa + ' x="' + r1(vx) + '" y="' + r1(vy) + '" text-anchor="' + (v.anchor || anchor) + '">—</text>';
         });
@@ -421,12 +422,19 @@
       clearTimeout(tipTimer);
       tipTimer = setTimeout(function () { if (svg.isConnected) showTip(tipHtml(n), ev.clientX, ev.clientY); }, 250);
     });
-    svg.addEventListener('pointerout', function (ev) { if (nodeOf(ev.target)) { clearTimeout(tipTimer); hideTip(); } });
+    svg.addEventListener('pointerout', function (ev) { if (nodeOf(ev.target)) { clearTimeout(tipTimer); hideTip(); loopMark(null); } });
+    /* PRD-SETPOINT-SIM P4: pointing at any member of a control loop (PV instrument, controller, driven unit, its signal
+       lines; data-loop = the registry setpoint id) marks the whole loop, PV -> controller -> MV */
+    function loopMark(id) {
+      svg.querySelectorAll('.is-loop').forEach(function (e) { e.classList.remove('is-loop'); });
+      if (id) svg.querySelectorAll('[data-loop="' + String(id).replace(/"/g, '') + '"]').forEach(function (e) { e.classList.add('is-loop'); });
+    }
+    svg.addEventListener('pointerover', function (ev) { var n = nodeOf(ev.target); loopMark(n && n.loop ? n.loop : null); });
     svg.addEventListener('focusin', function (ev) {
-      var n = nodeOf(ev.target); if (!n) return;
+      var n = nodeOf(ev.target); loopMark(n && n.loop ? n.loop : null); if (!n) return;
       var r = ev.target.getBoundingClientRect(); showTip(tipHtml(n), r.right, r.top);
     });
-    svg.addEventListener('focusout', hideTip);
+    svg.addEventListener('focusout', function () { hideTip(); loopMark(null); });
     function openNode(n, el) {
       if (!n || !opts.open) return;
       hideTip();

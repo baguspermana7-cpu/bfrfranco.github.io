@@ -1,0 +1,227 @@
+{
+  "classKey": "ups",
+  "title": "UPS (2N) — sequence of operations",
+  "note": "PRD-SETPOINT-SIM P3. Curated. A threshold is never typed here: a condition names a limit of the conv limits registry (limit), an engine parameter (param) or a value the engine derives (derived); tools/build-sequences.mjs resolves it. A delay that no source states is ASSUMED and says why.",
+  "basis": {
+    "ref": "IEC 62040-3:2021 (UPS performance: double conversion, stored-energy and bypass modes) and the Uptime Institute Tier IV / 2N topology",
+    "use": "the structure: normal double conversion, stored-energy (battery) mode on an input failure, static bypass on an inverter fault or overload, maintenance bypass, and the 2N transfer of the IT load to the other system",
+    "evidenceClass": "STANDARD",
+    "limits": "the numbers come from this plant's engine (systems, modules, module rating, IT load) and its limits registry, not from the standards"
+  },
+  "fleet": {
+    "noun": "UPS systems in one hall (streams A and B)",
+    "unitLabel": "kW",
+    "running": "electrical.ups_system_count",
+    "total": "electrical.ups_system_count",
+    "unit": {
+      "ratio": [
+        "electrical.ups_system_rated_kw",
+        "campus.halls.length"
+      ]
+    },
+    "load": {
+      "key": "campus.halls.0.it_load_kw"
+    },
+    "pv": {
+      "label": "IT load",
+      "short": "not carried",
+      "ok": "carried"
+    }
+  },
+  "plant": "2N per hall: stream A and stream B UPS, each a parallel group of modules; a system's share in one hall = the engine's system rating over the halls (js/conv-engine.js electrical: ups_system_rated_kw = ups_modules_per_system × ups_module_kw_rated, one system spans the four halls; EPMS E-S-102 draws 8 × 1,250 kW per hall and stream). Dual-corded IT load shared between the two; either stream alone carries the hall's IT load",
+  "modes": [
+    {
+      "id": "normal",
+      "label": "Normal — double conversion, load shared",
+      "kind": "normal",
+      "entry": [
+        {
+          "text": "input healthy, every module on its inverter, both systems sharing the dual-corded IT load"
+        }
+      ],
+      "actions": [
+        "rectifiers feed the DC bus and float-charge the batteries; inverters supply the critical bus",
+        "each system carries half the IT load"
+      ],
+      "exit": [
+        {
+          "to": "on_battery",
+          "event": "rectifier input voltage or frequency out of tolerance"
+        },
+        {
+          "to": "module_fault",
+          "event": "a module faults"
+        },
+        {
+          "to": "high_load",
+          "limit": "electrical.ups_load_pct_normal",
+          "band": "hi_warn",
+          "op": ">=",
+          "text": "system load above its normal-mode high warning"
+        },
+        {
+          "to": "system_loss",
+          "event": "a whole UPS system or its output breaker is lost"
+        }
+      ]
+    },
+    {
+      "id": "on_battery",
+      "label": "Stored energy — on battery",
+      "kind": "emergency",
+      "entry": [
+        {
+          "event": "rectifier input lost (utility failure before the generators carry the bus)"
+        }
+      ],
+      "actions": [
+        "the inverters keep the critical bus from the batteries with no break",
+        "alarm; the generating sets start on the same utility failure (generating-set sequence)"
+      ],
+      "exit": [
+        {
+          "to": "normal",
+          "event": "rectifier input restored (generators or utility) and the rectifiers walk the load back in"
+        }
+      ],
+      "notModelled": "battery autonomy and the state of charge after the outage are not modelled in this plant"
+    },
+    {
+      "id": "module_fault",
+      "label": "Module fault — the others share",
+      "kind": "protection",
+      "entry": [
+        {
+          "event": "a module faults"
+        }
+      ],
+      "actions": [
+        "the faulted module isolates itself from the parallel bus; alarm",
+        "the remaining modules of that system share its load"
+      ],
+      "exit": [
+        {
+          "to": "normal",
+          "event": "the module is repaired and back on the bus"
+        }
+      ]
+    },
+    {
+      "id": "high_load",
+      "label": "High load — alarm",
+      "kind": "protection",
+      "entry": [
+        {
+          "limit": "electrical.ups_load_pct_normal",
+          "band": "hi_warn",
+          "op": ">="
+        }
+      ],
+      "actions": [
+        "alarm to the operator: in 2N a system above half its rating could not carry the other's load alone",
+        "hold new IT load until it is resolved"
+      ],
+      "exit": [
+        {
+          "to": "normal",
+          "limit": "electrical.ups_load_pct_normal",
+          "band": "hi_warn",
+          "op": "<"
+        },
+        {
+          "to": "static_bypass",
+          "event": "inverter overload beyond its rating"
+        }
+      ]
+    },
+    {
+      "id": "static_bypass",
+      "label": "Static bypass",
+      "kind": "protection",
+      "entry": [
+        {
+          "event": "inverter fault or an overload beyond the inverter's rating"
+        }
+      ],
+      "actions": [
+        "the static switch transfers the critical bus to the bypass supply with no break",
+        "the load is unprotected from input disturbances while on bypass; alarm"
+      ],
+      "exit": [
+        {
+          "to": "normal",
+          "event": "the inverter is healthy and the load within its rating: retransfer to the inverter"
+        }
+      ]
+    },
+    {
+      "id": "system_loss",
+      "label": "System lost — the other carries the IT load",
+      "kind": "protection",
+      "entry": [
+        {
+          "event": "a whole UPS system or its output breaker is lost"
+        }
+      ],
+      "actions": [
+        "dual-corded IT equipment draws all of its load from the other system's PDUs",
+        "the remaining system runs at the engine's failover load; alarm"
+      ],
+      "exit": [
+        {
+          "to": "normal",
+          "event": "the system is restored and shares the load again"
+        }
+      ],
+      "notModelled": "single-corded IT equipment behind a static transfer switch is not modelled"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "system_loss",
+      "label": "One UPS system lost",
+      "steps": [
+        {
+          "mode": "normal",
+          "do": {}
+        },
+        {
+          "mode": "system_loss",
+          "do": {
+            "running": -1,
+            "available": -1
+          },
+          "note": "One system lost"
+        },
+        {
+          "mode": "normal",
+          "do": {
+            "running": 1,
+            "available": 1
+          },
+          "note": "System restored"
+        }
+      ]
+    },
+    {
+      "id": "on_battery",
+      "label": "Input lost, then restored",
+      "steps": [
+        {
+          "mode": "normal",
+          "do": {}
+        },
+        {
+          "mode": "on_battery",
+          "do": {},
+          "note": "Input lost: inverters on battery"
+        },
+        {
+          "mode": "normal",
+          "do": {},
+          "note": "Input restored"
+        }
+      ]
+    }
+  ]
+}

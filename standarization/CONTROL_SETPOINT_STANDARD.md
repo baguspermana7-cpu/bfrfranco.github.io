@@ -42,6 +42,7 @@ range). Otherwise it is fixed, and the modal says what fixes it.
 | trend | the SP is the pen's dashed reference line, labelled `SP 19.4` in muted ink in the right gutter; the label moves one 11 px row away from the plot's middle until it meets no limit label | `js/rz-trend.js` `refLab()` |
 | equipment modal | section "Setpoints & limits": SP, Live, Error (Live − SP), alarm band of the governed point, adjustable range or what fixes it, evidence, what holds it | `js/conv/equipment-modal.js` `spBlock()` |
 | what-if (P2) | under the table, one slider per ADJUSTABLE setpoint, inside its registry range and step; moving it recomputes the engine on a copy of the model (`CONV_CALC.recompute`) and shows the outputs the registry lists (`sp.whatIf`): Engine now, SIMULATED, Change, plus the registry note (`sp.whatIfNote`). Reset puts the SP back. Nothing is stored | `js/conv/equipment-modal.js` `wiBlock()` / `wiBind()` |
+| page setpoint slider (P2) | a slider on a cockpit page that sets an engine parameter shows the engine's steady-state response under it (the registry's what-if outputs, SIMULATED, "Dynamics not modelled"); a page-only setpoint moves its page values straight to the setpoint, never through an unsourced lag or noise; the slider's range is bound to the engine from the first paint |
 | sequence of operations (P3) | section "Sequence of operations" for a class with `data/sequences/<class>.json`: every mode (entry, ordered actions, exit, notes), a scenario picker, the scenario's path drawn through RZDiagram at its own size, and a step table (running, available, capacity, part load, capacity short, CHW supply direction) labelled SIMULATED. Simulate reveals one step per 900 ms; reduced motion or the keyboard show every step at once. Reset hides them. Nothing is stored | `js/conv/sequence-view.js` (`RZConvSequence`), twin `js/rz-sequences.js` |
 
 - A setpoint names the live points it governs (`sp.pv`) and the equipment-modal class that shows it (`sp.classKey`).
@@ -75,10 +76,37 @@ range). Otherwise it is fixed, and the modal says what fixes it.
   builder walks it on the engine's plant quantities: capacity = running × unit rating, part load = min(100 %, load /
   capacity) because a unit cannot run above its rating, capacity short = load − capacity, the PV moves exactly while
   capacity is short. These are steady states; how fast the plant gets there is not modelled.
+- A fleet quantity is one snapshot key, a difference, a ratio (the UPS share of one hall = system rating / halls, so
+  the sequence speaks the same unit as the EPMS sheet it opens on), a product (the generating set's usable unit = rating × maximum
+  loading; the table then heads its column "Load / usable" and the note shows the product), or a count of the engine's
+  unit-state table (`count: { kind, hall, state }`). A standby supply names `source: "utility"`: a step's `source`
+  says who carries the load (`utility` = short 0, none of the units loaded; `gen` = the units carry it; `none` = nothing
+  does, the whole load is short), the table gets a "Load on" column, and part load shows only while the units carry the
+  load. `running: "duty"` = available − the fleet's `spare` key, `"all"` = every available unit. The generating-set
+  sequence follows the fuel cockpit's own rule (duty sets = count − spare carry the hall's facility load; the spare
+  stays on standby).
 - What the plant model does not hold is said, not filled in: no thermal storage in this plant (no TES discharge step),
   pump ride-through on UPS and the chiller's rapid-restart time are not modelled.
 - The path figure stays inside the RZDiagram budget of 9 nodes: it draws the scenario's modes, the full list of modes is
   the text list under it.
+
+### 4b. Control loops on the P&ID (P4)
+
+- A loop lives in the curated setpoint row (`loop`: tag, sheet, kind PI/staging/reset/interlock, action direct/reverse,
+  pv {tag, node or draw, what}, mv {classKey, what}, tuning or tuningNote, basis). The builder refuses a loop without
+  them, and a loop with no sheet must say why (`notDrawn`: the chiller's own unit controller holds its CHWS inside the
+  machine). The twin answers `RZControlPoints.loops(sheetId)`.
+- The sheet draws what the registry lists for it and types no tag: a controller is an ISA-5.1 `instPanel` bubble (shared
+  BMS function), its PV instrument an `instField` bubble, joined by dashed signal lines (`w: 'signal'`); impulse lines
+  are `w: 'inst'`. A bubble carrying four letters is drawn at size 44 so the letters (8.5 px) sit inside the circle.
+- The bubble shows `SP` (registry; the operator's value in MAINT) and `OUT` (the engine's mean drive speed of the running
+  units). No tuning is invented: `tuningNote` says "not modelled" until a source gives gain and time.
+- A PV the plant does not measure separately reads the engine's steady state, which holds the setpoint, and says so
+  (PDT-01 remote DP = the DP setpoint in force). Never bind it to a different quantity: the chiller-plant KPI "Header
+  DP" averages the primary loops' authored DPS1/DPS2 and is not the remote DP the secondary pumps hold.
+- A double-click on a controller opens the modal of the equipment it drives; the Setpoints block names the loop
+  (`[data-rz-cvm-loop]`: PV → controller → MV, action, tuning, basis). Pointer or focus on any loop member marks the
+  whole loop (`data-loop` = registry setpoint id on nodes and signal lines, class `.is-loop`, js/rz-hmi-sheet.js).
 
 ## 5. Gates
 
@@ -89,13 +117,17 @@ range). Otherwise it is fixed, and the modal says what fixes it.
   S9 no page errors (browser). `RZ_SP_PLANT=no-registry` serves no twin and must fail S2–S4.
   S4 compares the Live cell with the page value at each modal repaint (a MutationObserver reads both in the same
   tick), never at an arbitrary moment: a one-period-old cell can match a drifted page value. A planted Live + 1
-  fails all four classes.
+  fails all four classes. S6: the chiller-plant MAINT sliders (first-paint ranges, loops at the setpoints with no
+  movement between ticks, DP response = Node recompute ± 0.1 %).
 - `node tools/test-sequences.mjs`: Q1 entry/actions/exit and a basis, Q2 every exit leads to a mode and every mode is
   reachable from Normal and back, Q3 no typed threshold (twin = registry / engine) and every unsourced delay or threshold
   listed as assumed, Q4 the scenario walk recomputed independently, Q5 twin fresh. `RZ_SEQ_PLANT=typed|orphan` must fail.
 - `node tools/test-setpoint-sim.mjs` S7: the chiller modal shows every mode with its thresholds = the twin; Simulate of
   each scenario walks the JSON's order with the twin's numbers, lights the step's mode, 0 RZDiagram warnings; keyboard =
   all steps at once; Reset; no storage. `RZ_SP_PLANT=no-sequence` must fail S7.
+- `node tools/test-setpoint-sim.mjs` S8: every registry loop with a sheet is drawn once with its registry tag, PV and
+  every unit of the driven fleet joined by a signal, bubble SP = registry, OUT = engine, a drawn remote PV = its
+  setpoint, 0 orphan bubbles, double-click opens the modal naming the loop. `RZ_SP_PLANT=no-loops` must fail S8.
 - `node tools/test-conv-trend-ranges.mjs`: L13, the SP label meets no limit label. `--plant=refstack` must fail it.
 
 Adding a sequence means a `data/sequences/<class>.json`, `--apply`, and the script tags (`js/rz-diagram-metrics.js`,

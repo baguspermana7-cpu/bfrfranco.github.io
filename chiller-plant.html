@@ -576,7 +576,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
         ]
     }
     </script>
-    <script src="js/rz-version.js?v=20261124-32698db1" defer></script>
+    <script src="js/rz-version.js?v=20261125-204f2132" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- Conventional BMS single scenario engine — single source of truth for the
@@ -589,7 +589,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
     <script src="js/rz-engine-versions.js?v=20261123-f9009513"></script>
     <script src="js/conv-engine.js?v=2.10.0"></script>
     <!-- v1.134.2 — generated parameter registry + the shared basis drawer. -->
-    <script src="js/conv-parameters.js?v=20261125-3e2e557c"></script>
+    <script src="js/conv-parameters.js?v=20261125-fcd2110d"></script>
     <!-- v1.134.25 — RZExplain, the site glossary engine. The cockpits were the only
          substantial pages carrying none of it, so terms an operator has to read
          (approach temperature, cycles of concentration, N+1, WUE) had nowhere to go.
@@ -604,13 +604,13 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
          existing rendering preserved when RZL/RZB are absent. -->
     <script src="js/rz-line-model.js?v=20260920-c4511df5"></script>
     <script src="js/rz-breaker-symbols.js?v=20260920-d428580e"></script>
-    <link rel="stylesheet" href="css/rz-hmi.css?v=20261123-6abace97">
+    <link rel="stylesheet" href="css/rz-hmi.css?v=20261125-ad89a44e">
     <link rel="stylesheet" href="css/conv-hmi-depth.css?v=20261115-09997c8c">
     <link rel="stylesheet" href="css/conv-vfx.css?v=20261118-5eed9b2f">
     <script src="js/conv/hmi-depth.js?v=20261120-05f86b64"></script>
     <script src="js/rz-eng-symbols.js?v=20261118-528d60ce"></script>
-    <script src="js/rz-hmi-sheet.js?v=20261123-02b8ef09"></script>
-    <script src="js/conv/chiller-sheet.js?v=20261123-92962423"></script>
+    <script src="js/rz-hmi-sheet.js?v=20261125-ca35ea9a"></script>
+    <script src="js/conv/chiller-sheet.js?v=20261125-d039a0e4"></script>
     <script src="js/conv/sheet-truth.js?v=20261122-14958672"></script>
     <script src="js/conv/payloads.js?v=20261124-18c67226"></script>
     <script src="js/conv/internals.js?v=20261122-76f7138e"></script>
@@ -619,7 +619,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
     <script src="js/conv/internals/tower.js?v=20261122-5e5dd76d"></script>
     <script src="js/conv/internals/crah.js?v=20261122-069758c5"></script>
     <script src="js/conv/ph-chart.js?v=20261122-8681e578"></script>
-    <script src="js/conv/equipment-modal.js?v=20261123-77ac2b2b"></script>
+    <script src="js/conv/equipment-modal.js?v=20261125-94c401e1"></script>
     <script src="js/conv/vfx.js?v=20261123-3fd25115"></script>
     <script src="js/conv/history.js?v=20261120-8d390d7e"></script>
     <script src="js/rz-trend.js?v=20261123-5b150d9f"></script>
@@ -630,12 +630,12 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
     <link rel="stylesheet" href="css/conv-live.css?v=20261122-9e4f1c46">
     <!-- this cockpit is dark-only (no data-theme on <html>): the phone trend sheet (js/rz-sheet.js) must not take its light skin -->
     <style>:root:not(#rz-chiller) .rz-sheet{--rz-sheet-bg:#16181d;--rz-sheet-ink:#e8ecf1;--rz-sheet-line:rgba(160,168,180,.4)}</style>
-    <script src="js/rz-control-points.js?v=20261124-5e6e781a"></script>
+    <script src="js/rz-control-points.js?v=20261125-25763316"></script>
     <script src="js/rz-diagram-metrics.js?v=20261016-1994fd2b"></script>
     <script src="js/rz-diagram-layout.js?v=20261016-a82d8709"></script>
     <script src="js/rz-diagram.js?v=20261109-b50004b8"></script>
-    <script src="js/rz-sequences.js?v=20261123-19d66514"></script>
-    <script src="js/conv/sequence-view.js?v=20261123-6d0322b2"></script>
+    <script src="js/rz-sequences.js?v=20261125-2961ca77"></script>
+    <script src="js/conv/sequence-view.js?v=20261125-78d371d7"></script>
     <script src="js/conv/point-status.js?v=20261123-0de9d3e8"></script>
 <script src="js/conv/motion.js?v=20261121-f2d16763" defer></script>
 <script src="js/conv/quiet.js?v=20261122-cde28b5e" defer></script>
@@ -868,6 +868,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
             <div class="field">
               <label>DP SP <span id="spDpTxt" data-const>UNAVAILABLE</span></label>
               <input id="spDp" type="range" min="60" max="140" step="1" value="90" aria-label="Sp Dp" />
+              <div class="meta sp-sim" data-sp-sim="spDp" aria-live="polite"></div>
             </div>
             <div class="field">
               <label>Branch Ref SP (sim) <span id="spFlowTxt" data-const>UNAVAILABLE</span></label>
@@ -1530,6 +1531,35 @@ function chwRead(n){
        conv-engine 2.10.0: head is the operating head on the system curve (0 when standing by), as the primary rows */
     if(ok && u) out.rows = [['Mode', duty ? 'Duty' : 'Standby'], ['Flow', duty ? conv.f(u.flowLps, ui.unit) + ' ' + conv.fu(ui.unit) : '—'], ['Motor', duty ? u.kwE + ' kWe' : '—'], ['Head', (duty ? u.headOpM : 0) + ' m', 'engine'],
       ['Speed', duty ? u.speedPct + ' % · ' + u.hz.toFixed(1) + ' Hz' : '0 %', 'engine'], ['Current', 'not modelled'], ['Vibration', 'not modelled']];
+  } else if(n.id === 'lpv-dp'){
+    /* PRD-SETPOINT-SIM P4: PDT-01 reads the remote DP. The engine solves the secondary pumps on the system curve through
+       the DP setpoint (steady state), so the remote DP IS the setpoint in force; no dynamics are modelled. It is not the
+       KPI 'Header DP', which averages the primary loops' authored DPS1/DPS2. */
+    const L = window.RZControlPoints ? window.RZControlPoints.loops('ch-m-101').filter((x) => x.pv.tag === n.tag)[0] : null;
+    const sp = ui.maint && st.sp && isFinite(st.sp.dp) ? st.sp.dp : (L ? L.value : null);
+    out.values = { dp: chwVal(ok && sp != null ? `${conv.p(sp,ui.unit)} ${conv.pu(ui.unit)}` : CHW_UNAV) };
+    if(ok && L) out.rows = [['Measures', L.pv.what], ['Reading', `${conv.p(sp,ui.unit)} ${conv.pu(ui.unit)}`, 'engine'], ['Basis', 'engine steady state: ' + L.tag + ' holds its setpoint; dynamics not modelled']];
+  } else if(n.id === 'lc-dp'){
+    /* PDIC-01: its setpoint is the registry's (the operator's in MAINT); its output is the engine's secondary pump speed */
+    const L = window.RZControlPoints ? window.RZControlPoints.loops('ch-m-101').filter((x) => x.tag === n.tag)[0] : null;
+    const sp = ui.maint && st.sp && isFinite(st.sp.dp) ? st.sp.dp : (L ? L.value : null);
+    const run = engineFleet('chw_secondary_pump').filter((u) => u.state === 'running');
+    const spd = run.length ? run.reduce((a, u) => a + u.speedPct, 0) / run.length : null;
+    out.state = !ok ? null : 'running';
+    out.values = !ok || sp == null ? { sp: chwVal(CHW_UNAV), out: chwVal('—') } : {
+      sp: chwVal(`SP ${conv.p(sp,ui.unit)} ${conv.pu(ui.unit)}`), out: chwVal(spd == null ? 'OUT —' : `OUT ${r1(spd)} %`) };
+    if(ok && L) out.rows = [['Setpoint', `${conv.p(sp,ui.unit)} ${conv.pu(ui.unit)}` + (ui.maint ? ' (operator, MAINT)' : ' (registry)')], ['Measured by', L.pv.tag],
+      ['Drives', L.mv.what], ['Action', L.action + ' acting ' + L.kind], ['Output', spd == null ? '—' : r1(spd) + ' % mean speed of ' + run.length + ' running pumps', 'engine'], ['Tuning', L.tuningNote]];
+  } else if(n.id === 'lc-cdw'){
+    /* TIC-CDWS: setpoint from the registry (engine parameter cooling.cdw_supply_c), output = the engine's mean fan speed
+       of the running tower cells */
+    const L = window.RZControlPoints ? window.RZControlPoints.loops('ch-m-102').filter((x) => x.tag === n.tag)[0] : null;
+    const run = engineFleet('tower_cell').filter((u) => u.state === 'running');
+    const spd = run.length ? run.reduce((a, u) => a + u.fanSpeedPct, 0) / run.length : null;
+    out.state = !ok ? null : 'running';
+    out.values = !ok || !L ? { sp: chwVal(CHW_UNAV), out: chwVal('—') } : { sp: chwVal(`SP ${T(L.value)}`), out: chwVal(spd == null ? 'OUT —' : `OUT ${r1(spd)} %`) };
+    if(ok && L) out.rows = [['Setpoint', T(L.value) + ' (registry)'], ['Measured by', L.pv.tag], ['Drives', L.mv.what], ['Action', L.action + ' acting ' + L.kind],
+      ['Output', spd == null ? '—' : r1(spd) + ' % mean fan speed of ' + run.length + ' running cells', 'engine'], ['Tuning', L.tuningNote]];
   } else if(n.id === 'sref'){
     out.values = { q: chwVal(ok ? `IT-REFERENCE FLOW ${chwPointText('sref:q')}` : CHW_UNAV) };
   } else if(/^crah[A-Z]+$/.test(n.id)){
@@ -1803,6 +1833,9 @@ function chwFleetOpts(kind, title, scope, unit, hall, bankId) {
 function chwDeepOpts(n) {
   const id = (n && n.id) || '';
   if (!CHW_AUTHORITY_AVAILABLE || !window.CONV_CALC || typeof window.CONV_CALC.getFleet !== 'function') return null;
+  /* P4: a control-loop bubble opens the equipment its loop drives, whose modal carries the setpoint and the loop */
+  if (id === 'lc-cdw') return chwFleetOpts('tower_cell', 'Cooling tower cell', 'CH-M-102 · ' + n.tag, 0);
+  if (id === 'lc-dp' || id === 'lpv-dp') return chwFleetOpts('chw_secondary_pump', 'Secondary chilled-water pump', 'CH-M-101 · ' + n.tag, 0);
   let m = /^crah([A-Z]+)$/.exec(id);
   if (m) return chwFleetOpts('crah', 'CRAH unit', 'CH-M-101 · Hall ' + m[1], 0, m[1], id);
   m = /^ps(\d+)$/.exec(id);
@@ -2541,16 +2574,17 @@ function stepProcess(){
     else if(!lp.pumpA && mtxL.vibB > 2.5){ lp.pumpA = true; }
 
     if(ui.maint){
-      const tf = st.sp.flow + r(-0.4,0.4);
-      lp.flow = r1(clamp(lp.flow + (tf-lp.flow)*0.28 + r(-0.2,0.2), 0, LOOP_FLOW_MAX));
+      /* PRD-SETPOINT-SIM P2: MAINT holds each running loop at the steady state of the setpoints. The first-order lags
+         (0.22-0.28 per tick) and the noise had no source for a time constant, so dynamics are not modelled: the loop
+         sits at its setpoint, and the slider panel says so. */
+      lp.flow = r1(clamp(st.sp.flow, 0, LOOP_FLOW_MAX));
       /* a dedicated branch is homologous (PRD-CONV-OPS-DEPTH 01 §6.1): speed moves with flow from the engine point */
       const sv = lp.ref && lp.ref.spd && lp.ref.flow ? r1(clamp(lp.ref.spd * lp.flow / lp.ref.flow, 0, 100)) : 0;
       if(lp.pumpA){ lp.spdA = sv; lp.spdB = 0; } else { lp.spdB = sv; lp.spdA = 0; }
-      lp.dp1 = Math.round(clamp(lp.dp1 + (st.sp.dp-lp.dp1)*0.22 + r(-2,2), 45, 150));
-      lp.dp2 = Math.round(clamp(lp.dp2 + (st.sp.dp-lp.dp2)*0.22 + r(-2,2), 45, 150));
-      lp.t1 = r1(clamp(lp.t1 + (st.sp.chws-lp.t1)*0.24 + r(-0.06,0.06), LOOP_T1_MIN, LOOP_T1_MAX));
-      const t2t = lp.t1 + (CHW.dt != null ? CHW.dt : 3.3) + r(-0.45,0.45);
-      lp.t2 = r1(clamp(lp.t2 + (t2t-lp.t2)*0.22 + r(-0.06,0.06), LOOP_T2_MIN, LOOP_T2_MAX));
+      lp.dp1 = Math.round(clamp(st.sp.dp, 45, 150));
+      lp.dp2 = Math.round(clamp(st.sp.dp, 45, 150));
+      lp.t1 = r1(st.sp.chws);   /* the slider is bound to primary CHWS … +4 K; the free-run band (+1.6 K) does not cap a setpoint */
+      lp.t2 = r1(lp.t1 + (CHW.dt != null ? CHW.dt : 3.3));
     } else {
       /* E3 Q4: NORMAL holds every basis value inside its normal band. The old free walks (flow ±0.9 down to 55 %
          of design, dp ±6 up to 145 kPa, CHWR ±0.28 K up to CHWR + 1.8 K) crossed the WARNING limits at rest, so 4
@@ -2656,6 +2690,14 @@ function applyScenario(v){
      BELOW the re-derived 19.4 °C primary CHWS. Bind the range to the primary so
      an impossible setpoint cannot be dialled in: floor = primary CHWS (no
      decoupler bypass), ceiling = +4 K (progressively more bypass). */
+  bindSpSliders();
+  syncToggles();
+  renderAll();
+}
+/* PRD-SETPOINT-SIM P2: the slider ranges and values follow the engine from the first paint. They were bound only
+   inside applyScenario, so before a scenario was picked the secondary SP slider ran 0-100 and could dial a supply
+   below the primary CHWS. */
+function bindSpSliders(){
   if (CHW.chws != null) {
     $("spChws").min = r1(CHW.chws);
     $("spChws").max = r1(CHW.chws + 4);
@@ -2671,8 +2713,27 @@ function applyScenario(v){
   $("spChws").value = st.sp.chws;
   $("spDp").value = st.sp.dp;
   $("spFlow").value = st.sp.flow;
-  syncToggles();
-  renderAll();
+  renderDpSim();
+}
+/* PRD-SETPOINT-SIM P2: the DP setpoint is an engine parameter (cooling.chw_secondary_dp_setpoint_kpa), so its slider
+   shows the engine's steady-state secondary pump response at that DP: CONV_CALC.recompute on a copy of the model,
+   the outputs the control registry lists for it. SIMULATED; dynamics are not modelled (no source states the loop's
+   time constant). */
+function renderDpSim(){
+  const host = document.querySelector('[data-sp-sim="spDp"]'), C = window.RZControlPoints, E = window.CONV_CALC;
+  if(!host) return;
+  const row = C && C.forClass ? C.forClass("chw_secondary_pump").find((x)=>x.id === "conv.chiller-plant.chw_dp_sp") : null;
+  if(!row || !E || typeof E.recompute !== "function" || !E.model || !CHW_AUTHORITY_AVAILABLE){ host.textContent = ""; return; }
+  const m = JSON.parse(JSON.stringify(E.model)), k = row.param.split("."), last = k.pop();
+  const o = k.reduce((a, b)=>a && a[b], m);
+  if(!o || typeof o[last] !== "number") { host.textContent = ""; return; }
+  o[last] = st.sp.dp;
+  const s = E.recompute(m), get = (p)=>p.split(".").reduce((a, b)=>a == null ? a : a[b], s);
+  host.innerHTML = `SIMULATED · engine steady state at ${st.sp.dp} kPa, secondary pumps: ` + row.whatIf.map((w)=>{
+    const v = get(w.path);
+    const tail = /, each$/.test(w.label) ? " each" : /fleet$/.test(w.label) ? " fleet" : /speed$/.test(w.label) ? " speed" : "";
+    return `<span data-wi-path="${w.path}" data-wi-sim="${typeof v === "number" ? v : ""}" title="${w.label}">${typeof v === "number" ? v : "\u2014"} ${w.unit}${tail}</span>`;
+  }).join(" · ") + ". Dynamics not modelled.";
 }
 
 function syncToggles(){
@@ -2705,8 +2766,9 @@ function bind(){
   $("unitSel").addEventListener("change", e=>{ ui.unit = e.target.value; ptDefineUnits(); renderAll(); });
   $("scSel").addEventListener("change", e=>applyScenario(e.target.value));
 
+  bindSpSliders();
   $("spChws").addEventListener("input", e=>{ st.sp.chws = Number(e.target.value); $("scSel").value = "custom"; $("scLbl").textContent = "Custom"; renderAll(); });
-  $("spDp").addEventListener("input", e=>{ st.sp.dp = Number(e.target.value); $("scSel").value = "custom"; $("scLbl").textContent = "Custom"; renderAll(); });
+  $("spDp").addEventListener("input", e=>{ st.sp.dp = Number(e.target.value); $("scSel").value = "custom"; $("scLbl").textContent = "Custom"; renderDpSim(); renderAll(); });
   $("spFlow").addEventListener("input", e=>{ st.sp.flow = Number(e.target.value); $("scSel").value = "custom"; $("scLbl").textContent = "Custom"; renderAll(); });
 
   $("faultBtn").addEventListener("click", ()=>{ ui.forced.add(Number($("faultSel").value)); renderAll(); });

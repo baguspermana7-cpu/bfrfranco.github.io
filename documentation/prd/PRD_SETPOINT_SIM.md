@@ -226,3 +226,74 @@ Each phase: `tools/test-setpoint-sim.mjs` red on main with quoted fails, then gr
   registries). Q-gate 462 checks, S-gate 194.
 - Remaining for P3: Simulate driving the PV trends; sequences for genset/ATS, UPS and the DC AI CDU /
   free-cooling switchover (P4).
+
+## P2 part 2 — chiller-plant setpoint sliders on the engine (2026-11-25)
+
+Decisions (the builder's, owner pattern "Kamu yg tentukan"; 8a released the MAINT/slider lines of chiller-plant.html):
+
+- **DP SP** (`#spDp`) is the engine parameter `cooling.chw_secondary_dp_setpoint_kpa`. Under the slider the page shows the
+  engine's steady-state secondary pump response at that DP (`CONV_CALC.recompute` on a copy of the model, the outputs
+  the registry's what-if lists: speed, drive frequency, kW each, kW running fleet), labelled SIMULATED, "Dynamics not
+  modelled". At 120 kPa: 98.8 %, 96 kW each, 383.9 kW fleet (90 kPa: 98.7 %, 95.6 kW, 382.5 kW).
+- **MAINT holds the steady state.** The first-order lags (0.22–0.28 per tick) and the noise on flow, loop DP and the
+  secondary supply/return had no source for a time constant; they are gone. A running loop sits at the setpoints:
+  flow = branch reference SP, DP = DP SP, supply = secondary SP, return = supply + engine ΔT. No FOPDT preview until a
+  source states τ and θ for this loop.
+- **Ranges from the first paint.** The secondary SP (primary CHWS … +4 K) and branch flow ranges were bound only when a
+  scenario was picked; before that the secondary SP slider ran 0–100 and could dial a supply below the primary CHWS.
+  `bindSpSliders()` now runs at boot and on every scenario. The free-run band (+1.6 K) no longer caps a MAINT setpoint.
+- Not changed: the branch reference flow and the secondary SP are page quantities (the engine has no per-branch flow
+  setpoint and no decoupler mixing temperature), so they carry no engine response; FREE-RUN is untouched.
+
+Law S6 (`tools/test-setpoint-sim.mjs`): first-paint ranges = engine CHWS … +4 K; in MAINT every running loop equals the
+setpoints and does not move between ticks; the DP response = a Node recompute ± 0.1 %, SIMULATED, "not modelled".
+Red on v3.105.0: 10 fails (unbound ranges, loops moved 52.4 → 19.6 L/s and 103 → 112 kPa between ticks, no response).
+Green: 218 checks, twice; `test-operator-cockpit-regressions` passes.
+
+## P3 part 2 — standby generating sets (2026-11-25)
+
+- `data/sequences/genset.json` (7 modes: on utility, utility failure, start and synchronise, on generators, set trip,
+  load shedding, retransfer; basis NFPA 110-2022 + IEEE 446). Numbers from the engine: hall A facility load
+  10,875 kW (`campus.halls.0.facility_load_kw`), 8 sets per hall, usable 2,400 kW each (3,000 kW × 0.8 maximum loading),
+  1 spare. The fuel cockpit's rule decides who runs: on a utility loss the 7 duty sets carry the hall (64.7 % of usable),
+  the spare stays on standby; a set trip leaves 6 × 2,400 = 14,400 kW ≥ 10,875 kW, no load short, and the spare
+  starts. Retransfer after 30 min of stable utility is ASSUMED (no source in the repo); battery autonomy, outage length,
+  start time (NFPA 110 Type 10 would be 10 s) and the shedding priority list are said to be not modelled.
+- Builder: fleet quantities may be a product or a count of the engine's unit-state table; `source` (utility / gen /
+  none) for a standby supply; `running: "duty" | "all"`; a step may carry a `note`. The four existing sequences walk
+  exactly as before (scenarios and modes byte-identical in the twin).
+- Modal: fuel-system.html loads the diagram engine, `js/rz-sequences.js` and `js/conv/sequence-view.js`; a generating
+  set's modal shows the sequence ("Load on" column; "Load / usable" for a product unit).
+- Laws: Q4 reads the new quantity forms independently and checks the source per step (planted "nothing carries = 0
+  short" fails 4 checks); S7 now also opens GEN-A1 on fuel-system.html (red: "no Sequence of operations block" on the
+  old page; a first green found an RZDiagram node overflow on "Retransfer to utility and cool-down", label shortened).
+  Q-gate 583, S-gate 255.
+
+## P3 part 3 — UPS 2N (2026-11-25)
+
+- `data/sequences/ups.json` (6 modes: normal double conversion, stored energy, module fault, high load, static bypass,
+  system lost; basis IEC 62040-3:2021 + Uptime Tier IV 2N). Per hall, as the EPMS LV sheet draws it: stream A and B,
+  10,000 kW each (`ups_system_rated_kw` 40,000 / 4 halls = 8 × 1,250 kW), hall IT load 7,500 kW. Normal 37.5 %, one
+  system lost 75 %: equal to the engine's `ups_load_pct_normal` and `ups_load_pct_on_failover` (a law). High load enters
+  on the limits registry `electrical.ups_load_pct_normal` H 45 % (ASSUMED class shown). Battery autonomy and
+  single-corded loads behind an STS are said to be not modelled.
+- A first version used the campus totals (30,000 kW on 2 × 40,000 kW): the same percentages, a different scale from the
+  modal's own 8 × 1,250 kW. Q4 now checks the unit against the EPMS LV sheet's UPS battery ratings (red on the campus
+  unit: "unit 40000 kW ≠ the EPMS LV sheet's UPS ratings 10000,10000"). Builder: `ratio` quantity.
+- EPMS_Telemetry.html loads the diagram engine and the sequence scripts (outside the deep-options block); S7 opens
+  UPS-AA on the LV view (red on the old page: "no Sequence of operations block"). Q-gate 685, S-gate 290.
+
+## P4 part 1 — control loops on the chiller-plant P&ID (2026-11-25)
+
+- Registry: `loop` on three curated setpoints. PDIC-01 (secondary DP, reverse acting PI, PDT-01 at the most remote CRAH
+  bank, drives every secondary pump VSD), TIC-CDWS (condenser water supply, direct acting PI, TT-CDWS, drives every tower
+  cell fan), and the CHWS setpoint's unit controller (not drawn: inside each chiller). Basis ASHRAE Guideline 36-2021;
+  tuning not modelled (no source).
+- CH-M-101: PDT-01 + PDIC-01 bubbles, signals to the 5 secondary pumps; CH-M-102: TIC-CDWS in the free left column,
+  signals to the 10 cells. SP from the registry, OUT = engine mean speed (98.7 % / 89.3 % at the design point).
+- Accuracy finding while drawing it: the KPI "Header DP" (80 kPa) averages the primary loops' authored DPS1/DPS2 with
+  noise, yet the registry named it the PV of the 90 kPa remote DP setpoint, so its tooltip said SP 90 over a value that
+  can never reach it. The DP setpoint's PV is now `chiller-plant.CHW.remote_dp` (PDT-01, engine steady state = SP).
+  The KPI itself (authored primary DP with noise) is left as it was and logged for the accuracy backlog.
+- Gate S8, red with `RZ_SP_PLANT=no-loops` (2 fails). Hover or focus on any loop member marks PV → controller → MV
+  (`data-loop` on nodes and signal lines, `.is-loop`); red with `RZ_SP_PLANT=no-loop-hover` (2 fails), green 311.

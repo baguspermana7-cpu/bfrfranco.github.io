@@ -190,7 +190,13 @@
         '<td data-k="ev">' + esc(r.ev) + '</td><td data-k="ctl">' + esc(r.control || '—') + '</td></tr>';
     }).join('');
     var wi = list.filter(function (r) { return r.adjustable && r.whatIf && r.param; }).map(wiBlock).join('');
-    return sec('Setpoints & limits', '<div class="rz-cvm-sp-wrap"><table class="rz-cvm-sp" data-rz-cvm-sp><thead><tr><th scope="col">Setpoint</th><th scope="col">SP</th><th scope="col">Live</th><th scope="col">Error</th><th scope="col" data-k="band">Alarm band</th><th scope="col" data-k="adj">Adjustable</th><th scope="col" data-k="ev">Evidence</th><th scope="col" data-k="ctl">Held by</th></tr></thead><tbody>' + body + '</tbody></table></div>' + wi, 'rz-cvm-sp-sec');
+    /* P4: the control loop that holds each setpoint (registry loop): PV -> controller -> MV, action, tuning */
+    var lp = list.filter(function (r) { return r.loop; }).map(function (r) {
+      var L = r.loop;
+      return '<p class="rz-cvm-note" data-rz-cvm-loop="' + esc(L.tag) + '"><strong>' + esc(L.tag) + '</strong> · ' + esc(L.pv.tag) + ' → ' + esc(L.tag) + ' → ' + esc(L.mv.what) +
+        ' · ' + esc(L.action + ' acting ' + L.kind) + ' · ' + esc(L.tuning ? 'tuning ' + JSON.stringify(L.tuning) : L.tuningNote) + (L.notDrawn ? ' · ' + esc(L.notDrawn) : '') + ' · basis: ' + esc(L.basis) + '</p>';
+    }).join('');
+    return sec('Setpoints & limits', '<div class="rz-cvm-sp-wrap"><table class="rz-cvm-sp" data-rz-cvm-sp><thead><tr><th scope="col">Setpoint</th><th scope="col">SP</th><th scope="col">Live</th><th scope="col">Error</th><th scope="col" data-k="band">Alarm band</th><th scope="col" data-k="adj">Adjustable</th><th scope="col" data-k="ev">Evidence</th><th scope="col" data-k="ctl">Held by</th></tr></thead><tbody>' + body + '</tbody></table></div>' + lp + wi, 'rz-cvm-sp-sec');
   }
   /* PRD-SETPOINT-SIM P2 what-if: a slider inside the registry's adjustable range recomputes the engine
      (CONV_CALC.recompute on a copy of the model with that one parameter changed) and shows the steady-state outputs the

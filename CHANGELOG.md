@@ -11,6 +11,40 @@ release sections rather than semver.
 
 ---
 
+## v3.107.0 — 2026-11-26 — Chiller-plant setpoint sliders on the engine; control loops on the P&ID; generating-set and UPS sequences of operations
+
+### Changed
+- **Chiller plant, operator controls (PRD-SETPOINT-SIM P2).** The DP setpoint slider now shows the engine's steady-state
+  secondary pump response at that DP (speed, drive frequency, kW each, kW running fleet), labelled SIMULATED, "Dynamics
+  not modelled" (`CONV_CALC.recompute`; 120 kPa: 98.8 %, 96 kW each, 383.9 kW fleet). In MAINT every running loop sits
+  at the setpoints: the unsourced first-order lags (0.22–0.28 per tick) and the noise are gone.
+
+- **Chiller plant, control loops on the P&ID (P4).** The loops of the control registry are drawn as ISA-5.1 bubbles:
+  PDT-01 (remote CHWS-CHWR differential) and PDIC-01 (reverse-acting PI, every secondary pump VSD) on CH-M-101,
+  TIC-CDWS (direct-acting PI, every tower cell fan) on CH-M-102, joined by dashed signal lines. Each controller shows SP
+  (registry) and OUT (engine drive speed: 98.7 %, 89.3 %). Pointing at any member marks PV, controller and driven units;
+  double-click opens the fleet modal, whose Setpoints block names the loop. The CHWS loop is inside each chiller and says so.
+
+### Fixed
+- **Chiller plant, DP setpoint process value:** the registry tied the 90 kPa DP setpoint to the KPI "Header DP", the mean
+  of the primary loops' DPS1/DPS2 (80 kPa), another quantity. Its PV is now the remote differential PDT-01.
+- **Chiller plant:** the secondary loop SP and branch flow sliders had no range until a scenario was picked, so the
+  secondary SP could be dialled to 1 °C, below the 19.4 °C primary CHWS. The ranges bind to the engine at first paint.
+
+### Added
+- **Generating sets, sequence of operations (fuel cockpit, P3).** NFPA 110 / IEEE 446 structure, engine numbers: hall A
+  10,875 kW on 7 duty sets of 2,400 kW usable (3,000 × 0.8), 1 spare; utility lost → UPS battery → start and
+  synchronise → on generators → retransfer (30 min stable utility, ASSUMED); a set trip leaves 14,400 kW, the spare
+  starts. A "Load on" column (utility / generators / UPS battery).
+- **UPS 2N, sequence of operations (EPMS LV view, P3).** IEC 62040-3 modes per hall and stream, as E-S-102 draws them:
+  10,000 kW each, 7,500 kW IT; normal 37.5 %, one system lost 75 %, equal to the engine's own UPS load keys.
+
+### Gates
+- `tools/test-setpoint-sim.mjs` S6 (sliders; red on v3.105.0, 10 fails) and S7 on fuel-system.html and
+  EPMS_Telemetry.html (red: no sequence block); 290 checks. `tools/test-sequences.mjs` 685 checks: new fleet quantities
+  read independently, load source per step, UPS load = engine keys, UPS unit = the EPMS LV sheet's rating (red on a
+  campus-level unit). S8 loops (registry loop = bubble on its sheet, PV and MV links, SP = registry, OUT = engine,
+  hover marks the loop, no orphan): red with no loops() (2 fails) and with no hover (2 fails); 311 checks.
 ## v3.106.0 — 2026-11-24 — A floor flag opens the alarms it stands for; pump trends sit on their loop's operating head
 
 PRD-DCAI-HALL-DEPTH Amendment 4 (A5c) and PRD-CONV-OPS-DEPTH 01 Amendment E2 (owner: "Continue improve more").

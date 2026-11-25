@@ -23,15 +23,31 @@ const UNIT = { degC: '°C', C: '°C' };
 const r1 = (x) => Math.round(x * 10) / 10;
 
 const num = (snap, key) => { const v = key.split('.').reduce((o, k) => (o == null ? o : o[k]), snap); if (typeof v !== 'number') throw new Error(key + ' is not a number in the engine snapshot'); return v; };
+/* a fleet quantity: one snapshot key, a difference (minus: [a, b]), a product (product: [a, b]) or a count of the engine's
+   unit-state table (count: { kind, hall, state }, CONV_CALC.getFleet) */
+let CALC = null;
+export function qty(snap, q) {
+  if (typeof q === 'string') return num(snap, q);
+  if (q.key) return num(snap, q.key);
+  if (q.minus) return num(snap, q.minus[0]) - num(snap, q.minus[1]);
+  if (q.product) return num(snap, q.product[0]) * num(snap, q.product[1]);
+  if (q.ratio) return num(snap, q.ratio[0]) / num(snap, q.ratio[1]);
+  if (q.count) { const f = CALC.getFleet(q.count.kind, q.count.hall); if (!Array.isArray(f) || !f.length) throw new Error('no engine fleet ' + q.count.kind); return f.filter((u) => u.state === q.count.state).length; }
+  throw new Error('unknown fleet quantity ' + JSON.stringify(q));
+}
+const qtyText = (q) => typeof q === 'string' ? q : q.key || (q.minus ? q.minus.join(' − ') : q.product ? q.product.join(' × ') : q.ratio ? q.ratio.join(' / ') : 'count of ' + q.count.kind + (q.count.hall ? ' hall ' + q.count.hall : '') + ' units ' + q.count.state);
 
 /* the fleet a sequence stages, read from the engine snapshot by the keys its JSON names:
    load = one key, a difference (minus: [a, b]) or a product (product: [a, b]) */
 export function plantOf(seq, snap) {
   const f = seq.fleet, L = f.load;
-  const load = r1(L.key ? num(snap, L.key) : L.minus ? num(snap, L.minus[0]) - num(snap, L.minus[1]) : num(snap, L.product[0]) * num(snap, L.product[1]));
-  return { noun: f.noun, unitLabel: f.unitLabel, pv: f.pv, load: load, unit: num(snap, f.unit), total: num(snap, f.total), running: num(snap, f.running),
+  const load = r1(qty(snap, L));
+  return { noun: f.noun, unitLabel: f.unitLabel, pv: f.pv, load: load, unit: qty(snap, f.unit), total: qty(snap, f.total), running: qty(snap, f.running),
+    source: f.source || null, spare: f.spare ? num(snap, f.spare) : 0,
+    unitBasis: f.unit.product ? f.unit.product.map((k) => num(snap, k)).join(' × ') : null,
+    unitPer: f.unit.ratio ? f.unit.ratio.map((k) => num(snap, k)).join(' / ') : null,
     keys: { running: f.running, total: f.total, unit: f.unit, load: L },
-    formula: { load: L.key || (L.minus ? L.minus.join(' − ') : L.product.join(' × ')), demand_pct: 'load / (running × unit) × 100 (above 100 = capacity short)',
+    formula: { load: qtyText(L), unit: qtyText(f.unit), running: qtyText(f.running), demand_pct: 'load / (running × unit) × 100 (above 100 = capacity short)',
       part_load_pct: 'min(100, demand_pct): a unit cannot run above its rating',
       part_load_n_minus_1_pct: 'load / ((running − 1) × unit) × 100', available_capacity_margin: 'available × unit − load' } };
 }
@@ -44,28 +60,35 @@ export function derived(P, running, available) {
   };
 }
 
-function state(P, t, mode, running, available, note) {
-  const cap = r1(running * P.unit), short = Math.max(0, r1(P.load - cap));
-  return { t_s: t, mode, note: note || null, running, available, capacity: cap,
-    part_load_pct: running > 0 ? Math.min(100, derived(P, running, available).demand_pct) : null, short: short, pv: short > 0 ? P.pv.short : P.pv.ok };
+/* source (a fleet that is a standby supply, e.g. generating sets): 'utility' = the load is on the utility and the fleet
+   carries none of it (short 0), 'gen' = the fleet carries it, 'none' = nothing does (the whole load is short) */
+function state(P, t, mode, running, available, note, source) {
+  const cap = r1(running * P.unit), short = source === 'utility' ? 0 : source === 'none' ? P.load : Math.max(0, r1(P.load - cap));
+  const s = { t_s: t, mode, note: note || null, running, available, capacity: cap,
+    part_load_pct: running > 0 && (!source || source === 'gen') ? Math.min(100, derived(P, running, available).demand_pct) : null, short: short, pv: short > 0 ? P.pv.short : P.pv.ok };
+  if (P.source) s.source = source;
+  return s;
 }
 
 /* walk a scenario on the plant quantities; each step applies its `do` to the state before it */
 export function walk(seq, sc, P) {
   const modes = Object.fromEntries(seq.modes.map((m) => [m.id, m]));
   const need = Math.ceil(P.load / P.unit);
-  let running = P.running, available = P.total, t = 0; const out = [];
+  let running = P.running, available = P.total, t = 0, source = P.source; const out = [];
   sc.steps.forEach((s) => {
     const d = s.do || {};
+    if (d.source) source = d.source;
     if (d.running === 'zero') running = 0;
+    else if (d.running === 'all') running = available;
+    else if (d.running === 'duty') running = available - P.spare;
     else if (typeof d.running === 'number') running += d.running;
     if (typeof d.available === 'number') available += d.available;
     if (d.restart === 'all') {
       const st = modes[s.mode].stagger_s;
-      for (let k = 1; k <= need; k++) { running = k; out.push(state(P, (k - 1) * st, s.mode, running, available, `Restart ${k} of ${need}`)); }
+      for (let k = 1; k <= need; k++) { running = k; out.push(state(P, (k - 1) * st, s.mode, running, available, `Restart ${k} of ${need}`, source)); }
       return;
     }
-    out.push(state(P, t, s.mode, running, available));
+    out.push(state(P, t, s.mode, running, available, s.note, source));
   });
   return out;
 }
@@ -98,7 +121,7 @@ export function build() {
   const conv = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/conv-parameters.json'), 'utf8'));
   PARAMS = Object.fromEntries(conv.parameters.map((p) => [p.id, p]));
   const LIM = Object.fromEntries(conv.limits.map((l) => [l.id, l]));
-  const E = require(path.join(ROOT, 'js/conv-engine.js')), snap = (E.CONV_CALC || E).snapshot;
+  const E = require(path.join(ROOT, 'js/conv-engine.js')), snap = (E.CONV_CALC || E).snapshot; CALC = E.CONV_CALC || E;
   const SPS = Object.fromEntries(JSON.parse(fs.readFileSync(path.join(ROOT, 'data/control-points.json'), 'utf8')).rows.filter((x) => x.sp)
     .map((x) => [x.id, { value: x.sp.value, unit: UNIT[x.unit] || x.unit || '', label: x.label, evidenceClass: x.sp.evidenceClass }]));
   const out = {};

@@ -32,6 +32,8 @@
   if (!root) return;
 
   function pad2(n) { return n < 10 ? '0' + n : String(n); }
+  /* PRD-SETPOINT-SIM P4: the registry's control loops drawn on a sheet (js/rz-control-points.js); none without it */
+  function loopsOf(sheet) { var C = root.RZControlPoints; return C && typeof C.loops === 'function' ? C.loops(sheet) : []; }
   function tagNo(tag, i) { var m = /(\d+)$/.exec(tag || ''); return m ? Number(m[1]) : i + 1; }
 
   /* the fleets the sheets draw, from the engine; a missing engine gives empty fleets (the page draws the
@@ -218,6 +220,31 @@
     });
     edges.push({ id: 'e-hrRet', from: prevR, to: 'jret', medium: 'chw', w: 'main', flowOf: 'hdr', line: 'CHWR · HALLS' });
 
+    /* PRD-SETPOINT-SIM P4: the control loops of this sheet as ISA-5.1 bubbles, from the control registry
+       (RZControlPoints.loops); a tag is never typed here, and a registry loop this sheet cannot place is not drawn
+       (tools/test-setpoint-sim.mjs S8 fails on it). PDT-01 reads the CHWS-CHWR differential at the most remote CRAH
+       bank (end of the supply header); PDIC-01 beside the secondary pump set drives every pump's VSD. */
+    loopsOf('ch-m-101').forEach(function (L) {
+      if (L.mv.classKey !== 'chw_secondary_pump' || !L.pv.draw) return;
+      var lastH = halls[halls.length - 1].code, PX = 1060, PY = SEC_Y - 34, CX = 170, CY = SEC_Y + 28, BUS = SEC_Y - 64, TX = 228;
+      nodes.push({ id: 'lpv-dp', tag: L.pv.tag, sym: 'instField', x: PX, y: PY, size: 40, inst: L.pv.tag.split('-')[0], tagAt: 'above', loop: L.sp,
+        label: L.pv.tag + ' — ' + L.pv.what,
+        values: [{ k: 'dp', dx: -14, dy: 22, anchor: 'end', lod: 1, point: 'chiller-plant.CHW.remote_dp', label: L.pv.tag + ' remote DP' }] });
+      nodes.push({ id: 'lc-dp', tag: L.tag, sym: 'instPanel', x: CX, y: CY, size: 44, inst: L.tag.split('-')[0], tagAt: 'above', loop: L.sp,
+        label: L.tag + ' — ' + L.label + ' controller (' + L.action + ' acting ' + L.kind + ')',
+        values: [{ k: 'sp', dx: 0, dy: 34, anchor: 'middle', lod: 1, const: 'setpoint from the control registry (' + L.sp + ')' },
+          { k: 'out', dx: 0, dy: 51, anchor: 'middle', lod: 1, point: 'chiller-plant.CHW.sec_pump_speed', label: L.tag + ' output (secondary pump speed)', unit: '%' }] });
+      edges.push({ id: 'e-lp-dps', from: 'jhs' + lastH, to: 'lpv-dp.process', via: [[PX, SEC_Y]], w: 'inst', medium: 'line', loop: L.sp });
+      edges.push({ id: 'e-lp-dpr', from: [RX, SEC_Y + 22], to: [PX, SEC_Y + 22], w: 'inst', medium: 'line', loop: L.sp });
+      edges.push({ id: 'e-lp-dpr2', from: [PX, SEC_Y + 22], to: [PX, SEC_Y], w: 'inst', medium: 'line', loop: L.sp });
+      edges.push({ id: 'e-lp-pv', from: [PX - 12, PY - 3], to: [CX - 22, CY], via: [[PX - 34, PY - 3], [PX - 34, BUS], [CX - 40, BUS], [CX - 40, CY]], w: 'signal', medium: 'line', loop: L.sp });
+      sec.forEach(function (u, k) {
+        var py = SEC_Y + 56 * k;
+        edges.push({ id: 'e-lp-mv' + (k + 1), from: [CX + 19, CY - 3], to: [340, py + 10], via: [[TX, CY - 3], [TX, py + 22], [340, py + 22]], w: 'signal', medium: 'line', loop: L.sp });
+        nodes.forEach(function (nd) { if (nd.id === 'ps' + (k + 1)) nd.loop = L.sp; });
+      });
+    });
+
     /* the drawing starts at the left zone edge: shift everything DX left so the sheet fits a 1440 px panel at 1:1 */
     var DX = 100, sx = function (pt) { return Array.isArray(pt) ? [pt[0] - DX, pt[1]] : pt; };
     nodes.forEach(function (nd) { nd.x -= DX; });
@@ -304,6 +331,23 @@
       edges.push({ id: 'e-tvb', from: 'tv01.c', to: 'jtv', medium: 'cw', flowOf: 'tvb' });
       edges.push({ id: 'e-tvs', from: 'jtv', to: prevS, medium: 'cw', flowOf: 'tvb' });
     }
+    /* PRD-SETPOINT-SIM P4: TIC-CDWS (registry loop) in the free left column: PV from TT-CDWS, output to every tower
+       cell's fan drive over a signal bus above the cell tags */
+    loopsOf('ch-m-102').forEach(function (L) {
+      if (L.mv.classKey !== 'tower_cell' || L.pv.node !== 'ttcs') return;
+      var CX = 52, CY = 236, BUS = 190;
+      nodes.push({ id: 'lc-cdw', tag: L.tag, sym: 'instPanel', x: CX, y: CY, size: 44, inst: L.tag.split('-')[0], tagAt: 'above', loop: L.sp,
+        label: L.tag + ' — ' + L.label + ' controller (' + L.action + ' acting ' + L.kind + ')',
+        values: [{ k: 'sp', dx: 0, dy: 34, anchor: 'middle', lod: 1, const: 'setpoint from the control registry (' + L.sp + ')' },
+          { k: 'out', dx: 0, dy: 51, anchor: 'middle', lod: 1, point: 'chiller-plant.CDW.tower_fan_speed', label: L.tag + ' output (tower fan speed)', unit: '%' }] });
+      nodes.forEach(function (nd) { if (nd.id === L.pv.node) nd.loop = L.sp; });
+      edges.push({ id: 'e-lp-cpv', from: [131, 386], to: [CX - 13, CY - 3], via: [[138, 386], [138, 327], [14, 327], [14, CY - 3]], w: 'signal', medium: 'line', loop: L.sp });
+      cells.forEach(function (c, i) {
+        var x = X0 + CP * i;
+        edges.push({ id: 'e-lp-cmv' + (i + 1), from: [CX + 13, CY - 3], to: [x - 19, TY2 - 10], via: [[90, CY - 3], [90, BUS], [x - 24, BUS], [x - 24, TY2 - 10]], w: 'signal', medium: 'line', loop: L.sp });
+        nodes.forEach(function (nd) { if (nd.id === 'ct' + (i + 1)) nd.loop = L.sp; });
+      });
+    });
     var H = OY + 64;
     return {
       id: 'ch-m-102', no: 'CH-M-102', title: title || 'CONDENSER WATER AND COOLING TOWERS', rev: 'A', basis: 'ISA-5.1 · ISO 10628',

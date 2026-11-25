@@ -1,0 +1,279 @@
+{
+  "classKey": "genset",
+  "title": "Standby generating sets (one hall) — sequence of operations",
+  "note": "PRD-SETPOINT-SIM P3. Curated. A threshold is never typed here: a condition names a limit of the conv limits registry (limit), an engine parameter (param) or a value the engine derives (derived); tools/build-sequences.mjs resolves it. A delay that no source states is ASSUMED and says why.",
+  "basis": {
+    "ref": "NFPA 110-2022 (emergency and standby power systems) and IEEE Std 446-1995 (Orange Book)",
+    "use": "the structure: utility failure detected, start signal, sets start and synchronise onto the bus, transfer, retransfer on a stable utility, unloaded cool-down; load shedding when the running sets cannot carry the load",
+    "evidenceClass": "STANDARD",
+    "limits": "the numbers come from this plant's engine (sets per hall, unit rating, maximum loading, hall design load) and its limits registry, not from the standards"
+  },
+  "fleet": {
+    "noun": "generating sets in one hall",
+    "unitLabel": "kW",
+    "running": {
+      "count": {
+        "kind": "genset",
+        "hall": "A",
+        "state": "running"
+      }
+    },
+    "total": "electrical.genset_per_hall",
+    "unit": {
+      "product": [
+        "electrical.genset_unit_kw",
+        "electrical.genset_max_loading"
+      ]
+    },
+    "load": {
+      "key": "campus.halls.0.facility_load_kw"
+    },
+    "source": "utility",
+    "pv": {
+      "label": "Hall load",
+      "short": "not carried",
+      "ok": "carried"
+    },
+    "spare": "electrical.genset_spare_per_hall"
+  },
+  "plant": "per hall: N + 1 diesel generating sets on a common generator bus behind the transfer switchgear; the IT load rides on 2N UPS. Sets per hall = ceil(hall design load / (unit rating × max loading)) + spare (js/conv-engine.js electrical); on a utility loss the duty sets (count − spare) run and share the hall's facility load, the spare stays on standby (fuel-system.html, the same rule)",
+  "modes": [
+    {
+      "id": "normal",
+      "label": "On utility — sets on standby",
+      "kind": "normal",
+      "entry": [
+        {
+          "text": "utility healthy and the transfer switchgear on the utility"
+        }
+      ],
+      "actions": [
+        "every set on automatic standby: jacket-water heater and battery charger on, generator breaker open",
+        "the UPS rectifiers take the IT load from the utility; the mechanical load runs on the utility"
+      ],
+      "exit": [
+        {
+          "to": "utility_fail",
+          "event": "utility voltage or frequency out of tolerance on the incomer"
+        }
+      ]
+    },
+    {
+      "id": "utility_fail",
+      "label": "Utility failure — UPS on battery, start signal",
+      "kind": "emergency",
+      "entry": [
+        {
+          "event": "utility voltage or frequency out of tolerance on the incomer"
+        }
+      ],
+      "actions": [
+        "the UPS carries the IT load from its batteries; the mechanical load (chillers, pumps, CRAHs) stops with the utility",
+        "after the utility-failure confirmation time, the start signal goes to the duty sets (every set but the spare)"
+      ],
+      "exit": [
+        {
+          "to": "start_sync",
+          "event": "start signal sent"
+        }
+      ],
+      "notModelled": "battery autonomy and the length of the outage are not modelled in this plant"
+    },
+    {
+      "id": "start_sync",
+      "label": "Start and synchronise",
+      "kind": "transition",
+      "entry": [
+        {
+          "event": "start signal"
+        }
+      ],
+      "actions": [
+        "the duty sets crank and run up to rated voltage and frequency; the spare stays on standby",
+        "the first set ready closes its breaker onto the dead generator bus; the others synchronise and close",
+        "the transfer switchgear opens the utility incomer and closes the generator incomer"
+      ],
+      "exit": [
+        {
+          "to": "on_gen",
+          "event": "the sets carry the generator bus and the transfer is closed"
+        }
+      ],
+      "notModelled": "the start time (NFPA 110 Type 10 would be 10 s) is not stated for this plant"
+    },
+    {
+      "id": "on_gen",
+      "label": "On generators — load sharing",
+      "kind": "emergency",
+      "entry": [
+        {
+          "event": "the transfer to the generator bus is closed"
+        }
+      ],
+      "actions": [
+        "the running sets share the hall load",
+        "the UPS rectifiers take the IT load back from the batteries",
+        "the mechanical plant restarts one machine at a time (the chiller plant's power-failure sequence)"
+      ],
+      "exit": [
+        {
+          "to": "gen_trip",
+          "event": "a running set trips"
+        },
+        {
+          "to": "retransfer",
+          "event": "utility restored and stable"
+        }
+      ]
+    },
+    {
+      "id": "gen_trip",
+      "label": "Set trip — start the spare",
+      "kind": "protection",
+      "entry": [
+        {
+          "event": "a running set trips on its own protection"
+        }
+      ],
+      "actions": [
+        "its generator breaker opens and the set is locked out; alarm",
+        "the remaining sets share the hall load",
+        "the spare set starts, synchronises and closes onto the bus"
+      ],
+      "exit": [
+        {
+          "to": "on_gen",
+          "event": "the spare set is on the bus"
+        },
+        {
+          "to": "load_shed",
+          "derived": "demand_pct",
+          "op": ">",
+          "value": 100,
+          "text": "load above the remaining sets' capacity"
+        }
+      ]
+    },
+    {
+      "id": "load_shed",
+      "label": "Load shedding",
+      "kind": "protection",
+      "entry": [
+        {
+          "derived": "demand_pct",
+          "op": ">",
+          "value": 100,
+          "text": "load above the running sets' capacity"
+        }
+      ],
+      "actions": [
+        "shed non-critical and mechanical load in its priority order so the running sets stay within their rating",
+        "the IT load stays on the UPS; alarm to the operator"
+      ],
+      "exit": [
+        {
+          "to": "on_gen",
+          "event": "a set restored to service"
+        }
+      ],
+      "notModelled": "the shedding priority list and how much load each step sheds are not modelled"
+    },
+    {
+      "id": "retransfer",
+      "label": "Retransfer — back to utility, sets cool down",
+      "kind": "transition",
+      "entry": [
+        {
+          "event": "utility restored and stable",
+          "delay_s": 1800
+        }
+      ],
+      "actions": [
+        "after the retransfer delay, the transfer switchgear returns the load to the utility",
+        "the sets run unloaded for their cool-down, then stop and return to automatic standby"
+      ],
+      "exit": [
+        {
+          "to": "normal",
+          "event": "every set stopped and on automatic standby"
+        }
+      ],
+      "assumed": {
+        "delay_s 1800": "30 min stable utility before retransfer: common practice for a data centre; no source in this repo states it"
+      }
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "utility_fail",
+      "label": "Utility lost, then restored",
+      "steps": [
+        {
+          "mode": "normal",
+          "do": {}
+        },
+        {
+          "mode": "utility_fail",
+          "do": {
+            "source": "none"
+          },
+          "note": "Utility lost: UPS on battery"
+        },
+        {
+          "mode": "start_sync",
+          "do": {
+            "running": "duty"
+          },
+          "note": "Duty sets start and synchronise"
+        },
+        {
+          "mode": "on_gen",
+          "do": {
+            "source": "gen"
+          }
+        },
+        {
+          "mode": "retransfer",
+          "do": {
+            "source": "utility"
+          },
+          "note": "Retransfer, sets cool down"
+        },
+        {
+          "mode": "normal",
+          "do": {
+            "running": "zero"
+          }
+        }
+      ]
+    },
+    {
+      "id": "gen_trip",
+      "label": "On generators, a running set trips",
+      "steps": [
+        {
+          "mode": "on_gen",
+          "do": {
+            "running": "duty",
+            "source": "gen"
+          }
+        },
+        {
+          "mode": "gen_trip",
+          "do": {
+            "running": -1,
+            "available": -1
+          },
+          "note": "A running set trips"
+        },
+        {
+          "mode": "on_gen",
+          "do": {
+            "running": 1
+          },
+          "note": "Spare set on the bus"
+        }
+      ]
+    }
+  ]
+}

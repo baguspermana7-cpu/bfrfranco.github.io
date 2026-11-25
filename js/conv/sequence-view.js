@@ -95,16 +95,18 @@
     return '<div class="rz-cvm-seq-fig" data-seq-fig data-seq-warnings="' + ctx.warnings.length + '" style="max-width:' + ctx.width + 'px">' + ctx.render() + '</div>';
   }
 
+  var SRC = { utility: 'utility', gen: 'generators', none: 'UPS battery / none' };
   function steps(S, sc) {
     var P = S.quantities, label = {}; S.modes.forEach(function (m) { label[m.id] = short(m.label); });
     var timed = sc.steps.some(function (s) { return s.t_s > 0; });
     var stag = S.modes.filter(function (m) { return m.stagger_s; })[0];
     return '<div class="rz-cvm-sp-wrap"><table class="rz-cvm-sp rz-cvm-seq-t" data-seq-steps><caption>SIMULATED · steady state per step</caption><thead><tr><th scope="col">Step</th>' +
-      (timed ? '<th scope="col" data-k="t">Time</th>' : '') + '<th scope="col">Running</th>' +
-      '<th scope="col" data-k="avail">Available</th><th scope="col" data-k="cap">' + esc('Capacity ' + P.unitLabel) + '</th><th scope="col" data-k="pl">Part load</th><th scope="col">' + esc('Short ' + P.unitLabel) + '</th><th scope="col">' + esc(P.pv.label) + '</th></tr></thead><tbody>' +
+      (timed ? '<th scope="col" data-k="t">Time</th>' : '') + (P.source ? '<th scope="col" data-k="src">Load on</th>' : '') + '<th scope="col">Running</th>' +
+      '<th scope="col" data-k="avail">Available</th><th scope="col" data-k="cap">' + esc('Capacity ' + P.unitLabel) + '</th><th scope="col" data-k="pl">' + (P.unitBasis ? 'Load / usable' : 'Part load') + '</th><th scope="col">' + esc('Short ' + P.unitLabel) + '</th><th scope="col">' + esc(P.pv.label) + '</th></tr></thead><tbody>' +
       sc.steps.map(function (s, i) {
         return '<tr data-seq-i="' + i + '" data-seq-step-mode="' + esc(s.mode) + '" data-seq-running="' + s.running + '" data-seq-short="' + s.short + '" data-seq-t="' + s.t_s + '" hidden>' +
           '<th scope="row">' + esc((i + 1) + '. ' + (s.note ? s.note : label[s.mode])) + '</th>' + (timed ? '<td data-k="t">' + (s.note ? '+' + s.t_s + ' s' : '—') + '</td>' : '') +
+          (P.source ? '<td data-k="src">' + esc(SRC[s.source] || '—') + '</td>' : '') +
           '<td>' + s.running + '</td><td data-k="avail">' + s.available + '</td>' +
           '<td data-k="cap">' + n(s.capacity) + '</td><td data-k="pl">' + (s.part_load_pct === null ? '—' : n(s.part_load_pct) + ' %') + '</td><td>' + n(s.short) + '</td><td>' + esc(s.pv) + '</td></tr>';
       }).join('') + '</tbody></table></div>' +
@@ -119,7 +121,7 @@
     var P = S.quantities, sc = S.scenarios[0];
     return '<section class="rz-cvm-sec rz-cvm-seq" data-rz-cvm-seq="' + esc(classKey) + '"><h3>Sequence of operations</h3>' +
       '<p class="rz-cvm-seq-note">' + esc('Structure: ' + S.basis.ref + ' (' + S.basis.evidenceClass + '). Thresholds from this plant\'s limits registry and engine. Plant now: load ' +
-        n(P.load) + ' ' + P.unitLabel + ', ' + P.running + ' of ' + P.total + ' ' + P.noun + ' running, ' + n(P.unit) + ' ' + P.unitLabel + ' each.') + '</p>' +
+        n(P.load) + ' ' + P.unitLabel + ', ' + P.running + ' of ' + P.total + ' ' + P.noun + ' running, ' + n(P.unit) + ' ' + P.unitLabel + ' each' + (P.unitBasis ? ' (' + P.unitBasis + ')' : P.unitPer ? ' (' + P.unitPer + ' halls)' : '') + (P.source === 'utility' ? '; on the utility, every set on standby' : '') + '.') + '</p>' +
       '<div class="rz-cvm-seq-ctl"><label>Scenario <select data-seq-scn>' + S.scenarios.map(function (x) { return '<option value="' + esc(x.id) + '">' + esc(x.label) + '</option>'; }).join('') + '</select></label>' +
       '<button type="button" data-seq-sim>Simulate</button><button type="button" data-seq-reset>Reset</button></div>' +
       '<div data-seq-body>' + scenarioBody(S, sc, classKey) + '</div>' + modeList(S) + '</section>';

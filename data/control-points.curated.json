@@ -17,7 +17,25 @@
         "cooling.chw_coil_approach_k"
       ],
       "adjustable": null,
-      "adjustableNote": "derived: it moves when its drivers move (rack-inlet target, coil approach), never on its own"
+      "adjustableNote": "derived: it moves when its drivers move (rack-inlet target, coil approach), never on its own",
+      "loop": {
+        "tag": "TIC (unit controller)",
+        "sheet": null,
+        "kind": "PI",
+        "action": "direct",
+        "pv": {
+          "tag": "TT-n01",
+          "what": "each chiller's leaving chilled-water temperature"
+        },
+        "mv": {
+          "classKey": "chiller",
+          "what": "compressor capacity (inlet guide vanes / speed) of that chiller"
+        },
+        "tuning": null,
+        "tuningNote": "not modelled: the chiller's own unit controller, inside the machine",
+        "notDrawn": "held inside each chiller by its own unit controller, not by a plant loop: the chiller's inside modal shows it",
+        "basis": "vendor unit-controller practice (ASSUMED structure; no vendor manual in this repo)"
+      }
     },
     {
       "id": "conv.datahall.crah_supply_air_sp",
@@ -105,7 +123,25 @@
       "role": "setpoint",
       "control": "tower leaving water temperature held by the tower fan speed",
       "adjustable": null,
-      "adjustableNote": "no floor is declared yet: the lowest reachable value is the design wet-bulb plus the tower approach, and the chiller's minimum lift; adjustable when both are in the engine"
+      "adjustableNote": "no floor is declared yet: the lowest reachable value is the design wet-bulb plus the tower approach, and the chiller's minimum lift; adjustable when both are in the engine",
+      "loop": {
+        "tag": "TIC-CDWS",
+        "sheet": "ch-m-102",
+        "kind": "PI",
+        "action": "direct",
+        "pv": {
+          "tag": "TT-CDWS",
+          "node": "ttcs",
+          "what": "condenser water supply temperature from the tower basins"
+        },
+        "mv": {
+          "classKey": "tower_cell",
+          "what": "fan speed of every running tower cell"
+        },
+        "tuning": null,
+        "tuningNote": "not modelled: no source states this loop's gain or time constant; the engine solves the steady state",
+        "basis": "ASHRAE Guideline 36-2021 (high-performance sequences of operation for HVAC systems): tower fans modulate to hold the condenser water supply setpoint; direct acting (temperature rises, fan speed rises)"
+      }
     },
     {
       "id": "conv.chiller-plant.chw_dp_sp",
@@ -113,7 +149,7 @@
       "label": "Secondary loop differential pressure setpoint",
       "param": "cooling.chw_secondary_dp_setpoint_kpa",
       "pv": [
-        "chiller-plant.CHW.header_dp"
+        "chiller-plant.CHW.remote_dp"
       ],
       "classKey": "chw_secondary_pump",
       "role": "setpoint",
@@ -146,7 +182,26 @@
           "unit": "kW"
         }
       ],
-      "whatIfNote": "Steady state of the engine: the pump speed its curve needs to hold this differential pressure, and the input power at that operating head (engine 2.10.0). The loop flow is set by the load, not by this setpoint, so the power moves little. PUE is a model input and does not move. Dynamics are not modelled."
+      "whatIfNote": "Steady state of the engine: the pump speed its curve needs to hold this differential pressure, and the input power at that operating head (engine 2.10.0). The loop flow is set by the load, not by this setpoint, so the power moves little. PUE is a model input and does not move. Dynamics are not modelled.",
+      "loop": {
+        "tag": "PDIC-01",
+        "sheet": "ch-m-101",
+        "kind": "PI",
+        "action": "reverse",
+        "pv": {
+          "tag": "PDT-01",
+          "draw": true,
+          "what": "differential pressure across the most remote CRAH bank"
+        },
+        "mv": {
+          "classKey": "chw_secondary_pump",
+          "what": "speed of every running secondary pump (VSD)"
+        },
+        "tuning": null,
+        "tuningNote": "not modelled: no source states this loop's gain or time constant; the engine solves the steady state",
+        "basis": "ASHRAE Guideline 36-2021 (high-performance sequences of operation for HVAC systems): variable-speed distribution pumps held at a remote differential-pressure setpoint; reverse acting (DP falls, speed rises)"
+      },
+      "pvNote": "PDT-01 on CH-M-101 (engine steady state, which holds this setpoint). Not the KPI 'Header DP' (chiller-plant.CHW.header_dp): that is the mean of the primary loops' authored DPS1/DPS2, a different quantity"
     }
   ],
   "dcaiValueEvidence": {

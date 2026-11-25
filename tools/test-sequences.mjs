@@ -30,7 +30,7 @@ const close = (a, b) => typeof a === 'number' && typeof b === 'number' && Math.a
 
 const conv = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/conv-parameters.json'), 'utf8'));
 const LIM = Object.fromEntries(conv.limits.map((l) => [l.id, l]));
-const E = require(path.join(ROOT, 'js/conv-engine.js')), snap = (E.CONV_CALC || E).snapshot;
+const E = require(path.join(ROOT, 'js/conv-engine.js')), snap = (E.CONV_CALC || E).snapshot, CALC = E.CONV_CALC || E;
 const SPS = Object.fromEntries(JSON.parse(fs.readFileSync(path.join(ROOT, 'data/control-points.json'), 'utf8')).rows.filter((x) => x.sp).map((x) => [x.id, x.sp.value]));
 const getPath = (o, p) => p.split('.').reduce((x, k) => (x == null ? x : x[k]), o);
 const DIR = path.join(ROOT, 'data/sequences');
@@ -86,22 +86,45 @@ for (const f of files) {
 
   /* Q4 */
   if (B) {
-    const f = seq.fleet || {}, need = (k) => getPath(snap, k);
-    ok(['running', 'total', 'unit'].every((k) => typeof need(f[k] || '') === 'number'), 'Q4', `${K}: fleet keys running/total/unit not numbers in the engine snapshot`);
-    const L = f.load || {}, load = L.key ? need(L.key) : L.minus ? need(L.minus[0]) - need(L.minus[1]) : need(L.product[0]) * need(L.product[1]), unit = need(f.unit);
+    const f = seq.fleet || {};
+    /* a fleet quantity read here independently: a snapshot key, minus, product, or a count of the engine's unit-state table */
+    const need = (q) => typeof q === 'string' ? getPath(snap, q) : !q ? undefined : q.key ? getPath(snap, q.key) : q.minus ? getPath(snap, q.minus[0]) - getPath(snap, q.minus[1])
+      : q.product ? getPath(snap, q.product[0]) * getPath(snap, q.product[1]) : q.ratio ? getPath(snap, q.ratio[0]) / getPath(snap, q.ratio[1]) : q.count ? CALC.getFleet(q.count.kind, q.count.hall).filter((u) => u.state === q.count.state).length : undefined;
+    ok(['running', 'total', 'unit'].every((k) => typeof need(f[k]) === 'number' && isFinite(need(f[k]))), 'Q4', `${K}: fleet running/total/unit not numbers from the engine`);
+    const load = need(f.load), unit = need(f.unit);
     ok(close(B.quantities.load, Math.round(load * 10) / 10) && B.quantities.running === need(f.running) && B.quantities.total === need(f.total), 'Q4', `${K}: twin plant ${JSON.stringify(B.quantities)} ≠ engine (load ${load})`);
-    ok(B.quantities.running * unit >= load - 0.05, 'Q4', `${K}: the engine's running ${f.noun} do not carry its own load`);
+    /* a standby supply (source 'utility') runs none of its units while the utility carries the load; any other fleet
+       carries its own load with the units the engine runs */
+    if (f.source === 'utility') ok(B.quantities.running === 0 && CALC.getFleet(f.running.count.kind, f.running.count.hall).every((u) => u.state !== 'running'), 'Q4', `${K}: a standby fleet runs ${B.quantities.running} units on the utility`);
+    else ok(B.quantities.running * unit >= load - 0.05, 'Q4', `${K}: the engine's running ${f.noun} do not carry its own load`);
+    let src = f.source || null;
     B.scenarios.forEach((sc) => {
+      src = f.source || null;
+      const srcOf = [], js = seq.scenarios.find((x) => x.id === sc.id).steps;
+      js.forEach((st) => { if (st.do && st.do.source) src = st.do.source; const reps = st.do && st.do.restart === 'all' ? Math.ceil(load / unit) : 1; for (let k = 0; k < reps; k++) srcOf.push(src); });
+      ok(srcOf.length === sc.steps.length, 'Q4', `${K}/${sc.id}: ${sc.steps.length} walked steps for ${srcOf.length} JSON steps`);
       sc.steps.forEach((s, i) => {
-        const cap = Math.round(s.running * unit * 10) / 10, short = Math.max(0, load - cap);
+        const cap = Math.round(s.running * unit * 10) / 10, so = srcOf[i], short = so === 'utility' ? 0 : so === 'none' ? load : Math.max(0, load - cap);
+        if (f.source) ok(s.source === so, 'Q4', `${K}/${sc.id} step ${i}: source ${s.source}, want ${so}`);
         ok(close(s.capacity, cap), 'Q4', `${K}/${sc.id} step ${i}: capacity ${s.capacity} ≠ ${cap}`);
         ok(Math.abs(s.short - short) <= 0.11, 'Q4', `${K}/${sc.id} step ${i}: short ${s.short} ≠ ${short}`);
-        ok(s.running === 0 ? s.part_load_pct === null : close(s.part_load_pct, Math.min(100, Math.round(load / (s.running * unit) * 1000) / 10)), 'Q4', `${K}/${sc.id} step ${i}: part load ${s.part_load_pct}`);
+        ok(s.running === 0 || (f.source && so !== 'gen') ? s.part_load_pct === null : close(s.part_load_pct, Math.min(100, Math.round(load / (s.running * unit) * 1000) / 10)), 'Q4', `${K}/${sc.id} step ${i}: part load ${s.part_load_pct}`);
         ok((s.pv === f.pv.short) === (short > 0.05) && (s.pv === f.pv.ok) === !(short > 0.05), 'Q4', `${K}/${sc.id} step ${i}: ${f.pv.label} "${s.pv}" with short ${short}`);
         ok(s.running <= s.available, 'Q4', `${K}/${sc.id} step ${i}: ${s.running} running of ${s.available} available`);
         if (i) { const a = sc.steps[i - 1].mode, b = s.mode; ok(a === b || (edges[a] || []).includes(b), 'Q4', `${K}/${sc.id}: step ${a} → ${b} is not an exit of ${a}`); }
       });
       ok(sc.steps.length && sc.steps[sc.steps.length - 1].short === 0, 'Q4', `${K}/${sc.id}: ends with capacity short`);
+      /* the UPS unit is the one the EPMS LV sheet draws for a hall and stream (E-S-102 battery rating) */
+      if (K === 'ups' && sc === B.scenarios[0]) {
+        global.window = global; require(path.join(ROOT, 'js/conv/epms-lv.js'));
+        const sh = window.RZEpmsLv.build(0, snap, CALC.getFleet('genset', 'A')), bats = sh.nodes.filter((n) => n.sym === 'batteryIec' && n.dcBus);
+        ok(bats.length === snap.electrical.ups_system_count && bats.every((b) => close(b.ratingKw, unit)), 'Q4', `${K}: unit ${unit} kW ≠ the EPMS LV sheet's UPS ratings ${bats.map((b) => b.ratingKw)}`);
+      }
+      /* where the engine states the load of a mode, the walk must equal it: UPS normal and 2N failover */
+      if (K === 'ups') sc.steps.forEach((s, i) => {
+        const want = s.running === snap.electrical.ups_system_count ? snap.electrical.ups_load_pct_normal : s.running === snap.electrical.ups_system_count - 1 ? snap.electrical.ups_load_pct_on_failover : null;
+        if (want !== null) ok(close(s.part_load_pct, want), 'Q4', `${K}/${sc.id} step ${i}: part load ${s.part_load_pct} % ≠ engine ${want} % with ${s.running} systems`);
+      });
     });
   }
 }
