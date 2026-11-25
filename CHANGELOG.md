@@ -11,6 +11,38 @@ release sections rather than semver.
 
 ---
 
+## v3.109.0 — 2026-11-26 — Control loops inside the chiller and the CRAH; how much output each loop has left; one setpoints block for both cockpits
+
+### Added
+- **Unit loops on the inside views (PRD-SETPOINT-SIM P4b).** The chiller's inside view draws TIC-CHWS: the leaving
+  chilled-water sensor, the controller (SP 19.4 °C, OUT 89.3 % compressor speed) and the signal to the drive. The
+  CRAH's inside view draws TIC-SAT: supply-air sensor, controller (SP 25.4 °C) and the chilled-water valve (OPEN
+  99.5 %, read from the engine). The rack-inlet target TIC-RI is a reset that sets TIC-SAT; the data hall has no P&ID,
+  so the modal says so. Hover marks the whole loop.
+- **Control authority (P10 part 1).** Every drawn loop states its output, how much output is left before it can no
+  longer hold its setpoint, and SATURATED when it is within 2 % (ASSUMED band) of 100 % or of its minimum. Today:
+  PDIC-01 secondary pumps 98.7 % (1.3 % left) and TIC-SAT CRAH valve 99.5 % (0.5 % left) are saturated; TIC-CDWS and
+  TIC-CHWS run at 89.3 %. The inside-view bubble appends `· SAT`.
+- **DC AI setpoints in the control registry.** The registry twin answers per DC AI unit class, and the CDU TCS supply
+  (30–45 °C, ASHRAE W45 ceiling) and fan-wall supply air (18–27 °C, TC9.9 A1) setpoints carry an engine what-if. The
+  DC AI page shows them in a later release.
+
+### Changed
+- `js/rz-sp-block.js` is now the one Setpoints & limits block (table, loop lines, what-if); the equipment modal frames
+  it. Loaded on the five cockpits that open the modal.
+
+### Fixed
+- A loop bubble's tooltip on a 390 px phone pushed its values off the screen (a page rule for phone tables reached
+  the tooltip table). It now wraps inside the screen.
+- The sheet text gate never measured straight pipes (a zero-width box), so text sitting on a straight pipe passed.
+  It now does; 12 hidden overlaps on the fire and EPMS drawings were moved off their lines.
+
+### Gates
+- `tools/test-setpoint-sim.mjs` 355 checks (S8b unit loops, S8c reset, S8d phone tooltip, S11 authority; each red
+  first). `tools/test-control-registry.mjs` C12-DC, C13-DC, C14 (one writer). `tools/test-conv-sheet-text-clear.mjs`
+  straight-line rule. `tools/test-dcai-setpoints.mjs` D2 (typed DC AI setpoint literals: 8, report until P5).
+- Standards: `standarization/CONTROL_SETPOINT_STANDARD.md` §4b/§5; PRD `documentation/prd/PRD_SETPOINT_SIM.md` C9–C10.
+
 ## v3.107.0 — 2026-11-26 — Chiller-plant setpoint sliders on the engine; control loops on the P&ID; generating-set and UPS sequences of operations
 
 ### Changed
