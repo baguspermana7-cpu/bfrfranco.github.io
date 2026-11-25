@@ -3630,7 +3630,7 @@ window.__hallZones={racks:X(Lm*.3),cdu:X(Lm*.5),crah:X(Lm*.8),vb:VB_W,hx0:HX0,hy
 hc.innerHTML=s;
 hallApplyLayers();
 /* PRD-DATAHALL-BMS-ISO F4: the 3D floor (js/datahall-ai/hall-iso.js) draws the same hall from these engine reads */
-window.__hallIsoGeo={rows:rows,perRow:perRow,m:{rackPitch:rackWM,rackDepth:rackDM,coldAisle:coldM,hotAisle:hotM,crossAisle:xaM,cduDepth:cduD,galleryDepth:gD,hallWidth:Wm,hallLength:Lm,modsPer:modsPer,place:HALL_PLACE},kwRack:kwRack,crahInst:crahInst,crahAct:crahAct,cduInst:cduInst,cduRun:cduRun,sp:SENS_PTS,supplyC:bn('airSupplyC'),returnC:bn('airReturnC'),rackRatedKw:bn('shelfInstalledKw'),crahKw:bn('crahPerUnit'),crahAir:bn('crahAirUnitM3h'),crahAirRated:bn('crahRatedAirM3h'),crahFan:bn('crahFanPct'),cduKw:bn('cduDutyPerUnit'),cduRated:bn('cduRating'),cduLoad:bn('cduLoadPct'),cduLpm:bn('cduFlowPerUnitLpm'),cduLpmRated:bn('cduRatedLpm'),cduPump:bn('cduPumpPct'),rowKw:bn('rowItKw'),buswayPct:bn('buswayLoadPct'),itKw:bn('itHall'),liqKw:bn('liquidHeat'),liqPct:bn('liquidCapturePct'),airKw:bn('airHeat')};
+window.__hallIsoGeo={rows:rows,perRow:perRow,m:{rackPitch:rackWM,rackDepth:rackDM,coldAisle:coldM,hotAisle:hotM,crossAisle:xaM,cduDepth:cduD,galleryDepth:gD,hallWidth:Wm,hallLength:Lm,modsPer:modsPer,place:HALL_PLACE},kwRack:kwRack,crahInst:crahInst,crahAct:crahAct,cduInst:cduInst,cduRun:cduRun,sp:SENS_PTS,supplyC:bn('airSupplyC'),returnC:bn('airReturnC'),rackRatedKw:bn('shelfInstalledKw'),crahKw:bn('crahPerUnit'),crahAir:bn('crahAirUnitM3h'),crahAirRated:bn('crahRatedAirM3h'),crahFan:bn('crahFanPct'),cduKw:bn('cduDutyPerUnit'),cduRated:bn('cduRating'),cduLoad:bn('cduLoadPct'),cduLpm:bn('cduFlowPerUnitLpm'),cduLpmRated:bn('cduRatedLpm'),cduPump:bn('cduPumpPct'),rowKw:bn('rowItKw'),buswayPct:bn('buswayLoadPct'),tcsSupC:bn('tcsSupply'),tcsRetC:bn('tcsReturn'),itKw:bn('itHall'),liqKw:bn('liquidHeat'),liqPct:bn('liquidCapturePct'),airKw:bn('airHeat')};
 if(window.RZHallIso)window.RZHallIso.update(window.__hallIsoGeo);
 }
 /* Layers are a VIEW of one drawing, so the state survives a re-render (hall switch, engine tick). */
@@ -3669,6 +3669,8 @@ const SR=Math.ceil(_rpb/2)*_bk,SP=3;   /* containment pairs across the hall x po
    simulated jitter about the engine air planes, never a field reading, and still 1 decimal
    (v2.18.0: five digits printed 25.78698 C on a 2.8 px glyph). */
 if(rzPanelOn('hall'))for(let r=0;r<SR;r++)for(let si=0;si<SP;si++){const ht=$('H'+r+si+'t'),hh=$('H'+r+si+'h'),ct=$('C'+r+si+'t'),ch=$('C'+r+si+'h');if(ht){const v=RZ_SIM('hac'+r+'-'+si,33.4+si*1.1,37.2+si*1.1,1);ht.textContent=v;const hz=$('H'+r+si+'z');if(hz)hz.setAttribute('fill',hallHeat(parseFloat(v),.34));}if(hh)hh.textContent=RZ_SIM('hah'+r+'-'+si,40,65,1)+'%';if(ct){const v=RZ_SIM('cac'+r+'-'+si,25.3+r*0.05+si*0.22,25.8+r*0.05+si*0.22,1);ct.textContent=v;document.querySelectorAll('#hSvg .C'+r+si+'z').forEach(z=>z.setAttribute('fill',hallHeat(parseFloat(v),.16)));}if(ch)ch.textContent=RZ_SIM('cah'+r+'-'+si,45,70,1)+'%'}
+/* PRD-DCAI-HALL-DEPTH Amendment 7 (A6a): the floor's aisle stations show these readings the moment they change */
+if(rzPanelOn('hall'))document.dispatchEvent(new CustomEvent('rz-hall-readings'));
 /* PUE/IT/DLC are ENGINE-DERIVED (not random). GPU% and W/GPU remain live
  * telemetry jitter (genuine sensor readings, not basis-of-design values). */
 /* v3.11.7 — these five cells live inside #p-hall; #sUA/#sUB below do not, so this function keeps

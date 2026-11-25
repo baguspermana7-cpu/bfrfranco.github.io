@@ -31,6 +31,8 @@
  *   CDU line between the cabinets and the south gallery (.crah-cell[data-kind=cdu], no fan); racks[i].ref / unit.ref become
  *   data-rz-equipment so the page's own equipment click opens; opts.toggle false (the page owns the 3D / Plan switch);
  *   opts.zoneHead(z) the row tag's head (default the letter).
+ *   opts.overlay(api) (DC AI, PRD-DCAI-HALL-DEPTH Amendment 7): after each build, api = { g, el, P, XY, G, nb, kRows, rowsIn,
+ *   Z, u, iso }; the page draws its lens layers into api.g (class fp-ovl). Absent = nothing drawn.
  */
 (function (global) {
   'use strict';
@@ -542,6 +544,11 @@
         inst.airIo.observe(svg);
       }
 
+      /* opts.overlay (DC AI, PRD-DCAI-HALL-DEPTH Amendment 7): the page draws its lens layers (pipes, stations, busway)
+         into one group above the units and under the rings, in the floor's own projection; the Conventional hall passes none */
+      if (typeof opts.overlay === 'function') {
+        opts.overlay({ g: el('g', { 'class': 'fp-ovl' }, svg), el: el, P: P, XY: XY, G: G, nb: nb, kRows: kRows, rowsIn: rowsIn, Z: Z, u: u, iso: iso });
+      }
       ringRow = el('polygon', { 'class': 'fp-ring fp-ring-row', points: '', display: 'none' }, svg);
       ringSel = el('polygon', { 'class': 'fp-ring fp-ring-sel', points: '', display: 'none' }, svg);
       ringHover = el('polygon', { 'class': 'fp-ring fp-ring-hover', points: '', display: 'none' }, svg);
