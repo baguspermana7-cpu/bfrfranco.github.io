@@ -935,3 +935,17 @@ RZSpBlock.bind(host, { recompute })  → wires sliders (input → recompute → 
   appears; extracting it with one consumer would be an abstraction for a single use.
 - **Gates.** `test-setpoint-sim.mjs` 311 → 332 checks (S8b red first: 0 controller bubbles tagged TIC-CHWS / TIC-SAT);
   text-clear 5 sheets C1–C5 PASS; geometry fire + EPMS exit 0; internals core / P3 PASS.
+
+## C10. P10 part 1 delivered with P4b (2026-11-26)
+
+- Grouped into the P4b release to save one full conv gate cycle (both touch only my files).
+- Registry loops carry `out` {key, minKey, what}; the twin's `authority()` holds the one rule (saturated within 2 % of
+  100 % or of the minimum, ASSUMED). Modal loop line: OUT, authority left, SATURATED with its meaning; inside-view
+  bubbles append `· SAT`. **Correction to C3 P10:** the mark is the word SATURATED / SAT, not `◆`, which is the alarm
+  glyph of `js/conv/point-status.js` (a second meaning for one glyph would misread an alarm).
+- Measured: PDIC-01 OUT 98.7 % → 1.3 % left, SATURATED; TIC-SAT 99.5 % → 0.5 %, SATURATED; TIC-CDWS and TIC-CHWS
+  89.3 % → 10.7 %.
+- Gate S11a/b red first (4 loops without an out key), green: setpoint-sim 346 checks.
+- Still open in P10: the mark on the plant-sheet bubbles (their OUT text is bound to a page point), the Loops table
+  (S11c), the DC AI CDU and fan-wall loops (with P5), the rack-inlet what-if showing the valve beyond 100 %.
+

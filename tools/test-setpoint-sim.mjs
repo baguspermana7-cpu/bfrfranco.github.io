@@ -253,6 +253,17 @@ try {
          remote PV the loop holds reads the setpoint (engine steady state); a double-click opens the modal whose
          Setpoints block names the loop. A registry loop without a sheet says why (notDrawn). 0 orphan bubbles. */
       const LOOPS = REG.filter((r) => r.cockpit === 'conv' && r.sp && r.sp.loop);
+      /* S11 control authority (PRD-SETPOINT-SIM P10): a loop's output read from the engine key its registry row names;
+         authority = 100 − OUT; saturated when OUT ≥ 100 − 2 or ≤ its minimum + 2 (2 % band ASSUMED). The modal's loop
+         line carries data-auth-out / -left / -sat and says SATURATED exactly when saturated. */
+      const AUTH = (L) => { if (!L.out) return null; const out = getPath(ENGC.snapshot, L.out.key), mn = L.out.minKey ? getPath(ENGC.snapshot, L.out.minKey) : (typeof L.out.min === 'number' ? L.out.min : null);
+        return { out, left: Math.round((100 - out) * 10) / 10, sat: out >= 98 || (mn !== null && out <= mn + 2) }; };
+      const authCheck = async (L, law) => {
+        const want = AUTH(L); ok(!!want, law, `${L.tag}: registry loop has no out key (P10 authority)`); if (!want) return;
+        const a = await pg.evaluate((tag) => { const x = document.querySelector(`.rz-cvm:not([hidden]) [data-rz-cvm-loop="${tag}"]`); return x ? { out: x.getAttribute('data-auth-out'), left: x.getAttribute('data-auth-left'), sat: x.getAttribute('data-auth-sat'), txt: x.textContent } : null; }, L.tag);
+        ok(!!a && a.out !== null && Math.abs(+a.out - want.out) < 0.051 && Math.abs(+a.left - want.left) < 0.11, 'S11a', `${L.tag}: modal authority ${JSON.stringify(a && { out: a.out, left: a.left })} ≠ engine OUT ${want.out}, left ${want.left}`);
+        ok(!!a && (a.sat === 'true') === want.sat && /SATURATED/.test(a.txt) === want.sat, 'S11b', `${L.tag}: saturated mark ${a && a.sat} / text ${a && /SATURATED/.test(a.txt)} ≠ engine ${want.sat} (OUT ${want.out})`);
+      };
       ok(LOOPS.length >= 2, 'S8', `registry has ${LOOPS.length} conv control loops, want ≥ 2`);
       const MVSEL = { chw_secondary_pump: '.hmi-node[data-node^="ps"]', tower_cell: '.hmi-node[data-node^="ct"]' };
       const MVSPD = { chw_secondary_pump: 'speedPct', tower_cell: 'fanSpeedPct' };
@@ -298,6 +309,7 @@ try {
         if (!(await pg.evaluate(() => !!document.querySelector('.rz-cvm:not([hidden])')))) { await pg.mouse.click(pt.x, pt.y, { clickCount: 2 }); await sleep(700); }
         const ml = await pg.evaluate((tag) => { const x = document.querySelector(`.rz-cvm:not([hidden]) [data-rz-cvm-loop="${tag}"]`); return x ? x.textContent : null; }, L.tag);
         ok(!!ml && ml.indexOf(L.pv.tag) >= 0 && ml.indexOf(L.action + ' acting') >= 0, 'S8', `${L.tag}: double-click opens no modal naming the loop ([data-rz-cvm-loop]) — got ${JSON.stringify(ml && ml.slice(0, 120))}`);
+        await authCheck(L, 'S11');
         await pg.keyboard.press('Escape'); await sleep(400);
       }
       await pg.evaluate(() => { const x = document.querySelector('[data-chw-sheet-btn="ch-m-101"]'); if (x) x.click(); }); await sleep(800);
@@ -343,6 +355,8 @@ try {
         ok(hv.ctl && hv.pv && hv.mv && hv.sig >= 2, 'S8b', `${L.tag}: hover marks ${JSON.stringify(hv)} (want controller, PV, MV and ≥ 2 signal lines)`);
         await pg.mouse.move(2, 2); await sleep(150);
         ok(await pg.evaluate(() => !document.querySelector('#rz-cvm-int-svg .is-loop')), 'S8b', `${L.tag}: the loop stays marked after the pointer leaves`);
+        await authCheck(L, 'S11');
+        const w = AUTH(L); if (w) ok(/SAT/.test(String(g.out)) === w.sat, 'S11b', `${L.tag}: bubble OUT "${g.out}" carries SAT ${/SAT/.test(String(g.out))}, engine saturated ${w.sat}`);
         await pg.keyboard.press('Escape'); await sleep(500);
       }
       /* S8c a reset loop (rack inlet → supply air) names a slave that is a registry loop, and the slave's setpoint is the

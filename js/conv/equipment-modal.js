@@ -192,9 +192,12 @@
     var wi = list.filter(function (r) { return r.adjustable && r.whatIf && r.param; }).map(wiBlock).join('');
     /* P4: the control loop that holds each setpoint (registry loop): PV -> controller -> MV, action, tuning */
     var lp = list.filter(function (r) { return r.loop; }).map(function (r) {
-      var L = r.loop;
-      return '<p class="rz-cvm-note" data-rz-cvm-loop="' + esc(L.tag) + '"><strong>' + esc(L.tag) + '</strong> · ' + esc(L.pv.tag) + ' → ' + esc(L.tag) + ' → ' + esc(L.mv.what) +
-        ' · ' + esc(L.action + ' acting ' + L.kind) + ' · ' + esc(L.tuning ? 'tuning ' + JSON.stringify(L.tuning) : L.tuningNote) + (L.notDrawn ? ' · ' + esc(L.notDrawn) : '') + ' · basis: ' + esc(L.basis) + '</p>';
+      var L = r.loop, E = root.CONV_CALC, A = C.authority && E ? C.authority(L, E.snapshot) : null;
+      /* P10: how much output the controller has left before it can no longer hold its setpoint (engine steady state) */
+      var auth = A ? ' · OUT ' + A.out + ' % (' + esc(L.out.what) + ') · ' + A.left + ' % authority left' +
+        (A.sat ? ' · <strong data-auth-word>SATURATED</strong>: the controller cannot move its output further, so more load moves the PV off its setpoint (band ' + A.band + ' %, ASSUMED)' : '') : '';
+      return '<p class="rz-cvm-note" data-rz-cvm-loop="' + esc(L.tag) + '"' + (A ? ' data-auth-out="' + A.out + '" data-auth-left="' + A.left + '" data-auth-sat="' + A.sat + '"' : '') + '><strong>' + esc(L.tag) + '</strong> · ' + esc(L.pv.tag) + ' → ' + esc(L.tag) + ' → ' + esc(L.mv.what) +
+        ' · ' + esc(L.action + ' acting ' + L.kind) + auth + ' · ' + esc(L.tuning ? 'tuning ' + JSON.stringify(L.tuning) : L.tuningNote) + (L.notDrawn ? ' · ' + esc(L.notDrawn) : '') + ' · basis: ' + esc(L.basis) + '</p>';
     }).join('');
     return sec('Setpoints & limits', '<div class="rz-cvm-sp-wrap"><table class="rz-cvm-sp" data-rz-cvm-sp><thead><tr><th scope="col">Setpoint</th><th scope="col">SP</th><th scope="col">Live</th><th scope="col">Error</th><th scope="col" data-k="band">Alarm band</th><th scope="col" data-k="adj">Adjustable</th><th scope="col" data-k="ev">Evidence</th><th scope="col" data-k="ctl">Held by</th></tr></thead><tbody>' + body + '</tbody></table></div>' + lp + wi, 'rz-cvm-sp-sec');
   }

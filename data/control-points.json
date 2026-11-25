@@ -219,6 +219,11 @@
             "classKey": "tower_cell",
             "what": "fan speed of every running tower cell"
           },
+          "out": {
+            "key": "cooling.tower_fan_speed_pct",
+            "minKey": null,
+            "what": "fan speed of the running tower cells"
+          },
           "tuning": null,
           "tuningNote": "not modelled: no source states this loop's gain or time constant; the engine solves the steady state",
           "basis": "ASHRAE Guideline 36-2021 (high-performance sequences of operation for HVAC systems): tower fans modulate to hold the condenser water supply setpoint; direct acting (temperature rises, fan speed rises)"
@@ -293,6 +298,11 @@
             "classKey": "chw_secondary_pump",
             "what": "speed of every running secondary pump (VSD)"
           },
+          "out": {
+            "key": "cooling.chw_secondary_pump_speed_pct",
+            "minKey": "cooling.pump_min_speed_pct",
+            "what": "mean speed of the running secondary pumps"
+          },
           "tuning": null,
           "tuningNote": "not modelled: no source states this loop's gain or time constant; the engine solves the steady state",
           "basis": "ASHRAE Guideline 36-2021 (high-performance sequences of operation for HVAC systems): variable-speed distribution pumps held at a remote differential-pressure setpoint; reverse acting (DP falls, speed rises)"
@@ -344,6 +354,11 @@
             "classKey": "chiller",
             "node": "vfd",
             "what": "compressor capacity of this chiller: drive speed first, inlet guide vanes at low load"
+          },
+          "out": {
+            "key": "cooling.chiller_speed_pct",
+            "minKey": "cooling.chiller_min_speed_pct",
+            "what": "compressor drive speed of a running chiller"
           },
           "tuning": null,
           "tuningNote": "not modelled: the chiller's own unit controller; no source states its gain or time constant",
@@ -513,6 +528,11 @@
             "classKey": "crah",
             "node": "cv",
             "what": "two-way chilled-water valve of this unit (coil flow)"
+          },
+          "out": {
+            "key": "cooling.crah_valve_open_pct",
+            "minKey": null,
+            "what": "chilled-water valve opening (coil flow / design flow) of a running CRAH"
           },
           "tuning": null,
           "tuningNote": "not modelled: the CRAH's own unit controller; no source states its gain or time constant",

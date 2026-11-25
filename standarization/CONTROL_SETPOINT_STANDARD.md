@@ -115,6 +115,12 @@ range). Otherwise it is fixed, and the modal says what fixes it.
   `cooling.crah_supply_air_c`, OUT = `cooling.crah_valve_open_pct`, the coil flow over its design flow). A cooling
   loop is **direct** acting (temperature up, capacity or valve up). The valve's stem position stays "not modelled";
   its opening as a flow ratio is the engine's.
+- **Authority (P10).** Every drawn loop names the engine key of its output (`out.key`, optional `out.minKey`; the
+  builder refuses a drawn loop without it). `RZControlPoints.authority(loop, snapshot)` = { out, left = 100 − out,
+  min, sat, band }: saturated within 2 % of 100 % or of the minimum (band ASSUMED, the one rule; never re-typed in a
+  page). The modal's loop line says `OUT · authority left` and **SATURATED** with what it means; an inside-view bubble
+  appends `· SAT` to its OUT. The word is used, never a glyph: ◆ is the alarm glyph of `js/conv/point-status.js`.
+  Measured: PDIC-01 98.7 % (1.3 % left) and TIC-SAT 99.5 % (0.5 % left) saturated; TIC-CDWS and TIC-CHWS 89.3 %.
 - **Reset (cascade) loops.** A `kind: 'reset'` loop names the loop whose setpoint it writes (`slave`, an existing
   registry tag; the builder refuses another). TIC-RI (rack inlet) resets TIC-SAT: contained aisle, no mixing modelled,
   so the slave setpoint equals the master's.
@@ -143,6 +149,8 @@ range). Otherwise it is fixed, and the modal says what fixes it.
   tag, PV and MV nodes joined to it by signal lines, SP = registry, OUT = the engine key, no other `instPanel` on that
   view, hover marks controller + PV + MV + ≥ 2 signal lines and clears. Red before the drawing: 0 bubbles. S8c: every
   reset names a registry slave whose setpoint equals the master's.
+  S11a/b: on every modal the loop line's OUT = the engine key ± 0.05, authority = 100 − OUT ± 0.1, SATURATED exactly
+  when the twin rule says so; an inside-view bubble carries SAT exactly then. Red before: every loop had no out key.
 - `node tools/test-conv-sheet-text-clear.mjs` C1/C5 measure straight lines too: an element is invisible only when
   BOTH its width and height are under 1 px (a straight pipe's box is 0 wide; the either-dimension test hid every
   straight edge — G11, proven red on PDT-01's value at dx -24 dy 16 over the riser `e-hrDec`).

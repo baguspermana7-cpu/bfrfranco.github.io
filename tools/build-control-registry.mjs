@@ -59,6 +59,8 @@ export function build() {
       if (!L.sheet && !L.notDrawn) bad('a loop without a sheet says why (notDrawn)');
       if (!L.tuning && !L.tuningNote) bad('no tuning and no note');
       if (L.sheet && /^int-/.test(L.sheet) && !fs.existsSync(path.join(ROOT, 'js/conv/internals', L.sheet.slice(4).replace(/_/g, '-') + '.js'))) bad('sheet ' + L.sheet + ' names no js/conv/internals file');
+      if (L.out && (!PARAM[L.out.key] || (L.out.minKey && !PARAM[L.out.minKey]))) bad('out.key / out.minKey must be engine parameters: ' + JSON.stringify(L.out));
+      if (L.sheet && L.kind !== 'reset' && !L.out) bad('a drawn loop names the engine key of its output (out.key, P10 authority)');
       if (L.kind === 'reset' && (!L.slave || !cur.convSetpoints.some((o) => o.loop && o.loop.tag === L.slave))) bad('a reset names the loop it sets (slave): ' + L.slave);
     }
     rows.push({ id: c.id, cockpit: 'conv', equipment: c.equipment, label: c.label, unit: p.unit,
@@ -112,17 +114,25 @@ export function twin(reg) {
     ' *   RZControlPoints.tipFor(pointId, unit)  -> "SP 19.4 °C · <setpoint name> · <evidence class>" | null\n' +
     ' *   RZControlPoints.rowOf(pointId)         -> the registry row summary | null\n' +
     ' *   RZControlPoints.forClass(classKey)     -> [{ id, label, value, unit, role, ev, pv, control, adjustable, note, param, whatIf, whatIfNote, loop }] (the equipment modal)\n' +
-    ' *   RZControlPoints.loops(sheetId)         -> the control loops drawn on that sheet (ISA-5.1 bubbles, P4) */\n' +
+    ' *   RZControlPoints.loops(sheetId)         -> the control loops drawn on that sheet (ISA-5.1 bubbles, P4)\n' +
+    ' *   RZControlPoints.authority(loop, snap)  -> { out, left, min, sat, band } from the engine snapshot (P10) | null */\n' +
     '(function (root) {\n  \'use strict\';\n  var BY_PV = ' + JSON.stringify(byPv, null, 1).replace(/\n\s*/g, ' ') + ';\n' +
     '  function fmt(v, u) { return u === \'°C\' || Math.round(v) !== v ? v.toFixed(1) : String(v); }\n' +
     '  var BY_CLASS = ' + JSON.stringify(byClass, null, 1).replace(/\n\s*/g, ' ') + ';\n' +
     '  var LOOPS = ' + JSON.stringify(loops, null, 1).replace(/\n\s*/g, ' ') + ';\n' +
     '  function loops(sheet) { return LOOPS.filter(function (l) { return l.sheet === sheet; }); }\n' +
+    '  /* P10 control authority: OUT from the engine key the loop names; left = 100 - OUT; saturated within SAT_BAND of 100 %\n' +
+    '     or of the minimum. SAT_BAND 2 % is ASSUMED (no source states where a loop stops holding; it is the visible margin) */\n' +
+    '  var SAT_BAND = 2;\n' +
+    '  function path(o, p) { var k = String(p).split(\'.\'); for (var i = 0; o != null && i < k.length; i++) o = o[k[i]]; return typeof o === \'number\' && isFinite(o) ? o : null; }\n' +
+    '  function authority(L, snap) { if (!L || !L.out || !snap) return null; var out = path(snap, L.out.key); if (out === null) return null;\n' +
+    '    var mn = L.out.minKey ? path(snap, L.out.minKey) : null;\n' +
+    '    return { out: out, left: Math.round((100 - out) * 10) / 10, min: mn, sat: out >= 100 - SAT_BAND || (mn !== null && out <= mn + SAT_BAND), band: SAT_BAND }; }\n' +
     '  function forClass(k) { return Object.prototype.hasOwnProperty.call(BY_CLASS, k) ? BY_CLASS[k].slice() : []; }\n' +
     '  function rowOf(id) { return Object.prototype.hasOwnProperty.call(BY_PV, id) ? BY_PV[id] : null; }\n' +
     '  function spOf(id) { var r = rowOf(id); return r ? { value: r.value, label: (r.role === \'setpoint\' ? \'SP \' : \'Ref \') + fmt(r.value, r.unit), unit: r.unit, id: r.id } : null; }\n' +
     '  function tipFor(id) { var r = rowOf(id), s = spOf(id); return r ? s.label + (r.unit ? \' \' + r.unit : \'\') + \' · \' + r.label + \' · \' + r.ev : null; }\n' +
-    '  root.RZControlPoints = { spOf: spOf, tipFor: tipFor, rowOf: rowOf, forClass: forClass, loops: loops, fmt: fmt, version: \'1.1.0\' };\n' +
+    '  root.RZControlPoints = { spOf: spOf, tipFor: tipFor, rowOf: rowOf, forClass: forClass, loops: loops, authority: authority, fmt: fmt, version: \'1.2.0\' };\n' +
     '})(typeof window !== \'undefined\' ? window : this);\n';
 }
 

@@ -56,7 +56,8 @@
     (d.blocks || []).forEach(function (b) { if (!out[b.node]) out[b.node] = { state: nodeState(b.node, m), values: {}, rows: [] }; });
     Object.keys(d.nodeValues || {}).forEach(function (id) {
       d.nodeValues[id].forEach(function (v) {
-        out[id].values[v.k] = { text: (v.prefix ? v.prefix + ' ' : '') + text(m[v.key], v.fmt) };
+        /* flag: a model key that, when true, appends its word (P10: OUT 99.5 % · SAT on a saturated loop) */
+        out[id].values[v.k] = { text: (v.prefix ? v.prefix + ' ' : '') + text(m[v.key], v.fmt) + (v.flag && m[v.flag.key] === true ? ' · ' + v.flag.word : '') };
       });
     });
     (d.blocks || []).forEach(function (b) {

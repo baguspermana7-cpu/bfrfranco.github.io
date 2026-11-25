@@ -86,6 +86,7 @@
       airflow: only(c.crah_unit_airflow_m3_s), supplyT: only(c.crah_supply_air_c), returnT: only(c.crah_return_air_c),
       airDt: only(c.airside_delta_t_k), chwsT: only(c.chws_c), chwrT: only(c.chwr_c),
       mode: run ? 'RUN' : 'STANDBY',
+      outSat: (function () { var CP = root && root.RZControlPoints, L = CP && CP.authority ? CP.loops('int-crah').shift() : null, A = run && L ? CP.authority(L, s) : null; return A ? A.sat : null; })(),   // P10 saturated loop (twin rule)
       satSp: c.crah_supply_air_c,                     // the setpoint (registry conv.datahall.crah_supply_air_sp = this engine key)
       valveOpen: only(c.crah_valve_open_pct),         // coil flow / design coil flow: the opening the loop needs (engine 2.10.0)
       valvePos: NM, fanKw: NM, filterDp: NM
@@ -108,7 +109,7 @@
     cv: [{ k: 'pos', key: 'valveOpen', fmt: 'pct', prefix: 'OPEN' }],
     chwr: [{ k: 't', key: 'chwrT', fmt: 'temp' }],
     chws: [{ k: 't', key: 'chwsT', fmt: 'temp' }, { k: 'q', key: 'chwFlow', fmt: 'flow' }],
-    ctl: [{ k: 'mode', key: 'mode', fmt: 'text' }, { k: 'sp', key: 'satSp', fmt: 'temp', prefix: 'SP' }, { k: 'out', key: 'valveOpen', fmt: 'pct', prefix: 'OUT' }]
+    ctl: [{ k: 'mode', key: 'mode', fmt: 'text' }, { k: 'sp', key: 'satSp', fmt: 'temp', prefix: 'SP' }, { k: 'out', key: 'valveOpen', fmt: 'pct', prefix: 'OUT', flag: { key: 'outSat', word: 'SAT' } }]
   };
   var C = 'cooling.';
   var BLOCKS = [

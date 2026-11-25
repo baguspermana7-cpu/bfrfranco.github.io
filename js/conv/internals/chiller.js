@@ -131,6 +131,7 @@
       state: u.state, tag: u.tag, n: u.n, running: run,
       chwIn: only(c.chwr_c),                          // CHWR enters the evaporator at the plant return temperature
       chwOut: only(c.chws_c),                         // CHWS leaves at the plant supply set point
+      outSat: (function () { var CP = root && root.RZControlPoints, L = CP && CP.authority ? CP.loops('int-chiller').shift() : null, A = run && L ? CP.authority(L, s) : null; return A ? A.sat : null; })(),   // P10 saturated loop (twin rule)
       chwSp: c.chws_c,                                // the setpoint itself (registry conv.chiller-plant.chws_sp = this engine key), on a standby unit too
       chwFlow: u.chwFlowLps,                          // fleet row: evaporator duty / (rho cp dT_chw)
       cdwIn: only(c.cdw_supply_c), cdwOut: only(c.cdw_return_c),
@@ -186,7 +187,7 @@
       { k: 'lift', key: 'lift', fmt: 'k', prefix: 'LIFT' }, { k: 'pr', key: 'pr', fmt: 'ratio', prefix: 'PR' }],
     eco: [{ k: 'pi', key: 'interPress', fmt: 'kpa', prefix: 'P' }],
     op: [{ k: 'p', key: 'oilPress', fmt: 'kpag', prefix: 'P' }],
-    tic: [{ k: 'sp', key: 'chwSp', fmt: 'temp', prefix: 'SP' }, { k: 'out', key: 'speedPct', fmt: 'pct', prefix: 'OUT' }]
+    tic: [{ k: 'sp', key: 'chwSp', fmt: 'temp', prefix: 'SP' }, { k: 'out', key: 'speedPct', fmt: 'pct', prefix: 'OUT', flag: { key: 'outSat', word: 'SAT' } }]
   };
 
   /* the block catalogue (PRD §5.1 chiller row): every block is a node on the sheet; role = two plain lines */
