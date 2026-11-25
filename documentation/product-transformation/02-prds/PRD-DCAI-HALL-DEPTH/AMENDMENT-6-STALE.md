@@ -53,6 +53,9 @@ Red on 3f3c82fa9: 74 of 89. Green: 89 / 89.
 - **R1.** `datahallAI.html` is shared. The rewrites are mechanical and keep every finite number's text: `nz(v)` and
   `nzf(v, d)` return the same text as before for a finite number. `P.v` prints the payload's formatted text, which
   has the payload's digits.
+  Measured 2026-11-25 (throwaway probe wrapping `safePayload().v` over the ST6 sweep in normal mode): 399 reads with a
+  finite value, every text a bare number except `unit_flow_m3h` ("41 m³/h"), which the dry-cooler HMI already printed alone
+  before this phase. The first probe wrapped a frozen object and saw 0 calls; it was rebuilt before it was trusted.
 - **R2.** The floor tick re-reads 145 payloads only while a replay is set.
 
 ## 5 · Status
