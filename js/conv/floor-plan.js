@@ -179,6 +179,9 @@
     '@media (prefers-reduced-motion:no-preference){.fp-rotor[data-turning="1"]{animation:fp-rot 1s linear infinite}}',
     '.fp-root.fp-offscreen .fp-rotor{animation-play-state:paused}',
     '.fp-ring-sel{stroke:var(--fp-accent);stroke-width:1.5}',
+    /* opts.selInk (DC AI, PRD-DCAI-HALL-DEPTH Amendment 5 / SL1): the selection is an ink outline, 2 px, never the warning amber */
+    '.fp-root[data-sel-ink] .fp-ring-sel{stroke:var(--fp-ink);stroke-width:2}',
+    '.fp-root[data-sel-ink] .zone[data-sel] .zone-head{border-color:var(--fp-ink)}',
     '.fp-ring-hover{stroke:var(--fp-ink);stroke-width:1}',
     '.fp-ring-row{stroke:var(--fp-accent);stroke-width:1.5}',
     '.fp-root:not(.fp-labels) .rk-id,.fp-root:not(.fp-labels) .rk-val,.fp-root .cr-n{display:none}',
@@ -373,7 +376,7 @@
       if (opts.height != null) { host.style.width = Math.min(svgW, meas.clientWidth || svgW) + 'px'; host.style.height = svgH + 'px'; }
       root = html('div', 'fp-root', host);
       root.setAttribute('data-fp', '1'); root.setAttribute('data-u', u.toFixed(2)); root.setAttribute('data-bands', String(nb));
-      root.setAttribute('data-proj', proj); root.setAttribute('data-proj-key', projKey);
+      root.setAttribute('data-proj', proj); root.setAttribute('data-proj-key', projKey); if (opts.selInk) root.setAttribute('data-sel-ink', '1');
       /* the 3D / Plan toggle: two buttons, aria-pressed, outside the scroller so it never scrolls away */
       var tg = opts.toggle === false ? null : html('div', 'fp-proj', root);   /* toggle false: the page owns the switch */
       if (tg) { tg.setAttribute('role', 'group'); tg.setAttribute('aria-label', 'Projection'); }

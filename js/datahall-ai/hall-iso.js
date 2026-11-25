@@ -128,6 +128,8 @@
     [pane, doc.getElementById('hallLayers')].concat([].slice.call(panel.querySelectorAll('.hp-key'))).forEach(function (el) { if (el) el.classList.add('dh-draw-hide'); });
     pane.parentNode.insertBefore(bar, pane);
     host = doc.createElement('div'); host.id = 'hIso'; host.setAttribute('data-rz-hall', String(win.currentDH || 1));
+    /* Amendment 5 (A5d): the unit the operator opened (click or Enter) stays selected after its HMI closes */
+    host.addEventListener('rz-equipment-activate', function (e) { selectRef(e.detail && e.detail.ref); });
     /* DC AI traceability (test-dcai-coverage): every number the 3D floor prints comes from here */
     host.setAttribute('data-rz-authored-basis', 'row-pair heat = racks per pair x design rack kW (engine counts multiplied, not a reading); ' +
       'rack inlet and hot-aisle values are the plan\'s simulated aisle readouts, or the engine design supply / return air before the first readout');
@@ -376,6 +378,21 @@
     if (ok) { o.modsPer = m.modsPer; o.place = {}; for (i = 0; i < pk.length; i++) o.place[pk[i]] = pl[pk[i]]; }
     return o;
   }
+  /* Amendment 5 (A5d). A pointer click never reaches the floor: equipment-inspector.js takes it in the capture phase and
+     reports it with rz-equipment-activate. Enter on the floor cursor reaches the floor's own handler, which calls this:
+     the unit gets the same click, so a key opens the same HMI a click opens. */
+  function openUnit(i, g) {
+    if (!g || !g.getAttribute('data-rz-equipment')) return;
+    var ev; try { ev = new MouseEvent('click', { bubbles: true, cancelable: true, view: win }); } catch (x) { return; }
+    g.dispatchEvent(ev);
+  }
+  function selectRef(ref) {
+    if (!inst || !host || !ref) return;
+    var g = host.querySelector('[data-rz-equipment="' + String(ref).replace(/["\\]/g, '') + '"]');
+    if (!g) return;
+    if (g.getAttribute('data-idx') != null) inst.select({ rack: +g.getAttribute('data-idx') });
+    else if (g.getAttribute('data-crah') != null) inst.select({ crah: +g.getAttribute('data-crah') });
+  }
   function render() {
     if (!geo || !host || !win.RZFloorPlan) return;
     /* HV-V3: a switch between 2D and 3D keeps the selected unit and the paint mode (one model, two projections) */
@@ -389,7 +406,7 @@
       /* the whole hall on the first screen, both axes, at every width: the stage takes what is left of the viewport below
          its own top (HV-F1); fitAll lets the unit shrink below the plan's label floor (labels live in tooltips) */
       height: function () { var t = wrap.getBoundingClientRect().top + (win.pageYOffset || 0); return Math.max(260, (win.innerHeight || 900) - bottomInset() - t - 12); },
-      watchHeight: false, fitAll: true, tagFit: true, stbyLamp: true, rotors: true, geo: geo.m || null, airModes: ['temp', 'cooling-margin'],
+      watchHeight: false, fitAll: true, tagFit: true, stbyLamp: true, selInk: true, onRack: openUnit, onCrah: openUnit, rotors: true, geo: geo.m || null, airModes: ['temp', 'cooling-margin'],
       rackTag: function (i) { return model.racks[i].ref.replace('rack-unit:', ''); },
       zoneTag: function (z) { return 'Rows R' + pad2(2 * z + 1) + ' and R' + pad2(2 * z + 2) + ', one contained hot aisle'; },
       /* a phone gives a row pair about 34 px: 'R01/02' (6 chars) would touch its neighbour, '01/02' keeps a gap; the full name stays in the tooltip */

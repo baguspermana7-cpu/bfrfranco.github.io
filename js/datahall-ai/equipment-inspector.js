@@ -99,6 +99,14 @@
     return t.closest('[data-rz-equipment]');
   }
 
+  /* PRD-DCAI-HALL-DEPTH Amendment 5 (A5d): this resolver takes the click in the capture phase and stops it, so a host that
+     draws the unit (the Data Hall floor) never sees it; it hears this event instead and marks the unit selected */
+  function activated(el) {
+    var ev;
+    try { ev = new CustomEvent('rz-equipment-activate', { bubbles: true, detail: { ref: el.getAttribute('data-rz-equipment') } }); } catch (x) { return; }
+    el.dispatchEvent(ev);
+  }
+
   function init() {
     if (!payloads() || !inspector()) { return; }
     if (!context()) { doc.body.setAttribute('data-rz-equipment-inspector', 'unavailable'); return; }
@@ -111,6 +119,7 @@
       if (win.__rzSvgPanMoved) { return; }
       if (e.detail >= 2) { return; }                               /* the dblclick listener owns the repeat */
       e.stopPropagation(); e.preventDefault();
+      activated(el);
       if (e.shiftKey) { openTier1(el); return; }
       var p = build(el.getAttribute('data-rz-equipment'), hallOf(el));
       if (p && !p.unavailable && p.actions && p.actions.openHmi && openTier2(p, el)) { return; }
@@ -127,6 +136,7 @@
       var el = e.target && e.target.closest ? e.target.closest('[data-rz-equipment]') : null;
       if (!el || e.target.closest('[data-basis-param]') || e.target.closest('.hmi-modal-back')) { return; }
       e.stopPropagation(); e.preventDefault();
+      activated(el);
       if (e.shiftKey) { openTier1(el); return; }
       var kp = build(el.getAttribute('data-rz-equipment'), hallOf(el));
       if (kp && !kp.unavailable && kp.actions && kp.actions.openHmi && openTier2(kp, el)) { return; }
