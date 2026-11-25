@@ -47,7 +47,7 @@
       values: [{ k: 'kw', dx: -18, dy: 68, anchor: 'end', lod: 1 }, { k: 'load', dx: -18, dy: 84, anchor: 'end', lod: 1 }, { k: 'td', dx: -170, dy: -268, anchor: 'end', lod: 1 }] },
     { id: 'mtr', tag: 'MOTOR', sym: 'motorIec', x: 620, y: 320, size: 44, tagAt: 'at', tagXY: [0, 34], label: 'Compressor drive motor' },
     { id: 'vfd', tag: 'VFD', sym: 'vfdDrive', x: 692, y: 320, size: 40, tagAt: 'at', tagXY: [0, 36], label: 'Variable-frequency drive',
-      values: [{ k: 'spd', dx: 38, dy: 52, anchor: 'end', lod: 1 }] },
+      values: [{ k: 'spd', dx: 0, dy: -30, anchor: 'middle', lod: 1 }] },
     { id: 'ucp', tag: 'UCP', sym: 'instPlc', x: 692, y: 140, size: 44, tagAt: 'at', tagXY: [0, -26], label: 'Unit control panel',
       values: [{ k: 'cop', dx: 18, dy: 42, anchor: 'end', lod: 1 }, { k: 'carnot', dx: 18, dy: 58, anchor: 'end', lod: 1 },
         { k: 'lift', dx: 18, dy: 74, anchor: 'end', lod: 1 }, { k: 'pr', dx: 18, dy: 90, anchor: 'end', lod: 1 }] },
@@ -61,7 +61,7 @@
     /* oil */
     { id: 'os', tag: 'OIL SUMP', sym: 'oilSump', x: 531, y: 500, size: 48, tagAt: 'at', tagXY: [0, 40], label: 'Oil sump with heater' },
     { id: 'op', tag: 'OIL PUMP', sym: 'pumpGear', x: 610, y: 512, size: 32, tagAt: 'at', tagXY: [0, 30], label: 'Oil pump',
-      values: [{ k: 'p', dx: 0, dy: 46, lod: 1 }] },
+      values: [{ k: 'p', dx: 16, dy: 46, anchor: 'end', lod: 1 }] },
     { id: 'oc', tag: 'OIL COOLER', sym: 'hxShellTube', x: 610, y: 420, size: 48, tagAt: 'at', tagXY: [0, -22], label: 'Oil cooler' },
     /* junctions */
     { id: 'jh', sym: 'junction', x: 285, y: 60 },
@@ -95,10 +95,30 @@
     { id: 'o-disch', from: 'op.discharge', to: 'oc.tubeOut', via: [[650, 512], [650, 420]], medium: 'oil', flowOf: 'oil' },
     { id: 'o-feed', from: 'oc.tubeIn', to: 'cp.oilIn', via: [[549, 420]], medium: 'oil', flowOf: 'oil' }
   ];
+  /* PRD-SETPOINT-SIM P4b: the unit's own control loop, from the control registry (RZControlPoints.loops('int-chiller');
+     tag, PV and MV are never typed here, and nothing is drawn without the registry). TT at the CHWS outlet nozzle,
+     the controller right of the oil circuit, its output to the drive entering from the right. */
+  function unitLoop() {
+    var C = root && root.RZControlPoints, L = C && typeof C.loops === 'function' ? C.loops('int-chiller')[0] : null;
+    if (!L) return null;
+    var sp = L.sp;
+    return { mv: L.mv.node, sp: sp,
+      nodes: [
+        { id: L.pv.node, tag: L.pv.tag, sym: 'instField', x: 444, y: 450, size: 22, inst: L.pv.tag.split('-')[0], tagAt: 'at', tagXY: [14, 4, 'start'], loop: sp,
+          label: L.pv.tag + ' — ' + L.pv.what },
+        { id: 'tic', tag: L.tag, sym: 'instPanel', x: 700, y: 470, size: 36, inst: L.tag.split('-')[0], tagAt: 'at', tagXY: [0, 32], loop: sp,
+          label: L.tag + ' — ' + L.label + ' controller (' + L.action + ' acting ' + L.kind + ')',
+          values: [{ k: 'sp', dx: 0, dy: 48, anchor: 'middle', lod: 1 }, { k: 'out', dx: 0, dy: 64, anchor: 'middle', lod: 1 }] }],
+      edges: [
+        { id: 'l-pvi', from: [414, 450], to: [433, 450], medium: 'line', w: 'inst', loop: sp },
+        { id: 'l-pv', from: [444, 461], to: [682, 470], via: [[444, 590], [662, 590], [662, 470]], medium: 'line', w: 'signal', loop: sp },
+        { id: 'l-mv', from: [700, 452], to: [712, 320], via: [[700, 400], [728, 400], [728, 320]], medium: 'line', w: 'signal', loop: sp }] };
+  }
   function sheet(unit) {
-    var tag = (unit && unit.tag) || 'CH';
+    var tag = (unit && unit.tag) || 'CH', lp = unitLoop();
+    var nodes = lp ? NODES.map(function (n) { return n.id === lp.mv ? Object.assign({}, n, { loop: lp.sp }) : n; }).concat(lp.nodes) : NODES;
     return { id: 'int-chiller', no: tag + '-INT', title: tag + ' internal — water-cooled centrifugal chiller', rev: 'A', basis: 'ISO 10628-2 · ISO 14617 · IEC 60617',
-      svgId: 'rz-cvm-int-svg', size: SHEET.size.slice(), minScale: SHEET.minScale, nodes: NODES, edges: EDGES, areas: [], notes: [] };
+      svgId: 'rz-cvm-int-svg', size: SHEET.size.slice(), minScale: SHEET.minScale, nodes: nodes, edges: lp ? EDGES.concat(lp.edges) : EDGES, areas: [], notes: [] };
   }
   /* GEOMETRY END */
 
@@ -111,6 +131,7 @@
       state: u.state, tag: u.tag, n: u.n, running: run,
       chwIn: only(c.chwr_c),                          // CHWR enters the evaporator at the plant return temperature
       chwOut: only(c.chws_c),                         // CHWS leaves at the plant supply set point
+      chwSp: c.chws_c,                                // the setpoint itself (registry conv.chiller-plant.chws_sp = this engine key), on a standby unit too
       chwFlow: u.chwFlowLps,                          // fleet row: evaporator duty / (rho cp dT_chw)
       cdwIn: only(c.cdw_supply_c), cdwOut: only(c.cdw_return_c),
       cdwFlow: u.cdwFlowLps,                          // fleet row: condenser duty / (rho cp cdw_range_k)
@@ -164,7 +185,8 @@
     ucp: [{ k: 'cop', key: 'cop', fmt: 'cop', prefix: 'COP' }, { k: 'carnot', key: 'carnotFraction', fmt: 'frac', prefix: 'CARNOT' },
       { k: 'lift', key: 'lift', fmt: 'k', prefix: 'LIFT' }, { k: 'pr', key: 'pr', fmt: 'ratio', prefix: 'PR' }],
     eco: [{ k: 'pi', key: 'interPress', fmt: 'kpa', prefix: 'P' }],
-    op: [{ k: 'p', key: 'oilPress', fmt: 'kpag', prefix: 'P' }]
+    op: [{ k: 'p', key: 'oilPress', fmt: 'kpag', prefix: 'P' }],
+    tic: [{ k: 'sp', key: 'chwSp', fmt: 'temp', prefix: 'SP' }, { k: 'out', key: 'speedPct', fmt: 'pct', prefix: 'OUT' }]
   };
 
   /* the block catalogue (PRD §5.1 chiller row): every block is a node on the sheet; role = two plain lines */

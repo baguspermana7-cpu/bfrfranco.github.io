@@ -97,7 +97,7 @@
   ZX.forEach(function (x, i) {
     var n = i + 1;
     nodes.push({ id: 'zd' + n, tag: 'ZONE ' + n, sym: 'smokeDetector', x: x, y: 78, size: 28, cls: 'fire-zone', label: 'Detection zone ' + n + ' · ' + ZNAME[i] + ' (SD · HD · VESDA)',
-      tagAt: 'above', values: [{ k: 'st', dx: 0, dy: 30, lod: 1 }] });
+      tagAt: 'above', values: [{ k: 'st', dx: 6, dy: 30, anchor: 'start', lod: 1 }] });   /* right of the loop drop (text-clear C1) */
     nodes.push({ id: 'jz' + n, sym: 'junction', x: x, y: HDR_Y, dot: n < 5 });
     nodes.push({ id: 'pav' + n, tag: 'PAV-0' + n, sym: 'preActionValve', x: x, y: VALVE_Y, size: 30, rot: 90, cls: 'fire-pav', label: 'Pre-action valve · zone ' + n + ' · ' + ZNAME[i], tagAt: 'left' });
     nodes.push({ id: 'jn' + n, sym: 'junction', x: x, y: 395 });

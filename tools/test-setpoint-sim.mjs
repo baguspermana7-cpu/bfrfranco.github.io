@@ -13,6 +13,8 @@
  *      SP = registry, OUT = engine, hover marks PV -> controller -> MV, double-click opens the modal naming the loop;
  *      0 orphan bubbles
  *      RZ_SP_PLANT=no-loops  serve the twin without loops(): S8 must fail; =no-loop-hover: the hover law must fail
+ *   S8b unit loops on the inside view (P4b): TIC-CHWS inside a chiller, TIC-SAT inside a CRAH, each one instPanel with SP =
+ *      registry, OUT = engine, PV and MV joined by signals, no orphan, hover marks the loop. S8c a reset names its slave.
  *   S9 (part) 0 page errors on the pages visited
  *
  * Red first: on v3.102.0 (no control registry in the browser) S2 and S3 fail on every page.
@@ -257,6 +259,7 @@ try {
       for (const r of LOOPS) {
         const L = r.sp.loop;
         if (!L.sheet) { ok(!!L.notDrawn, 'S8', `${r.id}: loop ${L.tag} has no sheet and no notDrawn reason`); continue; }
+        if (/^int-/.test(L.sheet)) continue;   /* a loop inside one unit is drawn on its inside view: S8b */
         await pg.evaluate((v) => { const x = document.querySelector(`[data-chw-sheet-btn="${v}"]`); if (x) x.click(); }, L.sheet); await sleep(1500);
         const g = await pg.evaluate((tag, pvTag, mvSel) => {
           const svg = document.querySelector('#chw-sheet-host svg'); if (!svg) return null;
@@ -298,6 +301,57 @@ try {
         await pg.keyboard.press('Escape'); await sleep(400);
       }
       await pg.evaluate(() => { const x = document.querySelector('[data-chw-sheet-btn="ch-m-101"]'); if (x) x.click(); }); await sleep(800);
+      /* S8b unit loops on the inside view (PRD-SETPOINT-SIM P4b): a registry loop whose sheet is int-<class> is drawn
+         inside every unit of that class. Open one running unit: exactly one controller bubble tagged as the registry
+         says, its PV instrument and the MV it drives joined to it by signal lines, SP = registry, OUT = the engine
+         (chiller drive speed, CRAH coil-flow opening), no other controller bubble (orphan), hover marks the loop. */
+      const INT = LOOPS.filter((r) => /^int-/.test(r.sp.loop.sheet || ''));
+      ok(INT.length >= 2, 'S8b', `registry has ${INT.length} loops drawn inside a unit (int-*), want ≥ 2 (TIC-CHWS, TIC-SAT)`);
+      const OPENER = { chiller: '.hmi-node[data-node="ch1"]', crah: '.hmi-node[data-node^="crah"]' };
+      const OUTKEY = { chiller: 'cooling.chiller_speed_pct', crah: 'cooling.crah_valve_open_pct' };
+      for (const r of INT) {
+        const L = r.sp.loop;
+        const pt = await pg.evaluate((sel) => { const n = document.querySelector('#chw-sheet-host ' + sel); if (!n) return null; n.scrollIntoView({ block: 'center', inline: 'center' }); const b = (n.querySelector('.b') || n).getBoundingClientRect(); return { x: b.x + b.width / 2, y: b.y + b.height / 2 }; }, OPENER[L.mv.classKey] || '.none');
+        ok(!!pt, 'S8b', `${L.tag}: no ${L.mv.classKey} unit on CH-M-101 to open`); if (!pt) continue;
+        await pg.mouse.click(pt.x, pt.y); await sleep(600);
+        if (!(await pg.evaluate(() => !!document.querySelector('.rz-cvm:not([hidden]) #rz-cvm-int-svg')))) { await pg.mouse.click(pt.x, pt.y, { clickCount: 2 }); await sleep(800); }
+        const g = await pg.evaluate((tag, pvNode, mvNode) => {
+          const svg = document.querySelector('.rz-cvm:not([hidden]) #rz-cvm-int-svg'); if (!svg) return null;
+          const nodes = [...svg.querySelectorAll('.hmi-node')], c = nodes.filter((n) => (n.getAttribute('aria-label') || '').startsWith(tag + ' — '));
+          const node = (id) => svg.querySelector(`.hmi-node[data-node="${id}"]`), c0 = c[0], pv = node(pvNode), mv = node(mvNode);
+          const near = (p, n, pad) => { const b = n.getBBox(); return p[0] >= b.x - pad && p[0] <= b.x + b.width + pad && p[1] >= b.y - pad && p[1] <= b.y + b.height + pad; };
+          const ends = [...svg.querySelectorAll('path.hmi-edge.w-signal')].map((p) => { const a = p.getPointAtLength(0), b = p.getPointAtLength(p.getTotalLength()); return [[a.x, a.y], [b.x, b.y]]; });
+          const link = (x, y) => x && y ? ends.filter((e) => (near(e[0], x, 6) && near(e[1], y, 6)) || (near(e[1], x, 6) && near(e[0], y, 6))).length : 0;
+          const val = (k) => { const t = c0 && svg.querySelector(`[data-val="${c0.getAttribute('data-node')}:${k}"]`); return t ? t.textContent.trim() : null; };
+          const bubbles = nodes.filter((n) => n.getAttribute('data-sym') === 'instPanel').map((n) => (n.getAttribute('aria-label') || '').split(' — ')[0]);
+          return { ctl: c.length, sym: c0 ? c0.getAttribute('data-sym') : null, id: c0 ? c0.getAttribute('data-node') : null, pv: !!pv, mv: !!mv,
+            pvLink: link(pv, c0), mvLink: link(c0, mv), sp: val('sp'), out: val('out'), bubbles };
+        }, L.tag, L.pv.node, L.mv.node);
+        ok(!!g && g.ctl === 1 && g.sym === 'instPanel', 'S8b', `${L.sheet}: ${g ? g.ctl : 'no inside view,'} controller bubbles tagged ${L.tag} (want 1, ISA-5.1 instPanel)`);
+        if (!g || g.ctl !== 1) { await pg.keyboard.press('Escape'); await sleep(400); continue; }
+        ok(g.pv && g.pvLink >= 1, 'S8b', `${L.tag}: PV node ${L.pv.node} drawn ${g.pv}, signals PV→controller ${g.pvLink}`);
+        ok(g.mv && g.mvLink >= 1, 'S8b', `${L.tag}: MV node ${L.mv.node} drawn ${g.mv}, signals controller→MV ${g.mvLink}`);
+        ok(g.sp !== null && Math.abs(parseFloat(String(g.sp).replace(/^SP\s*/, '')) - r.sp.value) < 0.051, 'S8b', `${L.tag}: bubble SP "${g.sp}" ≠ registry ${r.sp.value}`);
+        const want = getPath(ENGC.snapshot, OUTKEY[L.mv.classKey]);
+        ok(g.out !== null && want !== null && Math.abs(parseFloat(String(g.out).replace(/^OUT\s*/, '')) - want) < 0.051, 'S8b', `${L.tag}: bubble OUT "${g.out}" ≠ engine ${OUTKEY[L.mv.classKey]} ${want}`);
+        const regTags = INT.filter((x) => x.sp.loop.sheet === L.sheet).map((x) => x.sp.loop.tag).sort();
+        ok(JSON.stringify([...g.bubbles].sort()) === JSON.stringify(regTags), 'S8b', `${L.sheet}: controller bubbles ${JSON.stringify(g.bubbles)} ≠ registry loops ${JSON.stringify(regTags)} (orphan or missing)`);
+        const cp = await pg.evaluate((id) => { const n = document.querySelector(`#rz-cvm-int-svg .hmi-node[data-node="${id}"]`); n.scrollIntoView({ block: 'center', inline: 'center' }); const b = n.getBoundingClientRect(); return { x: b.x + b.width / 2, y: b.y + b.height / 2 }; }, g.id);
+        await pg.mouse.move(cp.x, cp.y); await sleep(350);
+        const hv = await pg.evaluate((pvNode, mvNode, id) => { const svg = document.querySelector('#rz-cvm-int-svg'), on = (sel) => !!svg.querySelector(sel + '.is-loop');
+          return { ctl: on(`.hmi-node[data-node="${id}"]`), pv: on(`.hmi-node[data-node="${pvNode}"]`), mv: on(`.hmi-node[data-node="${mvNode}"]`), sig: svg.querySelectorAll('path.hmi-edge.w-signal.is-loop').length }; }, L.pv.node, L.mv.node, g.id);
+        ok(hv.ctl && hv.pv && hv.mv && hv.sig >= 2, 'S8b', `${L.tag}: hover marks ${JSON.stringify(hv)} (want controller, PV, MV and ≥ 2 signal lines)`);
+        await pg.mouse.move(2, 2); await sleep(150);
+        ok(await pg.evaluate(() => !document.querySelector('#rz-cvm-int-svg .is-loop')), 'S8b', `${L.tag}: the loop stays marked after the pointer leaves`);
+        await pg.keyboard.press('Escape'); await sleep(500);
+      }
+      /* S8c a reset loop (rack inlet → supply air) names a slave that is a registry loop, and the slave's setpoint is the
+         master's (contained aisle, no mixing modelled: the engine sets one equal to the other) */
+      for (const r of LOOPS.filter((x) => x.sp.loop.kind === 'reset')) {
+        const sl = LOOPS.find((x) => x.sp.loop.tag === r.sp.loop.slave);
+        ok(!!sl && Math.abs(sl.sp.value - r.sp.value) < 0.051, 'S8c', `${r.sp.loop.tag} resets ${r.sp.loop.slave}: slave ${sl ? sl.sp.value : 'missing'} ≠ master ${r.sp.value}`);
+      }
+      ok(LOOPS.some((x) => x.sp.loop.kind === 'reset'), 'S8c', 'no reset loop in the registry (rack inlet → supply air)');
       /* S6 page setpoint sliders (PRD-SETPOINT-SIM P2, the chiller-plant MAINT panel): in maintenance the running
          loops sit at the steady state of the setpoints, exactly, with no lag and no noise on the next ticks (no source
          states a time constant, so dynamics are not modelled and the panel says so); the DP slider shows the engine's

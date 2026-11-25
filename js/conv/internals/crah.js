@@ -35,7 +35,7 @@
     { id: 'st', tag: 'SUPPLY AIR', sym: 'instField', x: 570, y: 150, size: 30, tagAt: 'at', tagXY: [0, -22], label: 'Supply-air temperature (cold aisle)',
       values: [{ k: 't', dx: 22, dy: 4, anchor: 'start', lod: 1 }] },
     { id: 'sa', tag: 'TO COLD AISLE', sym: 'offSheet', x: 690, y: 230, size: 22, tagAt: 'at', tagXY: [0, -16], label: 'Supply air to the cold aisle' },
-    { id: 'cv', tag: 'CHW VALVE', sym: 'valveControlMotor', x: 430, y: 380, size: 30, tagAt: 'at', tagXY: [0, -22], label: 'Two-way chilled-water control valve',
+    { id: 'cv', tag: 'CHW VALVE', sym: 'valveControlMotor', x: 430, y: 380, size: 30, tagAt: 'at', tagXY: [-22, -12, 'end'], label: 'Two-way chilled-water control valve',
       values: [{ k: 'pos', dx: 0, dy: 34, anchor: 'middle', lod: 1 }] },
     { id: 'chwr', tag: 'CHW RETURN', sym: 'offSheet', x: 690, y: 380, size: 22, tagAt: 'at', tagXY: [0, -16], label: 'Chilled-water return',
       values: [{ k: 't', dx: 0, dy: 26, anchor: 'middle', lod: 1 }] },
@@ -57,10 +57,23 @@
     { id: 'i-chws', from: 'chws.process', to: [120, 380], medium: 'line', w: 'inst' },
     { id: 'c-cv', from: 'ctl.process', to: 'cv.signal', via: [[570, 360], [430, 360]], medium: 'line', w: 'inst' }
   ];
+  /* PRD-SETPOINT-SIM P4b: with the control registry loaded the unit controller is the registry loop
+     (RZControlPoints.loops('int-crah'): tag, PV node and MV node from there): the supply-air TT feeds it from the right,
+     its output to the chilled-water valve becomes a signal line, SP and OUT print left of the bubble */
   function sheet(unit) {
-    var tag = (unit && unit.tag) || 'CRAH';
+    var tag = (unit && unit.tag) || 'CRAH', CP = root && root.RZControlPoints, L = CP && typeof CP.loops === 'function' ? CP.loops('int-crah')[0] : null;
+    var nodes = NODES, edges = EDGES;
+    if (L) {
+      nodes = NODES.map(function (n) {
+        if (n.id === 'ctl') return Object.assign({}, n, { tag: L.tag, loop: L.sp, label: L.tag + ' — ' + L.label + ' controller (' + L.action + ' acting ' + L.kind + ')',
+          values: n.values.concat([{ k: 'sp', dx: -26, dy: -6, anchor: 'end', lod: 1 }, { k: 'out', dx: -26, dy: 10, anchor: 'end', lod: 1 }]) });
+        return n.id === L.pv.node || n.id === L.mv.node ? Object.assign({}, n, { loop: L.sp }) : n;
+      });
+      edges = EDGES.map(function (e) { return e.id === 'c-cv' ? Object.assign({}, e, { w: 'signal', loop: L.sp }) : e; })
+        .concat([{ id: 'l-pv', from: [585, 162], to: [587, 318], via: [[620, 162], [620, 318]], medium: 'line', w: 'signal', loop: L.sp }]);
+    }
     return { id: 'int-crah', no: tag + '-INT', title: tag + ' internal — computer-room air handler', rev: 'A', basis: 'ISO 10628-2 · IEC 60617 · ASHRAE 127',
-      svgId: 'rz-cvm-int-svg', size: SHEET.size.slice(), minScale: SHEET.minScale, nodes: NODES, edges: EDGES, areas: [], notes: [] };
+      svgId: 'rz-cvm-int-svg', size: SHEET.size.slice(), minScale: SHEET.minScale, nodes: nodes, edges: edges, areas: [], notes: [] };
   }
   /* GEOMETRY END */
 
@@ -73,6 +86,8 @@
       airflow: only(c.crah_unit_airflow_m3_s), supplyT: only(c.crah_supply_air_c), returnT: only(c.crah_return_air_c),
       airDt: only(c.airside_delta_t_k), chwsT: only(c.chws_c), chwrT: only(c.chwr_c),
       mode: run ? 'RUN' : 'STANDBY',
+      satSp: c.crah_supply_air_c,                     // the setpoint (registry conv.datahall.crah_supply_air_sp = this engine key)
+      valveOpen: only(c.crah_valve_open_pct),         // coil flow / design coil flow: the opening the loop needs (engine 2.10.0)
       valvePos: NM, fanKw: NM, filterDp: NM
     };
   }
@@ -90,10 +105,10 @@
     rt: [{ k: 't', key: 'returnT', fmt: 'temp' }], st: [{ k: 't', key: 'supplyT', fmt: 'temp' }],
     coil: [{ k: 'q', key: 'duty', fmt: 'kwth' }, { k: 'load', key: 'loadPct', fmt: 'pct', prefix: 'LOAD' }],
     fan: [{ k: 'spd', key: 'fanSpd', fmt: 'pct', prefix: 'SPD' }, { k: 'af', key: 'airflow', fmt: 'm3s' }],
-    cv: [{ k: 'pos', key: 'valvePos', fmt: 'text', prefix: 'POS' }],
+    cv: [{ k: 'pos', key: 'valveOpen', fmt: 'pct', prefix: 'OPEN' }],
     chwr: [{ k: 't', key: 'chwrT', fmt: 'temp' }],
     chws: [{ k: 't', key: 'chwsT', fmt: 'temp' }, { k: 'q', key: 'chwFlow', fmt: 'flow' }],
-    ctl: [{ k: 'mode', key: 'mode', fmt: 'text' }]
+    ctl: [{ k: 'mode', key: 'mode', fmt: 'text' }, { k: 'sp', key: 'satSp', fmt: 'temp', prefix: 'SP' }, { k: 'out', key: 'valveOpen', fmt: 'pct', prefix: 'OUT' }]
   };
   var C = 'cooling.';
   var BLOCKS = [
@@ -117,7 +132,7 @@
         { label: 'Return air', key: 'returnT', fmt: 'temp', basis: C + 'crah_return_air_c' }] },
     { id: 'valve', node: 'cv', name: 'Two-way chilled-water valve', standard: 'ISO 10628-2 · ISA-5.1',
       role: ['Throttles the chilled water to hold supply-air temperature.', 'Its position is not modelled.'],
-      values: [{ label: 'Position', key: 'valvePos', fmt: 'text' }] },
+      values: [{ label: 'Position', key: 'valvePos', fmt: 'text' }, { label: 'Opening (coil flow / design flow)', key: 'valveOpen', fmt: 'pct', basis: C + 'crah_valve_open_pct' }] },
     { id: 'filter', node: 'flt', name: 'Air filter', standard: 'ISO 16890',
       role: ['Keeps dust off the coil and out of the hall.', 'A rising pressure drop calls for a change.'],
       values: [{ label: 'Pressure drop', key: 'filterDp', fmt: 'text' }] },

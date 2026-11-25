@@ -19,22 +19,23 @@
       "adjustable": null,
       "adjustableNote": "derived: it moves when its drivers move (rack-inlet target, coil approach), never on its own",
       "loop": {
-        "tag": "TIC (unit controller)",
-        "sheet": null,
+        "tag": "TIC-CHWS",
+        "sheet": "int-chiller",
         "kind": "PI",
         "action": "direct",
         "pv": {
-          "tag": "TT-n01",
-          "what": "each chiller's leaving chilled-water temperature"
+          "tag": "TT-CHWS",
+          "node": "ttchws",
+          "what": "leaving chilled-water temperature at the evaporator outlet nozzle"
         },
         "mv": {
           "classKey": "chiller",
-          "what": "compressor capacity (inlet guide vanes / speed) of that chiller"
+          "node": "vfd",
+          "what": "compressor capacity of this chiller: drive speed first, inlet guide vanes at low load"
         },
         "tuning": null,
-        "tuningNote": "not modelled: the chiller's own unit controller, inside the machine",
-        "notDrawn": "held inside each chiller by its own unit controller, not by a plant loop: the chiller's inside modal shows it",
-        "basis": "vendor unit-controller practice (ASSUMED structure; no vendor manual in this repo)"
+        "tuningNote": "not modelled: the chiller's own unit controller; no source states its gain or time constant",
+        "basis": "vendor unit-controller practice (ASSUMED structure; no vendor manual in this repo): the unit panel modulates capacity to hold leaving chilled water; direct acting (temperature rises, capacity rises)"
       }
     },
     {
@@ -52,7 +53,26 @@
         "cooling.rack_inlet_target_c"
       ],
       "adjustable": null,
-      "adjustableNote": "derived from the rack-inlet target"
+      "adjustableNote": "derived from the rack-inlet target",
+      "loop": {
+        "tag": "TIC-SAT",
+        "sheet": "int-crah",
+        "kind": "PI",
+        "action": "direct",
+        "pv": {
+          "tag": "TT-SA",
+          "node": "st",
+          "what": "supply-air temperature leaving the unit to the cold aisle"
+        },
+        "mv": {
+          "classKey": "crah",
+          "node": "cv",
+          "what": "two-way chilled-water valve of this unit (coil flow)"
+        },
+        "tuning": null,
+        "tuningNote": "not modelled: the CRAH's own unit controller; no source states its gain or time constant",
+        "basis": "ASHRAE Guideline 36-2021 (air-handler supply-air temperature control by the cooling-coil valve); direct acting for a cooling coil (temperature rises, valve opens)"
+      }
     },
     {
       "id": "conv.datahall.rack_inlet_sp",
@@ -109,7 +129,26 @@
           "unit": "kW"
         }
       ],
-      "whatIfNote": "Steady state of the engine: the rack inlet target resets the CRAH supply air and the CHW supply that follow it. PUE is a model input (site.pue) in this engine, so no setpoint moves it. Dynamics (how fast the plant gets there) are not modelled."
+      "whatIfNote": "Steady state of the engine: the rack inlet target resets the CRAH supply air and the CHW supply that follow it. PUE is a model input (site.pue) in this engine, so no setpoint moves it. Dynamics (how fast the plant gets there) are not modelled.",
+      "loop": {
+        "tag": "TIC-RI",
+        "sheet": null,
+        "kind": "reset",
+        "action": "direct",
+        "slave": "TIC-SAT",
+        "pv": {
+          "tag": "TT-RI",
+          "what": "rack inlet temperature in the contained cold aisle"
+        },
+        "mv": {
+          "classKey": "crah",
+          "what": "the TIC-SAT setpoint of every running CRAH (contained aisle, no mixing modelled: slave setpoint = master setpoint)"
+        },
+        "tuning": null,
+        "tuningNote": "not modelled: a reset sets the slave setpoint; the engine solves the steady state",
+        "notDrawn": "no P&ID on the data hall page: the rack-inlet target resets TIC-SAT, drawn inside each CRAH",
+        "basis": "ASHRAE TC9.9 Thermal Guidelines (rack inlet is the controlled condition) and ASHRAE Guideline 36-2021 supply-air temperature reset"
+      }
     },
     {
       "id": "conv.chiller-plant.cdw_supply_sp",

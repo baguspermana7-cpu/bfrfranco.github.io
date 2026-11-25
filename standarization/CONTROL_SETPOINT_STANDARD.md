@@ -94,8 +94,8 @@ range). Otherwise it is fixed, and the modal says what fixes it.
 
 - A loop lives in the curated setpoint row (`loop`: tag, sheet, kind PI/staging/reset/interlock, action direct/reverse,
   pv {tag, node or draw, what}, mv {classKey, what}, tuning or tuningNote, basis). The builder refuses a loop without
-  them, and a loop with no sheet must say why (`notDrawn`: the chiller's own unit controller holds its CHWS inside the
-  machine). The twin answers `RZControlPoints.loops(sheetId)`.
+  them, and a loop with no sheet must say why (`notDrawn`: the rack-inlet reset has no P&ID on the data hall page).
+  The twin answers `RZControlPoints.loops(sheetId)`.
 - The sheet draws what the registry lists for it and types no tag: a controller is an ISA-5.1 `instPanel` bubble (shared
   BMS function), its PV instrument an `instField` bubble, joined by dashed signal lines (`w: 'signal'`); impulse lines
   are `w: 'inst'`. A bubble carrying four letters is drawn at size 44 so the letters (8.5 px) sit inside the circle.
@@ -107,6 +107,17 @@ range). Otherwise it is fixed, and the modal says what fixes it.
 - A double-click on a controller opens the modal of the equipment it drives; the Setpoints block names the loop
   (`[data-rz-cvm-loop]`: PV → controller → MV, action, tuning, basis). Pointer or focus on any loop member marks the
   whole loop (`data-loop` = registry setpoint id on nodes and signal lines, class `.is-loop`, js/rz-hmi-sheet.js).
+- **Unit loops (P4b).** A loop held inside one machine names the inside view as its sheet (`int-<class>`, a file
+  `js/conv/internals/<class>.js`; the builder refuses another name) and its PV and MV as node ids of that view
+  (`pv.node`, `mv.node`). The internals file draws the loop only when the twin lists it: TIC-CHWS on the chiller
+  (TT-CHWS at the CHWS outlet nozzle → TIC-CHWS → VFD; SP = `cooling.chws_c`, OUT = `cooling.chiller_speed_pct`) and
+  TIC-SAT on the CRAH (the supply-air TT → the unit controller, retagged → the chilled-water valve; SP =
+  `cooling.crah_supply_air_c`, OUT = `cooling.crah_valve_open_pct`, the coil flow over its design flow). A cooling
+  loop is **direct** acting (temperature up, capacity or valve up). The valve's stem position stays "not modelled";
+  its opening as a flow ratio is the engine's.
+- **Reset (cascade) loops.** A `kind: 'reset'` loop names the loop whose setpoint it writes (`slave`, an existing
+  registry tag; the builder refuses another). TIC-RI (rack inlet) resets TIC-SAT: contained aisle, no mixing modelled,
+  so the slave setpoint equals the master's.
 
 ## 5. Gates
 
@@ -128,6 +139,13 @@ range). Otherwise it is fixed, and the modal says what fixes it.
 - `node tools/test-setpoint-sim.mjs` S8: every registry loop with a sheet is drawn once with its registry tag, PV and
   every unit of the driven fleet joined by a signal, bubble SP = registry, OUT = engine, a drawn remote PV = its
   setpoint, 0 orphan bubbles, double-click opens the modal naming the loop. `RZ_SP_PLANT=no-loops` must fail S8.
+  S8b: every `int-*` loop on the inside view of a running unit opened from CH-M-101: one `instPanel` with the registry
+  tag, PV and MV nodes joined to it by signal lines, SP = registry, OUT = the engine key, no other `instPanel` on that
+  view, hover marks controller + PV + MV + ≥ 2 signal lines and clears. Red before the drawing: 0 bubbles. S8c: every
+  reset names a registry slave whose setpoint equals the master's.
+- `node tools/test-conv-sheet-text-clear.mjs` C1/C5 measure straight lines too: an element is invisible only when
+  BOTH its width and height are under 1 px (a straight pipe's box is 0 wide; the either-dimension test hid every
+  straight edge — G11, proven red on PDT-01's value at dx -24 dy 16 over the riser `e-hrDec`).
 - `node tools/test-conv-trend-ranges.mjs`: L13, the SP label meets no limit label. `--plant=refstack` must fail it.
 
 Adding a sequence means a `data/sequences/<class>.json`, `--apply`, and the script tags (`js/rz-diagram-metrics.js`,

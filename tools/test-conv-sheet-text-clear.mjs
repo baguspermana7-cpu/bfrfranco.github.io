@@ -47,7 +47,9 @@ function probe(hostSel) {
   const host = document.querySelector(hostSel); if (!host) return { missing: true };
   host.scrollIntoView({ block: 'start' });
   const svg = host.querySelector('svg.hmi-svg') || host.querySelector('svg'); if (!svg) return { missing: true };
-  const vis = (e) => { const r = e.getBoundingClientRect(); if (r.width < 1 || r.height < 1) return false;
+  /* a straight pipe has a zero-width (or zero-height) box: rejecting either dimension under 1 px hid every straight edge
+     from C1 and C5 (G11, PRD-SETPOINT-SIM §C: PDT-01's value sat on the CHW riser e-hrDec and C1 passed) */
+  const vis = (e) => { const r = e.getBoundingClientRect(); if (r.width < 1 && r.height < 1) return false;
     for (let x = e; x && x !== svg; x = x.parentElement) { const cs = getComputedStyle(x); if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity === 0) return false; } return true; };
   const label = (t) => (t.getAttribute('data-tag-of') || t.getAttribute('data-val') || t.getAttribute('data-role') || 'text') + ' "' + t.textContent.trim().slice(0, 24) + '"';
   const texts = [...svg.querySelectorAll('g.hmi-text text, text.hmi-area-label')].filter((t) => !t.closest('[data-role="titleblock"]') && t.textContent.trim() && vis(t))

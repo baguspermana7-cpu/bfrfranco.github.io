@@ -58,6 +58,8 @@ export function build() {
       if (!['direct', 'reverse'].includes(L.action)) bad('action ' + L.action);
       if (!L.sheet && !L.notDrawn) bad('a loop without a sheet says why (notDrawn)');
       if (!L.tuning && !L.tuningNote) bad('no tuning and no note');
+      if (L.sheet && /^int-/.test(L.sheet) && !fs.existsSync(path.join(ROOT, 'js/conv/internals', L.sheet.slice(4).replace(/_/g, '-') + '.js'))) bad('sheet ' + L.sheet + ' names no js/conv/internals file');
+      if (L.kind === 'reset' && (!L.slave || !cur.convSetpoints.some((o) => o.loop && o.loop.tag === L.slave))) bad('a reset names the loop it sets (slave): ' + L.slave);
     }
     rows.push({ id: c.id, cockpit: 'conv', equipment: c.equipment, label: c.label, unit: p.unit,
       sp: { value: p.value, role: c.role, param: c.param, pv: c.pv || null, classKey: c.classKey || null, kind: p.kind, from: 'engine parameter ' + c.param,

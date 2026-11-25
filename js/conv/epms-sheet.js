@@ -169,7 +169,7 @@
       values: [{ k: 'st', dx: 18, dy: 15, anchor: 'start', lod: 1 }, { k: 'kw', dx: 18, dy: 27, anchor: 'start', lod: 1 }, { k: 'amp', dx: 18, dy: 39, anchor: 'start', lod: 1 }] });
     N({ id: p + 'ct', tag: 'CT' + T, sym: 'currentTransformer', x: x, y: 1060, size: SW, cls: 'epms', label: '20 kV feeder current transformer', tagAt: 'none' });
     N({ id: p + 'r', tag: 'R' + T, name: '50/51 50N/51N', sym: 'protectionRelay', x: x + 44, y: 1060, size: 24, cls: 'epms', prot: 'feeder', cb: p + 'cb',
-      label: '20 kV feeder overcurrent and earth-fault relay 50/51, 50N/51N', tagAt: 'below' });
+      label: '20 kV feeder overcurrent and earth-fault relay 50/51, 50N/51N', tagAt: 'at', tagXY: [-6, 24] });   /* tag + name centred between this feeder and the next (pitch FP): centred on the relay the name crossed the next cable (text-clear C1) */
     var tap = 'm' + ls + '-f' + (h + 1);
     (s === 'A' ? mvA : mvB).push([tap, x]);
     E(p + 'a', tap, p + 'cb.line');
@@ -213,7 +213,7 @@
   [['A', GAX, 'left'], ['B', GBX, 'right']].forEach(function (g) {
     var s = g[0], x = g[1], id = 'g' + s.toLowerCase() + '-cb', tap = 'm' + s.toLowerCase() + '-gen';
     N({ id: id, tag: 'CB-G' + s, sym: 'cbIec', x: x, y: 995, size: SW, cls: 'epms', sw: 'cb', kv: 'mv', role: 'gen', normal: 'open',
-      label: 'Generator bus incomer to section ' + s, tagAt: g[2], values: cbVals(g[2]) });
+      label: 'Generator bus incomer to section ' + s, tagAt: g[2], values: cbVals('left') });   /* values on the open side: on the right, B's crossed feeder FB1 (text-clear C1) */
     N({ id: 'gbus-' + s.toLowerCase(), sym: 'junction', x: x, y: 1100 });
     (s === 'A' ? mvA : mvB).push([tap, x]);
     E(id + '-a', tap, id + '.line');

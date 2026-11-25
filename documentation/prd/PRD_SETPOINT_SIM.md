@@ -297,3 +297,641 @@ Green: 218 checks, twice; `test-operator-cockpit-regressions` passes.
   The KPI itself (authored primary DP with noise) is left as it was and logged for the accuracy backlog.
 - Gate S8, red with `RZ_SP_PLANT=no-loops` (2 fails). Hover or focus on any loop member marks PV → controller → MV
   (`data-loop` on nodes and signal lines, `.is-loop`); red with `RZ_SP_PLANT=no-loop-hover` (2 fails), green 311.
+
+---
+
+# §C. Amendment 2 — control, simulation and analysis, every setpoint on both cockpits (approved 2026-11-26)
+
+**Owner, 2026-11-26 (R197):** "Continue, kembangkan dan sempurnakan. Buat detail super detail prd" → "Kurang detail kurang massive".
+**Standing:** "Harus sangat accurate" (R195), "semuanya literally semuanya" (R187).
+
+**Status of this document.**
+- §C amends `documentation/prd/PRD_SETPOINT_SIM.md`. B0–B5 and the phase notes P0 → P4 part 1 stay in force.
+- §C is committed to that file in the release of its first phase.
+- Every number below was measured on 2026-11-25/26 from the engines in `~/.cache/wt-sp4` (conv-engine 2.10.0, dcai-engine 1.7.0) or read from the file named beside it. Nothing below is an estimate unless it says ASSUMED.
+
+---
+
+## C0. Where the work stands
+
+### C0.1 Shipped and candidate
+
+| release | content | state |
+|---|---|---|
+| v3.105.0 | P0–P3 part 1: control registry, SP visible (tooltip, modal, trend SP line), what-if in the modal, chiller sequence (10 modes, 3 scenarios) | live |
+| v3.106.0 a1c01cecf (peer 87) | floor flag → alarms; pump trend on the loop operating head | live |
+| 0b5e8aafd (peer 87) | registry regenerated after a docs row | live |
+| **v3.107.0** 214c9e150 (branch `rel107`, `~/.cache/wt-sp3`) | P2 part 2 chiller-plant sliders on the engine; P3 genset (7 modes) and UPS 2N (6 modes) sequences; P4 part 1 PDIC-01/PDT-01 + TIC-CDWS bubbles with hover | gates running (conv lane 3, DC AI 37 lane 4); before push: rebase onto 0b5e8aafd + a fresh registry build |
+
+### C0.2 Control registry today (`data/control-points.json`, 99 rows)
+
+| cockpit | setpoints | reference values | limits only | monitored only |
+|---|---|---|---|---|
+| conv | **5** (chws 19.4 °C, chw_dp 90 kPa, cdw_supply 32 °C, crah_supply_air 25.4 °C, rack_inlet 25.4 °C) | 0 | 33 | 0 |
+| dcai | **9** (tcs_supply 40, htw 37/45, tcs_return 50, chiller chw 19/27 and cdw 37/43, crah air 25, rh 45, chem ×4 …) | 42 | — | 10 |
+
+- Adjustable (slider plus what-if): 2 of 14. Both are conv: `rack_inlet_sp` and `chw_dp_sp`.
+- Drawn loops: 2. PDIC-01 and TIC-CDWS. `chws_sp` is "not drawn".
+- Sequences: 6 files, all conv.
+
+| file | modes |
+|---|---|
+| chiller.json | normal, stage_up, stage_down, chiller_trip, loss_cdw, low_evap_flow, low_ecwt, high_cond, power_fail, emergency |
+| chw_secondary_pump.json | normal, stage_up, stage_down, pump_trip, low_dp |
+| crah.json | normal, crah_trip, high_inlet |
+| genset.json | normal, utility_fail, start_sync, on_gen, gen_trip, load_shed, retransfer |
+| tower_cell.json | normal, follow_chiller, cell_trip, high_cdw, low_ecwt |
+| ups.json | normal, on_battery, module_fault, high_load, static_bypass, system_loss |
+
+### C0.3 Gaps measured on the code (evidence, not opinion)
+
+| # | gap | evidence |
+|---|---|---|
+| **G1** | The DC AI operator sees no registry setpoint. | `datahallAI.html` loads 20 `js/datahall-ai/*.js` files. Neither `points.js` nor `rz-control-points.js` is among them (`grep -c RZDatahallAIPoints datahallAI.html` = 0). The 53 DC AI records with `sp` reach only `tools/test-dcai-points.mjs`. |
+| **G2** | DC AI setpoints are typed text (rule B1 broken). | `js/datahall-ai/hmi-payloads.js` has 8 literals: :406 `8.5 pH setpoint (window 8.2–8.8)`, :407 `800 µS/cm control setpoint`, :437 `45 % RH setpoint`, :702 `40 °C keep-warm setpoint`, :890 `2.5 mg/L aeration setpoint`, :899 `18 °C MMR supply setpoint`, :913 `24 °C support-room setpoint`, :914 `50 % RH setpoint`. |
+| **G3** | Conv pages type their control numbers. | `fire-system.html:708` `P_JOCKEY_ON = 11.5, P_JOCKEY_OFF = 12.8`, :709 `P_FP1_ON = 10.5, P_FP2_ON = 9.5`, :710 `P_LOW_ALM = 8.5` (bar). `fuel-system.html:1190` `DT_FILL_START = 50`, `DT_FILL_STOP = 90` (% day-tank level). `cdu-mini-bms.html:680` `TCV-01 holds TT-01 = 18 °C (≥ dew point +3 °C)`, P-01 VFD on ΔP (PDT-02), no value. `water-system.html` booster lead/lag pressure: no registry row. None is in `data/control-points.json`. |
+| **G4** | Unit loops are only words. | `js/conv/internals/crah.js:115` reads "The controller holds the supply-air temperature" with no bubble, no PV link, no SP. `internals/chiller.js:113` says CHWS "leaves at the plant supply set point", with no TIC. `chws_sp` and `crah_supply_air_sp` have no drawn loop. |
+| **G5** | DC AI has no what-if. | `DCAI_CALC.compute(m)` derives P2…P20 from `m.thermal.tcsSupplyC` (40) and `airSupplyC` (25) (`js/dcai-engine.js:110-170`), but every DC AI row has `adjustable: null`. |
+| **G6** | **The DC AI design point sits ON the free-cooling cliff, and nobody can see it.** | Design ambient 34 °C. The margin P4 = (40 − 3) − (34 + 3) = **0 K**. At 35 °C liquid free cooling ends: cooling power goes **61,187 → 106,122 kWe (+73 %)**, liquid chillers 0 → 35,405 kWe, and the worst bin runs **142 of 143 installed chillers**. Shaped bins (ASSUMED) give 8,600 of 8,760 h in free cooling. The engine knows this (`pue.free_cooling_cliff_ambient_c = 34`). No screen shows it as a control fact. |
+| **G7** | No DC AI sequence. | Free-cooling switchover is binary in the engine (`liquidFreeCooling = margin >= 0`, :118), with no hysteresis and no transition. There is no CDU duty/standby failover sequence (engine: 54 duty + 1 standby per hall). |
+| **G8** | Simulate does not move any trend. | `js/conv/sequence-view.js` reveals steady-state steps in a table. B2.5 promised "the PV trends show the response". |
+| **G9** | Conv loops run at saturation, unreported. | CRAH valve `cooling.crah_valve_open_pct` 99.5 %, CRAH fan 99.5 %, secondary pumps 98.7 %, tower fans 89.3 %, chiller speed 89.3 % (min 60 %). A loop at 99.5 % output has 0.5 % authority left: one more kW of load and the PV leaves the SP. No screen says so. |
+| **G10** | The engine clamps at copMax, silently. | DC AI P19 liquid-path COP = **12.00 at 35 and 36 °C ambient**: the `copMax: 12` ceiling, not the Carnot × 0.55 result. A clamped value is shown as if computed. |
+| **G11** | Gate blind spot. | PDT-01 value at `dx -24, dy 16` sat on the CHW supply riser (screenshot `p4-101-sec.png`), yet `test-conv-sheet-text-clear.mjs` C1 passed (run baymtt2nj). Cause unknown; to be found, not assumed. |
+| **G12** | KPI "Header DP" is authored. | Mean of the primary DPS1/DPS2 with `r(-3,3)` noise (80 kPa). It is not the remote DP that PDIC-01 controls (90 kPa) and not the primary operating DP (`cooling.chw_primary_pump_dp_op_kpa` 117.3 kPa). |
+
+---
+
+## C1. Principles (binding on every phase)
+
+1. **One implementation per concept, both cockpits.**
+
+   | concept | the one implementation | changes in §C |
+   |---|---|---|
+   | registry | `data/control-points.json` ← `tools/build-control-registry.mjs`; twin `js/rz-control-points.js` | — |
+   | SP block | `spBlock` | moves out of `js/conv/equipment-modal.js` into new `js/rz-sp-block.js`; conv and DC AI both call it |
+   | what-if | engine recompute | conv `CONV_CALC.recompute`; DC AI `DCAI_CALC.compute(clone)` |
+   | sequence | `data/sequences/*.json` + `RZConvSequence` | the file stays at `js/conv/sequence-view.js`; it is cockpit-agnostic by data |
+   | loop drawing | `instField`/`instPanel` symbols + `w:'signal'` edges + `loop:` tags in `rz-hmi-sheet.js` | — |
+2. **A page never types a control number.** SP, cut-in, cut-out, fill start/stop and alarm thresholds come from the registry. A static gate counts typed control numbers per page; the ratchet may only fall, and must reach 0.
+3. **No invented dynamics.** No τ, θ, Kp, Ti or ramp rate has a written source. Every simulated response is a sequence of steady states. The x-axis is "step", the label reads "dynamics not modelled", and nothing animates as if it were time.
+4. **Ranges need a basis.** A slider range cites a standard or the plant design. Otherwise it is `ASSUMED` and the UI shows that word next to the range.
+5. **Clamps and saturation are shown, never hidden.** An engine value that hit a ceiling (copMax, 100 % speed, valve 100 %) carries a mark `◆ at limit` and the limit's source.
+6. **Simulated is labelled.** The word SIMULATED appears on every what-if number, every overlay pen and every sequence step. Reset restores live exactly. Nothing is written to localStorage, sessionStorage or Supabase.
+7. **Peer files stay peer files.** A peer file gets an exact spec message; my gate proves the result. The peer files are `hmi-payloads.js`, `equipment-inspector.js`, `datahallAI.html` (outside script tags), `rz-trend.js`, `point-status.js`, the DC AI engine, the conv engine and the chiller-plant KPI row.
+8. **Every phase:**
+   - red before green, with the failing line quoted;
+   - full conv release gates plus the DC AI 37;
+   - shots at 1440/390 × dark/light, looked at by me;
+   - live check after push;
+   - standards doc and changelog in the same release.
+
+---
+
+## C2. The full inventory: every control number on both cockpits (target state)
+
+Each row lists the target registry id, its current home and value, and the phase that moves it. "Loop" means a drawn bubble.
+
+### C2.1 Conventional
+
+| target id | what | value now | where it lives today | basis | phase | loop |
+|---|---|---|---|---|---|---|
+| conv.chiller-plant.chws_sp | CHW supply | 19.4 °C | engine derived (crahSupplyAir − coil approach 6 K) | engine | done (P1) | **P4b** TIC-CHWS on chiller internals |
+| conv.chiller-plant.chw_dp_sp | secondary remote DP | 90 kPa | registry, adjustable | design ASSUMED | done | done PDIC-01 |
+| conv.chiller-plant.cdw_supply_sp | CDW supply | 32 °C | registry | design | done | done TIC-CDWS |
+| conv.datahall.crah_supply_air_sp | CRAH supply air | 25.4 °C | engine derived | ASHRAE TC9.9 A1 18–27 °C | done (P1) | **P4b** TIC-SAT on CRAH internals |
+| conv.datahall.rack_inlet_sp | rack inlet (cascade master) | 25.4 °C | registry, adjustable | TC9.9 A1 | done | **P4b** cascade TIC-RI → TIC-SAT (modal) |
+| conv.chiller-plant.chiller_min_speed | chiller minimum speed | 60 % | engine authored | vendor ASSUMED | **P9** | — |
+| conv.fire.jockey_on / jockey_off | jockey start / stop | 11.5 / 12.8 bar | `fire-system.html:708` typed | NFPA 20 §14.2.6 practice (jockey stop at churn + static, start ≥ 0.7 bar above main pump start); values page design | **P9** | **P9** PSL/PSH on fire sheet |
+| conv.fire.fp1_on / fp2_on | main pump 1 / 2 start | 10.5 / 9.5 bar | `fire-system.html:709` typed | NFPA 20 staggered start | **P9** | PS on fire sheet |
+| conv.fire.low_pressure_alarm | low header pressure alarm | 8.5 bar | `fire-system.html:710` typed | design | **P9** | — |
+| conv.fuel.day_tank_fill_start / stop | day tank refill start / stop | 50 / 90 % | `fuel-system.html:1190` typed | NFPA 110 / NFPA 30 practice, values ASSUMED | **P9** | **P9** LIC per day tank on fuel sheet |
+| conv.water.booster_pressure_sp | booster discharge pressure | to read in P9 step 1 | `water-system.html` lead/lag block | design | **P9** | **P9** PIC on water sheet |
+| conv.cdu-mini.tcv01_tt01_sp | CDU secondary supply (TCV-01 holds TT-01) | 18 °C | `cdu-mini-bms.html:680` typed text | dew point + 3 K (text cites it) | **P9** | **P9** TIC on cdu-mini sheet |
+| conv.cdu-mini.p01_dp_sp | P-01 VFD on ΔP (PDT-02) | no value shown | `cdu-mini-bms.html:680` | — | **P9**: value from the cdu-mini model, else "not modelled" | PDIC |
+
+### C2.2 DC AI
+
+| target id | what | value now | where | phase |
+|---|---|---|---|---|
+| dcai.cdu/tcs_supply_c | TCS supply (CDU HX valve) | 40 °C | engine plane p07, registry | **P5** visible, **P6** adjustable 30–45 |
+| dcai.crah/air_supply_c | fan-wall supply air (CHW valve) | 25 °C | plane p09 | **P5**, **P6** adjustable 18–27 |
+| dcai.chiller/chw_supply_c | chiller leaving CHW | 19 °C | plane p12 (= p09 − 6 K) | **P5** (derived, not adjustable) |
+| dcai.dry-cooler/leaving_c | dry cooler leaving water | 37 °C | plane p02 (= ambient + 3 K) | **P5**; it follows ambient, so it is a reference, not an SP |
+| dcai.crah/supply_rh | supply RH | 45 % | `hmi-payloads.js:437` typed | **P5** |
+| dcai.chem/ph, conductivity, orp, inhibitor_ppm | dosing control points | 8.5 / 800 µS/cm / 450 mV / 120 ppm | registry, plus 2 typed at :406-407 | **P5** |
+| dcai.genset/jacket_c | keep-warm | 40 °C | `hmi-payloads.js:702` typed | **P5** (new row, NFPA 110 keep-warm practice, ASSUMED) |
+| dcai.wwtp/do_mgl | aeration DO | 2.5 mg/L | :890 typed | **P5** (new row, ASSUMED) |
+| dcai.mmr/supply_c | MMR supply air | 18 °C | :899 typed | **P5** (new row, ASSUMED) |
+| dcai.support/temp_c, rh_pct | support rooms | 24 °C / 50 % | :913-914 typed | **P5** (new rows, ASSUMED) |
+
+**Count target after P5 + P9:**
+- registry setpoints: 14 → **≥ 31**;
+- typed control numbers on pages: 18 → **0**;
+- drawn loops: 2 → **≥ 10**.
+
+---
+
+## C3. Phases
+
+Each phase below is one release, in this order.
+- Conv-only phases ship through `run-conv-release-gates.sh`.
+- DC AI phases ship through the DC AI 37 plus their own gate.
+
+### P4b — unit loops and the cascade (conv)
+
+**Goal:** every conv setpoint that has a controller shows that controller as an ISA-5.1 bubble on the drawing where its instruments are, or says why not.
+
+**Content.**
+
+| loop | where drawn | PV (engine, value) | controller | MV (engine, value) | action |
+|---|---|---|---|---|---|
+| TIC-CHWS | chiller internals mini-sheet (`js/conv/internals/chiller.js`), beside node `chws` (404, 450) | TT at CHWS OUT = `cooling.chws_c` 19.4 °C | TIC in the unit panel, PI | compressor capacity = `cooling.chiller_speed_pct` 89.3 % (floor 60 %) | direct: PV above SP → more capacity |
+| TIC-SAT | CRAH internals (`js/conv/internals/crah.js`) | supply-air TT = `cooling.crah_supply_air_c` 25.4 °C | TIC, PI | CHW valve = `cooling.crah_valve_open_pct` **99.5 %** | reverse on cooling (PV above SP → open) |
+| TIC-RI → TIC-SAT | not drawn (`datahall.html` has no P&ID; floor-plan.js is peer read-only) | rack inlet = `cooling.rack_inlet_target_c` 25.4 °C | cascade master; contained aisle, 0 K mixing, so slave SP = master SP | TIC-SAT SP | modal only, `notDrawn: 'no P&ID on the data hall page; the cascade sets TIC-SAT'` |
+
+**Registry changes** (`data/control-points.curated.json` → `convSetpoints`):
+
+```json
+"conv.chiller-plant.chws_sp": { "loop": { "tag": "TIC-CHWS", "sheet": "int-chiller", "kind": "PI", "action": "direct",
+   "pv": { "tag": "TT-CHWS", "node": "chws" }, "mv": { "classKey": "chiller", "what": "compressor capacity (VSD speed)" },
+   "tuning": null, "tuningNote": "no source for Kp/Ti", "basis": "ASHRAE Guideline 36-2021 §5.20 (plant), vendor unit control" } },
+"conv.datahall.crah_supply_air_sp": { "loop": { "tag": "TIC-SAT", "sheet": "int-crah", "kind": "PI", "action": "reverse",
+   "pv": { "tag": "TT-SA", "node": "<crah supply node>" }, "mv": { "classKey": "crah", "what": "CHW valve" }, … } },
+"conv.datahall.rack_inlet_sp": { "loop": { "tag": "TIC-RI", "kind": "cascade", "slave": "TIC-SAT", "sheet": null,
+   "notDrawn": "no P&ID on the data hall page; the master resets TIC-SAT" } }
+```
+
+`tools/build-control-registry.mjs` validates:
+- `kind ∈ {PI, PID, cascade, staging, on-off}`;
+- a `cascade` has `slave` naming an existing loop tag;
+- a sheet `int-<class>` names an existing internals file.
+
+**UI — internals mini-sheet** (the modal "Inside" view; same symbol grammar as CH-M-101):
+
+```
+  CHWR IN ──▶ [ evaporator ]──▶ CHWS OUT ◀─TT─┐
+                                      19.4 °C  ┆ (impulse)
+                                          ╭────┴───╮
+                                          │  TIC   │  TIC-CHWS
+                                          │ CHWS   │  SP 19.4 °C
+                                          ╰───┬────╯  OUT 89.3 %
+                                              ┆ signal (dashed)
+                                     [ compressor VSD ]  89.3 %  (min 60 %)
+```
+
+- Hover: TT, TIC, VSD and the two dashed lines take `.is-loop`.
+- Double-click TIC: the modal Setpoints block opens with the loop line "PV TT-CHWS → TIC-CHWS → MV compressor capacity · direct PI · tuning not modelled · basis …".
+
+**UI — modal Control block for the cascade** (`js/conv/equipment-modal.js` → `rz-sp-block.js`):
+
+```
+Control
+  TIC-RI (rack inlet, cascade master)  SP 25.4 °C
+     └─ sets TIC-SAT (CRAH supply air)  SP 25.4 °C   contained aisle, 0 K mixing
+            └─ CHW valve  OUT 99.5 %   ◆ 0.5 % authority left   (see P10)
+  Not drawn: no P&ID on the data hall page.
+```
+
+**States:** live; MAINT (the SP slider of rack inlet moves both SPs, the TIC-SAT SP follows within the same tick); reduced motion (no hover transition, the class change is instant); dark and light; 390 px (the internals sheet scrolls inside the modal, no page side-scroll).
+
+**Laws** (extend `tools/test-setpoint-sim.mjs`):
+
+| law | claim | red condition |
+|---|---|---|
+| S8b | Opening the chiller and CRAH modals → Inside, each internals loop in the registry has exactly one controller bubble. Its OUT = engine (89.3 %, 99.5 % ± 0.1). Its PV link and MV link exist. Hover marks PV + controller + MV + ≥ 2 signal lines. | `RZ_SP_PLANT=no-loops` → 0 bubbles |
+| S8c | The cascade row prints master → slave, and slave SP = master SP. A rack inlet what-if of +1 K moves both by +1 K. | plant slave SP + 1 K |
+| S8d | 0 orphan bubbles: every bubble tag on any conv sheet or internals view is a registry loop. | plant a typed `TIC-X` |
+| keep | `test-conv-internals-render.mjs`, `test-conv-plant-internals.mjs`, `test-conv-internals-p3/p4.mjs`, text-clear C1–C5, geometry, point-coverage (unclassified 0) | — |
+
+**Files:**
+- `data/control-points.curated.json`
+- `tools/build-control-registry.mjs`
+- `js/rz-control-points.js` (generated)
+- `js/conv/internals/chiller.js`
+- `js/conv/internals/crah.js`
+- `js/conv/equipment-modal.js`
+- new `js/rz-sp-block.js`
+- `tools/test-setpoint-sim.mjs`
+- `standarization/CONTROL_SETPOINT_STANDARD.md` §4b (internals, cascade)
+- HMI_DRAWING_STANDARD (loop on internals)
+- CHANGELOG and version files
+
+**Done when:**
+- every law above is green and red-proven;
+- shots of both internals views and the cascade block, both themes, at 1440 and 390, have been looked at.
+
+### P5 — DC AI setpoints visible (closes G1, G2)
+
+**Goal:** a DC AI operator sees, for every unit class, what each controller holds, the live value, the error and the limits, all from the registry. No setpoint is typed on the page.
+
+**Content:**
+
+1. `datahallAI.html` loads `js/rz-control-points.js` after `hmi-points.js`. It is one `<script>` tag. The page owner adds it, or I add it after their ack; the token comes with it.
+2. `js/rz-sp-block.js`:
+   - `RZSpBlock.render(host, rows, opts)` returns HTML;
+   - `bind(host)` wires the sliders and what-if;
+   - each row = { id, label, value, unit, role, ev, pv, holder, limits, adjustable, whatIf };
+   - it is shared with conv (P4b extraction).
+3. **DC AI inspector block.**
+   - `equipment-inspector.js` calls `RZSpBlock.render` with `RZControlPoints.forClass('dcai:' + cls)` for the opened unit's class (cdu, crah, chiller, dry-cooler, cw-pump-station, fws-pump-station, chem, rack-manifold, tcs-manifold).
+   - Live PV from `DCAI_CALC.snapshot()`.
+   - Error = PV − SP.
+   - Limits resolved by `RZDatahallAIPoints.limits(id, snap)` (relative to SP).
+   - Holder from `dcaiPlaneController` ("the CDU holds TCS supply with its HX control valve").
+4. **Typed literals out** (spec to the `hmi-payloads.js` owner, exact diff in the message):
+   - **Before:** `{ value: 45, text: '45 % RH setpoint' }`.
+   - **After:** `{ value: SP('dcai.crah/supply_rh'), text: SPT('dcai.crah/supply_rh') + ' setpoint' }`, where `SP = RZControlPoints.value` and `SPT` formats value plus unit.
+   - The 8 lines are listed in C2.2.
+   - The 5 new rows (jacket keep-warm, DO, MMR supply, support-room temp and RH) go into `points.js` with evidenceClass ASSUMED and a written basis line each. `points.js` is mine (registry); it is announced to peer 02/87 first.
+5. **DC AI trends:** a point with an SP gets `ref`/`refLabel = 'SP 40.0 °C'` (the hook already used on conv).
+
+**UI — DC AI inspector, desktop:**
+
+```
+CDU-07 · coolant distribution unit                                   [×]
+Setpoints & limits                                         source: registry
+ point          SP        live      error    warn / alarm    holder / evidence
+ TCS supply     40.0 °C   40.2 °C   +0.2 K   41.0 / 43.0     CDU HX valve · DESIGN
+ HTW supply     37.0 °C   37.0 °C    0.0 K   ±1.5 / ±3.0     dry cooler (ref) · DESIGN
+ TCS return     50.0 °C   50.1 °C   +0.1 K   51.5 / 53.0     — (result of load) · DESIGN
+ DP             1.8 bar   …                                  CDU pump VSD · ASSUMED
+ ⓘ limits are relative to the setpoint; basis: ASHRAE TC9.9 W45 ceiling
+```
+
+- **Phone (390):** one card per point (SP, live, error on one line; limits and holder in the ⓘ tooltip), per owner taste "less visible text".
+
+**Laws** (new `tools/test-dcai-setpoints.mjs`; serves the page through `audit-conv-text.mjs serve`, drives the inspector the way `test-dh-hall.mjs` does):
+
+| law | claim | red today |
+|---|---|---|
+| D1 | For each of 9 classes, opening one unit shows the block. Each SP = `RZControlPoints.value` ± 0 (tcs 40, crah air 25, chiller chw 19 …). Live = snapshot ± display rounding. | block absent |
+| D2 | Static: 0 control numbers next to the word setpoint in `js/datahall-ai/*.js` outside `RZControlPoints` calls. | 8 |
+| D3 | A DC AI trend of a point with an SP draws one SP line at that value. | none |
+| D4 | 390 and 1440, dark and light: axe 0 serious, 0 page errors, no sideways scroll, block text ≥ 11 px. | — |
+
+**Risks:**
+- `datahallAI.html` is large and peer-edited daily. The change is one script tag only.
+- The inspector is shared with the hall iso view (peer A5d/A5e). The block is appended below the existing rows, behind `if (window.RZSpBlock)`.
+
+### P6 — DC AI what-if, with the free-cooling cliff made visible (closes G5, G6)
+
+**Goal:** the operator can move the TCS supply SP or the fan-wall supply-air SP and see, from the engine, what that does to free cooling, chillers, power and PUE. The cliff at 34 °C is visible as a control fact.
+
+**Adjustable:**
+
+| id | range | step | basis |
+|---|---|---|---|
+| dcai.cdu/tcs_supply_c | 30–45 °C | 0.5 | upper: ASHRAE TC9.9 liquid cooling W45 (facility water ≤ 45 °C); lower: dew-point margin, ASSUMED (labelled) |
+| dcai.crah/air_supply_c | 18–27 °C | 0.5 | ASHRAE TC9.9 A1 recommended inlet; contained aisle, rack inlet = supply |
+
+**Recompute:**
+- `DCAI_CALC.compute(clone(m))` with `m.thermal.tcsSupplyC` or `airSupplyC` replaced.
+- `DCAI_CALC.model` is exported, so the engine is not edited (peer read-only). The clone is a structured copy; the live model is never mutated.
+
+**What the engine says (measured, these numbers go into the gate as worked checks):**
+
+| TCS SP | switchover ambient (cliff) | free-cooling hours (shaped bins, ASSUMED) | annual PUE | design-day PUE | liquid chillers at 34 °C |
+|---|---|---|---|---|---|
+| 35 °C | 29 °C | 4,200 h | 1.2005 | 1.2572 | 40,771 kWe |
+| 38 °C | 32 °C | 8,000 h | 1.1640 | 1.2468 | 35,405 kWe |
+| **40 °C (design)** | **34 °C** | **8,600 h** | **1.1583** | **1.1652** | **0 (margin 0 K)** |
+| 42 °C | 36 °C | 8,760 h | 1.1569 | 1.1652 | 0 |
+| 45 °C | 39 °C | 8,760 h | 1.1569 | 1.1652 | 0 |
+
+| air SP | CHW supply | air-path COP | air chillers | cooling power |
+|---|---|---|---|---|
+| 18 °C | 12 °C | 4.33 | 32,834 kWe | 68,515 kWe |
+| 22 °C | 16 °C | 4.94 | 28,779 kWe | 64,283 kWe |
+| **25 °C (design)** | 19 °C | 5.50 | 25,811 kWe | 61,187 kWe |
+| 27 °C | 21 °C | 5.95 | 23,867 kWe | 59,157 kWe |
+
+The design-ambient sweep at TCS 40 °C is the cliff itself:
+
+| ambient | margin P4 | mode | liquid chillers | cooling power | COP P19 |
+|---|---|---|---|---|---|
+| 24 °C | +10 K | free | 0 | 51,899 kWe | — |
+| 30 °C | +4 K | free | 0 | 57,472 kWe | — |
+| **34 °C** | **0 K** | **free (edge)** | **0** | **61,187 kWe** | — |
+| 35 °C | −1 K | mechanical | 35,405 kWe | 106,122 kWe | **12.00 ◆ copMax** |
+| 36 °C | −2 K | mechanical | 35,405 kWe | 107,051 kWe | **12.00 ◆ copMax** |
+| 38 °C | −4 K | mechanical | 37,602 kWe | 111,201 kWe | 11.30 |
+| 40 °C | −6 K | mechanical | 42,616 kWe | 118,290 kWe | 9.97 |
+
+**UI — DC AI inspector, CDU, what-if panel:**
+
+```
+What if TCS supply were …                                  SIMULATED · engine recompute
+  [30 ───────●──────── 45] 41.0 °C   range: TC9.9 W45 ceiling; lower bound ASSUMED
+                         live 40.0     →  sim 41.0
+  free-cooling margin    0.0 K         →  +1.0 K
+  cliff ambient          34 °C         →  35 °C        ┌ ambient ───────────────┐
+  liquid chillers        0 kWe         →  0 kWe        │ 24 ▮▮▮▮▮▮▮▮▮▮ free      │
+  cooling power          61,187 kWe    →  61,187 kWe   │ 34 ▮ edge (design)      │
+  annual PUE             1.1583        →  1.15xx       │ 35 ▯ mechanical  +73 %  │
+  design-day PUE         1.1652        →  1.1652       └─────────────────────────┘
+  dynamics not modelled · nothing saved                 [Reset]
+```
+
+- **Cliff strip:** one row per weather bin (7 bins, hours), filled when in free cooling at the simulated SP. The design-ambient row is outlined. Ink only, no colour band; the alarm colour is used only for the bins that become mechanical.
+- **Phone:** the slider plus the 5 key rows; the strip collapses into a `details` element.
+- **Keyboard:** arrow keys step 0.5 K, with no animation (MOTION frequency rule).
+
+**New mark (closes G10):** wherever P19 equals `copMax`, the value shows `12.00 ◆` with the tooltip "engine ceiling copMax = 12 (model input), not the Carnot × 0.55 result". This applies to the inspector, the what-if and the trend label.
+
+**Laws** (`tools/test-dcai-setpoints.mjs`):
+
+| law | claim | red condition |
+|---|---|---|
+| D5 | Every what-if row = a direct Node `DCAI_CALC.compute(clone)` ± 0.1 % for TCS 35/38/40/42/45 and air 18/22/25/27 (the tables above). | plant an inspector that recomputes with the live SP |
+| D6 | The cliff ambient moves 1:1 with TCS SP (`tcs − cduApproach − dryCoolerApproach`): 40 → 34, 41 → 35. | plant +0.5 K offset |
+| D7 | Reset restores every live number exactly; 0 writes to localStorage, sessionStorage or Supabase (requests intercepted). | plant a `localStorage.setItem` |
+| D8 | Wherever P19 is clamped, the value carries `◆` and the copMax tooltip. | today: no mark |
+| D9 | 390 and 1440, both themes: axe 0 serious; the slider is reachable and operable by keyboard; reduced motion = no transitions. | — |
+
+### P7 — DC AI sequences of operations (closes G7)
+
+**Goal:** the operator can read and step through what the DC AI plant does as ambient rises, a CDU pump trips, or the fan wall loses a unit, with the engine's numbers at each step.
+
+**Files:** new `data/sequences/dcai-heat-rejection.json`, `dcai-cdu.json` and `dcai-fan-wall.json`. They use the same schema, validated by `tools/build-sequences.mjs`, and quantity forms key / minus / product / ratio / count.
+
+**`dcai-heat-rejection.json`** (dry coolers + trim chillers on the liquid loop):
+
+| mode | entry | actions in order | exit | basis |
+|---|---|---|---|---|
+| free_cooling | margin P4 ≥ 0 K (`design.planes.p04_free_cooling_margin_k`) | dry coolers hold HTW at P2 = ambient + 3 K; trim chillers off; HTW = P2 | margin < 0 K | ASHRAE 90.4 economizer intent |
+| edge | 0 ≤ P4 < 1 K (deadband 1 K, ASSUMED) | alarm "free-cooling margin < 1 K"; pre-start one trim chiller (vendor practice, ASSUMED) | P4 ≥ 1 K or < 0 | ASSUMED, labelled |
+| mechanical | P4 < 0 K | trim chillers make HTW at P3 = TCS SP − 3 K = 37 °C; dry coolers reject condenser heat; liquid chiller kWe from engine (35,405 at 35 °C) | P4 ≥ +1 K (hysteresis 1 K, ASSUMED) | engine |
+| high_ambient | ambient > design 34 °C | alarm; chillers running = engine worst-bin count (142 of 143) | ambient ≤ design | engine |
+| dry_cooler_loss | one dry cooler trips | running = engine design count 593 of 631 installed, so 38 spare cover the loss; if the engine has no per-unit derate: "margin effect not modelled" | unit back | engine counts |
+
+- **Scenario `ambient_rise`:** 24 → 30 → 34 → 35 → 38 °C. Each step is a full `DCAI_CALC.compute` with `designAmbientDbC` set; the numbers are the table in P6.
+- **Scenario `dry_cooler_trip`:** normal → loss → standby in.
+
+**`dcai-cdu.json`:**
+
+| mode | entry | actions | exit |
+|---|---|---|---|
+| normal | — | 54 duty + 1 standby per hall (engine), load 98.3 %, pump 98.9 % | — |
+| duty_trip | a duty CDU trips | standby starts; load per unit stays 98.3 % because the count is restored | tripped unit repaired |
+| low_flow | TCS flow < rated (1,500 L/min per unit, engine) | alarm | flow restored |
+| high_tcs | TCS supply > SP + 3 K (registry alarm, never typed) | alarm; rack throttling is "not modelled" | below SP + 1 K |
+| leak | leak zone active (existing `LEAK-Zxx` points) | isolate the row manifold (text from the existing payload) | reset |
+| facility_water_loss | HTW flow lost | the CDU cannot reject heat; TCS rises; time to limit "not modelled" | restored |
+
+- **Scenario `duty_trip`.**
+
+**`dcai-fan-wall.json`:**
+- normal: 89 duty + 1 standby per hall, fan 99.7 %.
+- trip: standby in.
+- high_inlet: alarm from the registry.
+
+**Where:**
+- the dry cooler, CDU and fan-wall inspectors, block "Sequence of operations", rendered by `RZConvSequence.render/bind`;
+- `datahallAI.html` adds `js/rz-sequences.js` + `js/conv/sequence-view.js` (2 tags, after P5's tag).
+
+**Laws:**
+
+| law | claim | red condition |
+|---|---|---|
+| Q1–Q4 | extended to the 3 files (entry / actions / exit + basis; graph connected; no typed threshold, assumed values listed; scenario walk) | — |
+| S7-DC1 | Simulate `ambient_rise`: the mode changes free → edge → mechanical at the engine cliff (34 °C ± 0); each step's cooling power = engine ± 0.1 %. | today: no block |
+| S7-DC2 | Simulate `duty_trip`: running count stays 54, standby 0 after the step. | — |
+| S7-DC3 | The edge and hysteresis rows show "ASSUMED". | plant one without the word |
+
+### P8 — Simulate drives the PV trends (closes G8)
+
+**Goal:** stepping through a sequence makes the named process values move on their own trends, as SIMULATED pens, so the system response is readable.
+
+**Mechanism:**
+1. Each sequence step already carries steady-state quantities. `sequence-view.js` maps each named quantity to its point id: conv through `data-point` ids, DC AI through `points.js` ids.
+2. **Hook in `rz-trend.js`** (peer-owned, agreed hooks only; spec sent to peer 87):
+   ```
+   RZTrend.overlay(pointId, { rows: [{ x: stepIndex, v }], label: 'SIMULATED · step n/N', kind: 'sim' })
+   RZTrend.clearOverlay(pointId)   // and clearOverlay() for all
+   ```
+   - Drawn as a second ink pen, dashed, its x axis labelled "step".
+   - The real trend keeps its time axis in its own small multiple. It is never a dual axis, per the trend design rules.
+3. **Fallback until the hook ships:** the sequence block draws its own step strip, one small multiple per named PV (≤ 4), as plain SVG from `sequence-view.js`, using the trend's nice-tick rules (copied as a 20-line function with a comment pointing to `rz-trend.js`). There is no chart library.
+4. Reset clears every overlay and strip.
+
+**UI — step strip in the sequence block:**
+
+```
+Simulate · loss of CDW · step 3 of 5            SIMULATED · dynamics not modelled
+ CDW supply °C   32 ─●──●──●╮                      x = step, not time
+                             ╰●──● 37.0 (step 4)
+ chiller lift K  20.6 ─●──●──●──●╮
+                                  ╰● 26.x
+ [◀ step] [step ▶] [Reset]
+```
+
+**Laws** (S7 extended):
+
+| law | claim | red condition |
+|---|---|---|
+| S7d | After Simulate of chiller `loss_cdw`, the CDW supply and chiller lift strips (or trend overlays) have N points = steps. The last value = the final step's engine value ± 0.1 %. | today: no pen |
+| S7e | Reset leaves 0 overlays and 0 strips. | plant leftover |
+| S7f | Reduced motion: no animated reveal. Keyboard step: no animation. | — |
+| S7g | No pen is labelled with a time unit (the x-axis text is "step"). | plant "min" |
+
+### P9 — conv typed control numbers into the registry (closes G3)
+
+**Goal:** "literally everything". Every control number on fire, fuel, water and cdu-mini comes from the registry, carries a basis and has a loop where a controller exists.
+
+| page | numbers | registry rows | loop drawn |
+|---|---|---|---|
+| fire-system | jockey on/off 11.5/12.8 bar; FP1/FP2 start 10.5/9.5 bar; low alarm 8.5 bar | 5 rows, `fire.*`, basis NFPA 20 (staggered start, jockey above main start), values = page design ASSUMED | PSL/PSH pressure switches on the fire sheet joined to the jockey / FP1 / FP2 starters (on-off, not PI) |
+| fuel-system | day tank fill start/stop 50/90 % | 2 rows, basis NFPA 110 / 30 practice, ASSUMED | LIC per day tank → fill valve XV / pump (on-off with differential 40 %) |
+| water-system | booster lead/lag discharge pressure (value read in step 1) | 1–2 rows | PIC → booster VSD |
+| cdu-mini-bms | TCV-01 holds TT-01 18 °C (dew point + 3 K); P-01 VFD on ΔP PDT-02 | 2 rows (the ΔP value from the cdu-mini model, else "not modelled") | TIC → TCV-01; PDIC → P-01 |
+
+- The pages read the registry: `fire-system.html:708` becomes `var P_JOCKEY_ON = CP.value('conv.fire.jockey_on')` and so on.
+- The state machine and the drawn thresholds keep using one constant source (the existing comment at :1263 requires it).
+- **New static gate:** `tools/test-typed-control-numbers.mjs`.
+  - It scans the conv pages and `js/conv/*.js` for numeric literals bound to names matching `/(_ON|_OFF|START|STOP|SETPOINT|_SP)\b/` or text "… setpoint".
+  - Ratchet: per-page counts may only fall, and the target is 0.
+  - Red today: fire 5, fuel 2, cdu-mini 1 (+ DC AI 8 from P5).
+
+**Laws:**
+- **T1:** ratchet 0 on the 4 pages.
+- **T2:** each new row shows in the page tooltip, modal and trend SP line (S2/S3 extended to fire, fuel, water, cdu-mini).
+- **T3:** the fire pressure state machine starts the jockey at the registry value. Plant jockey_on 11.0 → the jockey starts at 11.0 in the sim.
+- **S8e:** the new loops pass S8 (bubble, PV, MV, hover, no orphan).
+
+### P10 — control authority and saturation (closes G9) — the "analyse the system response" view
+
+**Goal:** for every drawn loop, show how much output is left before the controller can no longer hold its SP, and flag a loop that sits saturated.
+
+- **Authority** = `100 − OUT %`, for a direct-acting output toward 100 %, and correspondingly for the minimum.
+- **Measured today:**
+
+| loop | OUT now | authority left |
+|---|---|---|
+| TIC-SAT CRAH valve | 99.5 % | 0.5 % |
+| PDIC-01 secondary pumps | 98.7 % | 1.3 % |
+| TIC-CDWS tower fans | 89.3 % | 10.7 % |
+| TIC-CHWS chiller speed | 89.3 % | 10.7 % above, 29.3 % above the 60 % floor |
+| DC AI CDU pumps | 98.9 % | 1.1 % |
+| DC AI fan wall | 99.7 % | 0.3 % |
+- **Saturation flag:** OUT ≥ 98 % (or ≤ the MV minimum + 2 %). The 2 % band is ASSUMED and labelled. The mark `◆ saturated`, with the tooltip "the controller cannot raise its output further; one more unit of load moves the PV off SP. Remedy in the design: …" (a stage-up rule from the sequence, if any).
+- **Where:**
+  - the bubble's OUT line (`OUT 99.5 % ◆`);
+  - the modal Control block (`◆ 0.5 % authority left`);
+  - a new compact "Loops" table on chiller-plant and in the DC AI inspector header: loop, SP, PV, error, OUT, authority, state.
+- **What-if link:** in the rack inlet what-if, the CRAH valve and fan OUT after the change are shown. Lowering rack inlet 25.4 → 24.4 °C needs more coil capacity, so the valve would exceed 100 %. The engine's response is shown ("units required 58 → n" if the engine re-stages; else "cannot hold, not modelled").
+- **This phase is analysis only.** It changes no engine.
+
+**Laws** (`tools/test-setpoint-sim.mjs` S11):
+
+| law | claim | red condition |
+|---|---|---|
+| S11a | Each drawn loop's authority = 100 − engine OUT ± 0.1. | plant a typed OUT |
+| S11b | Loops with OUT ≥ 98 % carry `◆` (today: TIC-SAT, PDIC-01, DC AI CDU, fan wall). | today: none |
+| S11c | The Loops table row count = registry loop count on that page. | — |
+
+### P11 — accuracy and gate debt (closes G10 rest, G11, G12)
+
+- **G11 (text over pipe).**
+  - Reproduce: `RZ_TEXT_CLEAR_PLANT=pdt-riser` moves the PDT-01 value to `dx -24, dy 16`.
+  - Find why C1 passed. Candidates to test one at a time: the riser path class (`hmi-edge` vs overlay), LOD hiding the value at the gate's zoom, the sampling step vs a 4 px riser, the text bbox from `getBBox` vs the rendered box.
+  - Fix the gate. Red on the plant, green on the current position, and the 5 conv sheets stay green.
+- **G12 (KPI Header DP).**
+  - Bind the KPI to an engine quantity with an honest label. Two choices:
+    - "Remote DP (PDT-01) 90 kPa", the quantity the loop controls;
+    - "Primary loop DP 117.3 kPa" (`cooling.chw_primary_pump_dp_op_kpa`).
+  - Recommended: the remote DP, since the KPI row sits under the secondary loop.
+  - The noise goes.
+  - This row is the peer's chiller-plant area: I send a spec; they ship it, or ack me.
+  - **Law:** `probe-accuracy-validation.mjs` gains "Header DP KPI = engine ± 0"; it is red today.
+- **G10:** the copMax mark is covered in P6 (D8).
+
+---
+
+## C4. Shared component spec: `js/rz-sp-block.js`
+
+**API (UMD, Node-testable core):**
+
+```
+RZSpBlock.rows(classKey, ctx)        → [{ id, label, unit, sp, pv, err, limits:{loW,loA,hiW,hiA,db,delay}, ev, source,
+                                          holder, loop:{tag,pv,mv,action,kind,tuning,basis,slave}|null,
+                                          adjustable:{min,max,step,basis}|null, whatIf:{param, engine:'conv'|'dcai'}|null,
+                                          authority:{out, left, saturated}|null }]
+RZSpBlock.render(rows, { compact })  → HTML string (escaped; textContent for every value)
+RZSpBlock.bind(host, { recompute })  → wires sliders (input → recompute → before/after), Reset, keyboard steps
+```
+
+**Copy rules:**
+- Units always shown.
+- Evidence words exactly DESIGN / ASSUMED / MEASURED.
+- "not modelled" in lower case, never "N/A".
+
+**Security:** no `innerHTML` of registry text without escape. Registry strings are build-time data, but escape anyway.
+
+**Performance:**
+- render ≤ 4 ms for 12 rows;
+- the what-if recompute is debounced to the slider's `input` at 1 frame;
+- a DC AI `compute` takes about 2 ms in Node (to be measured in the gate and stated).
+
+---
+
+## C5. Release plan and ownership
+
+| order | release (number at push) | phases | lanes | peer messages before start |
+|---|---|---|---|---|
+| 0 | v3.107.0 (now) | P2 pt2, P3 pt2–3, P4 pt1 | 3 + 4 | SHA to 87 after push; 87 takes v3.108.0 |
+| 1 | next free | **P4b** + **P11-G11** + `rz-sp-block.js` extraction | 3 | none (my files) |
+| 2 | next | **P5** | 3 + 4 | to 87/02: `datahallAI.html` (1 tag), `equipment-inspector.js` (1 call + guard), `hmi-payloads.js` (8-line diff) |
+| 3 | next | **P6** | 4 | none beyond P5 |
+| 4 | next | **P7** | 4 | 2 more tags in `datahallAI.html` |
+| 5 | next | **P9** | 3 | fire, fuel, water, cdu-mini pages: tell 87 which lines |
+| 6 | next | **P10** | 3 + 4 | — |
+| 7 | when the hook is agreed | **P8** (fallback strip may ship earlier with P7) | 3 + 4 | `rz-trend.js` overlay hook spec to 87 |
+| 8 | with 87's next chiller-plant release | **P11-G12** | 3 | KPI spec to 87 |
+
+**Every release carries:**
+- the CHANGELOG entry;
+- rz-version, sw cache, changelog.html;
+- tokens (`--fix` on my assets only);
+- `standarization/CONTROL_SETPOINT_STANDARD.md` and the PRD §C phase note;
+- an OWNER_REQUESTS_STATUS line (R197);
+- IndexNow after push.
+
+---
+
+## C6. Test matrix (every phase)
+
+| dimension | values |
+|---|---|
+| widths | 390 × 844, 1440 × 900 (plus 1280 for text-clear C4) |
+| themes | dark, light |
+| motion | default, reduced |
+| input | pointer (hover, double-click), keyboard (Tab, Enter, arrows, Escape) |
+| states | live, MAINT (conv), scenario active, what-if active, Reset |
+| failure | registry twin missing → the block says "registry not loaded" (no throw); engine throws → the what-if says "engine refused: <message>" |
+
+**Gate commands:**
+- `bash tools/run-conv-release-gates.sh` (lane 3);
+- the DC AI 37 via `RZ_GATE_PICK` (lane 4);
+- the phase gate on lane 5 (2 cores, thermal-checked).
+
+---
+
+## C7. Risks
+
+| risk | effect | guard |
+|---|---|---|
+| peers edit `datahallAI.html` / inspector daily | merge conflicts, lost tags | one-line changes, announced first; token-only conflicts resolved by script; a fresh registry build after every rebase (peer rule) |
+| the registry docs index makes `conv-parameters.json` stale on any doc naming a parameter | step 6 red (it happened twice) | rebuild the registry as the last step before every gate run |
+| DC AI `compute` on every slider tick | jank | debounce 1 frame; measure p95 in the gate (budget 16 ms) |
+| ASSUMED values read as facts | wrong decisions | the word ASSUMED in the UI next to every such number; gate S2/T2 checks the word |
+| simulated pens read as real history | misread trends | dashed, labelled SIMULATED, step axis, never mixed into the time axis |
+| shaped weather bins (ASSUMED) behind the free-cooling hours | overconfidence | the hours row carries "shaped bins, not a TMY file" (engine `weather.basis`) |
+
+---
+
+## C8. Definition of done (whole amendment)
+
+**Registry:**
+- setpoints ≥ 31;
+- typed control numbers on pages = 0 (gate T1 + D2);
+- drawn loops ≥ 10, 0 orphans;
+- every loop shows authority.
+
+**DC AI:**
+- every unit class inspector shows SP/PV/error/limits;
+- TCS and air SP what-ifs equal the engine;
+- the cliff (34 °C, +73 %) is visible;
+- 3 DC AI sequences simulate.
+
+**Simulate:** moves PV pens (overlay or strip) in every sequence.
+
+**Gates:** every law in §C is red-proven, then green. Shots of each phase at 390/1440 × dark/light have been looked at and sent. The live version is checked after each push.
+
+---
+
+## C9. P4b delivered (2026-11-26)
+
+- **Registry.** `conv.chiller-plant.chws_sp` loop TIC-CHWS (sheet `int-chiller`, PV `TT-CHWS` node `ttchws`, MV node
+  `vfd`); `conv.datahall.crah_supply_air_sp` loop TIC-SAT (sheet `int-crah`, PV node `st`, MV node `cv`);
+  `conv.datahall.rack_inlet_sp` loop TIC-RI, `kind: 'reset'`, `slave: 'TIC-SAT'`, notDrawn (no P&ID on the data hall
+  page). The builder now refuses an `int-*` sheet without its internals file and a reset without a registry slave.
+- **Drawn.** Chiller inside: TT-CHWS right of the CHWS OUT nozzle, TIC-CHWS right of the oil circuit (the free corner;
+  the C3 sketch above put it beside the nozzle, where the evaporator readings sit), PV signal along the sheet floor,
+  MV signal into the VFD from the right; the VFD speed moved above the drive so the MV line clears it. CRAH inside:
+  the unit controller is retagged TIC-SAT when the twin lists the loop, PV signal from the supply-air TT, the existing
+  controller-to-valve line becomes a signal; the valve now reads OPEN = `cooling.crah_valve_open_pct` (coil flow /
+  design flow), its stem position stays "not modelled". Measured: TIC-CHWS SP 19.4 °C OUT 89.3 %; TIC-SAT SP 25.4 °C
+  OUT 99.5 %.
+- **Correction to C3.** TIC-SAT is **direct** acting (supply air above SP → valve opens), not reverse: ISA direct =
+  output rises with the PV, which a cooling coil valve does.
+- **G11 closed.** `test-conv-sheet-text-clear.mjs` `vis()` rejected any element under 1 px in EITHER dimension, so a
+  straight (vertical or horizontal) pipe never reached C1/C5. Now both dimensions must be under 1 px. Red proven:
+  PDT-01's value moved back to dx -24 dy 16 → `FAIL C1 … "90 kPa" × edge e-hrDec` (the old gate passed it). The
+  fixed gate found 12 hidden overlaps, all fixed: fire zone status "NORMAL" × its loop drop (5; value moved right of
+  the drop), EPMS feeder relay names "50/51 50N/51N" × the next feeder's cable (6; tag and name centred between the
+  two feeders) and CB-GB's power value × feeder FB1 (1; values on the open left side).
+- **Deferred.** The `js/rz-sp-block.js` extraction moves to P5, where its second consumer (the DC AI inspector)
+  appears; extracting it with one consumer would be an abstraction for a single use.
+- **Gates.** `test-setpoint-sim.mjs` 311 → 332 checks (S8b red first: 0 controller bubbles tagged TIC-CHWS / TIC-SAT);
+  text-clear 5 sheets C1–C5 PASS; geometry fire + EPMS exit 0; internals core / P3 PASS.
