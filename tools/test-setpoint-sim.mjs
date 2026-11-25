@@ -20,6 +20,7 @@
  * Red first: on v3.102.0 (no control registry in the browser) S2 and S3 fail on every page.
  *   node tools/test-setpoint-sim.mjs        run inside a browser lane (rz-lane)
  *   RZ_SP_PLANT=no-registry                 serve js/rz-control-points.js as 404 (the old state): S2 and S3 must fail
+ *   S8d phone: the loop bubble tooltip and every value cell inside it stay inside a 390 px screen (red on v3.107.0)
  *   S6 red: on v3.105.0 chiller-plant.html (sliders unbound until a scenario, lag + noise in MAINT, no DP response)
  *   RZ_SP_PLANT=no-sequence                 serve js/conv/sequence-view.js as 404 (before P3): S7 must fail
  */
@@ -403,6 +404,30 @@ try {
       }
     }
     ok(!errs.length, 'S9', `${page}: page errors ${errs.slice(0, 3).join(' | ')}`);
+    await pg.close();
+  }
+  /* S8d phone (390 px): hovering or tapping a loop bubble on CH-M-101 / CH-M-102 shows its tooltip inside the viewport
+     with every value cell inside the tooltip. Red on v3.107.0: a page rule for phone tables (display:block + nowrap)
+     reached the tooltip table and pushed PDIC-01's values out to x 874 on a 390 px screen. */
+  {
+    const pg = await browser.newPage(), errs = [];
+    pg.on('pageerror', (e) => errs.push(e.message));
+    await pg.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true });
+    await pg.goto(O + 'chiller-plant.html', { waitUntil: 'load', timeout: 90000 }); await sleep(4000);
+    for (const [view, sp] of [['ch-m-101', 'conv.chiller-plant.chw_dp_sp'], ['ch-m-102', 'conv.chiller-plant.cdw_supply_sp']]) {
+      await pg.evaluate((v) => { const x = document.querySelector(`[data-chw-sheet-btn="${v}"]`); if (x) x.click(); }, view); await sleep(1500);
+      const pt = await pg.evaluate((id) => { const n = document.querySelector(`#chw-sheet-host .hmi-node[data-sym="instPanel"][data-loop="${id}"]`); if (!n) return null; n.scrollIntoView({ block: 'center', inline: 'center' }); const r = n.getBoundingClientRect(); return { x: r.x + r.width / 2, y: r.y + r.height / 2 }; }, sp);
+      ok(!!pt, 'S8d', `${view}: no loop bubble for ${sp} at 390 px`); if (!pt) continue;
+      await sleep(400); await pg.mouse.move(pt.x, pt.y); await sleep(800);
+      const t = await pg.evaluate(() => { const t = document.querySelector('.hmi-tip.is-on'); if (!t) return null; const r = t.getBoundingClientRect();
+        const cells = [...t.querySelectorAll('td')].map((d) => d.getBoundingClientRect()), rows = t.querySelectorAll('tr').length;
+        return { l: r.left, r: r.right, vw: innerWidth, rows, out: cells.filter((c) => c.left < r.left - 1 || c.right > r.right + 1).length }; });
+      ok(!!t && t.rows >= 4, 'S8d', `${view}: the bubble tooltip at 390 px has ${t ? t.rows : 'no'} rows`);
+      ok(!!t && t.l >= 0 && t.r <= t.vw, 'S8d', `${view}: tooltip ${t && Math.round(t.l)}–${t && Math.round(t.r)} leaves the 390 px viewport`);
+      ok(!!t && t.out === 0, 'S8d', `${view}: ${t && t.out} tooltip value cells lie outside the tooltip at 390 px`);
+      await pg.mouse.move(2, 2); await sleep(300);
+    }
+    ok(!errs.length, 'S8d', `phone: page errors ${errs.slice(0, 3).join(' | ')}`);
     await pg.close();
   }
   /* S7 beyond the chiller plant: a generating set on the fuel cockpit (fuel-system.html F4) and a UPS on the EPMS LV

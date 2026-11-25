@@ -118,6 +118,11 @@
 .hmi-tip table { border-collapse: collapse; margin-top: 4px; width: 100%; }
 .hmi-tip td { padding: 1px 0; font: 400 11px 'JetBrains Mono', ui-monospace, monospace; color: var(--hmi-text-2); }
 .hmi-tip td + td { text-align: right; color: var(--hmi-text); }
+/* the tooltip table stays a table on a phone: page rules that turn phone tables into scrolling blocks with nowrap cells
+   (chiller-plant at 390 px) pushed the loop bubble's values off screen (v3.107.0, gate S8d) */
+.hmi-tip table { display: table; table-layout: auto; }
+.hmi-tip td { white-space: normal; overflow-wrap: anywhere; vertical-align: top; }
+.hmi-tip td:first-child { padding-right: 8px; white-space: nowrap; overflow-wrap: normal; width: 1%; }
 .hmi-tip .hint { margin-top: 4px; color: var(--hmi-text-3); font-size: 11px; }
 
 /* ── minimap ───────────────────────────────────────────────────────────────────────────────────── */
