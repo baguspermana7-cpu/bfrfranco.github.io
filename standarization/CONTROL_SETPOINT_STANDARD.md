@@ -118,7 +118,7 @@ range). Otherwise it is fixed, and the modal says what fixes it.
 - **One block (§C4).** `js/rz-sp-block.js` (`RZSpBlock.inner(rows, {snapshot})` + `bind(host, {recompute, live})`) is
   the only writer of the Setpoints & limits markup; the conv modal frames it in its section and passes
   `CONV_CALC.recompute` and its page-or-engine live reader; the DC AI inspector (P5) passes `DCAI_CALC`. Every page that
-  loads `js/conv/equipment-modal.js` loads it after `js/rz-control-points.js`. Gate C13 (`test-control-registry.mjs`).
+  loads `js/conv/equipment-modal.js` loads it after `js/rz-control-points.js`. Gate C14 (`test-control-registry.mjs`).
 - **Authority (P10).** Every drawn loop names the engine key of its output (`out.key`, optional `out.minKey`; the
   builder refuses a drawn loop without it). `RZControlPoints.authority(loop, snapshot)` = { out, left = 100 − out,
   min, sat, band }: saturated within 2 % of 100 % or of the minimum (band ASSUMED, the one rule; never re-typed in a

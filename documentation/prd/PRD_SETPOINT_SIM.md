@@ -949,6 +949,6 @@ RZSpBlock.bind(host, { recompute })  → wires sliders (input → recompute → 
 - Still open in P10: the mark on the plant-sheet bubbles (their OUT text is bound to a page point), the Loops table
   (S11c), the DC AI CDU and fan-wall loops (with P5), the rack-inlet what-if showing the valve beyond 100 %.
 - `js/rz-sp-block.js` extracted (C4) in the same release: the modal's spBlock / what-if / Live-Error code moved
-  unchanged in markup; the host passes recompute + live. Script tag on the 5 modal pages. Gate C13 red on the old modal
+  unchanged in markup; the host passes recompute + live. Script tag on the 5 modal pages. Gate C14 red on the old modal
   (two writers), green after; setpoint-sim 346 and internals P4 671 unchanged.
 

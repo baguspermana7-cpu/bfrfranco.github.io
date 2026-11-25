@@ -14,7 +14,7 @@
  *   C6 a conv sp never comes from a limits row's `nominal` (a nominal is the middle of a band, not a setpoint)
  *   C7 freshness: the file equals what the builder writes now
  *   C9 one controller per DC AI plane: setpoint on exactly the holding class, every other reader a reference naming it
- *   C13 only js/rz-sp-block.js writes the Setpoints & limits markup (one implementation, §C4)
+ *   C14 only js/rz-sp-block.js writes the Setpoints & limits markup (one implementation, §C4)
  *   C8 sp.role is 'setpoint' (a controller holds it: conv rows name it) or 'reference' (nameplate, nominal, design value)
  */
 import fs from 'node:fs';
@@ -158,7 +158,7 @@ try {
     }
   }
 } catch (e) { ok(false, 'C7/C11 builder does not load: ' + e.message); }
-/* C13 one implementation (PRD-SETPOINT-SIM §C1/§C4): only js/rz-sp-block.js writes the Setpoints & limits markup; a
+/* C14 one implementation (PRD-SETPOINT-SIM §C1/§C4): only js/rz-sp-block.js writes the Setpoints & limits markup; a
    host (conv modal, DC AI inspector) frames and binds it, never re-renders it */
 {
   const writers = [];
@@ -168,6 +168,6 @@ try {
     if (/\.js$/.test(d.name) && !/\.min\.js$/.test(d.name) && /data-sp-row="|data-rz-cvm-whatif="/.test(fs.readFileSync(path.join(ROOT, rel), 'utf8'))) writers.push(rel);
   });
   walk('js');
-  ok(writers.length === 1 && writers[0] === 'js/rz-sp-block.js', `C13 Setpoints & limits markup written by [${writers.join(', ')}], want only js/rz-sp-block.js`);
+  ok(writers.length === 1 && writers[0] === 'js/rz-sp-block.js', `C14 Setpoints & limits markup written by [${writers.join(', ')}], want only js/rz-sp-block.js`);
 }
 done();
