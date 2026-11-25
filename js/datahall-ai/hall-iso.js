@@ -201,6 +201,14 @@
   /* A5b B1: the hall's scenario alarms — every alarm of the CDU and fan-wall payloads plus the leak payload's zones (a
      wet rack row is that same leak event, never a second alarm). The strip counts them, the workspace journals them. */
   var hallAlarms = [], journalled = {}, journalSeq = 0, pendingJournal = [];
+  function noSample(p) {
+    var t = (p && p.tabs) || {}, k, i, r;
+    for (k in t) if (Object.prototype.hasOwnProperty.call(t, k) && Array.isArray(t[k])) for (i = 0; i < t[k].length; i++) {
+      r = t[k][i]; if (r && r.quality === 'replay' && (r.value == null || r.text === '\u2014')) return true;
+    }
+    return false;
+  }
+  function staleCount() { return model ? model.crahUnits.concat(model.cduUnits).filter(function (u) { return u.running !== false && u.stale; }).length : 0; }
   function unitStates() {
     if (!model) return;
     var P = win.RZDatahallAIHmiPayloads, ctx = null, i, rows = {}, set = [], seen = {};
@@ -210,6 +218,9 @@
     model.crahUnits.concat(model.cduUnits).forEach(function (u) {
       var m = /^(crah|cdu):(\d+)$/.exec(u.ref), p = m ? pay(m[1], m[2]) : null, s = sevOf(p), al = p && p.tabs && p.tabs.alarms && p.tabs.alarms[0];
       collect(p);
+      /* Amendment 6 (A5e): a replayed reading without a sample makes the unit stale — its lamp, tooltip and table say so */
+      u.stale = noSample(p);
+      u.staleNote = u.stale ? 'no sample at the replay time' : null;
       u.status = s; u.point = s ? (al ? al.point : 'STATE') : null;
       u.note = s ? (al ? al.point + ' · ' + al.message : (p.statusChip && p.statusChip.label) || '') : null;
       if (u.baseLines == null) u.baseLines = u.lines.slice();
@@ -427,7 +438,7 @@
     if (!wrap || !win.RZFloorPlan) return;
     if (!legendBox) { legendBox = doc.createElement('div'); legendBox.setAttribute('aria-label', 'Lens legend'); wrap.appendChild(legendBox); }
     win.RZFloorPlan.legend(legendBox, lensMode(lens));
-    if (lens !== 'layout') [['run', 'run'], ['stby', 'standby']].forEach(function (d) {
+    if (lens !== 'layout') [['run', 'run'], ['stby', 'standby']].concat(staleCount() ? [['stale', 'stale']] : []).forEach(function (d) {
       var it = doc.createElement('span'); it.className = 'lg-item';
       var sw = doc.createElement('span'); sw.className = 'fp-sw'; sw.setAttribute('data-state', d[0]); it.appendChild(sw);
       it.appendChild(doc.createTextNode(d[1])); legendBox.appendChild(it);
@@ -443,7 +454,7 @@
     function row(a, b, c) { var tr = doc.createElement('tr'), th = doc.createElement('th'); th.scope = 'row'; th.textContent = a; tr.appendChild(th);
       [b, c].forEach(function (x) { var td = doc.createElement('td'); td.textContent = x; tr.appendChild(td); }); rows.push(tr); }
     for (i = 0; i < model.racks.length; i++) row(model.racks[i].ref.replace('rack-unit:', 'Rack '), model.racks[i].status ? (model.racks[i].status === 'alarm' ? 'alarm: ' : 'warning: ') + model.racks[i].note.slice(2) : 'running', f1(model.racks[i].kw) + ' kW · inlet ' + f1(model.rackInletFor(i)) + ' °C');
-    function word(u) { return u.status ? (u.status === 'alarm' ? 'alarm: ' : 'warning: ') + u.note : (u.running === false ? 'standby' : 'running'); }
+    function word(u) { return u.running !== false && u.stale ? 'stale: ' + u.staleNote : u.status ? (u.status === 'alarm' ? 'alarm: ' : 'warning: ') + u.note : (u.running === false ? 'standby' : 'running'); }
     model.crahUnits.forEach(function (u) { row(u.tag, word(u), (u.baseLines || u.lines).join(' · ')); });
     model.cduUnits.forEach(function (u) { row(u.tag, word(u), (u.baseLines || u.lines).join(' · ')); });
     rows.forEach(function (r) { tb.appendChild(r); });
@@ -492,11 +503,17 @@
   }
 
   /* live: the aisle readouts move every few seconds; paint() writes attributes only */
+  var hadReplay = false;
   function tick() {
     stop();
     timer = win.setInterval(function () {
       if (doc.hidden || view === 'drawing' || !inst) return;
-      readSensors(); inst.paint(inst.mode);
+      readSensors();
+      /* A5e: under a replay the samples move with the scrubber, so the unit states are read again (and once more when it ends) */
+      var T = win.RZDatahallAISimTelemetry, rp = !!(T && T.hasProvider && T.hasProvider());
+      if (rp || hadReplay) { unitStates(); drawLegend(); if (tableBox && tableBox.open) unitTable(); }
+      hadReplay = rp;
+      inst.paint(inst.mode);
     }, 3000);
   }
   function stop() { if (timer) { win.clearInterval(timer); timer = 0; } }
@@ -505,7 +522,7 @@
   doc.addEventListener('change', function (ev) {
     if (!ev.target || ev.target.id !== 'coolingScenario' || !model) return;
     unitStates();
-    if (inst && view !== 'drawing') { inst.paint(inst.mode); drawFlags(); }
+    if (inst && view !== 'drawing') { inst.paint(inst.mode); drawLegend(); drawFlags(); }
     if (tableBox && tableBox.open) unitTable();
   }, true);
   /* a resize redraws the floor; the flags follow it */
@@ -533,6 +550,7 @@
     setView: function (v) { set(v, true); },
     model: function () { return model; },
     /* A5b: the hall's scenario alarms as alarm records (tag, point, severity, message, system); read by the status strip */
+    stale: function () { return staleCount(); },
     alarms: function () { flushJournal(); return hallAlarms.map(function (a) { return { tag: a.tag, point: a.point, severity: a.severity, message: a.message, system: a.system }; }); },
     repaint: function () { if (inst) inst.paint(inst.mode); }
   };

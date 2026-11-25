@@ -1591,6 +1591,10 @@ datahallPaintAuthority(datahallCurrentAuthority());
 })(window,document);
 </script>
 <script>
+/* PRD-DCAI-HALL-DEPTH Amendment 6 (A5e): a reading without a sample prints the dash, never 'null' or 'NaN' */
+function nz(v){return v==null||v!==v?'\u2014':v}
+function nzf(v,d){return v==null||!isFinite(v)?'\u2014':v.toFixed(d)}
+
 
 const $=id=>document.getElementById(id),J='JetBrains Mono';
 
@@ -2934,11 +2938,11 @@ s+=`<text x="10" y="17" fill="var(--c)" font-family="${F}" font-size="10" font-w
 s+=`<circle cx="380" cy="13" r="4" fill="var(--g)" opacity=".8"/><text x="388" y="17" fill="var(--g)" font-family="${F}" font-size="8">Online</text>`;
 s+=`<text x="${W-10}" y="17" fill="var(--t3)" font-family="${F}" font-size="8" text-anchor="end">SBR 50m\u00B3/day</text>`;
 // KPI strip
-var kpis=[{l:'Inlet Flow',v:P.n('auto_1')+' m\u00B3/h',c:'var(--c)'},{l:'Inlet pH',v:P.n('auto_2').toFixed(1),c:'var(--o)'},{l:'DO Level',v:P.n('auto_3').toFixed(1)+' mg/L',c:'var(--b)'},{l:'Eff. BOD',v:P.n('auto_4')+' mg/L',c:'var(--g)'},{l:'Eff. TSS',v:P.n('auto_5')+' mg/L',c:'var(--c)'},{l:'Eff. pH',v:P.n('auto_6').toFixed(1),c:'var(--g)'}];
+var kpis=[{l:'Inlet Flow',v:P.v('auto_1')+' m\u00B3/h',c:'var(--c)'},{l:'Inlet pH',v:nzf(P.n('auto_2'),1),c:'var(--o)'},{l:'DO Level',v:nzf(P.n('auto_3'),1)+' mg/L',c:'var(--b)'},{l:'Eff. BOD',v:P.v('auto_4')+' mg/L',c:'var(--g)'},{l:'Eff. TSS',v:P.v('auto_5')+' mg/L',c:'var(--c)'},{l:'Eff. pH',v:nzf(P.n('auto_6'),1),c:'var(--g)'}];
 for(var k=0;k<kpis.length;k++){var kx=10+k*127;
 s+=`<rect x="${kx}" y="30" width="122" height="28" rx="3" fill="rgba(6,182,212,.04)" stroke="var(--c)" stroke-width=".4"/>`;
 s+=`<text x="${kx+61}" y="41" fill="var(--t3)" font-family="${F}" font-size="5.5" text-anchor="middle">${kpis[k].l}</text>`;
-s+=`<text x="${kx+61}" y="53" fill="${kpis[k].c}" font-family="${F}" font-size="10" text-anchor="middle" font-weight="600">${kpis[k].v}</text>`;
+s+=`<text x="${kx+61}" y="53" fill="${kpis[k].c}" font-family="${F}" font-size="10" text-anchor="middle" font-weight="600">${nz(kpis[k].v)}</text>`;
 }
 // Process flow Y baseline
 var PY=100,BX=30;
@@ -2958,7 +2962,7 @@ s+=`<text x="${EQX+45}" y="${PY+20}" fill="var(--t3)" font-family="${F}" font-si
 var lvl=P.n('lvl');
 s+=`<rect x="${EQX+70}" y="${PY+5}" width="10" height="45" rx="1" fill="rgba(6,182,212,.1)" stroke="var(--c)" stroke-width=".5"/>`;
 s+=`<rect x="${EQX+71}" y="${PY+5+45*(100-lvl)/100}" width="8" height="${45*lvl/100}" rx="1" fill="rgba(6,182,212,.3)"/>`;
-s+=rzD(P.optAll(["lvl"]),`<text x="${EQX+75}" y="${PY+56}" fill="var(--c)" font-family="${F}" font-size="5" text-anchor="middle">${lvl}%</text>`);
+s+=rzD(P.optAll(["lvl"]),`<text x="${EQX+75}" y="${PY+56}" fill="var(--c)" font-family="${F}" font-size="5" text-anchor="middle">${nz(lvl)}%</text>`);
 // Submersible pump
 s+=`<circle cx="${EQX+30}" cy="${PY+42}" r="8" fill="none" stroke="var(--g)" stroke-width=".6"/>`;
 s+=`<text x="${EQX+30}" y="${PY+45}" fill="var(--g)" font-family="${F}" font-size="5" text-anchor="middle">P</text>`;
@@ -2968,7 +2972,7 @@ s+=`<line x1="${EQX+90}" y1="${PY+25}" x2="${EQX+115}" y2="${PY+25}" stroke="var
 var AEX=EQX+115;
 s+=`<rect x="${AEX}" y="${PY-10}" width="120" height="70" rx="6" fill="rgba(59,130,246,.06)" stroke="rgba(59,130,246,.4)" stroke-width=".8"/>`;
 s+=`<text x="${AEX+60}" y="${PY+8}" fill="var(--b)" font-family="${F}" font-size="7" text-anchor="middle" font-weight="600">AERATION TANK</text>`;
-s+=rzD(P.optAll(["auto_7"]),`<text x="${AEX+60}" y="${PY+20}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">SBR 30m\u00B3 | DO ${P.n('auto_7').toFixed(1)} mg/L</text>`);
+s+=rzD(P.optAll(["auto_7"]),`<text x="${AEX+60}" y="${PY+20}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">SBR 30m\u00B3 | DO ${nzf(P.n('auto_7'),1)} mg/L</text>`);
 // Air diffusers at bottom
 for(var d=0;d<6;d++){
 s+=`<circle cx="${AEX+15+d*18}" cy="${PY+48}" r="3" fill="rgba(59,130,246,.15)" stroke="var(--b)" stroke-width=".4"/>`;
@@ -3007,7 +3011,7 @@ var CHX=CLX+90;
 s+=`<rect x="${CHX}" y="${PY}" width="70" height="50" rx="4" fill="rgba(100, 116, 139,.06)" stroke="rgba(100, 116, 139,.4)" stroke-width=".8"/>`;
 s+=`<text x="${CHX+35}" y="${PY+18}" fill="var(--p)" font-family="${F}" font-size="7" text-anchor="middle" font-weight="600">CHLORINATION</text>`;
 s+=`<text x="${CHX+35}" y="${PY+30}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">Contact 30min</text>`;
-s+=rzD(P.optAll(["auto_8"]),`<text x="${CHX+35}" y="${PY+40}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">NaOCl ${P.n('auto_8').toFixed(1)} mg/L</text>`);
+s+=rzD(P.optAll(["auto_8"]),`<text x="${CHX+35}" y="${PY+40}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">NaOCl ${nzf(P.n('auto_8'),1)} mg/L</text>`);
 // Dosing pump
 s+=`<line x1="${CHX+35}" y1="${PY+50}" x2="${CHX+35}" y2="${PY+75}" stroke="var(--p)" stroke-width="1"/>`;
 s+=`<rect x="${CHX+15}" y="${PY+75}" width="40" height="20" rx="2" fill="rgba(100, 116, 139,.06)" stroke="rgba(100, 116, 139,.3)" stroke-width=".5"/>`;
@@ -3080,7 +3084,7 @@ s+=`<text x="${CLX+38}" y="${TY-10}" fill="var(--c)" font-family="${F}" font-siz
 s+=`<rect x="${TSX}" y="${TY}" width="80" height="55" rx="3" fill="rgba(245,158,11,.06)" stroke="rgba(245,158,11,.4)" stroke-width=".7"/>`;
 s+=`<text x="${TSX+40}" y="${TY+13}" fill="var(--o)" font-family="${F}" font-size="6.5" text-anchor="middle" font-weight="600">SAND FILTER</text>`;
 s+=`<text x="${TSX+40}" y="${TY+24}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">Polish SS</text>`;
-s+=rzD(P.optAll(["auto_9"]),`<text x="${TSX+40}" y="${TY+33}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">&Delta;P ${P.n('auto_9').toFixed(2)} bar</text>`);
+s+=rzD(P.optAll(["auto_9"]),`<text x="${TSX+40}" y="${TY+33}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">&Delta;P ${nzf(P.n('auto_9'),2)} bar</text>`);
 s+=`<text x="${TSX+40}" y="${TY+44}" fill="var(--t3)" font-family="${F}" font-size="4.5" text-anchor="middle">Backwash @ 0.8 bar</text>`;
 s+=`<line x1="${TSX+80}" y1="${TY+27}" x2="${TSX+98}" y2="${TY+27}" stroke="var(--g)" stroke-width="1.4" class="fR"/>`;
 // Activated carbon filter
@@ -3096,8 +3100,8 @@ var UVX=ACX+100;
 s+=`<rect x="${UVX}" y="${TY}" width="80" height="55" rx="3" fill="rgba(100, 116, 139,.06)" stroke="rgba(100, 116, 139,.4)" stroke-width=".7"/>`;
 s+=`<text x="${UVX+40}" y="${TY+13}" fill="var(--p)" font-family="${F}" font-size="6.5" text-anchor="middle" font-weight="600">UV DISINFECT</text>`;
 s+=`<text x="${UVX+40}" y="${TY+24}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">2&times; UV lamps \u00B7 N+1</text>`;
-var uvI=P.n('uv_pct').toFixed(1);
-s+=rzD(P.optAll(["uv_pct"]),`<text x="${UVX+40}" y="${TY+33}" fill="var(--p)" font-family="${F}" font-size="5" text-anchor="middle">${uvI} % intensity</text>`);
+var uvI=nzf(P.n('uv_pct'),1);
+s+=rzD(P.optAll(["uv_pct"]),`<text x="${UVX+40}" y="${TY+33}" fill="var(--p)" font-family="${F}" font-size="5" text-anchor="middle">${nz(uvI)} % intensity</text>`);
 s+=`<text x="${UVX+40}" y="${TY+44}" fill="var(--t3)" font-family="${F}" font-size="4.5" text-anchor="middle">UVT &gt; 70 % \u00B7 log 4 kill</text>`;
 s+=`<line x1="${UVX+80}" y1="${TY+27}" x2="${UVX+98}" y2="${TY+27}" stroke="var(--g)" stroke-width="1.4" class="fR"/>`;
 // Reclaim tank
@@ -3109,7 +3113,7 @@ s+=`<text x="${RCX+45}" y="${TY+15}" fill="var(--t3)" font-family="${F}" font-si
 var rlvl=P.n('rlvl');
 s+=`<rect x="${RCX+70}" y="${TY+18}" width="10" height="35" rx="1" fill="rgba(34,197,94,.1)" stroke="var(--g)" stroke-width=".4"/>`;
 s+=`<rect x="${RCX+71}" y="${TY+18+35*(100-rlvl)/100}" width="8" height="${35*rlvl/100}" rx="1" fill="rgba(34,197,94,.3)"/>`;
-s+=rzD(P.optAll(["rlvl"]),`<text x="${RCX+45}" y="${TY+32}" fill="var(--g)" font-family="${F}" font-size="6.5" text-anchor="middle" font-weight="700">${rlvl}%</text>`);
+s+=rzD(P.optAll(["rlvl"]),`<text x="${RCX+45}" y="${TY+32}" fill="var(--g)" font-family="${F}" font-size="6.5" text-anchor="middle" font-weight="700">${nz(rlvl)}%</text>`);
 s+=`<text x="${RCX+45}" y="${TY+45}" fill="var(--t3)" font-family="${F}" font-size="4.5" text-anchor="middle">Treated water buffer</text>`;
 s+=`<text x="${RCX+45}" y="${TY+55}" fill="var(--t3)" font-family="${F}" font-size="4.5" text-anchor="middle">NaOCl residual 0.5 mg/L</text>`;
 s+=`<line x1="${RCX+90}" y1="${TY+27}" x2="${RCX+110}" y2="${TY+27}" stroke="var(--g)" stroke-width="1.4" class="fR"/>`;
@@ -3180,7 +3184,7 @@ var kpis2=[{l:'Supply Air',v:sat.toFixed(1)+'\u00B0C',c:'var(--c)'},{l:'Return A
 for(var k=0;k<kpis2.length;k++){var kx=10+k*127;
 s+=`<rect x="${kx}" y="30" width="122" height="28" rx="3" fill="rgba(6,182,212,.04)" stroke="var(--c)" stroke-width=".4"/>`;
 s+=`<text x="${kx+61}" y="41" fill="var(--t3)" font-family="${F}" font-size="5.5" text-anchor="middle">${kpis2[k].l}</text>`;
-s+=`<text x="${kx+61}" y="53" fill="${kpis2[k].c}" font-family="${F}" font-size="10" text-anchor="middle" font-weight="600">${kpis2[k].v}</text>`;
+s+=`<text x="${kx+61}" y="53" fill="${kpis2[k].c}" font-family="${F}" font-size="10" text-anchor="middle" font-weight="600">${nz(kpis2[k].v)}</text>`;
 }
 // Main duct flow
 var DY=120,LX=20;
@@ -3202,14 +3206,14 @@ s+=`<text x="${MBX+27}" y="${DY+18}" fill="var(--c)" font-family="${F}" font-siz
 s+=`<text x="${MBX+27}" y="${DY+30}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">OA + RA</text>`;
 // Return air input (from below)
 s+=`<line x1="${MBX+27}" y1="${DY+55}" x2="${MBX+27}" y2="${DY+80}" stroke="var(--o)" stroke-width="2"/>`;
-s+=rzD(P.optAll(["return_c"]),`<text x="${MBX+32}" y="${DY+72}" fill="var(--o)" font-family="${F}" font-size="5">Return Air ${rat.toFixed(1)}\u00B0C</text>`);
+s+=rzD(P.optAll(["return_c"]),`<text x="${MBX+32}" y="${DY+72}" fill="var(--o)" font-family="${F}" font-size="5">Return Air ${nzf(rat,1)}\u00B0C</text>`);
 // Flow arrow
 s+=`<line x1="${MBX+55}" y1="${DY+22}" x2="${MBX+75}" y2="${DY+22}" stroke="var(--c)" stroke-width="2" class="fR"/>`;
 // === PRE-FILTER G4 ===
 var PFX=MBX+75;
 s+=`<rect x="${PFX}" y="${DY+5}" width="45" height="35" rx="3" fill="rgba(148,163,184,.06)" stroke="rgba(148,163,184,.4)" stroke-width=".8"/>`;
 s+=`<text x="${PFX+22}" y="${DY+20}" fill="var(--t2)" font-family="${F}" font-size="6" text-anchor="middle" font-weight="600">G4</text>`;
-s+=rzD(P.optAll(["dP1"]),`<text x="${PFX+22}" y="${DY+30}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">\u0394P ${dP1}Pa</text>`);
+s+=rzD(P.optAll(["dP1"]),`<text x="${PFX+22}" y="${DY+30}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">\u0394P ${nz(dP1)}Pa</text>`);
 // Pleated filter lines
 for(var fl=0;fl<4;fl++){
 s+=`<line x1="${PFX+8+fl*10}" y1="${DY+10}" x2="${PFX+8+fl*10}" y2="${DY+36}" stroke="var(--t3)" stroke-width=".5" opacity=".4"/>`;
@@ -3220,7 +3224,7 @@ s+=`<line x1="${PFX+45}" y1="${DY+22}" x2="${PFX+60}" y2="${DY+22}" stroke="var(
 var BFX=PFX+60;
 s+=`<rect x="${BFX}" y="${DY+5}" width="45" height="35" rx="3" fill="rgba(148,163,184,.08)" stroke="rgba(148,163,184,.5)" stroke-width=".8"/>`;
 s+=`<text x="${BFX+22}" y="${DY+20}" fill="var(--t2)" font-family="${F}" font-size="6" text-anchor="middle" font-weight="600">F7</text>`;
-s+=rzD(P.optAll(["dP2"]),`<text x="${BFX+22}" y="${DY+30}" fill="${dP2>120?'var(--o)':'var(--t3)'}" font-family="${F}" font-size="5" text-anchor="middle">\u0394P ${dP2}Pa</text>`);
+s+=rzD(P.optAll(["dP2"]),`<text x="${BFX+22}" y="${DY+30}" fill="${dP2>120?'var(--o)':'var(--t3)'}" font-family="${F}" font-size="5" text-anchor="middle">\u0394P ${nz(dP2)}Pa</text>`);
 // Bag filter pattern
 for(var bf=0;bf<3;bf++){
 s+=`<path d="M${BFX+10+bf*12},${DY+10} Q${BFX+16+bf*12},${DY+24} ${BFX+10+bf*12},${DY+36}" fill="none" stroke="var(--t3)" stroke-width=".5" opacity=".4"/>`;
@@ -3245,7 +3249,7 @@ s+=`<text x="${CCX+50}" y="${DY+90}" fill="var(--b)" font-family="${F}" font-siz
 // 3-way valve
 s+=`<circle cx="${CCX+32}" cy="${DY+70}" r="6" fill="none" stroke="var(--b)" stroke-width=".6"/>`;
 s+=`<text x="${CCX+32}" y="${DY+73}" fill="var(--b)" font-family="${F}" font-size="5" text-anchor="middle">V</text>`;
-s+=rzD(P.optAll(["valve_pct"]),`<text x="${CCX+32}" y="${DY+82}" fill="var(--t3)" font-family="${F}" font-size="4.5" text-anchor="middle">${chv}% open</text>`);
+s+=rzD(P.optAll(["valve_pct"]),`<text x="${CCX+32}" y="${DY+82}" fill="var(--t3)" font-family="${F}" font-size="4.5" text-anchor="middle">${nz(chv)}% open</text>`);
 // Flow arrow
 s+=`<line x1="${CCX+65}" y1="${DY+22}" x2="${CCX+85}" y2="${DY+22}" stroke="var(--c)" stroke-width="2" class="fR"/>`;
 // === SUPPLY FAN ===
@@ -3254,8 +3258,8 @@ s+=`<rect x="${SFX}" y="${DY}" width="60" height="45" rx="3" fill="rgba(34,197,9
 s+=`<text x="${SFX+30}" y="${DY+12}" fill="var(--g)" font-family="${F}" font-size="7" text-anchor="middle" font-weight="600">SUPPLY FAN</text>`;
 // Fan symbol
 s+=`<circle cx="${SFX+30}" cy="${DY+28}" r="10" fill="none" stroke="var(--g)" stroke-width=".8"/>`;
-s+=`<line x1="${SFX+22}" y1="${DY+28}" x2="${SFX+38}" y2="${DY+28}" stroke="var(--g)" stroke-width="1" transform="rotate(${fspd},${SFX+30},${DY+28})"/>`;
-s+=rzD(P.optAll(["fan_pct"]),`<text x="${SFX+30}" y="${DY+43}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">VFD ${fspd}% | 15kW</text>`);
+s+=`<line x1="${SFX+22}" y1="${DY+28}" x2="${SFX+38}" y2="${DY+28}" stroke="var(--g)" stroke-width="1" transform="rotate(${nz(fspd)},${SFX+30},${DY+28})"/>`;
+s+=rzD(P.optAll(["fan_pct"]),`<text x="${SFX+30}" y="${DY+43}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">VFD ${nz(fspd)}% | 15kW</text>`);
 // Flow arrow
 s+=`<line x1="${SFX+60}" y1="${DY+22}" x2="${SFX+80}" y2="${DY+22}" stroke="var(--c)" stroke-width="2" class="fR"/>`;
 // === SUPPLY DUCT TO ROOM ===
@@ -3263,14 +3267,14 @@ var SDX=SFX+80;
 s+=`<rect x="${SDX}" y="${DY+5}" width="55" height="35" rx="3" fill="rgba(6,182,212,.06)" stroke="rgba(6,182,212,.35)" stroke-width=".8"/>`;
 s+=`<text x="${SDX+27}" y="${DY+18}" fill="var(--c)" font-family="${F}" font-size="6" text-anchor="middle" font-weight="600">SUPPLY</text>`;
 s+=`<text x="${SDX+27}" y="${DY+28}" fill="var(--c)" font-family="${F}" font-size="6" text-anchor="middle" font-weight="600">TO ROOM</text>`;
-s+=rzD(P.optAll(["supply_c", "afr"]),`<text x="${SDX+27}" y="${DY+38}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">${sat.toFixed(1)}\u00B0C | ${afr} m\u00B3/h</text>`);
+s+=rzD(P.optAll(["supply_c", "afr"]),`<text x="${SDX+27}" y="${DY+38}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">${nzf(sat,1)}\u00B0C | ${nz(afr)} m\u00B3/h</text>`);
 // Temperature sensors
-s+=rzD(P.optAll(["auto_1"]),`<text x="${LX+30}" y="${DY-6}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">T-OA: ${P.n('auto_1').toFixed(1)}\u00B0C</text>`);
-s+=rzD(P.optAll(["supply_c"]),`<text x="${SDX+27}" y="${DY+2}" fill="var(--c)" font-family="${F}" font-size="5" text-anchor="middle">T-SA: ${sat.toFixed(1)}\u00B0C</text>`);
+s+=rzD(P.optAll(["auto_1"]),`<text x="${LX+30}" y="${DY-6}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">T-OA: ${nzf(P.n('auto_1'),1)}\u00B0C</text>`);
+s+=rzD(P.optAll(["supply_c"]),`<text x="${SDX+27}" y="${DY+2}" fill="var(--c)" font-family="${F}" font-size="5" text-anchor="middle">T-SA: ${nzf(sat,1)}\u00B0C</text>`);
 // Return air duct (bottom path)
 var RAY=DY+80;
 s+=`<rect x="${MBX+27}" y="${RAY}" width="${SDX-MBX-27+55}" height="25" rx="3" fill="rgba(245,158,11,.04)" stroke="rgba(245,158,11,.25)" stroke-width=".6"/>`;
-s+=rzD(P.optAll(["return_c"]),`<text x="${(MBX+27+SDX+55)/2}" y="${RAY+10}" fill="var(--o)" font-family="${F}" font-size="6" text-anchor="middle">RETURN AIR DUCT \u2014 T-RA: ${rat.toFixed(1)}\u00B0C</text>`);
+s+=rzD(P.optAll(["return_c"]),`<text x="${(MBX+27+SDX+55)/2}" y="${RAY+10}" fill="var(--o)" font-family="${F}" font-size="6" text-anchor="middle">RETURN AIR DUCT \u2014 T-RA: ${nzf(rat,1)}\u00B0C</text>`);
 // Return fan
 s+=`<circle cx="${SDX}" cy="${RAY+12}" r="8" fill="none" stroke="var(--o)" stroke-width=".6"/>`;
 s+=`<text x="${SDX}" y="${RAY+15}" fill="var(--o)" font-family="${F}" font-size="5" text-anchor="middle">RF</text>`;
@@ -3436,7 +3440,7 @@ const rackAm=p=>pairM(p)+coldM, hotM0=p=>rackAm(p)+rackDM, rackBm=p=>hotM0(p)+2*
 const rowLpm=(tcsLpm!=null)?tcsLpm*perRow:null;
 const flowDur=(rowLpm&&rowLpm>0)?Math.max(1.2,Math.min(6,12000/rowLpm)).toFixed(2):'3.00';
 const decl=t=>({declared:t});
-const pill=(x,y,w,h)=>`<rect x="${(x).toFixed(1)}" y="${(y).toFixed(1)}" width="${w.toFixed(1)}" height="${h}" rx="2" fill="var(--bg2)" fill-opacity=".9"/>`;
+const pill=(x,y,w,h)=>`<rect x="${(x).toFixed(1)}" y="${(y).toFixed(1)}" width="${nzf(w,1)}" height="${h}" rx="2" fill="var(--bg2)" fill-opacity=".9"/>`;
 const L=(x1,y1,x2,y2,c,w,extra)=>`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${c}" stroke-width="${w}"${extra||''}/>`;
 const anim=(v,d)=>`<animate attributeName="stroke-dashoffset" values="${v}" dur="${d}s" repeatCount="indefinite"/>`;
 
@@ -3469,7 +3473,7 @@ cards.forEach(k=>{s+=`<rect x="${k.x}" y="38" width="342" height="92" rx="3" fil
     before each aisle word, so no swatch can sit on a letter */
  {const cw=6,segs=[['AISLE SENSORS °C',null],['cold aisle','var(--c)'],['hot aisle','var(--o)']];
   let lx=HX1-segs.reduce((n,g)=>n+g[0].length*cw+(g[1]?13:0)+14,0)+14;
-  segs.forEach(g=>{if(g[1]){s+=`<rect x="${lx.toFixed(1)}" y="147" width="9" height="9" rx="1" fill="var(--bg1)" stroke="${g[1]}" stroke-width="1.4"/>`;lx+=13;}
+  segs.forEach(g=>{if(g[1]){s+=`<rect x="${nzf(lx,1)}" y="147" width="9" height="9" rx="1" fill="var(--bg1)" stroke="${g[1]}" stroke-width="1.4"/>`;lx+=13;}
    s+=tx(+lx.toFixed(1),155,g[0],'var(--t3)',10,'start',0);lx+=g[0].length*cw+14;});}}
 
 /* dimension lines and north arrow */
@@ -3494,16 +3498,16 @@ let th='<g class="hp-ly hp-ly-thermal">';
 const SENS_PTS=3,fh=M(rowLm);
 for(let p=0;p<pairs;p++){const pi=p;
 for(let si=0;si<SENS_PTS;si++){const y0=Y(yF0)+fh*si/SENS_PTS,h=fh/SENS_PTS;
-th+=`<rect id="H${pi}${si}z" data-pi="${pi}" x="${X(hotM0(p))}" y="${y0.toFixed(1)}" width="${M(2*hotM)}" height="${h.toFixed(1)}" fill="${hallHeat(null)}"/>`;
-th+=`<rect class="C${pi}${si}z" data-pi="${pi}" x="${X(pairM(p))}" y="${y0.toFixed(1)}" width="${M(coldM)}" height="${h.toFixed(1)}" fill="${hallHeat(null)}"/>`;
-th+=`<rect class="C${pi}${si}z" data-pi="${pi}" x="${X(coldEm(p))}" y="${y0.toFixed(1)}" width="${M(coldM)}" height="${h.toFixed(1)}" fill="${hallHeat(null)}"/>`;}}
+th+=`<rect id="H${pi}${si}z" data-pi="${pi}" x="${X(hotM0(p))}" y="${nzf(y0,1)}" width="${M(2*hotM)}" height="${nzf(h,1)}" fill="${hallHeat(null)}"/>`;
+th+=`<rect class="C${pi}${si}z" data-pi="${pi}" x="${X(pairM(p))}" y="${nzf(y0,1)}" width="${M(coldM)}" height="${nzf(h,1)}" fill="${hallHeat(null)}"/>`;
+th+=`<rect class="C${pi}${si}z" data-pi="${pi}" x="${X(coldEm(p))}" y="${nzf(y0,1)}" width="${M(coldM)}" height="${nzf(h,1)}" fill="${hallHeat(null)}"/>`;}}
 th+='</g>';s+=th;
 
 /* ===== RACK FIELD — 20 rows north-south, contained hot aisles, a manifold on every rear face == */
 const hS=Y(yF1+1.3),hR=Y(yF1+1.75);                         /* TCS supply / return headers, overhead in the corridor */
 for(let p=0;p<pairs;p++){const x0=X(hotM0(p)),w=M(2*hotM);
-s+=`<rect class="hp-hac" data-pi="${p}" x="${x0}" y="${Y(yF0)}" width="${w}" height="${fh.toFixed(1)}" fill="none" stroke="var(--o)" stroke-width="1" stroke-opacity=".6"/>`;
-s+=`<rect class="hp-ly hp-ly-overhead" x="${x0}" y="${Y(yF0)}" width="${w}" height="${fh.toFixed(1)}" fill="url(#hpRoof)"/>`;
+s+=`<rect class="hp-hac" data-pi="${p}" x="${x0}" y="${Y(yF0)}" width="${w}" height="${nzf(fh,1)}" fill="none" stroke="var(--o)" stroke-width="1" stroke-opacity=".6"/>`;
+s+=`<rect class="hp-ly hp-ly-overhead" x="${x0}" y="${Y(yF0)}" width="${w}" height="${nzf(fh,1)}" fill="url(#hpRoof)"/>`;
 s+=`<rect class="hp-hac" data-pi="${p}" x="${(x0+2).toFixed(1)}" y="${(Y(yF1)-3).toFixed(1)}" width="${(w-4).toFixed(1)}" height="3" fill="var(--o)" opacity=".85"/>`;}
 for(let r=0;r<rows;r++){const p=Math.floor(r/2),west=r%2===0,rowNo=r+1,id=pad2(rowNo);
 const rx=X(west?rackAm(p):rackBm(p)),rw=M(rackDM),rh=M(rackWM),rearX=west?rx+rw:rx;
@@ -3511,7 +3515,7 @@ s+=`<g class="rowg" data-row="${id}" data-rg="RG-${id}" data-pi="${p}">`;
 for(let k=0;k<perRow;k++){const ry=Y(yF1)-(k+1)*rh,rk=pad2(k+1),rid='R'+id+'-'+rk,fx=west?rx:rx+rw-1.6;
 s+=`<g class="hp-rack" data-rz-equipment="rack-unit:${rid}" tabindex="0" role="button" data-tip="RACK ${rid} · RG-${id} · GB300 NVL72 · ${em(kwRack)} kW · ${em(gpuR)} GPU · ${em(feedA)} A dual-corded · TCS ${tcsLpm==null?DASH:tcsLpm.toFixed(0)} L/min from the row manifold · front faces the cold aisle · click: rack HMI">`;
 s+=`<rect x="${(rx+.4).toFixed(1)}" y="${(ry+.5).toFixed(1)}" width="${(rw-.8).toFixed(1)}" height="${(rh-1).toFixed(1)}" rx="1" class="hp-body"/>`;
-s+=`<rect x="${fx.toFixed(1)}" y="${(ry+1.2).toFixed(1)}" width="1.6" height="${(rh-2.4).toFixed(1)}" fill="var(--c)" opacity=".85"/>`;
+s+=`<rect x="${nzf(fx,1)}" y="${(ry+1.2).toFixed(1)}" width="1.6" height="${(rh-2.4).toFixed(1)}" fill="var(--c)" opacity=".85"/>`;
 s+=`<rect x="${(west?rx+rw-2:rx+.4).toFixed(1)}" y="${(ry+1.2).toFixed(1)}" width="1.6" height="${(rh-2.4).toFixed(1)}" fill="var(--o)" opacity=".7"/>`;
 s+=`<circle cx="${(west?rx+5:rx+rw-5).toFixed(1)}" cy="${(ry+rh/2).toFixed(1)}" r="1.4" fill="var(--g)"/>`;
 s+='</g>';}
@@ -3551,7 +3555,7 @@ for(let k=0;k<cnt;k++){n++;const xm=x0m+k*HALL_PLACE.cduPitch,x=X(xm),on=(cduRun
 cl+=L((x+uw*.3).toFixed(1),uy0,(x+uw*.3).toFixed(1),hS,'var(--c)',1,' stroke-opacity=".55"')+L((x+uw*.7).toFixed(1),uy0,(x+uw*.7).toFixed(1),hR,'var(--o)',1,' stroke-opacity=".55"');
 cl+=L((x+uw/2).toFixed(1),(uy0+uh).toFixed(1),(x+uw/2).toFixed(1),hwS,'var(--g)',1,' stroke-opacity=".7"');
 cg+=`<g class="cdu-click hp-cdu" data-cdu="${n}" data-rz-equipment="cdu:${n}" tabindex="0" role="button" data-tip="${lbl} · ${cduShort()} · ${on?'DUTY':'STANDBY'} · ${em(bn('cduRating'))} kWth rated · ${grp(bn('cduFlowPerUnitLpm'))} L/min · secondary to the corridor TCS headers, primary on the HTW header · at the end of rows R${pad2(2*p+1)}/R${pad2(2*p+2)} · click: CDU HMI">`;
-cg+=`<rect x="${x.toFixed(1)}" y="${uy0}" width="${uw.toFixed(1)}" height="${uh.toFixed(1)}" rx="1.4" class="hp-cab" stroke="${c}" stroke-width="${on?1:.8}" ${on?'':'stroke-dasharray="3 2"'}/>`;
+cg+=`<rect x="${nzf(x,1)}" y="${uy0}" width="${nzf(uw,1)}" height="${nzf(uh,1)}" rx="1.4" class="hp-cab" stroke="${c}" stroke-width="${on?1:.8}" ${on?'':'stroke-dasharray="3 2"'}/>`;
 cg+=`<path d="M${(x+uw/2).toFixed(1)} ${(uy0+3).toFixed(1)} l-3.4 2.5 l6.8 2.5 l-6.8 2.5 l6.8 2.5 l-6.8 2.5 l3.4 2.5" fill="none" stroke="${c}" stroke-width=".9" opacity="${on?1:.6}"/>`;
 cg+=`<circle cx="${(x+uw/2).toFixed(1)}" cy="${(uy0+uh-7).toFixed(1)}" r="4" fill="none" stroke="${c}" stroke-width=".9"/><path d="M${(x+uw/2-2.4).toFixed(1)} ${(uy0+uh-5).toFixed(1)} l2.4 -4.4 l2.4 4.4z" fill="${c}"/>`;
 cg+='</g>';}
@@ -3583,11 +3587,11 @@ for(let k=0;k<modsPer&&crahInst!=null&&crahN<crahInst;k++){crahN++;
 const xm=k*pitchFw+pitchFw*(1-HALL_PLACE.fanFill)/2,w=M(pitchFw*HALL_PLACE.fanFill),x=X(xm),on=(crahAct!=null)?crahN<=crahAct:true,c=on?'var(--b)':'var(--t3)',id=pad2(crahN);
 fc+=L((x+w/2).toFixed(1),chwY,(x+w/2).toFixed(1),coilY,'var(--b)',.8,' stroke-opacity=".5"');
 fw+=`<g class="crah-unit crah-click hp-crah" data-crah="CRAH-${id}" data-rz-equipment="crah:${id}" tabindex="0" role="button" data-tip="FAN-WALL MODULE CRAH-${id} · ${north?'north':'south'} gallery · ${on?'DUTY':'STANDBY'} · ${em(bn('crahRating'))} kW rated, ${em(bn('crahPerUnit'))} kW duty each · draws the hot aisles back from the ceiling plenum, discharges ${em(bn('airSupplyC'))} °C into the cold aisles · CHW coil · click: CRAH HMI">`;
-fw+=`<rect x="${x.toFixed(1)}" y="${fy0}" width="${w.toFixed(1)}" height="${fhh}" rx="1.2" class="hp-cab" stroke="${c}" stroke-width="${on?1:.8}" ${on?'':'stroke-dasharray="3 2"'}/>`;
+fw+=`<rect x="${nzf(x,1)}" y="${fy0}" width="${nzf(w,1)}" height="${fhh}" rx="1.2" class="hp-cab" stroke="${c}" stroke-width="${on?1:.8}" ${on?'':'stroke-dasharray="3 2"'}/>`;
 fw+=L((x+1.5).toFixed(1),coilY,(x+w-1.5).toFixed(1),coilY,'var(--c)',2,' stroke-dasharray="1.2 1.2" opacity=".8"');
 const fx=x+w/2,fyc=fy0+fhh/2,fr=Math.min(6,w/2.6);
-fw+=`<circle cx="${fx.toFixed(1)}" cy="${fyc.toFixed(1)}" r="${fr.toFixed(1)}" fill="none" stroke="${c}" stroke-width=".8"/>`;
-fw+=`<path d="M${fx.toFixed(1)} ${fyc.toFixed(1)} l0 ${(-fr*.85).toFixed(1)} M${fx.toFixed(1)} ${fyc.toFixed(1)} l${(fr*.74).toFixed(1)} ${(fr*.42).toFixed(1)} M${fx.toFixed(1)} ${fyc.toFixed(1)} l${(-fr*.74).toFixed(1)} ${(fr*.42).toFixed(1)}" stroke="${c}" stroke-width="1.1">${on?`<animateTransform attributeName="transform" type="rotate" from="0 ${fx.toFixed(1)} ${fyc.toFixed(1)}" to="360 ${fx.toFixed(1)} ${fyc.toFixed(1)}" dur="1.6s" repeatCount="indefinite"/>`:''}</path>`;
+fw+=`<circle cx="${nzf(fx,1)}" cy="${nzf(fyc,1)}" r="${nzf(fr,1)}" fill="none" stroke="${c}" stroke-width=".8"/>`;
+fw+=`<path d="M${nzf(fx,1)} ${nzf(fyc,1)} l0 ${(-fr*.85).toFixed(1)} M${nzf(fx,1)} ${nzf(fyc,1)} l${(fr*.74).toFixed(1)} ${(fr*.42).toFixed(1)} M${nzf(fx,1)} ${nzf(fyc,1)} l${(-fr*.74).toFixed(1)} ${(fr*.42).toFixed(1)}" stroke="${c}" stroke-width="1.1">${on?`<animateTransform attributeName="transform" type="rotate" from="0 ${nzf(fx,1)} ${nzf(fyc,1)}" to="360 ${nzf(fx,1)} ${nzf(fyc,1)}" dur="1.6s" repeatCount="indefinite"/>`:''}</path>`;
 fw+='</g>';}
 const ly=north?Y(.55)+4:Y(Wm-.55)+4;
 fw+=pill(X(.5),ly-11,M(37),15)+tx(X(.8),ly,'FAN-WALL GALLERY '+(north?'N':'S')+' · '+em(modsPer)+' modules at '+em(bn('fanWallPitchM'))+' m · CHW '+em(bn('chwSupplyC'))+'/'+em(bn('chwReturnC'))+' °C',
@@ -3601,7 +3605,7 @@ for(let p=0;p<pairs;p++)for(const cm of [pairM(p)+coldM/2,coldEm(p)+coldM/2]){co
 af+=`<line x1="${cx}" y1="${Y(gD)+2}" x2="${cx}" y2="${Y(gD+2.6)}" stroke="var(--b)" stroke-width="2" stroke-opacity=".7" marker-end="url(#hpArrB)"/>`;
 af+=`<line x1="${cx}" y1="${Y(yS0)-2}" x2="${cx}" y2="${Y(yS0-.75)}" stroke="var(--b)" stroke-width="1.6" stroke-opacity=".5" marker-end="url(#hpArrB)"/>`;}
 for(let p=0;p<pairs;p++){const hx=X(hotM0(p)+hotM);for(const f of [1/3,2/3]){const yy=Y(yF0+rowLm*f);
-af+=`<circle cx="${hx}" cy="${yy.toFixed(1)}" r="4.2" fill="none" stroke="var(--r)" stroke-width="1.1" stroke-opacity=".8"/><circle cx="${hx}" cy="${yy.toFixed(1)}" r="1.3" fill="var(--r)"/>`;}
+af+=`<circle cx="${hx}" cy="${nzf(yy,1)}" r="4.2" fill="none" stroke="var(--r)" stroke-width="1.1" stroke-opacity=".8"/><circle cx="${hx}" cy="${nzf(yy,1)}" r="1.3" fill="var(--r)"/>`;}
 af+=`<path d="M${hx} ${Y(yF0+1.4)} L${hx} ${Y(gD-1.1)}" stroke="var(--o)" stroke-width="3" stroke-opacity=".5" stroke-dasharray="8 6" fill="none" marker-end="url(#hpArrO)"><animate attributeName="stroke-dashoffset" values="0;28" dur="3s" repeatCount="indefinite"/></path>`;}
 af+='</g>';s+=af;
 s+=`<g class="hp-ly hp-ly-air">`+pill(X(39),Y(Wm-.55)-7,M(22.4),15)+tx(X(Lm-.6),Y(Wm-.55)+4,'COLD SUPPLY '+em(bn('airSupplyC'))+' °C into every cold aisle · both walls','var(--b)',9,'end',1,bo('airSupplyC',{nomark:true}))+'</g>';
@@ -5262,7 +5266,7 @@ function lfAnnot(x,y,p,q,i,c){
 var s='<rect x="'+x+'" y="'+y+'" width="52" height="26" rx="2" fill="rgba(0,0,0,.4)" stroke="'+c+'" stroke-width=".4"/>';
 s+=tx2(x+3,y+8,'P='+p+' kW',c,3.5);
 s+=tx2(x+3,y+16,'Q='+q+' kVAr',c,3.5);
-s+=tx2(x+3,y+24,'I='+i+' A',c,3.5);
+s+=tx2(x+3,y+24,'I='+nz(i)+' A',c,3.5);
 return s;
 }
 
@@ -5391,6 +5395,8 @@ return s;
 
 // Idea 12: Circuit breaker loading semicircle gauge
 function cbGauge(cx,cy,pct,c,gid){
+/* A5e: a loading without a sample draws the empty track and the dash, never an arc to NaN */
+if(pct==null||!isFinite(pct)){return '<path id="'+gid+'" d="M'+(cx-12)+' '+cy+' A12 12 0 0 1 '+(cx+12)+' '+cy+'" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="2"/>'+tx2(cx,cy-2,'\u2014',c,3,'middle',1);}
 var fc=pct<70?'var(--g)':pct<85?'var(--o)':'var(--r)';
 var ang=Math.PI*(1-pct/100);
 var ex=cx+12*Math.cos(ang),ey=cy-12*Math.sin(ang);
@@ -5403,6 +5409,8 @@ return s;
 
 // Idea 15: Cable ampacity utilization display
 function cableAmp(x,y,actual,rated,c){
+/* A5e: a current without a sample prints the dash, never null/455A (0%) */
+if(actual==null||!isFinite(actual)){return tx2(x,y,'\u2014/'+rated+'A',c,3.5);}
 var pct=Math.round(actual/rated*100);
 var fc=pct<70?'var(--g)':pct<85?'var(--o)':'var(--r)';
 return tx2(x,y,actual+'/'+rated+'A ('+pct+'%)',fc,3.5);
@@ -5718,23 +5726,23 @@ s+=lossAnnot(760,358,P.v('auto_23'),P.v('auto_24'));
 s+=sectionSep(355,'LEVEL 2 — MONITORING');
 s+=bx2(80,360,360,50,CA);s+=tx2(260,375,'FEED A — SIMULATED PARAMETERS',CA,5,'middle',1);
 s+=lv('mm-va',100,395,P.v('auto_25')+' kV',CA,5);s+=tx2(100,405,'Bus V','var(--t3)',3.5);
-s+=lv('mm-ia',180,395,P.n('auto_26')+' A',CA,5,0,{declared:'simulated MV incomer current reading (240-280 A at 20 kV); the engine publishes no MV current'});s+=tx2(180,405,'Current','var(--t3)',3.5);
+s+=lv('mm-ia',180,395,P.v('auto_26')+' A',CA,5,0,{declared:'simulated MV incomer current reading (240-280 A at 20 kV); the engine publishes no MV current'});s+=tx2(180,405,'Current','var(--t3)',3.5);
 s+=lv('mm-pa',260,395,P.v('auto_27')+' MW',CA,5);s+=tx2(260,405,'Power','var(--t3)',3.5);
 s+=lv('mm-pfa',340,395,P.v('auto_28'),'var(--g)',5);s+=tx2(340,405,'PF','var(--t3)',3.5);
 s+=lv('mm-sf6a',420,395,P.v('auto_29')+' bar','var(--c)',5);s+=tx2(420,405,'SF6','var(--t3)',3.5);
 
 s+=bx2(480,360,360,50,CG);s+=tx2(660,375,'FEED B — SIMULATED PARAMETERS',CG,5,'middle',1);
 s+=lv('mm-vb',500,395,P.v('auto_30')+' kV',CG,5);s+=tx2(500,405,'Bus V','var(--t3)',3.5);
-s+=lv('mm-ib',580,395,P.n('auto_31')+' A',CG,5);s+=tx2(580,405,'Current','var(--t3)',3.5);
+s+=lv('mm-ib',580,395,P.v('auto_31')+' A',CG,5);s+=tx2(580,405,'Current','var(--t3)',3.5);
 s+=lv('mm-pb',660,395,P.v('auto_32')+' MW',CG,5);s+=tx2(660,405,'Power','var(--t3)',3.5);
 s+=lv('mm-pfb',740,395,P.v('auto_33'),'var(--g)',5);s+=tx2(740,405,'PF','var(--t3)',3.5);
 s+=lv('mm-sf6b',820,395,P.v('auto_34')+' bar','var(--c)',5);s+=tx2(820,405,'SF6','var(--t3)',3.5);
 
 // Temperature
 s+=bx2(200,420,520,45,'var(--o)');s+=tx2(460,435,'ENVIRONMENT','var(--o)',5,'middle',1);
-s+=lv('mm-ta',280,455,P.n('auto_35')+'°C','var(--o)',5);s+=tx2(280,465,'Ambient','var(--t3)',3.5);
-s+=lv('mm-tb',400,455,P.n('auto_36')+'°C','var(--o)',5);s+=tx2(400,465,'Switchgear','var(--t3)',3.5);
-s+=lv('mm-hum',520,455,P.n('auto_37')+'% RH','var(--c)',5);s+=tx2(520,465,'Humidity','var(--t3)',3.5);
+s+=lv('mm-ta',280,455,P.v('auto_35')+'°C','var(--o)',5);s+=tx2(280,465,'Ambient','var(--t3)',3.5);
+s+=lv('mm-tb',400,455,P.v('auto_36')+'°C','var(--o)',5);s+=tx2(400,465,'Switchgear','var(--t3)',3.5);
+s+=lv('mm-hum',520,455,P.v('auto_37')+'% RH','var(--c)',5);s+=tx2(520,465,'Humidity','var(--t3)',3.5);
 s+=lv('mm-freq',640,455,P.v('auto_38')+' Hz','var(--g)',5);s+=tx2(640,465,'Frequency','var(--t3)',3.5);
 
 // Idea 41: Tooltip zones — MV Substation
@@ -5759,17 +5767,17 @@ svg.innerHTML=s;
 startTimer(function(){P=RZ_HMI_P('sld-mv-sub','dh0'+dh,dh,'renderMvSub');
 var e=$('mm-va');if(e)e.textContent=P.v('mm-va')+' kV';
 e=$('mm-vb');if(e)e.textContent=P.v('mm-vb')+' kV';
-e=$('mm-ia');if(e)e.textContent=P.n('mm-ia')+' A';
-e=$('mm-ib');if(e)e.textContent=P.n('mm-ib')+' A';
+e=$('mm-ia');if(e)e.textContent=P.v('mm-ia')+' A';
+e=$('mm-ib');if(e)e.textContent=P.v('mm-ib')+' A';
 e=$('mm-pa');if(e)e.textContent=P.v('mm-pa')+' MW';
 e=$('mm-pb');if(e)e.textContent=P.v('mm-pb')+' MW';
 e=$('mm-pfa');if(e)e.textContent=P.v('mm-pfa');
 e=$('mm-pfb');if(e)e.textContent=P.v('mm-pfb');
 e=$('mm-sf6a');if(e)e.textContent=P.v('mm-sf6a')+' bar';
 e=$('mm-sf6b');if(e)e.textContent=P.v('mm-sf6b')+' bar';
-e=$('mm-ta');if(e)e.textContent=P.n('mm-ta')+'°C';
-e=$('mm-tb');if(e)e.textContent=P.n('mm-tb')+'°C';
-e=$('mm-hum');if(e)e.textContent=P.n('mm-hum')+'% RH';
+e=$('mm-ta');if(e)e.textContent=P.v('mm-ta')+'°C';
+e=$('mm-tb');if(e)e.textContent=P.v('mm-tb')+'°C';
+e=$('mm-hum');if(e)e.textContent=P.v('mm-hum')+'% RH';
 e=$('mm-freq');if(e)e.textContent=P.v('mm-freq')+' Hz';
 // Idea 26: voltage profile bus color update
 var vpu=parseFloat(P.v('auto_39'));var vpe=$('vp-mvA');if(vpe)vpe.setAttribute('fill',vProfileColor(vpu));
@@ -5854,20 +5862,20 @@ s+='<rect x="580" y="205" width="220" height="14" rx="2" fill="url(#mvGrad)" opa
 // Live parameters
 s+=bx2(60,260,380,55,CA);s+=tx2(250,275,'FEED A — SIMULATED',CA,5,'middle',1);
 s+=lv('mr-va',80,295,P.v('auto_17')+' kV',CA,5);s+=tx2(80,305,'Voltage','var(--t3)',3.5);
-s+=lv('mr-ia',180,295,P.n('auto_18')+' A',CA,5);s+=tx2(180,305,'Current','var(--t3)',3.5);
+s+=lv('mr-ia',180,295,P.v('auto_18')+' A',CA,5);s+=tx2(180,305,'Current','var(--t3)',3.5);
 s+=lv('mr-pa',280,295,P.v('auto_19')+' MW',CA,5);s+=tx2(280,305,'Power','var(--t3)',3.5);
 s+=lv('mr-sf6a',380,295,P.v('auto_20')+' bar','var(--c)',5);s+=tx2(380,305,'Gas P','var(--t3)',3.5);
 
 s+=bx2(480,260,380,55,CG);s+=tx2(670,275,'FEED B — SIMULATED',CG,5,'middle',1);
 s+=lv('mr-vb',500,295,P.v('auto_21')+' kV',CG,5);s+=tx2(500,305,'Voltage','var(--t3)',3.5);
-s+=lv('mr-ib',600,295,P.n('auto_22')+' A',CG,5);s+=tx2(600,305,'Current','var(--t3)',3.5);
+s+=lv('mr-ib',600,295,P.v('auto_22')+' A',CG,5);s+=tx2(600,305,'Current','var(--t3)',3.5);
 s+=lv('mr-pb',700,295,P.v('auto_23')+' MW',CG,5);s+=tx2(700,305,'Power','var(--t3)',3.5);
 s+=lv('mr-sf6b',800,295,P.v('auto_24')+' bar','var(--c)',5);s+=tx2(800,305,'Gas P','var(--t3)',3.5);
 // Temp
 s+=bx2(250,330,420,45,'var(--o)');s+=tx2(460,345,'ENVIRONMENT','var(--o)',5,'middle',1);
-s+=lv('mr-ta',320,365,P.n('auto_25')+'°C','var(--o)',5);s+=tx2(320,375,'Panel','var(--t3)',3.5);
-s+=lv('mr-tb',440,365,P.n('auto_26')+'°C','var(--c)',5);s+=tx2(440,375,'Ambient','var(--t3)',3.5);
-s+=lv('mr-hum',560,365,P.n('auto_27')+'% RH','var(--c)',5);s+=tx2(560,375,'Humidity','var(--t3)',3.5);
+s+=lv('mr-ta',320,365,P.v('auto_25')+'°C','var(--o)',5);s+=tx2(320,375,'Panel','var(--t3)',3.5);
+s+=lv('mr-tb',440,365,P.v('auto_26')+'°C','var(--c)',5);s+=tx2(440,375,'Ambient','var(--t3)',3.5);
+s+=lv('mr-hum',560,365,P.v('auto_27')+'% RH','var(--c)',5);s+=tx2(560,375,'Humidity','var(--t3)',3.5);
 // Idea 30: Voltage deviation badge
 s+=vDevBadge(W-120,5);
 // Idea 7: Bus node IDs on RMU buses
@@ -5877,7 +5885,7 @@ s+=titleBlock(W-260,H-48,250,'SLD-RMU-'+dh,'A',dh);
 
 svg.innerHTML=s;
 startTimer(function(){P=RZ_HMI_P('sld-rmu','dh0'+dh,dh,'renderRmu');
-var ids=[['mr-va',function(){return P.v('auto_28')+' kV'}],['mr-vb',function(){return P.v('auto_29')+' kV'}],['mr-ia',function(){return P.n('auto_30')+' A'}],['mr-ib',function(){return P.n('auto_31')+' A'}],['mr-pa',function(){return P.v('auto_32')+' MW'}],['mr-pb',function(){return P.v('auto_33')+' MW'}],['mr-sf6a',function(){return P.v('auto_34')+' bar'}],['mr-sf6b',function(){return P.v('auto_35')+' bar'}],['mr-ta',function(){return P.n('auto_36')+'°C'}],['mr-tb',function(){return P.n('auto_37')+'°C'}],['mr-hum',function(){return P.n('auto_38')+'% RH'}]];
+var ids=[['mr-va',function(){return P.v('auto_28')+' kV'}],['mr-vb',function(){return P.v('auto_29')+' kV'}],['mr-ia',function(){return P.v('auto_30')+' A'}],['mr-ib',function(){return P.v('auto_31')+' A'}],['mr-pa',function(){return P.v('auto_32')+' MW'}],['mr-pb',function(){return P.v('auto_33')+' MW'}],['mr-sf6a',function(){return P.v('auto_34')+' bar'}],['mr-sf6b',function(){return P.v('auto_35')+' bar'}],['mr-ta',function(){return P.v('auto_36')+'°C'}],['mr-tb',function(){return P.v('auto_37')+'°C'}],['mr-hum',function(){return P.v('auto_38')+'% RH'}]];
 ids.forEach(function(p){var e=$(p[0]);if(e)e.textContent=p[1]()});
 // Idea 26: voltage profile bus color update
 var vpu=parseFloat(P.v('auto_39'));var vpe=$('vp-rmuA');if(vpe)vpe.setAttribute('fill',vProfileColor(vpu));
@@ -5927,8 +5935,8 @@ s+=tx2(160,205,'LV BUSHING 400V',CA,4.5,'middle',1);
 s+=lossAnnot(240,270,P.v('auto_13'),P.v('auto_14'));
 // PT100 sensors
 s+=bx2(260,85,160,70,'var(--o)');s+=tx2(340,100,'PT100 SENSORS','var(--o)',4.5,'middle',1);
-s+=lv('mt-wa',280,118,P.n('auto_15')+'°C','var(--o)',4.5);s+=tx2(280,128,'Winding','var(--t3)',3.5);
-s+=lv('mt-ca',370,118,P.n('auto_16')+'°C','var(--o)',4.5);s+=tx2(370,128,'Core','var(--t3)',3.5);
+s+=lv('mt-wa',280,118,P.v('auto_15')+'°C','var(--o)',4.5);s+=tx2(280,128,'Winding','var(--t3)',3.5);
+s+=lv('mt-ca',370,118,P.v('auto_16')+'°C','var(--o)',4.5);s+=tx2(370,128,'Core','var(--t3)',3.5);
 // Cooling fans
 s+=symMotor(280,180,'var(--c)');s+=tx2(295,178,'FAN-1','var(--c)',3.5);s+=lv('mt-f1a',295,188,'AUTO','var(--g)',3.5);
 s+=symMotor(340,180,'var(--c)');s+=tx2(355,178,'FAN-2','var(--c)',3.5);s+=lv('mt-f2a',355,188,'AUTO','var(--g)',3.5);
@@ -5941,8 +5949,8 @@ s+=fl2(160,215,160,240,CA,'fD');s+=symCBe(160,250,CA,true,'LSI');s+=tx2(190,248,
 // Live params A
 s+=bx2(55,270,370,40,CA);s+=tx2(240,282,'SIMULATED STATUS',CA,4.5,'middle',1);
 s+=lv('mt-pva',75,300,P.v('auto_17')+' kV',CA,4.5);s+=tx2(75,310,'Primary','var(--t3)',3);
-s+=lv('mt-sva',170,300,P.n('auto_18')+' V',CA,4.5);s+=tx2(170,310,'Secondary','var(--t3)',3);
-s+=lv('mt-lda',265,300,P.n('auto_19')+' kVA','var(--o)',4.5);s+=tx2(265,310,'Load','var(--t3)',3);
+s+=lv('mt-sva',170,300,P.v('auto_18')+' V',CA,4.5);s+=tx2(170,310,'Secondary','var(--t3)',3);
+s+=lv('mt-lda',265,300,P.v('auto_19')+' kVA','var(--o)',4.5);s+=tx2(265,310,'Load','var(--t3)',3);
 s+=lv('mt-effa',370,300,P.v('auto_20')+'%','var(--g)',4.5);s+=tx2(370,310,'Efficiency','var(--t3)',3);
 
 // TX-B (right) — Idea 49: bx3 beveled panel box
@@ -5973,16 +5981,16 @@ s+=tx2(680,205,'LV BUSHING 400V',CG,4.5,'middle',1);
 // Idea 2: Power loss annotation near ACB TX-B
 s+=lossAnnot(700,270,P.v('auto_33'),P.v('auto_34'));
 s+=bx2(500,85,160,70,'var(--o)');s+=tx2(580,100,'PT100 SENSORS','var(--o)',4.5,'middle',1);
-s+=lv('mt-wb',520,118,P.n('auto_35')+'°C','var(--o)',4.5);s+=tx2(520,128,'Winding','var(--t3)',3.5);
-s+=lv('mt-cb',610,118,P.n('auto_36')+'°C','var(--o)',4.5);s+=tx2(610,128,'Core','var(--t3)',3.5);
+s+=lv('mt-wb',520,118,P.v('auto_35')+'°C','var(--o)',4.5);s+=tx2(520,128,'Winding','var(--t3)',3.5);
+s+=lv('mt-cb',610,118,P.v('auto_36')+'°C','var(--o)',4.5);s+=tx2(610,128,'Core','var(--t3)',3.5);
 s+=symMotor(600,180,'var(--c)');s+=tx2(615,178,'FAN-1','var(--c)',3.5);s+=lv('mt-f1b',615,188,'AUTO','var(--g)',3.5);
 s+=symMotor(660,180,'var(--c)');s+=tx2(675,178,'FAN-2','var(--c)',3.5);s+=lv('mt-f2b',675,188,'AUTO','var(--g)',3.5);
 s+=symSensor(620,210,CG,'BH');s+=tx2(600,225,'Buchholz','var(--t3)',3.5,'middle');
 s+=fl2(680,215,680,240,CG,'fD');s+=symCBe(680,250,CG,true,'LSI');s+=tx2(710,248,'ACB-'+dh+'B',CG,4.5,0,1);s+=tx2(710,258,(DHE?(DHE.buswayAFmt+' A class ACB'):'—'),'var(--t3)',4);
 s+=bx2(495,270,370,40,CG);s+=tx2(680,282,'SIMULATED STATUS',CG,4.5,'middle',1);
 s+=lv('mt-pvb',515,300,P.v('auto_37')+' kV',CG,4.5);s+=tx2(515,310,'Primary','var(--t3)',3);
-s+=lv('mt-svb',610,300,P.n('auto_38')+' V',CG,4.5);s+=tx2(610,310,'Secondary','var(--t3)',3);
-s+=lv('mt-ldb',705,300,P.n('auto_39')+' kVA','var(--o)',4.5);s+=tx2(705,310,'Load','var(--t3)',3);
+s+=lv('mt-svb',610,300,P.v('auto_38')+' V',CG,4.5);s+=tx2(610,310,'Secondary','var(--t3)',3);
+s+=lv('mt-ldb',705,300,P.v('auto_39')+' kVA','var(--o)',4.5);s+=tx2(705,310,'Load','var(--t3)',3);
 s+=lv('mt-effb',810,300,P.v('auto_40')+'%','var(--g)',4.5);s+=tx2(810,310,'Efficiency','var(--t3)',3);
 
 // Idea 22: Animated flow particles along TX feeder paths
@@ -6011,8 +6019,8 @@ s+=tipZone(480,35,400,280,'<b>TX-'+dh+'B — ABB RESIBLOC</b><div class=&quot;tt
 s+=cbToggle(160,250,'txA-acb');
 s+=cbToggle(680,250,'txB-acb');
 // Idea 48: Nameplate vs actual comparison
-s+=nameplate(310,160,[['Rated',(DHE?DHE.txRatingMVA+' MVA':'\u2014')],['Actual',P.v('auto_41')+' MVA'],['Margin',P.n('auto_42')+'%']]);
-s+=nameplate(780,160,[['Rated',(DHE?DHE.txRatingMVA+' MVA':'\u2014')],['Actual',P.v('auto_43')+' MVA'],['Margin',P.n('auto_44')+'%']]);
+s+=nameplate(310,160,[['Rated',(DHE?DHE.txRatingMVA+' MVA':'\u2014')],['Actual',P.v('auto_41')+' MVA'],['Margin',P.v('auto_42')+'%']]);
+s+=nameplate(780,160,[['Rated',(DHE?DHE.txRatingMVA+' MVA':'\u2014')],['Actual',P.v('auto_43')+' MVA'],['Margin',P.v('auto_44')+'%']]);
 // Idea 30: Voltage deviation badge
 s+=vDevBadge(W-120,5);
 // Idea 37: Title block
@@ -6023,7 +6031,7 @@ s+='<g id="alm-txB" style="display:none">'+alarmIcon(600,200,'WINDING TEMP')+'</
 
 svg.innerHTML=s;
 startTimer(function(){P=RZ_HMI_P('sld-tx','dh0'+dh,dh,'renderTx');
-[['mt-wa',function(){return P.n('auto_45')+'°C'}],['mt-wb',function(){return P.n('auto_46')+'°C'}],['mt-ca',function(){return P.n('auto_47')+'°C'}],['mt-cb',function(){return P.n('auto_48')+'°C'}],['mt-pva',function(){return P.v('auto_49')+' kV'}],['mt-pvb',function(){return P.v('auto_50')+' kV'}],['mt-sva',function(){return P.n('auto_51')+' V'}],['mt-svb',function(){return P.n('auto_52')+' V'}],['mt-lda',function(){return P.n('auto_53')+' kVA'}],['mt-ldb',function(){return P.n('auto_54')+' kVA'}],['mt-effa',function(){return P.v('auto_55')+'%'}],['mt-effb',function(){return P.v('auto_56')+'%'}],['mt-f1a',function(){return P.n('auto_57')>65?'ON':'AUTO'}],['mt-f2a',function(){return P.n('auto_58')>65?'ON':'AUTO'}],['mt-f1b',function(){return P.n('auto_59')>65?'ON':'AUTO'}],['mt-f2b',function(){return P.n('auto_60')>65?'ON':'AUTO'}],['mt-tapa',function(){return'Tap '+P.n('auto_61')}],['mt-tapb',function(){return'Tap '+P.n('auto_62')}]].forEach(function(p){var e=$(p[0]);if(e)e.textContent=p[1]()});
+[['mt-wa',function(){return P.v('auto_45')+'°C'}],['mt-wb',function(){return P.v('auto_46')+'°C'}],['mt-ca',function(){return P.v('auto_47')+'°C'}],['mt-cb',function(){return P.v('auto_48')+'°C'}],['mt-pva',function(){return P.v('auto_49')+' kV'}],['mt-pvb',function(){return P.v('auto_50')+' kV'}],['mt-sva',function(){return P.v('auto_51')+' V'}],['mt-svb',function(){return P.v('auto_52')+' V'}],['mt-lda',function(){return P.v('auto_53')+' kVA'}],['mt-ldb',function(){return P.v('auto_54')+' kVA'}],['mt-effa',function(){return P.v('auto_55')+'%'}],['mt-effb',function(){return P.v('auto_56')+'%'}],['mt-f1a',function(){return P.n('auto_57')>65?'ON':'AUTO'}],['mt-f2a',function(){return P.n('auto_58')>65?'ON':'AUTO'}],['mt-f1b',function(){return P.n('auto_59')>65?'ON':'AUTO'}],['mt-f2b',function(){return P.n('auto_60')>65?'ON':'AUTO'}],['mt-tapa',function(){return'Tap '+P.n('auto_61')}],['mt-tapb',function(){return'Tap '+P.n('auto_62')}]].forEach(function(p){var e=$(p[0]);if(e)e.textContent=p[1]()});
 // Idea 11: TX loading bar live update
 var lp=P.n('loading_pct');var tlb=$('tlb-a');if(tlb){tlb.setAttribute('height',Math.round(60*lp/100));tlb.setAttribute('y',95+60-Math.round(60*lp/100));tlb.setAttribute('fill',lp<70?'rgba(34,197,94,.4)':lp<85?'rgba(245,158,11,.4)':'rgba(239,68,68,.4)')}
 lp=P.n('loading_pct');tlb=$('tlb-b');if(tlb){tlb.setAttribute('height',Math.round(60*lp/100));tlb.setAttribute('y',95+60-Math.round(60*lp/100));tlb.setAttribute('fill',lp<70?'rgba(34,197,94,.4)':lp<85?'rgba(245,158,11,.4)':'rgba(239,68,68,.4)')}
@@ -6085,7 +6093,7 @@ s+=vDropAnnot(240,105,'-'+P.v('auto_10'),'-'+P.v('auto_11'),CA);
 // 3-phase labels
 s+=tx2(80,140,'L1','var(--pk)',4);s+=tx2(110,140,'L2','var(--o)',4);s+=tx2(140,140,'L3','var(--b)',4);s+=tx2(170,140,'N','var(--t3)',4);s+=symEarth(170,152,CA);
 // Live line
-s+=lv('msb-va',240,140,P.n('auto_12')+'V | '+P.n('auto_13')+'A | PF '+P.v('auto_14'),'var(--g)',4.5,0,P.optAll(["auto_12", "auto_13", "auto_14"]));
+s+=lv('msb-va',240,140,P.v('auto_12')+'V | '+P.v('auto_13')+'A | PF '+P.v('auto_14'),'var(--g)',4.5,0,P.optAll(["auto_12", "auto_13", "auto_14"]));
 // THD
 s+=lv('msb-thda',240,150,'THD: '+P.v('auto_15')+'%','var(--c)',4,0,P.optAll(["auto_15"]));
 // Outgoing feeders from A
@@ -6137,7 +6145,7 @@ s+=afLabel(530,134,P.v('auto_24'),2);
 // Idea 4: Voltage drop annotation below incoming ACB to bus MSB-B
 s+=vDropAnnot(640,105,'-'+P.v('auto_25'),'-'+P.v('auto_26'),CG);
 s+=tx2(510,140,'L1','var(--pk)',4);s+=tx2(540,140,'L2','var(--o)',4);s+=tx2(570,140,'L3','var(--b)',4);s+=tx2(600,140,'N','var(--t3)',4);s+=symEarth(600,152,CG);
-s+=lv('msb-vb',670,140,P.n('auto_27')+'V | '+P.n('auto_28')+'A | PF '+P.v('auto_29'),'var(--g)',4.5,0,P.optAll(["auto_27", "auto_28", "auto_29"]));
+s+=lv('msb-vb',670,140,P.v('auto_27')+'V | '+P.v('auto_28')+'A | PF '+P.v('auto_29'),'var(--g)',4.5,0,P.optAll(["auto_27", "auto_28", "auto_29"]));
 s+=lv('msb-thdb',670,150,'THD: '+P.v('auto_30')+'%','var(--c)',4,0,P.optAll(["auto_30"]));
 var oB=[{n:'ACB-UPS-'+dh+'B',sp:'4000A|65kA',c:CG},{n:'MCCB-COOL-'+dh,sp:'1250A|50kA',c:'var(--b)'},{n:'MCCB-AUX',sp:'400A|25kA',c:'var(--t2)'}];
 for(var i=0;i<oB.length;i++){var ox=510+i*140,oy=165;
@@ -6158,16 +6166,16 @@ s+=tieArrow(460,152,'0','OPEN');
 s+=sectionSep(290,'PER-PHASE MONITORING');
 s+=bx2(60,300,380,80,CA);s+=tx2(250,315,'FEED A — PER-PHASE SIMULATED',CA,5,'middle',1);
 var ph=['L1','L2','L3'];for(var i=0;i<3;i++){
-s+=lv('msb-l'+i+'a',90+i*120,340,P.n('auto_31')+' V','var(--g)',5,0,P.optAll(["auto_31"]));
+s+=lv('msb-l'+i+'a',90+i*120,340,P.v('auto_31')+' V','var(--g)',5,0,P.optAll(["auto_31"]));
 s+=tx2(90+i*120,355,ph[i]+'-N Voltage','var(--t3)',3.5);
-s+=lv('msb-i'+i+'a',90+i*120,370,P.n('auto_32')+' A','var(--o)',5,0,P.optAll(["auto_32"]));
+s+=lv('msb-i'+i+'a',90+i*120,370,P.v('auto_32')+' A','var(--o)',5,0,P.optAll(["auto_32"]));
 s+=tx2(90+i*120,380,ph[i]+' Current','var(--t3)',3.5)}
 
 s+=bx2(480,300,380,80,CG);s+=tx2(670,315,'FEED B — PER-PHASE SIMULATED',CG,5,'middle',1);
 for(var i=0;i<3;i++){
-s+=lv('msb-l'+i+'b',510+i*120,340,P.n('auto_33')+' V','var(--g)',5,0,P.optAll(["auto_33"]));
+s+=lv('msb-l'+i+'b',510+i*120,340,P.v('auto_33')+' V','var(--g)',5,0,P.optAll(["auto_33"]));
 s+=tx2(510+i*120,355,ph[i]+'-N Voltage','var(--t3)',3.5);
-s+=lv('msb-i'+i+'b',510+i*120,370,P.n('auto_34')+' A','var(--o)',5,0,P.optAll(["auto_34"]));
+s+=lv('msb-i'+i+'b',510+i*120,370,P.v('auto_34')+' A','var(--o)',5,0,P.optAll(["auto_34"]));
 s+=tx2(510+i*120,380,ph[i]+' Current','var(--t3)',3.5)}
 // Idea 28: Per-phase voltage bar charts
 s+=phaseBarChart(395,305,P.n('auto_35'),P.n('auto_36'),P.n('auto_37'),230);
@@ -6198,12 +6206,12 @@ s+='<g id="alm-msbB" style="display:none">'+alarmIcon(820,160,'OVERLOAD')+'</g>'
 
 svg.innerHTML=s;
 startTimer(function(){P=RZ_HMI_P('sld-msb','dh0'+dh,dh,'renderMsb');
-[['msb-va',function(){return P.n('auto_41')+'V | '+(DHE?Math.round(DHE.reqCurrentA+P.n('auto_42')):null)+'A | PF '+P.v('auto_43')}],['msb-vb',function(){return P.n('auto_44')+'V | '+(DHE?Math.round(DHE.reqCurrentA+P.n('auto_45')):null)+'A | PF '+P.v('auto_46')}],['msb-thda',function(){return'THD: '+P.v('auto_47')+'%'}],['msb-thdb',function(){return'THD: '+P.v('auto_48')+'%'}],['msb-gen',semanticGeneratorState],['msb-tie',function(){return'OPEN'}],['msb-kw',function(){return (DHE?Math.round(DHE.itHall+P.n('auto_49')):null)+' kW'}]].forEach(function(p){var e=$(p[0]);if(e)e.textContent=p[1]()});
+[['msb-va',function(){return P.v('auto_41')+'V | '+(DHE?Math.round(DHE.reqCurrentA+P.n('auto_42')):null)+'A | PF '+P.v('auto_43')}],['msb-vb',function(){return P.v('auto_44')+'V | '+(DHE?Math.round(DHE.reqCurrentA+P.n('auto_45')):null)+'A | PF '+P.v('auto_46')}],['msb-thda',function(){return'THD: '+P.v('auto_47')+'%'}],['msb-thdb',function(){return'THD: '+P.v('auto_48')+'%'}],['msb-gen',semanticGeneratorState],['msb-tie',function(){return'OPEN'}],['msb-kw',function(){return (DHE?Math.round(DHE.itHall+P.n('auto_49')):null)+' kW'}]].forEach(function(p){var e=$(p[0]);if(e)e.textContent=p[1]()});
 for(var i=0;i<3;i++){var e;
-e=$('msb-l'+i+'a');if(e)e.textContent=P.n('textContent_1')+' V';
-e=$('msb-i'+i+'a');if(e)e.textContent=P.n('textContent_2')+' A';
-e=$('msb-l'+i+'b');if(e)e.textContent=P.n('textContent_3')+' V';
-e=$('msb-i'+i+'b');if(e)e.textContent=P.n('textContent_4')+' A'}
+e=$('msb-l'+i+'a');if(e)e.textContent=P.v('textContent_1')+' V';
+e=$('msb-i'+i+'a');if(e)e.textContent=P.v('textContent_2')+' A';
+e=$('msb-l'+i+'b');if(e)e.textContent=P.v('textContent_3')+' V';
+e=$('msb-i'+i+'b');if(e)e.textContent=P.v('textContent_4')+' A'}
 // Idea 9: Bus loading bar dynamic update MSB
 var lp=P.n('group_current');var bl=$('blb-msbA');if(bl){bl.setAttribute('width',Math.round(390*lp/100));bl.setAttribute('fill',lp<70?'rgba(34,197,94,.4)':lp<85?'rgba(245,158,11,.4)':'rgba(239,68,68,.4)')}
 lp=P.n('group_current');bl=$('blb-msbB');if(bl){bl.setAttribute('width',Math.round(390*lp/100));bl.setAttribute('fill',lp<70?'rgba(34,197,94,.4)':lp<85?'rgba(245,158,11,.4)':'rgba(239,68,68,.4)')}
@@ -6287,7 +6295,7 @@ s+='<line x1="'+(ux+150)+'" y1="90" x2="'+(ux+165)+'" y2="90" stroke="'+c+'" str
 s+='<line x1="'+(ux+165)+'" y1="90" x2="'+(ux+165)+'" y2="155" stroke="var(--o)" stroke-width="2" opacity=".5"/>';
 s+=flowParticle(ux+165,90,155,1.2,'var(--o)');
 s+=tx2(ux+170,125,'DC','var(--o)',3.5,0,1);
-s+=tx2(ux+170,133,P.n('auto_1')+' V','var(--t3)',3,0,0,P.optAll(["auto_1"]));
+s+=tx2(ux+170,133,P.v('auto_1')+' V','var(--t3)',3,0,0,P.optAll(["auto_1"]));
 // DC bus node
 s+='<circle cx="'+(ux+165)+'" cy="155" r="2" fill="var(--o)"/>';
 
@@ -6385,7 +6393,7 @@ var ldColor=ldPct<70?'var(--g)':ldPct<85?'var(--o)':'var(--r)';
 s+='<path id="ug-arc'+sfx+'" d="M'+(gcx-gr)+' '+gcy+' A'+gr+' '+gr+' 0 '+ldLarge+' 1 '+ldEx.toFixed(1)+' '+ldEy.toFixed(1)+'" fill="none" stroke="'+ldColor+'" stroke-width="6" stroke-linecap="round"/>';
 // Center load text
 s+=lv('ug-pct'+sfx,gcx,gcy-10,ldPct+'%',ldColor,14,'middle',P.optAll(["ldPct"]));
-s+=lv('ug-kw'+sfx,gcx,gcy+2,'Load: '+P.n('auto_2')+' kW','var(--t2)',4.5,'middle',P.optAll(["auto_2"]));
+s+=lv('ug-kw'+sfx,gcx,gcy+2,'Load: '+P.v('auto_2')+' kW','var(--t2)',4.5,'middle',P.optAll(["auto_2"]));
 
 // ---- Voltage table ----
 var ty=gcy+18;
@@ -6397,23 +6405,23 @@ s+=tx2(rx+120,ty+10,'B','var(--t3)',3.5,'middle',1);
 s+=tx2(rx+150,ty+10,'C','var(--t3)',3.5,'middle',1);
 // Input row
 s+=tx2(rx+40,ty+21,'Input','var(--t3)',3.5,'middle');
-s+=lv('uv-inA'+sfx,rx+90,ty+21,P.n('auto_3')+'','var(--g)',3.5,'middle',P.optAll(["auto_3"]));
-s+=lv('uv-inB'+sfx,rx+120,ty+21,P.n('auto_4')+'','var(--g)',3.5,'middle',P.optAll(["auto_4"]));
-s+=lv('uv-inC'+sfx,rx+150,ty+21,P.n('auto_5')+'','var(--g)',3.5,'middle',P.optAll(["auto_5"]));
+s+=lv('uv-inA'+sfx,rx+90,ty+21,P.v('auto_3')+'','var(--g)',3.5,'middle',P.optAll(["auto_3"]));
+s+=lv('uv-inB'+sfx,rx+120,ty+21,P.v('auto_4')+'','var(--g)',3.5,'middle',P.optAll(["auto_4"]));
+s+=lv('uv-inC'+sfx,rx+150,ty+21,P.v('auto_5')+'','var(--g)',3.5,'middle',P.optAll(["auto_5"]));
 // Output row
 s+=tx2(rx+40,ty+31,'Output','var(--t3)',3.5,'middle');
-s+=lv('uv-outA'+sfx,rx+90,ty+31,P.n('auto_6')+'','var(--g)',3.5,'middle',P.optAll(["auto_6"]));
-s+=lv('uv-outB'+sfx,rx+120,ty+31,P.n('auto_7')+'','var(--g)',3.5,'middle',P.optAll(["auto_7"]));
-s+=lv('uv-outC'+sfx,rx+150,ty+31,P.n('auto_8')+'','var(--g)',3.5,'middle',P.optAll(["auto_8"]));
+s+=lv('uv-outA'+sfx,rx+90,ty+31,P.v('auto_6')+'','var(--g)',3.5,'middle',P.optAll(["auto_6"]));
+s+=lv('uv-outB'+sfx,rx+120,ty+31,P.v('auto_7')+'','var(--g)',3.5,'middle',P.optAll(["auto_7"]));
+s+=lv('uv-outC'+sfx,rx+150,ty+31,P.v('auto_8')+'','var(--g)',3.5,'middle',P.optAll(["auto_8"]));
 // Bypass row
 s+=tx2(rx+40,ty+41,'Bypass','var(--t3)',3.5,'middle');
-s+=lv('uv-bypA'+sfx,rx+90,ty+41,P.n('auto_9')+'','var(--t3)',3.5,'middle',P.optAll(["auto_9"]));
-s+=lv('uv-bypB'+sfx,rx+120,ty+41,P.n('auto_10')+'','var(--t3)',3.5,'middle',P.optAll(["auto_10"]));
-s+=lv('uv-bypC'+sfx,rx+150,ty+41,P.n('auto_11')+'','var(--t3)',3.5,'middle',P.optAll(["auto_11"]));
+s+=lv('uv-bypA'+sfx,rx+90,ty+41,P.v('auto_9')+'','var(--t3)',3.5,'middle',P.optAll(["auto_9"]));
+s+=lv('uv-bypB'+sfx,rx+120,ty+41,P.v('auto_10')+'','var(--t3)',3.5,'middle',P.optAll(["auto_10"]));
+s+=lv('uv-bypC'+sfx,rx+150,ty+41,P.v('auto_11')+'','var(--t3)',3.5,'middle',P.optAll(["auto_11"]));
 
 // ---- Battery section ----
 var by=ty+58;
-s+=lv('ug-bat'+sfx,rx+92,by,'Battery: '+P.n('auto_12')+' Min','var(--t3)',4.5,'middle',P.optAll(["auto_12"]));
+s+=lv('ug-bat'+sfx,rx+92,by,'Battery: '+P.v('auto_12')+' Min','var(--t3)',4.5,'middle',P.optAll(["auto_12"]));
 // SOC bar
 s+='<rect x="'+(rx+30)+'" y="'+(by+6)+'" width="125" height="8" rx="2" fill="rgba(255,255,255,.04)" stroke="var(--o)" stroke-width=".3"/>';
 var socPct=P.n('socPct');
@@ -6422,20 +6430,20 @@ s+='<rect x="'+(rx+31)+'" y="'+(by+7)+'" width="'+socW+'" height="6" rx="1" fill
 s+=lv('ug-soc'+sfx,rx+92,by+22,'SOC '+socPct+'%','var(--g)',5,'middle',P.optAll(["socPct"]));
 // Battery health
 s+=tx2(rx+45,by+32,'SOH','var(--t3)',3.5,'middle');
-s+=lv('ug-soh'+sfx,rx+80,by+32,P.n('auto_13')+'%','var(--g)',3.5,'middle',P.optAll(["auto_13"]));
+s+=lv('ug-soh'+sfx,rx+80,by+32,P.v('auto_13')+'%','var(--g)',3.5,'middle',P.optAll(["auto_13"]));
 s+=tx2(rx+110,by+32,'Cycles','var(--t3)',3.5,'middle');
-s+=lv('ug-cyc'+sfx,rx+150,by+32,P.n('auto_14')+'','var(--t2)',3.5,'middle',P.optAll(["auto_14"]));
+s+=lv('ug-cyc'+sfx,rx+150,by+32,P.v('auto_14')+'','var(--t2)',3.5,'middle',P.optAll(["auto_14"]));
 // BMS + Temp
 s+=tx2(rx+45,by+42,'BMS','var(--t3)',3.5,'middle');
 s+=lv('ug-bms'+sfx,rx+75,by+42,'OK','var(--g)',3.5);
 s+=tx2(rx+110,by+42,'Temp','var(--t3)',3.5,'middle');
-s+=lv('ug-tmp'+sfx,rx+150,by+42,P.n('auto_15')+'\u00B0C','var(--c)',3.5,'middle',P.optAll(["auto_15"]));
+s+=lv('ug-tmp'+sfx,rx+150,by+42,P.v('auto_15')+'\u00B0C','var(--c)',3.5,'middle',P.optAll(["auto_15"]));
 
 // ---- Efficiency + power summary at bottom ----
 s+='<rect x="'+(rx+5)+'" y="308" width="175" height="28" rx="2" fill="rgba(0,0,0,.2)" stroke="rgba(255,255,255,.05)" stroke-width=".3"/>';
-s+=lv('ug-pin'+sfx,rx+48,320,P.n('auto_16')+' kW','var(--o)',4,'middle',P.optAll(["auto_16"]));
+s+=lv('ug-pin'+sfx,rx+48,320,P.v('auto_16')+' kW','var(--o)',4,'middle',P.optAll(["auto_16"]));
 s+=tx2(rx+48,328,'Input','var(--t3)',3);
-s+=lv('ug-pout'+sfx,rx+112,320,P.n('auto_17')+' kW','var(--g)',4,'middle',P.optAll(["auto_17"]));
+s+=lv('ug-pout'+sfx,rx+112,320,P.v('auto_17')+' kW','var(--g)',4,'middle',P.optAll(["auto_17"]));
 s+=tx2(rx+112,328,'Output','var(--t3)',3);
 s+=lv('ug-eff'+sfx,rx+162,320,P.v('auto_18')+'%','var(--c)',4,'middle',P.optAll(["auto_18"]));
 s+=tx2(rx+162,328,'\u03B7','var(--t3)',3,'middle');
@@ -6456,8 +6464,8 @@ drawUpsUnit(460,'B',CG,'B');
 s+=sectionSep(350,'SYSTEM SUMMARY');
 s+=bx2(20,360,880,60,'var(--o)');
 s+=tx2(460,375,'UPS SYSTEM SUMMARY \u2014 DH-0'+dh,'var(--o)',5.5,'middle',1);
-s+=lv('mu-dcva',100,395,P.n('auto_19')+' VDC','var(--o)',5);s+=tx2(100,407,'DC Bus A','var(--t3)',3.5);
-s+=lv('mu-dcvb',240,395,P.n('auto_20')+' VDC','var(--o)',5);s+=tx2(240,407,'DC Bus B','var(--t3)',3.5);
+s+=lv('mu-dcva',100,395,P.v('auto_19')+' VDC','var(--o)',5);s+=tx2(100,407,'DC Bus A','var(--t3)',3.5);
+s+=lv('mu-dcvb',240,395,P.v('auto_20')+' VDC','var(--o)',5);s+=tx2(240,407,'DC Bus B','var(--t3)',3.5);
 s+=lv('mu-ldpa',380,395,(DHE?DHE.upsLoadPct.toFixed(0):null)+'%','var(--g)',5,0,bo('upsLoadPct'));s+=tx2(380,407,'Load A','var(--t3)',3.5);
 s+=lv('mu-ldpb',520,395,(DHE?DHE.upsLoadPct.toFixed(0):null)+'%','var(--g)',5,0,bo('upsLoadPct'));s+=tx2(520,407,'Load B','var(--t3)',3.5);
 s+=lv('mu-byp',660,395,'OFF','var(--g)',5);s+=tx2(660,407,'Bypass','var(--t3)',3.5);
@@ -6466,14 +6474,14 @@ s+=lv('mu-efft',800,395,P.v('auto_21')+'%','var(--c)',5);s+=tx2(800,407,'Avg \u0
 // Battery health row
 s+=bx2(20,430,880,50,'var(--c)');
 s+=tx2(460,445,'BATTERY HEALTH','var(--c)',5.5,'middle',1);
-s+=lv('mu-soha',150,470,'SOH '+P.n('auto_22')+'%','var(--g)',5);s+=tx2(150,480,'BAT-A','var(--t3)',3.5);
-s+=lv('mu-sohb',320,470,'SOH '+P.n('auto_23')+'%','var(--g)',5);s+=tx2(320,480,'BAT-B','var(--t3)',3.5);
-s+=lv('mu-cyca',490,470,P.n('auto_24')+' cycles','var(--t2)',5);s+=tx2(490,480,'A Cycles','var(--t3)',3.5);
-s+=lv('mu-cycb',660,470,P.n('auto_25')+' cycles','var(--t2)',5);s+=tx2(660,480,'B Cycles','var(--t3)',3.5);
+s+=lv('mu-soha',150,470,'SOH '+P.v('auto_22')+'%','var(--g)',5);s+=tx2(150,480,'BAT-A','var(--t3)',3.5);
+s+=lv('mu-sohb',320,470,'SOH '+P.v('auto_23')+'%','var(--g)',5);s+=tx2(320,480,'BAT-B','var(--t3)',3.5);
+s+=lv('mu-cyca',490,470,P.v('auto_24')+' cycles','var(--t2)',5);s+=tx2(490,480,'A Cycles','var(--t3)',3.5);
+s+=lv('mu-cycb',660,470,P.v('auto_25')+' cycles','var(--t2)',5);s+=tx2(660,480,'B Cycles','var(--t3)',3.5);
 s+=lv('mu-bms',830,470,'ALL OK','var(--g)',5);s+=tx2(830,480,'BMS','var(--t3)',3.5);
 
 // Nameplate comparison
-s+=nameplate(20,495,[['Rated','2 x 8 MW'],['Actual',P.v('auto_26')+' MW'],['Margin',P.n('auto_27')+'%'],['Redundancy','N+1']]);
+s+=nameplate(20,495,[['Rated','2 x 8 MW'],['Actual',P.v('auto_26')+' MW'],['Margin',P.v('auto_27')+'%'],['Redundancy','N+1']]);
 
 // Alarm placeholders
 s+='<g id="alm-upsA" style="display:none">'+alarmIcon(200,50,'BATTERY LOW')+'</g>';
@@ -6486,24 +6494,24 @@ s+=titleBlock(W-260,H-48,250,'SLD-UPS-'+dh,'A',dh);
 svg.innerHTML=s;
 startTimer(function(){P=RZ_HMI_P('sld-ups-'+(renderUps.unit||'a').toLowerCase(),'dh0'+dh,dh,'renderUps');
 // System summary values (same points the first paint used, so the ticker never disagrees with the sheet)
-[['mu-dcva',function(){return P.n('auto_19')+' VDC'}],['mu-dcvb',function(){return P.n('auto_20')+' VDC'}],['mu-ldpa',function(){return (DHE?DHE.upsLoadPct.toFixed(0):'\u2014')+'%'}],['mu-ldpb',function(){return (DHE?DHE.upsLoadPct.toFixed(0):'\u2014')+'%'}],['mu-byp',function(){return'OFF'}],['mu-efft',function(){return P.v('auto_21')+'%'}],['mu-soha',function(){return'SOH '+P.n('auto_22')+'%'}],['mu-sohb',function(){return'SOH '+P.n('auto_23')+'%'}],['mu-cyca',function(){return P.n('auto_24')+' cycles'}],['mu-cycb',function(){return P.n('auto_25')+' cycles'}]].forEach(function(p){var e=$(p[0]);if(e)e.textContent=p[1]()});
+[['mu-dcva',function(){return P.v('auto_19')+' VDC'}],['mu-dcvb',function(){return P.v('auto_20')+' VDC'}],['mu-ldpa',function(){return (DHE?DHE.upsLoadPct.toFixed(0):'\u2014')+'%'}],['mu-ldpb',function(){return (DHE?DHE.upsLoadPct.toFixed(0):'\u2014')+'%'}],['mu-byp',function(){return'OFF'}],['mu-efft',function(){return P.v('auto_21')+'%'}],['mu-soha',function(){return'SOH '+P.v('auto_22')+'%'}],['mu-sohb',function(){return'SOH '+P.v('auto_23')+'%'}],['mu-cyca',function(){return P.v('auto_24')+' cycles'}],['mu-cycb',function(){return P.v('auto_25')+' cycles'}]].forEach(function(p){var e=$(p[0]);if(e)e.textContent=p[1]()});
 // Per-unit live updates (A and B)
 ['A','B'].forEach(function(sfx){
 var ldP=P.n('ldP');
 var ldC=ldP<70?'var(--g)':ldP<85?'var(--o)':'var(--r)';
 var e=$('ug-pct'+sfx);if(e){e.textContent=ldP+'%';e.setAttribute('fill',ldC)}
-e=$('ug-kw'+sfx);if(e)e.textContent='Load: '+P.n('auto_37')+' kW';
-e=$('ug-pin'+sfx);if(e)e.textContent=P.n('textContent_1')+' kW';
-e=$('ug-pout'+sfx);if(e)e.textContent=P.n('textContent_2')+' kW';
+e=$('ug-kw'+sfx);if(e)e.textContent='Load: '+P.v('auto_37')+' kW';
+e=$('ug-pin'+sfx);if(e)e.textContent=P.v('textContent_1')+' kW';
+e=$('ug-pout'+sfx);if(e)e.textContent=P.v('textContent_2')+' kW';
 e=$('ug-eff'+sfx);if(e)e.textContent=P.v('textContent_3')+'%';
-e=$('ug-soc'+sfx);if(e)e.textContent='SOC '+P.n('auto_38')+'%';
-e=$('ug-soh'+sfx);if(e)e.textContent=P.n('textContent_4')+'%';
-e=$('ug-cyc'+sfx);if(e)e.textContent=P.n('textContent_5')+'';
-e=$('ug-tmp'+sfx);if(e)e.textContent=P.n('textContent_6')+'\u00B0C';
-e=$('ug-bat'+sfx);if(e)e.textContent='Battery: '+P.n('auto_39')+' Min';
+e=$('ug-soc'+sfx);if(e)e.textContent='SOC '+P.v('auto_38')+'%';
+e=$('ug-soh'+sfx);if(e)e.textContent=P.v('textContent_4')+'%';
+e=$('ug-cyc'+sfx);if(e)e.textContent=P.v('textContent_5')+'';
+e=$('ug-tmp'+sfx);if(e)e.textContent=P.v('textContent_6')+'\u00B0C';
+e=$('ug-bat'+sfx);if(e)e.textContent='Battery: '+P.v('auto_39')+' Min';
 // Per-phase voltages
 ['inA','inB','inC','outA','outB','outC','bypA','bypB','bypC'].forEach(function(k){
-var v=$(('uv-'+k+sfx));if(v)v.textContent=P.n('textContent_7')+''});
+var v=$(('uv-'+k+sfx));if(v)v.textContent=P.v('textContent_7')+''});
 // Mode simulation
 var uMode=(P.state('mode')==='fault'?0.99:P.state('mode')==='bypass'?0.96:0.5);   /* Rule 2: UPS mode from the electrical scenario */
 e=$('ups-mode'+sfx);if(e){
@@ -6642,13 +6650,13 @@ s+='<path d="M'+(bix-2)+' '+(biy-8)+' L'+(bix+1)+' '+(biy-2)+' L'+(bix-1)+' '+(b
 s+='<text id="bat-mSt'+u+mi+'" x="'+(mx+mw/2)+'" y="'+(my+75)+'" fill="var(--g)" font-family="'+J+'" font-size="6" text-anchor="middle" font-weight="600">Fully Charged</text>';
 // SOC
 s+='<text x="'+(mx+20)+'" y="'+(my+90)+'" fill="var(--t3)" font-family="'+J+'" font-size="4.5">SOC</text>';
-s+='<text id="bat-mSoc'+u+mi+'" x="'+(mx+55)+'" y="'+(my+90)+'" fill="var(--g)" font-family="'+J+'" font-size="5" font-weight="600">'+P.n('auto_1')+'%</text>';
+s+='<text id="bat-mSoc'+u+mi+'" x="'+(mx+55)+'" y="'+(my+90)+'" fill="var(--g)" font-family="'+J+'" font-size="5" font-weight="600">'+P.v('auto_1')+'%</text>';
 // Voltage
 s+='<text x="'+(mx+85)+'" y="'+(my+90)+'" fill="var(--t3)" font-family="'+J+'" font-size="4.5">Volt</text>';
 s+='<text id="bat-mV'+u+mi+'" x="'+(mx+115)+'" y="'+(my+90)+'" fill="var(--o)" font-family="'+J+'" font-size="5" font-weight="600">'+P.v('auto_2')+' V</text>';
 // Temp
 s+='<text x="'+(mx+20)+'" y="'+(my+102)+'" fill="var(--t3)" font-family="'+J+'" font-size="4.5">Temp</text>';
-s+='<text id="bat-mT'+u+mi+'" x="'+(mx+55)+'" y="'+(my+102)+'" fill="var(--c)" font-family="'+J+'" font-size="5" font-weight="600">'+P.n('auto_3')+'\u00B0C</text>';
+s+='<text id="bat-mT'+u+mi+'" x="'+(mx+55)+'" y="'+(my+102)+'" fill="var(--c)" font-family="'+J+'" font-size="5" font-weight="600">'+P.v('auto_3')+'\u00B0C</text>';
 // Current
 s+='<text x="'+(mx+85)+'" y="'+(my+102)+'" fill="var(--t3)" font-family="'+J+'" font-size="4.5">I</text>';
 s+='<text id="bat-mI'+u+mi+'" x="'+(mx+115)+'" y="'+(my+102)+'" fill="var(--t2)" font-family="'+J+'" font-size="5" font-weight="600">0 A</text>';
@@ -6666,7 +6674,7 @@ var sumItems=[
 ['Avg SOC',initAvgSoc+'%','var(--g)'],
 ['Avg Temp',initAvgT+'\u00B0C','var(--c)'],
 ['Strings','2S4P','var(--t2)'],
-['Cycles',P.n('auto_4')+'','var(--t2)'],
+['Cycles',P.v('auto_4')+'','var(--t2)'],
 ['BMS','OK','var(--g)']
 ];
 for(var si=0;si<sumItems.length;si++){
@@ -6679,21 +6687,21 @@ bSvg.innerHTML=s;
 
 // Live update timer (all IDs use unit suffix)
 batTimer=setInterval(function(){
-var e=$('bat-st1'+u);if(e)e.textContent=P.n('textContent_1')+'%';
-e=$('bat-st2'+u);if(e)e.textContent=P.n('textContent_2')+' V';
+var e=$('bat-st1'+u);if(e)e.textContent=P.v('textContent_1')+'%';
+e=$('bat-st2'+u);if(e)e.textContent=P.v('textContent_2')+' V';
 e=$('bat-op2'+u);if(e)e.textContent=P.v('textContent_3')+' A';
 var uL=P.n('uL');
 e=$('bat-upsLd'+u);if(e)e.textContent=uL+'%';
 var lb=$('bat-ldBar'+u);if(lb)lb.setAttribute('width',Math.round(68*uL/100));
 for(var mi=0;mi<8;mi++){
-e=$('bat-mSoc'+u+mi);if(e)e.textContent=P.n('textContent_4')+'%';
+e=$('bat-mSoc'+u+mi);if(e)e.textContent=P.v('textContent_4')+'%';
 e=$('bat-mV'+u+mi);if(e)e.textContent=P.v('textContent_5')+' V';
-e=$('bat-mT'+u+mi);if(e)e.textContent=P.n('textContent_6')+'\u00B0C';
+e=$('bat-mT'+u+mi);if(e)e.textContent=P.v('textContent_6')+'\u00B0C';
 e=$('bat-mI'+u+mi);if(e)e.textContent=P.v('textContent_7')+' A';
 }
-e=$('bat-sm'+u+'1');if(e)e.textContent=P.n('textContent_8')+' min';
-e=$('bat-sm'+u+'2');if(e)e.textContent=P.n('textContent_9')+'%';
-e=$('bat-sm'+u+'3');if(e)e.textContent=P.n('textContent_10')+'\u00B0C';
+e=$('bat-sm'+u+'1');if(e)e.textContent=P.v('textContent_8')+' min';
+e=$('bat-sm'+u+'2');if(e)e.textContent=P.v('textContent_9')+'%';
+e=$('bat-sm'+u+'3');if(e)e.textContent=P.v('textContent_10')+'\u00B0C';
 },4000);
 
 /* @rz-hmi:end renderBatteryEss */}
@@ -6758,16 +6766,16 @@ s+=bx2(rx,420,60,25,'var(--o)');s+=tx2(rx+30,435,rppCirc[i],'var(--t2)',3.5,'mid
 // Live
 s+=sectionSep(460,'MONITORING');
 s+=bx2(60,470,380,55,CA);s+=tx2(250,485,'BUSWAY A — SIMULATED',CA,5,'middle',1);
-s+=lv('mb-va',90,505,P.n('auto_5')+' V',CA,5);s+=tx2(90,515,'Voltage','var(--t3)',3.5);
-s+=lv('mb-ia',190,505,P.n('auto_6')+' A',CA,5);s+=tx2(190,515,'Current','var(--t3)',3.5);
-s+=lv('mb-la',290,505,P.n('auto_7')+'%','var(--g)',5);s+=tx2(290,515,'Load','var(--t3)',3.5);
-s+=lv('mb-ta',390,505,P.n('auto_8')+'°C','var(--o)',5);s+=tx2(390,515,'Temp','var(--t3)',3.5);
+s+=lv('mb-va',90,505,P.v('auto_5')+' V',CA,5);s+=tx2(90,515,'Voltage','var(--t3)',3.5);
+s+=lv('mb-ia',190,505,P.v('auto_6')+' A',CA,5);s+=tx2(190,515,'Current','var(--t3)',3.5);
+s+=lv('mb-la',290,505,P.v('auto_7')+'%','var(--g)',5);s+=tx2(290,515,'Load','var(--t3)',3.5);
+s+=lv('mb-ta',390,505,P.v('auto_8')+'°C','var(--o)',5);s+=tx2(390,515,'Temp','var(--t3)',3.5);
 
 s+=bx2(480,470,380,55,CG);s+=tx2(670,485,'BUSWAY B — SIMULATED',CG,5,'middle',1);
-s+=lv('mb-vb',510,505,P.n('auto_9')+' V',CG,5);s+=tx2(510,515,'Voltage','var(--t3)',3.5);
-s+=lv('mb-ib',610,505,P.n('auto_10')+' A',CG,5);s+=tx2(610,515,'Current','var(--t3)',3.5);
-s+=lv('mb-lb',710,505,P.n('auto_11')+'%','var(--g)',5);s+=tx2(710,515,'Load','var(--t3)',3.5);
-s+=lv('mb-tb',810,505,P.n('auto_12')+'°C','var(--o)',5);s+=tx2(810,515,'Temp','var(--t3)',3.5);
+s+=lv('mb-vb',510,505,P.v('auto_9')+' V',CG,5);s+=tx2(510,515,'Voltage','var(--t3)',3.5);
+s+=lv('mb-ib',610,505,P.v('auto_10')+' A',CG,5);s+=tx2(610,515,'Current','var(--t3)',3.5);
+s+=lv('mb-lb',710,505,P.v('auto_11')+'%','var(--g)',5);s+=tx2(710,515,'Load','var(--t3)',3.5);
+s+=lv('mb-tb',810,505,P.v('auto_12')+'°C','var(--o)',5);s+=tx2(810,515,'Temp','var(--t3)',3.5);
 // Idea 30: Voltage deviation badge
 s+=vDevBadge(W-120,5);
 // Idea 37: Title block
@@ -6778,7 +6786,7 @@ s+='<g id="alm-bwB" style="display:none">'+alarmIcon(790,530,'TEMP HIGH')+'</g>'
 
 svg.innerHTML=s;
 startTimer(function(){P=RZ_HMI_P('sld-busway','dh0'+dh,dh,'renderBusway');
-[['mb-va',function(){return P.n('auto_13')+' V'}],['mb-vb',function(){return P.n('auto_14')+' V'}],['mb-ia',function(){return P.n('auto_15')+' A'}],['mb-ib',function(){return P.n('auto_16')+' A'}],['mb-la',function(){return P.n('auto_17')+'%'}],['mb-lb',function(){return P.n('auto_18')+'%'}],['mb-ta',function(){return P.n('auto_19')+'°C'}],['mb-tb',function(){return P.n('auto_20')+'°C'}]].forEach(function(p){var e=$(p[0]);if(e)e.textContent=p[1]()});
+[['mb-va',function(){return P.v('auto_13')+' V'}],['mb-vb',function(){return P.v('auto_14')+' V'}],['mb-ia',function(){return P.v('auto_15')+' A'}],['mb-ib',function(){return P.v('auto_16')+' A'}],['mb-la',function(){return P.v('auto_17')+'%'}],['mb-lb',function(){return P.v('auto_18')+'%'}],['mb-ta',function(){return P.v('auto_19')+'°C'}],['mb-tb',function(){return P.v('auto_20')+'°C'}]].forEach(function(p){var e=$(p[0]);if(e)e.textContent=p[1]()});
 // Idea 35: Random alarm simulation
 var alm=$('alm-bwA');if(alm)alm.style.display=RZ_ALM(P,'bw_a');
 alm=$('alm-bwB');if(alm)alm.style.display=RZ_ALM(P,'bw_b')})
@@ -6829,7 +6837,7 @@ var vrms=[{n:'GPU VRM ×4',v:'0.8V',kw:'4×300W=1.2kW',c:'var(--g)'},{n:'CPU VRM
 for(var i=0;i<4;i++){var vx=100+i*185;
 s+=bx2(vx,270,170,50,vrms[i].c);s+=tx2(vx+85,285,vrms[i].n,vrms[i].c,4,'middle',1);
 s+=tx2(vx+85,298,vrms[i].v+' | '+vrms[i].kw,'var(--t3)',3.5,'middle');
-s+=lv('mp-vrm'+i,vx+85,312,P.n('auto_1')+'°C','var(--o)',4,'middle')}
+s+=lv('mp-vrm'+i,vx+85,312,P.v('auto_1')+'°C','var(--o)',4,'middle')}
 
 // Power tree (B200 + Grace72)
 s+=bx2(100,345,720,65,'var(--g)');s+=tx2(460,360,'COMPUTE POWER TREE','var(--g)',5,'middle',1);
@@ -6839,21 +6847,21 @@ s+=tx2(700,380,'NVSwitch + NIC','var(--p)',4.5,'middle',1);s+=tx2(700,392,'~350W
 
 // Live params
 s+=bx2(40,425,400,55,CA);s+=tx2(240,440,'PSU-A — SIMULATED',CA,5,'middle',1);
-s+=lv('mp-ina',80,465,P.n('auto_2')+' W in',CA,5);s+=tx2(80,475,'Input','var(--t3)',3.5);
-s+=lv('mp-outa',200,465,P.n('auto_3')+' W out','var(--g)',5);s+=tx2(200,475,'Output','var(--t3)',3.5);
+s+=lv('mp-ina',80,465,P.v('auto_2')+' W in',CA,5);s+=tx2(80,475,'Input','var(--t3)',3.5);
+s+=lv('mp-outa',200,465,P.v('auto_3')+' W out','var(--g)',5);s+=tx2(200,475,'Output','var(--t3)',3.5);
 s+=lv('mp-effa',320,465,'η '+P.v('auto_4')+'%','var(--c)',5);s+=tx2(320,475,'Efficiency','var(--t3)',3.5);
 
 s+=bx2(480,425,400,55,CG);s+=tx2(680,440,'PSU-B — SIMULATED',CG,5,'middle',1);
-s+=lv('mp-inb',520,465,P.n('auto_5')+' W in',CG,5);s+=tx2(520,475,'Input','var(--t3)',3.5);
-s+=lv('mp-outb',640,465,P.n('auto_6')+' W out','var(--g)',5);s+=tx2(640,475,'Output','var(--t3)',3.5);
+s+=lv('mp-inb',520,465,P.v('auto_5')+' W in',CG,5);s+=tx2(520,475,'Input','var(--t3)',3.5);
+s+=lv('mp-outb',640,465,P.v('auto_6')+' W out','var(--g)',5);s+=tx2(640,475,'Output','var(--t3)',3.5);
 s+=lv('mp-effb',760,465,'η '+P.v('auto_7')+'%','var(--c)',5);s+=tx2(760,475,'Efficiency','var(--t3)',3.5);
 
 // Rack summary
 s+=bx2(200,495,520,35,'var(--b)');s+=tx2(460,510,'RACK TOTAL','var(--b)',5,'middle',1);
 s+=lv('mp-dcv',300,525,P.v('auto_8')+' VDC','var(--o)',5);s+=tx2(300,535,'DC Bus','var(--t3)',3.5);
-s+=lv('mp-dci',420,525,P.n('auto_9')+' A','var(--o)',5);s+=tx2(420,535,'DC Current','var(--t3)',3.5);
-s+=lv('mp-gpu',540,525,P.n('auto_10')+' W','var(--g)',5);s+=tx2(540,535,'GPU Power','var(--t3)',3.5);
-s+=lv('mp-it',660,525,P.n('auto_11')+' W','var(--o)',5);s+=tx2(660,535,'IT Total','var(--t3)',3.5);
+s+=lv('mp-dci',420,525,P.v('auto_9')+' A','var(--o)',5);s+=tx2(420,535,'DC Current','var(--t3)',3.5);
+s+=lv('mp-gpu',540,525,P.v('auto_10')+' W','var(--g)',5);s+=tx2(540,535,'GPU Power','var(--t3)',3.5);
+s+=lv('mp-it',660,525,P.v('auto_11')+' W','var(--o)',5);s+=tx2(660,535,'IT Total','var(--t3)',3.5);
 // Idea 30: Voltage deviation badge
 s+=vDevBadge(W-120,5);
 // Idea 7: Bus node ID on 48VDC bus
@@ -6863,8 +6871,8 @@ s+=titleBlock(W-260,H-48,250,'SLD-PSU-'+dh,'A',dh);
 
 svg.innerHTML=s;
 startTimer(function(){P=RZ_HMI_P('sld-rack-psu','dh0'+dh,dh,'renderPsu');
-[['mp-ina',function(){return P.n('auto_12')+' W in'}],['mp-outa',function(){return P.n('auto_13')+' W out'}],['mp-effa',function(){return'η '+P.v('auto_14')+'%'}],['mp-inb',function(){return P.n('auto_15')+' W in'}],['mp-outb',function(){return P.n('auto_16')+' W out'}],['mp-effb',function(){return'η '+P.v('auto_17')+'%'}],['mp-dcv',function(){return P.v('auto_18')+' VDC'}],['mp-dci',function(){return P.n('auto_19')+' A'}],['mp-gpu',function(){return P.n('auto_20')+' W'}],['mp-it',function(){return P.n('auto_21')+' W'}]].forEach(function(p){var e=$(p[0]);if(e)e.textContent=p[1]()});
-for(var i=0;i<4;i++){var e=$('mp-vrm'+i);if(e)e.textContent=P.n('textContent_1')+'°C'}
+[['mp-ina',function(){return P.v('auto_12')+' W in'}],['mp-outa',function(){return P.v('auto_13')+' W out'}],['mp-effa',function(){return'η '+P.v('auto_14')+'%'}],['mp-inb',function(){return P.v('auto_15')+' W in'}],['mp-outb',function(){return P.v('auto_16')+' W out'}],['mp-effb',function(){return'η '+P.v('auto_17')+'%'}],['mp-dcv',function(){return P.v('auto_18')+' VDC'}],['mp-dci',function(){return P.v('auto_19')+' A'}],['mp-gpu',function(){return P.v('auto_20')+' W'}],['mp-it',function(){return P.v('auto_21')+' W'}]].forEach(function(p){var e=$(p[0]);if(e)e.textContent=p[1]()});
+for(var i=0;i<4;i++){var e=$('mp-vrm'+i);if(e)e.textContent=P.v('textContent_1')+'°C'}
 // Idea 26: voltage profile PSU bus color update
 var vpu=parseFloat(P.v('auto_22'));var vpe=$('vp-psu');if(vpe)vpe.setAttribute('fill',vProfileColor(vpu))})
 /* @rz-hmi:end renderPsu */}
@@ -8969,7 +8977,7 @@ let ch='';
 callouts.forEach(c=>{
 ch+=`<div style="position:absolute;left:${c.x};top:${c.y};background:rgba(9,10,12,.9);border:1px solid ${c.c};border-radius:6px;padding:6px 10px;">
 <div style="font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px">${c.l}</div>
-<div style="font-family:'JetBrains Mono';font-size:16px;font-weight:700;color:${c.c}${c.b?';cursor:pointer':''}" ${c.id?'id="'+c.id+'"':''} ${c.b?'data-basis-param="'+c.b+'" tabindex="0" role="button"':''} ${c.d?'data-rz-authored-basis="'+c.d+'"':''}>${c.v}</div>
+<div style="font-family:'JetBrains Mono';font-size:16px;font-weight:700;color:${c.c}${c.b?';cursor:pointer':''}" ${c.id?'id="'+c.id+'"':''} ${c.b?'data-basis-param="'+c.b+'" tabindex="0" role="button"':''} ${c.d?'data-rz-authored-basis="'+c.d+'"':''}>${nz(c.v)}</div>
 </div>`;
 });
 callEl.innerHTML=ch;
@@ -9160,7 +9168,7 @@ s+=tx(hx+97,hy+12,'HALL-'+h.id,'var(--g)',7,'middle',1);
 s+=`<rect x="${hx+62}" y="${hy+15}" width="70" height="10" rx="2" fill="rgba(34,197,94,.15)" stroke="var(--g)" stroke-width=".3"/>`;
 s+=tx(hx+97,hy+22,'OPERATIONAL','var(--g)',4,'middle');
 s+=tx(hx+8,hy+36,'IT:','var(--t3)',4.5);s+=`<text x="${hx+38}" y="${hy+36}" fill="var(--o)" font-family="${J}" font-size="5.5" id="dH${i}IT">${H.it.toLocaleString()}kW</text>`;
-s+=tx(hx+100,hy+36,'PUE:','var(--t3)',4.5);s+=`<text x="${hx+130}" y="${hy+36}" fill="var(--c)" font-family="${J}" font-size="5.5" id="dH${i}PUE">${H.pue.toFixed(2)}</text>`;
+s+=tx(hx+100,hy+36,'PUE:','var(--t3)',4.5);s+=`<text x="${hx+130}" y="${hy+36}" fill="var(--c)" font-family="${J}" font-size="5.5" id="dH${i}PUE">${nzf(H.pue,2)}</text>`;
 s+=tx(hx+8,hy+48,'GPU:','var(--t3)',4.5);s+=`<text x="${hx+38}" y="${hy+48}" fill="var(--g)" font-family="${J}" font-size="5.5">${H.gpu.toLocaleString()}</text>`;
 s+=tx(hx+100,hy+48,'ΔT:','var(--t3)',4.5);s+=`<text x="${hx+130}" y="${hy+48}" fill="var(--c)" font-family="${J}" font-size="5.5" id="dH${i}DT">${(DHE?DHE.tcsDeltaT:null).toFixed(1)}°C</text>`;
 });
@@ -9191,7 +9199,7 @@ const sust=[
 sust.forEach((su,i)=>{
 const sx=12+(i%3)*62,sy=228+Math.floor(i/3)*18;
 s+=tx(sx,sy,su.l+':','var(--t3)',4);
-s+=`<text x="${sx+45}" y="${sy}" fill="${su.c}" font-family="${J}" font-size="5" text-anchor="end" ${su.id?'id="'+su.id+'"':''}>${su.v}</text>`;
+s+=`<text x="${sx+45}" y="${sy}" fill="${su.c}" font-family="${J}" font-size="5" text-anchor="end" ${su.id?'id="'+su.id+'"':''}>${nz(su.v)}</text>`;
 });
 s+=`<rect x="203" y="202" width="192" height="68" rx="3" fill="rgba(100, 116, 139,.03)" stroke="rgba(100, 116, 139,.2)" stroke-width=".8"/>`;
 s+=tx(300,214,'OUTDOOR','var(--p)',5.5,'middle',1);
@@ -9202,7 +9210,7 @@ const outd=[
 outd.forEach((od,i)=>{
 const ox=210+(i%3)*62,oy=228+Math.floor(i/3)*18;
 s+=tx(ox,oy,od.l+':','var(--t3)',4);
-s+=`<text x="${ox+48}" y="${oy}" fill="${od.c}" font-family="${J}" font-size="5" text-anchor="end" ${od.id?'id="'+od.id+'"':''}>${od.v}</text>`;
+s+=`<text x="${ox+48}" y="${oy}" fill="${od.c}" font-family="${J}" font-size="5" text-anchor="end" ${od.id?'id="'+od.id+'"':''}>${nz(od.v)}</text>`;
 });
 // Power + Cooling in one row
 s+=`<rect x="5" y="274" width="192" height="65" rx="3" fill="rgba(245,158,11,.03)" stroke="rgba(245,158,11,.2)" stroke-width=".8"/>`;
@@ -9229,7 +9237,7 @@ const alarms=[
 alarms.forEach((a,i)=>{
 const ax=12+(i%3)*130,ay=370+Math.floor(i/3)*14;
 s+=tx(ax,ay,a.l+':','var(--t3)',4);
-s+=`<text x="${ax+42}" y="${ay}" fill="${a.c}" font-family="${J}" font-size="4.5" font-weight="600">${a.v}</text>`;
+s+=`<text x="${ax+42}" y="${ay}" fill="${a.c}" font-family="${J}" font-size="4.5" font-weight="600">${nz(a.v)}</text>`;
 });
 el.innerHTML=s;
 // v1.32.0 — basis KPI live updates removed. Only outdoor weather (real-world
@@ -9611,7 +9619,7 @@ var kpis=[
 for(var k=0;k<kpis.length;k++){var kx=10+k*(bw+4);
 s+=`<rect x="${kx}" y="${iy}" width="${bw}" height="30" rx="3" fill="${kpis[k].bg}" stroke="${kpis[k].bc}" stroke-width=".6"/>`;
 s+=rzD(P.optAll(["tcs_supply_c"]),`<text x="${kx+bw/2}" y="${iy+11}" fill="var(--t3)" font-family="${F}" font-size="6" text-anchor="middle">${kpis[k].l}</text>`);
-s+=`<text x="${kx+bw/2}" y="${iy+24}" fill="${kpis[k].c}" font-family="${F}" font-size="11" text-anchor="middle" font-weight="600">${kpis[k].v}</text>`;
+s+=`<text x="${kx+bw/2}" y="${iy+24}" fill="${kpis[k].c}" font-family="${F}" font-size="11" text-anchor="middle" font-weight="600">${nz(kpis[k].v)}</text>`;
 }
 // ===== HEAT EXCHANGER (left side) =====
 var hxX=15,hxY=74,hxW=80,hxH=195;
@@ -9666,7 +9674,7 @@ s+=`<circle cx="${pmpX+23}" cy="${supY}" r="12" fill="none" stroke="var(--g)" st
 s+=`<g><animateTransform attributeName="transform" type="rotate" from="0 ${pmpX+23} ${supY}" to="360 ${pmpX+23} ${supY}" dur="2s" repeatCount="indefinite"/>`;
 s+=`<polygon points="${pmpX+16},${supY-7} ${pmpX+30},${supY} ${pmpX+16},${supY+7}" fill="var(--g)" fill-opacity=".5"/>`;
 s+=`</g>`;
-s+=rzD(P.optAll(["p1pct"]),`<text x="${pmpX+23}" y="${supY+20}" fill="var(--g)" font-family="${F}" font-size="9" text-anchor="middle" font-weight="600">${p1pct}%</text>`);
+s+=rzD(P.optAll(["p1pct"]),`<text x="${pmpX+23}" y="${supY+20}" fill="var(--g)" font-family="${F}" font-size="9" text-anchor="middle" font-weight="600">${nz(p1pct)}%</text>`);
 // --- Pump P2 (active) ---
 s+=`<rect x="${pmpX+51}" y="${supY-27}" width="46" height="56" rx="3" fill="rgba(34,197,94,.06)" stroke="var(--g)" stroke-width=".8"/>`;
 s+=`<text x="${pmpX+74}" y="${supY-16}" fill="var(--g)" font-family="${F}" font-size="7" text-anchor="middle" font-weight="600">P2</text>`;
@@ -9674,7 +9682,7 @@ s+=`<circle cx="${pmpX+74}" cy="${supY}" r="12" fill="none" stroke="var(--g)" st
 s+=`<g><animateTransform attributeName="transform" type="rotate" from="0 ${pmpX+74} ${supY}" to="360 ${pmpX+74} ${supY}" dur="2.2s" repeatCount="indefinite"/>`;
 s+=`<polygon points="${pmpX+67},${supY-7} ${pmpX+81},${supY} ${pmpX+67},${supY+7}" fill="var(--g)" fill-opacity=".5"/>`;
 s+=`</g>`;
-s+=rzD(P.optAll(["p2pct"]),`<text x="${pmpX+74}" y="${supY+20}" fill="var(--g)" font-family="${F}" font-size="9" text-anchor="middle" font-weight="600">${p2pct}%</text>`);
+s+=rzD(P.optAll(["p2pct"]),`<text x="${pmpX+74}" y="${supY+20}" fill="var(--g)" font-family="${F}" font-size="9" text-anchor="middle" font-weight="600">${nz(p2pct)}%</text>`);
 // --- Pump P3 (standby) ---
 s+=`<rect x="${pmpX+102}" y="${supY-27}" width="46" height="56" rx="3" fill="rgba(107,114,128,.06)" stroke="var(--t3)" stroke-width=".6"/>`;
 s+=rzD(P.optAll(["tcs_supply_c"]),`<text x="${pmpX+125}" y="${supY-16}" fill="var(--t3)" font-family="${F}" font-size="7" text-anchor="middle" font-weight="600">P3</text>`);
@@ -9723,7 +9731,7 @@ s+=`<text x="693" y="${(supY+retY)/2+3}" fill="var(--o)" font-family="${F}" font
 s+=`<rect x="110" y="${retY-18}" width="75" height="36" rx="3" fill="rgba(100, 116, 139,.06)" stroke="var(--p)" stroke-width=".6"/>`;
 s+=`<circle cx="112" cy="${retY-16}" r="3" fill="var(--g)"/>`;
 s+=rzD(P.optAll(["tcs_supply_c"]),`<text x="147" y="${retY-6}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">3-Way Valve</text>`);
-s+=rzD(P.optAll(["valve_pct"]),`<text x="147" y="${retY+6}" fill="var(--p)" font-family="${F}" font-size="10" text-anchor="middle" font-weight="600">${valvePct}%</text>`);
+s+=rzD(P.optAll(["valve_pct"]),`<text x="147" y="${retY+6}" fill="var(--p)" font-family="${F}" font-size="10" text-anchor="middle" font-weight="600">${nz(valvePct)}%</text>`);
 s+=rzD(P.optAll(["tcs_supply_c"]),`<text x="147" y="${retY+15}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">Actuator</text>`);
 // ===== DIFF PRESSURE =====
 s+=`<rect x="${pmpX}" y="${supY+35}" width="148" height="28" rx="3" fill="rgba(6,182,212,.06)" stroke="var(--c)" stroke-width=".6"/>`;
@@ -9747,7 +9755,7 @@ s+=`<text x="427" y="${btY+24}" fill="var(--pk)" font-family="${F}" font-size="1
 s+=`<rect x="20" y="${btY}" width="80" height="28" rx="3" fill="rgba(100, 116, 139,.06)" stroke="var(--p)" stroke-width=".6"/>`;
 s+=`<circle cx="22" cy="${btY+2}" r="3" fill="var(--g)"/>`;
 s+=rzD(P.optAll(["tcs_supply_c"]),`<text x="60" y="${btY+12}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">Exp Tank Level</text>`);
-s+=rzD(P.optAll(["expansion_level"]),`<text x="60" y="${btY+24}" fill="var(--p)" font-family="${F}" font-size="10" text-anchor="middle" font-weight="600">${expLvl}%</text>`);
+s+=rzD(P.optAll(["expansion_level"]),`<text x="60" y="${btY+24}" fill="var(--p)" font-family="${F}" font-size="10" text-anchor="middle" font-weight="600">${nz(expLvl)}%</text>`);
 // PSV (safety valve)
 s+=`<rect x="110" y="${btY}" width="75" height="28" rx="3" fill="rgba(239,68,68,.06)" stroke="var(--r)" stroke-width=".5"/>`;
 s+=rzD(P.optAll(["tcs_supply_c"]),`<text x="147" y="${btY+12}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">PSV Relief</text>`);
@@ -9855,7 +9863,7 @@ var kpis=[
 for(var k=0;k<kpis.length;k++){var kx=8+k*(bw+2);
 s+=`<rect x="${kx}" y="${iy}" width="${bw}" height="28" rx="3" fill="${kpis[k].bg}" stroke="${kpis[k].bc}" stroke-width=".5"/>`;
 s+=`<text x="${kx+bw/2}" y="${iy+10}" fill="var(--t3)" font-family="${F}" font-size="5.5" text-anchor="middle">${kpis[k].l}</text>`;
-s+=`<text x="${kx+bw/2}" y="${iy+23}" fill="${kpis[k].c}" font-family="${F}" font-size="10" text-anchor="middle" font-weight="600">${kpis[k].v}</text>`;
+s+=`<text x="${kx+bw/2}" y="${iy+23}" fill="${kpis[k].c}" font-family="${F}" font-size="10" text-anchor="middle" font-weight="600">${nz(kpis[k].v)}</text>`;
 }
 // ===== EVAPORATOR (left) =====
 var evX=15,evY=72,evW=165,evH=195;
@@ -9877,7 +9885,7 @@ s+=symSensor(evX+evW-8,evY+50,'var(--c)','TI');
 s+=rzD(P.optAll(["chw_supply_c"]),`<text x="${evX+evW-8}" y="${evY+62}" fill="var(--c)" font-family="${F}" font-size="5" text-anchor="middle">${evapT}\u00B0C</text>`);
 // Labels
 s+=rzD(P.optAll(["chw_return_c", "chw_supply_c"]),`<text x="${evX+10}" y="${evY+130}" fill="var(--c)" font-family="${F}" font-size="6" font-weight="600">FWS ${evapEWT}\u2192${evapT}\u00B0C</text>`);
-s+=rzD(P.optAll(["chw_return_c", "chw_flow_hall", "chw_supply_c"]),`<text x="${evX+10}" y="${evY+142}" fill="var(--t3)" font-family="${F}" font-size="5">${evapFlow} m\u00B3/h | \u0394T ${(evapEWT-evapT).toFixed(1)}\u00B0C</text>`);
+s+=rzD(P.optAll(["chw_return_c", "chw_flow_hall", "chw_supply_c"]),`<text x="${evX+10}" y="${evY+142}" fill="var(--t3)" font-family="${F}" font-size="5">${nz(evapFlow)} m\u00B3/h | \u0394T ${(evapEWT-evapT).toFixed(1)}\u00B0C</text>`);
 // LP sensor
 s+=symSensor(evX+evW/2,evY+160,'var(--c)','LP');
 s+=rzD(P.optAll(["lpPress"]),`<text x="${evX+evW/2}" y="${evY+174}" fill="var(--c)" font-family="${F}" font-size="5" text-anchor="middle">${lpPress} bar</text>`);
@@ -9922,8 +9930,8 @@ s+=rzD(P.optAll(["hpPress"]),`<text x="${cpX+140}" y="${c.y+16}" fill="var(--o)"
 // VFD panel
 s+=`<rect x="${cpX+158}" y="${c.y+4}" width="52" height="52" rx="2" fill="rgba(107,114,128,.04)" stroke="var(--bd)" stroke-width=".3"/>`;
 s+=`<text x="${cpX+184}" y="${c.y+14}" fill="var(--t3)" font-family="${F}" font-size="5.5" text-anchor="middle">VFD</text>`;
-s+=`<text x="${cpX+184}" y="${c.y+26}" fill="${cc}" font-family="${F}" font-size="9" text-anchor="middle" font-weight="600">${c.st==='RUN'?c.vfd+'%':'OFF'}</text>`;
-s+=`<text x="${cpX+184}" y="${c.y+38}" fill="var(--t3)" font-family="${F}" font-size="5.5" text-anchor="middle">${c.st==='RUN'?c.amp+'A':'0A'}</text>`;
+s+=`<text x="${cpX+184}" y="${c.y+26}" fill="${cc}" font-family="${F}" font-size="9" text-anchor="middle" font-weight="600">${c.st==='RUN'?nz(c.vfd)+'%':'OFF'}</text>`;
+s+=`<text x="${cpX+184}" y="${c.y+38}" fill="var(--t3)" font-family="${F}" font-size="5.5" text-anchor="middle">${c.st==='RUN'?nz(c.amp)+'A':'0A'}</text>`;
 s+=`<text x="${cpX+184}" y="${c.y+50}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">Centrifugal 400V</text>`;
 });
 // Suction header (vertical)
@@ -9967,7 +9975,7 @@ for(var bi=0;bi<5;bi++){var bx2=shX2+40+bi*(shW2-80)/4;
 s+=`<line x1="${bx2}" y1="${shY2+6}" x2="${bx2}" y2="${shY2+shH2-6}" stroke="var(--o)" stroke-width=".5" opacity=".2" stroke-dasharray="3 2"/>`;
 }
 // Labels below shell
-s+=rzD(P.optAll(["auto_5", "cdw_supply_c", "cdw_return_c"]),`<text x="${cdX+cdW/2}" y="${shY2+shH2+15}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">CW \u0394T: ${(cwOut-cwIn).toFixed(1)}\u00B0C | Flow: ${P.n('auto_5')} m\u00B3/h</text>`);
+s+=rzD(P.optAll(["auto_5", "cdw_supply_c", "cdw_return_c"]),`<text x="${cdX+cdW/2}" y="${shY2+shH2+15}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">CW \u0394T: ${(cwOut-cwIn).toFixed(1)}\u00B0C | Flow: ${P.v('auto_5')} m\u00B3/h</text>`);
 s+=rzD(P.optAll(["hpPress", "sc"]),`<text x="${cdX+cdW/2}" y="${shY2+shH2+27}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">Cond Press: ${hpPress} bar | Subcool: ${sc}\u00B0C</text>`);
 // HP sensor
 s+=symSensor(cdX+cdW/2,shY2+shH2+32,'var(--o)','HP');
@@ -10011,11 +10019,11 @@ s+=rzD(P.optAll(["sh"]),`<text x="320" y="${btY+14}" fill="var(--c)" font-family
 s+=`<text x="370" y="${btY+14}" fill="var(--t3)" font-family="${F}" font-size="6">Subcool</text>`;
 s+=rzD(P.optAll(["sc"]),`<text x="430" y="${btY+14}" fill="var(--c)" font-family="${F}" font-size="8" font-weight="600">${sc}\u00B0C</text>`);
 s+=`<text x="480" y="${btY+14}" fill="var(--t3)" font-family="${F}" font-size="6">Evap Flow</text>`;
-s+=rzD(P.optAll(["chw_flow_hall"]),`<text x="560" y="${btY+14}" fill="var(--g)" font-family="${F}" font-size="8" font-weight="600">${evapFlow} m\u00B3/h</text>`);
+s+=rzD(P.optAll(["chw_flow_hall"]),`<text x="560" y="${btY+14}" fill="var(--g)" font-family="${F}" font-size="8" font-weight="600">${nz(evapFlow)} m\u00B3/h</text>`);
 s+=`<text x="${W-60}" y="${btY+14}" fill="var(--t3)" font-family="${F}" font-size="6">COP</text>`;
 s+=rzD(P.optAll(["cop"]),`<text x="${W-20}" y="${btY+14}" fill="var(--g)" font-family="${F}" font-size="10" text-anchor="end" font-weight="700">${cop}</text>`);
 s+=`<text x="20" y="${btY+32}" fill="var(--t3)" font-family="${F}" font-size="6">Bearing</text>`;
-s+=rzD(P.optAll(["bearing_c"]),`<text x="70" y="${btY+32}" fill="${bearingT>65?'var(--o)':'var(--g)'}" font-family="${F}" font-size="8" font-weight="600">${bearingT}\u00B0C</text>`);
+s+=rzD(P.optAll(["bearing_c"]),`<text x="70" y="${btY+32}" fill="${bearingT>65?'var(--o)':'var(--g)'}" font-family="${F}" font-size="8" font-weight="600">${nz(bearingT)}\u00B0C</text>`);
 s+=`<text x="120" y="${btY+32}" fill="var(--t3)" font-family="${F}" font-size="6">CW \u0394T</text>`;
 s+=rzD(P.optAll(["cdw_supply_c", "cdw_return_c"]),`<text x="185" y="${btY+32}" fill="var(--c)" font-family="${F}" font-size="8" font-weight="600">${(cwOut-cwIn).toFixed(1)}\u00B0C</text>`);
 s+=`<text x="250" y="${btY+32}" fill="var(--t3)" font-family="${F}" font-size="6">Approach</text>`;
@@ -10025,7 +10033,7 @@ s+=rzD(P.optAll(["condApp"]),`<text x="440" y="${btY+32}" fill="var(--o)" font-f
 s+=`<text x="480" y="${btY+32}" fill="var(--t3)" font-family="${F}" font-size="6">kW/ton</text>`;
 s+=rzD(P.optAll(["kw_ton"]),`<text x="540" y="${btY+32}" fill="var(--g)" font-family="${F}" font-size="8" font-weight="600">${kWton}</text>`);
 s+=`<text x="${W-60}" y="${btY+32}" fill="var(--t3)" font-family="${F}" font-size="6">Load</text>`;
-s+=rzD(P.optAll(["vfd_pct"]),`<text x="${W-20}" y="${btY+32}" fill="var(--o)" font-family="${F}" font-size="10" text-anchor="end" font-weight="700">${loadPct}%</text>`);
+s+=rzD(P.optAll(["vfd_pct"]),`<text x="${W-20}" y="${btY+32}" fill="var(--o)" font-family="${F}" font-size="10" text-anchor="end" font-weight="700">${nz(loadPct)}%</text>`);
 // ON/OFF + alarms
 s+=`<rect x="20" y="${btY+38}" width="35" height="14" rx="3" fill="rgba(34,197,94,.15)" stroke="var(--g)" stroke-width=".8"/>`;
 s+=`<text x="37" y="${btY+48}" fill="var(--g)" font-family="${F}" font-size="6" text-anchor="middle" font-weight="600">START</text>`;
@@ -10044,13 +10052,13 @@ s+=rzD(P.optAll(["brgRadDE"]),`<text x="165" y="${oY+24}" fill="var(--g)" font-f
 s+=`<text x="220" y="${oY+24}" fill="var(--t3)" font-family="${F}" font-size="5">Radial NDE</text>`;
 s+=rzD(P.optAll(["brgRadNDE"]),`<text x="285" y="${oY+24}" fill="var(--g)" font-family="${F}" font-size="6" font-weight="600">${brgRadNDE} mm</text>`);
 s+=`<text x="340" y="${oY+24}" fill="var(--t3)" font-family="${F}" font-size="5">Temp</text>`;
-s+=rzD(P.optAll(["bearing_c"]),`<text x="365" y="${oY+24}" fill="${bearingT>65?'var(--o)':'var(--g)'}" font-family="${F}" font-size="6" font-weight="600">${bearingT}\u00B0C</text>`);
+s+=rzD(P.optAll(["bearing_c"]),`<text x="365" y="${oY+24}" fill="${bearingT>65?'var(--o)':'var(--g)'}" font-family="${F}" font-size="6" font-weight="600">${nz(bearingT)}\u00B0C</text>`);
 s+=`<text x="20" y="${oY+38}" fill="var(--t3)" font-family="${F}" font-size="5">Speed</text>`;
-s+=rzD(P.optAll(["brgSpeed"]),`<text x="60" y="${oY+38}" fill="var(--p)" font-family="${F}" font-size="6" font-weight="600">${brgSpeed} RPM</text>`);
+s+=rzD(P.optAll(["brgSpeed"]),`<text x="60" y="${oY+38}" fill="var(--p)" font-family="${F}" font-size="6" font-weight="600">${nz(brgSpeed)} RPM</text>`);
 s+=`<text x="140" y="${oY+38}" fill="var(--t3)" font-family="${F}" font-size="5">EER</text>`;
 s+=rzD(P.optAll(["eer"]),`<text x="165" y="${oY+38}" fill="var(--g)" font-family="${F}" font-size="6" font-weight="600">${eer}</text>`);
 s+=`<text x="220" y="${oY+38}" fill="var(--t3)" font-family="${F}" font-size="5">Starts</text>`;
-s+=rzD(P.optAll(["starts"]),`<text x="260" y="${oY+38}" fill="var(--t3)" font-family="${F}" font-size="6">${starts}</text>`);
+s+=rzD(P.optAll(["starts"]),`<text x="260" y="${oY+38}" fill="var(--t3)" font-family="${F}" font-size="6">${nz(starts)}</text>`);
 s+=`<text x="310" y="${oY+38}" fill="var(--t3)" font-family="${F}" font-size="5">Levitation</text>`;
 s+=`<text x="365" y="${oY+38}" fill="var(--g)" font-family="${F}" font-size="6" font-weight="600">OK</text>`;
 // PERFORMANCE
@@ -10060,10 +10068,10 @@ comps.forEach(function(c,i){var cy3=oY+24+i*12;
 s+=`<text x="405" y="${cy3}" fill="var(--t3)" font-family="${F}" font-size="5">${c.id}</text>`;
 s+=`<circle cx="425" cy="${cy3-3}" r="2.5" fill="${c.st==='RUN'?'var(--g)':'var(--o)'}"/>`;
 s+=`<text x="432" y="${cy3}" fill="${c.st==='RUN'?'var(--g)':'var(--o)'}" font-family="${F}" font-size="5">${c.st}</text>`;
-s+=`<text x="470" y="${cy3}" fill="var(--t3)" font-family="${F}" font-size="5">VFD ${c.st==='RUN'?c.vfd+'%':'--'}</text>`;
-s+=`<text x="530" y="${cy3}" fill="var(--t3)" font-family="${F}" font-size="5">${c.st==='RUN'?c.amp+'A':'0A'}</text>`;
-s+=rzD(P.optAll(["auto_6"]),`<text x="575" y="${cy3}" fill="var(--t3)" font-family="${F}" font-size="5">Brg ${c.st==='RUN'?P.n('auto_6')+'\u00B0C':'--'}</text>`);
-s+=rzD(P.optAll(["auto_7"]),`<text x="640" y="${cy3}" fill="var(--t3)" font-family="${F}" font-size="5">Run ${c.st==='RUN'?P.n('auto_7')+'h':'0h'}</text>`);
+s+=`<text x="470" y="${cy3}" fill="var(--t3)" font-family="${F}" font-size="5">VFD ${c.st==='RUN'?nz(c.vfd)+'%':'--'}</text>`;
+s+=`<text x="530" y="${cy3}" fill="var(--t3)" font-family="${F}" font-size="5">${c.st==='RUN'?nz(c.amp)+'A':'0A'}</text>`;
+s+=rzD(P.optAll(["auto_6"]),`<text x="575" y="${cy3}" fill="var(--t3)" font-family="${F}" font-size="5">Brg ${c.st==='RUN'?P.v('auto_6')+'\u00B0C':'--'}</text>`);
+s+=rzD(P.optAll(["auto_7"]),`<text x="640" y="${cy3}" fill="var(--t3)" font-family="${F}" font-size="5">Run ${c.st==='RUN'?P.v('auto_7')+'h':'0h'}</text>`);
 s+=rzD(P.optAll(["auto_8"]),`<text x="710" y="${cy3}" fill="var(--t3)" font-family="${F}" font-size="5">Brg ${c.st==='RUN'?P.v('auto_8')+' mm':'--'}</text>`);
 });
 // Operating envelope: COP vs Load% mini chart (below magnetic bearing section)
@@ -10080,7 +10088,7 @@ s+=`<path d="M${opX+35},${opY+opH-20} Q${opX+120},${opY+20} ${opX+200},${opY+22}
 var opDotX=opX+35+(opW-50)*loadPct/100;
 var opDotY=opY+22+Math.abs(loadPct-55)*0.3;
 s+=`<circle cx="${opDotX}" cy="${opDotY}" r="3.5" fill="rgba(245,158,11,.3)" stroke="var(--o)" stroke-width="1"/>`;
-s+=rzD(P.optAll(["cop", "vfd_pct"]),`<text x="${opDotX+6}" y="${opDotY+2}" fill="var(--o)" font-family="${F}" font-size="5" font-weight="600">${loadPct}% / ${cop}</text>`);
+s+=rzD(P.optAll(["cop", "vfd_pct"]),`<text x="${opDotX+6}" y="${opDotY+2}" fill="var(--o)" font-family="${F}" font-size="5" font-weight="600">${nz(loadPct)}% / ${cop}</text>`);
 // Magnetic bearing gap trend (mini sparkline, right of COP chart)
 var brX=395,brY=opY,brW=375,brH=80;
 s+=`<rect x="${brX}" y="${brY}" width="${brW}" height="${brH}" rx="3" fill="rgba(100, 116, 139,.04)" stroke="var(--p)" stroke-width=".5"/>`;
@@ -10097,7 +10105,7 @@ s+=`<text x="${brX+brW/2}" y="${brY+opH-4}" fill="var(--t3)" font-family="${F}" 
 // Bottom bar
 s+=`<rect x="0" y="${H-24}" width="${W}" height="24" fill="rgba(245,158,11,.06)"/>`;
 s+=`<text x="10" y="${H-9}" fill="var(--t3)" font-family="${F}" font-size="7">IP: 192.168.11.15${chId} | R-1234ze(E) GWP<1 | Water-Cooled Centrifugal | 4,000 kW | Mag Bearing</text>`;
-s+=rzD(P.optAll(["cop", "vfd_pct", "run_hours", "kw_ton"]),`<text x="${W-10}" y="${H-9}" fill="var(--o)" font-family="${F}" font-size="7" text-anchor="end">COP ${cop} | Load ${loadPct}% | kW/ton ${kWton} | ${runHrs}h</text>`);
+s+=rzD(P.optAll(["cop", "vfd_pct", "run_hours", "kw_ton"]),`<text x="${W-10}" y="${H-9}" fill="var(--o)" font-family="${F}" font-size="7" text-anchor="end">COP ${cop} | Load ${nz(loadPct)}% | kW/ton ${kWton} | ${nz(runHrs)}h</text>`);
 el.innerHTML=s;
 
 /* @rz-hmi:end renderChillerHmi */}
@@ -10161,7 +10169,7 @@ s+=`<text x="10" y="17" fill="var(--p)" font-family="${F}" font-size="10" font-w
 s+=`<circle cx="200" cy="13" r="4" fill="var(--g)" opacity=".8"/>`;
 s+=`<text x="208" y="17" fill="var(--g)" font-family="${F}" font-size="8">RUN</text>`;
 s+=`<text x="${W/2}" y="17" fill="var(--t2)" font-family="${F}" font-size="8" text-anchor="middle">Closed-Loop Finned Coil | Zero Water</text>`;
-s+=rzD(P.optAll(["runHrs", "starts"]),`<text x="${W-10}" y="17" fill="var(--t3)" font-family="${F}" font-size="7" text-anchor="end">${runHrs} hrs | ${starts} starts</text>`);
+s+=rzD(P.optAll(["runHrs", "starts"]),`<text x="${W-10}" y="17" fill="var(--t3)" font-family="${F}" font-size="7" text-anchor="end">${nz(runHrs)} hrs | ${nz(starts)} starts</text>`);
 // KPI strip
 var iy=30,bw=110;
 var avgFan=Math.round((fanPct[0]+fanPct[1]+fanPct[2])/3);
@@ -10176,7 +10184,7 @@ var kpis=[
 for(var k=0;k<kpis.length;k++){var kx=10+k*(bw+5);
 s+=`<rect x="${kx}" y="${iy}" width="${bw}" height="30" rx="3" fill="${kpis[k].bg}" stroke="${kpis[k].bc}" stroke-width=".6"/>`;
 s+=`<text x="${kx+bw/2}" y="${iy+11}" fill="var(--t3)" font-family="${F}" font-size="6" text-anchor="middle">${kpis[k].l}</text>`;
-s+=`<text x="${kx+bw/2}" y="${iy+24}" fill="${kpis[k].c}" font-family="${F}" font-size="11" text-anchor="middle" font-weight="600">${kpis[k].v}</text>`;
+s+=`<text x="${kx+bw/2}" y="${iy+24}" fill="${kpis[k].c}" font-family="${F}" font-size="11" text-anchor="middle" font-weight="600">${nz(kpis[k].v)}</text>`;
 }
 // ===== DRY COOLER CROSS-SECTION =====
 var tX=10,tY=74,tW=700,tH=210;
@@ -10196,7 +10204,7 @@ s+=`<line x1="${fx}" y1="${fy+2}" x2="${fx+ddx}" y2="${fy+2+ddy}" stroke="var(--
 s+=`</g>`;
 // Fan label + VFD
 s+=`<text x="${fx-38}" y="${fy}" fill="var(--o)" font-family="${F}" font-size="5" font-weight="600">${fanNames[i]}</text>`;
-s+=`<text x="${fx+38}" y="${fy-2}" fill="var(--o)" font-family="${F}" font-size="5" text-anchor="end">${fanPct[i]}%</text>`;
+s+=`<text x="${fx+38}" y="${fy-2}" fill="var(--o)" font-family="${F}" font-size="5" text-anchor="end">${nz(fanPct[i])}%</text>`;
 s+=`<text x="${fx+38}" y="${fy+6}" fill="var(--t3)" font-family="${F}" font-size="5.5" text-anchor="end">${fanRPM[i]}rpm</text>`;
 // Exhaust arrows (hot air out top)
 s+=`<text x="${fx}" y="${fy-18}" fill="var(--t3)" font-family="${F}" font-size="8" text-anchor="middle" opacity=".4">\u25B2\u25B2</text>`;
@@ -10204,10 +10212,10 @@ s+=`<text x="${fx}" y="${fy-18}" fill="var(--t3)" font-family="${F}" font-size="
 var mbY=fy+20;
 s+=`<rect x="${fx-45}" y="${mbY}" width="90" height="38" rx="2" fill="rgba(245,158,11,.03)" stroke="var(--o)" stroke-width=".3"/>`;
 s+=`<text x="${fx-42}" y="${mbY+8}" fill="var(--o)" font-family="${F}" font-size="5.5" font-weight="600">Motor 45kW VFD</text>`;
-s+=`<text x="${fx-42}" y="${mbY+15}" fill="var(--t3)" font-family="${F}" font-size="5.5">Amps: <tspan fill="var(--c)">${fanAmps[i].toFixed(1)}A</tspan></text>`;
-s+=`<text x="${fx+3}" y="${mbY+15}" fill="var(--t3)" font-family="${F}" font-size="5.5">Vib: <tspan fill="${fanVib[i]>3?'var(--r)':'var(--g)'}">${fanVib[i].toFixed(1)}mm/s</tspan></text>`;
-s+=`<text x="${fx-42}" y="${mbY+22}" fill="var(--t3)" font-family="${F}" font-size="5.5">Brg DE: <tspan fill="${fanBrgDE[i]>46?'var(--o)':'var(--c)'}">${fanBrgDE[i].toFixed(0)}\u00B0C</tspan></text>`;
-s+=`<text x="${fx+3}" y="${mbY+22}" fill="var(--t3)" font-family="${F}" font-size="5.5">NDE: <tspan fill="${fanBrgNDE[i]>43?'var(--o)':'var(--c)'}">${fanBrgNDE[i].toFixed(0)}\u00B0C</tspan></text>`;
+s+=`<text x="${fx-42}" y="${mbY+15}" fill="var(--t3)" font-family="${F}" font-size="5.5">Amps: <tspan fill="var(--c)">${nzf(fanAmps[i],1)}A</tspan></text>`;
+s+=`<text x="${fx+3}" y="${mbY+15}" fill="var(--t3)" font-family="${F}" font-size="5.5">Vib: <tspan fill="${fanVib[i]>3?'var(--r)':'var(--g)'}">${nzf(fanVib[i],1)}mm/s</tspan></text>`;
+s+=`<text x="${fx-42}" y="${mbY+22}" fill="var(--t3)" font-family="${F}" font-size="5.5">Brg DE: <tspan fill="${fanBrgDE[i]>46?'var(--o)':'var(--c)'}">${nzf(fanBrgDE[i],0)}\u00B0C</tspan></text>`;
+s+=`<text x="${fx+3}" y="${mbY+22}" fill="var(--t3)" font-family="${F}" font-size="5.5">NDE: <tspan fill="${fanBrgNDE[i]>43?'var(--o)':'var(--c)'}">${nzf(fanBrgNDE[i],0)}\u00B0C</tspan></text>`;
 s+=`<circle cx="${fx+40}" cy="${mbY+32}" r="3" fill="${fanVib[i]>3?'rgba(239,68,68,.3)':'rgba(34,197,94,.3)'}" stroke="${fanVib[i]>3?'var(--r)':'var(--g)'}" stroke-width=".5"/>`;
 s+=`<text x="${fx+40}" y="${mbY+34}" fill="${fanVib[i]>3?'var(--r)':'var(--g)'}" font-family="${F}" font-size="5" text-anchor="middle">${fanVib[i]>3?'!':'\u2713'}</text>`;
 s+=`<text x="${fx-42}" y="${mbY+34}" fill="var(--t3)" font-family="${F}" font-size="5">Direct: <tspan fill="var(--g)">OK</tspan></text>`;
@@ -10245,7 +10253,7 @@ s+=`<text x="248" y="${wtY+28}" fill="var(--p)" font-family="${F}" font-size="6"
 s+=`<text x="275" y="${wtY+28}" fill="var(--t3)" font-family="${F}" font-size="5">Freeze Pt:</text>`;
 s+=`<text x="320" y="${wtY+28}" fill="var(--c)" font-family="${F}" font-size="6" font-weight="600">${glycolFP}\u00B0C</text>`;
 s+=`<text x="20" y="${wtY+42}" fill="var(--t3)" font-family="${F}" font-size="5">pH:</text>`;
-s+=`<text x="40" y="${wtY+42}" fill="var(--g)" font-family="${F}" font-size="6" font-weight="600">${glycolPH.toFixed(1)}</text>`;
+s+=`<text x="40" y="${wtY+42}" fill="var(--g)" font-family="${F}" font-size="6" font-weight="600">${nzf(glycolPH,1)}</text>`;
 s+=`<text x="75" y="${wtY+42}" fill="var(--t3)" font-family="${F}" font-size="5">Corr Inhibitor:</text>`;
 s+=`<text x="150" y="${wtY+42}" fill="var(--g)" font-family="${F}" font-size="6" font-weight="600">OK</text>`;
 s+=`<text x="180" y="${wtY+42}" fill="var(--t3)" font-family="${F}" font-size="5">Color:</text>`;
@@ -10258,7 +10266,7 @@ s+=`<text x="240" y="${wtY+56}" fill="var(--t3)" font-family="${F}" font-size="5
 s+=`<text x="20" y="${wtY+70}" fill="var(--t3)" font-family="${F}" font-size="5">Legionella Risk:</text>`;
 s+=`<text x="100" y="${wtY+70}" fill="var(--g)" font-family="${F}" font-size="6" font-weight="600">NONE (closed loop)</text>`;
 s+=`<text x="20" y="${wtY+84}" fill="var(--t3)" font-family="${F}" font-size="5">Expansion Vessel:</text>`;
-s+=rzD(P.optAll(["auto_20"]),`<text x="105" y="${wtY+84}" fill="var(--g)" font-family="${F}" font-size="6" font-weight="600">${P.n('auto_20')}% N\u2082</text>`);
+s+=rzD(P.optAll(["auto_20"]),`<text x="105" y="${wtY+84}" fill="var(--g)" font-family="${F}" font-size="6" font-weight="600">${P.v('auto_20')}% N\u2082</text>`);
 s+=`<text x="180" y="${wtY+84}" fill="var(--t3)" font-family="${F}" font-size="5">PRV Set:</text>`;
 s+=`<text x="220" y="${wtY+84}" fill="var(--c)" font-family="${F}" font-size="6" font-weight="600">6.0 bar</text>`;
 // ===== PERFORMANCE & MAINTENANCE =====
@@ -10272,7 +10280,7 @@ s+=`<text x="535" y="${pmY+28}" fill="var(--o)" font-family="${F}" font-size="7"
 s+=`<text x="580" y="${pmY+28}" fill="var(--t3)" font-family="${F}" font-size="5">Efficiency:</text>`;
 s+=`<text x="635" y="${pmY+28}" fill="var(--g)" font-family="${F}" font-size="7" font-weight="600">${eff}%</text>`;
 s+=`<text x="375" y="${pmY+42}" fill="var(--t3)" font-family="${F}" font-size="5">Total Fan Power:</text>`;
-s+=`<text x="455" y="${pmY+42}" fill="var(--o)" font-family="${F}" font-size="6" font-weight="600">${totalFanPwr} kW</text>`;
+s+=`<text x="455" y="${pmY+42}" fill="var(--o)" font-family="${F}" font-size="6" font-weight="600">${nz(totalFanPwr)} kW</text>`;
 s+=`<text x="510" y="${pmY+42}" fill="var(--t3)" font-family="${F}" font-size="5">kW/ton:</text>`;
 var kwTon=P.n('kw_ton')!=null?+P.n('kw_ton').toFixed(4):null;   /* Rule 2: plant kW/ton is the payload identity over marked parameters */
 s+=`<text x="550" y="${pmY+42}" fill="var(--c)" font-family="${F}" font-size="6" font-weight="600">${kwTon!=null?kwTon.toFixed(3):"\u2014"}</text>`;
@@ -10280,13 +10288,13 @@ s+=`<text x="600" y="${pmY+42}" fill="var(--t3)" font-family="${F}" font-size="5
 s+=rzD(P.optAll(["unit_flow_m3h"]),`<text x="648" y="${pmY+42}" fill="var(--c)" font-family="${F}" font-size="6" font-weight="600">${cwFlowTxt}</text>`);
 var heatRej=P.n('heatRej');
 s+=`<text x="375" y="${pmY+55}" fill="var(--t3)" font-family="${F}" font-size="5">Heat Rejection:</text>`;
-s+=rzD(P.optAll(["heatRej"]),`<text x="452" y="${pmY+55}" fill="var(--o)" font-family="${F}" font-size="6" font-weight="600">${heatRej} kW</text>`);
+s+=rzD(P.optAll(["heatRej"]),`<text x="452" y="${pmY+55}" fill="var(--o)" font-family="${F}" font-size="6" font-weight="600">${nz(heatRej)} kW</text>`);
 s+=`<text x="510" y="${pmY+55}" fill="var(--t3)" font-family="${F}" font-size="5">Coil Fouling:</text>`;
 s+=`<text x="575" y="${pmY+55}" fill="var(--g)" font-family="${F}" font-size="5" font-weight="600">LOW</text>`;
 s+=`<text x="375" y="${pmY+68}" fill="var(--t3)" font-family="${F}" font-size="5">Run Hours:</text>`;
-s+=rzD(P.optAll(["runHrs"]),`<text x="430" y="${pmY+68}" fill="var(--t2)" font-family="${F}" font-size="6" font-weight="600">${runHrs}</text>`);
+s+=rzD(P.optAll(["runHrs"]),`<text x="430" y="${pmY+68}" fill="var(--t2)" font-family="${F}" font-size="6" font-weight="600">${nz(runHrs)}</text>`);
 s+=`<text x="475" y="${pmY+68}" fill="var(--t3)" font-family="${F}" font-size="5">Starts:</text>`;
-s+=rzD(P.optAll(["starts"]),`<text x="510" y="${pmY+68}" fill="var(--t2)" font-family="${F}" font-size="6" font-weight="600">${starts}</text>`);
+s+=rzD(P.optAll(["starts"]),`<text x="510" y="${pmY+68}" fill="var(--t2)" font-family="${F}" font-size="6" font-weight="600">${nz(starts)}</text>`);
 s+=`<text x="550" y="${pmY+68}" fill="var(--t3)" font-family="${F}" font-size="5">Next PM:</text>`;
 s+=`<text x="600" y="${pmY+68}" fill="var(--g)" font-family="${F}" font-size="5" font-weight="600">1200h</text>`;
 s+=`<text x="375" y="${pmY+81}" fill="var(--t3)" font-family="${F}" font-size="5">Fin Cond:</text>`;
@@ -10306,12 +10314,12 @@ s+=`<text x="${cxs[c]}" y="${ftY+25}" fill="var(--t3)" font-family="${F}" font-s
 }
 for(var i=0;i<3;i++){var ry=ftY+35+i*10;
 s+=`<text x="${cxs[0]}" y="${ry}" fill="var(--o)" font-family="${F}" font-size="5" font-weight="600">${fanNames[i]}</text>`;
-s+=`<text x="${cxs[1]}" y="${ry}" fill="var(--c)" font-family="${F}" font-size="5">${fanPct[i]}%</text>`;
-s+=`<text x="${cxs[2]}" y="${ry}" fill="var(--c)" font-family="${F}" font-size="5">${fanRPM[i]}</text>`;
-s+=`<text x="${cxs[3]}" y="${ry}" fill="var(--c)" font-family="${F}" font-size="5">${fanAmps[i].toFixed(1)}A</text>`;
-s+=`<text x="${cxs[4]}" y="${ry}" fill="${fanBrgDE[i]>46?'var(--o)':'var(--c)'}" font-family="${F}" font-size="5">${fanBrgDE[i].toFixed(0)}\u00B0C</text>`;
-s+=`<text x="${cxs[5]}" y="${ry}" fill="${fanBrgNDE[i]>43?'var(--o)':'var(--c)'}" font-family="${F}" font-size="5">${fanBrgNDE[i].toFixed(0)}\u00B0C</text>`;
-s+=`<text x="${cxs[6]}" y="${ry}" fill="${fanVib[i]>3?'var(--r)':'var(--g)'}" font-family="${F}" font-size="5">${fanVib[i].toFixed(1)}mm/s</text>`;
+s+=`<text x="${cxs[1]}" y="${ry}" fill="var(--c)" font-family="${F}" font-size="5">${nz(fanPct[i])}%</text>`;
+s+=`<text x="${cxs[2]}" y="${ry}" fill="var(--c)" font-family="${F}" font-size="5">${nz(fanRPM[i])}</text>`;
+s+=`<text x="${cxs[3]}" y="${ry}" fill="var(--c)" font-family="${F}" font-size="5">${nzf(fanAmps[i],1)}A</text>`;
+s+=`<text x="${cxs[4]}" y="${ry}" fill="${fanBrgDE[i]>46?'var(--o)':'var(--c)'}" font-family="${F}" font-size="5">${nzf(fanBrgDE[i],0)}\u00B0C</text>`;
+s+=`<text x="${cxs[5]}" y="${ry}" fill="${fanBrgNDE[i]>43?'var(--o)':'var(--c)'}" font-family="${F}" font-size="5">${nzf(fanBrgNDE[i],0)}\u00B0C</text>`;
+s+=`<text x="${cxs[6]}" y="${ry}" fill="${fanVib[i]>3?'var(--r)':'var(--g)'}" font-family="${F}" font-size="5">${nzf(fanVib[i],1)}mm/s</text>`;
 s+=`<text x="${cxs[7]}" y="${ry}" fill="var(--g)" font-family="${F}" font-size="5">Direct</text>`;
 s+=`<circle cx="${cxs[8]+6}" cy="${ry-2}" r="3" fill="rgba(34,197,94,.2)" stroke="var(--g)" stroke-width=".5"/>`;
 s+=`<text x="${cxs[8]+6}" y="${ry}" fill="var(--g)" font-family="${F}" font-size="5.5" text-anchor="middle">\u2713</text>`;
@@ -10328,13 +10336,13 @@ s+=`<text x="79" y="${ftY+77}" fill="var(--t3)" font-family="${F}" font-size="7"
 s+=`<text x="${W-40}" y="${ftY+77}" fill="var(--g)" font-family="${F}" font-size="7" text-anchor="middle" font-weight="600">0 Alarms</text>`;
 // Environmental
 s+=rzD(P.optAll(["ambient_c"]),`<text x="130" y="${ftY+77}" fill="var(--t3)" font-family="${F}" font-size="5">Ambient: <tspan fill="var(--c)">${ambT}\u00B0C</tspan></text>`);
-s+=rzD(P.optAll(["auto_21"]),`<text x="230" y="${ftY+77}" fill="var(--t3)" font-family="${F}" font-size="5">RH: <tspan fill="var(--c)">${P.n('auto_21')}%</tspan></text>`);
+s+=rzD(P.optAll(["auto_21"]),`<text x="230" y="${ftY+77}" fill="var(--t3)" font-family="${F}" font-size="5">RH: <tspan fill="var(--c)">${P.v('auto_21')}%</tspan></text>`);
 s+=rzD(P.optAll(["auto_22"]),`<text x="290" y="${ftY+77}" fill="var(--t3)" font-family="${F}" font-size="5">Wind: <tspan fill="var(--c)">${P.v('auto_22')} m/s</tspan></text>`);
-s+=rzD(P.optAll(["auto_23"]),`<text x="390" y="${ftY+77}" fill="var(--t3)" font-family="${F}" font-size="5">Noise: <tspan fill="var(--c)">${P.n('auto_23')} dBA</tspan></text>`);
+s+=rzD(P.optAll(["auto_23"]),`<text x="390" y="${ftY+77}" fill="var(--t3)" font-family="${F}" font-size="5">Noise: <tspan fill="var(--c)">${P.v('auto_23')} dBA</tspan></text>`);
 // Bottom status bar
 s+=`<rect x="0" y="${H-24}" width="${W}" height="24" fill="rgba(100, 116, 139,.06)"/>`;
 s+=rzD(P.optAll(["unit_flow_m3h"]),`<text x="10" y="${H-9}" fill="var(--t3)" font-family="${F}" font-size="7">Closed-Loop | 30% PG Glycol | WUE 0.00 | No Make-up | CW Flow ${cwFlowTxt}</text>`);
-s+=rzD(P.optAll(["heatRej"]),`<text x="${W-10}" y="${H-9}" fill="var(--p)" font-family="${F}" font-size="7" text-anchor="end">Approach ${approach}\u00B0C | Range ${range}\u00B0C | \u03B7 ${eff}% | Heat Rej ${heatRej}kW</text>`);
+s+=rzD(P.optAll(["heatRej"]),`<text x="${W-10}" y="${H-9}" fill="var(--p)" font-family="${F}" font-size="7" text-anchor="end">Approach ${approach}\u00B0C | Range ${range}\u00B0C | \u03B7 ${eff}% | Heat Rej ${nz(heatRej)}kW</text>`);
 el.innerHTML=s;
 
 /* @rz-hmi:end renderCtHmi */}
@@ -10385,11 +10393,11 @@ s+=`<text x="10" y="17" fill="var(--c)" font-family="${F}" font-size="10" font-w
 s+=`<circle cx="340" cy="13" r="4" fill="var(--g)" opacity=".8"/><text x="348" y="17" fill="var(--g)" font-family="${F}" font-size="8">Online</text>`;
 s+=`<text x="${W-10}" y="17" fill="var(--t3)" font-family="${F}" font-size="8" text-anchor="end">3\u00D7 P-CW (N+1)</text>`;
 // KPI strip
-var kpis=[{l:'Total Flow',v:P.n('auto_1')+' m\u00B3/h',c:'var(--c)'},{l:'Discharge P',v:P.v('auto_2')+' bar',c:'var(--g)'},{l:'Suction P',v:P.v('auto_3')+' bar',c:'var(--c)'},{l:'\u0394P',v:P.v('auto_4')+' bar',c:'var(--o)'},{l:'Total kW',v:P.n('auto_5'),c:'var(--o)'},{l:'Pumps Active',v:'2/3',c:'var(--g)'}];
+var kpis=[{l:'Total Flow',v:P.v('auto_1')+' m\u00B3/h',c:'var(--c)'},{l:'Discharge P',v:P.v('auto_2')+' bar',c:'var(--g)'},{l:'Suction P',v:P.v('auto_3')+' bar',c:'var(--c)'},{l:'\u0394P',v:P.v('auto_4')+' bar',c:'var(--o)'},{l:'Total kW',v:P.n('auto_5'),c:'var(--o)'},{l:'Pumps Active',v:'2/3',c:'var(--g)'}];
 for(var k=0;k<kpis.length;k++){var kx=10+k*127;
 s+=`<rect x="${kx}" y="30" width="122" height="28" rx="3" fill="rgba(6,182,212,.04)" stroke="var(--c)" stroke-width=".4"/>`;
 s+=`<text x="${kx+61}" y="41" fill="var(--t3)" font-family="${F}" font-size="5.5" text-anchor="middle">${kpis[k].l}</text>`;
-s+=`<text x="${kx+61}" y="53" fill="${kpis[k].c}" font-family="${F}" font-size="10" text-anchor="middle" font-weight="600">${kpis[k].v}</text>`;
+s+=`<text x="${kx+61}" y="53" fill="${kpis[k].c}" font-family="${F}" font-size="10" text-anchor="middle" font-weight="600">${nz(kpis[k].v)}</text>`;
 }
 // ===== SUCTION HEADER =====
 s+=`<rect x="10" y="68" width="30" height="350" rx="3" fill="rgba(6,182,212,.04)" stroke="var(--c)" stroke-width=".8"/>`;
@@ -10437,8 +10445,8 @@ s+=`<line x1="195" y1="${p.y+58}" x2="${195+dx}" y2="${p.y+58+dy}" stroke="${pc}
 s+=`</g>`;
 }else{s+=`<text x="195" y="${p.y+61}" fill="${pc}" font-family="${F}" font-size="8" text-anchor="middle">M</text>`;}
 // VFD details
-s+=`<text x="225" y="${p.y+48}" fill="${pc}" font-family="${F}" font-size="6" font-weight="600">${p.st==='RUN'?p.vfd+'%':'OFF'}</text>`;
-s+=`<text x="225" y="${p.y+58}" fill="var(--t3)" font-family="${F}" font-size="5">${p.st==='RUN'?p.amp+'A':'0A'}</text>`;
+s+=`<text x="225" y="${p.y+48}" fill="${pc}" font-family="${F}" font-size="6" font-weight="600">${p.st==='RUN'?nz(p.vfd)+'%':'OFF'}</text>`;
+s+=`<text x="225" y="${p.y+58}" fill="var(--t3)" font-family="${F}" font-size="5">${p.st==='RUN'?nz(p.amp)+'A':'0A'}</text>`;
 s+=`<text x="225" y="${p.y+68}" fill="var(--t3)" font-family="${F}" font-size="5">Wdg: ${p.st==='RUN'?p.temp+'\u00B0C':'--'}</text>`;
 // Pump casing
 s+=`<line x1="245" y1="${p.y+50}" x2="275" y2="${p.y+50}" stroke="${pc}" stroke-width="2"/>`;
@@ -10466,7 +10474,7 @@ s+=`<rect x="405" y="${p.y+6}" width="320" height="92" rx="3" fill="rgba(107,114
 s+=`<text x="415" y="${p.y+18}" fill="var(--t3)" font-family="${F}" font-size="5">Motor</text>`;
 s+=`<text x="500" y="${p.y+18}" fill="${pc}" font-family="${F}" font-size="5" font-weight="600">75kW / 400V / IE4 Full access</text>`;
 s+=`<text x="415" y="${p.y+30}" fill="var(--t3)" font-family="${F}" font-size="5">Speed</text>`;
-s+=rzD(P.optAll(["auto_19"]),`<text x="500" y="${p.y+30}" fill="${pc}" font-family="${F}" font-size="5" font-weight="600">${p.st==='RUN'?P.n('auto_19'):0} RPM (${p.st==='RUN'?p.vfd:0}%)</text>`);
+s+=rzD(P.optAll(["auto_19"]),`<text x="500" y="${p.y+30}" fill="${pc}" font-family="${F}" font-size="5" font-weight="600">${p.st==='RUN'?P.v('auto_19'):0} RPM (${p.st==='RUN'?nz(p.vfd):0}%)</text>`);
 s+=`<text x="415" y="${p.y+42}" fill="var(--t3)" font-family="${F}" font-size="5">Vibration</text>`;
 s+=rzD(P.optAll(["auto_20"]),`<text x="500" y="${p.y+42}" fill="var(--g)" font-family="${F}" font-size="5" font-weight="600">${p.st==='RUN'?P.v('auto_20'):'--'} mm/s</text>`);
 s+=`<text x="415" y="${p.y+54}" fill="var(--t3)" font-family="${F}" font-size="5">Bearing DE</text>`;
@@ -10509,11 +10517,11 @@ s+=`<text x="10" y="17" fill="var(--g)" font-family="${F}" font-size="10" font-w
 s+=`<circle cx="400" cy="13" r="4" fill="var(--g)" opacity=".8"/><text x="408" y="17" fill="var(--g)" font-family="${F}" font-size="8">Online</text>`;
 s+=`<text x="${W-10}" y="17" fill="var(--t3)" font-family="${F}" font-size="8" text-anchor="end">3\u00D7 P-FWS (N+1)</text>`;
 // KPI strip
-var kpis=[{l:'Total Flow',v:P.n('auto_1')+' m\u00B3/h',c:'var(--g)'},{l:'Discharge P',v:P.v('auto_2')+' bar',c:'var(--g)'},{l:'Suction P',v:P.v('auto_3')+' bar',c:'var(--c)'},{l:'Glycol',v:'30%',c:'var(--pk)'},{l:'Exp Tank',v:P.n('auto_4')+'%',c:'var(--p)'},{l:'Pumps',v:'2/3',c:'var(--g)'}];
+var kpis=[{l:'Total Flow',v:P.v('auto_1')+' m\u00B3/h',c:'var(--g)'},{l:'Discharge P',v:P.v('auto_2')+' bar',c:'var(--g)'},{l:'Suction P',v:P.v('auto_3')+' bar',c:'var(--c)'},{l:'Glycol',v:'30%',c:'var(--pk)'},{l:'Exp Tank',v:P.v('auto_4')+'%',c:'var(--p)'},{l:'Pumps',v:'2/3',c:'var(--g)'}];
 for(var k=0;k<kpis.length;k++){var kx=10+k*127;
 s+=`<rect x="${kx}" y="30" width="122" height="28" rx="3" fill="rgba(34,197,94,.04)" stroke="var(--g)" stroke-width=".4"/>`;
 s+=`<text x="${kx+61}" y="41" fill="var(--t3)" font-family="${F}" font-size="5.5" text-anchor="middle">${kpis[k].l}</text>`;
-s+=`<text x="${kx+61}" y="53" fill="${kpis[k].c}" font-family="${F}" font-size="10" text-anchor="middle" font-weight="600">${kpis[k].v}</text>`;
+s+=`<text x="${kx+61}" y="53" fill="${kpis[k].c}" font-family="${F}" font-size="10" text-anchor="middle" font-weight="600">${nz(kpis[k].v)}</text>`;
 }
 // Suction header
 s+=`<rect x="10" y="68" width="25" height="245" rx="3" fill="rgba(34,197,94,.04)" stroke="var(--g)" stroke-width=".8"/>`;
@@ -10553,8 +10561,8 @@ s+=`<g><animateTransform attributeName="transform" type="rotate" from="0 175 ${p
 s+=`<polygon points="170,${p.y+44} 180,${p.y+48} 170,${p.y+52}" fill="${pc}" fill-opacity=".4"/>`;
 s+=`</g>`;
 }else{s+=`<text x="175" y="${p.y+51}" fill="${pc}" font-family="${F}" font-size="7" text-anchor="middle">M</text>`;}
-s+=`<text x="200" y="${p.y+46}" fill="${pc}" font-family="${F}" font-size="6" font-weight="600">${p.st==='RUN'?p.vfd+'%':'OFF'}</text>`;
-s+=`<text x="200" y="${p.y+56}" fill="var(--t3)" font-family="${F}" font-size="5">${p.st==='RUN'?p.amp+'A':'0A'}</text>`;
+s+=`<text x="200" y="${p.y+46}" fill="${pc}" font-family="${F}" font-size="6" font-weight="600">${p.st==='RUN'?nz(p.vfd)+'%':'OFF'}</text>`;
+s+=`<text x="200" y="${p.y+56}" fill="var(--t3)" font-family="${F}" font-size="5">${p.st==='RUN'?nz(p.amp)+'A':'0A'}</text>`;
 // Discharge
 s+=`<line x1="225" y1="${p.y+40}" x2="260" y2="${p.y+40}" stroke="${pc}" stroke-width="1.5"/>`;
 // NRV
@@ -10574,7 +10582,7 @@ s+=`<text x="365" y="${p.y+36}" fill="var(--c)" font-family="${F}" font-size="5"
 s+=`<text x="365" y="${p.y+27}" fill="var(--c)" font-family="${F}" font-size="5" text-anchor="middle">${p.st==='RUN'?p.flow:'0'}</text>`;
 // Parameters
 s+=`<rect x="395" y="${p.y+6}" width="330" height="60" rx="2" fill="rgba(107,114,128,.03)" stroke="var(--bd)" stroke-width=".3"/>`;
-var params=[['Motor','55kW/400V/IE4'],['Vibration',p.st==='RUN'?P.v('auto_13')+' mm/s':'--'],['Brg DE',p.st==='RUN'?P.v('auto_14')+'\u00B0C':'--'],['Brg NDE',p.st==='RUN'?P.v('auto_15')+'\u00B0C':'--'],['Run Hrs',p.st==='RUN'?P.n('auto_16')+'h':'--'],['Seal','Mech. OK']];
+var params=[['Motor','55kW/400V/IE4'],['Vibration',p.st==='RUN'?P.v('auto_13')+' mm/s':'--'],['Brg DE',p.st==='RUN'?P.v('auto_14')+'\u00B0C':'--'],['Brg NDE',p.st==='RUN'?P.v('auto_15')+'\u00B0C':'--'],['Run Hrs',p.st==='RUN'?P.v('auto_16')+'h':'--'],['Seal','Mech. OK']];
 params.forEach(function(pr,i){var px=405+(i%3)*110,py=p.y+20+Math.floor(i/3)*18;
 s+=`<text x="${px}" y="${py}" fill="var(--t3)" font-family="${F}" font-size="5.5">${pr[0]}</text>`;
 s+=`<text x="${px+65}" y="${py}" fill="var(--g)" font-family="${F}" font-size="5.5" font-weight="600">${pr[1]}</text>`;
@@ -10599,7 +10607,7 @@ s+=`<path d="M52,${aY+60} Q63,${aY+56} 75,${aY+60} Q87,${aY+64} 98,${aY+60}" fil
 s+=tx(75,aY+52,'N\u2082','var(--p)',5,'middle',1);
 s+=tx(75,aY+57,'pre-charge','var(--t3)',3,'middle');
 var expLvl=P.n('expLvl');
-s+=rzD(P.optAll(["expLvl"]),`<text x="75" y="${aY+74}" fill="var(--p)" font-family="${F}" font-size="8" text-anchor="middle" font-weight="600">${expLvl}%</text>`);
+s+=rzD(P.optAll(["expLvl"]),`<text x="75" y="${aY+74}" fill="var(--p)" font-family="${F}" font-size="8" text-anchor="middle" font-weight="600">${nz(expLvl)}%</text>`);
 s+=`<rect x="102" y="${aY+44}" width="3" height="38" rx=".5" fill="rgba(100, 116, 139,.04)" stroke="var(--p)" stroke-width=".3"/>`;
 s+=`<rect x="102.5" y="${aY+44+38*(100-expLvl)/100}" width="2" height="${38*expLvl/100}" rx=".5" fill="rgba(100, 116, 139,.35)"/>`;
 s+=`<line x1="65" y1="${aY+40}" x2="42" y2="${aY+40}" stroke="var(--r)" stroke-width=".5"/>`;
@@ -10719,11 +10727,11 @@ s+=`<text x="10" y="17" fill="var(--pk)" font-family="${F}" font-size="10" font-
 s+=`<circle cx="310" cy="13" r="4" fill="var(--g)" opacity=".8"/><text x="318" y="17" fill="var(--g)" font-family="${F}" font-size="8">Online</text>`;
 s+=`<text x="${W-10}" y="17" fill="var(--t3)" font-family="${F}" font-size="8" text-anchor="end">DI Water <5\u00B5S/cm</text>`;
 // KPI strip
-var kpis=[{l:'TCS Supply',v:P.v('auto_1')+'\u00B0C',c:'var(--c)'},{l:'TCS Return',v:P.v('auto_2')+'\u00B0C',c:'var(--o)'},{l:'\u0394T',v:P.v('auto_3')+'\u00B0C',c:'var(--g)'},{l:'Total Flow',v:P.n('auto_4')+' LPM',c:'var(--c)'},{l:'Pressure',v:'4/3 bar',c:'var(--o)'},{l:'Racks',v:'54/54',c:'var(--g)'}];
+var kpis=[{l:'TCS Supply',v:P.v('auto_1')+'\u00B0C',c:'var(--c)'},{l:'TCS Return',v:P.v('auto_2')+'\u00B0C',c:'var(--o)'},{l:'\u0394T',v:P.v('auto_3')+'\u00B0C',c:'var(--g)'},{l:'Total Flow',v:P.v('auto_4')+' LPM',c:'var(--c)'},{l:'Pressure',v:'4/3 bar',c:'var(--o)'},{l:'Racks',v:'54/54',c:'var(--g)'}];
 for(var k=0;k<kpis.length;k++){var kx=10+k*127;
 s+=`<rect x="${kx}" y="30" width="122" height="28" rx="3" fill="rgba(236,72,153,.04)" stroke="var(--pk)" stroke-width=".4"/>`;
 s+=`<text x="${kx+61}" y="41" fill="var(--t3)" font-family="${F}" font-size="5.5" text-anchor="middle">${kpis[k].l}</text>`;
-s+=`<text x="${kx+61}" y="53" fill="${kpis[k].c}" font-family="${F}" font-size="10" text-anchor="middle" font-weight="600">${kpis[k].v}</text>`;
+s+=`<text x="${kx+61}" y="53" fill="${kpis[k].c}" font-family="${F}" font-size="10" text-anchor="middle" font-weight="600">${nz(kpis[k].v)}</text>`;
 }
 // Supply header
 s+=`<rect x="10" y="68" width="${W-20}" height="18" rx="3" fill="rgba(6,182,212,.06)" stroke="var(--c)" stroke-width=".8"/>`;
@@ -10752,7 +10760,7 @@ s+=`<text x="${gx+20}" y="${gy+33}" fill="var(--c)" font-family="${F}" font-size
 for(var r=0;r<6;r++){
 var rr=gy+38+r*12;
 s+=`<rect x="${gx+3}" y="${rr}" width="${gW-6}" height="10" rx="1" fill="rgba(34,197,94,.06)" stroke="var(--g)" stroke-width=".15"/>`;
-s+=rzD(P.optAll(["auto_6"]),`<text x="${gx+gW/2}" y="${rr+8}" fill="var(--g)" font-family="${F}" font-size="5" text-anchor="middle">R${String(g*6+r+1).padStart(2,'0')} GPU\u00D712 ${P.n('auto_6')}kW</text>`);
+s+=rzD(P.optAll(["auto_6"]),`<text x="${gx+gW/2}" y="${rr+8}" fill="var(--g)" font-family="${F}" font-size="5" text-anchor="middle">R${String(g*6+r+1).padStart(2,'0')} GPU\u00D712 ${P.v('auto_6')}kW</text>`);
 // Flow animation inside
 s+=`<line x1="${gx+5}" y1="${rr+5}" x2="${gx+gW-5}" y2="${rr+5}" stroke="var(--c)" stroke-width=".4" opacity=".25" stroke-dasharray="3 2"><animate attributeName="stroke-dashoffset" values="0;-10" dur="${.6+r*.08}s" repeatCount="indefinite"/></line>`;
 }
@@ -10761,7 +10769,7 @@ s+=`<line x1="${gx+gW-20}" y1="${gy+112}" x2="${gx+gW-20}" y2="${gy+140}" stroke
 // Parameters
 s+=rzD(P.optAll(["tcs_supply_c"]),`<text x="${gx+gW/2}" y="${gy+118}" fill="var(--c)" font-family="${F}" font-size="5" text-anchor="middle">${gIn}\u00B0C</text>`);
 s+=rzD(P.optAll(["tcs_return_c"]),`<text x="${gx+gW/2}" y="${gy+126}" fill="var(--o)" font-family="${F}" font-size="5" text-anchor="middle">${gOut}\u00B0C</text>`);
-s+=rzD(P.optAll(["group_flow_lpm"]),`<text x="${gx+gW/2}" y="${gy+134}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">${gFlow} LPM</text>`);
+s+=rzD(P.optAll(["group_flow_lpm"]),`<text x="${gx+gW/2}" y="${gy+134}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">${nz(gFlow)} LPM</text>`);
 // Leak sensor indicator
 s+=`<circle cx="${gx+gW-6}" cy="${gy+138}" r="2" fill="var(--g)" opacity=".6"><animate attributeName="opacity" values=".3;.8;.3" dur="2s" repeatCount="indefinite"/></circle>`;
 }
@@ -10815,7 +10823,7 @@ var kpis=[{l:'pH',v:pH,c:'var(--g)'},{l:'Conductivity',v:cond+' \u00B5S',c:'var(
 for(var k=0;k<kpis.length;k++){var kx=8+k*128;
 s+=`<rect x="${kx}" y="30" width="122" height="28" rx="3" fill="rgba(236,72,153,.04)" stroke="var(--pk)" stroke-width=".3"/>`;
 s+=`<text x="${kx+61}" y="40" fill="var(--t3)" font-family="${F}" font-size="6" text-anchor="middle">${kpis[k].l}</text>`;
-s+=`<text x="${kx+61}" y="53" fill="${kpis[k].c}" font-family="${F}" font-size="10" text-anchor="middle" font-weight="600">${kpis[k].v}</text>`;
+s+=`<text x="${kx+61}" y="53" fill="${kpis[k].c}" font-family="${F}" font-size="10" text-anchor="middle" font-weight="600">${nz(kpis[k].v)}</text>`;
 }
 // Biocide Section (left)
 var bY=68;
@@ -10826,7 +10834,7 @@ s+=`<rect x="30" y="${bY+28}" width="60" height="80" rx="3" fill="rgba(236,72,15
 var tankFill=bioTank/100*70;
 s+=`<rect x="31" y="${bY+28+80-tankFill}" width="58" height="${tankFill}" rx="2" fill="rgba(236,72,153,.15)"/>`;
 s+=`<text x="60" y="${bY+55}" fill="var(--pk)" font-family="${F}" font-size="7" text-anchor="middle" font-weight="600">DAY TANK</text>`;
-s+=rzD(P.optAll(["bioTank"]),`<text x="60" y="${bY+70}" fill="var(--pk)" font-family="${F}" font-size="9" text-anchor="middle" font-weight="700">${bioTank}%</text>`);
+s+=rzD(P.optAll(["bioTank"]),`<text x="60" y="${bY+70}" fill="var(--pk)" font-family="${F}" font-size="9" text-anchor="middle" font-weight="700">${nz(bioTank)}%</text>`);
 s+=`<text x="60" y="${bY+82}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">50L capacity</text>`;
 s+=`<text x="60" y="${bY+98}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">NALCO 7330</text>`;
 // Metering pump
@@ -10855,7 +10863,7 @@ s+=`<rect x="415" y="${bY+28}" width="60" height="80" rx="3" fill="rgba(100, 116
 var tankFill2=inhTank/100*70;
 s+=`<rect x="416" y="${bY+28+80-tankFill2}" width="58" height="${tankFill2}" rx="2" fill="rgba(100, 116, 139,.15)"/>`;
 s+=`<text x="445" y="${bY+55}" fill="var(--p)" font-family="${F}" font-size="7" text-anchor="middle" font-weight="600">DAY TANK</text>`;
-s+=rzD(P.optAll(["inhTank"]),`<text x="445" y="${bY+70}" fill="var(--p)" font-family="${F}" font-size="9" text-anchor="middle" font-weight="700">${inhTank}%</text>`);
+s+=rzD(P.optAll(["inhTank"]),`<text x="445" y="${bY+70}" fill="var(--p)" font-family="${F}" font-size="9" text-anchor="middle" font-weight="700">${nz(inhTank)}%</text>`);
 s+=`<text x="445" y="${bY+82}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">30L capacity</text>`;
 s+=`<text x="445" y="${bY+98}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">NALCO 3DT177</text>`;
 // Metering pump
@@ -10883,7 +10891,7 @@ var wq=[
 ['pH','var(--g)',pH,'8.2-8.8','Online sensor'],['Conductivity','var(--c)',cond+' \u00B5S/cm','<800 \u00B5S/cm','Inline sensor'],
 ['ORP','var(--o)',oxi+' mV','200-600 mV','Redox electrode'],['Turbidity','var(--g)',P.v('auto_1')+' NTU','<5 NTU','Optical sensor'],
 ['Total Iron','var(--g)',P.v('auto_2')+' ppm','<1 ppm','Colorimetric'],['Glycol %','var(--p)','30%','28-32%','Refractometer'],
-['Bacteria','var(--g)',P.n('auto_3')+' CFU/mL','<10,000','Dip slide'],['Temperature','var(--c)',P.v('auto_4')+'\u00B0C','30-40\u00B0C','PT100 RTD']
+['Bacteria','var(--g)',P.v('auto_3')+' CFU/mL','<10,000','Dip slide'],['Temperature','var(--c)',P.v('auto_4')+'\u00B0C','30-40\u00B0C','PT100 RTD']
 ];
 wq.forEach(function(r,i){
 var px=20+(i%4)*190,py=wqY+30+Math.floor(i/4)*35;
@@ -10895,7 +10903,7 @@ s+=`<text x="${px+100}" y="${py+12}" fill="var(--t3)" font-family="${F}" font-si
 // Bottom bar
 s+=`<rect x="0" y="${H-24}" width="${W}" height="24" fill="rgba(236,72,153,.06)"/>`;
 s+=rzD(P.optAll(["ph"]),`<text x="10" y="${H-9}" fill="var(--t3)" font-family="${F}" font-size="6">NALCO 7330 Biocide + NALCO 3DT177 Inhibitor | Closed Loop 30% PG | Auto pH control</text>`);
-s+=rzD(P.optAll(["ph", "conductivity", "bioTank", "inhTank"]),`<text x="${W-10}" y="${H-9}" fill="var(--pk)" font-family="${F}" font-size="6" text-anchor="end">pH ${pH} | Cond ${cond} \u00B5S | Bio ${bioTank}% | Inh ${inhTank}%</text>`);
+s+=rzD(P.optAll(["ph", "conductivity", "bioTank", "inhTank"]),`<text x="${W-10}" y="${H-9}" fill="var(--pk)" font-family="${F}" font-size="6" text-anchor="end">pH ${pH} | Cond ${nz(cond)} \u00B5S | Bio ${nz(bioTank)}% | Inh ${nz(inhTank)}%</text>`);
 el.innerHTML=s;
 
 /* @rz-hmi:end renderChemHmi */}
@@ -11284,25 +11292,25 @@ s+=`<rect width="${W}" height="${H}" fill="#0e0f12" rx="4"/>`;
 s+=`<rect x="0" y="0" width="${W}" height="26" fill="rgba(6,182,212,.08)"/>`;
 s+=`<text x="10" y="17" fill="var(--c)" font-family="${F}" font-size="11" font-weight="600">${crahId} \u2014 CW CRAH EC Fan Wall</text>`;
 s+=`<circle cx="380" cy="13" r="4" fill="${on?'var(--g)':'var(--t3)'}" opacity=".8"/><text x="388" y="17" fill="${on?'var(--g)':'var(--t3)'}" font-family="${F}" font-size="9">${on?'Active':'Standby'}</text>`;
-s+=rzD(P.optAll(["auto_1"]),`<text x="${W-10}" y="17" fill="var(--t3)" font-family="${F}" font-size="8" text-anchor="end">IP: 10.1.4.${P.n('auto_1')}</text>`);
+s+=rzD(P.optAll(["auto_1"]),`<text x="${W-10}" y="17" fill="var(--t3)" font-family="${F}" font-size="8" text-anchor="end">IP: 10.1.4.${P.v('auto_1')}</text>`);
 // === KPI STRIP (y=30-62) ===
 var kpis=[{l:'Supply Air',v:supT+'\u00B0C',c:'var(--c)'},{l:'Return Air',v:retT+'\u00B0C',c:'var(--o)'},{l:'Fan Speed',v:fanSpd+'%',c:'var(--g)'},{l:'Airflow',v:airflowTxt,c:'var(--c)'},{l:'CHWS/CHWR',v:cwIn+'/'+cwOut+'\u00B0C',c:'var(--b)'},{l:'Cooling',v:coolKw+' kW',c:'var(--o)'}];
 for(var k=0;k<kpis.length;k++){var kx=10+k*117;
 s+=`<rect x="${kx}" y="30" width="112" height="30" rx="3" fill="rgba(6,182,212,.04)" stroke="var(--c)" stroke-width=".4"/>`;
 s+=`<text x="${kx+56}" y="42" fill="var(--t3)" font-family="${F}" font-size="6" text-anchor="middle">${kpis[k].l}</text>`;
-s+=`<text x="${kx+56}" y="56" fill="${kpis[k].c}" font-family="${F}" font-size="9" text-anchor="middle" font-weight="600">${kpis[k].v}</text>`;
+s+=`<text x="${kx+56}" y="56" fill="${kpis[k].c}" font-family="${F}" font-size="9" text-anchor="middle" font-weight="600">${nz(kpis[k].v)}</text>`;
 }
 // === LEFT COLUMN (x=10, w=210) ===
 // Return Air Intake (y=68-128)
 s+=`<rect x="10" y="68" width="210" height="60" rx="4" fill="rgba(245,158,11,.06)" stroke="var(--o)" stroke-width=".6"/>`;
 s+=`<text x="115" y="83" fill="var(--o)" font-family="${F}" font-size="8" text-anchor="middle" font-weight="600">RETURN AIR INTAKE</text>`;
-s+=rzD(P.optAll(["retRH"]),`<text x="115" y="97" fill="var(--o)" font-family="${F}" font-size="7" text-anchor="middle">${retT}\u00B0C | ${retRH}% RH</text>`);
+s+=rzD(P.optAll(["retRH"]),`<text x="115" y="97" fill="var(--o)" font-family="${F}" font-size="7" text-anchor="middle">${retT}\u00B0C | ${nz(retRH)}% RH</text>`);
 s+=`<circle cx="40" cy="114" r="7" fill="none" stroke="var(--o)" stroke-width=".6"/>`;
 s+=`<text x="40" y="117" fill="var(--o)" font-family="${F}" font-size="5.5" text-anchor="middle">TI</text>`;
 s+=`<text x="58" y="117" fill="var(--o)" font-family="${F}" font-size="6">${retT}\u00B0C</text>`;
 s+=`<circle cx="120" cy="114" r="7" fill="none" stroke="var(--c)" stroke-width=".6"/>`;
 s+=`<text x="120" y="117" fill="var(--c)" font-family="${F}" font-size="5.5" text-anchor="middle">HI</text>`;
-s+=rzD(P.optAll(["retRH"]),`<text x="138" y="117" fill="var(--c)" font-family="${F}" font-size="6">${retRH}%</text>`);
+s+=rzD(P.optAll(["retRH"]),`<text x="138" y="117" fill="var(--c)" font-family="${F}" font-size="6">${nz(retRH)}%</text>`);
 for(var a=0;a<4;a++){s+=`<text x="${30+a*50}" y="128" fill="rgba(245,158,11,.3)" font-size="8" class="fD">\u25BC</text>`}
 // Filter Bank (y=134-176)
 s+=`<rect x="10" y="134" width="210" height="42" rx="3" fill="rgba(107,114,128,.04)" stroke="var(--t3)" stroke-width=".5"/>`;
@@ -11311,7 +11319,7 @@ s+=`<rect x="20" y="155" width="90" height="16" rx="2" fill="rgba(107,114,128,.0
 s+=`<text x="65" y="166" fill="var(--t3)" font-family="${F}" font-size="6" text-anchor="middle">G4 Pre-filter</text>`;
 s+=`<rect x="120" y="155" width="90" height="16" rx="2" fill="rgba(59,130,246,.06)" stroke="var(--b)" stroke-width=".4"/>`;
 s+=`<text x="165" y="166" fill="var(--b)" font-family="${F}" font-size="6" text-anchor="middle">F7 Fine</text>`;
-s+=rzD(P.optAll(["filter_dp"]),`<text x="210" y="148" fill="var(--g)" font-family="${F}" font-size="5.5" text-anchor="end">\u0394P: ${filterDp} Pa</text>`);
+s+=rzD(P.optAll(["filter_dp"]),`<text x="210" y="148" fill="var(--g)" font-family="${F}" font-size="5.5" text-anchor="end">\u0394P: ${nz(filterDp)} Pa</text>`);
 // CW Cooling Coil (y=182-292)
 s+=`<rect x="10" y="182" width="210" height="110" rx="4" fill="rgba(59,130,246,.05)" stroke="var(--b)" stroke-width=".7"/>`;
 s+=`<text x="115" y="196" fill="var(--b)" font-family="${F}" font-size="8" text-anchor="middle" font-weight="600">CW COOLING COIL</text>`;
@@ -11333,12 +11341,12 @@ s+=symValve(6,262,'var(--o)');
 // Flow meter
 s+=`<circle cx="115" cy="242" r="8" fill="none" stroke="var(--c)" stroke-width=".6"/>`;
 s+=`<text x="115" y="245" fill="var(--c)" font-family="${F}" font-size="6" text-anchor="middle">F</text>`;
-s+=rzD(P.optAll(["cwFlow"]),`<text x="140" y="245" fill="var(--c)" font-family="${F}" font-size="6">${cwFlow} m\u00B3/h</text>`);
-s+=`<text x="115" y="260" fill="var(--g)" font-family="${F}" font-size="6" text-anchor="middle">\u0394T: ${cwDt.toFixed(1)}\u00B0C</text>`;
+s+=rzD(P.optAll(["cwFlow"]),`<text x="140" y="245" fill="var(--c)" font-family="${F}" font-size="6">${nz(cwFlow)} m\u00B3/h</text>`);
+s+=`<text x="115" y="260" fill="var(--g)" font-family="${F}" font-size="6" text-anchor="middle">\u0394T: ${nzf(cwDt,1)}\u00B0C</text>`;
 // Supply Air Output (y=298-348)
 s+=`<rect x="10" y="298" width="210" height="50" rx="4" fill="rgba(6,182,212,.05)" stroke="var(--c)" stroke-width=".6"/>`;
 s+=`<text x="115" y="314" fill="var(--c)" font-family="${F}" font-size="7" text-anchor="middle" font-weight="600">SUPPLY AIR TO THE COLD AISLES</text>`;
-s+=rzD(P.optAll(["air_supply_c", "unit_air_m3h", "supply_rh"]),`<text x="115" y="328" fill="var(--c)" font-family="${F}" font-size="7" text-anchor="middle">${supT}\u00B0C | ${supRH}% RH | ${airflowTxt}</text>`);
+s+=rzD(P.optAll(["air_supply_c", "unit_air_m3h", "supply_rh"]),`<text x="115" y="328" fill="var(--c)" font-family="${F}" font-size="7" text-anchor="middle">${supT}\u00B0C | ${nz(supRH)}% RH | ${airflowTxt}</text>`);
 s+=`<circle cx="40" cy="342" r="6" fill="none" stroke="var(--o)" stroke-width=".5"/>`;
 s+=`<text x="40" y="345" fill="var(--o)" font-family="${F}" font-size="5" text-anchor="middle">TI</text>`;
 s+=`<circle cx="100" cy="342" r="6" fill="none" stroke="var(--c)" stroke-width=".5"/>`;
@@ -11350,7 +11358,7 @@ s+=`<rect x="228" y="68" width="282" height="222" rx="4" fill="rgba(34,197,94,.0
 s+=`<text x="369" y="83" fill="var(--g)" font-family="${F}" font-size="9" text-anchor="middle" font-weight="600">EC FAN WALL</text>`;
 s+=`<rect x="238" y="88" width="90" height="30" rx="3" fill="rgba(100, 116, 139,.06)" stroke="var(--p)" stroke-width=".5"/>`;
 s+=`<text x="283" y="100" fill="var(--p)" font-family="${F}" font-size="7" text-anchor="middle" font-weight="600">VFD</text>`;
-s+=rzD(P.optAll(["auto_2", "fan_pct"]),`<text x="283" y="112" fill="var(--p)" font-family="${F}" font-size="6" text-anchor="middle">${fanSpd}% | ${P.n('auto_2')}A</text>`);
+s+=rzD(P.optAll(["auto_2", "fan_pct"]),`<text x="283" y="112" fill="var(--p)" font-family="${F}" font-size="6" text-anchor="middle">${nz(fanSpd)}% | ${P.v('auto_2')}A</text>`);
 var totalFanKw=0;
 for(var fr=0;fr<2;fr++){for(var fc=0;fc<3;fc++){
 var fx=238+fc*90,fy=124+fr*76;
@@ -11361,10 +11369,10 @@ s+=`<circle cx="${fx+41}" cy="${fy+28}" r="20" fill="none" stroke="var(--g)" str
 s+=`<g transform="translate(${fx+41},${fy+28})"><animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="${(.6+fr*.15+fc*.08).toFixed(2)}s" repeatCount="indefinite" additive="sum"/>`;
 for(var bl=0;bl<6;bl++){var ba=bl*60;s+=`<line x1="0" y1="0" x2="${(16*Math.cos(ba*Math.PI/180)).toFixed(1)}" y2="${(16*Math.sin(ba*Math.PI/180)).toFixed(1)}" stroke="var(--g)" stroke-width="1.5" opacity=".6"/>`}
 s+=`</g>`;
-s+=rzD(P.optAll(["fan_pct", "rpm"]),`<text x="${fx+41}" y="${fy+56}" fill="var(--g)" font-family="${F}" font-size="5.5" text-anchor="middle">${rpm}rpm ${fanSpd}%</text>`);
+s+=rzD(P.optAll(["fan_pct", "rpm"]),`<text x="${fx+41}" y="${fy+56}" fill="var(--g)" font-family="${F}" font-size="5.5" text-anchor="middle">${nz(rpm)}rpm ${nz(fanSpd)}%</text>`);
 s+=rzD(P.optAll(["fkw"]),`<text x="${fx+41}" y="${fy+64}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">${fkw}kW | F${fr*3+fc+1}</text>`);
 }}
-s+=rzD(P.optAll(["unit_air_m3h"]),`<text x="369" y="286" fill="var(--g)" font-family="${F}" font-size="6" text-anchor="middle">Total: ${totalFanKw.toFixed(1)} kW | ${airflowTxt}</text>`);
+s+=rzD(P.optAll(["unit_air_m3h"]),`<text x="369" y="286" fill="var(--g)" font-family="${F}" font-size="6" text-anchor="middle">Total: ${isFinite(totalFanKw)?totalFanKw.toFixed(1):'\u2014'} kW | ${airflowTxt}</text>`);
 // Air Temp Differential (y=296-348, below fan wall)
 s+=`<rect x="228" y="296" width="282" height="52" rx="4" fill="rgba(6,182,212,.04)" stroke="var(--c)" stroke-width=".5"/>`;
 s+=`<text x="369" y="310" fill="var(--c)" font-family="${F}" font-size="7" text-anchor="middle" font-weight="600">AIR TEMPERATURE DIFFERENTIAL</text>`;
@@ -11416,23 +11424,23 @@ s+=rzD(P.optAll(["chw_supply_c", "chw_return_c"]),`<text x="295" y="420" fill="v
 s+=`<text x="360" y="414" fill="var(--t3)" font-size="12">\u2192</text>`;
 s+=`<rect x="375" y="382" width="100" height="56" rx="2" fill="rgba(34,197,94,.08)" stroke="var(--g)" stroke-width=".4"/>`;
 s+=`<text x="425" y="402" fill="var(--g)" font-family="${F}" font-size="6" text-anchor="middle">EC FANS</text>`;
-s+=rzD(P.optAll(["fan_pct"]),`<text x="425" y="420" fill="var(--g)" font-family="${F}" font-size="6" text-anchor="middle">${fanSpd}% 2\u00D73</text>`);
+s+=rzD(P.optAll(["fan_pct"]),`<text x="425" y="420" fill="var(--g)" font-family="${F}" font-size="6" text-anchor="middle">${nz(fanSpd)}% 2\u00D73</text>`);
 s+=`<text x="485" y="414" fill="var(--t3)" font-size="12">\u2192</text>`;
 s+=`<rect x="500" y="382" width="110" height="56" rx="2" fill="rgba(6,182,212,.08)" stroke="var(--c)" stroke-width=".4"/>`;
 s+=`<text x="555" y="402" fill="var(--c)" font-family="${F}" font-size="6" text-anchor="middle">COLD AISLES</text>`;
 s+=rzD(P.optAll(["air_supply_c"]),`<text x="555" y="420" fill="var(--c)" font-family="${F}" font-size="8" text-anchor="middle" font-weight="600">${supT}\u00B0C</text>`);
 s+=`<text x="620" y="414" fill="var(--t3)" font-size="12">\u2192</text>`;
 s+=`<text x="670" y="414" fill="var(--c)" font-family="${F}" font-size="6" text-anchor="middle">COLD AISLE</text>`;
-s+=`<text x="360" y="454" fill="var(--t3)" font-family="${F}" font-size="6" text-anchor="middle">Sensible cooling: ${coolKw} kW | CW \u0394T: ${cwDt.toFixed(1)}\u00B0C | Air \u0394T: ${airDt}\u00B0C</text>`;
-s+=rzD(P.optAll(["cwFlow"]),`<text x="360" y="466" fill="var(--t3)" font-family="${F}" font-size="5.5" text-anchor="middle">Q = \u1E41 \u00D7 Cp \u00D7 \u0394T = ${cwFlow} m\u00B3/h \u00D7 4.18 kJ/kg\u00B7K \u00D7 ${cwDt.toFixed(1)}K = ${coolKw} kW</text>`);
+s+=`<text x="360" y="454" fill="var(--t3)" font-family="${F}" font-size="6" text-anchor="middle">Sensible cooling: ${nz(coolKw)} kW | CW \u0394T: ${nzf(cwDt,1)}\u00B0C | Air \u0394T: ${airDt}\u00B0C</text>`;
+s+=rzD(P.optAll(["cwFlow"]),`<text x="360" y="466" fill="var(--t3)" font-family="${F}" font-size="5.5" text-anchor="middle">Q = \u1E41 \u00D7 Cp \u00D7 \u0394T = ${nz(cwFlow)} m\u00B3/h \u00D7 4.18 kJ/kg\u00B7K \u00D7 ${nzf(cwDt,1)}K = ${nz(coolKw)} kW</text>`);
 // === FILTER STATUS BAR (y=478-518) ===
 s+=`<rect x="10" y="478" width="700" height="40" rx="4" fill="rgba(107,114,128,.03)" stroke="var(--t3)" stroke-width=".4"/>`;
 s+=`<text x="20" y="494" fill="var(--t2)" font-family="${F}" font-size="7" font-weight="600">FILTER STATUS</text>`;
 s+=`<rect x="130" y="487" width="400" height="8" rx="3" fill="var(--bg)" stroke="var(--bd)" stroke-width=".3"/>`;
 s+=`<rect x="130" y="487" width="${400*filterPct/100}" height="8" rx="3" fill="${filterPct>70?'var(--r)':filterPct>40?'var(--o)':'var(--g)'}"/>`;
-s+=rzD(P.optAll(["filterPct"]),`<text x="540" y="494" fill="${filterPct>40?'var(--o)':'var(--g)'}" font-family="${F}" font-size="6">Loading: ${filterPct}% ${filterPct<30?'(Clean)':filterPct<60?'(Fair)':'(Replace Soon)'}</text>`);
+s+=rzD(P.optAll(["filterPct"]),`<text x="540" y="494" fill="${filterPct>40?'var(--o)':'var(--g)'}" font-family="${F}" font-size="6">Loading: ${nz(filterPct)}% ${filterPct<30?'(Clean)':filterPct<60?'(Fair)':'(Replace Soon)'}</text>`);
 s+=`<text x="700" y="494" fill="var(--t3)" font-family="${F}" font-size="6" text-anchor="end">G4 + F7</text>`;
-s+=rzD(P.optAll(["auto_3", "filter_dp"]),`<text x="20" y="512" fill="var(--t3)" font-family="${F}" font-size="5.5">\u0394P: ${filterDp} Pa | Alarm: >250 Pa | Last changed: ${P.n('auto_3')} days ago</text>`);
+s+=rzD(P.optAll(["auto_3", "filter_dp"]),`<text x="20" y="512" fill="var(--t3)" font-family="${F}" font-size="5.5">\u0394P: ${nz(filterDp)} Pa | Alarm: >250 Pa | Last changed: ${P.v('auto_3')} days ago</text>`);
 // === BOTTOM STATUS BAR (y=530-570) ===
 s+=`<rect x="0" y="560" width="${W}" height="40" fill="rgba(6,182,212,.06)"/>`;
 s+=`<text x="10" y="576" fill="var(--t3)" font-family="${F}" font-size="7">Controller: BACnet IP | DDC | Auto PID supply air control</text>`;
@@ -11496,7 +11504,7 @@ var kpis=[{l:'Supply T',v:supT+'\u00B0C',c:'var(--g)'},{l:'Return T',v:retT+'\u0
 for(var k=0;k<kpis.length;k++){var kx=10+k*127;
 s+=`<rect x="${kx}" y="30" width="122" height="28" rx="3" fill="rgba(34,197,94,.04)" stroke="var(--g)" stroke-width=".4"/>`;
 s+=`<text x="${kx+61}" y="41" fill="var(--t3)" font-family="${F}" font-size="5.5" text-anchor="middle">${kpis[k].l}</text>`;
-s+=`<text x="${kx+61}" y="53" fill="${kpis[k].c}" font-family="${F}" font-size="10" text-anchor="middle" font-weight="600">${kpis[k].v}</text>`;
+s+=`<text x="${kx+61}" y="53" fill="${kpis[k].c}" font-family="${F}" font-size="10" text-anchor="middle" font-weight="600">${nz(kpis[k].v)}</text>`;
 }
 // === SUPPLY PIPE SCHEMATIC ===
 s+=`<rect x="10" y="68" width="${W-20}" height="120" rx="4" fill="rgba(34,197,94,.03)" stroke="var(--g)" stroke-width=".6"/>`;
@@ -11522,7 +11530,7 @@ s+=rzD(P.optAll(["pressure_bar"]),`<text x="150" y="130" fill="var(--g)" font-fa
 s+=`<circle cx="250" cy="118" r="5" fill="none" stroke="var(--c)" stroke-width=".5"/><text x="250" y="121" fill="var(--c)" font-family="${F}" font-size="5.5" text-anchor="middle">T</text>`;
 s+=rzD(P.optAll(["htw_supply_c"]),`<text x="250" y="130" fill="var(--g)" font-family="${F}" font-size="5" text-anchor="middle">${supT}\u00B0C</text>`);
 s+=`<circle cx="350" cy="118" r="5" fill="none" stroke="var(--b)" stroke-width=".5"/><text x="350" y="121" fill="var(--b)" font-family="${F}" font-size="5.5" text-anchor="middle">F</text>`;
-s+=rzD(P.optAll(["htw_flow"]),`<text x="350" y="130" fill="var(--c)" font-family="${F}" font-size="5" text-anchor="middle">${flow} m\u00B3/h</text>`);
+s+=rzD(P.optAll(["htw_flow"]),`<text x="350" y="130" fill="var(--c)" font-family="${F}" font-size="5" text-anchor="middle">${nz(flow)} m\u00B3/h</text>`);
 // T-branches (to CRAHs/CDUs)
 for(var i=0;i<4;i++){var brX=120+i*160;
 s+=`<line x1="${brX}" y1="95" x2="${brX}" y2="72" stroke="rgba(34,197,94,.3)" stroke-width="1.5" stroke-dasharray="3 2"/>`;
@@ -11601,7 +11609,7 @@ var kpis=[{l:'Total Zones',v:totalZones,c:'var(--o)'},{l:'Active',v:activeZ+'/'+
 for(var k=0;k<kpis.length;k++){var kx=10+k*127;
 s+=`<rect x="${kx}" y="30" width="122" height="28" rx="3" fill="rgba(245,158,11,.04)" stroke="var(--o)" stroke-width=".4"/>`;
 s+=`<text x="${kx+61}" y="41" fill="var(--t3)" font-family="${F}" font-size="5.5" text-anchor="middle">${kpis[k].l}</text>`;
-s+=`<text x="${kx+61}" y="53" fill="${kpis[k].c}" font-family="${F}" font-size="10" text-anchor="middle" font-weight="600">${kpis[k].v}</text>`;
+s+=`<text x="${kx+61}" y="53" fill="${kpis[k].c}" font-family="${F}" font-size="10" text-anchor="middle" font-weight="600">${nz(kpis[k].v)}</text>`;
 }
 // === 4x6 ZONE GRID ===
 s+=`<text x="390" y="74" fill="var(--o)" font-family="${F}" font-size="7" text-anchor="middle" font-weight="600">ZONE MAP</text>`;
@@ -11627,7 +11635,7 @@ s+=`<text x="${zx+61}" y="${zy+26}" fill="var(--t3)" font-family="${F}" font-siz
 s+=`<circle cx="${zx+61}" cy="${zy+40}" r="8" fill="${isDry?'rgba(34,197,94,.15)':'rgba(239,68,68,.2)'}" stroke="${sc}" stroke-width=".8"/>`;
 if(!isDry){s+=`<animate attributeName="opacity" values=".5;1;.5" dur="3s" repeatCount="indefinite"/>`}
 s+=`<text x="${zx+61}" y="${zy+43}" fill="${sc}" font-family="${F}" font-size="5" text-anchor="middle" font-weight="600">${st}</text>`;
-s+=rzD(P.optAll(["auto_1"]),`<text x="${zx+61}" y="${zy+56}" fill="var(--t3)" font-family="${F}" font-size="5.5" text-anchor="middle">${P.n('auto_1')}m rope</text>`);
+s+=rzD(P.optAll(["auto_1"]),`<text x="${zx+61}" y="${zy+56}" fill="var(--t3)" font-family="${F}" font-size="5.5" text-anchor="middle">${P.v('auto_1')}m rope</text>`);
 s+=rzD(P.optAll(["auto_2"]),`<text x="${zx+61}" y="${zy+63}" fill="var(--t3)" font-family="${F}" font-size="5" text-anchor="middle">\u03A9: ${P.v('auto_2')}k</text>`);
 }}
 // === CONTROLLER BOX ===
@@ -11650,7 +11658,7 @@ s+=`<text x="${W-20}" y="${cy}" fill="${ca[2]}" font-family="${F}" font-size="5.
 // Bottom
 s+=`<rect x="0" y="${H-24}" width="${W}" height="24" fill="rgba(245,158,11,.06)"/>`;
 s+=`<text x="10" y="${H-9}" fill="var(--t3)" font-family="${F}" font-size="7">Leak Detection: ${cableLen}m continuous sensing rope | 24 zones | TTK FG-NET Modbus TCP</text>`;
-s+=rzD(P.optAll(["auto_4"]),`<text x="${W-10}" y="${H-9}" fill="var(--g)" font-family="${F}" font-size="7" text-anchor="end">All zones DRY | Auto shutoff armed | Last test: ${P.n('auto_4')}d ago</text>`);
+s+=rzD(P.optAll(["auto_4"]),`<text x="${W-10}" y="${H-9}" fill="var(--g)" font-family="${F}" font-size="7" text-anchor="end">All zones DRY | Auto shutoff armed | Last test: ${P.v('auto_4')}d ago</text>`);
 el.innerHTML=s;
 
 /* @rz-hmi:end renderLeakHmi */}
@@ -11667,11 +11675,11 @@ s+=`<text x="10" y="17" fill="var(--b)" font-family="${F}" font-size="10" font-w
 s+=`<circle cx="330" cy="13" r="4" fill="var(--g)" opacity=".8"/><text x="338" y="17" fill="var(--g)" font-family="${F}" font-size="8">Nominal</text>`;
 s+=`<text x="${W-10}" y="17" fill="var(--t3)" font-family="${F}" font-size="8" text-anchor="end">E90 Fire Rated</text>`;
 // KPI strip
-var kpis=[{l:'PWR Fill',v:pwrFill+'%',c:'var(--o)'},{l:'Fiber Fill',v:fiberFill+'%',c:'var(--b)'},{l:'Cu Fill',v:cuFill+'%',c:'var(--p)'},{l:'Fire Rating',v:'E90',c:'var(--r)'},{l:'Load',v:P.n('auto_1')+' kg/m',c:'var(--t2)'},{l:'Sections',v:'3',c:'var(--c)'}];
+var kpis=[{l:'PWR Fill',v:pwrFill+'%',c:'var(--o)'},{l:'Fiber Fill',v:fiberFill+'%',c:'var(--b)'},{l:'Cu Fill',v:cuFill+'%',c:'var(--p)'},{l:'Fire Rating',v:'E90',c:'var(--r)'},{l:'Load',v:P.v('auto_1')+' kg/m',c:'var(--t2)'},{l:'Sections',v:'3',c:'var(--c)'}];
 for(var k=0;k<kpis.length;k++){var kx=10+k*127;
 s+=`<rect x="${kx}" y="30" width="122" height="28" rx="3" fill="rgba(59,130,246,.04)" stroke="var(--b)" stroke-width=".4"/>`;
 s+=`<text x="${kx+61}" y="41" fill="var(--t3)" font-family="${F}" font-size="5.5" text-anchor="middle">${kpis[k].l}</text>`;
-s+=`<text x="${kx+61}" y="53" fill="${kpis[k].c}" font-family="${F}" font-size="10" text-anchor="middle" font-weight="600">${kpis[k].v}</text>`;
+s+=`<text x="${kx+61}" y="53" fill="${kpis[k].c}" font-family="${F}" font-size="10" text-anchor="middle" font-weight="600">${nz(kpis[k].v)}</text>`;
 }
 // === CROSS-SECTION VIEW ===
 s+=`<rect x="10" y="66" width="${W-20}" height="200" rx="4" fill="rgba(107,114,128,.02)" stroke="var(--bd)" stroke-width=".4"/>`;
@@ -11745,7 +11753,7 @@ s+=`<text x="${cx}" y="${ty}" fill="${isHdr?'var(--t3)':'var(--t2)'}" font-famil
 // Bottom
 s+=`<rect x="0" y="${H-24}" width="${W}" height="24" fill="rgba(59,130,246,.06)"/>`;
 s+=`<text x="10" y="${H-9}" fill="var(--t3)" font-family="${F}" font-size="7">Cable Tray: 3 sections (PWR/Fiber/Cu) | E90 fire rated | HDG/SS | Ladder+Mesh+Solid</text>`;
-s+=rzD(P.optAll(["fill_power", "fill_fiber", "fill_cu"]),`<text x="${W-10}" y="${H-9}" fill="var(--g)" font-family="${F}" font-size="7" text-anchor="end">Fill: PWR ${pwrFill}% | Fiber ${fiberFill}% | Cu ${cuFill}% | All within NEC 392 limits</text>`);
+s+=rzD(P.optAll(["fill_power", "fill_fiber", "fill_cu"]),`<text x="${W-10}" y="${H-9}" fill="var(--g)" font-family="${F}" font-size="7" text-anchor="end">Fill: PWR ${nz(pwrFill)}% | Fiber ${nz(fiberFill)}% | Cu ${nz(cuFill)}% | All within NEC 392 limits</text>`);
 el.innerHTML=s;
 
 /* @rz-hmi:end renderCableTrayHmi */}
@@ -12028,7 +12036,7 @@ s+=`<text x="200" y="${ty+11}" fill="var(--t3)" font-family="${F}" font-size="5"
 s+=`<text x="115" y="${ty+24}" fill="var(--t3)" font-family="${F}" font-size="5">Sense wire + OCP trip</text>`;
 // Right side: output values
 s+=`<rect x="${bbX+bbW+20}" y="${ty}" width="160" height="28" rx="3" fill="rgba(6,182,212,.03)" stroke="var(--bd)" stroke-width=".4"/>`;
-s+=rzD(P.optAll(["auto_1", "auto_2"]),`<text x="${bbX+bbW+30}" y="${ty+12}" fill="var(--t2)" font-family="${F}" font-size="6">${P.v('auto_1')}V | ${P.n('auto_2')}A</text>`);
+s+=rzD(P.optAll(["auto_1", "auto_2"]),`<text x="${bbX+bbW+30}" y="${ty+12}" fill="var(--t2)" font-family="${F}" font-size="6">${P.v('auto_1')}V | ${P.v('auto_2')}A</text>`);
 s+=rzD(P.optAll(["auto_3"]),`<text x="${bbX+bbW+30}" y="${ty+24}" fill="var(--t3)" font-family="${F}" font-size="5">${P.v('auto_3')} kW delivered</text>`);
 // Connection lines
 s+=`<line x1="280" y1="${ty+14}" x2="${bbX}" y2="${ty+14}" stroke="var(--o)" stroke-width="1.5" opacity=".4"/>`;
@@ -12771,9 +12779,9 @@ function rules(){
   /* doc-22 Cooling: TCS range high >13 warn / >15 crit (engine p08 - p07) */
   var dT=E&&isFinite(E.tcsDeltaT)?E.tcsDeltaT:null;
   if(dT!=null){ if(dT>15)c++; else if(dT>13)w++; }
-  /* doc-22 BMS/DCIM: stale points >1% warn / >5% crit (nominal 0, quiet) */
-  var stalePct=0;
-  var stale=stalePct>5?2:(stalePct>1?1:0);
+  /* PRD-DCAI-HALL-DEPTH Amendment 6 (A5e): Stale = the units of this hall whose telemetry has no sample (a replay
+     without a sample); 0 when every reading is live */
+  var HS=window.RZHallIso, stale=HS&&HS.stale?HS.stale():0;
   /* v2.3.0 §A6 fire terms: a confirmed fire / discharge / EPO / wet leak is critical; an impaired zone or an expired
      isolation is a warning; maintenance = isolated points — all from the workstation snapshot, never a roll */
   var FW=window.RZDatahallAIFireWorkstation, F=FW&&FW.summary?FW.summary():null, m=0;
@@ -12858,7 +12866,9 @@ function paintBMSHealth(){
 }
 paintBMSHealth();
 /* A5b: a cooling-scenario change repaints every strip at once (hidden ones too: the next tab opens current) */
-document.addEventListener('rz-hall-alarms',function(){ for(var i=0;i<bars.length;i++)paint(bars[i]); });
+document.addEventListener('rz-hall-alarms',function(){ for(var i=0;i<bars.length;i++)paint(bars[i]);
+  /* A5e: the summary line inside an open modal is repainted too, so its Stale count never outlives the replay */
+  var ml=d.querySelectorAll('.dh-modal-alarmline'); for(var j=0;j<ml.length;j++){ var w=d.createElement('div'); w.innerHTML=modalAlarmLine(); ml[j].parentNode.replaceChild(w.firstChild,ml[j]); } });
 setInterval(function(){
   for(var i=0;i<bars.length;i++){ if(bars[i].offsetParent!==null)paint(bars[i]); }
   /* v3.11.7 — the three counters paintBMSHealth() writes are inside #p-bms. The bar loop above

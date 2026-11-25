@@ -141,6 +141,9 @@
     '.cr-lamp[data-lamp="warn"],.rk-lamp[data-lamp="warn"]{fill:var(--rz-pt-warn)}.cr-lamp[data-lamp="alarm"],.rk-lamp[data-lamp="alarm"]{fill:var(--rz-pt-alarm)}',
     /* opts.stbyLamp (DC AI, PRD-DCAI-HALL-DEPTH A2 / HV-S0): a standby unit's lamp is a hollow grey ring, never green */
     '.cr-lamp[data-lamp="stby"]{fill:none;stroke:var(--fp-muted);stroke-width:1px;vector-effect:non-scaling-stroke}',
+    /* unit.stale (DC AI, PRD-DCAI-HALL-DEPTH Amendment 6 / ST1): telemetry without a sample — a dotted muted ring, never run green */
+    '.cr-lamp[data-lamp="stale"]{fill:none;stroke:var(--fp-muted);stroke-width:1px;stroke-dasharray:1.5 1.5;vector-effect:non-scaling-stroke}',
+    '.fp-sw[data-state="stale"]{background:transparent;border:1px dotted var(--fp-muted);border-radius:50%}',
     '.fp-sw[data-state="stby"]{background:transparent;border-color:var(--fp-muted);border-radius:50%}.fp-sw[data-state="run"]{background:var(--rz-pt-ok);border-radius:50%}',
     '.fp-proj{position:absolute;z-index:3;top:4px;left:4px;display:inline-flex;border:1px solid var(--fp-ink);border-color:color-mix(in srgb,var(--fp-ink) 24%,transparent);border-radius:3px;background:var(--fp-surface)}',
     '.fp-proj-btn{appearance:none;margin:0;min-width:44px;height:24px;padding:0 10px;border:0;border-radius:0;background:transparent;color:var(--fp-muted);font:600 11px/24px "IBM Plex Sans",system-ui,sans-serif;cursor:pointer}',
@@ -644,16 +647,16 @@
         }
       }
       for (i = 0; i < crahEls.length; i++) {
-        ch = crahEls[i]; var run = ch.u.running !== false, st = ch.u.status === 'alarm' ? 'alarm' : (ch.u.status === 'warn' ? 'warn' : 'neutral');
-        ch.g.setAttribute('class', 'crah-cell' + (run ? '' : ' stby')); ch.g.setAttribute('data-state', run ? st : 'standby');
+        ch = crahEls[i]; var run = ch.u.running !== false, stale = run && !!ch.u.stale, st = ch.u.status === 'alarm' ? 'alarm' : (ch.u.status === 'warn' ? 'warn' : 'neutral');
+        ch.g.setAttribute('class', 'crah-cell' + (run ? '' : ' stby')); ch.g.setAttribute('data-state', !run ? 'standby' : (stale ? 'stale' : st));
         if (run) {
           f = fillFor(st);
           setAttr(ch.p.top, 'fill', 'var(--fp-' + st + '-t1)'); setAttr(ch.p.front, 'fill', f.front); setAttr(ch.p.side, 'fill', f.side);
-          setAttr(ch.lamp, 'data-lamp', st === 'neutral' ? 'run' : st);
+          setAttr(ch.lamp, 'data-lamp', stale ? 'stale' : (st === 'neutral' ? 'run' : st));
         } else { setAttr(ch.p.top, 'fill', 'none'); setAttr(ch.p.front, 'fill', 'none'); setAttr(ch.p.side, 'fill', 'none'); setAttr(ch.lamp, 'data-lamp', opts.stbyLamp ? 'stby' : 'off'); }
         /* rotor period = T_ref / (speed / 100): T_ref 1.0 s for a fan, 0.8 s for a pump (§7.1); still at 0 % or standby */
         if (ch.rot) {
-          var sp = run ? ch.u.rotorPct : 0, per = sp > 0 ? (ch.u.rotorRefS || 1) / (sp / 100) : 0;
+          var sp = run && !stale ? ch.u.rotorPct : 0, per = sp > 0 ? (ch.u.rotorRefS || 1) / (sp / 100) : 0;
           setAttr(ch.rot, 'data-turning', per > 0 ? '1' : '0');
           var pd = per > 0 ? per.toFixed(3) + 's' : '';
           if (ch.rot.style.animationDuration !== pd) ch.rot.style.animationDuration = pd;
@@ -739,9 +742,9 @@
           var n = +target.getAttribute('data-crah'), cu = null, q;
           for (q = 0; q < crahEls.length; q++) if (crahEls[q].n === n) cu = crahEls[q].u;
           html('div', '', tip, crahTag(n, cu)).style.fontWeight = '600';
-          html('div', '', tip, cu && cu.running === false ? 'standby' : 'running' + (cu && cu.leavingAirC != null ? ' · leaving air ' + cu.leavingAirC.toFixed(1) + ' °C' : ''));
-          /* unit.lines (DC AI, PRD-DCAI-HALL-DEPTH A3): the adapter's operating-point lines, already formatted with units */
-          if (cu && cu.lines) for (q = 0; q < cu.lines.length; q++) html('div', '', tip, cu.lines[q]);
+          html('div', '', tip, cu && cu.running === false ? 'standby' : (cu && cu.stale ? 'stale · ' + (cu.staleNote || 'no sample') : 'running' + (cu && cu.leavingAirC != null ? ' · leaving air ' + cu.leavingAirC.toFixed(1) + ' °C' : '')));
+          /* unit.lines (DC AI, PRD-DCAI-HALL-DEPTH A3): the adapter's operating-point lines, already formatted with units; a stale unit prints none */
+          if (cu && cu.lines && !cu.stale) for (q = 0; q < cu.lines.length; q++) html('div', '', tip, cu.lines[q]);
           html('div', 'tp-hint', tip, 'Click for detail');
         }
         tipKey = key;
