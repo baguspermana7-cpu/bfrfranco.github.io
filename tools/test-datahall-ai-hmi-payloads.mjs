@@ -153,3 +153,17 @@ test('H7 hall 12 is DH-12, never DH-012; a tray id keeps its tray number (audit 
         assert.ok(t2.includes(`"${cls === 'rack-ct' ? 'ct' : 'ns'}",${want}]`), `${cls}:${id} opens tray ${want}`);
     }
 });
+
+test('H8 PRD-DCAI-HALL-DEPTH Amendment 8 (A8a): valves are the engine model, never a typed opening', () => {
+    const rowsOf = (p) => { const out = []; (function walk(v) { if (Array.isArray(v)) v.forEach(walk); else if (v && typeof v === 'object') { if (v.point) out.push(v); Object.values(v).forEach(walk); } })(p); return out; };
+    const pick = (p, point) => rowsOf(p).find((r) => r.point === point);
+    const cdu = pick(Payloads.payload('cdu', '1', ctxFor()), 'valve_pct');
+    /* a telemetry point anchored on the engine model (+/- 0.3 % feedback), so a replayed BMS file can still override it */
+    assert.ok(cdu && cdu.anchor === 'equipment.cdu_fws_valve_pct', `CDU valve_pct is anchored on the engine model (anchor ${cdu && cdu.anchor})`);
+    assert.ok(Math.abs(cdu.value - engine.snapshot.equipment.cdu_fws_valve_pct) <= 0.3 + 1e-9 && cdu.value !== 70, `CDU valve ${cdu.value} within 0.3 of engine ${engine.snapshot.equipment.cdu_fws_valve_pct}`);
+    const crah = pick(Payloads.payload('crah', '1', ctxFor()), 'valve_pct');
+    assert.ok(crah && crah.anchor === 'equipment.crah_chw_valve_pct' && Math.abs(crah.value - engine.snapshot.equipment.crah_chw_valve_pct) <= 0.3 + 1e-9, `CRAH valve_pct anchored on the engine (${crah && crah.value}, ${crah && crah.anchor})`);
+    assert.match(crah.declared, /crah_chw_valve_pct/, 'the declared reason names the engine model it is simulated about');
+    const sb = pick(Payloads.payload('cdu', String(adapter.cduInstalled), ctxFor()), 'valve_pct');
+    assert.ok(sb && sb.value === 0, `standby CDU valve is shut (${sb && sb.value})`);
+});

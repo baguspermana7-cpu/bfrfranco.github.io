@@ -299,7 +299,11 @@
       b.S('live', 'pump_amps', 'Pump current', { value: 42, text: '42 A nameplate' }, 3, 'A', { digits: 1 });
     }
     b.S('live', 'dp_bar', 'Differential pressure', { value: 1.8, text: '1.8 bar design ΔP' }, 0.25, 'bar', { digits: 2 });
-    b.S('live', 'valve_pct', 'Control valve', { value: 70, text: '70 % design opening' }, 10, '%', { digits: 0, min: 0, max: 100 });
+    /* Amendment 8 (A8a): was a typed 70 % 'design opening'; now the facility-water valve's modelled stroke from the
+       unit's load ratio (engine 1.8.0, equal-percentage, R 50), as a telemetry point (position feedback +/- 0.3 %, a
+       replayed BMS file overrides it); a standby CDU's valve is shut */
+    if (isStandby) b.D('live', 'valve_pct', 'Control valve', '0 %', 'standby unit: facility-water valve shut until a duty CDU trips (equipment.cdu_standby_per_hall)', 0);
+    else b.S('live', 'valve_pct', 'Control valve', { field: 'cduValvePct' }, 0.3, '%', { digits: 1, min: 0, max: 100 });
     var p1 = isStandby ? 'stby' : (cs.cduPumpFault === 1 ? 'fault' : 'run'), p2 = isStandby ? 'stby' : 'run', p3 = isStandby ? 'stby' : (cs.cduPumpFault === 1 ? 'run' : 'stby');
     b.ST('live', 'pump_state_1', 'Pump 1', p1, COOL_REASON); b.ST('live', 'pump_state_2', 'Pump 2', p2, COOL_REASON); b.ST('live', 'pump_state_3', 'Pump 3', p3, COOL_REASON);
     b.chip(isStandby ? 'STANDBY' : (p1 === 'fault' ? 'DEGRADED' : 'RUN'), isStandby ? 'standby' : (p1 === 'fault' ? 'fault' : 'normal'));
@@ -441,12 +445,15 @@
       var SBC = 'standby unit: fans stopped and CHW valve shut until a duty CRAH trips (equipment.crah_duty_per_hall)';
       b.D('live', 'duty_kwth', 'Unit duty', '0 kWth', SBC, 0);
       b.D('live', 'fan_pct', 'Fan speed', '0 %', SBC, 0);
+      b.D('live', 'valve_pct', 'CHW valve', '0 %', SBC, 0);
     } else {
       b.E('live', 'duty_kwth', 'Unit duty', 'crahPerUnit', 'kWth', { digits: 0 });
       /* v3.104.0 (PRD-DCAI-HALL-DEPTH Amendment 3 D8): the engine's fan speed (fan law: unit airflow / rated airflow), the
          same number the floor's rotor turns at (a telemetry point: +/- 0.5 % around it, '—' under a replay with no sample);
          it was a simulated 75 % +/- 8 that contradicted the floor */
       b.S('live', 'fan_pct', 'Fan speed', { field: 'crahFanPct' }, 0.5, '%', { digits: 1, min: 0, max: 100 });
+      /* Amendment 8 (A8a): the coil valve's stroke from the unit's duty ratio (engine 1.8.0, equal-percentage, R 50) */
+      b.S('live', 'valve_pct', 'CHW valve', { field: 'crahValvePct' }, 0.3, '%', { digits: 1, min: 0, max: 100 });
     }
     b.S('live', 'supply_rh', 'Supply RH', { value: SP('crah/supply_rh'), text: SP('crah/supply_rh') + ' % RH setpoint' }, 5, '%', { digits: 0, min: 0, max: 100 });
     b.ST('live', 'unit_state', 'Unit', st, COOL_REASON); b.chip(st === 'run' ? 'RUN' : 'STANDBY', st === 'run' ? 'normal' : 'standby');

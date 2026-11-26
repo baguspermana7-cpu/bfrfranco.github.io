@@ -791,12 +791,12 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
          byte-frozen by the ship gate and still proving its own 57 worked examples, but this
          page no longer loads it. The ?v= token IS the version pin the authority block checks
          (= DCAI_CALC.snapshot.meta.version); tools/test-dcai-engine-version-pin.mjs asserts it. -->
-    <script src="js/rz-engine-versions.js?v=20261123-f9009513"></script>
-    <script src="js/dcai-model.js?v=1.7.0" data-datahall-model-authority></script>
-    <script src="js/dcai-engine.js?v=1.7.0" data-datahall-calc-authority></script>
+    <script src="js/rz-engine-versions.js?v=20261126-2677dd9d"></script>
+    <script src="js/dcai-model.js?v=1.8.0" data-datahall-model-authority></script>
+    <script src="js/dcai-engine.js?v=1.8.0" data-datahall-calc-authority></script>
     <!-- generated registry twin: the authority block validates the live snapshot against
          every id the registry publishes, so the allow-list is generated, never typed -->
-    <script src="js/dcai-parameters.js?v=1.7.0" data-datahall-registry></script>
+    <script src="js/dcai-parameters.js?v=1.8.0" data-datahall-registry></script>
     <script src="js/rz-evidence.js?v=20260920-3f7c72db"></script>
     <!-- v3.10.2 — the width budget, loaded BEFORE rz-svg-basis so a basis mark sits just past the
          end of its label instead of past a length*size*0.6 estimate of it. Synchronous and
@@ -882,8 +882,8 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
     <script src="js/datahall-ai/sp-inspector.js?v=20261126-f32ceaae" defer></script>
     <script src="js/datahall-ai/hall-interact.js?v=20261013-77877697" defer></script>
     <script src="js/conv/floor-plan-color.js?v=20261122-7138898a" defer></script>
-    <script src="js/conv/floor-plan.js?v=20261126-6388a641" defer></script>
-    <script src="js/datahall-ai/hall-iso.js?v=20261126-13d6c65d" defer></script>
+    <script src="js/conv/floor-plan.js?v=20261126-f55d04d1" defer></script>
+    <script src="js/datahall-ai/hall-iso.js?v=20261126-fa14869a" defer></script>
     <script src="js/datahall-ai/fire-workstation.js?v=20261116-0546e949" defer></script>
 <style id="rz-skiplink-v1">
 .skip-link{position:absolute;top:-50px;left:0;background:#1a1d23;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 4px 0;transition:top .2s ease}
@@ -1745,8 +1745,10 @@ var DH=(function(){
     batteryPerHall:rd(E.battery_hall_kwh,0),
     gensetStandby:E.gensets_standby,
     facilityKva:E.facility_kva, rowItKw:G.rack_it_row_kwe, tcsFlowRackLpm:Fl.tcs_rack_lpm, cduDutyPerUnit:E.cdu_duty_per_unit_kwth, cduFlowPerUnitLpm:E.cdu_flow_per_unit_lpm,
-    /* PRD-DCAI-HALL-DEPTH A3: one running unit's operating point (engine 1.7.0); a standby unit reads 0 */
+    /* PRD-DCAI-HALL-DEPTH A3: one running unit's operating point (engine 1.7.0; A8a valves 1.8.0); a standby unit reads 0 */
     crahStandby:E.crah_standby_per_hall, crahAirUnitM3h:E.crah_airflow_unit_m3h, crahRatedAirM3h:E.crah_rated_airflow_m3h, crahFanPct:E.crah_fan_speed_pct,
+    /* A8a (engine 1.8.0): modelled control-valve stroke of one running unit (equal-percentage, R 50) */
+    crahValvePct:E.crah_chw_valve_pct, cduValvePct:E.cdu_fws_valve_pct,
     cduStandby:E.cdu_standby_per_hall, cduLoadPct:E.cdu_load_pct, cduRatedLpm:E.cdu_rated_flow_lpm, cduPumpPct:E.cdu_pump_speed_pct,
     /* A3 diagram fields: raw engine numbers the drawings print (per-hall slices come from the engine, never page division) */
     nvlinkDomainTbs:Cm.nvlink_domain_tbs, switchesFacility:P.fabric_switches_facility,
@@ -1918,7 +1920,7 @@ window.DH_BASIS={
 "leavesPerHall":"network.leaves_per_hall","spinesPerHall":"network.spines_per_hall","coresPerHall":"network.cores_per_hall","switchesPerHall":"network.switches_per_hall",
 "leafRadix":"network.leaf_radix","gpuDownlinksPerHall":"network.gpu_downlinks_per_hall","leafSpineLinks":"network.leaf_spine_links_per_hall","spineCoreLinks":"network.spine_core_links_per_hall","switchesPerRackCheck":"network.switches_per_rack_check","computeTraysFacility":"compute.compute_trays_facility","switchesFacility":"power.fabric_switches_facility",
 "batteryPerHall":"equipment.battery_hall_kwh","gensetStandby":"equipment.gensets_standby",
-"rowItKw":"geometry.rack_it_row_kwe","tcsFlowRackLpm":"design.flows.tcs_rack_lpm","cpuPerRack":"compute.cpu_per_rack","cduDutyPerUnit":"equipment.cdu_duty_per_unit_kwth","cduFlowPerUnitLpm":"equipment.cdu_flow_per_unit_lpm","crahStandby":"equipment.crah_standby_per_hall","crahAirUnitM3h":"equipment.crah_airflow_unit_m3h","crahRatedAirM3h":"equipment.crah_rated_airflow_m3h","crahFanPct":"equipment.crah_fan_speed_pct","cduStandby":"equipment.cdu_standby_per_hall","cduLoadPct":"equipment.cdu_load_pct","cduRatedLpm":"equipment.cdu_rated_flow_lpm","cduPumpPct":"equipment.cdu_pump_speed_pct","htwFlowM3h":"design.flows.htw_hall_m3h","chwFlowM3h":"design.flows.chw_hall_m3h","nvlinkPerGpuGBs":"compute.nvlink_per_gpu_gbs","nvlinkDomainTBs":"compute.nvlink_domain_tbs","gpuMemoryPb":"compute.gpu_memory_pb_facility","computeTraysFacility":"compute.compute_trays_facility","nvswitchFacility":"compute.nvswitch_facility"
+"rowItKw":"geometry.rack_it_row_kwe","tcsFlowRackLpm":"design.flows.tcs_rack_lpm","cpuPerRack":"compute.cpu_per_rack","cduDutyPerUnit":"equipment.cdu_duty_per_unit_kwth","cduFlowPerUnitLpm":"equipment.cdu_flow_per_unit_lpm","crahValvePct":"equipment.crah_chw_valve_pct","cduValvePct":"equipment.cdu_fws_valve_pct","crahStandby":"equipment.crah_standby_per_hall","crahAirUnitM3h":"equipment.crah_airflow_unit_m3h","crahRatedAirM3h":"equipment.crah_rated_airflow_m3h","crahFanPct":"equipment.crah_fan_speed_pct","cduStandby":"equipment.cdu_standby_per_hall","cduLoadPct":"equipment.cdu_load_pct","cduRatedLpm":"equipment.cdu_rated_flow_lpm","cduPumpPct":"equipment.cdu_pump_speed_pct","htwFlowM3h":"design.flows.htw_hall_m3h","chwFlowM3h":"design.flows.chw_hall_m3h","nvlinkPerGpuGBs":"compute.nvlink_per_gpu_gbs","nvlinkDomainTBs":"compute.nvlink_domain_tbs","gpuMemoryPb":"compute.gpu_memory_pb_facility","computeTraysFacility":"compute.compute_trays_facility","nvswitchFacility":"compute.nvswitch_facility"
 };
 /* bo('<field>') -> {basis:'<id>'} for the helpers; bo() of an unmapped field is a loud null
    (the map gate lists unmapped SVG reads), and the helpers then draw a plain, untraced text. */
@@ -3385,6 +3387,9 @@ const VB_W=1200;
 const M=(m)=>+(m*SC).toFixed(1);               /* metres -> px */
 const CDU_W_M=0.9,CDU_D_M=1.9,CDU_ACC_M=1.0;   /* CoolIT CHx1000 class, model comment */
 /* Rack-field heat ramp: the same scale draws every aisle, so colour compares across the hall. */
+/* PRD-DCAI-HALL-DEPTH Amendment 8 (A8b): 4 points along every aisle (owner: "temp di 4 titik per aisle/row"); was 3,
+   typed twice (the drawing and the readout writer). One constant for both. */
+var SENS_PTS=4;
 function hallHeat(t,al){
   const A=(al==null?.3:al);
   const S=[[20,[37,99,235]],[25,[6,182,212]],[30,[34,197,94]],[34,[245,158,11]],[40,[239,68,68]]];
@@ -3502,7 +3507,7 @@ s+=`<rect class="hp-wall" x="${HX0}" y="${HY0b}" width="${M(Lm)}" height="${M(Wm
 
 /* ===== THERMAL LAYER — aisles coloured by their own sensors ================================== */
 let th='<g class="hp-ly hp-ly-thermal">';
-const SENS_PTS=3,fh=M(rowLm);
+const fh=M(rowLm);
 for(let p=0;p<pairs;p++){const pi=p;
 for(let si=0;si<SENS_PTS;si++){const y0=Y(yF0)+fh*si/SENS_PTS,h=fh/SENS_PTS;
 th+=`<rect id="H${pi}${si}z" data-pi="${pi}" x="${X(hotM0(p))}" y="${nzf(y0,1)}" width="${M(2*hotM)}" height="${nzf(h,1)}" fill="${hallHeat(null)}"/>`;
@@ -3637,7 +3642,7 @@ window.__hallZones={racks:X(Lm*.3),cdu:X(Lm*.5),crah:X(Lm*.8),vb:VB_W,hx0:HX0,hy
 hc.innerHTML=s;
 hallApplyLayers();
 /* PRD-DATAHALL-BMS-ISO F4: the 3D floor (js/datahall-ai/hall-iso.js) draws the same hall from these engine reads */
-window.__hallIsoGeo={rows:rows,perRow:perRow,m:{rackPitch:rackWM,rackDepth:rackDM,coldAisle:coldM,hotAisle:hotM,crossAisle:xaM,cduDepth:cduD,galleryDepth:gD,hallWidth:Wm,hallLength:Lm,modsPer:modsPer,place:HALL_PLACE},kwRack:kwRack,crahInst:crahInst,crahAct:crahAct,cduInst:cduInst,cduRun:cduRun,sp:SENS_PTS,supplyC:bn('airSupplyC'),returnC:bn('airReturnC'),rackRatedKw:bn('shelfInstalledKw'),crahKw:bn('crahPerUnit'),crahAir:bn('crahAirUnitM3h'),crahAirRated:bn('crahRatedAirM3h'),crahFan:bn('crahFanPct'),cduKw:bn('cduDutyPerUnit'),cduRated:bn('cduRating'),cduLoad:bn('cduLoadPct'),cduLpm:bn('cduFlowPerUnitLpm'),cduLpmRated:bn('cduRatedLpm'),cduPump:bn('cduPumpPct'),rowKw:bn('rowItKw'),buswayPct:bn('buswayLoadPct'),tcsSupC:bn('tcsSupply'),tcsRetC:bn('tcsReturn'),itKw:bn('itHall'),liqKw:bn('liquidHeat'),liqPct:bn('liquidCapturePct'),airKw:bn('airHeat')};
+window.__hallIsoGeo={rows:rows,perRow:perRow,m:{rackPitch:rackWM,rackDepth:rackDM,coldAisle:coldM,hotAisle:hotM,crossAisle:xaM,cduDepth:cduD,galleryDepth:gD,hallWidth:Wm,hallLength:Lm,modsPer:modsPer,place:HALL_PLACE},kwRack:kwRack,crahInst:crahInst,crahAct:crahAct,cduInst:cduInst,cduRun:cduRun,sp:SENS_PTS,supplyC:bn('airSupplyC'),returnC:bn('airReturnC'),rackRatedKw:bn('shelfInstalledKw'),crahKw:bn('crahPerUnit'),crahAir:bn('crahAirUnitM3h'),crahAirRated:bn('crahRatedAirM3h'),crahFan:bn('crahFanPct'),cduKw:bn('cduDutyPerUnit'),cduRated:bn('cduRating'),cduLoad:bn('cduLoadPct'),cduLpm:bn('cduFlowPerUnitLpm'),cduLpmRated:bn('cduRatedLpm'),cduPump:bn('cduPumpPct'),crahValve:bn('crahValvePct'),cduValve:bn('cduValvePct'),rowKw:bn('rowItKw'),buswayPct:bn('buswayLoadPct'),tcsSupC:bn('tcsSupply'),tcsRetC:bn('tcsReturn'),tcsRackLpm:bn('tcsFlowRackLpm'),feedA:bn('rackFeedA'),itKw:bn('itHall'),liqKw:bn('liquidHeat'),liqPct:bn('liquidCapturePct'),airKw:bn('airHeat')};
 if(window.RZHallIso)window.RZHallIso.update(window.__hallIsoGeo);
 }
 /* Layers are a VIEW of one drawing, so the state survives a re-render (hall switch, engine tick). */
@@ -3668,14 +3673,14 @@ RZDefer.add('hall',function(){renderHall();});
    for twenty rows, bank A only. The id scheme never needed changing — only this bound did. */
 function upd(){const _rpb=(DHE&&typeof DHE.rowsPerBank==='number'&&isFinite(DHE.rowsPerBank))?DHE.rowsPerBank:0;
 const _bk=(DHE&&typeof DHE.rackBanks==='number'&&isFinite(DHE.rackBanks))?DHE.rackBanks:0;
-const SR=Math.ceil(_rpb/2)*_bk,SP=3;   /* containment pairs across the hall x points along each aisle */
+const SR=Math.ceil(_rpb/2)*_bk,SP=SENS_PTS;   /* containment pairs across the hall x points along each aisle (A8b: one constant, 4) */
 /* v3.3.0 — the seed key now carries the aisle AND the point. Three readouts along one aisle all
    read 'page1', so all three printed the SAME number: the drawing said "several points" and
    showed one. A contained hot aisle warms along its length toward the return and a cold aisle
    picks up a little on the throw, so the anchor walks with the point index — still declared
    simulated jitter about the engine air planes, never a field reading, and still 1 decimal
    (v2.18.0: five digits printed 25.78698 C on a 2.8 px glyph). */
-if(rzPanelOn('hall'))for(let r=0;r<SR;r++)for(let si=0;si<SP;si++){const ht=$('H'+r+si+'t'),hh=$('H'+r+si+'h'),ct=$('C'+r+si+'t'),ch=$('C'+r+si+'h');if(ht){const v=RZ_SIM('hac'+r+'-'+si,33.4+si*1.1,37.2+si*1.1,1);ht.textContent=v;const hz=$('H'+r+si+'z');if(hz)hz.setAttribute('fill',hallHeat(parseFloat(v),.34));}if(hh)hh.textContent=RZ_SIM('hah'+r+'-'+si,40,65,1)+'%';if(ct){const v=RZ_SIM('cac'+r+'-'+si,25.3+r*0.05+si*0.22,25.8+r*0.05+si*0.22,1);ct.textContent=v;document.querySelectorAll('#hSvg .C'+r+si+'z').forEach(z=>z.setAttribute('fill',hallHeat(parseFloat(v),.16)));}if(ch)ch.textContent=RZ_SIM('cah'+r+'-'+si,45,70,1)+'%'}
+if(rzPanelOn('hall'))for(let r=0;r<SR;r++)for(let si=0;si<SP;si++){const ht=$('H'+r+si+'t'),hh=$('H'+r+si+'h'),ct=$('C'+r+si+'t'),ch=$('C'+r+si+'h');if(ht){const v=RZ_SIM('hac'+r+'-'+si,33.4+si*1.1,37.2+si*1.1,1);ht.textContent=v;const hz=$('H'+r+si+'z');if(hz)hz.setAttribute('fill',hallHeat(parseFloat(v),.34));}if(hh)hh.textContent=RZ_SIM('hah'+r+'-'+si,40,65,1)+'%';if(ct){const v=RZ_SIM('cac'+r+'-'+si,25.3+r*0.05+si*0.22,25.8+r*0.05+si*0.22,1);ct.textContent=v;document.querySelectorAll('#hSvg .C'+r+si+'z').forEach(z=>z.setAttribute('fill',hallHeat(parseFloat(v),.16)));}{/* A8b: the cold-aisle RH of every point is published for the floor's stations even where the drawing prints none (same keyed sim, one source) */const rc=RZ_SIM('cah'+r+'-'+si,45,70,1);(window.__hallRH||(window.__hallRH={}))[r+'-'+si]=rc;if(ch)ch.textContent=rc+'%'}}
 /* PRD-DCAI-HALL-DEPTH Amendment 7 (A6a): the floor's aisle stations show these readings the moment they change */
 if(rzPanelOn('hall'))document.dispatchEvent(new CustomEvent('rz-hall-readings'));
 /* PUE/IT/DLC are ENGINE-DERIVED (not random). GPU% and W/GPU remain live

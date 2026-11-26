@@ -183,6 +183,7 @@
     '@keyframes fp-rot{to{transform:rotate(360deg)}}',
     '@media (prefers-reduced-motion:no-preference){.fp-rotor[data-turning="1"]{animation:fp-rot 1s linear infinite}}',
     '.fp-root.fp-offscreen .fp-rotor{animation-play-state:paused}',
+    '.cr-valve-track{stroke:var(--fp-ink);stroke-opacity:.3;stroke-width:1.5}.cr-valve-fill{stroke:var(--fp-ink);stroke-width:1.5}',
     '.fp-ring-sel{stroke:var(--fp-accent);stroke-width:1.5}',
     /* opts.selInk (DC AI, PRD-DCAI-HALL-DEPTH Amendment 5 / SL1): the selection is an ink outline, 2 px, never the warning amber */
     '.fp-root[data-sel-ink] .fp-ring-sel{stroke:var(--fp-ink);stroke-width:2}',
@@ -448,8 +449,10 @@
           /* opts.rotors (DC AI, PRD-DCAI-HALL-DEPTH A4 §7.1), top view only: three blades on the fan (fan-wall module) or on a
              pump circle (CDU), turned by a CSS animation whose period paint() sets from the unit's speed; no JS loop */
           var rot = null;
-          if (opts.rotors && !iso) {
-            var rc = XY(bx + bw / 2, uy + ud / 2, hh, band), re = XY(bx + bw / 2 + rr, uy + ud / 2, hh, band), rp = Math.max(1, Math.abs(re[0] - rc[0]) * 0.9), bl = '', ang;
+          /* Amendment 8 (A8a): in 3D the rotor turns on the grille face toward the cabinets (where the grille is drawn) */
+          if (opts.rotors) {
+            var rc = iso ? XY(bx + bw / 2, uy + ud, hh * 0.5, band) : XY(bx + bw / 2, uy + ud / 2, hh, band),
+              re = iso ? XY(bx + bw / 2 + rr, uy + ud, hh * 0.5, band) : XY(bx + bw / 2 + rr, uy + ud / 2, hh, band), rp = Math.max(1, Math.abs(re[0] - rc[0]) * 0.9), bl = '', ang;
             if (kind !== 'crah') el('circle', { 'class': 'cr-fan cr-pump', cx: rc[0].toFixed(2), cy: rc[1].toFixed(2), r: (rp / 0.9).toFixed(2) }, cg);
             for (ang = 0; ang < 3; ang++) bl += 'M' + rc[0].toFixed(2) + ' ' + rc[1].toFixed(2) + 'L' + (rc[0] + rp * Math.cos(ang * 2.0944 - 1.5708)).toFixed(2) + ' ' + (rc[1] + rp * Math.sin(ang * 2.0944 - 1.5708)).toFixed(2);
             rot = el('path', { 'class': 'fp-rotor', d: bl }, cg);
@@ -460,7 +463,16 @@
           var tp = XY(bx + bw / 2, uy + ud, 0, band);
           var tx = el('text', { 'class': 'cr-n', x: tp[0].toFixed(1), y: (tp[1] + 9).toFixed(1), 'text-anchor': 'middle' }, cg);
           tx.textContent = String(nn);
-          crahEls.push({ g: cg, p: cell3, lamp: lamp, rot: rot, n: nn, u: cu, top: bp.top, gal: name, band: band, i: q, cx: bx + bw / 2 });
+          /* opts.valves (DC AI, Amendment 8 A8a): the control valve's stroke as a position bar on the roof's north-west edge,
+             track in muted ink, fill = stroke %; ink only (a valve has no limit, so no state colour). paint() sets the fill. */
+          var valve = null;
+          if (opts.valves) {
+            var vy = uy + Math.min(0.35, ud * 0.2), va = XY(bx + 0.15, vy, hh, band), vb = XY(bx + Math.max(0.3, bw * 0.55), vy, hh, band);
+            var vg = el('g', { 'class': 'cr-valve' }, cg);
+            el('line', { 'class': 'cr-valve-track', x1: va[0].toFixed(2), y1: va[1].toFixed(2), x2: vb[0].toFixed(2), y2: vb[1].toFixed(2) }, vg);
+            valve = { g: vg, a: va, b: vb, fill: el('line', { 'class': 'cr-valve-fill', x1: va[0].toFixed(2), y1: va[1].toFixed(2), x2: va[0].toFixed(2), y2: va[1].toFixed(2) }, vg) };
+          }
+          crahEls.push({ g: cg, p: cell3, lamp: lamp, rot: rot, valve: valve, n: nn, u: cu, top: bp.top, gal: name, band: band, i: q, cx: bx + bw / 2 });
         }
       }
       var wrapN = side(ids.top, 'north');
@@ -668,6 +680,11 @@
           var pd = per > 0 ? per.toFixed(3) + 's' : '';
           if (ch.rot.style.animationDuration !== pd) ch.rot.style.animationDuration = pd;
         }
+        if (ch.valve) {
+          var vp = run && !stale && ch.u.valvePct != null && isFinite(ch.u.valvePct) ? Math.max(0, Math.min(100, ch.u.valvePct)) : 0, va2 = ch.valve.a, vb2 = ch.valve.b;
+          setAttr(ch.valve.g, 'data-pct', (run && !stale && ch.u.valvePct != null) ? vp.toFixed(1) : '');
+          setAttr(ch.valve.fill, 'x2', (va2[0] + (vb2[0] - va2[0]) * vp / 100).toFixed(2)); setAttr(ch.valve.fill, 'y2', (va2[1] + (vb2[1] - va2[1]) * vp / 100).toFixed(2));
+        }
       }
       host.setAttribute('data-unit', { power: 'kW', temp: '°C', 'cooling-margin': 'K', alarms: '%' }[mode] || '');
       root.setAttribute('data-mode', mode);
@@ -740,7 +757,9 @@
           html('div', '', tip, rackTag(i) + ' · ' + zoneTag(rackEls[i].c.z)).style.fontWeight = '600';
           if (rk.occupied) {
             html('div', '', tip, rk.kw.toFixed(1) + ' kW · ' + Math.round(u0 * 100) + ' % of ' + (model.ratingKw || 0).toFixed(0) + ' kW rating');
-            html('div', '', tip, 'inlet ' + model.rackInletFor(i).toFixed(1) + ' °C');
+            /* model.rackLines (DC AI, Amendment 8 A8d): the adapter's own lines replace the bare inlet line */
+            if (typeof model.rackLines === 'function') { var rl = model.rackLines(i) || [], qq; for (qq = 0; qq < rl.length; qq++) html('div', '', tip, rl[qq]); }
+            else html('div', '', tip, 'inlet ' + model.rackInletFor(i).toFixed(1) + ' °C');
           }
           html('div', '', tip, STATE_WORD[r.state]);
           if (rk.note) html('div', '', tip, rk.note);

@@ -100,6 +100,7 @@
       '@keyframes dh-ovl-flow{to{stroke-dashoffset:-12}}',
       '@media (prefers-reduced-motion:no-preference){#hIso .ovl-pipe{animation:dh-ovl-flow 1s linear infinite}}',
       '#hIso .fp-root.fp-offscreen .ovl-pipe{animation-play-state:paused}',
+      '#hIso .cr-valve{display:none}#hIso[data-lens-on="cooling"] .cr-valve{display:inline}#hIso .ovl-st[data-hot="1"]{stroke:var(--fp-ink,#e8edf5);stroke-width:1.5}',
       '#hIso .ovl-st{stroke:var(--bg2);stroke-width:1}#hIso .ovl-st[data-state="stale"]{fill:none;stroke:var(--t3);stroke-dasharray:1.5 1.5}#hIso .ovl-st[data-state="ok"]{fill:var(--rz-pt-ok,#16a34a)}#hIso .ovl-st[data-state="warn"]{fill:var(--rz-pt-warn,#d97706)}#hIso .ovl-st[data-state="alarm"]{fill:var(--rz-pt-alarm,#dc2626)}#hIso .ovl-st[data-side="hot"]{fill:var(--fp-ink,#e8edf5)}',
       '#hIso .ovl-bw-track{stroke:var(--bd);stroke-width:3;stroke-linecap:butt}#hIso .ovl-bw{stroke:var(--fp-ink,#e8edf5);stroke-width:3;stroke-linecap:butt}',
       '#hIso .ovl-corr{fill:var(--t3);font:500 9px/1 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.06em}',
@@ -199,6 +200,13 @@
       rackInletFor: function (idx) {
         var zz = Math.floor(idx / perZone), j = (idx % perZone) % G.perRow, si = Math.min(G.sp - 1, Math.floor(j * G.sp / G.perRow));
         var v = num('C' + zz + si + 't'); return v != null ? v : zones[zz].rackInletC;
+      },
+      /* Amendment 8 (A8d): what one rack is doing, in one tooltip — its inlet NAMED by the station it reads (never
+         interpolated), its liquid loop and its feed, all engine fields; replaces the floor's bare inlet line */
+      rackLines: function (idx) {
+        var zz = Math.floor(idx / perZone), j = (idx % perZone) % G.perRow, si = Math.min(G.sp - 1, Math.floor(j * G.sp / G.perRow)), v = num('C' + zz + si + 't');
+        return ['inlet ' + (v != null ? v.toFixed(1) + ' °C' : '—') + ' · cold aisle point ' + (si + 1) + ' of ' + G.sp,
+          'TCS ' + f0(geo.tcsRackLpm) + ' L/min · ' + f1(geo.tcsSupC) + ' → ' + f1(geo.tcsRetC) + ' °C', 'feed A ' + f0(geo.feedA) + ' A'];
       }
     };
     readSensors();
@@ -376,11 +384,15 @@
     if (u.kind === 'crah') {
       u.ops = { kw: on ? o.crahKw : 0, airM3h: on ? o.crahAir : 0, fanPct: on ? o.crahFan : 0, supplyC: on ? geo.supplyC : null };
       u.rotorPct = u.ops.fanPct; u.rotorRefS = 1.0;   /* §7.1: fan rotor T_ref 1.0 s at 100 % */
-      u.lines = ['fan ' + f1(u.ops.fanPct) + ' % · ' + f0(u.ops.airM3h) + ' of ' + f0(o.crahAirRated) + ' m³/h', 'duty ' + f0(u.ops.kw) + ' kWth' + (on ? ' · supply ' + f1(geo.supplyC) + ' °C' : '')];
+      u.valvePct = on ? o.crahValve : 0;   /* Amendment 8 A8a: modelled CHW valve stroke (engine 1.8.0) */
+      u.lines = ['fan ' + f1(u.ops.fanPct) + ' % · ' + f0(u.ops.airM3h) + ' of ' + f0(o.crahAirRated) + ' m³/h', 'duty ' + f0(u.ops.kw) + ' kWth' + (on ? ' · supply ' + f1(geo.supplyC) + ' °C' : ''),
+        on ? 'return air ' + f1(geo.returnC) + ' °C · CHW valve ' + f1(u.valvePct) + ' % (modelled)' : 'CHW valve shut (standby)'];
     } else {
       u.ops = { kw: on ? o.cduKw : 0, loadPct: on ? o.cduLoad : 0, lpm: on ? o.cduLpm : 0, pumpPct: on ? o.cduPump : 0 };
       u.rotorPct = u.ops.pumpPct; u.rotorRefS = 0.8;  /* §7.1: pump rotor T_ref 0.8 s at 100 % */
-      u.lines = ['duty ' + f0(u.ops.kw) + ' of ' + f0(o.cduRated) + ' kWth (' + f1(u.ops.loadPct) + ' %)', 'TCS ' + f0(u.ops.lpm) + ' of ' + f0(o.cduLpmRated) + ' L/min · pump ' + f1(u.ops.pumpPct) + ' %'];
+      u.valvePct = on ? o.cduValve : 0;   /* Amendment 8 A8a: modelled facility-water valve stroke (engine 1.8.0) */
+      u.lines = ['duty ' + f0(u.ops.kw) + ' of ' + f0(o.cduRated) + ' kWth (' + f1(u.ops.loadPct) + ' %)', 'TCS ' + f0(u.ops.lpm) + ' of ' + f0(o.cduLpmRated) + ' L/min · pump ' + f1(u.ops.pumpPct) + ' %',
+        on ? 'FWS valve ' + f1(u.valvePct) + ' % (modelled)' : 'FWS valve shut (standby)'];
     }
     return u;
   }
@@ -491,18 +503,30 @@
   }
   /* D2 each station shows its reading; called after a build and whenever the page writes new readings (rz-hall-readings).
      A station without a reading claims no state (stale: dotted, as A5e) */
+  /* Magnus dew point (a 17.62, b 243.12 degC; Alduchov & Eskridge 1996), from a station's dry bulb and RH */
+  function dewPoint(t, rh) { if (!(rh > 0)) return null; var g = Math.log(rh / 100) + 17.62 * t / (243.12 + t); return 243.12 * g / (17.62 - g); }
   function stations() {
     if (!host) return;
+    var hot = {};
     [].forEach.call(host.querySelectorAll('.fp-ovl .ovl-st'), function (c) {
       var z = +c.getAttribute('data-z'), s = +c.getAttribute('data-s'), cold = c.getAttribute('data-side') === 'cold', v = num((cold ? 'C' : 'H') + z + s + 't');
       if (v == null) { c.removeAttribute('data-v'); c.setAttribute('data-state', 'stale'); }
       else { c.setAttribute('data-v', String(v)); if (cold) c.setAttribute('data-state', v > 30 ? 'alarm' : (v > 27 ? 'warn' : 'ok')); else c.removeAttribute('data-state'); }
-      var t = c.querySelector('title'); if (t) t.textContent = pairName(z) + (cold ? ' cold aisle point ' : ' hot aisle point ') + (s + 1) + ' · ' + (v == null ? '— (no reading)' : v.toFixed(1) + ' °C ' + (cold ? 'inlet' : 'return'));
+      if (cold && v != null && (hot[z] == null || v > hot[z].v)) hot[z] = { v: v, el: c };
+      c.removeAttribute('data-hot');
+      var rhRaw = cold ? (win.__hallRH || {})[z + '-' + s] : null, rh = rhRaw != null && isFinite(parseFloat(rhRaw)) ? parseFloat(rhRaw) : null, dew = v != null && rh != null ? dewPoint(v, rh) : null;
+      if (dew != null) c.setAttribute('data-dew', dew.toFixed(1)); else c.removeAttribute('data-dew');
+      if (rh != null) c.setAttribute('data-rh', String(rh)); else c.removeAttribute('data-rh');
+      var t = c.querySelector('title'); if (t) t.textContent = pairName(z) + (cold ? ' cold aisle · point ' : ' hot aisle · point ') + (s + 1) + ' of ' + (geo.sp || 4) + ' · ' + (v == null ? '— (no reading)' : v.toFixed(1) + ' °C ' + (cold ? 'inlet' : 'return')) + (rh != null ? ' · ' + Math.round(rh) + ' % RH' : '') + (dew != null ? ' · dew ' + dew.toFixed(1) + ' °C' : '') + (v != null ? ' · simulated about the engine air plane' : '');
     });
+    /* A8b: the warmest inlet point of each row pair carries a 1 px ink ring — a pointer, not a state */
+    Object.keys(hot).forEach(function (z) { hot[z].el.setAttribute('data-hot', '1'); });
   }
   doc.addEventListener('rz-hall-readings', function () {
     if (!inst || view === 'drawing' || !model) return;
-    readSensors(); stations(); if (lens === 'thermal') retag();
+    readSensors(); stations();
+    /* A8d: in Thermal each rack takes the state of the point it reads, so a warm point repaints only its own racks */
+    if (lens === 'thermal') { inst.paint(lensMode(lens)); retag(); }
   });
   /* D5 the hall's operating point beside the floor (Thermal and Cooling), from the adapter's engine numbers only */
   var opsBox = null;
@@ -533,7 +557,7 @@
       /* the whole hall on the first screen, both axes, at every width: the stage takes what is left of the viewport below
          its own top (HV-F1); fitAll lets the unit shrink below the plan's label floor (labels live in tooltips) */
       height: function () { var t = wrap.getBoundingClientRect().top + (win.pageYOffset || 0); return Math.max(260, (win.innerHeight || 900) - bottomInset() - t - 12); },
-      watchHeight: false, fitAll: true, overlay: drawOverlay, tagFit: true, stbyLamp: true, selInk: true, onRack: openUnit, onCrah: openUnit, rotors: true, geo: geo.m || null, airModes: ['temp', 'cooling-margin'],
+      watchHeight: false, fitAll: true, overlay: drawOverlay, tagFit: true, stbyLamp: true, selInk: true, onRack: openUnit, onCrah: openUnit, rotors: true, valves: true, geo: geo.m || null, airModes: ['temp', 'cooling-margin'],
       rackTag: function (i) { return model.racks[i].ref.replace('rack-unit:', ''); },
       zoneTag: function (z) { return 'Rows R' + pad2(2 * z + 1) + ' and R' + pad2(2 * z + 2) + ', one contained hot aisle'; },
       /* a phone gives a row pair about 34 px: 'R01/02' (6 chars) would touch its neighbour, '01/02' keeps a gap; the full name stays in the tooltip */
@@ -652,8 +676,8 @@
         itKw: g.itKw, liqKw: g.liqKw, liqPct: g.liqPct, airKw: g.airKw,
         /* PRD-DCAI-HALL-DEPTH A3: one running unit's operating point from the engine (1.7.0); standby units read 0 */
         ops: { crahKw: g.crahKw, crahAir: g.crahAir, crahAirRated: g.crahAirRated, crahFan: g.crahFan, cduKw: g.cduKw, cduRated: g.cduRated,
-          cduLoad: g.cduLoad, cduLpm: g.cduLpm, cduLpmRated: g.cduLpmRated, cduPump: g.cduPump, rowKw: g.rowKw, buswayPct: g.buswayPct },
-        tcsSupC: g.tcsSupC, tcsRetC: g.tcsRetC,
+          cduLoad: g.cduLoad, cduLpm: g.cduLpm, cduLpmRated: g.cduLpmRated, cduPump: g.cduPump, crahValve: g.crahValve, cduValve: g.cduValve, rowKw: g.rowKw, buswayPct: g.buswayPct },
+        tcsSupC: g.tcsSupC, tcsRetC: g.tcsRetC, tcsRackLpm: g.tcsRackLpm, feedA: g.feedA,
         /* the hall to scale (HV-G1): every length from the engine geometry, or none at all (the schematic stays) */
         m: metric(g.m) };
       ui(); summary();

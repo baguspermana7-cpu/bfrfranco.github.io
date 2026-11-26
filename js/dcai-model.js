@@ -266,6 +266,17 @@
         // source: the N+1 rule above as a count — one standby CDU per hall. ADOPTED
         redundantUnits: 1
       },
+      /* PRD-DCAI-HALL-DEPTH Amendment 8 (A8a): the modulating control valve on a fan-wall CHW coil and on a CDU's
+         facility-water side. The hall has no pipe-network model, so authority is taken as 1 (ideal installed curve). */
+      controlValve: {
+        // source: ASHRAE Handbook — HVAC Systems and Equipment, ch. 47 (valves): equal-percentage is the usual
+        //         characteristic for a coil / heat-exchanger control valve. ADOPTED
+        characteristic: 'equal-percentage',
+        // source: common inherent rangeability of a globe / characterised ball control valve, R = 50. ASSUMED
+        rangeability: 50,
+        // source: no hydraulic network model in this engine; authority 1 (ideal installed curve) declared. ASSUMED
+        authority: 1
+      },
       crah: {
         // source: no vendor selection. 200 kW sensible is a large-frame CRAH class. ASSUMED
         model: 'Large-frame CRAH, CHW coil',

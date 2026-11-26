@@ -2,5 +2,5 @@
    The engine version each cockpit trusts. Missing module = no pin = the cockpit fails CLOSED. */
 (function (root) {
   'use strict';
-  root.RZ_ENGINE_VERSIONS = Object.freeze({ conv: '2.10.0', dcai: '1.7.0' });
+  root.RZ_ENGINE_VERSIONS = Object.freeze({ conv: '2.10.0', dcai: '1.8.0' });
 })(typeof window !== 'undefined' ? window : globalThis);

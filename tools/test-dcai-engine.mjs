@@ -56,7 +56,7 @@ const S = C.snapshot;
 /* ── 0. sources and hygiene ─────────────────────────────────────────────── */
 ok(!/Math\.random/.test(ENGINE_SRC) && !/Math\.random/.test(MODEL_SRC), 'no Math.random in model or engine');
 ok(Object.isFrozen(S) && Object.isFrozen(S.design) && Object.isFrozen(M.thermal), 'snapshot and model are deep-frozen');
-ok(S.meta.version === '1.7.0' && S.meta.spec_version === M.specVersion, 'meta carries version and spec_version');
+ok(S.meta.version === '1.8.0' && S.meta.spec_version === M.specVersion, 'meta carries version and spec_version');
 ok(!/MEASURED/.test(MODEL_SRC.replace(/nothing may claim MEASURED[^\n]*/,'')), 'nothing in the model claims MEASURED');
 {
   /* every numeric leaf in the model has a `// source:` line within the 6 lines above it */
@@ -540,6 +540,19 @@ approx(S.heat.liquid_hall_kwth * M.facility.halls, S.heat.liquid_kwth, 1e-6, 'ha
   ok(E.gensets_standby === E.gensets_installed - E.gensets_duty, 'gensets_standby = installed - duty');
   approx(E.ups_loading_normal_pct, E.ups_loading_pct / 2, 1e-9, 'ups_loading_normal_pct = half of the failover loading (2N)');
   for (const b of M.weather.bins) { const op = C.operatingPoint(b.ambientDbC); approx(op.flows.tcs_hall_lpm, op.flows.tcs_m3h / h * 1000 / 60, 1e-9, `bin ${b.ambientDbC}: hall LPM`); }
+}
+
+/* ── PRD-DCAI-HALL-DEPTH Amendment 8 (A8a): control-valve stroke, equal-percentage characteristic ─────── */
+{
+  const E = S.equipment, v = M.equipment.controlValve;
+  ok(v && v.characteristic === 'equal-percentage' && v.rangeability === 50 && v.authority === 1, 'model declares the valve characteristic (equal-%, R 50, authority 1)');
+  const stroke = (phi) => phi >= 1 ? 100 : (phi < 1 / 50 ? 0 : 100 * (1 + Math.log(phi) / Math.log(50)));
+  const phiF = E.crah_fan_speed_pct / 100, phiC = E.cdu_load_pct / 100;
+  approx(E.crah_chw_valve_pct, stroke(phiF), 1e-9, 'AV1 fan-wall CHW valve = 1 + ln(phi)/ln 50 of the unit duty ratio');
+  approx(E.cdu_fws_valve_pct, stroke(phiC), 1e-9, 'AV1 CDU facility-water valve = 1 + ln(phi)/ln 50 of the unit load ratio');
+  approx(E.crah_chw_valve_pct, 99.93, 0.01, 'AV1 worked example: 199.49/200 kW -> 99.93 % (PRD §4.1)');
+  approx(E.cdu_fws_valve_pct, 99.57, 0.01, 'AV1 worked example: 983.5/1,000 kW -> 99.57 % (PRD §4.1)');
+  ok(typeof C.valveStroke === 'function' && C.valveStroke(1.2) === 100 && C.valveStroke(0.01) === 0 && C.valveStroke(0) === 0 && Math.abs(C.valveStroke(0.5) - 82.28) < 0.01, 'AV1 clamps: phi > 1 -> 100, phi < 1/R -> 0, phi 0.5 -> 82.28');
 }
 
 /* ── report ──────────────────────────────────────────────────────────────── */

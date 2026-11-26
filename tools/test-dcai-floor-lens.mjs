@@ -129,7 +129,7 @@ for (const [W, views] of [[1440, ['2d', '3d']], [390, ['2d']]]) {
     /* FL4 */
     const stMean = (z, side) => { const a = []; for (let s = 0; s < g.sp; s++) { const x = L.thermal.rd[(side === 'cold' ? 'C' : 'H') + z + s + 't']; if (isFinite(x)) a.push(x); } return a.reduce((p, q) => p + q, 0) / a.length; };
     const tt = L.thermal.tags, tc = L.cooling.tags, ts = L.status.tags;
-    ok('FL4', tt.length === pairs && tt.every((t, z) => /°C/.test(t) && nums(t)[0] === +n1(stMean(z, 'cold')) && nums(t)[1] === +n1(stMean(z, 'hot'))), `${tag} thermal tags ${JSON.stringify(tt.slice(0, 2))}, want ${n1(stMean(0, 'cold'))} / ${n1(stMean(0, 'hot'))} °C`);
+    ok('FL4', tt.length === pairs && tt.every((t, z) => /°C/.test(t) && Math.abs(nums(t)[0] - stMean(z, 'cold')) <= 0.0501 && Math.abs(nums(t)[1] - stMean(z, 'hot')) <= 0.0501   /* A8b: with 4 one-decimal points a mean often sits ON x.x5; the tag may round either way */), `${tag} thermal tags ${JSON.stringify(tt.slice(0, 2))}, want ${n1(stMean(0, 'cold'))} / ${n1(stMean(0, 'hot'))} °C`);
     const pairLpm = g.cduLpm * g.cduRun / pairs;
     ok('FL4', tc.length === pairs && tc.every((t) => /L\/min/.test(t) && Math.abs(nums(t)[0] - pairLpm) <= 1), `${tag} cooling tags ${JSON.stringify(tc.slice(0, 2))}, want ${Math.round(pairLpm)} L/min`);
     ok('FL4', ts.every((t) => /kW|MW/.test(t)), `${tag} status tags ${JSON.stringify(ts.slice(0, 2))}`);

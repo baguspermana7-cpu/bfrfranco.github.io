@@ -102,6 +102,14 @@
     return Math.min(num(copMax), num(carnotFraction) * carnot);
   }
 
+  /* PRD-DCAI-HALL-DEPTH A8a: stroke (0-100 %) of an equal-percentage valve at relative flow phi (= duty / design at a
+     fixed design dT): s = 1 + ln(phi) / ln(R); shut below 1/R, full stroke at phi >= 1 (a unit above design duty). */
+  function valveStroke(phi, R) {
+    var r = (typeof R === 'number' && R > 1) ? R : 50;
+    if (!(phi > 0) || phi < 1 / r) return 0;
+    if (phi >= 1) return 100;
+    return 100 * (1 + Math.log(phi) / Math.log(r));
+  }
   function ceilCount(duty, unit) { return Math.ceil(div(duty, unit, 'ceilCount')); }
 
   /* ========================================================================
@@ -401,6 +409,9 @@
       crah_airflow_unit_m3h: div(airHeatHall_kwth, geo.airDensityKgM3 * geo.airCpKjKgK * crahAirDtK * crahDutyHall, 'CRAH unit airflow') * 3600,
       /* fan law: flow is proportional to speed, so speed % = unit airflow / rated airflow at the same air dT */
       crah_fan_speed_pct: div(div(airHeatHall_kwth, crahDutyHall), eq.crah.unitKwTh) * 100,
+      /* A8a: the valve each running unit modulates, from its own duty ratio (a standby unit's valve is shut: 0) */
+      crah_chw_valve_pct: valveStroke(div(div(airHeatHall_kwth, crahDutyHall), eq.crah.unitKwTh), eq.controlValve.rangeability),
+      cdu_fws_valve_pct: valveStroke(div(div(liquidHeatHall_kwth, cduDutyHall), eq.cdu.unitKwTh), eq.controlValve.rangeability),
       cdu_standby_per_hall: eq.cdu.redundantUnits,
       cdu_load_pct: div(div(liquidHeatHall_kwth, cduDutyHall), eq.cdu.unitKwTh) * 100,
       cdu_rated_flow_lpm: eq.cdu.unitKwTh * eq.cdu.publishedLpmPerKw,
@@ -772,7 +783,7 @@
     return deepFreeze({
       meta: {
         engine: 'dcai-engine.js',
-        version: '1.7.0',   /* v3.103.0 (PRD-DCAI-HALL-DEPTH A3): one running unit's operating point — fan-wall airflow, rated airflow and fan speed %, CDU load %, rated flow and pump speed %, standby counts. // was 1.6.0 — v3.21.16: the campus arrangement — roads, setback, bands and the site area as a product of lengths. // was 1.5.0 — v3.21.9: the site branch — electrical wing, plate, roof share and yards from the engine counts. // was 1.4.0 — v3.21.7: one bank of 20 rows between two fan-wall galleries; the width and length stack checks. // was 1.3.0 — v3.7.0: the HV side of the main transformer is published — primary current, impedance and the switchyard bay count */
+        version: '1.8.0',   /* v3.111.0 (PRD-DCAI-HALL-DEPTH A8a): control-valve stroke per running fan wall and CDU (equal-percentage, R 50). // was 1.7.0: v3.103.0 (PRD-DCAI-HALL-DEPTH A3): one running unit's operating point — fan-wall airflow, rated airflow and fan speed %, CDU load %, rated flow and pump speed %, standby counts. // was 1.6.0 — v3.21.16: the campus arrangement — roads, setback, bands and the site area as a product of lengths. // was 1.5.0 — v3.21.9: the site branch — electrical wing, plate, roof share and yards from the engine counts. // was 1.4.0 — v3.21.7: one bank of 20 rows between two fan-wall galleries; the width and length stack checks. // was 1.3.0 — v3.7.0: the HV side of the main transformer is published — primary current, impedance and the switchyard bay count */
         spec_version: m.specVersion,
         authority: m.authority,
         evidence_class: 'SIMULATED/ADOPTED',
@@ -819,6 +830,7 @@
       model: model,
       snapshot: snapshot,
       compute: function (m) { return compute(m || model); },
+      valveStroke: function (phi) { return valveStroke(phi, model.equipment.controlValve.rangeability); },
       /* the same physics at an arbitrary ambient — for the weather slider and the gates */
       operatingPoint: function (ambientDbC, m) {
         var mm = m || model;

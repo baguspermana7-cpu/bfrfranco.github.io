@@ -1,6 +1,6 @@
 {
   "generatedBy": "tools/build-dcai-parameter-registry.mjs",
-  "engineVersion": "1.7.0",
+  "engineVersion": "1.8.0",
   "note": "GENERATED — do not hand-edit. Curated metadata lives in data/dcai-parameters.curated.json; authored-leaf provenance is read from js/dcai-model.js.",
   "parameters": [
     {
@@ -5837,6 +5837,36 @@
       "docs": []
     },
     {
+      "id": "equipment.cdu_fws_valve_pct",
+      "label": "Facility-water control-valve stroke of one running CDU (equal-percentage, R 50, modelled)",
+      "unit": "%",
+      "kind": "derived",
+      "value": 99.57422360483292,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "equipment.cdu.unitKwTh",
+        "equipment.controlValve.rangeability",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
       "id": "equipment.cdu_installed_facility",
       "label": "cdu installed facility",
       "unit": null,
@@ -5931,6 +5961,7 @@
         }
       ],
       "tests": [
+        "test-dcai-engine.mjs",
         "test-dcai-hall-views.mjs",
         "test-dcai-unit-ops.mjs"
       ],
@@ -6316,6 +6347,44 @@
       "docs": []
     },
     {
+      "id": "equipment.crah_chw_valve_pct",
+      "label": "CHW control-valve stroke of one running fan-wall module (equal-percentage, R 50, modelled)",
+      "unit": "%",
+      "kind": "derived",
+      "value": 99.93467870114607,
+      "formula": null,
+      "deps": [],
+      "scope": "plant",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "electrical.auxFractionOfIt",
+        "equipment.controlValve.rangeability",
+        "equipment.crah.unitKwTh",
+        "equipment.transformer.distributionEfficiency",
+        "equipment.ups.efficiency",
+        "fabric.oobKw",
+        "fabric.oobPerRack",
+        "fabric.storageMgmtFraction",
+        "fabric.switchKw",
+        "fabric.switchesPerRack",
+        "facility.rackItKw",
+        "facility.racksPerHall",
+        "gb300.liquidCaptureRatio"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [
+        {
+          "page": "datahallAI.html",
+          "reads": 3
+        }
+      ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
       "id": "equipment.crah_duty_per_hall",
       "label": "crah duty per hall",
       "unit": null,
@@ -6425,6 +6494,7 @@
         }
       ],
       "tests": [
+        "test-dcai-engine.mjs",
         "test-dcai-hall-views.mjs",
         "test-dcai-unit-ops.mjs"
       ],
@@ -9540,6 +9610,7 @@
         }
       ],
       "tests": [
+        "test-dcai-engine.mjs",
         "test-dcai-parameter-registry.mjs (semantic check)"
       ],
       "docs": [],
@@ -9730,7 +9801,7 @@
       "label": "version",
       "unit": null,
       "kind": "authored",
-      "value": "1.7.0",
+      "value": "1.8.0",
       "formula": null,
       "deps": [],
       "scope": "meta",
@@ -11513,6 +11584,7 @@
         }
       ],
       "tests": [
+        "test-dcai-air-stations.mjs",
         "test-dcai-engine.mjs",
         "test-dcai-floor-lens.mjs",
         "test-dcai-parameter-registry.mjs (provenance + evidence class)"

@@ -94,7 +94,7 @@ try {
     await wait(150);
     const rows = await cdu(tab);
     const insp = await tab.evaluate(() => (document.querySelector('aside.rz-inspector') || {}).innerText || '');
-    const good = rows.dp_bar.text === want[i][0] && rows.valve_pct.text === want[i][1] && rows.dp_bar.quality === 'replay' && insp.includes(want[i][0]) && insp.includes(want[i][1] + ' %');
+    const good = rows.dp_bar.text === want[i][0] && Number(rows.valve_pct.text) === Number(want[i][1]) && rows.dp_bar.quality === 'replay' && insp.includes(want[i][0]) && insp.includes(rows.valve_pct.text + ' %');   /* A8a: the valve is a 0.1 % point now (64 -> 64.0) */
     ok(good, `B4 scrub ${i}: payload + inspector print the file (dp ${want[i][0]} bar, valve ${want[i][1]} %)`, `dp ${rows.dp_bar.text} valve ${rows.valve_pct.text} inspector ${insp.includes(want[i][0])}`);
   }
   const rows = await cdu(tab);
