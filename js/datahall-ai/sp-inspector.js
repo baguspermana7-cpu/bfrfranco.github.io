@@ -71,7 +71,9 @@
       sec.className = 'rz-inspector-sp'; sec.setAttribute('data-rz-dcai-sp', payload.classId);
       sec.innerHTML = '<div class="rz-inspector-sec">Setpoints &amp; limits</div>' + B.inner(list, { snapshot: E && E.snapshot ? E.snapshot : null });
       sec.addEventListener('focusin', function (e) { kept.focus = e.target; });
-      sec.addEventListener('focusout', function (e) { if (!e.relatedTarget || !sec.contains(e.relatedTarget)) kept.focus = null; });
+      /* the 4 s body rewrite blurs the focused node BEFORE it detaches (Chrome); the rewrite puts the block back and
+         re-focuses in the same task, so the user has only left when focus is still outside one task later */
+      sec.addEventListener('focusout', function () { setTimeout(function () { if (!sec.contains(doc.activeElement)) kept.focus = null; }, 0); });
       kept.key = key; kept.sec = sec; kept.focus = null;
     }
     var f = kept.focus;
