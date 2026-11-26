@@ -952,3 +952,24 @@ RZSpBlock.bind(host, { recompute })  → wires sliders (input → recompute → 
   unchanged in markup; the host passes recompute + live. Script tag on the 5 modal pages. Gate C14 red on the old modal
   (two writers), green after; setpoint-sim 346 and internals P4 671 unchanged.
 
+## C11. P5 delivered (2026-11-26)
+
+- **What the DC AI operator sees.** Opening a CDU, fan-wall CRAH, chiller or chemical-dosing unit in the inspector shows
+  "Setpoints & limits" under the unit's own rows: TCS supply 40 °C; supply air 25 °C and supply RH 45 %; CHW supply
+  19 °C; pH 8.5, conductivity 800 µS/cm, ORP 450 mV, inhibitor 120 ppm. Each has SP, Live (the number the inspector
+  already shows) and Error. The band, range, evidence and controller sit in the row title.
+- **Reference values are not repeated** as setpoints (HTW, CDW, CHW return, pump current): they are live rows already.
+- **What-if.** TCS supply 30–45 °C and supply air 18–27 °C recompute `DCAI_CALC.compute` on a copy. The design point
+  sits on the cliff: margin 0.0 K, liquid free cooling ends at 34 °C ambient; at 41 °C it ends at 35 °C. Numbers print
+  to 4 significant figures (PUE 1.158, COP 5.503, 25,811 kWe), temperatures to 0.1.
+- **Typed setpoints gone.** The 8 literals in `js/datahall-ai/hmi-payloads.js` read the registry through `SP()` /
+  `SPT()`. Five new `points.js` records, each ASSUMED with its basis: genset jacket keep-warm 40 °C, aeration DO
+  2.5 mg/L, MMR supply air 18 °C, support room 24 °C and 50 % RH. `test-dcai-points` now reads maintenance rows too
+  (the keep-warm setpoint lives there).
+- **Wiring.** `js/rz-inspector.js` fires `rz-inspector-payload` after each render; `js/datahall-ai/sp-inspector.js`
+  appends the block. No change to `equipment-inspector.js`. `datahallAI.html` gains three script tags.
+- **Correction to C0.3 G1:** the DC AI band now reaches the page through the twin (`limits` on each `dcai:` row, resolved
+  on the design snapshot), because the page does not load `points.js`.
+- Gate `tools/test-dcai-setpoints.mjs` D0–D7 (see CONTROL_SETPOINT_STANDARD §5). D3 (trend SP line) waits for the
+  `rz-trend.js` hook.
+
