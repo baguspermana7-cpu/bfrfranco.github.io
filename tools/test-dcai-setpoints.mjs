@@ -33,7 +33,11 @@ let fails = 0; const law = (c, m) => { if (!c) { fails++; console.log('FAIL ' + 
   const SPI = require(path.join(ROOT, 'js/datahall-ai/sp-inspector.js'));
   globalThis.RZControlPoints = sb.RZControlPoints; globalThis.DCAI_CALC = D;
   const reg = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/control-points.json'), 'utf8')).rows.filter((r) => r.cockpit === 'dcai' && r.sp && r.sp.role === 'setpoint');
-  for (const r of reg) law(sb.RZControlPoints.forClass('dcai:' + r.equipment).some((x) => x.id === r.id), `D0 ${r.id}: no inspector row for class ${r.equipment}`);
+  for (const r of reg) law(SPI.rows(r.equipment).some((x) => x.id === r.id), `D0 ${r.id}: no inspector row for class ${r.equipment}`);
+  /* a reference value is not repeated as a setpoint row, and a row that has a band carries it (the page has no points.js) */
+  const refs = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/control-points.json'), 'utf8')).rows.filter((r) => r.cockpit === 'dcai' && r.sp && r.sp.role === 'reference');
+  for (const r of refs) law(!SPI.rows(r.equipment).some((x) => x.id === r.id), `D0 ${r.id}: a reference value shown as a setpoint row`);
+  for (const r of reg) if (r.limits) { const x = SPI.rows(r.equipment).find((y) => y.id === r.id); law(x && x.limits && ['lo_alarm', 'lo_warn', 'hi_warn', 'hi_alarm'].every((k) => x.limits[k] === r.limits[k]), `D0 ${r.id}: band ${JSON.stringify(x && x.limits)} ≠ registry ${JSON.stringify(r.limits)}`); }
   const before = JSON.stringify(D.model), get = (o, p) => p.split('.').reduce((x, k) => (x == null ? x : x[k]), o);
   const cases = [['thermal.tcsSupplyC', [35, 38, 40, 42, 45], 'pue.annual_bin_weighted'], ['thermal.tcsSupplyC', [35, 40, 42], 'pue.free_cooling_cliff_ambient_c'], ['thermal.airSupplyC', [18, 22, 25, 27], 'design.electrical.cooling_kwe']];
   for (const [param, vals, out] of cases) for (const v of vals) {

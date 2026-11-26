@@ -18,7 +18,7 @@
   /* PRD-SETPOINT-SIM P1: per setpoint the SP, the live value of the point it governs, the error, the alarm band of that
      point, the adjustable range or why it is fixed, the evidence class and what holds it */
   function rowHtml(r) {
-    var C = CP(), PS = root.RZPointStatus, pv = r.pv[0], L = PS && pv ? PS.limits(pv) : null, u = r.unit ? ' ' + r.unit : '';
+    var C = CP(), PS = root.RZPointStatus, pv = r.pv[0], L = (PS && pv ? PS.limits(pv) : null) || r.limits || null, u = r.unit ? ' ' + r.unit : '';
     var band = L ? ['lo_alarm', 'lo_warn', 'hi_warn', 'hi_alarm'].map(function (k) { return typeof L[k] === 'number' ? ({ lo_alarm: 'LL ', lo_warn: 'L ', hi_warn: 'H ', hi_alarm: 'HH ' })[k] + L[k] : null; }).filter(Boolean).join(' · ') : 'no band';
     var adj = r.adjustable ? r.adjustable.min + '–' + r.adjustable.max + u + ' (step ' + r.adjustable.step + ')' : 'fixed: ' + (r.note || 'design value');
     return '<tr data-sp-row="' + esc(r.id) + '" data-sp-pv="' + esc(pv || '') + '" data-sp="' + r.value + '" data-sp-unit="' + esc(r.unit) + '" title="' + esc('Alarm band ' + band + ' · ' + adj + ' · ' + r.ev + (r.control ? ' · ' + r.control : '')) + '"><th scope="row">' + esc(r.label) + '</th>' +
@@ -59,8 +59,11 @@
   }
 
   function get(s, p) { var k = p.split('.'), o = s; for (var i = 0; o != null && i < k.length; i++) o = o[k[i]]; return typeof o === 'number' && isFinite(o) ? o : NaN; }
-  function dec(n) { var s = String(n), i = s.indexOf('.'); return i < 0 ? 0 : s.length - i - 1; }
-  function show(n, u) { return isFinite(n) ? String(n) + (u ? ' ' + u : '') : '—'; }
+  /* an engine output as a reader reads it: 4 significant figures, at most 3 decimals (PUE 1.158, COP 5.503, 25,811 kWe),
+     never a raw float; the exact value stays in data-wi-now / data-wi-sim for the gates */
+  function dp(n) { var a = Math.abs(n); return a >= 1000 ? 0 : a >= 100 ? 1 : a >= 10 ? 2 : 3; }
+  function num(n, d) { return n.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d }); }
+  function show(n, u) { return isFinite(n) ? num(n, dp(n)) + (u ? ' ' + u : '') : '—'; }
   function bindWhatIf(box, recompute) {
     var C = CP();
     if (box.getAttribute('data-wi-bound')) return;
@@ -81,8 +84,8 @@
         var tr = trs[i], un2 = tr.getAttribute('data-wi-unit'), n0 = +tr.getAttribute('data-wi-now'), n1 = get(s1, tr.getAttribute('data-wi-path'));
         tr.setAttribute('data-wi-sim', isFinite(n1) ? String(n1) : '');
         tr.querySelector('[data-k="sim"]').textContent = show(n1, un2);
-        var d = n1 - n0, dp = Math.max(dec(n0), dec(n1));
-        tr.querySelector('[data-k="d"]').textContent = isFinite(d) ? (d > 0 ? '+' : d < 0 ? '−' : '') + Math.abs(d).toFixed(dp) + (un2 ? ' ' + un2 : '') : '—';
+        var d = n1 - n0, dd = Math.max(dp(n0), dp(n1));
+        tr.querySelector('[data-k="d"]').textContent = isFinite(d) ? (d > 0 ? '+' : d < 0 ? '−' : '') + num(Math.abs(d), dd) + (un2 ? ' ' + un2 : '') : '—';
       }
     }
     s.addEventListener('input', run);
@@ -101,7 +104,7 @@
       else { pc.textContent = '—'; ec.textContent = '—'; pc.setAttribute('title', 'not shown on this page and not an engine value'); pc.removeAttribute('data-src'); }
     }
   }
-  var api = { inner: inner, bind: bind, esc: esc, version: '1.0.0' };
+  var api = { inner: inner, bind: bind, esc: esc, version: '1.1.0' };
   if (root) root.RZSpBlock = api;
   if (typeof module === 'object' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : null);
