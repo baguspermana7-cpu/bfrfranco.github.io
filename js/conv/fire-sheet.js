@@ -95,7 +95,7 @@
     var i = -1; pumps.forEach(function (p, k) { if (p.id === L.mv.node) i = k; });
     if (i < 0) return;
     var y = PY[i], p = pumps[i], cy = y - 40, r = 15, id = 'lc-' + p.id, px = 480 + p.size / 2;
-    nodes.push({ id: id, tag: L.tag, sym: 'instPanel', x: LX, y: cy, size: 2 * r, inst: 'PC', tagAt: 'right', loop: L.sp,
+    nodes.push({ id: id, tag: L.tag, sym: 'instPanel', x: LX, y: cy, size: 2 * r, inst: 'PC', tagAt: 'right', loop: L.sp, ctrl: p.id,
       label: L.tag + ' — ' + p.tag + ' controller (' + L.action + ' acting ' + L.kind + ')',
       values: [{ k: 'sp', dx: 0, dy: -r - 8, anchor: 'middle', lod: 1, const: 'cut-in / cut-out from the control registry (' + L.sp + ')' }] });
     /* instPanel geometry (48-unit box): circle centre 4/48 of the size above the node centre, radius 14/48; the sensing line

@@ -64,8 +64,10 @@
     return '<tr data-loop-row="' + esc(L.tag) + '" data-sp-pv="' + esc(pv || '') + '" data-sp="' + r.value + '" data-sp-unit="' + esc(r.unit) + '"' +
       (A ? ' data-auth-out="' + A.out + '" data-auth-left="' + A.left + '" data-auth-sat="' + A.sat + '"' : '') +
       ' title="' + esc(L.tag + ' · ' + r.label + ' · ' + L.pv.tag + ' → ' + L.tag + ' → ' + (L.out ? L.out.what : L.mv && L.mv.what || '') + ' · ' + L.action + ' acting ' + L.kind) + '">' +
-      '<th scope="row">' + esc(L.tag) + '</th><td data-k="sp">' + esc(C.fmt(r.value, r.unit) + u) + '</td><td data-k="pv">—</td><td data-k="err">—</td>' +
-      '<td data-k="out">' + (A ? esc(A.out + ' %') : '—') + '</td><td data-k="left">' + (A ? esc(A.left + ' %') : '—') + '</td>' +
+      '<th scope="row">' + esc(L.tag) + '</th><td data-k="sp" data-const>' + esc(C.fmt(r.value, r.unit) + u) + '</td>' +
+      /* the PV and OUT cells open their trend (RZTrend, the registry ids); the SP is a design value (data-const) */
+      '<td data-k="pv"' + (pv ? ' data-trend="' + esc(pv) + '"' : '') + '>—</td><td data-k="err">—</td>' +
+      '<td data-k="out"' + (A ? ' data-trend="' + esc(L.out.key) + '" title="' + esc(A.left + ' % left') + '"' : '') + '>' + (A ? esc(A.out + ' %') : '—') + '</td><td data-k="left">' + (A ? esc(A.left + ' %') : '—') + '</td>' +
       '<td data-k="state"' + (why ? ' title="' + esc(why) + '"' : '') + (A && A.sat ? ' data-sat="1"' : '') + '>' + esc(st) + '</td></tr>';
   }
   function loops(rows, opts) {

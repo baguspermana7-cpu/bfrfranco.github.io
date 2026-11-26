@@ -190,8 +190,13 @@
           deep(build, n, el, el, function () { return x; })) return;
       if (!root.RZInspector || typeof root.RZInspector.openPayload !== 'function') return;
       var payload = build(n); if (!payload) return;
+      /* PRD-SETPOINT-SIM P9: a controller bubble (n.ctrl = the node it drives) keeps its own inspector; "Open equipment
+         HMI" opens the machine it controls (PC-FP1 -> fire pump 1, LIC-A1 -> its day tank) */
+      var target = n, tn = n.ctrl && api && api.sheet && api.sheet.nodes ? api.sheet.nodes.filter(function (x) { return x.id === n.ctrl; })[0] : null;
+      if (tn) { target = tn; if (!(payload.actions && payload.actions.openHmi)) { var q = {}; Object.keys(payload).forEach(function (k) { q[k] = payload[k]; });
+        q.actions = { openHmi: true, related: (payload.actions && payload.actions.related) || [] }; payload = q; } }
       root.RZInspector.openPayload(payload, { trigger: el,
-        onOpenHmi: function (p, btn) { deep(build, n, btn, el, more); },
+        onOpenHmi: function (p, btn) { deep(build, target, btn, el, more); },
         onNavigate: function (id) {
           var t = document.querySelector(hostSel + ' .hmi-node[data-node="' + id + '"]');
           if (t && t.dispatchEvent) t.dispatchEvent(new MouseEvent('click', { bubbles: true }));

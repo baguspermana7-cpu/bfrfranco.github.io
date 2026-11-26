@@ -213,6 +213,7 @@
         .insp-sec[hidden] { display: none !important; }
         .insp-group { padding: 8px 0; border-bottom: 1px solid var(--border-soft); }
         .insp-group > .kv:last-child { margin-bottom: 0; }
+        .insp-loops > summary { cursor: pointer; min-height: 32px; display: flex; align-items: center; font-size: 12px; color: var(--txt-main); }
         .insp-det { border-bottom: 1px solid var(--border-soft); }
         /* a disclosure is a button that shows or hides the block after it ([hidden], so a closed block is not on the screen at all) */
         .insp-sum { display: flex; align-items: center; width: 100%; min-height: 34px; padding: 0; background: transparent; border: 0; cursor: pointer; text-align: left; font: 600 12px 'IBM Plex Sans', system-ui, sans-serif; color: var(--txt-dim); }
@@ -474,7 +475,7 @@
          page used to carry its own hand-written basisFor dictionary; a drawer that restates
          provenance by hand is how v1.132.0 shipped a drawer explaining a density it had not
          derived. The drawer renders the registry now, so it cannot claim what is not there. -->
-    <script src="js/conv-parameters.js?v=20261126-fd980abd"></script>
+    <script src="js/conv-parameters.js?v=20261126-36435f64"></script>
     <link rel="stylesheet" href="css/conv-vfx.css?v=20261118-5eed9b2f">
     <script src="js/conv/vfx.js?v=20261123-3fd25115"></script>
     <script src="js/conv/air-section.js?v=20261117-99ef3c34"></script>
@@ -772,7 +773,8 @@
                     </div>
                     <!-- PRD-SETPOINT-SIM P10: the hall's control loops (TIC-RI resets TIC-SAT inside every CRAH), from the registry
                          through js/conv/loops-card.js; "none" = a loop with no drawing (the hall has no P&ID) -->
-                    <div class="insp-group" aria-label="Control loops" data-rz-loops-host data-sheets="int-crah none"></div>
+                    <details class="insp-group insp-loops"><summary>Control loops</summary>
+                        <div data-rz-loops-host data-caption-off data-sheets="int-crah none"></div></details>
                     <div class="insp-group" id="env-hall-title" aria-label="Environment (Hall A)">
                         <div class="kv"><span class="k">Inlet avg</span><span class="v num" id="env-temp" data-point="datahall.rack.inlet_c" data-pt-label="Rack inlet (average)" data-pt-unit="°C" data-pt-digits="1">UNAVAILABLE</span></div>
                         <div class="kv"><span class="k">Humidity</span><span class="v num" id="env-rh" data-point="environment.avg_rh_pct" data-pt-label="Relative humidity" data-pt-unit="%" data-pt-digits="1">UNAVAILABLE</span></div>
@@ -885,9 +887,9 @@
     <script src="js/conv/floor-plan.js?v=20261126-d9d24cd3"></script>
     <script src="js/rz-sheet.js?v=20261121-67db3ea5" defer></script>
     <script src="js/rz-trend.js?v=20261123-5b150d9f"></script>
-    <script src="js/rz-control-points.js?v=20261126-35e7e682"></script>
-    <script src="js/rz-sp-block.js?v=20261126-7847b7bb"></script>
-    <script src="js/conv/loops-card.js?v=20261126-42a7cf3c"></script>
+    <script src="js/rz-control-points.js?v=20261126-e3135306"></script>
+    <script src="js/rz-sp-block.js?v=20261126-5d590c85"></script>
+    <script src="js/conv/loops-card.js?v=20261126-3a62ca62"></script>
     <script src="js/conv/point-status.js?v=20261123-0de9d3e8"></script>
 <script src="js/conv/motion.js?v=20261121-f2d16763" defer></script>
 <script src="js/conv/quiet.js?v=20261122-cde28b5e" defer></script>

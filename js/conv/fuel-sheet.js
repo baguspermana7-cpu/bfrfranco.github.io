@@ -101,7 +101,7 @@
          The tag's nn is the set (LIC-A1); the page writes the fill start / stop from the registry. */
       LIC.forEach(function (L) {
         var cx = 994, cy = y - 16, r = 20, id = 'lc' + k;
-        nodes.push({ id: id, tag: L.tag.replace(/nn$/, set), sym: 'instPanel', x: cx, y: cy, size: 2 * r, inst: 'LIC', tagAt: 'right', loop: L.sp,
+        nodes.push({ id: id, tag: L.tag.replace(/nn$/, set), sym: 'instPanel', x: cx, y: cy, size: 2 * r, inst: 'LIC', tagAt: 'right', loop: L.sp, ctrl: 'dt' + k,
           label: L.tag.replace(/nn$/, set) + ' — DT-' + u.tag + ' level controller (' + L.action + ' acting ' + L.kind + ')',
           values: [{ k: 'sp', dx: r + 3, dy: -12, anchor: 'start', lod: 1, const: 'fill start / stop from the control registry (' + L.sp + ')' }] });
         /* instPanel geometry (48-unit box): circle centre 4/48 of the size above the node centre, radius 14/48, process port

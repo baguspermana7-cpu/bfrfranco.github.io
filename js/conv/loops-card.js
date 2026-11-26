@@ -20,7 +20,8 @@
     '[data-rz-loops-host] .rz-loops td[data-sat]{color:var(--rz-pt-warn);font-weight:600}[data-rz-loops-host] .rz-loops td[data-k="state"]{white-space:normal}' +
     /* a 344 px side column (the page's phone patch sets every table to a 0.8 rem scrolling block with 8 x 12 px cells; this
        one table opts out, !important against its !important): Error (Live − SP) stays in the cell for the gates but is not shown (the equipment modal's setpoint table shows it); on a phone SP too */
-    '[data-rz-loops-host] .rz-loops [data-k="err"],[data-rz-loops-host] .rz-loops thead th:nth-child(4){display:none}' +
+    /* Left (100 − OUT) is not a registry point: on a conv page it rides in the OUT cell's tooltip; the cell stays for the gates */
+    '[data-rz-loops-host] .rz-loops [data-k="err"],[data-rz-loops-host] .rz-loops thead th:nth-child(4),[data-rz-loops-host] .rz-loops [data-k="left"],[data-rz-loops-host] .rz-loops thead th:nth-child(6){display:none}' +
     '@media (max-width:600px){[data-rz-loops-host] .rz-loops [data-k="sp"],[data-rz-loops-host] .rz-loops thead th:nth-child(2){display:none}[data-rz-loops-host] .rz-loops{display:table !important;font-size:10px !important}[data-rz-loops-host] .rz-loops th,[data-rz-loops-host] .rz-loops td{padding:4px 3px !important}}';
   function style() {
     if (doc.getElementById('rz-loops-css')) return;

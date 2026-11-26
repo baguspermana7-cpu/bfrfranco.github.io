@@ -597,7 +597,12 @@
     /* 2. the class rows */
     var none = 'no class recipe for symbol "' + (n.sym || '?') + '" — reported, never filled in';
     (cls ? cls.live : []).forEach(function (s) { live.push(rowOf(s, ctx)); });
-    live.push({ label: 'Role', text: cls ? cls.role : none, unit: '', quality: 'declared', declared: DECL });
+    /* PRD-SETPOINT-SIM P9: a controller bubble (n.loop, no machine class) shows the page's controller rows (cut-in /
+       cut-out or fill start / stop from the control registry, what it senses, its output, its basis) */
+    if (!cls && n.loop && ctx.rows) ctx.rows.forEach(function (row) {
+      if (row && row[0]) live.push({ label: String(row[0]), text: row[1] == null ? '—' : String(row[1]), unit: '', quality: 'declared', declared: 'control registry ' + n.loop + ' · ' + (o.declared || SIMD) });
+    });
+    live.push({ label: 'Role', text: cls ? cls.role : (n.loop ? 'controller ' + tag + ' (control registry ' + n.loop + ')' : none), unit: '', quality: 'declared', declared: DECL });
     var capacity = cls ? cls.cap.map(function (s) { return rowOf(s, ctx); }) : [{ label: 'Capacity', text: 'UNAVAILABLE', unit: '', quality: 'state', declared: none }];
     var alarmPoints = cls ? cls.al.map(function (s) { return rowOf(s, ctx); }) : [];
     var trend = cls ? trendOf(cls, ctx) : null;
