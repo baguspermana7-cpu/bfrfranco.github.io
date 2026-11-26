@@ -11,6 +11,37 @@ release sections rather than semver.
 
 ---
 
+## v3.115.0 — 2026-11-27 — Control loops at a glance; fire and fuel controllers drawn; Simulate draws the response
+
+**Control loops you can read at a glance; fire and fuel controllers on their drawings; Simulate draws the response** (PRD-SETPOINT-SIM §C P10 part 3, P9 part 2, P8)
+
+- **Loops table.**
+  - The chiller plant has a new side card, "Control Loops". It lists every controller on CH-M-101, CH-M-102 and inside the chillers, with its setpoint, live value, output, travel left and state.
+  - PDIC-01 reads **98.7 %, ◆ saturated**: the secondary pumps have 1.3 % of speed left.
+  - TIC-CHWS and TIC-CDWS hold at 89.3 %.
+  - The data hall inspector gets the same table: TIC-SAT is at 99.5 % (saturated), and TIC-RI reads "OUT not modelled" because a reset writes a setpoint, not an output.
+  - The DC AI inspector now opens its Setpoints block with the class's loop. TIC-nn1 on the CDU is at 99.6 % and TIC-SA on the fan wall at 99.9 %; both are saturated.
+  - The rows come only from the control registry (`RZControlPoints.loopRows`), so a new loop appears without a page edit.
+- **Fire pump controllers drawn (FS-M-101).**
+  - PC-JP1 (11.5 / 12.8 bar), PC-FP1 (10.5 bar) and PC-FP2 (9.5 bar) are ISA-5.1 panel bubbles.
+  - Each controller has its own sensing line, tapped between its pump's check valve and discharge valve as NFPA 20 requires, and a signal to the pump it starts.
+  - The numbers come from the registry. Planting a jockey cut-in of 11.0 moves the bubble too.
+- **Day-tank level controllers drawn (FU-M-101).**
+  - Every day tank has its own LIC-<set>, with a level line from the tank and a signal to its fill valve.
+  - The bubble prints fill start / stop 50 / 90 % from the registry.
+- **Simulate shows the response.**
+  - Under every sequence's steps table, a small chart per quantity reveals one point per step: running units, part load and shortfall, or the engine results of a DC AI ambient sweep.
+  - The x axis is "step", never time, because dynamics are not modelled. The chart is labelled SIMULATED and Reset clears it.
+- **Not drawn yet:**
+  - The CDU-mini loops. Its schematic is hand-drawn SVG outside the sheet engine, and new bubbles would raise the diagram ratchet.
+  - The water booster PIC. There is no registry row for the booster pressure yet.
+- **Gates.**
+  - New laws: S11c and D12 (Loops table), S8e (fire and fuel bubbles), S7d / S7e / S7g (step strip). Each was red before its change.
+  - T3 caught the bubble reading a second copy of the cut-in. Pages now read `RZControlPoints.value`.
+  - A controller bubble keeps its own inspector (cut-in / cut-out or fill start / stop, what it senses, its output, its basis); "Open equipment HMI" opens the machine it drives (PC-FP1 opens fire pump 1, LIC-A1 opens day tank A1).
+  - In the Loops table the Live and OUT cells open their trend; the setpoint is a design value.
+- **Rack-inlet what-if:** the CRAH valve is not listed. The engine does not re-rate the coil for a colder supply air, so the valve stays at 99.5 % from 22 to 27 °C; the note says so instead of showing a row that cannot move.
+
 ## v3.114.0 — 2026-11-26 — DC AI data hall: no service corridor, the hall closes on its width
 
 ### Changed (PRD-DCAI-HALL-DEPTH Amendment 9, owner "Gak perlu ada service corridor")
