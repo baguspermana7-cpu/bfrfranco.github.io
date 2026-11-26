@@ -171,7 +171,28 @@ const rm = await read(pg);
 ok('AV4', rm.anims === 0, `reduced motion: ${rm.anims} running animations in #hIso`);
 ok('AV0', pg.errors.length === 0, `page errors: ${pg.errors.slice(0, 2).join(' | ')}`);
 await pg.close();
+/* A8f — the phone floor: the 2D plan stacks in bands and grows down the page, so a rack and a cell are tappable sizes */
+{
+  const ph = await open(390);
+  const F = await ph.evaluate(() => { const st = document.getElementById('hIso').getBoundingClientRect(), q = (s) => [...document.querySelectorAll(s)].map((e) => e.getBoundingClientRect());
+    const rk = q('#hIso [data-idx]'), cl = q('#hIso .crah-cell'), zi = document.getElementById('hIso').closest('.svg-zi');
+    return { bands: +(document.querySelector('#hIso .fp-root') || { getAttribute: () => 0 }).getAttribute('data-bands'),
+      rack: Math.min(...rk.map((b) => Math.min(b.width, b.height))), cell: Math.min(...cl.map((b) => Math.min(b.width, b.height))), nr: rk.length, nc: cl.length,
+      out: cl.filter((b) => b.right > st.right + 0.5 || b.left < st.left - 0.5).length + rk.filter((b) => b.right > st.right + 0.5 || b.left < st.left - 0.5).length,
+      sx: document.documentElement.scrollWidth - innerWidth, clip: zi ? zi.scrollHeight - zi.clientHeight : 0,
+      tags: [...document.querySelectorAll('#hIso .zone')].map((z) => z.getBoundingClientRect().height) }; });
+  F.rack = Number(F.rack) || 0; F.cell = Number(F.cell) || 0;
+  ok('PF1', F.nr === 440 && F.rack >= 7, `390: rack short side ${F.rack.toFixed(1)} px (want >= 7; was 3.5) over ${F.nr} racks`);
+  ok('PF1', F.nc > 140 && F.cell >= 12, `390: fan-wall / CDU cell short side ${F.cell.toFixed(1)} px (want >= 12)`);
+  ok('PF2', F.sx === 0 && F.out === 0, `390: page scrollX ${F.sx}, ${F.out} units past the stage edge (bands ${F.bands})`);
+  ok('PF2', F.clip <= 1, `390: the stage scroller hides ${F.clip} px of the floor (the plan must grow down the page)`);
+  await lensTo(ph, 'thermal');
+  const th = await ph.evaluate(() => [...document.querySelectorAll('#hIso .zone')].map((z) => z.getBoundingClientRect().height));
+  ok('PF2', th.length === 10 && Math.max(...th) <= Math.min(...th) + 1 && Math.max(...th) < 40, `390 Thermal: row tag heights ${JSON.stringify(th.map((h) => h | 0))} (one line each)`);
+  ok('AV0', ph.errors.length === 0, `390 page errors: ${ph.errors.slice(0, 2).join(' | ')}`);
+  await ph.close();
+}
 await browser.close(); srv.close();
-console.log(`${fails.length ? 'FAIL' : 'PASS'} — DC AI air side, valves and four points per aisle (A8a+A8b+A8c): ${checks - fails.length}/${checks}`);
+console.log(`${fails.length ? 'FAIL' : 'PASS'} — DC AI air side, valves and four points per aisle (A8a+A8b+A8c+A8f): ${checks - fails.length}/${checks}`);
 fails.forEach((f) => console.log('  ' + f));
 process.exit(fails.length ? 1 : 0);

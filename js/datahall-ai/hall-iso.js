@@ -72,6 +72,8 @@
       '@media (max-width:600px){#hIso .fp-root[data-proj="plan"] .zone-head{font-size:10px;letter-spacing:-.02em;padding:1px 0;min-width:0}}',
       /* D7: on a phone the row-pair foot stacks its unit under the value ('6.2' over 'MW'), three characters wide */
       '@media (max-width:600px){#hIso .fp-root[data-proj="plan"] .zone-foot{font-size:10px;letter-spacing:-.02em;padding:1px 0}#hIso .fp-root[data-proj="plan"] .zf-kw{display:inline-block;width:3.2ch;white-space:normal;text-align:center;line-height:1.1}}',
+      /* A8f: a banded phone plan grows down the page (no inner scroller cap) and each tag has a pair's width, one line */
+      '@media (max-width:600px){.svg-zi:has(#hIso .fp-root[data-proj="plan"]:not([data-bands="1"])){max-height:none}#hIso .fp-root[data-proj="plan"]:not([data-bands="1"]) .zf-kw{width:auto;white-space:nowrap}}',
       /* Amendment 3 D4: flags, ink on the panel with a 1 px state hairline and the state glyph; no wash, no motion */
       '#hIso{position:relative}.dh-flags{position:absolute;inset:0;pointer-events:none}',
       '.dh-flag,.dh-flag-more{position:absolute;white-space:nowrap;padding:1px 5px;border:1px solid var(--rz-pt-warn,#d97706);border-radius:2px;background:var(--bg2);color:var(--t1);font:600 11px/16px "IBM Plex Mono",ui-monospace,monospace}',
@@ -457,6 +459,9 @@
       });
     }
   }
+  /* Amendment 8 (A8f): on a phone the 2D plan stacks in up to 3 bands and grows down the page (the first-screen fit
+     squeezed a rack to 3.5 px); 3D and wide stages keep one band that fits the first screen */
+  function phoneFlat() { return view === 'flat' && (win.innerWidth || 1440) < 600; }
   function svgEl(api, tag, a, parent, title) { var e = api.el(tag, a, parent); if (title) { var t = doc.createElementNS('http://www.w3.org/2000/svg', 'title'); t.textContent = title; e.appendChild(t); } return e; }
   function drawOverlay(api) {
     var G = api.G, g = api.g, b, k, z, s, o = (geo && geo.ops) || {};
@@ -556,10 +561,10 @@
     if (inst && inst.destroy) inst.destroy();
     host.setAttribute('data-rz-hall', String(win.currentDH || 1));
     inst = win.RZFloorPlan.render(host, model, {
-      projection: view === 'flat' ? 'plan' : 'iso', toggle: false, mode: lensMode(lens), maxBands: 1, projKey: 'rz.dcai.fp', measure: wrap,
+      projection: view === 'flat' ? 'plan' : 'iso', toggle: false, mode: lensMode(lens), maxBands: function () { return phoneFlat() ? 3 : 1; }, projKey: 'rz.dcai.fp', measure: wrap,
       /* the whole hall on the first screen, both axes, at every width: the stage takes what is left of the viewport below
          its own top (HV-F1); fitAll lets the unit shrink below the plan's label floor (labels live in tooltips) */
-      height: function () { var t = wrap.getBoundingClientRect().top + (win.pageYOffset || 0); return Math.max(260, (win.innerHeight || 900) - bottomInset() - t - 12); },
+      height: function () { if (phoneFlat()) return null; var t = wrap.getBoundingClientRect().top + (win.pageYOffset || 0); return Math.max(260, (win.innerHeight || 900) - bottomInset() - t - 12); },
       watchHeight: false, fitAll: true, overlay: drawOverlay, tagFit: true, stbyLamp: true, selInk: true, onRack: openUnit, onCrah: openUnit, rotors: true, valves: true, geo: geo.m || null, airModes: ['temp', 'cooling-margin'],
       rackTag: function (i) { return model.racks[i].ref.replace('rack-unit:', ''); },
       zoneTag: function (z) { return 'Rows R' + pad2(2 * z + 1) + ' and R' + pad2(2 * z + 2) + ', one contained hot aisle'; },

@@ -348,7 +348,9 @@
       var W = opts.width || meas.clientWidth || host.clientWidth || 1100;
       var Hh = typeof opts.height === 'function' ? opts.height() : opts.height;
       var bounded = Hh != null && isFinite(Hh) && Hh > 0;
-      var maxB = Math.max(1, Math.min(3, opts.maxBands != null ? opts.maxBands : (Hh != null ? 3 : 1)));
+      /* opts.maxBands may be a function, read at every build (DC AI A8f: a phone stacks the plan in bands) */
+      var mB = typeof opts.maxBands === 'function' ? opts.maxBands() : opts.maxBands;
+      var maxB = Math.max(1, Math.min(3, mB != null ? mB : (Hh != null ? 3 : 1)));
       /* opts.fitAll (DC AI 2D/3D, PRD-DCAI-HALL-DEPTH A1): the whole hall fits the stage on both axes, so the legibility
          floor of the plan's per-rack labels does not apply (those labels move to tooltips); default unchanged */
       var uMin = opts.fitAll ? (opts.minUnit || 2) : Math.max(opts.minUnit || U_MIN, isIso() ? 0 : U_MIN_PLAN), best = null, b, kk, sp, fitW, fitH, uu, strip = isIso() ? STRIP_ISO : stripH();
@@ -424,11 +426,23 @@
 
       /* CRAH galleries: ONE <g id> per side holding one gallery per band; north units and south units split across the bands
          in order, so a row sits between the CRAHs that serve it. North first (far), south last (near). */
-      var units = model.crahUnits || [], split = Math.ceil(units.length / 2), nSouth = units.length - split;
+      var units = model.crahUnits || [], split = Math.ceil(units.length / 2), k2;
       function side(id, name) {
         var gw = el('g', { 'class': 'fp-crah', id: id, 'data-gallery': name }, svg), at = opts.crahAttrs && opts.crahAttrs[name], a;
         if (at) for (a in at) if (Object.prototype.hasOwnProperty.call(at, a)) gw.setAttribute(a, at[a]);
         return gw;
+      }
+      /* A8f: metric cells (opts.geo) sit where their box is, so with more than one band each band takes the cells whose
+         centre falls over its rows (a split by count put band 2's cells past its edge); one band, or no boxes: by count */
+      function cut(list, lo, hi, b) {
+        var i, n = 0, c, pick = [];
+        if (nb > 1 && G.metric && list[lo] && list[lo].box) {
+          for (i = lo; i < hi; i++) { c = list[i].box.x + list[i].box.w / 2; if (Math.max(0, Math.min(nb - 1, Math.floor((c - G.pad / 2) / (kRows * G.rowW)))) < b) n++; }
+          var from = lo + n; n = 0;
+          for (i = lo; i < hi; i++) { c = list[i].box.x + list[i].box.w / 2; if (Math.max(0, Math.min(nb - 1, Math.floor((c - G.pad / 2) / (kRows * G.rowW)))) === b) n++; }
+          return [from, from + n];
+        }
+        return [lo + Math.round(b * (hi - lo) / nb), lo + Math.round((b + 1) * (hi - lo) / nb)];
       }
       function gallery(wrap, name, from, to, y0, band, list, kind) {
         list = list || units; kind = kind || 'crah';
@@ -438,7 +452,7 @@
           var cu = list[from + q], nn = cu.n != null ? cu.n : from + q + 1, bx = G.pad / 2 + q * slot + 0.12, bw = slot - 0.24, hh = G.crahH;
           /* Amendment 2 P2 (opts.geo): the unit's own body in metres from the page (unit.box), not its allotment */
           var uy = y0, ud = gD;
-          if (G.metric && cu.box) { bx = cu.box.x; bw = cu.box.w; uy = cu.box.y; ud = cu.box.d; }
+          if (G.metric && cu.box) { bx = cu.box.x - band * kRows * G.rowW; bw = cu.box.w; uy = cu.box.y; ud = cu.box.d; }   /* A8f: whole-hall metres -> the band's own x */
           var cg = el('g', { 'class': 'crah-cell', 'data-crah': nn, 'data-kind': kind, id: 'fp-cr-' + nn }, gg), bp = boxPts(bx, uy, bw, ud, hh, band);
           if (cu.ref) cg.setAttribute('data-rz-equipment', cu.ref);
           var cell3 = { side: el('polygon', { 'class': 'cr-side', points: bp.side }, cg), front: el('polygon', { 'class': 'cr-front', points: bp.front }, cg), top: el('polygon', { 'class': 'cr-top', points: bp.top }, cg) };
@@ -476,7 +490,7 @@
         }
       }
       var wrapN = side(ids.top, 'north');
-      for (b = 0; b < nb; b++) gallery(wrapN, 'north', Math.round(b * split / nb), Math.round((b + 1) * split / nb), G.nY0, b);
+      for (b = 0; b < nb; b++) { k2 = cut(units, 0, split, b); gallery(wrapN, 'north', k2[0], k2[1], G.nY0, b); }
 
       /* painter's order, far to near: row by row west to east; in a row the west line north to south, the containment roof,
          then the east line. Rows apart on the floor never overlap on the screen, so this is exact for both projections. */
@@ -523,10 +537,10 @@
       }
       if (cdus.length) {   /* the CDU line: one unit line across the hall between the cabinets and the south gallery */
         var wrapC = el('g', { 'class': 'fp-crah fp-cdu', 'data-gallery': 'cdu' }, svg);
-        for (b = 0; b < nb; b++) gallery(wrapC, 'cdu', Math.round(b * cdus.length / nb), Math.round((b + 1) * cdus.length / nb), G.cduY0, b, cdus, 'cdu');
+        for (b = 0; b < nb; b++) { k2 = cut(cdus, 0, cdus.length, b); gallery(wrapC, 'cdu', k2[0], k2[1], G.cduY0, b, cdus, 'cdu'); }
       }
       var wrapS = side(ids.bottom, 'south');
-      for (b = 0; b < nb; b++) gallery(wrapS, 'south', split + Math.round(b * nSouth / nb), split + Math.round((b + 1) * nSouth / nb), G.sY0, b);
+      for (b = 0; b < nb; b++) { k2 = cut(units, split, units.length, b); gallery(wrapS, 'south', k2[0], k2[1], G.sY0, b); }
 
       /* L4 (PRD-CONV-BMS-LIVE): the air moves. Supply leaves each gallery along every cold aisle toward the middle of the
          rows; exhaust runs along each hot-aisle roof from the middle back to both galleries. paint() sets speed (row heat),

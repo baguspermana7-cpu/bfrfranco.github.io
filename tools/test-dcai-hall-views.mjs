@@ -119,7 +119,7 @@ const read = (pg) => pg.evaluate(() => {
   const plantWithValue = plant.filter((u) => [...u.querySelectorAll('[data-point]')].some((p) => vis(p) && /\d\s*(%|kWth|kW|L\/min|°C|m³\/h)/.test(p.textContent))).length;
   const floorText = vis(root) ? [...root.querySelectorAll('text')].map((t) => t.textContent.trim()).filter(Boolean).join('|') : '';
   return { btns, btnsVisible, stage, tabsB, covered, units: units.length, outside, labels: labels.length, over, lenses, legend, stbyWant, stby, plant: plant.length, plantWithValue, floorText,
-    oldKey: localStorage.getItem('rz.dcai.proj'), scrollW: document.documentElement.scrollWidth, vw: innerWidth, vh: innerHeight };
+    oldKey: localStorage.getItem('rz.dcai.proj'), bands: +((document.querySelector('#hIso .fp-root') || { getAttribute: () => 1 }).getAttribute('data-bands') || 1), scrollW: document.documentElement.scrollWidth, vw: innerWidth, vh: innerHeight };
 });
 
 const LENSES = ['status', 'thermal', 'cooling', 'power', 'layout'];
@@ -133,24 +133,30 @@ for (const W of [1440, 390]) {
   ok('HV-V2', s.oldKey == null, `${W}: old key rz.dcai.proj still stored (${s.oldKey})`);
   const topMax = W < 500 ? 260 : 200;
   ok('HV-F1', !!s.stage && s.stage.t - s.tabsB <= topMax, `${W}: floor stage top ${s.stage ? Math.round(s.stage.t - s.tabsB) : 'none'} px below the tab bar, want <= ${topMax}`);
-  ok('HV-F1', !!s.stage && s.stage.b <= s.vh + 1, `${W}: floor stage bottom ${s.stage ? Math.round(s.stage.b) : 'none'} px, below the first screen (${s.vh})`);
+  /* Amendment 8 A8f (owner-approved plan, §11): a phone plan stacks in bands and grows down the page so a rack is 17 x 9 px,
+     not 3.5 px; there the stage TOP stays on the first screen and the rest scrolls. One band: the whole floor fits. */
+  if (s.bands === 1) ok('HV-F1', !!s.stage && s.stage.b <= s.vh + 1, `${W}: floor stage bottom ${s.stage ? Math.round(s.stage.b) : 'none'} px, below the first screen (${s.vh})`);
   ok('HV-F1', s.covered === 0, `${W}: ${s.covered} of 3 points on the floor's bottom edge lie under another element`);
   ok('HV-V1', s.btnsVisible === 3, `${W}: ${s.btnsVisible} of 3 view buttons fully inside the viewport`);
   ok('HV-F1', !!s.stage && s.units >= 585 && s.outside === 0, `${W}: ${s.outside} of ${s.units} units outside the stage (want 0 of >= 585)`);
   ok('HV-F2', s.labels > 0 && s.over.length === 0, `${W}: ${s.over.length} label overlaps of ${s.labels}: ${s.over.slice(0, 3).join(' | ')}`);
   /* F2b: the row-pair heads are judged by their INK (a Range over the text), not their 20 px box: text overflowing its box
      once read 'R01/02R03/04' at 390 with every box apart */
-  const gaps = await pg.evaluate(() => [...document.querySelectorAll('#hIso .zone-head')].filter((e) => { const cs = getComputedStyle(e), z = e.closest('.zone'); return cs.visibility !== 'hidden' && +cs.opacity > 0 && !(z && (getComputedStyle(z).visibility === 'hidden' || +getComputedStyle(z).opacity === 0 || z.hidden)); }).map((e) => { const r = document.createRange(); r.selectNodeContents(e); const b = r.getBoundingClientRect(); return [b.left, b.right]; })
-    .filter((b) => b[1] > b[0]).sort((a, b) => a[0] - b[0]).map((b, i, A) => i ? b[0] - A[i - 1][1] : null).slice(1));
+  const gaps = await pg.evaluate(() => [...document.querySelectorAll('#hIso .zone-head')].filter((e) => { const cs = getComputedStyle(e), z = e.closest('.zone'); return cs.visibility !== 'hidden' && +cs.opacity > 0 && !(z && (getComputedStyle(z).visibility === 'hidden' || +getComputedStyle(z).opacity === 0 || z.hidden)); }).map((e) => { const r = document.createRange(); r.selectNodeContents(e); const b = r.getBoundingClientRect(); return [b.left, b.right, Math.round(b.top)]; })
+    .filter((b) => b[1] > b[0]).sort((a, b) => a[2] - b[2] || a[0] - b[0]).map((b, i, A) => i && Math.abs(b[2] - A[i - 1][2]) < 4 ? b[0] - A[i - 1][1] : null).filter((g) => g !== null));   /* A8f: gaps within one screen row (a banded phone plan has 3 rows of heads) */
   const minGap = Math.min(...gaps);
   /* a head is centred on its row pair: ink centre within 2 px of the hot aisle's centre */
   const off = await pg.evaluate(() => { const hs = [...document.querySelectorAll('#hIso .zone-head')], hot = [...document.querySelectorAll('#hIso .cap-top, #hIso .fp-aisle-hot')];
     return hs.map((e) => { const r = document.createRange(); r.selectNodeContents(e); const b = r.getBoundingClientRect(), q = e.getBoundingClientRect(); return Math.abs((b.left + b.right) / 2 - (q.left + q.right) / 2); }); });
   ok('HV-F2', off.length >= 10 && Math.max(...off) <= 2, `${W}: row-pair head ink off its own box centre by up to ${Math.max(...off).toFixed(1)} px (text overflowing a fixed box drifts right of its pair)`);
   /* every pair keeps its head at 390 too: 10 heads, not every other one */
-  ok('HV-F2', gaps.length >= 9 && minGap >= 3, `${W}: row-pair heads ${gaps.length}, closest ink gap ${minGap.toFixed(1)} px (want >= 3)`);
+  ok('HV-F2', gaps.length >= 10 - s.bands && minGap >= 3, `${W}: row-pair heads ${gaps.length}, closest ink gap ${minGap.toFixed(1)} px (want >= 3)`);
   ok('HV-L1', LENSES.every((l) => s.lenses.includes(l)), `${W}: lenses ${JSON.stringify(s.lenses)}, want ${LENSES.join('/')}`);
-  ok('HV-L1', s.legend, `${W}: no visible legend on the floor`);
+  let legendSeen = s.legend;
+  if (!legendSeen && s.bands > 1) legendSeen = await pg.evaluate(async () => {   /* banded phone: the legend follows the floor; scroll to it, then it must be seen */
+    const e = [...document.querySelectorAll('#hIsoWrap [class*=legend]')].find((x) => x.getBoundingClientRect().width >= 20); if (!e) return false;
+    e.scrollIntoView({ block: 'center' }); await new Promise((r) => setTimeout(r, 300)); const b = e.getBoundingClientRect(), t = document.elementFromPoint(b.left + Math.min(20, b.width / 2), b.top + b.height / 2); return !!t && e.contains(t); });
+  ok('HV-L1', legendSeen, `${W}: no visible legend on the floor`);
   ok('HV-S0', s.stbyWant != null && s.stby === s.stbyWant, `${W}: standby lamps ${s.stby}, engine standby ${s.stbyWant}`);
   /* Cooling lens, if the page has one */
   const hasCooling = await pg.evaluate(() => { const b = document.querySelector('#p-hall [data-lens="cooling"]'); if (b) b.click(); return !!b; });
@@ -220,6 +226,11 @@ for (const W of [1440, 390]) {
 for (const W of [1440, 390]) {
   if (ONLY.size && !ONLY.has('HV-G1')) break;
   const pg = await open(W);
+  { const nb = await pg.evaluate(() => +((document.querySelector('#hIso .fp-root') || { getAttribute: () => 1 }).getAttribute('data-bands') || 1));
+    /* A8f: only a phone plan may stack in bands; its band placement is gated by test-dcai-air-stations PF1/PF2 (no unit past
+       its band, metric cells split by position) — this law measures one slab in hall metres */
+    ok('HV-G1', nb === 1 || W < 600, `${W}: the floor stacked in ${nb} bands on a wide stage`);
+    if (nb > 1) { await pg.close(); continue; } }
   const r = await pg.evaluate(() => {
     const S = window.DCAI_CALC && window.DCAI_CALC.snapshot, g = S && S.geometry;
     const svg = document.querySelector('#hIso svg.fp-svg') || document.querySelector('#hIso svg'), slab = svg && svg.querySelector('.fp-slab');
@@ -258,6 +269,11 @@ for (const W of [1440, 390]) {
 for (const W of [1440, 390]) {
   if (ONLY.size && !ONLY.has('HV-G2')) break;
   const pg = await open(W);
+  { const nb = await pg.evaluate(() => +((document.querySelector('#hIso .fp-root') || { getAttribute: () => 1 }).getAttribute('data-bands') || 1));
+    /* A8f: only a phone plan may stack in bands; its band placement is gated by test-dcai-air-stations PF1/PF2 (no unit past
+       its band, metric cells split by position) — this law measures one slab in hall metres */
+    ok('HV-G2', nb === 1 || W < 600, `${W}: the floor stacked in ${nb} bands on a wide stage`);
+    if (nb > 1) { await pg.close(); continue; } }
   const floor = await pg.evaluate(() => {
     const g = window.DCAI_CALC.snapshot.geometry, svg = document.querySelector('#hIso svg.fp-svg') || document.querySelector('#hIso svg'), sl = svg.querySelector('.fp-slab').getBBox(), u = sl.width / g.hall_length_m, o = {};
     for (const c of svg.querySelectorAll('.crah-cell[data-rz-equipment]')) { const b = c.querySelector('.cr-top').getBBox(); o[c.getAttribute('data-rz-equipment')] = [(b.x - sl.x) / u, (b.y - sl.y) / u, b.width / u, b.height / u]; }

@@ -165,6 +165,18 @@ gains its fourth point (it already loops `SP`; its geometry is checked by the Dr
   22 of 22 pipes at floor height on the A8a tree, green), 3M3 (off screen 0 running, back on screen rotors run). 3M2 as
   written in §6 (elementFromPoint sampling) could not work: the overlay paints above the racks and has no pointer
   events, so every sample missed; the law checks the drawn height instead and the screenshot was read.
+- **A8f built (changed from §5):** instead of rotating the plan 90°, a phone stacks the 2D plan in up to 3 bands and lets
+  it grow down the page (`opts.maxBands` may be a function; DC AI passes 3 below 600 px in 2D, no height bound). Same
+  legibility, no new transform code: rack 6.9 × 3.5 → 17.3 × 8.7 px, cell 13 × 14 px, tags on one line, scrollX 0.
+  Found while building: metric cells (`cu.box`, whole-hall metres) were split between bands by COUNT and never shifted
+  into the band, so band 2's fan walls sat past its edge (32 units); they now go to the band whose rows they face and
+  are drawn in band-local x. Laws PF1 (red 3.5 / 5.2 px), PF2 (red 32 units past the edge under the count-split
+  mutation; inner-scroller clip; one-line tags). Pinch zoom (2×/4×) and tap-nearest (PF3) not built: the stage's
+  existing − / 100 % / + controls remain; at 17 × 9 px a rack is tappable without it.
+- **Laws superseded at 390 by A8f:** HV-F1 "whole floor on the first screen" now holds for a one-band floor only (the
+  phone keeps the stage top on the first screen); HV-F2 head gaps are measured per screen row; HV-L1 scrolls to the
+  legend under a banded floor; HV-G1/G2 measure one slab and run at 390 only when it is one band (a guard fails if a
+  wide stage ever bands). `test-dcai-hall-views.mjs` 164 checks green.
 - Committed in cp5; releases as v3.112.0 after the peer's v3.111.0 (order agreed 2026-11-26).
 - **Finding outside A8 (peer, P7 sequences):** at design ambient 38 °C the engine needs 634 dry coolers and 631 are
   installed — 2,875 kWth short. Recorded for the heat-rejection PRD; not changed here.
