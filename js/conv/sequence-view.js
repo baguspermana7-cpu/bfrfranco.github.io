@@ -33,6 +33,12 @@
     '.rz-cvm-seq-modes summary small{color:var(--cvm-mute);font-size:11px}' +
     '.rz-cvm-seq-modes dl{margin:6px 0 4px;font-size:12px;line-height:1.5}.rz-cvm-seq-modes dt{color:var(--cvm-mute);margin-top:6px}.rz-cvm-seq-modes dd{margin:0}' +
     '.rz-cvm-seq-modes ol,.rz-cvm-seq-modes ul{margin:2px 0;padding-left:18px}' +
+    /* P8 step strip: ink only, the simulated line dashed, 11 px text (the DC AI inspector rule) */
+    '.rz-cvm-seq-strip{margin:8px 0 10px}.rz-cvm-seq-strip[hidden]{display:none}.rz-cvm-seq-strip figcaption{color:var(--cvm-mute);font-size:11px;margin:0 0 4px}' +
+    '.rz-cvm-seq-strip [data-seq-series]{margin:0 0 6px;max-width:440px}.rz-cvm-seq-sl{font-size:11px;color:var(--cvm-text)}' +
+    '.rz-cvm-seq-strip svg{display:block;width:100%;height:auto;color:var(--cvm-text)}.rz-cvm-seq-strip [hidden]{display:none}' +
+    '.rz-cvm-seq-strip line[data-seq-pt-line]{stroke:currentColor;stroke-width:1.2;stroke-dasharray:4 3}.rz-cvm-seq-strip line.ax{stroke:var(--cvm-line);stroke-width:1}' +
+    '.rz-cvm-seq-strip circle{fill:currentColor}.rz-cvm-seq-strip text{font:11px "IBM Plex Mono","JetBrains Mono",monospace;fill:var(--cvm-mute)}' +
     '@media (max-width:600px){.rz-cvm-seq-t{font-size:11px}.rz-cvm-seq-t th,.rz-cvm-seq-t td{padding:6px 3px;white-space:normal}.rz-cvm-seq-t td[data-k=\"t\"]{white-space:nowrap}.rz-cvm-seq-t [data-k="avail"],.rz-cvm-seq-t [data-k="cap"],.rz-cvm-seq-t [data-k="pl"]{display:none}}';
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
@@ -120,7 +126,37 @@
   }
 
   /* narrow: the host is a side panel (the DC AI inspector, ~320 px) whatever the viewport: the path is drawn as a column */
-  function scenarioBody(S, sc, k, narrow) { return figure(S, sc, 'seq-' + k + '-' + sc.id, narrow) + steps(S, sc); }
+  /* PRD-SETPOINT-SIM P8: the response of a scenario as a step strip, one small multiple per quantity (≤ 4), one point per
+     step revealed with the table row. x = step (no time: dynamics are not modelled); y = the min and max of that series.
+     DC AI sweeps plot the engine results; a conventional sequence plots running units, part load and shortfall. */
+  function strip(S, sc) {
+    var P = S.quantities, N = sc.steps.length, e0 = sc.steps[0] && sc.steps[0].engine;
+    function v(s, k) { return /^eng:/.test(k) ? s.engine[+k.slice(4)].value : s[k]; }
+    var ser = (e0 ? e0.map(function (e, i) { return { k: 'eng:' + i, label: e.label, unit: e.unit }; })
+      : [{ k: 'running', label: 'Running', unit: P.noun }, { k: 'part_load_pct', label: 'Part load', unit: '%' }, { k: 'short', label: 'Shortfall', unit: P.unitLabel }])
+      .filter(function (x) { return sc.steps.every(function (s) { var y = v(s, x.k); return typeof y === 'number' && isFinite(y); }); }).slice(0, 4);
+    if (!ser.length || N < 2) return '';
+    var W = 300, H = 70, L = 52, R = 10, T = 8, B = 22;
+    function big(y) { return Math.abs(y) >= 1000 ? Math.round(y).toLocaleString('en-US') : n(y); }
+    return '<figure class="rz-cvm-seq-strip" data-seq-strip hidden><figcaption>SIMULATED · steady state per step · dynamics not modelled</figcaption>' +
+      ser.map(function (x) {
+        var ys = sc.steps.map(function (s) { return v(s, x.k); }), lo = Math.min.apply(null, ys), hi = Math.max.apply(null, ys), a = lo, b = hi;
+        if (b === a) { a = lo - 1; b = hi + 1; }
+        function X(i) { return (L + (W - L - R) * i / (N - 1)).toFixed(1); }
+        function Y(y) { return (T + (H - T - B) * (1 - (y - a) / (b - a))).toFixed(1); }
+        var g = '<line class="ax" x1="' + L + '" y1="' + (H - B) + '" x2="' + (W - R) + '" y2="' + (H - B) + '"/>' +
+          '<text x="' + (L - 6) + '" y="' + (+Y(hi) + 4) + '" text-anchor="end">' + esc(big(hi)) + '</text>' +
+          (hi !== lo ? '<text x="' + (L - 6) + '" y="' + (+Y(lo) + 4) + '" text-anchor="end">' + esc(big(lo)) + '</text>' : '') +
+          '<text data-seq-xaxis x="' + ((L + W - R) / 2) + '" y="' + (H - 6) + '" text-anchor="middle">' + esc('step 1 – ' + N) + '</text>';
+        ys.forEach(function (y, i) {
+          if (i) g += '<line data-seq-pt-line="' + i + '" x1="' + X(i - 1) + '" y1="' + Y(ys[i - 1]) + '" x2="' + X(i) + '" y2="' + Y(y) + '" hidden/>';
+          g += '<circle data-seq-pt="' + i + '" data-v="' + y + '" cx="' + X(i) + '" cy="' + Y(y) + '" r="2.6" hidden><title>' + esc('step ' + (i + 1) + ': ' + big(y) + (x.unit ? ' ' + x.unit : '')) + '</title></circle>';
+        });
+        return '<div data-seq-series="' + esc(x.k) + '"><div class="rz-cvm-seq-sl">' + esc(x.label + (x.unit ? ' (' + x.unit + ')' : '')) + '</div>' +
+          '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="' + esc(x.label + ' per step, simulated') + '">' + g + '</svg></div>';
+      }).join('') + '</figure>';
+  }
+  function scenarioBody(S, sc, k, narrow) { return figure(S, sc, 'seq-' + k + '-' + sc.id, narrow) + steps(S, sc) + strip(S, sc); }
 
   function block(classKey, opts) {
     var narrow = !!(opts && opts.narrow);
@@ -147,6 +183,10 @@
         Array.prototype.forEach.call(rows, function (r, j) { if (j <= i) r.removeAttribute('hidden'); else r.setAttribute('hidden', ''); if (j === i) r.setAttribute('data-seq-on', ''); else r.removeAttribute('data-seq-on'); });
         var on = i >= 0 && rows[i] ? rows[i].getAttribute('data-seq-step-mode') : null;
         Array.prototype.forEach.call(box.querySelectorAll('[data-seq-fig] rect[data-rzd-node]'), function (r) { r.setAttribute('data-rzd-state', r.getAttribute('data-rzd-node') === 'seq-' + on ? 'on' : 'off'); });
+        /* P8: the strip reveals the same steps; hidden when nothing is simulated */
+        Array.prototype.forEach.call(box.querySelectorAll('[data-seq-strip]'), function (f) { f.hidden = i < 0; });
+        Array.prototype.forEach.call(box.querySelectorAll('[data-seq-strip] [data-seq-pt], [data-seq-strip] [data-seq-pt-line]'), function (e) {
+          var j = +(e.getAttribute('data-seq-pt') || e.getAttribute('data-seq-pt-line')); if (j <= i) e.removeAttribute('hidden'); else e.setAttribute('hidden', ''); });
         box.setAttribute('data-seq-at', String(i));
       }
       function reset() { stop(); show(-1); }
@@ -170,5 +210,5 @@
     });
   }
 
-  root.RZConvSequence = { block: block, bind: bind, version: '1.0.0' };
+  root.RZConvSequence = { block: block, bind: bind, version: '1.1.0' };
 })(typeof window !== 'undefined' ? window : this);

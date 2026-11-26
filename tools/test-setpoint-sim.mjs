@@ -17,6 +17,8 @@
  *      registry, OUT = engine, PV and MV joined by signals, no orphan, hover marks the loop. S8c a reset names its slave.
  *   S11 control authority (P10): each loop's OUT / authority left = the engine, SATURATED within 2 % of a limit (modal,
  *       bubble); S11c the chiller-plant Loops table has one row per registry loop on its sheets and in its machines
+ *   S7d-g Simulate draws a step strip (P8): one point per step per series, last = the step's value, x axis "step" (no
+ *       time unit), SIMULATED · dynamics not modelled; Reset leaves none.
  *   S9 (part) 0 page errors on the pages visited
  *
  * Red first: on v3.102.0 (no control registry in the browser) S2 and S3 fail on every page.
@@ -104,10 +106,28 @@ async function seqCheck(pg, cls) {
         ok(g.on.length === 1 && g.on[0] === 'seq-' + sc.steps[sc.steps.length - 1].mode, 'S7', `${cls}/${sc.id}: lit ${g.on}, want the last step's mode`);
         ok(g.warn === 0, 'S7', `${cls}/${sc.id}: RZDiagram warned ${g.warn} times on the path`);
         ok(g.sim, 'S7', `${cls}/${sc.id}: steps not labelled SIMULATED`);
+        /* S7d/S7g (PRD-SETPOINT-SIM P8, the step strip): after the walk every strip series has one point per step, its last
+           point = the last step's value in the sequence file; the x axis says "step", never a time unit; labelled SIMULATED */
+        const st = await pg.evaluate(() => { const f = document.querySelector('.rz-cvm:not([hidden]) [data-rz-cvm-seq] [data-seq-strip]');
+          return f ? { hidden: f.hidden, txt: f.textContent, series: [...f.querySelectorAll('[data-seq-series]')].map((x) => ({ k: x.getAttribute('data-seq-series'),
+            pts: [...x.querySelectorAll('circle[data-seq-pt]')].filter((c) => !c.hasAttribute('hidden')).map((c) => +c.getAttribute('data-v')), axis: (x.querySelector('[data-seq-xaxis]') || {}).textContent || '' })) } : null; });
+        const val = (k, s0) => (/^eng:/.test(k) ? s0.engine[+k.slice(4)].value : s0[k]);
+        ok(!!st && !st.hidden && st.series.length >= 1, 'S7d', `${cls}/${sc.id}: no step strip after Simulate`);
+        for (const x of (st && st.series) || []) {
+          const last = sc.steps[sc.steps.length - 1], w = val(x.k, last);
+          ok(x.pts.length === sc.steps.length, 'S7d', `${cls}/${sc.id}: strip ${x.k} shows ${x.pts.length} points for ${sc.steps.length} steps`);
+          ok(typeof w === 'number' && Math.abs(x.pts[x.pts.length - 1] - w) <= Math.abs(w) * 0.001 + 1e-9, 'S7d', `${cls}/${sc.id}: strip ${x.k} last point ${x.pts[x.pts.length - 1]} ≠ step value ${w}`);
+          ok(/\bstep\b/.test(x.axis) && !/\b(s|sec|min|h|hour|time)\b/i.test(x.axis.replace(/step/g, '')), 'S7g', `${cls}/${sc.id}: strip ${x.k} x axis "${x.axis}" (want "step", no time unit)`);
+        }
+        ok(!!st && /SIMULATED/.test(st.txt) && /not modelled/.test(st.txt), 'S7d', `${cls}/${sc.id}: strip not labelled SIMULATED · dynamics not modelled`);
         const kb = await pg.evaluate(() => { const b = document.querySelector('.rz-cvm:not([hidden]) [data-rz-cvm-seq]'); b.querySelector('[data-seq-reset]').click();
           const hid = b.querySelectorAll('tr[data-seq-i]:not([hidden])').length; b.querySelector('[data-seq-sim]').dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 0 }));
           const all = b.querySelectorAll('tr[data-seq-i]:not([hidden])').length; b.querySelector('[data-seq-reset]').click(); return { hid, all }; });
         ok(kb.hid === 0 && kb.all === sc.steps.length, 'S7', `${cls}/${sc.id}: Reset left ${kb.hid} rows, keyboard Simulate showed ${kb.all} of ${sc.steps.length}`);
+        /* S7e Reset leaves no strip and no point */
+        const rs = await pg.evaluate(() => { const b = document.querySelector('.rz-cvm:not([hidden]) [data-rz-cvm-seq]'), f = b.querySelector('[data-seq-strip]');
+          return { shown: !!f && !f.hidden, pts: b.querySelectorAll('[data-seq-strip] circle[data-seq-pt]:not([hidden])').length }; });
+        ok(!rs.shown && rs.pts === 0, 'S7e', `${cls}/${sc.id}: after Reset the strip is ${rs.shown ? 'shown' : 'hidden'} with ${rs.pts} points`);
       }
       const store1 = await pg.evaluate(() => JSON.stringify([Object.keys(localStorage).sort(), Object.keys(sessionStorage).sort()]));
       ok(store0 === store1, 'S7', `${cls}: Simulate wrote to browser storage`);

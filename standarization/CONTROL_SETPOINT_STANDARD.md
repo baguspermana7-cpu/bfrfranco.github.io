@@ -137,6 +137,12 @@ range). Otherwise it is fixed, and the modal says what fixes it.
   `equipment.crah_chw_valve_pct`, both the engine's equal-percentage stroke (A8a). `authority()` rounds OUT to 0.1 %
   before the rule. Measured at design: CDU valve 99.6 % (0.4 % left), fan-wall valve 99.9 % (0.1 % left), both
   SATURATED: at the design point neither unit has valve travel left for more heat. Gate D11 of `test-dcai-setpoints.mjs`.
+- **Step strip (P8, fallback before the rz-trend overlay hook).** `RZConvSequence` 1.1.0 draws, under the steps table,
+  one small multiple per quantity (≤ 4): DC AI engine sweeps plot their engine results, a conventional sequence plots
+  running units, part load and shortfall (a series with a missing value in any step is left out). One point per step,
+  revealed with its table row; the line between points is dashed; x axis "step 1 – N" (never a time unit: dynamics are
+  not modelled); y labels are the series' min and max; caption "SIMULATED · steady state per step · dynamics not
+  modelled"; Reset hides the strip. No animation, so reduced motion needs no branch. Laws S7d / S7e / S7g.
 - **Loops table (P10 part 3).** `RZSpBlock.loops(rows, { snapshot })` is THE compact table of the loops a page owns:
   Loop · SP · Live · Error · OUT · Left · State (`holds`, `◆ saturated`, `OUT not modelled`). Rows come only from
   `RZControlPoints.loopRows(cockpit, sheets)` (twin 1.4.0): every registry setpoint whose loop is drawn on one of those

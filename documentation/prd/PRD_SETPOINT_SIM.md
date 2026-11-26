@@ -1039,6 +1039,16 @@ RZSpBlock.bind(host, { recompute })  → wires sliders (input → recompute → 
 - Still open in P10: the rack-inlet what-if showing CRAH valve OUT after the change; a Loops table on datahall (TIC-SAT,
   TIC-RI).
 
+## C18. P8 delivered (fallback step strip, 2026-11-26)
+
+- Simulate now draws the response: `RZConvSequence.strip` under every sequence's steps table, on both cockpits. A DC
+  AI ambient sweep plots margin, chillers running, liquid-chiller kWe and cooling power per step; a conventional
+  sequence plots running units, part load and shortfall.
+- One point per step, revealed with its row. Dashed line, x = step, labelled SIMULATED · dynamics not modelled.
+- Laws S7d (points = steps, last = the step value in the sequence file), S7e (Reset leaves none), S7g (x axis "step", no
+  time unit). Red on the old view: 20 findings ("no step strip after Simulate").
+- The rz-trend overlay pen (§C3 P8 item 2) stays a peer hook. The strip is the shipped form until then.
+
 ## C17. P9 part 2 delivered (2026-11-26): fire and fuel controllers drawn
 
 - Fire, FS-M-101: PC-JP1 (11.5 / 12.8 bar), PC-FP1 (10.5 bar), PC-FP2 (9.5 bar) as panel bubbles. Each has its own
