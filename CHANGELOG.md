@@ -11,6 +11,35 @@ release sections rather than semver.
 
 ---
 
+## v3.110.0 — 2026-11-26 — DC AI data hall: each lens draws what it is about; the unit you opened stays selected; a reading without a sample looks stale
+
+### DC AI data hall: the unit you opened stays selected; a reading without a sample looks stale (PRD-DCAI-HALL-DEPTH Amendments 5 and 6)
+
+- **Selection (A5d).** A click or Enter on a CDU, fan-wall unit or rack opens its HMI as before, and after the HMI closes the
+  unit stays selected: a 2 px ink outline (never a state colour), kept across a lens switch and 2D ↔ 3D (3D: the rack's top
+  face). Enter on the focused floor opens the HMI of the unit under the cursor. Escape clears. The Conventional data hall keeps
+  its own ring (opt-in `selInk`). Gate `tools/test-dcai-select.mjs` SL1–SL5, 45 checks (red 22 of 45 before).
+- **Stale (A5e).** Under a replay without a sample, every running CDU and fan-wall unit with a missing reading shows a dotted
+  muted lamp, a still rotor, and the tooltip / table "stale: no sample at the replay time"; the legend lists "stale" only while
+  one shows; the status strip and the modal summary count them (Stale was the constant 0). The floor re-reads unit states every
+  3 s while a replay is set, and once when it clears.
+- **The dash, never null.** No HMI prints "null", "NaN" or "undefined" any more: 145 display reads use the payload's own text,
+  template prints go through `nz()` / `nzf()`, the MV substation gauges and cable-ampacity labels draw "—". Four HMIs
+  (`P.n(x).toFixed()`) no longer throw without a sample. Gate `tools/test-dcai-stale.mjs` ST1–ST6, 89 checks over 30 equipment
+  classes (red 74 of 89 before).
+
+### DC AI data hall: each lens draws what it is about (PRD-DCAI-HALL-DEPTH Amendment 7, A6a)
+
+- **Cooling** draws the liquid path: TCS supply and return headers in the service corridor and a supply + return branch
+  up each contained hot aisle, moving at the engine's dash period (`RZConvVfx.dashSeconds(cduLoad)`), still under reduced
+  motion. Row tags read the pair's TCS flow (8,010 L/min).
+- **Thermal** draws the 3 stations per aisle the Drawing view reads, cold points on the 27 / 30 °C limits; they follow
+  every readout scan. Row tags read mean inlet / hot aisle °C.
+- **Power** draws the busway over each pair at its loading, neutral (no busway limit is registered).
+- Hall chips beside the floor in Thermal and Cooling: FW-N, FW-S (run, fan %, m³/h) and CDU (run, pump %, TCS °C).
+  The service corridor is labelled in the other lenses. In 3D a row tag that grows past the stage edge slides left.
+- Gate `tools/test-dcai-floor-lens.mjs` FL1–FL7, 114 checks (red 60 of 95 before).
+
 ## v3.109.0 — 2026-11-26 — Control loops inside the chiller and the CRAH; how much output each loop has left; one setpoints block for both cockpits
 
 ### Added
