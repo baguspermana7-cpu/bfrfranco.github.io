@@ -138,12 +138,40 @@ await viewTo(pg, '2d'); await lensTo(pg, 'thermal');
   const want = []; for (let i = 0; i < 20 / 2 * 2 * G2.perRow; i++) { const z = Math.floor(i / (2 * G2.perRow)), jj = (i % (2 * G2.perRow)) % G2.perRow; if (z === 1 && Math.min(G2.sp - 1, Math.floor(jj * G2.sp / G2.perRow)) === 2 && before.indexOf(i) < 0) want.push(i); }
   ok('RD2', added.length > 0 && JSON.stringify(added) === JSON.stringify(want), `forcing C12t to 28.4 warmed racks ${JSON.stringify(added)}, want exactly ${JSON.stringify(want)}`);
 }
+/* A8c — 3D that moves: rotors on every running cell in Status, a motion budget, the liquid overhead, still off screen */
+{
+  const runIn = () => pg.evaluate(() => { const a = document.getAnimations().filter((x) => x.playState === 'running' && x.effect && x.effect.target && x.effect.target.closest && x.effect.target.closest('#hIso'));
+    return { all: a.length, rot: a.filter((x) => x.effect.target.closest('.fp-rotor')).length }; });
+  await viewTo(pg, '3d'); await lensTo(pg, 'status');
+  const R3 = await read(pg), nRun = R3.cells.filter((c) => !c.stby).length, st = await runIn();
+  ok('3M1', nRun > 100 && st.rot === nRun, `3D Status: ${st.rot} running rotors for ${nRun} running cells`);
+  await lensTo(pg, 'cooling');
+  const co = await runIn();
+  ok('3M1', co.all > 0 && co.all <= 260, `3D Cooling: ${co.all} running animations (budget 260)`);
+  const P3 = await pg.evaluate(() => { const g = document.querySelector('#hIso .fp-ovl'); return { cap: +(g && g.getAttribute('data-cap')), p: [...document.querySelectorAll('#hIso .ovl-pipe')].map((e) => ({ k: e.getAttribute('data-kind'), h: e.getAttribute('data-h') })) }; });
+  const low = P3.p.filter((x) => !(x.h != null && +x.h > P3.cap));
+  ok('3M2', P3.cap > 1 && P3.p.length >= 22 && low.length === 0, `3D: ${low.length} of ${P3.p.length} pipes not above the rack tops (cap ${P3.cap} m) ${JSON.stringify(low.slice(0, 2))}`);
+  await viewTo(pg, '2d'); await lensTo(pg, 'cooling');
+  const P2 = await pg.evaluate(() => [...document.querySelectorAll('#hIso .ovl-pipe')].map((e) => e.getAttribute('data-h')));
+  ok('3M2', P2.length >= 22 && P2.every((h) => h === '0'), `2D keeps the plan: pipe heights ${JSON.stringify([...new Set(P2)])}`);
+  await viewTo(pg, '3d'); await lensTo(pg, 'status');
+  /* at 1440 x 900 the page scrolls only ~70 px, so the floor is moved out of the viewport by a transform (IntersectionObserver
+     sees transformed bounds) — the same signal a scroll gives */
+  await pg.evaluate(() => { document.getElementById('hIsoWrap').style.transform = 'translateY(4000px)'; });
+  await wait(900);
+  const vis = await pg.evaluate(() => { const r = document.getElementById('hIso').getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; });
+  const off = await runIn();
+  ok('3M3', !vis && off.all === 0, `off screen (visible ${vis}): ${off.all} running animations in #hIso`);
+  await pg.evaluate(() => { document.getElementById('hIsoWrap').style.transform = ''; }); await wait(900);
+  const back = await runIn();
+  ok('3M3', back.rot > 100, `back on screen: ${back.rot} rotors run again`);
+}
 await pg.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]); await lensTo(pg, 'status'); await lensTo(pg, 'cooling');
 const rm = await read(pg);
 ok('AV4', rm.anims === 0, `reduced motion: ${rm.anims} running animations in #hIso`);
 ok('AV0', pg.errors.length === 0, `page errors: ${pg.errors.slice(0, 2).join(' | ')}`);
 await pg.close();
 await browser.close(); srv.close();
-console.log(`${fails.length ? 'FAIL' : 'PASS'} — DC AI air side, valves and four points per aisle (A8a+A8b): ${checks - fails.length}/${checks}`);
+console.log(`${fails.length ? 'FAIL' : 'PASS'} — DC AI air side, valves and four points per aisle (A8a+A8b+A8c): ${checks - fails.length}/${checks}`);
 fails.forEach((f) => console.log('  ' + f));
 process.exit(fails.length ? 1 : 0);

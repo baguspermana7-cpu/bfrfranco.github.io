@@ -160,6 +160,11 @@ gains its fourth point (it already loops `SP`; its geometry is checked by the Dr
   0040a76cf, green 31/31**; ship-gate line added. Neighbour DC AI set (51 gates): 49 green on the first pass, the two
   reds above fixed and re-run green. Screenshots read: 1440 2D/3D Cooling (valve bars, 3D rotors), 2D Thermal (4 points
   per aisle, one ring per pair).
+- **A8c built:** 3D pipes overhead (header capH + 0.6 m, branches capH + 0.3 m with a drop at the row end; `data-h` per
+  pipe, 2D keeps the plan at 0). Laws 3M1 (3D Status rotors = 143 running cells; Cooling 3D ≤ 260 running), 3M2 (red
+  22 of 22 pipes at floor height on the A8a tree, green), 3M3 (off screen 0 running, back on screen rotors run). 3M2 as
+  written in §6 (elementFromPoint sampling) could not work: the overlay paints above the racks and has no pointer
+  events, so every sample missed; the law checks the drawn height instead and the screenshot was read.
 - Committed in cp5; releases as v3.112.0 after the peer's v3.111.0 (order agreed 2026-11-26).
 - **Finding outside A8 (peer, P7 sequences):** at design ambient 38 °C the engine needs 634 dry coolers and 631 are
   installed — 2,875 kWth short. Recorded for the heat-rejection PRD; not changed here.

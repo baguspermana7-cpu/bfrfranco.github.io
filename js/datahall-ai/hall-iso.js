@@ -461,11 +461,14 @@
   function drawOverlay(api) {
     var G = api.G, g = api.g, b, k, z, s, o = (geo && geo.ops) || {};
     var dash = win.RZConvVfx && o.cduLoad != null ? win.RZConvVfx.dashSeconds(Math.max(0, o.cduLoad) / 100) : null;
-    var lpm = pairLpm(), tS = geo.tcsSupC, tR = geo.tcsRetC, hPipe = api.iso ? 0.15 : 0, hBus = api.iso ? G.capH + 0.35 : 0, sp = geo.sp || 3;
+    var lpm = pairLpm(), tS = geo.tcsSupC, tR = geo.tcsRetC, hPipe = api.iso ? G.capH + 0.6 : 0, hBr = api.iso ? G.capH + 0.3 : 0, hBus = api.iso ? G.capH + 0.35 : 0, sp = geo.sp || 3;
     var cy0 = G.cabY1, cy1 = G.cduY0 != null ? G.cduY0 : G.cabY1 + 1, ySup = cy0 + (cy1 - cy0) * 0.35, yRet = cy0 + (cy1 - cy0) * 0.65;
     var rSt = Math.max(2, Math.min(4, 0.28 * api.u));
-    function pipe(d, kind, loop, z, title) {
-      var e = svgEl(api, 'path', { 'class': 'ovl-pipe', d: d, 'data-kind': kind, 'data-loop': loop, 'data-lens': 'cooling' }, g, title);
+    /* A8c: in 3D the liquid runs overhead (header capH + 0.6 m, branches capH + 0.3 m over the hot aisle, a drop at the
+       row end) so no pipe is painted across a rack face; data-h is the height it is drawn at (2D: 0, the plan) */
+    g.setAttribute('data-cap', String(api.iso ? G.capH : 0));
+    function pipe(d, kind, loop, z, title, h) {
+      var e = svgEl(api, 'path', { 'class': 'ovl-pipe', d: d, 'data-kind': kind, 'data-loop': loop, 'data-lens': 'cooling', 'data-h': String(h) }, g, title);
       if (z != null) e.setAttribute('data-z', String(z));
       if (dash) e.style.animationDuration = dash + 's';
       return e;
@@ -473,8 +476,8 @@
     for (b = 0; b < api.nb; b++) {
       var r0 = b * api.kRows, rn = api.rowsIn(b), xW = G.ox - G.cold / 2 + 0.2, xE = G.ox + rn * G.rowW - G.cold / 2 - 0.2;
       /* D1 the TCS headers in the service corridor: supply runs out from the CDU line, return runs back */
-      pipe('M' + api.P(xW, ySup, hPipe, b) + 'L' + api.P(xE, ySup, hPipe, b), 'header', 'sup', null, 'TCS supply header · ' + f1(tS) + ' °C');
-      pipe('M' + api.P(xE, yRet, hPipe, b) + 'L' + api.P(xW, yRet, hPipe, b), 'header', 'ret', null, 'TCS return header · ' + f1(tR) + ' °C');
+      pipe('M' + api.P(xW, ySup, hPipe, b) + 'L' + api.P(xE, ySup, hPipe, b), 'header', 'sup', null, 'TCS supply header · ' + f1(tS) + ' °C', hPipe);
+      pipe('M' + api.P(xE, yRet, hPipe, b) + 'L' + api.P(xW, yRet, hPipe, b), 'header', 'ret', null, 'TCS return header · ' + f1(tR) + ' °C', hPipe);
       if (!api.iso && G.cduY0 != null) {   /* D6: the corridor reads as a place in every other lens */
         var lp = api.XY(xW + 0.3, (cy0 + cy1) / 2, 0, b), tx = svgEl(api, 'text', { 'class': 'ovl-corr', x: lp[0].toFixed(1), y: (lp[1] + 3).toFixed(1), 'data-lens': 'status thermal power layout' }, g);
         tx.textContent = 'SERVICE CORRIDOR · ' + f1(cy1 - cy0) + ' m';
@@ -483,8 +486,8 @@
         z = r0 + k;
         var x0 = G.ox + k * G.rowW, xh = x0 + G.cabW + G.hot / 2, dx = Math.min(0.3, G.hot / 4), name = pairName(z);
         /* D1 a supply and a return branch up the pair's contained hot aisle (the rack manifolds sit at the rear doors) */
-        pipe('M' + api.P(xh - dx, ySup, hPipe, b) + 'L' + api.P(xh - dx, G.cabY0 + 0.3, hPipe, b), 'branch', 'sup', z, name + ' TCS supply branch · ' + f0(lpm) + ' L/min · ' + f1(tS) + ' °C');
-        pipe('M' + api.P(xh + dx, G.cabY0 + 0.3, hPipe, b) + 'L' + api.P(xh + dx, yRet, hPipe, b), 'branch', 'ret', z, name + ' TCS return branch · ' + f0(lpm) + ' L/min · ' + f1(tR) + ' °C');
+        pipe('M' + api.P(xh - dx, ySup, hPipe, b) + (api.iso ? 'L' + api.P(xh - dx, G.cabY1, hBr, b) : '') + 'L' + api.P(xh - dx, G.cabY0 + 0.3, hBr, b), 'branch', 'sup', z, name + ' TCS supply branch · ' + f0(lpm) + ' L/min · ' + f1(tS) + ' °C', hBr);
+        pipe('M' + api.P(xh + dx, G.cabY0 + 0.3, hBr, b) + (api.iso ? 'L' + api.P(xh + dx, G.cabY1, hBr, b) : '') + 'L' + api.P(xh + dx, yRet, hPipe, b), 'branch', 'ret', z, name + ' TCS return branch · ' + f0(lpm) + ' L/min · ' + f1(tR) + ' °C', hBr);
         /* D2 the stations the Drawing view reads: SENS_PTS per aisle, evenly along the rack line */
         for (s = 0; s < sp; s++) {
           var y = G.cabY0 + (s + 0.5) * (G.cabY1 - G.cabY0) / sp;
