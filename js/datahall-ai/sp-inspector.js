@@ -19,7 +19,11 @@
   }
   /* the inspector is ~360 px wide (a sheet on a phone): Setpoint · SP · Live · Error; the band, range, evidence and
      controller ride in the row's title (owner 2026-11-12: less visible text, details on hover). Ink only, no wash. */
-  var CSS = '.rz-inspector-sp{margin:10px 0 0}' +
+  /* the inspector is always the dark slate panel (js/rz-inspector.js); the DC AI page has no equipment-modal tokens, so
+     the ones the sequence view (and RZDiagram through it) draws with are set here to that panel's palette (else paper
+     and ink resolve black) */
+  var CSS = '.rz-inspector-sp{margin:10px 0 0;--cvm-bg:#0f172a;--cvm-panel:#16213a;--cvm-text:#e2e8f0;--cvm-mute:#94a3b8;' +
+      '--cvm-line:rgba(255,255,255,.12);--cvm-acc:#e8b563;--o:#e8b563;--c:#67e8f9;--g:#4ade80;--r:#fca5a5}' +
     '.rz-inspector-sp .rz-cvm-sp-wrap{overflow-x:auto;max-width:100%}' +
     '.rz-inspector-sp table{width:100%;border-collapse:collapse;table-layout:auto;font:12px/1.35 IBM Plex Sans,sans-serif;color:inherit}' +
     '.rz-inspector-sp th,.rz-inspector-sp td{padding:4px 6px 4px 0;border-bottom:1px solid rgba(255,255,255,.12);text-align:left;vertical-align:top;font-weight:400}' +
@@ -45,7 +49,17 @@
     '.rz-inspector-sp [data-mode="mechanical"]{color:#fca5a5}' +
     '.rz-inspector-sp tr[data-design-bin] th,.rz-inspector-sp tr[data-design-bin] td{border-top:1px solid rgba(255,255,255,.45);border-bottom:1px solid rgba(255,255,255,.45)}' +
     '.rz-inspector-sp td[data-wi-clamped]{text-decoration:underline dotted;cursor:help}' +
-    '.rz-inspector-sp .rz-cvm-note{margin:6px 0 0;font-size:11px;line-height:1.4;color:#94a3b8}';
+    '.rz-inspector-sp .rz-cvm-note{margin:6px 0 0;font-size:11px;line-height:1.4;color:#94a3b8}' +
+    /* P7 the step table in ~360 px: one step = one block, each value with its column name; Available and Capacity
+       (running × unit) go, the Short column keeps what is missing */
+    '.rz-inspector-sp .rz-cvm-seq-t thead,.rz-inspector-sp .rz-cvm-seq-t [data-k="avail"],.rz-inspector-sp .rz-cvm-seq-t [data-k="cap"]{display:none}' +
+    '.rz-inspector-sp .rz-cvm-seq-t,.rz-inspector-sp .rz-cvm-seq-t tbody{display:block}' +
+    '.rz-inspector-sp .rz-cvm-seq-t tr:not([hidden]){display:flex;flex-wrap:wrap;gap:2px 12px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.12)}' +
+    '.rz-inspector-sp .rz-cvm-seq-t tr > *{display:block;border:0;padding:0;white-space:nowrap}' +
+    '.rz-inspector-sp .rz-cvm-seq-t th[scope="row"]{flex:1 0 100%;white-space:normal;font-weight:600}' +
+    '.rz-inspector-sp .rz-cvm-seq-t td::before{content:attr(data-l) " ";color:#94a3b8;font-family:IBM Plex Sans,sans-serif;font-size:10.5px}' +
+    '.rz-inspector-sp .rz-cvm-seq-t caption{display:block}' +
+    '.rz-inspector-sp .rz-cvm-seq-fig{max-width:100%!important;overflow-x:auto}';
   function style(doc) {
     if (doc.getElementById('rz-inspector-sp-css')) return;
     var st = doc.createElement('style'); st.id = 'rz-inspector-sp-css'; st.textContent = CSS; doc.head.appendChild(st);
@@ -111,7 +125,7 @@
       sec = doc.createElement('section');
       sec.className = 'rz-inspector-sp'; sec.setAttribute('data-rz-dcai-sp', payload.classId);
       sec.innerHTML = (list.length ? '<div class="rz-inspector-sec">Setpoints &amp; limits</div>' + B.inner(list, { snapshot: E && E.snapshot ? E.snapshot : null }) : '') +
-        (seqKey ? V.block(seqKey) : '');
+        (seqKey ? V.block(seqKey, { narrow: true }) : '');
       if (list.length) cliff(sec);
       if (seqKey) V.bind(sec);
       sec.addEventListener('focusin', function (e) { kept.focus = e.target; });

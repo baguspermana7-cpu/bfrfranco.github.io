@@ -71,11 +71,11 @@
   }
 
   /* the scenario's path: its distinct modes in order, drawn through RZDiagram (row on a desktop, column on a phone) */
-  function figure(S, sc, slug) {
+  function figure(S, sc, slug, narrow) {
     var D = root.RZDiagram; if (!D) return '<p class="rz-cvm-seq-note">Diagram engine not loaded.</p>';
     var order = [], seen = {};
     sc.steps.forEach(function (s) { if (!seen[s.mode]) { seen[s.mode] = 1; order.push(s.mode); } });
-    var vert = phone(), ctx = D.create({ width: 960, height: 400, slug: slug, title: sc.label, desc: 'Sequence path: ' + order.join(' → ') });
+    var vert = narrow || phone(), ctx = D.create({ width: 960, height: 400, slug: slug, title: sc.label, desc: 'Sequence path: ' + order.join(' → ') });
     var box = {}, X = 16, Y = 16, G = vert ? 36 : 56;
     order.forEach(function (id) {
       var m = S.modes.filter(function (x) { return x.id === id; })[0];
@@ -119,18 +119,20 @@
       (timed && stag ? '<p class="rz-cvm-seq-note">' + esc('Time counts from the return of supply; ' + stag.stagger_s + ' s between two chiller starts (assumed). How long the supply is lost is not modelled.') + '</p>' : '');
   }
 
-  function scenarioBody(S, sc, k) { return figure(S, sc, 'seq-' + k + '-' + sc.id) + steps(S, sc); }
+  /* narrow: the host is a side panel (the DC AI inspector, ~320 px) whatever the viewport: the path is drawn as a column */
+  function scenarioBody(S, sc, k, narrow) { return figure(S, sc, 'seq-' + k + '-' + sc.id, narrow) + steps(S, sc); }
 
-  function block(classKey) {
+  function block(classKey, opts) {
+    var narrow = !!(opts && opts.narrow);
     var Q = root.RZSequences, S = Q && Q.get ? Q.get(classKey) : null; if (!S) return '';
     css();
     var P = S.quantities, sc = S.scenarios[0];
-    return '<section class="rz-cvm-sec rz-cvm-seq" data-rz-cvm-seq="' + esc(classKey) + '"><h3>Sequence of operations</h3>' +
+    return '<section class="rz-cvm-sec rz-cvm-seq" data-rz-cvm-seq="' + esc(classKey) + '"' + (narrow ? ' data-seq-narrow' : '') + '><h3>Sequence of operations</h3>' +
       '<p class="rz-cvm-seq-note">' + esc('Structure: ' + S.basis.ref + ' (' + S.basis.evidenceClass + '). Thresholds from this plant\'s limits registry and engine. Plant now: load ' +
         n(P.load) + ' ' + P.unitLabel + ', ' + P.running + ' of ' + P.total + ' ' + P.noun + ' running, ' + n(P.unit) + ' ' + P.unitLabel + ' each' + (P.unitBasis ? ' (' + P.unitBasis + ')' : P.unitPer ? ' (' + P.unitPer + ' halls)' : '') + (P.source === 'utility' ? '; on the utility, every set on standby' : '') + '.') + '</p>' +
       '<div class="rz-cvm-seq-ctl"><label>Scenario <select data-seq-scn>' + S.scenarios.map(function (x) { return '<option value="' + esc(x.id) + '">' + esc(x.label) + '</option>'; }).join('') + '</select></label>' +
       '<button type="button" data-seq-sim>Simulate</button><button type="button" data-seq-reset>Reset</button></div>' +
-      '<div data-seq-body>' + scenarioBody(S, sc, classKey) + '</div>' + modeList(S) + '</section>';
+      '<div data-seq-body>' + scenarioBody(S, sc, classKey, narrow) + '</div>' + modeList(S) + '</section>';
   }
 
   function bind(host) {
@@ -148,7 +150,15 @@
         box.setAttribute('data-seq-at', String(i));
       }
       function reset() { stop(); show(-1); }
-      box.querySelector('[data-seq-scn]').addEventListener('change', function () { reset(); box.querySelector('[data-seq-body]').innerHTML = scenarioBody(S, cur(), k); show(-1); });
+      /* each cell carries its column name (data-l) so a narrow host (the DC AI inspector) can stack a step as label · value */
+      function lab() {
+        Array.prototype.forEach.call(box.querySelectorAll('table[data-seq-steps]'), function (t) {
+          var h = Array.prototype.map.call(t.querySelectorAll('thead th'), function (x) { return x.textContent; });
+          Array.prototype.forEach.call(t.querySelectorAll('tbody tr'), function (r) { Array.prototype.forEach.call(r.children, function (c, j) { if (h[j]) c.setAttribute('data-l', h[j]); }); });
+        });
+      }
+      lab();
+      box.querySelector('[data-seq-scn]').addEventListener('change', function () { reset(); box.querySelector('[data-seq-body]').innerHTML = scenarioBody(S, cur(), k, box.hasAttribute('data-seq-narrow')); lab(); show(-1); });
       box.querySelector('[data-seq-reset]').addEventListener('click', reset);
       box.querySelector('[data-seq-sim]').addEventListener('click', function (e) {
         stop(); var last = cur().steps.length - 1;

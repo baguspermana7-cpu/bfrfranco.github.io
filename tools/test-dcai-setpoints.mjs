@@ -16,6 +16,8 @@
  *   D7  Reset: slider back on the registry SP, no SIMULATED value left, nothing stored.
  *   D6  Node: a weather bin is liquid free cooling exactly when TCS − 6 K ≥ its ambient (TCS 36/39/40/41/45 °C).
  *   D8  TCS 39 °C: the liquid-path COP sits on copMax 12 and shows ◆ with the ceiling note (a clamp is never hidden).
+ *   D10 (P7) the sequence block in the dry-cooler, CDU and fan-wall inspectors: Simulate walks every step; the ambient
+ *       sweep's mode and cooling power = an independent DCAI_CALC.compute; trips end with the duty count restored
  *   D9  the cliff strip under the TCS what-if: one row per engine bin, now and SIMULATED = the engine, the design
  *       ambient row marked, Reset clears.
  *   (D3 trend SP line joins with the rz-trend hook.)  --static skips the browser.
@@ -159,10 +161,51 @@ async function browserLaws() {
       const keys = (j) => JSON.parse(j).filter((x) => /sp|what|sim|setpoint/i.test(x));
       if (keys(r7.ls2).length || keys(r7.ss2).length) bad(`D7 ${tag}: storage keys ${r7.ls2} ${r7.ss2}`);
     }
+    /* D10 (P7) the sequence of operations in the inspector: one block per class with a DC AI sequence; Simulate walks
+       every step; the heat-rejection sweep's modes and cooling power equal an independent DCAI_CALC.compute per
+       ambient; the trip scenarios end with the duty count restored; no sideways page scroll */
+    const DE = require(path.join(ROOT, 'js/dcai-engine.js'));
+    for (const cls of ['dry-cooler', 'cdu', 'crah']) {
+      const r = await pg.evaluate(async (c) => {
+        document.querySelectorAll('aside.rz-inspector .rz-inspector-close, aside.rz-inspector [data-close]').forEach((x) => x.click());
+        const el = [...document.querySelectorAll('[data-rz-equipment^="' + c + ':"]')].sort((a, b2) => b2.getBoundingClientRect().width - a.getBoundingClientRect().width)[0];
+        if (!el) return { err: 'no ' + c + ' element on the cooling view' };
+        el.scrollIntoView({ block: 'center', inline: 'center' });
+        el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window, shiftKey: true }));
+        await new Promise((z) => setTimeout(z, 600));
+        const box = document.querySelectorAll('aside.rz-inspector.open [data-rz-cvm-seq="dcai:' + c + '"]');
+        if (box.length !== 1) return { err: box.length + ' sequence blocks' };
+        box[0].querySelector('[data-seq-sim]').click();
+        for (let k = 0; k < 60 && box[0].querySelector('tr[data-seq-i][hidden]'); k++) await new Promise((z) => setTimeout(z, 200));
+        const rows = [...box[0].querySelectorAll('tr[data-seq-i]')];
+        return { hidden: rows.filter((x) => x.hidden).length, rows: rows.map((x) => ({ mode: x.getAttribute('data-seq-step-mode'), running: +x.getAttribute('data-seq-running'), short: +x.getAttribute('data-seq-short'),
+          eng: [...x.querySelectorAll('td[data-k="eng"]')].map((t) => t.textContent) })), sx: document.documentElement.scrollWidth - innerWidth,
+          /* the step table stays inside its frame and the inspector (a column cut off is a lost number) */
+          over: Math.max(0, ...[...box[0].querySelectorAll('.rz-cvm-sp-wrap')].map((w) => w.scrollWidth - w.clientWidth)),
+          /* the path figure is drawn to scale: its smallest text as rendered (font size × svg scale) */
+          figPx: (() => { const sv = box[0].querySelector('[data-seq-fig] svg'); if (!sv) return 0; const k = sv.getBoundingClientRect().width / sv.viewBox.baseVal.width;
+            return Math.min(...[...sv.querySelectorAll('text')].map((t) => parseFloat(getComputedStyle(t).fontSize) * k)); })(),
+          past: (() => { const a = document.querySelector('aside.rz-inspector.open').getBoundingClientRect().right; return Math.max(0, ...[...box[0].querySelectorAll('td,th')].filter((t) => t.offsetParent).map((t) => t.getBoundingClientRect().right - Math.min(a, innerWidth))); })() };
+      }, cls);
+      if (r.err) { bad(`D10 ${tag} ${cls}: ${r.err}`); continue; }
+      if (r.hidden) bad(`D10 ${tag} ${cls}: ${r.hidden} steps still hidden after Simulate`);
+      if (r.sx > 1) bad(`D10 ${tag} ${cls}: page scrolls sideways by ${r.sx} px`);
+      if (!(r.figPx >= 9.5)) bad(`D10 ${tag} ${cls}: the sequence path's smallest text renders at ${r.figPx.toFixed(1)} px (a figure scaled down to fit)`);
+      if (r.over > 1 || r.past > 1) bad(`D10 ${tag} ${cls}: step table overflows its frame by ${r.over} px, a cell ends ${r.past.toFixed(0)} px past the inspector`);
+      if (cls === 'dry-cooler') {
+        const amb = [24, 30, 34, 35, 38], want = amb.map((a) => { const m = JSON.parse(JSON.stringify(DE.model)); m.thermal.designAmbientDbC = a; const R = DE.compute(m), g = R.design.planes.p04_free_cooling_margin_k;
+          return { mode: g < 0 ? 'mechanical' : g < 1 ? 'edge' : 'normal', kwe: Math.round(R.design.electrical.cooling_kwe).toLocaleString('en-US') }; });
+        if (r.rows.length !== amb.length) bad(`D10 ${tag} dry-cooler: ${r.rows.length} steps, want ${amb.length}`);
+        else want.forEach((w, i) => { const g = r.rows[i]; if (g.mode !== w.mode || g.eng[g.eng.length - 1] !== w.kwe) bad(`D10 ${tag} dry-cooler step ${i} (${amb[i]} °C): ${g.mode} ${g.eng[g.eng.length - 1]} kWe, engine ${w.mode} ${w.kwe}`); });
+      } else {
+        const duty = DE.snapshot.equipment[(cls === 'cdu' ? 'cdu' : 'crah') + '_duty_per_hall'], last = r.rows[r.rows.length - 1];
+        if (!last || last.running !== duty || last.short !== 0 || !r.rows.some((x) => x.short > 0)) bad(`D10 ${tag} ${cls}: trip walk ${JSON.stringify(r.rows.map((x) => x.running + '/' + x.short))}, duty ${duty}`);
+      }
+    }
     if (errs.length) bad(`D4 ${tag}: ${errs.length} page errors: ${errs.slice(0, 2).join(' | ').slice(0, 200)}`);
     await pg.close();
   }
   await b.close(); srv.close();
-  console.log(`${n ? 'FAIL' : 'PASS'} D1/D1r/D4/D5/D7/D8/D9 inspector block on datahallAI.html: ${CLASSES.length} classes × 390/1440 × dark/light${n ? ', ' + n + ' findings' : ''}`);
+  console.log(`${n ? 'FAIL' : 'PASS'} D1/D1r/D4/D5/D7/D8/D9/D10 inspector block on datahallAI.html: ${CLASSES.length} classes × 390/1440 × dark/light${n ? ', ' + n + ' findings' : ''}`);
   return n;
 }

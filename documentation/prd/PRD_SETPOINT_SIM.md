@@ -1001,3 +1001,17 @@ RZSpBlock.bind(host, { recompute })  → wires sliders (input → recompute → 
   ("not modelled"). Drawn loops for the pressure switches (fire), the day-tank LIC (fuel) and TIC/PDIC on the CDU sheet
   are P9 part 2. P-01 ΔP setpoint: the CDU model has no value ("not modelled").
 
+## C14. P7 delivered (2026-11-26)
+
+- Three DC AI sequences (`data/sequences/dcai-dry-cooler.json`, `dcai-cdu.json`, `dcai-crah.json`) in the inspector of
+  those classes, through the one sequence view.
+- **Heat rejection.** Normal (liquid free cooling) → edge (0 ≤ P4 < 1 K, ASSUMED band, alarm and trim-chiller pre-start)
+  → mechanical (P4 < 0). Scenario "ambient rises": 24, 30, 34 (design), 35, 38 °C, each a full engine re-compute.
+  Cooling power 51,899 → 57,472 → 61,187 → 106,122 → 111,201 kWe; liquid chillers 0 until 35 °C (35,405 kWe, 142 of 143
+  chillers). **Finding:** at 38 °C the engine needs 634 dry coolers and 631 are installed: 2,875 kWth short. The
+  step shows it ("HTW supply above setpoint").
+- **CDU and fan wall.** One duty unit trips (short 108 kWth CDU, 154.6 kWth fan wall), the standby restores the duty
+  count; high TCS / high supply air read the registry setpoints.
+- Not in this part: the CDU low-flow, leak and facility-water-loss modes (no engine quantity to step), dry-cooler loss
+  with derate (the engine has no per-unit derate). Hysteresis and edge band are ASSUMED and listed as such.
+
