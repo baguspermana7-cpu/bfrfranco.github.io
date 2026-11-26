@@ -26,6 +26,14 @@ const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const require = createRequire(import.meta.url);
 const OUT = path.join(ROOT, 'data/control-points.json');
 const LIMIT_KEYS = ['lo_alarm', 'lo_warn', 'hi_warn', 'hi_alarm', 'deadband', 'delay_s'];
+/* PRD-SETPOINT-SIM C1.5 (closes G10): a what-if output the engine clamps names its ceiling as a MODEL path; the value is
+   read from the model here, so a clamped number is marked, never shown as if computed */
+function ceil(w, model) {
+  if (!w.ceiling) return w;
+  const v = w.ceiling.split('.').reduce((o, k) => (o == null ? o : o[k]), model);
+  if (typeof v !== 'number') throw new Error('what-if ' + w.path + ': ceiling ' + w.ceiling + ' is not a number in the model');
+  return Object.assign({}, w, { ceilingValue: v, ceilingNote: 'engine ceiling ' + w.ceiling.split('.').pop() + ' = ' + v + ' (a model input), not the Carnot-fraction result' });
+}
 
 function pick(o, keys) { const r = {}; keys.forEach((k) => { if (typeof o[k] === 'number') r[k] = o[k]; }); return Object.keys(r).length ? r : null; }
 function evid(s) { return String(s || '').toUpperCase(); }
@@ -85,7 +93,7 @@ export function build() {
         src = { ref: 'js/datahall-ai/points.js ' + id, why: VE[id] ? VE[id].why : 'value typed in the point record; no source of its own' }; }
       row.sp = { value: v, role: role, from: r.sp.plane ? 'plane ' + r.sp.plane : r.sp.path ? 'path ' + r.sp.path : 'typed value', evidenceClass: ev, source: src, control: role === 'setpoint' ? control : null, heldBy: heldBy, adjustable: null };
       /* P6: a DC AI setpoint an operator can move (only on the class that holds it) */
-      if (ADJ[id] && role === 'setpoint') Object.assign(row.sp, { adjustable: ADJ[id].adjustable, param: ADJ[id].param, whatIf: ADJ[id].whatIf, whatIfNote: ADJ[id].whatIfNote });
+      if (ADJ[id] && role === 'setpoint') Object.assign(row.sp, { adjustable: ADJ[id].adjustable, param: ADJ[id].param, whatIf: ADJ[id].whatIf.map((w) => ceil(w, E.model)), whatIfNote: ADJ[id].whatIfNote });
       else if (ADJ[id]) throw new Error('dcaiAdjustable ' + id + ' is not a setpoint (only the holding class is adjustable)');
     }
     if (L && r.kind !== 'none') row.limits = Object.assign(pick(L, LIMIT_KEYS) || {}, { basis: r.source || null, evidenceClass: evid(r.evidenceClass) });

@@ -37,6 +37,10 @@
     '.rz-inspector-sp button[data-wi-reset]{min-height:28px;padding:2px 10px;border:1px solid rgba(255,255,255,.25);border-radius:3px;background:transparent;color:inherit;font:inherit;font-size:11px;cursor:pointer}' +
     '.rz-inspector-sp button[data-wi-reset]:focus-visible,.rz-inspector-sp input:focus-visible{outline:2px solid #e8b563;outline-offset:2px}' +
     '.rz-inspector-sp .rz-cvm-wi-t th[scope="row"]{width:44%}' +
+    '.rz-inspector-sp caption{caption-side:top;text-align:left;padding:8px 0 4px;font-size:11px;color:#94a3b8}' +
+    '.rz-inspector-sp [data-mode="mechanical"]{color:#fca5a5}' +
+    '.rz-inspector-sp tr[data-design-bin] th,.rz-inspector-sp tr[data-design-bin] td{border-top:1px solid rgba(255,255,255,.45);border-bottom:1px solid rgba(255,255,255,.45)}' +
+    '.rz-inspector-sp td[data-wi-clamped]{text-decoration:underline dotted;cursor:help}' +
     '.rz-inspector-sp .rz-cvm-note{margin:6px 0 0;font-size:11px;line-height:1.4;color:#94a3b8}';
   function style(doc) {
     if (doc.getElementById('rz-inspector-sp-css')) return;
@@ -56,6 +60,36 @@
       return typeof v === 'number' && isFinite(v) ? { v: v, src: 'page', title: 'the value this inspector shows' } : { v: NaN };
     };
   }
+  /* P6 the free-cooling cliff as a control fact (closes G6): under the TCS supply what-if, one row per weather bin of the
+     engine (shaped bins, ASSUMED), liquid free cooling or mechanical, engine now and at the simulated SP. The design
+     ambient row is marked. Ink only; the word "mechanical" carries the alarm ink. */
+  function binsOf(snap) { return snap && Array.isArray(snap.bins) ? snap.bins : []; }
+  function word(b) { return b ? (b.liquid_free_cooling ? 'free' : 'mechanical') : '—'; }
+  function cliff(sec) {
+    var E = root.DCAI_CALC, box = sec.querySelector('[data-rz-cvm-whatif][data-wi-param="thermal.tcsSupplyC"]');
+    if (!box || !E || !E.snapshot) return;
+    var now = binsOf(E.snapshot), design = E.snapshot.design ? E.snapshot.design.ambient_db_c : null; if (!now.length) return;
+    var esc = root.RZSpBlock.esc, t = box.ownerDocument.createElement('div');
+    t.className = 'rz-cvm-sp-wrap rz-inspector-cliff';
+    t.innerHTML = '<table class="rz-cvm-sp rz-cvm-wi-t" data-rz-cliff><caption>Liquid free cooling by weather bin (' + esc(E.model && E.model.weather ? E.model.weather.basis : 'shaped bins') + ')</caption>' +
+      '<thead><tr><th scope="col">Ambient</th><th scope="col">Hours</th><th scope="col">Engine now</th><th scope="col">SIMULATED</th></tr></thead><tbody>' +
+      now.map(function (b, i) {
+        var d = b.ambient_db_c === design;
+        return '<tr data-bin="' + i + '"' + (d ? ' data-design-bin' : '') + '><th scope="row">' + esc(b.ambient_db_c + ' °C' + (d ? ' · design' : '')) + '</th><td>' + esc(b.hours.toLocaleString('en-US')) + ' h</td>' +
+          '<td data-k="now" data-mode="' + word(b) + '">' + word(b) + '</td><td data-k="sim">—</td></tr>';
+      }).join('') + '</tbody></table>';
+    var note = box.querySelector('.rz-cvm-note'); box.insertBefore(t, note || null);
+    var s = box.querySelector('input[type="range"]'), sp = +box.getAttribute('data-wi-sp'), cells = t.querySelectorAll('td[data-k="sim"]');
+    function clear() { for (var i = 0; i < cells.length; i++) { cells[i].textContent = '—'; cells[i].removeAttribute('data-mode'); } }
+    function run() {
+      var v = +s.value; if (!isFinite(v) || v === sp) { clear(); return; }
+      var b1 = binsOf(recompute('thermal.tcsSupplyC', v));
+      for (var i = 0; i < cells.length; i++) { var w = word(b1[i]); cells[i].textContent = w; cells[i].setAttribute('data-mode', w); }
+    }
+    s.addEventListener('input', run);
+    box.querySelector('[data-wi-reset]').addEventListener('click', clear);
+  }
+
   /* the inspector rewrites its body every 4 s (same unit, new tick): the block is built once per unit and the SAME node
      is put back, so a what-if slider keeps its value and focus across a refresh; only Live / Error are repainted */
   var kept = { key: null, sec: null, focus: null };
@@ -70,6 +104,7 @@
       sec = doc.createElement('section');
       sec.className = 'rz-inspector-sp'; sec.setAttribute('data-rz-dcai-sp', payload.classId);
       sec.innerHTML = '<div class="rz-inspector-sec">Setpoints &amp; limits</div>' + B.inner(list, { snapshot: E && E.snapshot ? E.snapshot : null });
+      cliff(sec);
       sec.addEventListener('focusin', function (e) { kept.focus = e.target; });
       /* the 4 s body rewrite blurs the focused node BEFORE it detaches (Chrome); the rewrite puts the block back and
          re-focuses in the same task, so the user has only left when focus is still outside one task later */
@@ -82,7 +117,7 @@
     if (f && sec.contains(f) && doc.activeElement !== f) { try { f.focus({ preventScroll: true }); } catch (e) { /* not focusable */ } }
     return true;
   }
-  var api = { rows: rows, recompute: recompute, attach: attach, version: '1.1.0' };
+  var api = { rows: rows, recompute: recompute, attach: attach, version: '1.2.0' };
   if (root) {
     root.RZDcaiSpInspector = api;
     if (root.document && root.document.addEventListener) root.document.addEventListener('rz-inspector-payload', function (e) { if (e && e.detail) attach(e.detail.payload, e.detail.body); });

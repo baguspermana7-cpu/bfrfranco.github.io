@@ -135,7 +135,10 @@ for (const r of rows.filter((x) => x.cockpit === 'conv' && x.sp)) {
     ok(/dynamics[^.]*not modelled/i.test(sp.whatIfNote || ''), `C13-DC ${id} what-if note does not say the dynamics are not modelled`);
     const lo = at(sp.param, a.min), hi = at(sp.param, a.max), s0 = D.snapshot;
     for (const w of sp.whatIf) {
-      ok(!!w.label && typeof w.unit === 'string' && typeof get(s0, w.path) === 'number', `C13-DC ${id} what-if ${w.path}: label, unit and a number in the snapshot`);
+      /* a path the engine leaves null at the design point (the liquid-path COP while free cooling) is listed only with
+         the words the block prints for it (nullText) */
+      ok(!!w.label && typeof w.unit === 'string' && (typeof get(s0, w.path) === 'number' || (get(s0, w.path) === null && !!w.nullText)), `C13-DC ${id} what-if ${w.path}: label, unit and a number in the snapshot (or null with nullText)`);
+      if (w.ceiling) ok(w.ceilingValue === get(D.model, w.ceiling) && /ceiling/.test(w.ceilingNote || ''), `C13-DC ${id} what-if ${w.path}: ceiling ${w.ceilingValue} ≠ model ${w.ceiling} ${get(D.model, w.ceiling)}`);
       ok(get(lo, w.path) !== get(hi, w.path), `C13-DC ${id} what-if ${w.path} does not move between ${a.min} and ${a.max}`);
     }
   }

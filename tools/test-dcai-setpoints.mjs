@@ -14,6 +14,10 @@
  *   D4  390/1440 × dark/light: no sideways page scroll, the block inside its column, no text under 10.5 px, 0 page errors.
  *   D5  what-if TCS supply 41 °C: every SIMULATED output = DCAI_CALC.compute of a copy (± 0.1 %), no raw float printed.
  *   D7  Reset: slider back on the registry SP, no SIMULATED value left, nothing stored.
+ *   D6  Node: a weather bin is liquid free cooling exactly when TCS − 6 K ≥ its ambient (TCS 36/39/40/41/45 °C).
+ *   D8  TCS 39 °C: the liquid-path COP sits on copMax 12 and shows ◆ with the ceiling note (a clamp is never hidden).
+ *   D9  the cliff strip under the TCS what-if: one row per engine bin, now and SIMULATED = the engine, the design
+ *       ambient row marked, Reset clears.
  *   (D3 trend SP line joins with the rz-trend hook.)  --static skips the browser.
  *
  * Usage: node tools/test-dcai-setpoints.mjs [--list] [--static]
@@ -54,6 +58,8 @@ let fails = 0; const law = (c, m) => { if (!c) { fails++; console.log('FAIL ' + 
   law(get(SPI.recompute('thermal.tcsSupplyC', 41), 'pue.free_cooling_cliff_ambient_c') === get(D.snapshot, 'pue.free_cooling_cliff_ambient_c') + 1, 'D0 the cliff ambient does not move 1:1 with TCS supply (40 → 41 °C)');
   law(JSON.stringify(D.model) === before, 'D0 a what-if recompute changed the live DC AI model');
   law(SPI.recompute('thermal.noSuchField', 1) === null, 'D0 an unknown parameter is not refused (null)');
+  /* D6 the cliff by bin: a bin is liquid free cooling exactly when TCS − 3 − 3 ≥ its ambient (CDU + dry cooler approach) */
+  for (const t of [36, 39, 40, 41, 45]) { const bins = SPI.recompute('thermal.tcsSupplyC', t).bins; for (const b of bins) law(b.liquid_free_cooling === (t - 6 >= b.ambient_db_c), `D6 TCS ${t} °C bin ${b.ambient_db_c} °C: free cooling ${b.liquid_free_cooling}`); }
   if (!fails) console.log(`PASS D0 inspector core: ${reg.length} DC AI setpoints have rows; what-if = engine on 12 cases; live model untouched`);
 }
 
@@ -127,7 +133,7 @@ async function browserLaws() {
       const D = require(path.join(ROOT, 'js/dcai-engine.js')), m = JSON.parse(JSON.stringify(D.model)); m.thermal.tcsSupplyC = 41; const sim = D.compute(m);
       const w = await pg.evaluate(() => { const box = document.querySelector('[data-rz-dcai-sp] [data-rz-cvm-whatif]'); if (!box) return null; const s = box.querySelector('input[type="range"]'); s.value = '41'; s.dispatchEvent(new Event('input', { bubbles: true })); s.focus(); return [...box.querySelectorAll('tr[data-wi-path]')].map((t) => ({ path: t.getAttribute('data-wi-path'), sim: t.getAttribute('data-wi-sim'), text: t.querySelector('[data-k="sim"]').textContent })); });
       if (!w || !w.length) bad(`D5 ${tag}: no what-if on the CDU block`);
-      for (const r of w || []) { const v = r.path.split('.').reduce((o, k) => (o == null ? o : o[k]), sim); if (typeof v !== 'number' || Math.abs(+r.sim - v) > Math.abs(v) * 1e-3 + 1e-9) bad(`D5 ${tag} ${r.path}: SIMULATED ${r.sim} ≠ engine ${v}`); if (/\d\.\d{4,}/.test(r.text)) bad(`D5 ${tag} ${r.path}: raw float "${r.text}"`); }
+      for (const r of w || []) { const v = r.path.split('.').reduce((o, k) => (o == null ? o : o[k]), sim); if (v === null) { if (r.sim !== '' || !/free cooling/.test(r.text)) bad(`D5 ${tag} ${r.path}: engine null shown as "${r.text}"`); continue; } if (typeof v !== 'number' || Math.abs(+r.sim - v) > Math.abs(v) * 1e-3 + 1e-9) bad(`D5 ${tag} ${r.path}: SIMULATED ${r.sim} ≠ engine ${v}`); if (/\d\.\d{4,}/.test(r.text)) bad(`D5 ${tag} ${r.path}: raw float "${r.text}"`); }
       /* D1r one refresh later (4 s tick) the same block node is back, the slider still at 41 with focus, Live repainted */
       await sleep(4600);
       const k = await pg.evaluate(() => { const s = document.querySelector('aside.rz-inspector.open [data-rz-dcai-sp]'); const r = s && s.querySelector('input[type="range"]'); return s ? { node: s.__probe || null, v: r && r.value, focus: document.activeElement === r, n: document.querySelectorAll('[data-rz-dcai-sp]').length } : null; });
@@ -135,6 +141,19 @@ async function browserLaws() {
       /* D7 Reset: slider back on the registry SP, no SIMULATED value left, nothing written to storage */
       const r7 = await pg.evaluate(() => { const ls = JSON.stringify(Object.keys(localStorage)), ss = JSON.stringify(Object.keys(sessionStorage)); const box = document.querySelector('[data-rz-dcai-sp] [data-rz-cvm-whatif]'); box.querySelector('[data-wi-reset]').click(); return { v: box.querySelector('input[type="range"]').value, sp: box.getAttribute('data-wi-sp'), left: [...box.querySelectorAll('tr[data-wi-path]')].filter((t) => t.getAttribute('data-wi-sim')).length, ls, ss, ls2: JSON.stringify(Object.keys(localStorage)), ss2: JSON.stringify(Object.keys(sessionStorage)) }; });
       if (r7.v !== r7.sp || r7.left) bad(`D7 ${tag}: Reset left slider ${r7.v} (SP ${r7.sp}), ${r7.left} SIMULATED rows`);
+      /* D8 a clamped engine value is marked, D9 the cliff strip: TCS 39 °C -> the liquid-path COP sits on copMax 12 and
+         carries ◆ with the ceiling note; the 34 °C design bin turns mechanical, 32 °C stays free; Reset clears the strip */
+      const D9 = (() => { const m2 = JSON.parse(JSON.stringify(D.model)); m2.thermal.tcsSupplyC = 39; return D.compute(m2); })();
+      const c9 = await pg.evaluate(() => { const box = document.querySelector('[data-rz-dcai-sp] [data-rz-cvm-whatif]'); const s = box.querySelector('input[type="range"]'); s.value = '39'; s.dispatchEvent(new Event('input', { bubbles: true }));
+        const cop = box.querySelector('tr[data-wi-path="design.planes.p19_cop_liquid_path"] [data-k="sim"]'), strip = box.querySelector('[data-rz-cliff]');
+        const out = { cop: cop && cop.textContent, title: cop && cop.title, bins: strip ? [...strip.querySelectorAll('tbody tr')].map((t) => ({ a: t.querySelector('th').textContent, now: t.querySelector('[data-k="now"]').textContent, sim: t.querySelector('[data-k="sim"]').textContent })) : null };
+        box.querySelector('[data-wi-reset]').click(); out.after = strip ? [...strip.querySelectorAll('[data-k="sim"]')].filter((c) => c.textContent !== '—').length : -1; return out; });
+      if (D9.design.planes.p19_cop_liquid_path !== D.model.thermal.copMax) bad(`D8 ${tag}: the engine no longer clamps at TCS 39 °C (P19 ${D9.design.planes.p19_cop_liquid_path}); pick another case`);
+      if (!c9.cop || !/◆/.test(c9.cop) || !/ceiling/.test(c9.title || '')) bad(`D8 ${tag}: clamped COP shown as "${c9.cop}" title "${c9.title}"`);
+      if (!c9.bins || c9.bins.length !== D9.bins.length) bad(`D9 ${tag}: cliff strip ${c9.bins ? c9.bins.length : 'absent'} rows, engine ${D9.bins.length} bins`);
+      else D9.bins.forEach((b, i) => { const want = b.liquid_free_cooling ? 'free' : 'mechanical', now = D.snapshot.bins[i].liquid_free_cooling ? 'free' : 'mechanical'; if (c9.bins[i].sim !== want || c9.bins[i].now !== now) bad(`D9 ${tag} bin ${b.ambient_db_c} °C: now ${c9.bins[i].now} / sim ${c9.bins[i].sim}, engine ${now} / ${want}`); });
+      if (c9.bins && !/design/.test((c9.bins.find((x) => /^34/.test(x.a)) || {}).a || '')) bad(`D9 ${tag}: the design ambient bin is not marked`);
+      if (c9.after !== 0) bad(`D9 ${tag}: Reset left ${c9.after} SIMULATED bins`);
       const keys = (j) => JSON.parse(j).filter((x) => /sp|what|sim|setpoint/i.test(x));
       if (keys(r7.ls2).length || keys(r7.ss2).length) bad(`D7 ${tag}: storage keys ${r7.ls2} ${r7.ss2}`);
     }
@@ -142,6 +161,6 @@ async function browserLaws() {
     await pg.close();
   }
   await b.close(); srv.close();
-  console.log(`${n ? 'FAIL' : 'PASS'} D1/D1r/D4/D5/D7 inspector block on datahallAI.html: ${CLASSES.length} classes × 390/1440 × dark/light${n ? ', ' + n + ' findings' : ''}`);
+  console.log(`${n ? 'FAIL' : 'PASS'} D1/D1r/D4/D5/D7/D8/D9 inspector block on datahallAI.html: ${CLASSES.length} classes × 390/1440 × dark/light${n ? ', ' + n + ' findings' : ''}`);
   return n;
 }

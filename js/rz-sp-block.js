@@ -41,7 +41,9 @@
   function wiHtml(r) {
     var a = r.adjustable, u = r.unit ? ' ' + r.unit : '';
     var rows = r.whatIf.map(function (w) {
-      return '<tr data-wi-path="' + esc(w.path) + '" data-wi-unit="' + esc(w.unit) + '" data-wi-now="" data-wi-sim=""><th scope="row">' + esc(w.label) + '</th><td data-k="now">—</td><td data-k="sim">—</td><td data-k="d">—</td></tr>';
+      return '<tr data-wi-path="' + esc(w.path) + '" data-wi-unit="' + esc(w.unit) + '" data-wi-now="" data-wi-sim=""' +
+        (w.nullText ? ' data-wi-null="' + esc(w.nullText) + '"' : '') +
+        (typeof w.ceilingValue === 'number' ? ' data-wi-ceil="' + w.ceilingValue + '" data-wi-ceil-note="' + esc(w.ceilingNote || '') + '"' : '') + '><th scope="row">' + esc(w.label) + '</th><td data-k="now">—</td><td data-k="sim">—</td><td data-k="d">—</td></tr>';
     }).join('');
     return '<div class="rz-cvm-wi" data-rz-cvm-whatif="' + esc(r.id) + '" data-wi-param="' + esc(r.param) + '" data-wi-sp="' + r.value + '" data-wi-unit="' + esc(r.unit) + '">' +
       '<div class="rz-cvm-wi-ctl"><label><span>What-if · ' + esc(r.label) + '</span><input type="range" min="' + a.min + '" max="' + a.max + '" step="' + a.step + '" value="' + r.value + '" aria-label="' + esc('Simulate ' + r.label + ', ' + a.min + ' to ' + a.max + u) + '"></label>' +
@@ -64,6 +66,14 @@
   function dp(n, u) { var a = Math.abs(n); return u === '°C' || u === 'K' ? 1 : a === 0 || a >= 1000 ? 0 : a >= 100 ? 1 : a >= 10 ? 2 : 3; }
   function num(n, d) { return n.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d }); }
   function show(n, u) { return isFinite(n) ? num(n, dp(n, u)) + (u ? ' ' + u : '') : '—'; }
+  /* one what-if cell: a null the engine means (nullText, e.g. "off (free cooling)"), or the number; a value AT the
+     engine's ceiling carries ◆ and the ceiling's note (PRD C1.5: a clamp is shown, never hidden) */
+  function paint(td, tr, n) {
+    var nt = tr.getAttribute('data-wi-null'), ce = tr.getAttribute('data-wi-ceil'), at = ce !== null && isFinite(n) && n === +ce;
+    td.textContent = !isFinite(n) && nt ? nt : show(n, tr.getAttribute('data-wi-unit')) + (at ? ' ◆' : '');
+    if (at) { td.setAttribute('data-wi-clamped', '1'); td.title = tr.getAttribute('data-wi-ceil-note') || 'at the engine ceiling'; }
+    else { td.removeAttribute('data-wi-clamped'); td.removeAttribute('title'); }
+  }
   function bindWhatIf(box, recompute) {
     var C = CP();
     if (box.getAttribute('data-wi-bound')) return;
@@ -71,19 +81,19 @@
     var param = box.getAttribute('data-wi-param'), sp = +box.getAttribute('data-wi-sp'), un = box.getAttribute('data-wi-unit'), u = un ? ' ' + un : '';
     var s = box.querySelector('input[type="range"]'), out = box.querySelector('[data-wi-out]'), trs = box.querySelectorAll('tr[data-wi-path]');
     var s0 = recompute(param, null);
-    for (var i = 0; i < trs.length; i++) { var n0 = s0 ? get(s0, trs[i].getAttribute('data-wi-path')) : NaN; trs[i].setAttribute('data-wi-now', isFinite(n0) ? String(n0) : ''); trs[i].querySelector('[data-k="now"]').textContent = show(n0, trs[i].getAttribute('data-wi-unit')); }
+    for (var i = 0; i < trs.length; i++) { var n0 = s0 ? get(s0, trs[i].getAttribute('data-wi-path')) : NaN; trs[i].setAttribute('data-wi-now', isFinite(n0) ? String(n0) : ''); paint(trs[i].querySelector('[data-k="now"]'), trs[i], n0); }
     function clear() {
       out.textContent = 'SP ' + C.fmt(sp, un) + u; box.removeAttribute('data-wi-active');
-      for (var i = 0; i < trs.length; i++) { trs[i].setAttribute('data-wi-sim', ''); trs[i].querySelector('[data-k="sim"]').textContent = '—'; trs[i].querySelector('[data-k="d"]').textContent = '—'; }
+      for (var i = 0; i < trs.length; i++) { var c = trs[i].querySelector('[data-k="sim"]'); trs[i].setAttribute('data-wi-sim', ''); c.textContent = '—'; c.removeAttribute('data-wi-clamped'); c.removeAttribute('title'); trs[i].querySelector('[data-k="d"]').textContent = '—'; }
     }
     function run() {
       var v = +s.value; if (!isFinite(v) || v === sp) { clear(); return; }
       var s1 = recompute(param, v); if (!s1) { clear(); return; }
       out.textContent = 'SP′ ' + C.fmt(v, un) + u + ' (SIMULATED)'; box.setAttribute('data-wi-active', '1');
       for (var i = 0; i < trs.length; i++) {
-        var tr = trs[i], un2 = tr.getAttribute('data-wi-unit'), n0 = +tr.getAttribute('data-wi-now'), n1 = get(s1, tr.getAttribute('data-wi-path'));
+        var tr = trs[i], un2 = tr.getAttribute('data-wi-unit'), a0 = tr.getAttribute('data-wi-now'), n0 = a0 === '' || a0 === null ? NaN : +a0, n1 = get(s1, tr.getAttribute('data-wi-path'));
         tr.setAttribute('data-wi-sim', isFinite(n1) ? String(n1) : '');
-        tr.querySelector('[data-k="sim"]').textContent = show(n1, un2);
+        paint(tr.querySelector('[data-k="sim"]'), tr, n1);
         var d = n1 - n0, dd = Math.max(dp(n0, un2), dp(n1, un2));
         tr.querySelector('[data-k="d"]').textContent = isFinite(d) ? (d > 0 ? '+' : d < 0 ? '−' : '') + num(Math.abs(d), dd) + (un2 ? ' ' + un2 : '') : '—';
       }
