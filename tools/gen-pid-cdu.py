@@ -12,7 +12,7 @@ SRC = {
     "tiles": {"file": "cdu-mini-bms.html", "ref": "cdu-mini-bms.html lines 661-675, TILES: tag + normal band per instrument"},
     "pid": {"file": "cdu-mini-bms.html", "ref": "cdu-mini-bms.html lines 578-656, pidSVG(): tags, symbols and pipe topology"},
     "compute": {"file": "cdu-mini-bms.html", "ref": "cdu-mini-bms.html lines 728-734, compute(): return = supply + dT, HX approach 5 °C, level 56 %, filter dP 0.28 bar, flow total = flow x capacity"},
-    "note": {"file": "cdu-mini-bms.html", "ref": "cdu-mini-bms.html line 645, setpoint note: 'TCV-01 holds TT-01 = 18 °C (>= dew point +3 °C) · P-01 VFD on ΔP (PDT-02) · N+1 auto-changeover'"},
+    "note": {"file": "cdu-mini-bms.html", "ref": "cdu-mini-bms.html setpoint note: 'TCV-01 holds TT-01 = <type supply> °C (floor 18 °C: dew point + 3 K) · P-01 VFD on ΔP (PDT-02) · N+1 auto-changeover'; the numbers come from the control registry (conv.cdu-mini-bms.tcs_supply_sp, tcs_supply_floor)"},
     "leak": {"file": "cdu-mini-bms.html", "ref": "cdu-mini-bms.html lines 481 and 896: leak switch LSH-01 trips; 'the CDU latches isolation to protect the IT load'"},
     "trend": {"file": "cdu-mini-bms.html", "ref": "cdu-mini-bms.html line 840, TREND_META.flow: OCP cold-plate design point ≈1.5 LPM/kW at a 10 °C rise"},
 }
@@ -72,7 +72,7 @@ instruments = [
     inst("TT-01", "field", 790, 72, {"line": "L-SUP", "after": "FT-01"},
          attributes={"src": "types", "value": "32", "unit": "°C", "band": "17–45"}),
     inst("TIC-01", "dcs", 700, 72, confidence=LOW, name="Supply temperature controller",
-         attributes={"src": "note", "setpoint": "18 °C per the page note, but the in-row type runs 32 °C supply — the page disagrees with itself",
+         attributes={"src": "note", "setpoint": "32 °C (in-row type, control registry conv.cdu-mini-bms.tcs_supply_sp); floor 18 °C = dew point + 3 K",
                      "basis": "implied by the page note 'TCV-01 holds TT-01'; no controller bubble is drawn",
                      "explain": "The page states the loop as 'TCV-01 holds TT-01'. It does not draw the controller, so TIC-01 is inferred and drawn dashed."}),
     inst("TT-02", "field", 700, 548, {"line": "L-RET", "after": "HV-04"},
@@ -147,7 +147,7 @@ page = {
     "sheet": {"drawing_number": "RZ-CDU-01", "title": "CDU secondary (TCS) loop — in-row CDU", "drawing_type": "pid",
               "legend_notes": [
                   "Read from cdu-mini-bms.html (pidSVG, TILES, TYPES.inrow, compute, setpoint note). Values are the in-row type.",
-                  "The page note says TCV-01 holds TT-01 = 18 °C while TYPES.inrow runs a 32 °C supply; both are quoted, neither is chosen.",
+                  "TCV-01 holds TT-01 at the type's supply, 32 °C for in-row (control registry); 18 °C is the dew-point floor, not the setpoint (corrected 2026-11-26, PRD-SETPOINT-SIM P9).",
                   "Every bubble on the page carries a horizontal line, which ISA-5.1 reads as a main-panel device; transmitters are read here as field mounted.",
                   "Not drawn on the page and therefore marked low confidence: TIC-01, PDIC-02, the VFD tags, the TCV-01 bypass, the T-01 tie-in, the relief destination, the trip path."]},
     "equipment": equipment, "components": components, "instruments": instruments,

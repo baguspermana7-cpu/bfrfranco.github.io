@@ -405,5 +405,162 @@
       ],
       "whatIfNote": "Steady state of the DC AI engine at the design point (design ambient 34 °C, shaped weather bins ASSUMED, not a TMY file); dynamics not modelled; nothing is saved."
     }
-  }
+  },
+  "convPageSetpoints": [
+    {
+      "id": "conv.fire-system.jockey_on",
+      "page": "fire-system",
+      "label": "Jockey pump start (header pressure falls to)",
+      "unit": "bar",
+      "value": 11.5,
+      "kind": "cut-in",
+      "control": "the jockey pump controller (pressure switch PSL on the header) starts the jockey pump",
+      "evidenceClass": "ASSUMED",
+      "basis": "NFPA 20 (2022) Annex A.14.2.6 practice: jockey stop = churn + minimum static; jockey start >= 0.7 bar (10 psi) below its stop; the main pump starts 0.35 bar (5 psi) below the jockey start; each further pump >= 0.7 bar (10 psi) lower. The values are this page's design (ASSUMED: no site hydraulic calculation in this repository); law T3 checks the spacing.",
+      "pv": null,
+      "pvNote": "the header pressure is the page's simulated state (PT on the header), not yet a point of the limits registry"
+    },
+    {
+      "id": "conv.fire-system.jockey_off",
+      "page": "fire-system",
+      "label": "Jockey pump stop (header pressure rises to)",
+      "unit": "bar",
+      "value": 12.8,
+      "kind": "cut-out",
+      "control": "the jockey pump controller stops the jockey pump",
+      "evidenceClass": "ASSUMED",
+      "basis": "NFPA 20 (2022) Annex A.14.2.6 practice: jockey stop = churn + minimum static; jockey start >= 0.7 bar (10 psi) below its stop; the main pump starts 0.35 bar (5 psi) below the jockey start; each further pump >= 0.7 bar (10 psi) lower. The values are this page's design (ASSUMED: no site hydraulic calculation in this repository); law T3 checks the spacing.",
+      "pv": null,
+      "pvNote": "the header pressure is the page's simulated state (PT on the header), not yet a point of the limits registry"
+    },
+    {
+      "id": "conv.fire-system.fp1_on",
+      "page": "fire-system",
+      "label": "Main fire pump 1 start",
+      "unit": "bar",
+      "value": 10.5,
+      "kind": "cut-in",
+      "control": "the fire pump 1 controller (NFPA 20 listed) starts on falling header pressure",
+      "evidenceClass": "ASSUMED",
+      "basis": "NFPA 20 (2022) Annex A.14.2.6 practice: jockey stop = churn + minimum static; jockey start >= 0.7 bar (10 psi) below its stop; the main pump starts 0.35 bar (5 psi) below the jockey start; each further pump >= 0.7 bar (10 psi) lower. The values are this page's design (ASSUMED: no site hydraulic calculation in this repository); law T3 checks the spacing.",
+      "pv": null,
+      "pvNote": "the header pressure is the page's simulated state (PT on the header), not yet a point of the limits registry"
+    },
+    {
+      "id": "conv.fire-system.fp2_on",
+      "page": "fire-system",
+      "label": "Main fire pump 2 start",
+      "unit": "bar",
+      "value": 9.5,
+      "kind": "cut-in",
+      "control": "the fire pump 2 controller starts on falling header pressure, staggered below pump 1",
+      "evidenceClass": "ASSUMED",
+      "basis": "NFPA 20 (2022) Annex A.14.2.6 practice: jockey stop = churn + minimum static; jockey start >= 0.7 bar (10 psi) below its stop; the main pump starts 0.35 bar (5 psi) below the jockey start; each further pump >= 0.7 bar (10 psi) lower. The values are this page's design (ASSUMED: no site hydraulic calculation in this repository); law T3 checks the spacing.",
+      "pv": null,
+      "pvNote": "the header pressure is the page's simulated state (PT on the header), not yet a point of the limits registry"
+    },
+    {
+      "id": "conv.fire-system.header_low_alarm",
+      "page": "fire-system",
+      "label": "Header low-pressure alarm",
+      "unit": "bar",
+      "value": 8.5,
+      "kind": "alarm",
+      "side": "lo_alarm",
+      "evidenceClass": "ASSUMED",
+      "basis": "below both pump starts, so it only sounds when the pumps cannot hold the header; value is this page's design (ASSUMED)",
+      "pv": null,
+      "pvNote": "the header pressure is the page's simulated state (PT on the header), not yet a point of the limits registry"
+    },
+    {
+      "id": "conv.fuel-system.day_tank_fill_start",
+      "page": "fuel-system",
+      "label": "Day-tank fill start (running set)",
+      "unit": "%",
+      "value": 50,
+      "kind": "cut-in",
+      "control": "the day-tank level controller opens the fill valve and calls transfer pump P-101",
+      "evidenceClass": "ASSUMED",
+      "basis": "NFPA 110 (2022) §7.9.1 requires a day tank sized and refilled to keep the set running; start and stop levels are this page's design (ASSUMED, no source states them)",
+      "pv": [
+        "fuel-system.DT.level_pct"
+      ]
+    },
+    {
+      "id": "conv.fuel-system.day_tank_fill_stop",
+      "page": "fuel-system",
+      "label": "Day-tank fill stop",
+      "unit": "%",
+      "value": 90,
+      "kind": "cut-out",
+      "control": "the day-tank level controller closes the fill valve (high level)",
+      "evidenceClass": "ASSUMED",
+      "basis": "leaves 10 % headspace below the overflow; this page's design (ASSUMED)",
+      "pv": [
+        "fuel-system.DT.level_pct"
+      ]
+    },
+    {
+      "id": "conv.fuel-system.day_tank_min_pct",
+      "page": "fuel-system",
+      "label": "Day-tank level kept while fill is available",
+      "unit": "%",
+      "value": 45,
+      "kind": "design",
+      "evidenceClass": "ASSUMED",
+      "basis": "the fill answers within a few scans, so a running set's tank never falls below this; 45 % of 4 h = 1.8 h at rated burn (checked by tools/test-conv-fuel-truth.mjs)",
+      "pv": [
+        "fuel-system.DT.level_pct"
+      ]
+    },
+    {
+      "id": "conv.fuel-system.day_tank_lowlow",
+      "page": "fuel-system",
+      "label": "Day-tank low-low alarm",
+      "unit": "%",
+      "value": 25,
+      "kind": "alarm",
+      "side": "lo_alarm",
+      "evidenceClass": "ASSUMED",
+      "basis": "this page's design (ASSUMED); the point band lo_alarm 25 % agrees",
+      "pv": [
+        "fuel-system.DT.level_pct"
+      ]
+    },
+    {
+      "id": "conv.cdu-mini-bms.tcs_supply_sp",
+      "page": "cdu-mini-bms",
+      "label": "TCS supply (TCV-01 holds TT-01)",
+      "unit": "°C",
+      "kind": "modulating",
+      "byVariant": {
+        "inrack": 30,
+        "inrow": 32,
+        "sidecar": 30,
+        "l2l": 34,
+        "l2a": 33
+      },
+      "control": "TCV-01, the CDU three-way valve, holds the secondary supply TT-01 (direct acting PI in the unit controller)",
+      "evidenceClass": "ASSUMED",
+      "basis": "per CDU type, the supply this page's model runs at; ASHRAE TC9.9 liquid-cooling W classes cap it (W32 / W40); the floor is room dew point + 3 K (18 °C, the point's low warning)",
+      "pv": [
+        "cdu-mini-bms.TT-01.supply_c"
+      ]
+    },
+    {
+      "id": "conv.cdu-mini-bms.tcs_supply_floor",
+      "page": "cdu-mini-bms",
+      "label": "TCS supply floor (room dew point + 3 K)",
+      "unit": "°C",
+      "value": 18,
+      "kind": "alarm",
+      "side": "lo_warn",
+      "equalsLimit": "cdu-mini-bms.TT-01.supply_c",
+      "evidenceClass": "ASSUMED",
+      "basis": "hold the secondary supply at least 3 K above the room dew point (ASHRAE TC9.9 liquid cooling guidance); it is the TT-01 point's low warning, and the builder refuses a different number",
+      "pv": [
+        "cdu-mini-bms.TT-01.supply_c"
+      ]
+    }
+  ]
 }

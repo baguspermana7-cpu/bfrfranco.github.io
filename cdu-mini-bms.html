@@ -459,11 +459,11 @@
 
     <!-- PRD-CONV-POINT-STATUS-TREND T3: every number shows its state from the limits registry and opens its trend -->
     <link rel="stylesheet" href="css/conv-point.css?v=20261120-8daa6374">
-    <script src="js/conv-parameters.js?v=20261125-83a5f053"></script>
+    <script src="js/conv-parameters.js?v=20261126-fd980abd"></script>
     <script src="js/conv/history.js?v=20261120-8d390d7e"></script>
     <script src="js/rz-sheet.js?v=20261121-67db3ea5" defer></script>
     <script src="js/rz-trend.js?v=20261123-5b150d9f"></script>
-    <script src="js/rz-control-points.js?v=20261126-d149e6dd"></script>
+    <script src="js/rz-control-points.js?v=20261126-cd347294"></script>
     <script src="js/conv/point-status.js?v=20261123-0de9d3e8"></script>
 
     <footer class="footer footer-enhanced">
@@ -485,16 +485,19 @@
         var _nav=document.querySelector('.navbar'); function _ns(){ if(_nav) _nav.classList.toggle('scrolled', window.scrollY>10); } window.addEventListener('scroll',_ns,{passive:true}); _ns();
 
         /* ---------- CDU type model ---------- */
+        /* PRD-SETPOINT-SIM P9: the supply TCV-01 holds per CDU type comes from the control registry (convPageSetpoints);
+           value() throws when one is missing */
+        var CPV = window.RZControlPoints.value;
         var TYPES={
-            inrack:{ name:'In-Rack', cap:80, arch:'L2L', supply:30, dT:10, flow:1.30, dP:1.2, sysP:3.5, fac:'CDW',
+            inrack:{ name:'In-Rack', cap:80, arch:'L2L', supply:CPV('conv.cdu-mini-bms.tcs_supply_sp','inrack'), dT:10, flow:1.30, dP:1.2, sysP:3.5, fac:'CDW',
                 desc:'A 3U–4U CDU mounted <b>inside the rack</b> it serves. Shortest possible tubing run; one unit per rack. Best for staged, per-rack roll-outs.' },
-            inrow:{ name:'In-Row', cap:300, arch:'L2L', supply:32, dT:11, flow:1.30, dP:1.6, sysP:4.0, fac:'CDW',
+            inrow:{ name:'In-Row', cap:300, arch:'L2L', supply:CPV('conv.cdu-mini-bms.tcs_supply_sp','inrow'), dT:11, flow:1.30, dP:1.6, sysP:4.0, fac:'CDW',
                 desc:'A cabinet <b>between racks in the row</b>, serving several adjacent racks. The workhorse density tier — higher capacity than in-rack, simpler than facility-scale.' },
-            sidecar:{ name:'Sidecar', cap:120, arch:'L2L', supply:30, dT:9, flow:1.20, dP:1.1, sysP:3.2, fac:'CDW',
+            sidecar:{ name:'Sidecar', cap:120, arch:'L2L', supply:CPV('conv.cdu-mini-bms.tcs_supply_sp','sidecar'), dT:9, flow:1.20, dP:1.1, sysP:3.2, fac:'CDW',
                 desc:'A slim unit <b>bolted to the side of a rack</b> — between in-rack and in-row. Frees rack U-space while keeping the run short.' },
-            l2l:{ name:'L2L · End-of-Row', cap:1200, arch:'L2L', supply:34, dT:12, flow:1.25, dP:2.2, sysP:4.5, fac:'CDW',
+            l2l:{ name:'L2L · End-of-Row', cap:1200, arch:'L2L', supply:CPV('conv.cdu-mini-bms.tcs_supply_sp','l2l'), dT:12, flow:1.25, dP:2.2, sysP:4.5, fac:'CDW',
                 desc:'A large <b>liquid-to-liquid</b> CDU at the <b>end of the row</b>, rejecting to the <b>facility water</b> plant. Economy of scale; needs a chilled/condenser-water loop.' },
-            l2a:{ name:'L2A · Air-cooled', cap:60, arch:'L2A', supply:33, dT:9, flow:1.20, dP:1.0, sysP:3.0, fac:'AIR',
+            l2a:{ name:'L2A · Air-cooled', cap:60, arch:'L2A', supply:CPV('conv.cdu-mini-bms.tcs_supply_sp','l2a'), dT:9, flow:1.20, dP:1.0, sysP:3.0, fac:'AIR',
                 desc:'A <b>liquid-to-air</b> CDU that rejects heat to <b>room air</b> — no facility water. Retrofit-friendly, but the room CRAH/CRAC must absorb the heat, capping density.' }
         };
         // each fault propagates to the parameters it physically affects, so correlated
@@ -677,7 +680,7 @@
             // ===== leak rope + setpoint note + legend strip =====
             h+='<line x1="135" y1="322" x2="392" y2="322" stroke="var(--bm-muted)" stroke-width="1" stroke-dasharray="2 3"/><text class="sch-sub" x="138" y="319">leak rope LSH-01</text>';
             h+='<g class="leak-x'+(curScen==='leak'?' on':'')+'"><line x1="251" y1="315" x2="265" y2="329"/><line x1="265" y1="315" x2="251" y2="329"/></g>';
-            h+='<text class="sch-sub" x="8" y="352" data-const>SETPOINT — TCV-01 holds TT-01 = 18 °C (≥ dew point +3 °C) · P-01 VFD on ΔP (PDT-02) · N+1 auto-changeover</text>';
+            h+='<text class="sch-sub" x="8" y="352" data-const><title>Floor = room dew point + 3 K (TT-01 low warning). Values from the control registry.</title>SETPOINT — TCV-01 holds TT-01 = '+t.supply+' °C (floor '+CPV('conv.cdu-mini-bms.tcs_supply_floor')+' °C) · P-01 VFD on ΔP (PDT-02) · N+1 auto-changeover</text>';
             // legend strip (bottom) — simple inline symbols, tight spacing
             h+='<g transform="translate(120,368)">'
              + '<path class="sch-eq" d="M2 -4 L9 1 L2 6 Z M16 -4 L9 1 L16 6 Z"/><text class="sch-sub" x="22" y="4">iso valve</text>'

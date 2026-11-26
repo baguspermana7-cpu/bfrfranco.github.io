@@ -178,6 +178,74 @@
       }
     },
     {
+      "id": "conv.cdu-mini-bms.tcs_supply_floor",
+      "cockpit": "conv",
+      "equipment": "cdu-mini-bms",
+      "label": "TCS supply floor (room dew point + 3 K)",
+      "unit": "°C",
+      "page": "cdu-mini-bms",
+      "kind": "alarm",
+      "pvNote": null,
+      "limits": {
+        "lo_warn": 18,
+        "basis": "hold the secondary supply at least 3 K above the room dew point (ASHRAE TC9.9 liquid cooling guidance); it is the TT-01 point's low warning, and the builder refuses a different number",
+        "evidenceClass": "ASSUMED",
+        "source": {
+          "ref": "data/control-points.curated.json convPageSetpoints",
+          "why": "hold the secondary supply at least 3 K above the room dew point (ASHRAE TC9.9 liquid cooling guidance); it is the TT-01 point's low warning, and the builder refuses a different number"
+        }
+      },
+      "threshold": {
+        "value": 18,
+        "byVariant": null,
+        "kind": "alarm"
+      }
+    },
+    {
+      "id": "conv.cdu-mini-bms.tcs_supply_sp",
+      "cockpit": "conv",
+      "equipment": "cdu-mini-bms",
+      "label": "TCS supply (TCV-01 holds TT-01)",
+      "unit": "°C",
+      "page": "cdu-mini-bms",
+      "kind": "modulating",
+      "pvNote": null,
+      "sp": {
+        "value": null,
+        "byVariant": {
+          "inrack": 30,
+          "inrow": 32,
+          "sidecar": 30,
+          "l2l": 34,
+          "l2a": 33
+        },
+        "role": "setpoint",
+        "kind": "modulating",
+        "pv": [
+          "cdu-mini-bms.TT-01.supply_c"
+        ],
+        "from": "page control number (registry)",
+        "evidenceClass": "ASSUMED",
+        "source": {
+          "ref": "data/control-points.curated.json convPageSetpoints",
+          "why": "per CDU type, the supply this page's model runs at; ASHRAE TC9.9 liquid-cooling W classes cap it (W32 / W40); the floor is room dew point + 3 K (18 °C, the point's low warning)"
+        },
+        "control": "TCV-01, the CDU three-way valve, holds the secondary supply TT-01 (direct acting PI in the unit controller)",
+        "adjustable": null
+      },
+      "threshold": {
+        "value": null,
+        "byVariant": {
+          "inrack": 30,
+          "inrow": 32,
+          "sidecar": 30,
+          "l2l": 34,
+          "l2a": 33
+        },
+        "kind": "modulating"
+      }
+    },
+    {
       "id": "conv.chiller-plant.cdw_supply_sp",
       "cockpit": "conv",
       "equipment": "cooling-tower",
@@ -772,6 +840,150 @@
       }
     },
     {
+      "id": "conv.fire-system.fp1_on",
+      "cockpit": "conv",
+      "equipment": "fire-system",
+      "label": "Main fire pump 1 start",
+      "unit": "bar",
+      "page": "fire-system",
+      "kind": "cut-in",
+      "pvNote": "the header pressure is the page's simulated state (PT on the header), not yet a point of the limits registry",
+      "sp": {
+        "value": 10.5,
+        "byVariant": null,
+        "role": "setpoint",
+        "kind": "cut-in",
+        "pv": null,
+        "from": "page control number (registry)",
+        "evidenceClass": "ASSUMED",
+        "source": {
+          "ref": "data/control-points.curated.json convPageSetpoints",
+          "why": "NFPA 20 (2022) Annex A.14.2.6 practice: jockey stop = churn + minimum static; jockey start >= 0.7 bar (10 psi) below its stop; the main pump starts 0.35 bar (5 psi) below the jockey start; each further pump >= 0.7 bar (10 psi) lower. The values are this page's design (ASSUMED: no site hydraulic calculation in this repository); law T3 checks the spacing."
+        },
+        "control": "the fire pump 1 controller (NFPA 20 listed) starts on falling header pressure",
+        "adjustable": null
+      },
+      "threshold": {
+        "value": 10.5,
+        "byVariant": null,
+        "kind": "cut-in"
+      }
+    },
+    {
+      "id": "conv.fire-system.fp2_on",
+      "cockpit": "conv",
+      "equipment": "fire-system",
+      "label": "Main fire pump 2 start",
+      "unit": "bar",
+      "page": "fire-system",
+      "kind": "cut-in",
+      "pvNote": "the header pressure is the page's simulated state (PT on the header), not yet a point of the limits registry",
+      "sp": {
+        "value": 9.5,
+        "byVariant": null,
+        "role": "setpoint",
+        "kind": "cut-in",
+        "pv": null,
+        "from": "page control number (registry)",
+        "evidenceClass": "ASSUMED",
+        "source": {
+          "ref": "data/control-points.curated.json convPageSetpoints",
+          "why": "NFPA 20 (2022) Annex A.14.2.6 practice: jockey stop = churn + minimum static; jockey start >= 0.7 bar (10 psi) below its stop; the main pump starts 0.35 bar (5 psi) below the jockey start; each further pump >= 0.7 bar (10 psi) lower. The values are this page's design (ASSUMED: no site hydraulic calculation in this repository); law T3 checks the spacing."
+        },
+        "control": "the fire pump 2 controller starts on falling header pressure, staggered below pump 1",
+        "adjustable": null
+      },
+      "threshold": {
+        "value": 9.5,
+        "byVariant": null,
+        "kind": "cut-in"
+      }
+    },
+    {
+      "id": "conv.fire-system.header_low_alarm",
+      "cockpit": "conv",
+      "equipment": "fire-system",
+      "label": "Header low-pressure alarm",
+      "unit": "bar",
+      "page": "fire-system",
+      "kind": "alarm",
+      "pvNote": "the header pressure is the page's simulated state (PT on the header), not yet a point of the limits registry",
+      "limits": {
+        "lo_alarm": 8.5,
+        "basis": "below both pump starts, so it only sounds when the pumps cannot hold the header; value is this page's design (ASSUMED)",
+        "evidenceClass": "ASSUMED",
+        "source": {
+          "ref": "data/control-points.curated.json convPageSetpoints",
+          "why": "below both pump starts, so it only sounds when the pumps cannot hold the header; value is this page's design (ASSUMED)"
+        }
+      },
+      "threshold": {
+        "value": 8.5,
+        "byVariant": null,
+        "kind": "alarm"
+      }
+    },
+    {
+      "id": "conv.fire-system.jockey_off",
+      "cockpit": "conv",
+      "equipment": "fire-system",
+      "label": "Jockey pump stop (header pressure rises to)",
+      "unit": "bar",
+      "page": "fire-system",
+      "kind": "cut-out",
+      "pvNote": "the header pressure is the page's simulated state (PT on the header), not yet a point of the limits registry",
+      "sp": {
+        "value": 12.8,
+        "byVariant": null,
+        "role": "setpoint",
+        "kind": "cut-out",
+        "pv": null,
+        "from": "page control number (registry)",
+        "evidenceClass": "ASSUMED",
+        "source": {
+          "ref": "data/control-points.curated.json convPageSetpoints",
+          "why": "NFPA 20 (2022) Annex A.14.2.6 practice: jockey stop = churn + minimum static; jockey start >= 0.7 bar (10 psi) below its stop; the main pump starts 0.35 bar (5 psi) below the jockey start; each further pump >= 0.7 bar (10 psi) lower. The values are this page's design (ASSUMED: no site hydraulic calculation in this repository); law T3 checks the spacing."
+        },
+        "control": "the jockey pump controller stops the jockey pump",
+        "adjustable": null
+      },
+      "threshold": {
+        "value": 12.8,
+        "byVariant": null,
+        "kind": "cut-out"
+      }
+    },
+    {
+      "id": "conv.fire-system.jockey_on",
+      "cockpit": "conv",
+      "equipment": "fire-system",
+      "label": "Jockey pump start (header pressure falls to)",
+      "unit": "bar",
+      "page": "fire-system",
+      "kind": "cut-in",
+      "pvNote": "the header pressure is the page's simulated state (PT on the header), not yet a point of the limits registry",
+      "sp": {
+        "value": 11.5,
+        "byVariant": null,
+        "role": "setpoint",
+        "kind": "cut-in",
+        "pv": null,
+        "from": "page control number (registry)",
+        "evidenceClass": "ASSUMED",
+        "source": {
+          "ref": "data/control-points.curated.json convPageSetpoints",
+          "why": "NFPA 20 (2022) Annex A.14.2.6 practice: jockey stop = churn + minimum static; jockey start >= 0.7 bar (10 psi) below its stop; the main pump starts 0.35 bar (5 psi) below the jockey start; each further pump >= 0.7 bar (10 psi) lower. The values are this page's design (ASSUMED: no site hydraulic calculation in this repository); law T3 checks the spacing."
+        },
+        "control": "the jockey pump controller (pressure switch PSL on the header) starts the jockey pump",
+        "adjustable": null
+      },
+      "threshold": {
+        "value": 11.5,
+        "byVariant": null,
+        "kind": "cut-in"
+      }
+    },
+    {
       "id": "conv.fire.level_pct",
       "cockpit": "conv",
       "equipment": "fire",
@@ -826,19 +1038,19 @@
       "unit": "%",
       "limits": {
         "lo_alarm": 25,
-        "lo_warn": 30,
+        "lo_warn": 45,
         "deadband": 0.5,
-        "basis": "The fuel mimic's day-tank basis (FU-M-101): lead pump refills at DT_LOW 30 % (warn below it), low-low interlock at DT_LOWLOW 25 % (alarm). DT_HIGH 90 % is the pump stop setpoint, not a limit.",
+        "basis": "The fuel page's day-tank control numbers (control registry, PRD-SETPOINT-SIM P9): fill opens on a running set below 50 % and closes at 90 %, so while fill is available a running set's tank never falls below 45 % (1.8 h at rated burn): below 45 % means the fill has failed (warn); low-low 25 % (alarm). Corrected 2026-11-26: the band said warn 30 % from an older page (DT_LOW 30) while the page had moved to 50 / 45; law C16 keeps them equal.",
         "evidenceClass": "ASSUMED",
         "source": {
-          "ref": "fuel-system.html",
-          "section": "day-tank refill logic (DT_LOW / DT_LOWLOW / DT_HIGH)",
-          "asOf": "2026-11-20"
+          "ref": "data/control-points.curated.json",
+          "section": "convPageSetpoints conv.fuel-system.day_tank_min_pct / day_tank_lowlow",
+          "asOf": "2026-11-26"
         }
       },
       "nominal": {
-        "value": 60,
-        "ref": "midpoint of the refill cycle DT_LOW 30 … DT_HIGH 90"
+        "value": 70,
+        "ref": "midpoint of the fill cycle: fill start 50 … fill stop 90 (control registry conv.fuel-system.day_tank_fill_start / _stop)"
       }
     },
     {
@@ -861,6 +1073,126 @@
       "nominal": {
         "value": 60,
         "ref": "ASSUMED operating point inside the engine's max loading"
+      }
+    },
+    {
+      "id": "conv.fuel-system.day_tank_fill_start",
+      "cockpit": "conv",
+      "equipment": "fuel-system",
+      "label": "Day-tank fill start (running set)",
+      "unit": "%",
+      "page": "fuel-system",
+      "kind": "cut-in",
+      "pvNote": null,
+      "sp": {
+        "value": 50,
+        "byVariant": null,
+        "role": "setpoint",
+        "kind": "cut-in",
+        "pv": [
+          "fuel-system.DT.level_pct"
+        ],
+        "from": "page control number (registry)",
+        "evidenceClass": "ASSUMED",
+        "source": {
+          "ref": "data/control-points.curated.json convPageSetpoints",
+          "why": "NFPA 110 (2022) §7.9.1 requires a day tank sized and refilled to keep the set running; start and stop levels are this page's design (ASSUMED, no source states them)"
+        },
+        "control": "the day-tank level controller opens the fill valve and calls transfer pump P-101",
+        "adjustable": null
+      },
+      "threshold": {
+        "value": 50,
+        "byVariant": null,
+        "kind": "cut-in"
+      }
+    },
+    {
+      "id": "conv.fuel-system.day_tank_fill_stop",
+      "cockpit": "conv",
+      "equipment": "fuel-system",
+      "label": "Day-tank fill stop",
+      "unit": "%",
+      "page": "fuel-system",
+      "kind": "cut-out",
+      "pvNote": null,
+      "sp": {
+        "value": 90,
+        "byVariant": null,
+        "role": "setpoint",
+        "kind": "cut-out",
+        "pv": [
+          "fuel-system.DT.level_pct"
+        ],
+        "from": "page control number (registry)",
+        "evidenceClass": "ASSUMED",
+        "source": {
+          "ref": "data/control-points.curated.json convPageSetpoints",
+          "why": "leaves 10 % headspace below the overflow; this page's design (ASSUMED)"
+        },
+        "control": "the day-tank level controller closes the fill valve (high level)",
+        "adjustable": null
+      },
+      "threshold": {
+        "value": 90,
+        "byVariant": null,
+        "kind": "cut-out"
+      }
+    },
+    {
+      "id": "conv.fuel-system.day_tank_lowlow",
+      "cockpit": "conv",
+      "equipment": "fuel-system",
+      "label": "Day-tank low-low alarm",
+      "unit": "%",
+      "page": "fuel-system",
+      "kind": "alarm",
+      "pvNote": null,
+      "limits": {
+        "lo_alarm": 25,
+        "basis": "this page's design (ASSUMED); the point band lo_alarm 25 % agrees",
+        "evidenceClass": "ASSUMED",
+        "source": {
+          "ref": "data/control-points.curated.json convPageSetpoints",
+          "why": "this page's design (ASSUMED); the point band lo_alarm 25 % agrees"
+        }
+      },
+      "threshold": {
+        "value": 25,
+        "byVariant": null,
+        "kind": "alarm"
+      }
+    },
+    {
+      "id": "conv.fuel-system.day_tank_min_pct",
+      "cockpit": "conv",
+      "equipment": "fuel-system",
+      "label": "Day-tank level kept while fill is available",
+      "unit": "%",
+      "page": "fuel-system",
+      "kind": "design",
+      "pvNote": null,
+      "sp": {
+        "value": 45,
+        "byVariant": null,
+        "role": "reference",
+        "kind": "design",
+        "pv": [
+          "fuel-system.DT.level_pct"
+        ],
+        "from": "page control number (registry)",
+        "evidenceClass": "ASSUMED",
+        "source": {
+          "ref": "data/control-points.curated.json convPageSetpoints",
+          "why": "the fill answers within a few scans, so a running set's tank never falls below this; 45 % of 4 h = 1.8 h at rated burn (checked by tools/test-conv-fuel-truth.mjs)"
+        },
+        "control": null,
+        "adjustable": null
+      },
+      "threshold": {
+        "value": 45,
+        "byVariant": null,
+        "kind": "design"
       }
     },
     {

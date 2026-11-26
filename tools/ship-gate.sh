@@ -210,7 +210,8 @@ gate "Conventional history — deterministic series per point, stats, limits, CS
 # 1H/8H/1D/7D/30D ranges, bands, state header, stats and phone sheet; the coverage ratchet keeps unclassified numbers falling.
 gate "Conventional point status core — classify thresholds + deadband, limits registry rows, normal past >= 99 % (P-6), planted defects" node --test tools/test-conv-point-status-core.mjs
 gate "Conventional trend ranges — open click/Enter/tap, 1H..30D window + stats, last point = page value, header state, bands = registry, keys 1-5, Esc, 390 sheet, contrast" node tools/test-conv-trend-ranges.mjs
-gate "Conventional control registry — C1-C13: setpoint vs reference, sources, pv bound on a page, browser twin fresh, modal class" node tools/test-control-registry.mjs
+gate "Conventional control registry — C1-C16: setpoint vs reference, sources, pv bound on a page, browser twin fresh, modal class, page control numbers value(), NFPA 20 switch spacing + fuel band agreement" node tools/test-control-registry.mjs
+gate "Conventional typed control numbers — T1 ratchet 0 on the conv pages (fire, fuel, cdu-mini read the registry), T3 the page follows a changed registry number" node tools/test-typed-control-numbers.mjs --browser
 gate "Conventional sequences — Q1-Q5: chiller, CHW secondary pump, tower cell and CRAH modes with entry/actions/exit, graph closed, no typed threshold, assumed delays listed, scenario walk, twin fresh" node tools/test-sequences.mjs
 gate "Conventional setpoints shown — S2 tooltip = registry, S3 trend SP line, S4 modal Setpoints & limits, S5 what-if = Node recompute, S7 sequence walk, S9 no page errors" node tools/test-setpoint-sim.mjs
 gate "Conventional point coverage — ratchet: unclassified numbers on the 9 cockpits only fall (tools/conv-point-coverage-baseline.json)" node tools/test-conv-point-coverage.mjs

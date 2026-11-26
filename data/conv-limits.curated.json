@@ -199,11 +199,11 @@
       "id": "fuel-system.DT.level_pct",
       "label": "Day-tank level (running genset)",
       "unit": "%",
-      "lo_alarm": 25, "lo_warn": 30, "hi_warn": null, "hi_alarm": null, "deadband": 0.5,
-      "nominal": { "value": 60, "ref": "midpoint of the refill cycle DT_LOW 30 … DT_HIGH 90" },
-      "basis": "The fuel mimic's day-tank basis (FU-M-101): lead pump refills at DT_LOW 30 % (warn below it), low-low interlock at DT_LOWLOW 25 % (alarm). DT_HIGH 90 % is the pump stop setpoint, not a limit.",
+      "lo_alarm": 25, "lo_warn": 45, "hi_warn": null, "hi_alarm": null, "deadband": 0.5,
+      "nominal": { "value": 70, "ref": "midpoint of the fill cycle: fill start 50 … fill stop 90 (control registry conv.fuel-system.day_tank_fill_start / _stop)" },
+      "basis": "The fuel page's day-tank control numbers (control registry, PRD-SETPOINT-SIM P9): fill opens on a running set below 50 % and closes at 90 %, so while fill is available a running set's tank never falls below 45 % (1.8 h at rated burn): below 45 % means the fill has failed (warn); low-low 25 % (alarm). Corrected 2026-11-26: the band said warn 30 % from an older page (DT_LOW 30) while the page had moved to 50 / 45; law C16 keeps them equal.",
       "evidenceClass": "ASSUMED",
-      "source": { "ref": "fuel-system.html", "section": "day-tank refill logic (DT_LOW / DT_LOWLOW / DT_HIGH)", "asOf": "2026-11-20" },
+      "source": { "ref": "data/control-points.curated.json", "section": "convPageSetpoints conv.fuel-system.day_tank_min_pct / day_tank_lowlow", "asOf": "2026-11-26" },
       "migratedFrom": "fuel-system.html:1071 DT_LOW = 30, DT_LOWLOW = 25, DT_HIGH = 90"
     },
     {

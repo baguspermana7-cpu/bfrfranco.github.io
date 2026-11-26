@@ -984,3 +984,20 @@ RZSpBlock.bind(host, { recompute })  → wires sliders (input → recompute → 
   dropped in the inspector. Cliff cells never wrap.
 - Laws D6, D8, D9 and the stricter D4 (see CONTROL_SETPOINT_STANDARD §5).
 
+## C13. P9 part 1 delivered (2026-11-26)
+
+- **Registry.** 11 page control numbers in `convPageSetpoints`, built into `data/control-points.json` with kind
+  (cut-in, cut-out, modulating, alarm, design), basis and evidence class (all ASSUMED: page design, no site document).
+  Twin `RZControlPoints.value(id[, variant])` 1.3.0.
+- **Pages.** `fire-system.html`, `fuel-system.html` and `cdu-mini-bms.html` read every control number from the twin;
+  typed control numbers on the conv pages 10 → 0 (T1).
+- **Two errors found and fixed by the laws.**
+  - The fuel day-tank point band warned at 30 % (an older page's refill level) while the page fills at 50 % and keeps
+    45 %: the band is now warn 45 / alarm 25 (C16 keeps band and page equal).
+  - The CDU schematic said "TCV-01 holds TT-01 = 18 °C" while the model holds TT-01 at the type's supply (30–34 °C); 18 °C
+    is the dew-point floor. The note now prints the type's setpoint and the floor, both from the registry; the CDU P&ID
+    data (`data/pid/cdu-secondary-loop.json`) says the same.
+- **Not in this part.** Water booster: the page states lead/lag with no pressure value, so there is no number to move
+  ("not modelled"). Drawn loops for the pressure switches (fire), the day-tank LIC (fuel) and TIC/PDIC on the CDU sheet
+  are P9 part 2. P-01 ΔP setpoint: the CDU model has no value ("not modelled").
+

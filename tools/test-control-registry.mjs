@@ -51,9 +51,11 @@ for (const r of rows) {
   if (r.sp) {
     ok(!!(r.sp.source && r.sp.source.ref) && EVID.has(r.sp.evidenceClass), `C3 ${r.id} setpoint without source or evidence class (${r.sp.evidenceClass})`);
     let live = null;
-    if (r.cockpit === 'conv') { const p = PARAM[r.sp.param]; ok(!!p, `C4 ${r.id} sp.param ${r.sp.param} is not an engine parameter`); live = p ? p.value : null; }
+    /* P9 a page control number is the registry's own value (the page reads it back; law T2): a number, or one per variant */
+    if (r.page) { const v = r.sp.byVariant ? Object.values(r.sp.byVariant) : [r.sp.value]; ok(v.length > 0 && v.every((x) => typeof x === 'number' && isFinite(x)), `C4 ${r.id} page control number ${JSON.stringify(r.sp.value)}`); }
+    else if (r.cockpit === 'conv') { const p = PARAM[r.sp.param]; ok(!!p, `C4 ${r.id} sp.param ${r.sp.param} is not an engine parameter`); live = p ? p.value : null; }
     else live = PTS.setpoint(r.source.point, snap);
-    ok(typeof r.sp.value === 'number' && typeof live === 'number' && Math.abs(r.sp.value - live) < 1e-9, `C4 ${r.id} sp ${r.sp.value} but the engine says ${live}`);
+    if (!r.page) ok(typeof r.sp.value === 'number' && typeof live === 'number' && Math.abs(r.sp.value - live) < 1e-9, `C4 ${r.id} sp ${r.sp.value} but the engine says ${live}`);
     ok(r.sp.role === 'setpoint' || r.sp.role === 'reference', `C8 ${r.id} sp.role ${r.sp.role}`);
     if (r.sp.role === 'setpoint') ok(!!r.sp.control, `C8 ${r.id} is called a setpoint but names no controller that holds it`);
     if (r.cockpit === 'dcai' && r.sp.from.startsWith('plane ')) {   /* one controller per plane: a plane is a setpoint on one class only */
@@ -83,7 +85,14 @@ const scan = (dir, re) => fs.readdirSync(path.join(ROOT, dir)).filter((f) => re.
   for (const m of t.matchAll(/data-point="([^"]+)"|\bpoint:\s*'([^']+)'/g)) bound.add(m[1] || m[2]);
 });
 scan('.', /\.html$/); scan('js/conv', /\.js$/);
-for (const r of rows.filter((x) => x.cockpit === 'conv' && x.sp)) {
+/* P9 a page control number names its point by the limits-registry id (the page draws it from its own state), or says
+   why it has none (pvNote) */
+const LIMIT_IDS = new Set(rows.filter((x) => x.cockpit === 'conv' && x.limits && !x.page).map((x) => x.id.slice(5)));
+for (const r of rows.filter((x) => x.page && x.sp)) {
+  if (r.sp.pv) r.sp.pv.forEach((p) => ok(LIMIT_IDS.has(p), `C10 ${r.id} pv ${p} is not a point of the limits registry`));
+  else ok(!!r.pvNote && r.pvNote.length >= 20, `C10 ${r.id} names no point and says not why (pvNote)`);
+}
+for (const r of rows.filter((x) => x.cockpit === 'conv' && x.sp && !x.page)) {
   ok(Array.isArray(r.sp.pv) && r.sp.pv.length > 0, `C10 ${r.id} names no live point (sp.pv)`);
   (r.sp.pv || []).forEach((p) => ok(bound.has(p), `C10 ${r.id} pv ${p} is bound on no page`));
 }
@@ -158,7 +167,7 @@ try {
     const C = sb.RZControlPoints;
     ok(!!(C && C.spOf && C.tipFor), 'C11 window.RZControlPoints lacks spOf / tipFor');
     if (C && C.spOf) {
-      for (const r of rows.filter((x) => x.cockpit === 'conv' && x.sp && x.sp.pv)) for (const p of r.sp.pv) {
+      for (const r of rows.filter((x) => x.cockpit === 'conv' && x.sp && x.sp.pv && !x.page)) for (const p of r.sp.pv) {
         const s = C.spOf(p);
         ok(!!s && s.value === r.sp.value, `C11 spOf(${p}) = ${JSON.stringify(s)}, registry ${r.sp.value}`);
         ok(!!s && /^SP -?\d/.test(s.label), `C11 spOf(${p}).label "${s && s.label}"`);
@@ -175,7 +184,7 @@ try {
         const k = /var KINDS = \{([\s\S]*?)\n {2}\};/.exec(t); if (k) for (const m of k[1].matchAll(/^\s{4}([a-z_]+):/gm)) CLASSES.add(m[1]);
       });
       const want = {};
-      for (const r of rows.filter((x) => x.cockpit === 'conv' && x.sp)) {
+      for (const r of rows.filter((x) => x.cockpit === 'conv' && x.sp && !x.page)) {
         ok(!!r.sp.classKey && CLASSES.has(r.sp.classKey), `C12 ${r.id} classKey ${r.sp.classKey} is not an equipment-modal class (${[...CLASSES].join(', ')})`);
         (want[r.sp.classKey] = want[r.sp.classKey] || []).push(r.id);
       }
@@ -200,6 +209,41 @@ try {
       ok(!!x && g.value === x.sp.value && g.role === x.sp.role && g.pv[0] === x.id.slice(5) && (x.sp.role !== 'reference' || g.heldBy === x.sp.heldBy) && g.adjustable === (x.sp.adjustable ? g.adjustable : null), `C12-DC ${g.id} twin ${JSON.stringify({ v: g.value, role: g.role, pv: g.pv, heldBy: g.heldBy })}`); }
   }
 } catch (e) { ok(false, 'C12-DC twin does not load: ' + e.message); }
+/* C15 (P9) the twin's value(id[, variant]) answers every page control number with the registry's number (each variant
+   of a per-variant setpoint) and throws on an id or variant the registry does not hold: a page never runs on a default */
+{
+  const sb = {}; new Function('window', fs.readFileSync(path.join(ROOT, 'js/rz-control-points.js'), 'utf8'))(sb);
+  const C = sb.RZControlPoints, page = rows.filter((x) => x.page && x.threshold);
+  ok(page.length >= 10 && C && typeof C.value === 'function', `C15 ${page.length} page control numbers, twin value() ${C && typeof C.value}`);
+  const throws = (f) => { try { f(); return false; } catch (e) { return true; } };
+  for (const r of page) {
+    const t = r.threshold;
+    if (t.byVariant) { for (const [k, v] of Object.entries(t.byVariant)) ok(C.value(r.id, k) === v, `C15 value(${r.id}, ${k}) = ${C.value(r.id, k)}, registry ${v}`); ok(throws(() => C.value(r.id)) && throws(() => C.value(r.id, 'nope')), `C15 ${r.id}: a missing variant does not throw`); }
+    else ok(C.value(r.id) === t.value && (r.sp ? r.sp.value : r.limits[Object.keys(r.limits).find((k) => ['lo_alarm', 'lo_warn', 'hi_warn', 'hi_alarm'].includes(k))]) === t.value, `C15 value(${r.id}) = ${C.value(r.id)}, registry ${t.value}`);
+  }
+  ok(throws(() => C.value('conv.fire-system.no_such_number')), 'C15 an unknown id does not throw');
+}
+
+/* C16 (P9) the fire pressure switches keep NFPA 20 (2022) A.14.2.6 spacing: jockey stop >= 0.69 bar (10 psi) above its
+   start; main pump 1 starts >= 0.34 bar (5 psi) below the jockey start; pump 2 >= 0.69 bar below pump 1; the low-pressure
+   alarm sits below the last pump start. The fuel day tank: low-low < level kept < fill start < fill stop <= 100 %. */
+{
+  const v = (id) => { const r = rows.find((x) => x.id === id); return r ? r.threshold.value : NaN; };
+  const jOn = v('conv.fire-system.jockey_on'), jOff = v('conv.fire-system.jockey_off'), p1 = v('conv.fire-system.fp1_on'), p2 = v('conv.fire-system.fp2_on'), lo = v('conv.fire-system.header_low_alarm');
+  const PSI = 0.0689476;
+  ok(jOff - jOn >= 10 * PSI - 1e-9, `C16 jockey stop ${jOff} − start ${jOn} = ${(jOff - jOn).toFixed(2)} bar < 0.69 bar (10 psi)`);
+  ok(jOn - p1 >= 5 * PSI - 1e-9, `C16 jockey start ${jOn} − pump 1 start ${p1} = ${(jOn - p1).toFixed(2)} bar < 0.34 bar (5 psi)`);
+  ok(p1 - p2 >= 10 * PSI - 1e-9, `C16 pump 1 start ${p1} − pump 2 start ${p2} = ${(p1 - p2).toFixed(2)} bar < 0.69 bar (10 psi)`);
+  ok(lo < p2, `C16 low-pressure alarm ${lo} is not below the last pump start ${p2}`);
+  const ll = v('conv.fuel-system.day_tank_lowlow'), mn = v('conv.fuel-system.day_tank_min_pct'), fs0 = v('conv.fuel-system.day_tank_fill_start'), fs1 = v('conv.fuel-system.day_tank_fill_stop');
+  ok(ll < mn && mn < fs0 && fs0 < fs1 && fs1 <= 100, `C16 day tank order low-low ${ll} < kept ${mn} < fill start ${fs0} < fill stop ${fs1} <= 100`);
+  /* the day-tank point band agrees with the page's own numbers: low-low = the band's alarm, the level kept = its warning */
+  const L = rows.find((x) => x.id === 'conv.fuel-system.DT.level_pct');
+  const F = rows.find((x) => x.id === 'conv.fire.static_pressure_bar');
+  ok(!!F && F.limits.lo_alarm === lo && F.limits.lo_warn === p1, `C16 fire.static_pressure_bar band lo_warn ${F && F.limits.lo_warn} / lo_alarm ${F && F.limits.lo_alarm} ≠ pump 1 start ${p1} / low alarm ${lo}`);
+  ok(!!L && L.limits.lo_alarm === ll && L.limits.lo_warn === mn, `C16 fuel-system.DT.level_pct band lo_warn ${L && L.limits.lo_warn} / lo_alarm ${L && L.limits.lo_alarm} ≠ page level kept ${mn} / low-low ${ll}`);
+}
+
 /* C14 one implementation (PRD-SETPOINT-SIM §C1/§C4): only js/rz-sp-block.js writes the Setpoints & limits markup; a
    host (conv modal, DC AI inspector) frames and binds it, never re-renders it */
 {
