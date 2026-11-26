@@ -59,11 +59,11 @@
   }
 
   function get(s, p) { var k = p.split('.'), o = s; for (var i = 0; o != null && i < k.length; i++) o = o[k[i]]; return typeof o === 'number' && isFinite(o) ? o : NaN; }
-  /* an engine output as a reader reads it: 4 significant figures, at most 3 decimals (PUE 1.158, COP 5.503, 25,811 kWe),
+  /* an engine output as a reader reads it: 4 significant figures, at most 3 decimals (PUE 1.158, COP 5.503, 25,811 kWe), a temperature to 0.1, zero as 0,
      never a raw float; the exact value stays in data-wi-now / data-wi-sim for the gates */
-  function dp(n) { var a = Math.abs(n); return a >= 1000 ? 0 : a >= 100 ? 1 : a >= 10 ? 2 : 3; }
+  function dp(n, u) { var a = Math.abs(n); return u === '°C' || u === 'K' ? 1 : a === 0 || a >= 1000 ? 0 : a >= 100 ? 1 : a >= 10 ? 2 : 3; }
   function num(n, d) { return n.toLocaleString('en-US', { minimumFractionDigits: d, maximumFractionDigits: d }); }
-  function show(n, u) { return isFinite(n) ? num(n, dp(n)) + (u ? ' ' + u : '') : '—'; }
+  function show(n, u) { return isFinite(n) ? num(n, dp(n, u)) + (u ? ' ' + u : '') : '—'; }
   function bindWhatIf(box, recompute) {
     var C = CP();
     if (box.getAttribute('data-wi-bound')) return;
@@ -84,7 +84,7 @@
         var tr = trs[i], un2 = tr.getAttribute('data-wi-unit'), n0 = +tr.getAttribute('data-wi-now'), n1 = get(s1, tr.getAttribute('data-wi-path'));
         tr.setAttribute('data-wi-sim', isFinite(n1) ? String(n1) : '');
         tr.querySelector('[data-k="sim"]').textContent = show(n1, un2);
-        var d = n1 - n0, dd = Math.max(dp(n0), dp(n1));
+        var d = n1 - n0, dd = Math.max(dp(n0, un2), dp(n1, un2));
         tr.querySelector('[data-k="d"]').textContent = isFinite(d) ? (d > 0 ? '+' : d < 0 ? '−' : '') + num(Math.abs(d), dd) + (un2 ? ' ' + un2 : '') : '—';
       }
     }

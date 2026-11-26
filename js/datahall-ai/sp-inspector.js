@@ -56,15 +56,28 @@
       return typeof v === 'number' && isFinite(v) ? { v: v, src: 'page', title: 'the value this inspector shows' } : { v: NaN };
     };
   }
+  /* the inspector rewrites its body every 4 s (same unit, new tick): the block is built once per unit and the SAME node
+     is put back, so a what-if slider keeps its value and focus across a refresh; only Live / Error are repainted */
+  var kept = { key: null, sec: null, focus: null };
   function attach(payload, body) {
     var B = root.RZSpBlock; if (!B || !payload || !body) return false;
     var list = rows(payload.classId); if (!list.length) return false;
-    style(body.ownerDocument);
-    var E = root.DCAI_CALC, sec = body.ownerDocument.createElement('section');
-    sec.className = 'rz-inspector-sp'; sec.setAttribute('data-rz-dcai-sp', payload.classId);
-    sec.innerHTML = '<div class="rz-inspector-sec">Setpoints &amp; limits</div>' + B.inner(list, { snapshot: E && E.snapshot ? E.snapshot : null });
+    var doc = body.ownerDocument, key = payload.classId + ':' + payload.id + ':' + (payload.hall || '');
+    style(doc);
+    var sec = kept.key === key ? kept.sec : null;
+    if (!sec) {
+      var E = root.DCAI_CALC;
+      sec = doc.createElement('section');
+      sec.className = 'rz-inspector-sp'; sec.setAttribute('data-rz-dcai-sp', payload.classId);
+      sec.innerHTML = '<div class="rz-inspector-sec">Setpoints &amp; limits</div>' + B.inner(list, { snapshot: E && E.snapshot ? E.snapshot : null });
+      sec.addEventListener('focusin', function (e) { kept.focus = e.target; });
+      sec.addEventListener('focusout', function (e) { if (!e.relatedTarget || !sec.contains(e.relatedTarget)) kept.focus = null; });
+      kept.key = key; kept.sec = sec; kept.focus = null;
+    }
+    var f = kept.focus;
     body.appendChild(sec);
     B.bind(sec, { recompute: recompute, live: liveOf(payload) });
+    if (f && sec.contains(f) && doc.activeElement !== f) { try { f.focus({ preventScroll: true }); } catch (e) { /* not focusable */ } }
     return true;
   }
   var api = { rows: rows, recompute: recompute, attach: attach, version: '1.1.0' };
