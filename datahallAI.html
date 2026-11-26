@@ -883,7 +883,7 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
     <script src="js/datahall-ai/hall-interact.js?v=20261013-77877697" defer></script>
     <script src="js/conv/floor-plan-color.js?v=20261122-7138898a" defer></script>
     <script src="js/conv/floor-plan.js?v=20261126-d9d24cd3" defer></script>
-    <script src="js/datahall-ai/hall-iso.js?v=20261126-6ee357cb" defer></script>
+    <script src="js/datahall-ai/hall-iso.js?v=20261126-e3812d84" defer></script>
     <script src="js/datahall-ai/fire-workstation.js?v=20261116-0546e949" defer></script>
 <style id="rz-skiplink-v1">
 .skip-link{position:absolute;top:-50px;left:0;background:#1a1d23;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 4px 0;transition:top .2s ease}
@@ -1938,12 +1938,16 @@ window.RZDatahallAIHmiOpeners=window.RZDatahallAIHmiOpeners||{};
    drawings (all of it declared simulated by A3) is now a seeded reading from sim-telemetry.js:
    identical on every reload within a 4 s tick, moving slowly between ticks. R() returned a 1-dp
    string and RI() an integer; RZ_SIM keeps that contract (digits 0 -> number, else string). */
-function RZ_SIM(site,lo,hi,digits){
+function RZ_SIM(site,lo,hi,digits,tick){
   var S=window.RZDatahallAISimTelemetry; if(!S){ return digits===0?Math.round((lo+hi)/2):((lo+hi)/2).toFixed(digits); }
-  var p=S.point({id:'page',point:String(site),anchor:(lo+hi)/2,band:Math.abs(hi-lo)/2,digits:digits,min:Math.min(lo,hi),max:Math.max(lo,hi)});
+  var p=S.point({id:'page',point:String(site),anchor:(lo+hi)/2,band:Math.abs(hi-lo)/2,digits:digits,min:Math.min(lo,hi),max:Math.max(lo,hi),tick:tick});
   if(p.missing)return p.text;   /* PRD-P05: a replay with no sample for this reading prints the dash, never a number */
   return digits===0?p.value:p.text;
 }
+/* Amendment 8 (A8e): ONE source for an aisle point's reading — the readout writer and the floor station's trend both
+   call it; tick (optional) reads the same keyed simulation at a past instant (declared simulated, A3) */
+function hallPointSim(side,r,si,tick){return side==='hot'?RZ_SIM('hac'+r+'-'+si,33.4+si*1.1,37.2+si*1.1,1,tick):RZ_SIM('cac'+r+'-'+si,25.3+r*0.05+si*0.22,25.8+r*0.05+si*0.22,1,tick);}
+window.__hallPointSim=hallPointSim;
 /* PRD-P05 — the replay controls load on first use (core, then UI); the seam itself lives in sim-telemetry.js */
 (function(){var b=document.getElementById('rzReplayTrig');if(!b)return;if(document.body.getAttribute('data-rz-replay')==='off'){b.hidden=true;return;}
 function load(src,cb){var s=document.createElement('script');s.src=src;s.onload=cb;s.onerror=function(){b.title='Replay controls failed to load';};document.head.appendChild(s);}
@@ -3680,7 +3684,7 @@ const SR=Math.ceil(_rpb/2)*_bk,SP=SENS_PTS;   /* containment pairs across the ha
    picks up a little on the throw, so the anchor walks with the point index — still declared
    simulated jitter about the engine air planes, never a field reading, and still 1 decimal
    (v2.18.0: five digits printed 25.78698 C on a 2.8 px glyph). */
-if(rzPanelOn('hall'))for(let r=0;r<SR;r++)for(let si=0;si<SP;si++){const ht=$('H'+r+si+'t'),hh=$('H'+r+si+'h'),ct=$('C'+r+si+'t'),ch=$('C'+r+si+'h');if(ht){const v=RZ_SIM('hac'+r+'-'+si,33.4+si*1.1,37.2+si*1.1,1);ht.textContent=v;const hz=$('H'+r+si+'z');if(hz)hz.setAttribute('fill',hallHeat(parseFloat(v),.34));}if(hh)hh.textContent=RZ_SIM('hah'+r+'-'+si,40,65,1)+'%';if(ct){const v=RZ_SIM('cac'+r+'-'+si,25.3+r*0.05+si*0.22,25.8+r*0.05+si*0.22,1);ct.textContent=v;document.querySelectorAll('#hSvg .C'+r+si+'z').forEach(z=>z.setAttribute('fill',hallHeat(parseFloat(v),.16)));}{/* A8b: the cold-aisle RH of every point is published for the floor's stations even where the drawing prints none (same keyed sim, one source) */const rc=RZ_SIM('cah'+r+'-'+si,45,70,1);(window.__hallRH||(window.__hallRH={}))[r+'-'+si]=rc;if(ch)ch.textContent=rc+'%'}}
+if(rzPanelOn('hall'))for(let r=0;r<SR;r++)for(let si=0;si<SP;si++){const ht=$('H'+r+si+'t'),hh=$('H'+r+si+'h'),ct=$('C'+r+si+'t'),ch=$('C'+r+si+'h');if(ht){const v=hallPointSim('hot',r,si);ht.textContent=v;const hz=$('H'+r+si+'z');if(hz)hz.setAttribute('fill',hallHeat(parseFloat(v),.34));}if(hh)hh.textContent=RZ_SIM('hah'+r+'-'+si,40,65,1)+'%';if(ct){const v=hallPointSim('cold',r,si);ct.textContent=v;document.querySelectorAll('#hSvg .C'+r+si+'z').forEach(z=>z.setAttribute('fill',hallHeat(parseFloat(v),.16)));}{/* A8b: the cold-aisle RH of every point is published for the floor's stations even where the drawing prints none (same keyed sim, one source) */const rc=RZ_SIM('cah'+r+'-'+si,45,70,1);(window.__hallRH||(window.__hallRH={}))[r+'-'+si]=rc;if(ch)ch.textContent=rc+'%'}}
 /* PRD-DCAI-HALL-DEPTH Amendment 7 (A6a): the floor's aisle stations show these readings the moment they change */
 if(rzPanelOn('hall'))document.dispatchEvent(new CustomEvent('rz-hall-readings'));
 /* PUE/IT/DLC are ENGINE-DERIVED (not random). GPU% and W/GPU remain live

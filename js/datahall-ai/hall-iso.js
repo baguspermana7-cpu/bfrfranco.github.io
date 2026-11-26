@@ -102,6 +102,10 @@
       '@keyframes dh-ovl-flow{to{stroke-dashoffset:-12}}',
       '@media (prefers-reduced-motion:no-preference){#hIso .ovl-pipe{animation:dh-ovl-flow 1s linear infinite}}',
       '#hIso .fp-root.fp-offscreen .ovl-pipe{animation-play-state:paused}',
+      '#hIso .dh-sttrend{position:absolute;z-index:5;width:260px;max-width:calc(100% - 8px);box-sizing:border-box;padding:8px 10px;background:var(--bg2);border:1px solid var(--bd);border-radius:4px;color:var(--t1);font:12px/1.35 "IBM Plex Sans",system-ui,sans-serif}',
+      '#hIso .dh-sttrend .st-h{display:flex;justify-content:space-between;align-items:center;gap:8px}#hIso .dh-sttrend .st-x{appearance:none;border:0;background:transparent;color:var(--t2);font-size:16px;line-height:1;min-width:28px;min-height:28px;cursor:pointer}',
+      '#hIso .dh-sttrend svg{display:block;width:100%;height:64px;margin:6px 0 2px}#hIso .dh-sttrend .st-pen{fill:none;stroke:var(--fp-ink,#e8edf5);stroke-width:1.5;vector-effect:non-scaling-stroke}#hIso .dh-sttrend .st-lim{stroke:var(--t2);stroke-opacity:.5;stroke-width:1;vector-effect:non-scaling-stroke}',
+      '#hIso .dh-sttrend .st-ax{display:flex;justify-content:space-between;font:11px "JetBrains Mono",monospace;color:var(--t2)}#hIso .dh-sttrend .st-now{color:var(--t1)}#hIso .dh-sttrend .st-src{font-size:11px;color:var(--t2);margin-top:2px}',
       '#hIso .cr-valve{display:none}#hIso[data-lens-on="cooling"] .cr-valve{display:inline}#hIso .ovl-st[data-hot="1"]{stroke:var(--fp-ink,#e8edf5);stroke-width:1.5}',
       '#hIso .ovl-st{stroke:var(--bg2);stroke-width:1}#hIso .ovl-st[data-state="stale"]{fill:none;stroke:var(--t3);stroke-dasharray:1.5 1.5}#hIso .ovl-st[data-state="ok"]{fill:var(--rz-pt-ok,#16a34a)}#hIso .ovl-st[data-state="warn"]{fill:var(--rz-pt-warn,#d97706)}#hIso .ovl-st[data-state="alarm"]{fill:var(--rz-pt-alarm,#dc2626)}#hIso .ovl-st[data-side="hot"]{fill:var(--fp-ink,#e8edf5)}',
       '#hIso .ovl-bw-track{stroke:var(--bd);stroke-width:3;stroke-linecap:butt}#hIso .ovl-bw{stroke:var(--fp-ink,#e8edf5);stroke-width:3;stroke-linecap:butt}',
@@ -149,6 +153,14 @@
     host = doc.createElement('div'); host.id = 'hIso'; host.setAttribute('data-rz-hall', String(win.currentDH || 1));
     /* Amendment 5 (A5d): the unit the operator opened (click or Enter) stays selected after its HMI closes */
     host.addEventListener('rz-equipment-activate', function (e) { selectRef(e.detail && e.detail.ref); });
+    /* Amendment 8 (A8e): in Thermal a click within 12 px (phone 22 px) of a station opens that point's 24 h trend; capture
+       phase, so the rack under it does not also open its HMI. Anywhere else the click is the floor's, unchanged. */
+    host.addEventListener('click', function (e) {
+      if (lens !== 'thermal' || view === 'drawing' || (e.target && e.target.closest && e.target.closest('.dh-sttrend'))) return;
+      var st = nearStation(e.clientX, e.clientY, (win.innerWidth || 1440) < 600 ? 22 : 12);
+      if (!st) return;
+      e.stopPropagation(); e.preventDefault(); openStTrend(st);
+    }, true);
     /* DC AI traceability (test-dcai-coverage): every number the 3D floor prints comes from here */
     host.setAttribute('data-rz-authored-basis', 'row-pair heat = racks per pair x design rack kW (engine counts multiplied, not a reading); ' +
       'rack inlet and hot-aisle values are the plan\'s simulated aisle readouts, or the engine design supply / return air before the first readout');
@@ -529,6 +541,47 @@
     });
     /* A8b: the warmest inlet point of each row pair carries a 1 px ink ring — a pointer, not a state */
     Object.keys(hot).forEach(function (z) { hot[z].el.setAttribute('data-hot', '1'); });
+  }
+  function nearStation(x, y, rad) {
+    var best = null, bd = rad * rad;
+    [].forEach.call(host.querySelectorAll('.fp-ovl .ovl-st'), function (c) {
+      var b = c.getBoundingClientRect(); if (!b.width) return;
+      var dx = (b.left + b.right) / 2 - x, dy = (b.top + b.bottom) / 2 - y, d = dx * dx + dy * dy;
+      if (d <= bd) { bd = d; best = c; }
+    });
+    return best;
+  }
+  var stCard = null;
+  function closeStTrend() { if (stCard) { stCard.remove(); stCard = null; } }
+  /* the trend reads the page's ONE point function at 48 past ticks (30 min apart = 24 h) — the same keyed simulation the
+     readout prints now, declared simulated; cold points draw the lens limits (27 / 30 °C) as hairlines, hot ones none */
+  function openStTrend(c) {
+    closeStTrend();
+    var z = +c.getAttribute('data-z'), s = +c.getAttribute('data-s'), side = c.getAttribute('data-side'), cold = side === 'cold';
+    var name = pairName(z) + (cold ? ' cold aisle' : ' hot aisle') + ' · point ' + (s + 1) + ' of ' + (geo.sp || 4);
+    var sim = win.RZDatahallAISimTelemetry, t0 = sim && sim.tickNow ? sim.tickNow() : 0, fn = win.__hallPointSim, pts = [], k, v;
+    for (k = 47; k >= 0; k--) { v = fn ? parseFloat(fn(side, z, s, k ? t0 - k * 450 : undefined)) : NaN; pts.push(isFinite(v) ? v : null); }
+    var now = c.hasAttribute('data-v') ? +c.getAttribute('data-v') : null;
+    pts[47] = now;
+    var vals = pts.filter(function (x) { return x != null; }), lim = cold ? [27, 30] : [];
+    var lo = Math.min.apply(null, vals.concat(lim.length ? [lim[0] - 1] : [])), hi = Math.max.apply(null, vals.concat(lim));
+    if (!vals.length) { lo = 0; hi = 1; }
+    var pad = (hi - lo) * 0.1 || 0.5; lo -= pad; hi += pad;
+    function Y(x) { return (60 - (x - lo) / (hi - lo) * 56).toFixed(1); }
+    var d = pts.map(function (x, i) { return x == null ? '' : (i && pts[i - 1] != null ? 'L' : 'M') + (i * 300 / 47).toFixed(1) + ' ' + Y(x); }).join(' ');
+    var lines = lim.map(function (x) { return '<path class="st-lim" d="M0 ' + Y(x) + 'H300"/>'; }).join('');
+    stCard = doc.createElement('div'); stCard.className = 'dh-sttrend'; stCard.setAttribute('role', 'dialog'); stCard.setAttribute('aria-label', name + ' trend');
+    stCard.setAttribute('data-z', String(z)); stCard.setAttribute('data-s', String(s)); stCard.setAttribute('data-side', side);
+    stCard.innerHTML = '<div class="st-h"><b>' + name + '</b><button type="button" class="st-x" aria-label="Close trend">×</button></div>' +
+      '<svg viewBox="0 0 300 64" preserveAspectRatio="none" role="img" aria-label="' + name + ', last 24 hours">' + lines + '<path class="st-pen" d="' + d + '"/></svg>' +
+      '<div class="st-ax"><span>−24 h</span><span class="st-now">' + (now == null ? '— (no reading)' : now.toFixed(1) + ' °C ' + (cold ? 'inlet' : 'return')) + '</span><span>now</span></div>' +
+      '<div class="st-src">' + (cold ? 'lines: warn 27 · alarm 30 °C · ' : '') + 'simulated about the engine air plane</div>';
+    host.appendChild(stCard);
+    var hb = host.getBoundingClientRect(), cb = c.getBoundingClientRect(), w = stCard.offsetWidth, h = stCard.offsetHeight;
+    var x = Math.max(4, Math.min(hb.width - w - 4, cb.left - hb.left + 12)), y = cb.top - hb.top + 12; if (y + h > hb.height - 4) y = Math.max(4, cb.top - hb.top - h - 12);
+    stCard.style.left = x + 'px'; stCard.style.top = y + 'px';
+    var xb = stCard.querySelector('.st-x'); xb.addEventListener('click', closeStTrend); xb.focus();
+    stCard.addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.stopPropagation(); closeStTrend(); } });
   }
   doc.addEventListener('rz-hall-readings', function () {
     if (!inst || view === 'drawing' || !model) return;

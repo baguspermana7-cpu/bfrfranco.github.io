@@ -171,6 +171,31 @@ const rm = await read(pg);
 ok('AV4', rm.anims === 0, `reduced motion: ${rm.anims} running animations in #hIso`);
 ok('AV0', pg.errors.length === 0, `page errors: ${pg.errors.slice(0, 2).join(' | ')}`);
 await pg.close();
+/* A8e — a station opens its own 24 h trend (SA1): title names it, the value shown = its reading, no HMI opens, Escape closes */
+{
+  const sp = await open(1440);
+  await viewTo(sp, '2d'); await lensTo(sp, 'thermal');
+  for (const side of ['cold', 'hot']) {
+    const at = await sp.evaluate((side) => { const c = document.querySelector(`#hIso .ovl-st[data-side="${side}"][data-z="3"][data-s="1"]`); if (!c) return null; const b = c.getBoundingClientRect(); return { x: (b.left + b.right) / 2 + 3, y: (b.top + b.bottom) / 2 - 2, v: c.getAttribute('data-v') }; }, side);
+    if (!at) { ok('SA1', false, `${side}: station z3 s1 not drawn`); continue; }
+    await sp.mouse.click(at.x, at.y); await wait(500);
+    const R = await sp.evaluate(() => { const c = document.querySelector('#hIso .dh-sttrend'), modal = [...document.querySelectorAll('[aria-modal="true"]')].filter((m) => m.getBoundingClientRect().width > 0).length;
+      return c ? { label: c.getAttribute('aria-label'), now: c.querySelector('.st-now').textContent, pen: (c.querySelector('.st-pen').getAttribute('d').match(/[ML]/g) || []).length, lim: c.querySelectorAll('.st-lim').length, inside: (() => { const h = document.getElementById('hIso').getBoundingClientRect(), b = c.getBoundingClientRect(); return b.left >= h.left - 1 && b.right <= h.right + 1 && b.top >= h.top - 1 && b.bottom <= h.bottom + 1; })(), focus: document.activeElement && document.activeElement.classList.contains('st-x'), modal } : { modal }; }, );
+    ok('SA1', !!R.label && R.label.startsWith('R07/08 ' + side + ' aisle · point 2 of 4'), `${side}: trend card ${JSON.stringify(R)}`);
+    ok('SA1', !!R.now && at.v != null && Math.abs(parseFloat(R.now) - +at.v) < 0.051, `${side}: card shows ${R.now}, station reads ${at.v}`);
+    ok('SA1', R.pen >= 40 && R.lim === (side === 'cold' ? 2 : 0) && R.inside && R.focus, `${side}: pen points ${R.pen}, limit lines ${R.lim}, inside the stage ${R.inside}, focus on close ${R.focus}`);
+    ok('SA1', R.modal === 0, `${side}: a station click also opened ${R.modal} modal(s)`);
+    await sp.keyboard.press('Escape'); await wait(200);
+    ok('SA1', await sp.evaluate(() => !document.querySelector('#hIso .dh-sttrend')), `${side}: Escape left the trend card open`);
+  }
+  /* away from a station the click is still the floor's: a rack opens its HMI */
+  await lensTo(sp, 'status');
+  const rk = await sp.evaluate(() => { const b = document.querySelector('#hIso [data-idx="30"]').getBoundingClientRect(); return { x: (b.left + b.right) / 2, y: (b.top + b.bottom) / 2 }; });
+  await sp.mouse.click(rk.x, rk.y); await wait(900);
+  ok('SA1', await sp.evaluate(() => !document.querySelector('#hIso .dh-sttrend')), 'Status lens: a click opened a station trend');
+  ok('AV0', sp.errors.length === 0, `station trend page errors: ${sp.errors.slice(0, 2).join(' | ')}`);
+  await sp.close();
+}
 /* A8f — the phone floor: the 2D plan stacks in bands and grows down the page, so a rack and a cell are tappable sizes */
 {
   const ph = await open(390);
@@ -193,6 +218,6 @@ await pg.close();
   await ph.close();
 }
 await browser.close(); srv.close();
-console.log(`${fails.length ? 'FAIL' : 'PASS'} — DC AI air side, valves and four points per aisle (A8a+A8b+A8c+A8f): ${checks - fails.length}/${checks}`);
+console.log(`${fails.length ? 'FAIL' : 'PASS'} — DC AI air side, valves and four points per aisle (A8a-A8f): ${checks - fails.length}/${checks}`);
 fails.forEach((f) => console.log('  ' + f));
 process.exit(fails.length ? 1 : 0);

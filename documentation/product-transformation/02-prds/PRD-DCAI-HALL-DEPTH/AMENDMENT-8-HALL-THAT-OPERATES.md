@@ -177,6 +177,12 @@ gains its fourth point (it already loops `SP`; its geometry is checked by the Dr
   phone keeps the stage top on the first screen); HV-F2 head gaps are measured per screen row; HV-L1 scrolls to the
   legend under a banded floor; HV-G1/G2 measure one slab and run at 390 only when it is one band (a guard fails if a
   wide stage ever bands). `test-dcai-hall-views.mjs` 164 checks green.
+- **A8e part 1 built (SA1):** in Thermal a click within 12 px (phone 22 px) of a station opens its 24 h trend card —
+  48 samples of the page's ONE point function `hallPointSim(side, pair, point, tick)` (the readout writer calls the same
+  function), the card's value = the station's reading, cold points draw the 27 / 30 °C lens limits as hairlines, focus
+  on Close, Escape closes, capture phase so the rack under it does not open its HMI. Red 6 of 11 on the A8f tree.
+  **Not built yet: SA2 (a cold point > 27 °C raises a floor flag + alarm-list row) and SA3 (stale under replay) —
+  next phase**; the station already shows stale (dotted) when the replay has no sample (A6a D2b).
 - Committed in cp5; releases as v3.112.0 after the peer's v3.111.0 (order agreed 2026-11-26).
 - **Finding outside A8 (peer, P7 sequences):** at design ambient 38 °C the engine needs 634 dry coolers and 631 are
   installed — 2,875 kWth short. Recorded for the heat-rejection PRD; not changed here.
