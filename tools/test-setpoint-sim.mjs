@@ -184,6 +184,13 @@ try {
        loop with no drawing (TIC-RI); OUT / saturated = the engine where the loop names an output */
     if (page === 'datahall.html') {
       const want = REG.filter((r) => r.cockpit === 'conv' && r.sp && r.sp.loop && (r.sp.loop.sheet === 'int-crah' || !r.sp.loop.sheet));
+      /* closed, the table is not built (a closed <details> keeps layout boxes, so its text would count as visible words);
+         the summary carries no visible word (icon + title) and is named for assistive tech */
+      const closed = await pg.evaluate(() => { const d = document.querySelector('details.insp-loops'), s = d && d.querySelector('summary');
+        return d ? { open: d.open, rows: d.querySelectorAll('tr[data-loop-row]').length, words: (s.textContent.match(/[A-Za-z]{2,}/g) || []).length, name: s.getAttribute('aria-label') || '' } : null; });
+      ok(!!closed && !closed.open && closed.rows === 0, 'S11c', `datahall Loops closed: ${JSON.stringify(closed)} (want closed with 0 rows built)`);
+      ok(!!closed && closed.words === 0 && /loops/i.test(closed.name), 'S11c', `datahall Loops summary: ${closed && closed.words} visible words, name "${closed && closed.name}"`);
+      await pg.evaluate(() => { const d = document.querySelector('details.insp-loops'); if (d) d.open = true; });
       await pg.waitForFunction(() => document.querySelectorAll('[data-rz-loops] tr[data-loop-row]').length > 0, { timeout: 15000 }).catch(() => {});
       const lt = await pg.evaluate(() => [...document.querySelectorAll('[data-rz-loops] tr[data-loop-row]')].map((tr) => ({ tag: tr.getAttribute('data-loop-row'),
         pv: tr.querySelector('[data-k="pv"]').textContent, out: tr.getAttribute('data-auth-out'), sat: tr.getAttribute('data-auth-sat'), state: tr.querySelector('[data-k="state"]').textContent })));

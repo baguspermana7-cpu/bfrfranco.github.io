@@ -20,6 +20,8 @@ release sections rather than semver.
   - PDIC-01 reads **98.7 %, ◆ saturated**: the secondary pumps have 1.3 % of speed left.
   - TIC-CHWS and TIC-CDWS hold at 89.3 %.
   - The data hall inspector gets the same table: TIC-SAT is at 99.5 % (saturated), and TIC-RI reads "OUT not modelled" because a reset writes a setpoint, not an output.
+    It sits behind a loop icon (tooltip "Control loops") and is built only when opened, so the hall keeps its 120-word budget.
+  - A controller bubble's inspector (LIC, PC) shows the Trend and Alarms of the unit it controls.
   - The DC AI inspector now opens its Setpoints block with the class's loop. TIC-nn1 on the CDU is at 99.6 % and TIC-SA on the fan wall at 99.9 %; both are saturated.
   - The rows come only from the control registry (`RZControlPoints.loopRows`), so a new loop appears without a page edit.
 - **Fire pump controllers drawn (FS-M-101).**

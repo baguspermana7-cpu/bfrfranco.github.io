@@ -42,12 +42,15 @@
     if (!B || !B.loops || !C || !C.loopRows) return;
     var sheets = (host.getAttribute('data-sheets') || '').split(/\s+/).filter(Boolean).map(function (t) { return t === 'none' ? null : t; });   /* none = not drawn */
     style();
+    var fold = host.closest ? host.closest('details') : null;   /* a closed <details> keeps layout boxes: build nothing until it opens */
     function tick() {
       if (doc.hidden) return;
+      if (fold && !fold.open) { if (last) { host.innerHTML = ''; last = null; } return; }
       var snap = root.CONV_CALC && root.CONV_CALC.snapshot; if (!snap) return;
       if (snap !== last) { host.innerHTML = B.loops(C.loopRows('conv', sheets), { snapshot: snap }); last = snap; }
       B.bind(host, { live: live });
     }
+    if (fold) fold.addEventListener('toggle', tick);
     tick();
     root.setInterval(tick, 2000);
   }

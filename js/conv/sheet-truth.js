@@ -194,7 +194,15 @@
          HMI" opens the machine it controls (PC-FP1 -> fire pump 1, LIC-A1 -> its day tank) */
       var target = n, tn = n.ctrl && api && api.sheet && api.sheet.nodes ? api.sheet.nodes.filter(function (x) { return x.id === n.ctrl; })[0] : null;
       if (tn) { target = tn; if (!(payload.actions && payload.actions.openHmi)) { var q = {}; Object.keys(payload).forEach(function (k) { q[k] = payload[k]; });
-        q.actions = { openHmi: true, related: (payload.actions && payload.actions.related) || [] }; payload = q; } }
+        q.actions = { openHmi: true, related: (payload.actions && payload.actions.related) || [] }; payload = q; }
+        /* a controller bubble has no machine class: its Trend and Alarms are those of the unit it controls (the day tank
+           level an LIC holds, the pump a PC starts), taken from that unit's own payload, only where the bubble has none */
+        var pt = payload.tabs || {}, tt = (build(tn) || {}).tabs || {};
+        if ((!pt.trend && tt.trend) || (!(pt.alarmPoints || []).length && (tt.alarmPoints || []).length)) {
+          var t2 = {}; Object.keys(pt).forEach(function (k) { t2[k] = pt[k]; });
+          if (!t2.trend && tt.trend) t2.trend = tt.trend;
+          if (!(t2.alarmPoints || []).length && (tt.alarmPoints || []).length) t2.alarmPoints = tt.alarmPoints;
+          var q2 = {}; Object.keys(payload).forEach(function (k) { q2[k] = payload[k]; }); q2.tabs = t2; payload = q2; } }
       root.RZInspector.openPayload(payload, { trigger: el,
         onOpenHmi: function (p, btn) { deep(build, target, btn, el, more); },
         onNavigate: function (id) {
