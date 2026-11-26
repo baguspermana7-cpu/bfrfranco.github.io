@@ -1038,7 +1038,10 @@ RZSpBlock.bind(host, { recompute })  → wires sliders (input → recompute → 
   Loops table opts out (else OUT and State scrolled out of the card at 390 px).
 - Datahall inspector: TIC-SAT 99.5 % ◆ saturated (0.5 % of CRAH valve left), TIC-RI "OUT not modelled" (a reset loop
   writes a setpoint, not an output). S11c datahall red on the old page (rows [] ≠ [TIC-SAT, TIC-RI]).
-- Still open in P10: the rack-inlet what-if showing CRAH valve OUT after the change.
+- Rack-inlet what-if (P10): the cascade moves TIC-SAT SP with rack inlet, but the engine does not re-rate the CRAH coil
+  for a colder supply air, so `cooling.crah_valve_open_pct` does not move with this setpoint. The what-if lists only
+  quantities that move (chws_c, lift, kWe, COP, kW/RT); the valve OUT stays at its live value and is named in the note,
+  not in the rows. Whether a CRAH can hold a lower setpoint at 99.5 % is not modelled.
 
 ## C18. P8 delivered (fallback step strip, 2026-11-26)
 
