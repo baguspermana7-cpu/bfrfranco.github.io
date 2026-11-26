@@ -104,7 +104,13 @@
     { cls: 'sld-ups-b', point: 'soc_pct', label: 'State of charge', unit: '%', kind: 'low', sp: { value: 98 }, mode: 'abs', lowWarn: 90, lowAlarm: 80, evidenceClass: 'assumed', source: 'declared training setting: warning below 90 %, alarm below 80 % state of charge' },
     { cls: 'site-fuel-farm', point: 'level_pct', label: 'Tank level', unit: '%', kind: 'low', sp: { value: 95 }, mode: 'abs', lowWarn: 85, lowAlarm: 70, evidenceClass: 'assumed', source: 'declared training setting: warning below 85 %, alarm below 70 % of the tank' },
     /* ── page KPIs (not a payload row: page:true) ───────────────────────────────────────────────────────── */
-    { cls: 'hall-kpi', point: 'pue', label: 'PUE', unit: '', page: true, kind: 'high', sp: { path: 'pue.design_day' }, mode: 'abs', warn: { path: 'pue.band_max' }, alarm: 1.35, evidenceClass: 'design', source: 'engine design band pue.band_max (warning); 1.35 alarm is a declared setting' }
+    { cls: 'hall-kpi', point: 'pue', label: 'PUE', unit: '', page: true, kind: 'high', sp: { path: 'pue.design_day' }, mode: 'abs', warn: { path: 'pue.band_max' }, alarm: 1.35, evidenceClass: 'design', source: 'engine design band pue.band_max (warning); 1.35 alarm is a declared setting' },
+    /* ── PRD-SETPOINT-SIM §C P5: setpoints that were typed in js/datahall-ai/hmi-payloads.js; no alarm band is stated
+       for them, so kind 'none' (no colour), the SP alone, ASSUMED with its basis ── */
+    { cls: 'stp', point: 'do_mgl', label: 'Aeration DO', unit: 'mg/L', kind: 'none', sp: { value: 2.5 }, evidenceClass: 'assumed', source: 'declared training setting: activated-sludge aeration is commonly held near 2 mg/L dissolved oxygen (Metcalf & Eddy practice); 2.5 mg/L is this page\'s design value' },
+    { cls: 'ahu', point: 'supply_c', label: 'MMR supply air', unit: '°C', kind: 'none', sp: { value: 18 }, evidenceClass: 'assumed', source: 'declared training setting: 18 °C is the low end of the ASHRAE TC9.9 A1 recommended inlet (18–27 °C) for the meet-me room' },
+    { cls: 'room', point: 'temp_c', label: 'Support-room temperature', unit: '°C', kind: 'none', sp: { value: 24 }, evidenceClass: 'assumed', source: 'declared training setting: an occupied support room held at 24 °C (ASHRAE 55 comfort range); no source in this repository states the value' },
+    { cls: 'room', point: 'rh_pct', label: 'Support-room relative humidity', unit: '%', kind: 'none', sp: { value: 50 }, evidenceClass: 'assumed', source: 'declared training setting: 50 % RH, the middle of the ASHRAE 55 / 62.1 range for occupied rooms; no source in this repository states the value' },
   ];
   R.forEach(function (r) { Object.freeze(r); });
   var BY = {};
