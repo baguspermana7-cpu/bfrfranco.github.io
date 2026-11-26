@@ -973,3 +973,14 @@ RZSpBlock.bind(host, { recompute })  → wires sliders (input → recompute → 
 - Gate `tools/test-dcai-setpoints.mjs` D0–D7 (see CONTROL_SETPOINT_STANDARD §5). D3 (trend SP line) waits for the
   `rz-trend.js` hook.
 
+## C12. P6 delivered with P5 (2026-11-26)
+
+- **Cliff strip.** Under the CDU TCS supply what-if, the engine's 7 weather bins (24–36 °C, shaped, ASSUMED) show liquid
+  free cooling or mechanical, now and at the simulated SP. At 39 °C the 34 °C design bin turns mechanical: free-cooling
+  hours 8,600 → 8,000, liquid chillers 0 → 35,405 kWe, cooling power 61,187 → 105,193 kWe, annual PUE 1.158 → 1.164.
+- **Clamp mark (G10).** The liquid-path COP row reads "off (free cooling)" at the design point and `12.00 ◆` at 39 °C:
+  the copMax ceiling (a model input), not the Carnot-fraction result. The ceiling is read from the model at build.
+- **Phone and inspector width.** The what-if keeps Output, Engine now and SIMULATED; Change (their difference) is
+  dropped in the inspector. Cliff cells never wrap.
+- Laws D6, D8, D9 and the stricter D4 (see CONTROL_SETPOINT_STANDARD §5).
+

@@ -48,7 +48,7 @@
     return '<div class="rz-cvm-wi" data-rz-cvm-whatif="' + esc(r.id) + '" data-wi-param="' + esc(r.param) + '" data-wi-sp="' + r.value + '" data-wi-unit="' + esc(r.unit) + '">' +
       '<div class="rz-cvm-wi-ctl"><label><span>What-if · ' + esc(r.label) + '</span><input type="range" min="' + a.min + '" max="' + a.max + '" step="' + a.step + '" value="' + r.value + '" aria-label="' + esc('Simulate ' + r.label + ', ' + a.min + ' to ' + a.max + u) + '"></label>' +
       '<output data-wi-out>' + esc('SP ' + CP().fmt(r.value, r.unit) + u) + '</output><button type="button" data-wi-reset>Reset</button></div>' +
-      '<div class="rz-cvm-sp-wrap"><table class="rz-cvm-sp rz-cvm-wi-t"><thead><tr><th scope="col">Output (steady state)</th><th scope="col">Engine now</th><th scope="col">SIMULATED</th><th scope="col">Change</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
+      '<div class="rz-cvm-sp-wrap"><table class="rz-cvm-sp rz-cvm-wi-t"><thead><tr><th scope="col">Output (steady state)</th><th scope="col">Engine now</th><th scope="col">SIMULATED</th><th scope="col" data-k="d">Change</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
       '<p class="rz-cvm-note">' + esc(r.whatIfNote || '') + '</p></div>';
   }
   function inner(rows, opts) {

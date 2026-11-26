@@ -36,7 +36,11 @@
     '.rz-inspector-sp [data-wi-active] output{color:#e3a6c6}' +
     '.rz-inspector-sp button[data-wi-reset]{min-height:28px;padding:2px 10px;border:1px solid rgba(255,255,255,.25);border-radius:3px;background:transparent;color:inherit;font:inherit;font-size:11px;cursor:pointer}' +
     '.rz-inspector-sp button[data-wi-reset]:focus-visible,.rz-inspector-sp input:focus-visible{outline:2px solid #e8b563;outline-offset:2px}' +
-    '.rz-inspector-sp .rz-cvm-wi-t th[scope="row"]{width:44%}' +
+    /* what-if in ~360 px: Output · Engine now · SIMULATED; the change is the difference of the two shown, so it goes */
+    '.rz-inspector-sp .rz-cvm-wi-t [data-k="d"]{display:none}' +
+    '.rz-inspector-sp .rz-cvm-wi-t td{white-space:normal}' +
+    '.rz-inspector-sp [data-rz-cliff] td,.rz-inspector-sp [data-rz-cliff] th{white-space:nowrap}' +
+    '.rz-inspector-sp .rz-cvm-wi-t th[scope="row"]{width:42%}' +
     '.rz-inspector-sp caption{caption-side:top;text-align:left;padding:8px 0 4px;font-size:11px;color:#94a3b8}' +
     '.rz-inspector-sp [data-mode="mechanical"]{color:#fca5a5}' +
     '.rz-inspector-sp tr[data-design-bin] th,.rz-inspector-sp tr[data-design-bin] td{border-top:1px solid rgba(255,255,255,.45);border-bottom:1px solid rgba(255,255,255,.45)}' +

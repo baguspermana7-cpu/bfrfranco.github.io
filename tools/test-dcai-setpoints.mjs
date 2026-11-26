@@ -116,7 +116,7 @@ async function browserLaws() {
         const secs = document.querySelectorAll('aside.rz-inspector.open [data-rz-dcai-sp]'), s = secs[0]; if (!s) return null;
         const ins = document.querySelector('aside.rz-inspector.open'), body = ins.querySelector('[data-slot="body"]');
         return { n: secs.length, node: (s.__probe = s.__probe || Math.random()), rows: [...s.querySelectorAll('tr[data-sp-row]')].map((r) => ({ id: r.getAttribute('data-sp-row'), sp: +r.getAttribute('data-sp'), pv: r.querySelector('[data-k="pv"]').textContent })),
-          live: [...body.querySelectorAll('.rz-inspector-row, [data-rz-point]')].length, tw: s.scrollWidth, hw: s.clientWidth, sw: document.documentElement.scrollWidth, vw: innerWidth,
+          live: [...body.querySelectorAll('.rz-inspector-row, [data-rz-point]')].length, tw: Math.max(s.scrollWidth - s.clientWidth, ...[...s.querySelectorAll('.rz-cvm-sp-wrap, table')].map((x) => x.scrollWidth - x.clientWidth)), hw: 0, past: Math.round(Math.max(0, ...[...s.querySelectorAll('td, th')].filter((c) => c.offsetParent).map((c) => c.getBoundingClientRect().right - Math.min(innerWidth, ins.getBoundingClientRect().right, body.getBoundingClientRect().right)))), sw: document.documentElement.scrollWidth, vw: innerWidth,
           small: [...s.querySelectorAll('td, th, output, button, label span')].filter((e) => e.offsetParent && parseFloat(getComputedStyle(e).fontSize) < 10.5).length };
       });
       if (!d) { bad(`D1 ${tag} ${cls}: no Setpoints block in the inspector`); continue; }
@@ -126,7 +126,8 @@ async function browserLaws() {
       for (const r of d.rows) { const g = REG.find((x) => x.id === r.id); if (!g || r.sp !== g.sp.value) bad(`D1 ${tag} ${r.id}: SP ${r.sp} ≠ registry ${g && g.sp.value}`); if (!/\d/.test(r.pv)) bad(`D1 ${tag} ${r.id}: Live "${r.pv}" (the inspector shows this point)`); }
       /* D4 fits: no sideways page scroll, the block inside its column, no text under 10.5 px */
       if (d.sw > d.vw + 1) bad(`D4 ${tag} ${cls}: page scrolls sideways ${d.sw} > ${d.vw}`);
-      if (d.tw > d.hw + 1) bad(`D4 ${tag} ${cls}: block ${d.tw} px wider than its ${d.hw} px column`);
+      if (d.tw > 1) bad(`D4 ${tag} ${cls}: a table in the block overflows its frame by ${d.tw} px (a column scrolls out of view)`);
+      if (d.past > 1) bad(`D4 ${tag} ${cls}: a cell ends ${d.past} px past the inspector's right edge`);
       if (d.small) bad(`D4 ${tag} ${cls}: ${d.small} block texts under 10.5 px`);
       if (cls !== 'cdu' || W !== 1440) continue;
       /* D5 what-if: TCS supply 41 °C -> every SIMULATED output = a Node DCAI_CALC.compute of a copy; cliff ambient 35 °C */
@@ -147,12 +148,13 @@ async function browserLaws() {
       const c9 = await pg.evaluate(() => { const box = document.querySelector('[data-rz-dcai-sp] [data-rz-cvm-whatif]'); const s = box.querySelector('input[type="range"]'); s.value = '39'; s.dispatchEvent(new Event('input', { bubbles: true }));
         const cop = box.querySelector('tr[data-wi-path="design.planes.p19_cop_liquid_path"] [data-k="sim"]'), strip = box.querySelector('[data-rz-cliff]');
         const out = { cop: cop && cop.textContent, title: cop && cop.title, bins: strip ? [...strip.querySelectorAll('tbody tr')].map((t) => ({ a: t.querySelector('th').textContent, now: t.querySelector('[data-k="now"]').textContent, sim: t.querySelector('[data-k="sim"]').textContent })) : null };
-        box.querySelector('[data-wi-reset]').click(); out.after = strip ? [...strip.querySelectorAll('[data-k="sim"]')].filter((c) => c.textContent !== '—').length : -1; return out; });
+        box.querySelector('[data-wi-reset]').click(); out.broken = strip ? [...strip.querySelectorAll('td, th')].filter((c) => c.getBoundingClientRect().height > parseFloat(getComputedStyle(c).lineHeight || '16') * 1.6 + parseFloat(getComputedStyle(c).paddingTop) + parseFloat(getComputedStyle(c).paddingBottom) + 1).map((c) => c.textContent) : []; out.after = strip ? [...strip.querySelectorAll('[data-k="sim"]')].filter((c) => c.textContent !== '—').length : -1; return out; });
       if (D9.design.planes.p19_cop_liquid_path !== D.model.thermal.copMax) bad(`D8 ${tag}: the engine no longer clamps at TCS 39 °C (P19 ${D9.design.planes.p19_cop_liquid_path}); pick another case`);
       if (!c9.cop || !/◆/.test(c9.cop) || !/ceiling/.test(c9.title || '')) bad(`D8 ${tag}: clamped COP shown as "${c9.cop}" title "${c9.title}"`);
       if (!c9.bins || c9.bins.length !== D9.bins.length) bad(`D9 ${tag}: cliff strip ${c9.bins ? c9.bins.length : 'absent'} rows, engine ${D9.bins.length} bins`);
       else D9.bins.forEach((b, i) => { const want = b.liquid_free_cooling ? 'free' : 'mechanical', now = D.snapshot.bins[i].liquid_free_cooling ? 'free' : 'mechanical'; if (c9.bins[i].sim !== want || c9.bins[i].now !== now) bad(`D9 ${tag} bin ${b.ambient_db_c} °C: now ${c9.bins[i].now} / sim ${c9.bins[i].sim}, engine ${now} / ${want}`); });
       if (c9.bins && !/design/.test((c9.bins.find((x) => /^34/.test(x.a)) || {}).a || '')) bad(`D9 ${tag}: the design ambient bin is not marked`);
+      if (c9.broken && c9.broken.length) bad(`D9 ${tag}: cliff cells wrap onto a second line: ${c9.broken.slice(0, 4).join(' | ')}`);
       if (c9.after !== 0) bad(`D9 ${tag}: Reset left ${c9.after} SIMULATED bins`);
       const keys = (j) => JSON.parse(j).filter((x) => /sp|what|sim|setpoint/i.test(x));
       if (keys(r7.ls2).length || keys(r7.ss2).length) bad(`D7 ${tag}: storage keys ${r7.ls2} ${r7.ss2}`);
