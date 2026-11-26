@@ -1039,3 +1039,21 @@ RZSpBlock.bind(host, { recompute })  → wires sliders (input → recompute → 
 - Still open in P10: the rack-inlet what-if showing CRAH valve OUT after the change; a Loops table on datahall (TIC-SAT,
   TIC-RI).
 
+## C17. P9 part 2 delivered (2026-11-26): fire and fuel controllers drawn
+
+- Fire, FS-M-101: PC-JP1 (11.5 / 12.8 bar), PC-FP1 (10.5 bar), PC-FP2 (9.5 bar) as panel bubbles. Each has its own
+  sensing line, tapped between its pump's check valve and discharge valve (NFPA 20), and a signal to its pump. The main
+  pumps stop by hand: the page models no automatic stop, and the registry says so.
+- Fuel, FU-M-101: LIC-<set> beside every day tank (8 per hall). The level line runs from the tank to the bubble, and a
+  signal goes to the row's fill valve XV-<set>. The bubble prints fill start / stop 50 / 90 %.
+- Registry: `loop` on a `convPageSetpoints` cut-in (kind on-off, `stop` = the cut-out). The builder validates the side of
+  the differential.
+- Law S8e has three parts: structure, printed value = `value()`, and no orphan. Red on the old sheets. T3 now also moves
+  the bubbles.
+- Found while proving T3: the bubble first read `LOOPS[].value`. That is a second copy of the number, and the planted
+  twin did not move it. Pages now read `value(sp)`.
+- Not drawn, on purpose:
+  - **cdu-mini-bms** (TIC → TCV-01, PDIC → P-01). Its schematic is hand-authored SVG outside the sheet engine. New
+    bubbles would raise the diagram-engine ratchet, so this waits for the schematic's move onto RZHmiSheet.
+  - **Water booster PIC.** The page has no registry row for the booster pressure yet. That row comes first.
+
