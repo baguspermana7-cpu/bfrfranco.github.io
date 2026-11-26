@@ -773,7 +773,7 @@ body[data-datahall-authority="unavailable"] #tabs,
 body[data-datahall-authority="unavailable"] .wrap{display:none !important}
 body[data-datahall-authority="unavailable"] .hdr-r>.dot,body[data-datahall-authority="unavailable"] [data-cv="clock"]>.dot{background:#64748b !important;box-shadow:none !important;animation:none !important}
 body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:none}
-</style>    <script src="js/rz-version.js?v=20261126-7ff3eae5" defer></script>
+</style>    <script src="js/rz-version.js?v=20261126-215ddbf7" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <!-- v3.5.0 — hold the 8.5px legibility floor by SCALE, not by font size. Five of this page's
          fifteen diagrams were already clear; the dense ones (cooling P&ID, the four SLDs, the hall
@@ -791,12 +791,12 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
          byte-frozen by the ship gate and still proving its own 57 worked examples, but this
          page no longer loads it. The ?v= token IS the version pin the authority block checks
          (= DCAI_CALC.snapshot.meta.version); tools/test-dcai-engine-version-pin.mjs asserts it. -->
-    <script src="js/rz-engine-versions.js?v=20261126-2677dd9d"></script>
-    <script src="js/dcai-model.js?v=1.8.0" data-datahall-model-authority></script>
-    <script src="js/dcai-engine.js?v=1.8.0" data-datahall-calc-authority></script>
+    <script src="js/rz-engine-versions.js?v=20261126-86955311"></script>
+    <script src="js/dcai-model.js?v=1.9.0" data-datahall-model-authority></script>
+    <script src="js/dcai-engine.js?v=1.9.0" data-datahall-calc-authority></script>
     <!-- generated registry twin: the authority block validates the live snapshot against
          every id the registry publishes, so the allow-list is generated, never typed -->
-    <script src="js/dcai-parameters.js?v=1.8.0" data-datahall-registry></script>
+    <script src="js/dcai-parameters.js?v=1.9.0" data-datahall-registry></script>
     <script src="js/rz-evidence.js?v=20260920-3f7c72db"></script>
     <!-- v3.10.2 — the width budget, loaded BEFORE rz-svg-basis so a basis mark sits just past the
          end of its label instead of past a length*size*0.6 estimate of it. Synchronous and
@@ -883,7 +883,7 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
     <script src="js/datahall-ai/hall-interact.js?v=20261013-77877697" defer></script>
     <script src="js/conv/floor-plan-color.js?v=20261122-7138898a" defer></script>
     <script src="js/conv/floor-plan.js?v=20261126-d9d24cd3" defer></script>
-    <script src="js/datahall-ai/hall-iso.js?v=20261126-e3812d84" defer></script>
+    <script src="js/datahall-ai/hall-iso.js?v=20261126-c727f657" defer></script>
     <script src="js/datahall-ai/fire-workstation.js?v=20261116-0546e949" defer></script>
 <style id="rz-skiplink-v1">
 .skip-link{position:absolute;top:-50px;left:0;background:#1a1d23;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 4px 0;transition:top .2s ease}
@@ -1235,7 +1235,6 @@ Requested model/calculation versions and the complete locked schema must validat
     <div class="bx">
       <h3>Floor</h3>
       <div class="rw"><span class="l" title="Racks x rack pitch x row pitch. Row pitch is derived: rack depth + cold aisle + hot aisle.">Rack field</span><span class="v vg" data-basis-param="geometry.rack_field_m2" data-dcai-fill data-dcai-suffix=" m&#178;" tabindex="0" role="button">&mdash;</span></div>
-      <div class="rw"><span class="l" title="The service corridor along the row ends: TCS headers overhead, busway feeders and the egress route.">Service corridor</span><span class="v" data-basis-param="geometry.cross_aisle_m2" data-dcai-fill data-dcai-suffix=" m&#178;" tabindex="0" role="button">&mdash;</span></div>
       <div class="rw"><span class="l" title="Installed CDUs x serviced floor each — the CDU line at the row ends.">CDU line</span><span class="v" data-basis-param="geometry.cdu_gallery_m2" data-dcai-fill data-dcai-suffix=" m&#178;" tabindex="0" role="button">&mdash;</span></div>
       <div class="rw"><span class="l" title="Two CHW fan-wall galleries x hall length x gallery depth — the air plant is the two long walls.">Fan-wall galleries</span><span class="v" data-basis-param="geometry.air_plant_m2" data-dcai-fill data-dcai-suffix=" m&#178;" tabindex="0" role="button">&mdash;</span></div>
       <div class="rw"><span class="l" title="The sum of the four terms above, and nothing else.">Used</span><span class="v" data-basis-param="geometry.floor_used_m2" data-dcai-fill data-dcai-suffix=" m&#178;" tabindex="0" role="button">&mdash;</span></div>
@@ -1459,7 +1458,7 @@ Requested model/calculation versions and the complete locked schema must validat
 <div class="crah-hmi-body"><svg id="crahHmiSvg" role="group" aria-labelledby="crahHmiTitle" viewBox="0 0 720 600" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" data-rz-authored-basis="tier-2 HMI mimic: every value comes from the equipment payload (js/datahall-ai/hmi-payloads.js) — engine rows hooked, simulated and state rows declared; per-point provenance in the inspector (Track A §A5)"></svg></div>
 </div>
 <div class="corr-hmi" id="corrHmi">
-<div class="corr-hmi-hdr"><h4 id="corrHmiTitle">Corridor Service</h4><span class="mode" id="corrHmiMode">Online</span><button class="corr-hmi-close" onclick="$('corrHmi').classList.remove('show')">&times;</button></div>
+<div class="corr-hmi-hdr"><h4 id="corrHmiTitle">Row-end services</h4><span class="mode" id="corrHmiMode">Online</span><button class="corr-hmi-close" onclick="$('corrHmi').classList.remove('show')">&times;</button></div>
 <div class="corr-hmi-body"><svg id="corrHmiSvg" role="group" aria-labelledby="corrHmiTitle" viewBox="0 0 780 480" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" data-rz-authored-basis="tier-2 HMI mimic: every value comes from the equipment payload (js/datahall-ai/hmi-payloads.js) — engine rows hooked, simulated and state rows declared; per-point provenance in the inspector (Track A §A5)"></svg></div>
 </div>
 <div class="fire-iso" id="fireIsoDialog" aria-labelledby="fireIsoTitle" data-rz-inspector-keep="1">
@@ -1808,7 +1807,7 @@ txRatingMVA:E.transformer_unit_mva,                   /* 2.5 */
     rackFieldM2:rd(G.rack_field_m2,0), crossAisleM2:rd(G.cross_aisle_m2,0), cduGalleryM2:rd(G.cdu_gallery_m2,0),
     airPlantM2:rd(G.air_plant_m2,0), floorSpareM2:rd(G.floor_spare_m2,0), floorUsedM2:rd(G.floor_used_m2,0),
     airFlowM3s:rd(G.air_flow_m3s_per_hall,0), airPlantFrontageM:rd(G.air_plant_frontage_m,0),
-    /* v3.21.7 — fan-wall galleries on both long walls, the CDU line south of the service corridor,
+    /* v3.21.7 — fan-wall galleries on both long walls, the CDU line at the row ends (no service corridor since Amendment 9),
        and the two stack checks that prove the plan closes across the width and along the length */
     fanWallGalleries:G.fan_wall_galleries, fanWallModules:G.fan_wall_modules_per_gallery, fanWallPitchM:rd(G.fan_wall_module_pitch_m,2), fanWallVelocityMs:G.fan_wall_face_velocity_ms,
     fanWallFaceM2:rd(G.fan_wall_face_m2,0), fanWallFaceAvailM2:rd(G.air_plant_face_available_m2,0),
@@ -2498,8 +2497,8 @@ var grp=function(v){return v==null?'—':String(Math.round(v)).replace(/\B(?=(\d
    retired building grid with two undersized boxes standing for the 62 x 31 m halls, "CRAH x6" at 4 px and a CDU
    gallery the hall plan no longer has. The plate is now what the hall needs, west to east:
    core (stairs, lifts, risers, MDF) | the hall, 62 m | the electrical wing per hall; north to south:
-   hall N 31 m | spine corridor | hall S 31 m. Each hall is zoned exactly as the hall plan draws it
-   (fan-wall galleries on both long walls, twenty rows, service corridor, CDU line), from the same
+   hall N | spine corridor | hall S (hall width from the engine). Each hall is zoned exactly as the hall plan draws it
+   (fan-wall galleries on both long walls, twenty rows, CDU line; no service corridor since Amendment 9), from the same
    engine outputs. The core, the spine and the electrical wing are page-authored layout allowances,
    declared below; the wing is schematic and not sized to the engine's UPS frame count. */
 var HA=L.halls[0],HB=L.halls[1]!=null?L.halls[1]:L.halls[0],FN=L.floor,LA=String.fromCharCode(64+HA),LB=String.fromCharCode(64+HB);
@@ -2535,15 +2534,15 @@ function hall(h,y0,wing){
   for(var r=0;r<rows;r++){var p=Math.floor(r/2),west=r%2===0,xm=hx+p*2*pitch+(west?n('coldAisleM'):n('coldAisleM')+rackD+2*n('hotAisleM'));
     g+=R(xm,y0+gD,rackD,rowL,'rgba(148,163,184,.35)','rgba(148,163,184,.6)',.4);}
   for(var q=0;q<rows/2;q++){var hm=hx+q*2*pitch+n('coldAisleM')+rackD;g+=R(hm,y0+gD,2*n('hotAisleM'),rowL,'rgba(245,158,11,.22)');}
-  g+=R(hx,y0+yF1,Lm,xa,'rgba(148,163,184,.08)');
   g+=R(hx+.4,y0+yC1+1,Lm-.8,1.9,'rgba(6,182,212,.18)','var(--c)',.7);
   g+='</g>';
   /* labels outside the clickable group so the walker reads them as plain annotation */
-  g+=tx(X(hx+1),Y(y0+(gD-1)/2)+3,'FAN-WALL GALLERY · '+(n('fanWallModules')||'—')+' modules','var(--b)',8.5,'start',0,bo('fanWallModules',{nomark:true}));
   g+=tx(X(hx+Lm-1),Y(y0+(gD-1)/2)+3.5,'DATAHALL '+h+' · '+Lm+' × '+Wm+' m','var(--g)',10,'end',1,bo('hallLengthM',{also:['hallWidthM'],nomark:true}));
-  g+=tx(X(hx+1),Y(y0+yF1+xa*.62),'SERVICE CORRIDOR · '+(D.rackRows||'—')+' rows × '+(D.racksPerRow||'—')+' racks above','var(--t2)',8.5,'start',0,bo('rackRows',{also:['racksPerRow'],nomark:true}));
-  g+=tx(X(hx+Lm-1),Y(y0+yF1+xa*.62),(D.itHall!=null?(D.itHall/1000).toFixed(2):'—')+' MW IT','var(--o)',9,'end',1,bo('itHall',{nomark:true}));
-  g+=tx(X(hx+1),Y(y0+yL1+(yS0-yL1)*.7),'CDU LINE · '+(D.cduInstalled||'—')+' × '+((D.cduModel||'').replace(/\s*\(.*\)\s*$/,'')||'CDU'),'var(--c)',8.5,'start',0,bo('cduInstalled',{nomark:true}));
+  /* Amendment 9: no service corridor — the row ends face the CDU line, so its label sits on the CDU band; the north
+     gallery and the rows x racks labels left with the corridor (the 194 m plate has no room for them beside the hall name;
+     the hall tooltip carries the rack count) */
+  var yLb=Y(y0+yC1+1+1.9*.72);
+  g+=tx(X(hx+1),yLb,'CDU LINE · '+(D.cduInstalled||'—')+' × '+((D.cduModel||'').replace(/\s*\(.*\)\s*$/,'')||'CDU'),'var(--c)',8.5,'start',0,bo('cduInstalled',{nomark:true}));
   g+=tx(X(hx+1),Y(y0+yS0+1+(gD-1)/2)+3,'FAN-WALL GALLERY · '+(n('fanWallModules')||'—')+' modules','var(--b)',8.5,'start',0,bo('fanWallModules',{nomark:true}));
   /* electrical wing — engine length; the room split inside it is page-authored */
   var ex=CORE+Lm,fd=Wm*.44,ROOMS=decl('room split inside the electrical wing is page-authored; the wing length and the equipment counts are engine outputs');
@@ -2561,7 +2560,7 @@ s+=tx(X(PL/2),Y(Wm+SPINE/2)+3,'SPINE CORRIDOR · egress, logistics and the HTW /
 s+=hall(HB,Wm+SPINE,LB);
 /* west core */
 s+=R(0,0,CORE,Wm,'rgba(120,113,108,.06)','var(--t3)',.8)+R(0,Wm+SPINE,CORE,Wm,'rgba(120,113,108,.06)','var(--t3)',.8);
-[[Wm*.25,'STAIR A'],[Wm*.62,'LIFT · RISER'],[Wm+SPINE+Wm*.38,'MDF / MMR'],[Wm+SPINE+Wm*.75,'STAIR B']].forEach(function(c){
+[[Wm*.2,'STAIR A'],[Wm*.68,'LIFT · RISER'],[Wm+SPINE+Wm*.3,'MDF / MMR'],[Wm+SPINE+Wm*.78,'STAIR B']].forEach(function(c){
   s+='<g transform="rotate(-90 '+X(CORE/2)+' '+Y(c[0])+')">'+tx(X(CORE/2),Y(c[0])+3,c[1],'var(--t3)',8.5,'middle',1)+'</g>';});
 /* dimensions */
 s+='<g stroke="var(--t3)" stroke-width=".7"><line x1="'+X(CORE)+'" y1="'+(Y(PW)+14)+'" x2="'+X(CORE+Lm)+'" y2="'+(Y(PW)+14)+'"/><line x1="'+X(0)+'" y1="'+(Y(PW)+14)+'" x2="'+X(CORE)+'" y2="'+(Y(PW)+14)+'" stroke-dasharray="2 2"/><line x1="'+(X(0)-16)+'" y1="'+Y(0)+'" x2="'+(X(0)-16)+'" y2="'+Y(Wm)+'"/><line x1="'+(X(0)-16)+'" y1="'+Y(Wm+SPINE)+'" x2="'+(X(0)-16)+'" y2="'+Y(PW)+'"/></g>';
@@ -3436,16 +3435,17 @@ hc.innerHTML=s;return;}
 
      fan-wall gallery N   airPlantDepth       the wall is the air plant; it blows into the cold aisles
      rack field           22 x 0.6 m = 13.2   20 rows, north-south, 3.1 m pitch = the full 62 m
-     service corridor     crossAisle 4.6      TCS headers overhead, busway feeders, egress
-     CDU line             cduLineDepth 3.9    CHx1000 class at the row ends, HTW primary behind them
-     service aisle        the floor spare     what the width has left
+     CDU line             cduLineDepth 3.9    1 m aisle at the row ends (TCS headers overhead, leak rope,
+                                              egress) + CHx1000 class + 1 m aisle (HTW primary, busway, trays)
+     (no service corridor since Amendment 9: crossAisle 0, hall width = the width stack)
      fan-wall gallery S   airPlantDepth
 
    geometry.width_stack_fits and length_stack_fits are the engine's proof that this closes. */
-const VB_H=804;const svg=$('hSvg');if(svg)svg.setAttribute('viewBox','0 0 '+VB_W+' '+VB_H);
 const HY0b=194;                                             /* hall top; the header cards sit above */
 const X=m=>+(HX0+m*SC).toFixed(1), Y=m=>+(HY0b+m*SC).toFixed(1);
 const HX1=X(Lm),HY1=Y(Wm);
+/* Amendment 9: the sheet is as tall as the hall it draws (23.1 m wide hall, no service corridor) plus the dimension line */
+const VB_H=Math.ceil(HY1+64);const svg=$('hSvg');if(svg)svg.setAttribute('viewBox','0 0 '+VB_W+' '+VB_H);
 const gD=airPlantM2/(galN*Lm);                              /* gallery depth, derived: 3 m */
 const rowLm=perRow*rackWM;                                  /* 13.2 m */
 const yF0=gD,yF1=gD+rowLm,yC1=yF1+xaM,yL1=yC1+cduD,yS0=Wm-gD;
@@ -3479,7 +3479,7 @@ cards.forEach(k=>{s+=`<rect x="${k.x}" y="38" width="342" height="92" rx="3" fil
 /* the floor budget, term by term — the engine's proof that the room holds what it is given. PRD-DCAI-NUMBERS D4: the
    two sentences that stood here are the tooltip of one chip; the chip says whether the room closes. */
 {const wS=bn('widthStackM'),lS=bn('lengthStackM'),fits=wS!=null&&lS!=null&&wS<=Wm+1e-6&&lS<=Lm+1e-6;
- const tipF='FLOOR '+grp(bn('hallAreaM2'))+' m² = racks + aisles '+grp(bn('rackFieldM2'))+' · corridor '+grp(bn('crossAisleM2'))+' · CDU line '+grp(bn('cduGalleryM2'))+' · fan walls '+grp(airPlantM2)+' · spare '+grp(bn('floorSpareM2'))+' m²'
+ const tipF='FLOOR '+grp(bn('hallAreaM2'))+' m² = racks + aisles '+grp(bn('rackFieldM2'))+' · CDU line '+grp(bn('cduGalleryM2'))+' · fan walls '+grp(airPlantM2)+' · spare '+grp(bn('floorSpareM2'))+' m²'
   +' — CLOSES: width '+em(wS)+' m of '+em(Wm)+' m · length '+em(lS)+' m of '+em(Lm)+' m · fan-wall face '+grp(bn('fanWallFaceM2'))+' of '+grp(bn('fanWallFaceAvailM2'))+' m² at '+em(bn('fanWallVelocityMs'))+' m/s';
  const lab=fits?'AREA CHECK ✓ the room holds the plan':'AREA CHECK ✗ the plan does not fit',col=fits?'var(--g)':'var(--r)';
  s+=`<g class="hp-area" data-tip="${tipF.replace(/"/g,'&quot;')}" tabindex="0" role="button" aria-label="${(lab+'. '+tipF).replace(/"/g,'&quot;')}">`
@@ -3501,12 +3501,11 @@ s+=`<g transform="translate(${VB_W-30},${HY0b-22})"><polygon points="0,-10 6,6 0
 /* ===== FLOOR AND ZONES ======================================================================= */
 s+=`<rect x="${HX0}" y="${HY0b}" width="${M(Lm)}" height="${M(Wm)}" fill="url(#hpTile)"/>`;
 for(const [y0,y1] of [[0,gD],[yS0,Wm]])s+=`<rect x="${HX0}" y="${Y(y0)}" width="${M(Lm)}" height="${M(y1-y0)}" fill="rgba(245,158,11,.05)"/>`;
-s+=`<rect x="${HX0}" y="${Y(yF1)}" width="${M(Lm)}" height="${M(xaM)}" fill="rgba(148,163,184,.06)"/>`;
 s+=`<rect x="${HX0}" y="${Y(yC1)}" width="${M(Lm)}" height="${M(cduD)}" fill="rgba(6,182,212,.04)"/>`;
 s+=`<rect class="hp-wall" x="${HX0-3}" y="${HY0b-3}" width="${M(Lm)+6}" height="${M(Wm)+6}" fill="none" stroke="var(--t3)" stroke-width="3"/>`;
 s+=`<rect class="hp-wall" x="${HX0}" y="${HY0b}" width="${M(Lm)}" height="${M(Wm)}" fill="none" stroke="var(--bd)" stroke-width=".6"/>`;
 /* zone names down the west side, each sized to its band */
-[[0,gD,'FAN WALL'],[yF0,yF1,'RACK FIELD · '+grp(racksHall)+' RACKS'],[yF1,yC1,'CORRIDOR'],[yC1,yL1,'CDU LINE'],[yL1,yS0,'SERVICE'],[yS0,Wm,'FAN WALL']].forEach(([a,b,t],i)=>{
+[[0,gD,'FAN WALL'],[yF0,yF1,'RACK FIELD · '+grp(racksHall)+' RACKS'],[yC1,yL1,'CDU LINE'],[yS0,Wm,'FAN WALL']].forEach(([a,b,t],i)=>{
  const cy=Y((a+b)/2);s+=`<g transform="rotate(-90 ${HX0-20} ${cy})">`+tx(HX0-20,cy+3,t,'var(--t3)',9,'middle',1,i===1?bo('racksPerHall'):null)+'</g>';});
 
 /* ===== THERMAL LAYER — aisles coloured by their own sensors ================================== */
@@ -3520,7 +3519,7 @@ th+=`<rect class="C${pi}${si}z" data-pi="${pi}" x="${X(coldEm(p))}" y="${nzf(y0,
 th+='</g>';s+=th;
 
 /* ===== RACK FIELD — 20 rows north-south, contained hot aisles, a manifold on every rear face == */
-const hS=Y(yF1+1.3),hR=Y(yF1+1.75);                         /* TCS supply / return headers, overhead in the corridor */
+const hS=Y(yC1+.2),hR=Y(yC1+.85);                           /* TCS supply / return headers, overhead in the CDU line's north aisle at the row ends (Amendment 9); the row tags sit between them */
 for(let p=0;p<pairs;p++){const x0=X(hotM0(p)),w=M(2*hotM);
 s+=`<rect class="hp-hac" data-pi="${p}" x="${x0}" y="${Y(yF0)}" width="${w}" height="${nzf(fh,1)}" fill="none" stroke="var(--o)" stroke-width="1" stroke-opacity=".6"/>`;
 s+=`<rect class="hp-ly hp-ly-overhead" x="${x0}" y="${Y(yF0)}" width="${w}" height="${nzf(fh,1)}" fill="url(#hpRoof)"/>`;
@@ -3535,7 +3534,7 @@ s+=`<rect x="${nzf(fx,1)}" y="${(ry+1.2).toFixed(1)}" width="1.6" height="${(rh-
 s+=`<rect x="${(west?rx+rw-2:rx+.4).toFixed(1)}" y="${(ry+1.2).toFixed(1)}" width="1.6" height="${(rh-2.4).toFixed(1)}" fill="var(--o)" opacity=".7"/>`;
 s+=`<circle cx="${(west?rx+5:rx+rw-5).toFixed(1)}" cy="${(ry+rh/2).toFixed(1)}" r="1.4" fill="var(--g)"/>`;
 s+='</g>';}
-/* row manifold on the rear face: supply runs north from the corridor header, return comes back */
+/* row manifold on the rear face: supply runs north from the row-end header, return comes back */
 const m1=west?rearX+2.5:rearX-2.5,m2=west?rearX+5:rearX-5,yTop=Y(yF0)+3;
 s+=`<g class="hp-ly hp-ly-liquid">${L(m1.toFixed(1),hS,m1.toFixed(1),yTop,'var(--c)',1.4,' stroke-dasharray="6 4"').replace('/>','>'+anim('0;20',flowDur)+'</line>')}`;
 s+=`${L(m2.toFixed(1),yTop,m2.toFixed(1),hR,'var(--o)',1.4,' stroke-dasharray="6 4"').replace('/>','>'+anim('0;-20',flowDur)+'</line>')}</g>`;
@@ -3543,13 +3542,13 @@ s+='</g>';
 s+=`<g data-row-l="${id}">`+tx(rx+rw/2,Y(yF1)+13,'R'+id,'var(--t2)',9,'middle',1,bo('racksPerRow',{also:['kwPerRack','rowItKw'],nomark:rowNo>1}))+'</g>';}
 
 let late='';
-/* ===== SERVICE CORRIDOR — TCS headers overhead, leak rope, busway feeders, egress ============ */
+/* ===== ROW-END AISLE — TCS headers overhead, leak rope, egress (Amendment 9: no corridor) ==== */
 let lq='<g class="hp-ly hp-ly-liquid">';
 lq+=L(X(.4),hS,X(Lm-.4),hS,'var(--c)',3,' stroke-dasharray="10 6"').replace('/>','>'+anim('0;32',flowDur)+'</line>');
 lq+=L(X(.4),hR,X(Lm-.4),hR,'var(--o)',3,' stroke-dasharray="10 6"').replace('/>','>'+anim('0;-32',flowDur)+'</line>');
 lq+='</g>';s+=lq;
-s+=`<g class="hp-ly hp-ly-overhead"><g class="cable-click" data-rz-equipment="cable-tray:dh01" tabindex="0" role="button" data-tip="Overhead spine along the corridor: busway feeders (A and B) and fiber/copper trays to every row">`;
-[['var(--o)',3.9],['var(--g)',4.15],['var(--b)',4.4]].forEach(([c,yy])=>{s+=L(X(.6),Y(yF1+yy),X(Lm-.6),Y(yF1+yy),c,3,' stroke-opacity=".4"');});
+s+=`<g class="hp-ly hp-ly-overhead"><g class="cable-click" data-rz-equipment="cable-tray:dh01" tabindex="0" role="button" data-tip="Overhead spine over the CDU line's south aisle: busway feeders (A and B) and fiber/copper trays to every row">`;
+[['var(--o)',2.98],['var(--g)',3.1],['var(--b)',3.22]].forEach(([c,yy])=>{s+=L(X(.6),Y(yC1+yy),X(Lm-.6),Y(yC1+yy),c,2,' stroke-opacity=".4"');});
 s+='</g></g>';
 
 /* PRD-DCAI-HALL-DEPTH Amendment 2 P1: THE placement of a unit body, shared by this Drawing and the 2D / 3D floor
@@ -3561,38 +3560,32 @@ const HALL_PLACE={fanFill:.86,fanD:1.0,cduW:.9,cduD:1.9,cduOff:1.0,cduPitch:.95}
 const cduN=(cduInst!=null&&cduInst>0)?cduInst:0;
 const base=Math.floor(cduN/pairs),extra=cduN%pairs;
 const uy0=Y(yC1+HALL_PLACE.cduOff),uh=M(HALL_PLACE.cduD),uw=M(HALL_PLACE.cduW);
-const hwS=Y(yC1+3.2),hwR=Y(yC1+3.55);                      /* HTW primary supply / return behind the CDUs */
+const hwS=Y(yC1+3.45),hwR=Y(yC1+3.72);                      /* HTW primary supply / return behind the CDUs */
 let n=0,cg='',cl='<g class="hp-ly hp-ly-liquid">';
 cl+=L(X(.4),hwS,X(Lm),hwS,'var(--g)',2.6,' stroke-dasharray="8 5"').replace('/>','>'+anim('0;26',flowDur)+'</line>');
 cl+=L(X(.4),hwR,X(Lm),hwR,'var(--g)',1.8,' stroke-opacity=".6" stroke-dasharray="4 4"');
-for(let p=0;p<pairs;p++){const cnt=base+(p<extra?1:0),pw=cnt*HALL_PLACE.cduPitch,x0m=pairM(p)+pitchM-pw/2;const first=n+1;
+for(let p=0;p<pairs;p++){const cnt=base+(p<extra?1:0),pw=cnt*HALL_PLACE.cduPitch,x0m=pairM(p)+pitchM-pw/2;
 for(let k=0;k<cnt;k++){n++;const xm=x0m+k*HALL_PLACE.cduPitch,x=X(xm),on=(cduRun!=null)?n<=cduRun:true,c=on?'var(--c)':'var(--t3)',lbl='CDU-'+pad2(n);
-/* secondary: up to the corridor headers; primary: down to the HTW header */
+/* secondary: up to the row-end headers; primary: down to the HTW header */
 cl+=L((x+uw*.3).toFixed(1),uy0,(x+uw*.3).toFixed(1),hS,'var(--c)',1,' stroke-opacity=".55"')+L((x+uw*.7).toFixed(1),uy0,(x+uw*.7).toFixed(1),hR,'var(--o)',1,' stroke-opacity=".55"');
 cl+=L((x+uw/2).toFixed(1),(uy0+uh).toFixed(1),(x+uw/2).toFixed(1),hwS,'var(--g)',1,' stroke-opacity=".7"');
-cg+=`<g class="cdu-click hp-cdu" data-cdu="${n}" data-rz-equipment="cdu:${n}" tabindex="0" role="button" data-tip="${lbl} · ${cduShort()} · ${on?'DUTY':'STANDBY'} · ${em(bn('cduRating'))} kWth rated · ${grp(bn('cduFlowPerUnitLpm'))} L/min · secondary to the corridor TCS headers, primary on the HTW header · at the end of rows R${pad2(2*p+1)}/R${pad2(2*p+2)} · click: CDU HMI">`;
+cg+=`<g class="cdu-click hp-cdu" data-cdu="${n}" data-rz-equipment="cdu:${n}" tabindex="0" role="button" data-tip="${lbl} · ${cduShort()} · ${on?'DUTY':'STANDBY'} · ${em(bn('cduRating'))} kWth rated · ${grp(bn('cduFlowPerUnitLpm'))} L/min · secondary to the row-end TCS headers, primary on the HTW header · at the end of rows R${pad2(2*p+1)}/R${pad2(2*p+2)} · click: CDU HMI">`;
 cg+=`<rect x="${nzf(x,1)}" y="${uy0}" width="${nzf(uw,1)}" height="${nzf(uh,1)}" rx="1.4" class="hp-cab" stroke="${c}" stroke-width="${on?1:.8}" ${on?'':'stroke-dasharray="3 2"'}/>`;
 cg+=`<path d="M${(x+uw/2).toFixed(1)} ${(uy0+3).toFixed(1)} l-3.4 2.5 l6.8 2.5 l-6.8 2.5 l6.8 2.5 l-6.8 2.5 l3.4 2.5" fill="none" stroke="${c}" stroke-width=".9" opacity="${on?1:.6}"/>`;
 cg+=`<circle cx="${(x+uw/2).toFixed(1)}" cy="${(uy0+uh-7).toFixed(1)}" r="4" fill="none" stroke="${c}" stroke-width=".9"/><path d="M${(x+uw/2-2.4).toFixed(1)} ${(uy0+uh-5).toFixed(1)} l2.4 -4.4 l2.4 4.4z" fill="${c}"/>`;
 cg+='</g>';}
-const gx=X(pairM(p)+pitchM);
-cg+=tx(gx,Y(yL1)+13,'CDU '+pad2(first)+'–'+pad2(n),'var(--c)',9,'middle',1,decl('CDU unit ids serving this containment pair, numbered along the CDU line: ids, not quantities'));}
+}
 cl+='</g>';s+=cl+cg;
-const svY=Y(yL1+2.1);
-s+=pill(X(.5),svY-11,M(44),15)+tx(X(.8),svY,'CDU LINE '+em(cduInst)+' × '+cduShort()+' · '+em(cduRun)+' duty + '+((cduInst!=null&&cduRun!=null)?cduInst-cduRun:DASH)+' standby · '+em(bn('cduRating'))+' kWth · '+grp(bn('cduFlowPerUnitLpm'))+' L/min each · HTW '+em(bn('htwSupplyC'))+'/'+em(bn('htwReturnC'))+' °C behind','var(--c)',9,'start',0,bo('cduInstalled',{also:['cduRunning','cduRating','cduFlowPerUnitLpm','htwSupplyC','htwReturnC']}));
-s+=pill(X(45.3),svY-11,M(16.2),15)+tx(X(Lm-.6),svY,'SERVICE AISLE · spare '+grp(bn('floorSpareM2'))+' m²','var(--t3)',9,'end',0,bo('floorSpareM2'));
+/* Amendment 9: the CDU line caption went with the empty band it sat in; the LIQUID PATH card and each CDU tooltip carry it */
 
-const capY=Y(yF1+3.3);
-const capT='SERVICE CORRIDOR '+em(xaM)+' m — TCS SUPPLY '+em(bn('tcsSupply'))+' °C / RETURN '+em(bn('tcsReturn'))+' °C HEADERS OVERHEAD · BUSWAY FEEDERS · EGRESS';
-late+=pill(X(5.2),capY-11,M(36.5),15)+tx(X(5.6),capY,capT,'var(--c)',9,'start',1,bo('crossAisleM',{also:['tcsSupply','tcsReturn']}));
-/* egress doors and the occupancy reader at both corridor ends */
-for(const ex of [HX0-3,HX1+3])s+=`<rect x="${ex-4}" y="${Y(yF1+1.1)}" width="8" height="${M(2.4)}" fill="var(--bg2)" stroke="var(--g)" stroke-width="1"/>`;
-late+=`<g data-rz-authored-basis="simulated occupancy count at the hall door reader; never a field reading">`+pill(X(.5),capY-11,M(4.3),15)+`<text x="${X(.8)}" y="${capY}" fill="var(--g)" font-family="${J}" font-size="9" font-weight="600">ENTRY <tspan id="pplCount">—</tspan> in</text></g>`;
+/* egress doors and the occupancy reader at both ends of the row-end aisle */
+for(const ex of [HX0-3,HX1+3])s+=`<rect x="${ex-4}" y="${Y(yC1)}" width="8" height="${M(HALL_PLACE.cduOff)}" fill="var(--bg2)" stroke="var(--g)" stroke-width="1"/>`;
+late+=`<g data-rz-authored-basis="simulated occupancy count at the hall door reader; never a field reading">`+pill(HX0,HY1+12,M(4.5),15)+`<text x="${HX0+5}" y="${HY1+23}" fill="var(--g)" font-family="${J}" font-size="9" font-weight="600">ENTRY <tspan id="pplCount">—</tspan> in</text></g>`;
 s+=`<g class="hp-ly hp-ly-leak"><g class="leak-click" data-rz-equipment="leak:dh01" tabindex="0" role="button" data-tip="Leak detection rope under the TCS headers and along the CDU line · 24 zones">`;
-const lkY=Y(yF1+2.25);
+const lkY=Y(yC1+.97);
 s+=L(X(.6),lkY,X(Lm-.6),lkY,'var(--o)',1.2,' stroke-dasharray="3 3"');
 for(let z=1;z<=24;z++){const zx=X(.6+(Lm-1.2)*(z-.5)/24);s+=L(zx.toFixed(1),(lkY-3).toFixed(1),zx.toFixed(1),(lkY+3).toFixed(1),'var(--o)',.8);}
-s+='</g></g>';late+='<g class="hp-ly hp-ly-leak">'+pill(X(Lm-13.2),lkY+3,M(12.6),13)+tx(X(Lm-.8),lkY+13,'LEAK ROPE · 24 ZONES','var(--o)',9,'end',0,decl('leak-rope zone count is a page-authored detection layout, not an engine quantity'));late+='</g>';
+s+='</g></g>';late+='<g class="hp-ly hp-ly-leak">'+pill(X(Lm-13.2),HY1+12,M(12.6),15)+tx(X(Lm-.8),HY1+23,'LEAK ROPE · 24 ZONES','var(--o)',9,'end',0,decl('leak-rope zone count is a page-authored detection layout, not an engine quantity'));late+='</g>';
 s+=late;
 /* ===== FAN-WALL GALLERIES — the air plant is the two long walls ============================== */
 let fw='',fc='<g class="hp-ly hp-ly-liquid">';const pitchFw=Lm/modsPer;let crahN=0;
@@ -11689,7 +11682,7 @@ var pwrFill=P.n('fill_power'),fiberFill=P.n('fill_fiber'),cuFill=P.n('fill_cu');
 s+=`<rect width="${W}" height="${H}" fill="#0e0f12" rx="4"/>`;
 // Header
 s+=`<rect x="0" y="0" width="${W}" height="26" fill="rgba(59,130,246,.08)"/>`;
-s+=`<text x="10" y="17" fill="var(--b)" font-family="${F}" font-size="10" font-weight="600">CABLE TRAY SYSTEM \u2014 Corridor Services</text>`;
+s+=`<text x="10" y="17" fill="var(--b)" font-family="${F}" font-size="10" font-weight="600">CABLE TRAY SYSTEM \u2014 Row-end services</text>`;
 s+=`<circle cx="330" cy="13" r="4" fill="var(--g)" opacity=".8"/><text x="338" y="17" fill="var(--g)" font-family="${F}" font-size="8">Nominal</text>`;
 s+=`<text x="${W-10}" y="17" fill="var(--t3)" font-family="${F}" font-size="8" text-anchor="end">E90 Fire Rated</text>`;
 // KPI strip
@@ -15826,7 +15819,7 @@ if(faqBtn){ faqBtn.addEventListener('click',openFaqDialog); }
     <script src="js/rz-eng-symbols.js?v=20261118-528d60ce"></script>
     <script src="js/rz-elec-voltage.js?v=20261122-84c5c299"></script>
     <script src="js/rz-hmi-sheet.js?v=20261125-ca35ea9a"></script>
-    <script src="js/datahall-ai/hmi-sheets.js?v=20261123-b8fbd76b"></script>
+    <script src="js/datahall-ai/hmi-sheets.js?v=20261126-446e3111"></script>
     <script src="js/conv/vfx.js?v=20261123-3fd25115"></script>
     <script src="js/datahall-ai/hmi-v2.js?v=20261123-7ce12335"></script>
     <script src="js/rz-el-iso.js?v=20261123-243f32ae"></script>

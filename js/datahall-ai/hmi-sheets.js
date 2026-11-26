@@ -620,13 +620,16 @@
     var fw = (Wm - rowLen - cross - cduDepth) / galleries;
     s.areas.push({ x: X(0) - 5, y: Y(0) - 5, w: Lm * SC + 10, h: Wm * SC + 10, kind: 'box' });
     var bands = [['fan wall A', fw], ['rack field', rowLen], ['cross aisle', cross], ['CDU gallery', cduDepth], ['fan wall B', fw]], yb = 0;
-    bands.forEach(function (b) { s.areas.push({ x: X(0), y: Y(yb), w: Lm * SC, h: b[1] * SC, kind: 'zone' }); b.y = yb; yb += b[1]; });
+    /* Amendment 9: the cross aisle is 0 m (no service corridor) — a band with no depth draws nothing */
+    bands.forEach(function (b) { if (b[1] > 0) s.areas.push({ x: X(0), y: Y(yb), w: Lm * SC, h: b[1] * SC, kind: 'zone' }); b.y = yb; yb += b[1]; });
+    // the egress route: along the cross aisle when the model has one, else along the CDU line's 1 m aisle at the row ends
+    var egY = cross > 0 ? bands[2].y + cross / 2 : bands[3].y + 0.5;
     // fire zones of the hall from the inventory: Z05–Z08 rack-row quarters, Z01–Z04 CDU-line quarters
     var inv = o && o.fire, zones = inv ? inv.zones.filter(function (z) { return z.hall === 1 && z.n <= 8; }) : [];
     zones.forEach(function (z) {
       var q = (z.n - 1) % 4, isRack = z.n >= 5, zx = X(q * Lm / 4) + 2, zw = Lm / 4 * SC - 4;
       var zy = isRack ? Y(bands[1].y) + 2 : Y(bands[3].y) + 2, zh = (isRack ? rowLen : cduDepth) * SC - 4;
-      // the zone tag sits in the cross aisle beside its zone (racks and CDUs fill the zone itself)
+      // the zone tag sits at the row ends beside its zone (racks and CDUs fill the zone itself)
       s.notes.push({ x: zx + 4, y: isRack ? Y(bands[2].y) + 11 : Y(bands[3].y) - 4, text: 'Z' + pad(z.n), role: 'tag' });
       s.n({ id: 'zone-' + z.id.toLowerCase(), tag: 'Z' + pad(z.n), box: [zw, zh], x: zx + zw / 2, y: zy + zh / 2, cls: 'fire-zone', eqId: z.id, tagAt: 'none', boxSym: 'fire-zone', lod: 1, label: 'Fire zone ' + z.id.slice(-3) + ' ' + z.name + ' — ' + Math.round(z.areaM2) + ' m², ' + z.means.length + ' detection means' + (z.release ? ', clean-agent release' : '') });
     });
@@ -653,9 +656,9 @@
     // CDU line in the gallery: every installed CDU as a box to scale (1.2 × 0.8 m class), standby last
     var cduPitch = Lm / cdus;
     for (var c = 1; c <= cdus; c++) s.n({ id: 'cdu' + pad(c), tag: 'CDU-' + pad(c), box: [Math.min(1.2, cduPitch - 0.1) * SC, 0.8 * SC], x: X((c - 0.5) * cduPitch), y: Y(bands[3].y + cduDepth / 2), cls: 'cdu', eqId: String(c), tagAt: 'none', boxSym: 'cdu-plan', label: 'CDU-' + pad(c) + (c > need(snap, 'equipment.cdu_duty_per_hall') ? ' (standby)' : '') });
-    // doors (double, 1.8 m) on the short walls, egress routes along the cross aisle
-    [[0, 'W'], [Lm, 'E']].forEach(function (d) { s.n({ id: 'door-' + d[1].toLowerCase(), tag: 'DOOR ' + d[1], box: [6, 1.8 * SC], x: X(d[0]), y: Y(bands[2].y + cross / 2), tagAt: 'none', boxSym: 'door', label: 'Double fire door, ' + d[1] + ' wall, 1.8 m, 90 min (EI 90)' }); });
-    s.e([X(0) + 6, Y(bands[2].y + cross / 2)], [X(Lm) - 6, Y(bands[2].y + cross / 2)], 'signal', { w: 'signal', line: 'EGRESS ' + Lm + ' m' });
+    // doors (double, 1.8 m) on the short walls, on the egress route
+    [[0, 'W'], [Lm, 'E']].forEach(function (d) { s.n({ id: 'door-' + d[1].toLowerCase(), tag: 'DOOR ' + d[1], box: [6, 1.8 * SC], x: X(d[0]), y: Y(egY), tagAt: 'none', boxSym: 'door', label: 'Double fire door, ' + d[1] + ' wall, 1.8 m, 90 min (EI 90)' }); });
+    s.e([X(0) + 6, Y(egY)], [X(Lm) - 6, Y(egY)], 'signal', { w: 'signal', line: 'EGRESS ' + Lm + ' m' });
     // ancillary rooms beside the hall (fire zones Z09–Z12), drawn as a strip to the right, to scale by area
     var rooms = inv ? inv.zones.filter(function (z) { return z.hall === 1 && z.n >= 9; }) : [], ry = [0, 0];
     rooms.forEach(function (z, i) {
@@ -1419,7 +1422,7 @@
     var s = Sheet({ id: 'dh-f-104', no: 'DH-F-104', title: 'DH-01 FIRE ZONES', size: [W, H], svgId: 'fireZoneSvg', sheet: '4/4', basis: 'engine hall geometry + fire inventory' });
     var fw = (Wm - rowLen - cross - cduDepth) / galleries, bands = [['FAN WALL A', fw], ['', rowLen], ['CROSS AISLE', cross], ['', cduDepth], ['FAN WALL B', fw]], yb = 0;
     s.areas.push({ x: X(0) - 5, y: Y(0) - 5, w: Lm * SC + 10, h: Wm * SC + 10, kind: 'box' });
-    bands.forEach(function (b) { b.y = yb; if (b[0]) s.notes.push({ x: X(0) + 6, y: Y(yb + b[1] / 2) + 3, text: b[0], role: 'tag' }); yb += b[1]; });
+    bands.forEach(function (b) { b.y = yb; if (b[0] && b[1] > 0.5) s.notes.push({ x: X(0) + 6, y: Y(yb + b[1] / 2) + 3, text: b[0], role: 'tag' }); yb += b[1]; });
     var bx = function (z, x, y, w, h) {
       s.n({ id: 'z' + pad(z.n), tag: 'Z' + pad(z.n), text: 'Z' + pad(z.n), textRole: 'tag', textAt: 'top', name: z.name.toUpperCase(), box: [w, h], x: x + w / 2, y: y + h / 2,
         cls: 'fire-zone', eqId: z.id, boxSym: 'fire-zone', values: [{ k: 'means' }], label: 'Fire zone ' + z.id.slice(-3) + ' ' + z.name + ', ' + z.areaM2 + ' m²' + (z.release ? ', clean-agent release' : '') + (z.epo ? ', zoned EPO' : '') });

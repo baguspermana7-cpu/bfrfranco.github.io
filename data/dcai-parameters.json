@@ -1,6 +1,6 @@
 {
   "generatedBy": "tools/build-dcai-parameter-registry.mjs",
-  "engineVersion": "1.8.0",
+  "engineVersion": "1.9.0",
   "note": "GENERATED — do not hand-edit. Curated metadata lives in data/dcai-parameters.curated.json; authored-leaf provenance is read from js/dcai-model.js.",
   "parameters": [
     {
@@ -7948,7 +7948,8 @@
       ],
       "tests": [
         "test-dcai-engine.mjs",
-        "test-dcai-hall-views.mjs"
+        "test-dcai-hall-views.mjs",
+        "test-dcai-no-corridor.mjs"
       ],
       "docs": []
     },
@@ -8052,11 +8053,11 @@
       "label": "cross aisle m",
       "unit": "m",
       "kind": "authored",
-      "value": 4.6,
+      "value": 0,
       "formula": null,
       "deps": [],
       "scope": "hall",
-      "evidenceClass": "ADOPTED",
+      "evidenceClass": "ASSUMED",
       "explainKey": null,
       "dependsOnInputs": [
         "geometry.crossAisleM"
@@ -8065,18 +8066,19 @@
       "consumers": [
         {
           "page": "datahallAI.html",
-          "reads": 6
+          "reads": 5
         }
       ],
       "tests": [
         "test-dcai-engine.mjs",
         "test-dcai-hall-views.mjs",
+        "test-dcai-no-corridor.mjs",
         "test-dcai-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [],
       "source": {
         "ref": "js/dcai-model.js geometry.crossAisleM",
-        "method": "v3.21.7 — the SERVICE CORRIDOR along the south ends of the rows: it carries the secondary-fluid-network (TCS) supply and return headers overhead, the busway feeders and the fire egress route, between the row ends and the CDU line. Width kept from the retired cross aisle. ADOPTED",
+        "method": "Amendment 9 (owner 2026-11-26 \"Gak perlu ada service corridor\"): NO service corridor. The row ends face the CDU line's own north access face (1 m, inside cduLineDepthM); that aisle is the walkway along the row ends, and the TCS headers and busway feeders run overhead above it. Was 4.6 m (v3.21.7). That a 1 m aisle is enough for egress is ASSUMED, not checked against a code clause.",
         "asOf": "2026-09-06"
       }
     },
@@ -8085,21 +8087,20 @@
       "label": "cross aisle m2",
       "unit": "m²",
       "kind": "derived",
-      "value": 285.2,
+      "value": 0,
       "formula": null,
       "deps": [],
       "scope": "hall",
       "evidenceClass": "DERIVED",
       "explainKey": null,
       "dependsOnInputs": [
-        "geometry.crossAisleM",
-        "geometry.lengthM"
+        "geometry.crossAisleM"
       ],
       "dependsOnInputsAtCliff": [],
       "consumers": [
         {
           "page": "datahallAI.html",
-          "reads": 6
+          "reads": 3
         }
       ],
       "tests": [
@@ -8278,6 +8279,7 @@
       ],
       "tests": [
         "test-dcai-hall-views.mjs",
+        "test-dcai-no-corridor.mjs",
         "test-dcai-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [],
@@ -8380,8 +8382,18 @@
       "evidenceClass": "DERIVED",
       "explainKey": null,
       "dependsOnInputs": [
+        "equipment.cdu.unitKwTh",
+        "facility.rackItKw",
         "facility.racksPerHall",
+        "gb300.liquidCaptureRatio",
+        "geometry.airPlantDepthM",
+        "geometry.cduServiceM2",
+        "geometry.coldAisleM",
+        "geometry.crossAisleM",
+        "geometry.fanWallGalleries",
+        "geometry.hotAisleM",
         "geometry.lengthM",
+        "geometry.rackDepthM",
         "geometry.rackPitchM",
         "geometry.widthM"
       ],
@@ -8399,7 +8411,7 @@
       "label": "floor spare fraction",
       "unit": null,
       "kind": "derived",
-      "value": 0.11779396462018735,
+      "value": 0.015221337801983089,
       "formula": null,
       "display": "internal",
       "displayReason": "The percentage form of geometry.floor_spare_m2, which the hall panel renders in square metres because a floor plan is read in area, not in percent.",
@@ -8436,7 +8448,7 @@
       "label": "floor spare m2",
       "unit": "m²",
       "kind": "derived",
-      "value": 226.4000000000001,
+      "value": 21.800000000000182,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -8476,7 +8488,7 @@
       "label": "floor used m2",
       "unit": "m²",
       "kind": "derived",
-      "value": 1695.6,
+      "value": 1410.3999999999999,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -8540,7 +8552,7 @@
       "label": "hall area m2",
       "unit": "m²",
       "kind": "derived",
-      "value": 1922,
+      "value": 1432.2,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -8589,7 +8601,7 @@
       "docs": [],
       "source": {
         "ref": "js/dcai-model.js geometry.heightM",
-        "method": "the room is unchanged from the four-hall basis. What changed is that its floor is now BUDGETED rather than asserted: see geometry.floor_* in the engine, which adds the rack field, the aisles, the CDU gallery and the air plant and requires the total to fit. ADOPTED",
+        "method": "the room is unchanged from the four-hall basis (clear height). ADOPTED",
         "asOf": "2026-09-06"
       }
     },
@@ -8617,6 +8629,7 @@
       "tests": [
         "test-dcai-engine.mjs",
         "test-dcai-hall-views.mjs",
+        "test-dcai-no-corridor.mjs",
         "test-dcai-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [
@@ -8633,7 +8646,7 @@
       "label": "hall perimeter m",
       "unit": "m",
       "kind": "derived",
-      "value": 186,
+      "value": 170.2,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -8660,7 +8673,7 @@
       "label": "hall volume m3",
       "unit": "m³",
       "kind": "derived",
-      "value": 10571,
+      "value": 7877.1,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -8690,7 +8703,7 @@
       "label": "hall width m",
       "unit": "m",
       "kind": "authored",
-      "value": 31,
+      "value": 23.1,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -8709,12 +8722,13 @@
       "tests": [
         "test-dcai-engine.mjs",
         "test-dcai-hall-views.mjs",
+        "test-dcai-no-corridor.mjs",
         "test-dcai-parameter-registry.mjs (provenance + evidence class)"
       ],
       "docs": [],
       "source": {
         "ref": "js/dcai-model.js geometry.widthM",
-        "method": "the room is unchanged from the four-hall basis. What changed is that its floor is now BUDGETED rather than asserted: see geometry.floor_* in the engine, which adds the rack field, the aisles, the CDU gallery and the air plant and requires the total to fit. ADOPTED",
+        "method": "Amendment 9 (v3.114.0) — the width stack: 2 x 3 m fan-wall galleries + 13.2 m row + 0 m corridor + 3.9 m CDU line = 23.1 m, no empty band (was 31 m with 3.3 m empty); the length closes the same way. ADOPTED",
         "asOf": "2026-09-06"
       }
     },
@@ -8782,7 +8796,7 @@
       "label": "it density kw per m2",
       "unit": "m²",
       "kind": "derived",
-      "value": 32.50780437044745,
+      "value": 43.625192012288785,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -8967,7 +8981,7 @@
       "label": "rack footprint fraction",
       "unit": null,
       "kind": "derived",
-      "value": 0.1648283038501561,
+      "value": 0.22119815668202766,
       "formula": null,
       "display": "internal",
       "displayReason": "Auxiliary geometry ratio behind geometry.it_density_kw_per_m2, which the page renders; kept for the floor re-grid work (Track A).",
@@ -9262,7 +9276,8 @@
         }
       ],
       "tests": [
-        "test-dcai-engine.mjs"
+        "test-dcai-engine.mjs",
+        "test-dcai-no-corridor.mjs"
       ],
       "docs": []
     },
@@ -9338,7 +9353,11 @@
       "explainKey": null,
       "dependsOnInputs": [
         "facility.racksPerHall",
+        "geometry.airPlantDepthM",
         "geometry.banks",
+        "geometry.cduLineDepthM",
+        "geometry.crossAisleM",
+        "geometry.fanWallGalleries",
         "geometry.rackPitchM",
         "geometry.rows",
         "geometry.widthM"
@@ -9361,7 +9380,7 @@
       "id": "geometry.width_stack_m",
       "unit": "m",
       "kind": "derived",
-      "value": 27.699999999999996,
+      "value": 23.099999999999998,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -9384,6 +9403,37 @@
           "reads": 3
         }
       ],
+      "tests": [
+        "test-dcai-engine.mjs"
+      ],
+      "docs": []
+    },
+    {
+      "id": "geometry.width_stack_slack_m",
+      "label": "width stack slack",
+      "unit": "m",
+      "kind": "derived",
+      "value": 3.552713678800501e-15,
+      "formula": null,
+      "display": "internal",
+      "displayReason": "Amendment 9: hall width minus the width stack, 0 when the hall has no empty band. The page shows the same closure as 'width 23.1 m of 23.1 m' in the AREA CHECK tooltip (widthStackM vs hallWidthM).",
+      "deps": [],
+      "scope": "hall",
+      "evidenceClass": "DERIVED",
+      "explainKey": null,
+      "dependsOnInputs": [
+        "facility.racksPerHall",
+        "geometry.airPlantDepthM",
+        "geometry.banks",
+        "geometry.cduLineDepthM",
+        "geometry.crossAisleM",
+        "geometry.fanWallGalleries",
+        "geometry.rackPitchM",
+        "geometry.rows",
+        "geometry.widthM"
+      ],
+      "dependsOnInputsAtCliff": [],
+      "consumers": [],
       "tests": [
         "test-dcai-engine.mjs"
       ],
@@ -9808,7 +9858,7 @@
       "label": "version",
       "unit": null,
       "kind": "authored",
-      "value": "1.8.0",
+      "value": "1.9.0",
       "formula": null,
       "deps": [],
       "scope": "meta",
@@ -11736,7 +11786,7 @@
       "label": "campus depth",
       "unit": "m",
       "kind": "derived",
-      "value": 194.78948109442126,
+      "value": 159.51988206092028,
       "formula": null,
       "display": "internal",
       "displayReason": "Layout intermediate: three bands and two roads; the site plan prints the site depth (site.site_depth_m), which adds the perimeter road and the setback each side.",
@@ -11837,7 +11887,7 @@
       "label": "campus width",
       "unit": "m",
       "kind": "derived",
-      "value": 376.1764705882353,
+      "value": 468.06896551724134,
       "formula": null,
       "display": "internal",
       "displayReason": "Layout intermediate: the three bands span this width inside the perimeter road; the site plan prints the site width (site.site_width_m), which adds the road and the setback each side.",
@@ -11978,7 +12028,7 @@
       "id": "site.dry_cooler_yard_m2",
       "unit": "m²",
       "kind": "derived",
-      "value": 20655,
+      "value": 21330,
       "formula": null,
       "deps": [],
       "scope": "site",
@@ -12054,7 +12104,7 @@
       "id": "site.dry_coolers_roof",
       "unit": null,
       "kind": "derived",
-      "value": 172,
+      "value": 157,
       "formula": null,
       "deps": [],
       "scope": "site",
@@ -12117,7 +12167,7 @@
       "id": "site.dry_coolers_yard",
       "unit": null,
       "kind": "derived",
-      "value": 459,
+      "value": 474,
       "formula": null,
       "deps": [],
       "scope": "site",
@@ -12281,7 +12331,7 @@
       "id": "site.electrical_wing_m",
       "unit": "m",
       "kind": "derived",
-      "value": 93,
+      "value": 124,
       "formula": null,
       "deps": [],
       "scope": "hall",
@@ -12338,7 +12388,7 @@
       "id": "site.footprint_m2",
       "unit": "m²",
       "kind": "derived",
-      "value": 11084,
+      "value": 10126.800000000001,
       "formula": null,
       "deps": [],
       "scope": "site",
@@ -12632,7 +12682,7 @@
       "id": "site.genset_yard_width_m",
       "unit": "m",
       "kind": "derived",
-      "value": 201.1764705882353,
+      "value": 262.06896551724134,
       "formula": null,
       "deps": [],
       "scope": "site",
@@ -12782,7 +12832,7 @@
       "id": "site.north_band_depth_m",
       "unit": "m",
       "kind": "derived",
-      "value": 21.33446574956583,
+      "value": 16.797048248732157,
       "formula": null,
       "deps": [],
       "scope": "site",
@@ -12879,7 +12929,7 @@
       "id": "site.plant_outside_m2",
       "unit": "m²",
       "kind": "derived",
-      "value": 50361.483260572895,
+      "value": 51036.483260572895,
       "formula": null,
       "deps": [],
       "scope": "site",
@@ -12980,7 +13030,7 @@
       "id": "site.plate_length_m",
       "unit": "m",
       "kind": "derived",
-      "value": 163,
+      "value": 194,
       "formula": null,
       "deps": [],
       "scope": "site",
@@ -13039,7 +13089,7 @@
       "id": "site.plate_width_m",
       "unit": "m",
       "kind": "derived",
-      "value": 68,
+      "value": 52.2,
       "formula": null,
       "deps": [],
       "scope": "site",
@@ -13100,7 +13150,7 @@
       "id": "site.roads_m2",
       "unit": "m²",
       "kind": "derived",
-      "value": 33440.51050581592,
+      "value": 37152.22142792823,
       "formula": null,
       "deps": [],
       "scope": "site",
@@ -13206,7 +13256,7 @@
       "id": "site.roof_usable_m2",
       "unit": "m²",
       "kind": "derived",
-      "value": 7758.799999999999,
+      "value": 7088.76,
       "formula": null,
       "deps": [],
       "scope": "site",
@@ -13298,7 +13348,7 @@
       "id": "site.site_area_m2",
       "unit": "m²",
       "kind": "derived",
-      "value": 95125.99376638881,
+      "value": 98555.50468850113,
       "formula": null,
       "deps": [],
       "scope": "site",
@@ -13402,7 +13452,7 @@
       "id": "site.site_depth_m",
       "unit": "m",
       "kind": "derived",
-      "value": 230.78948109442126,
+      "value": 195.51988206092028,
       "formula": null,
       "deps": [],
       "scope": "site",
@@ -13506,7 +13556,7 @@
       "id": "site.site_width_m",
       "unit": "m",
       "kind": "derived",
-      "value": 412.1764705882353,
+      "value": 504.06896551724134,
       "formula": null,
       "deps": [],
       "scope": "site",
@@ -13584,7 +13634,7 @@
       "id": "site.south_band_depth_m",
       "unit": "m",
       "kind": "derived",
-      "value": 81.45501534485544,
+      "value": 66.52283381218813,
       "formula": null,
       "deps": [],
       "scope": "site",

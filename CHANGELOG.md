@@ -11,6 +11,34 @@ release sections rather than semver.
 
 ---
 
+## v3.114.0 — 2026-11-26 — DC AI data hall: no service corridor, the hall closes on its width
+
+### Changed (PRD-DCAI-HALL-DEPTH Amendment 9, owner "Gak perlu ada service corridor")
+
+- Engine 1.9.0: `geometry.crossAisleM` 4.6 → 0 and `geometry.widthM` 31 → 23.1 m, which is the width stack (two 3 m
+  fan-wall galleries + 13.2 m row + 3.9 m CDU line). The hall is 62 × 23.1 m = 1,432.2 m² (was 1,922 m², of which
+  4.6 m was corridor and 3.3 m was empty floor). IT density goes from 32.5 to 43.6 kW/m². New output
+  `geometry.width_stack_slack_m` (0). The building plate, electrical wing and fire counts follow by derivation.
+  The claim that a 1 m aisle at the row ends is enough for egress is ASSUMED.
+- The rack row ends face the CDU line's 1 m access aisle. The TCS supply and return headers and the leak rope run
+  above it. The busway and trays run over the CDU line's south aisle, beside the HTW header.
+- Floor 2D/3D: the "SERVICE CORRIDOR" label is gone. The Drawing view loses the corridor band and caption, the empty
+  "SERVICE AISLE" and the hidden CDU group ids. The sheet height follows the hall. The Room Layout "Service corridor" row
+  is removed. The corridor HMI is now "Row-end services".
+
+### Fixed
+
+- `hall-iso.js` refused a 0 m cross aisle, so the floor fell back silently to a layout that was not to scale. A zero
+  cross aisle is now accepted.
+- The wider-than-tall hall pushed the lens legend and the operating-point chips under the floor. The floor now
+  measures the wrap minus the legend column.
+- DH-A-101 / DH-F-104 sheets: a band with no depth draws nothing, and the egress route runs along the row-end aisle.
+
+### Gates
+
+- New `tools/test-dcai-no-corridor.mjs` (NC2 floor, NC3 Drawing view, NC5 errors): 15 checks, 8 red on 5b99e45c7.
+  `test-dcai-engine` NC1: 609/0, 4 red before.
+
 ## v3.113.0 — 2026-11-26 — DC AI inspector: how much valve travel the CDU and fan-wall controllers have left
 
 ### DC AI control authority (PRD-SETPOINT-SIM §C P10 part 2)

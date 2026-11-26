@@ -412,7 +412,11 @@
       //         adds the rack field, the aisles, the CDU gallery and the air plant and requires
       //         the total to fit. ADOPTED
       lengthM: 62,
-      widthM: 31,
+      // source: Amendment 9 (v3.114.0) — the width stack: 2 x 3 m fan-wall galleries + 13.2 m row
+      //         + 0 m corridor + 3.9 m CDU line = 23.1 m, no empty band (was 31 m with 3.3 m empty);
+      //         the length closes the same way. ADOPTED
+      widthM: 23.1,
+      // source: the room is unchanged from the four-hall basis (clear height). ADOPTED
       heightM: 5.5,
       // source: 440 racks / 22 per row. A row is one RPP group, so the electrical unit of
       //         account and the floor unit of account are the same object. ADOPTED
@@ -438,11 +442,12 @@
       //         manifolds and containment doors need the full clearance on both faces. ADOPTED
       coldAisleM: 1.2,
       hotAisleM: 0.7,
-      // source: v3.21.7 — the SERVICE CORRIDOR along the south ends of the rows: it carries the
-      //         secondary-fluid-network (TCS) supply and return headers overhead, the busway
-      //         feeders and the fire egress route, between the row ends and the CDU line. Width
-      //         kept from the retired cross aisle. ADOPTED
-      crossAisleM: 4.6,
+      // source: Amendment 9 (owner 2026-11-26 "Gak perlu ada service corridor"): NO service corridor.
+      //         The row ends face the CDU line's own north access face (1 m, inside cduLineDepthM);
+      //         that aisle is the walkway along the row ends, and the TCS headers and busway feeders
+      //         run overhead above it. Was 4.6 m (v3.21.7). That a 1 m aisle is enough for egress
+      //         is ASSUMED, not checked against a code clause.
+      crossAisleM: 0,
       // source: the CDU line south of the service corridor: CoolIT CHx1000 class 1.9 m deep with
       //         1 m of access on each face = 3.9 m (the same unit as cduServiceM2). ADOPTED
       cduLineDepthM: 3.9,

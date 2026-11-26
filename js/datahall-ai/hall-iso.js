@@ -32,7 +32,7 @@
   function lensMode(l) { for (var i = 0; i < LENSES.length; i++) if (LENSES[i][0] === l) return LENSES[i][2]; return 'alarms'; }
   function lensStored() { try { var v = win.localStorage.getItem(LENS_KEY); return lensMode(v) && LENSES.some(function (d) { return d[0] === v; }) ? v : null; } catch (e) { return null; } }
   var lens = lensStored() || 'status', lensBar = null, legendBox = null, tableBox = null;
-  var lastHall = '', geo = null, model = null, inst = null, host = null, wrap = null, bar = null, sum = null, view = null, timer = 0, sig = '';
+  var meas = null, lastHall = '', geo = null, model = null, inst = null, host = null, wrap = null, bar = null, sum = null, view = null, timer = 0, sig = '';
   function pad2(n) { return (n < 10 ? '0' : '') + n; }
   function stored() { try { var v = win.localStorage.getItem(KEY); return VIEWS.indexOf(v) >= 0 ? v : null; } catch (e) { return null; } }
   function fromUrl() { var m = /[?&]view=(flat|iso|drawing)(?:&|$)/.exec(win.location.search || ''); return m ? m[1] : null; }
@@ -63,6 +63,7 @@
       '.dh-units table{width:100%;border-collapse:collapse;font:11px/1.4 "IBM Plex Mono",ui-monospace,monospace}.dh-units caption{text-align:left;color:var(--t3);padding:2px 0}',
       '.dh-units th,.dh-units td{text-align:left;padding:2px 8px 2px 0;border-bottom:1px solid var(--bd);color:var(--t1);font-weight:400}',
       '#hIsoWrap .dh-legend{flex-direction:column;align-items:flex-start;gap:6px;padding-top:4px}',
+      '#hIsoWrap{position:relative}#hIsoWrap .dh-meas{position:absolute;left:0;right:176px;top:0;height:0;pointer-events:none}@media (max-width:600px){#hIsoWrap .dh-meas{right:0}}',
       '@media (max-width:600px){.dh-proj [role=toolbar]{order:3;flex:1 1 100%;margin-left:0}.dh-proj [role=toolbar] button{flex:1 1 0;min-width:0;padding:0 4px}}',
       '.dh-proj button:focus-visible{outline:2px solid var(--c);outline-offset:-2px}',
       '@media (max-width:600px){.dh-proj button{height:40px;line-height:40px;min-width:56px}}',
@@ -109,7 +110,6 @@
       '#hIso .cr-valve{display:none}#hIso[data-lens-on="cooling"] .cr-valve{display:inline}#hIso .ovl-st[data-hot="1"]{stroke:var(--fp-ink,#e8edf5);stroke-width:1.5}',
       '#hIso .ovl-st{stroke:var(--bg2);stroke-width:1}#hIso .ovl-st[data-state="stale"]{fill:none;stroke:var(--t3);stroke-dasharray:1.5 1.5}#hIso .ovl-st[data-state="ok"]{fill:var(--rz-pt-ok,#16a34a)}#hIso .ovl-st[data-state="warn"]{fill:var(--rz-pt-warn,#d97706)}#hIso .ovl-st[data-state="alarm"]{fill:var(--rz-pt-alarm,#dc2626)}#hIso .ovl-st[data-side="hot"]{fill:var(--fp-ink,#e8edf5)}',
       '#hIso .ovl-bw-track{stroke:var(--bd);stroke-width:3;stroke-linecap:butt}#hIso .ovl-bw{stroke:var(--fp-ink,#e8edf5);stroke-width:3;stroke-linecap:butt}',
-      '#hIso .ovl-corr{fill:var(--t3);font:500 9px/1 "IBM Plex Mono",ui-monospace,monospace;letter-spacing:.06em}',
       '.dh-hallops{display:flex;flex-direction:column;gap:6px;margin-top:10px;font:500 11px/1.35 "IBM Plex Mono",ui-monospace,monospace;color:var(--t2)}',
       '.dh-hallops{width:150px;max-width:150px}.dh-hallchip{padding:4px 6px;border:1px solid var(--bd);border-radius:2px;background:var(--bg2);white-space:normal}.dh-hallchip b{color:var(--t1);font-weight:600}',
       '#hIsoWrap .dh-hallops[hidden]{display:none}',
@@ -167,6 +167,9 @@
     /* the floor measures this wrapper, never #hIso itself: the renderer sets the host's width from what it measures, so
        measuring the bordered host shrank it 2 px per resize, for ever, until the hall vanished (owner, 2026-11-22) */
     wrap = doc.createElement('div'); wrap.id = 'hIsoWrap'; wrap.appendChild(host);
+    /* Amendment 9: the hall (62 x 23.1 m) is wider than the stage is tall, so the floor is width-bound; it measures the wrap
+       less the legend column, so the legend keeps its column beside the floor (FL7) */
+    meas = doc.createElement('div'); meas.className = 'dh-meas'; meas.setAttribute('aria-hidden', 'true'); wrap.appendChild(meas);
     bar.parentNode.insertBefore(wrap, bar.nextSibling);   /* right under the switch: the floor is the first thing below it */
     /* HV-A1: every unit of the floor as rows (racks, fan-wall modules, CDUs), built when opened */
     tableBox = doc.createElement('details'); tableBox.className = 'dh-units';
@@ -200,7 +203,7 @@
     for (i = 0; i < Z * perZone; i++) {
       z = Math.floor(i / perZone);
       var r = i % perZone, line = r < G.perRow ? 0 : 1, j = r % G.perRow;
-      /* the plan numbers racks from the corridor (south) end: k = 1 is the southernmost; the renderer counts j from north */
+      /* the plan numbers racks from the CDU (south) end: k = 1 is the southernmost; the renderer counts j from north */
       racks.push({ idx: i, occupied: true, kw: G.kwRack, ref: 'rack-unit:R' + pad2(2 * z + line + 1) + '-' + pad2(G.perRow - j) });
     }
     for (z = 0; z < Z; z++) zones.push({ z: z, heat: perZone * G.kwRack, rackInletC: 0, hotAisleC: 0 });
@@ -424,7 +427,8 @@
   function metric(m) {
     var k = ['rackPitch', 'rackDepth', 'coldAisle', 'hotAisle', 'crossAisle', 'cduDepth', 'galleryDepth', 'hallWidth', 'hallLength'], o = {}, i;
     if (!m) return null;
-    for (i = 0; i < k.length; i++) { if (!(typeof m[k[i]] === 'number' && isFinite(m[k[i]]) && m[k[i]] > 0)) return null; o[k[i]] = m[k[i]]; }
+    /* Amendment 9: the cross aisle may be 0 (no service corridor); every other length must be positive */
+    for (i = 0; i < k.length; i++) { if (!(typeof m[k[i]] === 'number' && isFinite(m[k[i]]) && (m[k[i]] > 0 || (k[i] === 'crossAisle' && m[k[i]] === 0)))) return null; o[k[i]] = m[k[i]]; }
     /* Amendment 2 P1: the Drawing view's unit placement (HALL_PLACE); without it the units fill their allotments */
     var pk = ['fanFill', 'fanD', 'cduW', 'cduD', 'cduOff', 'cduPitch'], pl = m.place, ok = pl && m.modsPer > 0;
     for (i = 0; ok && i < pk.length; i++) ok = typeof pl[pk[i]] === 'number' && isFinite(pl[pk[i]]) && pl[pk[i]] > 0;
@@ -479,7 +483,12 @@
     var G = api.G, g = api.g, b, k, z, s, o = (geo && geo.ops) || {};
     var dash = win.RZConvVfx && o.cduLoad != null ? win.RZConvVfx.dashSeconds(Math.max(0, o.cduLoad) / 100) : null;
     var lpm = pairLpm(), tS = geo.tcsSupC, tR = geo.tcsRetC, hPipe = api.iso ? G.capH + 0.6 : 0, hBr = api.iso ? G.capH + 0.3 : 0, hBus = api.iso ? G.capH + 0.35 : 0, sp = geo.sp || 3;
-    var cy0 = G.cabY1, cy1 = G.cduY0 != null ? G.cduY0 : G.cabY1 + 1, ySup = cy0 + (cy1 - cy0) * 0.35, yRet = cy0 + (cy1 - cy0) * 0.65;
+    /* Amendment 9: no service corridor — the headers run over the CDU line's north access aisle (the walkway along the row
+       ends, cduOff deep); a model that still has a corridor keeps them in it */
+    var pl = geo.m && geo.m.place, acc = pl && pl.cduOff > 0 ? pl.cduOff : 1;
+    var cy0 = G.cabY1, cy1 = G.cduY0 != null ? G.cduY0 : G.cabY1 + 1;
+    if (cy1 - cy0 < 0.5) { cy0 = cy1; cy1 = cy1 + acc; }
+    var ySup = cy0 + (cy1 - cy0) * 0.35, yRet = cy0 + (cy1 - cy0) * 0.65;
     var rSt = Math.max(2, Math.min(4, 0.28 * api.u));
     /* A8c: in 3D the liquid runs overhead (header capH + 0.6 m, branches capH + 0.3 m over the hot aisle, a drop at the
        row end) so no pipe is painted across a rack face; data-h is the height it is drawn at (2D: 0, the plan) */
@@ -492,13 +501,9 @@
     }
     for (b = 0; b < api.nb; b++) {
       var r0 = b * api.kRows, rn = api.rowsIn(b), xW = G.ox - G.cold / 2 + 0.2, xE = G.ox + rn * G.rowW - G.cold / 2 - 0.2;
-      /* D1 the TCS headers in the service corridor: supply runs out from the CDU line, return runs back */
+      /* D1 the TCS headers along the row ends (over the CDU access aisle, Amendment 9): supply runs out from the CDU line, return runs back */
       pipe('M' + api.P(xW, ySup, hPipe, b) + 'L' + api.P(xE, ySup, hPipe, b), 'header', 'sup', null, 'TCS supply header · ' + f1(tS) + ' °C', hPipe);
       pipe('M' + api.P(xE, yRet, hPipe, b) + 'L' + api.P(xW, yRet, hPipe, b), 'header', 'ret', null, 'TCS return header · ' + f1(tR) + ' °C', hPipe);
-      if (!api.iso && G.cduY0 != null) {   /* D6: the corridor reads as a place in every other lens */
-        var lp = api.XY(xW + 0.3, (cy0 + cy1) / 2, 0, b), tx = svgEl(api, 'text', { 'class': 'ovl-corr', x: lp[0].toFixed(1), y: (lp[1] + 3).toFixed(1), 'data-lens': 'status thermal power layout' }, g);
-        tx.textContent = 'SERVICE CORRIDOR · ' + f1(cy1 - cy0) + ' m';
-      }
       for (k = 0; k < rn; k++) {
         z = r0 + k;
         var x0 = G.ox + k * G.rowW, xh = x0 + G.cabW + G.hot / 2, dx = Math.min(0.3, G.hot / 4), name = pairName(z);
@@ -614,7 +619,7 @@
     if (inst && inst.destroy) inst.destroy();
     host.setAttribute('data-rz-hall', String(win.currentDH || 1));
     inst = win.RZFloorPlan.render(host, model, {
-      projection: view === 'flat' ? 'plan' : 'iso', toggle: false, mode: lensMode(lens), maxBands: function () { return phoneFlat() ? 3 : 1; }, projKey: 'rz.dcai.fp', measure: wrap,
+      projection: view === 'flat' ? 'plan' : 'iso', toggle: false, mode: lensMode(lens), maxBands: function () { return phoneFlat() ? 3 : 1; }, projKey: 'rz.dcai.fp', measure: meas || wrap,
       /* the whole hall on the first screen, both axes, at every width: the stage takes what is left of the viewport below
          its own top (HV-F1); fitAll lets the unit shrink below the plan's label floor (labels live in tooltips) */
       height: function () { if (phoneFlat()) return null; var t = wrap.getBoundingClientRect().top + (win.pageYOffset || 0); return Math.max(260, (win.innerHeight || 900) - bottomInset() - t - 12); },

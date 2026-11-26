@@ -49,7 +49,7 @@ is fully rewritten and carries none of the retired vocabulary. See
 (`AI-Test-3a`, `TS-AI-1`).
 
 **LV electrical grouping (new at GB300 — a per-rack SLD will not fit a hall of this size).** Each
-1,922 m² hall (62 × 31 m) is laid out as **20 rows × 22 racks in two banks of 10** (v3.0.0; it was
+1,432.2 m² hall (62 × 23.1 m since v3.114.0; 62 × 31 m before) is laid out as **20 rows × 22 racks in two banks of 10** (v3.0.0; it was
 40 rows of 880 racks until the floor budget showed that hall could not hold its own CDUs and CRAHs).
 Each row IS one **RPP group
 of 22 racks** (`geometry.racks_per_row` 22, `geometry.rack_rows` 40, `geometry.rack_banks` 2, `geometry.rows_per_bank` 20, `geometry.racks_per_group` 22,
@@ -467,14 +467,13 @@ liquid-to-liquid CDUs; Schneider GB300 NVL72 hall). From north to south, each ba
 |---|---|---|
 | fan-wall gallery N | 3 m | `geometry.airPlantDepthM`; 45 modules at `fan_wall_module_pitch_m` |
 | rack field | 13.2 m | 20 rows × 22 racks, rows north–south at 3.1 m pitch = the 62 m length |
-| service corridor | 4.6 m | `crossAisleM`; TCS headers overhead, busway feeders, egress |
-| CDU line | 3.9 m | `cduLineDepthM`; the CDUs at the row ends, one group per containment pair |
-| service aisle | 3.3 m | the floor spare |
+| CDU line | 3.9 m | `cduLineDepthM`; 1 m aisle at the row ends (TCS headers overhead, leak rope, egress), the CDUs, 1 m aisle (HTW, busway, trays) |
 | fan-wall gallery S | 3 m | as N |
 
-- **The plan closes.** `geometry.width_stack_fits` (27.7 of 31 m) and `length_stack_fits` (62 of 62 m) prove it. `fan_wall_fits` compares the face area needed at 2.5 m/s with the two long walls' face.
+- **No service corridor (v3.114.0, Amendment 9, owner 2026-11-26).** `crossAisleM` = 0 and the hall width = the width stack, 23.1 m (`width_stack_slack_m` = 0), so the hall is 62 × 23.1 m = 1,432.2 m² (was 62 × 31 = 1,922 m² with a 4.6 m corridor and 3.3 m of empty floor). IT density rises from 32.5 to 43.6 kW/m². That a 1 m aisle at the row ends is enough for egress is ASSUMED, not checked against a code clause. Gate `tools/test-dcai-no-corridor.mjs` (NC2, NC3) and `test-dcai-engine` NC1.
+- **The plan closes.** `geometry.width_stack_fits` (23.1 of 23.1 m) and `length_stack_fits` (62 of 62 m) prove it. `fan_wall_fits` compares the face area needed at 2.5 m/s with the two long walls' face.
 - **The same arrangement everywhere.** The Room Layout level plans draw both halls of a level at true scale on a 90 × 68 m plate. The plate's core, spine and electrical wing are page-authored allowances, declared as such. The electrical wing is schematic and not sized to the UPS frame count.
-- **Gate.** `tools/test-datahall-ai-hall-plan.mjs` asserts that every CDU stands in the CDU line, past the corridor, and that every air unit is a fan-wall module in the N or S gallery, split evenly.
+- **Gate.** `tools/test-datahall-ai-hall-plan.mjs` asserts that every CDU stands in the CDU line, and that every air unit is a fan-wall module in the N or S gallery, split evenly.
 
 ## Site plan and building plate (v3.21.9)
 
@@ -492,7 +491,7 @@ Hovering an object lights the part of the plant it belongs to and dims everythin
 | pointed at | stays lit |
 |---|---|
 | a rack | its row, its row label, its contained hot aisle, that aisle's thermal cells and sensors |
-| a CDU or the HTW entry | the liquid path: CDU stubs, corridor TCS headers, row manifolds (racks dimmed), HTW |
+| a CDU or the HTW entry | the liquid path: CDU stubs, row-end TCS headers, row manifolds (racks dimmed), HTW |
 | a fan-wall module | the air path: cold supply, hot aisles, plenum return, sensors, both fan-wall galleries |
 | a layer chip / a key entry | that layer / that kind of object |
 

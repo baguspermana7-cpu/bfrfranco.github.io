@@ -56,7 +56,7 @@ const S = C.snapshot;
 /* ── 0. sources and hygiene ─────────────────────────────────────────────── */
 ok(!/Math\.random/.test(ENGINE_SRC) && !/Math\.random/.test(MODEL_SRC), 'no Math.random in model or engine');
 ok(Object.isFrozen(S) && Object.isFrozen(S.design) && Object.isFrozen(M.thermal), 'snapshot and model are deep-frozen');
-ok(S.meta.version === '1.8.0' && S.meta.spec_version === M.specVersion, 'meta carries version and spec_version');
+ok(S.meta.version === '1.9.0' && S.meta.spec_version === M.specVersion, 'meta carries version and spec_version');
 ok(!/MEASURED/.test(MODEL_SRC.replace(/nothing may claim MEASURED[^\n]*/,'')), 'nothing in the model claims MEASURED');
 {
   /* every numeric leaf in the model has a `// source:` line within the 6 lines above it */
@@ -292,6 +292,12 @@ approx(S.heat.liquid_hall_kwth * M.facility.halls, S.heat.liquid_kwth, 1e-6, 'ha
   approx(Ge.width_stack_m, M.geometry.fanWallGalleries * M.geometry.airPlantDepthM + M.geometry.banks * Ge.racks_per_row * M.geometry.rackPitchM + M.geometry.crossAisleM + M.geometry.cduLineDepthM, 1e-9,
     'width_stack_m = galleries + row length + service corridor + CDU line');
   ok(Ge.width_stack_fits === true && Ge.width_stack_m <= M.geometry.widthM, 'the plan closes across the width', Ge.width_stack_m.toFixed(1) + ' of ' + M.geometry.widthM + ' m');
+  /* NC1 (Amendment 9, owner 2026-11-26 "Gak perlu ada service corridor"): no corridor, and the hall closes on its width as
+     it does on its length — no empty band of floor */
+  ok(Ge.cross_aisle_m === 0 && Ge.cross_aisle_m2 === 0, 'NC1 no service corridor (cross aisle 0 m, 0 m2)', Ge.cross_aisle_m + ' m');
+  approx(Ge.hall_width_m, Ge.width_stack_m, 1e-9, 'NC1 hall width = width stack (galleries + row + CDU line), no empty band');
+  approx(Ge.width_stack_slack_m, Ge.hall_width_m - Ge.width_stack_m, 1e-9, 'NC1 width_stack_slack_m = hall width - width stack');
+  approx(Ge.hall_area_m2, 62 * 23.1, 1e-6, 'NC1 hall area 62 x 23.1 = 1,432.2 m2');
   ok(Ge.length_stack_fits === true && Ge.length_stack_m <= M.geometry.lengthM + 1e-9, 'the rows close along the length', Ge.length_stack_m.toFixed(1) + ' of ' + M.geometry.lengthM + ' m');
   approx(Ge.floor_used_m2, Ge.rack_field_m2 + Ge.cross_aisle_m2 + Ge.cdu_gallery_m2 + Ge.air_plant_m2, 1e-9,
     'floor_used_m2 is the sum of its four named terms and nothing else');
