@@ -23,6 +23,8 @@
  *   D11 (P10) the CDU and fan-wall setpoints name the loop that holds them: TIC-TCS on the CDU facility-water valve,
  *       TIC-SA on the fan-wall chilled-water valve; OUT = the engine's valve stroke (A8a equipment.*_valve_pct, 0.1 %),
  *       authority left = 100 - OUT, SATURATED from the twin's one rule; the inspector prints that line (no raw float).
+ *   D12 (P10) the Loops table heads the block: one row per registry loop of the class, SP / Live / Error / OUT / left /
+ *       state, OUT = the engine valve stroke, "saturated" from the twin's rule.
  *   (D3 trend SP line joins with the rz-trend hook.)  --static skips the browser.
  *
  * Usage: node tools/test-dcai-setpoints.mjs [--list] [--static]
@@ -160,6 +162,28 @@ async function browserLaws() {
           if (lp.past > 1) bad(`D11 ${tag} ${cls}: the loop line ends ${lp.past.toFixed(0)} px past the inspector`);
         }
       }
+      /* D12 (P10) the Loops table heads the block: one row per registry loop of this class, SP = registry, Live / Error
+         filled, OUT = the engine valve stroke, state "saturated" exactly when the twin says so; above the setpoints */
+      {
+        const wantTags = REG.filter((r) => r.equipment === cls && r.sp.loop).map((r) => r.sp.loop.tag);
+        const lt = await pg.evaluate(() => { const sec = document.querySelector('aside.rz-inspector.open [data-rz-dcai-sp]'); if (!sec) return null;
+          const t = sec.querySelector('[data-rz-loops]'), sp = sec.querySelector('[data-rz-cvm-sp]');
+          return { above: !!t && !!sp && t.getBoundingClientRect().top < sp.getBoundingClientRect().top, rows: t ? [...t.querySelectorAll('tr[data-loop-row]')].map((tr) => ({ tag: tr.getAttribute('data-loop-row'),
+            sp: +tr.getAttribute('data-sp'), pv: tr.querySelector('[data-k="pv"]').textContent, err: tr.querySelector('[data-k="err"]').textContent,
+            out: +tr.getAttribute('data-auth-out'), sat: tr.getAttribute('data-auth-sat'), state: tr.querySelector('[data-k="state"]').textContent })) : [] }; });
+        if (!lt || lt.rows.map((r) => r.tag).join() !== wantTags.join()) bad(`D12 ${tag} ${cls}: Loops rows [${lt ? lt.rows.map((r) => r.tag) : 'no block'}] ≠ registry loops [${wantTags}]`);
+        else {
+          if (wantTags.length && !lt.above) bad(`D12 ${tag} ${cls}: the Loops table is not above the setpoints table`);
+          const eng = Math.round(require(path.join(ROOT, 'js/dcai-engine.js')).snapshot.equipment[cls === 'cdu' ? 'cdu_fws_valve_pct' : 'crah_chw_valve_pct'] * 10) / 10;
+          for (const r of lt.rows) {
+            const g = REG.find((x) => x.sp && x.sp.loop && x.sp.loop.tag === r.tag);
+            if (!g || r.sp !== g.sp.value) bad(`D12 ${tag} ${r.tag}: SP ${r.sp} ≠ registry ${g && g.sp.value}`);
+            if (!/\d/.test(r.pv) || !/\d/.test(r.err)) bad(`D12 ${tag} ${r.tag}: Live "${r.pv}" / Error "${r.err}" not filled`);
+            if (r.out !== eng) bad(`D12 ${tag} ${r.tag}: OUT ${r.out} ≠ engine valve ${eng}`);
+            if ((r.sat === 'true') !== (eng >= 98) || /saturated/.test(r.state) !== (eng >= 98)) bad(`D12 ${tag} ${r.tag}: state "${r.state}" (sat ${r.sat}) at OUT ${eng}`);
+          }
+        }
+      }
       if (cls !== 'cdu' || W !== 1440) continue;
       /* D5 what-if: TCS supply 41 °C -> every SIMULATED output = a Node DCAI_CALC.compute of a copy; cliff ambient 35 °C */
       const D = require(path.join(ROOT, 'js/dcai-engine.js')), m = JSON.parse(JSON.stringify(D.model)); m.thermal.tcsSupplyC = 41; const sim = D.compute(m);
@@ -235,6 +259,6 @@ async function browserLaws() {
     await pg.close();
   }
   await b.close(); srv.close();
-  console.log(`${n ? 'FAIL' : 'PASS'} D1/D1r/D4/D5/D7/D8/D9/D10/D11 inspector block on datahallAI.html: ${CLASSES.length} classes × 390/1440 × dark/light${n ? ', ' + n + ' findings' : ''}`);
+  console.log(`${n ? 'FAIL' : 'PASS'} D1/D1r/D4/D5/D7/D8/D9/D10/D11/D12 inspector block on datahallAI.html: ${CLASSES.length} classes × 390/1440 × dark/light${n ? ', ' + n + ' findings' : ''}`);
   return n;
 }

@@ -174,6 +174,8 @@ export function twin(reg) {
     ' *   RZControlPoints.forClass(classKey)     -> [{ id, label, value, unit, role, ev, pv, control, adjustable, note, param, whatIf, whatIfNote, loop }] (the equipment modal; DC AI: \'dcai:<cls>\', heldBy on a reference)\n' +
     ' *   RZControlPoints.loops(sheetId)         -> the control loops drawn on that sheet (ISA-5.1 bubbles, P4)\n' +
     ' *   RZControlPoints.authority(loop, snap)  -> { out, left, min, sat, band } from the engine snapshot (P10) | null\n' +
+    ' *   RZControlPoints.loopRows(prefix, sheets) -> the setpoint rows of one cockpit (\'conv\' | \'dcai\') that a loop holds,\n' +
+    ' *                                             optionally only loops drawn on those sheets (the Loops table, P10 S11c)\n' +
     ' *   RZControlPoints.value(id[, variant])   -> a page control number (P9: cut-in/out, setpoint per variant, alarm); throws if absent */\n' +
     '(function (root) {\n  \'use strict\';\n  var BY_PV = ' + JSON.stringify(byPv, null, 1).replace(/\n\s*/g, ' ') + ';\n' +
     '  function fmt(v, u) { return u === \'°C\' || Math.round(v) !== v ? v.toFixed(1) : String(v); }\n' +
@@ -197,10 +199,15 @@ export function twin(reg) {
     '    var mn = L.out.minKey ? path(snap, L.out.minKey) : null;\n' +
     '    return { out: out, left: Math.round((100 - out) * 10) / 10, min: mn, sat: out >= 100 - SAT_BAND || (mn !== null && out <= mn + SAT_BAND), band: SAT_BAND }; }\n' +
     '  function forClass(k) { return Object.prototype.hasOwnProperty.call(BY_CLASS, k) ? BY_CLASS[k].slice() : []; }\n' +
+    '  function loopRows(prefix, sheets) { var seen = {}, out = [];\n' +
+    '    Object.keys(BY_CLASS).sort().forEach(function (k) { BY_CLASS[k].forEach(function (r) {\n' +
+    '      if (!r.loop || seen[r.id] || r.id.indexOf(prefix + \'.\') !== 0 || (sheets && sheets.indexOf(r.loop.sheet) < 0)) return;\n' +
+    '      seen[r.id] = 1; out.push(r); }); });\n' +
+    '    return out; }\n' +
     '  function rowOf(id) { return Object.prototype.hasOwnProperty.call(BY_PV, id) ? BY_PV[id] : null; }\n' +
     '  function spOf(id) { var r = rowOf(id); return r ? { value: r.value, label: (r.role === \'setpoint\' ? \'SP \' : \'Ref \') + fmt(r.value, r.unit), unit: r.unit, id: r.id } : null; }\n' +
     '  function tipFor(id) { var r = rowOf(id), s = spOf(id); return r ? s.label + (r.unit ? \' \' + r.unit : \'\') + \' · \' + r.label + \' · \' + r.ev : null; }\n' +
-    '  root.RZControlPoints = { spOf: spOf, tipFor: tipFor, rowOf: rowOf, forClass: forClass, loops: loops, authority: authority, value: value, fmt: fmt, version: \'1.3.0\' };\n' +
+    '  root.RZControlPoints = { spOf: spOf, tipFor: tipFor, rowOf: rowOf, forClass: forClass, loops: loops, loopRows: loopRows, authority: authority, value: value, fmt: fmt, version: \'1.4.0\' };\n' +
     '})(typeof window !== \'undefined\' ? window : this);\n';
 }
 

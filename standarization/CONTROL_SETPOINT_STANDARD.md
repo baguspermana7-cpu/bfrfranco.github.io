@@ -136,6 +136,14 @@ range). Otherwise it is fixed, and the modal says what fixes it.
   `equipment.crah_chw_valve_pct`, both the engine's equal-percentage stroke (A8a). `authority()` rounds OUT to 0.1 %
   before the rule. Measured at design: CDU valve 99.6 % (0.4 % left), fan-wall valve 99.9 % (0.1 % left), both
   SATURATED: at the design point neither unit has valve travel left for more heat. Gate D11 of `test-dcai-setpoints.mjs`.
+- **Loops table (P10 part 3).** `RZSpBlock.loops(rows, { snapshot })` is THE compact table of the loops a page owns:
+  Loop · SP · Live · Error · OUT · Left · State (`holds`, `◆ saturated`, `OUT not modelled`). Rows come only from
+  `RZControlPoints.loopRows(cockpit, sheets)` (twin 1.4.0): every registry setpoint whose loop is drawn on one of those
+  sheets or inside those machines, so a new loop in the registry appears without a page edit. Live / Error are filled by
+  `RZSpBlock.bind` like the setpoint rows. Conventional pages mount it with `<div data-rz-loops-host data-sheets="…">` +
+  `js/conv/loops-card.js` (chiller-plant: CH-M-101, CH-M-102, int-chiller → PDIC-01, TIC-CDWS, TIC-CHWS); in a 344 px
+  column it hides Error, and SP below 600 px, keeping both in the cells. The DC AI inspector puts it at the top of its
+  Setpoints block (Loop · Live · OUT · Left · State). Gates S11c (`test-setpoint-sim.mjs`) and D12 (`test-dcai-setpoints.mjs`).
 - **Reset (cascade) loops.** A `kind: 'reset'` loop names the loop whose setpoint it writes (`slave`, an existing
   registry tag; the builder refuses another). TIC-RI (rack inlet) resets TIC-SAT: contained aisle, no mixing modelled,
   so the slave setpoint equals the master's.

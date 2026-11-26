@@ -31,6 +31,12 @@
     '.rz-inspector-sp th[scope="row"]{white-space:normal}' +
     '.rz-inspector-sp td[data-k="sp"],.rz-inspector-sp td[data-k="pv"],.rz-inspector-sp td[data-k="err"],.rz-inspector-sp .rz-cvm-wi-t td{font-family:JetBrains Mono,IBM Plex Mono,monospace;white-space:nowrap}' +
     '.rz-inspector-sp [data-k="band"],.rz-inspector-sp [data-k="adj"],.rz-inspector-sp [data-k="ev"],.rz-inspector-sp [data-k="ctl"]{display:none}' +
+    /* P10 Loops table: Loop · Live · OUT · Left · State at 360 px; SP and Error are the setpoint row just below (still in
+       the cells for the gates and screen readers) */
+    '.rz-inspector-sp .rz-loops{margin:0 0 8px}.rz-inspector-sp .rz-loops caption{text-align:left;font-size:10.5px;color:#94a3b8;padding:0 0 2px}' +
+    '.rz-inspector-sp .rz-loops [data-k="sp"],.rz-inspector-sp .rz-loops [data-k="err"],.rz-inspector-sp .rz-loops th:nth-child(2),.rz-inspector-sp .rz-loops th:nth-child(4){display:none}' +
+    '.rz-inspector-sp .rz-loops td{font-family:JetBrains Mono,IBM Plex Mono,monospace;font-variant-numeric:tabular-nums;white-space:nowrap}' +
+    '.rz-inspector-sp .rz-loops td[data-sat]{color:#e8b563;font-weight:600}' +
     '.rz-inspector-sp .rz-cvm-wi{margin:10px 0 0;padding:8px 0 0;border-top:1px solid rgba(255,255,255,.12)}' +
     '.rz-inspector-sp .rz-cvm-wi-ctl label{display:grid;gap:4px;font-size:11.5px}' +
     '.rz-inspector-sp .rz-cvm-wi-ctl input[type="range"]{width:100%;accent-color:#e8b563}' +
@@ -126,7 +132,7 @@
       sec.className = 'rz-inspector-sp'; sec.setAttribute('data-rz-dcai-sp', payload.classId);
       /* the traceability reason of every number in this block (test-dcai-coverage DECLARED): none is typed here */
       sec.setAttribute('data-rz-authored-basis', 'Setpoints and bands from the control registry (js/rz-control-points.js, data/control-points.json); Live = the value this inspector shows; what-if, cliff bins and sequence steps = DCAI_CALC.compute on a copy of the model (PRD-SETPOINT-SIM P5-P7)');
-      sec.innerHTML = (list.length ? '<div class="rz-inspector-sec">Setpoints &amp; limits</div>' + B.inner(list, { snapshot: E && E.snapshot ? E.snapshot : null }) : '') +
+      sec.innerHTML = (list.length ? '<div class="rz-inspector-sec">Setpoints &amp; limits</div>' + B.loops(list, { snapshot: E && E.snapshot ? E.snapshot : null }) + B.inner(list, { snapshot: E && E.snapshot ? E.snapshot : null }) : '') +
         (seqKey ? V.block(seqKey, { narrow: true }) : '');
       if (list.length) cliff(sec);
       if (seqKey) V.bind(sec);
@@ -142,7 +148,7 @@
     if (f && sec.contains(f) && doc.activeElement !== f) { try { f.focus({ preventScroll: true }); } catch (e) { /* not focusable */ } }
     return true;
   }
-  var api = { rows: rows, recompute: recompute, attach: attach, version: '1.3.0' };
+  var api = { rows: rows, recompute: recompute, attach: attach, version: '1.4.0' };
   if (root) {
     root.RZDcaiSpInspector = api;
     if (root.document && root.document.addEventListener) root.document.addEventListener('rz-inspector-payload', function (e) { if (e && e.detail) attach(e.detail.payload, e.detail.body); });

@@ -1026,3 +1026,16 @@ RZSpBlock.bind(host, { recompute })  → wires sliders (input → recompute → 
   drawn tags and a law checks the drawing still joins them.
 - Not done in this part: the compact Loops table (chiller-plant, inspector header) of §C3 P10.
 
+## C16. P10 part 3 delivered (2026-11-26): the Loops table
+
+- `RZSpBlock.loops()` + `RZControlPoints.loopRows()`: one compact table per page of the loops it owns, rows from the
+  registry only. Chiller-plant side card "Control Loops" (PDIC-01 98.7 % ◆ saturated, TIC-CHWS and TIC-CDWS 89.3 %
+  holding, 10.7 % left); DC AI inspector head of the Setpoints block (TIC-nn1 99.6 %, TIC-SA 99.9 %, both saturated).
+- Laws S11c (row set = registry loops on CH-M-101, CH-M-102 and the chiller internals; SP, Live, OUT, left, state) and D12
+  (one row per class loop, above the setpoints, OUT = engine valve stroke, state from the twin). Red first: S11c "Loops
+  table rows [] ≠ registry loops on this page [TIC-CDWS,PDIC-01,TIC-CHWS]", D12 "Loops rows [] ≠ registry loops [TIC-nn1]".
+- Layout: the chiller-plant phone patch forces every table into a 0.8 rem scrolling block with 8 × 12 px cells; the
+  Loops table opts out (else OUT and State scrolled out of the card at 390 px).
+- Still open in P10: the rack-inlet what-if showing CRAH valve OUT after the change; a Loops table on datahall (TIC-SAT,
+  TIC-RI).
+

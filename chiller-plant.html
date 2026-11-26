@@ -630,13 +630,14 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
     <link rel="stylesheet" href="css/conv-live.css?v=20261122-9e4f1c46">
     <!-- this cockpit is dark-only (no data-theme on <html>): the phone trend sheet (js/rz-sheet.js) must not take its light skin -->
     <style>:root:not(#rz-chiller) .rz-sheet{--rz-sheet-bg:#16181d;--rz-sheet-ink:#e8ecf1;--rz-sheet-line:rgba(160,168,180,.4)}</style>
-    <script src="js/rz-control-points.js?v=20261126-dc907416"></script>
-    <script src="js/rz-sp-block.js?v=20261126-452ea387"></script>
+    <script src="js/rz-control-points.js?v=20261126-5000ce1a"></script>
+    <script src="js/rz-sp-block.js?v=20261126-7847b7bb"></script>
     <script src="js/rz-diagram-metrics.js?v=20261016-1994fd2b"></script>
     <script src="js/rz-diagram-layout.js?v=20261016-a82d8709"></script>
     <script src="js/rz-diagram.js?v=20261109-b50004b8"></script>
     <script src="js/rz-sequences.js?v=20261126-31f8c503"></script>
     <script src="js/conv/sequence-view.js?v=20261126-34a2a17f"></script>
+    <script src="js/conv/loops-card.js?v=20261126-81aca53d"></script>
     <script src="js/conv/point-status.js?v=20261123-0de9d3e8"></script>
 <script src="js/conv/motion.js?v=20261121-f2d16763" defer></script>
 <script src="js/conv/quiet.js?v=20261122-cde28b5e" defer></script>
@@ -841,6 +842,12 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
           <div class="meta" data-explain="conv-chw-flow-ref"><b id="kFlowItB" data-point="chiller-plant.CHW.flow_it_ref" data-pt-label="IT sensible reference flow" data-pt-cls="ENGINE">&mdash;</b> IT ref · <b id="kFlowHrB" data-point="chiller-plant.CHW.flow_duty_ref" data-pt-label="Plant-duty reference flow" data-pt-cls="ENGINE">&mdash;</b> evap duty</div>
         </div>
 
+        <!-- PRD-SETPOINT-SIM P10 (S11c): every registry loop on CH-M-101, CH-M-102 and inside the chillers; filled by
+             js/conv/loops-card.js from js/rz-control-points.js and the engine snapshot. No number is typed here. -->
+        <div class="card" data-rz-loops-card>
+          <h4>Control Loops</h4>
+          <div data-rz-loops-host data-sheets="ch-m-101 ch-m-102 int-chiller"></div>
+        </div>
         <div class="card" data-bms-mode-hide="overview">
           <h4>Operator Controls</h4>
           <div class="controls">

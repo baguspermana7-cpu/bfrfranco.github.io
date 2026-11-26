@@ -8,6 +8,9 @@
  *                                   opts.recompute(param, v) -> engine snapshot with that one parameter changed
  *                                   (v === null: unchanged) | null
  *                                   opts.live(pvId) -> { v, src: 'page' | 'engine', title } (v NaN when not shown)
+ *   RZSpBlock.loops(rows, opts)  -> HTML of the compact Loops table (P10): one row per row with a loop: loop, SP, Live,
+ *                                   Error, OUT, authority left, state. rows = RZControlPoints.loopRows(cockpit, sheets);
+ *                                   opts.snapshot as for inner(); Live / Error are filled by bind() like the setpoint rows.
  * Nothing is stored: Reset puts the slider back on the registry SP. Values are textContent; registry text is escaped.
  */
 (function (root) {
@@ -50,6 +53,28 @@
       '<output data-wi-out>' + esc('SP ' + CP().fmt(r.value, r.unit) + u) + '</output><button type="button" data-wi-reset>Reset</button></div>' +
       '<div class="rz-cvm-sp-wrap"><table class="rz-cvm-sp rz-cvm-wi-t"><thead><tr><th scope="col">Output (steady state)</th><th scope="col">Engine now</th><th scope="col">SIMULATED</th><th scope="col" data-k="d">Change</th></tr></thead><tbody>' + rows + '</tbody></table></div>' +
       '<p class="rz-cvm-note">' + esc(r.whatIfNote || '') + '</p></div>';
+  }
+  /* P10 the Loops table: what each controller holds, how far the PV is from it and how much output it has left. A loop
+     whose engine output is within the band of a limit reads "◆ saturated" (the band is ASSUMED, said in the title) */
+  function loopRow(r, snap) {
+    var C = CP(), L = r.loop, A = C.authority && snap ? C.authority(L, snap) : null, u = r.unit ? ' ' + r.unit : '', pv = r.pv[0];
+    var st = !L.out ? 'OUT not modelled' : !A ? 'OUT not in the engine' : A.sat ? '◆ saturated' : 'holds';
+    var why = A && A.sat ? 'OUT ' + A.out + ' % is within ' + A.band + ' % (ASSUMED) of a limit: the controller cannot move its output further, so more load moves the PV off its setpoint' :
+      A ? A.left + ' % of travel left before ' + L.tag + ' can no longer hold ' + C.fmt(r.value, r.unit) + u : '';
+    return '<tr data-loop-row="' + esc(L.tag) + '" data-sp-pv="' + esc(pv || '') + '" data-sp="' + r.value + '" data-sp-unit="' + esc(r.unit) + '"' +
+      (A ? ' data-auth-out="' + A.out + '" data-auth-left="' + A.left + '" data-auth-sat="' + A.sat + '"' : '') +
+      ' title="' + esc(L.tag + ' · ' + r.label + ' · ' + L.pv.tag + ' → ' + L.tag + ' → ' + (L.out ? L.out.what : L.mv && L.mv.what || '') + ' · ' + L.action + ' acting ' + L.kind) + '">' +
+      '<th scope="row">' + esc(L.tag) + '</th><td data-k="sp">' + esc(C.fmt(r.value, r.unit) + u) + '</td><td data-k="pv">—</td><td data-k="err">—</td>' +
+      '<td data-k="out">' + (A ? esc(A.out + ' %') : '—') + '</td><td data-k="left">' + (A ? esc(A.left + ' %') : '—') + '</td>' +
+      '<td data-k="state"' + (why ? ' title="' + esc(why) + '"' : '') + (A && A.sat ? ' data-sat="1"' : '') + '>' + esc(st) + '</td></tr>';
+  }
+  function loops(rows, opts) {
+    var list = (rows || []).filter(function (r) { return r.loop; });
+    if (!CP() || !list.length) return '';
+    var snap = opts && opts.snapshot || null;
+    return '<div class="rz-cvm-sp-wrap"><table class="rz-cvm-sp rz-loops" data-rz-loops><caption>Control loops · engine steady state</caption><thead><tr>' +
+      '<th scope="col">Loop</th><th scope="col">SP</th><th scope="col">Live</th><th scope="col">Error</th><th scope="col">OUT</th><th scope="col" title="100 − OUT: output the controller has left">Left</th><th scope="col">State</th></tr></thead><tbody>' +
+      list.map(function (r) { return loopRow(r, snap); }).join('') + '</tbody></table></div>';
   }
   function inner(rows, opts) {
     if (!CP() || !rows || !rows.length) return '';
@@ -105,7 +130,7 @@
     var C = CP(); if (!host || !C) return;
     var boxes = host.querySelectorAll('[data-rz-cvm-whatif]');
     for (var b = 0; b < boxes.length; b++) bindWhatIf(boxes[b], opts.recompute || function () { return null; });
-    var trs = host.querySelectorAll('tr[data-sp-row]');
+    var trs = host.querySelectorAll('tr[data-sp-row], tr[data-loop-row]');
     for (var i = 0; i < trs.length; i++) {
       var tr = trs[i], pv = tr.getAttribute('data-sp-pv'), sp = +tr.getAttribute('data-sp'), un = tr.getAttribute('data-sp-unit'), u = un ? ' ' + un : '';
       var L = pv && opts.live ? opts.live(pv) : { v: NaN }, v = L.v;
@@ -114,7 +139,7 @@
       else { pc.textContent = '—'; ec.textContent = '—'; pc.setAttribute('title', 'not shown on this page and not an engine value'); pc.removeAttribute('data-src'); }
     }
   }
-  var api = { inner: inner, bind: bind, esc: esc, version: '1.1.0' };
+  var api = { inner: inner, loops: loops, bind: bind, esc: esc, version: '1.2.0' };
   if (root) root.RZSpBlock = api;
   if (typeof module === 'object' && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : null);

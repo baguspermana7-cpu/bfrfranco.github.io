@@ -15,6 +15,8 @@
  *      RZ_SP_PLANT=no-loops  serve the twin without loops(): S8 must fail; =no-loop-hover: the hover law must fail
  *   S8b unit loops on the inside view (P4b): TIC-CHWS inside a chiller, TIC-SAT inside a CRAH, each one instPanel with SP =
  *      registry, OUT = engine, PV and MV joined by signals, no orphan, hover marks the loop. S8c a reset names its slave.
+ *   S11 control authority (P10): each loop's OUT / authority left = the engine, SATURATED within 2 % of a limit (modal,
+ *       bubble); S11c the chiller-plant Loops table has one row per registry loop on its sheets and in its machines
  *   S9 (part) 0 page errors on the pages visited
  *
  * Red first: on v3.102.0 (no control registry in the browser) S2 and S3 fail on every page.
@@ -372,6 +374,26 @@ try {
         ok(!!sl && Math.abs(sl.sp.value - r.sp.value) < 0.051, 'S8c', `${r.sp.loop.tag} resets ${r.sp.loop.slave}: slave ${sl ? sl.sp.value : 'missing'} ≠ master ${r.sp.value}`);
       }
       ok(LOOPS.some((x) => x.sp.loop.kind === 'reset'), 'S8c', 'no reset loop in the registry (rack inlet → supply air)');
+      /* S11c the Loops table (PRD-SETPOINT-SIM P10): the chiller-plant side card lists every registry loop drawn on this
+         page's sheets (CH-M-101, CH-M-102) or inside its machines (the chiller internals) — one row per loop, no more —
+         with SP = registry, Live = the page's value of the loop's PV (else the engine's), OUT / left = the engine's, and
+         the word saturated exactly when the engine output is within 2 % of a limit */
+      const PAGE_SHEETS = ['ch-m-101', 'ch-m-102', 'int-chiller'];
+      const wantLoops = LOOPS.filter((r) => PAGE_SHEETS.includes(r.sp.loop.sheet));
+      await pg.waitForFunction(() => document.querySelectorAll('[data-rz-loops] tr[data-loop-row] td[data-k="pv"]').length > 0 &&
+        ![...document.querySelectorAll('[data-rz-loops] tr[data-loop-row] td[data-k="pv"]')].some((c) => c.textContent === '—'), { timeout: 15000 }).catch(() => {});
+      const lt = await pg.evaluate(() => [...document.querySelectorAll('[data-rz-loops] tr[data-loop-row]')].map((tr) => ({ tag: tr.getAttribute('data-loop-row'),
+        sp: tr.querySelector('[data-k="sp"]').textContent, pv: tr.querySelector('[data-k="pv"]').textContent, err: tr.querySelector('[data-k="err"]').textContent,
+        out: tr.getAttribute('data-auth-out'), left: tr.getAttribute('data-auth-left'), sat: tr.getAttribute('data-auth-sat'), state: tr.querySelector('[data-k="state"]').textContent })));
+      ok(lt.length === wantLoops.length && wantLoops.every((r) => lt.some((x) => x.tag === r.sp.loop.tag)), 'S11c',
+        `Loops table rows [${lt.map((x) => x.tag)}] ≠ registry loops on this page [${wantLoops.map((r) => r.sp.loop.tag)}]`);
+      for (const r of wantLoops) {
+        const x = lt.find((y) => y.tag === r.sp.loop.tag), w = AUTH(r.sp.loop); if (!x || !w) continue;
+        ok(x.sp.startsWith(String(r.sp.value)) || parseFloat(x.sp) === r.sp.value, 'S11c', `${x.tag}: Loops SP "${x.sp}" ≠ registry ${r.sp.value}`);
+        ok(/\d/.test(x.pv) && /\d/.test(x.err), 'S11c', `${x.tag}: Loops Live "${x.pv}" / Error "${x.err}" not filled`);
+        ok(Math.abs(+x.out - w.out) < 0.051 && Math.abs(+x.left - w.left) < 0.11, 'S11a', `${x.tag}: Loops OUT ${x.out} / left ${x.left} ≠ engine ${w.out} / ${w.left}`);
+        ok((x.sat === 'true') === w.sat && /saturated/i.test(x.state) === w.sat, 'S11b', `${x.tag}: Loops state "${x.state}" (sat ${x.sat}) ≠ engine saturated ${w.sat} (OUT ${w.out})`);
+      }
       /* S6 page setpoint sliders (PRD-SETPOINT-SIM P2, the chiller-plant MAINT panel): in maintenance the running
          loops sit at the steady state of the setpoints, exactly, with no lag and no noise on the next ticks (no source
          states a time constant, so dynamics are not modelled and the panel says so); the DP slider shows the engine's
