@@ -11,6 +11,36 @@ release sections rather than semver.
 
 ---
 
+## v3.112.0 — 2026-11-26 — DC AI data hall: valves, return air and fan speed on every unit; four points per aisle; 3D fans and overhead pipes; a phone floor you can read
+
+### DC AI data hall operates from the floor (PRD-DCAI-HALL-DEPTH Amendment 8, A8a–A8d, A8e part 1, A8f)
+
+- **Control valves are modelled, not typed (engine 1.7.0 → 1.8.0).** Each running fan wall's CHW coil valve and each
+  running CDU's facility-water valve now has a stroke from its own duty ratio: equal-percentage, rangeability 50,
+  authority 1 (declared in `equipment.controlValve`, ASHRAE Handbook — Systems and Equipment ch. 47). Today 99.93 % and
+  99.57 %; a standby unit's valve is shut. The CDU HMI's "Control valve 70 % design opening" was a typed number; it now reads
+  `equipment.cdu_fws_valve_pct`, and the fan-wall HMI gains a CHW valve point. Both HMI points are position feedback
+  (±0.3 %, 0.1 % resolution) about the modelled stroke, so a replayed BMS file still overrides them.
+- **Cooling lens:** every running unit shows its valve as a position bar on its roof (ink, no state colour; a valve has
+  no limit). The fan-wall tooltip adds return air and the valve stroke "(modelled)"; the CDU tooltip adds the FWS valve.
+- **3D fans turn.** The fan-wall and CDU rotors now also turn in 3D, on the grille face, at the engine's fan or pump
+  speed (3D had none). Still under reduced motion and off screen.
+- **Four points per aisle.** The aisle stations go from 3 to 4 on every cold and hot aisle (80 in a 20-row hall), on the
+  floor and on the Drawing view from one constant (it was typed twice). A cold point's tooltip adds RH and the dew point
+  (Magnus). The warmest inlet point of each row pair carries a 1 px ink ring.
+- **3D pipes run overhead.** The TCS headers and branches were drawn at floor height and painted across the rack faces;
+  they now run over the corridor (rack top + 0.6 m) and over each contained hot aisle (+ 0.3 m), with a drop at the row end.
+- **A phone floor you can read.** At 390 px the 2D plan stacked in one band squeezed a rack to 3.5 px and a cell to
+  5.2 px. It now stacks in 3 bands and grows down the page: rack 17 × 9 px, cell 13 × 14 px, row tags on one line. The
+  fan walls and CDUs of each band are the ones over its rows (a split by count had put band 2's cells past its edge).
+- **A station opens its trend.** In Thermal, click an aisle point: a card with its last 24 h (the same keyed simulation
+  the readout prints, one function for both), the 27 / 30 °C limits as hairlines on a cold point, Escape closes. A rack
+  under a station does not also open its HMI.
+- **One tooltip per rack:** inlet named by the point it reads, TCS 182 L/min 40 → 50 °C, feed A 213 A. In Thermal a warm
+  point repaints only the racks that read it.
+- Gates: `tools/test-dcai-air-stations.mjs` (AV0, AV3–AV5, ST4-1/2/4, RD1–2, 3M1–3, PF1–2, SA1; 55 checks, red 14 + 2 + 3 on the old trees), `test-dcai-engine.mjs` (+ AV1, 604),
+  `test-datahall-ai-hmi-payloads.mjs` H8.
+
 ## v3.111.0 — 2026-11-26 — DC AI setpoints, what-if and sequences in the inspector; no Conventional page types a control number
 
 ### DC AI: what each controller holds, a what-if on the engine, and the sequences of operations (PRD-SETPOINT-SIM §C P5, P6, P7)
