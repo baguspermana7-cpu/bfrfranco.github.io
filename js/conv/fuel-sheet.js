@@ -79,6 +79,7 @@
     var b = base(), nodes = b.nodes, edges = b.edges, list = Array.isArray(units) ? units : [];
     var n = list.length, last = n ? rowY(n - 1) : 330;
     var H = Math.max(660, last + 108);
+    var C = root.RZControlPoints, LIC = C && typeof C.loops === 'function' ? C.loops('fu-m-101').filter(function (L) { return L.mv.node === 'xv'; }) : [];
     list.forEach(function (u, i) {
       var k = i + 1, y = rowY(i), fy = y + FEED_DY, set = String(u.tag || '').replace(/^GEN-/, '');
       nodes.push(
@@ -95,6 +96,21 @@
         { id: 'fs-dt-' + k + '-in', from: 'xv' + k + '.b', to: 'dt' + k + '.inlet', via: [[DT_X, fy]], medium: 'fuel', flowOf: 'f' + k },
         { id: 'fs-gen-' + k + '-supply', from: 'dt' + k + '.outlet', to: 'gen' + k + '.fuelIn', via: [[1040, y + 18], [1040, y + 5.5]], medium: 'fuel', flowOf: 'g' + k }
       );
+      /* PRD-SETPOINT-SIM P9 part 2: the day-tank level controller of this row as an ISA-5.1 panel bubble, from the control
+         registry (RZControlPoints.loops('fu-m-101'), on-off): fed by the tank's level, signal to the fill valve's actuator.
+         The tag's nn is the set (LIC-A1); the page writes the fill start / stop from the registry. */
+      LIC.forEach(function (L) {
+        var cx = 994, cy = y - 16, r = 20, id = 'lc' + k;
+        nodes.push({ id: id, tag: L.tag.replace(/nn$/, set), sym: 'instPanel', x: cx, y: cy, size: 2 * r, inst: 'LIC', tagAt: 'right', loop: L.sp,
+          label: L.tag.replace(/nn$/, set) + ' — DT-' + u.tag + ' level controller (' + L.action + ' acting ' + L.kind + ')',
+          values: [{ k: 'sp', dx: r + 3, dy: -12, anchor: 'start', lod: 1, const: 'fill start / stop from the control registry (' + L.sp + ')' }] });
+        /* instPanel geometry (48-unit box): circle centre 4/48 of the size above the node centre, radius 14/48, process port
+           at the bottom of its stem; the level comes in at the port, the signal leaves the top of the circle */
+        var top = cy - 18 * 2 * r / 48;
+        edges.push({ id: 'e-ll-' + k, from: [DT_X + 15, cy + r], to: id + '.process', w: 'inst', medium: 'line', loop: L.sp },
+          { id: 'e-lm-' + k, from: [cx, top], to: [XV_X + 12, fy - 9], via: [[cx, fy - 9]], w: 'signal', medium: 'line', loop: L.sp });
+        nodes.forEach(function (nd) { if (nd.id === L.mv.node + k || nd.id === 'dt' + k) nd.loop = L.sp; });
+      });
     });
     /* the day-tank header: from the transfer header junction up to the first row and down to the last; segment s carries
        the flow of every row beyond it (busOf lists those rows, the page maps them to points) */

@@ -657,7 +657,7 @@
     <script src="js/conv/vfx.js?v=20261123-3fd25115"></script>
     <script src="js/conv/history.js?v=20261120-8d390d7e"></script>
     <script src="js/rz-trend.js?v=20261123-5b150d9f"></script>
-    <script src="js/conv/fuel-sheet.js?v=20261120-183ab1ae"></script>
+    <script src="js/conv/fuel-sheet.js?v=20261126-07e981a0"></script>
     <script src="js/conv/sheet-truth.js?v=20261122-14958672"></script>
     <script src="js/conv/payloads.js?v=20261124-18c67226"></script>
     <script src="js/conv/internals.js?v=20261125-8f073c38"></script>
@@ -681,7 +681,7 @@
     <link rel="stylesheet" href="css/conv-point.css?v=20261120-8daa6374">
     <link rel="stylesheet" href="css/conv-motion.css?v=20261121-88ede45d">
     <link rel="stylesheet" href="css/conv-live.css?v=20261122-9e4f1c46">
-    <script src="js/rz-control-points.js?v=20261126-a404af2b"></script>
+    <script src="js/rz-control-points.js?v=20261126-35e7e682"></script>
     <script src="js/rz-sp-block.js?v=20261126-7847b7bb"></script>
     <script src="js/rz-diagram-metrics.js?v=20261016-1994fd2b"></script>
     <script src="js/rz-diagram-layout.js?v=20261016-a82d8709"></script>
@@ -1725,12 +1725,21 @@
         function fuelRead(n) {
             var L = fuelSheetLive, U = 'UNAVAILABLE', o = { values: {} };
             var run = L && transferCmd(), polish = L && !!state.interlocks.polish;
-            var m = /^(xv|dt|gen)(\d+)$/.exec(n.id), k = m ? Number(m[2]) : 0, set = m ? setsOf(state.hall)[k - 1] : null;
+            var m = /^(xv|dt|gen|lc)(\d+)$/.exec(n.id), k = m ? Number(m[2]) : 0, set = m ? setsOf(state.hall)[k - 1] : null;
             if (m && !set) { o.values.st = fv(U); return o; }
             if (m && m[1] === 'xv') {
                 var open = L && xvOpen(k);
                 o.state = L ? (open ? 'open' : 'closed') : null;
                 o.values.st = fv(L ? (open ? 'OPEN' : 'CLOSED') : U); return o;
+            }
+            if (m && m[1] === 'lc') {
+                /* PRD-SETPOINT-SIM P9 part 2: LIC-nn shows the registry's fill start / stop and its output, the fill valve */
+                var LP = window.RZControlPoints.loops('fu-m-101')[0], vo = L && xvOpen(k);
+                o.state = L ? (vo ? 'running' : 'stopped') : null;
+                o.values.sp = fv(L && LP ? CPV(LP.sp) + ' / ' + CPV(LP.stop) + ' %' : U);   /* registry numbers as written (50 / 90 %) */
+                if (L && LP) o.rows = [['Opens', LP.mv.what], ['Fill start', fmt1(CPV(LP.sp)) + ' % (registry)'], ['Fill stop', fmt1(CPV(LP.stop)) + ' % (registry)'],
+                    ['Senses', LP.pv.what], ['Action', LP.action + ' acting ' + LP.kind + ' (level falls → fill)'], ['Output', vo ? 'fill valve OPEN' : 'fill valve CLOSED'], ['Basis', LP.basis]];
+                return o;
             }
             if (m && m[1] === 'dt') {
                 var pct = L ? set.dayTank.pct : null, low = L && pct < DT_FILL_START && !fillAvailable(state.hall);

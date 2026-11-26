@@ -17,7 +17,8 @@
  * it; the served-as-is run must show the registry value. 0 page errors on every load.
  *
  * S8e (--browser, P9 part 2): the fire pump controllers PC-JP1 / PC-FP1 / PC-FP2 on FS-M-101, one ISA-5.1 panel bubble each
- *   from the registry, own sensing line, signal to its pump, cut-in (/ cut-out) printed = registry, no orphan bubble.
+ *   from the registry, own sensing line, signal to its pump, cut-in (/ cut-out) printed = registry, no orphan bubble;
+ *   one LIC per day tank on FU-M-101, level line from its tank, signal to its fill valve, fill start / stop = registry.
  *
  * Usage: node tools/test-typed-control-numbers.mjs [--list] [--baseline] [--browser]
  *        (--baseline only after a deliberate cut; RZ_T3_NOPLANT=1 turns the plant run into an unplanted one: red check)
@@ -89,6 +90,8 @@ const read = {
   'fire-system#pc': () => { const s = document.querySelector('#fire-sheet-host svg, .hmi-svg'); if (!s) return '';
     const n = [...s.querySelectorAll('.hmi-node')].find((x) => (x.getAttribute('aria-label') || '').startsWith('PC-JP1 — '));
     const t = n && s.querySelector('[data-val="' + n.getAttribute('data-node') + ':sp"]'); return t ? t.textContent.trim() : ''; },
+  /* S8e: the first day-tank level controller prints the registry's fill start / stop */
+  'fuel-system#lic': () => { const t = document.querySelector('#fuel-sheet-host [data-val="lc1:sp"]'); return t ? t.textContent.trim() : ''; },
   'fuel-system': () => { const l = document.querySelector('#fuel-dt-basis [data-basis-line]'), m = l && /fill \d+(?:\.\d+)?→\d+(?:\.\d+)? %/.exec(l.textContent); return m ? m[0] : ''; },
   /* the note must also fit its drawing: a text past the viewBox is cut off (red at 1440 with the first, longer note) */
   'cdu-mini-bms': () => { const n = [...document.querySelectorAll('svg text')].find((x) => /SETPOINT/.test(x.textContent)); if (!n) return '';
@@ -96,8 +99,8 @@ const read = {
     return n.textContent.replace(/^.*?SETPOINT/, 'SETPOINT') + (over > 0.5 ? ' [past the drawing by ' + over.toFixed(1) + ']' : ''); }
 };
 const want = {
-  false: { 'fire-system#pc': /^11\.5 \/ 12\.8 bar$/, 'fire-system': /^11\.5 \/ 12\.8 bar$/, 'fuel-system': /^fill 50→90 %$/, 'cdu-mini-bms': /TT-01 = 32 °C \(floor 18 °C\)(?!.*past the drawing)/ },
-  true: { 'fire-system#pc': /^11\.0 \/ 12\.8 bar$/, 'fire-system': /^11\.0 \/ 12\.8 bar$/, 'fuel-system': /^fill 55→90 %$/, 'cdu-mini-bms': /TT-01 = 31 °C \(floor 18 °C\)(?!.*past the drawing)/ }
+  false: { 'fuel-system#lic': /^50 \/ 90 %$/, 'fire-system#pc': /^11\.5 \/ 12\.8 bar$/, 'fire-system': /^11\.5 \/ 12\.8 bar$/, 'fuel-system': /^fill 50→90 %$/, 'cdu-mini-bms': /TT-01 = 32 °C \(floor 18 °C\)(?!.*past the drawing)/ },
+  true: { 'fuel-system#lic': /^55 \/ 90 %$/, 'fire-system#pc': /^11\.0 \/ 12\.8 bar$/, 'fire-system': /^11\.0 \/ 12\.8 bar$/, 'fuel-system': /^fill 55→90 %$/, 'cdu-mini-bms': /TT-01 = 31 °C \(floor 18 °C\)(?!.*past the drawing)/ }
 };
 let bad = 0;
 for (const pl of [false, true]) {
@@ -154,6 +157,47 @@ for (const pl of [false, true]) {
   if (errs.length) f.push('page errors ' + errs.slice(0, 2).join(' | '));
   f.forEach((x) => console.log('FAIL S8e ' + x)); bad += f.length;
   console.log(`${f.length ? 'FAIL' : 'PASS'} S8e pump controllers on FS-M-101: ${(g.rows || []).map((r) => r.tag + ' ' + r.sp).join(' · ')}`);
+  await pg.close();
+}
+/* S8e fuel: one level controller per day tank on FU-M-101 (LIC-<set>), fed by its tank at the bubble's process port, a
+   signal to that row's fill valve, the registry fill start / stop printed; no other bubble on the sheet */
+{
+  planted = false;
+  const pg = await browser.newPage(), errs = []; pg.on('pageerror', (e) => errs.push(e.message));
+  await pg.setViewport({ width: 1440, height: 900 }); await primeCockpitAuditDocument(pg, 'dark');
+  await pg.goto(ORIGIN + 'fuel-system.html', { waitUntil: 'networkidle2', timeout: 90000 });
+  try { await enterAuthorizedAuditState(pg, 'fuel-system'); } catch (e) { /* public */ }
+  await new Promise((r) => setTimeout(r, 3000));
+  const g = await pg.evaluate(() => {
+    const C = window.RZControlPoints, L = C ? C.loops('fu-m-101')[0] : null, svg = document.querySelector('#fuel-sheet-host svg.hmi-svg');
+    if (!svg || !L) return { err: !L ? 'no registry loop on fu-m-101' : 'no sheet' };
+    const nodes = [...svg.querySelectorAll('.hmi-node')], by = (id) => nodes.find((n) => n.getAttribute('data-node') === id);
+    const near = (pt, n, pad) => { const b = n.getBBox(); return pt[0] >= b.x - pad && pt[0] <= b.x + b.width + pad && pt[1] >= b.y - pad && pt[1] <= b.y + b.height + pad; };
+    const ends = (w) => [...svg.querySelectorAll('path.hmi-edge.' + w)].map((p) => { const a = p.getPointAtLength(0), b = p.getPointAtLength(p.getTotalLength()); return [[a.x, a.y], [b.x, b.y]]; });
+    const sig = ends('w-signal'), ins = ends('w-inst'), want = C.value(L.sp) + ' / ' + C.value(L.stop) + ' %';
+    const tanks = nodes.filter((n) => /^dt\d+$/.test(n.getAttribute('data-node')));
+    const bubbles = nodes.filter((n) => n.getAttribute('data-sym') === 'instPanel');
+    return { tanks: tanks.length, bubbles: bubbles.length, want, rows: tanks.map((t) => {
+      const k = t.getAttribute('data-node').slice(2), c = by('lc' + k), xv = by('xv' + k), tv = c && svg.querySelector('[data-val="lc' + k + ':sp"]');
+      return { k, tag: c ? (c.getAttribute('aria-label') || '').split(' — ')[0] : null, dt: (t.getAttribute('aria-label') || '').split(' — ')[0],
+        sense: c ? ins.filter((e) => (near(e[0], t, 4) && near(e[1], c, 4)) || (near(e[1], t, 4) && near(e[0], c, 4))).length : 0,
+        sig: c && xv ? sig.filter((e) => (near(e[0], c, 6) && near(e[1], xv, 6)) || (near(e[1], c, 6) && near(e[0], xv, 6))).length : 0, sp: tv ? tv.textContent.trim() : '' }; }) };
+  });
+  const f = [];
+  if (g.err) f.push(g.err);
+  else {
+    if (!g.tanks || g.bubbles !== g.tanks) f.push(`${g.bubbles} level-controller bubbles for ${g.tanks} day tanks`);
+    for (const r of g.rows) {
+      const set = (r.dt || '').replace(/^DT-GEN-/, '');
+      if (r.tag !== 'LIC-' + set) f.push(`row ${r.k}: controller ${r.tag} (want LIC-${set} beside ${r.dt})`);
+      if (r.sense < 1) f.push(`row ${r.k}: no level line from ${r.dt} to its controller`);
+      if (r.sig < 1) f.push(`row ${r.k}: no signal from the controller to its fill valve`);
+      if (r.sp !== g.want) f.push(`row ${r.k}: prints "${r.sp}", registry "${g.want}"`);
+    }
+  }
+  if (errs.length) f.push('page errors ' + errs.slice(0, 2).join(' | '));
+  f.forEach((x) => console.log('FAIL S8e fuel ' + x)); bad += f.length;
+  console.log(`${f.length ? 'FAIL' : 'PASS'} S8e day-tank level controllers on FU-M-101: ${g.rows ? g.rows.length : 0} tanks, ${g.bubbles || 0} LIC, "${g.want || ''}"`);
   await pg.close();
 }
 await browser.close(); srv.close();

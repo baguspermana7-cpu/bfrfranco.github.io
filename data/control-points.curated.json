@@ -539,7 +539,25 @@
       "basis": "NFPA 110 (2022) §7.9.1 requires a day tank sized and refilled to keep the set running; start and stop levels are this page's design (ASSUMED, no source states them)",
       "pv": [
         "fuel-system.DT.level_pct"
-      ]
+      ],
+      "loop": {
+        "tag": "LIC-nn",
+        "sheet": "fu-m-101",
+        "kind": "on-off",
+        "action": "reverse",
+        "stop": "conv.fuel-system.day_tank_fill_stop",
+        "pv": {
+          "tag": "LT (in the tank)",
+          "what": "day-tank level, from the tank's own level transmitter"
+        },
+        "mv": {
+          "node": "xv",
+          "what": "day-tank fill valve XV-nn: opens at the fill start (and calls the transfer pump), closes at the fill stop"
+        },
+        "tuning": null,
+        "tuningNote": "on-off with a differential (fill start to fill stop); no gain or time constant",
+        "basis": "Day-tank practice in the NFPA 110 / NFPA 30 context: a level controller on each day tank opens its fill valve on low level and closes it on high level; the start / stop levels are the registry numbers (ASSUMED page design). nn = the genset set (DT-GEN-A1 -> LIC-A1 -> XV-A1). On-off: no gain or time constant applies."
+      }
     },
     {
       "id": "conv.fuel-system.day_tank_fill_stop",

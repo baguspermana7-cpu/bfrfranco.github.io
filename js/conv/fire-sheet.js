@@ -98,8 +98,11 @@
     nodes.push({ id: id, tag: L.tag, sym: 'instPanel', x: LX, y: cy, size: 2 * r, inst: 'PC', tagAt: 'right', loop: L.sp,
       label: L.tag + ' — ' + p.tag + ' controller (' + L.action + ' acting ' + L.kind + ')',
       values: [{ k: 'sp', dx: 0, dy: -r - 8, anchor: 'middle', lod: 1, const: 'cut-in / cut-out from the control registry (' + L.sp + ')' }] });
-    edges.push({ id: 'e-ls-' + p.id, from: [LX, y], to: [LX, cy + r], w: 'inst', medium: 'line', loop: L.sp });
-    edges.push({ id: 'e-lm-' + p.id, from: [LX - r, cy], to: [px + 1, y - 10], via: [[515, cy], [515, y - 10]], w: 'signal', medium: 'line', loop: L.sp });
+    /* instPanel geometry (48-unit box): circle centre 4/48 of the size above the node centre, radius 14/48; the sensing line
+       enters at the process port (bottom of the stem), the signal leaves the left of the circle */
+    var ccy = cy - 4 * 2 * r / 48, cl = LX - 14 * 2 * r / 48;
+    edges.push({ id: 'e-ls-' + p.id, from: [LX, y], to: id + '.process', w: 'inst', medium: 'line', loop: L.sp });
+    edges.push({ id: 'e-lm-' + p.id, from: [cl, ccy], to: [px + 1, y - 10], via: [[515, ccy], [515, y - 10]], w: 'signal', medium: 'line', loop: L.sp });
     nodes.forEach(function (nd) { if (nd.id === p.id) nd.loop = L.sp; });
   });
   WX.forEach(function (x, i) {
