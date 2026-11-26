@@ -1670,6 +1670,26 @@
           "step": 0.5,
           "basis": "upper 45 °C: ASHRAE TC9.9 liquid cooling class W45 (facility water ≤ 45 °C); lower 30 °C: dew-point margin, ASSUMED"
         },
+        "loop": {
+          "tag": "TIC-nn1",
+          "sheet": "DH-M-103",
+          "kind": "PI",
+          "action": "direct",
+          "pv": {
+            "tag": "TT-nn3"
+          },
+          "mv": {
+            "classKey": "cdu",
+            "what": "FWS control valve TV-nn1"
+          },
+          "out": {
+            "key": "equipment.cdu_fws_valve_pct",
+            "what": "FWS valve stroke"
+          },
+          "tuning": null,
+          "tuningNote": "tuning not modelled (no source for Kp / Ti)",
+          "basis": "TCS supply above SP opens the facility-water valve (more heat to the HX); stroke = the engine's equal-percentage valve at the duty per CDU (js/dcai-engine.js valveStroke, A8a)"
+        },
         "param": "thermal.tcsSupplyC",
         "whatIf": [
           {
@@ -2044,6 +2064,27 @@
           "max": 27,
           "step": 0.5,
           "basis": "ASHRAE TC9.9 Thermal Guidelines (5th ed.), class A1 recommended inlet 18–27 °C; contained aisle, rack inlet = supply air"
+        },
+        "loop": {
+          "tag": "TIC-SA",
+          "sheet": null,
+          "kind": "PI",
+          "action": "direct",
+          "pv": {
+            "tag": "TT-nn2"
+          },
+          "mv": {
+            "classKey": "crah",
+            "what": "CHW control valve TV-nn"
+          },
+          "out": {
+            "key": "equipment.crah_chw_valve_pct",
+            "what": "CHW valve stroke"
+          },
+          "tuning": null,
+          "tuningNote": "tuning not modelled (no source for Kp / Ti)",
+          "notDrawn": "the fan-wall unit sheet (FW-nn) draws TT-nn2 and TV-nn with their signals, not the controller",
+          "basis": "supply air above SP opens the chilled-water valve (more coil duty); stroke = the engine's equal-percentage valve at the duty per fan-wall unit (js/dcai-engine.js valveStroke, A8a)"
         },
         "param": "thermal.airSupplyC",
         "whatIf": [

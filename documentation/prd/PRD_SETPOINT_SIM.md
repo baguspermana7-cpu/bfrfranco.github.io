@@ -1015,3 +1015,14 @@ RZSpBlock.bind(host, { recompute })  → wires sliders (input → recompute → 
 - Not in this part: the CDU low-flow, leak and facility-water-loss modes (no engine quantity to step), dry-cooler loss
   with derate (the engine has no per-unit derate). Hysteresis and edge band are ASSUMED and listed as such.
 
+## C15. P10 part 2 delivered (2026-11-26): DC AI control authority
+
+- The CDU TCS supply and the fan-wall supply-air setpoints name their loop and the engine output it moves (A8a valve
+  stroke, engine 1.8.0). The inspector prints `OUT · authority left · SATURATED` from the one twin rule.
+- Finding: at design both valves sit on full travel (CDU 99.6 %, fan wall 99.9 %), so the hall's design load uses every
+  CDU and fan-wall valve to its stop; the N+1 standby is the only margin. The engine sizes the duty count by
+  `ceil(load / unit)`, which leaves < 1 unit of slack by construction.
+- Corrected during the work: the CDU loop is drawn on DH-M-103 (TT-nn3 → TIC-nn1 → TV-nn1); the registry carries the
+  drawn tags and a law checks the drawing still joins them.
+- Not done in this part: the compact Loops table (chiller-plant, inspector header) of §C3 P10.
+

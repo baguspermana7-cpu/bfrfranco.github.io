@@ -11,6 +11,23 @@ release sections rather than semver.
 
 ---
 
+## v3.113.0 — 2026-11-26 — DC AI inspector: how much valve travel the CDU and fan-wall controllers have left
+
+### DC AI control authority (PRD-SETPOINT-SIM §C P10 part 2)
+
+- The CDU TCS supply and the fan-wall supply-air setpoints name the loop that holds them: TIC-nn1 on the CDU's
+  facility-water valve (drawn on DH-M-103: TT-nn3 → TIC-nn1 → TV-nn1) and TIC-SA on the fan-wall chilled-water valve
+  (the FW-nn sheet draws the sensor and valve, not the controller). The inspector prints OUT (the engine's
+  equal-percentage valve stroke, A8a), authority left and SATURATED from the one twin rule (band 2 %, ASSUMED).
+- **Finding:** at design both valves are at full travel, CDU 99.6 % (0.4 % left) and fan wall 99.9 % (0.1 % left): the
+  duty count is `ceil(load / unit)`, so every duty unit runs within one unit's share of its rating and the N+1 standby
+  is the only margin for more heat.
+- `RZControlPoints.authority()` rounds OUT to 0.1 % before the rule (the conv loops already read at 0.1 %).
+- Gate: `tools/test-dcai-setpoints.mjs` D11 (registry loop and twin authority = engine valve; the inspector line at
+  390/1440 × dark/light; DH-M-103 still draws the loop). Red first: no loop on either setpoint; a CDU signal line
+  mutated to a process line.
+- Standards: `standarization/CONTROL_SETPOINT_STANDARD.md` §4; PRD `documentation/prd/PRD_SETPOINT_SIM.md` §C15.
+
 ## v3.112.0 — 2026-11-26 — DC AI data hall: valves, return air and fan speed on every unit; four points per aisle; 3D fans and overhead pipes; a phone floor you can read
 
 ### DC AI data hall operates from the floor (PRD-DCAI-HALL-DEPTH Amendment 8, A8a–A8d, A8e part 1, A8f)

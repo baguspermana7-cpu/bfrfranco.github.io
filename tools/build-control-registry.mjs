@@ -103,7 +103,17 @@ export function build() {
   });
 
   /* 3. DC AI point classes */
-  const VE = cur.dcaiValueEvidence || {}, PC = cur.dcaiPlaneController || {}, TS = cur.dcaiTypedSetpoints || {}; const ADJ = cur.dcaiAdjustable || {};
+  const VE = cur.dcaiValueEvidence || {}, PC = cur.dcaiPlaneController || {}, TS = cur.dcaiTypedSetpoints || {}; const ADJ = cur.dcaiAdjustable || {}; const DL = cur.dcaiLoops || {};
+  const spath = (o, k) => k.split('.').reduce((x, y) => (x == null ? undefined : x[y]), o);
+  Object.keys(DL).filter((k) => k !== 'note').forEach((id) => {   /* P10: a DC AI loop names its output in the engine */
+    const L = DL[id], bad = (m) => { throw new Error('dcaiLoops ' + id + ': ' + m); };
+    if (!PTS.records().some((r) => r.cls + '/' + r.point === id)) bad('no DC AI point ' + id);
+    if (!L.tag || !L.pv || !L.pv.tag || !L.mv || !L.mv.what || !L.basis) bad('tag, pv.tag, mv.what and basis are required');
+    if (!['PI', 'staging'].includes(L.kind) || !['direct', 'reverse'].includes(L.action)) bad('kind / action');
+    if (!L.sheet && !L.notDrawn) bad('a loop without a sheet says why (notDrawn)');
+    if (!L.tuning && !L.tuningNote) bad('no tuning and no note');
+    if (!L.out || typeof spath(snap, L.out.key) !== 'number') bad('out.key must be a number in DCAI_CALC.snapshot: ' + JSON.stringify(L.out));
+  });
   PTS.records().forEach((r) => {
     const id = r.cls + '/' + r.point, v = PTS.setpoint(id, snap);
     let L = null; try { L = PTS.resolve(id, snap); } catch (e) { L = null; }
@@ -117,6 +127,7 @@ export function build() {
         src = { ref: 'js/datahall-ai/points.js ' + id, why: VE[id] ? VE[id].why : 'value typed in the point record; no source of its own' }; }
       row.sp = { value: v, role: role, from: r.sp.plane ? 'plane ' + r.sp.plane : r.sp.path ? 'path ' + r.sp.path : 'typed value', evidenceClass: ev, source: src, control: role === 'setpoint' ? control : null, heldBy: heldBy, adjustable: null };
       /* P6: a DC AI setpoint an operator can move (only on the class that holds it) */
+      if (DL[id]) { if (role !== 'setpoint') throw new Error('dcaiLoops ' + id + ' is not a setpoint of its class'); row.sp.loop = DL[id]; }
       if (ADJ[id] && role === 'setpoint') Object.assign(row.sp, { adjustable: ADJ[id].adjustable, param: ADJ[id].param, whatIf: ADJ[id].whatIf.map((w) => ceil(w, E.model)), whatIfNote: ADJ[id].whatIfNote });
       else if (ADJ[id]) throw new Error('dcaiAdjustable ' + id + ' is not a setpoint (only the holding class is adjustable)');
     }
@@ -148,7 +159,7 @@ export function twin(reg) {
     const k = 'dcai:' + r.equipment;
     (byClass[k] = byClass[k] || []).push({ id: r.id, label: r.label, value: r.sp.value, unit: UNIT[r.unit] || r.unit || '', role: r.sp.role,
       ev: r.sp.evidenceClass, pv: [r.id.slice(5)], control: r.sp.control || null, heldBy: r.sp.heldBy || null, adjustable: r.sp.adjustable || null,
-      note: null, param: r.sp.param || null, whatIf: r.sp.whatIf || null, whatIfNote: r.sp.whatIfNote || null, loop: null,
+      note: null, param: r.sp.param || null, whatIf: r.sp.whatIf || null, whatIfNote: r.sp.whatIfNote || null, loop: r.sp.loop || null,
       /* the DC AI page does not load js/datahall-ai/points.js: the band rides along, resolved on the design snapshot */
       limits: r.limits ? LIMIT_KEYS.reduce((o, k) => (typeof r.limits[k] === 'number' ? Object.assign(o, { [k]: r.limits[k] }) : o), {}) : null });
   });
@@ -182,7 +193,7 @@ export function twin(reg) {
     '     or of the minimum. SAT_BAND 2 % is ASSUMED (no source states where a loop stops holding; it is the visible margin) */\n' +
     '  var SAT_BAND = 2;\n' +
     '  function path(o, p) { var k = String(p).split(\'.\'); for (var i = 0; o != null && i < k.length; i++) o = o[k[i]]; return typeof o === \'number\' && isFinite(o) ? o : null; }\n' +
-    '  function authority(L, snap) { if (!L || !L.out || !snap) return null; var out = path(snap, L.out.key); if (out === null) return null;\n' +
+    '  function authority(L, snap) { if (!L || !L.out || !snap) return null; var out = path(snap, L.out.key); if (out === null) return null; out = Math.round(out * 10) / 10;\n' +
     '    var mn = L.out.minKey ? path(snap, L.out.minKey) : null;\n' +
     '    return { out: out, left: Math.round((100 - out) * 10) / 10, min: mn, sat: out >= 100 - SAT_BAND || (mn !== null && out <= mn + SAT_BAND), band: SAT_BAND }; }\n' +
     '  function forClass(k) { return Object.prototype.hasOwnProperty.call(BY_CLASS, k) ? BY_CLASS[k].slice() : []; }\n' +

@@ -129,6 +129,13 @@ range). Otherwise it is fixed, and the modal says what fixes it.
   page). The modal's loop line says `OUT · authority left` and **SATURATED** with what it means; an inside-view bubble
   appends `· SAT` to its OUT. The word is used, never a glyph: ◆ is the alarm glyph of `js/conv/point-status.js`.
   Measured: PDIC-01 98.7 % (1.3 % left) and TIC-SAT 99.5 % (0.5 % left) saturated; TIC-CDWS and TIC-CHWS 89.3 %.
+- **DC AI loops (P10 part 2).** `dcaiLoops` in `data/control-points.curated.json` gives a DC AI setpoint its loop; the
+  builder refuses an id that is not a point, a loop on a reference value, and an `out.key` that is not a number in
+  `DCAI_CALC.snapshot`. TIC-nn1 (CDU, drawn on DH-M-103: TT-nn3 → TIC-nn1 → TV-nn1) acts on
+  `equipment.cdu_fws_valve_pct`; TIC-SA (fan wall, not drawn: the FW-nn sheet has TT-nn2 and TV-nn, no controller) on
+  `equipment.crah_chw_valve_pct`, both the engine's equal-percentage stroke (A8a). `authority()` rounds OUT to 0.1 %
+  before the rule. Measured at design: CDU valve 99.6 % (0.4 % left), fan-wall valve 99.9 % (0.1 % left), both
+  SATURATED: at the design point neither unit has valve travel left for more heat. Gate D11 of `test-dcai-setpoints.mjs`.
 - **Reset (cascade) loops.** A `kind: 'reset'` loop names the loop whose setpoint it writes (`slave`, an existing
   registry tag; the builder refuses another). TIC-RI (rack inlet) resets TIC-SAT: contained aisle, no mixing modelled,
   so the slave setpoint equals the master's.

@@ -20,6 +20,9 @@
  *       sweep's mode and cooling power = an independent DCAI_CALC.compute; trips end with the duty count restored
  *   D9  the cliff strip under the TCS what-if: one row per engine bin, now and SIMULATED = the engine, the design
  *       ambient row marked, Reset clears.
+ *   D11 (P10) the CDU and fan-wall setpoints name the loop that holds them: TIC-TCS on the CDU facility-water valve,
+ *       TIC-SA on the fan-wall chilled-water valve; OUT = the engine's valve stroke (A8a equipment.*_valve_pct, 0.1 %),
+ *       authority left = 100 - OUT, SATURATED from the twin's one rule; the inspector prints that line (no raw float).
  *   (D3 trend SP line joins with the rz-trend hook.)  --static skips the browser.
  *
  * Usage: node tools/test-dcai-setpoints.mjs [--list] [--static]
@@ -62,6 +65,19 @@ let fails = 0; const law = (c, m) => { if (!c) { fails++; console.log('FAIL ' + 
   law(SPI.recompute('thermal.noSuchField', 1) === null, 'D0 an unknown parameter is not refused (null)');
   /* D6 the cliff by bin: a bin is liquid free cooling exactly when TCS − 3 − 3 ≥ its ambient (CDU + dry cooler approach) */
   for (const t of [36, 39, 40, 41, 45]) { const bins = SPI.recompute('thermal.tcsSupplyC', t).bins; for (const b of bins) law(b.liquid_free_cooling === (t - 6 >= b.ambient_db_c), `D6 TCS ${t} °C bin ${b.ambient_db_c} °C: free cooling ${b.liquid_free_cooling}`); }
+  /* D11 (P10) authority of the DC AI loops: the twin's rule on the engine's valve stroke */
+  const LOOPS = { 'dcai.cdu/tcs_supply_c': 'equipment.cdu_fws_valve_pct', 'dcai.crah/air_supply_c': 'equipment.crah_chw_valve_pct' };
+  for (const [id, key] of Object.entries(LOOPS)) {
+    const r = reg.find((x) => x.id === id), L = r && r.sp.loop, eng = get(D.snapshot, key);
+    if (!L || !L.out || L.out.key !== key) { law(false, `D11 ${id}: loop ${JSON.stringify(L && L.out)} (want out.key ${key})`); continue; }
+    const row = SPI.rows(r.equipment).find((x) => x.id === id), A = sb.RZControlPoints.authority(row && row.loop, D.snapshot);
+    law(A && A.out === Math.round(eng * 10) / 10 && A.left === Math.round((100 - A.out) * 10) / 10 && A.sat === (eng >= 98), `D11 ${id}: authority ${JSON.stringify(A)} vs engine ${eng}`);
+  }
+  /* D11 a loop that names a sheet is drawn there: DH-M-103 joins TT-nn3 -> TIC-nn1 -> TV-nn1 with signal lines */
+  { const hs = fs.readFileSync(path.join(ROOT, 'js/datahall-ai/hmi-sheets.js'), 'utf8');
+    const drawn = /inst: 'TIC'[^\n]*t\('TIC1'\)/.test(hs) && /s\.e\(tt3 \+ '\.process', tic \+ '\.process', 'line', \{ w: 'signal'/.test(hs) && /s\.e\(tic \+ '\.process', tv \+ '\.signal', 'line', \{ w: 'signal'/.test(hs);
+    const L = (reg.find((x) => x.id === 'dcai.cdu/tcs_supply_c') || { sp: {} }).sp.loop;
+    law(!L || L.sheet !== 'DH-M-103' || drawn, 'D11 dcai.cdu/tcs_supply_c names DH-M-103 but the sheet does not draw TT-nn3 -> TIC-nn1 -> TV-nn1'); }
   if (!fails) console.log(`PASS D0 inspector core: ${reg.length} DC AI setpoints have rows; what-if = engine on 12 cases; live model untouched`);
 }
 
@@ -131,6 +147,19 @@ async function browserLaws() {
       if (d.tw > 1) bad(`D4 ${tag} ${cls}: a table in the block overflows its frame by ${d.tw} px (a column scrolls out of view)`);
       if (d.past > 1) bad(`D4 ${tag} ${cls}: a cell ends ${d.past} px past the inspector's right edge`);
       if (d.small) bad(`D4 ${tag} ${cls}: ${d.small} block texts under 10.5 px`);
+      /* D11 (P10) the loop line: OUT = the engine's valve stroke at 0.1 %, authority left, SATURATED, inside the inspector */
+      if (cls === 'cdu' || cls === 'crah') {
+        const key = cls === 'cdu' ? 'cdu_fws_valve_pct' : 'crah_chw_valve_pct', eng = Math.round(require(path.join(ROOT, 'js/dcai-engine.js')).snapshot.equipment[key] * 10) / 10;
+        const lp = await pg.evaluate(() => { const p = document.querySelector('aside.rz-inspector.open [data-rz-dcai-sp] [data-rz-cvm-loop]'); if (!p) return null; const ins = document.querySelector('aside.rz-inspector.open').getBoundingClientRect(), b = p.getBoundingClientRect();
+          return { tag: p.getAttribute('data-rz-cvm-loop'), out: +p.getAttribute('data-auth-out'), sat: p.getAttribute('data-auth-sat'), text: p.textContent, past: b.right - Math.min(innerWidth, ins.right) }; });
+        if (!lp) bad(`D11 ${tag} ${cls}: no control-loop line in the block`);
+        else {
+          if (lp.out !== eng) bad(`D11 ${tag} ${cls}: OUT ${lp.out} ≠ engine valve ${eng}`);
+          if (lp.sat !== String(eng >= 98)) bad(`D11 ${tag} ${cls}: saturated ${lp.sat} at OUT ${eng}`);
+          if (/\d\.\d{3,}/.test(lp.text)) bad(`D11 ${tag} ${cls}: raw float in "${lp.text.slice(0, 90)}"`);
+          if (lp.past > 1) bad(`D11 ${tag} ${cls}: the loop line ends ${lp.past.toFixed(0)} px past the inspector`);
+        }
+      }
       if (cls !== 'cdu' || W !== 1440) continue;
       /* D5 what-if: TCS supply 41 °C -> every SIMULATED output = a Node DCAI_CALC.compute of a copy; cliff ambient 35 °C */
       const D = require(path.join(ROOT, 'js/dcai-engine.js')), m = JSON.parse(JSON.stringify(D.model)); m.thermal.tcsSupplyC = 41; const sim = D.compute(m);
@@ -206,6 +235,6 @@ async function browserLaws() {
     await pg.close();
   }
   await b.close(); srv.close();
-  console.log(`${n ? 'FAIL' : 'PASS'} D1/D1r/D4/D5/D7/D8/D9/D10 inspector block on datahallAI.html: ${CLASSES.length} classes × 390/1440 × dark/light${n ? ', ' + n + ' findings' : ''}`);
+  console.log(`${n ? 'FAIL' : 'PASS'} D1/D1r/D4/D5/D7/D8/D9/D10/D11 inspector block on datahallAI.html: ${CLASSES.length} classes × 390/1440 × dark/light${n ? ', ' + n + ' findings' : ''}`);
   return n;
 }
