@@ -35,14 +35,14 @@ const E = require(path.join(ROOT, 'js/dcai-engine.js'));
 const snap = typeof E.snapshot === 'function' ? E.snapshot() : E.snapshot;
 const SRC = fs.readFileSync(path.join(ROOT, 'js/datahall-ai/hmi-payloads.js'), 'utf8');
 
-/* live rows per class, parsed from the payload source: { cls: { point: { kind, valueAnchor, band } } } */
+/* live rows per class (and maintenance rows, where a keep-warm setpoint lives, PRD-SETPOINT-SIM P5), parsed from the payload source: { cls: { point: { kind, valueAnchor, band } } } */
 const LIVE = {}; let cls = null;
 for (const line of SRC.split('\n')) {
   const d = /def\('([a-z0-9-]+)'/.exec(line); if (d) cls = d[1];
-  const re = /b\.([SEPD])\('live', '([a-z0-9_]+)', '[^']*', ([^;]*)/g; let m;
+  const re = /b\.([SEPD])\('(?:live|maint)', '([a-z0-9_]+)', '[^']*', ([^;]*)/g; let m;
   while ((m = re.exec(line))) {
-    const va = /^\{ value: (-?[\d.]+)/.exec(m[3]), bd = /^\{[^}]*\}, ([\d.]+)/.exec(m[3]);
-    ((LIVE[cls] = LIVE[cls] || {})[m[2]] = { k: m[1], value: va ? Number(va[1]) : null, band: bd ? Number(bd[1]) : 0 });
+    const va = /^\{ value: (-?[\d.]+)/.exec(m[3]), vr = /^\{ value: SP\('([a-z0-9-]+\/[a-z0-9_]+)'\)/.exec(m[3]), bd = /^\{[^}]*\}, ([\d.]+)/.exec(m[3]);
+    ((LIVE[cls] = LIVE[cls] || {})[m[2]] = { k: m[1], value: va ? Number(va[1]) : vr ? { registry: vr[1] } : null, band: bd ? Number(bd[1]) : 0 });
   }
 }
 
@@ -64,7 +64,9 @@ for (const r of recs) {
   /* P3 setpoint */
   const sp = PTS.setpoint(id, snap);
   ok(typeof sp === 'number' && isFinite(sp), `P3 ${id}: setpoint ${sp} not a number`);
-  if (r.sp && r.sp.value != null && row) ok(row.value === r.sp.value, `P3 ${id}: setpoint ${r.sp.value} but the payload authors ${row.value}`);
+  /* P3 the payload shows this record's setpoint: either the same typed number, or (PRD-SETPOINT-SIM P5) a read of this
+     very record through SP('<cls>/<point>') from the control registry */
+  if (r.sp && r.sp.value != null && row) ok(row.value === r.sp.value || (row.value && row.value.registry === id), `P3 ${id}: setpoint ${r.sp.value} but the payload authors ${JSON.stringify(row.value)}`);
   /* P4 order */
   let L = null; try { L = PTS.resolve(id, snap); } catch (e) { ok(false, `P4 ${id}: resolve threw ${e.message}`); continue; }
   const b = [L.lo_alarm, L.lo_warn, L.hi_warn, L.hi_alarm];

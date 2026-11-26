@@ -11,6 +11,42 @@ release sections rather than semver.
 
 ---
 
+## v3.111.0 — 2026-11-26 — DC AI setpoints, what-if and sequences in the inspector; no Conventional page types a control number
+
+### DC AI: what each controller holds, a what-if on the engine, and the sequences of operations (PRD-SETPOINT-SIM §C P5, P6, P7)
+
+- **Setpoints in the inspector (P5).** The CDU, fan-wall, chiller and chemical-dosing inspectors show each setpoint their
+  controller holds (SP, live value, error), read from the control registry through the one block `js/rz-sp-block.js`; the
+  band, range, evidence and controller ride in the row's title. The 8 setpoints typed in `js/datahall-ai/hmi-payloads.js`
+  (pH, conductivity, RH, keep-warm, DO, MMR supply, support-room temperature and RH) now come from the registry (`SP()` /
+  `SPT()`), with 5 new ASSUMED records in `js/datahall-ai/points.js`. The block keeps its node, slider value and focus
+  across the inspector's 4 s refresh.
+- **What-if and the free-cooling cliff (P6).** TCS supply (30–45 °C) and fan-wall supply air (18–27 °C) are adjustable in
+  the inspector; every SIMULATED number is `DCAI_CALC.compute` on a copy of the model (the live model is never touched).
+  Under the TCS what-if, one row per engine weather bin shows liquid free cooling or mechanical, now and simulated; the
+  design bin is marked. Where the liquid-path COP sits on the copMax ceiling it reads `12.00 ◆` with the note that it is
+  a model input, not the Carnot-fraction result.
+- **Sequences of operations (P7).** Dry coolers: normal → edge (0 ≤ margin < 1 K, ASSUMED) → mechanical, the mode read
+  from the engine margin; "ambient rises" 24 → 38 °C re-computes the engine per step (cooling 51,899 → 111,201 kWe; liquid
+  chillers from 35 °C). CDU (54 + 1) and fan wall (89 + 1): one duty unit trips, the standby restores the duty count.
+  **Finding:** at 38 °C the engine needs 634 dry coolers and 631 are installed, 2,875 kWth short; the step shows it.
+- Gates: `tools/test-dcai-setpoints.mjs` D0–D10 (wired in ship-gate; red first: 16 inspectors without a block, 8 typed
+  literals, table 474 px past its frame, path text 4.3 px, cliff cells wrapping); `tools/test-sequences.mjs` walks the DC AI
+  sequences and re-computes each engine step (890 checks).
+
+### Conventional: the pages read their control numbers from the registry (P9 part 1)
+
+- `fire-system.html` (jockey 11.5 / 12.8 bar, FP-01 10.5, FP-02 9.5, low alarm 8.5 bar), `fuel-system.html` (day-tank
+  fill 50 → 90 %, level kept 45 %, low-low 25 %) and `cdu-mini-bms.html` (TCS supply per CDU type 30–34 °C, floor 18 °C)
+  read every control number through `RZControlPoints.value(id[, variant])` (twin 1.3.0), which throws on a missing one.
+- **Fixed:** the fuel day-tank point band warned at 30 % while the page keeps ≥ 45 %: now warn 45 / alarm 25. The CDU
+  schematic said "TCV-01 holds TT-01 = 18 °C"; it holds the type's supply (In-Row 32 °C) and 18 °C is the dew-point floor.
+- **Fixed:** the equipment modal's Setpoints table fits the modal at 1440 px (it ran 1,415 px in 1,212).
+- Gates: `tools/test-typed-control-numbers.mjs` T1 (typed control numbers 10 → 0) and T3 (a changed registry number moves
+  the page; the note fits its drawing); registry laws C15 (`value()`) and C16 (NFPA 20 switch spacing, bands equal the
+  page's numbers), 899 checks.
+- Standards: `standarization/CONTROL_SETPOINT_STANDARD.md` §4 and §5; PRD `documentation/prd/PRD_SETPOINT_SIM.md` §C11–§C14.
+
 ## v3.110.0 — 2026-11-26 — DC AI data hall: each lens draws what it is about; the unit you opened stays selected; a reading without a sample looks stale
 
 ### DC AI data hall: the unit you opened stays selected; a reading without a sample looks stale (PRD-DCAI-HALL-DEPTH Amendments 5 and 6)

@@ -549,6 +549,9 @@
       deps[i].addEventListener('click', function (e) { e.stopPropagation(); var id = e.currentTarget.getAttribute('data-rz-depid'); if (payloadOpts && payloadOpts.onNavigate) { payloadOpts.onNavigate(id); } });
       deps[i].addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.currentTarget.click(); } });
     }
+    /* PRD-SETPOINT-SIM P5: a page may append a block for the opened unit (js/datahall-ai/sp-inspector.js); fired after
+       every render, open and refresh, with the body that was just written */
+    try { doc.dispatchEvent(new CustomEvent('rz-inspector-payload', { detail: { payload: p, body: body } })); } catch (e) { /* no listener */ }
     var cells = body.querySelectorAll('.rz-inspector-v[data-basis-param]');
     for (var j = 0; j < cells.length; j++) {
       cells[j].addEventListener('click', function (e) { e.stopPropagation(); e.preventDefault(); openBasisFromPayload(e.currentTarget.getAttribute('data-basis-param')); });

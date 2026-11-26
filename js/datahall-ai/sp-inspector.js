@@ -124,6 +124,8 @@
       var E = root.DCAI_CALC;
       sec = doc.createElement('section');
       sec.className = 'rz-inspector-sp'; sec.setAttribute('data-rz-dcai-sp', payload.classId);
+      /* the traceability reason of every number in this block (test-dcai-coverage DECLARED): none is typed here */
+      sec.setAttribute('data-rz-authored-basis', 'Setpoints and bands from the control registry (js/rz-control-points.js, data/control-points.json); Live = the value this inspector shows; what-if, cliff bins and sequence steps = DCAI_CALC.compute on a copy of the model (PRD-SETPOINT-SIM P5-P7)');
       sec.innerHTML = (list.length ? '<div class="rz-inspector-sec">Setpoints &amp; limits</div>' + B.inner(list, { snapshot: E && E.snapshot ? E.snapshot : null }) : '') +
         (seqKey ? V.block(seqKey, { narrow: true }) : '');
       if (list.length) cliff(sec);

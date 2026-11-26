@@ -67,6 +67,20 @@
     'leak-z07': { label: 'Leak detected — zone 7 rope wet', cduPumpFault: null, chillerTripped: null, leakWetZones: [7], stpBlowerDuty: 2 }
   });
 
+  /* PRD-SETPOINT-SIM §C P5: a controller's setpoint is read from the control registry (js/rz-control-points.js,
+     window.RZControlPoints), never typed here. SP(id) = the registry value; SPT(id) = value + unit as the page prints it.
+     Without the twin (it loads before this file) the page throws, as for any other missing registry. */
+  function SPROW(id) {
+    var C = (typeof window !== 'undefined' ? window : globalThis).RZControlPoints, r = null;
+    /* Node (tests, tools): the twin is a module there */
+    if (!C && typeof require === 'function') { try { C = require('../rz-control-points.js').RZControlPoints; } catch (e) { C = null; } }
+    if (C && C.forClass) { var cls = String(id).split('/')[0]; C.forClass('dcai:' + cls).forEach(function (x) { if (x.id === 'dcai.' + id) r = x; }); }
+    if (!r) { throw new Error('hmi-payloads: control registry has no setpoint dcai.' + id); }
+    return r;
+  }
+  function SP(id) { return SPROW(id).value; }
+  function SPT(id) { var r = SPROW(id); return String(r.value) + (r.unit ? (r.unit === '%' ? ' %' : ' ' + r.unit) : ''); }
+
   /* ------------------------------------------------------------------------
    * Builder
    * ---------------------------------------------------------------------- */
@@ -403,8 +417,8 @@
 
   def('chem', { kind: 'authored', label: 'Chemical dosing', system: 'cooling', tier2: 'eq' }, function (b) {
     b.title = 'Water treatment — chemical dosing';
-    b.S('live', 'ph', 'pH', { value: 8.5, text: '8.5 pH setpoint (window 8.2–8.8)' }, 0.2, '', { digits: 2 });
-    b.S('live', 'conductivity', 'Conductivity', { value: 800, text: '800 µS/cm control setpoint' }, 60, 'µS/cm', { digits: 0 });
+    b.S('live', 'ph', 'pH', { value: SP('chem/ph'), text: SP('chem/ph') + ' pH setpoint (window 8.2–8.8)' }, 0.2, '', { digits: 2 });
+    b.S('live', 'conductivity', 'Conductivity', { value: SP('chem/conductivity'), text: SPT('chem/conductivity') + ' control setpoint' }, 60, 'µS/cm', { digits: 0 });
     b.S('live', 'orp', 'ORP', { value: 450, text: '450 mV biocide control' }, 30, 'mV', { digits: 0 });
     b.S('live', 'inhibitor_ppm', 'Inhibitor', { value: 120, text: '120 ppm inhibitor residual' }, 12, 'ppm', { digits: 0 });
     b.ST('live', 'dose_pump', 'Dosing pump', 'run', COOL_REASON);
@@ -434,7 +448,7 @@
          it was a simulated 75 % +/- 8 that contradicted the floor */
       b.S('live', 'fan_pct', 'Fan speed', { field: 'crahFanPct' }, 0.5, '%', { digits: 1, min: 0, max: 100 });
     }
-    b.S('live', 'supply_rh', 'Supply RH', { value: 45, text: '45 % RH setpoint' }, 5, '%', { digits: 0, min: 0, max: 100 });
+    b.S('live', 'supply_rh', 'Supply RH', { value: SP('crah/supply_rh'), text: SP('crah/supply_rh') + ' % RH setpoint' }, 5, '%', { digits: 0, min: 0, max: 100 });
     b.ST('live', 'unit_state', 'Unit', st, COOL_REASON); b.chip(st === 'run' ? 'RUN' : 'STANDBY', st === 'run' ? 'normal' : 'standby');
     b.E('capacity', 'unit_kwth', 'Unit rating', 'crahRating', 'kWth', { digits: 0 });
     b.E('capacity', 'duty_per_hall', 'Duty units per hall', 'crahActive', '', { digits: 0 });
@@ -699,7 +713,7 @@
     b.E('capacity', 'unit_kw', 'Unit rating', 'gensetKW', 'kW', { digits: 0 });
     b.E('capacity', 'yard_m2', 'Yard area', 'gensetYardM2', 'm²', { digits: 0 });
     b.E('capacity', 'autonomy_h', 'Fuel autonomy at full load', 'fuelAutonomyH', 'h', { digits: 0 });
-    b.S('maint', 'jacket_c', 'Jacket water, keep-warm', { value: 40, text: '40 °C keep-warm setpoint' }, 1.5, '°C', { digits: 1 });
+    b.S('maint', 'jacket_c', 'Jacket water, keep-warm', { value: SP('site-genset-yard/jacket_c'), text: SPT('site-genset-yard/jacket_c') + ' keep-warm setpoint' }, 1.5, '°C', { digits: 1 });
     b.chip(sg === 'running' ? 'RUNNING' : 'STANDBY', sg === 'running' ? 'normal' : 'standby');
     if (sg === 'running') { b.alarm({ tag: 'GEN-POOL', point: 'RUN', severity: 'high', message: 'Generator pool running — the campus is off the grid', system: 'electrical', currentState: sg }); }
     b.dep('upstream', 'site-fuel-farm:1', 'Fuel farm');
@@ -887,7 +901,7 @@
     b.title = 'Sewage treatment plant';
     b.S('live', 'inlet_m3h', 'Inlet flow', { value: 6, text: '6 m³/h design inflow' }, 1, 'm³/h', { digits: 1, min: 0 });
     b.S('live', 'ph', 'Inlet pH', { value: 7.2, text: '7.2 pH domestic effluent' }, 0.3, '', { digits: 2 });
-    b.S('live', 'do_mgl', 'Aeration DO', { value: 2.5, text: '2.5 mg/L aeration setpoint' }, 0.4, 'mg/L', { digits: 2, min: 0 });
+    b.S('live', 'do_mgl', 'Aeration DO', { value: SP('stp/do_mgl'), text: SPT('stp/do_mgl') + ' aeration setpoint' }, 0.4, 'mg/L', { digits: 2, min: 0 });
     b.ST('live', 'blower_1', 'Blower 1', cs.stpBlowerDuty === 1 ? 'run' : 'stby', COOL_REASON); b.ST('live', 'blower_2', 'Blower 2', cs.stpBlowerDuty === 2 ? 'run' : 'stby', COOL_REASON);
     b.D('capacity', 'capacity', 'Design capacity', '50 m³/day SBR', SPEC('STP sizing'));
     b.trend('do_mgl', 'Aeration DO', 'mg/L', { value: 2.5 }, 0.4, { digits: 2 });
@@ -896,7 +910,7 @@
   });
   def('ahu', { kind: 'authored', label: 'AHU', system: 'hvac', tier2: 'ahu' }, function (b, ctx) {
     b.title = 'MMR air-handling unit';
-    b.S('live', 'supply_c', 'Supply air', { value: 18, text: '18 °C MMR supply setpoint' }, 1, '°C');
+    b.S('live', 'supply_c', 'Supply air', { value: SP('ahu/supply_c'), text: SPT('ahu/supply_c') + ' MMR supply setpoint' }, 1, '°C');
     b.S('live', 'return_c', 'Return air', { value: 25, text: '25 °C MMR return' }, 1, '°C');
     b.S('live', 'fan_pct', 'Fan speed', { value: 70, text: '70 % design speed' }, 8, '%', { digits: 0, min: 0, max: 100 });
     b.S('live', 'valve_pct', 'CHW valve', { value: 55, text: '55 % design opening' }, 10, '%', { digits: 0, min: 0, max: 100 });
@@ -910,8 +924,8 @@
   def('room', { kind: 'authored', label: 'Room', system: 'building', tier2: null }, function (b, ctx, id) {
     b.title = 'Room — ' + id;
     b.D('live', 'grid', 'Building plate', 'engine plate: core + hall + electrical wing by two halls + spine', 'the plate dimensions are engine outputs (site.plate_length_m, site.plate_width_m); the room zoning inside it is page-authored');
-    b.S('live', 'temp_c', 'Room temperature', { value: 24, text: '24 °C support-room setpoint' }, 1, '°C');
-    b.S('live', 'rh_pct', 'Relative humidity', { value: 50, text: '50 % RH setpoint' }, 6, '%', { digits: 0 });
+    b.S('live', 'temp_c', 'Room temperature', { value: SP('room/temp_c'), text: SPT('room/temp_c') + ' support-room setpoint' }, 1, '°C');
+    b.S('live', 'rh_pct', 'Relative humidity', { value: SP('room/rh_pct'), text: SP('room/rh_pct') + ' % RH setpoint' }, 6, '%', { digits: 0 });
     b.trend('temp_c', 'Room temperature', '°C', { value: 24 }, 1);
   });
   def('roof-dry-cooler-bank', { kind: 'engine', label: 'Roof dry-cooler bank', system: 'cooling', tier2: 'dryCooler' }, CLASSES['dry-cooler'].build);
