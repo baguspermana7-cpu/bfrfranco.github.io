@@ -20,6 +20,7 @@
  * Red first: on v3.102.0 (no control registry in the browser) S2 and S3 fail on every page.
  *   node tools/test-setpoint-sim.mjs        run inside a browser lane (rz-lane)
  *   RZ_SP_PLANT=no-registry                 serve js/rz-control-points.js as 404 (the old state): S2 and S3 must fail
+ *   S4w at 1440 the Setpoints table fits its frame (no column scrolled out of view; red on v3.109.0)
  *   S8d phone: the loop bubble tooltip and every value cell inside it stay inside a 390 px screen (red on v3.107.0)
  *   S6 red: on v3.105.0 chiller-plant.html (sliders unbound until a scenario, lag + noise in MAINT, no DP response)
  *   RZ_SP_PLANT=no-sequence                 serve js/conv/sequence-view.js as 404 (before P3): S7 must fail
@@ -173,6 +174,10 @@ try {
           return [...t.querySelectorAll('tr[data-sp-row]')].map((r) => ({ id: r.getAttribute('data-sp-row'), sp: r.querySelector('[data-k="sp"]').textContent, pv: r.querySelector('[data-k="pv"]').textContent, src: r.querySelector('[data-k="pv"]').getAttribute('data-src') }));
         });
         const want = (BYCLS[cls] || []).map((r) => r.id).sort();
+        /* S4w at 1440 the whole Setpoints table fits its frame: no sideways scroll hiding "Held by" (v3.109.0: a long
+           'fixed: …' note in the Adjustable cell made the table 1415 px in a 1212 px frame) */
+        const fit = await pg.evaluate(() => { const t = document.querySelector('.rz-cvm:not([hidden]) [data-rz-cvm-sp]'); const w = t && t.closest('.rz-cvm-sp-wrap'); return w ? { tw: t.scrollWidth, ww: w.clientWidth } : null; });
+        ok(!!fit && fit.tw <= fit.ww + 1, 'S4w', `${page} ${cls}: Setpoints table ${fit && fit.tw} px in a ${fit && fit.ww} px frame at 1440 (columns scroll out of view)`);
         ok(!!m && m.map((x) => x.id).sort().join() === want.join(), 'S4', `${page} ${cls} modal setpoint rows ${JSON.stringify(m && m.map((x) => x.id))}, want ${JSON.stringify(want)}`);
         for (const row of m || []) {
           const r = REG.find((x) => x.id === row.id);

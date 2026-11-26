@@ -107,6 +107,8 @@
     '.rz-cvm-sp th,.rz-cvm-sp td{padding:6px 10px;border-bottom:1px solid var(--cvm-line);text-align:left;white-space:nowrap;font-weight:400}' +
     '.rz-cvm-sp thead th{color:var(--cvm-mute);font-size:11px}.rz-cvm-sp td[data-k="sp"],.rz-cvm-sp td[data-k="pv"],.rz-cvm-sp td[data-k="err"]{font-family:"IBM Plex Mono","JetBrains Mono",monospace}' +
     '.rz-cvm-sp td[data-k="ctl"]{white-space:normal;min-width:220px;color:var(--cvm-mute)}' +
+    /* the Adjustable cell carries the "fixed: …" reason: it wraps, so the table fits the frame (gate S4w) */
+    '.rz-cvm-sp td[data-k="adj"]{white-space:normal;min-width:150px;max-width:260px}' +
     '.rz-cvm-wi{margin-top:16px;padding-top:12px;border-top:1px solid var(--cvm-line)}.rz-cvm-wi-ctl{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin-bottom:8px}' +
     '.rz-cvm-wi-ctl label{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;font-size:12px;color:var(--cvm-text)}.rz-cvm-wi-ctl input[type="range"]{width:220px;max-width:100%;min-height:44px;accent-color:var(--cvm-acc)}' +
     '.rz-cvm-wi-ctl output{font:12px/1.2 JetBrains Mono,monospace;color:var(--cvm-text)}.rz-cvm-wi-ctl button{min-height:44px;padding:0 14px;border:1px solid var(--cvm-line);background:transparent;color:var(--cvm-text);border-radius:4px;cursor:pointer;font:600 12px/1 JetBrains Mono,monospace}' +
