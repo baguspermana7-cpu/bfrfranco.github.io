@@ -86,6 +86,22 @@
     edges.push({ id: 'e-v' + i, from: 'cv' + i + '.outlet', to: 'vd' + i + '.a', medium: 'fw', flowOf: flow });
     edges.push({ id: 'e-h' + i, from: 'vd' + i + '.b', to: 'jd' + (i + 1), medium: 'fw', flowOf: flow });
   });
+  /* PRD-SETPOINT-SIM P9 part 2: the pump controllers as ISA-5.1 panel bubbles, from the control registry
+     (RZControlPoints.loops('fs-m-101'), on-off). NFPA 20: each controller senses the discharge through its own line,
+     tapped between the pump's check valve (x 555) and its discharge valve (x 605); it starts its own pump. No tag or
+     number is typed here: a registry loop names its pump (mv.node) and the page writes the cut-in / cut-out. */
+  var C = root.RZControlPoints, LX = 580;
+  (C && typeof C.loops === 'function' ? C.loops('fs-m-101') : []).forEach(function (L) {
+    var i = -1; pumps.forEach(function (p, k) { if (p.id === L.mv.node) i = k; });
+    if (i < 0) return;
+    var y = PY[i], p = pumps[i], cy = y - 40, r = 15, id = 'lc-' + p.id, px = 480 + p.size / 2;
+    nodes.push({ id: id, tag: L.tag, sym: 'instPanel', x: LX, y: cy, size: 2 * r, inst: 'PC', tagAt: 'right', loop: L.sp,
+      label: L.tag + ' — ' + p.tag + ' controller (' + L.action + ' acting ' + L.kind + ')',
+      values: [{ k: 'sp', dx: 0, dy: -r - 8, anchor: 'middle', lod: 1, const: 'cut-in / cut-out from the control registry (' + L.sp + ')' }] });
+    edges.push({ id: 'e-ls-' + p.id, from: [LX, y], to: [LX, cy + r], w: 'inst', medium: 'line', loop: L.sp });
+    edges.push({ id: 'e-lm-' + p.id, from: [LX - r, cy], to: [px + 1, y - 10], via: [[515, cy], [515, y - 10]], w: 'signal', medium: 'line', loop: L.sp });
+    nodes.forEach(function (nd) { if (nd.id === p.id) nd.loop = L.sp; });
+  });
   WX.forEach(function (x, i) {
     var n = i + 1;
     nodes.push({ id: 'jw' + n, sym: 'junction', x: x, y: HDR_Y });

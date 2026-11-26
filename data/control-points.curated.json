@@ -415,11 +415,29 @@
       "unit": "bar",
       "value": 11.5,
       "kind": "cut-in",
-      "control": "the jockey pump controller (pressure switch PSL on the header) starts the jockey pump",
+      "control": "the jockey pump controller PC-JP1 (its pressure switch on its own sensing line from the discharge) starts the jockey pump",
       "evidenceClass": "ASSUMED",
       "basis": "NFPA 20 (2022) Annex A.14.2.6 practice: jockey stop = churn + minimum static; jockey start >= 0.7 bar (10 psi) below its stop; the main pump starts 0.35 bar (5 psi) below the jockey start; each further pump >= 0.7 bar (10 psi) lower. The values are this page's design (ASSUMED: no site hydraulic calculation in this repository); law T3 checks the spacing.",
       "pv": null,
-      "pvNote": "the header pressure is the page's simulated state (PT on the header), not yet a point of the limits registry"
+      "pvNote": "the header pressure is the page's simulated state (PT on the header), not yet a point of the limits registry",
+      "loop": {
+        "tag": "PC-JP1",
+        "sheet": "fs-m-101",
+        "kind": "on-off",
+        "action": "reverse",
+        "stop": "conv.fire-system.jockey_off",
+        "pv": {
+          "tag": "sensing line",
+          "what": "discharge pressure through the controller's own sensing line, tapped between the pump's discharge check valve and its discharge isolation valve"
+        },
+        "mv": {
+          "node": "jp1",
+          "what": "jockey pump JP-01: start at the cut-in, stop at the cut-out"
+        },
+        "tuning": null,
+        "tuningNote": "on-off with a differential (cut-in to cut-out); no gain or time constant",
+        "basis": "NFPA 20 (2022): each fire-pump and jockey-pump controller has its own pressure-sensing line, connected between the pump's discharge check valve and its discharge isolation valve, and starts its pump when the pressure falls to its cut-in; the staggered cut-ins (A.14.2.6 practice) are the registry numbers. On-off: no gain or time constant applies."
+      }
     },
     {
       "id": "conv.fire-system.jockey_off",
@@ -445,7 +463,25 @@
       "evidenceClass": "ASSUMED",
       "basis": "NFPA 20 (2022) Annex A.14.2.6 practice: jockey stop = churn + minimum static; jockey start >= 0.7 bar (10 psi) below its stop; the main pump starts 0.35 bar (5 psi) below the jockey start; each further pump >= 0.7 bar (10 psi) lower. The values are this page's design (ASSUMED: no site hydraulic calculation in this repository); law T3 checks the spacing.",
       "pv": null,
-      "pvNote": "the header pressure is the page's simulated state (PT on the header), not yet a point of the limits registry"
+      "pvNote": "the header pressure is the page's simulated state (PT on the header), not yet a point of the limits registry",
+      "loop": {
+        "tag": "PC-FP1",
+        "sheet": "fs-m-101",
+        "kind": "on-off",
+        "action": "reverse",
+        "stop": null,
+        "pv": {
+          "tag": "sensing line",
+          "what": "discharge pressure through the controller's own sensing line, tapped between the pump's discharge check valve and its discharge isolation valve"
+        },
+        "mv": {
+          "node": "fp1",
+          "what": "main fire pump FP-01 (electric): start at the cut-in; stop by hand (the page models no automatic stop)"
+        },
+        "tuning": null,
+        "tuningNote": "start only; no gain or time constant",
+        "basis": "NFPA 20 (2022): each fire-pump and jockey-pump controller has its own pressure-sensing line, connected between the pump's discharge check valve and its discharge isolation valve, and starts its pump when the pressure falls to its cut-in; the staggered cut-ins (A.14.2.6 practice) are the registry numbers. On-off: no gain or time constant applies."
+      }
     },
     {
       "id": "conv.fire-system.fp2_on",
@@ -458,7 +494,25 @@
       "evidenceClass": "ASSUMED",
       "basis": "NFPA 20 (2022) Annex A.14.2.6 practice: jockey stop = churn + minimum static; jockey start >= 0.7 bar (10 psi) below its stop; the main pump starts 0.35 bar (5 psi) below the jockey start; each further pump >= 0.7 bar (10 psi) lower. The values are this page's design (ASSUMED: no site hydraulic calculation in this repository); law T3 checks the spacing.",
       "pv": null,
-      "pvNote": "the header pressure is the page's simulated state (PT on the header), not yet a point of the limits registry"
+      "pvNote": "the header pressure is the page's simulated state (PT on the header), not yet a point of the limits registry",
+      "loop": {
+        "tag": "PC-FP2",
+        "sheet": "fs-m-101",
+        "kind": "on-off",
+        "action": "reverse",
+        "stop": null,
+        "pv": {
+          "tag": "sensing line",
+          "what": "discharge pressure through the controller's own sensing line, tapped between the pump's discharge check valve and its discharge isolation valve"
+        },
+        "mv": {
+          "node": "fp2",
+          "what": "main fire pump FP-02 (diesel): start at the cut-in; stop by hand (the page models no automatic stop)"
+        },
+        "tuning": null,
+        "tuningNote": "start only; no gain or time constant",
+        "basis": "NFPA 20 (2022): each fire-pump and jockey-pump controller has its own pressure-sensing line, connected between the pump's discharge check valve and its discharge isolation valve, and starts its pump when the pressure falls to its cut-in; the staggered cut-ins (A.14.2.6 practice) are the registry numbers. On-off: no gain or time constant applies."
+      }
     },
     {
       "id": "conv.fire-system.header_low_alarm",

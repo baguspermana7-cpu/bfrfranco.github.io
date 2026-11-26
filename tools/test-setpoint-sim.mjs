@@ -279,6 +279,7 @@ try {
         const L = r.sp.loop;
         if (!L.sheet) { ok(!!L.notDrawn, 'S8', `${r.id}: loop ${L.tag} has no sheet and no notDrawn reason`); continue; }
         if (/^int-/.test(L.sheet)) continue;   /* a loop inside one unit is drawn on its inside view: S8b */
+        if (!/^ch-m-10[12]$/.test(L.sheet)) continue;   /* a loop on another page's sheet: that page's gate (fire FS-M-101: S8e of test-typed-control-numbers) */
         await pg.evaluate((v) => { const x = document.querySelector(`[data-chw-sheet-btn="${v}"]`); if (x) x.click(); }, L.sheet); await sleep(1500);
         const g = await pg.evaluate((tag, pvTag, mvSel) => {
           const svg = document.querySelector('#chw-sheet-host svg'); if (!svg) return null;

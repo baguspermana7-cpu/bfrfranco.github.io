@@ -99,6 +99,21 @@ export function build() {
       pv: c.pv || null, from: 'page control number (registry)', evidenceClass: evid(c.evidenceClass), source: src,
       control: c.kind === 'design' ? null : c.control, adjustable: null };
     row.threshold = { value: c.byVariant ? null : c.value, byVariant: c.byVariant || null, kind: c.kind };
+    if (c.loop) {   /* P9 part 2: the on-off controller that acts on a page cut-in, drawn on the page's sheet */
+      const L = c.loop;
+      if (c.kind !== 'cut-in') bad('a loop sits on the cut-in that starts its unit');
+      if (!L.tag || !L.pv || !L.pv.tag || !L.pv.what || !L.mv || !L.mv.node || !L.mv.what || !L.basis) bad('loop: tag, pv.tag/what, mv.node/what and basis are required');
+      if (L.kind !== 'on-off') bad('loop kind ' + L.kind + ' (a page control number is an on-off cut-in)');
+      if (!['direct', 'reverse'].includes(L.action)) bad('loop action ' + L.action);
+      if (!L.sheet && !L.notDrawn) bad('a loop without a sheet says why (notDrawn)');
+      if (L.tuning || !L.tuningNote) bad('an on-off loop has no tuning and says so (tuningNote)');
+      if (L.out) bad('an on-off loop has no continuous output (no out key)');
+      if (L.stop) { const o = (cur.convPageSetpoints || []).find((x) => x.id === L.stop);
+        if (!o || o.kind !== 'cut-out' || o.page !== c.page) bad('loop.stop ' + L.stop + ' is not a cut-out of this page');
+        if (L.action === 'reverse' ? !(o.value > c.value) : !(o.value < c.value)) bad('cut-out ' + o.value + ' is on the wrong side of the cut-in ' + c.value + ' for a ' + L.action + ' acting loop'); }
+      if (L.sheet && (cur.convPageSetpoints || []).some((x) => x !== c && x.loop && x.loop.tag === L.tag)) bad('tag ' + L.tag + ' is used twice');
+      row.sp.loop = L;
+    }
     rows.push(row);
   });
 

@@ -127,7 +127,7 @@
     <link rel="stylesheet" href="css/conv-point.css?v=20261120-8daa6374">
     <link rel="stylesheet" href="css/conv-motion.css?v=20261121-88ede45d">
     <link rel="stylesheet" href="css/conv-live.css?v=20261122-9e4f1c46">
-    <script src="js/rz-control-points.js?v=20261126-5000ce1a"></script>
+    <script src="js/rz-control-points.js?v=20261126-a404af2b"></script>
     <script src="js/rz-sp-block.js?v=20261126-7847b7bb"></script>
     <script src="js/conv/point-status.js?v=20261123-0de9d3e8"></script>
 <script src="js/conv/motion.js?v=20261121-f2d16763" defer></script>
@@ -137,7 +137,7 @@
     <script src="js/conv/equipment-modal.js?v=20261126-fb07133b"></script>
     <script src="js/rz-eng-symbols.js?v=20261118-528d60ce"></script>
     <script src="js/rz-hmi-sheet.js?v=20261125-ca35ea9a"></script>
-    <script src="js/conv/fire-sheet.js?v=20261125-ac6285d7"></script>
+    <script src="js/conv/fire-sheet.js?v=20261126-aba80fb2"></script>
     <!-- v1.43.1 — Right-side inspector. Click any tagged fire-water / N2
          pipe to inspect medium / state / capacity / flow / sensor tabs. -->
     <!-- v1.43.4 — alarm state machine + color discipline (review §3.3 + §4.3). -->
@@ -958,7 +958,7 @@
         function fireRead(n) {
             var v = fireView(), out = { rows: specRows(n) }, id = n.id;
             if (!v.auth) {
-                out.values = { st: txt(UNAVAILABLE), lvl: txt(UNAVAILABLE), vol: txt('—'), dur: txt('—'), p: txt(UNAVAILABLE), q: txt(UNAVAILABLE) };
+                out.values = { st: txt(UNAVAILABLE), lvl: txt(UNAVAILABLE), vol: txt('—'), dur: txt('—'), p: txt(UNAVAILABLE), q: txt(UNAVAILABLE), sp: txt(UNAVAILABLE) };
                 return out;
             }
             if (id === 'tank') {
@@ -976,6 +976,15 @@
                 out.mismatch = !!(v.pa && mm);
                 out.values = { cmd: txt(!v.pa ? '—' : (pc === 'on' ? 'CMD ON' : 'CMD OFF'), v.pa && mm ? '2' : null),
                     st: txt(!v.pa ? UNAVAILABLE : (on ? 'RUN' : 'STOP'), out.alarm) };
+            } else if (/^lc-(fp1|fp2|jp1)$/.test(id)) {
+                /* PRD-SETPOINT-SIM P9 part 2: a pump controller shows the registry's cut-in (/ cut-out) it acts on, and its
+                   pump's feedback as its output (on-off: RUN or STOP) */
+                var LP = window.RZControlPoints.loops('fs-m-101').filter(function (x) { return x.tag === n.tag; })[0], pid = id.slice(3);
+                var cin = LP ? CPV(LP.sp) : null, cout = LP && LP.stop ? CPV(LP.stop) : null, run = firePumpFb(pid) === 'on';
+                out.state = !v.pa || !LP ? null : (run ? 'running' : 'stopped');
+                out.values = { sp: txt(!LP ? UNAVAILABLE : cin.toFixed(1) + (cout !== null ? ' / ' + cout.toFixed(1) : '') + ' bar') };
+                if (LP) out.rows = [['Starts', LP.mv.what], ['Cut-in', cin.toFixed(1) + ' bar (registry)'], ['Cut-out', cout !== null ? cout.toFixed(1) + ' bar (registry)' : 'by hand'],
+                    ['Senses', LP.pv.what], ['Action', LP.action + ' acting ' + LP.kind + ' (pressure falls → start)'], ['Output', !v.pa ? UNAVAILABLE : (run ? 'pump RUN' : 'pump STOP')], ['Basis', LP.basis]];
             } else if (id === 'pt') {
                 var pAl = !v.pa ? null : (state.press <= P_LOW_ALM ? '1' : (state.press <= P_JOCKEY_ON ? '2' : null));
                 out.values = { p: txt(v.pa ? state.press.toFixed(1) + ' bar' : UNAVAILABLE, pAl) };

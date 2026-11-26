@@ -16,6 +16,9 @@
  * (jockey start 11.5 → 11.0 bar, fill start 50 → 55 %, In-Row TCS supply 32 → 31 °C) and the page's own text must follow
  * it; the served-as-is run must show the registry value. 0 page errors on every load.
  *
+ * S8e (--browser, P9 part 2): the fire pump controllers PC-JP1 / PC-FP1 / PC-FP2 on FS-M-101, one ISA-5.1 panel bubble each
+ *   from the registry, own sensing line, signal to its pump, cut-in (/ cut-out) printed = registry, no orphan bubble.
+ *
  * Usage: node tools/test-typed-control-numbers.mjs [--list] [--baseline] [--browser]
  *        (--baseline only after a deliberate cut; RZ_T3_NOPLANT=1 turns the plant run into an unplanted one: red check)
  */
@@ -82,6 +85,10 @@ const ORIGIN = `http://127.0.0.1:${srv.address().port}/`;
 const browser = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox'] });
 const read = {
   'fire-system': () => (document.getElementById('m-sp-jockey') || {}).textContent || '',
+  /* S8e (P9 part 2): the jockey controller bubble on FS-M-101 prints the registry's cut-in / cut-out */
+  'fire-system#pc': () => { const s = document.querySelector('#fire-sheet-host svg, .hmi-svg'); if (!s) return '';
+    const n = [...s.querySelectorAll('.hmi-node')].find((x) => (x.getAttribute('aria-label') || '').startsWith('PC-JP1 — '));
+    const t = n && s.querySelector('[data-val="' + n.getAttribute('data-node') + ':sp"]'); return t ? t.textContent.trim() : ''; },
   'fuel-system': () => { const l = document.querySelector('#fuel-dt-basis [data-basis-line]'), m = l && /fill \d+(?:\.\d+)?→\d+(?:\.\d+)? %/.exec(l.textContent); return m ? m[0] : ''; },
   /* the note must also fit its drawing: a text past the viewBox is cut off (red at 1440 with the first, longer note) */
   'cdu-mini-bms': () => { const n = [...document.querySelectorAll('svg text')].find((x) => /SETPOINT/.test(x.textContent)); if (!n) return '';
@@ -89,8 +96,8 @@ const read = {
     return n.textContent.replace(/^.*?SETPOINT/, 'SETPOINT') + (over > 0.5 ? ' [past the drawing by ' + over.toFixed(1) + ']' : ''); }
 };
 const want = {
-  false: { 'fire-system': /^11\.5 \/ 12\.8 bar$/, 'fuel-system': /^fill 50→90 %$/, 'cdu-mini-bms': /TT-01 = 32 °C \(floor 18 °C\)(?!.*past the drawing)/ },
-  true: { 'fire-system': /^11\.0 \/ 12\.8 bar$/, 'fuel-system': /^fill 55→90 %$/, 'cdu-mini-bms': /TT-01 = 31 °C \(floor 18 °C\)(?!.*past the drawing)/ }
+  false: { 'fire-system#pc': /^11\.5 \/ 12\.8 bar$/, 'fire-system': /^11\.5 \/ 12\.8 bar$/, 'fuel-system': /^fill 50→90 %$/, 'cdu-mini-bms': /TT-01 = 32 °C \(floor 18 °C\)(?!.*past the drawing)/ },
+  true: { 'fire-system#pc': /^11\.0 \/ 12\.8 bar$/, 'fire-system': /^11\.0 \/ 12\.8 bar$/, 'fuel-system': /^fill 55→90 %$/, 'cdu-mini-bms': /TT-01 = 31 °C \(floor 18 °C\)(?!.*past the drawing)/ }
 };
 let bad = 0;
 for (const pl of [false, true]) {
@@ -100,8 +107,8 @@ for (const pl of [false, true]) {
     pg.on('pageerror', (e) => errs.push(e.message));
     await pg.setViewport({ width: 1440, height: 900 });
     await primeCockpitAuditDocument(pg, 'dark');
-    await pg.goto(ORIGIN + page + '.html', { waitUntil: 'networkidle2', timeout: 90000 });
-    try { await enterAuthorizedAuditState(pg, page); } catch (e) { /* a public page has no gate */ }
+    await pg.goto(ORIGIN + page.split('#')[0] + '.html', { waitUntil: 'networkidle2', timeout: 90000 });
+    try { await enterAuthorizedAuditState(pg, page.split('#')[0]); } catch (e) { /* a public page has no gate */ }
     await pg.waitForFunction((f) => !!new Function('return (' + f + ')()')(), { timeout: 20000 }, read[page].toString()).catch(() => {});
     const got = await pg.evaluate(read[page]);
     const ok = want[pl][page].test(got) && errs.length === 0;
@@ -109,6 +116,45 @@ for (const pl of [false, true]) {
     console.log(`${ok ? 'PASS' : 'FAIL'} T3 ${pl ? 'planted' : 'as served'} ${page}: "${got.slice(0, 90)}"${errs.length ? ' · page errors ' + errs.slice(0, 2).join(' | ') : ''}`);
     await pg.close();
   }
+}
+/* S8e (PRD-SETPOINT-SIM P9 part 2): every registry loop on FS-M-101 is one ISA-5.1 panel bubble (instPanel) tagged as the
+   registry says, fed by its own sensing line (an instrument line ending on the bubble, NFPA 20), joined by a signal to
+   the pump it starts (mv.node), printing the registry cut-in (/ cut-out); no other bubble on the sheet (no orphan) */
+{
+  planted = false;
+  const pg = await browser.newPage(), errs = []; pg.on('pageerror', (e) => errs.push(e.message));
+  await pg.setViewport({ width: 1440, height: 900 }); await primeCockpitAuditDocument(pg, 'dark');
+  await pg.goto(ORIGIN + 'fire-system.html', { waitUntil: 'networkidle2', timeout: 90000 });
+  try { await enterAuthorizedAuditState(pg, 'fire-system'); } catch (e) { /* public */ }
+  await new Promise((r) => setTimeout(r, 3000));
+  const g = await pg.evaluate(() => {
+    const C = window.RZControlPoints, L = C ? C.loops('fs-m-101') : [], svg = document.querySelector('.hmi-svg');
+    if (!svg) return { loops: L.length, err: 'no sheet' };
+    const nodes = [...svg.querySelectorAll('.hmi-node')], near = (pt, n, pad) => { const b = n.getBBox(); return pt[0] >= b.x - pad && pt[0] <= b.x + b.width + pad && pt[1] >= b.y - pad && pt[1] <= b.y + b.height + pad; };
+    const ends = (w) => [...svg.querySelectorAll('path.hmi-edge.' + w)].map((p) => { const a = p.getPointAtLength(0), b = p.getPointAtLength(p.getTotalLength()); return [[a.x, a.y], [b.x, b.y]]; });
+    const sig = ends('w-signal'), ins = ends('w-inst');
+    const bubbles = nodes.filter((n) => n.getAttribute('data-sym') === 'instPanel').map((n) => (n.getAttribute('aria-label') || '').split(' — ')[0]);
+    return { loops: L.length, bubbles, rows: L.map((l) => {
+      const c = nodes.filter((n) => (n.getAttribute('aria-label') || '').startsWith(l.tag + ' — ')), c0 = c[0], pump = nodes.find((n) => n.getAttribute('data-node') === l.mv.node);
+      const t = c0 && svg.querySelector('[data-val="' + c0.getAttribute('data-node') + ':sp"]');
+      return { tag: l.tag, n: c.length, sym: c0 && c0.getAttribute('data-sym'), sense: c0 ? ins.filter((e) => near(e[0], c0, 4) || near(e[1], c0, 4)).length : 0,
+        sig: c0 && pump ? sig.filter((e) => (near(e[0], c0, 6) && near(e[1], pump, 6)) || (near(e[1], c0, 6) && near(e[0], pump, 6))).length : 0,
+        sp: t ? t.textContent.trim() : '', want: C.value(l.sp).toFixed(1) + (l.stop ? ' / ' + C.value(l.stop).toFixed(1) : '') + ' bar' }; }) };
+  });
+  const f = [];
+  if (g.err || g.loops < 3) f.push(`registry loops on FS-M-101 ${g.loops} (want 3: PC-JP1, PC-FP1, PC-FP2)${g.err ? ' · ' + g.err : ''}`);
+  for (const r of g.rows || []) {
+    if (r.n !== 1 || r.sym !== 'instPanel') f.push(`${r.tag}: ${r.n} bubbles (${r.sym}), want 1 instPanel`);
+    if (r.sense < 1) f.push(`${r.tag}: no sensing line on the bubble`);
+    if (r.sig < 1) f.push(`${r.tag}: no signal joining the bubble and its pump`);
+    if (r.sp !== r.want) f.push(`${r.tag}: prints "${r.sp}", registry "${r.want}"`);
+  }
+  const orphan = (g.bubbles || []).filter((t) => !(g.rows || []).some((r) => r.tag === t));
+  if (orphan.length) f.push('orphan bubbles ' + orphan.join(', '));
+  if (errs.length) f.push('page errors ' + errs.slice(0, 2).join(' | '));
+  f.forEach((x) => console.log('FAIL S8e ' + x)); bad += f.length;
+  console.log(`${f.length ? 'FAIL' : 'PASS'} S8e pump controllers on FS-M-101: ${(g.rows || []).map((r) => r.tag + ' ' + r.sp).join(' · ')}`);
+  await pg.close();
 }
 await browser.close(); srv.close();
 console.log(`${bad ? 'FAIL' : 'PASS'} T3 the pages act on the registry's numbers (${bad} failed)`);
