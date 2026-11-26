@@ -1,0 +1,139 @@
+{
+  "classKey": "dcai:crah",
+  "engine": "dcai",
+  "title": "Fan wall duty / standby (one hall)",
+  "note": "PRD-SETPOINT-SIM P7. Counts, unit rating and load from DCAI_CALC.snapshot.equipment.",
+  "basis": {
+    "ref": "ASHRAE TC9.9 liquid cooling guidelines (CDU N+1); Uptime Tier concurrent maintainability practice",
+    "evidenceClass": "DESIGN"
+  },
+  "fleet": {
+    "noun": "fan-wall units in one hall",
+    "unitLabel": "kWth",
+    "running": "equipment.crah_duty_per_hall",
+    "total": "equipment.crah_installed_per_hall",
+    "unit": "equipment.crah_unit_kwth",
+    "load": {
+      "product": [
+        "equipment.crah_duty_per_hall",
+        "equipment.crah_duty_per_unit_kwth"
+      ]
+    },
+    "spare": "equipment.crah_standby_per_hall",
+    "pv": {
+      "label": "Supply air",
+      "short": "rises above setpoint",
+      "ok": "at setpoint"
+    }
+  },
+  "plant": "Each fan-wall unit holds the supply air with its CHW valve (registry dcai.crah/air_supply_c); the hall runs its duty units with one standby.",
+  "modes": [
+    {
+      "id": "normal",
+      "label": "Normal, N+1",
+      "kind": "normal",
+      "entry": [
+        {
+          "event": "all duty units proven running, standby available"
+        }
+      ],
+      "actions": [
+        "each duty unit holds supply air at its setpoint",
+        "the standby unit is ready"
+      ],
+      "exit": [
+        {
+          "to": "unit_trip",
+          "event": "a duty unit trips"
+        },
+        {
+          "to": "high_air",
+          "text": "supply air above setpoint",
+          "setpoint": "dcai.crah/air_supply_c",
+          "op": ">"
+        }
+      ]
+    },
+    {
+      "id": "unit_trip",
+      "label": "Unit trip — standby start",
+      "kind": "protection",
+      "entry": [
+        {
+          "event": "a duty fan-wall unit trips"
+        }
+      ],
+      "actions": [
+        "alarm and lock out the tripped unit",
+        "start the standby unit",
+        "the duty count is restored"
+      ],
+      "exit": [
+        {
+          "to": "normal",
+          "event": "the standby unit is proven and the tripped unit is repaired"
+        }
+      ],
+      "notModelled": "the transient while the standby starts"
+    },
+    {
+      "id": "high_air",
+      "label": "High supply air",
+      "kind": "alarm",
+      "entry": [
+        {
+          "text": "supply air above setpoint",
+          "setpoint": "dcai.crah/air_supply_c",
+          "op": ">"
+        }
+      ],
+      "actions": [
+        "alarm from the registry band of dcai.crah/air_supply_c",
+        "check CHW supply from the air-path chillers"
+      ],
+      "exit": [
+        {
+          "to": "normal",
+          "text": "supply air back at setpoint",
+          "setpoint": "dcai.crah/air_supply_c",
+          "op": "<="
+        }
+      ],
+      "notModelled": "time to the alarm limit"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "unit_trip",
+      "label": "One duty unit trips",
+      "steps": [
+        {
+          "mode": "normal",
+          "do": {}
+        },
+        {
+          "mode": "unit_trip",
+          "do": {
+            "running": -1,
+            "available": -1
+          },
+          "note": "trip"
+        },
+        {
+          "mode": "unit_trip",
+          "do": {
+            "running": 1
+          },
+          "note": "standby in"
+        },
+        {
+          "mode": "normal",
+          "do": {
+            "available": 1
+          },
+          "note": "repaired"
+        }
+      ]
+    }
+  ]
+}

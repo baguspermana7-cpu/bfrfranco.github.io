@@ -1,0 +1,233 @@
+{
+  "classKey": "dcai:dry-cooler",
+  "engine": "dcai",
+  "title": "Heat rejection: dry coolers with trim chillers on the liquid loop",
+  "note": "PRD-SETPOINT-SIM P7. Every step is a full DCAI_CALC.compute on a copy of the model; the mode is read from the engine's free-cooling margin (P4), never typed.",
+  "basis": {
+    "ref": "ASHRAE 90.4-2022 economizer intent; ASHRAE TC9.9 liquid cooling (W classes); the engine's planes P0-P4",
+    "evidenceClass": "DESIGN"
+  },
+  "fleet": {
+    "noun": "dry coolers (site)",
+    "unitLabel": "kWth",
+    "running": "design.counts.dry_coolers_running",
+    "total": "equipment.dry_coolers_installed",
+    "unit": "equipment.dry_cooler_unit_kwth",
+    "load": "design.heat.dry_cooler_duty_kwth",
+    "pv": {
+      "label": "HTW supply",
+      "short": "above setpoint",
+      "ok": "at setpoint"
+    }
+  },
+  "plant": "Dry coolers reject the liquid loop's heat (and the trim chillers' condenser heat). The CDU holds TCS supply; the free-cooling margin P4 = (TCS supply − CDU approach) − (ambient + dry-cooler approach).",
+  "modeBy": {
+    "key": "design.planes.p04_free_cooling_margin_k",
+    "bands": [
+      {
+        "mode": "mechanical",
+        "below": 0
+      },
+      {
+        "mode": "edge",
+        "below": 1
+      },
+      {
+        "mode": "normal"
+      }
+    ]
+  },
+  "engineFields": [
+    {
+      "key": "design.planes.p04_free_cooling_margin_k",
+      "label": "Margin P4",
+      "unit": "K"
+    },
+    {
+      "key": "design.counts.chillers_running",
+      "label": "Chillers running",
+      "unit": ""
+    },
+    {
+      "key": "design.electrical.chiller_liquid_kwe",
+      "label": "Liquid chillers",
+      "unit": "kWe"
+    },
+    {
+      "key": "design.electrical.cooling_kwe",
+      "label": "Cooling power",
+      "unit": "kWe"
+    }
+  ],
+  "modes": [
+    {
+      "id": "normal",
+      "label": "Liquid free cooling",
+      "kind": "normal",
+      "entry": [
+        {
+          "text": "free-cooling margin P4 at least the edge band",
+          "derived": "free_cooling_margin_k",
+          "op": ">=",
+          "value": 1,
+          "unit": "K"
+        }
+      ],
+      "actions": [
+        "dry coolers hold the HTW supply at ambient + dry-cooler approach",
+        "liquid-path trim chillers off",
+        "fan speed follows the HTW supply"
+      ],
+      "exit": [
+        {
+          "to": "edge",
+          "text": "margin P4 below the edge band",
+          "derived": "free_cooling_margin_k",
+          "op": "<",
+          "value": 1,
+          "unit": "K"
+        }
+      ],
+      "assumed": {
+        "value 1": "the 1 K edge band and hysteresis: no source states one; this model's choice (ASSUMED)"
+      }
+    },
+    {
+      "id": "edge",
+      "label": "Free cooling at the edge",
+      "kind": "alarm",
+      "entry": [
+        {
+          "text": "0 ≤ margin P4 < 1 K",
+          "derived": "free_cooling_margin_k",
+          "op": "<",
+          "value": 1,
+          "unit": "K"
+        }
+      ],
+      "actions": [
+        "raise the alarm: free-cooling margin under 1 K",
+        "pre-start one trim chiller so it is proven before the margin goes negative"
+      ],
+      "exit": [
+        {
+          "to": "mechanical",
+          "text": "margin P4 below 0 K",
+          "derived": "free_cooling_margin_k",
+          "op": "<",
+          "value": 0,
+          "unit": "K"
+        },
+        {
+          "to": "normal",
+          "text": "margin back to the edge band",
+          "derived": "free_cooling_margin_k",
+          "op": ">=",
+          "value": 1,
+          "unit": "K"
+        }
+      ],
+      "assumed": {
+        "value 1": "the 1 K edge band and hysteresis: no source states one; this model's choice (ASSUMED)",
+        "pre-start": "vendor practice, not modelled by the engine; the engine runs no liquid chiller at the edge"
+      }
+    },
+    {
+      "id": "mechanical",
+      "label": "Mechanical (trim chillers)",
+      "kind": "protection",
+      "entry": [
+        {
+          "text": "margin P4 below 0 K",
+          "derived": "free_cooling_margin_k",
+          "op": "<",
+          "value": 0,
+          "unit": "K"
+        }
+      ],
+      "actions": [
+        "trim chillers make the HTW at TCS supply − CDU approach",
+        "dry coolers reject the condenser heat as well",
+        "liquid chiller power and the running count come from the engine"
+      ],
+      "exit": [
+        {
+          "to": "normal",
+          "text": "margin back above the edge band (1 K hysteresis)",
+          "derived": "free_cooling_margin_k",
+          "op": ">=",
+          "value": 1,
+          "unit": "K"
+        }
+      ],
+      "assumed": {
+        "value 1": "the 1 K edge band and hysteresis: no source states one; this model's choice (ASSUMED)"
+      },
+      "notModelled": "how fast the chillers load up; the engine gives steady states only"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "ambient_rise",
+      "label": "Ambient rises through the design point",
+      "steps": [
+        {
+          "mode": "normal",
+          "do": {
+            "set": {
+              "path": "thermal.designAmbientDbC",
+              "value": 24,
+              "label": "Ambient",
+              "unit": "°C"
+            }
+          }
+        },
+        {
+          "mode": "normal",
+          "do": {
+            "set": {
+              "path": "thermal.designAmbientDbC",
+              "value": 30,
+              "label": "Ambient",
+              "unit": "°C"
+            }
+          }
+        },
+        {
+          "mode": "edge",
+          "do": {
+            "set": {
+              "path": "thermal.designAmbientDbC",
+              "value": 34,
+              "label": "Ambient",
+              "unit": "°C"
+            }
+          },
+          "note": "34 °C · design"
+        },
+        {
+          "mode": "mechanical",
+          "do": {
+            "set": {
+              "path": "thermal.designAmbientDbC",
+              "value": 35,
+              "label": "Ambient",
+              "unit": "°C"
+            }
+          }
+        },
+        {
+          "mode": "mechanical",
+          "do": {
+            "set": {
+              "path": "thermal.designAmbientDbC",
+              "value": 38,
+              "label": "Ambient",
+              "unit": "°C"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

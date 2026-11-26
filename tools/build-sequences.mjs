@@ -71,12 +71,37 @@ function state(P, t, mode, running, available, note, source) {
 }
 
 /* walk a scenario on the plant quantities; each step applies its `do` to the state before it */
-export function walk(seq, sc, P) {
+/* P7 (DC AI): a step that sets a model input (do.set { path, value }) is a full engine re-compute on a copy of the model;
+   its fleet is re-read from that result, its engine fields (seq.engineFields) are recorded, and seq.modeBy decides the
+   mode from one result key: a step that names another mode stops the build (the sequence follows the engine). */
+function modeOf(seq, snap) {
+  const B = seq.modeBy, v = num(snap, B.key);
+  const b = B.bands.find((x) => typeof x.below !== 'number' || v < x.below);
+  return b.mode;
+}
+function recompute(set) {
+  const m = JSON.parse(JSON.stringify(DCAI.model)), k = set.path.split('.'); let o = m;
+  for (let i = 0; i < k.length - 1; i++) o = o[k[i]];
+  if (typeof o[k[k.length - 1]] !== 'number') throw new Error('set ' + set.path + ' is not a number in DCAI_CALC.model');
+  o[k[k.length - 1]] = set.value;
+  return DCAI.compute(m);
+}
+export function walk(seq, sc, P0) {
   const modes = Object.fromEntries(seq.modes.map((m) => [m.id, m]));
+  let P = P0;
   const need = Math.ceil(P.load / P.unit);
   let running = P.running, available = P.total, t = 0, source = P.source; const out = [];
   sc.steps.forEach((s) => {
     const d = s.do || {};
+    if (d.set) {
+      const snap = recompute(d.set), want = modeOf(seq, snap);
+      if (want !== s.mode) throw new Error(sc.id + ': ' + d.set.path + ' = ' + d.set.value + ' is mode ' + want + ' in the engine, the step says ' + s.mode);
+      P = plantOf(seq, snap); available = P.total; running = Math.min(P.running, available);   /* the engine may ask for more units than are installed: the rest is short */
+      const st = state(P, t, s.mode, running, available, s.note, source);
+      st.set = { path: d.set.path, value: d.set.value, label: d.set.label || d.set.path, unit: d.set.unit || '' };
+      st.engine = seq.engineFields.map((f) => ({ key: f.key, label: f.label, unit: f.unit || '', value: r1(num(snap, f.key)) }));
+      out.push(st); return;
+    }
     if (d.source) source = d.source;
     if (d.running === 'zero') running = 0;
     else if (d.running === 'all') running = available;
@@ -102,32 +127,41 @@ function resolveCond(c, LIM, snap, P, SPS) {
     return Object.assign(r, { kind: 'limit', point: c.limit, band: c.band, value: L[c.band], unit: UNIT[L.unit] || L.unit || '', label: r.text || L.label,
       evidenceClass: String(L.evidenceClass || '').toUpperCase(), source: 'limits registry ' + c.limit + '.' + c.band });
   }
+  if (c.model) {   /* a DC AI model input (thermal.dryCoolerApproachK …) */
+    const v = c.model.split('.').reduce((o, k) => (o == null ? o : o[k]), DCAI.model);
+    if (typeof v !== 'number') throw new Error('model ' + c.model + ' is not a number in DCAI_CALC.model');
+    return Object.assign(r, { kind: 'param', point: c.model, value: v, unit: c.unit || '', label: r.text, evidenceClass: c.evidenceClass || 'DESIGN', source: 'DCAI_CALC.model ' + c.model });
+  }
   if (c.param) {
     const v = c.param.split('.').reduce((o, k) => (o == null ? o : o[k]), snap);
     if (typeof v !== 'number') throw new Error('param ' + c.param + ' is not a number in the engine snapshot');
     const p = PARAMS[c.param] || {};
-    return Object.assign(r, { kind: 'param', point: c.param, value: v, unit: UNIT[p.unit] || p.unit || '', evidenceClass: String(p.evidenceClass || '').toUpperCase(), source: 'engine parameter ' + c.param });
+    return Object.assign(r, { kind: 'param', point: c.param, value: v, unit: UNIT[p.unit] || p.unit || c.unit || '', label: r.text, evidenceClass: c.evidenceClass || String(p.evidenceClass || '').toUpperCase(), source: 'engine parameter ' + c.param });
   }
   if (c.setpoint) {
     const sp = SPS[c.setpoint]; if (!sp) throw new Error('setpoint ' + c.setpoint + ' is not in data/control-points.json');
     return Object.assign(r, { kind: 'setpoint', point: c.setpoint, value: sp.value, unit: sp.unit, label: r.text || sp.label, evidenceClass: sp.evidenceClass, source: 'control registry ' + c.setpoint });
   }
-  if (c.derived) return Object.assign(r, { kind: 'derived', point: c.derived, value: c.value, unit: /margin/.test(c.derived) ? P.unitLabel : '%', evidenceClass: 'DERIVED', source: 'plant quantity ' + c.derived });
+  if (c.derived) return Object.assign(r, { kind: 'derived', point: c.derived, value: c.value, unit: c.unit || (/margin/.test(c.derived) ? P.unitLabel : '%'), evidenceClass: 'DERIVED', source: 'plant quantity ' + c.derived });
   r.kind = 'state'; return r;
 }
 
-let PARAMS = {};
+let PARAMS = {}, DCAI = null;
 export function build() {
   const conv = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/conv-parameters.json'), 'utf8'));
   PARAMS = Object.fromEntries(conv.parameters.map((p) => [p.id, p]));
   const LIM = Object.fromEntries(conv.limits.map((l) => [l.id, l]));
-  const E = require(path.join(ROOT, 'js/conv-engine.js')), snap = (E.CONV_CALC || E).snapshot; CALC = E.CONV_CALC || E;
+  const E = require(path.join(ROOT, 'js/conv-engine.js')), convSnap = (E.CONV_CALC || E).snapshot; CALC = E.CONV_CALC || E;
+  DCAI = require(path.join(ROOT, 'js/dcai-engine.js')); const dcaiSnap = DCAI.snapshot;
   const SPS = Object.fromEntries(JSON.parse(fs.readFileSync(path.join(ROOT, 'data/control-points.json'), 'utf8')).rows.filter((x) => x.sp)
     .map((x) => [x.id, { value: x.sp.value, unit: UNIT[x.unit] || x.unit || '', label: x.label, evidenceClass: x.sp.evidenceClass }]));
   const out = {};
   fs.readdirSync(DIR).filter((f) => f.endsWith('.json')).sort().forEach((f) => {
-    const seq = JSON.parse(fs.readFileSync(path.join(DIR, f), 'utf8')), P = plantOf(seq, snap);
-    out[seq.classKey] = { title: seq.title, basis: seq.basis, plant: seq.plant, quantities: P,
+    const seq = JSON.parse(fs.readFileSync(path.join(DIR, f), 'utf8')), dc = seq.engine === 'dcai', snap = dc ? dcaiSnap : convSnap, P = plantOf(seq, snap);
+    if (dc && !/^dcai:/.test(seq.classKey)) throw new Error(f + ': a DC AI sequence has a dcai:<cls> classKey');
+    if (dc && seq.modeBy) { const now = modeOf(seq, snap); if (!seq.modes.some((m) => m.id === now)) throw new Error(f + ': modeBy gives ' + now + ', not a mode'); }
+    out[seq.classKey] = { title: seq.title, basis: seq.basis, plant: seq.plant, quantities: P, engine: dc ? 'dcai' : 'conv',
+      modeNow: dc && seq.modeBy ? modeOf(seq, snap) : null,
       modes: seq.modes.map((m) => ({ id: m.id, label: m.label, kind: m.kind, actions: m.actions,
         entry: m.entry.map((c) => resolveCond(c, LIM, snap, P, SPS)), exit: m.exit.map((c) => resolveCond(c, LIM, snap, P, SPS)),
         stagger_s: m.stagger_s || null, notModelled: m.notModelled || null, assumed: m.assumed || null })),

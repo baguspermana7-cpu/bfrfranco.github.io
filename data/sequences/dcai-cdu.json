@@ -1,0 +1,139 @@
+{
+  "classKey": "dcai:cdu",
+  "engine": "dcai",
+  "title": "CDU duty / standby (one hall)",
+  "note": "PRD-SETPOINT-SIM P7. Counts, unit rating and load from DCAI_CALC.snapshot.equipment.",
+  "basis": {
+    "ref": "ASHRAE TC9.9 liquid cooling guidelines (CDU N+1); Uptime Tier concurrent maintainability practice",
+    "evidenceClass": "DESIGN"
+  },
+  "fleet": {
+    "noun": "CDUs in one hall",
+    "unitLabel": "kWth",
+    "running": "equipment.cdu_duty_per_hall",
+    "total": "equipment.cdu_installed_per_hall",
+    "unit": "equipment.cdu_unit_kwth",
+    "load": {
+      "product": [
+        "equipment.cdu_duty_per_hall",
+        "equipment.cdu_duty_per_unit_kwth"
+      ]
+    },
+    "spare": "equipment.cdu_standby_per_hall",
+    "pv": {
+      "label": "TCS supply",
+      "short": "rises above setpoint",
+      "ok": "at setpoint"
+    }
+  },
+  "plant": "Each CDU holds the TCS supply with its HX control valve (registry dcai.cdu/tcs_supply_c); the hall runs its duty CDUs with one standby.",
+  "modes": [
+    {
+      "id": "normal",
+      "label": "Normal, N+1",
+      "kind": "normal",
+      "entry": [
+        {
+          "event": "all duty CDUs proven running, standby available"
+        }
+      ],
+      "actions": [
+        "each duty CDU holds TCS supply at its setpoint",
+        "the standby CDU is isolated and ready"
+      ],
+      "exit": [
+        {
+          "to": "duty_trip",
+          "event": "a duty CDU trips (pump, controls or leak isolation)"
+        },
+        {
+          "to": "high_tcs",
+          "text": "TCS supply above setpoint",
+          "setpoint": "dcai.cdu/tcs_supply_c",
+          "op": ">"
+        }
+      ]
+    },
+    {
+      "id": "duty_trip",
+      "label": "Duty CDU trip — standby start",
+      "kind": "protection",
+      "entry": [
+        {
+          "event": "a duty CDU trips"
+        }
+      ],
+      "actions": [
+        "isolate the tripped CDU and raise an alarm",
+        "open the standby CDU's isolation valves and start its pump",
+        "the duty count is restored; each unit stays at its load"
+      ],
+      "exit": [
+        {
+          "to": "normal",
+          "event": "the standby CDU is proven running and the tripped unit is repaired"
+        }
+      ],
+      "notModelled": "the seconds between trip and standby proven; the rack TCS rise during it"
+    },
+    {
+      "id": "high_tcs",
+      "label": "High TCS supply",
+      "kind": "alarm",
+      "entry": [
+        {
+          "text": "TCS supply above setpoint",
+          "setpoint": "dcai.cdu/tcs_supply_c",
+          "op": ">"
+        }
+      ],
+      "actions": [
+        "alarm from the registry band of dcai.cdu/tcs_supply_c",
+        "check facility water (HTW) supply and the HX valve position"
+      ],
+      "exit": [
+        {
+          "to": "normal",
+          "text": "TCS supply back at setpoint",
+          "setpoint": "dcai.cdu/tcs_supply_c",
+          "op": "<="
+        }
+      ],
+      "notModelled": "rack throttling and time to the alarm limit"
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "duty_trip",
+      "label": "One duty CDU trips",
+      "steps": [
+        {
+          "mode": "normal",
+          "do": {}
+        },
+        {
+          "mode": "duty_trip",
+          "do": {
+            "running": -1,
+            "available": -1
+          },
+          "note": "trip"
+        },
+        {
+          "mode": "duty_trip",
+          "do": {
+            "running": 1
+          },
+          "note": "standby in"
+        },
+        {
+          "mode": "normal",
+          "do": {
+            "available": 1
+          },
+          "note": "repaired"
+        }
+      ]
+    }
+  ]
+}

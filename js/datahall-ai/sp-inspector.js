@@ -99,7 +99,10 @@
   var kept = { key: null, sec: null, focus: null };
   function attach(payload, body) {
     var B = root.RZSpBlock; if (!B || !payload || !body) return false;
-    var list = rows(payload.classId); if (!list.length) return false;
+    /* P7: a class with a sequence of operations (RZSequences 'dcai:<cls>') gets the block even with no setpoint of its own */
+    var list = rows(payload.classId), Q = root.RZSequences, V = root.RZConvSequence;
+    var seqKey = Q && Q.get && V && Q.get('dcai:' + payload.classId) ? 'dcai:' + payload.classId : null;
+    if (!list.length && !seqKey) return false;
     var doc = body.ownerDocument, key = payload.classId + ':' + payload.id + ':' + (payload.hall || '');
     style(doc);
     var sec = kept.key === key ? kept.sec : null;
@@ -107,8 +110,10 @@
       var E = root.DCAI_CALC;
       sec = doc.createElement('section');
       sec.className = 'rz-inspector-sp'; sec.setAttribute('data-rz-dcai-sp', payload.classId);
-      sec.innerHTML = '<div class="rz-inspector-sec">Setpoints &amp; limits</div>' + B.inner(list, { snapshot: E && E.snapshot ? E.snapshot : null });
-      cliff(sec);
+      sec.innerHTML = (list.length ? '<div class="rz-inspector-sec">Setpoints &amp; limits</div>' + B.inner(list, { snapshot: E && E.snapshot ? E.snapshot : null }) : '') +
+        (seqKey ? V.block(seqKey) : '');
+      if (list.length) cliff(sec);
+      if (seqKey) V.bind(sec);
       sec.addEventListener('focusin', function (e) { kept.focus = e.target; });
       /* the 4 s body rewrite blurs the focused node BEFORE it detaches (Chrome); the rewrite puts the block back and
          re-focuses in the same task, so the user has only left when focus is still outside one task later */
@@ -117,11 +122,11 @@
     }
     var f = kept.focus;
     body.appendChild(sec);
-    B.bind(sec, { recompute: recompute, live: liveOf(payload) });
+    if (list.length) B.bind(sec, { recompute: recompute, live: liveOf(payload) });
     if (f && sec.contains(f) && doc.activeElement !== f) { try { f.focus({ preventScroll: true }); } catch (e) { /* not focusable */ } }
     return true;
   }
-  var api = { rows: rows, recompute: recompute, attach: attach, version: '1.2.0' };
+  var api = { rows: rows, recompute: recompute, attach: attach, version: '1.3.0' };
   if (root) {
     root.RZDcaiSpInspector = api;
     if (root.document && root.document.addEventListener) root.document.addEventListener('rz-inspector-payload', function (e) { if (e && e.detail) attach(e.detail.payload, e.detail.body); });

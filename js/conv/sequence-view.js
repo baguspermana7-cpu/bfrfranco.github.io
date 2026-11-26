@@ -100,15 +100,21 @@
     var P = S.quantities, label = {}; S.modes.forEach(function (m) { label[m.id] = short(m.label); });
     var timed = sc.steps.some(function (s) { return s.t_s > 0; });
     var stag = S.modes.filter(function (m) { return m.stagger_s; })[0];
-    return '<div class="rz-cvm-sp-wrap"><table class="rz-cvm-sp rz-cvm-seq-t" data-seq-steps><caption>SIMULATED · steady state per step</caption><thead><tr><th scope="col">Step</th>' +
+    /* P7: an engine sweep (DC AI) shows the input it set and the engine's own result per step */
+    var eng = sc.steps[0] && sc.steps[0].engine ? sc.steps[0] : null;
+    function big(v) { return typeof v === 'number' ? (Math.abs(v) >= 1000 ? Math.round(v).toLocaleString('en-US') : n(v)) : '—'; }
+    var engTh = eng ? '<th scope="col" data-k="set">' + esc(eng.set.label + (eng.set.unit ? ' ' + eng.set.unit : '')) + '</th>' +
+      eng.engine.map(function (e) { return '<th scope="col" data-k="eng">' + esc(e.label + (e.unit ? ' ' + e.unit : '')) + '</th>'; }).join('') : '';
+    function engTd(s) { return eng ? '<td data-k="set">' + big(s.set.value) + '</td>' + s.engine.map(function (e) { return '<td data-k="eng">' + big(e.value) + '</td>'; }).join('') : ''; }
+    return '<div class="rz-cvm-sp-wrap"><table class="rz-cvm-sp rz-cvm-seq-t" data-seq-steps><caption>SIMULATED · steady state per step</caption><thead><tr><th scope="col">Step</th>' + engTh +
       (timed ? '<th scope="col" data-k="t">Time</th>' : '') + (P.source ? '<th scope="col" data-k="src">Load on</th>' : '') + '<th scope="col">Running</th>' +
       '<th scope="col" data-k="avail">Available</th><th scope="col" data-k="cap">' + esc('Capacity ' + P.unitLabel) + '</th><th scope="col" data-k="pl">' + (P.unitBasis ? 'Load / usable' : 'Part load') + '</th><th scope="col">' + esc('Short ' + P.unitLabel) + '</th><th scope="col">' + esc(P.pv.label) + '</th></tr></thead><tbody>' +
       sc.steps.map(function (s, i) {
         return '<tr data-seq-i="' + i + '" data-seq-step-mode="' + esc(s.mode) + '" data-seq-running="' + s.running + '" data-seq-short="' + s.short + '" data-seq-t="' + s.t_s + '" hidden>' +
-          '<th scope="row">' + esc((i + 1) + '. ' + (s.note ? s.note : label[s.mode])) + '</th>' + (timed ? '<td data-k="t">' + (s.note ? '+' + s.t_s + ' s' : '—') + '</td>' : '') +
+          '<th scope="row">' + esc((i + 1) + '. ' + (s.note ? s.note : label[s.mode])) + '</th>' + engTd(s) + (timed ? '<td data-k="t">' + (s.note ? '+' + s.t_s + ' s' : '—') + '</td>' : '') +
           (P.source ? '<td data-k="src">' + esc(SRC[s.source] || '—') + '</td>' : '') +
           '<td>' + s.running + '</td><td data-k="avail">' + s.available + '</td>' +
-          '<td data-k="cap">' + n(s.capacity) + '</td><td data-k="pl">' + (s.part_load_pct === null ? '—' : n(s.part_load_pct) + ' %') + '</td><td>' + n(s.short) + '</td><td>' + esc(s.pv) + '</td></tr>';
+          '<td data-k="cap">' + big(s.capacity) + '</td><td data-k="pl">' + (s.part_load_pct === null ? '—' : n(s.part_load_pct) + ' %') + '</td><td>' + big(s.short) + '</td><td>' + esc(s.pv) + '</td></tr>';
       }).join('') + '</tbody></table></div>' +
       (timed && stag ? '<p class="rz-cvm-seq-note">' + esc('Time counts from the return of supply; ' + stag.stagger_s + ' s between two chiller starts (assumed). How long the supply is lost is not modelled.') + '</p>' : '');
   }
