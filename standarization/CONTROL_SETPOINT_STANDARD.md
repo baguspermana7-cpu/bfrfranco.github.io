@@ -148,7 +148,8 @@ range). Otherwise it is fixed, and the modal says what fixes it.
   `RZControlPoints.loopRows(cockpit, sheets)` (twin 1.4.0): every registry setpoint whose loop is drawn on one of those
   sheets or inside those machines, so a new loop in the registry appears without a page edit. Live / Error are filled by
   `RZSpBlock.bind` like the setpoint rows. Conventional pages mount it with `<div data-rz-loops-host data-sheets="…">` +
-  `js/conv/loops-card.js` (chiller-plant: CH-M-101, CH-M-102, int-chiller → PDIC-01, TIC-CDWS, TIC-CHWS); in a 344 px
+  `js/conv/loops-card.js` (chiller-plant: CH-M-101, CH-M-102, int-chiller → PDIC-01, TIC-CDWS, TIC-CHWS; datahall
+  inspector: `int-crah none` → TIC-SAT and TIC-RI, `none` = a loop with no drawing, OUT not modelled); in a 344 px
   column it hides Error, and SP below 600 px, keeping both in the cells. The DC AI inspector puts it at the top of its
   Setpoints block (Loop · Live · OUT · Left · State). Gates S11c (`test-setpoint-sim.mjs`) and D12 (`test-dcai-setpoints.mjs`).
 - **Reset (cascade) loops.** A `kind: 'reset'` loop names the loop whose setpoint it writes (`slave`, an existing

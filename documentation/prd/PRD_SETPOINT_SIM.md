@@ -1036,8 +1036,9 @@ RZSpBlock.bind(host, { recompute })  → wires sliders (input → recompute → 
   table rows [] ≠ registry loops on this page [TIC-CDWS,PDIC-01,TIC-CHWS]", D12 "Loops rows [] ≠ registry loops [TIC-nn1]".
 - Layout: the chiller-plant phone patch forces every table into a 0.8 rem scrolling block with 8 × 12 px cells; the
   Loops table opts out (else OUT and State scrolled out of the card at 390 px).
-- Still open in P10: the rack-inlet what-if showing CRAH valve OUT after the change; a Loops table on datahall (TIC-SAT,
-  TIC-RI).
+- Datahall inspector: TIC-SAT 99.5 % ◆ saturated (0.5 % of CRAH valve left), TIC-RI "OUT not modelled" (a reset loop
+  writes a setpoint, not an output). S11c datahall red on the old page (rows [] ≠ [TIC-SAT, TIC-RI]).
+- Still open in P10: the rack-inlet what-if showing CRAH valve OUT after the change.
 
 ## C18. P8 delivered (fallback step strip, 2026-11-26)
 

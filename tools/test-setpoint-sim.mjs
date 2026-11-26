@@ -180,6 +180,22 @@ try {
     }
     /* S4: the equipment modal of a class that holds a setpoint shows a "Setpoints & limits" table: one row per registry
        setpoint of that class, the SP cell = the registry value, the Live cell = the value the page shows */
+    /* S11c on the data hall (P10): the inspector's Loops table lists the loops inside its CRAHs (TIC-SAT) and the hall
+       loop with no drawing (TIC-RI); OUT / saturated = the engine where the loop names an output */
+    if (page === 'datahall.html') {
+      const want = REG.filter((r) => r.cockpit === 'conv' && r.sp && r.sp.loop && (r.sp.loop.sheet === 'int-crah' || !r.sp.loop.sheet));
+      await pg.waitForFunction(() => document.querySelectorAll('[data-rz-loops] tr[data-loop-row]').length > 0, { timeout: 15000 }).catch(() => {});
+      const lt = await pg.evaluate(() => [...document.querySelectorAll('[data-rz-loops] tr[data-loop-row]')].map((tr) => ({ tag: tr.getAttribute('data-loop-row'),
+        pv: tr.querySelector('[data-k="pv"]').textContent, out: tr.getAttribute('data-auth-out'), sat: tr.getAttribute('data-auth-sat'), state: tr.querySelector('[data-k="state"]').textContent })));
+      ok(lt.length === want.length && want.every((r) => lt.some((x) => x.tag === r.sp.loop.tag)), 'S11c', `datahall Loops rows [${lt.map((x) => x.tag)}] ≠ registry [${want.map((r) => r.sp.loop.tag)}]`);
+      for (const r of want) {
+        const x = lt.find((y) => y.tag === r.sp.loop.tag); if (!x) continue;
+        ok(/\d/.test(x.pv), 'S11c', `datahall ${x.tag}: Live "${x.pv}"`);
+        if (!r.sp.loop.out) { ok(/not modelled/.test(x.state), 'S11c', `datahall ${x.tag}: no output key, state "${x.state}" (want OUT not modelled)`); continue; }
+        const o = Math.round(getPath(ENGC.snapshot, r.sp.loop.out.key) * 10) / 10;
+        ok(+x.out === o && (x.sat === 'true') === (o >= 98) && /saturated/.test(x.state) === (o >= 98), 'S11c', `datahall ${x.tag}: OUT ${x.out} sat ${x.sat} "${x.state}" vs engine ${o}`);
+      }
+    }
     if (page === 'chiller-plant.html') {
       const BYCLS = {};
       REG.filter((r) => r.cockpit === 'conv' && r.sp && r.sp.classKey).forEach((r) => { (BYCLS[r.sp.classKey] = BYCLS[r.sp.classKey] || []).push(r); });
