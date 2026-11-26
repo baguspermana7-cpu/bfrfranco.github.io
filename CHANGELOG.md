@@ -11,6 +11,17 @@ release sections rather than semver.
 
 ---
 
+## v3.115.1 — 2026-11-27 — A level controller's alarms are its day tank's, not the bulk tank's
+
+- **Fix (v3.115.0 regression).**
+  - v3.115.0 gave a controller bubble the Trend and Alarms of the unit it controls, taken from that unit's equipment class.
+  - A day tank shares the "fuel tank" class with the bulk tank UST-01. So LIC-A3 showed the bulk level trend (fuel.level_pct, 85 %) and the bulk alarms (60 / 30 / 95 %).
+  - Its own day tank reads 90 %, with day-tank limits of 45 % (low warning) and 25 % (low alarm).
+- **Now.**
+  - A controller's Alarms are the limits of the process value it holds, read from the limits registry by the id its unit prints (`fuel-system.DT.level_pct`), with their evidence class.
+  - The Trend tab stays empty rather than showing another tank's line.
+- **Found, not fixed here.** The day-tank inspector itself still prints the bulk tank's Level, Trend and Alarms, through the shared class. It is next on the P9 list.
+
 ## v3.115.0 — 2026-11-27 — Control loops at a glance; fire and fuel controllers drawn; Simulate draws the response
 
 **Control loops you can read at a glance; fire and fuel controllers on their drawings; Simulate draws the response** (PRD-SETPOINT-SIM §C P10 part 3, P9 part 2, P8)
@@ -21,7 +32,7 @@ release sections rather than semver.
   - TIC-CHWS and TIC-CDWS hold at 89.3 %.
   - The data hall inspector gets the same table: TIC-SAT is at 99.5 % (saturated), and TIC-RI reads "OUT not modelled" because a reset writes a setpoint, not an output.
     It sits behind a loop icon (tooltip "Control loops") and is built only when opened, so the hall keeps its 120-word budget.
-  - A controller bubble's inspector (LIC, PC) shows the Trend and Alarms of the unit it controls.
+  - A controller bubble's inspector (LIC, PC) shows the Trend and Alarms of the unit it controls (corrected in v3.115.1).
   - The DC AI inspector now opens its Setpoints block with the class's loop. TIC-nn1 on the CDU is at 99.6 % and TIC-SA on the fan wall at 99.9 %; both are saturated.
   - The rows come only from the control registry (`RZControlPoints.loopRows`), so a new loop appears without a page edit.
 - **Fire pump controllers drawn (FS-M-101).**

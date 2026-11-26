@@ -195,13 +195,17 @@
       var target = n, tn = n.ctrl && api && api.sheet && api.sheet.nodes ? api.sheet.nodes.filter(function (x) { return x.id === n.ctrl; })[0] : null;
       if (tn) { target = tn; if (!(payload.actions && payload.actions.openHmi)) { var q = {}; Object.keys(payload).forEach(function (k) { q[k] = payload[k]; });
         q.actions = { openHmi: true, related: (payload.actions && payload.actions.related) || [] }; payload = q; }
-        /* a controller bubble has no machine class: its Trend and Alarms are those of the unit it controls (the day tank
-           level an LIC holds, the pump a PC starts), taken from that unit's own payload, only where the bubble has none */
-        var pt = payload.tabs || {}, tt = (build(tn) || {}).tabs || {};
-        if ((!pt.trend && tt.trend) || (!(pt.alarmPoints || []).length && (tt.alarmPoints || []).length)) {
-          var t2 = {}; Object.keys(pt).forEach(function (k) { t2[k] = pt[k]; });
-          if (!t2.trend && tt.trend) t2.trend = tt.trend;
-          if (!(t2.alarmPoints || []).length && (tt.alarmPoints || []).length) t2.alarmPoints = tt.alarmPoints;
+        /* a controller bubble has no machine class: its Alarms are the limits of the process value it holds, read from the
+           limits registry by the id the controlled unit prints (the day-tank level an LIC holds: fuel-system.DT.level_pct).
+           Never the unit CLASS's alarms or trend: the day tank shares its class with the bulk tank (fuel.level_pct). */
+        var pt = payload.tabs || {}, PS = root.RZPointStatus, al = [];
+        if (!(pt.alarmPoints || []).length && PS && PS.limits) (tn.values || []).forEach(function (v) {
+          var lid = v.limitsOf || v.point, L = lid ? PS.limits(lid) : null; if (!L || al.length) return;
+          var u = L.unit || '', why = (L.evidenceClass ? L.evidenceClass + ' · ' : '') + 'limits registry ' + lid;
+          [['lo_alarm', 'Low alarm'], ['lo_warn', 'Low warning'], ['hi_warn', 'High warning'], ['hi_alarm', 'High alarm']].forEach(function (b) {
+            if (typeof L[b[0]] === 'number') al.push({ label: b[1] + ' · ' + (v.label || lid), text: String(L[b[0]]), unit: u, quality: 'declared', declared: why }); });
+        });
+        if (al.length) { var t2 = {}; Object.keys(pt).forEach(function (k) { t2[k] = pt[k]; }); t2.alarmPoints = al;
           var q2 = {}; Object.keys(payload).forEach(function (k) { q2[k] = payload[k]; }); q2.tabs = t2; payload = q2; } }
       root.RZInspector.openPayload(payload, { trigger: el,
         onOpenHmi: function (p, btn) { deep(build, target, btn, el, more); },

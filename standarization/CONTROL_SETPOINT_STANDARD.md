@@ -155,6 +155,14 @@ range). Otherwise it is fixed, and the modal says what fixes it.
 - **Reset (cascade) loops.** A `kind: 'reset'` loop names the loop whose setpoint it writes (`slave`, an existing
   registry tag; the builder refuses another). TIC-RI (rack inlet) resets TIC-SAT: contained aisle, no mixing modelled,
   so the slave setpoint equals the master's.
+- **Loops table under a word budget.** Where a page's word budget is spent (datahall T2 120), the table sits in a
+  `<details>` whose summary is an icon named by `aria-label` + `title` ("Control loops"). `loops-card.js` builds the
+  table only while the details is open, because a closed `<details>` keeps layout boxes and its text counts as visible.
+- **A controller bubble's inspector (v3.115.1).** A bubble with `ctrl: <node id>` opens with Open equipment HMI on that
+  unit. Its Alarms are the limits of the process value it holds, from the limits registry by the id the controlled
+  unit prints (`values[].limitsOf || point`; LIC-A3 → `fuel-system.DT.level_pct`, 45 / 25 %). Never borrow the unit
+  CLASS's alarms or trend: a class can be shared by different vessels (day tank and bulk tank are both
+  `fuel:tankStorage`; v3.115.0 showed the bulk 85 % trend on a 90 % day tank).
 
 ## 5. Gates
 
