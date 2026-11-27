@@ -1071,3 +1071,34 @@ RZSpBlock.bind(host, { recompute })  → wires sliders (input → recompute → 
     bubbles would raise the diagram-engine ratchet, so this waits for the schematic's move onto RZHmiSheet.
   - **Water booster PIC.** The page has no registry row for the booster pressure yet. That row comes first.
 
+
+## C19. P9 part 3 delivered (2026-11-27, v3.115.1 + v3.115.2): the booster PIC, the day tank's own numbers
+
+- **v3.115.1, a controller's alarms.** "Open equipment HMI" on a controller bubble (`ctrl`) opens the unit it drives.
+  The bubble's Alarms are the limits of the process value it holds, read from the limits registry by the id that unit
+  prints. LIC-A3 → `fuel-system.DT.level_pct`, 45 / 25 %.
+  - The first version borrowed the unit class's alarms and trend. The live screenshot showed the bulk tank's 85 %
+    trend on a 90 % day tank.
+- **Water, WT-M-101: PIC-301.**
+  - Registry row: `conv.water-system.booster_discharge_sp`, 4.2 bar, kind modulating, loop PI reverse, ASSUMED. 4.2 bar
+    is the drawing's own design value; no hydraulic calculation exists.
+  - Signals run PT-301 → PIC-301 → P-301A. PT-301 prints the setpoint (steady state), so the page no longer types it.
+  - OUT reads "not modelled". The builder now takes a PI / PID loop on a modulating page setpoint when it names its
+    transmitter (`pv.node`).
+- **The day tank's payload has its own class.** It used to borrow the bulk tank's class (`fuel.level_pct`, alarms
+  60 / 30 / 95 %).
+  - Its alarms and trend reference now come from `fuel-system.DT.level_pct` (45 / 25 %, nominal 70 %).
+  - Clicking a day tank opens its genset's inside drawing. That drawing was already right, so the payload fix serves the
+    inspector fallback and the gates.
+- **Bubble names.** The sheet engine names a node "<tag> — <label>". 13 bubble labels on 4 pages started with the tag
+  again, so the inspector title read "LIC-A3 — LIC-A3 — …".
+  - Each label now says the tag once.
+  - A bubble is named "Controller" in the inspector.
+  - Its registry number is declared, not SIM.
+- **Laws, each red first:**
+  - T3 and S8e water;
+  - S8f, no tag said twice (red on 13);
+  - P10, a day tank reads no bulk parameter;
+  - P11, the controller's kind and SP quality.
+- **Still not drawn:** cdu-mini-bms (TIC → TCV-01, PDIC → P-01). The reason is unchanged: a hand-authored schematic,
+  and the diagram-engine ratchet does not rise.
