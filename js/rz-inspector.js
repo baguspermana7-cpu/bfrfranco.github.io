@@ -44,7 +44,7 @@
     '.rz-inspector-kind{font-family:JetBrains Mono,monospace;font-size:9.5px;letter-spacing:.08em;' +
       'text-transform:uppercase;color:#7dd3fc;margin-bottom:3px}' +
     '.rz-inspector-id{font-family:JetBrains Mono,monospace;font-size:14px;font-weight:600;' +
-      'color:#f1f5f9;word-break:break-all;line-height:1.25}' +
+      'color:#f1f5f9;overflow-wrap:anywhere;line-height:1.25;padding-right:30px}' +
     '.rz-inspector-close{position:absolute;top:12px;right:12px;width:28px;height:28px;' +
       'border:none;background:rgba(255,255,255,0.04);color:#94a3b8;font-size:18px;cursor:pointer;' +
       'border-radius:6px;display:grid;place-items:center;line-height:1;padding:0}' +
@@ -63,8 +63,9 @@
     '.rz-inspector-k{font-family:IBM Plex Sans,sans-serif;font-size:10.5px;color:#94a3b8;' +
       'text-transform:uppercase;letter-spacing:.04em;flex-shrink:0}' +
     '.rz-inspector-v{font-family:JetBrains Mono,monospace;font-size:11.5px;color:#e2e8f0;' +
-      'text-align:right;font-variant-numeric:tabular-nums;word-break:break-all}' +
+      'text-align:right;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;min-width:0}' +
     '.rz-inspector-v.state-energized{color:#86efac}' +
+    '.rz-nb{white-space:nowrap}' +
     '.rz-inspector-v.state-fault,.rz-inspector-v.state-tripped{color:#fca5a5}' +
     '.rz-inspector-v.state-standby,.rz-inspector-v.state-open{color:#fbbf24}' +
     '.rz-inspector-v.state-maintenance,.rz-inspector-v.state-isolated{color:#67e8f9}' +
@@ -178,13 +179,18 @@
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
       .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
+  /* escape, then keep a hyphenated tag on one line: "PT-301" must not wrap as "PT-" / "301" (v3.115.3).
+     The text is unchanged; only a nowrap span is added around each token. */
+  function escNb(s) {
+    return esc(s).replace(/[A-Za-z0-9]+(?:-[A-Za-z0-9]+)+/g, '<span class="rz-nb">$&</span>');
+  }
 
   function row(k, v, stateClass) {
     if (v === null || v === undefined || v === '') { return ''; }
     var cls = 'rz-inspector-v' + (stateClass ? ' state-' + esc(stateClass) : '');
     return '<div class="rz-inspector-row">' +
       '<span class="rz-inspector-k">' + esc(k) + '</span>' +
-      '<span class="' + cls + '">' + esc(v) + '</span>' +
+      '<span class="' + cls + '">' + escNb(v) + '</span>' +
     '</div>';
   }
 
@@ -338,7 +344,7 @@
     if (!currentEl || !inspectorEl) { return; }
     var m = getMetadata(currentEl);
     inspectorEl.querySelector('[data-slot="kind"]').textContent = m.kind.toUpperCase();
-    inspectorEl.querySelector('[data-slot="id"]').textContent = m.id;
+    inspectorEl.querySelector('[data-slot="id"]').innerHTML = escNb(m.id);
     var body = inspectorEl.querySelector('[data-slot="body"]');
     var html = '';
     switch (currentTab) {
@@ -414,7 +420,7 @@
     inspectorEl.classList.add('rz-inspector-basis');
     inspectorEl.querySelector('.rz-inspector-tabs').hidden = true;
     inspectorEl.querySelector('[data-slot="kind"]').textContent = 'BASIS';
-    inspectorEl.querySelector('[data-slot="id"]').textContent = id;
+    inspectorEl.querySelector('[data-slot="id"]').innerHTML = escNb(id);
     var body = inspectorEl.querySelector('[data-slot="body"]');
     var drawer = root.RZBasisDrawer;
     body.innerHTML = drawer && drawer.renderRecord
@@ -450,7 +456,7 @@
   function payloadRow(r) {
     var cls = 'rz-inspector-v' + (r.state ? ' state-' + esc(r.state) : '');
     return '<div class="rz-inspector-row"><span class="rz-inspector-k">' + esc(r.label) + '</span>' +
-      '<span class="' + cls + '"' + cellAttrs(r) + '>' + esc(r.text) + (r.unit ? ' ' + esc(r.unit) : '') + '</span></div>';
+      '<span class="' + cls + '"' + cellAttrs(r) + '>' + escNb(r.text) + (r.unit ? ' ' + esc(r.unit) : '') + '</span></div>';
   }
   function payloadRows(rows, empty) {
     if (!rows || !rows.length) { return '<div class="rz-inspector-empty">' + esc(empty) + '</div>'; }
@@ -505,7 +511,7 @@
   function renderPayload() {
     var p = currentPayload; if (!p || !inspectorEl) { return; }
     inspectorEl.querySelector('[data-slot="kind"]').textContent = String(p.kind || 'equipment').toUpperCase() + ' · ' + String(p.label || '');
-    inspectorEl.querySelector('[data-slot="id"]').textContent = p.title;
+    inspectorEl.querySelector('[data-slot="id"]').innerHTML = escNb(p.title);
     var chip = p.statusChip || { label: 'NORMAL', state: 'normal' };
     inspectorEl.querySelector('[data-slot="chip"]').innerHTML = '<span class="rz-inspector-chip is-' + esc(chip.state) + '">' + esc(chip.label) + '</span>';
     var actions = inspectorEl.querySelector('[data-slot="actions"]');

@@ -1102,3 +1102,13 @@ RZSpBlock.bind(host, { recompute })  → wires sliders (input → recompute → 
   - P11, the controller's kind and SP quality.
 - **Still not drawn:** cdu-mini-bms (TIC → TCV-01, PDIC → P-01). The reason is unchanged: a hand-authored schematic,
   and the diagram-engine ratchet does not rise.
+
+## C20. Inspector text (2026-11-27, v3.116.1)
+
+- The v3.115.2 live screenshot of PIC-301 showed the inspector breaking words in half: "pai / r", "reve / rse".
+  `js/rz-inspector.js` used `word-break: break-all`. A tag split at its hyphen ("PT- / 301"), and on a phone the
+  title ran under the close button.
+- Values and the title now wrap between words. A hyphenated tag stays on one line. The title is clear of the close
+  button.
+- Law: `tools/test-inspector-wrap.mjs` W1 and W2, in the Conventional release gate. It was red on 8 of 8 checks
+  first, then red on 2 (the hyphen split) until the no-wrap tag span.

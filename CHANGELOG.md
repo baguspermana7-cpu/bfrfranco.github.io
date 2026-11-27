@@ -11,6 +11,16 @@ release sections rather than semver.
 
 ---
 
+## v3.116.1 — 2026-11-27 — The inspector stops breaking words in half
+
+**Conventional inspector text wraps between words, and a tag stays whole** (found on the v3.115.2 live screenshot)
+
+- The inspector beside every Conventional drawing wrapped its title and every value with `word-break: break-all`. A line ended wherever the box did: "pai / r", "reve / rse", "t / he speed", and on a phone the title ran under the close button.
+- Values and the title now wrap between words (`overflow-wrap: anywhere` only breaks a token wider than its box, such as a long registry id).
+- A hyphenated tag (PT-301, XV-A1, P-301A) is kept on one line, so it never reads "PT- / 301". The text itself is unchanged; only a no-wrap span is added around the tag.
+- The title keeps 30 px clear of the close button.
+- **Gate (red before the change):** `tools/test-inspector-wrap.mjs`, in the Conventional release gate. W1: no word or tag splits across two lines when it fits its box. W2: the title stays clear of the close button. It runs on water PIC-301 and fuel LIC-A1 at 390 and 1440 px. It was red on all 8 checks on v3.115.2 (9 split words on the water inspector). After the first fix it was still red on 2, PT-301 and XV-A1 split at their hyphen.
+
 ## v3.116.0 — 2026-11-27 — DC AI: the hall operating, visible at rest
 
 **The Data Hall and the Room Layout show the hall running without a click** (PRD-DCAI-HALL-DEPTH Amendment 10; owner
