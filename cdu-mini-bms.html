@@ -31,7 +31,7 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.min.css?v=20261108-ff5c7268">
 <link rel="stylesheet" href="css/rz-cockpit-instrument.css?v=20261105-c3fa9df6"><!-- P23: the instrument register this page declares -->
-    <script src="js/rz-version.js?v=20261127-c7383cab" defer></script>
+    <script src="js/rz-version.js?v=20261127-9834e49a" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <script type="application/ld+json">
@@ -602,7 +602,7 @@
                  + '<text class="sch-sub" x="'+x+'" y="'+(y-21)+'" text-anchor="middle">'+tag+'</text></g>'; }
         function pPump(x,y,tag,on,slow){ return '<g><circle class="'+(on?'sch-eq':'sch-eq2')+'" cx="'+x+'" cy="'+y+'" r="12"/>'
                  + '<path class="pump-rot '+(on?(slow?'slow':'on'):'off')+'" d="M'+x+' '+(y-8)+' L'+x+' '+(y+8)+' M'+(x-8)+' '+y+' L'+(x+8)+' '+y+'" stroke="var(--bm-cyan)" stroke-width="1.5"/>'
-                 + '<text class="sch-sub" x="'+x+'" y="'+(y+24)+'" text-anchor="middle">'+tag+'</text></g>'; }
+                 + '<text class="sch-sub" x="'+(x+4)+'" y="'+(y+24)+'" text-anchor="middle">'+tag+'</text></g>'; }   // +4: clear of the suction header (x 148)
         function pInst(x,y,top,tag,valId,link){
                  var attrs = link ? ' class="pid-inst" data-link="'+link+'" role="button" tabindex="0" aria-label="'+top+'-'+tag+' instrument — show '+link+' reading"' : '';
                  var hit = link ? '<rect x="'+(x-16)+'" y="'+(y-15)+'" width="32" height="41" rx="4" fill="transparent" style="pointer-events:all"/>' : '';
@@ -634,26 +634,26 @@
                 h+='<text class="sch-sub" x="6" y="14">FACILITY WATER · FWS</text>';
                 h+='<path class="pipe-s '+fcls+'" d="M8 44 H86"/>'+pHV(40,44,'HV-01')+pTCV(68,44,'TCV-01');
                 h+='<path class="pipe-r '+fcls+'" d="M8 250 H86"/>'+pHV(40,250,'HV-02');
-                h+='<text class="sch-sub" x="8" y="40">supply</text><text class="sch-sub" x="8" y="264">return</text>';
+                h+='<text class="sch-sub" x="8" y="57">supply</text><text class="sch-sub" x="8" y="264">return</text>';
                 // plate HX E-01
                 h+='<rect class="sch-eq" x="86" y="30" width="34" height="234" rx="3"/>';
-                h+='<path class="sch-eq2" d="M90 40 L116 70 M90 70 L116 100 M90 130 L116 160 M90 200 L116 230"/>';
+                h+='<path class="sch-eq2" d="M90 40 L116 70 M90 70 L116 100 M90 200 L116 230 M90 230 L116 260"/>';
                 h+='<text class="sch-lbl" x="103" y="150" text-anchor="middle" transform="rotate(-90 103 150)">E-01 PLATE HX</text>';
-                h+='<text class="sch-sub" x="103" y="272" text-anchor="middle">HX approach</text>'+pInst(103,288,'TI','03','pv-atd','atd');
+                h+='<text class="sch-sub" x="91" y="290" text-anchor="end">HX approach</text>'+pInst(103,288,'TI','03','pv-atd','atd');
             } else {
                 h+='<text class="sch-sub" x="6" y="14">AIR-COOLED · L2A</text>';
                 h+='<rect class="sch-eq" data-tag="AIR-COIL" x="86" y="40" width="34" height="150" rx="3"><title>Air coil and fans (the L2A type rejects to room air)</title></rect>';
-                h+='<text class="sch-lbl" x="103" y="118" text-anchor="middle" transform="rotate(-90 103 118)">AIR COIL + FANS</text>';
-                h+='<path class="pipe-hot flow on" d="M103 40 V12"/><text class="sch-sub" x="98" y="28" text-anchor="end">room air ↑ (no FWS)</text>';
+                h+='<text class="sch-lbl" x="103" y="148" text-anchor="middle" transform="rotate(-90 103 148)">AIR COIL + FANS</text>';
+                h+='<path class="pipe-hot flow on" d="M95 40 V12"/><text class="sch-sub" x="90" y="28" text-anchor="end">room air ↑ (no FWS)</text>';
                 h+=pInst(103,288,'TI','03','pv-atd','atd');
             }
             // ===== CDU envelope =====
             h+='<rect x="130" y="18" width="270" height="318" rx="6" fill="none" stroke="var(--bm-cyan)" stroke-dasharray="3 3" stroke-width="1"/>';
             h+='<text class="sch-sub" x="340" y="30">CDU SKID</text>';
             // expansion tank T-01 + makeup MV-01 + relief PSV-01 (top)
-            h+='<rect class="sch-eq" x="150" y="40" width="22" height="30" rx="10"/><path class="sch-eq2" d="M150 58 H172"/><text class="sch-sub" x="161" y="80" text-anchor="middle">T-01 EXP</text>';
+            h+='<rect class="sch-eq" x="150" y="40" width="22" height="30" rx="10"/><path class="sch-eq2" d="M150 58 H172"/><text class="sch-sub" x="152" y="80">T-01 EXP</text>';
             h+=pInst(196,52,'LT','01','pv-level','level');
-            h+='<path class="pipe-s" d="M161 40 V30 H120" stroke-dasharray="2 2"/>'+pHV(140,30,'MV-01')+'<text class="sch-sub" x="122" y="39">makeup</text>';
+            h+='<path class="pipe-s" d="M161 40 V30 H120" stroke-dasharray="2 2"/>'+pHV(140,30,'')+'<text class="sch-sub" x="128" y="19" text-anchor="end">MV-01</text><text class="sch-sub" x="128" y="27" text-anchor="end">makeup</text>';
             h+='<path class="sch-eq2" d="M161 40 V26 M156 26 l5 -6 l5 6" /><text class="sch-sub" x="178" y="26">PSV-01</text>';
             // pumps P-01A duty / P-01B standby (N+1) with suction iso, check, discharge iso
             h+=pPump(175,150,'P-01A '+(pumpAon?'(duty)':'(off)'),pumpAon,slow);
@@ -673,7 +673,7 @@
             h+='<path class="pipe-s '+fcls+'" d="M248 150 H388 V60"/>';                  // filter → TCS supply header out
             // ===== secondary TCS to rack =====
             h+=pInst(355,60,'TT','01','pv-sup','supply')+'<text class="sch-sub" x="355" y="44" text-anchor="middle">TCS supply</text>';
-            h+=pHV(388,90,'HV-03')+'<text class="sch-sub" x="404" y="90" text-anchor="start">bal BV-01</text>';
+            h+=pHV(388,90,'')+'<text class="sch-sub" x="379" y="90" text-anchor="end">HV-03</text><text class="sch-sub" x="379" y="99" text-anchor="end">bal BV-01</text>';
             h+='<text class="sch-sub" x="412" y="56">TCS →</text>';
             h+='<path class="pipe-s '+fcls+'" d="M388 60 H430 V120"/>';
             // rack manifold M-01 + QD couplers + cold plates

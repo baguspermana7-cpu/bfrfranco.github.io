@@ -1136,3 +1136,25 @@ RZSpBlock.bind(host, { recompute })  → wires sliders (input → recompute → 
   - T3 cdu: the SETPOINT note follows a planted registry (In-Row 32 → 31 °C, 1.6 → 1.5 bar). Red: no PDIC-02 in the
     note.
 - **Count:** the registry builder reports 117 rows, 28 setpoints (one new row); drawn loops on Conventional pages +2.
+
+## C22. The CDU P&ID text measured (2026-11-28, v3.117.1)
+
+- **Why:** C21 found two label collisions on the CDU drawing by eye. No gate measured that drawing: the sheet
+  text-clear gate covers the five rz-hmi-sheet drawings only.
+- **New gate** `tools/test-cdu-pid-text-clear.mjs` (ship gate, in the conv release set): all five CDU types at 1440 px.
+  - X1: no text over text.
+  - X2: no stroked line through a text. Ink boxes are used, and stroke width counts.
+  - X3: nothing outside the frame.
+- **Red on v3.117.0:** 48 findings, 8 to 10 per type.
+- **Fixed by moving labels only; no symbol and no value changed:**
+  - HV-03 and bal BV-01 now sit left of the riser.
+  - The T-01 EXP tag moved right of the suction header.
+  - The P-01A/B tags moved +4 to clear the header.
+  - The MV-01 and makeup tags moved outside the skid envelope.
+  - Two E-01 plate lines moved off the HX name.
+  - HX approach moved beside TI-03.
+  - The AIR COIL + FANS name moved below the TIC-01 signal.
+  - The L2A room-air riser moved to x 95.
+  - The L2L "supply" label moved under its pipe.
+- **Plant:** `RZ_CDU_TEXT_PLANT=1` puts HV-03 back on the riser, and the gate turns red.
+

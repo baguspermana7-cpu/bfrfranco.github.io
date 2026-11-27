@@ -11,6 +11,26 @@ release sections rather than semver.
 
 ---
 
+## v3.117.1 — 2026-11-28 — CDU P&ID: every label clear of every line, on all five CDU types
+
+**The hand-drawn CDU P&ID is measured like the sheet drawings** (PRD-SETPOINT-SIM §C22)
+
+### Added
+- `tools/test-cdu-pid-text-clear.mjs` (ship gate, in the conv release set, now 108 steps): on cdu-mini-bms at 1440 px,
+  for In-Rack, In-Row, Sidecar, L2L and L2A: X1 no text over text, X2 no stroked line (pipe, signal, valve, bubble,
+  skid envelope) through a text, X3 no text outside the frame. Ink boxes, not em boxes; a line's stroke width counts.
+  Red on v3.117.0 with 48 findings; `RZ_CDU_TEXT_PLANT=1` turns it red again. `RZ_CDU_SHOT=<dir>` writes one PNG per type.
+
+### Fixed
+- `cdu-mini-bms.html` P&ID labels, positions only (no symbol, pipe or value changed): HV-03 and bal BV-01 off the
+  supply riser; T-01 EXP and P-01A/B tags off the suction header; MV-01 and makeup off the skid envelope and the
+  valve; two E-01 plate lines off the HX name; HX approach off the TCS return; AIR COIL + FANS off the TIC-01 signal;
+  L2A room-air riser to x 95; L2L "supply" under its pipe, clear of HV-01.
+
+### Docs
+- `standarization/CONVENTIONAL_DC_OPERATIONS_STANDARD.md` rule 26b; `CONTROL_SETPOINT_STANDARD.md` (hand-drawn P&ID
+  bullet); `documentation/prd/PRD_SETPOINT_SIM.md` §C22.
+
 ## v3.117.0 — 2026-11-28 — DC AI: a warm inlet is an alarm; the whole building on Room Layout
 
 **A cold aisle point above its limit raises an alarm, and the building overview shows its ground floor** (PRD-DCAI-HALL-DEPTH

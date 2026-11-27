@@ -182,6 +182,8 @@ range). Otherwise it is fixed, and the modal says what fixes it.
   ISA-5.1 panel bubble per loop with `data-loop="<tag>"`, its setpoint printed under it from the registry, and dashed
   `path.sch-sig` signal lines from the transmitter and to what it drives (`data-tag` on the driven symbol). No other
   `data-loop` bubble may exist on that drawing. Gate: S8e cdu in `test-typed-control-numbers.mjs`.
+  Its labels, setpoint text included, clear every line and every other label on all five CDU types
+  (`tools/test-cdu-pid-text-clear.mjs`, v3.117.1).
 
 ## 5. Gates
 

@@ -330,6 +330,15 @@ Before release:
     holding a sheet needs `min-width: 0`).
 
 
+26b. **The hand-drawn CDU P&ID is held to the same rule (v3.117.1, `tools/test-cdu-pid-text-clear.mjs`, ship gate).**
+    cdu-mini-bms draws its P&ID with its own string builder, so rule 26's gate never saw it. At 1440 px on all five
+    CDU types: X1 no two texts overlap, X2 no stroked outline (pipe, signal, valve, bubble, envelope) passes through a
+    text, X3 no text leaves the frame. A text box is its INK box (glyph advances × measured ascent/descent), not the
+    em box, so an ISA bubble's divider under "TIC" is not a hit; a line's ink is its centre line plus half its stroke
+    width, so a 3-unit pipe grazing a tag is. Proven red on v3.117.0: 48 findings (HV-03, T-01 EXP and P-01A tags on
+    pipes, E-01 PLATE HX struck by its own plate lines, HX approach by the TCS return, AIR COIL + FANS by the TIC-01
+    signal, MV-01 / makeup on the skid envelope). A new label on this drawing is placed by this gate, not by eye.
+
 27. **The sheet tells the truth about flow, state and quality (W4, PRD-CONV-BMS-UIUX, `js/conv/sheet-truth.js`,
     gates `tools/test-conv-bms-truth.mjs` + `tools/test-conv-sheet-perf.mjs`).** On fire, chiller, water and fuel:
     every drawn flow is a point with a quality; an edge moves only when its point is good and > 0, a good 0 is
