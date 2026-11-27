@@ -53,3 +53,36 @@ operating-point chips were pushed under the floor (FL7 red).
 - The egress adequacy of the 1 m row-end aisle (decision 1) is not checked against a code clause.
 - `HV-P1` (Cooling lens values on every unit) is red on origin as well. It is not in the release gate set and is not
   changed here.
+
+## Follow-up (2026-11-28): the 1 m row-end aisle against the egress clauses
+
+Decision 1 leaves a 1 m walkway along the row ends and marks it ASSUMED. Checked on 2026-11-28 against published
+adoptions of IBC 2021 chapter 10. The base ICC text was not retrieved; the figures below are from state and local
+adoptions that carry the model-code values.
+
+- **Aisle minimum (IBC §1018):** clear width by the occupant load served (§1005.1), and not less than 36 in (914 mm).
+  Minnesota adoption, Minn. R. 1305.1018:
+  https://www.law.cornell.edu/regulations/minnesota/Minn-R-1305-1018
+- **Aisles outside assembly, Group B and Group M (§1018.5):** width by §1005.1 and not less than the corridor width the
+  code requires. California guide: https://corada.com/documents/2022CBCPG/1018-5-aisles-in-other-than-assembly-spaces-and-groups-b-and-m
+- **Corridor width table:** 44 in (1,118 mm) in general, 36 in (914 mm) where the occupant load is under 50, 24 in
+  (610 mm) for access to mechanical, plumbing or electrical equipment. Chicago adoption:
+  https://codelibrary.amlegal.com/codes/chicago/latest/chicago_il/0-0-0-2665038 (numbered 1020.2 there).
+
+What that means for this hall (62 m x 23.1 m = 1,432 m² = 15,414 ft²):
+
+| reading of the code | occupants | required | 1 m aisle |
+|---|---|---|---|
+| aisle minimum (§1018) | any | 914 mm | passes, +86 mm |
+| equipment-access width | n/a | 610 mm | passes |
+| §1018.5 -> corridor, occupant load < 50 | < 50 | 914 mm | passes |
+| §1018.5 -> corridor, occupant load >= 50 | >= 50 | 1,118 mm | **short by 118 mm** |
+
+The occupant load decides it. Table 1004.5 gives 300 ft² per occupant for storage/mechanical use, which is 52
+occupants here (>= 50). An approved actual count (a data hall staffed by a few technicians) is permitted under §1004.
+So the 1 m aisle is adequate only if the hall's occupant load is set below 50 by the authority, or the walkway counts
+as equipment access.
+
+**Status:** still ASSUMED, now with the condition named. Widening it to 1.12 m would add 0.12 m to the width stack
+(`geometry.widthM` 23.1 -> 23.22) and move every derived consumer. That is a design decision for the owner, not a
+silent fix. Not checked: NFPA 101 (life safety) and the local adoption that would govern a real site.
