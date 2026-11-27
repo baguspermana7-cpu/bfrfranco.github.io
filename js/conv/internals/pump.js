@@ -32,7 +32,7 @@
     { id: 'pi1', tag: 'PI SUCTION', sym: 'instField', x: 250, y: 140, size: 30, tagAt: 'at', tagXY: [0, -22], label: 'Suction pressure indicator',
       values: [{ k: 'p', dx: 22, dy: 4, anchor: 'start', lod: 1 }] },
     { id: 'pmp', tag: 'PUMP', sym: 'pumpCentrifugal', x: 330, y: 230, size: 60, tagAt: 'at', tagXY: [0, -40], label: 'End-suction centrifugal pump: impeller, volute, mechanical seal, bearings',
-      values: [{ k: 'q', dx: 0, dy: 48, anchor: 'middle', lod: 1 }, { k: 'h', dx: 0, dy: 64, anchor: 'middle', lod: 1 }] },
+      values: [{ k: 'q', dx: -8, dy: 48, anchor: 'end', lod: 1 }, { k: 'h', dx: -8, dy: 64, anchor: 'end', lod: 1 }] },   /* left of the shaft (x 330): a centred value sat on it */
     { id: 'ck', tag: 'CHECK', sym: 'valveCheck', x: 440, y: 230, size: 30, tagAt: 'at', tagXY: [0, -22], label: 'Discharge check valve',
       values: [{ k: 'st', dx: 0, dy: 34, anchor: 'middle', lod: 1 }] },
     { id: 'pi2', tag: 'PI DISCHARGE', sym: 'instField', x: 510, y: 140, size: 30, tagAt: 'at', tagXY: [0, -22], label: 'Discharge pressure indicator',

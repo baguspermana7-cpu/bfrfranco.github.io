@@ -338,6 +338,15 @@ Before release:
     width, so a 3-unit pipe grazing a tag is. Proven red on v3.117.0: 48 findings (HV-03, T-01 EXP and P-01A tags on
     pipes, E-01 PLATE HX struck by its own plate lines, HX approach by the TCS return, AIR COIL + FANS by the TIC-01
     signal, MV-01 / makeup on the skid envelope). A new label on this drawing is placed by this gate, not by eye.
+26c. **Every equipment Inside drawing is held to the same ink-box rule (v3.117.3, `tools/test-conv-internals-text-clear.mjs`,
+    ship gate).** The internals gates (render I8, P3-5, EL5, EB6) measure text on the em box and against pipe edges
+    only. This gate opens one unit of each internals class at 1440 px (chiller, CHW secondary pump, CRAH, CDW pump, tower
+    cell, genset, HV and distribution transformer, breaker, relay, UPS): N1 no text over text, N2 no stroked shape
+    (pipe, signal, shaft line, symbol outline, flange) through a text with stroke width counted, N3 nothing outside the
+    frame. Proven red on v3.117.1: 20 findings (genset ECU / GOVERNOR on the start cable, RADIATOR and its value on the
+    jacket-water riser; pump flow and head on the shaft line; the chiller TT and TIC letters touching bubbles drawn at
+    size 22 and 36). An ISA bubble on an internals drawing is drawn at size 30 or more (field) and 44 or more (panel), so
+    its 8.5 px letters clear the circle.
 
 27. **The sheet tells the truth about flow, state and quality (W4, PRD-CONV-BMS-UIUX, `js/conv/sheet-truth.js`,
     gates `tools/test-conv-bms-truth.mjs` + `tools/test-conv-sheet-perf.mjs`).** On fire, chiller, water and fuel:

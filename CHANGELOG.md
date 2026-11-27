@@ -11,6 +11,28 @@ release sections rather than semver.
 
 ---
 
+## v3.117.3 — 2026-11-28 — Equipment insides: every label clear of every line, on all eleven drawings
+
+**The equipment Inside drawings are measured on the glyph ink, not the em box** (PRD-SETPOINT-SIM §C24)
+
+### Fixed
+- `js/conv/internals/genset.js` (fuel-system G-01 inside): "ECU / GOVERNOR" sat on the start-battery cable; it moves
+  14 units right. "RADIATOR" and its jacket-water value sat on the jacket-water riser; they move left of it, and the
+  JW heater moves to x 240 to make room.
+- `js/conv/internals/pump.js` (CDW and CHW pump insides): flow and head sat on the shaft line; they are right-aligned
+  left of it.
+- `js/conv/internals/chiller.js` (CH-01 inside): the TT-CHWS and TIC-CHWS bubbles were too small for their 8.5 px
+  letters (size 22 and 36, letters touching the circle); they are drawn at 30 and 44, and the signal lines end at the new
+  symbol edges. No value, symbol or connection changed.
+
+### Gates
+- New `tools/test-conv-internals-text-clear.mjs` (ship gate, conv release set): one unit of each of 11 internals
+  classes at 1440 px (chiller, CHW secondary pump, CRAH, CDW pump, tower cell, genset, HV and distribution
+  transformer, breaker, relay, UPS). N1 no text over text, N2 no stroked shape (pipe, signal, shaft, symbol outline)
+  through a text with stroke width counted, N3 nothing outside the frame. Red on v3.117.1: 20 findings in 4 drawings.
+  `RZ_INT_TEXT_PLANT=1` puts a value on a pipe: all 11 cases go red.
+- Standard: `CONVENTIONAL_DC_OPERATIONS_STANDARD.md` rule 26c.
+
 ## v3.117.2 — 2026-11-28 — Chiller plant: the DP KPI is the remote DP that PDT-01 reads
 
 **The plant KPI no longer averages hand-typed loop DPs with noise** (PRD-SETPOINT-SIM §C P11, G12)

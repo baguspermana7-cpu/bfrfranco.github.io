@@ -104,15 +104,15 @@
     var sp = L.sp;
     return { mv: L.mv.node, sp: sp,
       nodes: [
-        { id: L.pv.node, tag: L.pv.tag, sym: 'instField', x: 444, y: 450, size: 22, inst: L.pv.tag.split('-')[0], tagAt: 'at', tagXY: [14, 4, 'start'], loop: sp,
+        { id: L.pv.node, tag: L.pv.tag, sym: 'instField', x: 444, y: 450, size: 30, inst: L.pv.tag.split('-')[0], tagAt: 'at', tagXY: [18, 4, 'start'], loop: sp,
           label: L.pv.tag + ' — ' + L.pv.what },
-        { id: 'tic', tag: L.tag, sym: 'instPanel', x: 700, y: 470, size: 36, inst: L.tag.split('-')[0], tagAt: 'at', tagXY: [0, 32], loop: sp,
+        { id: 'tic', tag: L.tag, sym: 'instPanel', x: 700, y: 470, size: 44, inst: L.tag.split('-')[0], tagAt: 'at', tagXY: [0, 36], loop: sp,
           label: L.tag + ' — ' + L.label + ' controller (' + L.action + ' acting ' + L.kind + ')',
-          values: [{ k: 'sp', dx: 0, dy: 48, anchor: 'middle', lod: 1 }, { k: 'out', dx: 0, dy: 64, anchor: 'middle', lod: 1 }] }],
+          values: [{ k: 'sp', dx: 0, dy: 52, anchor: 'middle', lod: 1 }, { k: 'out', dx: 0, dy: 68, anchor: 'middle', lod: 1 }] }],
       edges: [
-        { id: 'l-pvi', from: [414, 450], to: [433, 450], medium: 'line', w: 'inst', loop: sp },
-        { id: 'l-pv', from: [444, 461], to: [682, 470], via: [[444, 590], [662, 590], [662, 470]], medium: 'line', w: 'signal', loop: sp },
-        { id: 'l-mv', from: [700, 452], to: [712, 320], via: [[700, 400], [728, 400], [728, 320]], medium: 'line', w: 'signal', loop: sp }] };
+        { id: 'l-pvi', from: [414, 450], to: [429, 450], medium: 'line', w: 'inst', loop: sp },
+        { id: 'l-pv', from: [444, 465], to: [678, 470], via: [[444, 590], [662, 590], [662, 470]], medium: 'line', w: 'signal', loop: sp },
+        { id: 'l-mv', from: [700, 448], to: [712, 320], via: [[700, 400], [728, 400], [728, 320]], medium: 'line', w: 'signal', loop: sp }] };
   }
   function sheet(unit) {
     var tag = (unit && unit.tag) || 'CH', lp = unitLoop();

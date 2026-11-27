@@ -1168,3 +1168,16 @@ RZSpBlock.bind(host, { recompute })  → wires sliders (input → recompute → 
 - **Law S12** in `tools/test-setpoint-sim.mjs`: the KPI equals the registry 90 kPa and does not move between ticks;
   the label names PDT-01; in MAINT at 120 kPa the KPI reads 120. Red on b9cd070ed: 80 → 79 kPa, label "Header DP".
   Green 496/496.
+
+## C24. Equipment Inside drawings measured on ink (2026-11-28, v3.117.3)
+
+- **Why:** the C22 method (ink boxes, stroke width, every stroked shape) found 48 hits on a drawing whose checks were
+  green. The equipment Inside drawings had the same blind spot: em boxes, pipe edges only.
+- **New gate** `tools/test-conv-internals-text-clear.mjs` (ship gate, conv release set): 11 classes at 1440 px, N1-N3.
+- **Red on v3.117.1:** 20 findings in 4 drawings (chiller 4, CHW and CDW pump 2 each, genset 12); 7 drawings clean.
+- **Fixed by moving labels and resizing two bubbles; no value changed:**
+  - genset: ECU / GOVERNOR tag +14 right of the start cable; RADIATOR and its value left of the jacket-water riser;
+    the JW heater moved to x 240 so the radiator labels have room.
+  - pumps: flow and head right-aligned left of the shaft line.
+  - chiller loop: TT-CHWS bubble size 22 -> 30, TIC-CHWS 36 -> 44, signal endpoints moved to the new symbol edges.
+- **Plant:** `RZ_INT_TEXT_PLANT=1` moves the first value text of each drawing onto its first pipe; every case goes red.

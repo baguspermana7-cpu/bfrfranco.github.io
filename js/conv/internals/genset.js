@@ -43,14 +43,14 @@
     { id: 'sync', tag: 'SYNC', sym: 'protectionRelay', x: 700, y: 450, size: 30, tagAt: 'at', tagXY: [0, -22], label: 'Synchroniser / load-share controller' },
     { id: 'avr', tag: 'AVR', sym: 'instPanel', x: 620, y: 230, size: 36, tagAt: 'at', tagXY: [0, -24], label: 'Automatic voltage regulator',
       values: [{ k: 'pf', dx: 26, dy: 4, anchor: 'start', lod: 1 }] },
-    { id: 'ecu', tag: 'ECU / GOVERNOR', sym: 'instPlc', x: 470, y: 150, size: 40, tagAt: 'at', tagXY: [0, -26], label: 'Engine control unit and speed governor',
+    { id: 'ecu', tag: 'ECU / GOVERNOR', sym: 'instPlc', x: 470, y: 150, size: 40, tagAt: 'at', tagXY: [14, -26], label: 'Engine control unit and speed governor',
       values: [{ k: 'mode', dx: 30, dy: -8, anchor: 'start', lod: 1 }] },
     { id: 'af', tag: 'AIR FILTER', sym: 'filterCartridge', x: 320, y: 230, size: 30, tagAt: 'at', tagXY: [0, -22], label: 'Combustion air intake filter' },
     { id: 'exh', tag: 'EXHAUST', sym: 'offSheet', x: 640, y: 160, size: 22, tagAt: 'at', tagXY: [14, 4, 'start'], label: 'Exhaust and silencer' },
-    { id: 'rad', tag: 'RADIATOR', sym: 'coolingCoil', x: 470, y: 500, size: 56, tagAt: 'at', tagXY: [-62, 4, 'end'], label: 'Engine jacket-water radiator',
-      values: [{ k: 't', dx: -62, dy: 20, anchor: 'end', lod: 1 }] },
+    { id: 'rad', tag: 'RADIATOR', sym: 'coolingCoil', x: 470, y: 500, size: 56, tagAt: 'at', tagXY: [-72, 4, 'end'], label: 'Engine jacket-water radiator',   /* left of the jacket-water riser (x 408), not on it */
+      values: [{ k: 't', dx: -72, dy: 20, anchor: 'end', lod: 1 }] },
     { id: 'fan', tag: 'RAD FAN', sym: 'fanAxial', x: 560, y: 500, size: 36, tagAt: 'at', tagXY: [0, 34], label: 'Radiator fan (engine-driven or electric)' },
-    { id: 'jwh', tag: 'JW HEATER', sym: 'resistor', x: 300, y: 500, size: 30, tagAt: 'at', tagXY: [-20, 4, 'end'], label: 'Jacket-water heater (standby)' },
+    { id: 'jwh', tag: 'JW HEATER', sym: 'resistor', x: 240, y: 500, size: 30, tagAt: 'at', tagXY: [-20, 4, 'end'], label: 'Jacket-water heater (standby)' },
     { id: 'bat', tag: 'START BATTERY', sym: 'batteryIec', x: 230, y: 150, size: 36, tagAt: 'at', tagXY: [24, 4, 'start'], label: 'Starter battery',
       values: [{ k: 'v', dx: 24, dy: 20, anchor: 'start', lod: 1 }] },
     { id: 'chg', tag: 'CHARGER', sym: 'rectifier', x: 110, y: 150, size: 36, tagAt: 'at', tagXY: [0, -24], label: 'Battery charger' }
@@ -67,7 +67,7 @@
     /* jacket water */
     { id: 'w-out', from: [440, 380], to: 'rad.waterIn', via: [[440, 410], [408, 410], [408, 560], [456, 560]], medium: 'htw', flowOf: 'jw' },
     { id: 'w-ret', from: 'rad.waterOut', to: [490, 380], via: [[484, 560], [520, 560], [520, 410], [490, 410]], medium: 'htw', flowOf: 'jw' },
-    { id: 'w-jwh', from: 'jwh.load', to: [408, 535], via: [[300, 535]], medium: 'htw', flowOf: 'jwh' },
+    { id: 'w-jwh', from: 'jwh.load', to: [408, 535], via: [[240, 535]], medium: 'htw', flowOf: 'jwh' },
     { id: 'a-rad', from: 'rad.airOut', to: 'fan.inlet', medium: 'air', flowOf: 'air' },
     /* power and control */
     { id: 'e-shaft', from: 'eng.out', to: [592, 330], medium: 'line', w: 'inst' },
