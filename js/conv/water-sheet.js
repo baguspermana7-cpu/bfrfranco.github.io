@@ -90,6 +90,27 @@
     { id: 'e-dr2', from: 'jd1', to: 'drain.port', medium: 'dr', w: 'main', flowOf: 'run' }
   ];
 
+  /* PRD-SETPOINT-SIM §C P9 (v3.115.2): the booster set's pressure controller PIC-301 as an ISA-5.1 panel bubble, from the
+     control registry (RZControlPoints.loops('wt-m-101'), PI). PT-301 on the common discharge signals the controller; the
+     controller trims the duty pump's speed. No tag or number is typed here: the registry loop names its transmitter
+     (pv.node) and its pump (mv.node); the page writes the setpoint. instPanel geometry (48-unit box): circle centre 4/48
+     of the size above the node centre, radius 14/48. */
+  var C = root.RZControlPoints;
+  (C && typeof C.loops === 'function' ? C.loops('wt-m-101') : []).forEach(function (L) {
+    var pv = null, mv = null;
+    nodes.forEach(function (nd) { if (nd.id === L.pv.node) pv = nd; if (nd.id === L.mv.node) mv = nd; });
+    if (!pv || !mv) return;
+    var id = 'pic301', x = 566, y = 182, sz = 30, ccy = y - 4 * sz / 48, r = 14 * sz / 48;
+    nodes.push({ id: id, tag: L.tag, sym: 'instPanel', x: x, y: y, size: sz, inst: 'PIC', tagAt: 'left', loop: L.sp, ctrl: mv.id,
+      label: mv.tag + ' pressure controller (' + L.action + ' acting ' + L.kind + ')',
+      values: [{ k: 'sp', dx: 0, dy: -sz / 2 - 6, anchor: 'middle', lod: 1, const: 'booster discharge setpoint from the control registry (' + L.sp + ')' }] });
+    /* transmitter -> controller: from PT-301's left edge, level with the controller circle */
+    edges.push({ id: 'e-ps-' + id, from: [pv.x - 14 * pv.size / 48, pv.y - 4], to: [x + r, ccy], via: [[598, pv.y - 4], [598, ccy]], w: 'signal', medium: 'line', loop: L.sp });
+    /* controller -> duty pump: down the right of the pump tag to the pump's upper right */
+    edges.push({ id: 'e-pm-' + id, from: [x, ccy + r], to: [mv.x + mv.size / 2 - 2, mv.y - 8], via: [[x, mv.y - 8]], w: 'signal', medium: 'line', loop: L.sp });
+    pv.loop = L.sp; mv.loop = L.sp;
+  });
+
   root.RZWaterSheets = {
     pid: {
       id: 'wt-m-101', no: 'WT-M-101', title: 'SITE WATER · TREATMENT · TOWER MAKE-UP', rev: 'A', basis: 'ISA-5.1 · ISO 10628',

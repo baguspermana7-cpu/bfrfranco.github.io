@@ -18,7 +18,9 @@
  *
  * S8e (--browser, P9 part 2): the fire pump controllers PC-JP1 / PC-FP1 / PC-FP2 on FS-M-101, one ISA-5.1 panel bubble each
  *   from the registry, own sensing line, signal to its pump, cut-in (/ cut-out) printed = registry, no orphan bubble;
- *   one LIC per day tank on FU-M-101, level line from its tank, signal to its fill valve, fill start / stop = registry.
+ *   one LIC per day tank on FU-M-101, level line from its tank, signal to its fill valve, fill start / stop = registry;
+ *   PIC-301 on WT-M-101 (v3.115.2): one panel bubble, a signal from PT-301, a signal to the duty booster P-301A, the
+ *   registry discharge setpoint printed, and PT-301 prints the same number (steady state: the booster holds it).
  *
  * Usage: node tools/test-typed-control-numbers.mjs [--list] [--baseline] [--browser]
  *        (--baseline only after a deliberate cut; RZ_T3_NOPLANT=1 turns the plant run into an unplanted one: red check)
@@ -65,7 +67,7 @@ if (!process.argv.includes('--browser') || fail) process.exit(fail ? 1 : 0);
 const http = await import('node:http');
 const { default: puppeteer } = await import('puppeteer');
 const { primeCockpitAuditDocument, enterAuthorizedAuditState } = await import('./lib/cockpit-audit-state.mjs');
-const PLANT = [['"conv.fire-system.jockey_on": 11.5', '"conv.fire-system.jockey_on": 11'], ['"conv.fuel-system.day_tank_fill_start": 50', '"conv.fuel-system.day_tank_fill_start": 55'], ['"inrow": 32', '"inrow": 31']];
+const PLANT = [['"conv.fire-system.jockey_on": 11.5', '"conv.fire-system.jockey_on": 11'], ['"conv.fuel-system.day_tank_fill_start": 50', '"conv.fuel-system.day_tank_fill_start": 55'], ['"inrow": 32', '"inrow": 31'], ['"conv.water-system.booster_discharge_sp": 4.2', '"conv.water-system.booster_discharge_sp": 4']];
 let planted = false;
 const TYPES = { html: 'text/html', js: 'text/javascript', css: 'text/css', json: 'application/json', svg: 'image/svg+xml', png: 'image/png', woff2: 'font/woff2' };
 const srv = http.createServer((req, res) => {
@@ -92,6 +94,9 @@ const read = {
     const t = n && s.querySelector('[data-val="' + n.getAttribute('data-node') + ':sp"]'); return t ? t.textContent.trim() : ''; },
   /* S8e: the first day-tank level controller prints the registry's fill start / stop */
   'fuel-system#lic': () => { const t = document.querySelector('#fuel-sheet-host [data-val="lc1:sp"]'); return t ? t.textContent.trim() : ''; },
+  /* PIC-301 prints the booster discharge setpoint; PT-301 prints the pressure it holds (the same number at steady state) */
+  'water-system#pic': () => { const t = document.querySelector('#water-svg [data-val="pic301:sp"], [data-val="pic301:sp"]'); return t ? t.textContent.trim() : ''; },
+  'water-system': () => { const t = document.querySelector('[data-val="pt301:p"]'); return t ? t.textContent.trim() : ''; },
   'fuel-system': () => { const l = document.querySelector('#fuel-dt-basis [data-basis-line]'), m = l && /fill \d+(?:\.\d+)?→\d+(?:\.\d+)? %/.exec(l.textContent); return m ? m[0] : ''; },
   /* the note must also fit its drawing: a text past the viewBox is cut off (red at 1440 with the first, longer note) */
   'cdu-mini-bms': () => { const n = [...document.querySelectorAll('svg text')].find((x) => /SETPOINT/.test(x.textContent)); if (!n) return '';
@@ -99,8 +104,8 @@ const read = {
     return n.textContent.replace(/^.*?SETPOINT/, 'SETPOINT') + (over > 0.5 ? ' [past the drawing by ' + over.toFixed(1) + ']' : ''); }
 };
 const want = {
-  false: { 'fuel-system#lic': /^50 \/ 90 %$/, 'fire-system#pc': /^11\.5 \/ 12\.8 bar$/, 'fire-system': /^11\.5 \/ 12\.8 bar$/, 'fuel-system': /^fill 50→90 %$/, 'cdu-mini-bms': /TT-01 = 32 °C \(floor 18 °C\)(?!.*past the drawing)/ },
-  true: { 'fuel-system#lic': /^55 \/ 90 %$/, 'fire-system#pc': /^11\.0 \/ 12\.8 bar$/, 'fire-system': /^11\.0 \/ 12\.8 bar$/, 'fuel-system': /^fill 55→90 %$/, 'cdu-mini-bms': /TT-01 = 31 °C \(floor 18 °C\)(?!.*past the drawing)/ }
+  false: { 'water-system#pic': /^SP 4\.2 bar$/, 'water-system': /^4\.2 bar$/, 'fuel-system#lic': /^50 \/ 90 %$/, 'fire-system#pc': /^11\.5 \/ 12\.8 bar$/, 'fire-system': /^11\.5 \/ 12\.8 bar$/, 'fuel-system': /^fill 50→90 %$/, 'cdu-mini-bms': /TT-01 = 32 °C \(floor 18 °C\)(?!.*past the drawing)/ },
+  true: { 'water-system#pic': /^SP 4\.0 bar$/, 'water-system': /^4\.0 bar$/, 'fuel-system#lic': /^55 \/ 90 %$/, 'fire-system#pc': /^11\.0 \/ 12\.8 bar$/, 'fire-system': /^11\.0 \/ 12\.8 bar$/, 'fuel-system': /^fill 55→90 %$/, 'cdu-mini-bms': /TT-01 = 31 °C \(floor 18 °C\)(?!.*past the drawing)/ }
 };
 let bad = 0;
 for (const pl of [false, true]) {
@@ -198,6 +203,58 @@ for (const pl of [false, true]) {
   if (errs.length) f.push('page errors ' + errs.slice(0, 2).join(' | '));
   f.forEach((x) => console.log('FAIL S8e fuel ' + x)); bad += f.length;
   console.log(`${f.length ? 'FAIL' : 'PASS'} S8e day-tank level controllers on FU-M-101: ${g.rows ? g.rows.length : 0} tanks, ${g.bubbles || 0} LIC, "${g.want || ''}"`);
+  await pg.close();
+}
+/* S8e water (v3.115.2): PIC-301 on WT-M-101, the booster set's pressure controller: one instPanel bubble, a signal from
+   the transmitter PT-301 (pv.node) and a signal to the duty booster pump (mv.node), the registry setpoint printed; no
+   other panel bubble on the sheet */
+{
+  planted = false;
+  const pg = await browser.newPage(), errs = []; pg.on('pageerror', (e) => errs.push(e.message));
+  await pg.setViewport({ width: 1440, height: 900 }); await primeCockpitAuditDocument(pg, 'dark');
+  await pg.goto(ORIGIN + 'water-system.html', { waitUntil: 'networkidle2', timeout: 90000 });
+  try { await enterAuthorizedAuditState(pg, 'water-system'); } catch (e) { /* public */ }
+  await new Promise((r) => setTimeout(r, 3000));
+  const g = await pg.evaluate(() => {
+    const C = window.RZControlPoints, L = C ? C.loops('wt-m-101') : [], svg = document.getElementById('water-svg') || document.querySelector('.hmi-svg');
+    if (!svg) return { loops: L.length, err: 'no sheet' };
+    const nodes = [...svg.querySelectorAll('.hmi-node')], by = (id) => nodes.find((n) => n.getAttribute('data-node') === id);
+    const near = (pt, n, pad) => { const b = n.getBBox(); return pt[0] >= b.x - pad && pt[0] <= b.x + b.width + pad && pt[1] >= b.y - pad && pt[1] <= b.y + b.height + pad; };
+    const sig = [...svg.querySelectorAll('path.hmi-edge.w-signal')].map((p) => { const a = p.getPointAtLength(0), b = p.getPointAtLength(p.getTotalLength()); return [[a.x, a.y], [b.x, b.y]]; });
+    const joins = (x, y) => (x && y ? sig.filter((e) => (near(e[0], x, 6) && near(e[1], y, 6)) || (near(e[1], x, 6) && near(e[0], y, 6))).length : 0);
+    const bubbles = nodes.filter((n) => n.getAttribute('data-sym') === 'instPanel').map((n) => (n.getAttribute('aria-label') || '').split(' — ')[0]);
+    return { loops: L.length, bubbles, rows: L.map((l) => {
+      const c = nodes.filter((n) => (n.getAttribute('aria-label') || '').startsWith(l.tag + ' — ')), c0 = c[0], t = c0 && svg.querySelector('[data-val="' + c0.getAttribute('data-node') + ':sp"]');
+      return { tag: l.tag, kind: l.kind, n: c.length, sym: c0 && c0.getAttribute('data-sym'), fromPv: joins(c0, by(l.pv.node)), toMv: joins(c0, by(l.mv.node)),
+        sp: t ? t.textContent.trim() : '', want: 'SP ' + C.value(l.sp).toFixed(1) + ' bar' }; }) };
+  });
+  const f = [];
+  if (g.err || g.loops !== 1) f.push(`registry loops on WT-M-101 ${g.loops} (want 1: PIC-301)${g.err ? ' · ' + g.err : ''}`);
+  for (const r of g.rows || []) {
+    if (r.n !== 1 || r.sym !== 'instPanel') f.push(`${r.tag}: ${r.n} bubbles (${r.sym}), want 1 instPanel`);
+    if (r.fromPv < 1) f.push(`${r.tag}: no signal from its transmitter`);
+    if (r.toMv < 1) f.push(`${r.tag}: no signal to the pump it drives`);
+    if (r.sp !== r.want) f.push(`${r.tag}: prints "${r.sp}", registry "${r.want}"`);
+  }
+  const orphan = (g.bubbles || []).filter((t) => !(g.rows || []).some((r) => r.tag === t));
+  if (orphan.length) f.push('orphan bubbles ' + orphan.join(', '));
+  if (errs.length) f.push('page errors ' + errs.slice(0, 2).join(' | '));
+  f.forEach((x) => console.log('FAIL S8e water ' + x)); bad += f.length;
+  console.log(`${f.length ? 'FAIL' : 'PASS'} S8e booster pressure controller on WT-M-101: ${(g.rows || []).map((r) => r.tag + ' ' + r.kind + ' ' + r.sp).join(' · ')}`);
+  await pg.close();
+}
+/* S8f (v3.115.2): a controller bubble's accessible name (and so its inspector title) says its tag once. The sheet engine
+   names a node "<tag> — <label>"; a label that starts with the tag again read "PIC-301 — PIC-301 — P-301A …" */
+for (const page of ['chiller-plant', 'fire-system', 'fuel-system', 'water-system']) {
+  planted = false;
+  const pg = await browser.newPage(); await pg.setViewport({ width: 1440, height: 900 }); await primeCockpitAuditDocument(pg, 'dark');
+  await pg.goto(ORIGIN + page + '.html', { waitUntil: 'networkidle2', timeout: 90000 });
+  try { await enterAuthorizedAuditState(pg, page); } catch (e) { /* public */ }
+  await new Promise((r) => setTimeout(r, 2500));
+  const g = await pg.evaluate(() => { const all = [...document.querySelectorAll('.hmi-node[aria-label]')].map((n) => n.getAttribute('aria-label'));
+    return { n: all.filter((a) => / controller \(/.test(a)).length, twice: all.filter((a) => /^(\S+) — \1 — /.test(a)) }; });
+  const ok = g.n > 0 && !g.twice.length; if (!ok) bad++;
+  console.log(`${ok ? 'PASS' : 'FAIL'} S8f ${page}: ${g.n} controller bubbles, ${g.twice.length} name their tag twice${g.twice.length ? ' (' + g.twice.slice(0, 2).join(' | ') + ')' : ''}`);
   await pg.close();
 }
 await browser.close(); srv.close();

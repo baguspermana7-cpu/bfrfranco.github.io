@@ -149,3 +149,47 @@ test('P9 pump differential-head trend follows the engine operating dp of its loo
   }
   assert.deepEqual([...seen].sort(), ['cdw-pump', 'chw-sec', 'chw-train'], 'every loop has a pump checked');
 });
+
+/* P10 (PRD-SETPOINT-SIM §C P9, v3.115.2): a day tank (FU-M-101 dt<k>) is not the bulk tank. It shares the symbol
+   tankStorage with the bulk UST, and until v3.115.1 it borrowed the bulk tank's class: Level / Usable volume / Autonomy
+   from fuel.level_pct, the bulk 60 / 30 / 95 % alarms and a trend on the bulk level (85 %) beside a day tank the drawing
+   prints at 90 %. Its alarms are the limits registry row its own level points at (limitsOf), its trend reference is that
+   row's nominal, and no row reads a bulk-tank parameter. */
+test('P10 a day tank prints its own limits and trend, never the bulk tank class', () => {
+  const sh = sheets.fuel, LIM = Object.fromEntries((REG.limits || []).map((l) => [l.id, l]));
+  const tanks = sh.nodes.filter((n) => n.sym === 'tankStorage' && /^dt\d+$/.test(n.id));
+  assert.ok(tanks.length >= 2, `FU-M-101 draws day tanks (${tanks.length})`);
+  const bulk = /^fuel\.(level_pct|usable_l|autonomy_hr|tank_capacity_l|usable_fraction|level_low_pct|level_low_low_pct|level_overfill_pct)$/;
+  for (const n of tanks) {
+    const lid = (n.values || []).map((v) => v.limitsOf).find(Boolean), L = LIM[lid];
+    assert.ok(L, `${n.tag} level points at a limits registry row (${lid})`);
+    const p = P.build({ page: 'fuel', node: n, read: { values: { pct: { text: '90 %' } } }, edges: sh.edges, nodes: sh.nodes, tick: 3 });
+    const rows = [...p.tabs.live, ...p.tabs.capacity, ...p.tabs.alarmPoints, ...(p.tabs.trend ? p.tabs.trend.rows : [])];
+    const leak = rows.filter((r) => r.basis && bulk.test(r.basis)).map((r) => r.label + ' <- ' + r.basis);
+    assert.deepEqual(leak, [], `${n.tag} reads no bulk-tank parameter`);
+    const al = p.tabs.alarmPoints.map((r) => +r.text).sort((a, b) => a - b);
+    assert.deepEqual(al, [L.lo_alarm, L.lo_warn].sort((a, b) => a - b), `${n.tag} alarms = ${lid} lo_alarm / lo_warn`);
+    assert.ok(p.tabs.alarmPoints.every((r) => r.unit === L.unit && new RegExp(lid.replace(/\./g, '\\.')).test(r.declared)), `${n.tag} alarm rows name the registry row and its unit`);
+    assert.ok(p.tabs.trend, `${n.tag} has a trend`);
+    assert.equal(p.tabs.trend.ref, L.nominal.value, `${n.tag} trend reference = ${lid} nominal`);
+    assert.ok(p.tabs.trend.series.every((v) => v <= 100 && v >= 0), `${n.tag} trend stays a level`);
+  }
+  /* the bulk tank keeps its class */
+  const ust = sh.nodes.find((n) => n.sym === 'tankStorage' && !/^dt\d+$/.test(n.id));
+  if (ust) {
+    const b = P.build({ page: 'fuel', node: ust, read: { values: {} }, edges: sh.edges, nodes: sh.nodes, tick: 3 });
+    assert.ok(b.tabs.live.some((r) => r.basis === 'fuel.level_pct'), 'the bulk tank still reads fuel.level_pct');
+  }
+});
+
+/* P11 (v3.115.2): a controller bubble (n.loop, no machine class) is a controller, not "instPanel", and the number it
+   prints from the control registry (a value spec with `const`) is a declared registry value, never a SIM reading */
+test('P11 a controller bubble names itself a controller and its registry number is not SIM', () => {
+  const n = { id: 'pic301', tag: 'PIC-301', sym: 'instPanel', loop: 'conv.water-system.booster_discharge_sp', ctrl: 'pump-duty', label: 'P-301A pressure controller (reverse acting PI)',
+    values: [{ k: 'sp', const: 'booster discharge setpoint from the control registry (conv.water-system.booster_discharge_sp)' }] };
+  const p = P.build({ page: 'water', node: n, read: { values: { sp: { text: 'SP 4.2 bar' } }, rows: [['Setpoint', '4.2 bar (registry, ASSUMED)']] }, edges: [], nodes: [n], tick: 1 });
+  assert.equal(p.kind, 'Controller', 'kind');
+  const sp = p.tabs.live.find((r) => r.text === 'SP 4.2 bar');
+  assert.ok(sp, 'the SP row is shown');
+  assert.ok(!sp.sim && sp.quality === 'declared' && /control registry/.test(sp.declared), `SP row is declared from the registry: ${JSON.stringify(sp)}`);
+});

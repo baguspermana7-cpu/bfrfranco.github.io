@@ -26,10 +26,13 @@
     if (!r || !Array.isArray(r.parameters)) return null;
     var idx = {};
     r.parameters.forEach(function (p) { idx[p.id] = p; });
-    REG = { engineVersion: r.engineVersion, idx: idx };
+    var lim = {};
+    (Array.isArray(r.limits) ? r.limits : []).forEach(function (l) { if (l && l.id) lim[l.id] = l; });
+    REG = { engineVersion: r.engineVersion, idx: idx, lim: lim };
     return REG;
   }
   function param(id) { var r = registry(); return r ? r.idx[id] || null : null; }
+  function limit(id) { var r = registry(); return r ? r.lim[id] || null : null; }
 
   function freeze(o) {
     if (o && typeof o === 'object' && !Object.isFrozen(o)) {
@@ -70,6 +73,9 @@
   function S(label, unit, base, amp, digits, period) { return { k: 'S', label: label, unit: unit, base: base, amp: amp, digits: digits, period: period }; }
   function SB(label, id, amp, digits, period) { return { k: 'SB', label: label, id: id, amp: amp, digits: digits, period: period }; }
   function D(label, text) { return { k: 'D', label: label, text: text }; }
+  /* a band of the one limits registry (data/conv-parameters.json limits, from data/conv-limits.curated.json): key = lo_warn,
+     lo_alarm, hi_warn, hi_alarm or nominal */
+  function L(label, id, key) { return { k: 'L', label: label, id: id, key: key }; }
 
   /* standards cited at document level (clause numbers only where the interval is the clause's own wording) */
   var STD = {
@@ -268,6 +274,17 @@
       al: [B('Low level', 'fuel.level_low_pct', 0), B('Low-low level', 'fuel.level_low_low_pct', 0), B('Overfill', 'fuel.level_overfill_pct', 0)],
       tr: { label: 'Level', id: 'fuel.level_pct', amp: 0.3, digits: 0 }, m: 'nfpa110fuel',
       g: 'Order fuel at the low level; at low-low the autonomy no longer covers the contracted delivery time.' },
+    /* a day tank (FU-M-101 dt<k>) shares the symbol with the bulk UST but not its numbers: its level, alarms and trend are
+       the limits registry row its own level points at (v3.115.2; until then it printed the bulk 60 / 30 / 95 % alarms
+       and a trend on the bulk level). classOf() picks it. */
+    'fuel:dayTank': { name: 'Day tank', role: 'Holds the running genset\'s own fuel between refills from the bulk tank',
+      live: [L('Normal level (fill-cycle midpoint)', 'fuel-system.DT.level_pct', 'nominal'),
+        D('Fill control', 'its LIC opens the XV fill valve at the fill start and closes it at the fill stop (control registry)')],
+      cap: [D('Tank volume', 'not modelled: the engine carries the bulk tank volume, not the day-tank volume'),
+        B('Specific consumption', 'fuel.specific_consumption_l_per_kwh', 3)],
+      al: [L('Low warning (fill has failed)', 'fuel-system.DT.level_pct', 'lo_warn'), L('Low-low level', 'fuel-system.DT.level_pct', 'lo_alarm')],
+      tr: { label: 'Level', lim: 'fuel-system.DT.level_pct', amp: 0.3, digits: 0 }, m: 'nfpa110fuel',
+      g: 'Below the low warning the fill has failed while the set runs: check its XV fill valve and the transfer pumps before low-low.' },
     'fuel:pumpCentrifugal': { name: 'Fuel transfer pump', role: 'Lifts diesel from the bulk tank to the day tanks',
       live: [S('Discharge pressure', 'bar', 2.1, 0.05, 2), S('Motor current', 'A', 7.4, 0.3, 1), D('Mode', 'duty / standby alternate weekly')],
       cap: [B('Fleet burn to replace', 'fuel.generator_consumption_lph', 0), D('Rule', 'pump flow >= 1.25 × fleet burn (plan E-1)')],
@@ -446,6 +463,7 @@
     return out;
   }
   function classOf(page, sym, n) {
+    if (page === 'fuel' && sym === 'tankStorage' && n && /^dt\d+$/.test(n.id || '')) return CLASSES['fuel:dayTank'];
     var cls = CLASSES[page + ':' + sym] || CLASSES[sym] || null, out, k;
     if (cls && cls.trBy && n && cls.trBy[n.cls]) {
       out = {};
@@ -491,6 +509,11 @@
         p = param(spec.id);
         if (!p) return { label: spec.label, text: 'UNAVAILABLE', unit: '', quality: 'state', declared: 'registry id ' + spec.id + ' did not resolve — reported, never filled in' };
         return { label: spec.label, text: fmt(p.value, spec.digits), unit: isNum(p.value) ? unitOf(p) : '', quality: 'derived', basis: spec.id };
+      case 'L':
+        var lr = limit(spec.id), lv = lr ? (spec.key === 'nominal' ? lr.nominal && lr.nominal.value : lr[spec.key]) : null;
+        if (!isNum(lv)) return { label: spec.label, text: 'UNAVAILABLE', unit: '', quality: 'state', declared: 'limits registry ' + spec.id + ' has no ' + spec.key + ' — reported, never filled in' };
+        return { label: spec.label, text: fmt(lv, 0), unit: lr.unit || '', quality: 'declared',
+          declared: (lr.evidenceClass ? lr.evidenceClass + ' · ' : '') + 'limits registry ' + spec.id + ' ' + spec.key + (lr.source && lr.source.ref ? ' (' + lr.source.ref + ')' : '') };
       case 'SB':
         p = param(spec.id);
         v = p && isNum(p.value) ? wave(ctx.id + ':' + spec.label, ctx.tick, p.value, spec.amp, spec.period) : null;
@@ -518,14 +541,15 @@
 
   function trendOf(cls, ctx) {
     var t = cls.tr; if (!t) return null;
-    var p = t.id ? param(t.id) : null, base = p && isNum(p.value) ? p.value : t.base, amp = t.amp;
+    var p = t.id ? param(t.id) : null, lm = t.lim ? limit(t.lim) : null, nom = lm && lm.nominal && isNum(lm.nominal.value) ? lm.nominal.value : null;
+    var base = p && isNum(p.value) ? p.value : (nom !== null ? nom : t.base), amp = t.amp;
     /* a pump the page shows standing by prints Head 0 m from the engine: its differential head trends a flat 0 (E2) */
     var pv = t.label === 'Differential head' ? pageRow(ctx, 'Differential head') : null, sb = pv === 0 || !!(pv && pv.eng === 0);
     if (sb) { base = 0; amp = 0; }
     if (!isNum(base)) return null;
     var series = [], d = isNum(t.digits) ? t.digits : 1, f = Math.pow(10, d + 2);   /* stored finer than printed: the line stays smooth */
     for (var i = 0; i < 60; i++) series.push(Math.round(wave(ctx.id + ':trend', ctx.tick - 59 + i, base, amp, 23) * f) / f);
-    var mn = Math.min.apply(null, series), mx = Math.max.apply(null, series), unit = p ? unitOf(p) : (t.unit || '');
+    var mn = Math.min.apply(null, series), mx = Math.max.apply(null, series), unit = p ? unitOf(p) : (lm && lm.unit) || t.unit || '';
     var rows = [
       { label: 'Minimum (60 ticks)', text: fmt(mn, d), unit: unit, quality: 'simulated', sim: true, declared: SIMD },
       { label: 'Maximum (60 ticks)', text: fmt(mx, d), unit: unit, quality: 'simulated', sim: true, declared: SIMD }
@@ -533,9 +557,11 @@
     if (sb) rows.unshift({ label: 'Standing by (reference line)', text: fmt(0, d), unit: unit, quality: 'derived',
       declared: 'the page shows this pump standing by (Head 0 m): no differential head; the duty pumps run at ' + fmt(p ? p.value : t.base, d) + ' ' + unit });
     else if (p) rows.unshift({ label: 'Engine plane (reference line)', text: fmt(p.value, d), unit: unit, quality: 'derived', basis: t.id });
+    else if (nom !== null) rows.unshift({ label: 'Registry nominal (reference line)', text: fmt(nom, d), unit: unit, quality: 'declared',
+      declared: 'limits registry ' + t.lim + ' nominal: ' + (lm.nominal.ref || 'the normal operating value') });
     else rows.unshift({ label: 'Declared normal (reference line)', text: fmt(base, d), unit: unit, quality: 'declared', declared: DECL });
     return { label: t.label + ' (simulated)', unit: unit, series: series, ref: base, rows: rows,
-      declared: 'SIMULATED 60-tick series, seeded from the point id; the dashed line is ' + (sb ? 'zero: the pump stands by' : p ? 'the engine value ' + t.id : 'the declared normal value') };
+      declared: 'SIMULATED 60-tick series, seeded from the point id; the dashed line is ' + (sb ? 'zero: the pump stands by' : p ? 'the engine value ' + t.id : nom !== null ? 'the limits registry nominal of ' + t.lim : 'the declared normal value') };
   }
 
   var DAY = 86400000, FIXTURE_EPOCH = Date.UTC(2026, 9, 1);
@@ -582,9 +608,16 @@
     var ctx = { id: page + ':' + id, tick: tick, tag: tag, rows: Array.isArray(r.rows) ? r.rows : null };
     var qualityWord = { good: 'measured', stale: 'stale', bad: 'bad', nodata: 'no data' };
     /* 1. the sheet's own state rows (what the drawing prints), each with its point quality */
+    var specs = {}; (n.values || []).forEach(function (s) { if (s && s.k) specs[s.k] = s; });
     Object.keys(values).forEach(function (k) {
       var v = values[k] || {}, pid = id + ':' + k;
       var rec = o.store && o.store.ids && o.store.ids().indexOf(pid) >= 0 ? o.store.get(pid) : null;
+      /* a value the drawing prints from the control registry (spec.const: a controller's setpoint) is declared, not SIM */
+      if (specs[k] && specs[k].const && n.loop) {
+        live.push({ label: VALUE_LABEL[k] || k.toUpperCase(), text: v.text == null ? '—' : String(v.text), unit: '', quality: 'declared',
+          declared: 'control registry ' + n.loop + ': ' + specs[k].const });
+        return;
+      }
       live.push({ label: VALUE_LABEL[k] || k.toUpperCase(), text: v.text == null ? '—' : String(v.text), unit: '',
         quality: rec && rec.quality !== 'good' ? 'state' : 'simulated', sim: !rec || rec.quality === 'good',
         declared: (rec ? 'point ' + pid + ' · quality ' + (qualityWord[rec.quality] || rec.quality) + ' · ' : '') + (o.declared || SIMD) });
@@ -687,7 +720,7 @@
     var counts = { derived: 0, published: 0, simulated: 0, state: 0 };
     all.forEach(function (x) { if (x.basis) counts.derived++; else if (x.sim) counts.simulated++; else counts.state++; });
     return freeze({
-      classId: page, id: id, hall: null, title: tag + (n.label ? ' — ' + n.label : ''), kind: cls ? cls.name : (n.sym || 'equipment'),
+      classId: page, id: id, hall: null, title: tag + (n.label ? ' — ' + n.label : ''), kind: cls ? cls.name : (n.loop ? 'Controller' : (n.sym || 'equipment')),
       label: o.scope || 'site-wide plant', statusChip: chip, guidance: cls ? cls.g : none, sym: n.sym || null,
       tabs: { live: live, capacity: capacity, deps: { upstream: up.slice(0, 8), downstream: down.slice(0, 8), edges: [] }, alarms: alarms, alarmPoints: alarmPoints, trend: trend, maint: maint },
       actions: { openHmi: !!cls, related: [] },

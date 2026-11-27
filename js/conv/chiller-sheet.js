@@ -228,10 +228,10 @@
       if (L.mv.classKey !== 'chw_secondary_pump' || !L.pv.draw) return;
       var lastH = halls[halls.length - 1].code, PX = 1060, PY = SEC_Y - 34, CX = 170, CY = SEC_Y + 28, BUS = SEC_Y - 64, TX = 228;
       nodes.push({ id: 'lpv-dp', tag: L.pv.tag, sym: 'instField', x: PX, y: PY, size: 40, inst: L.pv.tag.split('-')[0], tagAt: 'above', loop: L.sp,
-        label: L.pv.tag + ' — ' + L.pv.what,
+        label: L.pv.what,
         values: [{ k: 'dp', dx: -14, dy: 22, anchor: 'end', lod: 1, point: 'chiller-plant.CHW.remote_dp', label: L.pv.tag + ' remote DP' }] });
       nodes.push({ id: 'lc-dp', tag: L.tag, sym: 'instPanel', x: CX, y: CY, size: 44, inst: L.tag.split('-')[0], tagAt: 'above', loop: L.sp,
-        label: L.tag + ' — ' + L.label + ' controller (' + L.action + ' acting ' + L.kind + ')',
+        label: L.label + ' controller (' + L.action + ' acting ' + L.kind + ')',
         values: [{ k: 'sp', dx: 0, dy: 34, anchor: 'middle', lod: 1, const: 'setpoint from the control registry (' + L.sp + ')' },
           { k: 'out', dx: 0, dy: 51, anchor: 'middle', lod: 1, point: 'chiller-plant.CHW.sec_pump_speed', label: L.tag + ' output (secondary pump speed)', unit: '%' }] });
       edges.push({ id: 'e-lp-dps', from: 'jhs' + lastH, to: 'lpv-dp.process', via: [[PX, SEC_Y]], w: 'inst', medium: 'line', loop: L.sp });
@@ -337,7 +337,7 @@
       if (L.mv.classKey !== 'tower_cell' || L.pv.node !== 'ttcs') return;
       var CX = 52, CY = 236, BUS = 190;
       nodes.push({ id: 'lc-cdw', tag: L.tag, sym: 'instPanel', x: CX, y: CY, size: 44, inst: L.tag.split('-')[0], tagAt: 'above', loop: L.sp,
-        label: L.tag + ' — ' + L.label + ' controller (' + L.action + ' acting ' + L.kind + ')',
+        label: L.label + ' controller (' + L.action + ' acting ' + L.kind + ')',
         values: [{ k: 'sp', dx: 0, dy: 34, anchor: 'middle', lod: 1, const: 'setpoint from the control registry (' + L.sp + ')' },
           { k: 'out', dx: 0, dy: 51, anchor: 'middle', lod: 1, point: 'chiller-plant.CDW.tower_fan_speed', label: L.tag + ' output (tower fan speed)', unit: '%' }] });
       nodes.forEach(function (nd) { if (nd.id === L.pv.node) nd.loop = L.sp; });

@@ -163,6 +163,20 @@ range). Otherwise it is fixed, and the modal says what fixes it.
   unit prints (`values[].limitsOf || point`; LIC-A3 → `fuel-system.DT.level_pct`, 45 / 25 %). Never borrow the unit
   CLASS's alarms or trend: a class can be shared by different vessels (day tank and bulk tank are both
   `fuel:tankStorage`; v3.115.0 showed the bulk 85 % trend on a 90 % day tank).
+- **A modulating page loop (v3.115.2).** A page setpoint with `kind: 'modulating'` may carry a PI / PID loop. That
+  loop names its transmitter node (`pv.node`) and its driven unit (`mv.node`), both on the sheet. It has no cut-out,
+  no sourced tuning (`tuningNote` says so) and no engine output, so OUT reads "not modelled". The page's simulated PV
+  is the setpoint at steady state. PIC-301 (WT-M-101) holds PT-301 at `conv.water-system.booster_discharge_sp`
+  through the duty booster's speed. The signals run PT-301 → PIC-301 → P-301A. On-off loops still sit only on the
+  cut-in that starts their unit. Gates: T3 and S8e water in `test-typed-control-numbers.mjs`.
+- **A bubble says its tag once (v3.115.2).** The sheet engine names a node "<tag> — <label>", so a controller's
+  `label` never starts with its tag: write "P-301A pressure controller (reverse acting PI)", not
+  "PIC-301 — …". Gate S8f. The payload kind of a bubble (`n.loop`, no class) is "Controller". A value a bubble prints
+  from the registry (`values[].const`) is declared, never SIM (`test-conv-payloads` P11).
+- **One vessel symbol, two classes (v3.115.2).** `classOf` gives a day tank (`fuel`, `tankStorage`, `dt<k>`) the class
+  `fuel:dayTank`, whose rows read the limits registry (`L(label, id, key)`, key lo_warn / lo_alarm / hi_* /
+  nominal) instead of the bulk tank's parameters. A trend with `lim:` takes that row's nominal as its reference
+  (P10).
 
 ## 5. Gates
 

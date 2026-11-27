@@ -634,6 +634,37 @@
       "pv": [
         "cdu-mini-bms.TT-01.supply_c"
       ]
+    },
+    {
+      "id": "conv.water-system.booster_discharge_sp",
+      "page": "water-system",
+      "label": "Booster discharge pressure setpoint (PT-301)",
+      "unit": "bar",
+      "value": 4.2,
+      "kind": "modulating",
+      "control": "the booster set controller PIC-301 holds the discharge pressure at PT-301 with the duty pump's speed (lead/lag pair P-301A/B)",
+      "evidenceClass": "ASSUMED",
+      "basis": "A constant-pressure booster set (variable-speed duty pump, lead/lag standby) holds its discharge at a setpoint, as booster-set practice for building water service does (EN 806-2 / ASPE pressure-booster design). The value is this page's design: the drawing declared it for PT-301 before the registry (water-system.html pt301Bar); no site hydraulic calculation is in this repository, so it is ASSUMED.",
+      "pv": null,
+      "pvNote": "the discharge pressure is the page's simulated state at PT-301 (steady state: the controller holds it at its setpoint), not yet a point of the limits registry",
+      "loop": {
+        "tag": "PIC-301",
+        "sheet": "wt-m-101",
+        "kind": "PI",
+        "action": "reverse",
+        "pv": {
+          "tag": "PT-301",
+          "node": "pt301",
+          "what": "booster discharge pressure, transmitter PT-301 on the header after the pump pair"
+        },
+        "mv": {
+          "node": "pump-duty",
+          "what": "duty booster pump P-301A speed (VSD); the speed itself is not modelled on this page"
+        },
+        "tuning": null,
+        "tuningNote": "no source for Kp / Ti; the page shows steady states only (dynamics not modelled)",
+        "basis": "Pressure-booster practice: the transmitter on the common discharge feeds the set controller, which trims the duty pump speed to hold the setpoint and calls the lag pump when the duty pump is at full speed. Reverse acting: pressure below the setpoint raises the speed."
+      }
     }
   ],
   "dcaiLoops": {

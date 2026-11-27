@@ -78,9 +78,11 @@
     <script src="js/conv/vfx.js?v=20261123-3fd25115"></script>
     <script src="js/conv/history.js?v=20261120-8d390d7e"></script>
     <script src="js/rz-trend.js?v=20261123-5b150d9f"></script>
-    <script src="js/conv/water-sheet.js?v=20261120-d53cd730"></script>
+    <!-- the control registry before the sheet: WT-M-101 draws PIC-301 from it (v3.115.2) -->
+    <script src="js/rz-control-points.js?v=20261126-8a49c3f0"></script>
+    <script src="js/conv/water-sheet.js?v=20261126-f2177353"></script>
     <script src="js/conv/sheet-truth.js?v=20261126-d1e56422"></script>
-    <script src="js/conv/payloads.js?v=20261126-1bde44aa"></script>
+    <script src="js/conv/payloads.js?v=20261127-1db85bcd"></script>
     <script src="js/conv/equipment-modal.js?v=20261126-fb07133b"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" integrity="sha384-9nhczxUqK87bcKHh20fSQcTGD4qq5GhayNYSYWqwBkINBhOfQLg/P5HG5lF1urn4" crossorigin="anonymous"></script>
     <!-- conv-engine: single scenario basis (WUE = water vol / IT energy, computed).
@@ -103,7 +105,6 @@
     <link rel="stylesheet" href="css/conv-point.css?v=20261120-8daa6374">
     <link rel="stylesheet" href="css/conv-motion.css?v=20261121-88ede45d">
     <link rel="stylesheet" href="css/conv-live.css?v=20261122-9e4f1c46">
-    <script src="js/rz-control-points.js?v=20261126-e3135306"></script>
     <script src="js/rz-sp-block.js?v=20261126-5d590c85"></script>
     <script src="js/conv/point-status.js?v=20261123-0de9d3e8"></script>
 <script src="js/conv/motion.js?v=20261121-f2d16763" defer></script>
@@ -466,7 +467,7 @@
 /* PRD-COCKPIT-QUIET R5: the P&ID subtitle is the title's tooltip (kept for screen readers) */
 .ws-sub-tip { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
 </style>
-    <script src="js/rz-version.js?v=20261126-02b70e7b" defer></script>
+    <script src="js/rz-version.js?v=20261127-0912bbd1" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
 <style id="rz-skiplink-v1">
@@ -805,7 +806,10 @@
             var cdwSupplyC = ok(COOL.cdw_supply_c) ? COOL.cdw_supply_c : null;
             var cdwReturnC = ok(COOL.cdw_return_c) ? COOL.cdw_return_c : null;
             var heatRejKw = ok(COOL.heat_rejection_kw) ? COOL.heat_rejection_kw : null;
-            var pt301Bar = 4.2;   // simulated discharge pressure, declared on the drawing
+            /* PT-301 at steady state = the booster discharge setpoint PIC-301 holds (control registry, v3.115.2); the
+               drawing used to declare its own copy of the number */
+            var CPW = window.RZControlPoints, PIC = CPW ? CPW.loops('wt-m-101').filter(function (x) { return x.tag === 'PIC-301'; })[0] : null;
+            var pt301Bar = PIC ? CPW.value(PIC.sp) : null;
             var filterDp = 0.40, tds = 140, cl2 = 0.85, cl2Res = 0.6, uvInt = 99.8;
             var pumpKw = 7.5;
 
@@ -1018,7 +1022,14 @@
                         o.values = { st: wv(A ? (bwActive ? 'ACTIVE' : 'INHIBIT') : UNAV) }; break;
                     case 'pump-duty': o.state = A ? 'running' : null; o.values = { st: wv(A ? 'RUN · ' + pumpKw + ' kW' : UNAV) }; break;
                     case 'pump-standby': o.state = A ? 'standby' : null; o.values = { st: wv(A ? 'AVAILABLE' : UNAV) }; break;
-                    case 'pt301': o.values = { p: wv(A ? f1(pt301Bar) + ' bar' : UNAV) }; break;
+                    case 'pt301': o.values = { p: wv(A && ok(pt301Bar) ? f1(pt301Bar) + ' bar' : UNAV) }; break;
+                    case 'pic301':
+                        /* the booster pressure controller: its registry setpoint; OUT (pump speed) is not modelled */
+                        o.state = A && PIC ? 'running' : null;
+                        o.values = { sp: wv(PIC && ok(pt301Bar) ? 'SP ' + f1(pt301Bar) + ' bar' : UNAV) };
+                        if (PIC) o.rows = [['Holds', PIC.pv.what], ['Setpoint', f1(pt301Bar) + ' bar (registry, ASSUMED)'], ['Drives', PIC.mv.what],
+                            ['Action', PIC.action + ' acting ' + PIC.kind + ' (pressure falls → more speed)'], ['Output', 'not modelled'], ['Tuning', PIC.tuningNote], ['Basis', PIC.basis]];
+                        break;
                     case 'dosing': o.values = { cl2: wv(pointText('dosing:cl2')), res: wv(A ? cl2Res + ' ppm' : '—') }; break;
                     case 'uv': o.state = A ? 'running' : null; o.values = { int: wv(A ? uvInt + ' % INT' : UNAV) }; break;
                     case 'domtank':

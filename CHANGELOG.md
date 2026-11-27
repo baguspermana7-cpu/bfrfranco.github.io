@@ -11,6 +11,28 @@ release sections rather than semver.
 
 ---
 
+## v3.115.2 — 2026-11-27 — The water booster gets its pressure controller; a day tank stops borrowing the bulk tank's numbers
+
+**PIC-301 on WT-M-101, a day tank's own limits, and controller bubbles that say their name once** (PRD-SETPOINT-SIM §C P9)
+
+- **Booster pressure controller drawn (WT-M-101).**
+  - PIC-301 is an ISA-5.1 panel bubble beside the booster pair. PT-301 on the common discharge signals it, and it signals the duty pump P-301A.
+  - The bubble prints SP 4.2 bar from the new registry row `conv.water-system.booster_discharge_sp`: PI, reverse acting, evidence ASSUMED (the drawing's own design value; no site hydraulic calculation exists).
+  - PT-301 now reads that same number, because a booster set at steady state holds its setpoint. Before, the page typed its own 4.2.
+  - OUT (pump speed) reads "not modelled". The tuning reads "no source for Kp / Ti".
+  - The registry builder now accepts a PI / PID loop on a modulating page setpoint, if its transmitter is named. An on-off loop still sits only on a cut-in.
+- **A day tank is not the bulk tank.**
+  - DT-GEN-xx shares its symbol with the bulk UST. Its inspector payload used to take the bulk tank's class: Level, Usable volume and Autonomy from `fuel.level_pct`, alarms at 60 / 30 / 95 %, and a trend on the bulk level.
+  - It now has its own class. Its alarms come from the limits registry row its level points at (`fuel-system.DT.level_pct`: low warning 45 %, low-low 25 %, ASSUMED). Its trend reference is that row's nominal (70 %, the fill-cycle midpoint). Tank volume reads "not modelled".
+  - Clicking a day tank still opens its genset's inside drawing. That drawing was already right (90 %, 3,849 of 4,277 L). The fix is for the inspector fallback and the gates that read the payload.
+- **Controller bubbles.**
+  - Every bubble's accessible name, and so its inspector title, used to say its tag twice ("PIC-301 — PIC-301 — …"). That affected 13 bubbles on 4 pages, PDT-01 included. Each now says its tag once.
+  - The inspector names a bubble "Controller", not "instPanel".
+  - The setpoint a bubble prints from the registry is shown as a declared registry value, no longer marked SIM.
+- **Gates (each red before its change).**
+  - `test-typed-control-numbers` T3 water (the bubble and PT-301 follow a planted 4.0 bar), S8e water and S8f (no tag said twice). S8f was red on 13 bubbles.
+  - `test-conv-payloads` P10 (a day tank reads no bulk parameter) and P11 (a controller is named one and its registry number is not SIM).
+
 ## v3.115.1 — 2026-11-27 — A level controller's alarms are its day tank's, not the bulk tank's
 
 - **Fix (v3.115.0 regression).**
