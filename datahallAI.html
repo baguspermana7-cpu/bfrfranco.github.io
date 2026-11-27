@@ -107,6 +107,9 @@ body>.rz-manual-link,.scroll-top-btn{display:none!important}
   .wrap{position:relative}
 }
 .svg-zw{position:relative}.svg-zi{overflow:auto;cursor:grab;max-height:calc(100vh - 160px)}
+/* v3.117.0: the building is one picture, not a pan surface. The 100vh cap hid its ground floor (139 px at 1440x900)
+   behind an inner scroll, so the page scrolls it instead (test-dcai-visible-at-rest VR5). */
+.svg-zi:has(#bldgSvg){max-height:none}
 .svg-zi:active{cursor:grabbing}
 .svg-zi svg{display:block}
 /* v2.12.0 — the rack elevation is drawn at label tiers that need >= 1200 px of sheet; it scrolls inside .svg-zi, never shrinks */
@@ -773,7 +776,7 @@ body[data-datahall-authority="unavailable"] #tabs,
 body[data-datahall-authority="unavailable"] .wrap{display:none !important}
 body[data-datahall-authority="unavailable"] .hdr-r>.dot,body[data-datahall-authority="unavailable"] [data-cv="clock"]>.dot{background:#64748b !important;box-shadow:none !important;animation:none !important}
 body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:none}
-</style>    <script src="js/rz-version.js?v=20261127-d539a61e" defer></script>
+</style>    <script src="js/rz-version.js?v=20261127-c7383cab" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <!-- v3.5.0 — hold the 8.5px legibility floor by SCALE, not by font size. Five of this page's
          fifteen diagrams were already clear; the dense ones (cooling P&ID, the four SLDs, the hall
@@ -883,7 +886,7 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
     <script src="js/datahall-ai/hall-interact.js?v=20261013-77877697" defer></script>
     <script src="js/conv/floor-plan-color.js?v=20261122-7138898a" defer></script>
     <script src="js/conv/floor-plan.js?v=20261126-d9d24cd3" defer></script>
-    <script src="js/datahall-ai/hall-iso.js?v=20261127-38e3380d" defer></script>
+    <script src="js/datahall-ai/hall-iso.js?v=20261127-bd4fcb7a" defer></script>
     <script src="js/datahall-ai/fire-workstation.js?v=20261116-0546e949" defer></script>
 <style id="rz-skiplink-v1">
 .skip-link{position:absolute;top:-50px;left:0;background:#1a1d23;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 4px 0;transition:top .2s ease}

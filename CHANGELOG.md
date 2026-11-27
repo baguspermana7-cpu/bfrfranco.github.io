@@ -11,6 +11,30 @@ release sections rather than semver.
 
 ---
 
+## v3.117.0 — 2026-11-28 — DC AI: a warm inlet is an alarm; the whole building on Room Layout
+
+**A cold aisle point above its limit raises an alarm, and the building overview shows its ground floor** (PRD-DCAI-HALL-DEPTH
+A8e SA2/SA3, Amendment 10 follow-up)
+
+### Added
+- `js/datahall-ai/hall-iso.js`: a cold aisle station above 27 °C is an alarm record of its own, tag `TT-CA<pair>-<point>`,
+  point `INLET`, severity high (critical above 30 °C), the same limits the Thermal lens paints. It joins the hall's
+  alarm set (status strip count), is journalled into Alarms & Events when it starts and when it clears, and carries one
+  floor flag anchored on the station ("▲ TT-CA02-3 · INLET 28.4 °C") that opens Alarms & Events on it. A station
+  without a reading (replay without a sample) stays stale and raises nothing.
+
+### Fixed
+- `datahallAI.html`: every zoomable drawing sits in a `.svg-zi` box capped at `100vh - 160px`. The building is 879 px
+  tall at 1440 x 900, so the cap hid 139 px (174 px on a 390 phone): the ground floor, its label and the legend.
+  `.svg-zi:has(#bldgSvg)` drops the cap and the page scrolls it; a phone still pans it sideways at the 8.5 px floor.
+
+### Gates
+- New `tools/test-dcai-station-alarms.mjs` (SA2 28.4 °C: one flag, one INLET record, the flag opens Alarms & Events on
+  a row naming the tag; SA2b 31.0 °C critical; SA2c clears; SA3 stale raises nothing; SA4 0 page errors). Red 3 of 8
+  on the old code (no flag, no record), green 10/10. Wired into `tools/ship-gate.sh`.
+- `tools/test-dcai-visible-at-rest.mjs` VR5 adds 0 px of the building hidden below its zoom box at 1440 and 390 (red
+  139 / 174 px, green 29/29).
+
 ## v3.116.2 — 2026-11-27 — The CDU drawing shows its two controllers
 
 **cdu-mini-bms: TIC-01 and PDIC-02 drawn on the CDU P&ID, from the control registry** (PRD-SETPOINT-SIM C21, P9 part 4)

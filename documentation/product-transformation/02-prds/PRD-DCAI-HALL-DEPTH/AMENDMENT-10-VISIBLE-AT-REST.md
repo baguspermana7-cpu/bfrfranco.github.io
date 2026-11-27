@@ -60,3 +60,9 @@ caught a real defect: the first version counted run cells before the floor had m
 - The building overview on a phone still pans (legibility floor).
 - DH-A-101 still pans inside its pane at 1440 (its own legibility scale). The support strip is now inside the sheet.
 - 3D draws no aisle tints (the printed readings and lines do show).
+
+## Follow-up v3.117.0
+
+Live check of v3.116.0 found the building's ground floor hidden at 1440 x 900: the shared `.svg-zi` cap
+(`100vh - 160px` = 740 px) is shorter than the 879 px drawing. VR5 now asserts 0 px hidden below the zoom box (red
+139 / 174 px, green after `.svg-zi:has(#bldgSvg){max-height:none}`).

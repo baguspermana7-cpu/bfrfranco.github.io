@@ -7,7 +7,7 @@
    VR3 a cold aisle takes its worst point's state: a planted 28.0 °C inlet turns that pair's cold aisle warn
    VR4 390: one printed reading per row pair (the warmest inlet), no two printed readings overlap
    VR5 Room Layout building overview at 1440: drawn at 1.0x (no legibility upscale), no sideways scroll; title inside the
-       box and every label >= 8.5 px at every width (a phone pans; without a minimum width a phone drew 6 px labels)
+       box, nothing hidden below the zoom box (v3.117.0), and every label >= 8.5 px at every width (a phone pans; without a minimum width a phone drew 6 px labels)
    VR6 DH-A-101: zone tags do not overlap, CDU-zone tags lie a row south of the rack-zone tags (the CDU line is south of
        the row ends), standby CDUs + fan-wall modules drawn standby = engine counts, the support strip inside the sheet
    VR7 0 page errors
@@ -136,7 +136,8 @@ for (const W of [1440, 390]) {
     const nSt = sheet ? sheet.querySelectorAll('.hmi-node[data-state="standby"]').length : 0;
     const ty = (re) => tags.filter((t) => re.test(t.t)).map((t) => (t.tp + t.b) / 2);
     const minH = Math.min(...[...svg.querySelectorAll('text')].filter((t) => t.textContent.trim()).map((t) => t.getBoundingClientRect().height).filter((h) => h > 0));
-    return { minH, wantSt, nSt, cduY: ty(/^Z0[1-4]/), rackY: ty(/^Z0[5-8]/), scale, scrollW: box.scrollWidth, clientW: box.clientWidth, tb: tb && { x: tb.x, y: tb.y, w: tb.width }, vb: { x: vb.x, y: vb.y, w: vb.width }, title: title && title.textContent, ov, nt: tags.length, sup, sh };
+    const zi = svg.closest('.svg-zi'), hidY = zi ? zi.scrollHeight - zi.clientHeight : 0;
+    return { hidY, minH, wantSt, nSt, cduY: ty(/^Z0[1-4]/), rackY: ty(/^Z0[5-8]/), scale, scrollW: box.scrollWidth, clientW: box.clientWidth, tb: tb && { x: tb.x, y: tb.y, w: tb.width }, vb: { x: vb.x, y: vb.y, w: vb.width }, title: title && title.textContent, ov, nt: tags.length, sup, sh };
   });
   if (L.err) ok('VR5', false, L.err);
   else {
@@ -145,6 +146,7 @@ for (const W of [1440, 390]) {
       ok('VR5', L.scale <= 1.01, `${W}: building drawn at ${L.scale.toFixed(2)}x its box`);
       ok('VR5', L.scrollW <= L.clientW + 1, `${W}: building box scrolls sideways ${L.scrollW} > ${L.clientW}`);
     }
+    ok('VR5', L.hidY <= 1, `${W}: ${L.hidY} px of the building hidden below its zoom box (the ground floor needs an inner scroll)`);
     ok('VR5', L.minH >= 8.5, `${W}: smallest building label ${L.minH.toFixed(1)} px (floor 8.5)`);
     ok('VR5', L.tb && L.tb.x >= L.vb.x && L.tb.x + L.tb.w <= L.vb.x + L.vb.w && L.tb.y >= L.vb.y, `${W}: title "${L.title}" outside the viewBox`);
     if (W === 1440) {

@@ -250,7 +250,29 @@
   }
   /* A5b B1: the hall's scenario alarms — every alarm of the CDU and fan-wall payloads plus the leak payload's zones (a
      wet rack row is that same leak event, never a second alarm). The strip counts them, the workspace journals them. */
-  var hallAlarms = [], journalled = {}, journalSeq = 0, pendingJournal = [];
+  var hallAlarms = [], unitAlarms = [], stAlarmKey = '', journalled = {}, journalSeq = 0, pendingJournal = [];
+  /* A8e SA2: a cold aisle point above the lens limits is an alarm record of its own (27 °C high, 30 °C critical, the
+     limits the Thermal lens paints), tagged TT-CA<pair>-<point>. A stale point (no reading) claims nothing (SA3). */
+  function stTag(z, s) { return 'TT-CA' + pad2(z + 1) + '-' + (s + 1); }
+  function stationAlarms() {
+    var out = [];
+    if (!host) return out;
+    [].forEach.call(host.querySelectorAll('.fp-ovl .ovl-st[data-side="cold"]'), function (c) {
+      var st = c.getAttribute('data-state'); if (st !== 'warn' && st !== 'alarm') return;
+      var z = +c.getAttribute('data-z'), s = +c.getAttribute('data-s'), v = +c.getAttribute('data-v');
+      out.push({ tag: stTag(z, s), point: 'INLET', severity: st === 'alarm' ? 'critical' : 'high', system: 'cooling', z: z, s: s, sev: st, v: v,
+        message: pairName(z) + ' cold aisle point ' + (s + 1) + ' inlet ' + v.toFixed(1) + ' °C, above ' + (st === 'alarm' ? 30 : 27) + ' °C' });
+    });
+    return out;
+  }
+  /* on each new set of readings: journal a station alarm when it starts or clears, and redraw the flags */
+  function syncStationAlarms() {
+    var st = stationAlarms(), key = st.map(function (a) { return a.tag + a.severity + a.v; }).join();   /* the flag prints the reading */
+    if (key === stAlarmKey) return;
+    stAlarmKey = key; hallAlarms = unitAlarms.concat(st); journal();
+    try { doc.dispatchEvent(new CustomEvent('rz-hall-alarms', { detail: { count: hallAlarms.length } })); } catch (e) { /* old engine: no event */ }
+    drawFlags();
+  }
   function noSample(p) {
     var t = (p && p.tabs) || {}, k, i, r;
     for (k in t) if (Object.prototype.hasOwnProperty.call(t, k) && Array.isArray(t[k])) for (i = 0; i < t[k].length; i++) {
@@ -286,9 +308,10 @@
       rk.status = st ? st.s : null; rk.point = st ? st.point : null; rk.note = st ? (st.s === 'alarm' ? '◆ ' : '▲ ') + st.note : null;
     }
     collect(pay('leak', '1'));
-    hallAlarms = set;
+    unitAlarms = set;
+    hallAlarms = set.concat(stationAlarms());
     journal();
-    try { doc.dispatchEvent(new CustomEvent('rz-hall-alarms', { detail: { count: set.length } })); } catch (e) { /* old engine: no event */ }
+    try { doc.dispatchEvent(new CustomEvent('rz-hall-alarms', { detail: { count: hallAlarms.length } })); } catch (e) { /* old engine: no event */ }
   }
   /* A5b B3: the Alarms workspace is append-only (the fire workstation's pattern). A new alarm is journalled active, an
      alarm the scenario clears is journalled returned; its scenario is the one that raised it. */
@@ -323,6 +346,11 @@
     var mods = geo.m && geo.m.modsPer;
     model.crahUnits.forEach(function (u, i) { if (u.status) add('f' + (mods && i >= mods ? 's' : 'n') + u.point + u.status, u.status, u.point, u.tag, u.ref, 'fault'); });
     model.cduUnits.forEach(function (u) { if (u.status) add('c' + u.point + u.status, u.status, u.point, u.tag, u.ref, 'fault'); });
+    /* SA2: one flag per alarmed cold point, anchored on the station itself (a station is not equipment, so no HMI ref) */
+    stationAlarms().forEach(function (a) {
+      out.push({ sev: a.sev, point: a.point, tags: [a.tag], refs: ['station:' + a.tag], note: a.v.toFixed(1) + ' °C',
+        sel: '.fp-ovl .ovl-st[data-side="cold"][data-z="' + a.z + '"][data-s="' + a.s + '"]' });
+    });
     for (k = 0; k < out.length; k++) out[k].tags.sort(function (a, b) { return a.localeCompare(b, 'en', { numeric: true }); });
     for (k = 0; k < out.length; k++) out[k].label = (out[k].sev === 'alarm' ? '◆ ' : '▲ ') + (out[k].row ? 'Row ' + out[k].row + (out[k].tags.length > 1 ? ' ×' + out[k].tags.length : '') : out[k].tags.length > 1 ? out[k].tags[0] + '…' + out[k].tags[out[k].tags.length - 1] + ' ×' + out[k].tags.length : out[k].tags[0]) +
       ' · ' + out[k].point + (out[k].note ? ' ' + out[k].note : '');
@@ -374,7 +402,7 @@
     for (i = 0; i < gs.length; i++) {
       var g = gs[i];
       if (shown >= 8) { left += g.refs.length; continue; }
-      var mid = host.querySelector('[data-rz-equipment="' + g.refs[Math.floor(g.refs.length / 2)] + '"]'), ab = mid && mid.getBoundingClientRect();
+      var mid = g.sel ? host.querySelector(g.sel) : host.querySelector('[data-rz-equipment="' + g.refs[Math.floor(g.refs.length / 2)] + '"]'), ab = mid && mid.getBoundingClientRect();
       if (!ab || !ab.width) { left += g.refs.length; continue; }
       var recs = alarmsOf(g), ap = recs.length ? recs[0].point : null;
       var f = doc.createElement(ap ? 'button' : 'span'); f.className = 'dh-flag'; f.setAttribute('data-sev', g.sev); f.setAttribute('data-point', g.point); f.setAttribute('data-units', String(g.refs.length));
@@ -637,7 +665,7 @@
   }
   doc.addEventListener('rz-hall-readings', function () {
     if (!inst || view === 'drawing' || !model) return;
-    readSensors(); stations(); opsRun();
+    readSensors(); stations(); opsRun(); syncStationAlarms();
     /* A8d: in Thermal each rack takes the state of the point it reads, so a warm point repaints only its own racks */
     if (lens === 'thermal') { inst.paint(lensMode(lens)); retag(); }
   });
