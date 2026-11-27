@@ -177,6 +177,11 @@ range). Otherwise it is fixed, and the modal says what fixes it.
   `fuel:dayTank`, whose rows read the limits registry (`L(label, id, key)`, key lo_warn / lo_alarm / hi_* /
   nominal) instead of the bulk tank's parameters. A trend with `lim:` takes that row's nominal as its reference
   (P10).
+- **A controller on a hand-drawn P&ID (v3.116.2).** A page whose drawing is not on the sheet engine (cdu-mini-bms)
+  still takes its controllers from the registry: `loop.sheet` names the drawing (`cdu-pid`), and the page draws one
+  ISA-5.1 panel bubble per loop with `data-loop="<tag>"`, its setpoint printed under it from the registry, and dashed
+  `path.sch-sig` signal lines from the transmitter and to what it drives (`data-tag` on the driven symbol). No other
+  `data-loop` bubble may exist on that drawing. Gate: S8e cdu in `test-typed-control-numbers.mjs`.
 
 ## 5. Gates
 

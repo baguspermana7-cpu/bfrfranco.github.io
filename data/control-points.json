@@ -99,7 +99,7 @@
       },
       "nominal": {
         "value": 1.2,
-        "ref": "cdu-mini-bms.html TYPES.inrack.dP"
+        "ref": "control registry conv.cdu-mini-bms.loop_dp_sp (inrack)"
       }
     },
     {
@@ -178,6 +178,68 @@
       }
     },
     {
+      "id": "conv.cdu-mini-bms.loop_dp_sp",
+      "cockpit": "conv",
+      "equipment": "cdu-mini-bms",
+      "label": "TCS loop dP (P-01 VFD holds PDT-02)",
+      "unit": "bar",
+      "page": "cdu-mini-bms",
+      "kind": "modulating",
+      "pvNote": null,
+      "sp": {
+        "value": null,
+        "byVariant": {
+          "inrack": 1.2,
+          "inrow": 1.6,
+          "sidecar": 1.1,
+          "l2l": 2.2,
+          "l2a": 1
+        },
+        "role": "setpoint",
+        "kind": "modulating",
+        "pv": [
+          "cdu-mini-bms.PDT-02.loop_dp_bar"
+        ],
+        "from": "page control number (registry)",
+        "evidenceClass": "ASSUMED",
+        "source": {
+          "ref": "data/control-points.curated.json convPageSetpoints",
+          "why": "per CDU type, the loop dP this page's model runs at (page design; no source states these numbers). Variable-speed CDU pumps on a constant loop differential pressure is common CDU practice; the cold-plate manifold needs a minimum dP for its flow, and the point's band (0.5 to 3.0 bar) brackets every type."
+        },
+        "control": "PDIC-02 holds the secondary loop differential pressure PDT-02 with the duty pump's VFD (P-01A, or P-01B after an N+1 changeover)",
+        "adjustable": null,
+        "loop": {
+          "tag": "PDIC-02",
+          "sheet": "cdu-pid",
+          "kind": "PI",
+          "action": "reverse",
+          "pv": {
+            "tag": "PDT-02",
+            "node": "pv-dp",
+            "what": "secondary loop differential pressure, PDT-02"
+          },
+          "mv": {
+            "node": "VFD-01",
+            "what": "the duty pump's variable-frequency drive (P-01A, or P-01B after an N+1 changeover); the speed itself is not modelled on this page"
+          },
+          "tuning": null,
+          "tuningNote": "no source for Kp / Ti; the page shows steady states only (dynamics not modelled)",
+          "basis": "Constant-dP pumping: the loop dP transmitter feeds the controller, which trims the duty pump speed. Reverse acting: dP below the setpoint raises the speed. The fault scenarios (filter clog, low flow, pump trip) move the PV off its setpoint because the page models the fault, not the controller's recovery."
+        }
+      },
+      "threshold": {
+        "value": null,
+        "byVariant": {
+          "inrack": 1.2,
+          "inrow": 1.6,
+          "sidecar": 1.1,
+          "l2l": 2.2,
+          "l2a": 1
+        },
+        "kind": "modulating"
+      }
+    },
+    {
       "id": "conv.cdu-mini-bms.tcs_supply_floor",
       "cockpit": "conv",
       "equipment": "cdu-mini-bms",
@@ -231,7 +293,25 @@
           "why": "per CDU type, the supply this page's model runs at; ASHRAE TC9.9 liquid-cooling W classes cap it (W32 / W40); the floor is room dew point + 3 K (18 °C, the point's low warning)"
         },
         "control": "TCV-01, the CDU three-way valve, holds the secondary supply TT-01 (direct acting PI in the unit controller)",
-        "adjustable": null
+        "adjustable": null,
+        "loop": {
+          "tag": "TIC-01",
+          "sheet": "cdu-pid",
+          "kind": "PI",
+          "action": "direct",
+          "pv": {
+            "tag": "TT-01",
+            "node": "pv-sup",
+            "what": "TCS secondary supply temperature, TT-01 on the supply header to the rack"
+          },
+          "mv": {
+            "node": "TCV-01",
+            "what": "three-way facility-water valve TCV-01 on the liquid-to-liquid types; on the air-cooled L2A type (no facility water) the air-coil fan speed"
+          },
+          "tuning": null,
+          "tuningNote": "no source for Kp / Ti; the page shows steady states only (dynamics not modelled)",
+          "basis": "CDU unit control as vendors describe it: the secondary supply transmitter feeds the unit controller, which positions the facility-water valve (or, liquid-to-air, the coil fans) to hold the supply. Direct acting: supply above the setpoint opens the valve (more facility water through E-01)."
+        }
       },
       "threshold": {
         "value": null,

@@ -31,7 +31,7 @@
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.min.css?v=20261108-ff5c7268">
 <link rel="stylesheet" href="css/rz-cockpit-instrument.css?v=20261105-c3fa9df6"><!-- P23: the instrument register this page declares -->
-    <script src="js/rz-version.js?v=20261127-b588bcfa" defer></script>
+    <script src="js/rz-version.js?v=20261127-d539a61e" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <script type="application/ld+json">
@@ -268,6 +268,8 @@
         .sch-eq2{ fill:none; stroke:var(--bm-muted); stroke-width:1.1; }
         .sch-lbl{ font-family:var(--bm-mono); font-size:9px; fill:var(--bm-text); }
         .sch-sub{ font-family:var(--bm-mono); font-size:7.5px; fill:var(--bm-muted); }
+        /* ISA-5.1 electric signal: dashed, thinner than any pipe (PRD-SETPOINT-SIM P9 part 4) */
+        .sch-sig{ fill:none; stroke:var(--bm-muted); stroke-width:.9; stroke-dasharray:4 2.5; }
         .sch-val{ font-family:var(--bm-mono); font-size:8.5px; font-weight:700; fill:var(--bm-cyan); font-variant-numeric:tabular-nums slashed-zero; }
         .pipe-s{ stroke:var(--bm-blue); stroke-width:3; fill:none; stroke-linecap:round; }
         .pipe-r{ stroke:var(--bm-red); stroke-width:3; fill:none; stroke-linecap:round; opacity:.85; }
@@ -459,11 +461,11 @@
 
     <!-- PRD-CONV-POINT-STATUS-TREND T3: every number shows its state from the limits registry and opens its trend -->
     <link rel="stylesheet" href="css/conv-point.css?v=20261120-8daa6374">
-    <script src="js/conv-parameters.js?v=20261127-0e4f59a0"></script>
+    <script src="js/conv-parameters.js?v=20261127-88313209"></script>
     <script src="js/conv/history.js?v=20261120-8d390d7e"></script>
     <script src="js/rz-sheet.js?v=20261121-67db3ea5" defer></script>
     <script src="js/rz-trend.js?v=20261123-5b150d9f"></script>
-    <script src="js/rz-control-points.js?v=20261126-8a49c3f0"></script>
+    <script src="js/rz-control-points.js?v=20261127-e26242a3"></script>
     <script src="js/conv/point-status.js?v=20261123-0de9d3e8"></script>
 
     <footer class="footer footer-enhanced">
@@ -485,19 +487,20 @@
         var _nav=document.querySelector('.navbar'); function _ns(){ if(_nav) _nav.classList.toggle('scrolled', window.scrollY>10); } window.addEventListener('scroll',_ns,{passive:true}); _ns();
 
         /* ---------- CDU type model ---------- */
-        /* PRD-SETPOINT-SIM P9: the supply TCV-01 holds per CDU type comes from the control registry (convPageSetpoints);
+        /* PRD-SETPOINT-SIM P9: the supply TCV-01 holds and (P9 part 4) the loop dP the pump VFD holds, per CDU type, come from
+           the control registry (convPageSetpoints);
            value() throws when one is missing */
         var CPV = window.RZControlPoints.value;
         var TYPES={
-            inrack:{ name:'In-Rack', cap:80, arch:'L2L', supply:CPV('conv.cdu-mini-bms.tcs_supply_sp','inrack'), dT:10, flow:1.30, dP:1.2, sysP:3.5, fac:'CDW',
+            inrack:{ name:'In-Rack', cap:80, arch:'L2L', supply:CPV('conv.cdu-mini-bms.tcs_supply_sp','inrack'), dT:10, flow:1.30, dP:CPV('conv.cdu-mini-bms.loop_dp_sp','inrack'), sysP:3.5, fac:'CDW',
                 desc:'A 3U–4U CDU mounted <b>inside the rack</b> it serves. Shortest possible tubing run; one unit per rack. Best for staged, per-rack roll-outs.' },
-            inrow:{ name:'In-Row', cap:300, arch:'L2L', supply:CPV('conv.cdu-mini-bms.tcs_supply_sp','inrow'), dT:11, flow:1.30, dP:1.6, sysP:4.0, fac:'CDW',
+            inrow:{ name:'In-Row', cap:300, arch:'L2L', supply:CPV('conv.cdu-mini-bms.tcs_supply_sp','inrow'), dT:11, flow:1.30, dP:CPV('conv.cdu-mini-bms.loop_dp_sp','inrow'), sysP:4.0, fac:'CDW',
                 desc:'A cabinet <b>between racks in the row</b>, serving several adjacent racks. The workhorse density tier — higher capacity than in-rack, simpler than facility-scale.' },
-            sidecar:{ name:'Sidecar', cap:120, arch:'L2L', supply:CPV('conv.cdu-mini-bms.tcs_supply_sp','sidecar'), dT:9, flow:1.20, dP:1.1, sysP:3.2, fac:'CDW',
+            sidecar:{ name:'Sidecar', cap:120, arch:'L2L', supply:CPV('conv.cdu-mini-bms.tcs_supply_sp','sidecar'), dT:9, flow:1.20, dP:CPV('conv.cdu-mini-bms.loop_dp_sp','sidecar'), sysP:3.2, fac:'CDW',
                 desc:'A slim unit <b>bolted to the side of a rack</b> — between in-rack and in-row. Frees rack U-space while keeping the run short.' },
-            l2l:{ name:'L2L · End-of-Row', cap:1200, arch:'L2L', supply:CPV('conv.cdu-mini-bms.tcs_supply_sp','l2l'), dT:12, flow:1.25, dP:2.2, sysP:4.5, fac:'CDW',
+            l2l:{ name:'L2L · End-of-Row', cap:1200, arch:'L2L', supply:CPV('conv.cdu-mini-bms.tcs_supply_sp','l2l'), dT:12, flow:1.25, dP:CPV('conv.cdu-mini-bms.loop_dp_sp','l2l'), sysP:4.5, fac:'CDW',
                 desc:'A large <b>liquid-to-liquid</b> CDU at the <b>end of the row</b>, rejecting to the <b>facility water</b> plant. Economy of scale; needs a chilled/condenser-water loop.' },
-            l2a:{ name:'L2A · Air-cooled', cap:60, arch:'L2A', supply:CPV('conv.cdu-mini-bms.tcs_supply_sp','l2a'), dT:9, flow:1.20, dP:1.0, sysP:3.0, fac:'AIR',
+            l2a:{ name:'L2A · Air-cooled', cap:60, arch:'L2A', supply:CPV('conv.cdu-mini-bms.tcs_supply_sp','l2a'), dT:9, flow:1.20, dP:CPV('conv.cdu-mini-bms.loop_dp_sp','l2a'), sysP:3.0, fac:'AIR',
                 desc:'A <b>liquid-to-air</b> CDU that rejects heat to <b>room air</b> — no facility water. Retrofit-friendly, but the room CRAH/CRAC must absorb the heat, capping density.' }
         };
         // each fault propagates to the parameters it physically affects, so correlated
@@ -592,7 +595,7 @@
         function pCHK(x,y,tag){ // check valve — bowtie + seat bar
             return pHV(x,y,tag).replace('</g>','')+'<line x1="'+(x+7)+'" y1="'+(y-7)+'" x2="'+(x+7)+'" y2="'+(y+7)+'" stroke="var(--bm-cyan)" stroke-width="1.4"/></g>'; }
         function pTCV(x,y,tag){ // 3-way control valve + actuator
-            return '<g><path class="sch-eq" d="M'+(x-7)+' '+(y-6)+' L'+x+' '+y+' L'+(x-7)+' '+(y+6)+' Z"/>'
+            return '<g data-tag="'+tag+'"><path class="sch-eq" d="M'+(x-7)+' '+(y-6)+' L'+x+' '+y+' L'+(x-7)+' '+(y+6)+' Z"/>'
                  + '<path class="sch-eq" d="M'+(x+7)+' '+(y-6)+' L'+x+' '+y+' L'+(x+7)+' '+(y+6)+' Z"/>'
                  + '<path class="sch-eq" d="M'+(x-6)+' '+(y+7)+' L'+x+' '+y+' L'+(x+6)+' '+(y+7)+' Z"/>'
                  + '<rect class="sch-eq2" x="'+(x-5)+'" y="'+(y-18)+'" width="10" height="8"/><line x1="'+x+'" y1="'+(y-10)+'" x2="'+x+'" y2="'+(y-6)+'" stroke="var(--bm-muted)" stroke-width="1"/>'
@@ -608,6 +611,16 @@
                  + '<text class="sch-sub" x="'+x+'" y="'+(y-2.5)+'" text-anchor="middle">'+top+'</text>'
                  + '<text class="sch-sub" x="'+x+'" y="'+(y+7)+'" text-anchor="middle">'+tag+'</text>'
                  + (valId?'<text class="sch-val" id="'+valId+'"'+(PV_PT[valId]?' data-point="'+PV_PT[valId][0]+'" data-pt-label="'+PV_PT[valId][1]+'"':'')+' x="'+x+'" y="'+(y+21)+'" text-anchor="middle"></text>':'')+'</g>'; }
+        /* PRD-SETPOINT-SIM P9 part 4: a controller of the control registry (loop.sheet 'cdu-pid'), an ISA-5.1 panel bubble
+           with its setpoint printed under it. link = the tile of the value it holds (a click shows that reading). */
+        function pCtl(x,y,tag,link,sp,title){ var p=tag.split('-');
+            return '<g class="pid-inst pid-ctl" data-loop="'+tag+'" data-link="'+link+'" role="button" tabindex="0" aria-label="'+tag+' controller — '+title+'">'
+                 + '<rect x="'+(x-16)+'" y="'+(y-15)+'" width="32" height="41" rx="4" fill="transparent" style="pointer-events:all"/>'
+                 + '<circle class="sch-eq2" cx="'+x+'" cy="'+y+'" r="11"/>'
+                 + '<line x1="'+(x-11)+'" y1="'+y+'" x2="'+(x+11)+'" y2="'+y+'" stroke="var(--bm-muted)" stroke-width=".5"/>'
+                 + '<text class="sch-sub" x="'+x+'" y="'+(y-2.5)+'" text-anchor="middle"'+(p[0].length>3?' style="font-size:6px"':'')+'>'+p[0]+'</text>'
+                 + '<text class="sch-sub" x="'+x+'" y="'+(y+7)+'" text-anchor="middle">'+p[1]+'</text>'
+                 + '<text class="sch-sub" data-const data-sp="'+tag+'" x="'+x+'" y="'+(y+21)+'" text-anchor="middle"><title>Setpoint from the control registry; tuning and dynamics not modelled</title>'+sp+'</text></g>'; }
         /* P&ID label -> its point (the same ids as the tiles; PDT-01 filter dP has no tile and no limits: Informational) */
         var PV_PT={ 'pv-flow':['cdu-mini-bms.FT-01S.flow_lpm','TCS flow total'], 'pv-sysp':['cdu-mini-bms.PT-01.system_bar','System pressure'],
             'pv-dp':['cdu-mini-bms.PDT-02.loop_dp_bar','Loop dP'], 'pv-fdp':['cdu-mini-bms.PDT-01.filter_dp_bar','Filter dP'], 'pv-sup':['cdu-mini-bms.TT-01.supply_c','TCS supply'],
@@ -629,9 +642,9 @@
                 h+='<text class="sch-sub" x="103" y="272" text-anchor="middle">HX approach</text>'+pInst(103,288,'TI','03','pv-atd','atd');
             } else {
                 h+='<text class="sch-sub" x="6" y="14">AIR-COOLED · L2A</text>';
-                h+='<rect class="sch-eq" x="86" y="40" width="34" height="150" rx="3"/>';
+                h+='<rect class="sch-eq" data-tag="AIR-COIL" x="86" y="40" width="34" height="150" rx="3"><title>Air coil and fans (the L2A type rejects to room air)</title></rect>';
                 h+='<text class="sch-lbl" x="103" y="118" text-anchor="middle" transform="rotate(-90 103 118)">AIR COIL + FANS</text>';
-                h+='<path class="pipe-hot flow on" d="M103 40 V12"/><text class="sch-sub" x="108" y="20">→ room air (no FWS)</text>';
+                h+='<path class="pipe-hot flow on" d="M103 40 V12"/><text class="sch-sub" x="98" y="28" text-anchor="end">room air ↑ (no FWS)</text>';
                 h+=pInst(103,288,'TI','03','pv-atd','atd');
             }
             // ===== CDU envelope =====
@@ -640,7 +653,7 @@
             // expansion tank T-01 + makeup MV-01 + relief PSV-01 (top)
             h+='<rect class="sch-eq" x="150" y="40" width="22" height="30" rx="10"/><path class="sch-eq2" d="M150 58 H172"/><text class="sch-sub" x="161" y="80" text-anchor="middle">T-01 EXP</text>';
             h+=pInst(196,52,'LT','01','pv-level','level');
-            h+='<path class="pipe-s" d="M161 40 V30 H120" stroke-dasharray="2 2"/>'+pHV(140,30,'MV-01')+'<text class="sch-sub" x="120" y="26">makeup</text>';
+            h+='<path class="pipe-s" d="M161 40 V30 H120" stroke-dasharray="2 2"/>'+pHV(140,30,'MV-01')+'<text class="sch-sub" x="122" y="39">makeup</text>';
             h+='<path class="sch-eq2" d="M161 40 V26 M156 26 l5 -6 l5 6" /><text class="sch-sub" x="178" y="26">PSV-01</text>';
             // pumps P-01A duty / P-01B standby (N+1) with suction iso, check, discharge iso
             h+=pPump(175,150,'P-01A '+(pumpAon?'(duty)':'(off)'),pumpAon,slow);
@@ -677,10 +690,18 @@
             h+=pHV(300,270,'HV-04');
             // pump status readout
             h+='<text class="sch-val" id="pv-pump" x="175" y="120" text-anchor="middle"></text>';
+            // ===== control loops (registry, sheet 'cdu-pid'); drawn after the transmitters so a tile's highlight finds the
+            // transmitter first. TIC-01: TT-01 -> TIC-01 -> TCV-01 (L2A: the air-coil fans). PDIC-02: PDT-02 -> PDIC-02 -> VFD.
+            h+='<path class="sch-sig" d="M344 60 H300 V104 H71"/>';
+            h+=(t.arch==='L2L'?'<path class="sch-sig" d="M60 93 V72 H68 V51"/>':'<path class="sch-sig" d="M60 93 V70 H86"/>');
+            h+=pCtl(60,104,'TIC-01','supply','SP '+t.supply+' °C','holds TCS supply TT-01 with '+(t.arch==='L2L'?'TCV-01':'the air-coil fans'));
+            h+='<path class="sch-sig" d="M350 211 V190 H319"/><path class="sch-sig" d="M297 190 H186"/>';
+            h+='<g data-tag="VFD-01"><rect class="sch-eq2" x="164" y="184" width="22" height="12" rx="1.5"/><text class="sch-sub" x="175" y="192.5" text-anchor="middle">VFD</text><title>Duty pump VFD (P-01A, or P-01B after an N+1 changeover)</title></g>';
+            h+=pCtl(308,190,'PDIC-02','dP','SP '+t.dP.toFixed(1)+' bar','holds loop dP PDT-02 with the duty pump VFD');
             // ===== leak rope + setpoint note + legend strip =====
             h+='<line x1="135" y1="322" x2="392" y2="322" stroke="var(--bm-muted)" stroke-width="1" stroke-dasharray="2 3"/><text class="sch-sub" x="138" y="319">leak rope LSH-01</text>';
             h+='<g class="leak-x'+(curScen==='leak'?' on':'')+'"><line x1="251" y1="315" x2="265" y2="329"/><line x1="265" y1="315" x2="251" y2="329"/></g>';
-            h+='<text class="sch-sub" x="8" y="352" data-const><title>Floor = room dew point + 3 K (TT-01 low warning). Values from the control registry.</title>SETPOINT — TCV-01 holds TT-01 = '+t.supply+' °C (floor '+CPV('conv.cdu-mini-bms.tcs_supply_floor')+' °C) · P-01 VFD on ΔP (PDT-02) · N+1 auto-changeover</text>';
+            h+='<text class="sch-sub" x="8" y="352" data-const><title>Floor = room dew point + 3 K (TT-01 low warning). Values from the control registry.</title>SETPOINT — TIC-01 holds TT-01 = '+t.supply+' °C (floor '+CPV('conv.cdu-mini-bms.tcs_supply_floor')+' °C) · PDIC-02 holds PDT-02 = '+t.dP.toFixed(1)+' bar · N+1 pumps</text>';
             // legend strip (bottom) — simple inline symbols, tight spacing
             h+='<g transform="translate(120,368)">'
              + '<path class="sch-eq" d="M2 -4 L9 1 L2 6 Z M16 -4 L9 1 L16 6 Z"/><text class="sch-sub" x="22" y="4">iso valve</text>'

@@ -67,7 +67,7 @@ if (!process.argv.includes('--browser') || fail) process.exit(fail ? 1 : 0);
 const http = await import('node:http');
 const { default: puppeteer } = await import('puppeteer');
 const { primeCockpitAuditDocument, enterAuthorizedAuditState } = await import('./lib/cockpit-audit-state.mjs');
-const PLANT = [['"conv.fire-system.jockey_on": 11.5', '"conv.fire-system.jockey_on": 11'], ['"conv.fuel-system.day_tank_fill_start": 50', '"conv.fuel-system.day_tank_fill_start": 55'], ['"inrow": 32', '"inrow": 31'], ['"conv.water-system.booster_discharge_sp": 4.2', '"conv.water-system.booster_discharge_sp": 4']];
+const PLANT = [['"conv.fire-system.jockey_on": 11.5', '"conv.fire-system.jockey_on": 11'], ['"conv.fuel-system.day_tank_fill_start": 50', '"conv.fuel-system.day_tank_fill_start": 55'], ['"inrow": 32', '"inrow": 31'], ['"inrow": 1.6', '"inrow": 1.5'], ['"conv.water-system.booster_discharge_sp": 4.2', '"conv.water-system.booster_discharge_sp": 4']];
 let planted = false;
 const TYPES = { html: 'text/html', js: 'text/javascript', css: 'text/css', json: 'application/json', svg: 'image/svg+xml', png: 'image/png', woff2: 'font/woff2' };
 const srv = http.createServer((req, res) => {
@@ -104,8 +104,8 @@ const read = {
     return n.textContent.replace(/^.*?SETPOINT/, 'SETPOINT') + (over > 0.5 ? ' [past the drawing by ' + over.toFixed(1) + ']' : ''); }
 };
 const want = {
-  false: { 'water-system#pic': /^SP 4\.2 bar$/, 'water-system': /^4\.2 bar$/, 'fuel-system#lic': /^50 \/ 90 %$/, 'fire-system#pc': /^11\.5 \/ 12\.8 bar$/, 'fire-system': /^11\.5 \/ 12\.8 bar$/, 'fuel-system': /^fill 50→90 %$/, 'cdu-mini-bms': /TT-01 = 32 °C \(floor 18 °C\)(?!.*past the drawing)/ },
-  true: { 'water-system#pic': /^SP 4\.0 bar$/, 'water-system': /^4\.0 bar$/, 'fuel-system#lic': /^55 \/ 90 %$/, 'fire-system#pc': /^11\.0 \/ 12\.8 bar$/, 'fire-system': /^11\.0 \/ 12\.8 bar$/, 'fuel-system': /^fill 55→90 %$/, 'cdu-mini-bms': /TT-01 = 31 °C \(floor 18 °C\)(?!.*past the drawing)/ }
+  false: { 'water-system#pic': /^SP 4\.2 bar$/, 'water-system': /^4\.2 bar$/, 'fuel-system#lic': /^50 \/ 90 %$/, 'fire-system#pc': /^11\.5 \/ 12\.8 bar$/, 'fire-system': /^11\.5 \/ 12\.8 bar$/, 'fuel-system': /^fill 50→90 %$/, 'cdu-mini-bms': /TT-01 = 32 °C \(floor 18 °C\).*PDT-02 = 1\.6 bar(?!.*past the drawing)/ },
+  true: { 'water-system#pic': /^SP 4\.0 bar$/, 'water-system': /^4\.0 bar$/, 'fuel-system#lic': /^55 \/ 90 %$/, 'fire-system#pc': /^11\.0 \/ 12\.8 bar$/, 'fire-system': /^11\.0 \/ 12\.8 bar$/, 'fuel-system': /^fill 55→90 %$/, 'cdu-mini-bms': /TT-01 = 31 °C \(floor 18 °C\).*PDT-02 = 1\.5 bar(?!.*past the drawing)/ }
 };
 let bad = 0;
 for (const pl of [false, true]) {
@@ -241,6 +241,51 @@ for (const pl of [false, true]) {
   if (errs.length) f.push('page errors ' + errs.slice(0, 2).join(' | '));
   f.forEach((x) => console.log('FAIL S8e water ' + x)); bad += f.length;
   console.log(`${f.length ? 'FAIL' : 'PASS'} S8e booster pressure controller on WT-M-101: ${(g.rows || []).map((r) => r.tag + ' ' + r.kind + ' ' + r.sp).join(' · ')}`);
+  await pg.close();
+}
+/* S8e cdu (P9 part 4, v3.116.2): the CDU P&ID (hand-drawn, sheet 'cdu-pid') carries its two controllers from the registry:
+   TIC-01 (TT-01 -> TCV-01, or the air-coil fans on the air-cooled L2A type) and PDIC-02 (PDT-02 -> the duty pump's VFD).
+   Each: one bubble [data-loop], a signal line (path.sch-sig) from its transmitter and one to what it drives, the registry
+   setpoint of the selected CDU type printed; no other controller bubble on the drawing. Checked on In-Row and on L2A. */
+{
+  planted = false;
+  const pg = await browser.newPage(), errs = []; pg.on('pageerror', (e) => errs.push(e.message));
+  await pg.setViewport({ width: 1440, height: 900 }); await primeCockpitAuditDocument(pg, 'dark');
+  await pg.goto(ORIGIN + 'cdu-mini-bms.html', { waitUntil: 'networkidle2', timeout: 90000 });
+  await new Promise((r) => setTimeout(r, 2000));
+  const f = [], seen = [];
+  for (const type of ['inrow', 'l2a']) {
+    await pg.evaluate((t) => { const b = document.querySelector('button[data-type="' + t + '"]'); if (b) b.click(); }, type);
+    await new Promise((r) => setTimeout(r, 800));
+    const g = await pg.evaluate((type) => {
+      const C = window.RZControlPoints, L = C && C.loops ? C.loops('cdu-pid') : [], svg = document.querySelector('#pidBox svg');
+      if (!svg) return { loops: L.length, err: 'no P&ID' };
+      const L2A = type === 'l2a';
+      const byTag = (t) => svg.querySelector('[data-tag="' + t + '"]') || [...svg.querySelectorAll('.pid-inst')].find((x) => (x.getAttribute('aria-label') || '').startsWith(t + ' '));
+      const near = (pt, n, pad) => { const b = n.getBBox(); return pt[0] >= b.x - pad && pt[0] <= b.x + b.width + pad && pt[1] >= b.y - pad && pt[1] <= b.y + b.height + pad; };
+      const sig = [...svg.querySelectorAll('path.sch-sig')].map((p) => { const a = p.getPointAtLength(0), b = p.getPointAtLength(p.getTotalLength()); return [[a.x, a.y], [b.x, b.y]]; });
+      const joins = (x, y) => (x && y ? sig.filter((e) => (near(e[0], x, 3) && near(e[1], y, 3)) || (near(e[1], x, 3) && near(e[0], y, 3))).length : 0);
+      const ctl = [...svg.querySelectorAll('[data-loop]')].map((n) => n.getAttribute('data-loop'));
+      return { loops: L.length, ctl, rows: L.map((l) => {
+        const c = [...svg.querySelectorAll('[data-loop="' + l.tag + '"]')], c0 = c[0], v = C.value(l.sp, type);
+        const mvTag = L2A && l.mv.node === 'TCV-01' ? 'AIR-COIL' : l.mv.node, t = svg.querySelector('[data-sp="' + l.tag + '"]');
+        return { tag: l.tag, n: c.length, fromPv: joins(c0, byTag(l.pv.tag)), toMv: joins(c0, byTag(mvTag)), mvTag,
+          sp: t ? [...t.childNodes].filter((x) => x.nodeType === 3).map((x) => x.data).join('').trim() : '', want: 'SP ' + (l.tag.startsWith('TIC') ? v + ' °C' : v.toFixed(1) + ' bar') }; }) };
+    }, type);
+    if (g.err || g.loops !== 2) { f.push(`${type}: registry loops on cdu-pid ${g.loops} (want 2: TIC-01, PDIC-02)${g.err ? ' · ' + g.err : ''}`); continue; }
+    for (const r of g.rows) {
+      if (r.n !== 1) f.push(`${type} ${r.tag}: ${r.n} bubbles, want 1`);
+      if (r.fromPv < 1) f.push(`${type} ${r.tag}: no signal from its transmitter`);
+      if (r.toMv < 1) f.push(`${type} ${r.tag}: no signal to ${r.mvTag}`);
+      if (r.sp !== r.want) f.push(`${type} ${r.tag}: prints "${r.sp}", registry "${r.want}"`);
+      seen.push(type + ' ' + r.tag + ' ' + r.sp);
+    }
+    const orphan = g.ctl.filter((t) => !g.rows.some((r) => r.tag === t));
+    if (orphan.length) f.push(`${type}: orphan controller bubbles ${orphan.join(', ')}`);
+  }
+  if (errs.length) f.push('page errors ' + errs.slice(0, 2).join(' | '));
+  f.forEach((x) => console.log('FAIL S8e cdu ' + x)); bad += f.length;
+  console.log(`${f.length ? 'FAIL' : 'PASS'} S8e CDU controllers on the cdu-mini P&ID: ${seen.join(' · ')}`);
   await pg.close();
 }
 /* S8f (v3.115.2): a controller bubble's accessible name (and so its inspector title) says its tag once. The sheet engine

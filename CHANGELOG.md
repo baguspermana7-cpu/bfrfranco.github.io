@@ -11,6 +11,18 @@ release sections rather than semver.
 
 ---
 
+## v3.116.2 — 2026-11-27 — The CDU drawing shows its two controllers
+
+**cdu-mini-bms: TIC-01 and PDIC-02 drawn on the CDU P&ID, from the control registry** (PRD-SETPOINT-SIM C21, P9 part 4)
+
+- TIC-01 holds the TCS supply TT-01 with the facility-water valve TCV-01. On the air-cooled L2A type it drives the air-coil fans instead, since that type has no facility water.
+- PDIC-02 holds the loop dP at PDT-02 with the duty pump's VFD.
+- Each bubble prints its setpoint for the selected CDU type (In-Row: SP 32 °C, SP 1.6 bar). Dashed signal lines join it to its transmitter and to what it drives.
+- The loop dP per CDU type (1.2 / 1.6 / 1.1 / 2.2 / 1.0 bar) was typed in the page. It is now registry row `conv.cdu-mini-bms.loop_dp_sp` (ASSUMED, page design).
+- The fault scenarios still move PDT-02 off its setpoint: the page models the fault, not the controller's recovery.
+- Fixed two label collisions on the same drawing: "room air" over MV-01, and "makeup" over the MV-01 tag.
+- **Gate (red first):** `tools/test-typed-control-numbers.mjs --browser`, S8e cdu and T3. Red on v3.116.1: no registry loop on the CDU drawing, and the SETPOINT note did not name PDIC-02.
+
 ## v3.116.1 — 2026-11-27 — The inspector stops breaking words in half
 
 **Conventional inspector text wraps between words, and a tag stays whole** (found on the v3.115.2 live screenshot)

@@ -1112,3 +1112,27 @@ RZSpBlock.bind(host, { recompute })  → wires sliders (input → recompute → 
   button.
 - Law: `tools/test-inspector-wrap.mjs` W1 and W2, in the Conventional release gate. It was red on 8 of 8 checks
   first, then red on 2 (the hyphen split) until the no-wrap tag span.
+
+## C21. P9 part 4 delivered (2026-11-27, v3.116.2): the CDU controllers drawn
+
+- **cdu-mini-bms now draws its two controllers.** They come from the control registry, sheet `cdu-pid`. The page's
+  P&ID is still hand-drawn. The diagram-engine ratchet (`tools/test-diagram-engine-adoption.mjs`) does not cover this
+  page, so the reason given in C19 for not drawing them was wrong.
+  - **TIC-01** (PI, direct). TT-01 → TIC-01 → TCV-01. On the air-cooled L2A type there is no facility water, so the
+    signal goes to the air-coil fans. SP per CDU type = `conv.cdu-mini-bms.tcs_supply_sp` (In-Row 32 °C).
+  - **PDIC-02** (PI, reverse). PDT-02 → PDIC-02 → the duty pump's VFD (P-01A, or P-01B after an N+1 changeover).
+    New row `conv.cdu-mini-bms.loop_dp_sp`, by type 1.2 / 1.6 / 1.1 / 2.2 / 1.0 bar (In-Rack / In-Row / Sidecar /
+    L2L / L2A), ASSUMED. These numbers used to be typed in the page's `TYPES` table; the page now reads them from the
+    registry. The PDT-02 band nominal points at the registry row.
+  - Each bubble prints its setpoint ("SP 32 °C", "SP 1.6 bar"). The signals are dashed ISA-5.1 electric lines. The
+    SETPOINT note names both controllers.
+  - Honest limit: the fault scenarios (filter clog, low flow, pump trip) move PDT-02 off its setpoint. The page models
+    the fault, not the controller's recovery, and the row's basis says so.
+- **Two label collisions on the same drawing fixed:** "→ room air (no FWS)" over MV-01 (L2A), and "makeup" over the
+  MV-01 tag.
+- **Laws, red first** (`tools/test-typed-control-numbers.mjs --browser`):
+  - S8e cdu: one bubble per registry loop, a signal from its transmitter and one to what it drives, the registry SP
+    printed, no orphan, on In-Row and L2A. Red: 0 registry loops on `cdu-pid`.
+  - T3 cdu: the SETPOINT note follows a planted registry (In-Row 32 → 31 °C, 1.6 → 1.5 bar). Red: no PDIC-02 in the
+    note.
+- **Count:** the registry builder reports 117 rows, 28 setpoints (one new row); drawn loops on Conventional pages +2.
