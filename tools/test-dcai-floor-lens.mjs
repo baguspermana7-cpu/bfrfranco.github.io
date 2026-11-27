@@ -6,7 +6,8 @@
        the lens thresholds (warn > 27, alarm > 30 degC)
    FL3 pipe dash period = RZConvVfx.dashSeconds(cduLoad / 100) +-5 %; reduced motion: 0 running animations in .fp-ovl
    FL4 row tags speak the lens: Thermal degC (station means), Cooling L/min (hall TCS flow / pairs), Status kW
-   FL5 three hall chips in Thermal and Cooling, none in Status, numbers = __hallIsoGeo
+   FL5 three hall operating lines in Thermal and Cooling (on the floor's bands >= 600 px, chips on a phone), none in
+       Status, numbers = __hallIsoGeo
    FL6 Power: one busway bar per row pair, length ratio = buswayPct / 100 +-2 %, no state attribute
    FL7 0 page errors; chips beside the floor (never over it) and clear of each other; datahall.html (Conventional) draws no .fp-ovl
    Red on 4a1b15c33: no overlay exists. */
@@ -94,10 +95,11 @@ const read = (pg) => pg.evaluate(() => {
   const tags = [...root.querySelectorAll('.zone .zf-kw')].map((t) => t.textContent.trim());
   const cut = [...root.querySelectorAll('.zone')].filter((t) => getComputedStyle(t).visibility !== 'hidden').filter((t) => { const r = t.getBoundingClientRect(); return r.width && (r.right > stage.right + 1 || r.left < stage.left - 1); }).length;
   const chips = [...document.querySelectorAll('#hIsoWrap .dh-hallchip')].filter((c) => c.getClientRects().length && getComputedStyle(c).display !== 'none').map((c) => { const r = c.getBoundingClientRect(); return { t: c.textContent, l: r.left, r: r.right, top: r.top, b: r.bottom }; });
+  const ops = [...document.querySelectorAll('#hIso .fp-ovl .ovl-ops')].filter((t) => t.getClientRects().length && getComputedStyle(t).display !== 'none').map((t) => ({ t: t.textContent, k: t.dataset.ops }));
   const anims = document.getAnimations().filter((a) => a.playState === 'running' && a.effect && a.effect.target && a.effect.target.closest && a.effect.target.closest('.fp-ovl')).length;
   const rd = {}; document.querySelectorAll('[id^="C"],[id^="H"]').forEach((e) => { if (/^[CH]\d+\d+t$/.test(e.id)) rd[e.id] = parseFloat(e.textContent); });
   const g = window.__hallIsoGeo;
-  return { pipes, st, bars, tags, cut, chips, stage: { l: stage.left, r: stage.right, t: stage.top, b: stage.bottom }, anims, rd, g: { sp: g.sp, rows: g.rows, cduLoad: g.cduLoad, cduLpm: g.cduLpm, cduRun: g.cduRun, cduInst: g.cduInst, crahAct: g.crahAct, crahInst: g.crahInst, crahFan: g.crahFan, crahAir: g.crahAir, cduPump: g.cduPump, busway: g.buswayPct, tcs: [window.DHE && DHE.tcsSupply, window.DHE && DHE.tcsReturn] },
+  return { pipes, st, bars, tags, cut, chips, ops, stage: { l: stage.left, r: stage.right, t: stage.top, b: stage.bottom }, anims, rd, g: { sp: g.sp, rows: g.rows, cduLoad: g.cduLoad, cduLpm: g.cduLpm, cduRun: g.cduRun, cduInst: g.cduInst, crahAct: g.crahAct, crahInst: g.crahInst, crahFan: g.crahFan, crahAir: g.crahAir, cduPump: g.cduPump, busway: g.buswayPct, tcs: [window.DHE && DHE.tcsSupply, window.DHE && DHE.tcsReturn] },
     dash: window.RZConvVfx ? window.RZConvVfx.dashSeconds(g.cduLoad / 100) : null };
 });
 const n1 = (x) => (Math.round(x * 10) / 10).toFixed(1);
@@ -136,10 +138,12 @@ for (const [W, views] of [[1440, ['2d', '3d']], [390, ['2d']]]) {
     for (const l of ['status', 'thermal', 'cooling']) ok('FL7', L[l].cut === 0, `${tag} ${l}: ${L[l].cut} row tags cut by the stage edge`);
     /* FL5 */
     for (const l of ['thermal', 'cooling']) {
-      const c = L[l].chips, txt = c.map((x) => x.t).join(' | ');
-      ok('FL5', c.length === 3, `${tag} ${l} chips ${c.length}: ${txt}`);
-      const need = [n1(g.crahFan), Math.round(g.crahAir).toLocaleString('en-US'), String(g.cduRun), n1(g.cduPump), n1(g.tcs[0]), n1(g.tcs[1])];
-      const fw = c.filter((x) => /^FW-/.test(x.t)).map((x) => +((/(\d+) run/.exec(x.t) || [])[1]));
+      /* Amendment 10: a wide stage prints the three lines on the floor's own bands (.ovl-ops); a phone keeps the chips */
+      const c = L[l].chips, o = W >= 600 ? L[l].ops : c, txt = o.map((x) => x.t).join(' | ');
+      ok('FL5', o.length === 3, `${tag} ${l} operating lines ${o.length}: ${txt}`);
+      if (W >= 600) ok('FL5', c.length === 0, `${tag} ${l} chips ${c.length} beside a floor that prints its lines`);
+      const need = [n1(g.crahFan), String(g.cduRun), n1(g.cduPump), n1(g.tcs[0]), n1(g.tcs[1])].concat(W >= 600 ? [] : [Math.round(g.crahAir).toLocaleString('en-US')]);
+      const fw = o.filter((x) => /^(FW-|FAN WALL)/.test(x.t)).map((x) => +((/(\d+) run/.exec(x.t) || [])[1]));
       ok('FL5', fw.length === 2 && fw[0] + fw[1] === g.crahAct, `${tag} ${l} fan-wall run counts ${JSON.stringify(fw)} sum to ${g.crahAct}`);
       const miss = need.filter((x) => !txt.replace(/ /g, '').includes(x));
       ok('FL5', miss.length === 0, `${tag} ${l} chips miss ${JSON.stringify(miss)}: ${txt}`);
@@ -149,7 +153,7 @@ for (const [W, views] of [[1440, ['2d', '3d']], [390, ['2d']]]) {
       ok('FL7', ov === 0, `${tag} ${l} ${ov} chip overlaps`);
       if (W >= 1000) ok('FL7', c.every((x) => x.l >= L[l].stage.r && x.top < L[l].stage.b), `${tag} ${l} chips not in the column beside the floor: ${JSON.stringify(c.map((x) => [Math.round(x.l), Math.round(x.top)]))}`);
     }
-    ok('FL5', L.status.chips.length === 0 && L.power.chips.length === 0, `${tag} status/power chips ${L.status.chips.length}/${L.power.chips.length}`);
+    ok('FL5', L.status.chips.length + L.status.ops.length === 0 && L.power.chips.length + L.power.ops.length === 0, `${tag} status/power chips ${L.status.chips.length}/${L.power.chips.length}`);
     /* FL6 */
     const B = L.power.bars;
     ok('FL6', B.length === pairs && B.every((b) => Math.abs(b.ratio - g.busway / 100) <= 0.02 && !b.state), `${tag} power bars ${B.length}, ratios ${JSON.stringify(B.slice(0, 2))}, want ${g.busway / 100}`);

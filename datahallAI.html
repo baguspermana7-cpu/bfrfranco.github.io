@@ -773,7 +773,7 @@ body[data-datahall-authority="unavailable"] #tabs,
 body[data-datahall-authority="unavailable"] .wrap{display:none !important}
 body[data-datahall-authority="unavailable"] .hdr-r>.dot,body[data-datahall-authority="unavailable"] [data-cv="clock"]>.dot{background:#64748b !important;box-shadow:none !important;animation:none !important}
 body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:none}
-</style>    <script src="js/rz-version.js?v=20261127-0912bbd1" defer></script>
+</style>    <script src="js/rz-version.js?v=20261127-88f4c8de" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <!-- v3.5.0 — hold the 8.5px legibility floor by SCALE, not by font size. Five of this page's
          fifteen diagrams were already clear; the dense ones (cooling P&ID, the four SLDs, the hall
@@ -883,7 +883,7 @@ body[data-datahall-authority="current"] #datahallAuthorityUnavailable{display:no
     <script src="js/datahall-ai/hall-interact.js?v=20261013-77877697" defer></script>
     <script src="js/conv/floor-plan-color.js?v=20261122-7138898a" defer></script>
     <script src="js/conv/floor-plan.js?v=20261126-d9d24cd3" defer></script>
-    <script src="js/datahall-ai/hall-iso.js?v=20261126-c727f657" defer></script>
+    <script src="js/datahall-ai/hall-iso.js?v=20261127-38e3380d" defer></script>
     <script src="js/datahall-ai/fire-workstation.js?v=20261116-0546e949" defer></script>
 <style id="rz-skiplink-v1">
 .skip-link{position:absolute;top:-50px;left:0;background:#1a1d23;color:#fff;padding:10px 20px;text-decoration:none;font-weight:600;font-size:.9rem;z-index:10000;border-radius:0 0 4px 0;transition:top .2s ease}
@@ -15772,7 +15772,11 @@ if(faqBtn){ faqBtn.addEventListener('click',openFaqDialog); }
     R('#hSvg',      {maxScale:12, minWidth:1240});   /* v3.21.0: smallest label 9 units in a 1200 viewBox */
     R('#elecOvSvg', {maxScale:12, minWidth:2520});
     for(var hq=1;hq<=(window.HALL_LAYOUT&&window.HALL_LAYOUT.halls||4);hq++)R('#elecDH'+hq+'Svg',{maxScale:12, minWidth:2650});   /* same shape on every hall */
-    R('#bldgSvg',   {maxScale:12, minWidth:1860});
+    /* Amendment 10 (VR5): the building's smallest label is 9 units in a 1200 viewBox, so 1160 px draws it at 8.7 px: a
+       desktop pane (1240 at 1440) shows the whole building at 1.0x, a narrower pane pans. The old 1860 px minimum cropped
+       its title and right half on desktop. Without a minimum, a phone measured before its pane settled drew 6 px
+       labels (test-conv-geometry G5). */
+    R('#bldgSvg',   {maxScale:12, minWidth:1160});
     R('#fireSvg',   {maxScale:12, minWidth:2250});
     /* The floor-plan element is shared by four drawings; the widest requirement wins, because the
        reader switches between them without the pane being re-measured from scratch. */
@@ -15819,7 +15823,7 @@ if(faqBtn){ faqBtn.addEventListener('click',openFaqDialog); }
     <script src="js/rz-eng-symbols.js?v=20261118-528d60ce"></script>
     <script src="js/rz-elec-voltage.js?v=20261122-84c5c299"></script>
     <script src="js/rz-hmi-sheet.js?v=20261125-ca35ea9a"></script>
-    <script src="js/datahall-ai/hmi-sheets.js?v=20261126-446e3111"></script>
+    <script src="js/datahall-ai/hmi-sheets.js?v=20261127-2e91bf69"></script>
     <script src="js/conv/vfx.js?v=20261123-3fd25115"></script>
     <script src="js/datahall-ai/hmi-v2.js?v=20261123-7ce12335"></script>
     <script src="js/rz-el-iso.js?v=20261123-243f32ae"></script>

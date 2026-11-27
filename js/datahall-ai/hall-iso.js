@@ -31,7 +31,8 @@
     ['layout', 'Layout', 'space', 'Occupied and spare positions']];
   function lensMode(l) { for (var i = 0; i < LENSES.length; i++) if (LENSES[i][0] === l) return LENSES[i][2]; return 'alarms'; }
   function lensStored() { try { var v = win.localStorage.getItem(LENS_KEY); return lensMode(v) && LENSES.some(function (d) { return d[0] === v; }) ? v : null; } catch (e) { return null; } }
-  var lens = lensStored() || 'status', lensBar = null, legendBox = null, tableBox = null;
+  /* Amendment 10 (VR1): a first visit opens on Thermal, the lens that shows the hall operating; a stored choice still wins */
+  var lens = lensStored() || 'thermal', lensBar = null, legendBox = null, tableBox = null;
   var meas = null, lastHall = '', geo = null, model = null, inst = null, host = null, wrap = null, bar = null, sum = null, view = null, timer = 0, sig = '';
   function pad2(n) { return (n < 10 ? '0' : '') + n; }
   function stored() { try { var v = win.localStorage.getItem(KEY); return VIEWS.indexOf(v) >= 0 ? v : null; } catch (e) { return null; } }
@@ -95,7 +96,7 @@
       '#p-hall[data-dh-view]:not([data-dh-view="drawing"]) [data-rz-legible-note]{display:none!important}',
       /* a phone: the KPI strip is one row that scrolls inside itself, so the floor starts on the first screen (HV-F1) */
       /* Amendment 7 (A6a): each lens draws its own layer; nothing of it shows in another lens */
-      '#hIso{--fp-liq-sup:#5fb0c6;--fp-liq-ret:#c48c68}[data-theme="light"] #hIso{--fp-liq-sup:#1d6b80;--fp-liq-ret:#87502e}',
+      '#hIsoWrap,#hIso{--fp-liq-sup:#5fb0c6;--fp-liq-ret:#c48c68}[data-theme="light"] #hIsoWrap,[data-theme="light"] #hIso{--fp-liq-sup:#1d6b80;--fp-liq-ret:#87502e}',
       '#hIso .fp-ovl{pointer-events:none}#hIso .fp-ovl [data-lens]{display:none}',
       '#hIso[data-lens-on="cooling"] .fp-ovl [data-lens~="cooling"],#hIso[data-lens-on="thermal"] .fp-ovl [data-lens~="thermal"],#hIso[data-lens-on="power"] .fp-ovl [data-lens~="power"],#hIso[data-lens-on="status"] .fp-ovl [data-lens~="status"],#hIso[data-lens-on="layout"] .fp-ovl [data-lens~="layout"]{display:inline}',
       '#hIso .ovl-pipe{fill:none;stroke-width:2;stroke-linecap:round;stroke-dasharray:5 7}',
@@ -109,6 +110,14 @@
       '#hIso .dh-sttrend .st-ax{display:flex;justify-content:space-between;font:11px "JetBrains Mono",monospace;color:var(--t2)}#hIso .dh-sttrend .st-now{color:var(--t1)}#hIso .dh-sttrend .st-src{font-size:11px;color:var(--t2);margin-top:2px}',
       '#hIso .cr-valve{display:none}#hIso[data-lens-on="cooling"] .cr-valve{display:inline}#hIso .ovl-st[data-hot="1"]{stroke:var(--fp-ink,#e8edf5);stroke-width:1.5}',
       '#hIso .ovl-st{stroke:var(--bg2);stroke-width:1}#hIso .ovl-st[data-state="stale"]{fill:none;stroke:var(--t3);stroke-dasharray:1.5 1.5}#hIso .ovl-st[data-state="ok"]{fill:var(--rz-pt-ok,#16a34a)}#hIso .ovl-st[data-state="warn"]{fill:var(--rz-pt-warn,#d97706)}#hIso .ovl-st[data-state="alarm"]{fill:var(--rz-pt-alarm,#dc2626)}#hIso .ovl-st[data-side="hot"]{fill:var(--fp-ink,#e8edf5)}',
+      /* Amendment 10: printed readings, aisle tints (identity; a cold aisle turns warn/alarm only by state), operating lines, a readable valve bar */
+      '#hIso .ovl-stv{font:500 9px "JetBrains Mono",ui-monospace,monospace;fill:var(--t1);text-anchor:middle;paint-order:stroke;stroke:var(--bg2);stroke-width:3px;stroke-linejoin:round}',
+      '#hIso .ovl-ops{font:600 10px "JetBrains Mono",ui-monospace,monospace;fill:var(--t1);paint-order:stroke;stroke:var(--bg2);stroke-width:3.5px;stroke-linejoin:round}',
+      '.dh-aisle-sw[data-aisle="cold"]{background:color-mix(in srgb,var(--fp-liq-sup,#5fb0c6) 30%,transparent)!important;border-color:var(--fp-liq-sup,#5fb0c6)!important}.dh-aisle-sw[data-aisle="hot"]{background:color-mix(in srgb,var(--fp-liq-ret,#c48c68) 28%,transparent)!important;border-color:var(--fp-liq-ret,#c48c68)!important}',
+      '#hIso .ovl-opsbg{fill:var(--bg2);fill-opacity:.92;stroke:var(--bd);stroke-width:1}',
+      '#hIso .ovl-aisle{stroke:none}#hIso .ovl-aisle[data-side="cold"]{fill:var(--fp-liq-sup);fill-opacity:.16}#hIso .ovl-aisle[data-side="hot"]{fill:var(--fp-liq-ret);fill-opacity:.14}',
+      '#hIso .ovl-aisle[data-state="warn"]{fill:var(--rz-pt-warn,#d97706);fill-opacity:.3}#hIso .ovl-aisle[data-state="alarm"]{fill:var(--rz-pt-alarm,#dc2626);fill-opacity:.3}',
+      '#hIso .cr-valve-track,#hIso .cr-valve-fill{stroke-width:4;stroke-linecap:butt}',
       '#hIso .ovl-bw-track{stroke:var(--bd);stroke-width:3;stroke-linecap:butt}#hIso .ovl-bw{stroke:var(--fp-ink,#e8edf5);stroke-width:3;stroke-linecap:butt}',
       '.dh-hallops{display:flex;flex-direction:column;gap:6px;margin-top:10px;font:500 11px/1.35 "IBM Plex Mono",ui-monospace,monospace;color:var(--t2)}',
       '.dh-hallops{width:150px;max-width:150px}.dh-hallchip{padding:4px 6px;border:1px solid var(--bd);border-radius:2px;background:var(--bg2);white-space:normal}.dh-hallchip b{color:var(--t1);font-weight:600}',
@@ -511,11 +520,20 @@
         pipe('M' + api.P(xh - dx, ySup, hPipe, b) + (api.iso ? 'L' + api.P(xh - dx, G.cabY1, hBr, b) : '') + 'L' + api.P(xh - dx, G.cabY0 + 0.3, hBr, b), 'branch', 'sup', z, name + ' TCS supply branch · ' + f0(lpm) + ' L/min · ' + f1(tS) + ' °C', hBr);
         pipe('M' + api.P(xh + dx, G.cabY0 + 0.3, hBr, b) + (api.iso ? 'L' + api.P(xh + dx, G.cabY1, hBr, b) : '') + 'L' + api.P(xh + dx, yRet, hPipe, b), 'branch', 'ret', z, name + ' TCS return branch · ' + f0(lpm) + ' L/min · ' + f1(tR) + ' °C', hBr);
         /* D2 the stations the Drawing view reads: SENS_PTS per aisle, evenly along the rack line */
+        /* Amendment 10 (VR3): the pair's half of the cold aisle takes the state of its worst inlet point; the contained hot
+           aisle carries the return identity tint (never a state colour) */
+        if (!api.iso) {
+          svgEl(api, 'path', { 'class': 'ovl-aisle', 'data-side': 'cold', 'data-lens': 'thermal', 'data-z': z, d: 'M' + api.P(x0 - G.cold / 2, G.cabY0, 0, b) + 'L' + api.P(x0, G.cabY0, 0, b) + 'L' + api.P(x0, G.cabY1, 0, b) + 'L' + api.P(x0 - G.cold / 2, G.cabY1, 0, b) + 'Z' }, g);
+          svgEl(api, 'path', { 'class': 'ovl-aisle', 'data-side': 'hot', 'data-lens': 'thermal', 'data-z': z, d: 'M' + api.P(x0 + G.cabW, G.cabY0, 0, b) + 'L' + api.P(x0 + G.cabW + G.hot, G.cabY0, 0, b) + 'L' + api.P(x0 + G.cabW + G.hot, G.cabY1, 0, b) + 'L' + api.P(x0 + G.cabW, G.cabY1, 0, b) + 'Z' }, g);
+        }
         for (s = 0; s < sp; s++) {
           var y = G.cabY0 + (s + 0.5) * (G.cabY1 - G.cabY0) / sp;
           var pc = api.XY(x0 - G.cold / 4, y, api.iso ? 1.0 : 0, b), ph = api.XY(xh, y, api.iso ? G.capH : 0, b);
           svgEl(api, 'circle', { 'class': 'ovl-st', cx: pc[0].toFixed(1), cy: pc[1].toFixed(1), r: rSt, 'data-lens': 'thermal', 'data-side': 'cold', 'data-z': z, 'data-s': s }, g, ' ');
           svgEl(api, 'circle', { 'class': 'ovl-st', cx: ph[0].toFixed(1), cy: ph[1].toFixed(1), r: rSt, 'data-lens': 'thermal', 'data-side': 'hot', 'data-z': z, 'data-s': s }, g, ' ');
+          /* Amendment 10 (VR1): the reading printed under its point (stations() writes the text) */
+          svgEl(api, 'text', { 'class': 'ovl-stv', x: pc[0].toFixed(1), y: (pc[1] + rSt + 9).toFixed(1), 'data-lens': 'thermal', 'data-side': 'cold', 'data-z': z, 'data-s': s }, g);
+          svgEl(api, 'text', { 'class': 'ovl-stv', x: ph[0].toFixed(1), y: (ph[1] + rSt + 9).toFixed(1), 'data-lens': 'thermal', 'data-side': 'hot', 'data-z': z, 'data-s': s }, g);
         }
         /* D3 the busway over the pair: neutral, its length = loading (no limit is registered, so no state is claimed) */
         if (o.buswayPct != null) {
@@ -524,6 +542,24 @@
           svgEl(api, 'path', { 'class': 'ovl-bw', d: 'M' + api.P(xb, yA, hBus, b) + 'L' + api.P(xb, yP, hBus, b) }, bg, name + ' busway · ' + f1(o.buswayPct) + ' % of trunk rating (no limit registered)');
         }
       }
+    }
+    /* Amendment 10 (VR2): the air and liquid operating point printed on the bands it belongs to (Thermal and Cooling);
+       a phone keeps the side chips instead (drawOps) */
+    if ((win.innerWidth || 1440) >= 600 && geo) {
+      var hAir = api.iso ? G.capH + 0.8 : 0, xL = G.ox - G.cold / 2 + 0.4, bl = api.nb - 1;
+      function opsLine(key, y, band, text, gal) {
+        var p = api.XY(xL, y, hAir, band);
+        /* v3.116.1: a plate under the line, so it reads as a label on the plan and not across the rotor icons (opsRun sizes it) */
+        svgEl(api, 'rect', { 'class': 'ovl-opsbg', 'data-lens': 'thermal cooling', 'data-ops': key, rx: 2 }, g);
+        var t = svgEl(api, 'text', { 'class': 'ovl-ops', x: p[0].toFixed(1), y: (p[1] + 4).toFixed(1), 'data-lens': 'thermal cooling', 'data-ops': key }, g);
+        t.textContent = text;
+        /* a gallery's run count is read off its drawn cells once the floor has marked its standbys (opsRun) */
+        if (gal) { t.setAttribute('data-gallery', gal); t.setAttribute('data-text', text); }
+      }
+      var air = ' · SA ' + f1(geo.supplyC) + ' · RA ' + f1(geo.returnC) + ' °C · fan ' + f1(o.crahFan) + ' % · CHW valve ' + f1(o.crahValve) + ' %';
+      opsLine('fw-n', G.gD / 2, 0, 'FAN WALL N · {n} run' + air, 'north');
+      if (G.cduY0 != null && G.cduD) opsLine('cdu', G.cduY0 + G.cduD / 2, bl, 'CDU LINE · ' + geo.cduRun + ' run · TCS ' + f1(tS) + ' → ' + f1(tR) + ' °C · pump ' + f1(o.cduPump) + ' % · FWS valve ' + f1(o.cduValve) + ' %');
+      if (G.sY0 != null) opsLine('fw-s', G.sY0 + G.gD / 2, bl, 'FAN WALL S · {n} run' + air, 'south');
     }
   }
   /* D2 each station shows its reading; called after a build and whenever the page writes new readings (rz-hall-readings).
@@ -546,6 +582,17 @@
     });
     /* A8b: the warmest inlet point of each row pair carries a 1 px ink ring — a pointer, not a state */
     Object.keys(hot).forEach(function (z) { hot[z].el.setAttribute('data-hot', '1'); });
+    /* Amendment 10: every reading printed under its point; under 1000 px only the warmest inlet of each pair */
+    var all = (win.innerWidth || 1440) >= 1000, worst = {};
+    [].forEach.call(host.querySelectorAll('.fp-ovl .ovl-stv'), function (t) {
+      var z = t.getAttribute('data-z'), s = t.getAttribute('data-s'), side = t.getAttribute('data-side');
+      var c = host.querySelector('.fp-ovl .ovl-st[data-side="' + side + '"][data-z="' + z + '"][data-s="' + s + '"]'), v = c && c.hasAttribute('data-v') ? +c.getAttribute('data-v') : null;
+      var show = v != null && (all || (side === 'cold' && hot[z] && hot[z].el === c));
+      t.textContent = show ? v.toFixed(1) : '';
+      if (show) t.setAttribute('data-v', String(v)); else t.removeAttribute('data-v');
+      if (side === 'cold' && c) { var st = c.getAttribute('data-state'), rk = { stale: 0, ok: 1, warn: 2, alarm: 3 }; if (worst[z] == null || (rk[st] || 0) > (rk[worst[z]] || 0)) worst[z] = st; }
+    });
+    [].forEach.call(host.querySelectorAll('.fp-ovl .ovl-aisle[data-side="cold"]'), function (a) { var w = worst[a.getAttribute('data-z')]; if (w) a.setAttribute('data-state', w); else a.removeAttribute('data-state'); });
   }
   function nearStation(x, y, rad) {
     var best = null, bd = rad * rad;
@@ -590,7 +637,7 @@
   }
   doc.addEventListener('rz-hall-readings', function () {
     if (!inst || view === 'drawing' || !model) return;
-    readSensors(); stations();
+    readSensors(); stations(); opsRun();
     /* A8d: in Thermal each rack takes the state of the point it reads, so a warm point repaints only its own racks */
     if (lens === 'thermal') { inst.paint(lensMode(lens)); retag(); }
   });
@@ -601,7 +648,8 @@
     if (!opsBox) { opsBox = doc.createElement('div'); opsBox.className = 'dh-hallops'; opsBox.setAttribute('aria-label', 'Hall operating point'); }
     /* in the legend's column, under the legend (drawLegend rebuilds the legend, so the box is re-attached each time) */
     if (legendBox) legendBox.appendChild(opsBox); else if (!opsBox.parentNode) wrap.appendChild(opsBox);
-    opsBox.hidden = !(lens === 'thermal' || lens === 'cooling') || !geo;
+    /* Amendment 10: on a wide stage the floor prints these lines on its own bands; the chips stay for a phone */
+    opsBox.hidden = !(lens === 'thermal' || lens === 'cooling') || !geo || (win.innerWidth || 1440) >= 600;
     if (opsBox.hidden) return;
     var o = geo.ops || {}, runN = host ? host.querySelectorAll('[data-gallery="north"] .crah-cell:not(.stby)').length : 0, runS = host ? host.querySelectorAll('[data-gallery="south"] .crah-cell:not(.stby)').length : 0;
     function chip(h, t) { return '<div class="dh-hallchip"><b>' + h + '</b> · ' + t + '</div>'; }
@@ -609,7 +657,20 @@
       chip('FW-S', runS + ' run · fan ' + f1(o.crahFan) + ' % · ' + f0(o.crahAir) + ' m³/h each') +
       chip('CDU', geo.cduRun + ' run · pump ' + f1(o.cduPump) + ' % · TCS ' + f1(geo.tcsSupC) + ' → ' + f1(geo.tcsRetC) + ' °C');
   }
-  function lensOn() { if (host) host.setAttribute('data-lens-on', lens); readSensors(); stations(); retag(); drawOps(); }
+  function opsRun() {
+    if (!host) return;
+    [].forEach.call(host.querySelectorAll('.fp-ovl .ovl-ops[data-gallery]'), function (t) {
+      var n = host.querySelectorAll('[data-gallery="' + t.getAttribute('data-gallery') + '"] .crah-cell:not(.stby)').length;
+      t.textContent = t.getAttribute('data-text').replace('{n}', String(n));
+    });
+    [].forEach.call(host.querySelectorAll('.fp-ovl .ovl-ops'), function (t) {
+      var bg = t.previousSibling, b; if (!bg || bg.getAttribute('class') !== 'ovl-opsbg') return;
+      try { b = t.getBBox(); } catch (e) { return; }
+      if (!b.width) return;   /* hidden in this lens: sized when a lens shows it */
+      bg.setAttribute('x', (b.x - 4).toFixed(1)); bg.setAttribute('y', (b.y - 2).toFixed(1)); bg.setAttribute('width', (b.width + 8).toFixed(1)); bg.setAttribute('height', (b.height + 4).toFixed(1));
+    });
+  }
+  function lensOn() { if (host) host.setAttribute('data-lens-on', lens); readSensors(); stations(); opsRun(); retag(); drawOps(); }
   function render() {
     if (!geo || !host || !win.RZFloorPlan) return;
     /* HV-V3: a switch between 2D and 3D keeps the selected unit and the paint mode (one model, two projections) */
@@ -647,6 +708,12 @@
     if (lens !== 'layout') [['run', 'run'], ['stby', 'standby']].concat(staleCount() ? [['stale', 'stale']] : []).forEach(function (d) {
       var it = doc.createElement('span'); it.className = 'lg-item';
       var sw = doc.createElement('span'); sw.className = 'fp-sw'; sw.setAttribute('data-state', d[0]); it.appendChild(sw);
+      it.appendChild(doc.createTextNode(d[1])); legendBox.appendChild(it);
+    });
+    /* v3.116.1: the aisle tints are identity, not state — the Thermal key says so */
+    if (lens === 'thermal' && !phoneFlat() && view !== 'iso') [['cold', 'cold aisle (supply)'], ['hot', 'hot aisle (return)']].forEach(function (d) {
+      var it = doc.createElement('span'); it.className = 'lg-item';
+      var sw = doc.createElement('span'); sw.className = 'fp-sw dh-aisle-sw'; sw.setAttribute('data-aisle', d[0]); it.appendChild(sw);
       it.appendChild(doc.createTextNode(d[1])); legendBox.appendChild(it);
     });
     legendBox.className = 'fp-legend dh-legend';

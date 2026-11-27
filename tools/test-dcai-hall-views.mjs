@@ -72,6 +72,10 @@ async function open(width) {
       localStorage.clear();
       localStorage.setItem('theme', 'dark'); localStorage.setItem('rz_cookie_consent', 'declined');
       entries.forEach(([k, v]) => localStorage.setItem(k, v));
+      /* Amendment 10 opens a first visit on Thermal (printed live readings); these laws are about the Status picture
+         (deterministic floor text, kW feet), so they pin it as a returning user's stored lens. Thermal at rest is
+         test-dcai-visible-at-rest. */
+      localStorage.setItem('rz.dcai.lens', 'status');
       localStorage.setItem('rz.dcai.proj', 'iso');   /* a stored old-key value: V2 wants it ignored and removed */
     } catch (x) { /* no storage */ }
   }, signedInStorage({ email: 'educator@resistancezero.com', tier: 'pro', role: 'educator' }));
@@ -117,7 +121,7 @@ const read = (pg) => pg.evaluate(() => {
   const stby = vis(root) ? root.querySelectorAll('[data-lamp="stby"]').length : 0;
   const plant = vis(root) ? [...root.querySelectorAll('[data-rz-equipment^="crah"], [data-rz-equipment^="cdu"]')] : [];
   const plantWithValue = plant.filter((u) => [...u.querySelectorAll('[data-point]')].some((p) => vis(p) && /\d\s*(%|kWth|kW|L\/min|°C|m³\/h)/.test(p.textContent))).length;
-  const floorText = vis(root) ? [...root.querySelectorAll('text')].map((t) => t.textContent.trim()).filter(Boolean).join('|') : '';
+  const floorText = vis(root) ? [...root.querySelectorAll('text')].filter((t) => t.getClientRects().length > 0).map((t) => t.textContent.trim()).filter(Boolean).join('|') : '';
   return { btns, btnsVisible, stage, tabsB, covered, units: units.length, outside, labels: labels.length, over, lenses, legend, stbyWant, stby, plant: plant.length, plantWithValue, floorText,
     oldKey: localStorage.getItem('rz.dcai.proj'), bands: +((document.querySelector('#hIso .fp-root') || { getAttribute: () => 1 }).getAttribute('data-bands') || 1), scrollW: document.documentElement.scrollWidth, vw: innerWidth, vh: innerHeight };
 });
@@ -366,7 +370,8 @@ for (const W of [1440, 390]) {
     const heads = [...root.querySelectorAll('.zone-head')].filter(vis).map(bx), stage = bx(root);
     const cut = (a, b) => Math.min(a.r, b.r) - Math.max(a.l, b.l) > 1 && Math.min(a.b, b.b) - Math.max(a.t, b.t) > 1;
     const rot = [...root.querySelectorAll('.crah-cell .fp-rotor')].map((r) => r.style.animationDuration).join('|');
-    const text = [...root.querySelectorAll('text')].map((t) => t.textContent.trim()).join('|');
+    /* text a reader sees: another lens's layer (Amendment 10 printed readings) is in the DOM but not drawn */
+    const text = [...root.querySelectorAll('text')].filter(vis).map((t) => t.textContent.trim()).join('|');
     return { want, floor, flags, more, rot, text,
       outside: flags.filter((f) => f.l < stage.l - 1 || f.t < stage.t - 1 || f.r > stage.r + 1 || f.b > stage.b + 1).length,
       overlap: flags.filter((f, i) => flags.some((g, j) => j > i && cut(f, g))).length + flags.filter((f) => heads.some((h) => cut(f, h))).length };

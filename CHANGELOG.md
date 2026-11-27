@@ -11,6 +11,37 @@ release sections rather than semver.
 
 ---
 
+## v3.116.0 — 2026-11-27 — DC AI: the hall operating, visible at rest
+
+**The Data Hall and the Room Layout show the hall running without a click** (PRD-DCAI-HALL-DEPTH Amendment 10; owner
+2026-11-27: "almost no significant change on the datahall page and room layout")
+
+### Changed
+- The Data Hall floor opens on **Thermal** (a stored lens still wins). Every one of the 80 aisle stations prints its
+  reading under its point. Below 1000 px only the warmest inlet of each row pair prints.
+- Each pair's half of the cold aisle takes the state of its worst inlet point. At normal it carries the supply identity
+  tint; the contained hot aisle carries the return tint. Neither identity tint is a state colour.
+- Thermal and Cooling print the operating point on the floor's own bands. FAN WALL N/S: run count, supply air, return
+  air, fan %, CHW valve %. CDU LINE: run count, TCS supply → return, pump %, FWS valve %. A phone keeps the chips.
+- Each operating line sits on a plate (graphite, 1 px hairline), so it reads as a label and not across the rotor icons.
+- The Thermal key names the two identity tints: cold aisle (supply) and hot aisle (return).
+- Cooling valve bars are 4 px thick (were 1.5 px).
+- Room Layout: the building overview fits its pane at 1.0× on desktop (a fixed 1860 px minimum had cropped its title and
+  right half). A narrower pane pans at a 1160 px minimum, so every label stays >= 8.5 px (with no minimum a phone drew
+  6 px labels; test-conv-geometry G5 caught it).
+
+### Fixed
+- DH-A-101 printed the CDU zone tags (Z01–Z04) above the rack zone tags (Z05–Z08) on one line, a regression from
+  v3.114.0 (no cross aisle). Rack-zone tags now sit in the row-end aisle and CDU-zone tags on the CDU line's south edge.
+  The sheet is wide enough for the L2 support strip. Standby CDUs and fan-wall modules are marked standby.
+- The fan-wall run count is read off the drawn cells after the floor marks its standbys. The first version counted
+  45 + 45 instead of 44 + 45; the gate caught it.
+
+### Gates
+- New `tools/test-dcai-visible-at-rest.mjs` (VR1–VR9). Red on d5f06e3a9: 13 failed; VR8/VR9 (plates, aisle key) red 2 on the first cut. Green: 25/25.
+- `test-dcai-hall-views` pins the Status lens for its Status-picture laws (deterministic floor text, kW feet) and reads only drawn text: the hidden Thermal layer is in the DOM.
+- `test-dcai-floor-lens` FL5 reads the printed lines at >= 600 px and the chips on a phone.
+
 ## v3.115.2 — 2026-11-27 — The water booster gets its pressure controller; a day tank stops borrowing the bulk tank's numbers
 
 **PIC-301 on WT-M-101, a day tank's own limits, and controller bubbles that say their name once** (PRD-SETPOINT-SIM §C P9)

@@ -613,7 +613,9 @@
     var pitch = need(snap, 'geometry.rack_pitch_m'), depth = need(snap, 'geometry.rack_depth_m'), cold = need(snap, 'geometry.cold_aisle_m'), hot = need(snap, 'geometry.hot_aisle_m'), rowPitch = need(snap, 'geometry.row_pitch_m');
     var cross = need(snap, 'geometry.cross_aisle_m'), cduDepth = need(snap, 'geometry.cdu_line_depth_m'), rowLen = need(snap, 'geometry.row_length_m'), galleries = need(snap, 'geometry.fan_wall_galleries'), fwMods = need(snap, 'geometry.fan_wall_modules_per_gallery');
     var cdus = need(snap, 'equipment.cdu_installed_per_hall'), crahs = need(snap, 'equipment.crah_installed_per_hall');
-    var SC = 17.5, M = 40, W = Math.round(Lm * SC + 2 * M + 400), H = Math.round(Wm * SC + 2 * M + 90);
+    /* Amendment 10 (VR6): the sheet is as wide as the hall plus the L2 support strip beside it (the strip ran past the
+       sheet's right edge: 2 x (9 m x SC + 6) + 10 wide, 112 to the right of the hall) */
+    var SC = 17.5, M = 40, W = Math.round(Lm * SC + 2 * M + 112 + 2 * (9 * SC + 6) + 10), H = Math.round(Wm * SC + 2 * M + 90);
     var s = Sheet({ id: 'dh-a-101', no: 'DH-A-101', title: 'DH-01 ROOM LAYOUT', size: [W, H], svgId: 'floorSvg', sheet: '1/3', basis: 'engine hall geometry' });
     var X = function (m) { return M + m * SC; }, Y = function (m) { return M + 50 + m * SC; };
     // hall shell (walls 0.3 m), fan-wall galleries along both long walls, rack field, cross aisle, CDU gallery
@@ -630,7 +632,10 @@
       var q = (z.n - 1) % 4, isRack = z.n >= 5, zx = X(q * Lm / 4) + 2, zw = Lm / 4 * SC - 4;
       var zy = isRack ? Y(bands[1].y) + 2 : Y(bands[3].y) + 2, zh = (isRack ? rowLen : cduDepth) * SC - 4;
       // the zone tag sits at the row ends beside its zone (racks and CDUs fill the zone itself)
-      s.notes.push({ x: zx + 4, y: isRack ? Y(bands[2].y) + 11 : Y(bands[3].y) - 4, text: 'Z' + pad(z.n), role: 'tag' });
+      /* Amendment 10 (VR6): with no cross aisle (A9) both rows of tags fell on one line, the CDU zone's above the rack
+         zone's. Rack zones Z05-Z08 now sit in the CDU line's 1 m access aisle at the row ends, CDU zones Z01-Z04 on the
+         south edge of the CDU line */
+      s.notes.push({ x: zx + 4, y: isRack ? Y(bands[1].y + rowLen) + 11 : Y(bands[3].y + cduDepth) - 4, text: 'Z' + pad(z.n), role: 'tag' });
       s.n({ id: 'zone-' + z.id.toLowerCase(), tag: 'Z' + pad(z.n), box: [zw, zh], x: zx + zw / 2, y: zy + zh / 2, cls: 'fire-zone', eqId: z.id, tagAt: 'none', boxSym: 'fire-zone', lod: 1, label: 'Fire zone ' + z.id.slice(-3) + ' ' + z.name + ' — ' + Math.round(z.areaM2) + ' m², ' + z.means.length + ' detection means' + (z.release ? ', clean-agent release' : '') });
     });
     // fan-wall modules (CRAH units) along the two galleries, every one clickable
@@ -638,7 +643,7 @@
     [bands[0], bands[4]].forEach(function (g, gi) {
       for (var i = 0; i < fwMods && k <= crahs; i++, k++) {
         var cx = X((i + 0.5) * fwPitch), cy = Y(g.y + fw / 2);
-        s.n({ id: 'crah' + pad(k), tag: 'FW-' + pad(k), box: [fwPitch * SC - 2, fw * SC - 6], x: cx, y: cy, cls: 'crah', eqId: String(k), tagAt: 'none', boxSym: 'fanwall', label: 'Fan-wall module ' + pad(k) + ' (CRAH), gallery ' + (gi ? 'B' : 'A') });
+        s.n({ id: 'crah' + pad(k), tag: 'FW-' + pad(k), box: [fwPitch * SC - 2, fw * SC - 6], x: cx, y: cy, cls: 'crah', eqId: String(k), tagAt: 'none', boxSym: 'fanwall', label: 'Fan-wall module ' + pad(k) + ' (CRAH), gallery ' + (gi ? 'B' : 'A') + (k > need(snap, 'equipment.crah_duty_per_hall') ? ' (standby)' : ''), standby: k > need(snap, 'equipment.crah_duty_per_hall') });
       }
     });
     // rack rows: each row runs across the rack field; racks are boxes to scale, cold aisle toward gallery A
@@ -655,7 +660,7 @@
     }
     // CDU line in the gallery: every installed CDU as a box to scale (1.2 × 0.8 m class), standby last
     var cduPitch = Lm / cdus;
-    for (var c = 1; c <= cdus; c++) s.n({ id: 'cdu' + pad(c), tag: 'CDU-' + pad(c), box: [Math.min(1.2, cduPitch - 0.1) * SC, 0.8 * SC], x: X((c - 0.5) * cduPitch), y: Y(bands[3].y + cduDepth / 2), cls: 'cdu', eqId: String(c), tagAt: 'none', boxSym: 'cdu-plan', label: 'CDU-' + pad(c) + (c > need(snap, 'equipment.cdu_duty_per_hall') ? ' (standby)' : '') });
+    for (var c = 1; c <= cdus; c++) s.n({ id: 'cdu' + pad(c), tag: 'CDU-' + pad(c), box: [Math.min(1.2, cduPitch - 0.1) * SC, 0.8 * SC], x: X((c - 0.5) * cduPitch), y: Y(bands[3].y + cduDepth / 2), cls: 'cdu', eqId: String(c), tagAt: 'none', boxSym: 'cdu-plan', label: 'CDU-' + pad(c) + (c > need(snap, 'equipment.cdu_duty_per_hall') ? ' (standby)' : ''), standby: c > need(snap, 'equipment.cdu_duty_per_hall') });
     // doors (double, 1.8 m) on the short walls, on the egress route
     [[0, 'W'], [Lm, 'E']].forEach(function (d) { s.n({ id: 'door-' + d[1].toLowerCase(), tag: 'DOOR ' + d[1], box: [6, 1.8 * SC], x: X(d[0]), y: Y(egY), tagAt: 'none', boxSym: 'door', label: 'Double fire door, ' + d[1] + ' wall, 1.8 m, 90 min (EI 90)' }); });
     s.e([X(0) + 6, Y(egY)], [X(Lm) - 6, Y(egY)], 'signal', { w: 'signal', line: 'EGRESS ' + Lm + ' m' });
