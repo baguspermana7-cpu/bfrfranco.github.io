@@ -11,6 +11,22 @@ release sections rather than semver.
 
 ---
 
+## v3.117.2 — 2026-11-28 — Chiller plant: the DP KPI is the remote DP that PDT-01 reads
+
+**The plant KPI no longer averages hand-typed loop DPs with noise** (PRD-SETPOINT-SIM §C P11, G12)
+
+### Fixed
+- `chiller-plant.html`: the KPI "Header DP" averaged the primary loops' authored DPS1/DPS2 with a random walk
+  (about 80 kPa, moving every tick). That is neither the 90 kPa that PDIC-01 holds nor the engine's 117.3 kPa primary
+  operating DP. It is now **"Remote DP (PDT-01)"** (`data-point="chiller-plant.CHW.remote_dp"`): the DP setpoint in
+  force (the control registry's `conv.chiller-plant.chw_dp_sp`, or the operator's in MAINT), the same value the PDT-01
+  bubble prints, steady. The MAINT "Active setpoints" row takes the same name. The per-loop DPS1/DPS2 rows are unchanged.
+
+### Gates
+- `tools/test-setpoint-sim.mjs` S12: at rest the KPI equals the registry 90 kPa and does not move between ticks, its
+  label names PDT-01, and in MAINT at 120 kPa it reads 120. Red on b9cd070ed (80 → 79 kPa, label "Header DP"), green
+  496/496.
+
 ## v3.117.1 — 2026-11-28 — CDU P&ID: every label clear of every line, on all five CDU types
 
 **The hand-drawn CDU P&ID is measured like the sheet drawings** (PRD-SETPOINT-SIM §C22)

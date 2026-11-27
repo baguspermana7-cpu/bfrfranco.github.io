@@ -1158,3 +1158,13 @@ RZSpBlock.bind(host, { recompute })  → wires sliders (input → recompute → 
   - The L2L "supply" label moved under its pipe.
 - **Plant:** `RZ_CDU_TEXT_PLANT=1` puts HV-03 back on the riser, and the gate turns red.
 
+## C23. P11-G12 built: the plant DP KPI is the remote DP (2026-11-28, v3.117.2)
+
+- The chiller-plant KPI "Header DP" is now **"Remote DP (PDT-01)"**, `data-point="chiller-plant.CHW.remote_dp"`. Its
+  value is the DP setpoint in force (`remoteDpKpa()`: the operator's in MAINT, else the control registry
+  `conv.chiller-plant.chw_dp_sp`), the same value the PDT-01 bubble prints. It is steady, with no noise; the engine holds
+  that DP in steady state. The MAINT "Active setpoints" row carries the same name. The per-loop DPS1/DPS2 rows are
+  unchanged.
+- **Law S12** in `tools/test-setpoint-sim.mjs`: the KPI equals the registry 90 kPa and does not move between ticks;
+  the label names PDT-01; in MAINT at 120 kPa the KPI reads 120. Red on b9cd070ed: 80 → 79 kPa, label "Header DP".
+  Green 496/496.

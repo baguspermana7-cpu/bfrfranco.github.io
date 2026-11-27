@@ -576,7 +576,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
         ]
     }
     </script>
-    <script src="js/rz-version.js?v=20261127-9834e49a" defer></script>
+    <script src="js/rz-version.js?v=20261127-fab1c9f6" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- Conventional BMS single scenario engine — single source of truth for the
@@ -816,7 +816,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
           <div class="kv" data-basis-param="cooling.chw_delta_t" tabindex="0" role="button" title="CHW delta-T — click for basis"><div class="k">ΔT</div><div class="v" id="kDt" data-point="cooling.chw_delta_t" data-pt-label="CHW ΔT" data-pt-unit="K" data-pt-cls="ENGINE">UNAVAILABLE</div></div>
           <div class="kv" data-basis-param="cooling.flow_lps" tabindex="0" role="button" title="IT sensible-load CHW reference flow — click for basis"><div class="k">IT-reference Flow</div><div class="v" id="kFlow" data-point="cooling.flow_lps" data-pt-label="IT-reference CHW flow" data-pt-cls="ENGINE">&mdash;</div></div>
           <div class="kv" data-basis-param="cooling.heat_rejection_kw" tabindex="0" role="button" title="Current evaporator duty — click for basis"><div class="k">Evaporator Duty</div><div class="v" id="kCool" data-point="chiller-plant.CHW.evap_duty_mw" data-pt-label="Evaporator duty" data-pt-unit="MW">UNAVAILABLE</div></div>
-          <div class="kv"><div class="k">Header DP</div><div class="v" id="kDp" data-point="chiller-plant.CHW.header_dp" data-pt-label="CHW header DP">UNAVAILABLE</div></div>
+          <div class="kv"><div class="k">Remote DP (PDT-01)</div><div class="v" id="kDp" data-point="chiller-plant.CHW.remote_dp" data-pt-label="Remote DP at PDT-01">UNAVAILABLE</div></div>
           <!-- v1.134.11 — the adopted machine type and the two assumptions that set the plant's
                efficiency and its heat rejection were engine-published and rendered nowhere. An
                operator could read COP 6.06 and never see what it rests on. -->
@@ -1541,8 +1541,8 @@ function chwRead(n){
       ['Speed', duty ? u.speedPct + ' % · ' + u.hz.toFixed(1) + ' Hz' : '0 %', 'engine'], ['Current', 'not modelled'], ['Vibration', 'not modelled']];
   } else if(n.id === 'lpv-dp'){
     /* PRD-SETPOINT-SIM P4: PDT-01 reads the remote DP. The engine solves the secondary pumps on the system curve through
-       the DP setpoint (steady state), so the remote DP IS the setpoint in force; no dynamics are modelled. It is not the
-       KPI 'Header DP', which averages the primary loops' authored DPS1/DPS2. */
+       the DP setpoint (steady state), so the remote DP IS the setpoint in force; no dynamics are modelled. The plant KPI
+       'Remote DP (PDT-01)' reads the same value (remoteDpKpa, G12). */
     const L = window.RZControlPoints ? window.RZControlPoints.loops('ch-m-101').filter((x) => x.pv.tag === n.tag)[0] : null;
     const sp = ui.maint && st.sp && isFinite(st.sp.dp) ? st.sp.dp : (L ? L.value : null);
     out.values = { dp: chwVal(ok && sp != null ? `${conv.p(sp,ui.unit)} ${conv.pu(ui.unit)}` : CHW_UNAV) };
@@ -2237,7 +2237,7 @@ function renderSupervisory(){
 
   const sp = `<div class="sp-card"><h5>Active setpoints<span>${ui.maint?"MAINT":"FREE-RUN"}</span></h5>`
     + row("Secondary loop", ptConst(st.sp.chws==null?dash:`${conv.t(st.sp.chws,u)}${conv.tu(u)}`))
-    + row("Header DP", ptConst(`${conv.p(st.sp.dp,u)} ${conv.pu(u)}`))
+    + row("Remote DP (PDT-01)", ptConst(`${conv.p(st.sp.dp,u)} ${conv.pu(u)}`))
     + row("Per-loop flow", ptConst(st.sp.flow==null?dash:`${conv.f(st.sp.flow,u)} ${conv.fu(u)}`))
     + `</div>`;
 
@@ -2354,8 +2354,8 @@ function renderKpi(){
   /* Header differential pressure is simulated hydraulic state — conv-engine.js models
      the thermal side and publishes no pressure plane, so this reading has no parameter
      to trace to and says so on the element rather than sitting in the untraced pile. */
-  $("kDp").textContent = `${conv.p(st.header.dp,ui.unit)} ${conv.pu(ui.unit)}`;
-  $("kDp").setAttribute("data-rz-authored-basis", AUTHORED_MECHANICAL_BASIS);
+  $("kDp").textContent = st.header.dp != null ? `${conv.p(st.header.dp,ui.unit)} ${conv.pu(ui.unit)}` : "\u2014";
+  $("kDp").setAttribute("data-rz-authored-basis", "Remote DP at PDT-01 = the DP setpoint in force: control registry conv.chiller-plant.chw_dp_sp (the operator's in MAINT); the engine holds it in steady state, dynamics not modelled");
   /* v1.134.11 — the basis behind the efficiency figures, on screen. */
   const eSnap = engineSnap();
   if (eSnap && eSnap.cooling) {
@@ -2559,6 +2559,11 @@ function closeModal(){
   }
 }
 
+/* G12: the remote DP PDT-01 reads = the DP setpoint in force (the operator's in MAINT, else the control registry's) */
+function remoteDpKpa(){
+  const L = window.RZControlPoints ? window.RZControlPoints.loops('ch-m-101').filter((x) => x.pv && x.pv.tag === 'PDT-01')[0] : null;
+  return ui.maint && st.sp && isFinite(st.sp.dp) ? st.sp.dp : (L && isFinite(L.value) ? L.value : null);
+}
 function stepProcess(){
   if(!ui.sim || !CHW_AUTHORITY_AVAILABLE) return;
   chwPumpScan();   /* W4 B2: feedback answers the command of the previous scan */
@@ -2636,10 +2641,10 @@ function stepProcess(){
   st.header.dt = B.dt;           // 7.6 K
   st.header.flow = B.flow;       // IT sensible-load reference; not measured header flow
   st.header.coolingKw = B.coolingKw;
-  // Header DP is a hydraulic reading (not an engine engineering value) — it may
-  // track the secondary-side pump duty for realism, but stays a plant DP figure.
-  const dpLoops = st.loops.filter((l)=>!l.standby);
-  st.header.dp = dpLoops.length ? Math.round(dpLoops.reduce((s,l)=>s+(l.dp1+l.dp2)/2,0)/dpLoops.length) : 0;
+  /* PRD-SETPOINT-SIM §C P11 (G12): the plant DP KPI is the remote DP PDT-01 reads, which the engine holds at the DP
+     setpoint in force (steady state, no noise). It used to average the primary loops' authored DPS1/DPS2 with a random
+     walk (~80 kPa), which was neither the 90 kPa PDIC-01 holds nor the engine's 117.3 kPa primary operating DP. */
+  st.header.dp = remoteDpKpa();
 
   // Ambient temp drift (condenser-side environment, not an engine value)
   ui.ambient = r1(clamp(ui.ambient + r(-0.15, 0.15), 28, 42));

@@ -184,6 +184,9 @@ range). Otherwise it is fixed, and the modal says what fixes it.
   `data-loop` bubble may exist on that drawing. Gate: S8e cdu in `test-typed-control-numbers.mjs`.
   Its labels, setpoint text included, clear every line and every other label on all five CDU types
   (`tools/test-cdu-pid-text-clear.mjs`, v3.117.1).
+- **A plant DP KPI is the remote DP (v3.117.2, G12).** The chiller-plant KPI reads PDT-01, which is the DP setpoint in
+  force at steady state (registry `conv.chiller-plant.chw_dp_sp`, or the operator's in MAINT), named "Remote DP
+  (PDT-01)", with no noise. Never average authored loop DPs into a plant KPI. Gate: S12 in `test-setpoint-sim.mjs`.
 
 ## 5. Gates
 

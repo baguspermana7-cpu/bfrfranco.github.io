@@ -443,6 +443,13 @@ try {
          states a time constant, so dynamics are not modelled and the panel says so); the DP slider shows the engine's
          secondary pump response labelled SIMULATED, equal to a Node recompute at that DP (± 0.1 %) */
       const DPR = REG.find((x) => x.id === 'conv.chiller-plant.chw_dp_sp');
+      /* S12 (PRD-SETPOINT-SIM §C P11, G12): the plant KPI is the remote DP that PDT-01 reads, i.e. the DP setpoint in
+         force (engine steady state), labelled as such, with no noise. Red on b9cd070ed: "Header DP" averaged the
+         primary loops' authored DPS1/DPS2 with random walk, ~80 ± 3 kPa, neither 90 (registry) nor 117.3 (engine primary). */
+      const kdp = () => pg.evaluate(() => { const v = document.getElementById('kDp'), k = v && v.parentElement.querySelector('.k'); return v ? { v: parseFloat(v.textContent), k: k ? k.textContent.trim() : '' } : null; });
+      { const k1 = await kdp(); await sleep(2600); const k2 = await kdp();
+        ok(!!k1 && k1.v === DPR.sp.value && k2.v === k1.v, 'S12', `${page}: KPI ${JSON.stringify(k1)} → ${JSON.stringify(k2)}, want the DP setpoint ${DPR.sp.value} kPa, steady`);
+        ok(!!k1 && /remote dp/i.test(k1.k) && /PDT-01/.test(k1.k), 'S12', `${page}: KPI label "${k1 && k1.k}", want "Remote DP (PDT-01)"`); }
       const pick = await pg.evaluate(() => {
         const g = (id) => document.getElementById(id);
         if (!g('maintTgl') || !g('spDp')) return null;
@@ -464,6 +471,7 @@ try {
         await sleep(2700); const a = await loops(); await sleep(2500); const b = await loops();
         ok(a.length > 0, 'S6', `${page}: no running loop in the MAINT table`);
         for (const l of a) ok(Math.abs(l.flow - pick.flow) < 0.051 && Math.abs(l.chws - pick.chws) < 0.051 && l.dp === pick.dp, 'S6', `${l.id}: MAINT loop ${JSON.stringify(l)} not at the setpoints ${JSON.stringify(pick)}`);
+        { const k3 = await kdp(); ok(!!k3 && k3.v === pick.dp, 'S12', `${page}: in MAINT at DP ${pick.dp} the KPI reads ${k3 && k3.v}`); }
         ok(JSON.stringify(a) === JSON.stringify(b), 'S6', `${page}: MAINT loops moved between ticks at constant setpoints (lag or noise): ${JSON.stringify(a[0])} → ${JSON.stringify(b[0])}`);
         const d = await pg.evaluate(() => { const x = document.querySelector('[data-sp-sim="spDp"]'); return x ? { text: x.textContent, rows: [...x.querySelectorAll('[data-wi-path]')].map((t) => ({ path: t.getAttribute('data-wi-path'), sim: +t.getAttribute('data-wi-sim') })) } : null; });
         ok(!!d && /SIMULATED/.test(d.text) && /not modelled/i.test(d.text), 'S6', `${page}: the DP slider shows no SIMULATED engine response with "dynamics not modelled" ([data-sp-sim="spDp"])`);
