@@ -91,7 +91,7 @@
   N({ id: 'cp-ds2', tag: 'DS2-CP', sym: 'disconnector', x: C2, y: 545, size: SW, cls: 'epms', sw: 'ds', cb: 'cp-cb', kv: 'hv', label: 'Coupler disconnector BB2', tagAt: 'right' });
   N({ id: 'cp-cb', tag: 'CB-CP', sym: 'cbIec', x: C1, y: 600, size: SW, cls: 'epms', sw: 'cb', kv: 'hv', relay: 'cp-r', label: 'Bus coupler circuit breaker', tagAt: 'right',
     values: [{ k: 'st', dx: 30, dy: 70, anchor: 'middle', lod: 1 }, { k: 'pw', dx: 30, dy: 82, anchor: 'middle', lod: 1 }] });
-  N({ id: 'cp-r', tag: 'R-CP', name: '50BF', sym: 'protectionRelay', x: C1 - 52, y: 600, size: 26, rot: 180, cls: 'epms', prot: null, cb: 'cp-cb',
+  N({ id: 'cp-r', tag: 'R-CP', name: '50BF', sym: 'protectionRelay', x: C1 - 52, y: 600, size: 34, rot: 180, cls: 'epms', prot: null, cb: 'cp-cb',
     label: 'Bus coupler breaker-failure relay 50BF', tagAt: 'below' });
   E('cp-a', 'bb1-cp', 'cp-ds1.line');
   E('cp-b', 'bb2-cp', 'cp-ds2.line');

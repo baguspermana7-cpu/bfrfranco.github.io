@@ -1181,3 +1181,20 @@ RZSpBlock.bind(host, { recompute })  → wires sliders (input → recompute → 
   - pumps: flow and head right-aligned left of the shaft line.
   - chiller loop: TT-CHWS bubble size 22 -> 30, TIC-CHWS 36 -> 44, signal endpoints moved to the new symbol edges.
 - **Plant:** `RZ_INT_TEXT_PLANT=1` moves the first value text of each drawing onto its first pipe; every case goes red.
+
+## C25. The five HMI sheets measured on ink (2026-11-28, v3.117.5)
+
+- **Why:** C22 and C24 found 48 and 20 hits on drawings whose em-box checks were green. The five main sheets carry
+  every drawn controller of §C (PDIC-01, PDT-01, TIC-CDWS, PC ×3, LIC ×8, PIC-301), and their gate had the same blind
+  spot.
+- **New gate** `tools/test-conv-sheet-ink-clear.mjs` (ship gate, conv release set): six sheet views at 1440 px, K1-K4.
+- **Red on v3.117.3:** 53 findings on all five sheets: bubble letters wider than their circle (chiller TT at 12 px
+  in 22-unit bubbles, fuel LIC, chiller PDIC, fire PC), PDT-01's "90 kPa" on the CHW riser jacket, the E-S-101
+  K1/K2 key links through the DSL, CB and CT tags and the CB reading, the two DS keys on their switches and on each
+  other, CB-TIE touching its breaker glyph, the 50BF digits wider than the relay box.
+- **Fixed in one place where the defect was generic** (`js/rz-hmi-sheet.js`: bubble letters fitted into their circle;
+  key-link lanes scored against words and conductors; key glyphs keep off symbols, zone borders and each other), and by
+  sizing the bubbles of the drawn controllers so their letters keep 8.5 px (K4). No value, tag text or connection
+  changed.
+- **Plant:** `RZ_INK_PLANT=1` puts a value on a pipe; every sheet view goes red.
+

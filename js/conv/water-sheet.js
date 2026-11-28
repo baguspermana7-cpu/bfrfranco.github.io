@@ -22,7 +22,7 @@
       values: [{ k: 'q', dx: 0, dy: 28, lod: 1, point: 'water.total_treated_lpm', label: 'FM-101 treatment-train flow' }, { k: 'p', dx: 0, dy: 40, lod: 1, point: 'water.FM-101.pressure_bar', label: 'FM-101 mains pressure', unit: 'bar' }] },
     { id: 'rawtank', tag: 'TK-101', sym: 'tankStorage', x: 240, y: 250, size: 96, cls: 'water', label: 'Raw water tank', tagAt: 'left',
       values: [{ k: 'pct', dx: -56, dy: 18, anchor: 'end', lod: 1, point: 'water.raw_tank_pct', label: 'TK-101 raw tank level' }, { k: 'vol', dx: -56, dy: 30, anchor: 'end', lod: 1, point: 'water.TK-101.volume_m3', label: 'TK-101 raw tank volume', unit: 'm³' }, { k: 'aut', dx: -56, dy: 42, anchor: 'end', lod: 1, point: 'water.TK-101.autonomy_h', label: 'TK-101 autonomy at total treated flow', unit: 'h' }] },
-    { id: 'lit', tag: 'LIT-101', sym: 'instField', x: 316, y: 214, size: 28, inst: 'LIT', tagAt: 'right' },
+    { id: 'lit', tag: 'LIT-101', sym: 'instField', x: 316, y: 214, size: 34, inst: 'LIT', tagAt: 'right' },
     { id: 'filter', tag: 'FLT-201', sym: 'filterCartridge', x: 370, y: Y, size: 36, cls: 'water', label: 'Media filter', tagAt: 'above',
       values: [{ k: 'dp', dx: 0, dy: 30, lod: 1, point: 'water.filter_dp_bar', label: 'FLT-201 differential pressure' }, { k: 'io', dx: 0, dy: 42, lod: 1, point: 'water.FLT-201.inlet_bar', label: 'FLT-201 inlet pressure (outlet = inlet minus DP)', unit: 'bar' }] },
     { id: 'jbw', sym: 'junction', x: 420, y: Y },
@@ -100,7 +100,7 @@
     var pv = null, mv = null;
     nodes.forEach(function (nd) { if (nd.id === L.pv.node) pv = nd; if (nd.id === L.mv.node) mv = nd; });
     if (!pv || !mv) return;
-    var id = 'pic301', x = 566, y = 182, sz = 30, ccy = y - 4 * sz / 48, r = 14 * sz / 48;
+    var id = 'pic301', x = 566, y = 182, sz = 46, ccy = y - 4 * sz / 48, r = 14 * sz / 48;
     nodes.push({ id: id, tag: L.tag, sym: 'instPanel', x: x, y: y, size: sz, inst: 'PIC', tagAt: 'left', loop: L.sp, ctrl: mv.id,
       label: mv.tag + ' pressure controller (' + L.action + ' acting ' + L.kind + ')',
       values: [{ k: 'sp', dx: 0, dy: -sz / 2 - 6, anchor: 'middle', lod: 1, const: 'booster discharge setpoint from the control registry (' + L.sp + ')' }] });

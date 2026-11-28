@@ -542,6 +542,20 @@
         var ar = E.arrows[e.id], disp = f === 'running' ? '' : 'none'; if (ar && ar.style.display !== disp) ar.style.display = disp;
       });
     }
+    /* the key-link lanes are scored while every reading still reads "—", and a page may write its readings itself: whenever
+       the readings grow longer than ever before (first values, a wider number), score the lanes again, once per frame; a
+       steady sheet stops re-scoring after the first ticks */
+    var keysOnChars = 0, keysOnQueued = false;
+    if (svg.querySelector('path.hmi-key-link') && typeof MutationObserver === 'function') {
+      new MutationObserver(function () {
+        if (keysOnQueued) return; keysOnQueued = true;
+        (root.requestAnimationFrame || setTimeout)(function () {
+          keysOnQueued = false; if (!svg.isConnected || !svg.clientWidth) return;
+          var chars = 0; svg.querySelectorAll('[data-val]').forEach(function (t) { chars += t.textContent.length; });
+          if (chars > keysOnChars) { keysOnChars = chars; relinkKeys(); }
+        });
+      }).observe(svg, { characterData: true, childList: true, subtree: true });
+    }
 
     /* ── trace: follow the edges from a node, in flow direction (down) or against it (up) ─── */
     function trace(id, dir) {
@@ -594,12 +608,19 @@
     /* a breaker's glyph + lamp sit left of the symbol; where that covers a drawn word (a zone title, its own tag) they
        move right, then above / below (either side), to the first place that covers none, else the one covering fewest */
     function settleBrk() {
+      /* each word 1 unit wider either side: a glyph flush against a tag's last letter (CB-TIE) touched it (v3.117.4) */
       var words = [].slice.call(svg.querySelectorAll('text')).filter(function (t) { return !t.closest('.hmi-key'); }).map(function (t) { try { return t.getBBox(); } catch (x) { return null; } })
-        .filter(function (r) { return r && r.width; });
+        .filter(function (r) { return r && r.width; }).map(function (r) { return { x: r.x - 1, y: r.y, width: r.width + 2, height: r.height }; });
       /* straight conductors and signal runs count as well (a lamp parked on the 51 relay link on DC AI's incomers) */
       [].slice.call(svg.querySelectorAll('path.hmi-edge:not(.hmi-flow)')).forEach(function (p) {
         var r; try { r = p.getBBox(); } catch (x) { return; }
         if (r && (r.width < 2 || r.height < 2)) words.push({ x: r.x - 1, y: r.y - 1, width: r.width + 2, height: r.height + 2 });
+      });
+      /* zone and box borders count as four thin strips (a K3 number sat on the MV switchboard border) */
+      [].slice.call(svg.querySelectorAll('rect.hmi-zone, rect.hmi-box')).forEach(function (z) {
+        var r; try { r = z.getBBox(); } catch (x) { return; } if (!r || !r.width) return;
+        words.push({ x: r.x - 1, y: r.y - 1, width: r.width + 2, height: 2 }, { x: r.x - 1, y: r.y + r.height - 1, width: r.width + 2, height: 2 },
+          { x: r.x - 1, y: r.y - 1, width: 2, height: r.height + 2 }, { x: r.x + r.width - 1, y: r.y - 1, width: 2, height: r.height + 2 });
       });
       /* a key glyph also keeps off breaker glyphs and lamps (they settle first, so their final place is known) */
       var marks = [];
@@ -607,9 +628,19 @@
       [].slice.call(svg.querySelectorAll('g.hmi-brk[data-brk-flip], g.hmi-relay[data-alt]')).concat([].slice.call(svg.querySelectorAll('g.hmi-key[data-alt]'))).forEach(function (g) {
         g.removeAttribute('transform');
         var isKey = g.classList.contains('hmi-key');
-        if (isKey && !marks.length) svg.querySelectorAll('g.hmi-brk, g.hmi-relay').forEach(function (b) { try { var q = b.getBBox(), t = b.transform && b.transform.baseVal.consolidate(); marks.push({ x: q.x + (t ? t.matrix.e : 0), y: q.y + (t ? t.matrix.f : 0), width: q.width, height: q.height }); } catch (x) { /* not laid out */ } });
+        if (isKey && !marks.length) {
+          svg.querySelectorAll('g.hmi-brk, g.hmi-relay').forEach(function (b) { try { var q = b.getBBox(), t = b.transform && b.transform.baseVal.consolidate(); marks.push({ x: q.x + (t ? t.matrix.e : 0), y: q.y + (t ? t.matrix.f : 0), width: q.width, height: q.height }); } catch (x) { /* not laid out */ } });
+          /* v3.117.4: and off every drawn symbol (a disconnector's blade and contacts): the DS1 / DS2 keys of E-S-101 sat on
+             both switches and on each other. Symbol boxes are read on screen and brought back to sheet units. */
+          var inv = svg.getScreenCTM() && svg.getScreenCTM().inverse();
+          if (inv) svg.querySelectorAll('.hmi-node > g:not(.hmi-key):not(.hmi-brk):not(.hmi-relay):not(.hmi-stack)').forEach(function (b) {
+            var q = b.getBoundingClientRect(); if (!q.width && !q.height) return;
+            var a = new DOMPoint(q.left, q.top).matrixTransform(inv), z = new DOMPoint(q.right, q.bottom).matrixTransform(inv);
+            marks.push({ x: Math.min(a.x, z.x), y: Math.min(a.y, z.y), width: Math.abs(z.x - a.x), height: Math.abs(z.y - a.y) });
+          });
+        }
         var r = g.getBBox(), dx = +g.getAttribute('data-brk-flip'), here = hit(r, isKey);
-        if (!here || !r.width) return;
+        if (!here || !r.width) { if (isKey && r.width) marks.push(r); return; }
         var best = [0, 0, here], alt = g.hasAttribute('data-alt') ? JSON.parse(g.getAttribute('data-alt')) : [[dx, 0], [0, -18], [dx, -18], [0, 18], [dx, 18]];
         alt.some(function (d) {
           var n = hit({ x: r.x + d[0], y: r.y + d[1], width: r.width, height: r.height }, isKey);
@@ -617,11 +648,32 @@
           return n === 0;
         });
         if (best[0] || best[1]) g.setAttribute('transform', 'translate(' + best[0] + ' ' + best[1] + ')');
+        if (isKey) marks.push({ x: r.x + best[0], y: r.y + best[1], width: r.width, height: r.height });   /* the next key keeps off this one */
       });
     }
     /* E16: the dashed key link runs from glyph to glyph after they settle: a trunk along the longer side, spurs to each */
     function relinkKeys() {
-      svg.querySelectorAll('path.hmi-key-link[data-members]').forEach(function (p) {
+      var links = svg.querySelectorAll('path.hmi-key-link[data-members]'); if (!links.length) return;
+      /* words on screen (em boxes inset 1 px, title block excluded): a lane that samples into one crosses it */
+      var words = [].slice.call(svg.querySelectorAll('text')).filter(function (t) { return t.textContent.trim() && !t.closest('[data-role="titleblock"]'); })
+        .map(function (t) { var r = t.getBoundingClientRect(); return { l: r.left + 1, t: r.top + 1, r: r.right - 1, b: r.bottom - 1 }; })
+        .filter(function (r) { return r.r > r.l && r.b > r.t; });
+      /* straight conductors (screen boxes, 1.5 px either side): a spur crossing one costs a little, a trunk laid along it a lot */
+      var wires = [].slice.call(svg.querySelectorAll('path.hmi-edge:not(.hmi-flow)')).map(function (e) { var r = e.getBoundingClientRect(); return r; })
+        .filter(function (r) { return (r.width || r.height) && (r.width < 3 || r.height < 3); })
+        .map(function (r) { return { l: r.left - 1.5, t: r.top - 1.5, r: r.right + 1.5, b: r.bottom + 1.5 }; });
+      var crossings = function (p) {
+        var m = p.getScreenCTM(), L = 0; if (!m) return 0; try { L = p.getTotalLength(); } catch (x) { return 0; }
+        var pts = [], hit = 0;
+        for (var s = 0; s <= L; s += 1) { var q = p.getPointAtLength(s); pts.push([m.a * q.x + m.c * q.y + m.e, m.b * q.x + m.d * q.y + m.f]); }
+        var xs = pts.map(function (v) { return v[0]; }), ys = pts.map(function (v) { return v[1]; });
+        var bl = Math.min.apply(null, xs), br = Math.max.apply(null, xs), bt = Math.min.apply(null, ys), bm = Math.max.apply(null, ys);
+        var near = words.filter(function (w) { return w.r > bl && w.l < br && w.b > bt && w.t < bm; });
+        near.forEach(function (w) { if (pts.some(function (v) { return v[0] > w.l && v[0] < w.r && v[1] > w.t && v[1] < w.b; })) hit += 1000; });
+        wires.forEach(function (w) { if (w.r > bl && w.l < br && w.b > bt && w.t < bm) pts.forEach(function (v) { if (v[0] > w.l && v[0] < w.r && v[1] > w.t && v[1] < w.b) hit++; }); });
+        return hit;
+      };
+      links.forEach(function (p) {
         var id = p.getAttribute('data-key-link'), c = p.getAttribute('data-members').split(' ').map(function (m) {
           var k = svg.querySelector('.hmi-node[data-node="' + m + '"] .hmi-key[data-key="' + id + '"] circle'); if (!k) return null;
           var r = k.getBBox(), g = k.closest('.hmi-key'), t = g.transform && g.transform.baseVal.consolidate(), q = k.parentNode.transform.baseVal.consolidate();
@@ -629,10 +681,23 @@
         }).filter(Boolean);
         if (c.length < 2) return;
         var xs = c.map(function (v) { return v[0]; }), ys = c.map(function (v) { return v[1]; });
-        var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs), y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys), d;
-        if (x1 - x0 >= y1 - y0) { var ty = y0 - 7; d = 'M' + r1(x0) + ' ' + r1(ty) + ' H' + r1(x1) + c.map(function (v) { return ' M' + r1(v[0]) + ' ' + r1(ty) + ' V' + r1(v[1] - 2.4); }).join(''); }
-        else { var tx = x0 - 9; d = 'M' + r1(tx) + ' ' + r1(y0) + ' V' + r1(y1) + c.map(function (v) { return ' M' + r1(tx) + ' ' + r1(v[1]) + ' H' + r1(v[0] - 2.4); }).join(''); }
-        p.setAttribute('d', d);
+        var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs), y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
+        /* v3.117.4: the trunk took the first lane outside the glyphs (x0 - 9) whatever lay there; on E-S-101 the K1/K2 trunks
+           ran through DSL, CB and CT tags and the CB reading, and no lane outside the glyphs was free of words. Now every lane
+           3 units apart within 130 of that first lane is scored (a word crossed = 1000, a conductor sample = 1) and the
+           cheapest wins, the nearest on a tie: a trunk between the glyphs crosses the conductor once instead of a word. */
+        var horiz = x1 - x0 >= y1 - y0, q0 = horiz ? y0 - 7 : x0 - 9, lanes = [q0];
+        for (var st = 3; st <= 130; st += 3) lanes.push(q0 + st, q0 - st);
+        var path = function (q) {
+          return horiz ? 'M' + r1(x0) + ' ' + r1(q) + ' H' + r1(x1) + c.map(function (v) { return ' M' + r1(v[0]) + ' ' + r1(q) + ' V' + r1(v[1] + (q < v[1] ? -2.4 : 2.4)); }).join('')
+            /* each spur runs 6 units above its glyph and drops onto the bow: a straight spur to the farther of two keys on one
+               row passed through the nearer key's number */
+            : 'M' + r1(q) + ' ' + r1(y0 - 6) + ' V' + r1(y1 - 6) + c.map(function (v) { return ' M' + r1(q) + ' ' + r1(v[1] - 6) + ' H' + r1(v[0] - 4) + ' V' + r1(v[1] - 2.4); }).join('');
+        };
+        var best = [lanes[0], Infinity];
+        lanes.forEach(function (q) { if (c.some(function (v) { return horiz ? Math.abs(q - v[1]) < 5 : Math.abs(q - v[0]) < 7; })) return;   /* never through a glyph row */
+          p.setAttribute('d', path(q)); var n = crossings(p); if (n < best[1]) best = [q, n]; });
+        p.setAttribute('d', path(best[0]));
       });
     }
     /* PRD-ELECTRICAL-BMS E7 (phone): on a narrow screen (css/rz-hmi.css, max-width 600 px) the sheet's floor width is the one
@@ -646,14 +711,48 @@
       for (var i = 0; i < ts.length; i++) {
         if (!ts[i].textContent.trim()) continue;
         var cs = getComputedStyle(ts[i]); if (cs.display === 'none' || cs.visibility === 'hidden') continue;
-        var fs = parseFloat(cs.fontSize); if (fs > 0 && fs < min) min = fs;
+        /* a bubble's letters fitted into their circle count at the page's own size: the fit must not widen the phone floor */
+        var fs = parseFloat(ts[i].getAttribute('data-fs-css') || cs.fontSize); if (fs > 0 && fs < min) min = fs;
       }
       if (min === Infinity) return;
       frame.querySelector('.hmi-vp').style.setProperty('--hmi-phone-w', Math.ceil(B.w * PHONE_LABEL_PX / min) + 1 + 'px');
     }
+    /* ISA-5.1 letters stay inside their bubble (v3.117.4): a page may raise [data-role="inst"] to 11-12 px for reading, but a
+       22-unit field bubble (r 6.4) cannot hold "TT" at 12 px, and a 44-unit panel bubble cannot hold "PDIC" above its line:
+       the letters spilled over the circle (test-conv-sheet-ink-clear K2). Each bubble's letters keep the page's size when
+       they fit, else shrink to the largest size whose ink corners clear the circle's inner edge; field letters are centred
+       on the circle, panel letters sit above the control-room line. Measured on the glyph advances and canvas ink ascent. */
+    var inkCtx = null;
+    function fitInst() {
+      if (!inkCtx) { try { inkCtx = doc.createElement('canvas').getContext('2d'); } catch (x) { return; } if (!inkCtx) return; }
+      svg.querySelectorAll('.hmi-node[data-sym="instField"] > text[data-role="inst"], .hmi-node[data-sym="instPanel"] > text[data-role="inst"]').forEach(function (t) {
+        var n = nodes[t.parentNode.getAttribute('data-node')]; if (!n || !t.textContent) return;
+        t.style.removeProperty('font-size');
+        var cs = getComputedStyle(t), f = parseFloat(cs.fontSize); if (!(f > 0)) return;
+        inkCtx.font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+        var w = 0; try { w = t.getComputedTextLength(); } catch (x) { return; }
+        var asc = inkCtx.measureText(t.textContent).actualBoundingBoxAscent; if (!(w > 0) || !(asc > 0)) return;
+        var sz = n.size || 32, cy = n.y - sz * 4 / 48, R = 14 * sz / 48 - sz / 48 - 0.6, s = 1, base;
+        if (n.sym === 'instPanel') {   /* ink box from the baseline (g above the line) up by asc: solve the far corner on R */
+          var g = sz / 48 + 1, A = w * w / 4 + asc * asc;
+          s = (-g * asc + Math.sqrt(g * g * asc * asc - A * (g * g - R * R))) / A;
+          base = function (k) { return cy - g; };
+        } else {
+          s = R / Math.sqrt(w * w / 4 + asc * asc / 4);
+          base = function (k) { return cy + asc * k / 2; };
+        }
+        if (!(s > 0)) return;
+        /* never below the 8.5 px sheet base: a bubble too small for its letters is drawn larger (test-conv-sheet-ink-clear
+           K4), never filled with letters no one can read (test-conv-geometry G5, test-dh-operator O9) */
+        var k = Math.max(Math.min(1, s), Math.min(1, 8.5 / f));
+        t.removeAttribute('data-fs-css');
+        if (k < 1) { t.style.setProperty('font-size', (Math.floor(f * k * 10) / 10) + 'px'); t.setAttribute('data-fs-css', f); }
+        t.setAttribute('y', r1(base(Math.floor(f * k * 10) / 10 / f)));
+      });
+    }
     function settle() {
       if (!svg.clientWidth) return false;
-      settleBrk(); relinkKeys();
+      fitInst(); settleBrk(); relinkKeys();
       if (sheet.crop === true && measureCrop() && view.z <= 1.001 && !frame.classList.contains('is-fit-all')) fit();
       phoneFloor();
       return true;

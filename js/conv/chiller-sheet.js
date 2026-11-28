@@ -81,11 +81,11 @@
     var nodes = [
       { id: 'avs', tag: 'AV', sym: 'airVent', x: SX, y: 112, size: 22, tagAt: 'none' },
       { id: 'jhs', sym: 'junction', x: SX, y: 150, dot: false },
-      { id: 'tths', tag: 'TT-CHWS', sym: 'instField', x: 290, y: 124, size: 22, inst: 'TT', tagAt: 'right',
+      { id: 'tths', tag: 'TT-CHWS', sym: 'instField', x: 290, y: 124, size: 30, inst: 'TT', tagAt: 'right',
         values: [{ k: 't', dx: 14, dy: 18, anchor: 'start', lod: 1, point: 'cooling.chws_c', label: 'CHWS header' }] },
       { id: 'avr', tag: 'AV', sym: 'airVent', x: RX, y: 112, size: 22, tagAt: 'none' },
       { id: 'jhr', sym: 'junction', x: RX, y: 150, dot: false },
-      { id: 'tthr', tag: 'TT-CHWR', sym: 'instField', x: 950, y: 124, size: 22, inst: 'TT', tagAt: 'left',
+      { id: 'tthr', tag: 'TT-CHWR', sym: 'instField', x: 950, y: 124, size: 30, inst: 'TT', tagAt: 'left',
         values: [{ k: 't', dx: -14, dy: 18, anchor: 'end', lod: 1, point: 'cooling.chwr_c', label: 'CHWR header' }] },
       { id: 'jds', sym: 'junction', x: SX, y: DEC_Y }, { id: 'jdr', sym: 'junction', x: RX, y: DEC_Y },
       { id: 'vdec', tag: 'DECOUPLER', sym: 'valveBalancing', x: 620, y: DEC_Y, size: 24, tagAt: 'above' },
@@ -123,7 +123,7 @@
       /* supply leg: evaporator -> TT-n01 -> isolation valve -> CHWS header */
       nodes.push({ id: 'vs' + n, sym: 'valveButterfly', x: 456, y: s, size: 22, tagAt: 'none' });
       nodes.push({ id: 'jts' + n, sym: 'junction', x: 370, y: s, dot: false });
-      nodes.push({ id: 'tts' + n, tag: 'TT-' + t + '01', sym: 'instField', x: 370, y: s - 34, size: 22, inst: 'TT', tagAt: 'above',
+      nodes.push({ id: 'tts' + n, tag: 'TT-' + t + '01', sym: 'instField', x: 370, y: s - 34, size: 30, inst: 'TT', tagAt: 'above',
         values: [{ k: 't', dx: -14, dy: 4, anchor: 'end', lod: 1, point: pt + 'chws_c', label: 'TT-' + t + '01 CHWS ' + ctag, limitsOf: 'cooling.chws_c' }] });
       nodes.push({ id: 'js' + n, sym: 'junction', x: SX, y: s });
       edges.push({ id: 'e-s' + n + 'a', from: 'ch' + n + '.chwOut', to: 'vs' + n + '.b', medium: 'chw', flowOf: 't' + n });
@@ -134,7 +134,7 @@
       nodes.push({ id: 'jr' + n, sym: 'junction', x: RX, y: s });
       nodes.push({ id: 'vr' + n, sym: 'valveButterfly', x: 950, y: s, size: 22, tagAt: 'none' });
       nodes.push({ id: 'jtr' + n, sym: 'junction', x: 892, y: s, dot: false });
-      nodes.push({ id: 'ttr' + n, tag: 'TT-' + t + '02', sym: 'instField', x: 892, y: s - 34, size: 22, inst: 'TT', tagAt: 'above',
+      nodes.push({ id: 'ttr' + n, tag: 'TT-' + t + '02', sym: 'instField', x: 892, y: s - 34, size: 30, inst: 'TT', tagAt: 'above',
         values: [{ k: 't', dx: 14, dy: 4, anchor: 'start', lod: 1, point: pt + 'chwr_c', label: 'TT-' + t + '02 CHWR ' + ctag, limitsOf: 'cooling.chwr_c' }] });
       nodes.push({ id: 'jpr' + n, sym: 'junction', x: 840, y: s });
       nodes.push({ id: 'jpl' + n, sym: 'junction', x: 640, y: s });
@@ -227,13 +227,16 @@
     loopsOf('ch-m-101').forEach(function (L) {
       if (L.mv.classKey !== 'chw_secondary_pump' || !L.pv.draw) return;
       var lastH = halls[halls.length - 1].code, PX = 1060, PY = SEC_Y - 34, CX = 170, CY = SEC_Y + 28, BUS = SEC_Y - 64, TX = 228;
+      /* the DP reading sits 10 left of the bubble's stem: at 14 its first digit lay on the CHW riser jacket, right of the
+         stem it meets the zone border (v3.117.4) */
       nodes.push({ id: 'lpv-dp', tag: L.pv.tag, sym: 'instField', x: PX, y: PY, size: 40, inst: L.pv.tag.split('-')[0], tagAt: 'above', loop: L.sp,
         label: L.pv.what,
-        values: [{ k: 'dp', dx: -14, dy: 22, anchor: 'end', lod: 1, point: 'chiller-plant.CHW.remote_dp', label: L.pv.tag + ' remote DP' }] });
-      nodes.push({ id: 'lc-dp', tag: L.tag, sym: 'instPanel', x: CX, y: CY, size: 44, inst: L.tag.split('-')[0], tagAt: 'above', loop: L.sp,
+        values: [{ k: 'dp', dx: -10, dy: 22, anchor: 'end', lod: 1, point: 'chiller-plant.CHW.remote_dp', label: L.pv.tag + ' remote DP' }] });
+      /* PDIC-01 is drawn at 52 so its four letters keep 8.5 px inside the circle; SP and OUT move 4 down past its stem */
+      nodes.push({ id: 'lc-dp', tag: L.tag, sym: 'instPanel', x: CX, y: CY, size: 52, inst: L.tag.split('-')[0], tagAt: 'above', loop: L.sp,
         label: L.label + ' controller (' + L.action + ' acting ' + L.kind + ')',
-        values: [{ k: 'sp', dx: 0, dy: 34, anchor: 'middle', lod: 1, const: 'setpoint from the control registry (' + L.sp + ')' },
-          { k: 'out', dx: 0, dy: 51, anchor: 'middle', lod: 1, point: 'chiller-plant.CHW.sec_pump_speed', label: L.tag + ' output (secondary pump speed)', unit: '%' }] });
+        values: [{ k: 'sp', dx: 0, dy: 38, anchor: 'middle', lod: 1, const: 'setpoint from the control registry (' + L.sp + ')' },
+          { k: 'out', dx: 0, dy: 55, anchor: 'middle', lod: 1, point: 'chiller-plant.CHW.sec_pump_speed', label: L.tag + ' output (secondary pump speed)', unit: '%' }] });
       edges.push({ id: 'e-lp-dps', from: 'jhs' + lastH, to: 'lpv-dp.process', via: [[PX, SEC_Y]], w: 'inst', medium: 'line', loop: L.sp });
       edges.push({ id: 'e-lp-dpr', from: [RX, SEC_Y + 22], to: [PX, SEC_Y + 22], w: 'inst', medium: 'line', loop: L.sp });
       edges.push({ id: 'e-lp-dpr2', from: [PX, SEC_Y + 22], to: [PX, SEC_Y], w: 'inst', medium: 'line', loop: L.sp });
@@ -277,10 +280,10 @@
         values: [{ k: 'r', dx: -30, dy: 26, anchor: 'start', lod: 1, point: 'cooling.tower_rejection_kw_th', label: 'Heat rejected Σ running cells' },
           { k: 'q', dx: -30, dy: 42, anchor: 'start', lod: 1, point: 'chiller-plant.CDW.flow_lps', label: 'CDW flow Σ running pumps' }] },
       { id: 'jrin', sym: 'junction', x: 100, y: HR, dot: false },
-      { id: 'ttcr', tag: 'TT-CDWR', sym: 'instField', x: 100, y: HR - 50, size: 22, inst: 'TT', tagAt: 'right',
+      { id: 'ttcr', tag: 'TT-CDWR', sym: 'instField', x: 100, y: HR - 50, size: 30, inst: 'TT', tagAt: 'right',
         values: [{ k: 't', dx: 15, dy: 20, anchor: 'start', lod: 1, point: 'cooling.cdw_return_c', label: 'TT-CDWR' }] },
       { id: 'jcs0', sym: 'junction', x: 124, y: HS, dot: false },
-      { id: 'ttcs', tag: 'TT-CDWS', sym: 'instField', x: 124, y: HS + 52, size: 22, inst: 'TT', tagAt: 'left',
+      { id: 'ttcs', tag: 'TT-CDWS', sym: 'instField', x: 124, y: HS + 52, size: 30, inst: 'TT', tagAt: 'left',
         values: [{ k: 't', dx: -15, dy: 20, anchor: 'end', lod: 1, point: 'cooling.cdw_supply_c', label: 'TT-CDWS' }] }
     ];
     var edges = [

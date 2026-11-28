@@ -193,6 +193,7 @@ gate "Conventional equipment insides P4b — every breaker and protection relay 
 gate "Conventional HMI sheets — no text struck by a pipe, a zone border or a foreign body or outline (W3, C1-C5)" node tools/test-conv-sheet-text-clear.mjs
 gate "Conventional CDU P&ID (cdu-mini-bms, 5 types) — no text over text, no text struck by a pipe, signal or outline, none outside the frame (X1-X3)" node tools/test-cdu-pid-text-clear.mjs
 gate "Conventional equipment insides (11 classes: chiller, pumps, CRAH, tower, genset, transformers, breaker, relay, UPS) — ink-box text: no text over text, no text struck by a pipe, signal or symbol outline, none outside the frame (N1-N3)" node tools/test-conv-internals-text-clear.mjs
+gate "Conventional HMI sheets (fire, chiller, water, fuel, EPMS) — ink-box text: no text over text, no text struck by any drawn line incl. stroke width, signal and key-interlock links, bubble letters inside their circle, none outside the frame (K1-K3)" node tools/test-conv-sheet-ink-clear.mjs
 gate "Conventional HMI sheets — flow, values and states follow evidence and quality; cmd/fb apart; marks without colour; every asset opens (W4 B1-B6)" node tools/test-conv-bms-truth.mjs
 gate "Conventional HMI sheets — alarm reaches its mark <= 250 ms, motion stops off screen; frame budgets reported (W4 B7)" node tools/test-conv-sheet-perf.mjs
 # v3.66.0 — PRD-CONV-LIVING-PLANT P0: the depth layer. One payload builder, one equipment modal, a ratchet on what a

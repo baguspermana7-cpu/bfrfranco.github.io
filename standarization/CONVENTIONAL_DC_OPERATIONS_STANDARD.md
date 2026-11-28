@@ -347,6 +347,17 @@ Before release:
     jacket-water riser; pump flow and head on the shaft line; the chiller TT and TIC letters touching bubbles drawn at
     size 22 and 36). An ISA bubble on an internals drawing is drawn at size 30 or more (field) and 44 or more (panel), so
     its 8.5 px letters clear the circle.
+26d. **The five HMI sheets are held to the ink-box rule too (v3.117.5, `tools/test-conv-sheet-ink-clear.mjs`, ship
+    gate).** The sheet gate (C1-C5) measures em boxes against pipe centre lines, zone borders and foreign symbol
+    outlines only. This gate opens fire FS-M-101, chiller CH-M-101 and CH-M-102, water WT-M-101, fuel FU-M-101 and EPMS
+    E-S-101 at 1440 px: K1 no text over text; K2 no stroked shape through a text, stroke width counted, signal and
+    key-interlock links, the text's own symbol and zone borders included, the run of a pipe hidden under an opaque
+    symbol body excluded; K3 nothing outside the frame; K4 ISA bubble letters at 8.5 px or more. Red on v3.117.3: 53
+    findings (bubble letters wider than their circle on four sheets, the K1/K2 key links through the E-S-101 feeder
+    tags, PDT-01's reading on the CHW riser jacket). Since v3.117.5 `rz-hmi-sheet.js` fits each bubble's letters into
+    its circle (the page's size when it fits, else the largest that clears the circle) and scores every key-link lane
+    against the words and conductors it would cross. A sheet bubble is drawn large enough that its letters fit at
+    8.5 px: field 2 letters ≥ 26, 3 letters ≥ 34; panel 2 letters ≥ 40, 3 letters ≥ 46, 4 letters ≥ 52.
 
 27. **The sheet tells the truth about flow, state and quality (W4, PRD-CONV-BMS-UIUX, `js/conv/sheet-truth.js`,
     gates `tools/test-conv-bms-truth.mjs` + `tools/test-conv-sheet-perf.mjs`).** On fire, chiller, water and fuel:

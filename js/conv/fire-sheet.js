@@ -26,14 +26,14 @@
     { id: 'ftmu', tag: 'FT-MU', sym: 'flowMeter', x: 170, y: 250, size: 24, tagAt: 'above', values: [{ k: 'q', dx: 0, dy: 26, lod: 1, point: 'fire.FT-MU.flow_m3h', label: 'FT-MU town make-up flow', unit: 'm³/h' }] },
     { id: 'tank', tag: 'TK-FW-01', sym: 'tankStorage', x: 240, y: 380, size: 96, cls: 'fire-tank', label: 'Fire-water reserve tank', tagAt: 'left',
       values: [{ k: 'lvl', dx: -56, dy: 18, anchor: 'end', lod: 1, point: 'fire.level_pct', label: 'Fire-water tank level' }, { k: 'vol', dx: -56, dy: 30, anchor: 'end', lod: 1, point: 'fire.stored_m3', label: 'Fire-water stored volume', unit: 'm³' }, { k: 'dur', dx: -56, dy: 42, anchor: 'end', lod: 1, point: 'fire.duration_min', label: 'Fire-water duration at pump demand', unit: 'min' }] },
-    { id: 'lt', tag: 'LT', sym: 'instField', x: 312, y: 350, size: 22, inst: 'LT', tagAt: 'none' },
+    { id: 'lt', tag: 'LT', sym: 'instField', x: 312, y: 350, size: 26, inst: 'LT', tagAt: 'none' },
     /* suction header junctions */
     { id: 'js0', sym: 'junction', x: 360, y: 416, dot: false },
     { id: 'js1', sym: 'junction', x: 360, y: PY[0] }, { id: 'js2', sym: 'junction', x: 360, y: PY[1] }, { id: 'js3', sym: 'junction', x: 360, y: PY[2], dot: false },
     /* discharge header junctions */
     { id: 'jd1', sym: 'junction', x: 650, y: PY[0] }, { id: 'jd2', sym: 'junction', x: 650, y: PY[1] }, { id: 'jd3', sym: 'junction', x: 650, y: PY[2] },
     { id: 'jtop', sym: 'junction', x: 650, y: HDR_Y }, { id: 'jpt', sym: 'junction', x: 650, y: 330 },
-    { id: 'pt', tag: 'PT-01', sym: 'instField', x: 600, y: 330, size: 22, inst: 'PT', tagAt: 'left', values: [{ k: 'p', dx: -14, dy: 16, anchor: 'end', lod: 1, point: 'fire.static_pressure_bar', label: 'PT-01 fire main pressure' }] },
+    { id: 'pt', tag: 'PT-01', sym: 'instField', x: 600, y: 330, size: 26, inst: 'PT', tagAt: 'left', values: [{ k: 'p', dx: -14, dy: 16, anchor: 'end', lod: 1, point: 'fire.static_pressure_bar', label: 'PT-01 fire main pressure' }] },
     { id: 'riser', tag: 'FH / HR RISER', sym: 'offSheet', x: 650, y: 190, size: 24, rot: 270, tagAt: 'left' },
     /* test header */
     { id: 'fe', tag: 'FE-01', sym: 'flowMeter', x: 590, y: 715, size: 24, rot: 180, tagAt: 'above', values: [{ k: 'q', dx: 0, dy: 26, lod: 1, point: 'fire.FE-01.flow_m3h', label: 'FE-01 fire pump discharge flow', unit: 'm³/h' }] },
@@ -94,7 +94,7 @@
   (C && typeof C.loops === 'function' ? C.loops('fs-m-101') : []).forEach(function (L) {
     var i = -1; pumps.forEach(function (p, k) { if (p.id === L.mv.node) i = k; });
     if (i < 0) return;
-    var y = PY[i], p = pumps[i], cy = y - 40, r = 15, id = 'lc-' + p.id, px = 480 + p.size / 2;
+    var y = PY[i], p = pumps[i], cy = y - 40, r = 20, id = 'lc-' + p.id, px = 480 + p.size / 2;
     nodes.push({ id: id, tag: L.tag, sym: 'instPanel', x: LX, y: cy, size: 2 * r, inst: 'PC', tagAt: 'right', loop: L.sp, ctrl: p.id,
       label: p.tag + ' controller (' + L.action + ' acting ' + L.kind + ')',
       values: [{ k: 'sp', dx: 0, dy: -r - 8, anchor: 'middle', lod: 1, const: 'cut-in / cut-out from the control registry (' + L.sp + ')' }] });

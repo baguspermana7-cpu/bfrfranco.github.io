@@ -11,6 +11,37 @@ release sections rather than semver.
 
 ---
 
+## v3.117.5 — 2026-11-28 — HMI sheets: bubble letters inside their circles, key links clear of every label
+
+**The five Conventional HMI sheets are measured on the glyph ink, not the em box** (PRD-SETPOINT-SIM §C25)
+
+### Fixed
+- `js/rz-hmi-sheet.js` (every HMI sheet, both cockpits): ISA-5.1 bubble letters were wider than their bubble on the
+  pages that raise them to 11-12 px (chiller CH-M-101 "TT" spilled out of 22-unit bubbles, fuel "LIC" and chiller
+  "PDIC" were cut by the circle). Each bubble's letters keep the page's size when they fit, else shrink to the largest
+  size whose ink corners clear the circle; field letters are centred on the circle, panel letters sit above the line.
+  The fit never goes under the 8.5 px sheet base (a bubble that small is drawn larger instead), and a fitted bubble
+  does not widen the phone sheet: the phone floor reads the page's own letter size.
+- `js/rz-hmi-sheet.js` (E-S-101 key interlocks): the dashed K1/K2 key links ran through the DSL, CB and CT tags and
+  the CB reading, and the two keys at DS1/DS2 sat on both switches and on each other. Every trunk lane within 130 units
+  is now scored (a word crossed = 1000, a conductor sample = 1) and the cheapest wins; spurs drop onto each key from
+  6 units above; lanes are scored again once the readings are written. A key glyph also keeps off every symbol, every
+  zone border and every key placed before it; a breaker glyph keeps 1 unit off a tag's last letter (CB-TIE).
+- Bubbles too small for their letters at 8.5 px are drawn larger (sizes from the fit equation; no tag, value or
+  connection changed): chiller TT bubbles (22 on CH-M-101, 2 on CH-M-102) 22 → 30 and PDIC-01 44 → 52 (its SP and OUT move 4 down past the stem); fire LT
+  and PT-01 22 → 26, PC ×3 30 → 40; water LIT-101 28 → 34, PIC-301 30 → 46; fuel LIC ×8 40 → 46; EPMS 50BF relay
+  box 26 → 34.
+- `js/conv/chiller-sheet.js`: the PDT-01 reading "90 kPa" lay on the CHW riser jacket; it moves 4 units right.
+
+### Gates
+- New `tools/test-conv-sheet-ink-clear.mjs` (ship gate, conv release set): fire, chiller (CH-M-101 and the condenser
+  view CH-M-102), water, fuel and EPMS sheets at 1440 px. K1 no text over text, K2 no stroked shape through a text
+  (stroke width counted; signal and key links, symbol outlines and zone borders included; a pipe's run hidden under an opaque symbol body excluded), K3 nothing
+  outside the frame, K4 fitted bubble letters at 8.5 px or more. Red on v3.117.3: 53 findings on all 5 sheets
+  (K1-K3 alone); K4 then found 36 bubbles too small once the fit was in. `RZ_INK_PLANT=1` puts
+  a value on a pipe: every sheet view red.
+- Standard: `CONVENTIONAL_DC_OPERATIONS_STANDARD.md` rule 26d.
+
 ## v3.117.4 — 2026-11-28 — Chiller plant: the specific power says where it comes from
 
 **A hover title no longer claims a number is ASSUMED when the registry derives it**
