@@ -427,6 +427,9 @@ compares across the hall.
   `font-size` attribute. At the hall's 1.304 scale a `font-size="2.9"` label renders 3.8 px.
 * `audit-legibility` lists `datahallAI.html` in `MONITOR_PAGES`: reported, **not gating**. Treat a
   clean run as no signal for this page; read the NOTE line.
+* **HTML text holds the same floor (v3.117.6).** No visible HTML text on any tab is under 8.5 px computed, at
+  1440 and at 390. New small text is 9 px or more. `tools/test-dcai-text-floor.mjs` gates the 10 tabs at rest;
+  it does not open dialogs or tooltips, so author those at 9 px too.
 * Overlap must be measured with **`getBoundingClientRect()`**, never `getBBox()`. getBBox ignores
   `transform`, so it reads a rotated label at its unrotated position — it reported 34 collisions
   where the reader sees 2.

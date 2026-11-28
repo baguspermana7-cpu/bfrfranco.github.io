@@ -11,6 +11,21 @@ release sections rather than semver.
 
 ---
 
+## v3.117.6 — 2026-11-28 — DC AI: no text under 8.5 px
+
+**The HTML around the DC AI drawings now holds the same 8.5 px floor the drawings hold** (DATAHALL_AI_STANDARD, "Measuring legibility on this page")
+
+### Fixed
+- `datahallAI.html`, `css/datahall-ai-operator.css`, `css/rz-dh-shell.css`: KPI unit lines, operator metric labels,
+  table heads, status chips (152 on Fire & Safety), the section chevrons, basis-of-design notes and floor tooltips were
+  8 px on every width. They are 9 px. Measured on all 10 tabs at 1440 and 390: 19 tab views had text under the floor,
+  now 0; no tab scrolls sideways on a phone.
+
+### Added
+- Ship gate `tools/test-dcai-text-floor.mjs` (TF1-TF3, 52 checks): every tab at 1440 and 390, visible HTML text has a
+  computed size of at least 8.5 px, the phone document does not scroll sideways, and the scan saw text on every tab.
+  Red on v3.117.5 (19 of 52), green here.
+
 ## v3.117.5 — 2026-11-28 — HMI sheets: bubble letters inside their circles, key links clear of every label
 
 **The five Conventional HMI sheets are measured on the glyph ink, not the em box** (PRD-SETPOINT-SIM §C25)
