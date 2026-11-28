@@ -11,6 +11,21 @@ release sections rather than semver.
 
 ---
 
+## v3.117.4 — 2026-11-28 — Chiller plant: the specific power says where it comes from
+
+**A hover title no longer claims a number is ASSUMED when the registry derives it**
+
+### Fixed
+- `chiller-plant.html` "Specific power": the title said "(ASSUMED)". The parameter record
+  `cooling.chiller_specific_power_kw_e_per_kw_th` is DERIVED, computed at the operating point: 0.1028 kW/kW at 19.4 °C
+  CHWS, against 0.165 kW/kW rated at AHRI. It now reads "at the operating point (DERIVED)". The value prints two
+  decimals ("0.10 kW/kWₜₕ"), where it used to print "0.1".
+
+### Gates
+- New `tools/test-basis-title-evidence.mjs` (conv release gates, static): on every page, a basis title that names an
+  evidence class names the class its record carries, and the record exists. Red on e42c0a130 (1 of 4 claims wrong),
+  green 4/4. Render checked at 1440 and 390: "0.10 kW/kWₜₕ", title DERIVED, cell fits, 0 page errors.
+
 ## v3.117.3 — 2026-11-28 — Equipment insides: every label clear of every line, on all eleven drawings
 
 **The equipment Inside drawings are measured on the glyph ink, not the em box** (PRD-SETPOINT-SIM §C24)

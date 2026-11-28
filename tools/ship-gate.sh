@@ -409,6 +409,7 @@ gate "Saved-scenario Open routes — every calculator id opens its own page; unk
 gate "Calculator inline handlers — every onclick on the 11 calculators calls a function that exists (X3)" node tools/test-calc-onclick-handlers.mjs
 gate "Calculator registry — data/calculators.json pages, fields and result selectors match the 11 rendered calculators (F1)" node tools/test-calculator-registry.mjs
 gate "Calculator basis (P10) — 40 headline results on 6 calculators hooked, registry = fresh render at defaults, inputs measured, drawer by keyboard" node tools/test-calc-parameter-registry.mjs
+gate "Conventional basis titles (all pages) — a hover title that names an evidence class (ASSUMED, DERIVED ...) names the class its parameter record carries; chiller-plant specific power was ASSUMED, registry DERIVED" node tools/test-basis-title-evidence.mjs
 gate "Ask about this page (P21) — answers only from registry records + manual sections, every citation resolves, 20 hits / 10 honest misses / held-out, gated values withheld, text-only render, 15 pages" node tools/test-explain-ask.mjs
 gate "Embedded compute — hidden-iframe loop: fixture 2x, queue of one, refusals, timeout, real calculator, ?embed flag (F2)" node tools/test-embed-compute.mjs
 gate "Article embeds (P20A) — 9 calculators compact, every shown input moves its result, auto-height no inner scroll, P02 open link, cross-origin parent refused, 8 s fallback, 3 articles CLS <= 0.02 both themes" node tools/test-embed-article.mjs

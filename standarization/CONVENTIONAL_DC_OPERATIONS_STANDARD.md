@@ -364,6 +364,12 @@ Before release:
     control); the gate prints the numbers and leaves the budget for target hardware. Signed reverse flow and
     breaker/energised scenarios do not apply to these four mechanical sheets (no reversible path, no breaker feedback).
 
+- **A hover title never contradicts the registry about evidence (v3.117.4).** When a `data-basis-param` element's
+    title names an evidence class in parentheses, it is the class the parameter record carries. Chiller-plant
+    "Specific power" said ASSUMED while its record is DERIVED (the operating point, 0.1028 kW/kW at 19.4 °C CHWS
+    against 0.165 rated). The cell now prints two decimals ("0.10", not "0.1"). Gate
+    `tools/test-basis-title-evidence.mjs` (static, every page, both registries): red 1 of 4, green 4/4.
+
 ## 10. Change and lesson ledger
 
 ### 2026-11-23 — pump speed is solved, not typed (PRD-CONV-OPS-DEPTH 01 P1, engine 2.7.0)

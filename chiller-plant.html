@@ -576,7 +576,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
         ]
     }
     </script>
-    <script src="js/rz-version.js?v=20261127-5912c2d7" defer></script>
+    <script src="js/rz-version.js?v=20261128-b7628d0c" defer></script>
     <script src="js/rz-mobile-nav.js?v=20261103-1b7d3ed8" defer></script>
     <script src="js/rz-cookie-consent.js?v=20261110-c3b9ad79" defer></script>
     <!-- Conventional BMS single scenario engine — single source of truth for the
@@ -821,7 +821,7 @@ html,body{min-height:100%;background:var(--bg);color:var(--txt);font-family:"IBM
                efficiency and its heat rejection were engine-published and rendered nowhere. An
                operator could read COP 6.06 and never see what it rests on. -->
           <div class="kv" data-basis-param="cooling.chiller_type" tabindex="0" role="button" title="Chiller machine type — click for basis"><div class="k">Machine type</div><div class="v" id="kMachine">&mdash;</div></div>
-          <div class="kv" data-basis-param="cooling.chiller_specific_power_kw_e_per_kw_th" tabindex="0" role="button" title="Chiller specific power (ASSUMED) — click for basis"><div class="k">Specific power</div><div class="v" id="kSpecPwr" data-const>&mdash;</div></div>
+          <div class="kv" data-basis-param="cooling.chiller_specific_power_kw_e_per_kw_th" tabindex="0" role="button" title="Chiller specific power at the operating point (DERIVED) — click for basis"><div class="k">Specific power</div><div class="v" id="kSpecPwr" data-const>&mdash;</div></div>
           <div class="kv" data-basis-param="cooling.cdw_range_k" tabindex="0" role="button" title="Cooling tower range (ASSUMED) — click for basis"><div class="k">Tower range</div><div class="v" id="kCdwRange" data-const>&mdash;</div></div>
           <div class="kv" data-basis-param="cooling.chiller_design_duty_kw_th" tabindex="0" role="button" title="Plant design duty — click for basis"><div class="k">Design duty</div><div class="v" id="kDesignDuty" data-const>&mdash;</div></div>
         </div>
@@ -2361,7 +2361,7 @@ function renderKpi(){
   if (eSnap && eSnap.cooling) {
     $("kMachine").textContent = String(eSnap.cooling.chiller_type || "\u2014").replace(/-/g, " ");
     $("kSpecPwr").textContent = eSnap.cooling.chiller_specific_power_kw_e_per_kw_th != null
-      ? `${r2(eSnap.cooling.chiller_specific_power_kw_e_per_kw_th)} kW/kW\u209C\u2095` : "\u2014";
+      ? `${eSnap.cooling.chiller_specific_power_kw_e_per_kw_th.toFixed(2)} kW/kW\u209C\u2095` : "\u2014";
     $("kCdwRange").textContent = eSnap.cooling.cdw_range_k != null
       ? `${r1(eSnap.cooling.cdw_range_k)} K` : "\u2014";
     $("kDesignDuty").textContent = eSnap.cooling.chiller_design_duty_kw_th != null
