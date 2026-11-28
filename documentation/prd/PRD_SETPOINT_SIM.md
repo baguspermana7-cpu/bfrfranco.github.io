@@ -1198,3 +1198,15 @@ RZSpBlock.bind(host, { recompute })  → wires sliders (input → recompute → 
   changed.
 - **Plant:** `RZ_INK_PLANT=1` puts a value on a pipe; every sheet view goes red.
 
+
+## C26. The CDU drawings on a phone (2026-11-28, v3.117.7)
+
+- **Why:** the CDU P&ID carries TIC-01 and PDIC-02 (P9 part 4). The geometry gate had reported it without failing
+  since v3.37.0: 92 rows on v3.117.6 (5 label pairs touching, labels at 4-6 px at 390 px).
+- **Fix:** a legibility floor per drawing (plan 420 px, P&ID 680 px) with sideways pan inside the panel; TT-01 and
+  LT-01 moved so their readings clear HV-03 and "T-01 EXP"; three label pairs spaced. The TIC-01 signal still starts at
+  TT-01. No value, tag or connection changed.
+- **Plan view:** X1-X3 extended to `#layoutBox`: 19 findings red (risers through the aisle names and the pitch
+  dimension, two captions past the frame), 0 after the moves. Pan clamp fixed (10 px of the right edge stayed hidden).
+- **Gates:** `tools/test-conv-geometry.mjs` enforces the page (report-only set empty); `tools/test-cdu-pid-text-clear.mjs`
+  X4 checks the floor and the pan at 390 px. Plant: floor removed, "PDIC" at 4.2 px, red.

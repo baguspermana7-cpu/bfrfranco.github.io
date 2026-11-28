@@ -377,8 +377,12 @@ try {
    "makeup", "HV-01" x "supply", "FACILITY WATER · FWS" x "TCV-01"; 33 labels at 6-8 px). A 500-unit
    P&ID in a card cannot clear 8.5 px at 360 px without LOD or zoom, which is a redesign, not a nudge.
    Flip condition: remove it from this set when its rows read zero, tolerances unchanged.
-   Ledger: standarization/UIUX_AUDIT_LEDGER.md row 26 (OPEN). */
-const MONITOR_PAGES = new Set(['cdu-mini-bms.html']);
+   Ledger: standarization/UIUX_AUDIT_LEDGER.md row 26 (OPEN).
+
+   v3.117.7 — its rows read zero and it left the set (ledger row 26 CLOSED). No LOD was needed: each drawing got a
+   legibility floor (a minimum rendered width that keeps its smallest label at 8.5 px) and pans sideways inside its
+   panel where the panel is narrower; five label pairs were moved apart. The set is empty again. */
+const MONITOR_PAGES = new Set([]);
 const blocking = findings.filter((f) => !MONITOR_PAGES.has(f.page));
 const monitored = findings.length - blocking.length;
 if (monitored) {

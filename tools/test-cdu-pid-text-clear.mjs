@@ -6,19 +6,22 @@
  * test-conv-sheet-text-clear covers the five rz-hmi-sheet drawings only (fire, chiller, water, fuel, EPMS). The CDU P&ID
  * is drawn by the page's own string builder and redrawn per CDU type, so nothing measured it: v3.116.2 found, on a
  * screenshot only, "→ room air" lying over the MV-01 tag and "makeup" over MV-01's own tag on the L2A type.
- * This gate opens the page at 1440 px and, for each of the 5 types (inrack, inrow, sidecar, l2l, l2a):
+ * This gate opens the page at 1440 px and, for each of the 5 types (inrack, inrow, sidecar, l2l, l2a), on the P&ID and
+ * (since v3.117.7) on the plan view of the row (#layoutBox):
  *
  *   X1  no two visible texts overlap (ink boxes inset by 0.5 px, overlap > 1 px on both axes)
  *   X2  no stroked outline (path, line, polyline, polygon, circle, ellipse, rect) passes through a visible text box:
  *       each outline is sampled every 1 user unit and its ink reaches half the stroke width past that centre line; a shape with stroke none / width 0 / opacity 0 is not drawn and skipped
  *   X3  every visible text stays inside the drawing's viewBox (nothing clipped at the frame)
+ *   X4  at 390 px the layout and the P&ID keep every label at 8.5 px or more (their legibility floor); a drawing wider than
+ *       its panel pans by drag to its right edge; the page does not scroll sideways (v3.117.7, UIUX ledger row 26)
  *
  * Text = every <text> in the P&ID with its own text (child <title> tooltips are not text on the drawing); its box is the
  * INK box (glyph advances x measured ink ascent/descent), not the em box. RZ_CDU_SHOT=<dir> writes one PNG per type.
  * Proven red on b9cd070ed (v3.117.0, before the fixes): 48 findings, 8-10 per type, among them HV-03 and T-01 EXP struck by the
  * TCS supply pipe, "E-01 PLATE HX" by its own plate lines, "HX approach" by the TCS return, "AIR COIL + FANS" by the
  * TIC-01 signal, "supply" over HV-01's tag, and P-01A's tag by the suction header (found once stroke width counted).
- * RZ_CDU_TEXT_PLANT=1 puts the HV-03 tag back on the riser.
+ * RZ_CDU_TEXT_PLANT=1 puts the HV-03 tag back on the riser and removes the P&ID floor (X4).
  * Usage: node tools/test-cdu-pid-text-clear.mjs [--type=l2a]
  */
 import puppeteer from 'puppeteer';
@@ -40,7 +43,9 @@ const srv = http.createServer((q, r) => {
   fs.readFile(p, (e, d) => {
     if (e) { r.writeHead(404); r.end(); return; }
     /* the plant: the HV-03 tag back at its pre-v3.117.1 spot, centred over its valve on the supply riser (x 388) */
-    if (PLANT && p.endsWith('cdu-mini-bms.html')) d = Buffer.from(String(d).replace('x="379" y="90" text-anchor="end">HV-03', 'x="388" y="81" text-anchor="middle">HV-03'));
+    if (PLANT && p.endsWith('cdu-mini-bms.html')) { const a = 'x="379" y="88.5" text-anchor="end">HV-03', b = '#pidBox{ min-width:680px; }', t = String(d);
+      if (!t.includes(a) || !t.includes(b)) { console.log('FAIL the plant no longer matches the page'); process.exit(1); }
+      d = Buffer.from(t.replace(a, 'x="388" y="81" text-anchor="middle">HV-03').replace(b, '')); }   /* and X4: the P&ID's legibility floor removed */
     r.writeHead(200, { 'content-type': MIME[path.extname(p)] || 'application/octet-stream' }); r.end(d);
   });
 });
@@ -48,8 +53,8 @@ await new Promise((res) => srv.listen(0, '127.0.0.1', res));
 const ORIGIN = `http://127.0.0.1:${srv.address().port}/`;
 const browser = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox'] });
 
-function probe() {
-  const svg = document.querySelector('#pidBox svg'); if (!svg) return { missing: true };
+function probe(boxSel) {
+  const svg = document.querySelector((boxSel || '#pidBox') + ' svg'); if (!svg) return { missing: true };
   svg.scrollIntoView({ block: 'center' });
   const vis = (e) => { for (let x = e; x && x !== svg.parentElement; x = x.parentElement) { const cs = getComputedStyle(x);
     if (cs.display === 'none' || cs.visibility === 'hidden' || +cs.opacity === 0) return false; } return true; };
@@ -116,6 +121,43 @@ for (const type of TYPES) {
   const f = [...g.x1.map((x) => 'X1 ' + x), ...g.x2.map((x) => 'X2 ' + x), ...g.x3.map((x) => 'X3 ' + x)];
   f.forEach((x) => console.log(`FAIL ${type} ${x}`)); bad += f.length;
   console.log(`${f.length ? 'FAIL' : 'PASS'} ${type}: ${g.n} texts, ${g.x1.length} overlaps, ${g.x2.length} struck, ${g.x3.length} outside`);
+  /* the plan view of the row (#layoutBox) is redrawn per type too, and is held to the same X1-X3 (v3.117.7) */
+  const l = await pg.evaluate(probe, '#layoutBox');
+  if (l.missing) { console.log(`FAIL ${type} plan: no svg in #layoutBox`); bad++; continue; }
+  const lf = [...l.x1.map((x) => 'X1 ' + x), ...l.x2.map((x) => 'X2 ' + x), ...l.x3.map((x) => 'X3 ' + x)];
+  lf.forEach((x) => console.log(`FAIL ${type} plan ${x}`)); bad += lf.length;
+  console.log(`${lf.length ? 'FAIL' : 'PASS'} ${type} plan: ${l.n} texts, ${l.x1.length} overlaps, ${l.x2.length} struck, ${l.x3.length} outside`);
+}
+/* X4 — phone (390 px): both drawings keep every label at 8.5 px or more; one wider than its panel pans by a real drag until
+   its right edge is in view; the page itself never scrolls sideways */
+if (!only) {
+  const ph = await browser.newPage(); ph.on('pageerror', (e) => errs.push(e.message));
+  await ph.setViewport({ width: 390, height: 844, deviceScaleFactor: 1 }); await primeCockpitAuditDocument(ph, 'dark');
+  await ph.goto(ORIGIN + 'cdu-mini-bms.html', { waitUntil: 'networkidle2', timeout: 90000 });
+  await new Promise((r) => setTimeout(r, 2000));
+  for (const sel of ['#layoutBox', '#pidBox']) {
+    /* the page scrolls smoothly: jump, then let it settle, or the drag lands off screen */
+    await ph.evaluate((s) => document.querySelector(s).scrollIntoView({ block: 'center', behavior: 'instant' }), sel);
+    await new Promise((r) => setTimeout(r, 400));
+    const m = () => ph.evaluate((s) => { const b = document.querySelector(s), v = b.querySelector('svg'), r = v.getBoundingClientRect(), p = b.parentNode.getBoundingClientRect();
+      const k = r.width / v.viewBox.baseVal.width;
+      const fs = [...v.querySelectorAll('text')].filter((t) => t.textContent.trim()).map((t) => [parseFloat(getComputedStyle(t).fontSize) * k, t.textContent.trim().slice(0, 20)]).sort((a, c) => a[0] - c[0])[0];
+      if (p.top > innerHeight - 40 || p.bottom < 40) return { off: true };
+      const cs = getComputedStyle(b.parentNode);   /* the panel body's CONTENT box: its padding is not drawing room, and overflow clips at the padding edge */
+      return { min: fs[0], who: fs[1], left: r.left, right: r.right, pl: p.left + parseFloat(cs.paddingLeft), pr: p.right - parseFloat(cs.paddingRight), cy: Math.max(p.top + 20, Math.min(p.bottom - 20, innerHeight / 2)), sx: document.documentElement.scrollWidth - innerWidth }; }, sel);
+    const a = await m(), f = [];
+    if (a.off) { console.log(`FAIL X4 phone ${sel}: the drawing is not on screen, nothing measured`); bad++; continue; }
+    if (a.min < 8.45) f.push(`smallest label "${a.who}" renders at ${a.min.toFixed(1)} px (floor 8.5)`);
+    if (a.sx > 1) f.push(`the page scrolls sideways by ${a.sx} px`);
+    if (a.right > a.pr + 1) {   /* wider than its panel: drag left twice, the right edge must arrive */
+      for (let i = 0; i < 3; i++) { await ph.mouse.move(a.pr - 30, a.cy); await ph.mouse.down(); await ph.mouse.move(a.pl + 20, a.cy, { steps: 8 }); await ph.mouse.up(); }
+      const z = await m(); if (z.right > z.pr + 1.5) f.push(`drag does not bring the right edge into view (${Math.round(z.right - z.pr)} px still hidden)`);
+      if (z.left > z.pl + 1.5) f.push('the drawing left its panel on the left side');
+    }
+    f.forEach((x) => console.log(`FAIL X4 phone ${sel}: ${x}`)); bad += f.length;
+    console.log(`${f.length ? 'FAIL' : 'PASS'} phone ${sel}: smallest label ${a.min.toFixed(1)} px, ${a.right > a.pr + 1 ? 'pans to its right edge' : 'fits its panel'}`);
+  }
+  await ph.close();
 }
 if (errs.length) { console.log('FAIL page errors: ' + errs.slice(0, 3).join(' | ')); bad++; }
 await browser.close(); srv.close();

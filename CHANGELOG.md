@@ -11,6 +11,20 @@ release sections rather than semver.
 
 ---
 
+## v3.117.7 — 2026-11-28 — CDU mini-BMS: both drawings readable on a phone, geometry gate enforced
+
+**The CDU layout and P&ID keep every label at 8.5 px or more at any width, and the page left the geometry gate's report-only list** (UIUX_AUDIT_LEDGER row 26, CONVENTIONAL_DC_OPERATIONS_STANDARD rule 26e)
+
+### Fixed
+- `cdu-mini-bms.html`: on a 390 px phone the P&ID drew its labels at 4-6 px and the plan view at 7 px. Each drawing now has a legibility floor (plan 420 px, P&ID 680 px wide); in a narrower panel it is shown at that size and pans sideways by drag or the arrow keys. A vertical swipe on a drawing scrolls the page again (it was swallowed before).
+- The plan view of the row had never been measured on ink: 19 findings on the five types. The supply and return risers ran through "COLD AISLE", "HOT AISLE" and "600 mm pitch"; the pitch label sat on its own dimension line; the L2L and L2A captions ran past the frame. Labels and the dimension moved clear; the two captions were shortened (the L2L caption no longer names an example product).
+- Pan stopped 10 px short of the drawing's right edge (the panel's padding was counted as room); a mouse drag selected the labels. Both fixed.
+- Five label pairs no longer touch: the TT-01 reading and HV-03, "FACILITY WATER · FWS" and TCV-01, HV-03 and "bal BV-01", MV-01 and "makeup", "T-01 EXP" and the LT-01 reading. TT-01 and LT-01 moved 25 and 10 units; no value, tag or connection changed.
+
+### Changed
+- `tools/test-conv-geometry.mjs`: `cdu-mini-bms.html` is enforced (92 reported rows on v3.117.6, 0 now); the report-only set is empty.
+- `tools/test-cdu-pid-text-clear.mjs`: X1-X3 now also run on the plan view of the row, per type. New X4 at 390 px (8.5 px floor on both drawings, drag reaches the right edge, no page side-scroll). The plant also removes the P&ID floor: red, "PDIC" at 4.2 px.
+
 ## v3.117.6 — 2026-11-28 — DC AI: no text under 8.5 px
 
 **The HTML around the DC AI drawings now holds the same 8.5 px floor the drawings hold** (DATAHALL_AI_STANDARD, "Measuring legibility on this page")

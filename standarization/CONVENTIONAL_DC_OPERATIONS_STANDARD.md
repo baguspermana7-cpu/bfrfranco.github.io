@@ -359,6 +359,13 @@ Before release:
     against the words and conductors it would cross. A sheet bubble is drawn large enough that its letters fit at
     8.5 px: field 2 letters ≥ 26, 3 letters ≥ 34; panel 2 letters ≥ 40, 3 letters ≥ 46, 4 letters ≥ 52.
 
+26e. **A drawing in a card has a legibility floor, not a smaller font (v3.117.7, `cdu-mini-bms.html`).** A drawing
+    whose card can be narrower than the width at which its smallest label reads 8.5 px gets that width as its
+    `min-width`; the card clips it and the drawing pans sideways inside the card (drag, arrow keys), with
+    `touch-action: pan-y` at 100 % so a vertical swipe still scrolls the page. Never shrink the labels to fit and never
+    let the page scroll sideways. Gates: `tools/test-conv-geometry.mjs` (no report-only page left) and
+    `tools/test-cdu-pid-text-clear.mjs` X4.
+
 27. **The sheet tells the truth about flow, state and quality (W4, PRD-CONV-BMS-UIUX, `js/conv/sheet-truth.js`,
     gates `tools/test-conv-bms-truth.mjs` + `tools/test-conv-sheet-perf.mjs`).** On fire, chiller, water and fuel:
     every drawn flow is a point with a quality; an edge moves only when its point is good and > 0, a good 0 is
